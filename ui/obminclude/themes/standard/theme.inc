@@ -106,6 +106,7 @@ $ico_warning        = "warning.gif";
 
 //Agenda Icons
 $ico_new_event      = "new_event.gif";
+$ico_event          = "ico_calendar_evt.gif";
 $ico_left_day       = "left_day.gif";
 $ico_right_day      = "right_day.gif";
 $ico_spacer         = "spacer.gif";

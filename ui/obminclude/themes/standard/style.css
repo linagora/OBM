@@ -33,6 +33,7 @@ p			{
 	margin-right:		auto;
 }	
 
+
 /*System Message*/
 .messageOk		{
         margin-left:		auto;
@@ -711,10 +712,9 @@ td.agendaHead2		{
 	}
 	
 td.agendaEventHead	{ 
-    background-color:       	#336699;
-    border:			1px #a1a4a8 solid; 
+    background-color:       	#ffffff;
     text-align:			center;	
-    font-weight: 		800;		
+    font-size: 			11px;
 	}
 td.agendaEventBg5 	{ 
     background-color: 		#b1d29d; 
@@ -730,6 +730,7 @@ td.agendaEventBg4 	{
 	
 td.agendaEventBg3 	{ 
     background-color:	 	#24682d;  
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
@@ -760,14 +761,20 @@ td.agendaEventYear {
 	}
 			
 select.agendaQuery 	{ 
-	font-size:			11px; 
+	font-size:		11px; 
 	font-family: 		sans-serif;
-	width:                156px; 
+	width:                	156px; 
 	margin-bottom:          0;
 }
 
-			
-	
+img.menuBarIconG	{
+	float:			right;
+	border:			0;
+	text-align:		right;
+	margin:			0;
+	padding:		0;
+}			
+img.agendaEvent {}	
 
 a.agendaLink		{ text-decoration:	none; }
 a.agendaLink:link	{ font-family: sans-serif; font-size: 11px;color: #0066ff; background-color: transparent; }
