@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obmintra/";
+$cgp_host = "http://obm/";
 
 // Use specific site includes
 //$cgp_site_include = true;
@@ -29,18 +29,18 @@ $cgp_host = "http://obmintra/";
 $cgp_mail_enabled = true;
 
 // Generic E-mail for Incident module
-$cmail_incident = "support@aliacom.fr";
+//$cmail_incident = "support@mydomain";
 
 // is mailing enabled by default for a new user
 $cgp_mailing_default = true;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 1;
-$cg_prod = 1;
+$cg_com = 2;
+$cg_prod = 3;
 
 // Tuning constants
-$ctu_sql_limit = true;
+$ctu_sql_limit = false;
 
 // Todo lines to display
 $cgp_todo_nb = 5;
