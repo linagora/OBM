@@ -103,6 +103,8 @@ function run_query_search_possible_children($group) {
 
   // WHERE Clause
 
+  // only the one which are allowed (ie. publics )
+  $where .=  " and " .sql_obm_entity_privacy("group");
   if ($user != '') {
     $where .= " and C.userobm_lastname $like '$user%'";
   }
