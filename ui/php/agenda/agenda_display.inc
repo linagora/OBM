@@ -1077,10 +1077,10 @@ $hidden_div
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono;
-  global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate;
+  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono,$l_free,$l_possible,$l_occupied;
+  global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate,$set_cal_interval,$l_meeting_legend;
   global $action,$auth;
-  
+ 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
 
@@ -1165,15 +1165,22 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 }
 
 // User Selection
-  if ( ($action != "view_day") && ($action != "view_week") &&
+
+  if($action == "perform_meeting") {
+    $duration = $agenda["duration"];     
+    $dis_duration = "<input type=\"hidden\" name=\"param_duration\" value=\"$duration\" />";
+    $new_action = "$action";
+    $p_duration = "&amp;param_duration=$duration";
+  }
+  elseif ( ($action != "view_day") && ($action != "view_week") &&
        ($action != "view_month") && ($action != "view_year") ) {
     $new_action = "view_week";
-  }
+  }  
   else {
     $new_action = $action;
   }
   if(count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
-    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
+    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
   }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"12\" multiple=\"multiple\" style=\"font-size:10px\">";
   while ($usr_q->next_record()) {
@@ -1198,6 +1205,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   $dis_sel_user .= "</select>
     <br />
     <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
+    $dis_duration
     <input type=\"submit\" value=\"$l_validate\" />";
 
 
@@ -1240,10 +1248,30 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   } while ($whole_month == TRUE);
 
   // Legend
-  foreach($calendar_user as $user_id => $user_data) {
-    $dis_leg_user .=" <tr><td class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td class=\"detailText\">&nbsp;&nbsp;".$user_data["name"]."</td></tr>";
+  if($action == "perform_meeting") {
+    $l_legend = $l_meeting_legend;
+    $dis_leg_user ="
+    <tr><td class=\"agendaPossible\" >
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td class=\"detailText\">&nbsp;$l_possible
+    </td></tr>
+    <tr><td class=\"agendaFree\" >
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td class=\"detailText\">&nbsp;$l_free
+    </td></tr>
+    <tr><td class=\"agendaOccupied\" >
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td class=\"detailText\">&nbsp;$l_occupied
+    </td></tr>    
+    ";
   }
-  
+  else{
+    $l_legend = $l_user_calendar;
+    foreach($calendar_user as $user_id => $user_data) {
+      $dis_leg_user .="
+      <tr>
+       <td class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+       <td class=\"detailText\">&nbsp;&nbsp;".$user_data["name"]."</td>
+      </tr>";
+    }
+  }
 echo "
 
    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"170\">
@@ -1341,14 +1369,14 @@ echo "
         <td width=\"1%\" class=\"agendaHead2\">
          <img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" />
         </td>
-        <td width=\"98%\" class=\"agendaHead2\">$l_user_calendar</td>
+        <td width=\"98%\" class=\"agendaHead2\">$l_legend</td>
 	<td width=\"1%\" class=\"agendaHead2\"></td>
        </tr>
        <tr>
         <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
        </tr>
        <tr>
-	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
+	<td colspan=\"3\" width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
        </tr>	
        $dis_leg_user
        <tr>
@@ -2221,7 +2249,6 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   $datebegin = substr($agenda["date"],0,8);    
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array);
   $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
-  $dateend = date("Y-m-d",strtotime("+1 month",strtotime($day_array[0])));    
   $dis_button = "
      <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"perform_meeting\" />
@@ -2297,15 +2324,6 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
       </a>
      </td>
     </tr>
-    <tr>
-     <td class=\"detailLabel\">$l_dateend $l_format</td>
-     <td>
-      <input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_end,'agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
-      </a>
-     </td>       
-    </tr>
     <tr>    
      <td class=\"detailLabel\">$l_event_duration</td>
      <td>$dis_hour_d : $dis_min_d</td>
@@ -2331,6 +2349,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
   global $set_cal_interval,$set_weekstart_default, $set_start_time, $set_stop_time;
+  $getdate = $agenda["date"];
   $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
   $end_week_time = $start_week_day + ((6 * 24) * 60 * 60);
   $start_week_time = strtotime("+$set_start_time hours",$start_week_day);
@@ -2338,7 +2357,7 @@ function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
   $calendar_user = store_users($user_q);
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
   $duration = round($agenda["duration"]*$set_cal_interval) - 1;
-  $meeting = store_meeting_cell($current_events,$duration,$calendar_user);
+  $meeting = store_meeting_cell($current_events,$duration,$calendar_user,$getdate);
   html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$calendar_user);
 }
 ////////////////////////////////////////////////////////////////////////////////////
@@ -2387,13 +2406,18 @@ function html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$c
       $goto = "agenda_index.php?action=new&param_date_begin=$current_time&param_date_end=$end_time&p_user_meeting=1";
       switch($meeting[$current_time]) {
 	case 0 : 
-	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"></td>";
+	  $hour_day_list .="
+	  <td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+	   onmouseover=\"this.style.backgroundColor='#ffde01';this.style.cursor = 'pointer'\"
+	   onmouseout=\"this.style.backgroundColor='#97bdec'\"></td>\n";
 	  break;
 	case 1 : 
-	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\"></td>";
+	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\" 
+	   onmouseover=\"this.style.backgroundColor='#fdffbf';this.style.cursor = 'pointer'\"
+	   onmouseout=\"this.style.backgroundColor='#cee1ed'\"></td>\n";
 	  break;
 	case 2 : 
-	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\"></td>";
+	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\"></td>\n";
 	  break;	 
       }
     }
@@ -2406,13 +2430,17 @@ function html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$c
 	$goto = "agenda_index.php?action=new&param_date_begin=$current_time&param_date_end=$end_time&p_user_meeting=1";
 	switch($meeting[$current_time]) {
 	  case 0 : 
-	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"></td>";
+	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"
+	     onmouseover=\"this.style.backgroundColor='#ffde01';this.style.cursor = 'pointer'\"
+	     onmouseout=\"this.style.backgroundColor='#97bdec'\"></td>\n";
  	    break;
 	  case 1 : 
-	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\"></td>";
+	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\"
+	     onmouseover=\"this.style.backgroundColor='#fdffbf';this.style.cursor = 'pointer'\"
+	     onmouseout=\"this.style.backgroundColor='#cee1ed'\"></td>\n";
 	    break;
 	  case 2 : 
-	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\"></td>";
+	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\"></td>\n";
 	    break;
 	}
       }
@@ -2460,13 +2488,6 @@ echo "
            </td>
 	   $week_day_list
 	  </tr>
-	  <tr>
-	   <td class=\"agendaCell\" width=\"60\">
-            <img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" />
-           </td>
-           <td width=\"1\">
-           </td>
-          </tr>
             $hour_day_list
          </table>
         </td>

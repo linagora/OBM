@@ -721,37 +721,37 @@ td.agendaEventHead	{
 td.agendaEventBg5 	{ 
     background-color: 		#86c860; 
     vertical-align:		top;
-    border : 			1px #336600 solid;        
+    border : 			1px solid #336600;        
     }
 	
 td.agendaEventBg4 	{ 
     background-color: 		#d8f0b8; 
     vertical-align:		top;
-    border : 			1px #669900 solid;        
+    border : 			1px solid #669900;        
   }
 	
 td.agendaEventBg3 	{ 
     background-color:	 	#84a8d7;  
     vertical-align:		top;
-    border : 			1px #333366 solid;        
+    border : 			1px solid #333366;        
     }
 	
 td.agendaEventBg2 	{ 
     background-color: 		#cfe5f6;  
     vertical-align:		top;
-    border : 			1px #336699 solid;        
+    border : 			1px solid #336699;        
     }
 	
 td.agendaEventBg1 	{ 
     background-color: 		#f8d049;  
     vertical-align:		top;
-    border : 			1px #cc3300 solid;          
+    border : 			1px solid #cc3300;          
   }
 	
 td.agendaEventBg0 	{ 
     background-color: 		#fffba4;  
     vertical-align:		top;
-    border : 			1px #cc6600 solid;    
+    border : 			1px solid #cc6600;    
 }	
 
 td.agendaEventYear {
@@ -761,34 +761,24 @@ td.agendaEventYear {
 	padding:		0;
 	border:			0;	
 	}
-td.agendaPossible 	{ 
-    background-color: 		#97d993;  
-    vertical-align:		top;
-    border : 			1px #6aad6a dashed;    
-}
 
-td.agendaPossible:hover 	{ 
-    background-color: 		#a9ff54;  
-    vertical-align:		top;
-    border : 			1px #6aad6a dashed;    
-}	
+td.agendaPossible 	{ 
+    background-color: 		#97bdec; 
+    border-top: 		1px dashed #6a90c3;
+    border-right: 		1px dashed #6a90c3;    
+}
 
 td.agendaFree 	{ 
-    background-color: 		#bddf92;  
-    vertical-align:		top;
-    border : 			1px #9dbf74 dashed;    
+    background-color: 		#cee1ed;  
+    border-top: 		1px dashed #a0b3c4;
+    border-right: 		1px dashed #a0b3c4;     
 }
 
-td.agendaFree:hover 	{ 
-    background-color: 		#def0a2;  
-    vertical-align:		top;
-    border : 			1px #9dbf74 dashed;    
-}
 
 td.agendaOccupied 	{ 
-    background-color: 		#e0e4e9;  
-    vertical-align:		top;
-    border : 			1px #9ca1aa dashed;    
+    background-color: 		#e3e5ea;  
+    border-top: 		1px dashed #afb2ba;
+    border-right: 		1px dashed #afb2ba;  
 }	
 
 select.agendaQuery 	{ 

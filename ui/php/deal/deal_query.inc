@@ -1543,7 +1543,7 @@ function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
      ", invoice_amount_HT ".
      ", invoice_amount_TTC ".
      ", invoicestatus_label as invoice_status ".
-     ", invoice_date ".
+     ", invoice_date as date".
      ", deal_label as invoice_deal ".
      ", company_name as invoice_company ".
      ", company_id".

@@ -612,7 +612,7 @@ class OBM_DISPLAY {
 	  $name = "$amount";
 	}
         else if ($fieldname == "invoice_date") {
-	  $name = date_format($this->data_set->f("date"));
+	  $name = $this->data_set->f("date");
 	}
 
         //------------------------

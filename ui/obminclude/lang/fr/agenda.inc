@@ -43,6 +43,10 @@ $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'evenement";
 
 $l_waiting_events = "Rendez-vous en attente";
+$l_free = "Libre mais restreint";
+$l_possible = "Libre";
+$l_occupied ="Non disponible";
+$l_meeting_legend = "Légende";
 
 $l_accepted = "Accepté";
 $l_rejected = "Rejeté";
@@ -212,6 +216,8 @@ $mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de 
 $mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
-
+$l_j_category_create = "Vous devez specifier un nom à la catégorie";
+$l_j_category_update = "Vous devez séléctionner une categorie et lui donner un nom pour la mettre a jour";
+$l_j_category_delete = "Vous devez séléctionner une catégorie pour la supprimer";
 
 ?>

@@ -46,7 +46,9 @@ $l_short_accepted = "A";
 $l_short_rejected = "R";
 $l_short_waiting  = "Wait";
 $l_wait = "Waiting";
-
+$l_free = "Free but restricted";
+$l_possible = "Free";
+$l_occupied = "Unavailable";
 $l_daily = "daily";
 $l_weekly = "weekly";
 $l_monthlybydate = "monthly (date)";
@@ -55,11 +57,12 @@ $l_yearly = "yearly";
 
 $l_from = "from";
 $l_to = "to";
+$l_event_duration = "Meeting duration";
 
 $l_conflicts = "Conflit(s) found";
 $l_date = "Date";
 $l_user = "User";
-
+$l_meeting_legend = "Legend";
 // actions 
 $l_insert = "Insert the event";
 $l_update = "Update the event";
@@ -82,6 +85,7 @@ $l_category_delete = "Delete Category";
 $l_category_insert = "Insert Category";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
+$l_meeting_perform = "Seek for free crenels";
 
 
 $l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
@@ -153,6 +157,7 @@ $l_category_manage = "Calendar Category Management";
 $l_category_exist = "Existing Categorys";
 $l_category_new = "New Category";
 $l_header_right = "Right management";
+$l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
 $l_authorize_list = "Authorized people";
 $l_denie_list = "Unauthorized people";
@@ -177,6 +182,7 @@ $l_add_event_mail_subject = "New event on obm";
 $l_update_event_mail_subject = "Updated event on obm";
 $l_delete_event_mail_subject = "Deleted event on obm";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_interval_null = "Duration cannot be null";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";
 $mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";
@@ -188,7 +194,9 @@ $mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de 
 $mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
-
+$l_j_category_create = "Please specify a label for the new category";
+$l_j_category_update = "Please specify a new label, and select a category for the update";
+$l_j_category_delete = "Please select a category to delete it";
 
 
 ?>

@@ -1427,9 +1427,8 @@ function store_users($user_q) {
 //    - $current_event : Week event table 
 //    - $duration : duration of the event
 /////////////////////////////////////////////////////////////////////////////
-function store_meeting_cell($current_events,$duration,$calendar_user) {
+function store_meeting_cell($current_events,$duration,$calendar_user,$getdate) {
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval;
-
   $time_unit = 60 / $set_cal_interval;
   $start_week_time = strtotime(dateOfWeek($getdate, $set_weekstart_default));
   $end_week_time = $start_week_time + ((6 * 24) * 60 * 60);
