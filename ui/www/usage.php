@@ -33,6 +33,7 @@ If you are using OBM and want to be referenced here drop us a note.
     <li>IB Group
     <li>Cellon - Philips
     <li><a href="http://www.igtech.fr/"><img src="images/logo-igtech.png"></a> IGTech
+    <li><img src="images/logo-gsi.png"> IUP Génie des Systèmes d'Information à Annecy (OBM pour gestion de la relation avec les entreprises)
     <li>...
   </ul>
   </p>
