@@ -27,7 +27,7 @@ function display_page(&$display) {
     return;
   }
 
-  if (($display["link"] != "") || ($display["detailInfo"] != "")) {
+  if (($display["link"] != "") || ($display["detailInfo"] != "" || $display["features"] != "")) {
     $right_panel = true;
   } else {
     $right_panel = false;
@@ -44,8 +44,8 @@ function display_page(&$display) {
   if ($right_panel) {
     echo "
     <!-- right panel -->  <div class=\"rightpanel\">" .
-      $display["detailInfo"] . "<p>" .
-      $display["link"] . "
+      $display["detailInfo"] . "<p />" .
+      $display["link"] . "<p />" . $display["features"] ."
     <!-- right panel end --> </div>
 
     <!-- center zone --> <div class=\"middlepanel\">";

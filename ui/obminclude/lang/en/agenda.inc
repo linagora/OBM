@@ -39,6 +39,7 @@ $l_use_endrepeat = "End repetition date";
 $l_too_much_user = "No more than six users";
 $l_waiting_events = "Waiting events";
 $l_user_calendar = "Multi-user view";
+$l_repeatdays2 = "Repeatition days";
 
 $l_link_events = "linked events with this category.";
 $l_accepted = "Accept";
@@ -56,12 +57,14 @@ $l_weekly = "weekly";
 $l_monthlybydate = "monthly (date)";
 $l_monthlybyday = "monthly (day)";
 $l_yearly = "yearly";
-
+$l_repeatkind = "Repeatition kind";
 $l_from = "from";
 $l_to = "to";
 $l_event_duration = "Meeting duration";
-
-$l_conflicts = "Conflit(s) found";
+$l_use_endrepeat = "End repeatition";
+$l_timebegin2 = "Begin time";
+$l_timeend2 = "End time";
+$l_conflicts = "Conflict(s) found";
 $l_date = "Date";
 $l_user = "User";
 $l_meeting_legend = "Legend";

@@ -177,7 +177,7 @@ a.detail:active 	{ color: #000000; background-color: transparent;}
 a.detail:visited 	{ color: #000000; background-color: transparent;}
 
 
-table.detail {
+.detail {
 	font-size: 12px;
 	background-color: #FFFFFF;
 	border: 1px solid #009EC6;
@@ -206,6 +206,7 @@ table.detail {
 }
 
 .detailForm {
+  	padding-left: 5px;
 	text-align: left;
 	font-weight: bold;
 	color: #666666;
@@ -802,15 +803,26 @@ a.agendaHead:link 	{ color: #ffff00; background-color: transparent;}
 a.agendaHead:active 	{ color: #ffff00; background-color: transparent;}
 a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
 
-table.agenda		{
-        margin-left:		auto;
-	margin-right:		auto;
-	border:			3px outset blue;
-	background-color:	#93919c;
-	color:			#ffff00;
+
+
+
+
+div.agendaBar {
+	width:			170px;
+	margin-bottom:		20px;
 }
 
-table.agendaMain	{
+div.agendaHidden {
+	position:		absolute;
+	z-index: 		20;
+	visibility: 		hidden;
+	top: 			0px;
+	left: 			0px;
+	width:			auto;
+
+}
+
+.agendaMain	{
         margin-left:		auto;
 	margin-right:		auto;
 	width:			auto;
@@ -819,11 +831,65 @@ table.agendaMain	{
 	color:			#000000;
 }
 
+.agendaDelete	{
+        text-align: center;
+        font-style: italic;
+	font-size:  14px;
+        color: #7B9EAD;
+	margin: auto;
+	vertical-align: middle;
+}  	
+
+table.agendaCalWeek		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+	width:			540px;
+}
+
+table.agendaCalDay		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+	width:			520px;
+}
+
+table.agendaCalMonth		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+	width:			735px;
+}
+
+table.agendaCalYear		{
+        margin-left:		auto;
+	margin-right:		auto;
+	border: 		1px #a1a5a9 solid; 
+	width:			676px;
+}
+
+table.agendaCalMeeting		{
+        margin-left:		auto;
+	margin-right:		auto;
+	border: 		1px #a1a5a9 solid; 
+	width:			540px;
+}
+
+.agendaRight			{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			500px;
+}
+
 table.agendaCal		{
         margin-left:		auto;
 	margin-right:		auto;
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
+	width:			100%;
 }
 
 table.agendaMonth	{
@@ -839,12 +905,14 @@ table.agendaYear	{
         margin-left:		auto;
 	margin-right:		auto;		
 }
+
 table.agendaEventYear {
 	margin:			0;
 	padding:		0;
 	border:			0;	
 	border-spacing:		0;	
 	}
+	
 td.agendaMonthReg	{
         margin-left:		auto;
 	margin-right:		auto;
@@ -1058,6 +1126,7 @@ a.agendaLink4:link	{ font-family: sans-serif; font-size: 13px;color: #0454c4; ba
 a.agendaLink4:visited	{ font-family: sans-serif; font-size: 13px;color: #0454c4; background-color: transparent; }
 a.agendaLink4:active	{ font-family: sans-serif; font-size: 13px;color: #3366cc background-color:  transparent; }
 a.agendaLink4:hover	{ font-family: sans-serif; font-size: 13px;color: #000099; background-color: transparent; }
+
 
 
 /* ///////////////////TIME/////////////////// */

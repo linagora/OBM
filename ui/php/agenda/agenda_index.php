@@ -81,16 +81,14 @@ if ($popup) {
   }
   exit();
 }
-display_head($l_agenda);
-generate_menu($menu,$section);      // Menu
 //////////////////////////////////////////////////////////////////////////////
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_waiting_events();
   if($obm_wait->nf() != 0) {
-    display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
-    html_waiting_events($obm_wait);
+    $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+    $display["detail"] = html_waiting_events($obm_wait);
   }
   else {
     if(count($sel_user_id) != 0){
@@ -101,9 +99,10 @@ if ($action == "index") {
     }
     require("agenda_js.inc");
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
+    $user_q = store_users(run_query_get_user_name($p_user_array));
     $user_obm = run_query_userobm_readable();  
-    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
   }
 }
 
@@ -113,24 +112,25 @@ elseif($action == "decision") {
   if (count($conflict) == 0) {
     $obm_wait = run_query_waiting_events();
     if($obm_wait->nf() != 0) {
-      display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
-      html_waiting_events($obm_wait);
+      $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+      $display["detail"] = html_waiting_events($obm_wait);
     }
     else {
       require("agenda_js.inc");
-      display_ok_msg($l_update_ok); 
+      $display["msg"] .= display_ok_msg($l_update_ok); 
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
   }
   else {
     require("agenda_js.inc");
-    display_warn_msg($l_update_warning);      
-    html_dis_conflict($agenda,$conflict,$agenda["id"],1);
+    $display["msg"] .= display_warn_msg($l_update_warning);      
+    $display["detail"] = html_dis_conflict($agenda,$conflict,$agenda["id"],1);
   }
 }
 
@@ -144,9 +144,11 @@ elseif ($action == "view_day") {
     $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_day_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
+  $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
-  dis_day_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  $display["result"] = dis_day_planning($agenda,$obm_q,$user_q,$user_obm);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+
 }
 
 elseif ($action == "view_week") {
@@ -159,9 +161,10 @@ elseif ($action == "view_week") {
     $p_user_array =  array($auth->auth["uid"]);
   }
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
+  $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
-  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 }
 
 elseif ($action == "view_month") {
@@ -174,9 +177,10 @@ elseif ($action == "view_month") {
     $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_month_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
+  $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
-  dis_month_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  $display["result"] = dis_month_planning($agenda,$obm_q,$user_q,$user_obm);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 }
 
 elseif ($action == "view_year") {
@@ -188,9 +192,10 @@ elseif ($action == "view_year") {
     $p_user_array = array($auth->auth["uid"]);
   }
   $obm_q = run_query_year_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
+  $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
-  dis_year_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  $display["result"] = dis_year_planning($agenda,$obm_q,$user_q,$user_obm);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 }
 
 elseif ($action == "new") {
@@ -204,7 +209,7 @@ elseif ($action == "new") {
   }else {
     $p_user_array = array($auth->auth["uid"]);
   }
-  dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
+  $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }
 
 elseif ($action == "insert") {
@@ -215,40 +220,42 @@ elseif ($action == "insert") {
       require("agenda_js.inc");
       $p_user_array = array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      display_ok_msg($l_insert_ok);
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
-      display_warn_msg($l_insert_warning);
-      html_dis_conflict($agenda,$conflict,$event_id,0);
+      $display["msg"] .= display_warn_msg($l_insert_warning);
+      $display["detail"] = html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);      
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     else{
       require("agenda_js.inc");      
       require("$obminclude/calendar.js");
-      display_err_msg($l_insert_error);
-      html_dis_conflict($agenda,$conflict,'',0);
+      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
       $user_obm = run_query_userobm_writable();
       $cat_event = run_query_get_eventcategories();
-      dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+      $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
     }
   }
   else {
     require("$obminclude/calendar.js");
     require("agenda_js.inc");
-    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm_writable();
     $cat_event = run_query_get_eventcategories();
-    dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
   }
 }
 
@@ -257,8 +264,8 @@ elseif ($action == "insert_conflict") {
   run_query_manage_conflict($agenda);  
   $obm_wait = run_query_waiting_events();
   if($obm_wait->nf() != 0) {
-    display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
-    html_waiting_events($obm_wait);
+    $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+    $display["detail"] = html_waiting_events($obm_wait);
   }
   else {
     if(count($sel_user_id) != 0){
@@ -269,9 +276,10 @@ elseif ($action == "insert_conflict") {
     }
     require("agenda_js.inc");
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
+    $user_q = store_users(run_query_get_user_name($p_user_array));
     $user_obm = run_query_userobm_readable();  
-    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
   }
 }
 
@@ -280,8 +288,8 @@ elseif ($action == "detailconsult") {
   if ($param_event > 0) {
     $eve_q = run_query_detail($param_event,$agenda["date"]);
     $cust_q = run_query_event_customers($param_event,$agenda["date"]);
-    display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("timecreate"),$eve_q->f("timeupdate"));
-    html_calendar_consult($eve_q, $cust_q);
+    $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("timecreate"),$eve_q->f("timeupdate"));
+    $display["detail"] = html_calendar_consult($eve_q, $cust_q);
   }
 }
 
@@ -294,8 +302,8 @@ if ($param_event > 0) {
   $cat_event = run_query_get_eventcategories();
   $eve_q = run_query_detail($param_event,$agenda["date"]);  
   $p_user_array = run_query_event_customers_array($param_event,$agenda["date"]);
-  display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
-  dis_event_form($action, $agenda,$eve_q, $user_obm, $cat_event, $p_user_array);
+  $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
+  $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm, $cat_event, $p_user_array);
   }
 }
 
@@ -305,46 +313,49 @@ elseif ($action == "update") {
     $conflict = run_query_modify_event($agenda,$sel_user_id,$event_id);
     if(count($conflict) == 0) {
       require("agenda_js.inc");
-      display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg($l_update_ok);
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
-      display_warn_msg($l_update_warning);      
-      html_dis_conflict($agenda,$conflict,$event_id,0);
+      $display["msg"] .= display_warn_msg($l_update_warning);      
+      $display["detail"] = html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);      
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     else{
       require("agenda_js.inc");
       require("$obminclude/calendar.js");      
-      display_error_msg($l_update_error); 
-      html_dis_conflict($agenda,$conflict,'',0);
+      $display["msg"] .= display_error_msg($l_update_error); 
+      $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
-      $user_obm = run_query_userobm_readable();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
   }
   else {
     require("agenda_js.inc");
     require("$obminclude/calendar.js");    
-    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm_writable();
     $cat_event = run_query_get_eventcategories();
-    dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
   }
 }
 
@@ -353,25 +364,26 @@ elseif ($action == "update_decision") {
   $conflict = run_query_change_decision($agenda);
   if(count($conflict) == 0) {
     require("agenda_js.inc");
-    display_ok_msg($l_update_ok);
+    $display["msg"] .= display_ok_msg($l_update_ok);
     $sel_user_id = array($auth->auth["uid"]);
     $p_user_array = $sel_user_id ;
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
-    $user_obm = run_query_userobm_readable();
-    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    $user_q = store_users(run_query_get_user_name($p_user_array));
+    $user_obm = run_query_userobm_readable();  
+    $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
   }
   else {
     require("agenda_js.inc");
-    display_warn_msg($l_update_warning);      
-    html_dis_conflict($agenda,$conflict,$agenda["id"],0);
+    $display["msg"] .= display_warn_msg($l_update_warning);      
+    $display["detail"] = html_dis_conflict($agenda,$conflict,$agenda["id"],0);
   }
 }
 
 elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
-    html_dis_delete($agenda);
+    $display["detail"] = html_dis_delete($agenda);
   }
 }
 
@@ -388,21 +400,22 @@ elseif ($action == "delete") {
     $p_user_array =  array($auth->auth["uid"]);
   }
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
+  $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
-  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);     
+  $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 }
 
 elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   $user_obm = run_query_userobm_right();
-  html_dis_right_admin($user_obm);
+  $display["detail"] = html_dis_right_admin($user_obm);
 
 } elseif ($action == "rights_update") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update_right($agenda);
   $user_obm = run_query_userobm_right();
-  html_dis_right_admin($user_obm);
+  $display["detail"] = html_dis_right_admin($user_obm);
 
 } elseif ($action == "new_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -410,7 +423,7 @@ elseif ($action == "rights_admin") {
   require("$obminclude/calendar.js");
   $user_obm = run_query_userobm_writable();
   $p_user_array = array($auth->auth["uid"]);
-  dis_meeting_form($agenda, $user_obm, $p_user_array);
+  $display["detail"] = dis_meeting_form($agenda, $user_obm, $p_user_array);
 
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -429,48 +442,53 @@ elseif ($action == "rights_admin") {
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "category_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_category_insert($agenda);
   if ($retour) {
-    display_ok_msg($l_category_insert_ok);
+    $display["msg"] .= display_ok_msg($l_category_insert_ok);
   } else {
-    display_err_msg($l_category_insert_error);
+    $display["msg"] .= display_err_msg($l_category_insert_error);
   }
   require("agenda_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "category_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_category_update($agenda);
   if ($retour) {
-    display_ok_msg($l_category_update_ok);
+    $display["msg"] .= display_ok_msg($l_category_update_ok);
   } else {
-    display_err_msg($l_category_update_error);
+    $display["msg"] .= display_err_msg($l_category_update_error);
   }
   require("agenda_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "category_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_category_links($agenda);//$sel_category);
+  $display["detail"] .= dis_category_links($agenda);//$sel_category);
   require("agenda_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "category_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_category_delete($agenda);
   if ($retour) {
-    display_ok_msg($l_category_delete_ok);
+    $display["msg"] .= display_ok_msg($l_category_delete_ok);
   } else {
-    display_err_msg($l_category_delete_error);
+    $display["msg"] .= display_err_msg($l_category_delete_error);
   }
   require("agenda_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 }
 
+$display["head"] = display_head($l_agenda);
+$display["header"] = generate_menu($menu,$section);      
+$display["end"] = display_end();
+
+display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
