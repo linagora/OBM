@@ -28,6 +28,10 @@ $path = "..";
 $section = "USERS";
 $menu = "TIME";
 
+// Deal we display in project list
+//  added proposal for 'avantvente';
+$project_dealstatus= "( 1 ,6,7 ,8,9 )";
+
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");

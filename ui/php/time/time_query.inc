@@ -593,8 +593,9 @@ function run_query_tasktype() {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project() {
   global $cdg_sql;
+  global $project_dealstatus;
 
-  $query = "select deal_id, deal_label, company_name from Deal, Company where company_id = deal_company_id and deal_status_id in ( 1 ,7 ,8,9 ) order by company_name";
+  $query = "select deal_id, deal_label, company_name from Deal, Company where company_id = deal_company_id and deal_status_id in $project_dealstatus order by company_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_project");
   $obm_q= new DB_OBM;
