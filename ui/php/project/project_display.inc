@@ -173,7 +173,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
   }
   $sel_tt .= "</select></td>";
   
-  // target action
+ // target action
   if ($action == "detailupdate") {
     $dis_action = "<input type=\"hidden\" name=\"action\" value=\"d_update\" />";
     $dis_action .= "<input type=\"hidden\" name=\"hd_state\" value=2 />";
@@ -181,16 +181,12 @@ function html_project_form($action, $project_q, $tt_q, $project) {
     $dis_action = "<input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
-  if ($action == "detailupdate") {
-    $dis_submit = "<input type=\"submit\" value=\"$l_update\" />";
-  } else {
-    $dis_submit = "<input type=\"submit\" value=\"$l_insert\" />";
-  }
+  $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
 
   // --- HTML Template --------------------------------------------------------
   echo "
     <form method=\"post\" name=\"form_project_create\" 
-      onsubmit=\"if (check_form(this)) return true; else return false;\"
+      onsubmit=\"if (check_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
      <table class=\"details\">
        <tr>
@@ -213,7 +209,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
        <td class=\"detailHead\">
         $dis_action
         <input type=\"hidden\" name=\"param_project\" value=$pid />
-        $dis_submit
+        <input type=\"submit\" value=\"$l_button\" />
        </td>
       </tr>
      </table>
@@ -227,8 +223,8 @@ function html_project_form($action, $project_q, $tt_q, $project) {
 // Display Company search Form                                               //
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_init_form($action, $project_q, $project) {
-  global $l_dealinfos, $l_projectinfos, $l_member_add;
-  global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_insert;
+  global $l_dealinfos, $l_projectinfos, $l_member_add, $l_insert, $l_update;
+  global $l_name, $l_tasktype, $l_company_name, $l_soldtime;
 
   $pid = $project["id"];
 
@@ -250,10 +246,12 @@ function html_project_init_form($action, $project_q, $project) {
     $dis_action = "<input type=\"hidden\" name=\"action\" value=\"create\" />";
   }
 
+  $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
+
   // --- HTML Template --------------------------------------------------------
   echo "
     <form method=\"post\" name=\"form_project_init\" 
-      onsubmit=\"if (check_form(this)) return true; else return false;\"
+      onsubmit=\"if (check_init_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
      <table class=\"details\">
        <tr>
@@ -279,7 +277,7 @@ function html_project_init_form($action, $project_q, $project) {
        <td class=\"detailHead\">
         $dis_action
         <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-        <input type=\"submit\" value=\"$l_insert\" />
+        <input type=\"submit\" value=\"$l_button\" />
        </td>
       </tr>
      </table>
@@ -517,6 +515,7 @@ function html_project_consult($project_q, $members_q, $project) {
 
       $projected = $members_q->f("projected_time");
       $used = $members_q->f("used_time");
+      $used = number_format($used, 1);
       $remaining = $projected - $used;
       $missing = $members_q->f("missing_time");
       $diff = $remaining - $missing;
@@ -677,7 +676,7 @@ function html_project_memberlist($members_q, $project) {
 
  
   echo "
-    <form method=\"post\">
+    <form name=\"form_memberlist\" method=\"post\">
     <table class=\"details\">
       <tr>
         <td colspan=\"6\" class=\"detailHead\">$l_membersinfos</td>
@@ -692,7 +691,7 @@ function html_project_memberlist($members_q, $project) {
                   onclick=\"submit_memberdel(this.form)\" />
          </td><td>
            <input type=\"submit\" value=\"$l_valid_member\"
-                  onclick=\"submit_valid(this.form)\" />
+                  onclick=\"if(submit_valid(this.form)) return true; else return false;\" />
          </td>
          <input type=\"hidden\" name=\"param_project\" value=\"$id\" />
        </tr>

@@ -99,8 +99,8 @@ function run_query_detail($p_id) {
       deal_soldtime as project_soldtime,
       deal_userupdate as userupdate,
       deal_usercreate as usercreate,
-      UNIX_TIMESTAMP(company_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(company_timecreate) as timecreate
+      UNIX_TIMESTAMP(deal_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(deal_timecreate) as timecreate
     from Deal, TaskType
       left join Company on deal_company_id=company_id
     where deal_id=$p_id
@@ -420,9 +420,11 @@ function run_query_advanceupdate($project) {
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_statlog($p_id) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $c_day_fraction;
 
-  $query = "select sum(task_length) as time_used
+  $frac = $c_day_fraction;
+
+  $query = "select (sum(task_length)/$frac) as time_used
             from Task
             where task_deal_id=$p_id
             group by task_deal_id";
@@ -600,44 +602,27 @@ function run_query_member($p_id = 0) {
 //   - $pid      : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_memberstime($p_id) {
-  global $cdg_sql;
+  global $cdg_sql, $c_day_fraction;
+
+  $frac = $c_day_fraction;
 
   $query = "select
-userobm_id,
-userobm_lastname,
-userobm_firstname,
-sum(task_length) as used_time,
-projectuser_projectedtime as projected_time,
-projectuser_missingtime as missing_time,
-projectuser_manager
-
-from UserObm, ProjectUser
-left join Task 
-on  task_deal_id = $p_id
-and task_user_id = userobm_id
-
-where projectuser_deal_id = $p_id
-and projectuser_userobm_id = userobm_id
-
-group by userobm_id, task_user_id
-order by projectuser_manager desc, userobm_lastname, userobm_firstname
-";
-
-//   $query = "select
-//       userobm_id,
-//       userobm_lastname,
-//       userobm_firstname,
-//       sum(task_length) as used_time,
-//       projectuser_projectedtime as projected_time,
-//       projectuser_missingtime as missing_time,
-//       projectuser_manager
-//     from Task, UserObm, ProjectUser
-//     where task_deal_id=$p_id
-//       and task_user_id=userobm_id
-//       and projectuser_userobm_id=task_user_id
-//       and projectuser_deal_id=task_deal_id
-//     group by projectuser_userobm_id
-//     order by projectuser_manager desc, userobm_lastname, userobm_firstname";
+      userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      sum((task_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time,
+      projectuser_manager
+    from UserObm, ProjectUser
+    left join Task 
+      on  task_deal_id = $p_id
+      and task_user_id = userobm_id
+    where projectuser_deal_id = $p_id
+      and projectuser_userobm_id = userobm_id
+    group by userobm_id, task_user_id
+    order by projectuser_manager desc, userobm_lastname, userobm_firstname
+    ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -91,9 +91,14 @@ $l_del_member_sel = "Enlever ces participants";
 $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";
 $l_valid_member = "Confirmer";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Really delete the company ?";
-$l_fill_name = "Vous devez renseigner le Nom avant de valider.";
+$l_fill_name = "Vous devez indiquer un nom avant de valider.";
+$l_fill_tt = "Vous devez indiquer le type de tâche avant de valider.";
+$l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
+$l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";
+$l_fill_projected = "Vous devez indiquer le temps prévu \n pour chaque participant avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de la Société ?";
 $l_j_check_zip = "Le code postal n'est pas correct.";
 $l_j_check_phone = "Le numéro de téléphone n'est pas correct.";

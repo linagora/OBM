@@ -190,17 +190,22 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $project_q = run_query_detail($param_project);
-  
-  if ($project_q->f("project_state")==1) {
-    html_project_init_form($action, $project_q, $project);
+  if ($param_project > 0) {
+    $project_q = run_query_detail($param_project);
+    
+    display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+    
+    if ($project_q->f("project_state")==1) {
+      html_project_init_form($action, $project_q, $project);
+    }
+    elseif ($project_q->f("project_state") == 2) {
+      $tt_q = run_query_projecttype('intern');
+      html_project_form($action, $project_q, $tt_q, $project);
+    } 
+    else {
+      display_err_msg($l_state_error);
+    }
   }
-  elseif ($project_q->f("project_state") == 2) {
-    $tt_q = run_query_projecttype('intern');
-    html_project_form($action, $project_q, $tt_q, $project);
-  } 
-  else
-    display_err_msg($l_state_error);
 
 } elseif ($action == "d_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,13 +224,13 @@ if ($action == "index" || $action == "") {
       ($project_q->f("usercreate")==$uid) ) {
     display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
     
-    html_project_consult($project_q, $members_q, $project);
+    html_project_infos($project_q, $project);
+    html_project_memberlist($members_q, $project );
   } else {
     // this project's page has "private" access
     display_err_msg($l_error_visibility);
   } 	
   
-
 } elseif ($action == "close")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_close($param_project);
@@ -512,7 +517,7 @@ function get_project_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'd_update', 'validate') 
                                      	      );
 
 // Update
@@ -550,7 +555,7 @@ function get_project_action() {
     'Right'    => $user_write,
     'Popup'    => 1,
     'Target'   => $l_list,
-    'Condition'=> array ('insert', 'create', 'member_add','member_del') 
+    'Condition'=> array ('insert', 'create', 'd_update', 'member_add','member_del') 
                                     	  );
 
 // Display

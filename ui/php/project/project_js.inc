@@ -17,26 +17,6 @@ require("$obminclude/javascript/check_js.inc");
 
 echo "
 
-function check_get_id_url(form, p_url) {
-  comp_pos = form.param_company.selectedIndex;
-  if (! (comp_pos >= 0)) {
-    alert (\"$l_j_select_company\");
-    return false;
-  }
-  valeur = form.param_company.options[comp_pos].value;
-  text = form.param_company.options[comp_pos].text;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_company\");
-    return false;
-  } else {
-    new_url = p_url + valeur;
-    window.opener.location.href=new_url;
-    window.close();
-    return true;
-  }
-}
-
-
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -44,14 +24,36 @@ function confirm_del() {
     return false;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the kind check or deletion is possible                           //
+///////////////////////////////////////////////////////////////////////////////
 
 function check_project(form) {
 
-  // MANDATORY : Check that the Company name is not empty
-  if (trim(form.tf_soldtime.value) == \"\") {
+  // MANDATORY : Check that the Project soldtime is not empty
+  if (trim(form.tf_name.value) == \"\") {
+    alert (\"$l_fill_name\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not empty
+  else if ((form.sel_tt.value) == 0) {
+    alert (\"$l_fill_tt\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not empty
+  else if (trim(form.tf_soldtime.value) == \"\") {
     alert (\"$l_fill_soldtime\");
     return false;
   }
+
+  // MANDATORY : Check that the Project soldtime is not empty
+  else if (!(check_number(form.tf_soldtime.value))) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
+
   else
     return true;
 } 
@@ -60,99 +62,28 @@ function check_project(form) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_checkdel(form)
-{
-   if (form.sel_kind.selectedIndex >= 0) {
-      return true;
-   }
-   else {
-      alert(\"$l_j_kind_delete\");
-      return false;
-   }
-}
 
+function check_init_project(form) {
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the kind update is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_kind_upd(form,formd)
-{
-  kind_pos = formd.sel_kind.selectedIndex;
-
-  if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
-    form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
-    return true;
-  } else {
-    alert(\"$l_j_kind_update\");
+  // MANDATORY : Check that the Project soldtime is not empty
+  if (trim(form.tf_soldtime.value) == \"\") {
+    alert (\"$l_fill_soldtime\");
     return false;
   }
-}
 
+  // MANDATORY : Check that the Project soldtime is not empty
+  else if (!(check_number(form.tf_soldtime.value))) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the kind creation is possible                                    //
-///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form)
-{
-   if (form.tf_kind.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_kind_create\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the activity check or deletion is possible                       //
-///////////////////////////////////////////////////////////////////////////////
-function check_act_checkdel(form)
-{
-   if (form.sel_act.selectedIndex >= 0)
-   {
-      return true;
-   }
-   else
-   {
-      alert(\"$l_j_act_delete\");
-      return false;
-   }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the activity update is possible                                  //
-///////////////////////////////////////////////////////////////////////////////
-function check_act_upd(form,formd)
-{
-  act_pos = formd.sel_act.selectedIndex;
-  if ((act_pos >= 0) && (form.tf_act.value != \"\")) {
-    form.sel_act.value=formd.sel_act.options[act_pos].value;
+  else
     return true;
-   } else {
-     alert(\"$l_j_act_update\");
-     return false;
-   }
-}
+} 
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the activity creation is possible                                //
-///////////////////////////////////////////////////////////////////////////////
-function check_act_new(form)
-{
-   if (form.tf_act.value != \"\")
-      return true;
-   else
-   {
-      alert(\"$l_j_act_create\");
-      return false;
-   }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the activity creation is possible                                //
+// Select the appropriate action for the form                                //
 ///////////////////////////////////////////////////////////////////////////////
 function submit_memberdel(form)
 {
@@ -160,13 +91,28 @@ function submit_memberdel(form)
   form.submit();
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Check if the activity creation is possible                                //
-///////////////////////////////////////////////////////////////////////////////
 function submit_valid(form)
 {
-  form.action = \"project_index.php?action=validate\"
-  form.submit();
+  error = 0;
+
+  for (i = 0; i < document.forms[0].length; i++) {
+    i_name = document.forms[0].elements[i].name.substr(0,12);
+    i_value = document.forms[0].elements[i].value;
+
+    if ((i_name == \"tf_projected\") && 
+       ((i_value == \"\") || (!(check_number(i_value))))) {
+      error = 1;
+    }
+
+  }
+
+  if (error) {
+    alert (\"$l_fill_projected\");
+    return false;
+  } else {
+    form.action = \"project_index.php?action=validate\"
+    return true;
+  }
 }
 
 // -->
