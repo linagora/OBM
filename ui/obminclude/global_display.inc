@@ -370,6 +370,11 @@ class OBM_DISPLAY {
 	else if ($fieldname == "company_name") {
 	   $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
 	}
+	else if ($fieldname == "company_archive") {
+          $align = "center";
+          if ($this->data_set->f($fieldname)) $name ="X";
+          else $name="&nbsp;";
+	}
 	else if ($fieldname == "company_email") {
 	  if (strcmp($this->data_set->f("company_email"),"") != 0) {
 	    $url = "mailto:".$this->data_set->f("company_email");

@@ -338,7 +338,7 @@ if ($action == "index" || $action == "") {
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_company() {
-  global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
+  global $tf_num, $cb_archive, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
   global $sel_act, $sel_market, $ta_com, $param_company;
   global $tf_kind, $tf_act, $title, $url;
@@ -346,7 +346,7 @@ function get_param_company() {
 
   if (isset ($param_company)) $company["id"] = $param_company;
   if (isset ($tf_num)) $company["num"] = $tf_num;
-  $company["state"] = ($cb_state == 1 ? 1 : 0);
+  if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
   if (isset ($tf_name)) $company["name"] = $tf_name;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
   if (isset ($sel_act)) $company["activity"] = $sel_act;
@@ -392,7 +392,7 @@ function get_param_company() {
 function get_company_action() {
   global $company, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_admin;
+  global $l_header_consult, $l_header_display,$l_header_admin;
   global $company_read, $company_write, $company_admin_read, $company_admin_write;
 
 // Index
@@ -420,9 +420,10 @@ function get_company_action() {
 
 // Detail Consult
   $actions["COMPANY"]["detailconsult"]  = array (
-    'Url'      => "$path/company/company_index.php?action=detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"]."",
     'Right'    => $company_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                      		 );
 
 // Detail Update
@@ -452,7 +453,7 @@ function get_company_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
     'Right'    => $company_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete

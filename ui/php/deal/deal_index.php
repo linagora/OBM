@@ -652,7 +652,8 @@ function dis_debug_param($deal) {
 function get_deal_action() {
   global $deal, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_admin,$l_header_new_parent;
+  global $l_header_consult,$l_header_display,$l_header_admin;
+  global $l_header_new_parent;
   global $l_deal_select_company;
   global $deal_read, $deal_write, $deal_admin_read, $deal_admin_write;
 
@@ -706,9 +707,10 @@ function get_deal_action() {
 
   // Parent Detail Consult
   $actions["DEAL"]["parent_detailconsult"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=parent_detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate')
                                     	    );
 
   // Detail Update

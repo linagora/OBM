@@ -484,17 +484,6 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
       <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_update\" />
      ";
-  $dis_delete = "<form method=\"get\" name=\"form_contract_delete\" onsubmit=\"if (confirm_del()) return true; else return false;\" action=\"".url_prepare("contract_index.php")."\">
-      <table class=\"details\">
-        <tr>
-          <td>
-      <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_delete\" />
-          </td>
-        </tr>
-      </table>
-      </form>";
   } else {
     $dis_sub = "
       <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
@@ -585,8 +574,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
    </tr>
   </table>
   </form>
-    $dis_delete
-   ";
+";
 }
 
 

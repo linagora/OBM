@@ -322,7 +322,7 @@ function get_param_incident() {
 function get_incident_action() {
   global $incident, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_admin, $l_header_display;
+  global $l_header_consult, $l_header_admin, $l_header_display;
   global $incident_read, $incident_write, $incident_admin_write, $incident_admin_read;
 
 //  Index
@@ -350,9 +350,10 @@ function get_incident_action() {
 
 // Detail Consult
   $actions["INCIDENT"]["detailconsult"] = array (
-    'Url'      => "$path/incident/incident_index.php?action=consult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$incident["id"]."",
     'Right'    => $incident_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                 	       );
 
 // Detail Update

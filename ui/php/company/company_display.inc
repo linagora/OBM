@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["company_name"] = $l_name;
+$fieldnames["company_archive"] = $l_archive_first;
 $fieldnames["company_address1"] = $l_address;
 $fieldnames["company_address2"] = $l_address;
 $fieldnames["company_phone"] = $l_phone;
@@ -34,14 +35,14 @@ $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" 
 //   - $act_q     : database object with activity list
 //   - $usr_q     : database object with userobm list
 //   - $company[] : default form values
-//     keys used  : state, name, kind, zip, mm
+//     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
-  global $l_company_name, $l_company_kind, $l_postcode, $l_internal, $l_phone;
+  global $l_company_name, $l_company_kind, $l_postcode, $l_archive, $l_phone;
   global $l_all, $l_find, $l_market, $l_activity; 
   global $c_all;
 
-  $state = $company["state"];
+  $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
   $name = stripslashes($company["name"]);
   $phone = stripslashes($company["phone"]);
   $kind = $company["kind"];
@@ -82,7 +83,6 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
   }
   $sel_market .= "</select>";
 
-  if ($state == '1') $cstate = " checked=\"checked\"";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -111,9 +111,8 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
       <td class=\"textLabelForm\">$l_market<br />
         $sel_market</td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_internal<br />
-        <input type=\"checkbox\" name=\"cb_state\" id=\"cb_state\" value=\"1\"
-        $cstate /></td>
+      <td class=\"textLabelForm\">$l_archive<br />
+        <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
       <td>&nbsp;&nbsp;&nbsp;&nbsp;
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
@@ -129,7 +128,7 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
 // Display the Company search result                                         //
 // Parameters:
 //   - $company[] : company search criteria
-//     keys used  : state, name, kind, zip
+//     keys used  : name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
   global $l_no_found;
@@ -153,13 +152,13 @@ function dis_company_search_list($company) {
 //   - $pref_q     : the fields which have to be displayed
 //   - $nb_company : nb companies returned by the search query
 //   - $company[]  : company search criteria
-//     keys used   : state, name, kind, zip
+//     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   global $l_found;
 
   // we urlencode to avoid breakage for space char
-  $state = $company["state"];
+  $archive = $company["archive"];
   $name = urlencode(stripslashes($company["name"]));
   $phone = urlencode(stripslashes($company["phone"]));
   $kind = $company["kind"];
@@ -167,7 +166,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_state=$state&amp;sel_market=$market");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market");
 
   $obm_q_comp->seek($first_row);
 
@@ -244,19 +243,18 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q) {
   // - Themes
-  global $set_theme;
-  global $ico_contact,$ico_contact_new,$ico_web,$ico_mail;
+  global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
-  global $l_name,$l_number,$l_kind,$l_activity;
+  global $l_name,$l_number,$l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
-  global $l_insert,$l_update,$l_delete, $l_company;
-  global $perms_user,$l_coord;
+  global $l_insert,$l_update,$l_delete, $l_company, $l_coord;
+  global $c_yes, $c_no;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
-  $state = $co_q->f("company_state");
+  $archive = ($co_q->f("company_archive") == 1 ? $c_yes : $c_no);
   $name = $co_q->f("company_name");
   $kind = $co_q->f("companytype_label");
   $act = $co_q->f("companyactivity_label");
@@ -322,6 +320,9 @@ function html_company_consult($co_q) {
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailText\">$num</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailText\">$kind</td>
     </tr><tr>
@@ -383,14 +384,15 @@ function html_company_consult($co_q) {
 //   - $kind_q    : kind database result 
 //   - $usr_q     : userobm database result 
 //   - $company[] : default values
-//     keys used  : id, num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email ,com
+//     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
+//                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   // -- Themes
   global $set_theme,$ico_web,$ico_mail;
   // -- Labels
-  global $l_name,$l_kind,$l_activity,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town;
+  global $l_name,$l_kind,$l_activity,$l_archive,$l_phone,$l_fax,$l_address;
+  global $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
   global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
 
@@ -398,7 +400,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   if ($action == "detailupdate") {
     $id = $co_q->f("company_id");
     $num = $co_q->f("company_number");
-    $state = $co_q->f("company_state");
+    $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
     $name = $co_q->f("company_name");
     $kind = $co_q->f("company_type_id");
     $act = $co_q->f("company_activity_id");
@@ -421,7 +423,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   // If parameters have been given, they supercede the default action value
   if (isset($company["id"])) { $id = $company["id"]; }
   if (isset($company["num"])) { $num = stripslashes($company["num"]); }
-  if (isset($company["state"])) { $state = stripslashes($company["state"]); }
+  if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
   if (isset($company["name"])) { $name = stripslashes($company["name"]); }
   if (isset($company["kind"])) { $kind = $company["kind"]; }
   if (isset($company["activity"])) { $act = $company["activity"]; }
@@ -468,9 +470,6 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   }
   $sel_market .= "</select>";
 
-  // cb state state
-  if ($state == 1) $lstate = " checked=\"checked\"";
-
   // Email link
   if (($action=="detailupdate") || ($action=="update")) { 
     if ($email != "") {
@@ -506,16 +505,6 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
       <form method=\"post\" name=\"f_sup_societe\"
       onsubmit=\"if (valider_suppression()) return true; else return false;\"
       action=\"" . url_prepare("company_index.php") . "\"> 
-      <table class=\"details\">
-        <tr>
-          <td>
-      <input type=\"hidden\" name=\"action\" value=\"check_delete\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_checkdelete\" />
-         </td>
-       </tr>
-      </table>
-      </form>
       ";
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
@@ -539,6 +528,9 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
       <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td>$sel_kind</td>
@@ -684,7 +676,7 @@ function dis_check_links($p_id) {
 //   - $cid       : company id
 //   - $co_q      : company database result (at least 1 row)
 //   - $company[] : default values
-//     keys used  : num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
+//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
 //                : phone, fax, web, email, com
 /////////////////////////////////////////////////////////////////////////////
 function dis_company_warn_insert($cid, $co_q, $company) {
@@ -692,7 +684,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   global $c_yes, $c_no;
 
   $num = $company["num"];
-  $state = $company["state"];
+  $archive = ($company["archive"] == 1 ? "1" : "0");
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -729,7 +721,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
-    <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
@@ -751,7 +743,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
-    <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />

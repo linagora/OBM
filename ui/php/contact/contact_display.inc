@@ -133,12 +133,13 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   }
 
   // we urlencode to avoid breakage for space char
+  $archive = $contact["archive"];
   $lname = urlencode(stripslashes($contact["lname"]));
   $phone = urlencode(stripslashes($contact["phone"]));
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;param_company=$company_id$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA",$pref_q);
   if ($popup) {
@@ -556,6 +557,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $email = stripslashes($contact["email"]);
   $com = $contact["com"];
   $vis = $contact["vis"];
+  $archive = ($contact["archive"] == 1 ? "1" : "0");
 
   $disp_same_cont = "
     <tr>
@@ -603,6 +605,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     </td><td>
@@ -627,6 +630,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" 
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
     </td></tr>

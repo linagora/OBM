@@ -115,6 +115,7 @@ $l_header_agenda = "Agenda";
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
 $l_header_find = "Chercher";
+$l_header_consult = "Consulter";
 $l_header_update = "Modifier";
 $l_header_display = "Affichage";
 $l_header_delete = "Supprimer";

@@ -127,6 +127,7 @@ $l_header_title_agenda = "CALENDARIO";
 $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";
+$l_header_consult = "Consulta";
 $l_header_update = "Modifica";
 $l_header_delete =  "Word to define";
 $l_header_display = "Visualizza";

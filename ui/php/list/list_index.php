@@ -373,7 +373,8 @@ function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
-  global $l_header_admin, $l_header_add_contact, $l_select_list;
+  global $l_header_consult,$l_header_admin, $l_header_add_contact;
+  global $l_select_list;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 
 // Index
@@ -400,9 +401,10 @@ function get_list_action() {
                                   );
 // Detail Consult
   $actions["LIST"]["detailconsult"] = array (
-    'Url'      => "$path/list/list_index.php?action=detailconsult",
+     'Name'     => $l_header_consult,
+     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
     'Right'    => $list_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                       );
 
 // Detail Update

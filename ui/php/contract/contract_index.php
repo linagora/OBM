@@ -340,7 +340,7 @@ function get_param_contract() {
 function get_contract_action() {
   global $contract, $actions, $path, $l_select_company;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_admin;
+  global $l_header_consult, $l_header_display, $l_header_admin;
   global $contract_read, $contract_write, $contract_admin_read, $contract_admin_write;
 
 // Ext Get Id
@@ -381,6 +381,14 @@ function get_contract_action() {
     'Condition'=> array ('None') 
                                     	);
 
+// Detail Consult
+  $actions["CONTRACT"]["detailconsult"] = array (
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$contract["id"]."",
+    'Right'    => $contract_read, 
+    'Condition'=> array ('detailupdate') 
+                                    	);
+
 // Detail Update
   $actions["CONTRACT"]["detailupdate"] = array (
     'Name'     => $l_header_update,
@@ -388,13 +396,6 @@ function get_contract_action() {
     'Right'    => $contract_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
-
-// Detail Consult
-  $actions["CONTRACT"]["detailconsult"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=detailconsult",
-    'Right'    => $contract_read, 
-    'Condition'=> array ('None') 
-                                    	);
 
 // Update
   $actions["CONTRACT"]["update"] = array (

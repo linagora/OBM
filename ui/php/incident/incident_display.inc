@@ -478,19 +478,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
       <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
       <input type=\"submit\" value=\"$l_update\" />";
 
-  // check delete
-    $dis_delete .= "<form method=\"get\" name=\"f_del_con\"
-        onsubmit=\"if (confirm_del()) return true; else return false;\"
-        action=\"" . url_prepare("incident_index.php") . "\">
-      <table class=\"details\">
-      <tr><td>
-        <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
-        <input type=\"submit\" value=\"$l_checkdelete\" />
-        </td>
-      </tr>
-      </table></form>";
-
   // insert
   } elseif (($action=="new") || ($action=="insert")) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
@@ -559,7 +546,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
  </tr>
 </table>
 </form>
-$dis_delete
 ";
 }
 

@@ -12,14 +12,14 @@
 // Company search query execution                                            //
 // Parametes:
 //   - $company[]    : company search criteria
-//     keys used       state, name, phone, kind, zip
+//     keys used       archive, name, phone, kind, zip
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($company, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql;  
 
-  $state = $company["state"];
+  $archive = $company["archive"];
   $name = $company["name"];
   $phone = $company["phone"];
   $kind = $company["kind"];
@@ -31,7 +31,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_id as Id,
       company_id,
       company_name,
-      company_state,
+      company_archive,
       company_type_id,
       company_activity_id,
       company_marketingmanager_id,
@@ -79,8 +79,9 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where .= " $and company_zipcode like '$zip%'";
     $and = "and";
   }
-  if ($state == 1) {
-    $where .= " $and company_state=1";
+  // Get only not archived by default
+  if ($archive != "1") {
+    $where .= " $and company_archive=0";
     $and = "and";
   }
 
@@ -138,14 +139,14 @@ function run_query_detail($p_id) {
 // Insertion query execution                                                 //
 // Parameters:
 //   - $company[] : Entry's values
-//     keys used  : num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
+//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
 //                : phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $state = $company["state"];
+  $archive = $company["archive"];
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -167,7 +168,7 @@ function run_query_insert($company) {
     company_userupdate,
     company_usercreate,
     company_number,
-    company_state,
+    company_archive,
     company_name,
     company_type_id,
     company_activity_id,
@@ -188,7 +189,7 @@ function run_query_insert($company) {
     null,
     " . $auth->auth["uid"] . ",
     '$num',
-    '$state',
+    '$archive',
     '$name',
     '$kind',
     '$act',
@@ -218,14 +219,14 @@ function run_query_insert($company) {
 // Parameters:
 //   - $cid       : company id
 //   - $company[] : Entry's values
-//     keys used  : num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
+//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
 //                : phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($cid, $company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $state = $company["state"];
+  $archive = $company["archive"];
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -246,7 +247,7 @@ function run_query_update($cid, $company) {
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate='". $auth->auth["uid"] ."',
     company_number='$num',
-    company_state='$state',
+    company_archive='$archive',
     company_name='$name',
     company_type_id='$kind',
     company_activity_id='$act',

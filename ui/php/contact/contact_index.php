@@ -275,9 +275,9 @@ function get_param_contact() {
   if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
   if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
-  $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
-  $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
-  $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
+  if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
+  if (isset ($cb_vis)) $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
+  if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
 
   // External param
@@ -305,7 +305,7 @@ function get_param_contact() {
 function get_contact_action() {
   global $contact, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_admin;
+  global $l_header_consult, $l_header_display, $l_header_admin;
   global $contact_read, $contact_write, $contact_admin_read, $contact_admin_write;
 
 // Index
@@ -328,14 +328,15 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $contact_write,
-    'Condition'=> array ('','index','search','new','detailconsult','admin','display') 
+    'Condition'=> array ('','index','search','new','detailconsult','update','admin','display') 
                                      );
 
 // Detail Consult
  $actions["CONTACT"]["detailconsult"]   = array (
-    'Url'      => "$path/contact/contact_index.php?action=detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
     'Right'    => $contact_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailupdate') 
                                     		 );
 
 // Detail Update
@@ -343,7 +344,7 @@ function get_contact_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $contact_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      		 );
 
 // Insert
@@ -365,7 +366,7 @@ function get_contact_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $contact_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
