@@ -1,0 +1,9 @@
+obm (0.6.1) unstable; urgency=low
+
+  * LDAP DbDriver: If bind to server fails, throw an error (that can be
+    downgraded to a warning by making the DbDriver non-required), instead of
+    calling a method of an undefined value. Closes: #175989
+  * Applied Denis Barbier's LANGUAGE env variable support patch.
+    Closes: #172704
+
+ -- Thomas Cataldo <tom@aliacom.fr>  Tue,  4 Feb 2003 22:15:14 -0500

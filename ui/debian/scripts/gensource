@@ -1,0 +1,81 @@
+#!/bin/sh
+#------------------------------------------------------------------------------#
+# Regenerate debian/control and debhelper files to build the obm
+# package.
+# See the README.Debian
+# Author, Luca - De Whiskeys - De Vitis <luca@debian.org>
+#------------------------------------------------------------------------------#
+
+# Some variables.
+CONTROL="debian/control"
+APPBASE="usr/share/obm"
+DOCBASE="usr/share/doc"
+LIST="debian/packages"
+
+# Find options.
+COPYRIGHT="-iname copyright\* -or -iname copying -or -iname license"
+CHANGELOG="-iname changes -or -iname changelog"
+EXAMPLES="-path '*examples*'"
+INSTALL="-iname install"
+FINDOPT="-maxdepth 1 -not -size 0"
+SPECIAL="$INSTALL -or $CHANGELOG -or $COPYRIGHT -or $EXAMPLES"
+
+# Debian documentation files.
+DOCS="README TODO HOWTO"
+
+# Clean old generated control file by copying the source control file.
+cp debian/ctrl/Source debian/control
+
+# Clean old generate debhelper files.
+rm -f debian/obm-*.*
+
+# Generate all files.
+while read app mod doc ; do
+	for pkg in $mod $doc ; do
+		# If has a description, then generate the files to build it.
+		if [ -s debian/ctrl/$pkg.Description ] ; then
+			# Add this module to the control file.
+			echo "Package: ${pkg}" >> $CONTROL
+			echo "Architecture: all" >> $CONTROL
+			for field in Section Depends Suggests ; do
+				# If package name appear in any file, add the control field.
+				value=$(awk -F "\t+" "\$1~/^$pkg$/ { print \$2 }" < debian/ctrl/$field)
+				if [ "$value" ]
+					then echo "$field: $value" >> $CONTROL
+				elif [ $field = "Depends" ] 
+					then echo W: $pkg has not field $field
+				fi
+			done
+			cat debian/ctrl/$pkg.Description >> $CONTROL
+
+			# Begin to build the list of dir to create
+			echo $APPBASE/${app} >> debian/${pkg}.dirs
+			echo $DOCBASE/${pkg} >> debian/${pkg}.dirs
+
+			# Check for extra documentation package.
+			if [ -n "${doc}" ] ; then
+				# Install documentation in the binary package doc dir
+				echo $DOCBASE/${pkg} >> debian/${doc}.dirs
+			# Check for examples
+			elif [ -d "${app}/doc/examples" ] ; then
+				# Add only the examples dir
+				echo $DOCBASE/${pkg}/examples >> debian/${pkg}.dirs
+				# Build the list of documentation file
+				find ${app}/doc $FINDOPT -type f -not \( $SPECIAL -or -path "${app}/doc" \) > debian/${pkg}.docs
+				# Build the list of examples
+				find ${app}/doc/examples -type f > debian/${pkg}.examples
+			# Check for any documentation.
+			elif [ -d "${app}/doc" ] ; then
+				# Build the list of documentation file
+				find ${app}/doc $FINDOPT -type f -not \( $SPECIAL -or -path "*${app}/doc" \) > debian/${pkg}.docs
+			fi ;
+			# Any package should link the default .Debian doc provided
+			for file in $DOCS ; do
+				echo $DOCBASE/obm/${file}.Debian $DOCBASE/${pkg}/${file}.Debian >> debian/${pkg}.links
+			done
+		else
+			echo W: skipping $pkg
+		fi
+	done
+done < $LIST
+

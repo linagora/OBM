@@ -1,0 +1,125 @@
+#!/usr/bin/make -f
+# Uncomment this to turn on verbose mode. 
+# export DH_VERBOSE=1
+
+# This is the debhelper compatability version to use.
+export DH_COMPAT=3
+
+# This has to be exported to make some magic below work.
+# export DH_OPTIONS=-i
+
+APPBASE=usr/share/obm
+DOCBASE=usr/share/doc
+LIST=debian/packages
+
+COPYRIGHT=-iname copyright\* -or -iname copying -or -iname license
+CHANGELOG=-iname changes -or -iname changelog
+INSTALL=-iname install
+FINDOPT=-type f
+SPECIAL=-size 0 -or $(INSTALL) -or $(CHANGELOG) -or $(COPYRIGHT)
+APPFILE=-not \( -path "*$${app}/doc*" -or -path "$${app}" -or -path '*CVS*' -or -name '*.pl' -or -name '*.py' -or -name 'obmlib.inc'  \)
+
+
+configure: configure-stamp
+configure-stamp:
+
+	###
+	### Fear is the path to the darkside...
+	###
+	dh_testdir
+
+build: configure-stamp build-stamp
+build-stamp:
+
+	###
+	### Fear leads to anger...
+	###
+	dh_testdir
+	touch build-stamp
+
+clean:
+
+	###
+	### I sense mutch fear in you...
+	###
+	dh_testdir
+	rm -f build-stamp configure-stamp debian/files
+	dh_clean -k
+
+install: build
+
+	###
+	### Anger leads to hate...
+	###
+	dh_testdir
+	dh_installdirs
+
+# Install obm... well, it contains only the apache.conf file :)
+	install --mode=644 \
+		debian/etc/apache.conf debian/obm/etc/obm
+
+# Installing obm modules, their changelogs, and doc (if any).
+	while read app mod doc ; do \
+		for pkg in $$mod $$doc ; do \
+			if [ -s "debian/ctrl/$${pkg}.Description" ] ; then \
+				if [ "$${pkg}" = "$${doc}" ] ; then \
+					cd $${app}/doc ;\
+					find $(FINDOPT) -not \( $(SPECIAL) \) \
+						-exec install -D --mode=644 \
+							{} ../../debian/$${doc}/$(DOCBASE)/$${pkg}/{} \; ;\
+					cd ../.. ;\
+				else \
+					find $${app} $(FINDOPT) $(APPFILE) \
+						-exec install -D --mode=644 \
+							{} debian/$${pkg}/$(APPBASE)/{} \; ;\
+				fi ;\
+			fi ;\
+		done ;\
+	done < $(LIST)
+
+# Ok, now move obm files back one dir.
+# I do not like this. I've to implement an hook system for each (package x
+# target). Something like:
+# for hook in debian/hooks/*.<target> ; do $hook ; done
+# $hook file should be of the form <package>.<target>
+# I should probably add this on the previous `for' cycle.
+
+# tom comment
+#	mv debian/obm/$(APPBASE)/obm/* debian/obm/$(APPBASE)
+#	rmdir debian/obm/$(APPBASE)/obm
+#	touch build-stamp configure-stamp
+
+binary-indep: build install
+
+	###
+	### Hate leads to suffering...
+	###
+	dh_testdir
+	dh_testroot
+
+	dh_installchangelogs --package=obm
+	while read app mod doc ; do \
+		for pkg in $$mod $$doc ; do \
+			if [ -s "debian/ctrl/$${pkg}.Description" ] ; then \
+				if [ -d "$${app}/doc" ] ; then \
+					find $${app}/doc -maxdepth 1 $(FINDOPT) $(CHANGELOG) | ( \
+						read changelog ; \
+						dh_installchangelogs --package=$${pkg} $$changelog \
+					) ;\
+				else \
+					dh_installchangelogs --package=$${pkg} ;\
+				fi ;\
+			fi ;\
+		done ;\
+	done < $(LIST)
+	dh_installdocs
+	dh_installdebconf
+	dh_link
+	dh_compress
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep
+.PHONY: build clean binary-indep binary install configure

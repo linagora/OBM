@@ -1,0 +1,95 @@
+This package was debianized by Luca - De Whiskey's - De Vitis
+<luca@debian.org> on Thu, 11 Jan 2001 22:25:06 +0100.
+
+It was downloaded from: http://www.phpgroupware.org
+
+Upstream Author(s): (project leaders)
+Please, visit http://www.phpgroupware.org/developers.php
+
+This are the only other authors I'm aware of.
+
+Application      Authors
+------------------------
+
+addressbook      Joseph Engo <jengo@phpgroupware.org>
+                 Ralf Becker <RalfBecker@outdoor-training.de>
+admin            Joseph Engo <jengo@phpgroupware.org>
+backup           Bettina Gille <ceb@phpgroupware.org>
+bookkeeping      Rick Bakker <r.bakker@linvision.com>
+brewer           Joseph Engo <jengo@phpgroupware.org>
+                 Miles Lott <milosch@phpgroupware.org>
+calendar         Mark Peters <skeeter@phpgroupware.org>
+cart             Bettina Gille <ceb@phpgroupware.org>
+ccs              Darryl VanDorp (Maniac)
+cdb              Patrick Walsh <mr_e@phpgroupware.net>
+                 dtm <dtm@mmmgood.net>
+                 blinky <blinky@phpgroupware.net>
+                 gnrfan <powell@linuxstart.com>
+                 Bob Schader <bobs@product-des.com>
+                 Bo Kersey <bo@vircio.com>
+                 Mathieu van Loon <mvanloon@itti.nl>
+                 Miles Lott <milos@insync.net>
+chat             Joseph Engo <jengo@phpgroupware.org>
+chora            Miles Lott <milosch@phpgroupware.org>
+                 Bettina Gille <ceb@phpgroupware.org>
+comic            Sam Wynn <neotexan@wynnsite.com>
+dj               Bettina Gille <ceb@phpgroupware.org>
+                 Joseph Engo <jengo@phpgroupware.org>
+                 Miles Lott <milosch@phpgroupware.org>
+eldaptir         Miles Lott <milosch@phpgroupware.org>
+email            Angelo (Angles) Puglisi
+                 Joseph Engo <jengo@phpgroupware.org>
+                 Bettina Gille <ceb@phpgroupware.org>
+filemanager      Dan Kuykendall <dan@kuykendall.org>
+                 Dan Markus Graf <m.graf@cyberunix.com>
+forum            Jani Hirvinen <jpkh@shadownet.com>
+ftp              Scott Moser <smoser@brickies.net>
+headlines        Joseph Engo <jengo@phpgroupware.org>
+                 Mark Peters <mpeters@satx.rr.com>
+hr               Joseph Engo <jengo@phpgroupware.org>
+img              Miles Lott <milosch@phpgroupware.org>
+infolog          Ralf Becker <RalfBecker@outdoor-training.de>
+                 Joseph Engo <jengo@phpgroupware.org>
+inv              Joseph Engo <jengo@phpgroupware.org>
+                 Bettina Gille <ceb@phpgroupware.org>                 
+mediadb          Sam Wynn <neotexan@wynnsite.com>
+messenger        Joseph Engo <jengo@phpgroupware.org>
+napster          Aakash Kambuj <aakash@idearing.com>
+                 Mark Peters <mpeters@satx.rr.com>
+netsaint         Bettina Gille <ceb@phpgroupware.org>
+nntp             Mark Peters <mpeters@satx.rr.com>
+notes            Bettina Gille <ceb@phpgroupware.org>
+phonelog         Mathieu van Loon <mathieu@playcollective.com>
+phpgroupware     Joseph Engo <jengo@phpgroupware.org>
+                 Dan Kuykendall <seek3r@phpgroupware.org>
+                 Miles Lott <milosch@phpgroupware.org>
+phpwebhosting    Jason Wies (Zone)
+preferences      Joseph Engo <jengo@phpgroupware.org>
+projects         Bettina Gille <ceb@phpgroupware.org>
+qmailldap        Bettina Gille <ceb@phpgroupware.org>
+registration     Joseph Engo <jengo@phpgroupware.org>
+soap             Joseph Engo <jengo@phpgroupware.org>
+syncml-server    Jens P. Elsner <jpelsner@gmx.net>
+timetrack        Camden Spiller <camden@arrowtech.net>
+                 Joseph Engo <jengo@phpgroupware.org>
+                 Robert Schader <bobs@product-des.com>
+todo             Joseph Engo <jengo@phpgroupware.org>
+tts              Joseph Engo <jengo@phpgroupware.org>
+wap              Phill Zarfos <zarf@home.com>
+weather          Sam Wynn <neotexan@wynnsite.com>
+xmlrpc           Miles Lott <milosch@phpgroupware.org
+                 Dan Kuykendall <dan@kuykendall.org>
+                 Fred Yankowski <fred@ontosys.com>
+                 Edd Dumbill  <edd@usefulinc.com>
+
+Copyright:
+All the applications within the source code of PHPGroupWare are distriduted
+under the GNU General Public License; the PHPGroupWare API is distributed under
+the GNU Lesser General Public License.
+
+A copy of the GNU General Public License, version 2, can be found in
+/usr/share/common-licenses/GPL.
+
+A copy og the GNU Lesser General Public License version 2.1 can be found in
+/usr/share/common-licenses/LGPL.
+
