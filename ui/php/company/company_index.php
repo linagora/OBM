@@ -330,8 +330,23 @@ if ($action == "ext_get_id") {
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
   $display["detail"] = dis_company_display_pref($pref_q);
 }
-
-
+ elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($company["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($company,"Company");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  $comp_q = run_query_detail($company["id"]);
+  if ($comp_q->num_rows() == 1) {
+    $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+    $display["detail"] = html_company_consult($comp_q);
+  } else {
+    var_dump($company);    
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->num_rows() . " !");
+  }
+}    
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -352,7 +367,37 @@ function get_param_company() {
   global $tf_kind, $tf_act, $title, $url;
   global $popup;
   global $cdg_param;
+  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
+
+  if (isset ($ext_action)) $company["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $company["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $company["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $company["id"] = $ext_id;
+  if (isset ($ext_title)) $company["ext_title"] = $ext_title;
+  if (isset ($ext_target)) $company["ext_target"] = $ext_target;
+
+  
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_d = 0;
+    $nb_comp = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$company["doc$nb_d"] = $d_num;
+      }
+    }
+    $company["doc_nb"] = $nb_d;
+  }
+  
   if (isset ($param_company)) $company["id"] = $param_company;
   if (isset ($tf_num)) $company["num"] = $tf_num;
   if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
@@ -559,6 +604,12 @@ function get_company_action() {
     'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
-}
-
+					       }
+					       
+// Document add
+  $actions["DEAL"]["document_add"] = array (
+    'Url'      => "$path/company/company_index.php?action=document_add",
+    'Right'    => $company_write,
+    'Condition'=> array ('None')
+  );     
 </SCRIPT>

@@ -556,9 +556,8 @@ function html_deal_links($deal_q, $inv_nb) {
   $nb_inv_arch = run_query_nb_archived_invoices ($id);
   $contract_nb = run_query_contract_nb ($id);
 
-  // document
-  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=deal");
-  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=deal");
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Deal");
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
   $nb_document = run_query_document_nb ($id,"Deal");
 

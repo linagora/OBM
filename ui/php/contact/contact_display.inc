@@ -270,7 +270,7 @@ function html_contact_consult($co_q) {
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
-
+  $display["link"] = html_deal_links($id);
   if ($usercreate == $auth->auth["uid"]) {
     if ($vis == 1) 
       $l_priv = $l_private;
@@ -374,6 +374,47 @@ function html_contact_consult($co_q) {
     </tr>
     </table>
 ";
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Deal links menu                                                  //
+// Parameters:
+//   - $deal_q : DBO : information about the deal
+//   - $inv_nb : invoices number
+// Returns:
+//   $r : string with HTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_deal_links($id) {
+  // -- Themes
+  global $set_theme,$ico_document,$ico_document_new;
+  // -- Labels
+  global $l_header_document,$l_contact;
+  global $l_document_new,$l_document_add,$l_add_document;
+  global $perms_user, $path, $auth,$popup_height,$popup_width;
+
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contact");
+  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
+  $nb_document = run_query_document_nb ($id,"Contact");
+
+  $block = "<div class=\"link\">
+  <div class=\"linkTitle\">:: $l_header_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_document_new</a></li>
+	<li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>
+       
+ </div>
+";
+
   return $block;
 }
 

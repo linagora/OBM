@@ -407,6 +407,7 @@ function run_query_delete($p_id) {
   $retour = $obm_q->query($query);
 
   if ($retour) {
+    run_query_delete_document($p_id,"Contact");    
     run_query_company_contact_dec($comp_id);
   }
 

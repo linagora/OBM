@@ -148,7 +148,7 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert(&$document) {
-  global $auth, $cdg_sql,$c_auto,$document_path;
+  global $auth, $cdg_sql,$c_auto,$document_path,$err_msg,$l_already_exist_error,$l_creation_error;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -180,8 +180,8 @@ function run_query_insert(&$document) {
     $file_kind = 2;
   }
   elseif(file_exists($final_path)) {
-    echo $final_path;
-    return false;;
+    $err_msg = $l_already_exist_error;
+    return false;
   }
 
   if($size == "") $size = 0;
@@ -195,8 +195,10 @@ function run_query_insert(&$document) {
 
   if($kind == "new_file") {
     $file_kind = 1;
-    if(!run_query_create_file($document)) 
+    if(!run_query_create_file($document)){
+      $err_msg = $l_creation_error;
       return false;
+    }
   }
 
   $query = "insert into Document (
@@ -651,7 +653,7 @@ function run_query_detail_by_path($path,$name) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($did, &$document) {
   global $auth, $cdg_sql,$document_path,$c_auto;
-
+  global $l_already_exist_error,$l_creation_error,$err_msg;
   $title = $document["title"];
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];
@@ -681,6 +683,7 @@ function run_query_update($did, &$document) {
     $file_kind = 2;
   }
   elseif(file_exists($final_path) && $file_update=="yes") {
+    $err_msg = $l_already_exist_error;
     return false;
   }
 
@@ -696,9 +699,12 @@ function run_query_update($did, &$document) {
   if($kind == "new_file" && $file_update=="yes") {
     $file_kind = 1;
     $obm_q = run_query_detail($document);
-    if(!run_query_delete_file($obm_q->f("document_path"),$obm_q->f("document_name"))) 
-    
+    if(!run_query_delete_file($obm_q->f("document_path"),$obm_q->f("document_name"))){ 
+      $err_msg = $l_creation_error;
+      return false;
+    }
     if(!run_query_create_file($document)) {
+      $err_msg = $l_creation_error;
       return false;
     }
   }

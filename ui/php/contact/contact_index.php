@@ -228,6 +228,25 @@ if ($action == "index" || $action == "") {
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   $display["detail"] = dis_contact_display_pref($pref_q);
+} elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($contact["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($contact,"Contact");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  $con_q = run_query_detail($contact["id"]);
+  if ($con_q->num_rows() != 1) {
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+  }
+  if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
+    $display["detailInfo"] = display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("timecreate"),$con_q->f("timeupdate")); 	    
+    $display["detail"] = html_contact_consult($con_q);
+  } else {
+    // this contact's page has "private" access
+    $display["msg"] .= display_err_msg($l_error_visibility);
+  }
 }
 
 
@@ -252,7 +271,34 @@ function get_param_contact() {
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target;
+  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
+  if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $contact["id"] = $ext_id;
+  if (isset ($ext_title)) $contact["ext_title"] = $ext_title;
+  if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
+
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_d = 0;
+    $nb_contact = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$contact["doc$nb_d"] = $d_num;
+      }
+    }
+    $contact["doc_nb"] = $nb_d;
+  }
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_kind)) $contact["kind"] = $sel_kind;

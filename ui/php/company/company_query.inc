@@ -292,6 +292,7 @@ function run_query_delete($p_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  run_query_delete_document($p_id,"Company");
 
   return $retour;
 }

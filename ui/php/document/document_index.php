@@ -133,7 +133,7 @@ elseif ($action == "insert")  {
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg($l_insert_error." ".$err_msg);
     }    
     $cat1_q = run_query_documentcategory1();
     $cat2_q = run_query_documentcategory2();

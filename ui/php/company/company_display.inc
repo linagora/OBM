@@ -286,16 +286,22 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -- Themes
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
+  global $ico_document,$ico_document_new;
   // -- Labels
-  global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
-  global $perms_user, $path, $auth;
+  global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new,$popup_height,$popup_width; 
+  global $perms_user,$l_company, $path, $auth,$l_document_new,$l_header_document,$l_document_add;
 
   $uname = urlencode($name);
   $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id&amp;tf_company=$uname");
   $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id");
   $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id&amp;tf_company_name=$uname");
   $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id");
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$p_id&amp;entity=Company");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$p_id&amp;entity=Company");
+  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$p_id&amp;ext_target=$l_company";
+  $nb_document = run_query_document_nb ($p_id,"Company");
 
+  
   $block = "<div class=\"link\"> 
   <div class=\"linkTitle\">:: Contacts associes</div>
   <ul class=\"linkList\">
@@ -310,7 +316,18 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
         <a href=\"$url_deal_list\">$l_deal_list ($deal_num)</a></li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>
-  </ul>
+   </ul>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_document_new</a></li>
+	<li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>       
 </div>";
 
   return $block;

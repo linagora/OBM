@@ -107,6 +107,8 @@ $l_have_link = "This document is linked with various objects";
 $l_have_no_link = "This document isn't linked and can be deleted";
 $l_no_document = "Document not found";
 $l_invalid_url = "Incorrect URL";
+$l_already_exist_error = "This file already exist";
+$l_creation_error = "File creation error";
 // Actions
 $l_checkdelete = "Check or Delete the Document";
 $l_delete = "Delete the Document";

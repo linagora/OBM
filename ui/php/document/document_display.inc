@@ -446,7 +446,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
    $update_file_end
    <div class=\"detailButton\">
     <p class=\"detailButtons\">
-    <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"30000\">
+    <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"3000000\">
     <input type=\"hidden\" name=\"upload\" value=\"yes\">
     $dis_button
     <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />

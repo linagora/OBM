@@ -102,6 +102,8 @@ $l_invalid_link_file = "Impossible de creer un alias sur un lien";
 $l_invalid_url = "Adresse invalide";
 $l_noupdate_file = "Ne pas changer le fichier";
 $l_update_file = "Changer le fichier";
+$l_already_exist_error = "Ce fichier existe déjà";
+$l_creation_error = "Une erreur est survenue pendant la création du fichier";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut etre supprimer";

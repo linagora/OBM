@@ -32,7 +32,7 @@ $l_color = "Couleur";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
-
+$l_document_added = " documents ajoutés";
 // OBM_DISPLAY
 $l_entries = "Entrées";
 $l_page_res = "Pages de résultat";
