@@ -389,7 +389,7 @@ function dis_data_deal($action, $mode) {
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_document($action, $mode) {
-  global $debug, $c_all, $php_regexp_number,$document_path;
+  global $debug, $c_all, $php_regexp_number,$document_path,$link_to;
 
   // Get the deal list
   $d_q = get_document_list();
@@ -445,7 +445,7 @@ at least as much in the file system.
 	$type = "Link";
       }
 
-      if($fpath != $file_path || $file_name != $name) {
+      if(($fpath != $file_path || $file_name != $name) && $kind != 2) {
 	if(($f_q[$fpath.$name][0] == "" || !$bool_fs) && $bool_bd) {
 	  $cpt_du ++;
 	  $fs_err = "X";
@@ -461,11 +461,17 @@ at least as much in the file system.
 	  $bool_fs = next($f_q);
 	  $name = $file_name;
 	  $fpath = $file_path;
-	  if(is_dir($document_path.$file_path.$file_name)) { 
+	  if(is_dir($document_path.$file_path.$file_name)) {
+	    echo
 	    $type = "Repository";
 	    $kind = 0;
 	    $author = "";
 	    $bd_name = "";
+	  }
+	  elseif(substr_count($file_name,$link_to) == 1) {
+	    $type = "Link";
+	    $kind = 2;
+	    $bd_name = $file_name;
 	  }
 	  else {
 	    $type = "File";
@@ -475,44 +481,48 @@ at least as much in the file system.
 	  }
 	  $url ="";
 	  if($action == "data_update") {
-	    $query = "insert into Document (
-	      document_timeupdate,
-	      document_timecreate,
-	      document_userupdate,
-	      document_usercreate,
-	      document_title,
-	      document_author,
-	      document_name,
-	      document_path,
-	      document_kind,
-	      document_size,
-	      document_category1,
-	      document_category2,
-	      document_mimetype,
-	      document_private
-	    )
-	    values (
-	      null,
-	      '" . date("Y-m-d H:i:s") . "',
-	      null,
-	      '0',
-	      '$bd_name',
-	      '$author',
-	      '$file_name',
-	      '$file_path',
-	      '$kind',
-	      '',
-	      '',
-	      '',
-	      '',
-	      '0'
-	    )";
-	    
-	    if($db->query($query)) {
-	      $update = "<td class=\"adminText\">Updated</td>";
-	    }
-	    else {
-	      $update = "<td class=\"adminText\">Error</td>";
+	    if($kind != 2) {
+	      $query = "insert into Document (
+		document_timeupdate,
+		document_timecreate,
+		document_userupdate,
+		document_usercreate,
+		document_title,
+		document_author,
+		document_name,
+		document_path,
+		document_kind,
+		document_size,
+		document_category1,
+		document_category2,
+		document_mimetype,
+		document_private
+	      )
+	      values (
+		null,
+		'" . date("Y-m-d H:i:s") . "',
+		null,
+		'0',
+		'$bd_name',
+		'$author',
+		'$file_name',
+		'$file_path',
+		'$kind',
+		'',
+		'',
+		'',
+		'',
+		'0'
+	      )";
+	      if($db->query($query)) {
+		$update = "<td class=\"adminText\">Updated</td>";
+	      }
+	      else {
+		$update = "<td class=\"adminText\">Error</td>";
+	      }
+	    }else {
+	      unlink($document_path.$file_path.$file_name);
+	      $update = "<td class=\"adminText\">Deleted</td>";
 	    }
 	  }
 	}
@@ -527,7 +537,9 @@ at least as much in the file system.
 	 $update
 	 </tr>";
       }
-      else {
+      elseif($kind==2) {
+	$bool_bd = $d_q->next_record();
+      }else{
 	$bool_fs = next($f_q);
 	$bool_bd = $d_q->next_record();
       }
