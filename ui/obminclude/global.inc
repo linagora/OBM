@@ -7,26 +7,26 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version="0.6.0pre1";
+$obm_version = "0.6.0pre1";
 //$set_debug=0;
-$l_title="O.B.M.";
-$status="";
+$l_title = "O.B.M.";
+
 // VARS that go in session
-$set_lang_default="en";
-$set_theme_default="aliacom";
-$set_rows_default=10;
-$set_display_default="no";
+$set_lang_default = "en";
+$set_theme_default = "aliacom";
+$set_rows_default = 10;
+$set_display_default = "no";
 //$set_debug_default=0;
-$last_deal_default=0;
-$last_company_default=0;
-$last_contact_default=0;
-$last_contract_default=0;
-$last_invoice_default=0;
-$last_account_default=0;
-$last_payment_default=0;
-$last_contract_default=0;
-$last_incident_default=0;
-$set_weekstart_default="monday";
+$last_deal_default = 0;
+$last_company_default = 0;
+$last_contact_default = 0;
+$last_contract_default = 0;
+$last_invoice_default = 0;
+$last_account_default = 0;
+$last_payment_default = 0;
+$last_contract_default = 0;
+$last_incident_default = 0;
+$set_weekstart_default = "monday";
 
 //Timemanager module CONSTANTS
 // In how many parts we can chop a day
@@ -42,6 +42,9 @@ $c_days_in_a_week= 5;
 $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
+
+// Date constants
+$c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
 
 // Perms
 $perms_user = "user" ;

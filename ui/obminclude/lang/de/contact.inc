@@ -67,11 +67,6 @@ $lj_check_pphone = "The personal phone number is not valid.";
 $lj_check_mphone = "The mobile phone number is not valid.";
 $lj_check_fax = "The fax number is not valid.";
 $lj_check_email = "The email adress is not valid.";
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
 
 // For the display parameters modification screen
 $l_contact_options = "Anzeige-Optionen Kontakte"; 

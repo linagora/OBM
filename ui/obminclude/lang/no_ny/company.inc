@@ -103,10 +103,5 @@ $mj_kind_update = "Du må velge ein kategori og legge inn eit nytt namn for å opp
 $mj_kind_create = "Du må legge inn eit nytt kategorinamn for å opprette det!"; 
 $mj_kind_delete_confirm = "Slett kategori?";
 
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
 // For the display parameters modification screen
 $l_company_options = "Display options for companies list"; 

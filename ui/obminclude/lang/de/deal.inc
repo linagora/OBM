@@ -170,15 +170,6 @@ $mj_type_create = "You have to enter a new kind name to create it !";
 $mj_status_create = "You have to enter a new state name to create it !";
 $mj_category_create = "You have to enter a new category name to create it !";
 
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%H:%i";
-$l_date_format = "%m/%d/%Y";
-
-
-
-
 // For the display parameters modification screen
 $l_deal_options = "Anzeige-Optionen für Verträge"; 
 $l_parentdeal_options = "Anzeige-Optionen für Hauptverträge";

@@ -197,6 +197,7 @@ $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";
 $l_fill_label = "Vous devez renseigner le Label avant de valider.";
 $l_fill_number = "Vous devez renseigner le Numero avant de valider.";
 $l_fill_datealarm = "Vous devez renseigner la date alarme avant de valider.";
+$l_fill_datebegin = "Vous devez renseigner la date de début avant de valider.";
 $l_j_select_company = "Vous devez sélectionner une société !";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";

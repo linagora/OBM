@@ -80,27 +80,5 @@ $l_update_port = "Scanner les ports" ;
 $l_modify_compu = "Modifier l'ordinateur" ;
 $l_del_compu = "Supprimer l'ordinateur" ;
 
-//Computer options
-
-
-// Champs specifiques
-// Format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%d-%m-%Y %H:%i";
-$l_date_format = "%d-%m-%Y %H:%i";
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

@@ -98,11 +98,5 @@ $mj_kind_update = "Firmenart auswählen und neuen Namen eintragen!";
 $mj_kind_create = "Neue Firmenart eintragen!";
 $mj_kind_delete_confirm = "Firmenart löschen?";
 
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
-
 // For the display parameters modification screen
 $l_company_options = "Anzeige-Optionen für Firma"; 

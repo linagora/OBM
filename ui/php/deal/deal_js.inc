@@ -68,6 +68,11 @@ function check_form(f_aff) {
     return false;
   }
 
+  if (trim(f_aff.tf_datebegin.value) == \"\") {
+    alert (\"$l_fill_datebegin\");
+    return false;
+  }
+
   //else if (trim(f_aff.tf_num.value) == \"\") {
   //  alert (\"$l_fill_number\")
   //  return false;

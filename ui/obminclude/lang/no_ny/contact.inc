@@ -74,11 +74,6 @@ $lj_check_pphone = "Privatnummeret er ugyldig.";
 $lj_check_mphone = "Mobilnummeret er ugyldig.";
 $lj_check_fax = "Faksnummeret er ugyldig.";
 $lj_check_email = "E-postadressa er ugyldig.";
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
 
 // For the display parameters modification screen
 $l_contact_options = "Display options for contacts list"; 

@@ -60,9 +60,3 @@ $l_j_select_company = "Vous devez sélectionner une société !";
 $l_fill_date = "La date doit être renseignée.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
-
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-

@@ -49,6 +49,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
+  $company_id = $deal["company"];
 
   // Kind select construction
   $sel_kind = "<SELECT name=sel_kind>
@@ -138,6 +139,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
       <td valign=bottom> 
       <input name=action type=hidden value=search>
       <input name=param_parent type=hidden value=\"$parent\">
+      <input name=param_company type=hidden value=\"$company_id\">
       <input name=submit type=submit value=\"$l_find\">
       </td>
     </tr>
@@ -586,7 +588,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
-  global $l_update,$l_delete,$l_insert, $l_none;
+  global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_private,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
   
@@ -649,6 +651,11 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       $zip = $comp_q->f("company_zipcode");
       $town = $comp_q->f("company_town");
       $market = $comp_q->f("company_marketingmanager_id");
+      // We pre-fill datebegin and datealarm with current date
+      $today = getdate();
+      $datebegin = $today["year"]."-".$today["mon"]."-".$today["mday"];
+      $datebegin = date($c_php_isodate_format); 
+      $datealarm = $datebegin;
     } else {
       $comp = stripslashes($deal["company_name"]);
       $ad1 = $deal["company_ad1"];
@@ -1678,7 +1685,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
       <input type=submit name=sub_detailupdate value=\"$l_update_parent\">
       </FORM>";
 
-    $ret_url = urlencode($path."deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
+    $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
     $title = urlencode($l_deal_select_company);
     $win_url = $sess->url("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
     $f_new = "<FORM NAME=\"form_deal_new\"

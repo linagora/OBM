@@ -82,14 +82,6 @@ $l_error_which = "Error::: The which variable is NOT CORRECTLY set... Please Che
 $l_error_authentification = "Error::: Wrong Authentification... Please Check your administrator " ;
 
 
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%d-%m %H:%i";
-$l_date_format = "%Y-%d-%m %H:%i";
-
-
 //Contact
 $l_lastname = "Lastname";
 $l_firstname = "Fisrtname";

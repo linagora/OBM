@@ -64,9 +64,3 @@ $l_fill_login = "\\n Du må fylle inn brukaren før du legg inn.";
 $l_fill_password = "\\n Du må fylle inn passord før du legg inn.";
 $l_delete_confirm = "Slette brukar?";
 $lj_check_email = "Mailadressa er ugyldig.";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-
