@@ -221,6 +221,12 @@ if ($section == "COM") {
 			           'Right'=> $cright_read);
   }
 
+  if ($cgp_show["module"]["statistic"]) {
+    $menus["COM"]["STATISTIC"] = array('Name'=> $l_header_statistic,
+			           'Ico' => "$ico_statistic",
+			           'Url' => "$path/statistic/statistic_index.php",
+			           'Right'=> $cright_read);
+  }
   //  print_r($menus["COM"]);
 } elseif ($section == "PROD") {
 

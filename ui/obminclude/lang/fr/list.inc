@@ -48,9 +48,9 @@ $l_country = "Pays";
 
 //Publication
 $l_publication = "Publication";
-$l_title = "Title";
-$l_year = "Year";
-$l_lang = "Language";
+$l_title = "Titre";
+$l_year = "Année";
+$l_lang = "Langue";
 
 //Logical
 $l_or = "OU";

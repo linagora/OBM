@@ -754,5 +754,12 @@ td.adminTextRight	{
 
 
 /* /////////////////////////////////////////////////////////////////////////
-// Classes de test
-*/
+// Classes divers
+ ////////////////////////////////////////////////////////////////////////*/
+table.classic {
+  border :			3px solid black;
+  background-color : 		#000000;
+}
+table.classic td {
+  border:	inherit;
+}

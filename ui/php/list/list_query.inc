@@ -791,6 +791,8 @@ function make_query($list) {
   $common_like = "%f $like '%v%'";
   $common_equal = "%f = '%v'";
   $category_equal = "(%f $like '%v.%' OR %f = '%v')";
+  $pub_lang_like = "%f $like '%%v%'";
+
   
   $operateurs = array(
     "company_name" => $common_like,
@@ -815,7 +817,7 @@ function make_query($list) {
     "contactcategory2link_category_id" => $common_equal,
     "contact_function_id" => $common_equal,
     "publication_title"  => $common_like,
-    "publication_lang"  => $common_like,
+    "publication_lang"  => $pub_lang_like,
     "publication_year"  => $common_like,
   );
     
@@ -834,8 +836,8 @@ function make_query($list) {
         company_zipcode,
         company_town
         FROM
-        Contact
-             left join Company on contact_company_id=company_id
+        Company
+             left join Contact on contact_company_id=company_id
 	     left join CompanyCategoryLink on company_id = companycategorylink_company_id 
 	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
 	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id

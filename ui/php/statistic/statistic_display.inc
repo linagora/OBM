@@ -1,0 +1,200 @@
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : statistic_display.php                                          //
+//     - Desc : Statistic Display File                                         //
+// 2004-04-19 Rande Mehdi                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics differents actions                                //
+// Parameters:                                                               //
+// Returns:                                                                  //
+///////////////////////////////////////////////////////////////////////////////
+function dis_menu_stats() {
+  global $path, $set_theme;
+  global $set_theme, $action;
+  global $actions,$menu, $perm;
+  global $l_statistic;
+
+  $ret = "
+  <div class=\"menusInner\">
+  <div class=\"last\">
+  <div class=\"lastTitle\">:: $l_statistic </div>
+  <ul class=\"lastList\">";
+
+
+
+  
+  if (is_array($actions[$menu])) {
+    $module_right = $perm->get_module_rights($menu); 
+    foreach ($actions[$menu] as $key => $value) {
+      if (in_array("content", $value["Condition"])) {
+	if (($module_right & $value["Right"]) == $value["Right"]) {
+	    $ret .= "
+        <li class=\"lastList\">
+	<a href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/".$value["Ico"]."\" alt=\"\"></a>
+         <a href=\"".$value["Url"]."\">".$value["Name"]."</a></li>";
+	}
+      }
+    }
+  }
+   
+  $ret .= "</ul>
+        </div>
+	</div>";
+
+  return $ret;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About the responsibles                                 //
+// Parameters:                                                               //
+//  - $cont_q : DB Object for contact stats
+//  - $comp_q : DB Object for companies stats
+// Returns:                                                                  //
+///////////////////////////////////////////////////////////////////////////////
+function dis_resp_stats($cont_q,$comp_q) {
+  global $path, $set_theme;
+  global $set_theme, $action,$l_header_company,$l_header_contact,$l_key;
+  global $actions,$menu, $perm;
+
+  $max = 1;
+  while($cont_q->next_record()) {
+    $stat[$cont_q->f("userobm_id")]["contact"] = $cont_q->f("cont_stat");
+     $stat[$cont_q->f("userobm_id")]["name"] = $cont_q->f("userobm_firstname")." ".$cont_q->f("userobm_lastname");
+    if($cont_q->f("cont_stat") > $max) {
+      $max = $cont_q->f("cont_stat");
+    }
+  } 
+  while($comp_q->next_record()) {
+    $stat[$comp_q->f("userobm_id")]["company"] = $comp_q->f("comp_stat");
+    $stat[$comp_q->f("userobm_id")]["name"] = $comp_q->f("userobm_firstname")." ".$comp_q->f("userobm_lastname");
+    if($comp_q->f("comp_stat") > $max) {
+      $max = $comp_q->f("comp_stat");
+    }
+  } 
+  $block .= "<table class=\"detail\" >";
+  foreach($stat as $id => $value) {
+    $cont = round(($value["contact"]/$max)*90);
+    $comp = round(($value["company"]/$max)*90);
+    $block .= "<tr>
+    <td class=\"detailLabel\" rowspan =\"2\">".$value["name"]."</td>
+    <td class=\"detailForm\">
+     <table style=\"width:100%;\">
+      <tr><td style=\"width:".$cont."%; background-color:#DE5B5B;\"></td><td>".$value["contact"]."</td></tr>
+     </table>
+    </td>
+   </tr>
+   <tr>
+    <td class=\"detailForm\">
+    <table style=\"width:100%;\">
+    <tr><td style=\"width:".$comp."%; background-color:#5C8CBC;\"></td><td>".$value["company"]."</td></tr>
+    </table>   
+    </td>
+   </tr>";    
+  }
+   
+  $block .= "
+  <tr>
+    <td class=\"detailLabel\" class=\"detailLabel\" rowspan =\"2\">$l_key</td>
+    <td class=\"detailForm\">
+     <table>
+      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_header_contact</td></tr>
+     </table>
+    </td>
+   </tr>
+   <tr>
+    <td class=\"detailForm\">
+    <table>
+    <tr><td style=\"width:20px;background-color:#5C8CBC;\">&nbsp;</td><td>$l_header_company</td></tr>
+    </table>   
+    </td>
+   </tr>
+   
+  
+  </table>"; 
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About the responsibles                                //
+// Parameters:                                                               //
+// Returns:                                                                  //
+///////////////////////////////////////////////////////////////////////////////
+function dis_cat_stats($comp_q,$tot) {
+  global $path, $set_theme;
+  global $set_theme, $action,$l_header_company,$l_header_contact,$l_key;
+  global $actions,$menu, $perm,$l_null,$l_totals, $l_header_country,$l_compcat;
+  while($comp_q->next_record()) {
+    if($comp_q->f("companycategory_id") == NULL) {
+      $cat_id = 0;
+      $cat_c = $l_null;
+    }
+    else {
+      $cat_id = $comp_q->f("companycategory_id");
+      $cat_c = $comp_q->f("companycategory_code");
+    }
+    if($comp_q->f("country_id") == NULL || $comp_q->f("country_id") == 0) {
+      $cty_id = 0;
+      $cty_c = $l_null;
+    }
+    else {
+      $cty_id = $comp_q->f("country_id") ;
+      $cty_c = $comp_q->f("country_iso3166") ;
+    }
+    $nb = $comp_q->f("nb");
+    $stat[$cty_id][$cat_id] += $nb;
+    $cty_count[$cty_id] += $nb;
+    $cat_count[$cat_id] += $nb;
+    $cty[$cty_id] = $cty_c;
+    $cat[$cat_id] = $cat_c;
+  }
+  ksort($cat);
+  $block .= "
+  <div class=\"title\">
+  x = $l_compcat /  y = $l_header_country
+  </div>
+  <div class=\"classic\">
+  <table class=\"classic\">
+  <tr>
+  <th></th>";
+  foreach($cat as $cat_id =>$cat_name) {
+    $block .= "<th>".$cat_name."</th >";
+    $percent = round(($cat_count[$cat_id])*100/$tot,1);    
+    $cat_percent .= "<td  class=\"totals\">$percent</td>";
+    $cat_tots .= "<td class=\"totals\">".$cat_count[$cat_id]."</td>";
+  }
+  $pair = 0;
+  $block .= "<th>$l_totals</th><th>%</th></tr>";
+  foreach($stat as $cty_id => $data) {
+    if($pair == 0) {
+      $pair = 1;
+      $block .= "<tr class=\"pair\">";
+    }
+    else {
+      $pair = 0;
+      $block .= "<tr class=\"impair\">";
+    }
+    $block .= " <th> ".$cty[$cty_id]."</th>";
+    foreach($cat as $cat_id => $cat_name) {
+      $block .= "<td>".$data[$cat_id]."</td >";
+    }
+    $percent = round(($cty_count[$cty_id])*100/$tot,1);
+    $block .= "<td class=\"totals\">".$cty_count[$cty_id]."</td>";
+    $block .= "<td class=\"totals\">$percent</td>";
+    $block .= "</tr>";
+  }
+  $block .= "
+  <tr><th>$l_totals</th>$cat_tots<td>$tot</td><td></td></tr>
+  <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
+   </table>
+   </div>
+  ";
+  return $block;
+}
+
+</script>

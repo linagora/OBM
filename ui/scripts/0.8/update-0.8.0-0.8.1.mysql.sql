@@ -22,7 +22,7 @@ ALTER TABLE Contact CHANGE column contact_address3 contact_address3 VARCHAR(64);
 -------------------------------------------------------------------------------
 -- Update Publication tables
 -------------------------------------------------------------------------------
--- Change column : publication_lang varchar(20)
+-- Change column : publication_lang varchar(30)
 ALTER TABLE Publication CHANGE column publication_lang publication_lang VARCHAR(30);
 
 -------------------------------------------------------------------------------

@@ -79,7 +79,7 @@ ALTER TABLE Contact RENAME COLUMN temp_contact_address3 TO contact_address3;
 -------------------------------------------------------------------------------
 -- Update Publication tables
 -------------------------------------------------------------------------------
--- Change column : publication_lang varchar(20)
+-- Change column : publication_lang varchar(30)
 
 DROP table Publication;
 

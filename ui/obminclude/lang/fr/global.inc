@@ -113,6 +113,7 @@ $l_header_list    = "Listes";
 $l_header_agenda  = "Agenda";
 $l_header_todo    = "A faire";
 $l_header_publication    = "Publication";
+$l_header_statistic    = "Statistiques";
 
 $l_header_time = "Gestion des temps";
 $l_header_project = "Projets";

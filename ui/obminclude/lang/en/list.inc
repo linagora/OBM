@@ -47,9 +47,9 @@ $l_country = "Country";
 
 //Publication
 $l_publication = "Publication";
-$l_title = "Titre";
-$l_year = "Année";
-$l_lang = "Langue";
+$l_title = "Title";
+$l_year = "Year";
+$l_lang = "Language";
 
 
 // Actions

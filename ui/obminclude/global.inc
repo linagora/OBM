@@ -98,6 +98,7 @@ $cgp_show["module"]["payment"] = true;
 $cgp_show["module"]["settings"] = true;
 $cgp_show["module"]["user"] = true;
 $cgp_show["module"]["group"] = true;
+$cgp_show["module"]["statistic"] = true;
 
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");

@@ -240,7 +240,8 @@ class OBM_Perm {
     $this->mod_pos["AGENDA"] = $this->mod_pos["LIST"] + $mod_length;
     $this->mod_pos["TODO"] = $this->mod_pos["AGENDA"] + $mod_length;
     $this->mod_pos["PUBLICATION"] = $this->mod_pos["TODO"] + $mod_length;
-    $this->mod_pos["TIME"] = $this->mod_pos["PUBLICATION"] + $mod_length;
+    $this->mod_pos["STATISTIC"] = $this->mod_pos["PUBLICATION"] + $mod_length;
+    $this->mod_pos["TIME"] = $this->mod_pos["STATISTIC"] + $mod_length;
     $this->mod_pos["PROJECT"] = $this->mod_pos["TIME"] + $mod_length;
     $this->mod_pos["CONTRACT"] = $this->mod_pos["PROJECT"] + $mod_length;
     $this->mod_pos["INCIDENT"] = $this->mod_pos["CONTRACT"] + $mod_length;
