@@ -779,8 +779,8 @@ function get_list_query_num_rows($query="") {
   // Get the From ... Where clauses
   // IF 'Group by' present, take between From and group by (ungreedy)
   // else get between From and the end
-  if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
-    $query_c = "select count(distinct contact_id) " . $matches[1];
+  if (preg_match('/(FROM (.*))($)/Uis', $query, $matches)) {
+    $query_c = "select contact_id " . $matches[1];
     display_debug_msg($query_c, $cdg_sql);
     $obm_q = new DB_OBM;
     $r = $obm_q->query($query_c, 1);
@@ -788,7 +788,7 @@ function get_list_query_num_rows($query="") {
       $ret = -1;
     } else {
       $obm_q->next_record();
-      $ret = $obm_q->f(0);
+      $ret = $obm_q->nf();
     }
   } else {
     $ret = 0;
