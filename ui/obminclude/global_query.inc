@@ -675,15 +675,19 @@ function get_modules_array() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Send a Mail to an user                                                       //
-// Return : $modules : array of modules
+// Send a Mail to an user                                                    //
+// Parameters:
+//  - $subject : subject of the mail
+//  - $message : content of the mail
+//  - $receivers : Ids of the receivers.
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject,$message,$sender,$receiver) {
+function send_mail($subject,$message,$receivers) {
   global $path;
 
+
   $obm_q_send = run_query_get_sender();
-  $obm_q_rece = run_query_get_receiver();
-  while($obm_q_rece->suivant()) {
+  $obm_q_rece = run_query_get_receiver($receivers);
+  while($obm_q_rece->next_record()) {
     if($obm_q_rece->f("userobm_email") != "") {
       if($rece_list == "") {
 	$rece_list = $obm_q_rece->f("userobm_email");
@@ -696,10 +700,42 @@ function send_mail($subject,$message,$sender,$receiver) {
       //send private message via obm
     }
   }
-  $headers .= "From: ".$obm_q_send->f("userobm_email")."\r\n";
+  $headers .= "From: ".$obm_q_send->f("userobm_email")."\r\n Reply-To: ".$obm_q_send->f("userobm_email");
   if($rece_list != "") {
-    mail($rece_list,$subject,$message,$headers);
-  
+    mail($rece_list,$subject,$message,$headers);      
   }
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get receivers mail adress                                                 //
+// Parameters:
+//  - $receivers : Ids of the receivers.
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_receiver($receivers) {
+  global $cdg_sql;
+
+  $query = "SELECT userobm_email FROM UserObm WHERE userobm_id IN (".$receivers[0];
+  for ($i=1;$i<count($contacts_array);$i++) {
+    $query.= ",".$contacts_array[$i];
+  }
+  $query.=")";
+
+  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Get sender mail adress                                                 //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_sender() {
+  global $auth;
+  $query = "SELECT userobm_email  FROM UserObm WHERE userobm_id = ".$auth->auth["uid"];  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q;
+}
+  
 ?>

@@ -332,7 +332,7 @@ function run_query_get_user_name($contacts_array) {
 //   - $contacts_array : List of the users 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_add_event($agenda,$contacts_array,&$event_id) {
-  global $auth;
+  global $auth, $l_event_mail_head,$l_event_mail_subject;
 
   $force = $agenda["force"];
   $return_info = array();
@@ -353,7 +353,10 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
+    $message = $l_event_mail_head.$agenda["title"];
+    send_mail($l_event_mail_subject,$message,$contacts_array);    
   }
+
   return $return_info;
 }
 

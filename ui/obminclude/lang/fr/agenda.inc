@@ -146,7 +146,8 @@ $l_short_thursday="Jeu";
 $l_short_friday="Ven";
 $l_short_saturday="Sam";
 $l_short_sunday="Dim";
-
+$l_event_mail_head = "Un nouvel évenement à été programmé pour vous sur Obm. Cet événement à pour titre :";
+$l_event_mail_subject = "Nouvel événement sur Obm";
 $l_unknown="Inconnu";
 $l_user_calendar = "Vue Multi-utilisateurs";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

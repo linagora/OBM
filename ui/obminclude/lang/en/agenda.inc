@@ -130,27 +130,11 @@ $l_err_begin_end = "End date must be after begin date !";
 $l_err_end_repeat = "Repetion end must be after end date";
 $l_err_end_repeat2 = "The max duration of a repetition is one year";
 
-$l_short_december="Dec";
-
-$l_monday="Lundi";
-$l_tuesday="Mardi";
-$l_wednesday="Mercredi";
-$l_thursday="Jeudi";
-$l_friday="Vendredi";
-$l_saturday="Samedi";
-$l_sunday="Dimanche";
-
-$l_short_monday="Lun";
-$l_short_tuesday="Mar";
-$l_short_wednesday="Mer";
-$l_short_thursday="Jeu";
-$l_short_friday="Ven";
-$l_short_saturday="Sam";
-$l_short_sunday="Dim";
 
 $l_unknown="Inconnu";
 
-
+$l_event_mail_head = "A new event has been define for you on the obm application. This event title is :";
+$l_event_mail_subject = "New event on obm";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";
