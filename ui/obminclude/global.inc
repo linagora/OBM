@@ -10,8 +10,8 @@
 
 require_once("$obminclude/obm_conf.inc");
 
-$obm_version = "0.7.5pre1";
-$l_title = "O.B.M.";
+$obm_version = "0.7.5pre2";
+$l_obm_title = "O.B.M.";
 
 // Bookmarks default
 $last_deal_default = 0;

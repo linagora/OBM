@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_display.php                                          //
 //     - Desc : Contact Display File                                         //
@@ -81,25 +81,39 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 //   - $contact[] : default form values
 //     keys used  : name, company
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q) {
+function html_contact_search_form ($contact, $usr_q, $func_q) {
   global $l_contact_name, $l_phone, $l_from_company, $l_email, $l_archive;
-  global $l_market, $l_find, $popup, $display, $c_all, $l_all;
+  global $l_function, $l_market, $l_find, $popup, $display, $c_all, $l_all;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
   $company = stripslashes($contact["company"]);
   $email = stripslashes($contact["email"]);
+  $func = $contact["function"];
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
+
+  // Function select
+  $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($func_q->next_record()) {
+    $f_id = $func_q->f("function_id");
+    $f_label = $func_q->f("function_label");
+    $sel_func .= "\n<option value=\"$f_id\"";
+    if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
+    $sel_func .= ">$f_label</option>";
+  }
+  $sel_func .= "</select>";
 
   // Marketing manager select
   $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
     <option value=\"$c_all\">$l_all</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
+    $u_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+    $sel_market .= ">$u_name</option>";
   }
   $sel_market .= "</select>";
 
@@ -133,6 +147,9 @@ function html_contact_search_form ($contact, $usr_q) {
     </div>
     <div class=\"searchLabel\">$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </div>
+    <div class=\"searchLabel\">$l_function<br />
+      $sel_func
     </div>
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
@@ -248,13 +265,13 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Consultation                                         //
 // Parameters:
-//   - $co_q      : contact database result
+//   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_consult($co_q) {
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
-  global $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode,$l_expresspostal;
-  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
-  global $l_public,$l_private,$l_archive,$l_visibility;
+  global $l_company,$l_lastname,$l_firstname,$l_kind,$l_function,$l_title;
+  global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
+  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
+  global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail;
   global $display, $path, $action, $auth;
@@ -266,6 +283,8 @@ function html_contact_consult($co_q) {
   $c_phone = $co_q->f("company_phone");
   $id = $co_q->f("contact_id");
   $kind = $co_q->f("kind_minilabel");
+  $function = $co_q->f("function_label");
+  $title = $co_q->f("contact_title");
   $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
   $lname = $co_q->f("contact_lastname");
   $fname = $co_q->f("contact_firstname");
@@ -334,7 +353,10 @@ function html_contact_consult($co_q) {
       </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailText\">$func</td>
+      <td class=\"detailText\">$function</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailText\">$title</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_market</td>
       <td class=\"detailText\">$market</td>
@@ -435,8 +457,7 @@ function html_contact_links($id) {
 	 $l_document_add</a></li>
   </ul>
        
- </div>
-";
+ </div>";
 
   return $block;
 }
@@ -456,10 +477,11 @@ function dis_contact_form($action, $co_q, $contact) {
 
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
+  $func_q = run_query_function();
   $users = array($contact["marketing_manager"]);
   $usr_q = run_query_userobm_active($users);
   $ctry_q = run_query_country();
-  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
@@ -471,22 +493,23 @@ function dis_contact_form($action, $co_q, $contact) {
 //   - $action    : action called
 //   - $co_q      : contact database result 
 //   - $dsrc_q    : datasource database result 
-//   - $kind_q    : contact kind database result 
+//   - $func_q    : function database result 
+//   - $kind_q    : kind database result 
 //   - $usr_q     : active userobm database result 
 //   - $ctry_q    : country database result 
 //   - $contact[] : default values
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $set_theme, $ico_company;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+  global $set_dsrc, $set_theme, $ico_company, $l_company;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $display, $path, $auth;
+  global $display, $path, $auth, $l_none;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -505,7 +528,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
     $town = $co_q->f("contact_town");
     $cdx = $co_q->f("contact_expresspostal");
     $ctry = $co_q->f("contact_country_id");
-    $func = $co_q->f("contact_function");
+    $func = $co_q->f("contact_function_id");
+    $title = $co_q->f("contact_title");
     $phone = $co_q->f("contact_phone");
     $hphone = $co_q->f("contact_homephone");
     $mphone = $co_q->f("contact_mobilephone");
@@ -551,7 +575,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
   if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
   if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
   if (isset($contact["ctry"])) { $ctry = $contact["ctry"]; }
-  if (isset($contact["func"])) { $func = stripslashes($contact["func"]); }
+  if (isset($contact["function"])) { $func = $contact["function"]; }
+  if (isset($contact["title"])) { $title = stripslashes($contact["title"]); }
   if (isset($contact["phone"])) { $phone = stripslashes($contact["phone"]); }
   if (isset($contact["hphone"])) { $hphone = stripslashes($contact["hphone"]); }
   if (isset($contact["mphone"])) { $mphone = stripslashes($contact["mphone"]); }
@@ -592,6 +617,18 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
     $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
   }
   $sel_market .= "</select>";
+
+  // Function select
+  $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
+    <option value=\"0\">$l_none</option>";
+  while ($func_q->next_record()) {
+    $f_id = $func_q->f("function_id");
+    $f_label = $func_q->f("function_label");
+    $sel_func .= "\n<option value=\"$f_id\"";
+    if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
+    $sel_func .= ">$f_label</option>";
+  }
+  $sel_func .= "</select>";
 
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
@@ -668,9 +705,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
+    </tr><tr>    
+      <td class=\"detailLabel\">$l_function</td> 
+      <td class=\"detailForm\">$sel_func</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td class=\"detailForm\">$sel_market</td>
@@ -733,8 +773,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
-    </form>
- ";
+    </form>";
 
   return $block;
 }
@@ -747,7 +786,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $c
 //   - $cid       : contact id
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
-//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
+//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town,cdx
 //                : ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
@@ -765,13 +804,14 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $town = stripslashes($contact["town"]);
   $cdx = stripslashes($contact["cdx"]);
   $ctry = $contact["ctry"];
-  $func = stripslashes($contact["func"]);
+  $func = $contact["function"];
+  $title = stripslashes($contact["title"]);
   $phone = stripslashes($contact["phone"]);
   $hphone = stripslashes($contact["hphone"]);
   $mphone = stripslashes($contact["mphone"]);
   $fax = stripslashes($contact["fax"]);
   $email = stripslashes($contact["email"]);
-  $com = $contact["com"];
+  $com = stripslashes($contact["com"]);
   $vis = $contact["vis"];
   $archive = ($contact["archive"] == 1 ? "1" : "0");
 
@@ -810,7 +850,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"tf_func\" value=\"$func\" />
+    <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
+    <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
@@ -837,7 +878,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"tf_func\" value=\"$func\" />
+    <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
+    <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
@@ -990,6 +1032,199 @@ function dis_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the contact administration index                                  //
+///////////////////////////////////////////////////////////////////////////////
+function dis_admin_index() {
+
+  $func_q = run_query_function();
+  $block = html_contact_function_form($func_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contact Function section                                         //
+// Parameters:
+//   - $func_q : Function list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_function_form($func_q) {
+  global $l_func_manage, $l_func_exist, $l_func_no;
+  global $l_func_checkdelete, $l_func_update, $l_func_new, $l_func_insert;
+
+  if ($func_q->num_rows() > 0) {
+
+    // Function select construction
+    $sel_func = "<select name=\"sel_func\" onChange=\"
+      forms.form_func_update.tf_func.value=this.options[this.selectedIndex].text;\"
+      size=\"8\">";
+    while ($func_q->next_record()) {
+      $id = $func_q->f("function_id");
+      $label = $func_q->f("function_label");
+      $sel_func .= "\n<option value=\"$id\">$label</option>";
+    }
+    $sel_func .= "</select>";
+
+    $dis_update_delete = "
+<!-- Function Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_func_delete\" method=\"post\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_func_exist</td>
+            </tr>
+            <tr>
+              <td class=\"adminLabel\">$sel_func</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"function_checklink\" />
+              <input type=\"submit\" name=\"sub_func\" value=\"$l_func_checkdelete\" onclick=\"if (check_func_checkdel(this.form.sel_func)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Function Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_func_update\" method=\"get\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_func\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"function_update\" />
+            <input type=\"text\" name=\"tf_func\" />
+            <input type=\"submit\" name=\"sub_func\" value=\"$l_func_update\"
+              onclick=\"if (check_func_upd(this.form,document.form_func_delete.sel_func)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>";
+
+  } else {
+    $dis_update_delete = $l_func_no;
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_func_manage
+      </td>
+    </tr><tr>
+      <td>
+        $dis_update_delete
+      </td>
+      <td>
+
+<!-- New Function Section -->
+
+        <form name=\"form_func_new\" method=\"get\"
+          action=\"" . url_prepare("contact_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_func_new :
+            <input name=\"tf_func\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"function_insert\" />
+            <input type=\"submit\" name=\"sub_func\" value=\"$l_func_insert\"
+              onclick=\"if (check_func_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the function links                                               //
+// Parameters:
+//   - $contact : contact hash info : keys used : function
+///////////////////////////////////////////////////////////////////////////////
+function dis_function_links($contact) {
+  global $display, $l_back, $l_func_link_contact, $l_func_link_company_no;
+  global $l_func_delete, $l_func_can_delete, $l_func_cant_delete;
+
+  $delete_ok = true;
+  $id = $contact["function"];
+  $label = get_function_label($id);
+  $obm_q = run_query_function_links($id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_func_link_contact</td>
+    </tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
+      $dis_link .="
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_func_link_contact_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("contact_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_func_can_delete);
+    $dis_del = "<form name=\"form_func_delete\".
+          method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"function_delete\" />
+        <input type=\"hidden\" name=\"sel_func\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_func\" value=\"$l_func_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_func_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  $block .= "<p>&nbsp;</p>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Display preference screen                             //
 // Parameters:
 //   - $display_pref_q : DBO : Field list to display
@@ -1010,4 +1245,4 @@ function dis_contact_display_pref($display_pref_q) {
 }
 
 
-</SCRIPT>
+</script>

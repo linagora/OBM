@@ -30,6 +30,7 @@ $l_name = "Name";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
+$l_query_error = "Error while executing the query";
 $l_color = "Color";
 $l_phone = "Phone";
 $l_address = "Address";

@@ -85,7 +85,7 @@ function display_page(&$display) {
 // Display: HTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_title, $set_theme, $obminclude, $extra_css, $extra_js;
+  global $l_obm_title, $set_theme, $obminclude, $extra_css, $extra_js;
 
   if (isset($extra_css))
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
@@ -97,7 +97,7 @@ function display_head($p_module) {
   return "$headers_e
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
-  <title>$l_title - $p_module</title>
+  <title>$l_obm_title - $p_module</title>
   <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
   $dis_extra_css
   $extra_js

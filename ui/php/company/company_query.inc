@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_query.inc                                            //
 //     - Desc : company query File                                           //
@@ -259,7 +259,7 @@ function run_query_insert($company) {
   $obm_q->next_record();
   $id = $obm_q->f("Id");
 
-  if($retour && is_array($compcat)) {
+  if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
 	companycategorylink_companyid,
@@ -662,7 +662,7 @@ function run_query_get_companycat_name($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie insertion query construction and execution                           //
+// Categorie insertion query construction and execution                      //
 // Parameters:
 //   - $company : company hash info : keys used : cat_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -694,7 +694,7 @@ function run_query_cat_insert($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie update query execution                                               //
+// Categorie update query execution                                          //
 // Parameters:
 //   - $company : company hash info : keys used : cat, cat_label,cat_code
 ///////////////////////////////////////////////////////////////////////////////
@@ -724,7 +724,7 @@ function run_query_cat_update($company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie deletion query execution                                             //
+// Categorie deletion query execution                                        //
 // Parameters:
 //   - $id : Categorie id to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -742,7 +742,7 @@ function run_query_cat_delete($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Categorie - Company links query execution                                      //
+// Categorie - Company links query execution                                 //
 // Parameters:
 //   - $p_id : cat id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1043,4 +1043,4 @@ function run_query_get_tree() {
 
 }
 
-</SCRIPT>
+</script>

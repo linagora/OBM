@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : contact.inc                                              //
@@ -14,6 +14,7 @@ $l_firstname = "Firstname";
 $l_kind = "Kind";
 $l_market = "Person in charge";
 $l_function = "Function";
+$l_title = "Job Title";
 $l_hphone = "Home Phone";
 $l_minihphone = "(Home)";
 $l_mphone = "Mobile Phone";
@@ -34,6 +35,10 @@ $l_telother = "Other tel";
 $l_private = "Private";
 $l_public = "Public";
 $l_contact_select_company = "Select the company for the contact.";
+$l_func_manage = "Contact Function Management";
+$l_func_exist = "Existing Functions";
+$l_func_no = "No functions defined";
+$l_func_new = "New Function";
 
 // Titles
 $l_contact = "Contact";
@@ -43,6 +48,14 @@ $l_insert = "Insert the Contact";
 $l_update = "Update the Contact";
 $l_checkdelete = "Check or Delete the Contact";
 $l_delete = "Delete the Contact";
+$l_func_update = "Update Function";
+$l_func_checkdelete = "Check or Delete Function";
+$l_func_delete = "Delete Function";
+$l_func_insert = "Insert Function";
+$l_kind_update = "Update Kind";
+$l_kind_checkdelete = "Check or Delete Kind";
+$l_kind_delete = "Delete Kind";
+$l_kind_insert = "Insert Kind";
 $l_add = "Add these contacts";
 
 // Messages
@@ -64,7 +77,28 @@ $l_insert_ok = "The contact has been inserted successfully.";
 $l_insert_error = "The insertion of the contact has failed !";
 $l_update_ok = "The contact has been updated successfully.";
 $l_update_error = "The update of the contact has failed !";
-$l_query_error = "Error while executing the query";
+// Function Messages
+$l_func_insert_ok = "The function has been inserted successfully.";
+$l_func_insert_error = "The insertion of the function has failed !";
+$l_func_delete_ok = "The function has been deleted successfully.";
+$l_func_delete_error = "The deletion of the function has failed !";
+$l_func_update_ok = "The function has been updated successfully.";
+$l_func_update_error = "The update of the function has failed !";
+$l_func_link_contact = "These contacts are referenced as";
+$l_func_link_contact_no = "No contact referenced as";
+$l_func_cant_delete = "The Function can't be deleted !";
+$l_func_can_delete = "The Function can be deleted.";
+// Kind Messages
+$l_kind_insert_ok = "The kind has been inserted successfully.";
+$l_kind_insert_error = "The insertion of the kind has failed !";
+$l_kind_delete_ok = "The kind has been deleted successfully.";
+$l_kind_delete_error = "The deletion of the kind has failed !";
+$l_kind_update_ok = "The kind has been updated successfully.";
+$l_kind_update_error = "The update of the kind has failed !";
+$l_kind_link_company = "These companies are referenced as";
+$l_kind_link_company_no = "No company referenced as";
+$l_kind_cant_delete = "The Kind can't be deleted !";
+$l_kind_can_delete = "The Kind can be deleted.";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
 $l_fill_lastname = "You have to fill the Lastname before submitting.";
@@ -77,6 +111,11 @@ $l_j_check_hphone = "The personal phone number is not valid.";
 $l_j_check_mphone = "The mobile phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
 $l_j_check_email = "The email adress is not valid.";
+// JavaScript messages - Function
+$l_j_func_delete = "You have to select a function to check or delete it !";
+$l_j_func_update = "You have to select a function and enter a new name to update it !";
+$l_j_func_create = "You have to enter a new function label to create it !";
+$l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen
 $l_contact_display = "Display options for contacts list"; 

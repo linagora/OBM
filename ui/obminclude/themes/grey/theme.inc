@@ -65,11 +65,13 @@ $ico_group          = "ico_group.gif";
 $ico_add_group      = "ico_group_new.gif";
 $ico_setting        = "ico_setting.gif";
 
+// Admin icons
 $ico_admin          = "ico_admin.gif";
 $ico_code           = "ico_code.gif";
 $ico_pref           = "ico_pref.gif";
 $ico_data           = "ico_data.gif";
 $ico_lang           = "ico_lang.gif";
+$ico_ref            = "ico_ref.gif";
 
 // OBM DISPLAY Icons
 $ico_export         = "ico_export.gif";

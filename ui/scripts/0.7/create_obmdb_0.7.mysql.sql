@@ -227,7 +227,8 @@ CREATE TABLE Contact (
   contact_town varchar(24),
   contact_expresspostal varchar(8),
   contact_country_id int(8),
-  contact_function varchar(50),
+  contact_function_id int(8),
+  contact_title varchar(64),
   contact_phone varchar(16),
   contact_homephone varchar(16),
   contact_mobilephone varchar(16),
@@ -254,6 +255,21 @@ CREATE TABLE Kind (
   kind_label char(20),
   PRIMARY KEY (kind_id)
 );
+
+
+--
+-- Table structure for the table 'Function'
+--
+CREATE TABLE Function (
+  function_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  function_timeupdate timestamp(14),
+  function_timecreate timestamp(14),
+  function_userupdate int(8),
+  function_usercreate int(8),
+  function_label varchar(64),
+  PRIMARY KEY (function_id)
+);
+
 
 -------------------------------------------------------------------------------
 -- Deal module tables

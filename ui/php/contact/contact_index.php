@@ -7,23 +7,27 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
-// - index (default) -- search fields  -- show the contact search form
-// - search          -- search fields  -- show the result set of search
-// - new             -- $param_company -- show the new contact form
-// - detailconsult   -- $param_contact -- show the contact detail
-// - detailupdate    -- $param_contact -- show the contact detail form
-// - insert          -- form fields    -- insert the company
-// - update          -- form fields    -- update the company
-// - check_delete    -- $param_contact -- check links before delete
-// - delete          -- $param_contact -- delete the company
-// - admin           --                -- admin index (kind)
-// - kind_insert     -- form fields    -- insert the kind
-// - kind_update     -- form fields    -- update the kind
-// - kind_checklink  --                -- check if kind is used
-// - kind_delete     -- $sel_kind      -- delete the kind
-// - display         --                -- display and set display parameters
-// - dispref_display --                -- update one field display value
-// - dispref_level   --                -- update one field display position 
+// - index (default)    -- search fields  -- show the contact search form
+// - search             -- search fields  -- show the result set of search
+// - new                -- $param_company -- show the new contact form
+// - detailconsult      -- $param_contact -- show the contact detail
+// - detailupdate       -- $param_contact -- show the contact detail form
+// - insert             -- form fields    -- insert the company
+// - update             -- form fields    -- update the company
+// - check_delete       -- $param_contact -- check links before delete
+// - delete             -- $param_contact -- delete the company
+// - admin              --                -- admin index (kind)
+// - kind_insert        -- form fields    -- insert the kind
+// - kind_update        -- form fields    -- update the kind
+// - kind_checklink     --                -- check if kind is used
+// - kind_delete     	-- $sel_kind      -- delete the kind
+// - function_insert    -- form fields    -- insert the function
+// - function_update    -- form fields    -- update the function
+// - function_checklink --                -- check if function is used
+// - function_delete    -- $sel_func      -- delete the function
+// - display            --                -- display and set display parameters
+// - dispref_display    --                -- update one field display value
+// - dispref_level      --                -- update one field display position 
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,7 +77,8 @@ if (! $contact["popup"]) {
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
   $usr_q = run_query_userobm_active();
-  $display["search"] = html_contact_search_form($contact, $usr_q);
+  $func_q = run_query_function();
+  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
   } else {
@@ -88,7 +93,8 @@ if ($action == "ext_get_ids") {
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $usr_q = run_query_userobm_active();
-  $display["search"] = html_contact_search_form($contact, $usr_q);
+  $func_q = run_query_function();
+  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
   } else {
@@ -98,7 +104,8 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $usr_q = run_query_userobm_active();
-  $display["search"] = html_contact_search_form($contact, $usr_q);
+  $func_q = run_query_function();
+  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
   $display["result"] = dis_contact_search_list($contact);
   
 } elseif ($action == "new")  {
@@ -130,14 +137,9 @@ if ($action == "index" || $action == "") {
   if ($param_contact > 0) {
     $con_q = run_query_detail($param_contact);
     if ($con_q->num_rows() == 1) {
-      $dsrc_q = run_query_datasource();
-      $kind_q = run_query_kind();
-      $users = array($con_q->f("contact_marketingmanager_id"));
-      $usr_q = run_query_userobm_active($users);
-      $ctry_q = run_query_country();
       require("contact_js.inc");
       $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = html_contact_form($action, $con_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact);
+      $display["detail"] = dis_contact_form($action, $con_q, $contact);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
@@ -156,7 +158,8 @@ if ($action == "index" || $action == "") {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
       $usr_q = run_query_userobm_active();
-      $display["search"] = html_contact_search_form($contact, $usr_q);
+      $func_q = run_query_function();
+      $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
@@ -172,19 +175,16 @@ if ($action == "index" || $action == "") {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
 	$usr_q = run_query_userobm_active();
-        $display["search"] = html_contact_search_form($contact, $usr_q);
+	$func_q = run_query_function();
+        $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
       }
     }
 
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $dsrc_q = run_query_datasource();
-    $kind_q = run_query_kind();
-    $users = array($con_q->f("contact_marketingmanager_id"));
-    $usr_q = run_query_userobm_active($users);
-    $ctry_q = run_query_country();
-    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact);
+    require("contact_js.inc");
+    $display["detail"] = dis_contact_form($action, "", $contact);
   }
   
 } elseif ($action == "update")  {
@@ -201,12 +201,8 @@ if ($action == "index" || $action == "") {
     $display["detail"] = html_contact_consult($con_q);
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
-    $dsrc_q = run_query_datasource();
-    $kind_q = run_query_kind();
-    $users = array($con_q->f("contact_marketingmanager_id"));
-    $usr_q = run_query_userobm_active($users);
-    $ctry_q = run_query_country();
-    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact);
+    require("contact_js.inc");
+    $display["detail"] = dis_contact_form($action, "", $contact);
   }
   
 } elseif ($action == "check_delete")  {
@@ -223,12 +219,53 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
   $usr_q = run_query_userobm_active();
-  $display["search"] = html_contact_search_form($contact, $usr_q);
+  $func_q = run_query_function();
+  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-   $display["msg"] .= display_err_msg("Nothing admin here for now.");
-   
+  require("contact_js.inc");
+  $display["detail"] = dis_admin_index();
+
+} elseif ($action == "function_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_function_insert($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_func_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_func_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "function_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_function_update($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_func_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_func_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "function_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_function_links($contact);
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "function_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_function_delete($contact["function"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_func_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_func_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "contact", 1);
@@ -245,6 +282,7 @@ if ($action == "index" || $action == "") {
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   $display["detail"] = dis_contact_display_pref($pref_q);
+
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["doc_nb"] > 0) {
@@ -284,10 +322,11 @@ function get_param_contact() {
   global $action;
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
-  global $tf_func, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax, $sel_market;
-  global $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
+  global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
+  global $sel_market, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
+  global $tf_func;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
@@ -328,7 +367,8 @@ function get_param_contact() {
   if (isset ($tf_town)) $contact["town"] = $tf_town;
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
   if (isset ($sel_ctry)) $contact["ctry"] = $sel_ctry;
-  if (isset ($tf_func)) $contact["func"] = $tf_func;
+  if (isset ($sel_func)) $contact["function"] = $sel_func;
+  if (isset ($tf_title)) $contact["title"] = $tf_title;
   if (isset ($tf_phone)) $contact["phone"] = trim($tf_phone);
   if (isset ($tf_hphone)) $contact["hphone"] = trim($tf_hphone);
   if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
@@ -338,6 +378,10 @@ function get_param_contact() {
   if (isset ($cb_vis)) $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
+
+  // Admin - Kind fields
+  // $sel_func -> "function" is already set
+  if (isset ($tf_func)) $contact["func_label"] = $tf_func;
 
   // External param
   if (isset ($popup)) $contact["popup"] = $popup;

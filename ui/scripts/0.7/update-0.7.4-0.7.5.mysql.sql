@@ -9,7 +9,7 @@
 -- References Tables
 -------------------------------------------------------------------------------
 --
--- Table structure for the table  'DataSource'
+-- Table structure for the table 'DataSource'
 --
 CREATE TABLE DataSource (
   datasource_id int(8) DEFAULT '0' NOT NULL auto_increment,
@@ -23,7 +23,7 @@ CREATE TABLE DataSource (
 
 
 --
--- Table structure for the table  'Country'
+-- Table structure for the table 'Country'
 --
 CREATE TABLE Country (
   country_id int(8) DEFAULT '0' NOT NULL auto_increment,
@@ -36,6 +36,20 @@ CREATE TABLE Country (
   country_lang char(2),
   country_phone varchar(4),
   PRIMARY KEY (country_id)
+);
+
+
+--
+-- Table structure for the table 'Function'
+--
+CREATE TABLE Function (
+  function_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  function_timeupdate timestamp(14),
+  function_timecreate timestamp(14),
+  function_userupdate int(8),
+  function_usercreate int(8),
+  function_label varchar(64),
+  PRIMARY KEY (function_id)
 );
 
 
@@ -97,3 +111,10 @@ ALTER table Contact add column contact_country_id int(8) after contact_expresspo
 
 -- Add new column : contact_marketingmanager_id
 ALTER table Contact add column contact_marketingmanager_id int(8) after contact_kind_id;
+
+-- Change column : contact_function to contact_titel
+ALTER table Contact change column contact_function contact_title varchar(64);
+
+-- Add new column : contact_function_id
+ALTER table Contact add column contact_function_id int(8) after contact_country_id;
+

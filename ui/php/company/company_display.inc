@@ -1104,11 +1104,11 @@ function html_company_kind_form($kind_q) {
         </form>
       </td>
     </tr>
-    </table>
-";
+    </table>";
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Company Category section                                             //
@@ -1225,7 +1225,6 @@ function html_company_cat_form($cat_q) {
 
   return $block;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1623,6 +1622,7 @@ function html_select_company($comp_q, $company) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category Tree
 // Parameters:
@@ -1674,11 +1674,8 @@ function html_category_tree($category) {
   <input name=\"popup\" type=\"hidden\" value=\"1\" />
   <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
   </form>
-  </div>
-  ";
+  </div>";
 
-
-  
   return $block;
 }
 
@@ -1687,7 +1684,6 @@ function html_category_tree($category) {
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-
 function display_popup_tree($tree,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;

@@ -14,6 +14,7 @@ $l_firstname = "Prénom";
 $l_kind = "Genre";
 $l_market = "Responsable";
 $l_function = "Fonction";
+$l_title = "Titre";
 $l_hphone = "Tel personnel";
 $l_minihphone = "(Perso)";
 $l_mphone = "Tel mobile";
@@ -26,13 +27,19 @@ $l_country = "Pays";
 $l_comment = "Commentaire";
 $l_visibility ="Accès";
 $l_coord = "Coordonnées";
-
 $l_contact_name = "Nom Contact";
 $l_from_company = "&nbsp;&nbsp;Société";
 $l_telother = "Autres tel";
 $l_private = "Privé";
 $l_public = "Publique";
 $l_contact_select_company = "Sélectionner la société du Contact.";
+$l_func_manage = "Gestion des Fonctions";
+$l_func_exist = "Fonctions existantes";
+$l_func_no = "Pas de fonctions définies";
+$l_func_new = "Nouvelle Fonction";
+$l_kind_manage = "Gestion des Genre";
+$l_kind_exist = "Genre existants";
+$l_kind_new = "Nouveau Genre";
 
 // Titres
 $l_contact = "Contact";
@@ -42,6 +49,14 @@ $l_insert = "Enregistrer le Contact";
 $l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
 $l_delete = "Supprimer le Contact";
+$l_func_update = "Modifier la Fonction";
+$l_func_checkdelete = "Vérifier ou Supprimer la Fonction";
+$l_func_delete = "Supprimer la Fonction";
+$l_func_insert = "Créer la Fonction";
+$l_kind_update = "Modifier le Genre";
+$l_kind_checkdelete = "Vérifier ou Supprimer le Genre";
+$l_kind_delete = "Supprimer le Genre";
+$l_kind_insert = "Créer le Genre";
 $l_add = "Ajouter ces contacts";
 
 // Messages
@@ -63,7 +78,29 @@ $l_insert_ok = "L'insertion du contact a été correctement effectuée.";
 $l_insert_error = "L'insertion du contact a échoué !";
 $l_update_ok = "La modification du contact a été correctement effectuée";
 $l_update_error = "La modification du contact a échoué !";
-$l_query_error = "Problème en executant la requete";
+// Function messages
+$l_func_delete_ok = "La suppression de la fonction a été correctement effectuée.";
+$l_func_delete_error = "La suppression de la fonction a échoué !";
+$l_func_insert_ok = "L'insertion de la fonction a été correctement effectuée.";
+$l_func_insert_error = "L'insertion de la fonction a échoué !";
+$l_func_update_ok = "La modification de la fonction a été correctement effectuée";
+$l_func_update_error = "La modification de la fonction a échoué !";
+$l_func_link_contact = "Ces contacts ont cette fonction";
+$l_func_link_contact_no = "Pas de contacts de la fonction";
+$l_func_cant_delete = "La fonction ne peut être supprimée !";
+$l_func_can_delete = "La fonction peut être supprimée.";
+// Kind messages
+$l_kind_delete_ok = "La suppression du genre a été correctement effectuée.";
+$l_kind_delete_error = "La suppression du genre a échoué !";
+$l_kind_insert_ok = "L'insertion du genre a été correctement effectuée.";
+$l_kind_insert_error = "L'insertion du genre a échoué !";
+$l_kind_update_ok = "La modification du genre a été correctement effectuée";
+$l_kind_update_error = "La modification du genre a échoué !";
+$l_kind_link_contact = "Ces contacts sont du genre";
+$l_kind_link_contact_no = "Pas de contacts du genre";
+$l_kind_cant_delete = "Le contact ne peut être supprimé !";
+$l_kind_can_delete = "Le contact peut être supprimé.";
+
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
@@ -76,6 +113,10 @@ $l_j_check_hphone = "Le numéro de téléphone personnel n'est pas correct.";
 $l_j_check_mphone = "Le numéro de téléphone mobile n'est pas correct.";
 $l_j_check_fax = "Le numéro de fax n'est pas correct.";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+// JavaScript Messages - Functions
+$l_j_func_delete = "Sélectionnez une fonction pour la vérifier ou supprimer !";
+$l_j_func_update = "Vous devez sélectionner une fonction et entrer une modification avant de valider !";
+$l_j_func_create = "Vous devez saisir un label de fonction pour la créer !";
 
 // For the display preferences modification screen 
 $l_contact_display = "Options d'affichage des listes de contacts";

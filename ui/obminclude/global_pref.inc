@@ -217,7 +217,7 @@ if ($section == "COM") {
                    'Url' => "$path/admin_lang/admin_lang_index.php?mode=html",
                    'Right'=> $admini_lang_read);
   $menus["ADMINS"]["ADMIN_REF"] = array('Name'=> $l_header_admin_ref,
-                   'Ico' => "$ico_lang",
+                   'Ico' => "$ico_ref",
                    'Url' => "$path/admin_ref/admin_ref_index.php",
                    'Right'=> $admini_ref_read);
 

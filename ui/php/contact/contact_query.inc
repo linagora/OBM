@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_query.inc                                            //
 //     - Desc : contact query File                                           //
@@ -24,6 +24,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $email = $contact["email"];
   $company = $contact["company"];
   $market = $contact["marketing_manager"];
+  $func = $contact["function"];
   $archive = $contact["archive"];
 
   $query = "select
@@ -35,15 +36,19 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       contact_marketingmanager_id,
       contact_lastname,
       contact_firstname,
-      contact_function,
+      contact_function_id,
       contact_phone,
       contact_homephone,
       contact_mobilephone,
       contact_email,
       contact_archive,
       contact_visibility,
-      company_name as contact_company_name, company_phone
-    from Contact, Company
+      company_name as contact_company_name,
+      company_phone,
+      function_label
+    from Contact
+        left join Function on contact_function_id=function_id,
+      Company
     where";
 
   // If a contact indication has been specified, get it 
@@ -71,6 +76,10 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
     $query .= " $and contact_marketingmanager_id='$market' and";
+  }
+  // If a function has been set
+  if (($func != $c_all) && ($func != "")) { 
+    $query .= " $and contact_function_id='$func' and";
   }
   // Get only not archived by default
   if ($archive != "1") {
@@ -103,7 +112,9 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
 function run_query_contact_company($c_id) {
   global $cdg_sql;
 
-  $query = "select company_id, company_name, company_phone from Company where company_id='$c_id'";
+  $query = "select company_id, company_name, company_phone
+    from Company
+    where company_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -132,6 +143,26 @@ function run_query_kind() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Contact: Function select query execution
+// Returns:
+//   DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function() {
+  global $cdg_sql;
+
+  $query = "select function_id, function_label
+    from Function
+    order by function_label";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Contact detail query execution                                            //
 // Parameters:
 //   - $p_id : contact id
@@ -148,6 +179,7 @@ function run_query_detail($p_id) {
         kind_minilabel,
         m.userobm_lastname as market_lname,
         m.userobm_firstname as market_fname,
+        function_label,
         country_name,
         datasource_name,
         c.userobm_login as usercreate,
@@ -157,6 +189,7 @@ function run_query_detail($p_id) {
         left join Company on contact_company_id=company_id
         left join Kind on kind_id=contact_kind_id
         left join UserObm as m on contact_marketingmanager_id=m.userobm_id
+        left join Function on contact_function_id=function_id
         left join Country on contact_country_id=country_id
         left join DataSource on contact_datasource_id=datasource_id
         left join UserObm as c on contact_usercreate=c.userobm_id
@@ -213,7 +246,8 @@ function run_query_insert($contact) {
   $town = $contact["town"];
   $cdx = $contact["cdx"];
   $ctry = $contact["ctry"];
-  $func = $contact["func"];
+  $func = $contact["function"];
+  $title = $contact["title"];
   $phone = $contact["phone"];
   $hphone = $contact["hphone"];
   $mphone = $contact["mphone"];
@@ -241,7 +275,8 @@ function run_query_insert($contact) {
     contact_town,
     contact_expresspostal,
     contact_country_id,
-    contact_function,
+    contact_function_id,
+    contact_title,
     contact_phone,
     contact_homephone,
     contact_mobilephone,
@@ -269,6 +304,7 @@ function run_query_insert($contact) {
     '$cdx',
     '$ctry',
     '$func',
+    '$title',
     '$phone',
     '$hphone',
     '$mphone',
@@ -321,7 +357,8 @@ function run_query_update($contact) {
   $town = $contact["town"];
   $cdx = $contact["cdx"];
   $ctry = $contact["ctry"];
-  $func = $contact["func"];
+  $func = $contact["function"];
+  $title = $contact["title"];
   $phone = $contact["phone"];
   $hphone = $contact["hphone"];
   $mphone = $contact["mphone"];
@@ -348,7 +385,8 @@ function run_query_update($contact) {
     contact_town='$town',
     contact_expresspostal='$cdx',
     contact_country_id='$ctry',
-    contact_function='$func',
+    contact_function_id='$func',
+    contact_title='$title',
     contact_phone='$phone',
     contact_homephone='$hphone',
     contact_mobilephone='$mphone',
@@ -642,5 +680,123 @@ function get_contact_company_id($con_id) {
 }
 
 
-</SCRIPT>
+///////////////////////////////////////////////////////////////////////////////
+// Function insertion query construction and execution                       //
+// Parameters:
+//   - $contact : contact hash info : keys used : func_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function_insert($contact) {
+  global $auth, $cdg_sql;
 
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $function = $contact["func_label"];
+
+  $query = "insert into Function (
+    function_timecreate,
+    function_usercreate,
+    function_label)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$function')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Function update query execution                                           //
+// Parameters:
+//   - $contact : contact hash info : keys used : function, func_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function_update($contact) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $contact["function"];
+  $function = $contact["func_label"];
+
+  $query = "update Function set
+      function_label='$function',
+      function_timeupdate='$timeupdate',
+      function_userupdate='$userupdate'
+    where
+      function_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Function deletion query execution                                         //
+// Parameters:
+//   - $id : Function id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from Function where function_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Fuction - Contact links query execution                                   //
+// Parameters:
+//   - $id : function id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function_links($id) {
+  global $cdg_sql;
+
+  $query = "select contact_lastname,
+      contact_firstname,
+      contact_id,
+      contact_function_id
+    from Contact where contact_function_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a function from its id
+// Parameters:
+//   - $id : function id
+///////////////////////////////////////////////////////////////////////////////
+function get_function_label($id) {
+  global $cdg_sql;
+
+  $query = "select function_label
+    from Function
+    where function_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("function_label");
+  return $retour;
+}
+
+
+</script>
