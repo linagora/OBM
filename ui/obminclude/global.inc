@@ -172,6 +172,13 @@ $time_write	 	= $prod_read + $prod_write;
 $time_admin_read 	= $prod_admin_read;
 $time_admin_write	= $prod_admin_read + $prod_admin_write;
 			////////////
+			//PROJECT //
+			////////////
+$project_read		= $prod_read;
+$project_write	 	= $prod_read + $prod_write;
+$project_admin_read 	= $prod_admin_read;
+$project_admin_write	= $prod_admin_read + $prod_admin_write;
+			////////////
 			//CONTRACT//
 			////////////
 $contract_read		= $prod_read;

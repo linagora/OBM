@@ -7,21 +7,17 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// Headers
-$l_header_stats = "Statistiques";
-$l_header_view = "Vue mensuelle";
-$l_header_globalview = "Vue générale";
-
 // for list
 $l_task_fac = "Taches Facturées";
-$l_task_int = "Taches Internes";
+$l_task_div = "Taches Diverses";
+$l_task_int = "Tâches Internes";
 
 // Database fields
 $l_date_task="Date tâche";
 $l_tasktype = "Type tâche";
 $l_tasklabel="Label tâche";
 $l_deallabel="Projet/Affaire";
-$l_task_del="Supprimer ?";
+$l_task_del="Suppr";
 $l_company = "Société";
 $l_delete = "Supprimer les tâches";
 $l_length="Durée";
@@ -33,6 +29,8 @@ $l_day="Jour";
 $l_period="Période";
 
 $l_task_del="Suppr.";
+$l_from = "du";
+$l_to = "au";
 $l_week="Semaine";
 $l_month="Mois";
 $l_month2="Mois de";
@@ -44,6 +42,7 @@ $l_valid = "Valider";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 $l_fill= "compléter";
+$l_intern = "Interne";
 
 $l_week_next = "Semaine suivante";
 $l_week_prev = "Semaine précédente";
@@ -62,6 +61,15 @@ $total_companies="Total par société";
 $total_projects="Total par projet/affaire";
 $l_workingdays ="Jours ouvrés";
 $l_workingdays2 ="jours ouvrés";
+
+// short names for days
+$l_daysofweekshort = array (	'Dim',
+				'Lun',
+				'Mar',
+				'Mer',
+				'Jeu',
+				'Ven',
+				'Sam');
 
 // Titres
 $l_time = "Gestion des temps";

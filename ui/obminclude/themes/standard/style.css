@@ -822,5 +822,101 @@ a.agendaLink4:active	{ font-family: sans-serif; font-size: 13px;color: #3366cc b
 a.agendaLink4:hover	{ font-family: sans-serif; font-size: 13px;color: #000099; background-color: transparent; }
 
 
+/* ///////////////////TIME/////////////////// */
+/* //////  Time table style definition  ///// */
+/* ////////////////////////////////////////// */
 
+td.timePeriod			{
+	color:			#49627a;
+ 	text-align: 		center; 
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		15px;
+	font-weight: 		800;
+        width			300px;
+	}
 
+td.timeLinks			{
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		10px;
+	font-weight: 		80;
+/*        width			300px;*/
+	}
+
+th.timeTask			{
+	background-color:	#a6b8ca;
+ 	text-align: 		left; 
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		12px;
+	font-weight: 		80;
+/*        width			300px;*/
+	}
+
+td.timeTask			{
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		12px;
+	font-weight: 		80;
+/*        width			300px;*/
+	}
+
+tr.timeHeader			{
+	background-color:	#a6b8ca;
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	/*font-size: 		10px;*/
+/*	font-weight: 		80;*/
+ /*       width			300px;*/
+	}
+
+tr.timeUnvalid			{
+	background-color:	#ffcc00;
+ 	text-align: 		left; 
+	vertical-align: 	middle;
+/* 	font-family: 		sans-serif;*/
+	font-size: 		10px;
+/*	font-weight: 		800;*/
+	}
+
+tr.timeValid			{
+	background-color:	#eeeeee;
+ 	text-align: 		left; 
+	vertical-align: 	middle;
+/* 	font-family: 		sans-serif;*/
+	font-size: 		20px;
+/*	font-weight: 		800;*/
+	}
+
+td.timeWorkdayHead 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+}
+
+td.timeOffdayHead 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	font-weight:		bold;
+	color:			#ffff00;
+	text-align:		center;
+	background-color:	#93919c;
+}
+
+td.timeWorkday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#000000;
+	text-align:		center;
+}
+
+td.timeOffday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#ffff00;
+	text-align:		center;
+	background-color:	#93919c;
+}

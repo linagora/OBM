@@ -111,6 +111,7 @@ $l_header_account = "Comptes";
 $l_header_invoice = "Factures";
 $l_header_payment = "Paiements";
 $l_header_time = "Gestion des temps";
+$l_header_project = "Projets";
 $l_header_agenda = "Agenda";
 
 $l_header_new_f = "Nouvelle";
@@ -130,6 +131,7 @@ $l_header_dupplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
+$l_header_add_member = "Ajouter participant";
 
 $l_header_reset = "Préférence par défaut";
 

@@ -126,7 +126,7 @@ $menus["COM"]    = array('Name' => $l_header_com,
                          'Url'  => "$path/company/company_index.php",
                          'Right'=> $com_read);
 $menus["PROD"]   = array('Name' => $l_header_prod,
-                         'Url'  => "$path/contract/contract_index.php",
+                         'Url'  => "$path/time/time_index.php",
                          'Right'=> $prod_read);
 $menus["COMPTA"] = array('Name' => $l_header_compta,
                          'Url'  => "$path/account/account_index.php",
@@ -170,6 +170,10 @@ if ($section == "COM") {
                                       'Ico' => "$ico_time",
 			              'Url' => "$path/time/time_index.php",
 			              'Right'=> $time_read);
+  $menus["PROD"]["PROJECT"]  = array('Name'=> $l_header_project,
+                                      'Ico' => "$ico_project",
+			              'Url' => "$path/project/project_index.php",
+			              'Right'=> $project_read);
   $menus["PROD"]["CONTRACT"] = array('Name' => $l_header_contract,
 			           'Ico' => "$ico_contract",
   			           'Url' => "$path/contract/contract_index.php",

@@ -339,7 +339,7 @@ class OBM_DISPLAY {
 	//------------------------------
 	// Format dates
 	if (substr($fieldname,0,5) == "date_") {
-	  $name = date_format($this->data_set->f($fieldname));
+	  $name =date_format($this->data_set->f($fieldname));
 	}
 	elseif ($fieldname == "timeupdate") {
 	  $name = datetime_format($this->data_set->f($fieldname));
