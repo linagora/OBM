@@ -90,6 +90,7 @@ $cgp_show["module"]["list"] = true;
 $cgp_show["module"]["agenda"] = true;
 $cgp_show["module"]["todo"] = true;
 $cgp_show["module"]["publication"] = true;
+$cgp_show["module"]["statistic"] = false;
 $cgp_show["module"]["time"] = true;
 $cgp_show["module"]["project"] = true;
 $cgp_show["module"]["contract"] = true;
@@ -101,7 +102,6 @@ $cgp_show["module"]["payment"] = true;
 $cgp_show["module"]["settings"] = true;
 $cgp_show["module"]["user"] = true;
 $cgp_show["module"]["group"] = true;
-$cgp_show["module"]["statistic"] = true;
 
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");

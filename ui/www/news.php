@@ -19,7 +19,7 @@
     <ul class="detailList">
 
       <li>
-        <div align="left"><b>2004-04-21</b> : version <b>0.8.1</b> released (fixes)
+        <div align="left"><b>2004-04-22</b> : version <b>0.8.1</b> released (fixes)
         <ol>
           <li> Corrected some action rights on deal, document and user modules
           <li> Corrected problem that prevent inserting Category with IE 6

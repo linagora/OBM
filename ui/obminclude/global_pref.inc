@@ -213,21 +213,19 @@ if ($section == "COM") {
                                   'Url' => "$path/todo/todo_index.php",
                                   'Right'=> $cright_read);
   }
-
   if ($cgp_show["module"]["publication"]) {
     $menus["COM"]["PUBLICATION"] = array('Name'=> $l_header_publication,
 			           'Ico' => "$ico_publication",
 			           'Url' => "$path/publication/publication_index.php",
 			           'Right'=> $cright_read);
   }
-
   if ($cgp_show["module"]["statistic"]) {
     $menus["COM"]["STATISTIC"] = array('Name'=> $l_header_statistic,
 			           'Ico' => "$ico_statistic",
 			           'Url' => "$path/statistic/statistic_index.php",
 			           'Right'=> $cright_read);
   }
-  //  print_r($menus["COM"]);
+
 } elseif ($section == "PROD") {
 
   if ($cgp_show["module"]["time"]) {

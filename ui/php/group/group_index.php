@@ -25,6 +25,7 @@
 // - dispref_level   --                -- update one field display position 
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple groups (return id) 
+// - ext_get_ids_sel --                -- select multiple groups (fill select) 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -63,19 +64,10 @@ if (! $group["popup"]) {
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_ids") {
+if (($action == "ext_get_ids") || ($action == "ext_get_ids_sel")) {
   $display["search"] = html_group_search_form($group);
   if ($set_display == "yes") {
     $display["result"] = dis_group_search_group($group, $popup);
-  } else {
-    $display["msg"] .= display_info_msg($l_no_display);
-  }
-}
-
-elseif ($action == "ext_get_group") {
-  $display["search"] = html_get_group_search_form($group);
-  if ($set_display == "yes") {
-    $display["result"] = dis_get_group_search_group($group, $popup);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
@@ -96,11 +88,7 @@ else if ($action == "search") {
   $display["search"] = html_group_search_form($group);
   $display["result"] = dis_group_search_group($group, $popup);
 }
-else if ($action == "getsearch") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_get_group_search_form($group);
-  $display["result"] = dis_get_group_search_group($group, $popup);
-}
+
 else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_group_form($action, "", $group);
@@ -258,7 +246,7 @@ else if ($action == "detailupdate") {
   $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
 }
 
-else if($action == "dispref_display") {
+else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($uid, "group", 1);
@@ -289,10 +277,10 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_group() {
-  global $param_group, $cdg_param, $popup, $child_res;
+  global $action, $param_group, $cdg_param, $popup, $child_res;
   global $new_order, $order_dir, $entity;
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
+  global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   // Group fields
@@ -316,6 +304,7 @@ function get_param_group() {
   if (isset ($ext_id)) $group["ext_id"] = $ext_id;
   if (isset ($ext_id)) $group["id"] = $ext_id;
   if (isset ($ext_target)) $group["ext_target"] = $ext_target;
+  if (isset ($ext_widget)) $group["ext_widget"] = $ext_widget;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -374,7 +363,6 @@ function get_group_action() {
 
 // Search
   $actions["GROUP"]["search"] = array (
-    'Url'      => "$path/group/group_index.php?action=new",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   );
@@ -434,6 +422,12 @@ function get_group_action() {
 
 // Ext get Ids : external Group selection
   $actions["GROUP"]["ext_get_ids"] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                    	  );
+
+// Ext get Ids in a select : external Group selection
+  $actions["GROUP"]["ext_get_ids_sel"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     	  );

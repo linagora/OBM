@@ -1768,7 +1768,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   $dis_min_e .= "</select>";
   $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
   $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[5]";
-  $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]&amp;ext_title=" . urlencode($l_agenda_select_group);
+  $url2 = "$path/group/group_index.php?action=ext_get_ids_sel&amp;popup=1&amp;ext_target=forms[0].elements[6]&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_agenda_select_group);
 
 
   // --- HTML Template --------------------------------------------------------

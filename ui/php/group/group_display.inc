@@ -86,12 +86,14 @@ function html_group_search_form ($group) {
   if ($popup) {
     $ext_action = $group["ext_action"];
     $ext_target = $group["ext_target"];
+    $ext_widget = $group["ext_widget"];
     $ext_url = $group["ext_url"];
     $ext_id = $group["ext_id"];
     $ext_title = stripslashes($group["ext_title"]);
     $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+      <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display["title"] = "<div class=\"title\">$ext_title</div>";
@@ -142,9 +144,10 @@ function html_group_search_form ($group) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_group_search_group($group, $popup=false) {
   global $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $action, $display, $auth, $new_order, $order_dir;
 
   $child_res = $group["children_restriction"];
+  $widget = $group["ext_widget"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "group");
   if ($child_res) {
@@ -157,7 +160,11 @@ function dis_group_search_group($group, $popup=false) {
   if ($nb_group == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
+    if ($widget == "") {
+      $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
+    } else {
+      $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
+    }
   }
 
   return $block;
@@ -178,14 +185,16 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   global $display, $l_found, $l_add, $l_close;
 
   $child_res = $group["children_restriction"];
+  $widget = $group["ext_widget"];
 
   if ($popup) {
     $ext_action = $group["ext_action"];
     $ext_url = $group["ext_url"];
     $ext_target = $group["ext_target"];
+    $ext_widget = $group["ext_widget"];
     $ext_id = $group["ext_id"];
     $ext_title = urlencode(stripslashes($group["ext_title"]));
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;child_res=$child_res";
   }
 
   $name = urlencode(stripslashes($group["name"]));
@@ -199,13 +208,20 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
     $dis_group->data_cb_text = "X";
     $dis_group->data_idfield = "group_id";
     $dis_group->data_cb_name = "cb_g";
-    $display_popup_head = "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
+    if ($widget == "") {
+      $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";
+    } else {
+      $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";
+      $input_target = "<input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />";
+    }
+    $display_popup_head = "<form $form_attr>";
     $display_popup_end = "
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
       <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_group\" value=\"$ext_id\" /> 
-      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" /> 
+      <input type=\"hidden\" name=\"param_group\" value=\"$ext_id\" />
+      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+      $input_target
     </p>
     </p>
     </form>
@@ -224,146 +240,6 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Group search Form                                                 //
-// Parameters : 
-//   - $group[]   : default form values
-//     keys used  : name, user
-///////////////////////////////////////////////////////////////////////////////
-function html_get_group_search_form ($group) {
-  global $display, $l_name, $l_group_user, $l_email, $l_find;
-
-  $popup = $group["popup"];
-
-  if ($popup) {
-    $ext_action = $group["ext_action"];
-    $ext_target = $group["ext_target"];
-    $ext_url = $group["ext_url"];
-    $ext_id = $group["ext_id"];
-    $ext_title = stripslashes($group["ext_title"]);
-    $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
-      <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-      <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-      <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-      <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
-  }
-  
-  // --- Var preparation ------------------------------------------------------
-
-  $name = stripslashes($group["name"]);
-  $email = stripslashes($group["email"]);
-  $user = stripslashes($group["user"]);
-
-  // --- HTML Page display ----------------------------------------------------
-
-  $block = "
-  <form method=\"get\" name=\"f_group\" action=\"".url_prepare("group_index.php")."\">
-  <div class=\"search\">
-
-    <div class=\"searchLabel\">$l_name<br />
-      <input name=\"tf_name\" size=\"16\" maxlength=\"16\" value=\"$name\" />
-    </div>
-    <div class=\"searchLabel\">$l_group_user<br />
-      <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
-    </div>
-    <div class=\"searchLabel\">$l_email<br />
-      <input name=\"tf_email\" size=\"20\" maxlength=\"20\" value=\"$email\" />
-    </div>
-    <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"action\" type=\"hidden\" value=\"getsearch\" />
-      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      $ext
-    </div>
-    <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Group search result                                           //
-// Parameters:
-//   - $group[]   : group search criteria
-//     keys used  : name, description, email
-//   - $popup     : if true, doesn't display links and display checkbox
-///////////////////////////////////////////////////////////////////////////////
-function dis_get_group_search_group($group, $popup=false) {
-  global $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "group");
-  //$obm_q = run_query_search_possible_children($group,$new_order, $order_dir);
-  $obm_q = run_query_search($group, $new_order, $order_dir);
-
-  $nb_group = $obm_q->num_rows();
-  if ($nb_group == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
-  } else {
-    $block = html_get_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Group search result                                      //
-// Parameters : 
-//   - $obm_q     : list of the groups to display 
-//   - $pref_q    : the fields which have to be displayed
-//   - $nb_group  : nb groups returned by the search query 
-//   - $group[]   : group search criteria
-//     keys used  : name, user
-//   - $popup     : if true, doesn't display links and display checkbox
-///////////////////////////////////////////////////////////////////////////////
-function html_get_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
-  global $l_found, $l_add, $l_close;
-
-  $ext_action = $group["ext_action"];
-  $ext_url = $group["ext_url"];
-  $ext_target = $group["ext_target"];
-  $ext_id = $group["ext_id"];
-  $ext_title = urlencode(stripslashes($group["ext_title"]));
-  $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title";
-
-  $name = urlencode(stripslashes($group["name"]));
-  $user = urlencode(stripslashes($group["user"]));
-
-  $url = url_prepare("group_index.php?action=search&amp;tf_name=$namet&amp;tf_user=$user$url_ext");
-  
-  $dis_group = new OBM_DISPLAY("DATA", $pref_q);
-  $dis_group->display_link = false;
-  $dis_group->data_cb_text = "X";
-  $dis_group->data_idfield = "group_id";
-  $dis_group->data_cb_name = "cb_g";
-  $display_popup_head = "<form  onsubmit=\"fill_ext_form(this);return false;\">";
-  $display_popup_end = "
-  <p class=\"detailButton\">
-  <p class=\"detailButtons\">
-    <input type=\"submit\" value=\"$l_add\" />
-    <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
-    <input name=\"popup\" type=\"hidden\" value=\"1\" />
-    <input name=\"action\" type=\"hidden\" value=\"ext_get_group\">
-  </p>
-  </p>
-  </form>
-    <p><a href=\"\" onclick='window.close();'>$l_close</a></p>";
-
-  $dis_group->data_set = $obm_q;
-  $dis_group->data_url = $url;
-
-  // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_ok_msg("$nb_group $l_found");
-  $block .= $display_popup_head;
-  $block .= $dis_group->display("dis_data_group");
-  $block .= $display_popup_end;
-
-  return $block;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Group Form                                                        //
