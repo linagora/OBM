@@ -11,8 +11,8 @@ Ce module est une gestion de société, souvent appelée \textbf{pages jaunes} perm
 
 C'est un module central dans OBM car de nombreux autres modules utilisent \company (comme Affaire, Projet, Contrat,..).
 
-De nombreux attribus permettent de décrire une société.
-Afin de couvrir des utilisations diverses plusieurs attribus peuvent être désactivés et ne pas apparaître dans l'application.
+De nombreux attributs permettent de décrire une société.
+Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.
 
 Le module \company bénéficie d'une recherche avancée (recherche phonétique et approchée).
 
@@ -30,7 +30,9 @@ Numéro & Un numéro de référence pour la société.\\
 \hline
 Source de données & Identification de l'origine de l'information.\\
 \hline
-Archive & Etat d'archivage de la société. Une société archivée ne pourra plus être modifiée.\\
+Archive & Etat d'archivage de la société. Une société archivée ne pourra plus être modifiée 
+% %PC
+et n'apparaitra pas dans les résultats de recherche par défaut.\\
 \hline
 Type & Classification de la société (client, propect, fournisseur,...).\\
 \hline
@@ -56,7 +58,7 @@ Commentaire & Commentaire sur la société.\\
 \vspace{0.3cm}
 
 
-Les attribus suivant peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+Les attributs suivants peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
 
 \begin{itemize}
 \item Numéro
@@ -76,7 +78,7 @@ Les catégories sont administrables par la menu ``Administration'' du module \com
 
 Par exemple : des secteurs géographiques, des secteurs d'activité détaillés, une classification interne (selon des produits, cibles...).
 
-Les catégories peuvent être organisées hiérarchiquement (avec une profondeur de 3 niveaux) par exemple :\\
+Les catégories peuvent être organisées hiérarchiquement (avec une profondeur de 3 niveaux maximum) par exemple :\\
 
 \begin{tabular}{|p{3cm}|p{10cm}|}
 \hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
@@ -104,7 +106,7 @@ Les catégories peuvent être organisées hiérarchiquement (avec une profondeur de 
 
 \subsubsection{Les liens d'une société}
 
-Le module \company étant central à OBM de nombreux liens sont disponibles depuis une société et permettent d'accéder directement aux entités liées à cette société :\\
+Le module \company étant central à OBM, de nombreux liens sont disponibles depuis une société et permettent d'accéder directement aux entités liées à cette société :\\
 
 \begin{itemize}
 \item Contact
@@ -122,7 +124,7 @@ Le module \company comporte 7 sous-menus (accessibles selon les droits d'accès) 
 \hline
 \textbf{Nom} & \textbf{Action / Description} \\
 \hline
-Chercher & Recherche multicritères et avancée des sociétés \\
+Chercher & Recherche multicritère et avancée des sociétés \\
 \hline
 Nouveau & Créer une nouvelle société.\\
 \hline
@@ -175,17 +177,18 @@ La recherche avancée cumule une recherche phonétique et approchée.\\
 
 La recherche phonétique permet de chercher sur la signature sonore du nom (par exemple la recherche d'''Alliacom'' trouvera ``Aliacom'', ou la recherche de ``restorant'' trouvera ``restaurant'').\\
 
-La recherche avancée est une recherche ne tenant pas compte de divers caracères (par exemple la recherche d'''edf'' trouvera ``E.D.F'', ou la recherche de ``lautre'' trouvera ``l'autre'') par l'utilisation du champ ``Aussi connue comme''.
+La recherche avancée est une recherche ne tenant pas compte de divers caracères (par exemple la recherche d'''edf'' trouvera ``E.D.F'', ou la recherche de ``lautre'' trouvera ``l'autre''). Ce mode de recherche s'appuie sur le champ ``Aussi connue comme'', généré automatiquement par l'application.
 
+% %PC ne devrait-on pas masquer ce champ ?
 
 \subsubsection{Le sous-menu : Nouveau}
 
 Ce menu permet de créer une société.
 
-Pour insérer la société saisie il faut cliquer sur le bouton ``Enregistrer la société''.
+Pour insérer la société saisie, il faut cliquer sur le bouton ``Enregistrer la société''.
 
 Si des sociétés similaires existent déjà (possédant un nom ressemblant, même racine), avant d'insérer la nouvelle société, \obm affiche une page d'alerte présentant les sociétés similaires et permet de continuer l'insertion ou de l'annuler.
-Ceci est particulièrement utile lorsque une société déjà existante est créée à nouveau, et permet d'éviter la saisie de doublons..
+Ceci est particulièrement utile lorsque une société déjà existante est créée à nouveau, et permet d'éviter la saisie de doublons.
 
 Le champ ``aussi connue sous'' est rempli automatiquement avec une version simplifiée du nom.
 
@@ -217,6 +220,10 @@ Si la société peut être supprimée, un bouton ``Supprimer la société'' est alors 
 \item Etre référencée dans les contrats
 \item Etre référencée dans les documents.
 \end{itemize}
+
+% %PC
+Cette fonctionnalité ne doit servir qu'en cas de fausse manipulation suite à la création d'une société. On préfèrera l'option d'archivage pour masquer (dans le mode de consultation standard) une société aux utilisateurs.
+
 
 \subsubsection{Le sous-menu : Administrer}
 
