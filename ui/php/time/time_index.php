@@ -67,7 +67,7 @@ else if (isset($s_users)) {
   //  if (count($s_users) == 1)
   //$time["user_id"] = $s_users[0];
     //else
-    $time["user_id"] = $s_users;
+  $time["user_id"] = $s_users;
 
   if (debug_level_isset($cdg_param)) {
 	echo "variable de session \$s_users is set : ". $s_users ." <br>";
@@ -240,7 +240,7 @@ elseif ($action == "insert") {
   dis_time_links($time,"week");
 
   run_query_insert($time);
-  run_query_validate($time["user_id"][0]);
+  run_query_validate($time["user_id"]);
 
   // bcontins planning hebdomadaire
   dis_time_index($time);
@@ -303,7 +303,7 @@ elseif ($action == "delete") {
   dis_time_links($time,"week");
 
   run_query_delete($HTTP_POST_VARS);
-  run_query_validate($time["user_id"][0]);
+  run_query_validate($time["user_id"]);
 
   // bcontins planning hebdomadaire
   dis_time_index($time);
@@ -325,6 +325,8 @@ elseif ($action == "update") {
     $obm_tasktype_q = run_query_tasktype($time["user"]);
     // Project
     $obm_project_q = run_query_project($time);
+    // ProjectTask
+    $obm_projecttask_q = run_query_projecttask($time);
     //get the current start and end of week
     $d_start_week = first_day_week($time);
     // Creating the dates for the selected (or current) date
@@ -335,6 +337,7 @@ elseif ($action == "update") {
 
     dis_form_addtask("update",
 		     $obm_project_q, 
+		     $obm_projecttask_q, 
 		     $obm_tasktype_q, 
 		     $day_q, 
 		     $c_day_fraction, 
@@ -344,9 +347,9 @@ elseif ($action == "update") {
 
   else {
     run_query_update($time);
-    run_query_validate($time["user_id"]["0"]);
+    run_query_validate($time["user_id"]);
   
-    $user_id = $time["user_id"]["0"];
+    $user_id = $time["user_id"];
     
     echo "
     <Script language=\"javascript\">
@@ -376,9 +379,10 @@ if ($popup != 2)
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_time() {
   // Forms parameters
-  global $sel_date, $sel_tasktype, $sel_project, $sel_time, $tf_label, $task_id;
+  global $sel_date, $sel_tasktype, $sel_time, $tf_label, $task_id;
+  global $sel_project, $sel_projecttask;
 
-  global $tf_lweek, $f_time, $sel_user_id, $user_id, $cb_day, $rd_day, $cb_allusers;
+  global $tf_lweek, $f_time, $sel_user_id, $cb_day, $rd_day, $cb_allusers;
   //global $st_detail;
 
   // URLs parameters
@@ -388,11 +392,12 @@ function get_param_time() {
   if (isset ($action)) $task["action"] = $action;
   if (isset ($sel_tasktype)) $task["tasktype"] = $sel_tasktype;
   if (isset ($sel_project)) $task["project"] = $sel_project;
+  if (isset ($sel_projecttask)) $task["projecttask"] = $sel_projecttask;
   if (isset ($sel_time)) $task["time"] = $sel_time;
   if (isset ($tf_label)) $task["label"] = $tf_label;
   if (isset ($f_time)) $task["f_time"] = $f_time;
+//   if (isset ($user_id)) $task["user_id"] = $user_id;
   if (isset ($sel_user_id)) $task["user_id"] = $sel_user_id;
-  if (isset ($user_id)) $task["user_id"] = $user_id;
   if (isset ($cb_allusers)) $task["allusers"] = $cb_allusers;
   if (isset ($submit)) $task["submit"] = $submit;
   if (isset ($wbegin)) $task["date"] = $wbegin;

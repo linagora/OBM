@@ -42,12 +42,12 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme;
   global $time; // ???? Pour quoi ???
 
-  if (($fieldname == "task_id")
-      && ($OD->data_set->f("task_status")==0) ) {
+  if (($fieldname == "timetask_id")
+      && ($OD->data_set->f("timetask_status")==0) ) {
     $res["popup"] = true;
     $res["popup_width"] = 970;
     $res["popup_height"] = 270;
-    $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+    $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("timetask_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
     $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\">";
   }
 
@@ -223,7 +223,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
 	$period = $l_month;
 
   if (in_array($uid, $project_managers)) {
-    $sel_user_id = $time["user_id"]["0"];
+    $sel_user_id = $time["user_id"];
   
     // UserObm Select
     $sel_user = "<select name=\"sel_user_id\" size=6>";
@@ -422,11 +422,14 @@ function dis_time_list($time) {
   $obm_tasktype_q = run_query_tasktype($time["user_id"]);
   // Project
   $obm_project_q = run_query_project($time);
+  // ProjectTask
+  $obm_projecttask_q = run_query_projecttask($time);
 
   // dis_form_addtask does not display anything if days are full
   //   and validated
   dis_form_addtask("insert", 
                    $obm_project_q, 
+                   $obm_projecttask_q, 
                    $obm_tasktype_q, 
                    $day_q,
                    $c_day_fraction,
@@ -673,16 +676,16 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 
   while ($task_q->next_record()) {
 
-    $status = $task_q->f("task_status");
+    $status = $task_q->f("timetask_status");
 
     $taskid =  $task_q->f("Id");
     $date = $task_q->f("date_task");
     $date = date("$set_date", $date);
-    $company = $task_q->f("task_company_name");
-    $deal = $task_q->f("task_deal_label");
-    $task = $task_q->f("task_label");
+    $company = $task_q->f("timetask_company_name");
+    $deal = $task_q->f("timetask_deal_label");
+    $task = $task_q->f("timetask_label");
     $tt = $task_q->f("tasktype_label");
-    $length = $task_q->f("task_length");
+    $length = $task_q->f("timetask_length");
 
     if ($status != 0)
       $tab_tasks .= "<tr class=\"timeValid\">\n";
@@ -1288,7 +1291,8 @@ function dis_table_title($message) {
 //    
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$time, $validate_days) {
+function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
+                          $day_q, $fraction_t, $time, $validate_days) {
 
   global $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
   global $l_add, $task_list, $l_none;
@@ -1322,23 +1326,12 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   if ($action == "update") {
     $task_id = $time["task_id"];
     $task_to_be_modify = run_query_get_task($task_id);
-    $is_day = substr($task_to_be_modify->f("task_date"),0,8);
-    $is_tt = $task_to_be_modify->f("task_tasktype_id");
-    $is_proj = $task_to_be_modify->f("task_deal_id");
-    $is_time = $task_to_be_modify->f("task_length");
+    $is_day = substr($task_to_be_modify->f("timetask_date"),0,8);
+    $is_tt = $task_to_be_modify->f("timetask_tasktype_id");
+    $is_proj = $task_to_be_modify->f("timetask_project_id");
+    $is_time = $task_to_be_modify->f("timetask_length");
   }
 
-// Day radio construction
-//     $sel_day = "<select name=sel_date>";
-//     for ($day=0;$day< sizeof($day_q);  $day++) {    
-//       if(sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]])) continue;
-//       $dlabel = $day_q[$day][0];
-//       $sel_day .= "<option value=\"".$day_q[$day][1]."\"";
-//       if ($is_day == $day_q[$day][1]) $sel_day .= " selected"; 
-//       $sel_day .= ">$dlabel</option>\n";
-//     }
-//     $sel_day .= "</select>";
-//   }
   
 //   // Day check construction
   if ($action == "update") {
@@ -1406,9 +1399,45 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   $script .= "\n</script>\n\n";
 
 
+  // data array for the projecttask dynamic list construction
+  // the generated array is used by fill_project()
+  $previous_dl = 0;
+  $projtask_data = "\nprojecttask = new Array (";
+
+  while($projecttask_q->next_record()) {
+    $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
+    $projtask_id = $projecttask_q->f("projecttask_id");
+    
+    $projtask_label = "\"". $projecttask_q->f("projecttask_label") ."\"";
+
+    if ($previous_dl != $projtask_dl) {
+      if ($previous_dl != 0) {
+        $projtask_data .= "\n),";
+      }
+
+      $projtask_data .= "\nnew Array (\n". $projtask_dl .",\n";
+      $previous_dl = $projtask_dl;
+    }
+    else {
+      $projtask_data .= ",\n";
+    }
+
+    $projtask_data .= "new Array(". $projtask_label .", ". $projtask_id .")";
+
+  }
+
+  $projtask_data .= "\n)\n);\n\n";
+
+  $script2 = "\n\n<script language=\"JavaScript\">\n";
+  $script2 .= $projtask_data;
+  $script2 .= "\n</script>\n\n";
+
+
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<select name=sel_tasktype onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value)\">";
+  $sel_tt = "<select name=sel_tasktype ";
+  $sel_tt .= "  onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,";
+  $sel_tt .= "  this.form.sel_projecttask)\">";
   $sel_tt .= "<option value=\"0\">$l_none</option>";
   while($taskt_q->next_record()) {
     //put menu titles
@@ -1425,15 +1454,20 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   $sel_tt .= "</select>";
 
   // Project select construction
-  $sel_proj = "<select name=sel_project>";
+  $sel_proj = "<select name=sel_project onchange=\"fill_projecttask(this.form.sel_projecttask, this.form.sel_project.value)\">";
   $sel_proj .= "<option value=\"0\">$l_none</option>";
   $sel_proj .= "</select>";
 
+  // ProjectTask select construction
+  $sel_projtask = "<select name=sel_projecttask>";
+  $sel_projtask .= "<option value=\"0\">$l_none</option>";
+  $sel_projtask .= "</select>";
+
   // Project Label
-  if ($action == "update")
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\" />";
-  else
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
+//   if ($action == "update")
+//     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\" />";
+//   else
+//     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
 
   // Project time length
   $sel_time="<select name=sel_time>";
@@ -1448,6 +1482,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
 
 // FORM
   echo "$script";
+  echo "$script2";
   echo "<p></p>";
 
   if ($action == "insert") {
@@ -1485,7 +1520,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     </tr>
     <tr class=\"timeHeader\">
      <td colspan=2>".col_table($col_textem, $l_project)."<br>$sel_proj</td>
-     <td>".col_table($col_textem, $l_label)."<br>$tf_label</td>
+     <td>".col_table($col_textem, $l_label)."<br>$sel_projtask</td>
     </tr>
   </table>";
 
@@ -1499,7 +1534,6 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   }     
   
   echo "</center>
-    <input type=hidden name=user_id[] value=\"".$time["user_id"][0]."\"\n>
     <input type=hidden name=wbegin value=\"".$time["date"]."\">\n";
   
   if ($action == "update"){

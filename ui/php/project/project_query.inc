@@ -74,7 +74,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "deal_label";
   $query .= " order by $order $p_order_dir";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_search");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   
@@ -109,7 +109,7 @@ function run_query_detail($p_id) {
       and tasktype_id=deal_tasktype_id";
 
   $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_detail");
   $obm_q->query($query);
   $obm_q->next_record();
 
@@ -148,7 +148,7 @@ function run_query_insert($project) {
     $soldtime,
     2)";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_insert");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -157,7 +157,7 @@ function run_query_insert($project) {
             from Deal
             where deal_label = '$name'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_insert (search)");
   $obm_q->query($query);
 
   if ($obm_q->num_rows() > 0) {
@@ -191,7 +191,7 @@ function run_query_create($project) {
       deal_project_status = 1
     where deal_id = $p_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_create");
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
@@ -209,7 +209,7 @@ function run_query_create($project) {
 function run_query_update($pid, $project) {
   global $auth, $cdg_sql;
 
-  $state = $project["state"];
+  $state = $project["status"];
   $soldtime = $project["soldtime"];
   $name = $project["name"];
   $tt = $project["tt"];
@@ -225,7 +225,7 @@ function run_query_update($pid, $project) {
   
   $query .= " where deal_id='$pid'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_update");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -248,7 +248,7 @@ function run_query_close($pid) {
       deal_project_status=3
     where deal_id='$pid'";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_close");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -287,7 +287,7 @@ function run_query_tasklist_insert($project) {
       1)
     ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_tasklist_insert");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   
@@ -316,7 +316,7 @@ function run_query_tasklist_delete($project) {
         or  projecttask_parenttask_id = $tsk_id
       ";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_tasklist_delete");
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
     if ($retour) {
@@ -346,7 +346,7 @@ function run_query_memberlist_insert($project) {
     from ProjectTask
     where projecttask_deal_id = $id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(1)");
   $ptask_q = new DB_OBM;
   $ptask_q->query($query);
   $ptask_q->next_record();
@@ -363,7 +363,7 @@ function run_query_memberlist_insert($project) {
       where projectuser_projecttask_id = $pt_id
         and projectuser_user_id = $mem_id";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(2)");
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
     
@@ -382,7 +382,7 @@ function run_query_memberlist_insert($project) {
           '".date("Y-m-d H:i:s")."',
           ". $auth->auth["uid"] .")";
 
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(3)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
       $cpt_ins++;
@@ -412,7 +412,7 @@ function run_query_memberlist_delete($project, $all = 0) {
     from ProjectTask
     where projecttask_deal_id = $id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(1)");
   $ptask_q = new DB_OBM;
   $ptask_q->query($query);
 
@@ -436,7 +436,7 @@ function run_query_memberlist_delete($project, $all = 0) {
         where projectuser_projecttask_id in $pt_tab
         ";
 
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(2)");
     $retour = $obm_q->query($query);
     
   } else {
@@ -452,7 +452,7 @@ function run_query_memberlist_delete($project, $all = 0) {
           and projectuser_user_id = '$mem_id'
         ";
 
-      display_debug_msg($query, $cdg_sql);
+      display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(2b)");
       $retour = $obm_q->query($query);
       if ($retour) {
 	$cpt_del++;
@@ -501,18 +501,8 @@ function run_query_projectupdate($project) {
              $proj
             )";
 	
-
-// 	$query = "
-//           update ProjectUser set
-//             projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
-//             projectuser_userupdate='". $auth->auth["uid"] ."',
-//             projectuser_missingtime =  $proj,
-//             projectuser_projectedtime =  $proj
-//           where projectuser_projecttask_id = $t_id
-//             and projectuser_user_id = $m_id
-//         ";
 	
-	display_debug_msg($query, $cdg_sql);
+	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
 	$retour = $obm_q->query($query);
 	
 	if (!($retour))
@@ -552,7 +542,7 @@ function run_query_advanceupdate($project) {
             and projectuser_user_id = $m_id
           ";
 	
-	display_debug_msg($query, $cdg_sql);
+	display_debug_msg($query, $cdg_sql, "run_query_advanceupdate");
 	$retour = $obm_q->query($query);
 	
 	if (!($retour))
@@ -582,7 +572,7 @@ function run_query_statlog($p_id) {
     from ProjectTask
     where projecttask_deal_id = $p_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_statlog(1)");
   $ptask_q = new DB_OBM;
   $ptask_q->query($query);
 
@@ -604,7 +594,7 @@ function run_query_statlog($p_id) {
             where timetask_projecttask_id in $pt_tab
             group by timetask_projecttask_id, timetask_user_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_statlog(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -617,7 +607,7 @@ function run_query_statlog($p_id) {
             where projectuser_projecttask_id in $pt_tab
             group by projectuser_projecttask_id, projectuser_user_id";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_statlog(3)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -637,7 +627,7 @@ function run_query_statlog($p_id) {
       $time_left
     )";
 
-   display_debug_msg($query, $cdg_sql);
+   display_debug_msg($query, $cdg_sql, "run_query_statlog(4)");
    $obm_q = new DB_OBM;
    $retour = $obm_q->query($query);
 
@@ -683,7 +673,7 @@ function run_query_newprojects() {
               and deal_archive = 0
             order by project_initlabel";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_newprojects");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -707,7 +697,7 @@ function run_query_tasks($pid) {
     order by projecttask_parent, projecttask_rank
   ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_tasks");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -751,7 +741,7 @@ function run_query_members() { //$p_id = 0) {
     ";
 //   }
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_members");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -790,7 +780,7 @@ function run_query_memberstime($p_id) {
     order by projectuser_manager desc,userobm_lastname, userobm_firstname
     ";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_memberstime");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -818,7 +808,7 @@ function run_query_managers($p_id = 0) {
   $query .= "group by manager_id
              order by manager_firstname";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_managers");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -848,7 +838,7 @@ function run_query_projecttype($type = 'all') {
 
   $query .= " order by tasktype_internal";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_projecttype");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
@@ -923,10 +913,10 @@ function check_init_form($pid, $project) {
   }
 
   // MANDATORY: Soldtime
-//    if (ereg($php_regexp_number, $soldtime) == false) {
-//      $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
-//      return false;
-//    }
+//   if (ereg($php_regexp_number, $soldtime) == false) {
+//     $err_msg = $l_fill_soldnumber;
+//     return false;
+//   }
 
   return true; 
 }
@@ -941,7 +931,18 @@ function check_init_form($pid, $project) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd_form($pid, $project) {
-  return true;
+  global $l_fill_tasklabel;
+  global $err_msg;
+
+  $tasklabel = $project["tasklabel"];
+
+  // MANDATORY: Soldtime
+  if (trim($tasklabel) == "") {
+    $err_msg = $l_fill_tasklabel;
+    return false;
+  }
+
+  return true; 
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -953,8 +954,22 @@ function check_taskadd_form($pid, $project) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_advance_form($pid, $project) {
-  return true;
+function check_advance_form($project) {
+
+  $error = 0;
+
+  while ( list($t_id, $misstab) = each($project["missing"]) ) {
+    while ( list($m_id, $misstime) = each($misstab) ) {
+      if (trim($misstime == "")) {
+	$error = 1;
+      }
+    }
+  }
+
+  if ($error == 1)
+    return false;
+  else
+    return true;
 }
 
 </SCRIPT>

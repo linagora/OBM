@@ -10,15 +10,16 @@
 // - index (default) -- search fields  -- show the project search form
 // - search          -- search fields  -- show the result set of search
 // - new             -- $param_company -- show the new project form
-// - insert          -- form fields    -- insert the project
 // - init            -- form fields    -- show the init project form
-// - create          -- form fields    -- create the project
+// - task_fill       -- $param_project -- 
+// - member_fill     -- $param_project -- 
 // - detailconsult   -- $param_project -- show the project detail
 // - detailupdate    -- $param_project -- show the project detail form
 // - d_update        -- form fields    -- update the project
-// - close           -- $param_project -- close the project
 // - advanceupdate   -- $param_project -- show the project advance form
 // - a_update        -- form fields    -- update the project advance
+// - member_add      -- form fields    -- 
+// - member_del      -- form fields    -- 
 // // - check_delete    -- $param_project -- check links before delete
 // // - delete          -- $param_project -- delete the project
 // // - admin           --                -- admin index (kind)
@@ -159,8 +160,6 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "member_fill")  {
 ///////////////////////////////////////////////////////////////////////////////
-    $project_q = run_query_detail($param_project);
-
     // gets updated infos
     $project_q = run_query_detail($param_project);
     $tasks_q = run_query_tasks($param_project);
@@ -270,27 +269,6 @@ if ($action == "index" || $action == "") {
     html_project_init_form($action, $project_q, $project);
   }
 
-//   $retour = run_query_update($param_project, $project);
-
-//   if ($retour) {
-//     display_ok_msg($l_update_ok);
-//   } else {
-//     display_err_msg($l_update_error);
-//   }
-
-//   $project_q = run_query_detail($param_project);
-//   $members_q = run_query_memberstime($param_project);
-  
-//   if (($project_q->f("project_visibility")==0) ||
-//       ($project_q->f("usercreate")==$uid) ) {
-//     display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
-    
-//     html_project_infos($project_q, $project);
-//     html_project_memberlist($members_q, $project );
-//   } else {
-//     // this project's page has "private" access
-//     display_err_msg($l_error_visibility);
-//   } 	
   
 } elseif ($action == "close")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -322,7 +300,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "a_update")  {
   ///////////////////////////////////////////////////////////////////////////////
-  if (check_advance_form($param_project, $project)) {
+  if (check_advance_form($project)) {
     
     $ins_err = run_query_advanceupdate($project);
   
@@ -373,7 +351,6 @@ if ($action == "index" || $action == "") {
       
 	$project_q = run_query_detail($param_project);
 	$tasks_q = run_query_tasks($param_project);
-	//      $tasks2_q = run_query_tasks($param_project);
 
 	html_project_infos($project_q, $project);
 	html_project_taskadd_form($tasks_q, $project);
@@ -648,7 +625,7 @@ function get_project_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'validate') 
+    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate') 
                                      	      );
 
 // Update
@@ -679,6 +656,7 @@ function get_project_action() {
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                      	 );
+
 // Ext get Ids : Lists selection
   $actions["PROJECT"]["ext_get_ids"] = array (
     'Name'     => $l_header_add_member,
@@ -686,7 +664,7 @@ function get_project_action() {
     'Right'    => $user_write,
     'Popup'    => 1,
     'Target'   => $l_list,
-    'Condition'=> array ('insert', 'create', 'd_update', 'member_add','member_del') 
+    'Condition'=> array ('member_fill', 'member_add','member_del') 
                                     	  );
 
 // Display

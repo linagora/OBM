@@ -68,33 +68,74 @@ function check_sel_project(form) {
   } else
     return true;
 }
-// -->
 
 /////////////////////////////////////
 // project dynamic list generation //
 /////////////////////////////////////
-function fill_project(sel_list, tasktype_id) {
+
+function fill_project(sel_list, tasktype_id, next_sel) {
+  var i, j;
+  // location of selected tasktype in project array
+  var tt_location = -1;
+
+  // empty existing items
+  for (i = sel_list.options.length-1; i >= 0; i--) {
+    sel_list.options[i] = null; 
+  }
+
+  for (i = 0; i < project.length; i++) {
+    if (project[i][0] == tasktype_id) {
+      tt_location = i; 
+    }
+  }
+
+  // there are projects with the selected tasktype
+  if (tt_location != -1) {
+    // add new items
+    for (i = 1; i < project[tt_location].length; i++) {
+      sel_list.options[i-1] = new Option(project[tt_location][i][0]);
+      sel_list.options[i-1].value = project[tt_location][i][1]; 
+    }
+  }
+  // there are no projects with the selected tasktype
+  else {
+    sel_list.options[0] = new Option(\"$l_none\");
+    sel_list.options[0].value = 0; 
+  }
+
+  // select first item (prompt) for sub list
+  //select_list.options[0].selected = true;
+
+  fill_projecttask(next_sel, sel_list.options[0].value);
+  
+}
+
+/////////////////////////////////////////
+// projecttask dynamic list generation //
+/////////////////////////////////////////
+
+function fill_projecttask(sel_list, deal_id) {
 	var i, j;
-        // location of selected tasktype in project array
-	var tt_location = -1;
+        // location of selected deal in projecttask array
+	var dl_location = -1;
 
 	// empty existing items
 	for (i = sel_list.options.length-1; i >= 0; i--) {
 	  sel_list.options[i] = null; 
 	}
 
-	for (i = 0; i < project.length; i++) {
-          if (project[i][0] == tasktype_id) {
-            tt_location = i; 
+	for (i = 0; i < projecttask.length; i++) {
+          if (projecttask[i][0] == deal_id) {
+            dl_location = i; 
 	  }
         }
 
 	// there are projects with the selected tasktype
-	if (tt_location != -1) {
+	if (dl_location != -1) {
 	  // add new items
-	  for (i = 1; i < project[tt_location].length; i++) {
-	    sel_list.options[i-1] = new Option(project[tt_location][i][0]);
-	    sel_list.options[i-1].value = project[tt_location][i][1]; 
+	  for (i = 1; i < projecttask[dl_location].length; i++) {
+	    sel_list.options[i-1] = new Option(projecttask[dl_location][i][0]);
+	    sel_list.options[i-1].value = projecttask[dl_location][i][1]; 
 	  }
 	}
 	// there are no projects with the selected tasktype
@@ -114,6 +155,7 @@ function select_default(sel_list, def_value) {
   }
 }
 
+// -->
 </SCRIPT>
 ";
 

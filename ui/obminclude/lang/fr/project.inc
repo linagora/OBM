@@ -108,7 +108,6 @@ $l_no_member_del = "Aucun participant à effacer";
 $l_valid_member = "Confirmer";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_delete_confirm = "Really delete the company ?";
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
 $l_fill_tt = "Vous devez indiquer le type de tâche avant de valider.";
 $l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
@@ -117,19 +116,9 @@ $l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";
 $l_fill_member = "Vous devez renseigner les participants au projet.";
 $l_fill_projected = "Chaque participant avant doit être affecté à au moins une tâche";
 $l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
+$l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du projet";
+$l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
 $l_delete_confirm = "Confirmer la suppression de la Société ?";
-$l_j_check_zip = "Le code postal n'est pas correct.";
-$l_j_check_phone = "Le numéro de téléphone n'est pas correct.";
-$l_j_check_fax = "Le numéro de fax n'est pas correct.";
-$l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
-$l_j_check_web = "L'adresse web n'est pas valide.";
-$l_j_kind_delete = "Sélectionnez un type pour le vérifier ou supprimer !";
-$l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
-$l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
-$l_j_act_delete = "Sélectionnez un secteur d'activité pour le vérifier ou supprimer !";
-$l_j_act_update = "Vous devez sélectionner un secteur d'activité et entrer une modification avant de valider !";
-$l_j_act_create = "Vous devez saisir un nom de secteur d'activité pour le créer !";
-$l_j_select_company = "Vous devez sélectionner une société !";
 
 // For the display preferences modification screen 
 $l_searchproject_display = "Options d'affichage des listes de projets";

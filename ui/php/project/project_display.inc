@@ -1021,8 +1021,7 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
       for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
 
 	$m_id = $array_mem[$cpt_e]["id"];
-	$tm_proj = $array_time["proj"][$t_id][$m_id];
-	$tm_miss = $array_time["miss"][$t_id][$m_id];
+	$tm_proj = $array_time[$t_id][$m_id];
 
 	if ($t_parent) {
  	  $dis_member .= "<td class=\"detailText\" colspan=\"2\">&nbsp;</td>\n";
@@ -1217,6 +1216,7 @@ function html_project_advance($members_q, $tasks_q, $project) {
   
   echo "
      <form method=\"post\" name=\"form_advance2\"
+         onsubmit=\"if (check_advancevalid(this)) return true; else return false;\"
          action=\"".url_prepare("project_index.php")."\">
      <table class=\"details\">
        <tr>

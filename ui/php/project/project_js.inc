@@ -87,7 +87,7 @@ function check_init_project(form) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd(form)
 {
-  // MANDATORY : Check that the Project soldtime is not empty
+  // MANDATORY : Check that the ProjectTask label is not empty
   if (trim(form.tf_tasklabel.value) == \"\") {
     alert (\"$l_fill_tasklabel\");
     return false;
@@ -97,17 +97,13 @@ function check_taskadd(form)
   }
 }
 
-// function submit_taskdel(form)
+//bcontins verif un selectionner
+//function check_taskdel(form)
 // {
 //   form.action = \"project_index.php?action=task_del\"
 //   form.submit();
 // }
 
-// function submit_taskvalid(form)
-// {
-//   form.action = \"project_index.php?action=member_fill\"
-//   form.submit();
-// }
 
 function submit_memberdel(form)
 {
@@ -156,7 +152,37 @@ function check_membervalid(form, nb_mem)
     return false;
   } else {
     form.action = \"project_index.php?action=validate\";
-    form.submit();
+    //    form.submit();
+    return true;
+  }
+}
+
+function check_advancevalid(form)
+{
+  error = 0;
+
+  for (i = 0; i < document.forms[0].length; i++) {
+    i_name = form.elements[i].name.substr(0,10);
+    i_value = form.elements[i].value;
+
+    if (i_name == \"tf_missing\") { 
+      if ((i_value != \"\") && (!(check_number(i_value)))) {
+	error = 1;
+      } else if (i_value == \"\") {
+	error += 2 ;
+      } else {
+	;
+      }
+    }
+  }
+
+  if (error == 1) {
+    alert (\"$l_fill_missnumber\");
+    return false;
+  } else if (error != 0) {
+    alert (\"$l_fill_missing\");
+    return false;
+  } else {
     return true;
   }
 }
