@@ -112,7 +112,7 @@ else if ($action == "new") {
   if ($perm->have_perm("editor")) {
     html_list_form($action, "", $list);
   } else {
-    echo $l_error_authentification;
+    echo $l_error_permission;
   }
 }
 
@@ -200,7 +200,7 @@ else if ($action == "insert") {
     }
     html_list_search_form("");
   } else {
-   display_err_msg($l_error_authentification);
+   display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "contact_add")  {
@@ -217,7 +217,7 @@ else if ($action == "insert") {
     $con_q = run_query_contacts_list($list["id"]);
     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
-    display_err_msg($l_error_authentification);
+    display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "contact_del")  {
@@ -234,7 +234,7 @@ else if ($action == "insert") {
     $con_q = run_query_contacts_list($list["id"]);
     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
-    display_err_msg($l_error_authentification);
+    display_err_msg($l_error_permission);
   }
 
 } else if ($action == "display") {
@@ -289,7 +289,7 @@ display_end();
 // returns : $list hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
-  global $tf_name, $tf_subject, $tf_contact, $tf_datebegin, $tf_email, $cb_vis;
+  global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact;
   global $param_list, $param_ext,  $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
@@ -300,24 +300,8 @@ function get_param_list() {
   if (isset ($tf_name)) $list["name"] = trim($tf_name);
   if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);
   if (isset ($tf_email)) $list["email"] = $tf_email;
-  if (isset ($cb_vis)) $list["vis"] = $cb_vis;
+  if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
-
-  if (isset ($tf_datebegin)) $list["datebegin"] = $tf_datebegin;
-  if (isset ($param_parent)) $list["parent"] = $param_parent;
-  if (isset ($sel_kind)) $list["kind"] = $sel_kind;
-  if (isset ($sel_cat)) $list["cat"] = $sel_cat;
-  if (isset ($param_company)) $list["company"] = $param_company;
-  if (isset ($sel_contact1)) $list["contact1"] = $sel_contact1;
-  if (isset ($sel_contact2)) $list["contact2"] = $sel_contact2;
-  if (isset ($sel_market)) $list["market"] = $sel_market;
-  if (isset ($sel_tech)) $list["tech"] = $sel_tech;
-  if (isset ($tf_dateprop)) $list["dateprop"] = $tf_dateprop;
-  if (isset ($tf_amount)) $list["amount"] = $tf_amount;
-  if (isset ($sel_state)) $list["state"] = $sel_state;
-  if (isset ($tf_datealarm)) $list["datealarm"] = $tf_datealarm;
-  if (isset ($ta_com)) $list["com"] = $ta_com;
-  if (isset ($cb_archive)) $list["archive"] = $cb_archive;
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
@@ -413,7 +397,7 @@ function get_list_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
      'Right'    => $list_write,
-     'Condition'=> array ('detailconsult','contact_add','contact_del') 
+     'Condition'=> array ('detailconsult','contact_add','contact_del', 'update') 
                                            );
 
 // Insert

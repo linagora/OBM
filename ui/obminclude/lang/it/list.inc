@@ -12,6 +12,7 @@
 $l_name = "Nome";
 $l_subject = "Oggetto";
 $l_email = "E-mail";
+$l_query = "Query";
 $l_creator = "Creato da";
 $l_date_creation = "Creazione";
 $l_updater = "Ultima modificatore";
@@ -75,6 +76,9 @@ $l_add_contact = "Inserisci contatti" ;
 $l_del_contact_sel = "Elimina questi contatti";
 $l_contact_added = "Contatti inseriti";
 $l_contact_removed = "Contatti eliminati";
+
+$l_fill_name = "The list Name must be filled !";
+$l_invalid_query = "The query is invalid !";
 
 //------------------------------------//
 // Export Format informations         //

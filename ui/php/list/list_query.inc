@@ -111,6 +111,7 @@ function run_query_insert($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
+  $list_query = $list["query"];
 
   $query = "insert into List (list_timeupdate,
     list_timecreate,
@@ -118,14 +119,16 @@ function run_query_insert($list) {
     list_usercreate,
     list_name,
     list_subject,
-    list_email)
+    list_email,
+    list_query)
   values (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
     '$name',
     '$subject',
-    '$email')";
+    '$email',
+    '$list_query')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -147,12 +150,14 @@ function run_query_update($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
+  $list_query = $list["query"];
   
   $query = "update List set list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
     list_name='$name',
     list_subject='$subject',
-    list_email='$email'
+    list_email='$email',
+    list_query='$list_query'
   where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -348,6 +353,7 @@ function run_query_check_list($l_id, $name, $subject) {
   // If subject is short, we test equality, else similarity
   if (strlen($subject)  > 2) {
     $wsubject = "list_subject like '%$subject%'";
+    //  } elseif ($subject != "") {
   } else {
     $wsubject = "list_subject = '$subject'";
   }
@@ -395,12 +401,13 @@ function check_list_context($l_id, $list) {
 //     keys used : name, subject, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($l_id, $list) {
-  global $php_regexp_email, $l_fill_name;
+  global $php_regexp_email, $l_fill_name, $l_invalid_query;
   global $err_msg, $l_j_check_email;
 
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
+  $query = stripslashes($list["query"]);
 
   // MANDATORY: List name not empty
   if (trim($name) == "") {
@@ -413,6 +420,20 @@ function check_data_form($l_id, $list) {
     $err_msg = " $email : $l_j_check_email";
     return false;
   }
+
+  // If a query has been given, check if it is correct
+  if (trim($query) != "") {
+    $query = "explain $query";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    // 1 indicate to PHPLIB not to report the error if any
+    $ret = $obm_q->query($query, 1);
+    if (substr($ret, 0,4) == "obm:") {
+      $err_msg = "$l_invalid_query : " . substr($ret,4);
+      return false;
+    }
+  }
+
 
   return true;
 }

@@ -12,6 +12,7 @@
 $l_name = "Name";
 $l_subject = "Subject";
 $l_email = "E-mail";
+$l_query = "Query";
 $l_creator = "Creator";
 $l_date_creation = "Creation";
 $l_updater = "Last updater";
@@ -57,7 +58,6 @@ $l_delete_ok = "The list has been deleted successfully.";
 $l_delete_error = "The list deletion has failed !";
 $l_fill_name = "You have to fill the list name";
 $l_name_list_nomatch = "List name is not valid";
-$l_subject_list_empty = "List subject is not valid";
 $l_list_exists = "Sorry but this list already exists";
 $l_check_samelist = "These lists seem similar to this new entry !";
 $l_j_check_email = "The email adress is not valid.";
@@ -72,6 +72,21 @@ $l_add_contact = "Add contacts" ;
 $l_del_contact_sel = "Remove these contacts";
 $l_contact_added = "added Contact(s)";
 $l_contact_removed = "removed Contact(s)";
+
+$l_fill_name = "The list Name must be filled !";
+$l_invalid_query = "The query is invalid !";
+
+
+
+$l_con_found = "registered contacts";
+$l_no_contact = "No contact registered";
+$l_nb_contact_deleted = "Number of contact deleted" ;
+$l_list_add_contact = "Add" ;
+$l_list_add_contact_chosen = "Add selected contacts" ;
+$l_nb_contact_added = "Number of contact added" ;
+$l_delete_confirm = "Do you comfirm removal of list" ;
+$l_complete_mail_form = "Please fill mail fields to sent mail" ;
+
 
 //------------------------------------//
 // Export Format informations         //
@@ -88,47 +103,3 @@ $c_export_format[2]["info"] = "RTF Sticker creation";
 // Format 3 : Excel data
 $c_export_format[3]["name"] = "Excel Table";
 $c_export_format[3]["info"] = "Excel table data";
-
-
-$l_new_contact1 = "NC" ;
-$l_list_contact1 = "C" ;
-$l_list_infos = "List informations" ;
-$l_list_infos_short = "List informations" ;
-$l_list_noinfo = "No information is available" ;
-
-$l_list_contacts = "Contacts registered";
-$l_con_found = "registered contacts";
-$l_no_contact = "No contact registered";
-$l_list_contacts_todel = "Here withdrawable contacts of this list" ;
-$l_list_del_contact = "Remove" ;
-$l_list_del_contact_chosen = "Remove selected contacts" ;
-$l_nb_contact_deleted = "Number of contact deleted" ;
-$l_name_contact = "Name" ;
-$l_name_company = "Company" ;
-$l_list_add_contact = "Add" ;
-$l_list_add_contact_chosen = "Add selected contacts" ;
-$l_nb_contact_added = "Number of contact added" ;
-$l_delete_confirm = "Do you comfirm removal of list" ;
-$l_complete_mail_form = "Please fill mail fields to sent mail" ;
-$l_mail_sender = "Sender" ;
-$l_mail_rcpt = "Reply to" ;
-$l_mail_subject = "Mail subject" ;
-$l_mail_body = "Mail body" ;
-$l_send_mail = "Send mail" ;
-$l_confirm_send = "Confirm to send mail" ;
-$l_name_empty = "You must fill sender name" ;
-$l_mail_empty = "The sender mail must be set" ;
-$l_mail_false = "The sender mail must be valid" ;
-$l_mail_same = "No used to inform this mail if it's the same than the sender mail" ;
-$l_mail_rcpt_false = "The 'Reply to' mail must be valid'" ;
-$l_subject_empty = "Subject of mail is required" ;
-$l_body_empty = "Mail body is required" ;
-$l_name_obligatory = "Your name is required" ;
-$l_mail_obligatory = "Your e-mail is required" ;
-$l_mail_rcpt_obli = "If diffrenet from sender e-mail" ;
-$l_subject_obli = "The subject of mail is required" ;
-$l_nb_message_send = "Number of mail(s) sent : " ;
-
-//Error:
-$l_error_which = "Error::: The which variable is NOT CORRECTLY set... Please Check your administrator" ;
-$l_error_authentification = "Error::: Wrong Authentification... Please Check your administrator " ;

@@ -95,7 +95,9 @@ class DB_Sql {
   }
 
   /* public: perform a query */
-  function query($Query_String) {
+  // Added an argument to hide error reporting if it must be handled by OBM
+  // Extends: in Dynamic lists, a user can fill a query, checked by OBM
+  function query($Query_String, $hide_error="") {
     /* No empty queries, please, since PHP4 chokes on them. */
     if ($Query_String == "")
       /* The empty query string is passed on from the constructor,
@@ -122,8 +124,14 @@ class DB_Sql {
     $this->Row   = 0;
     $this->Errno = mysql_errno();
     $this->Error = mysql_error();
+
     if (!$this->Query_ID) {
-      $this->halt("Invalid SQL: ".$Query_String);
+      // Added test (! $hide_error) - Aliacom - PB
+      if ($hide_error) {
+	return "obm:".$this->Error;
+      } else {
+	$this->halt("Invalid SQL: ".$Query_String);
+      }
     }
 
     # Will return nada if it fails. That's fine.

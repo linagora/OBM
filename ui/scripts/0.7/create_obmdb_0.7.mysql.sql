@@ -150,7 +150,7 @@ CREATE TABLE Company (
   company_userupdate int(8),
   company_usercreate int(8),
   company_number varchar(32),
-  company_archive char(1) DEFAULT '0',
+  company_archive char(1) DEFAULT '0' NOT NULL,
   company_name varchar(50) DEFAULT '' NOT NULL,
   company_type_id int(8),
   company_activity_id int(8),

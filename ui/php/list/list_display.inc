@@ -215,7 +215,8 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   //-- Label
-  global $l_name, $l_subject, $l_email, $l_list_infos, $l_no_contact, $l_list_infos_short;
+  global $l_name, $l_subject, $l_email;
+  global $l_query, $l_no_contact;
   global $perm, $action;
   global $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
 
@@ -227,6 +228,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
+  $query = nl2br($list_q->f("list_query"));
 
   display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
 
@@ -241,6 +243,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_query</td>
+      <td class=\"detailText\">$query</td>
     </tr>
     </table>";
 
@@ -298,7 +303,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email, $l_insert, $l_update, $l_back;
+  global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -307,6 +312,7 @@ function html_list_form($action, $list_q, $list) {
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
+    $query = $list_q->f("list_query");
   }
 
   // If parameters have been given, they supercede the default action value
@@ -314,6 +320,7 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
+  if (isset($list["query"])) { $query = stripslashes($list["query"]); }
 
   $url = url_prepare("list_index.php");
 
@@ -335,6 +342,11 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailLabel\">$l_email>
     <td class=\"detailText\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_query</td>
+    <td class=\"detailText\">
+      <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
   </tr>
   <tr>
     <td class=\"detailHead\" colspan=\"2\">
@@ -451,16 +463,23 @@ function dis_list_warn_insert($l_id, $l_q, $list) {
   $name = $list["name"];
   $subject = $list["subject"];
 
-  echo $l_check_samelist;
+  display_warn_msg($l_check_samelist);
   while ($l_q->next_record()) {
     $id = $l_q->f("list_id");
     $samename = $l_q->f("list_name");
     $samesubject = $l_q->f("list_subject");
-    echo "<br /><a href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>";
+    $dis_same_list .= "
+      <tr><td colspan =\"2\" class=\"detailText\">
+        <a class=\"details\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>
+      </td></tr>";
   }
 
   echo "<p />
     <table class=\"details\">
+    $dis_same_list
+    <tr>
+      <td>&nbsp;</td>
+    </tr>
     <tr>
       <td>
         <form method=\"post\" name=\"form_insert\"

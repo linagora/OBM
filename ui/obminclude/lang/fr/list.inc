@@ -11,6 +11,7 @@
 $l_name = "Nom";
 $l_subject = "Sujet";
 $l_email = "E-mail";
+$l_query = "Requête";
 $l_creator = "Créateur";
 $l_date_creation = "Création";
 $l_updater = "Mise à jour par" ;
@@ -56,7 +57,7 @@ $l_delete_ok = "La suppression de la liste a été correctement effectuée.";
 $l_delete_error = "La suppression de la liste a échoué !";
 $l_name_list = "Le nom de la liste doit etre rempli" ;
 $l_name_list_nomatch = "Le nom de la liste n'est pas valide" ;
-$l_name_list_nomatch = "Le sujet de la liste doit etre rempli" ;
+$l_check_samelist = "Ces listes sembles similaires à la nouvelle !" ;
 $l_list_exists = "Désolé mais cette liste existe déjà";
 $l_j_check_email = "L'adresse e-mail n'est pas valide !";
 $l_warn_delete = "contacts enregistrés dans cette liste";
@@ -72,6 +73,9 @@ $l_contact_added = "Contact(s) ajouté(s)";
 $l_contact_removed = "Contact(s) enlevé(s)";
 $l_con_found = "contacts enregistrés";
 $l_no_contact = "Il n'y a pas de contact dans cette liste" ;
+
+$l_fill_name = "Le nom de la liste doit être saisi !";
+$l_invalid_query = "La requête saisie est incorrecte !";
 
 //------------------------------------//
 // Export Format informations         //
