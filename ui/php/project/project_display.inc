@@ -647,6 +647,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   global $l_allotted, $l_no_members, $l_adv_update, $l_project, $l_resume;
   global $l_allosold, $l_usedsold, $l_progeval, $l_progress, $l_nbtask;
   global $l_nbmem, $l_no_projected, $l_no_tasks, $l_archive, $l_yes, $l_no;
+  global $l_projected, $l_alloproj, $l_usedproj;
 
   $pid = $project["id"];
   $cpt_t = 0;
@@ -662,7 +663,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   $soldtime = $project_q->f("project_soldtime");
 
   // Table header
-  $title = ($status == 1 ? $l_externinfos : $l_interninfos);
+  $title = ($status == 1) ? $l_externinfos : $l_interninfos;
+  $l_time = ($status == 1) ? $l_sold : $l_projected;
+  $l_allotime = ($status == 1) ? $l_allosold : $l_alloproj;
 
   // Company name
   if ($status == 1) {
@@ -878,10 +881,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     //advance array
     $dis_advance = "
     <tr>
-     <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_time&nbsp;</td>
      <td class=\"detailText\" align=\"right\">$soldtime</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_allotime&nbsp;</td>
      <td class=\"detailText\" align=\"right\">$ratio_allosold %</td>
     </tr>
     <tr>
@@ -926,10 +929,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 
     $dis_advance = "
       <tr>
-       <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;$l_time&nbsp;</td>
        <td class=\"detailText\" align=\"right\">$soldtime</td>
        <td width=10%>&nbsp;&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;$l_allotime&nbsp;</td>
        <td class=\"detailText\" align=\"right\">0 %</td>
       </tr>";
 
@@ -943,10 +946,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 
     $dis_advance = "
       <tr>
-       <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;$l_time&nbsp;</td>
        <td class=\"detailText\" align=\"right\">$soldtime</td>
        <td width=10%>&nbsp;&nbsp;</td>
-       <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
+       <td class=\"detailLabel\">&nbsp;$l_allotime&nbsp;</td>
        <td class=\"detailText\" align=\"right\">0 %</td>
       </tr>";
   }

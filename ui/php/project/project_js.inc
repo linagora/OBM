@@ -48,8 +48,14 @@ function check_project(form) {
     return false;
   }
 
-  // MANDATORY : Check that the Project soldtime is not empty
+  // MANDATORY : Check that the Project soldtime is a number
   else if (!(check_number(form.tf_soldtime.value))) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not null
+  else if ((form.tf_soldtime.value) == 0) {
     alert (\"$l_fill_soldnumber\");
     return false;
   }
@@ -71,8 +77,14 @@ function check_init_project(form) {
     return false;
   }
 
-  // MANDATORY : Check that the Project soldtime is not empty
+  // MANDATORY : Check that the Project soldtime is a number
   else if (!(check_number(form.tf_soldtime.value))) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not null
+  else if ((form.tf_soldtime.value) == 0) {
     alert (\"$l_fill_soldnumber\");
     return false;
   }

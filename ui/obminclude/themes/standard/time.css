@@ -16,6 +16,19 @@ table.timeLinks			{
 	margin:			auto;
 	}
 
+table.timeMonth			{
+	border-spacing:		1;
+	margin:			auto;
+	padding:		2;
+	}
+
+table.timeValid			{
+	border:			1px #4f7091 solid;
+	border-spacing:		1;
+	margin:			auto;
+	padding:		2;
+	}
+
 td.timePeriod			{
  	text-align: 		center; 
  	font-family: 		sans-serif;

@@ -47,8 +47,8 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $query .= " left join Company on deal_company_id=company_id
               where tasktype_id=deal_tasktype_id";
 
-  if ($new) {
-    $query .= " and deal_project_status = 0";
+  if (!($new)) {
+    $query .= " and deal_project_status != 0";
   }
 
   if (!($archive)) {
@@ -1021,6 +1021,12 @@ function check_new_form($pid, $project) {
   }
 
   // MANDATORY: Soldtime
+  if (trim($soldtime) == 0) {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
 //   if (ereg($php_regexp_number, $soldtime) == false) {
 //     $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
 //     return false;
@@ -1046,6 +1052,12 @@ function check_init_form($pid, $project) {
 
   // MANDATORY: Soldtime
   if (trim($soldtime) == "") {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+  if (trim($soldtime) == 0) {
     $err_msg = $l_fill_soldtime;
     return false;
   }

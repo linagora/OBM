@@ -196,7 +196,7 @@ function dis_time_links ($time, $type="all") {
       echo "date ". $time["date"] . " <br>";
     }
 
-    $tot_width = 400;
+    $tot_width = (in_array($action, $no_name)) ? 200 : 400;
 
     // This should work for january also (month 0 = december) 
     $month=substr($time["date"],4,2);
@@ -210,7 +210,7 @@ function dis_time_links ($time, $type="all") {
     }
 
     //Daylight Savings Time
-    // nothing to do for this
+    // nothing to do for this width=\"$tot_width\"
 
     $block = "
      <div class=\"timeCenter\">
@@ -306,10 +306,9 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
                                 onclick=\"select_all(f_time)\" />";
 
     $block = "<br>
-      <center>
-      <form method=post name=\"f_time\" action=\"" .
+     <form method=post name=\"f_time\" action=\"" .
       url_prepare("time_index.php") . "\">
-       <table cellpadding=\"0\" cellspacing=\"0\" class=\"timeUser\">
+       <table class=\"timeUser\">
         <tr>
          <td class=\"timeUserhead\">$l_user</td>
         </tr><tr>
@@ -323,8 +322,7 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
          </td>
         </tr>
        </table>
-      </form>
-      </center>";
+      </form>";
   }
 
   return $block;
@@ -480,53 +478,6 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   
   return $block;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Stats TimeManager result page                                 //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-// function dis_time_statsmonth($statproj_q, $stattt_q, $time) {
-//   global $l_no_found, $cdg_param;
-//   global $auth, $new_order, $order_dir, $new_order2;
-//   global $l_projmonth_stats, $l_no_projmonth_stats;
-//   global $l_ttmonth_stats, $l_no_ttmonth_stats;
-  
-//   if ($statproj_q->num_rows() != 0) {
-//     $pref_pq = run_query_display_pref($auth->auth["uid"], "time_projmonth");
-
-//     $dis_projmonth_list = new OBM_DISPLAY("DATA",$pref_pq);
-//     $dis_projmonth_list->data_set = $statproj_q;
-//     $dis_projmonth_list->data_order = false;
-//     $dis_projmonth_list->data_page = false;
-//     $dis_projmonth_list->data_header = "top";
-  
-//     //$block .= display_ok_msg($l_projmonth_stats);
-//     $block .= "<div class=\"detailHead\">$l_projmonth_stats</div>";
-//     $block .= $dis_projmonth_list->display("dis_data_time");
-//   } else {
-//     $block .= display_warn_msg($l_no_projmonth_stats);
-//   }
-
-//   if ($stattt_q->num_rows() != 0) {
-//     $pref_tq = run_query_display_pref($auth->auth["uid"], "time_ttmonth");
-
-//     $dis_ttmonth_list = new OBM_DISPLAY("DATA",$pref_tq);
-//     $dis_ttmonth_list->data_set = $stattt_q;
-//     $dis_ttmonth_list->data_order = false;
-//     $dis_ttmonth_list->data_page = false;
-//     $dis_ttmonth_list->data_header = "top";
-
-//     //$block .= display_ok_msg($l_ttmonth_stats);
-//     $block .= "<div class=\"detailHead\">$l_ttmonth_stats</div>";
-//     $block .= $dis_ttmonth_list->display("dis_data_time");
-//   }else {
-//     $block .= display_warn_msg($l_no_ttmonth_stats);
-//   }
-
-//   return $block;
-// }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Export the Stats TimeManager result in a file                                 //
@@ -733,26 +684,6 @@ function display_monthview($time, $array_res, $total, $status) {
 	$span += 1;
       }
       
-      //       //or first day of the month
-      //       if ($day == "01") {
-	 
-
-      // 	// return first and last day of the week
-      // 	$week = get_week_point($year.$month."01");
-      // 	$url= url_prepare("time_index.php?action=index".
-      // 			  "&amp;wbegin=".$week[0]);
-
-      // 	// This week is not $c_days_in_a_week long
-      // 	$week_length = $c_days_in_a_week - $val["wday"] +1;
-
-      // 	if ($status == 2)
-      // 	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$week_length\"><a href=\"$url\">$l_see</a></td>";
-      // 	else if ($time_length != $time_worked)
-      // 	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
-      // 	else
-      // 	  $line3 .="<td class=\"timeValid\" colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
-      //       }
-
       // last day of the week 
       if (($val["wday"] == $c_days_in_a_week) or ($day == $month_length)) {
 	// return first and last day of the week
@@ -767,29 +698,15 @@ function display_monthview($time, $array_res, $total, $status) {
 	else
 	  $line3 .="<td class=\"timeValid\" colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
 	
-	// 	$span = $c_days_in_a_week;
       }
       
       $line1.=$cell_1;
     }
-
-    //     $span += 1;
   }
   
-  // we display a recap for this user
-  //   $fract = $total/$c_day_fraction;
-  //   $tot_workingdays = get_nb_working_days($time["date"]);
-
-  //   $last_cell_1 = "<td>&nbsp;&nbsp;</td><td width=60 align=center>$l_total</td>";
-  //   $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
-  //   $dis_tot= $fract != $tot_workingdays ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
-  //   $last_cell_2 = "<td>&nbsp;&nbsp;</td><td $bg_color>$dis_tot</td>";
-  //   $line1.=$last_cell_1;
-  //   $line2.=$last_cell_2;
-
   $block = "
-   <center>
-    <table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">
+    <div class=\"timeCenter\">
+    <table class=\"timeMonth\">
      <tr>
       $line1
      </tr>
@@ -800,7 +717,7 @@ function display_monthview($time, $array_res, $total, $status) {
       $line3
      </tr>
     </table>
-   <center>
+    <div>
    ";
 
   return $block;
@@ -917,10 +834,11 @@ function display_shortview($time, $array_res) { //, $order) {
   $block = "
    <div class=\"detailHead\">$l_admin_valid</div>
 
-   <center>
-   <table border=1>
-     $dis_months
-   </table>
+   <div class=\"timeCenter\">
+    <table class=\"timeValid\">
+      $dis_months
+    </table>
+   <div>
    ";
 
   return $block;

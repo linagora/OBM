@@ -26,8 +26,10 @@ $l_prevmissing = "Old estimation";
 $l_nextmissing = "New estimation";
 $l_diff = "Advance/Lateness";
 
-$l_allosold = "Time allocation";
-$l_usedsold = "Time usage";
+$l_allosold = "Sold time allocation";
+$l_usedsold = "Sold time usage";
+$l_alloproj = "Projected time allocation";
+$l_usedproj = "Projected time usage";
 $l_progress = "Project progress";
 $l_progeval = "Advance/Lateness evaluation";
 

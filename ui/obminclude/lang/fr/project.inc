@@ -28,6 +28,8 @@ $l_diff = "Avance/Retard";
 
 $l_allosold = "Attribution du temps vendu";
 $l_usedsold = "Utilisation du temps vendu";
+$l_alloproj = "Attribution du temps prévu";
+$l_usedproj = "Utilisation du temps prévu";
 $l_progress = "Avancement du projet";
 $l_progeval = "Evaluation de l'avance retard";
 
