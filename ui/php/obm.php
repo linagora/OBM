@@ -66,7 +66,7 @@ function dis_logout_detail() {
     <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"/images/standard/standard.jpg\"></a>$obm_version</td>
   <td width=\"5%\">&nbsp;</td>
   <td width=\"50%\" align=\"center\">
-    <h1>OBM CONNEXION CLOSED</h1></td>
+    <h1>OBM CONNECTION CLOSED</h1></td>
   <td width=\"25%\" align=\"center\">&nbsp;</td>
 </tr>
 <tr>

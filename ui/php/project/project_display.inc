@@ -294,8 +294,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
   $deal_label = $project_q->f("deal_label");
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
-  $datebegin = (($project_q->f("datebegin") != "0") ? date_format($project_q->f("datebegin")) : "");
-  $dateend = (($project_q->f("dateend") != "0") ? date_format($project_q->f("dateend")) : "");
+  $datebegin = date_format($project_q->f("datebegin"));
+  $dateend = date_format($project_q->f("dateend"));
 
   // Labels are different for sales and R&D projects
   if ($company != "") {
@@ -348,12 +348,12 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
   $has_members = ($members_q != 0) && ($members_q->num_rows() != 0);
   $nb_tsk = ($has_tasks) ? $tasks_q->nf() : 0;
 
-  // we don't have informations about time allocation
-  //  if (($allo_q == 0) or ($allo_q->num_rows() == 0)) {
+
+  //---------------------------------------------------------------------------
+  // tasks or members not defined, we just display task or member list
+  //---------------------------------------------------------------------------
   if (!($has_tasks) or !($has_members)) {
-
     $tab_style = "class=\"detail\"";
-
     $dis_advance = "
      <tr>
        <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
@@ -365,7 +365,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 
     // we display the task list
     if ($has_tasks) { 
-
       $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_task_list :</td>
@@ -373,16 +372,13 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 
       while ($tasks_q->next_record()) {
 	$tsk_name = $tasks_q->f("projecttask_label");
-	
 	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
-	
 	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
         <td class=\"detailText\">$img $tsk_name</td>
        </tr>";
 	}
-      
     } else {
       $dis_member .= "
         <tr>
@@ -396,7 +392,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
      <tr>";
 
     if ($has_members) {
-      
       $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_members_info :</td>
@@ -404,7 +399,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
       
       while (list($key,$val) = each($array_mem)) {
 	$mem_name = $val["firstname"] ." ". $val["name"];
-	
 	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
@@ -419,17 +413,17 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
        </tr>";
     }
 
-    // Display the detailled advance array
+  //---------------------------------------------------------------------------
+  // Display the detailled advance array
+  //---------------------------------------------------------------------------
   } else {
     
     $allotted = 0;
     $usedtime = 0;
     $missingtime = 0;
-    
     $tab_style = "class=\"projectDetail\"";
 
     while ($tasks_q->next_record()) {
-
       $t_id = $tasks_q->f("projecttask_id");
       $t_parent = $tasks_q->f("parent_id");
 
@@ -437,9 +431,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
       $array_tsk[$cpt_t]["label"] = $tasks_q->f("projecttask_label");
       $array_tsk[$cpt_t]["parent"] = ($t_parent == 0) ? 1 : 0;
 
-      if ($t_parent)
+      if ($t_parent) {
 	$array_child[$t_parent] = 1;
-
+      }
       $array_parent[$t_id] = $t_parent;
 
       $cpt_t++; 
@@ -447,7 +441,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
   
     // list the members of the project
     while ($allo_q->next_record()) {
-      
       $m_id = $allo_q->f("userobm_id");
       $m_task = ($allo_q->f("projecttask_id") ? $allo_q->f("projecttask_id") : 0);
       $m_proj = ($allo_q->f("projected_time") ? $allo_q->f("projected_time") : 0);
@@ -725,8 +718,8 @@ function html_project_form($action, $project_q, $project) {
     $arc_val = ($project_q->f("project_archive")) ? "checked" : "";
     $company_name = $project_q->f("company_name");
     $deal_label = $project_q->f("deal_label");
-    $datebegin = (($project_q->f("datebegin") != "0") ? date_format($project_q->f("datebegin")) : "");
-    $dateend = (($project_q->f("dateend") != "0") ? date_format($project_q->f("dateend")) : "");
+    $datebegin = isodate_format($project_q->f("datebegin"));
+    $dateend = isodate_format($project_q->f("dateend"));
   } else {
     $pid = $project["id"];
     $name = $project["name"];

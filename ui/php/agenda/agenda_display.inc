@@ -435,7 +435,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $this_month = $day_array2[2];
   $this_year = $day_array2[1];
   $nb_user = count($calendar_user);
-  $td_width = floor(70/$nb_user);
+  $td_width = ($nb_user > 0 ? floor(70/$nb_user) : 70);
   $td_colspan = $nb_user;
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {

@@ -180,7 +180,7 @@ $l_header_pref_update = "Reset users preferences";
 $l_header_year = "Jahr";
 $l_header_day = "Tag";
 $l_header_week = "Woche";
-$l_header_month = "Monat;
+$l_header_month = "Monat";
 $l_header_new_event = "Neues Ereignis";
 
 //time headers

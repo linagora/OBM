@@ -374,6 +374,7 @@ if ($action == "index" || $action == "") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 // Actions menus are retrieved here as $project values can be set in process
+// But this prevent to test the current action authorisations... XXXX
 get_project_action();
 if (! $contact["popup"]) {
   $display["header"] = generate_menu($menu,$section);

@@ -1141,6 +1141,26 @@ function run_query_allocation($p_id) {
     group by userobm_id, projecttask_id
     ";
 
+  $query = "
+    select
+      userobm_id,
+      projectuser_projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time
+    from ProjectUser
+      left join ProjectTask
+        on projectuser_projecttask_id = projecttask_id
+      left join TimeTask
+        on  timetask_projecttask_id = projecttask_id
+        and timetask_user_id = userobm_id
+      left join UserObm
+        on projectuser_user_id = userobm_id
+    where projectuser_project_id = '$p_id'
+      and projectuser_projectedtime != '0'
+    group by userobm_id, projecttask_id
+    ";
+
   display_debug_msg($query, $cdg_sql, "run_query_allocation");
   $obm_q = new DB_OBM;
   $obm_q->query($query);

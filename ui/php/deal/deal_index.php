@@ -92,9 +92,6 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-if (! $popup) {
-  $display["header"] = generate_menu($menu, $section);
-}
 
 // when searching deals belonging to a parent, we display the parent
 if (($action == "search") && ($deal["parent"])) {
@@ -172,14 +169,13 @@ elseif (($action == "index") || ($action == "")) {
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
-    $retour = run_query_insert($deal);
-    if ($retour) {
+    $deal["id"] = run_query_insert($deal);
+    if ($deal["id"]) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      $param_deal = run_query_deal_id($deal);
-      $deal_q = run_query_detail($param_deal);
+      $deal_q = run_query_detail($deal["id"]);
       $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
       $cid = $deal_q->f("deal_company_id");
-      $inv_q = run_query_search_connected_invoices ($param_deal, $incl_arch);
+      $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
       $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, "");
     } else {
       $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
@@ -525,6 +521,12 @@ elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+// re-read the actions in case some values have been updated (id after insert) 
+get_deal_action();
+if (! $popup) {
+  $display["header"] = generate_menu($menu, $section);
+}
+
 $display["head"] = display_head($l_deal);
 $display["end"] = display_end();
 

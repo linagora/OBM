@@ -149,6 +149,7 @@ function run_query_detail($id) {
         c1.contact_phone as phonec1, c2.contact_phone as phonec2,
         c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
         UNIX_TIMESTAMP(deal_datebegin) as datebegin,
+        UNIX_TIMESTAMP(deal_dateproposal) as dateproposal,
         UNIX_TIMESTAMP(deal_datealarm) as datealarm,
         UNIX_TIMESTAMP(deal_timeupdate) as datemodif,
         UNIX_TIMESTAMP(deal_timeupdate) as timeupdate,
@@ -283,19 +284,21 @@ function run_query_insert($deal) {
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
+  $obm_q->query($query);
+
+  $d_id = run_query_deal_id($deal);
 
   // if the deal inserted is not archived, we increment the company deal number
-  if (($retour) && ($archive == '0')) {
+  if (($d_id) && ($archive == '0')) {
     run_query_company_active_deal_inc($comp);
   }
 
   // we increment the company total deal number
-  if ($retour) {
+  if ($d_id) {
     run_query_company_total_deal_inc($comp);
   }
 
-  return $retour;
+  return $d_id;
 }
 
 
@@ -381,6 +384,8 @@ function run_query_update($deal) {
 // Deal ID : Get the id of the deal inserted.                                //
 // Parameters:
 //   - $deal[] : deal hash info : keys used : all
+// Returns:
+//   deal Id if found else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_id($deal) {
   global $cdg_sql;
@@ -428,8 +433,15 @@ function run_query_deal_id($deal) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  $obm_q->next_record();
-  return  $obm_q->f("deal_id");
+
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $id = $obm_q->f("deal_id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
 }
 
 

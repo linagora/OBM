@@ -433,7 +433,7 @@ elseif ($action == "delete")  { // delete means delete an invoice
 } elseif ($action == "admin")  {
 //////////////////////h////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {  
-    echo "<center>Nothing here for now</center><br />";
+    $display["detail"] .= "Nothing here for now";
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
   }	

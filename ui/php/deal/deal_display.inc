@@ -641,7 +641,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $lvis = ($deal_q->f("deal_visibility") == 0 ? $l_public : $l_private);
   $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
   $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
-  $datepro = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
+  $datepro = date_format($deal_q->f("dateproposal"));
   $amount = $deal_q->f("deal_amount");
   $hitrate = $deal_q->f("deal_hitrate");
   $datealarm = date_format($deal_q->f("datealarm"));
@@ -854,7 +854,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $vis = ($deal_q->f("deal_visibility") == 0 ? "0" : "1");
     $market = $deal_q->f("deal_marketingmanager_id");
     $tech = $deal_q->f("deal_technicalmanager_id");
-    $dateprop = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
+    $dateprop = isodate_format($deal_q->f("dateproposal"));
     $amount = $deal_q->f("deal_amount");
     $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");

@@ -432,10 +432,15 @@ function date_format($timestamp="") {
 
   $format = $set_date;
   if (trim($format) == "") $format = $set_date_default;
-  if ($timestamp != "")
-    $date = date($format, $timestamp);
-  else
+  if ($timestamp != "") {
+    if ($timestamp == "0") {
+      $date = "";
+    } else {
+      $date = date($format, $timestamp);
+    }
+  } else {
     $date = date($format);
+  }
 
   return $date;
 }
@@ -451,10 +456,15 @@ function date_format($timestamp="") {
 function isodate_format($timestamp="") {
   global $c_php_isodate_format;
 
-  if ($timestamp != "")
-    $date = date($c_php_isodate_format, $timestamp);
-  else
+  if ($timestamp != "") {
+    if ($timestamp == "0") {
+      $date = "";
+    } else {
+      $date = date($c_php_isodate_format, $timestamp);
+    }
+  } else {
     $date = date($c_php_isodate_format);
+  }
 
   return $date;
 }
