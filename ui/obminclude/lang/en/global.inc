@@ -65,7 +65,7 @@ $l_invalid_date = "Invalid date format (JJ/MM/AAAA ou AAAA-MM-JJ)";
 //tasktype groups
 $l_task_fac = "Factured Tasks";
 $l_task_int = "Internal Projects";
-$l_task_div = "Not Factures Tasks";
+$l_task_div = "Not Factured Tasks";
 
 // days and months
 $l_january="January";

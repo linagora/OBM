@@ -46,12 +46,6 @@ function check_addtaskform(f_aff) {
   else if (! check_sel_tasktype(f_aff)) {
     return false;
   }
-//   else if (! check_sel_project(f_aff)) {
-//     return false;
-//   }
-//   else if (! check_sel_projecttask(f_aff)) {
-//     return false;
-//   }
   else
     return true;
 }
@@ -91,24 +85,6 @@ function check_sel_tasktype(form) {
     return true;
 }
 
-// function check_sel_project(form) {
-//   if ((form.sel_project.options[form.sel_project.selectedIndex].value == 0) &&
-//        (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value < 10)) {
-//     alert (\"$l_j_select_project\");
-//     return false;
-//   } else
-//     return true;
-// }
-
-// function check_sel_projecttask(form) {
-//   if ((form.sel_project.options[form.sel_projecttask.selectedIndex].value == 0) &&
-//        (form.sel_tasktype.options[form.sel_project.selectedIndex].value != 0)) {
-//     alert (\"$l_j_select_projecttask\");
-//     return false;
-//   } else
-//     return true;
-// }
-
 /////////////////////////////////////
 // tasklist auto-selection         //
 /////////////////////////////////////
@@ -136,9 +112,32 @@ function fill_tasktype(sel_tt, deal_id) {
 // project dynamic list generation //
 /////////////////////////////////////
 
+function fill_projectall(sel_list) {
+  var i, j, k;
+  k = 0;
+
+  proj_array = new Array();
+
+  for (i = 0; i < project.length; i++) {
+    for (j = 1; j < project[i].length; j++) {
+      proj_array[k]=project[i][j];
+      k++;
+    }
+  }
+
+  proj_array.sort();
+
+  sel_list.options[0] = new Option('$l_none');
+  sel_list.options[0].value = 0; 
+
+  for (i = 0; i < proj_array.length; i++) {
+    sel_list.options[i+1] = new Option(proj_array[i][0]);
+    sel_list.options[i+1].value = proj_array[i][1]; 
+  }
+}
+
 function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
   var i, j, k;
-  // location of selected tasktype in project array
   var tt_location = -1;
 
   // empty existing items
@@ -146,38 +145,49 @@ function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
     sel_list.options[i] = null; 
   }
 
-  for (i = 0; i < project.length; i++) {
-    if (project[i][0] == tasktype_id) {
-      tt_location = i; 
+  if (tasktype_id == 0) {
+    fill_projectall(sel_list);
+
+    for (i = next_sel.options.length-1; i >= 0; i--) {
+      next_sel.options[i] = null; 
     }
-  }
 
-  // there are projects with the selected tasktype
-  if (tt_location != -1) {
-    // add new items
-    for (i = 1; i < project[tt_location].length; i++) {
-      sel_list.options[i-1] = new Option(project[tt_location][i][0]);
-      sel_list.options[i-1].value = project[tt_location][i][1]; 
+    next_sel.options[0] = new Option('$l_none');
+    next_sel.options[0].value = 0; 
+
+  } else {
+
+    for (i = 0; i < project.length; i++) {
+      if (project[i][0] == tasktype_id) {
+        tt_location = i; 
+      }
     }
-  }
-  // there are no projects with the selected tasktype
-  else {
-    sel_list.options[0] = new Option(\"$l_none\");
-    sel_list.options[0].value = 0; 
-  }
 
-  // select first item (prompt) for sub list
-  //select_list.options[0].selected = true;
+    // there are projects with the selected tasktype
+    if (tt_location != -1) {
+      // add new items
+      for (i = 1; i < project[tt_location].length; i++) {
+        sel_list.options[i-1] = new Option(project[tt_location][i][0]);
+        sel_list.options[i-1].value = project[tt_location][i][1]; 
+      }
+    }
+    // there are no projects with the selected tasktype
+    else {
+      sel_list.options[0] = new Option(\"$l_none\");
+      sel_list.options[0].value = 0; 
+    }
 
-  for (k=0; k<(sel_list.options.length); k++) {
-    if (sel_list.options[k].value == deal_id)
-      sel_list.options[k].selected = true;
+    // select the correct project
+    for (k=0; k<(sel_list.options.length); k++) {
+      if (sel_list.options[k].value == deal_id)
+        sel_list.options[k].selected = true;
+    }
+
+    if (deal_id > 0)
+      fill_projecttask(next_sel, deal_id);
+    else 
+      fill_projecttask(next_sel, sel_list.options[0].value);
   }
-
-  if (deal_id > 0)
-    fill_projecttask(next_sel, deal_id);
-  else 
-    fill_projecttask(next_sel, sel_list.options[0].value);
 }
 
 /////////////////////////////////////////

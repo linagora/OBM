@@ -41,7 +41,7 @@
 /*	border: 1px solid #000000;*/
 	padding: 0px;
 	margin-top: 10px;
-	margin-right: 2px;
+	margin-right: 10px;
 /*	background-color: #00FF00;*/
 }
 
@@ -286,15 +286,17 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 }
 
 table.resultTable	 {
-	background-color:	#93919c;
+	background-color:	#009ec6;
 	color:			#000000;
 	width:			100%;
 	border:			0;
+	border-spacing:0px;
+	border:1px solid #009ec6;
 }
 
 .resultIndex {
-	color: #56545C;
-	background-color: #94929C;
+	color: #666666;
+	background-color: #eff3f7;
 	width: 100%;
 	text-align: center;
 	padding-top: 4px;
@@ -303,8 +305,7 @@ table.resultTable	 {
 	font-weight: bold;
 	font-family: Arial, Helvetica, sans-serif;
 	vertical-align: middle;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+	border: 1px solid #009ec6;
 }
 
 .resultIndexIcon {
@@ -316,9 +317,9 @@ td.resultHead	 {
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
-	color:			#ffff00;
+	color:			#ffffff;
 	text-align:		center;
-	background-color:	#93919c;
+	background-color:	#009ec6;
 }
 
 td.resultLabel	 {
@@ -335,6 +336,8 @@ td.resultText  	{
 	text-align:		left;
 	color:			#000000;
 	background-color:	#ffffff;
+border-right:1px dashed #009ec6;
+border-top:1px solid #009ec6;
 }
 
 td.resultTextC  {
@@ -343,6 +346,8 @@ td.resultTextC  {
 	text-align:		center;
 	color:			#000000;
 	background-color:	#ffffff;
+border-right:1px dashed #009ec6;
+border-top:1px solid #009ec6;
 }
 
 table.resultPref	 {
@@ -351,10 +356,9 @@ table.resultPref	 {
 	background-color:	#93919c;
 	color:			#000000;
 	width:			auto;
-	border:			3px outset green;
 }
 
-a.resultHead:link	 { color: #ffff00; background-color: transparent;}
+a.resultHead:link	 { color: #ffffff; background-color: transparent;}
 a.resultHead:active	 { color: #ffff00; background-color: transparent;}
 a.resultHead:visited { color: #ffff00; background-color: transparent;}
 

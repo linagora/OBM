@@ -115,4 +115,3 @@ $l_delete_confirm = "----";
 
 // For the display preferences modification screen 
 $l_searchproject_display = "Options d'affichage des listes de projets";
-$l_newproject_display = "Options d'affichage de la liste de nouveaux projets";

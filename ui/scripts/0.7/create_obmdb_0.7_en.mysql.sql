@@ -144,6 +144,8 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Holydays,...',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Outgoings',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Graphics/Communication',2);
+INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (21,'Administrative',2);
+INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22,'Meetings',2);
 
 --
 -- Dumping data for table 'DocumentCategory1'

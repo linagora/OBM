@@ -18,6 +18,9 @@
 // - delete          -- $params        -- delete the tasks
 // - detailupdate    -- $task_id       -- show the update task form in a popup
 // -                 -- form fields    -- update the task
+// - display         --                -- display and set display parameters
+// - dispref_display --                -- update one field display value
+// - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -363,6 +366,28 @@ elseif ($action == "detailupdate") {
     </script>
     ";
   }
+  
+}  elseif ($action == "display") {
+/////////////////////////////////////////////////////////////////////////
+  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
+
+  $display["detail"] = dis_time_display_pref($pref_search_q);
+
+} else if ($action == "dispref_display") {
+/////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_update($entity, $fieldname, $display);
+
+  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
+
+  $display["detail"] = dis_time_display_pref($pref_search_q);
+
+} else if ($action == "dispref_level") {
+/////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
+
+  $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
+
+  $display["detail"] = dis_time_display_pref($pref_search_q);
 }  
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -506,6 +531,27 @@ function get_time_actions() {
     'Condition'=> array ('None') 
                                     );
 
+// Display
+   $actions["TIME"]["display"] = array (
+     'Name'     => $l_header_display,
+     'Url'      => "$path/time/time_index.php?action=display",
+     'Right'    => $time_read,
+     'Condition'=> array ('all') 
+                                       	 );
+
+// Display Préférences
+  $actions["TIME"]["dispref_display"] = array (
+    'Url'      => "$path/time/time_index.php?action=dispref_display",
+    'Right'    => $time_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
+// Display Level
+  $actions["TIME"]["dispref_level"]  = array (
+    'Url'      => "$path/time/time_index.php?action=dispref_level",
+    'Right'    => $time_read,
+    'Condition'=> array ('None') 
+                                     		 );
 }
 
 </SCRIPT>

@@ -55,6 +55,7 @@ $l_label = "Label";
 $l_duration = "Duration";
 
 //$show_events="See details";
+$l_searchtime_display = "Display options for tasks list";
 $total_menu="Summary";
 $total_tasks="Task total";
 $total_companies="Total per company";
@@ -98,7 +99,7 @@ $l_no_tt_stats = "This person(s) is/are not using the time management";
 //$l_task_adminvalid= "Validated by an admin only";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_day = "You must select a task type.";
+$l_j_select_day = "You must select a day.";
 $l_j_select_tasktype = "You must select a task type.";
 $l_j_select_project = "You must select a projet with a billed task type.";
 $l_j_select_projecttask = "You must select a project task.";

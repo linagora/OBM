@@ -9,7 +9,7 @@
 
 // Database fields
 $l_date_task="Date";
-$l_tasktype = "Type tâche";
+$l_tasktype = "Catégorie";
 $l_tasklabel="Commentaire";
 $l_deallabel="Projet/Affaire";
 $l_task_del="Suppr";
@@ -54,6 +54,7 @@ $l_label = "Label";
 $l_duration = "Durée";
 
 //$show_events="Voir le Détail";
+$l_searchtime_display = "Options d'affichage des listes de tâches";
 $total_menu="Récapitulatifs";
 $total_tasks="Total par taches";
 $total_companies="Total par société";

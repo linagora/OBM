@@ -160,7 +160,7 @@ function dis_time_links ($time, $type="all") {
     $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
 
     $block = "
-<div class=\"timeCenter\">
+      <div class=\"timeCenter\">
        <table class=\"timeLinks\" width=\"$tot_width\">
         <tr>
          <td align=\"left\">
@@ -182,7 +182,7 @@ function dis_time_links ($time, $type="all") {
          </td>
         </tr>
        </table>    
-</div>
+      </div>
       ";
 
   } else if ($type == "month") {
@@ -978,7 +978,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   global $auth, $time, $fraction_jour ,$task_id_modify;
   global $l_addtask_start, $l_addtask_end, $l_add, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
-  global $l_fill_addtask;
+  global $l_fill_addtask, $l_daysofweekshort;
   //for list classement of task
   global $l_task_fac,$l_task_div,$l_task_int, $l_intern, $l_cat, $l_comment;
   global $c_days_in_a_week; // number of days to be displayed in a week
@@ -1029,12 +1029,30 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   
   // Day check construction
   else {
+
+    $day_checked = -1;
     for ($day=0;$day< sizeof($day_q);  $day++) {
-      if(sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]])) continue;
+      if ($day_q[$day][1] == date("Ymd"))
+	$day_checked = $day;
+    }
+
+    for ($day=0;$day< sizeof($day_q);  $day++) {
+
+      if(sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]]))
+	$disabled = 1;
+      else
+	$disabled = 0;
+   
+      // $d_label=$l_daysofweekshort[$day];
       $dlabel = $day_q[$day][0];
       $ch_day .= "<input type=\"checkbox\" name=\"cb_day[".$day_q[$day][1]."]\"";
       
-      if ($day_q[$day][1] == date("Ymd"))
+      if ($disabled)
+	$ch_day .= " disabled";
+      else if ($day_checked == -1) {
+	$ch_day .= " checked";
+	$day_checked = $day;
+      } else if ($day == $day_checked)
 	$ch_day .= " checked";
       
       $ch_day .= " />$dlabel\n";
@@ -1080,8 +1098,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   }
 
   // data array for the projecttask dynamic list construction
-  // the generated array is used by fill_project()
-
+  // the generated array is used by fill_projecttask()
   if ($projecttask_q->num_rows() != 0) {
     $previous_dl = 0;
     $projtask_data = "\nprojecttask = new Array (";
@@ -1135,48 +1152,11 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_tt .= "</select>";
 
   // Project select construction
-
-  $dis_deal_list = "<option value=\"0\">$l_none</option>\n";
-  $arr = Array();
-
-  // we put the elements in an array to sort them (they are sorted by tasktype)
-  if ($project_q->num_rows() != 0) {
-    $project_q->seek(0);
-
-    while($project_q->next_record()) {
-
-      $proj_id = $project_q->f("deal_id");
-      $company = $project_q->f("company_name");
-      $proj_name = addslashes($project_q->f("deal_label"));
-
-      if ($company == "") $company = $l_intern;
-
-      $company = (strlen($company) > 20) ? substr($company,0,20)."..." : $company;
-      $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
-      $proj_label = "$company -- ". $proj_name;
-
-      array_push($arr, Array($proj_label, $proj_id));
-    }
-  }
-
-  // we build the list from the array
-  while (count($arr) != 0) {
-    // we sort the array
-    rsort($arr);
-
-    $tab_proj = array_pop($arr);
-    $proj_id = $tab_proj[1];
-    $proj_label = $tab_proj[0];
-
-    $dis_deal_list .= "<option value=\"$proj_id\">$proj_label</option>\n";
-  }
-
   $sel_proj = "
     <select name=sel_project
             onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
                        fill_project(this.form.sel_project, this.form.sel_tasktype.value,
-                                    this.form.sel_projecttask, this.form.sel_project.value);\">    
-      $dis_deal_list
+                                    this.form.sel_projecttask, this.form.sel_project.value);return true;\"
     </select>";
 
   // ProjectTask select construction
@@ -1260,6 +1240,11 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
         fill_projecttask(document.f_add_task.sel_projecttask, $is_proj);
         select_default(document.f_add_task.sel_project, $is_proj);
         select_default(document.f_add_task.sel_projecttask, $is_projtask);
+      </script>";
+  } else {
+    $dis_script .= "
+      <script language=\"JavaScript\">
+        fill_projectall(document.f_add_task.sel_project);
       </script>";
   }
   
@@ -1367,6 +1352,26 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 //   return "<font color=\"#$col\">$data</font>";
 // } 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the Time Display preference screen                             //
+// Parameters:
+//   - $display_newpref_q    : DBO : Field list to display
+//   - $display_searchpref_q : DBO : Field list to display
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_display_pref($display_searchpref_q) {
+  global $l_searchtime_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
+  $dis_pref->display_entity = "time";
+  $dis_pref->pref_title = $l_searchtime_display;
+
+  $block .= "<td>";
+  $block .= $dis_pref->display();
+  $block .= "</td></tr></table>";
+
+  $block .= $dis_pref->dis_pref_help();
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Time search form with params                                  //

@@ -133,7 +133,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
      <div class=\"searchLabel\">$l_label<br />
        <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
      </div>
-     <div class=\"searchLabel\">$l_companyr<br />
+     <div class=\"searchLabel\">$l_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
      </div>	    
      <div class=\"searchLabel\">$l_contract<br />

@@ -132,6 +132,8 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Congés , absences , maladie',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Déplacements',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Infographie/Communication',2);
+INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (21,'Administratif',2);
+INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22,'Réunions',2);
 
 --
 -- Dumping data for table 'DocumentCategory1'
