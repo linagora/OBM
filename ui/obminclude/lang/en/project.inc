@@ -18,7 +18,7 @@ $l_dateend = "End date";
 
 $l_sold = "Sold";
 $l_estimated = "Estimated";
-$l_allotted = "Alloted";
+$l_allotted = "Allocated";
 $l_projected = "Projected";
 $l_used = "Used";
 $l_missing = "Missing";
