@@ -35,6 +35,7 @@ $l_period="Période";
 $l_task_del="Suppr.";
 $l_week="Semaine";
 $l_month="Mois";
+$l_month2="Mois de";
 $l_user="Utilisateur";
 $l_all_users="Tous ?";
 $l_see = "Voir";
@@ -54,6 +55,14 @@ $l_task = "Tache:";
 $l_label = "Label:";
 $l_duration = "Durée:";
 
+$show_events="Voir le Détail";
+$total_menu="Récapitulatifs";
+$total_tasks="Total par taches";
+$total_companies="Total par société";
+$total_projects="Total par projet/affaire";
+$l_workingdays ="Jours ouvrés";
+$l_workingdays2 ="jours ouvrés";
+
 // Titres
 $l_time = "Gestion des temps";
 
@@ -69,6 +78,12 @@ $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
 $l_total_day = "Récapitulatif des tâches par jour.Si une journée a été intégralement saisie,<BR> vous devez confirmer ci-dessous en sélectionnant les journées à valider et en validant le formulaire.";
 $l_total_deal = "Récapitulatif par taches :";
 $l_total_month = "Récapitulatif mensuel :";
+$l_validate_msg1="aucune tache validée par l'utilisateur, on affiche pas le tableau de validation admin";
+$l_total_days_msg1 = "Total jours pour ";
+$l_total_days_msg2 = " utilisateurs ";
+$l_total_days_msg3 = " sur ";
+$l_total_days_msg4 = " (total à remplir)";
+$l_total_user_msg1 = "Total jours pour cet utilisateur ";
 
 // Type de tâches à rechercher
 $l_tasktype = "Type des tâches";

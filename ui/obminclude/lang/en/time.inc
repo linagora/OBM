@@ -34,6 +34,7 @@ $l_day="Day";
 $l_task_del="Remove.";
 $l_week="Week";
 $l_month="Month";
+$l_month2=" ";
 $l_user="User";
 $l_all_users="All ?";
 $l_see = "See";
@@ -54,6 +55,15 @@ $l_task = "Task:";
 $l_label = "Label:";
 $l_duration = "Duration:";
 
+$show_events="See details";
+$total_menu="Summary";
+$total_tasks="Task total";
+$total_companies="Total per company";
+$total_projects="Total per project/deal";
+
+$l_workingdays ="Working days";
+$l_workingdays2 ="working days";
+
 // Titres
 $l_time = "Time management";
 
@@ -68,6 +78,12 @@ $l_update_task = "Here is the form where you can update your task:";
 $l_total_day = "Summary by day. If a day is complete,<BR> Confirm it by selecting complet days and validate form.";
 $l_total_deal = "Summary by task:";
 $l_total_month = "Summary by month:";
+$l_validate_msg1="no task validated by user, admin validation table is not displayed.";
+$l_total_days_msg1 = "Number of days for ";
+$l_total_days_msg2 = " users ";
+$l_total_days_msg3 = " on ";
+$l_total_days_msg4 = " (total to fill)";
+$l_total_user_msg1 = "Number of days for this user ";
 
 // Type de tâches à rechercher
 $l_tasktype = "Task type";
