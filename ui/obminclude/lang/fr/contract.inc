@@ -19,7 +19,7 @@ $l_before = "Date Expiration Avant";
 $l_incident_list = "Liste des incidents";
 $l_incident_new = "Ajouter un incident";
 
-$l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
+$l_contract_select_deal = "Sélection de l'Affaire liée au contrat.";
 $l_deal = "Affaire";
 $l_label = "Label";
 $l_label_libelle = "Mot-clef du libellé";

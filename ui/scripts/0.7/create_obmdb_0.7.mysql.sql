@@ -194,6 +194,7 @@ CREATE TABLE Contact (
   contact_firstname varchar(24),
   contact_address1 varchar(50),
   contact_address2 varchar(50),
+  contact_address3 varchar(50),
   contact_zipcode varchar(14),
   contact_town varchar(24),
   contact_expresspostal varchar(8),

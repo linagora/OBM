@@ -539,15 +539,15 @@ function check_data_form($cid, $document) {
   $url = $document["url"];
   $file_update = $document["file_update"];
   
-  if(strpos($path,'/') === 0) {
+  if (strpos($path,'/') === 0) {
     $final_path = $document_path.$path;
   }
   else {
     $final_path = $document_path.'/'.$path;
   }
-   
-  if($kind == "new_file" && !is_dir($final_path) && $file_update != "no") {
-    $err_msg = $l_invalid_repository_path;
+
+  if ($kind == "new_file" && !is_dir($final_path) && $file_update != "no") {
+    $err_msg = "$l_invalid_repository_path ($final_path)";
     return false;
   }
   

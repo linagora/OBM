@@ -111,7 +111,7 @@ function html_contact_search_form ($contact) {
       <input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" />
+      <input type=\"text\" name=\"tf_phone\" size=\"14\" maxlength=\"16\" value=\"$phone\" />
     </div>
     <div class=\"searchLabel\">$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
@@ -591,16 +591,16 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     <table class=\"detail\">
     <tr>
     <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"16\" value=\"$phone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\" value=\"$phone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_hphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"16\" value=\"$hphone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"16\" maxlength=\"16\" value=\"$hphone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"16\" value=\"$fax\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\" value=\"$fax\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"16\" value=\"$mphone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"16\" maxlength=\"16\" value=\"$mphone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_address 1</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"30\" value=\"$ad1\" /></td>

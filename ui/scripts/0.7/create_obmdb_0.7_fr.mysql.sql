@@ -135,6 +135,13 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (21,'Administratif',2);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22,'Réunions',2);
 
+
+--
+-- Default Document root
+--
+INSERT INTO Document (document_title, document_name, document_kind, document_private, document_path) VALUES ('Root', 'Default', 0, 0, '/');
+
+
 --
 -- Dumping data for table 'DocumentCategory1'
 --
@@ -177,3 +184,6 @@ INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documen
 VALUES (9,'Fichier Binaire','exe','application/octet-stream');
 INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES (10,'Fichier PowerPoint','ppt','application/vnd.ms-powerpoint');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (11,'Fichier CSV','csv','text/x-csv');
+
