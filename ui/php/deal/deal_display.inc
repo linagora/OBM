@@ -1209,7 +1209,7 @@ function auto_set_hitrate(select, targetField, pos) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
   global $display, $path, $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_contract, $l_link_contract_no;
+  global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
 
   $delete_ok = true;
 
@@ -1236,8 +1236,32 @@ function dis_check_links($p_id) {
     </tr>";
   }
 
+  // Links from Project
+  $obm_q = run_query_deal_project_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_linkp ="<tr><td class=\"detailHead\">$l_link_project</td></tr>";
+    while ($obm_q->next_record()) {
+      $pid = $obm_q->f("project_id");
+      $pname = $obm_q->f("project_name");
+      $display_linkp .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
+      </td>
+    </tr>";
+    }
+  } else {
+    $display_linkp = "
+    <tr>
+      <td class=\"detailHead\">$l_link_project_no</td>
+    </tr>";
+  }
+
   $block .= "<table class=\"detail\">
    $display_linkc
+   $display_linkp
    </table>";
 
   $dis_back = "<form name=\"form_back\" method=\"post\"

@@ -295,13 +295,15 @@ function run_query_insert($project) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  // get the id of the inserted project
+  // get the id of the inserted project. Date is to insure correct project
+  // is selected (and not similar from the same deal)
   $query = "select project_id
             from Project
             where project_name = '$name'
               and project_tasktype_id = '$tt'
               and project_soldtime = '$soldtime'
-              and project_estimatedtime = '$estimated'";
+              and project_estimatedtime = '$estimated'
+              and project_timecreate = '$date_now'";
 
   display_debug_msg($query, $cdg_sql, "run_query_insert (get Id)");
   $obm_q->query($query);
@@ -352,7 +354,9 @@ function run_query_insert($project) {
       $obm_q->next_record();
       $pt_id = $obm_q->f("projecttask_id");
     } else {
+      // If a User but without a task, projected and missing times are 0
       $pt_id = "NULL";
+      $estimated = 0;
     }
 
     // We affect the member to this project / projecttask

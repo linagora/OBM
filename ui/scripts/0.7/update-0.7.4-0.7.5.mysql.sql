@@ -146,3 +146,9 @@ ALTER table UserObm_SessionLog change column userobm_sessionlog_timeupdate usero
 
 -- Change column : userobm_sessionlog_timecreate to timestamp
 ALTER table UserObm_SessionLog change column userobm_sessionlog_timecreate userobm_sessionlog_timecreate timestamp(14);
+
+
+-------------------------------------------------------------------------------
+-- Update some content in ProjectUser (bug#290)
+-------------------------------------------------------------------------------
+UPDATE ProjectUser set projectuser_projectedtime=0, projectuser_missingtime=0 where projectuser_projecttask_id is NULL;

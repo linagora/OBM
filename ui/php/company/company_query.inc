@@ -472,6 +472,26 @@ function run_query_company_contract_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return all the projects attached to the company
+// Parameters:
+//   - $p_id : company Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_project_links($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select distinct project_id, project_name 
+            from Project
+            where project_company_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the companies with this name and zip (not with this id if set)
 // Parameters:
 //   - $p_id : company Id not to return

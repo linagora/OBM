@@ -60,6 +60,17 @@ $l_act_delete = "Delete Activity";
 $l_act_insert = "Insert Activity";
 
 // Messages
+$l_link_contact = "These contacts are from this company";
+$l_link_contact_no = "The company hasn't any contacts";
+$l_link_deal = "The company is involved in these deals";
+$l_link_deal_no = "The company isn't involved in any deal";
+$l_link_contract = "The company is involved in these contracts";
+$l_link_contract_no = "The company isn't involved in any contract";
+$l_link_project = "The company is involved in these projects";
+$l_link_project_no = "The company isn't involved in any projects";
+$l_cant_delete = "The company can't be deleted !";
+$l_can_delete = "The company can be deleted.";
+
 $l_company_del_verif_error = " es sind noch Verträge zugeordnet: Firma kann nicht gelöscht werden";
 $l_found = "Firmen gefunden.";
 $l_no_found = "Keine Firma zum Suchkriterium gefunden!";

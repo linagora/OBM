@@ -27,6 +27,7 @@ If you are using OBM and want to be referenced here drop us a note.
          Aliacom - gestion interne de la société
     <li>GMX
     <li>SOPRA
+    <li>Castel & Fromager (groupe FAYAT, 1er groupe indépendant de BTP)
     <li>...
   </ul>
   </p>

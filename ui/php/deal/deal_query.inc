@@ -551,6 +551,26 @@ function run_query_deal_contract_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return all the projects attached to the deal
+// Parameters:
+//   - $p_id : deal Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_project_links($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select distinct project_id, project_name 
+            from Project
+            where project_deal_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : Company info                                            //
 // Parameters:
 //   - $id : company id

@@ -104,7 +104,7 @@ $l_fill_projected = "Each member must be assigned to a task";
 $l_fill_projnumber = "The projected time number is not valid.";
 $l_fill_missing = "The missing time must be filled for every member";
 $l_fill_missnumber = "The missing time number is not valid.";
-$l_delete_confirm = "----";
+$l_delete_confirm = "Confirm the project deletion ?";
 
 // For the display preferences modification screen 
 $l_project_display = "Display options for projects list";

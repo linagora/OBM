@@ -13,8 +13,8 @@ $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
 //$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
-$obmdb_user = "root";
-$obmdb_password = "";
+$obmdb_user = "obm";
+$obmdb_password = "obm";
 
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;

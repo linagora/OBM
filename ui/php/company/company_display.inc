@@ -295,11 +295,13 @@ function html_company_links($co_q) {
   $ctry = $co_q->f("company_country_id");
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
+  $deal_total = $co_q->f("company_deal_total");
 
   $uname = urlencode($name);
   $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
   $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
   $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
+  $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
   $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
   $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
   $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Company");
@@ -321,7 +323,9 @@ function html_company_links($co_q) {
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
-        <a href=\"$url_deal_list\">$l_header_deal ($deal_num)</a></li>
+        $l_header_deal (
+        <a href=\"$url_deal_list\">$deal_num</a> /
+        <a href=\"$url_deal_total\">$deal_total</a> )</li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>
   </ul>
@@ -776,7 +780,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
-  global $l_link_contract, $l_link_contract_no;
+  global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
   global $path, $display;
 
   $delete_ok = true;
@@ -853,6 +857,29 @@ function dis_check_links($p_id) {
     $display_link_cr = "<tr><td class=\"detailHead\">$l_link_contract_no</td></tr>";
   }
 
+  // Links from Project
+  $obm_q = run_query_company_project_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_linkp ="<tr><td class=\"detailHead\">$l_link_project</td></tr>";
+    while ($obm_q->next_record()) {
+      $pid = $obm_q->f("project_id");
+      $pname = $obm_q->f("project_name");
+      $display_linkp .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
+      </td>
+    </tr>";
+    }
+  } else {
+    $display_linkp = "
+    <tr>
+      <td class=\"detailHead\">$l_link_project_no</td>
+    </tr>";
+  }
+
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("company_index.php") ."\">
     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
@@ -864,6 +891,7 @@ function dis_check_links($p_id) {
    $display_linkc
    $display_linkd
    $display_link_cr
+   $display_linkp
    </table>";
 
   if ($delete_ok == true) {

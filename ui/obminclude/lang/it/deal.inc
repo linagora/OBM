@@ -91,6 +91,8 @@ $l_affect = "Affect";
 
 $l_link_contract = "The deal is involved in these contracts";
 $l_link_contract_no = "The deal isn't involved in any contracts";
+$l_link_project = "The deal is involved in these projects";
+$l_link_project_no = "The deal isn't involved in any projects";
 $l_cant_delete = "The deal can't be deleted !";
 $l_can_delete = "The deal can be deleted.";
 

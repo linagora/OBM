@@ -107,7 +107,7 @@ safe_mode = On
 </table>
 
 <h3>2.1: Check that php support mysql or postgresql</h3>
-Depending on your database engine, one of these lines must be present in your php.ini :
+Depending on your database engine, one of these lines must be present in your php.ini (both module and command line if they are separated) :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -333,11 +333,13 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* 
 <p />
 
 The script <i>install_obmdb_0.7.sh</i> handle all the database creation steps.
-Run the creation script
+<br>
+Set the correct User / password (or DB) in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
 cd obm/scripts/0.7
+emacs /install_obmdb_0.7.sh
 ./install_obmdb_0.7.sh
 </pre>
   </td>
@@ -361,13 +363,25 @@ create database obm with owner = obm;
 </table>
 <p />
 
-The script <i>install_obmdb_0.7.pgsql.sh</i> handle all the database creation steps.
+If your Postgres server is not configured with latin1 character set, edit the file script/0.7/obmdb_test_values_0.7.sql and uncomment the line
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+\encoding latin1
+</pre>
+  </td>
+</tr>
+</table>
+<p />
 
-Run the creation script
+The script <i>install_obmdb_0.7.pgsql.sh</i> handle all the database creation steps.
+<br>
+Edit User / password (or DB) infos in this script and run it
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
 cd obm/scripts/0.7
+emacs install_obmdb_0.7_pgsql.sh
 ./install_obmdb_0.7_pgsql.sh
 </pre>
   </td>

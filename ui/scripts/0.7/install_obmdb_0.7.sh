@@ -8,8 +8,8 @@
 ###############################################################################
 
 # Mysql User and Password var definition
-U=web
-P="web"
+U=obm
+P="obm"
 DB="obm"
 
 # We search for the PHP interpreter (different name on Debian, RedHat)

@@ -117,6 +117,8 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $member = $project["member"];
   $archive = $project["archive"];
   $date = $project["datebegin"];
+  $company_id = $project["company"];
+  $deal_id = $project["deal"];
 
   $task_list = array($l_task_fac, $l_task_int, $l_task_div);
 
@@ -193,6 +195,8 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" type=\"hidden\" value=\"search\" />
+        <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
+        <input name=\"param_deal\" type=\"hidden\" value=\"$deal_id\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       </div>
       <div class=\"searchEnd\"></div>
