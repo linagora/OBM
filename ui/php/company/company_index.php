@@ -235,7 +235,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_insert($tf_kind_new);
+  $retour = run_query_kind_insert($company);
   if ($retour) {
     display_ok_msg($l_kind_insert_ok);
   } else {
@@ -246,7 +246,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_update($tf_kind_upd, $sel_kind);
+  $retour = run_query_kind_update($company);
   if ($retour) {
     display_ok_msg($l_kind_update_ok);
   } else {
@@ -257,13 +257,13 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_kind_links($sel_kind);
+  dis_kind_links($company);
   require("company_js.inc");
   dis_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_delete($hd_kind_label);
+  $retour = run_query_kind_delete($company["kind"]);
   if ($retour) {
     display_ok_msg($l_kind_delete_ok);
   } else {
@@ -274,7 +274,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "activity_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_insert($tf_act_new);
+  $retour = run_query_activity_insert($company);
   if ($retour) {
     display_ok_msg($l_act_insert_ok);
   } else {
@@ -285,7 +285,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "activity_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_update($tf_act_upd, $sel_act);
+  $retour = run_query_activity_update($company);
   if ($retour) {
     display_ok_msg($l_act_update_ok);
   } else {
@@ -296,13 +296,13 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "activity_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_activity_links($sel_act);
+  dis_activity_links($company);
   require("company_js.inc");
   dis_admin_index();
 
 } elseif ($action == "activity_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_activity_delete($hd_act_label);
+  $retour = run_query_activity_delete($company["activity"]);
   if ($retour) {
     display_ok_msg($l_act_delete_ok);
   } else {
@@ -336,7 +336,7 @@ function get_param_company() {
   global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
   global $sel_act, $sel_market, $ta_com, $param_company;
-  global $title, $url;
+  global $tf_kind, $tf_act, $title, $url;
   global $cdg_param;
 
   if (isset ($param_company)) $company["id"] = $param_company;
@@ -358,13 +358,21 @@ function get_param_company() {
   if (isset ($tf_email)) $company["email"] = $tf_email;
   if (isset ($ta_com)) $company["com"] = $ta_com;
 
+  // Admin - Kind fields
+  // $sel_kind -> "kind" is already set
+  if (isset ($tf_kind)) $company["kind_label"] = $tf_kind;
+
+  // Admin - Activity fields
+  // $sel_act -> "act" is already set
+  if (isset ($tf_act)) $company["act_label"] = $tf_act;
+
   if (isset ($title)) $company["title"] = stripslashes(urldecode($title));
   if (isset ($url)) $company["url"] = urldecode($url);
 
   if (debug_level_isset($cdg_param)) {
     if ( $company ) {
       while ( list( $key, $val ) = each( $company ) ) {
-        echo "<BR>company[$key]=$val";
+        echo "<br />company[$key]=$val";
       }
     }
   }

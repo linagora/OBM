@@ -149,6 +149,50 @@ if ($action == "index" || $action == "") {
   require("incident_js.inc");
   html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   
+} elseif ($action == "admin")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "priority_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_priority_insert($incident);
+  if ($retour) {
+    display_ok_msg($l_pri_insert_ok);
+  } else {
+    display_err_msg($l_pri_insert_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "priority_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_priority_update($incident);
+  if ($retour) {
+    display_ok_msg($l_pri_update_ok);
+  } else {
+    display_err_msg($l_pri_update_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "priority_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_priority_links($incident["priority"]);
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "priority_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_priority_delete($incident["priority"]);
+  if ($retour) {
+    display_ok_msg($l_pri_delete_ok);
+  } else {
+    display_err_msg($l_pri_delete_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "incident", 1);
@@ -181,7 +225,9 @@ display_end();
 function get_param_incident() {
   global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
-  global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident,$tf_dateafter,$tf_datebefore, $contract_new_id;
+  global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident;
+  global $tf_dateafter,$tf_datebefore, $contract_new_id;
+  global $tf_pri, $tf_order;
   global $set_debug, $cdg_param;
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
@@ -202,6 +248,11 @@ function get_param_incident() {
   if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
   if (isset ($contract_new_id)) $incident["cont_new_id"] = $contract_new_id;
 
+  // Admin - Priority fields
+  // $sel_priority -> "priority" is already set
+  if (isset ($tf_pri)) $incident["pri_label"] = $tf_pri;
+  $incident["pri_order"] = (isset($tf_order) ? $tf_order : "0");
+
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
     if ( $incident ) {
       while ( list( $key, $val ) = each( $incident ) ) {
@@ -220,7 +271,7 @@ function get_param_incident() {
 function get_incident_action() {
   global $incident, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_display;
+  global $l_header_admin, $l_header_display;
   global $incident_read, $incident_write, $incident_admin_write, $incident_admin_read;
 
 //  Index
@@ -282,6 +333,14 @@ function get_incident_action() {
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
+// Admin
+  $actions["INCIDENT"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/incident/incident_index.php?action=admin",
+    'Right'    => $incident_admin_read,
+    'Condition'=> array ('all') 
+                                       );
+
 // Display
   $actions["INCIDENT"]["display"] = array (
      'Name'     => $l_header_display,

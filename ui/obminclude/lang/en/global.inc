@@ -33,7 +33,7 @@ $l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
 // OBM_DISPLAY
 $l_field = "Field";
 $l_displayed = "Displayed";
-$l_order = "Display order";
+$l_order = "Order";
 $l_move = "Move";
 $l_mandatory = "Display of this field is mandatory";
 $l_display_no = "Stop displaying this field";

@@ -88,35 +88,26 @@ $l_delete_parent = "Delete the ParentDeal";
 $l_affect = "Affect";
 $l_parentdeal_deal_new = "Create a new deal";
 
-$l_link_contract = "The deal is involved in these contracts";
-$l_link_contract_no = "The deal isn't involved in any contracts";
-$l_cant_delete = "The deal can't be deleted !";
-$l_can_delete = "The deal can be deleted.";
-
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
-$l_kind_can_delete = "The Kind can be deleted !";
-$l_kind_cant_delete = "The Kind can't be deleted !";
-$l_kind_link_deal = "The Kind is involved in these deals";
 $l_kind_update = "Update Kind";
 $l_kind_insert = "Insert Kind";
 $l_status_update = "Update State";
 $l_status_checkdelete = "Check or Delete State";
 $l_status_delete = "Delete State";
-$l_status_can_delete = "The Status can be deleted";
-$l_status_cant_delete = "The Status can't be deleted";
-$l_status_link_deal = "The Status is involved in these deals";
 $l_status_insert = "Insert State";
 $l_cat_checkdelete = "Check or Delete Category";
 $l_cat_delete = "Delete Category";
-$l_cat_can_delete = "The Category can be deleted";
-$l_cat_cant_delete = "The Category can't be deleted";
-$l_cat_link_deal = "The Category is involved in these deals";
 $l_cat_update = "Update Category";
 $l_cat_insert = "Insert Category";
 
 
 // Messages
+$l_link_contract = "The deal is involved in these contracts";
+$l_link_contract_no = "The deal isn't involved in any contracts";
+$l_cant_delete = "The deal can't be deleted !";
+$l_can_delete = "The deal can be deleted.";
+
 $l_err_parent_has_deal = "Deals are attached to this ParentDeal, it can't be deleted !";
 $l_err_label_empty = "You must fill the Parentdeal label !";
 $l_err_kind_empty = "You must fill the deal kind !";
@@ -149,18 +140,27 @@ $l_kind_update_ok = "The kind has been updated successfully.";
 $l_kind_update_error = "The kind of the deal has failed !";
 $l_kind_delete_error = "The deletion of the kind has failed !";
 $l_kind_delete_ok = "The kind has been deleted successfully.";
+$l_kind_can_delete = "The Kind can be deleted !";
+$l_kind_cant_delete = "The Kind can't be deleted !";
+$l_kind_link_deal = "The Kind is involved in these deals";
 $l_status_insert_ok = "The state has been inserted successfully.";
 $l_status_insert_error = "The insertion of the state has failed !";
 $l_status_update_ok = "The State has been updated successfully.";
 $l_status_update_error = "The state of the deal has failed !";
 $l_status_delete_error = "The deletion of the state has failed !";
 $l_status_delete_ok = "The state has been deleted successfully.";
+$l_status_can_delete = "The Status can be deleted";
+$l_status_cant_delete = "The Status can't be deleted";
+$l_status_link_deal = "The Status is involved in these deals";
 $l_cat_insert_ok = "The category has been inserted successfully.";
 $l_cat_insert_error = "The insertion of the category has failed !";
 $l_cat_update_ok = "The category has been updated successfully.";
-$l_cat_update_error = "The category of the deal has failed !";
+$l_cat_update_error = "The category update has failed !";
 $l_cat_delete_error = "The deletion of the category has failed !";
 $l_cat_delete_ok = "The category has been deleted successfully.";
+$l_cat_can_delete = "The Category can be deleted";
+$l_cat_cant_delete = "The Category can't be deleted";
+$l_cat_link_deal = "The Category is involved in these deals";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

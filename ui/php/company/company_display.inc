@@ -812,8 +812,9 @@ function html_company_kind_form($kind_q) {
 
   $sel_kind = "<select name=\"sel_kind\" size=\"4\" >";
   while ($kind_q->next_record()) {
+    $id = $kind_q->f("companytype_id");
     $label = $kind_q->f("companytype_label");
-    $sel_kind .= "\n<option value=\"$label\">$label</option>";
+    $sel_kind .= "\n<option value=\"$id\">$label</option>";
   }
   $sel_kind .= "</select>";
 
@@ -833,7 +834,7 @@ function html_company_kind_form($kind_q) {
         <table>
         <tr>
           <td colspan=\"3\">
-            <form name=\"form_admin_kind_delete\" method=\"post\"
+            <form name=\"form_kind_delete\" method=\"post\"
               action=\"" . url_prepare("company_index.php") . "\">
             <table>
             <tr>
@@ -857,9 +858,9 @@ function html_company_kind_form($kind_q) {
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
-            <input type=\"text\" name=\"tf_kind_upd\" />
+            <input type=\"text\" name=\"tf_kind\" />
             <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
-              onclick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\" />
+              onclick=\"if (check_kind_upd(this.form,document.form_kind_delete)) return true; else return false;\" />
             </form>
           </td>
           <td>&nbsp;</td>
@@ -875,7 +876,7 @@ function html_company_kind_form($kind_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_kind_new :
-            <input name=\"tf_kind_new\" /></td>
+            <input name=\"tf_kind\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
@@ -893,39 +894,19 @@ function html_company_kind_form($kind_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the kind delete display form (button)                              //
-// Parameters:
-//   - $label : kind label
-// Retuns:
-//   $r : string with HTML code
-///////////////////////////////////////////////////////////////////////////////
-function dis_kind_delete_form($label) {
-  global $l_kind_delete;
-
-  $r = "<form name=\"form_kind_delete\"
-          method=post action=\"" . url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind_delete\">
-        <input type=\"hidden\" name=\"hd_kind_label\" value=\"$label\">
-        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
-        </form>";
-
-  return $r;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Displays the kind links                                                   //
 // Parameters:
-//   - $label : kind label
+//   - $company : company hash info : keys used : kind
 ///////////////////////////////////////////////////////////////////////////////
-function dis_kind_links($label) {
+function dis_kind_links($company) {
   global $l_kind_link_company, $l_kind_link_company_no;
-  global $l_kind_can_delete, $l_kind_cant_delete;
+  global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
   global $l_back;
 
-  $id = get_kind_id($label);
+  // $id = get_kind_id($label);
+  $id = $company["kind"];
+  $label = get_kind_label($id);
   $obm_q = run_query_kind_links($id);
-  $del_form = dis_kind_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
@@ -955,7 +936,14 @@ function dis_kind_links($label) {
       <td colspan=\"2\" class=\"messageOk\">
       $l_kind_link_company_no '$label' : $l_kind_can_delete</td>
     </tr><tr>
-      <td>$del_form</td>
+      <td>
+        <form name=\"form_kind_delete\"
+          method=post action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind_delete\">
+        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\">
+        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
+        </form>
+      </td>
       <td>
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("company_index.php") . "\">
@@ -981,8 +969,9 @@ function html_company_activity_form($act_q) {
 
   $sel_act = "<select name=\"sel_act\" size=\"8\" >";
   while ($act_q->next_record()) {
+    $id = $act_q->f("companyactivity_id");
     $label = $act_q->f("companyactivity_label");
-    $sel_act .= "\n<option value=\"$label\">$label</option>";
+    $sel_act .= "\n<option value=\"$id\">$label</option>";
   }
   $sel_act .= "</select>";
 
@@ -1027,7 +1016,7 @@ function html_company_activity_form($act_q) {
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_act\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"activity_update\" />
-            <input type=\"text\" name=\"tf_act_upd\" />
+            <input type=\"text\" name=\"tf_act\" />
             <input type=\"submit\" name=\"sub_act\" value=\"$l_act_update\"
               onclick=\"if (check_act_upd(this.form,document.form_admin_act_delete)) return true; else return false;\" />
             </form>
@@ -1044,7 +1033,7 @@ function html_company_activity_form($act_q) {
         <table>
         <tr>
           <td class=\"adminLabel\">$l_act_new :
-            <input name=\"tf_act_new\" /></td>
+            <input name=\"tf_act\" /></td>
         </tr><tr>
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"activity_insert\" />
@@ -1062,39 +1051,18 @@ function html_company_activity_form($act_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the activity delete display form (button)                          //
-// Parameters:
-//   - $label : activity label
-// Retuns:
-//   $r : string with HTML code
-///////////////////////////////////////////////////////////////////////////////
-function dis_activity_delete_form($label) {
-  global $l_act_delete;
-
-  $r = "<form name=\"form_act_delete\"
-          method=post action=\"" . url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"activity_delete\">
-        <input type=\"hidden\" name=\"hd_act_label\" value=\"$label\">
-        <input type=\"submit\" name=\"sub_act\" value=\"$l_act_delete\">
-        </form>";
-
-  return $r;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Displays the activity links                                               //
 // Parameters:
-//   - $label : activity label
+//   - $company : company hash info : keys used : activity
 ///////////////////////////////////////////////////////////////////////////////
-function dis_activity_links($label) {
+function dis_activity_links($company) {
   global $l_act_link_company, $l_act_link_company_no;
-  global $l_act_can_delete, $l_act_cant_delete;
+  global $l_act_delete, $l_act_can_delete, $l_act_cant_delete;
   global $l_back;
 
-  $id = get_activity_id($label);
+  $id = $company["activity"];
+  $label = get_activity_label($id);
   $obm_q = run_query_activity_links($id);
-  $del_form = dis_activity_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
@@ -1124,7 +1092,14 @@ function dis_activity_links($label) {
       <td colspan=\"2\" class=\"messageOk\">
         $l_act_link_company_no '$label' : $l_act_can_delete</td>
     </tr><tr>
-      <td>$del_form</td>
+      <td>
+        <form name=\"form_act_delete\"
+          method=post action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"activity_delete\">
+        <input type=\"hidden\" name=\"sel_act\" value=\"$id\">
+        <input type=\"submit\" name=\"sub_act\" value=\"$l_act_delete\">
+        </form>
+      </td>
       <td>
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("company_index.php") . "\">

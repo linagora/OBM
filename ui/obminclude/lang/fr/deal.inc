@@ -100,34 +100,25 @@ $l_update_parent = "Modifier SurAffaire";
 $l_delete_parent = "Supprimer SurAffaire";
 $l_parentdeal_deal_new = "Créer nouvelle affaire";
 
+$l_kind_checkdelete = "Vérifier ou Supprimer le Type";
+$l_kind_delete = "Supprimer le Type";
+$l_kind_update = "Modifier le Type";
+$l_kind_insert = "Créer le Type";
+$l_status_checkdelete = "Vérifier ou Supprimer l'état";
+$l_status_delete = "Supprimer l'état";
+$l_status_update = "Modifier l'état";
+$l_status_insert = "Créer l'état";
+$l_cat_checkdelete = "Vérifier ou Supprimer la catégorie";
+$l_cat_delete = "Supprimer la catégorie";
+$l_cat_update = "Modifier la catégorie";
+$l_cat_insert = "Créer la catégorie";
+
+// Messages
 $l_link_contract = "L'affaire est référencée par ces contrats";
 $l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
 $l_cant_delete = "L'affaire ne peut être supprimée !";
 $l_can_delete = "L'affaire peut être supprimée.";
 
-$l_kind_checkdelete = "Vérifier ou Supprimer le Type";
-$l_kind_delete = "Supprimer le Type";
-$l_kind_can_delete = "Le type peut être supprimé";
-$l_kind_cant_delete = "Le type ne peut être supprimé";
-$l_kind_link_deal = "Le type est référencé par ces affaires";
-$l_kind_update = "Modifier le Type";
-$l_kind_insert = "Créer le Type";
-$l_status_checkdelete = "Vérifier ou Supprimer l'état";
-$l_status_delete = "Supprimer l'état";
-$l_status_can_delete = "L'état peut être supprimé";
-$l_status_cant_delete = "L'état ne peut être supprimé";
-$l_status_link_deal = "L'état est référencé par ces affaires";
-$l_status_update = "Modifier l'état";
-$l_status_insert = "Créer l'état";
-$l_cat_checkdelete = "Vérifier ou Supprimer la catégorie";
-$l_cat_delete = "Supprimer la catégorie";
-$l_cat_can_delete = "La catégorie peut être supprimée";
-$l_cat_cant_delete = "La catégorie ne peut être supprimée";
-$l_cat_link_deal = "La catégorie est référencée par ces affaires";
-$l_cat_update = "Modifier la catégorie";
-$l_cat_insert = "Créer la catégorie";
-
-// Messages
 $l_err_parent_has_deal = "Cette suraffaire contient des affaires, elle ne peut être supprimée !";
 $l_err_label_empty = "Le label doit être renseigné !";
 $l_err_kind_empty = "Le type d'affaire doit être renseigné !";
@@ -139,6 +130,9 @@ $l_updateaffect_ok = "L'affaire a bien été affectée a une surAffaire.";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
 $l_found = "affaire(s) trouvée(s).";
 $l_no_found = "Aucune affaire ne correspond à ces critères !";
+$l_found_parent = "SurAffaires trouvées";
+$l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
+
 $l_delete_ok = "La suppression de l'affaire a été correctement effectuée.";
 $l_delete_error = "La suppression de l'affaire a échoué !";
 $l_insert_ok = "L'insertion de l'affaire a été correctement effectuée.";
@@ -155,20 +149,27 @@ $l_kind_update_ok = "La modification du type a été correctement effectuée";
 $l_kind_update_error = "La modification du type a échoué !";
 $l_kind_delete_error = "La suppression du type a échoué !";
 $l_kind_delete_ok = "La suppression du type a été correctement effectuée.";
+$l_kind_can_delete = "Le type peut être supprimé";
+$l_kind_cant_delete = "Le type ne peut être supprimé";
+$l_kind_link_deal = "Le type est référencé par ces affaires";
 $l_status_insert_ok = "L'insertion de l'état a été correctement effectuée.";
 $l_status_insert_error = "L'insertion de l'état a échoué !";
 $l_status_update_ok = "La modification de l'état a été correctement effectuée";
 $l_status_update_error = "La modification de l'état a échoué !";
 $l_status_delete_error = "La suppression de l'état a échoué !";
 $l_status_delete_ok = "La suppression de l'état a été correctement effectuée.";
+$l_status_can_delete = "L'état peut être supprimé";
+$l_status_cant_delete = "L'état ne peut être supprimé";
+$l_status_link_deal = "L'état est référencé par ces affaires";
 $l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
 $l_cat_insert_error = "L'insertion de la catégorie a échoué !";
 $l_cat_update_ok = "La modification de la catégorie a été correctement effectuée";
 $l_cat_update_error = "La modification de la catégorie a échoué !";
 $l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée !";
 $l_cat_delete_error = "La suppression de la catégorie a échoué !";
-$l_found_parent = "SurAffaires trouvées";
-$l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
+$l_cat_can_delete = "La catégorie peut être supprimée";
+$l_cat_cant_delete = "La catégorie ne peut être supprimée";
+$l_cat_link_deal = "La catégorie est référencée par ces affaires";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";

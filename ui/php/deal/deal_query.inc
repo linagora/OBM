@@ -783,7 +783,7 @@ function run_query_status_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["status_label"];
-  $order = ($deal["status_order"] ? $deal["status_order"] : "0");
+  $order = $deal["status_order"];
 
   $query = "insert into DealStatus (dealstatus_timeupdate,
     dealstatus_timecreate,
@@ -813,7 +813,7 @@ function run_query_status_update($deal) {
 
   $status = $deal["state"];
   $label = $deal["status_label"];
-  $order = ($deal["status_order"] ? $deal["status_order"] : "0");
+  $order = $deal["status_order"];
 
   $query = "update DealStatus set dealstatus_label='$label',
     dealstatus_timeupdate='".date("Y-m-d H:i:s")."',
@@ -1316,7 +1316,7 @@ function get_kind_label($id) {
 function get_status_label($id) {
   global $cdg_sql;
 
-  $query="select dealstatus_label from DealStatus where dealstatus_id='$id'";
+  $query = "select dealstatus_label from DealStatus where dealstatus_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -337,6 +337,122 @@ function run_query_status() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : Priority insert                                         //
+// Parameters:
+//   - $incdident[] : incident hash info : keys used : pri_label, pri_order
+///////////////////////////////////////////////////////////////////////////////
+function run_query_priority_insert($incident) {
+  global $auth, $cdg_sql;
+	
+  $label = $incident["pri_label"];
+  $order = $incident["pri_order"];
+
+  $query = "insert into IncidentPriority (incidentpriority_timeupdate,
+    incidentpriority_timecreate,
+    incidentpriority_usercreate,
+    incidentpriority_label,
+    incidentpriority_order)
+  values ('null',
+    '".date("Y-m-d H:i:s")."',
+    ".$auth->auth["uid"].",
+    '$label',
+    '$order')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Priority update                                         //
+// Parameters:
+//   - $incident[] : incident hash info :
+//     keys used : priority, pri_label, pri_order
+///////////////////////////////////////////////////////////////////////////////
+function run_query_priority_update($incident) {
+  global $auth, $cdg_sql;
+
+  $priority = $incident["priority"];
+  $label = $incident["pri_label"];
+  $order = $incident["pri_order"];
+
+  $query = "update IncidentPriority set incidentpriority_label='$label',
+    incidentpriority_timeupdate='".date("Y-m-d H:i:s")."',
+    incidentpriority_userupdate='".$auth->auth["uid"]."',
+    incidentpriority_order='$order'
+  where incidentpriority_id='$priority'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Priority deletion                                       //
+// Parameters:
+//   - $id : Priority id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_priority_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from IncidentPriority where incidentpriority_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $sta_q = new DB_OBM;
+  $retour = $sta_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Links to the Priority given                             //
+// Parameters:
+//   - $s_id : priority id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_priority_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select incident_id, incident_label
+    from Incident where incident_priority_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $pri_q = new DB_OBM;
+  $pri_q->query($query);
+
+  return $pri_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a priority label                                                      //
+// Parameters:
+//   - $id : priority id
+///////////////////////////////////////////////////////////////////////////////
+function get_priority_label($id) {
+  global $cdg_sql;
+
+  $query = "select incidentpriority_label
+    from IncidentPriority
+    where incidentpriority_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("incidentpriority_label");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Incident Form Data checking and formatting
 // Parameters:
 //   - $incident[] : values to check
@@ -344,7 +460,7 @@ function run_query_status() {
 ///////////////////////////////////////////////////////////////////////////////
 function check_incident_form($incident) {
   global $cdg_sql;
-  global  $php_regexp_isodate, $l_fill_label, $l_fill_contract, $l_incident_date;
+  global $php_regexp_isodate, $l_fill_label, $l_fill_contract,$l_incident_date;
   global $err_msg,$l_length_label,$l_invalid_date ;
 
   $c_id = $incident["contract_id"];

@@ -397,13 +397,14 @@ function run_query_companytype() {
 ///////////////////////////////////////////////////////////////////////////////
 // Kind insertion query construction and execution                           //
 // Parameters:
-//   - $label : Kind label
+//   - $company : company hash info : keys used : kind_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_insert($label) {
+function run_query_kind_insert($company) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
+  $kind = $company["kind_label"];
 
   $query = "insert into CompanyType (
     companytype_timecreate,
@@ -412,7 +413,7 @@ function run_query_kind_insert($label) {
   values (
     '$timecreate',
     '$usercreate',
-    '$label')";
+    '$kind')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -425,21 +426,22 @@ function run_query_kind_insert($label) {
 ///////////////////////////////////////////////////////////////////////////////
 // Kind update query execution                                               //
 // Parameters:
-//   - $label     : label to set
-//   - $label_old : Kind label to update
+//   - $company : company hash info : keys used : kind, kind_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_update($label, $label_old) {
+function run_query_kind_update($company) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
+  $id = $company["kind"];
+  $kind = $company["kind_label"];
 
   $query = "update CompanyType set
-    companytype_label='$label',
+    companytype_label='$kind',
     companytype_timeupdate='$timeupdate',
     companytype_userupdate='$userupdate'
       where
-    companytype_label='$label_old'";
+    companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -452,12 +454,12 @@ function run_query_kind_update($label, $label_old) {
 ///////////////////////////////////////////////////////////////////////////////
 // Kind deletion query execution                                             //
 // Parameters:
-//   - $label     : Kind label to delete
+//   - $id : Kind id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind_delete($label) {
+function run_query_kind_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyType where companytype_label='$label'";
+  $query = "delete from CompanyType where companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -505,13 +507,14 @@ function run_query_companyactivity() {
 ///////////////////////////////////////////////////////////////////////////////
 // Activity insertion query construction and execution                       //
 // Parameters:
-//   - $label : Activity label
+//   - $company : company hash info : keys used : act_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_insert($label) {
+function run_query_activity_insert($company) {
   global $auth, $cdg_sql;
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
+  $act = $company["act_label"];
 
   $query = "insert into CompanyActivity (
       companyactivity_timecreate,
@@ -520,7 +523,7 @@ function run_query_activity_insert($label) {
     values (
       '$timecreate',
       '$usercreate',
-      '$label')";
+      '$act')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -533,21 +536,22 @@ function run_query_activity_insert($label) {
 ///////////////////////////////////////////////////////////////////////////////
 // Activity update query execution                                           //
 // Parameters:
-//   - $label     : label to set
-//   - $label_old : Activity label to update
+//   - $company : company hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_update($label, $label_old) {
+function run_query_activity_update($company) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
+  $id = $company["activity"];
+  $activity = $company["act_label"];
 
   $query = "update CompanyActivity set
-      companyactivity_label='$label',
+      companyactivity_label='$activity',
       companyactivity_timeupdate='$timeupdate',
       companyactivity_userupdate='$userupdate'
     where
-      companyactivity_label='$label_old'";
+      companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -560,12 +564,12 @@ function run_query_activity_update($label, $label_old) {
 ///////////////////////////////////////////////////////////////////////////////
 // Activity deletion query execution                                         //
 // Parameters:
-//   - $label : Activity label to delete
+//   - $id : Activity id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_delete($label) {
+function run_query_activity_delete($id) {
   global $cdg_sql;
 
-  $query = "delete from CompanyActivity where companyactivity_label='$label'";
+  $query = "delete from CompanyActivity where companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -595,42 +599,45 @@ function run_query_activity_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the Id of a Kind from its label                                       //
+// Get the label of a Kind from its id                                       //
 // Parameters:
-//   - $label : label
+//   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_kind_id($label) {
+function get_kind_label($id) {
   global $cdg_sql;
 
-  $query="select companytype_id from CompanyType where companytype_label='$label'";
+  $query = "select companytype_label
+    from CompanyType
+    where companytype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("companytype_id");
+  $retour = $obm_q->f("companytype_label");
   return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the Id of an Activity from its label                                  //
+// Get the label of an Activity from its id                                  //
 // Parameters:
-//   - $label : label
+//   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
-function get_activity_id($label) {
+function get_activity_label($id) {
   global $cdg_sql;
 
-  $query = "select companyactivity_id
-    from CompanyActivity where companyactivity_label='$label'";
+  $query = "select companyactivity_label
+    from CompanyActivity
+    where companyactivity_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("companyactivity_id");
+  $retour = $obm_q->f("companyactivity_label");
   return $retour;
 }
 

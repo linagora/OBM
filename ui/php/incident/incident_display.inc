@@ -553,6 +553,192 @@ $dis_delete
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Incident administration index                                 //
+///////////////////////////////////////////////////////////////////////////////
+function dis_admin_index() {
+
+  $pri_q = run_query_priority();
+  $sta_q = run_query_status();
+  html_incident_priority_form($pri_q);
+  //  html_incident_status_form($sta_q);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Incident Priority section                                                 //
+// Parameters:
+//   - $pri_q : Priority list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_priority_form($pri_q) {
+  global $l_pri_manage,$l_pri_exist, $l_label, $l_order;
+  global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
+
+  // Priority select construction
+  $sel_pri = "<select name=\"sel_priority\" size=\"4\" >";
+  while ($pri_q->next_record()) {
+    $id = $pri_q->f("incidentpriority_id");
+    $order = $pri_q->f("incidentpriority_order");
+    $label = $pri_q->f("incidentpriority_label");
+    $sel_pri .= "\n<option value=\"$id\">$order-$label</option>";
+  }
+  $sel_pri .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_pri_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Priority Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_pri_delete\" method=\"post\"
+              action=\"" . url_prepare("incident_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_pri_exist</td>
+              <td class=\"adminLabel\">$sel_pri</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"priority_checklink\" />
+              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_pri_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Priority Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_admin_pri_update\" method=\"get\"
+              action=\"" . url_prepare("incident_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_priority\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"priority_update\" />
+          <table>
+          <tr>
+            <td class=\"adminLabel\">$l_label : </td>
+            <td><input type=\"text\" name=\"tf_pri\" /></td>
+            <td rowspan=\"2\">
+              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_update\"
+              onclick=\"if (check_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
+            </td>
+          </tr>
+          <tr>
+            <td class=\"adminLabel\">$l_order : </td>
+            <td>
+	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	    </td>
+          </tr>
+          </table>
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Priority Section -->
+
+        <form name=\"form_admin_pri_new\" method=\"get\"
+          action=\"" . url_prepare("incident_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_pri_new : </td>
+          <td><input name=\"tf_pri\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_order : </td>
+          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+        </tr><tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
+            <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_insert\"
+              onclick=\"if (check_pri_new(this.form)) return true; else return false;\" />
+          </td>
+
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>
+";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the priority links                                               //
+// Parameters:
+//   - $id : priority id
+///////////////////////////////////////////////////////////////////////////////
+function dis_priority_links($id) {
+  global $l_pri_link_incident, $l_pri_link_incident_no;
+  global $l_pri_delete, $l_pri_can_delete, $l_pri_cant_delete;
+  global $l_back;
+
+  $label = get_priority_label($id);
+  $obm_q = run_query_priority_links($id);
+
+  if ($obm_q->num_rows() > 0) {
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_pri_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$l_pri_link_incident $label</td>
+    </tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("incident_id");
+      $cname = $obm_q->f("incident_label");
+      $dis_link .="
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">
+      $l_pri_link_incident_no '$label' : $l_pri_can_delete</td>
+    </tr><tr>
+      <td>
+        <form name=\"form_pri_delete\"
+          method=post action=\"" . url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"priority_delete\">
+        <input type=\"hidden\" name=\"sel_priority\" value=\"$id\">
+        <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_delete\">
+        </form>
+      </td>
+      <td>
+        <form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+      </td>
+    </tr>
+    </table>";
+  }
+  echo "$dis_link";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the Incidnet Display preference screen                            //
 // Parameters:
 //   - $display_pref_q : DBO : Field list to display

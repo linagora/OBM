@@ -435,13 +435,13 @@ if (($action == "index") || ($action == "")) {
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-    if ($param_parent > 0) {
-      require("deal_js.inc");
-      $obm_q = run_query_detail_parentdeal($param_parent);
-      $usr_q = run_query_userobm();
-      display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
-      html_parentdeal_form($action,$obm_q, $usr_q, $deal);
-    } 
+  if ($param_parent > 0) {
+    require("deal_js.inc");
+    $obm_q = run_query_detail_parentdeal($param_parent);
+    $usr_q = run_query_userobm();
+    display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
+    html_parentdeal_form($action,$obm_q, $usr_q, $deal);
+  } 
   
 } elseif ($action == "parent_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -526,8 +526,6 @@ if (($action == "index") || ($action == "")) {
   } else {
     display_err_msg($l_query_error);
   }
-  
-
 }
 
 
@@ -535,7 +533,6 @@ if (($action == "index") || ($action == "")) {
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
 display_end();
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -619,7 +616,7 @@ function get_param_deal() {
   // Admin - Status fields
   // $sel_state -> "state" is already set
   if (isset ($tf_status)) $deal["status_label"] = $tf_status;
-  if (isset ($tf_order)) $deal["status_order"] = $tf_order;
+  $deal["status_order"] = (isset($tf_order) ? $tf_order : "0");
 
   // Admin - Category fields
   // $sel_cat -> "cat" is already set

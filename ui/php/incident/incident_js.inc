@@ -53,6 +53,54 @@ function check_incident(form) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the priority check or deletion is possible                       //
+///////////////////////////////////////////////////////////////////////////////
+function check_priority_checkdel(form)
+{
+   if (form.sel_priority.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_pri_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the priority update is possible                                  //
+///////////////////////////////////////////////////////////////////////////////
+function check_priority_upd(form,formd)
+{
+  pri_pos = formd.sel_priority.selectedIndex;
+  if ((pri_pos >= 0) && (form.tf_pri.value != \"\")) {
+    form.sel_priority.value=formd.sel_priority.options[pri_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_pri_update\");
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the priority creation is possible                                //
+///////////////////////////////////////////////////////////////////////////////
+function check_priority_new(form)
+{
+   if (form.tf_pri.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_pri_create\");
+      return false;
+   }
+}
+
+
 function auto_archive(form) {
   if (form.sel_status.value == 'CLOSED')
     form.cb_archive.checked = 1;

@@ -110,9 +110,8 @@ function check_company(form) {
   else
     return true;
 } 
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -128,16 +127,15 @@ function check_kind_checkdel(form)
       return false;
    }
 }
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind update is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_upd(form,formd)
 {
   kind_pos = formd.sel_kind.selectedIndex;
-  if ((kind_pos >= 0) && (form.tf_kind_upd.value != \"\")) {
+  if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
     form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
     return true;
   } else {
@@ -145,15 +143,14 @@ function check_kind_upd(form,formd)
     return false;
   }
 }
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_kind_new(form)
 {
-   if (form.tf_kind_new.value != \"\")
+   if (form.tf_kind.value != \"\")
       return true;
    else
    {
@@ -161,9 +158,8 @@ function check_kind_new(form)
       return false;
    }
 }
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the activity check or deletion is possible                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,16 +175,15 @@ function check_act_checkdel(form)
       return false;
    }
 }
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the activity update is possible                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function check_act_upd(form,formd)
 {
   act_pos = formd.sel_act.selectedIndex;
-  if ((act_pos >= 0) && (form.tf_act_upd.value != \"\")) {
+  if ((act_pos >= 0) && (form.tf_act.value != \"\")) {
     form.sel_act.value=formd.sel_act.options[act_pos].value;
     return true;
    } else {
@@ -196,15 +191,14 @@ function check_act_upd(form,formd)
      return false;
    }
 }
-";
 
-echo "
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the activity creation is possible                                //
 ///////////////////////////////////////////////////////////////////////////////
 function check_act_new(form)
 {
-   if (form.tf_act_new.value != \"\")
+   if (form.tf_act.value != \"\")
       return true;
    else
    {
