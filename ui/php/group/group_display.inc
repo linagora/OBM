@@ -38,12 +38,15 @@ $fieldnames["group_user_email"] = $l_email;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_group(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new,$ext_element;
 
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;param_group=".$OD->data_set->f("group_id");
   }
-
+  if (($fieldname == "hidden_field") && $ext_element != "") {
+    $res["name"] = "<span id=\"data".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
+    $OD->data_set->f("group_name")."</span>";
+  }  
   else if ($fieldname == "group_system") {
     $res["align"] = "center";
   }
@@ -57,7 +60,6 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $res["name"] = $nb_q->f(0);
     $res["align"] = "center";
   }
-
   // For User member lists
   elseif (($fieldname == "group_user_lastname")  && $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
@@ -90,11 +92,14 @@ function html_group_search_form ($group) {
     $ext_url = $group["ext_url"];
     $ext_id = $group["ext_id"];
     $ext_title = stripslashes($group["ext_title"]);
+    $ext_element =  $group["ext_element"];
+
     $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
       <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+      <input name=\"ext_element\" type=\"hidden\" value=\"$ext_element\">      
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     if ($ext_title == "") {
       $ext_title = $l_add_groups;
@@ -190,8 +195,9 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
     $ext_target = $group["ext_target"];
     $ext_widget = $group["ext_widget"];
     $ext_id = $group["ext_id"];
+    $ext_element = $group["ext_element"];
     $ext_title = urlencode(stripslashes($group["ext_title"]));
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;child_res=$child_res";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_titled&amp;ext_element=$ext_element&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;child_res=$child_res";
   }
 
   $name = urlencode(stripslashes($group["name"]));
@@ -205,7 +211,12 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
     $dis_group->data_cb_text = "X";
     $dis_group->data_idfield = "group_id";
     $dis_group->data_cb_name = "cb_g";
-    if ($widget == "") {
+    if ($ext_element != "") {
+      $dis_group->data_cb_name = "";
+      $form_attr = "
+      onsubmit=\"fill_ext_form2(this); return false;\" ";
+    }
+    elseif ($widget == "") {
       $form_attr = "target=\"$ext_target\" method=\"get\" action=\"$ext_url\"";
     } else {
       $form_attr = "onsubmit=\"fill_ext_form(this);return false;\"";

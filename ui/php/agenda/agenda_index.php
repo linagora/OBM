@@ -408,7 +408,7 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_grp_id,$sel_user_meeting_id;
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id;
 
   // Agenda fields
   if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
@@ -495,7 +495,7 @@ function get_param_agenda() {
   if (isset($hd_date_begin)) $agenda["date_begin"] = $hd_date_begin;
   if (isset($hd_date_end)) $agenda["date_end"] = $hd_date_end;
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
-  if (is_array($sel_grp_id)) $agenda["group"] = $sel_grp_id;
+  if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
 
 
   if (debug_level_isset($cdg_param)) {

@@ -470,19 +470,20 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      </td>
      ";
 
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
-
-  
- 
-  // group select
-  $dis_sel_grp = "<select name=\"sel_grp_id[]\" size=\"5\" multiple=\"multiple\">";
-  while ($grp_q->next_record()) {
-    $g_id = $grp_q->f("group_id");
-    $g_name = $grp_q->f("group_name");
-    $dis_sel_grp .= "\n<option value=\"$g_id\"$tag_grp>$g_name</option>";
-  } 
-  $dis_sel_grp .= "</select>";
- 
+    $block_group = "
+    <td class=\"detailLabel\">
+    $l_groups
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"/images/$set_theme/$ico_add_group\" alt=\"[Add]\" />
+      </a>
+     </td>    
+     <td class=\"detailForm\" id=\"sel_group_id\">
+     </td>
+     ";
   if ($force == 1){
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
   } else {
@@ -575,10 +576,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $block_user
     </tr>
     <tr>
-     <td class=\"detailLabel\">$l_groups&nbsp;&nbsp;
-     <a href=\"javascript: return false;\" onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_add_group\" /></a></td>
-</td>
-     <td class=\"detailForm\">$dis_sel_grp</td>
+    $block_group
     </tr>    
    </table>
    <div class=\"detailHead\">$l_carac</div>

@@ -243,6 +243,7 @@ function get_param_group() {
   global $new_order, $order_dir, $entity;
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
+  global $ext_element;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   // Group fields
@@ -266,6 +267,7 @@ function get_param_group() {
   if (isset ($ext_url)) $group["ext_url"] = $ext_url;
   if (isset ($ext_id)) $group["ext_id"] = $ext_id;
   if (isset ($ext_id)) $group["id"] = $ext_id;
+  if (isset ($ext_element)) $group["ext_element"] = $ext_element;  
   if (isset ($ext_widget)) $group["ext_widget"] = $ext_widget;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {

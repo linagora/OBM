@@ -14,6 +14,7 @@ include("$obminclude/global.inc");
     calendareventdata_timecreate   timestamp(14),
     calendareventdata_userupdate   int(8) default NULL,
     calendareventdata_usercreate   int(8) default NULL,
+    calendareventdata_owner	     int(8) default NULL, 
     calendareventdata_title        varchar(255) default NULL,
     calendareventdata_description  text,
     calendareventdata_category_id  int(8) default NULL,
@@ -85,9 +86,11 @@ include("$obminclude/global.inc");
     $repeatfrequence = 1;
     $endrepeat = $obm_db->f("calendarevent_endrepeat");  
     if($endrepeat >= "20100101000000" || $endrepeat == "00000000000000") {
-      $query = "SELECT calendarsegment_customerid, calendarsegment_state, MIN(calendarsegment_date)
+      $query = "SELECT calendarsegment_customerid, calendarsegment_state, calendarsegment_date
 		FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
-		GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date ORDER BY calendarsegment_date LIMIT 0,1";
+		GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date
+		HAVING calendarsegment_date = MAX(calendarsegment_date)
+		ORDER BY calendarsegment_date";
 		
       display_debug_msg($query, $cdg_sql);
       $obm_sub_db->query($query);
@@ -95,18 +98,20 @@ include("$obminclude/global.inc");
       $endrepeat =  $obm_sub_db->f("calendarsegment_date");      
     }
     
-    $query = "SELECT calendarsegment_customerid, calendarsegment_state, MIN(calendarsegment_date)
+    $query = "SELECT calendarsegment_customerid, calendarsegment_state, calendarsegment_date
               FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
-              GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date ORDER BY calendarsegment_date LIMIT 0,1";
+	      GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date 
+	      HAVING calendarsegment_date = MIN(calendarsegment_date)
+	      ORDER BY calendarsegment_date";
 	      
     display_debug_msg($query, $cdg_sql);
     $obm_sub_db->query($query);
     $obm_sub_db->next_record();
     $date_begin =  $obm_sub_db->f("calendarsegment_date");
-   
+    echo $date_begin; 
     $query = "INSERT INTO CalendarEventData VALUES('".addslashes($id)."', '".addslashes($timeupdate)."',
              '".addslashes($timecreate)."','".addslashes($userupdate)."', '".addslashes($usercreate)."',
-	     '".addslashes($title)."', '".addslashes($description)."', '".addslashes($category_id)."',
+	     '".addslashes($usercreate)."','".addslashes($title)."', '".addslashes($description)."', '".addslashes($category_id)."',
              '".addslashes($priority)."','".addslashes($privacy)."','".addslashes($date_begin)."',
 	     '".addslashes($length)."','".addslashes($allday)."','".addslashes($repeatkind)."',
 	     '".addslashes($repeatfrequence)."','".addslashes($repeatdays)."','".addslashes($endrepeat)."')";
@@ -170,6 +175,7 @@ include("$obminclude/global.inc");
   calendarevent_timecreate   timestamp(14),
   calendarevent_userupdate   int(8) default NULL,
   calendarevent_usercreate   int(8) default NULL,
+  calendarevent_owner	     int(8) default NULL, 
   calendarevent_title        varchar(255) default NULL,
   calendarevent_description  text,
   calendarevent_category_id  int(8) default NULL,
