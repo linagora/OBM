@@ -270,10 +270,18 @@ class OBM_Perm {
     $perm_editor = "05";
     $perm_admin = "1D";
 
-    $profiles["reader"] = str_pad("110100", $profile_length, $perm_reader);
-    $profiles["user"] = str_pad("110101", $profile_length, $perm_user);
-    $profiles["editor"] = str_pad("110101", $profile_length, $perm_editor);
-    $profiles["admin"] = str_pad("111111", $profile_length, $perm_admin);
+    if (! isset($profiles["reader"])) {
+      $profiles["reader"] = str_pad("110100", $profile_length, $perm_reader);
+    }
+    if (! isset($profiles["user"])) {
+      $profiles["user"] = str_pad("110101", $profile_length, $perm_user);
+    }
+    if (! isset($profiles["editor"])) {
+      $profiles["editor"] = str_pad("110101", $profile_length, $perm_editor);
+    }
+    if (! isset($profiles["admin"])) {
+      $profiles["admin"] = str_pad("111111", $profile_length, $perm_admin);
+    }
   }
 
   //-------------------------------------------------------------------------//

@@ -488,6 +488,8 @@ function html_import_file_import($import_q, $import) {
       $fields = get_import_row_mapping($row, $map);
       run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
 
+      // XXX If contact, insert
+
       // Update the existing company
     } else if ($conflict_action == "company_update") {
       list($num_line, $line) = each($r);

@@ -2445,7 +2445,7 @@ function html_dis_right_admin($user_q,$user_id) {
 //    -$groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_meeting_form($agenda, $usr_q, $p_user_array) {
-  global $display; 
+  global $display, $path;
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   global $ico_add_user,$popup_height,$popup_width;
   // -- Labels
