@@ -848,8 +848,8 @@ echo "
        <tr>
         <td class=\"agendaHead\">
          <a href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$yesterdays_date)."\">
-          <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
-         </a>
+	  <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
+	 </a>
         </td>
         <td class=\"agendaHead\">
          $display_date

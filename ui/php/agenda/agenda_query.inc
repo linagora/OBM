@@ -1147,7 +1147,7 @@ function check_data_form($agenda) {
     }  
   }
 
-  if($dateend<$datebegin || ($dateend==$datebegin && $timeend<$timebegin)) {
+  if($dateend<$datebegin || ($dateend==$datebegin && $timeend<=$timebegin)) {
     $err_msg =  $l_err_begin_end;
     return false;
   } 
