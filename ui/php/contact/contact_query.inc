@@ -483,19 +483,21 @@ function run_query_update($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  
-  $query = "delete
+  if($cat1 != "") { 
+    $query = "delete
     from ContactCategory1Link
-    where contactcategory1link_contact_id='$cid'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+    where contactcategory1link_contact_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+  if($cat2 != "") { 
   
-  $query = "delete
+    $query = "delete
     from ContactCategory2Link
-    where contactcategory2link_contact_id='$cid'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
+    where contactcategory2link_contact_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
   if ($retour && is_array($cat1)) {
     foreach($cat1 as $categoryid) {
       $query = "insert into ContactCategory1Link (
@@ -1353,13 +1355,16 @@ function run_query_cat2_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat1_delete($id) {
   global $cdg_sql;
+  if($id != '') {
+    $query = "delete from ContactCategory1 where contactcategory1_id='$id'";
 
-  $query = "delete from ContactCategory1 where contactcategory1_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
+  else 
+  $retour = 1;
+  
   return $retour;
 }
 
@@ -1371,13 +1376,16 @@ function run_query_cat1_delete($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat2_delete($id) {
   global $cdg_sql;
+  if($id != '') {
 
-  $query = "delete from ContactCategory2 where contactcategory2_id='$id'";
+    $query = "delete from ContactCategory2 where contactcategory2_id='$id'";
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
+  else 
+  $retour = 1;
   return $retour;
 }
 

@@ -656,8 +656,6 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $j=0;
     $k=0;
     $k_kind_js .= "lang_array = new Array ();\n";
-  //  $k_header_js = "header_array = new Array ();"
-  //  $k_label_js = "label_array = new Array ();"
     while ($kind_q->next_record()) {      
       $k_id = $kind_q->f("kind_id");
       $k_lang = $kind_q->f("kind_lang");
@@ -724,7 +722,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
 	$sel_kind_label .= "\n<option value=\"$k_label\"";
 	if($k_label == $kind_label) {
 	  foreach($k_kind_header as $k_header => $k_id) {
-	    $sel_kind_header .= "\n<option value=\"$k_header\"";
+	    $sel_kind_header .= "\n<option value=\"$k_id\"";
 	    if ($k_id == $kind) { 
 	      $sel_kind_lang .= "selected = \"selected\"";
 	      $sel_kind_label .= "selected = \"selected\"";
