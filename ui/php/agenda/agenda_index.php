@@ -378,6 +378,49 @@ elseif ($action == "perform_right") {
   run_query_update_right($agenda);
   $user_obm = run_query_userobm_right();
   html_dis_right_model($user_obm); 
+} elseif ($action == "admin")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "category_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_category_insert($tf_category_new);
+  if ($retour) {
+    display_ok_msg($l_category_insert_ok);
+  } else {
+    display_err_msg($l_category_insert_error);
+  }
+  require("agenda_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "category_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_category_update($tf_category_upd, $sel_category);
+  if ($retour) {
+    display_ok_msg($l_category_update_ok);
+  } else {
+    display_err_msg($l_category_update_error);
+  }
+  require("agenda_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "category_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_category_links($sel_category);
+  require("agenda_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "category_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_category_delete($hd_category_label);
+  if ($retour) {
+    display_ok_msg($l_category_delete_ok);
+  } else {
+    display_err_msg($l_category_delete_error);
+  }
+  require("agenda_js.inc");
+  dis_admin_index();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -473,8 +516,6 @@ function get_param_agenda() {
 
   return $agenda;
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 //  Agenda Action 
 ///////////////////////////////////////////////////////////////////////////////
@@ -482,7 +523,7 @@ function get_agenda_action() {
   global $actions, $path;
   global $l_header_update,$l_header_right;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
-  global $l_header_month,$l_header_new_event,$param_event,$param_date;
+  global $l_header_month,$l_header_new_event,$param_event,$param_date,$l_header_admin;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
 //Index
@@ -599,9 +640,6 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
-						 
-
-
 //Update
 
   $actions["AGENDA"]["update"] = array (
@@ -633,7 +671,41 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
-					 
+// Admin
+  $actions["AGENDA"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/agenda/agenda_index.php?action=admin",
+    'Right'    => $agenda_admin_read,
+    'Condition'=> array ('all') 
+                                       );
+
+// Kind Insert
+  $actions["AGENDA"]["category_insert"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=category_insert",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Kind Update
+  $actions["AGENDA"]["category_update"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=category_update",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Kind Check Link
+  $actions["AGENDA"]["category_checklink"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=category_checklink",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Kind Delete
+  $actions["AGENDA"]["category_delete"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=category_delete",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
 
 }
   

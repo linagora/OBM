@@ -89,8 +89,23 @@ $l_insert_warning = "Attention des conflits ont été détectés";
 $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 $l_sendamail = "Notifier les participants par mail";
+$l_category_update = "Modifier la Categorie";
+$l_category_checkdelete = "Vérifier ou Supprimer la Categorie";
+$l_category_delete = "Supprimer la Categorie";
+$l_category_insert = "Créer la Categorie";
 
-// Messages 
+	
+// Messages
+$l_category_delete_ok = "La suppression de la categorie a été correctement effectuée.";
+$l_category_delete_error = "La suppression de la categorie a échoué !";
+$l_category_insert_ok = "L'insertion de la categorie a été correctement effectuée.";
+$l_category_insert_error = "L'insertion de la categorie a échoué !";
+$l_category_update_ok = "La modification de la categorie a été correctement effectuée";
+$l_category_update_error = "La modification de la categorie a &eacute;chou&eacute;e !";
+$l_category_link_company = "Certain événements sont de la categorie";
+$l_category_link_company_no = "Pas d'événements de la categorie";
+$l_category_cant_delete = "Le categorie ne peut être supprimée !";
+$l_category_can_delete = "Le categorie peut être supprimée.";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
 $l_confirm_delete = "Cette opération supprimer toutes les occurences de cet évenement pour tout les utilisateur, êtes-vous sûre de vouloit poursuivre ?";
@@ -150,7 +165,11 @@ $l_short_friday="Ven";
 $l_short_saturday="Sam";
 $l_short_sunday="Dim";
 
+$l_category_manage = "Gestion des Categories d'évenements";
+$l_category_exist = "Categories existantes";
+$l_category_new = "Nouvelle Categorie";
 $l_header_right = "Gestion des droits";
+$l_header_admin = "Administration";
 $l_authorize_list = "Personnes authorisées";
 $l_denie_list = "Personnes non-authorisées";
 $l_read_permission = "Gestion des permissions de lecture de votre agenda";

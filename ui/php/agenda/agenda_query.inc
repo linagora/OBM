@@ -1053,6 +1053,128 @@ function run_query_update_right($agenda) {
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);  
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Category agenda query execution                                              //
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_agendacategory() {
+  global $cdg_sql;
+
+  $query = "select * from CalendarCategory order by calendarcategory_label";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// category insertion query construction and execution                           //
+// Parameters:
+//   - $label : category label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_category_insert($label) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+
+  $query = "insert into CalendarCategory (
+    calendarcategory_timecreate,
+    calendarcategory_usercreate,
+    calendarcategory_label)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$label')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// category update query execution                                               //
+// Parameters:
+//   - $label     : label to set
+//   - $label_old : category label to update
+///////////////////////////////////////////////////////////////////////////////
+function run_query_category_update($label, $category_id) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+
+  $query = "update CalendarCategory set
+    calendarcategory_label='$label',
+    calendarcategory_timeupdate='$timeupdate',
+    calendarcategory_userupdate='$userupdate'
+      where
+    calendarcategory_id ='$category_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// category deletion query execution                                             //
+// Parameters:
+//   - category_id     : category id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_category_delete($category_id) {
+  global $cdg_sql;
+
+  $query = "delete from CalendarCategory where calendarcategory_id = $category_id";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// category deletion query execution                                             //
+// Parameters:
+//   - $label     : category label to delete
+///////////////////////////////////////////////////////////////////////////////
+function get_category_label($category_id) {
+  global $cdg_sql;
+
+  $query = "Select * from CalendarCategory Where calendarcategory_id = $category_id";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f("calendarcategory_label");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// category - Company links query execution                                      //
+// Parameters:
+//   - $p_id : category id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_category_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select count(*) as numlink from CalendarEvent where calendarevent_category_id = '$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
   
 /////////////////////////////////////////////////////////////////////////////
 // Return if the event is valid or not. It permit to keep only valid event in
@@ -1325,7 +1447,7 @@ function check_data_form($agenda) {
   $this_day_r = $day_array3[3]; 
   $this_month_r = $day_array3[2];
   $this_year_r = $day_array3[1];
-  $kind = $agenda["kind"];
+  $category = $agenda["category"];
   $repeat_days = $agenda["repeat_days"];
 
   if (trim($title) == "") {
@@ -1351,7 +1473,7 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if (trim($repeat_end) != "" && $kind != "none") {
+  if (trim($repeat_end) != "" && $category != "none") {
     if(!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
       $err_msg = $l_err_repeat;
       return false;
@@ -1363,33 +1485,33 @@ function check_data_form($agenda) {
     return false;
   } 
   
-  if(trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
+  if(trim($repeat_end) != "" && $dateend>$repeat_end && $category != "none") {
     $err_msg =  $l_err_end_repeat;
     return false;
   }
   
-  if($kind == "weekly" && $repeat_days == "0000000") {
+  if($category == "weekly" && $repeat_days == "0000000") {
     $err_msg =  $l_err_days_repeat;
     return false;
   }  
 
-  if($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
+  if($category == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
     $err_msg =  $l_err_weekly_repeat;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
+  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $category == "yearly") {
     $err_msg =  $l_err_end_repeat3;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
+  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $category != "none" &&  $category != "yearly") {
     $err_msg =  $l_err_end_repeat2;
     return false;
   }  
 
   
-  if($kind != "none" && $dateend > $datebegin) {
+  if($category != "none" && $dateend > $datebegin) {
     $err_msg =  $l_err_repeat;
     return false;
   }  
@@ -1412,7 +1534,7 @@ function check_data_form($agenda) {
 function get_event_repetition_dates($agenda) {
   global $set_weekstart_default;
 
-  $repeat_kind = $agenda["kind"];
+  $repeat_category = $agenda["category"];
   $repeat_days =$agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
   
@@ -1442,17 +1564,17 @@ function get_event_repetition_dates($agenda) {
   }
   $time_b=strtotime("+$this_hour_b hours +$this_min_b minutes",strtotime($this_year_b.$this_month_b.$this_day_b));
   $time_e=strtotime("+$this_hour_e hours +$this_min_e minutes",strtotime($this_year_e.$this_month_e.$this_day_e));
-  if ($repeat_kind=="none") {
+  if ($repeat_category=="none") {
     $event_dates[] = array("date_begin" => date("YmdHi",$time_b),"date_end" => date("YmdHi",$time_e));
   }    
-  elseif ($repeat_kind=="daily") {
+  elseif ($repeat_category=="daily") {
     for($var_time_b=$time_b, $var_time_e=$time_e;
     $var_time_b <= $time_end_repeat;
     $var_time_b = strtotime("+1 day",$var_time_b), $var_time_e = strtotime("+1 day",$var_time_e)){
       $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
     }
   }
-  elseif ($repeat_kind=="weekly") {
+  elseif ($repeat_category=="weekly") {
     $start_week_day = strtotime($set_weekstart_default);
     $first_day = (date("w",$time_b) - date("w",$start_week_day)+7)%7;
     for($var_time_b = strtotime("-$first_day days",$time_b), 
@@ -1468,7 +1590,7 @@ function get_event_repetition_dates($agenda) {
       }
     }  
   }  
-  else if ($repeat_kind=="monthlybydate") {
+  else if ($repeat_category=="monthlybydate") {
     $var_time_e = $time_e;
     $i = 0;
     while(($var_time_t = strtotime("+$i month",$time_b)) <= $time_end_repeat) {
@@ -1478,7 +1600,7 @@ function get_event_repetition_dates($agenda) {
       $i++;
     }
   }
-  else if ($repeat_kind=="monthlybyday") {
+  else if ($repeat_category=="monthlybyday") {
     $start_of_month = strtotime($this_year_b.$this_month_b."01");
     $time_rb = $time_b;
     $time_re = $time_e;
@@ -1511,7 +1633,7 @@ function get_event_repetition_dates($agenda) {
       }
       $i ++;
     }
-  } else if ($repeat_kind=="yearly") {  
+  } else if ($repeat_category=="yearly") {  
     for($var_time_b=$time_b, $var_time_e=$time_e;
     $var_time_b <= $time_end_repeat;
     $var_time_b = strtotime("+1 year",$var_time_b), $var_time_e = strtotime("+1 year",$var_time_e)){  

@@ -158,6 +158,53 @@ function hide ( name ) {
     document.all[name].style.visibility = \"hidden\";
   }
 }
+///////////////////////////////////////////////////////////////////////////////
+// Check if the category check or deletion is possible                           //
+///////////////////////////////////////////////////////////////////////////////
+function check_category_checkdel(form)
+{
+   if (form.sel_category.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_category_delete\");
+      return false;
+   }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the category update is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_category_upd(form,formd)
+{
+  category_pos = formd.sel_category.selectedIndex;
+  if ((category_pos >= 0) && (form.tf_category_upd.value != \"\")) {
+    form.sel_category.value=formd.sel_category.options[category_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_category_update\");
+    return false;
+  }
+}
+";
+
+echo "
+///////////////////////////////////////////////////////////////////////////////
+// Check if the category creation is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_category_new(form)
+{
+   if (form.tf_category_new.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_category_create\");
+      return false;
+   }
+}
+
 -->
 </script>
 

@@ -76,7 +76,10 @@ $l_cancel_all = "Cancel all";
 $l_force_event = "Force";
 $l_cancel_event = "Cancel";
 $l_replace_event = "Replace";
-
+$l_category_update = "Update Category";
+$l_category_checkdelete = "Check or Delete Category";
+$l_category_delete = "Delete Category";
+$l_category_insert = "Insert Category";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 
@@ -133,11 +136,24 @@ $l_err_end_repeat2 = "The max duration of a repetition is one year";
 $l_err_end_repeat3 = "The max duration of a repetition is ten years when the repeatition kind is yearly";
 $l_err_days_repeat = "You must check one or more repeatition day.";
 $l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
+$l_category_insert_ok = "The category has been inserted successfully.";
+$l_category_insert_error = "The insertion of the category has failed !";
+$l_category_delete_ok = "The category has been deleted successfully.";
+$l_category_delete_error = "The deletion of the category has failed !";
+$l_category_update_ok = "The category has been updated successfully.";
+$l_category_update_error = "The update of the category has failed !";
+$l_category_link_company = "These companies are referenced as";
+$l_category_link_company_no = "No company referenced as";
+$l_category_cant_delete = "The category can't be deleted !";
+$l_category_can_delete = "The category can be deleted.";
 
 $l_unknown="Inconnu";
 
-
+$l_category_manage = "Calendar Category Management";
+$l_category_exist = "Existing Categorys";
+$l_category_new = "New Category";
 $l_header_right = "Right management";
+$l_header_admin = "Administration";
 $l_authorize_list = "Authorized people";
 $l_denie_list = "Unauthorized people";
 $l_read_permission = "Read access management";
