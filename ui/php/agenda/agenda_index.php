@@ -62,10 +62,10 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
+if ($action == "") $action = "index";
 display_head($l_agenda);     // Head & Body
 generate_menu($menu,$section);      // Menu
 //////////////////////////////////////////////////////////////////////////////
-if ($action == "") $action = "index";
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -167,12 +167,7 @@ elseif ($action == "new") {
   require("agenda_js.inc");
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
-  if (count($sel_user_id) != 0) {
-    $p_user_array = $sel_user_id;
-  }
-  else {
-    $p_user_array = array($auth->auth["uid"]);
-  }
+  $p_user_array = array($auth->auth["uid"]);
   $user_obm = run_query_userobm();  
   dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }

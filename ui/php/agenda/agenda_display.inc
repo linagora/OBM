@@ -535,7 +535,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 echo "
 <table class=\"agendaMain\">
  <tr>
-  <td style=\"valign: top;\">
+  <td style=\"vertical-align: top;\">
    <table width=\"540\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td>
@@ -624,38 +624,47 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= 	"<tr>";
     $hour_day_list .= 	"<td height=\"15\" width=\"60\" rowspan=\"2\" class=\"agendaHour\">$i:00</td>";
-    $hour_day_list .= 	"<td width=\"1\"></td>";
+    $hour_day_list .= 	"<td height=\"15\" width=\"1\"></td>";
     $current_time = date("YmdHi", strtotime("+$i hours",strtotime($getdate)));  
     if(is_array($current_events[$current_time])) {
-      $user_indice = 1;
+      $user_indice = 0;
       foreach($calendar_user as $id => $user_data ) {
 	if(is_array($current_events[$current_time][$id])){    
-	  $is_title = FALSE;	  
-	  for ($h=0;$h<count($current_events[$current_time][$id]);$h++) {
-	    if($event_data[$current_events[$current_time][$id][$h]]["status"] > 0) {
-	      if($is_title == FALSE) {
-		$hour_day_list .= "<td width=\"$td_width\" class=\"agendaEventHead\">";	
+	  if($event_data[$current_events[$current_time][$id][0]]["status"] > 0) {
+  	    $is_title = FALSE;	  
+	    $indice_time = $current_time;
+	    $rowspan_event = 0;
+	    do{
+	      for ($h=0;$h<count($current_events[$indice_time][$id]);$h++) {
+		if($is_title == FALSE) {
+		  $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
+		  $is_title = TRUE;
+		  $event_head_display = "";
+		}
+		elseif($event_data[$current_events[$indice_time][$id][$h]]["status"] > 0){
+		  $event_head_display .= "<br />";
+		}
+		if($event_data[$current_events[$indice_time][$id][$h]]["status"] > 0) {		
+	  	  $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$current_events[$current_time][$id][$h]."&param_date=$getdate\">";
+		  $event_head_display .= $event_data[$current_events[$indice_time][$id][$h]]["begin"]."-";
+		  $event_head_display .= $event_data[$current_events[$indice_time][$id][$h]]["end"];
+		  if($nb_user == 1) {
+		    $event_head_display .= "&nbsp;&nbsp;".$event_data[$current_events[$indice_time][$id][$h]]["title"];
+		  }
+		  $event_head_display .= "</a>";	  
+		  $event_data[$current_events[$indice_time][$id][$h]]["status"] = $event_data[$current_events[$indice_time][$id][$h]]["status"] -1;
+	        }
 	      }
-	      else{
-		$hour_day_list .= "<br />";
-	      }
-	      $hour_day_list .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$current_events[$current_time][$id][$h]."&param_date=$getdate\">";
-	      $hour_day_list .= $event_data[$current_events[$current_time][$id][$h]]["begin"]."-";
-	      $hour_day_list .= $event_data[$current_events[$current_time][$id][$h]]["end"];
-	      if($nb_user == 1) {
-		$hour_day_list .= "&nbsp;&nbsp;".$event_data[$current_events[$current_time][$id][$h]]["title"];
-	      }
-	      $hour_day_list .= "</a>";	  
-	      $is_title = TRUE;
- 
-	      $event_data[$current_events[$current_time][$id][$h]]["status"] = $event_data[$current_events[$current_time][$id][$h]]["status"] -1;
-	    }
+	      $rowspan_event++;
+	      $temp_array = $current_events[$indice_time][$id];
+	      $temp_array2 = next($current_events);
+	      $indice_time = key($current_events);
+	    }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
+	    $rowspan = "rowspan=\"$rowspan_event\"";
+	    $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
+	    $hour_day_list .= "</td>";	
 	  }
-	  if($is_title == FALSE) {
-	    $hour_day_list .= "<td width=\"$td_width\" class=\"".$user_data["class"]."\">&nbsp;";
-	  }
-	  $hour_day_list .= "</td>";	
-	}
+        }       
 	else {
 	  if($user_indice != $nb_user) {
 	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
@@ -668,7 +677,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       }	  
     }else {
       $hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
-    }
+    }    
     $hour_day_list .=   "</tr>\n";
     for($k=1;$k<$set_time_unit;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
@@ -676,31 +685,39 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       if(is_array($current_events[$current_time])) {
 	$user_indice = 1;
 	foreach($calendar_user as $id => $user_data ) {
-	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){      
-  	    $is_title = FALSE;	  
-	    for ($h=0;$h<count($current_events[$current_time][$id]);$h++) {
-	      if($event_data[$current_events[$current_time][$id][$h]]["status"] > 0) {
-	       	if($is_title == FALSE) {
-	  	  $hour_day_list .= "<td width=\"$td_width\" class=\"agendaEventHead\">";	
-	     	}
-	       	else{
-       		  $hour_day_list .= "<br />";
+	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){     
+	    if($event_data[$current_events[$current_time][$id][0]]["status"] > 0) {
+	      $is_title = FALSE;	  
+	      $indice_time = $current_time;
+	      $rowspan_event = 0;
+	      do{
+		for ($h=0;$h<count($current_events[$current_time][$id]);$h++) {
+		  if($is_title == FALSE) {
+		    $td_begin .= "<td width=\"$td_width\" class=\"".$user_data["class"]."\"";
+		  }
+		  elseif($event_data[$current_events[$indice_time][$id][$h]]["status"] > 0){
+		    $event_head_display =" <br />";
+		  }
+		  if($event_data[$current_events[$indice_time][$id][$h]]["status"] > 0) {
+		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$current_events[$current_time][$id][$h]."&param_date=$getdate\">";
+		    $event_head_display .= $event_data[$current_events[$indice_time][$id][$h]]["begin"]."-";
+		    $event_head_display .= $event_data[$current_events[$indice_time][$id][$h]]["end"];
+		    if($nb_user == 1) {
+		      $event_head_display .= "&nbsp;&nbsp;".$event_data[$current_events[$indice_time][$id][$h]]["title"];
+		    }
+		    $event_head_display .= "</a>";	  
+		    $is_title = TRUE;
+		    $event_head_display .= "</td>";	 
+		    $event_data[$current_events[$indice_time][$id][$h]]["status"] = $event_data[$current_events[$indice_time][$id][$h]]["status"] -1;
+	       	  }
 		}
-	       	$hour_day_list .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$current_events[$current_time][$id][$h]."&param_date=$getdate\">";
-       	        $hour_day_list .= $event_data[$current_events[$current_time][$id][$h]]["begin"]."-";
-	      	$hour_day_list .= $event_data[$current_events[$current_time][$id][$h]]["end"];
-	       	if($nb_user == 1) {
-	      	  $hour_day_list .= "&nbsp;&nbsp;".$event_data[$current_events[$current_time][$id][$h]]["title"];
-		}
-		$hour_day_list .= "</a>";	  
-	        $is_title = TRUE;
-	        $hour_day_list .= "</td>";	 
-	        $event_data[$current_events[$current_time][$id][$h]]["status"] = $event_data[$current_events[$current_time][$id][$h]]["status"] -1;
-	      }
-	    }
-	    if($is_title == FALSE) {
-	      $hour_day_list .= "<td width=\"$td_width\" class=\"".$user_data["class"]."\">";
-	      $hour_day_list .= "&nbsp;</td>";
+  		$rowspan_event++;
+	      	$temp_array = $current_events[$indice_time][$id];
+	      	$temp_array2 = next($current_events);
+	      }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
+	      $rowspan = "rowspan=\"$rowspan_event\"";
+	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
+	      $hour_day_list .= "</td>";	
 	    }
 	  }
 	  else {
@@ -725,7 +742,7 @@ echo "
 
 <table class=\"agendaMain\">
  <tr>
-  <td width=\"520\" style=\"valign: top;\">
+  <td width=\"520\" style=\"vertical-align: top;\">
    <table width=\"520\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td align=\"center\">

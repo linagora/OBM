@@ -419,7 +419,6 @@ function run_query_get_latent_conflicts($event_id, $user_id) {
   while( $obm_db->next_record() ) {
     $conflicts = run_query_get_conflicts($obm_db->f("datebegin"),$obm_db->f("dateend"),array($user_id));
     $return_info = array_merge($return_info, $conflicts);
-    var_dump($return_info);
   }
   return $return_info;  
 }
