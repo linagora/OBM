@@ -33,3 +33,10 @@ CREATE TABLE CompanyActivity (
   companyactivity_label varchar(64),
   PRIMARY KEY (companyactivity_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- Deal Update
+-------------------------------------------------------------------------------
+-- Add new column : deal_hitrate
+ALTER table Deal add column deal_hitrate char(3) default 0 AFTER deal_amount;

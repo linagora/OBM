@@ -149,9 +149,10 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','dealstatus_label',6,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_marketingmanager',7,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_amount',8,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_archive',9,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_todo',10,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_datealarm',11,2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_hitrate',9,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_archive',10,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_todo',11,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (1,'deal','deal_datealarm',12,2);
 
 -- module 'parentdeal'
 
@@ -418,6 +419,7 @@ CREATE TABLE Deal (
   deal_technicalmanager_id int(8),
   deal_dateproposal date,
   deal_amount decimal(12,2),
+  deal_hitrate char(3) DEFAULT '0',
   deal_status_id int(2),
   deal_datealarm date,
   deal_comment text,

@@ -29,6 +29,7 @@ $l_technical_manager = "Produktionsleiter";
 $l_manager= "Manager";
 $l_proposition = "Vorschlag";
 $l_amount = "Bemerkung";
+$l_hitrate = "Hit Rate";
 $l_contacts = "Kontakte";
 $l_show_archive = "anzeigen Archiv";
 $l_archive_first = "A";
@@ -73,6 +74,7 @@ $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_amount"] = $l_amount;
+$fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
@@ -155,6 +157,7 @@ $l_found_parent = "Hauptverträge gefunden";
 $l_no_display_parent ="Fill the search fields and press < $l_find > to retrieve the parentdeals"; 
 $l_no_found_parent ="No parentdeal found matching the query !";
 
+$l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
 
 
 

@@ -468,6 +468,10 @@ class OBM_DISPLAY {
           if ($this->data_set->f($fieldname)) $name ="X";
           else $name="&nbsp;";
 	}
+	else if ($fieldname == "deal_hitrate") {
+          $align = "center";
+          $name = $this->data_set->f($fieldname) . " %";
+	}
 	else if ($fieldname == "deal_company_name") {
 	  $name="";
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");

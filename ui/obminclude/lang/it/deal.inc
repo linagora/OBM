@@ -25,6 +25,7 @@ $l_marketing_manager = "Resp. Marketing";
 $l_technical_manager = "Resp. Tecnico ";
 $l_date_proposal = "Data Proposta";
 $l_amount = "Totale";
+$l_hitrate = "Hit Rate";
 $l_state = "Stato";
 $l_date_alarm = "Data avviso";
 $l_todo = "Da fare";
@@ -77,6 +78,7 @@ $fieldnames["deal_datealarm"] = $l_date_alarm;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_amount"] = $l_amount;
+$fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
@@ -135,8 +137,9 @@ $l_err_parent_has_deal = "L'Impegno ha dei  Sub, non può essere eliminato!";
 $l_err_label_empty = "Scrivi nome Sub-impegno!";
 $l_err_kind_empty = "Scrivi impegno tipo!";
 $l_err_task_empty = "Scrivi impegno categoria!";
-$l_err_market_empty = "Scrivi  responsabile marketing!";
+$l_err_market_empty = "Scrivi responsabile marketing!";
 $l_err_tech_empty = "Scrivi responsabile tecnico!";
+$l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
 
 $l_updateaffect_ok = "Impegno collegato al Sub-impegno";
 $l_error_permission = "Accesso negato alla pagina";

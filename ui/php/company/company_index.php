@@ -6,27 +6,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Actions           -- Parameter
-// - index (default) -- search fields  -- show the company search form
-// - search          -- search fields  -- show the result set of search
-// - new             --                -- show the new company form
-// - detailconsult   -- $param_company -- show the company detail
-// - detailupdate    -- $param_company -- show the company detail form
-// - insert          -- form fields    -- insert the company
-// - update          -- form fields    -- update the company
-// - check_delete    -- $param_company -- check links before delete
-// - delete          -- $hd_company_id -- delete the company
-// - admin           --                -- admin index (kind)
-// - kind_insert     -- form fields    -- insert the kind
-// - kind_update     -- form fields    -- update the kind
-// - kind_checklink  --                -- check if kind is used
-// - kind_delete     -- $sel_kind      -- delete the kind
-// - display         --                -- display and set display parameters
-// - dispref_display --                -- update one field display value
-// - dispref_level   --                -- update one field display position 
+// Actions              -- Parameter
+// - index (default)    -- search fields  -- show the company search form
+// - search             -- search fields  -- show the result set of search
+// - new                --                -- show the new company form
+// - detailconsult      -- $param_company -- show the company detail
+// - detailupdate       -- $param_company -- show the company detail form
+// - insert             -- form fields    -- insert the company
+// - update             -- form fields    -- update the company
+// - check_delete       -- $param_company -- check links before delete
+// - delete             -- $hd_company_id -- delete the company
+// - admin              --                -- admin index (kind)
+// - kind_insert        -- form fields    -- insert the kind
+// - kind_update        -- form fields    -- update the kind
+// - kind_checklink     --                -- check if kind is used
+// - kind_delete        -- $sel_kind      -- delete the kind
+// - activity_insert    -- form fields    -- insert the kind
+// - activity_update    -- form fields    -- update the kind
+// - activity_checklink --                -- check if kind is used
+// - activity_delete    -- $sel_kind      -- delete the kind
+// - display            --                -- display and set display parameters
+// - dispref_display    --                -- update one field display value
+// - dispref_level      --                -- update one field display position 
 // External API ---------------------------------------------------------------
-// - ext_get_id      -- $title         -- select a company (return id) 
-// - ext_get_id_url  -- $url, $title   -- select a company (id), load URL 
+// - ext_get_id         -- $title         -- select a company (return id) 
+// - ext_get_id_url     -- $url, $title   -- select a company (id), load URL 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -460,7 +464,7 @@ function get_company_action() {
 
 // Kind Update
   $actions["COMPANY"]["kind_update"] = array (
-    'Url'      => "$path/company/company_index.php?action=kind_insert",
+    'Url'      => "$path/company/company_index.php?action=kind_update",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	      );
@@ -475,6 +479,34 @@ function get_company_action() {
 // Kind Delete
   $actions["COMPANY"]["kind_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_delete",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Activity Insert
+  $actions["COMPANY"]["activity_insert"] = array (
+    'Url'      => "$path/company/company_index.php?action=activity_insert",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Activity Update
+  $actions["COMPANY"]["activity_update"] = array (
+    'Url'      => "$path/company/company_index.php?action=activity_update",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Activity Check Link
+  $actions["COMPANY"]["activity_checklink"] = array (
+    'Url'      => "$path/company/company_index.php?action=activity_checklink",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Activity Delete
+  $actions["COMPANY"]["activity_delete"] = array (
+    'Url'      => "$path/company/company_index.php?action=activity_delete",
     'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	       );

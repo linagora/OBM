@@ -555,7 +555,7 @@ function get_param_deal() {
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent, $ch_contrat;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
-  global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat;
+  global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat, $tf_hitrate;
 
   // Deal fields
   if (isset ($param_deal)) $deal["id"] = $param_deal;
@@ -572,6 +572,7 @@ function get_param_deal() {
   if (isset ($sel_tech)) $deal["tech"] = $sel_tech;
   if (isset ($tf_dateprop)) $deal["dateprop"] = $tf_dateprop;
   if (isset ($tf_amount)) $deal["amount"] = $tf_amount;
+  if (isset ($tf_hitrate)) $deal["hitrate"] = $tf_hitrate;
   if (isset ($sel_state)) $deal["state"] = $sel_state;
   if (isset ($tf_datealarm)) $deal["datealarm"] = $tf_datealarm;
   if (isset ($ta_com)) $deal["com"] = $ta_com;
@@ -719,7 +720,7 @@ function get_deal_action() {
     'Name'     => $l_header_modify,
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	    );
 
   // Parent Detail Update
@@ -749,7 +750,7 @@ function get_deal_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/deal/deal_index.php?action=delete&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      );
 
   // Parent Delete

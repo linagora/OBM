@@ -25,6 +25,7 @@ $l_marketing_manager = "Marketing manager";
 $l_technical_manager = "Technical manager";
 $l_date_proposal = "Proposal Date";
 $l_amount = "Amount";
+$l_hitrate = "Hit Rate";
 $l_state = "State";
 $l_date_alarm = "Alarm Date";
 $l_comment = "Comment";
@@ -80,6 +81,7 @@ $fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["deal_marketingmanager"] = $l_marketing_manager;
 $fieldnames["deal_amount"] = $l_amount;
+$fieldnames["deal_hitrate"] = $l_hitrate;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
@@ -142,6 +144,7 @@ $l_err_kind_empty = "You must fill the deal kind !";
 $l_err_task_empty = "You must fill the deal category !";
 $l_err_market_empty = "You must fill the marketing manager !";
 $l_err_tech_empty = "You must fill the technical manager !";
+$l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
 
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
 $l_error_permission = "You have not the rights to access this page";

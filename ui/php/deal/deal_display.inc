@@ -366,7 +366,7 @@ function beautify_deal_comment($com) {
   }
 
   $result .= "
-    <table border=1>
+    <table border=\"1\">
     <tr>
       <td>$res</td>
     </tr>
@@ -389,13 +389,14 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
-  global $l_amount,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
+  global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoices_connected,$l_no_invoices_connected;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $l_contract_list;
   global $auth, $sess, $c_yes, $c_no;
+  global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -410,6 +411,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
   $datepro = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
   $amount = $deal_q->f("deal_amount");
+  $hitrate = $deal_q->f("deal_hitrate");
   $con1 = $deal_q->f("deal_contact1_id");
   $dis_con1 = $deal_q->f("lnamec1") . " " . $deal_q->f("fnamec1");
   $phone_con1 = $deal_q->f("phonec1");
@@ -435,7 +437,12 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 
   $nb_invoices = $q_invoices->num_rows ();
 
-/*
+
+  echo "
+    <table class=\"details\">
+    <tr>
+      <td rowspan=\"4\">";
+
 //////////////////
 //LIENS EXTERNES//
 //////////////////
@@ -465,13 +472,14 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<br><br><font color=\"#$col_link\">".
       $nb_arch_invoices." ".$l_archived_invoices_connected.
       "</font>";
-  } else { echo "probleme...";  //}
+  } else { echo "probleme...";  }
 //////////////////////
 //FIN LIENS EXTERNES//
 //////////////////////
-*/
+
   echo "
-    <table>
+      </td>
+    </tr>
     <tr>
       <td valign=\"top\">
       <table class=\"details\">
@@ -505,6 +513,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
       </tr><tr>
         <td class=\"detailLabel\">$l_amount</td>
         <td class=\"detailText\">$amount</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_hitrate</td>
+        <td class=\"detailText\">$hitrate %</td>
       </tr>
       </table>
       </td>
@@ -619,7 +630,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   // -- Labels
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none, $l_deal,$l_infos,$l_company;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_private;
-  global $l_proposition,$l_amount,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
+  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
   
   // if update mode and first time, values are taken from db
@@ -637,6 +648,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $tech = $deal_q->f("deal_technicalmanager_id");
     $dateprop = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
     $amount = $deal_q->f("deal_amount");
+    $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");
     $con2 = $deal_q->f("deal_contact2_id");
     $datealarm = $deal_q->f("datealarm");
@@ -665,6 +677,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $tech = $deal["tech"];
     $dateprop = stripslashes($deal["dateprop"]);
     $amount = stripslashes($deal["amount"]);
+    $hitrate = stripslashes($deal["hitrate"]);
     $con1 = $deal["contact1"];
     $con2 = $deal["contact2"];
     $datealarm = stripslashes($deal["datealarm"]);
@@ -895,6 +908,9 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       </tr><tr>
         <td class=\"detailLabel\">$l_proposition $l_amount</td>
         <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_hitrate</td>
+        <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
       </tr><tr>
         <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
       </tr><tr>

@@ -201,6 +201,7 @@ function run_query_insert($deal) {
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
   $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
   $amount = $deal["amount"];
+  $hitrate = $deal["hitrate"];
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
@@ -225,6 +226,7 @@ function run_query_insert($deal) {
     deal_technicalmanager_id,
     deal_dateproposal,
     deal_amount,
+    deal_hitrate,
     deal_status_id,
     deal_datealarm,
     deal_comment,
@@ -248,6 +250,7 @@ function run_query_insert($deal) {
     '$tech',
     '$dateprop',
     '$amount',
+    '$hitrate',
     '$status',
     '$datealarm',
     '$comment',
@@ -295,6 +298,7 @@ function run_query_update($deal) {
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
   $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
   $amount = $deal["amount"];
+  $hitrate = $deal["hitrate"];
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
@@ -317,6 +321,7 @@ function run_query_update($deal) {
     deal_technicalmanager_id='$tech',
     deal_dateproposal='$dateprop',
     deal_amount='$amount',
+    deal_hitrate='$hitrate',
     deal_status_id='$status',
     deal_datealarm='$datealarm',
     deal_comment='$comment',
@@ -362,6 +367,7 @@ function run_query_deal_id($deal) {
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
   $dateprop = ($deal["dateprop"] ? $deal["dateprop"] : "null");
   $amount = $deal["amount"];
+  $hitrate = $deal["hitrate"];
   $con1 = ($deal["contact1"] ? $deal["contact1"] : "null");
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
@@ -383,6 +389,7 @@ function run_query_deal_id($deal) {
     deal_technicalmanager_id='$tech' and
     deal_dateproposal='$dateprop' and
     deal_amount='$amount' and
+    deal_hitrate='$hitrate' and
     deal_status_id='$status' and
     deal_datealarm='$datealarm' and
     deal_comment='$comment' and
@@ -908,7 +915,7 @@ function run_query_cat_links($c_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_form($did, $deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_date_init;
-  global $err_msg, $l_err_label_empty;
+  global $err_msg, $l_err_label_empty, $l_err_hitrate;
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
@@ -938,6 +945,13 @@ function check_deal_form($did, $deal) {
   // Check if the tech resp. is filled
   if ($deal["tech"] < 1) {
     $err_msg = $l_err_tech_empty;
+    return false;
+  }
+
+  // Check if the hitrate is between 0 and 100
+  if ( ($deal["hitrate"] == "")
+    || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
+    $err_msg = $l_err_hitrate;
     return false;
   }
 
