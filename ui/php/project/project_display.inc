@@ -35,7 +35,13 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
   
   if ($fieldname == "project_name") {
-    $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("project_id").",'".addslashes($OD->data_set->f("project_name"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("project_id").");";
+    } else {
+      $res["url"] = "$path/project/project_index.php?action=detailconsult&amp;param_project=".$OD->data_set->f("project_id");
+    }
   }
 
   else if ($fieldname == "project_archive") {
@@ -114,8 +120,9 @@ function dis_project_search_form($project) {
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   global $l_name, $l_company, $l_tasktype, $l_manager, $l_member, $l_date;
   global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
-  global $c_all;
+  global $display, $c_all, $l_select_project;
 
+  $popup = $project["popup"];
   $name = $project["name"];
   $company_name = $project["company_name"];
   $tt = $project["tt"];
@@ -171,10 +178,30 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $checked = ($archive) ? "checked" : "";
   $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" $checked />";
 
+  $url = url_prepare("project_index.php");
+
+  if ($popup) {
+    $ext_action = $project["ext_action"];
+    $ext_url = $project["ext_url"];
+    $ext_id = $project["ext_id"];
+    $ext_title = ($project["ext_title"] ? $project["ext_title"] : "$l_select_project");
+    $ext_target = $project["ext_target"];
+    $ext_widget = $project["ext_widget"];
+    $ext_widget_text = $project["ext_widget_text"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"" . url_prepare("project_index.php") . "\">
+    <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"$url\">
 
     <div class=\"search\">
       <div class=\"searchLabel\">$l_name<br />
@@ -204,6 +231,8 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
         <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
         <input name=\"param_deal\" type=\"hidden\" value=\"$deal_id\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+        <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
+       $ext
       </div>
       <div class=\"searchEnd\"></div>
     </div>
@@ -221,8 +250,10 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_list($project) {
-  global $display, $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $display, $auth, $l_no_found;
+
+  $new_order = $project["new_order"];
+  $order_dir = $project["order_dir"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
   $obm_q = run_query_search($project, $new_order, $order_dir);
@@ -239,17 +270,18 @@ function dis_project_search_list($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Project Search result                                    //
+// XHTML Display the Project Search result
 // Parameters:
-//   - $obm_q_projects : list of projects
-//   - $pref_q      : fields to display in the list of projects 
-//   - $nb_deal     : nb projects found
-//   - $project[]   : project search criteria
-//     keys used    : name, company_name, tt, manager, member
+//   - $proj_q    : list of projects
+//   - $pref_q    : fields to display in the list of projects 
+//   - $nb_deal   : nb projects found
+//   - $project[] : project search criteria
+//     keys used  : name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
+function html_project_search_list($proj_q, $pref_q, $nb_project, $project) {
   global $display, $l_found;
 
+  $popup = $project["popup"];
   $name = $project["name"];
   $company_name = $project["company_name"];
   $tt = $project["tt"];
@@ -257,17 +289,37 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
   $member = $project["member"];
   $archive = $project["archive"];
 
-  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;cb_archive=$archive");
+  if ($popup) {
+    $ext_action = $project["ext_action"];
+    $ext_url = $project["ext_url"];
+    $ext_id = $project["ext_id"];
+    $ext_target = $project["ext_target"];
+    $ext_widget = $project["ext_widget"];
+    $ext_widget_text = $project["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
+  }
 
-  $dis_projects_list=new OBM_DISPLAY("DATA", $pref_q, "project");
-  $dis_projects_list->data_set = $obm_q_projects;
-  $dis_projects_list->data_url = $url;
-  $dis_projects_list->data_header = "both";
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;cb_archive=$archive$url_ext");
 
-  // --- HTML Template --------------------------------------------------------
-
+  $proj_d = new OBM_DISPLAY("DATA", $pref_q, "project");
+  if ($popup) {
+    $proj_d->display_link = false;
+    if ($ext_url != "") {
+      $proj_d->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $proj_d->display_ext = "get_id";
+    }
+   $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+  $proj_d->data_set = $proj_q;
+  $proj_d->data_url = $url;
+  $proj_d->data_header = "both";
   $display["msg"] .= display_info_msg($nb_project." ".$l_found);
-  $block = $dis_projects_list->display("dis_data_project");
+  $block = $proj_d->display("dis_data_project");
+  $block .= $display_popup_end;
 
   return $block;
 }

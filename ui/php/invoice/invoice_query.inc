@@ -88,10 +88,12 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
       $date,
       company_id, company_name as invoice_company,
       deal_id, deal_label as invoice_deal,
+      project_id, project_name as invoice_project,
       invoicestatus_id, invoicestatus_label as invoice_status
     from Invoice
-      left outer join Deal on invoice_deal_id = deal_id
       left outer join Company on invoice_company_id = company_id
+      left outer join Deal on invoice_deal_id = deal_id
+      left outer join Project on invoice_project_id = project_id
       left join InvoiceStatus on invoice_status_id = invoicestatus_id
     $whereq
     $orderq
@@ -178,13 +180,17 @@ function run_query_insert($invoice) {
   $comment = $invoice["comment"];
   $date = $invoice["date"];
   $inout = $invoice["inout"];
-  $comp_id = ($invoice["company_id"] > 0 ? $invoice["company_id"] : "0");
-  $deal_id = $invoice["deal_id"];
-  $proj_id = $invoice["project_id"];
+  $comp_id = $invoice["comp_new_id"];
+  if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
+  $deal_id = $invoice["deal_new_id"];
+  if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
+  $proj_id = $invoice["proj_new_id"];
+  if ($proj_id < 1) { $proj_id = $invoice["project_id"]; }
 
   if ($status == ""){
     $status = "0";
   }
+  $arch = (isset($project["archive"]) ? $project["archive"] : '0');
 
   $query = "insert into Invoice (
       invoice_timeupdate,
@@ -201,7 +207,8 @@ function run_query_insert($invoice) {
       invoice_status_id,
       invoice_comment,
       invoice_date,
-      invoice_inout
+      invoice_inout,
+      invoice_archive
     ) values (
       null,
      '$now',
@@ -217,7 +224,8 @@ function run_query_insert($invoice) {
      '$status',
      '$comment',
      '$date',
-     '$inout')"; 
+     '$inout'
+     '$arch')"; 
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -234,6 +242,7 @@ function run_query_update ($invoice) {
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
 
+  $id = $invoice["id"];
   $label = $invoice["label"];
   $number = $invoice["number"];
   $ht = $invoice["ht"];
@@ -242,13 +251,16 @@ function run_query_update ($invoice) {
   $comment = $invoice["comment"];
   $date = $invoice["date"];
   $inout = $invoice["inout"];
-  $invoice_id = $invoice["invoice"];
   if ($status == ""){
-    $status="0";
+    $status = "0";
   }
-  $comp_id = ($invoice["company_id"] > 0 ? $invoice["company_id"] : "0");
-  $deal_id = $invoice["deal_id"];
-  $proj_id = $invoice["project_id"];
+  $arch = (isset($project["archive"]) ? $project["archive"] : '0');
+  $comp_id = $invoice["comp_new_id"];
+  if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
+  $deal_id = $invoice["deal_new_id"];
+  if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
+  $proj_id = $invoice["proj_new_id"];
+  if ($proj_id < 1) { $proj_id = $invoice["project_id"]; }
 
   $query = "update Invoice set
       invoice_timeupdate='$now',
@@ -263,8 +275,9 @@ function run_query_update ($invoice) {
       invoice_status_id='$status',
       invoice_comment='$comment',
       invoice_date='$date',
-      invoice_inout='$inout'
-    where invoice_id='$invoice_id'"; 
+      invoice_inout='$inout',
+      invoice_archive='$arch'
+    where invoice_id='$id'"; 
 
   display_debug_msg($query, $cdg_sql, "run_query_update()");
   $obm_q = new DB_OBM;

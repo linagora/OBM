@@ -11,7 +11,6 @@
 // invoice only
 $l_label_start = "Inicio de Referencia";
 $l_amount = "Cantidad";
-$l_geninvoice = "Características";
 $l_amount_ht = "Cantidad HT";
 $l_amount_ttc = "Cantidad TTC";
 $l_status="Estado";
@@ -105,9 +104,7 @@ $l_rate_nan = "La tasa de IVA es inválida !";
 $l_ht_nan = "salida de los impuestos no es válida";
 
 // For the display parameters modification screen
-$l_invoice_options = "Opciones de despliegue de listas de facturas"; 
-$l_deal_options = "Opciones de despliegue de Negocios"; 
-$l_options_dis = "Opciones de despliegue" ;
+$l_invoice_display = "Opciones de despliegue de listas de facturas"; 
 
 // default invoice numbering policy :
 // this is used as a date format

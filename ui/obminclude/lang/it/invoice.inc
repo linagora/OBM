@@ -92,7 +92,7 @@ $lj_check_deal = "Seleziona un affare.";
 $lj_select_deals = "Seleziona un numero di affari";
 
 // For the display parameters modification screen
-$l_invoice_options = "Mostra opzioni nella lista delle fatture";
+$l_invoice_display = "Mostra opzioni nella lista delle fatture";
 
 // default invoice numbering policy :
 $default_invoice_numbering = "Y"; // we use only year

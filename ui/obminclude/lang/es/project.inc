@@ -44,6 +44,7 @@ $l_memberstimeinfos = "Llene la duración proyectada del trabajo (en días) para c
 $l_task_new = "Nueva tarea";
 $l_task_list = "Tareas definidas";
 $l_progress_info = "Llene la duración perdida del trabajo (en dias) para cada persona para completar una tarea";
+$l_select_project = "Seleccionar proyecto";
 
 // Actions
 $l_insert = "Crear proyecto";

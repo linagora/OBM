@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : projet.inc                                               //
-// 2003-07-10 Bastien Continsouzas                                           //
+// 2003-07-10 Aliacom - Bastien Continsouzas                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -45,6 +45,7 @@ $l_task_new = "New task";
 $l_task_update = "Update task";
 $l_task_list = "Defined tasks";
 $l_progress_info = "Fill in the working length (in days) missing for each person to complete a task";
+$l_select_project = "Select a project";
 
 // Actions
 $l_insert = "Create the project";

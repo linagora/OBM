@@ -1,8 +1,10 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM   - Language : English                                                //
 //       - File     : check_date_js.inc                                      //
 // 1999-01-25 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // JAVASCRIPT function that check the validity of a given date               //
 // Formats accepted are MM/JJ/AAAA and the ISO format ISO AAAA-MM-JJ         //

@@ -55,9 +55,21 @@ $fieldnames["invoice_company"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_deal(&$OD, $fieldname, $link_ok) {
-  global $path, $col_ok, $col_error, $col_client, $col_frs;
+  global $path, $deal, $col_ok, $col_error, $col_client, $col_frs;
 
-  if ($fieldname == "parentdeal_label") {
+  $ext_url = $deal["ext_url"];
+
+  if ($fieldname == "deal_label") {
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("deal_id").",'".addslashes($OD->data_set->f("deal_label"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("deal_id").");";
+    } else {
+      $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
+    }
+  }
+
+  else if ($fieldname == "parentdeal_label") {
     $res["url"] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$OD->data_set->f("parentdeal_id");
   }
 
@@ -67,10 +79,6 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "parentdeal_technical_lastname") {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_technicalmanager_id");
-  }
-
-  else if ($fieldname == "deal_label") {
-    $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
   }
 
   else if ($fieldname == "deal_archive") {
@@ -88,7 +96,7 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $res["name"] = $OD->data_set->f($fieldname) . " %";
   }
 
-  else if ($fieldname == "deal_company_name") {
+  else if (($fieldname == "deal_company_name") && $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("deal_company_id");
   }
   
@@ -148,7 +156,26 @@ function dis_deal_index($deal="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal search form                                                  //
+// Display Deal Search page                                                  //
+// Parameters:
+//   - $deal[] : hash with deal and parent deal values
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_search_form($deal="") {
+  global $display, $ctt_sales;
+
+  $usr_q = run_query_userobm();
+  $type_q = run_query_dealtype();
+  $tt_q = run_query_tasktype($ctt_sales);
+  $cat_q = run_query_dealcategory();
+  $status_q = run_query_dealstatus();
+  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cat_q, $status_q, $usr_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Deal search form
 // Parameters : 
 //   - $deal[]     : default form values
 //     keys used   : parent, label, company_name, archive, kind, cat, state,
@@ -163,9 +190,11 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
   global $l_all, $l_all_f, $l_find, $c_all, $l_category;
+  global $display, $l_select_deal;
 
   // --- Var preparation ------------------------------------------------------
 
+  $popup = $deal["popup"];
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
@@ -248,12 +277,33 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   }
   $sel_manager .= "</select>";
 
+
+  $url = url_prepare("deal_index.php");
+
+  if ($popup) {
+    $ext_action = $deal["ext_action"];
+    $ext_url = $deal["ext_url"];
+    $ext_id = $deal["ext_id"];
+    $ext_title = ($deal["ext_title"] ? $deal["ext_title"] : "$l_select_deal");
+    $ext_target = $deal["ext_target"];
+    $ext_widget = $deal["ext_widget"];
+    $ext_widget_text = $deal["ext_widget_text"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_widget\" type=\"hidden\" value=\"$ext_widget\">
+            <input name=\"ext_widget_text\" type=\"hidden\" value=\"$ext_widget_text\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "
   <form method=\"get\" name=\"form_deal\"
   onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
-  action=\"" . url_prepare("deal_index.php") . "\">
+  action=\"$url\">
   <div class=\"detailHead\">$l_deal</div>
   <div class=\"search\">
     <div class=\"searchLabel\">$l_label_start<br />
@@ -295,7 +345,9 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
       <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      $ext
     </div>
     <div class=\"searchEnd\"></div>
   </div>
@@ -372,8 +424,10 @@ function html_parentdeal_search_form($deal, $pmanager_q) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_search_list($deal) {
-  global $l_no_found;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth, $l_no_found;
+
+  $new_order = $deal["new_order"];
+  $order_dir = $deal["order_dir"];
 
   $obm_q = run_query_search($deal, 0, $new_order, $order_dir);
   $nb_deal = $obm_q->num_rows_total();
@@ -391,17 +445,17 @@ function dis_deal_search_list($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Deal Search result                                       //
 // Parameters:
-//   - $obm_q_deals : list of deals
-//   - $pref_q      : fields to display in the list of deals 
-//   - $nb_deal     : nb deals found
-//   - $deal[]      : deal search criteria
-//     keys used    : parent, label, company_name, archive, kind, tt, state,
-//                    manager, dateafter, datebefore
-///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
-  //-- Labels
-  global $display, $l_found, $popup;
+//   - $deal_q   : list of deals
+//   - $pref_q   : fields to display in the list of deals 
+//   - $nb_deal  : nb deals found
+//   - $deal[]   : deal search criteria
+//     keys used : parent, label, company_name, archive, kind, tt, state,
+//                 manager, dateafter, datebefore
+//////////////////////////////////////////////////////////////////////////////
+function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
+  global $display, $l_found, $l_close;
 
+  $popup = $deal["popup"];
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
   $name = urlencode(stripslashes($deal["company_name"]));
@@ -415,27 +469,39 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
   $param_comp = $deal["company"];
-  $obm_q_deals->seek($first_row);
   
   if ($popup) {
     $ext_action = $deal["ext_action"];
     $ext_url = $deal["ext_url"];
     $ext_id = $deal["ext_id"];
     $ext_target = $deal["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+    $ext_widget = $deal["ext_widget"];
+    $ext_widget_text = $deal["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp$url_ext");
 
-  $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q, "deal");
-  $dis_deals_list->data_set = $obm_q_deals;
-  $dis_deals_list->data_url = $url;
-  $dis_deals_list->data_header = "both";
+  $deal_d = new OBM_DISPLAY("DATA", $pref_q, "deal");
+  if ($popup) {
+    $deal_d->display_link = false;
+    if ($ext_url != "") {
+      $deal_d->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $deal_d->display_ext = "get_id";
+    }
+   $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
 
-  // --- HTML Template --------------------------------------------------------
-
-  $display["msg"] .= display_info_msg($nb_deal." ".$l_found);
-  $block = $dis_deals_list->display("dis_data_deal");
+  $deal_d->data_set = $deal_q;
+  $deal_d->data_url = $url;
+  $deal_d->data_header = "both";
+  $display["msg"] .= display_info_msg("$nb_deal $l_found");
+  $block = $deal_d->display("dis_data_deal");
+  $block .= $display_popup_end;
 
   return $block;
 }
@@ -2347,7 +2413,10 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_parentdeal_search_list($deal) {
   global $l_no_found_parent;
-  global $display, $auth, $new_order, $order_dir;
+  global $display, $auth;
+
+  $new_order = $deal["new_order"];
+  $order_dir = $deal["order_dir"];
 
   $obm_q = run_query_search_parentdeal($deal, $new_order, $order_dir);
   
@@ -2395,103 +2464,35 @@ function html_parentdeal_search_list($obm_q, $pref_q, $nb_parentdeals, $deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Parent Deal Form                                                  //
+// Display Parent Deal Detail
 // Parameters :
-//   - $action    : action called
-//   - $deal_q    : DBO : information about the parent deal (null for new deal)
-//   - $usrc_q    : DBO : OBM user list from system group Commercial
-//   - $usrp_q    : DBO : OBM user list from system group Production
-//   - deal[]     : default or transmitted values
-//     keys used  : parent_id, plabel, pmarket, ptech, pcom
+//   - deal[]    : default or transmitted values
+//     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
-  global $l_update_parent,$l_insert_parent,$l_label,$l_marketing_manager;
-  global $l_parentdeal,$l_technical_manager,$l_comment;
+function dis_parentdeal_consult($deal) {
+  global $ctt_sales, $uid;
 
-  // if update mode and first time, values are taken from db
-  if (($action == "parent_detailupdate") || ($action == "parent_delete")) {
-    $parent = $deal_q->f("parentdeal_id");
-    $plabel = $deal_q->f("parentdeal_label");
-    $pmarket = $deal_q->f("parentdeal_marketingmanager_id");
-    $ptech = $deal_q->f("parentdeal_technicalmanager_id");
-    $pcomment = $deal_q->f("parentdeal_comment");
-  } else {
-    // Values are taken from parameters
-    $parent = $deal["parent"];
-    $plabel = stripslashes($deal["plabel"]);
-    $pmarket = $deal["pmarket"];
-    $ptech = $deal["ptech"];
-    $pcomment = stripslashes($deal["pcom"]);
-  }  
+  $new_order = $deal["new_order"];
+  $order_dir = $deal["order_dir"];
 
-  // Marketing manager select
-  $sel_market = "<select name=\"sel_pmarket\">";
-  while ($usrc_q->next_record()) {
-    $sel_market .= "<option value=\"" . $usrc_q->f("userobm_id") . "\"";
-    if ($usrc_q->f("userobm_id") == $pmarket) $sel_market .= " selected= \" selected \"";
-    $sel_market .= ">" . $usrc_q->f("userobm_lastname") . " " . $usrc_q->f("userobm_firstname")."</option>";
-  }
-  $sel_market .= "</select>";
+  $obm_q = run_query_detail_parentdeal($deal["parent"]);
+  $pref_q = run_query_display_pref ($uid, "deal");
+  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
+  $num_rows = $deal_q->num_rows();
+  $kind_q = run_query_dealtype();
+  $tt_q = run_query_tasktype($ctt_sales);
+  $cat_q = run_query_dealcategory();
+  $state_q = run_query_dealstatus();
+  $usr_q = run_query_userobm();
 
-  // Technical manager select
-  $sel_tech = "<select name=\"sel_ptech\">";
-  while ($usrp_q->next_record()) {
-    $sel_tech .= "<option value=\"" . $usrp_q->f("userobm_id") . "\"";
-    if ($usrp_q->f("userobm_id") == $ptech) $sel_tech .= "selected= \" selected \"";
-    $sel_tech .= ">" . $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
-  }
-  $sel_tech .= "</select>";
-
-  if (($action == "parent_detailupdate") || ($action == "parent_update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"parent_update\" />
-        <input type=\"hidden\" name=\"param_parent\" value=\"$parent\" />
-        <input type=\"submit\" value=\"$l_update_parent\" />
-         ";
-  } else {
-     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"parent_insert\" />
-      <input type=\"submit\" value=\"$l_insert_parent\" />";
-  }
-
-  $block = "
-  <form method=\"post\" name=\"form_parentdeal_update\"
-      onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
-      action=\"" . url_prepare("deal_index.php") . "\">
-
-  <div class=\"detailHead\">$l_parentdeal</div>
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$l_label</td>
-      <td class=\"detailForm\"><input name=\"tf_plabel\" type=\"text\" size=\"40\" value=\"$plabel\" /></td>
-    </tr><tr>
-      <td class=\"detailHead\">$l_marketing_manager</td>
-      <td class=\"detailForm\">$sel_market</td>
-    </tr><tr>
-      <td class=\"detailHead\">$l_technical_manager</td>
-      <td class=\"detailForm\">$sel_tech</td>
-    </tr>
-    </table>
-
-  <div class=\"detailHead\">$l_comment</div>
-
-    <table class=\"detail\">
-    <tr>
-     <td class=\"detailForm\"><textarea name=\"ta_pcom\" rows=\"8\" cols=\"72\">$pcomment</textarea></td>
-    </tr>
-    </table>
-
-    <div class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_button</p>
-    </div>
-    </form>
-";
+  $block = html_parentdeal_consult($obm_q, $deal_q, $deal, $pref_q, $num_rows, $kind_q, $tt_q, $cat_q, $state_q, $usr_q);
 
   return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Parent Deal Detail                                               //
+// XHTML Display Parent Deal Detail
 // Parameters :
 //   - $parent_q : DBO : information about the parent deal
 //   - $deal_q   : DBO : parentdeal deal list
@@ -2629,68 +2630,134 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal Select Form                                               //
-// Parameters:
-//   - $deal_q : deal database result
-//   - $title  : Title to be displayed
-//   - $url    : URL to call with parameter deal
+// Display Parent Deal Form
+// Parameters :
+//   - $action   : action called
+//   - $deal[]   : default or transmitted values
+//     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
 ///////////////////////////////////////////////////////////////////////////////
-function html_select_deal($deal_q, $title, $url="") {
-  global $l_select_deal, $l_close;
+function dis_parentdeal_form($action, $deal) {
+  global $display, $ctt_sales, $cg_com, $cg_prod, $uid, $l_no_found;
 
-  if ($url != "") {
-    $jsfunc = "check_get_id_url(this, '$url')";
+  $new_order = $deal["new_order"];
+  $order_dir = $deal["order_dir"];
+  $users = array();
+
+  if ($deal["parent"] > 0) {
+    $obm_q = run_query_detail_parentdeal($deal["parent"]);
+    if ($obm_q->num_rows() != 1) {
+      $display["msg"] .= display_err_msg($l_no_found);
+      return;
+    } else {
+      $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
+      $display["detailInfo"] = display_record_info($obm_q);
+    }
+  }
+
+  $usrc_q = run_query_all_users_from_group($cg_com, $users);
+  $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+  $block = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Parent Deal Form
+// Parameters :
+//   - $action    : action called
+//   - $deal_q    : DBO : information about the parent deal (null for new deal)
+//   - $usrc_q    : DBO : OBM user list from system group Commercial
+//   - $usrp_q    : DBO : OBM user list from system group Production
+//   - deal[]     : default or transmitted values
+//     keys used  : parent_id, plabel, pmarket, ptech, pcom
+///////////////////////////////////////////////////////////////////////////////
+function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
+  global $l_update_parent,$l_insert_parent,$l_label,$l_marketing_manager;
+  global $l_parentdeal,$l_technical_manager,$l_comment;
+
+  // if update mode and first time, values are taken from db
+  if (($action == "parent_detailupdate") || ($action == "parent_delete")) {
+    $parent = $deal_q->f("parentdeal_id");
+    $plabel = $deal_q->f("parentdeal_label");
+    $pmarket = $deal_q->f("parentdeal_marketingmanager_id");
+    $ptech = $deal_q->f("parentdeal_technicalmanager_id");
+    $pcomment = $deal_q->f("parentdeal_comment");
   } else {
-    $jsfunc = "check_get_id(this)";
+    // Values are taken from parameters
+    $parent = $deal["parent"];
+    $plabel = stripslashes($deal["plabel"]);
+    $pmarket = $deal["pmarket"];
+    $ptech = $deal["ptech"];
+    $pcomment = stripslashes($deal["pcom"]);
+  }  
+
+  // Marketing manager select
+  $sel_market = "<select name=\"sel_pmarket\">";
+  while ($usrc_q->next_record()) {
+    $sel_market .= "<option value=\"" . $usrc_q->f("userobm_id") . "\"";
+    if ($usrc_q->f("userobm_id") == $pmarket) $sel_market .= " selected= \" selected \"";
+    $sel_market .= ">" . $usrc_q->f("userobm_lastname") . " " . $usrc_q->f("userobm_firstname")."</option>";
   }
-  $dis_select ="<select name=\"param_deal\" size=\"10\" style=\"font-family:fixed,courier\">";
+  $sel_market .= "</select>";
 
-  while ($deal_q->next_record()) {
-    $id = $deal_q->f("deal_id");
-    $name = $deal_q->f("deal_label");
-    $dis_select .= "\n<option value=\"$id\">$name</option>";
+  // Technical manager select
+  $sel_tech = "<select name=\"sel_ptech\">";
+  while ($usrp_q->next_record()) {
+    $sel_tech .= "<option value=\"" . $usrp_q->f("userobm_id") . "\"";
+    if ($usrp_q->f("userobm_id") == $ptech) $sel_tech .= "selected= \" selected \"";
+    $sel_tech .= ">" . $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
   }
-  $dis_select .= "</select>";
+  $sel_tech .= "</select>";
 
-  echo "
-  <div class=\"detailHead\">$title</div>
+  if (($action == "parent_detailupdate") || ($action == "parent_update")) {
+    $dis_button = "
+        <input type=\"hidden\" name=\"action\" value=\"parent_update\" />
+        <input type=\"hidden\" name=\"param_parent\" value=\"$parent\" />
+        <input type=\"submit\" value=\"$l_update_parent\" />
+         ";
+  } else {
+     $dis_button = "
+      <input type=\"hidden\" name=\"action\" value=\"parent_insert\" />
+      <input type=\"submit\" value=\"$l_insert_parent\" />";
+  }
 
-  <form method=\"get\" name=\"form_contr\"
-    onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
+  $block = "
+  <form method=\"post\" name=\"form_parentdeal_update\"
+      onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
+      action=\"" . url_prepare("deal_index.php") . "\">
 
-  <table class=\"detail\">
+  <div class=\"detailHead\">$l_parentdeal</div>
+
+    <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">
-      $dis_select
-      </td>
+      <td class=\"detailHead\">$l_label</td>
+      <td class=\"detailForm\"><input name=\"tf_plabel\" type=\"text\" size=\"40\" value=\"$plabel\" /></td>
+    </tr><tr>
+      <td class=\"detailHead\">$l_marketing_manager</td>
+      <td class=\"detailForm\">$sel_market</td>
+    </tr><tr>
+      <td class=\"detailHead\">$l_technical_manager</td>
+      <td class=\"detailForm\">$sel_tech</td>
     </tr>
-  </table>
+    </table>
 
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"submit\" value=\"$l_select_deal\" />
-    </p>
-  </div>
-  </form>
+  <div class=\"detailHead\">$l_comment</div>
 
-  <a href=\"\" onclick='window.close();'>$l_close</a>
+    <table class=\"detail\">
+    <tr>
+     <td class=\"detailForm\"><textarea name=\"ta_pcom\" rows=\"8\" cols=\"72\">$pcomment</textarea></td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>
 ";
 
-  if ($popup) {
-    $ext_action = $deal["ext_action"];
-    $ext_url = $deal["ext_url"];
-    $ext_id = $deal["ext_id"];
-    $ext_title = $deal["ext_title"];
-    $ext_target = $deal["ext_target"];
-    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
-            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["title"] = "<div class=\"title\">$ext_title</div>";
-  }
+  return $block;
 }
- 
+
 
 </script>

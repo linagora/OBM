@@ -17,10 +17,39 @@ $extra_js .= "
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
-///////////////////////////////////////////
-// Deal Search Form checking (Dates,...) //
-///////////////////////////////////////////
+
+// to avoid a javascript error when ext_widget or ext_widget_label not defined
+if (($ext_widget != "") || ($ext_widget_text != "")) {
+  $extra_js .= "
+
+function check_get_id(valeur,text) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_select_deal\");
+    return false;
+  } else {
+    window.opener.document.$ext_widget.value=valeur;
+    window.opener.document.$ext_widget_text.value=text;
+    window.close();
+    return true;
+  }
+}";
+}
+
 $extra_js .= "
+
+function check_get_id_url(p_url, valeur) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_select_deal\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+
+
 function check_search_form(f_aff) {
   if ((f_aff.tf_dateafter.value != \"\") &&
       (check_date(f_aff.tf_dateafter, \"$l_date_alarm_after\") == false)) {
@@ -31,14 +60,6 @@ function check_search_form(f_aff) {
     return false;
   }
   else return true;
-}
-
-
-function confirm_del() {
-  if (confirm (\"$l_delete_confirm\"))
-    return true;
-  else
-    return false;
 }
 
 
@@ -93,43 +114,11 @@ function check_form(f_aff) {
 }
 
 
-function check_get_id(form) {
-  deal_pos = form.param_deal.selectedIndex;
-  if (! (deal_pos >= 0)) {
-    alert (\"$l_j_select_deal\");
-    return false;
-  }
-  valeur = form.param_deal.options[deal_pos].value;
-  text = form.param_deal.options[deal_pos].text;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_deal\");
-    return false;
-  } else {
-    window.opener.document.form_contract.param_deal.value=valeur;
-    window.opener.document.form_contract.deal_label.value=text;
-    window.close();
+function confirm_del() {
+  if (confirm (\"$l_delete_confirm\"))
     return true;
-  }
-}
-
-
-function check_get_id_url(form, p_url) {
-  deal_pos = form.param_deal.selectedIndex;
-  if (! (deal_pos >= 0)) {
-    alert (\"$l_j_select_deal\");
+  else
     return false;
-  }
-  valeur = form.param_deal.options[deal_pos].value;
-  text = form.param_deal.options[deal_pos].text;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_deal\");
-    return false;
-  } else {
-    new_url = p_url + valeur;
-    window.opener.location.href=new_url;
-    window.close();
-    return true;
-  }
 }
 
 

@@ -629,7 +629,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       </td>
       <td class=\"detailForm\">
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
-        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=form_contract.deal_new_id&amp;ext_widget_text=form_contract.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
         <img src=\"/images/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>

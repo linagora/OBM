@@ -63,9 +63,9 @@ $l_add_contrat = "Add a contract";
 $l_contract_new = "New contract";
 
 // Actions
-$l_select_deal = "Select Deal";
+$l_select_deal = "Select a Deal";
 $l_insert = "Insert the Deal";
-$l_update = "Update the  Deal";
+$l_update = "Update the Deal";
 $l_delete = "Delete the Deal";
 $l_archive_update = "Update Archives";
 $l_select_company = "Select the Company";

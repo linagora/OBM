@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : project_js.inc                                              //
 //     - Desc  : Project javascript functions File                           //
@@ -16,7 +16,37 @@ $extra_js .= "
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
+// to avoid a javascript error when ext_widget or ext_widget_label not defined
+if (($ext_widget != "") || ($ext_widget_text != "")) {
+  $extra_js .= "
+
+function check_get_id(valeur,text) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_select_project\");
+    return false;
+  } else {
+    window.opener.document.$ext_widget.value=valeur;
+    window.opener.document.$ext_widget_text.value=text;
+    window.close();
+    return true;
+  }
+}";
+}
+
 $extra_js .= "
+
+function check_get_id_url(p_url, valeur) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_select_project\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+
 
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))

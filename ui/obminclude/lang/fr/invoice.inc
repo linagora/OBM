@@ -12,7 +12,6 @@
 $l_label_start = "Début de Label";
 $l_number = "Numéro";
 $l_amount = "Montant";
-$l_geninvoice = "Caractéristiques";
 $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
 $l_status = "Etat";
@@ -99,8 +98,7 @@ $l_rate_nan = "Le taux TVA est invalide !";
 $l_ht_nan = "Le montant Hors Taxes est invalide !";
 
 // For the display parameters modification screen
-$l_invoice_options = "Options d'affichage pour les listes de Factures"; 
-$l_options_dis = "Options d'affichage" ;
+$l_invoice_display = "Options d'affichage pour les listes de Factures"; 
 
 // default invoice numbering policy :
 // this is used as a date format

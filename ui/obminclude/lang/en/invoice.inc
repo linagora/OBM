@@ -10,7 +10,6 @@
 // Labels et textes
 $l_label_start = "Label start";
 $l_amount = "Amount";
-$l_geninvoice = "Caractéristics";
 $l_amount_ht = "HT amount";
 $l_amount_ttc = "TTC Amount";
 $l_status="Status";
@@ -110,7 +109,7 @@ $lj_check_deal = "You have to select a Deal before submitting";
 $lj_select_deals = "You have to select a number of deals";
 
 // For the display parameters modification screen
-$l_invoice_options = "Display options for invoices list"; 
+$l_invoice_display = "Display options for invoices list"; 
 
 // default invoice numbering policy :
 $default_invoice_numbering = "Y"; // we use only year

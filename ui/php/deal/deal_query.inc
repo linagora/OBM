@@ -1859,22 +1859,4 @@ function run_query_contract_nb ($deal_id) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Selection of the Deal according to Company id           //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal($comp_id = "0") {
-  global $cdg_sql;
-
-  if ($comp_id == "0")
-   $query = "select * from Deal ";
-  else
-   $query = "select * from Deal Where deal_company_id = '$comp_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
 </script>

@@ -51,7 +51,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "company_name") {
     if ($OD->display_ext == "get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".$OD->data_set->f("company_name")."');";
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".addslashes($OD->data_set->f("company_name"))."');";
     } else if ($OD->display_ext == "get_id_url") {
       $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("company_id").");";
     } else {
@@ -480,7 +480,7 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $comp_d->data_header = "both";
   $display["msg"] = display_info_msg("$nb_company $l_found");
   $block = $comp_d->display("dis_data_company");
-  $block .= $display_popup_end;  
+  $block .= $display_popup_end;
 
   return $block;
 }

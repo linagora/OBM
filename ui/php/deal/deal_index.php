@@ -40,7 +40,7 @@
 // - parent_update        -- form fields    -- update the parent
 // - parent_delete        -- $param_parent  -- delete the parent
 // External API ---------------------------------------------------------------
-// - ext_get_id      -- $title         -- select a deal (return id) 
+// - ext_get_id      -- $ext_params    -- select a deal (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,16 +91,13 @@ if (($action == "search") && ($deal["parent"])) {
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
   require("deal_js.inc");
-  $deal_q = run_query_deal($comp_id);
-  $display["detail"] = html_select_deal($deal_q, stripslashes($title));
-
-} else if ($action == "ext_get_ids") {
-  $display["search"] = html_deal_search_form($contact);
+  $display["search"] = dis_deal_search_form($deal);
   if ($set_display == "yes") {
-    $display["result"] = dis_deal_search_list($contact);
+    $display["result"] = dis_deal_search_list($deal);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+
 } elseif ($action == "ext_get_cat_ids") {
   $extra_css = "category.css";
   require("deal_js.inc");
@@ -123,9 +120,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "search")  { // tester si hd_parent mis ??? pour form :oui
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $usr_q = run_query_userobm();
-  $cat_q = run_query_dealcategory();
-  $display["search"] = html_deal_search_form($deal, run_query_dealtype(), run_query_tasktype($ctt_sales), $cat_q, run_query_dealstatus(), $usr_q);
+  $display["search"] = dis_deal_search_form($deal);
   $display["result"] = dis_deal_search_list($deal);
   
 } elseif ($action == "new")  {
@@ -384,31 +379,16 @@ $display["detail"] .= dis_cat_links($deal);
 } elseif ($action == "parent_new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $obm_q = new DB_OBM;
-  $usrc_q = run_query_all_users_from_group($cg_com);
-  $usrp_q = run_query_all_users_from_group($cg_prod);
-  $display["detail"] = html_parentdeal_form($action,$obm_q, $usrc_q,$usrp_q,'');
+  $display["detail"] = dis_parentdeal_form($action, $deal);
 
 } elseif ($action == "parent_detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail_parentdeal($deal["parent"]);
-  $pref_q = run_query_display_pref ($uid, "deal");
-  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
-  $num_rows = $deal_q->num_rows();
-  $cat_q = run_query_dealcategory();
-  $display["detail"] = html_parentdeal_consult($obm_q,$deal_q,$deal,$pref_q,$num_rows,run_query_dealtype(),run_query_tasktype($ctt_sales),$cat_q,run_query_dealstatus(),run_query_userobm());
+  $display["detail"] = dis_parentdeal_consult($deal);
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($deal["parent"] > 0) {
-    require("deal_js.inc");
-    $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
-  } 
+  require("deal_js.inc");
+  $display["detail"] = dis_parentdeal_form($action, $deal);
   
 } elseif ($action == "parent_insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -430,12 +410,7 @@ $display["detail"] .= dis_cat_links($deal);
 ///////////////////////////////////////////////////////////////////////////////
   if (check_parent_has_deal($deal["parent"])) {
     $display["msg"] .= display_err_msg($l_err_parent_has_deal);
-    $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detailInfo"] = display_record_info($obm_q);
-    $display["search"] = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
+    $display["search"] = dis_parentdeal_consult($deal);
   } else {
     run_query_delete_parentdeal($deal["parent"]); 
     $display["msg"] .= display_ok_msg($l_delete_ok); 
@@ -452,22 +427,11 @@ $display["detail"] .= dis_cat_links($deal);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $pref_q = run_query_display_pref ($uid,"deal");
-    $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
-    $cat_q = run_query_dealcategory();
-    $num_rows = $deal_q->num_rows();
-    $display["detail"] = html_parentdeal_consult($obm_q,$deal_q,$deal,$pref_q,$num_rows,run_query_dealtype(),      
-    run_query_tasktype($ctt_sales),$cat_q,run_query_dealstatus(),run_query_userobm());
+    $display["detail"] = dis_parentdeal_consult($deal);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     require("deal_js.inc");
-    $obm_q = run_query_detail_parentdeal($deal["parent"]);
-    $users = array($uid, $obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usrp_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_parentdeal_form($action, $obm_q, $usrc_q, $usrp_q, $deal);
+    $display["detail"] = dis_parentdeal_form($action, $deal);
   }
 
 } elseif ($action == "affect") {
@@ -517,34 +481,22 @@ function get_param_deal() {
   global $sel_cat, $tf_code, $tf_cat;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
-  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $ext_widget, $ext_widget_text, $new_order, $order_dir;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
  
+  if (isset ($popup)) $deal["popup"] = $popup;
   if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
   if (isset ($ext_url)) $deal["ext_url"] = $ext_url;
   if (isset ($ext_id)) $deal["ext_id"] = $ext_id;
-  if (isset ($ext_title)) $deal["ext_title"] = $ext_title;
+  if (isset ($ext_title)) $deal["ext_title"] = stripslashes(urldecode($ext_title));
   if (isset ($ext_target)) $deal["ext_target"] = $ext_target;
- 
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
+  if (isset ($ext_widget)) $deal["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $deal["ext_widget_text"] = $ext_widget_text;
 
-  if (isset ($http_obm_vars)) {
-    $nb_d = 0;
-    $nb_deal = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$deal["doc$nb_d"] = $d_num;
-      }
-    }
-    $deal["doc_nb"] = $nb_d;
-  }
-  
+  if (isset ($new_order)) $deal["new_order"] = $new_order;
+  if (isset ($order_dir)) $deal["order_dir"] = $order_dir;
+
   // Deal fields
   if (isset ($param_deal)) $deal["id"] = $param_deal;
   if (isset ($tf_num)) $deal["num"] = $tf_num;
@@ -613,7 +565,27 @@ function get_param_deal() {
   if (isset ($tf_status)) $deal["status_label"] = $tf_status;
   $deal["status_order"] = (isset($tf_order) ? $tf_order : "0");
 
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_d = 0;
+    $nb_deal = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$deal["doc$nb_d"] = $d_num;
+      }
+    }
+    $deal["doc_nb"] = $nb_d;
+  }
+  
   dis_debug_param($deal);
+
   return $deal;
 }
 
@@ -756,7 +728,7 @@ function get_deal_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"],
     'Right'    => $cright_write,
-    'Condition'=> array ('parent_detailconsult') 
+    'Condition'=> array ('parent_detailconsult', 'parent_update') 
                                      		  );
                                                                                                                                                              
   // Parent Update
@@ -948,7 +920,7 @@ function get_deal_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-  // Popup
+  // External call : select one deal
   $actions["DEAL"]["ext_get_id"] = array (
     'Url'      => "$path/deal/deal_index.php?action=ext_get_id",
     'Right'    => $cright_read,

@@ -32,6 +32,8 @@
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
+// External API ---------------------------------------------------------------
+// - ext_get_id      -- $ext_params    -- select a deal (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -62,7 +64,22 @@ get_project_action();
 $perm->check_permissions($menu, $action);
 
 
-if ($action == "index" || $action == "") {
+///////////////////////////////////////////////////////////////////////////////
+// External calls
+///////////////////////////////////////////////////////////////////////////////
+if ($action == "ext_get_id") {
+  require("project_js.inc");
+  $display["search"] = dis_project_search_form($project);
+  if ($set_display == "yes") {
+    $display["result"] = dis_project_search_list($project);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+
+///////////////////////////////////////////////////////////////////////////////
+// Standard calls
+///////////////////////////////////////////////////////////////////////////////
+} else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($project);
   $display["msg"] .= display_info_msg($l_no_display);
@@ -308,7 +325,7 @@ if ($action == "index" || $action == "") {
   }
   // gets updated infos
   $members_q = run_query_members($pid);
-  $display["detail"] = html_project_member_form($members_q, $project );
+  $display["detail"] = html_project_member_form($members_q, $project);
 
 } elseif ($action == "member_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -355,7 +372,7 @@ if ($action == "index" || $action == "") {
 // Action menus are retrieved here too as $project values can be set in process
 // XXXXX to optimize here (update_project_action) with only needed action
 get_project_action();
-if (! $contact["popup"]) {
+if (! $project["popup"]) {
   $display["header"] = generate_menu($menu,$section);
 }
 
@@ -370,12 +387,12 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_project() {
-  global $param_project, $param_user, $param_status, $param_company, $param_deal;
+  global $param_project, $param_user, $param_status,$param_company,$param_deal;
   global $tf_missing, $tf_projected, $tf_datebegin, $tf_dateend;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_estimated, $tf_tasklabel, $cb_archive;
-  global $sel_tt, $sel_manager, $sel_member, $sel_task, $sel_ptask, $param_ext;
-  global $deal_label;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
+  global $sel_tt, $sel_manager, $sel_member, $sel_task, $sel_ptask,$deal_label;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $ext_widget, $ext_widget_text, $new_order, $order_dir;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
   global $cdg_param;
 
@@ -408,12 +425,18 @@ function get_param_project() {
   if (isset ($cb_archive)) $project["archive"] = $cb_archive;
 
   // External param
+  if (isset ($popup)) $project["popup"] = $popup;
   if (isset ($ext_action)) $project["ext_action"] = $ext_action;
   if (isset ($ext_url)) $project["ext_url"] = $ext_url;
   if (isset ($ext_id)) $project["ext_id"] = $ext_id;
   if (isset ($ext_id)) $project["id"] = $ext_id;
   if (isset ($ext_target)) $project["ext_target"] = $ext_target;
-  if (isset ($title)) $project["title"] = stripslashes($title);
+  if (isset ($ext_title)) $project["ext_title"] = stripslashes(urldecode($ext_title));
+  if (isset ($ext_widget)) $project["ext_widget"] = $ext_widget;
+  if (isset ($ext_widget_text)) $project["ext_widget_text"] = $ext_widget_text;
+
+  if (isset ($new_order)) $project["new_order"] = $new_order;
+  if (isset ($order_dir)) $project["order_dir"] = $order_dir;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -468,6 +491,13 @@ function get_project_action() {
   global $l_header_man_task, $l_header_man_member, $l_header_man_advance;
   global $l_header_man_affect, $l_header_consult;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+
+// External call : select one deal
+  $actions["PROJECT"]["ext_get_id"] = array (
+    'Url'      => "$path/project/project_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     );
 
 // Index
   $actions["PROJECT"]["index"] = array (
