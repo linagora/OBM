@@ -355,7 +355,7 @@ function beautify_deal_comment($com) {
   $col0 = "FFFFFF";
   $col1 = "BBBBBB";
 
-  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/";
+  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
   $replace = "</td>
     </tr>
     <tr>
