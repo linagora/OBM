@@ -277,7 +277,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group) {
-  global $l_group, $l_name, $l_desc, $l_email, $l_insert, $l_update, $l_back;
+  global $l_group, $l_name, $l_desc, $l_email, $l_visibility, $l_insert, $l_update, $l_back;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -286,16 +286,28 @@ function html_group_form($action, $group_q, $group) {
     $name = $group_q->f("group_name");
     $desc = $group_q->f("group_desc");
     $email = $group_q->f("group_email");
+    $priv = $group_q->f("group_privacy");
   } else {
     // Values are taken from parameters
     $id = $group["id"];
     $name = stripslashes($group["name"]);
     $desc = stripslashes($group["desc"]);
     $email = stripslashes($group["email"]);
+    $priv = stripslashes($group["priv"]);
   }
 
   //  $mail = get_mail_info();
   //  $main_domain = $mail["main_domain"];
+
+  // If new group or group update and user is owner, display visibility
+  if ( ($action == "new") || ($action == "insert") ||
+       ( (($action=="detailupdate") || ($action=="update")) &&
+         ($usercreate == $auth->auth["uid"]) ) ) {
+    if ($priv == '1') {
+      $private_c = " checked";
+    }
+    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />";
+  }
 
   $block = "<center>
   <form method=\"get\" name=\"f_group\" action=\"".url_prepare("group_index.php")."\">
@@ -315,6 +327,10 @@ function html_group_form($action, $group_q, $group) {
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" />@</td>
+  </tr>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_visibility</td>
+    <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>
   </table>";
 
@@ -381,8 +397,10 @@ function dis_group_consult($group, $uid) {
 //   - $u_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
+  global $auth; 
   global $c_yes, $c_no, $ico_mail;
-  global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
+  global $l_group, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_group_group;
+  global $l_private, $l_public;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $display, $perm, $module, $action, $cright_write;
@@ -398,12 +416,24 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
+  $priv = $group_q->f("group_privacy");
 
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
   $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<div class=\"title\">$l_group : $name</div>";
+
+  // Privacy
+  if ($usercreate == $auth->auth["uid"]) {
+    if ($priv == 1)
+      $l_priv = $l_private;
+    else
+      $l_priv = $l_public;
+    $l_priv = "</tr><tr>
+      <td class=\"detailLabel\">$l_visibility</td>
+      <td class=\"detailText\">$l_priv</td>";
+  }
 
   $block = "
     <div class=\"detailHead\">$l_group</div>
@@ -428,6 +458,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email@</td>
     </tr>
+    $l_priv
     </table>";
 
 

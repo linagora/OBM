@@ -40,6 +40,9 @@ function run_query_search($group) {
   if ($email != '') {
     $where .= " and group_email $like '%$email%'";
   }
+  // only the one which are allowed (ie. publics )
+  $where .=  " and " .sql_obm_entity_privacy("group");
+    
   $whereq = "where $where";
 
   // ORDER construction
@@ -179,6 +182,7 @@ function run_query_insert($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
+  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
   $now = date("Y-m-d H:i:s");
 
   $query = "insert into UGroup (group_timeupdate,
@@ -186,6 +190,7 @@ function run_query_insert($group) {
     group_userupdate,
     group_usercreate,
     group_system,
+    group_privacy,
     group_name,
     group_desc,
     group_email)
@@ -194,6 +199,7 @@ function run_query_insert($group) {
     null,
     '$uid',
     '$system',
+    '$priv',
     '$name',
     '$desc',
     '$email')";
@@ -219,17 +225,19 @@ function run_query_update($group) {
   $desc = $group["desc"];
   $email = $group["email"];
   $system = ($group["system"] == 1) ? 1 : 0;
+  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
   $now = date("Y-m-d H:i:s");
   
   $query = "update UGroup set
     group_timeupdate='$now',
     group_userupdate='$uid',
     group_system='$system',
+    group_privacy='$priv',
     group_name='$name',
     group_desc='$desc',
     group_email='$email'
   where group_id='$id'";
-
+echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
