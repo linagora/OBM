@@ -258,16 +258,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
 
   // Naf Code select
   if ($show_naf) {
-    $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">
-    <option value=\"$c_all\">$l_all</option>";
-    while ($naf_q->next_record()) {
-      $n_id = $naf_q->f("companynafcode_id");
-      $n_code = $naf_q->f("companynafcode_code");
-      $sel_naf .= "\n<option value=\"$n_id\"";
-      if ($a_id == $naf) { $sel_naf .= " selected=\"selected\""; }
-      $sel_naf .= ">$n_code</option>\n";
-    }
-    $sel_naf .= "</select>";
+    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"$c_all\">$l_all</option>", $naf);
 
     $block_naf = "
     <div class=\"searchLabel\">$l_nafcode<br />
@@ -956,17 +947,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
   // Naf code select field
   if ($show_naf) {
-    $sel_naf = "<select name=\"sel_naf\" id=\"sel_naf\">
-    <option value=\"0\">$l_none</option>";
-    while ($naf_q->next_record()) {
-      $n_id = $naf_q->f("companynafcode_id");
-      $n_code = $naf_q->f("companynafcode_code");
-      $n_label = $naf_q->f("companynafcode_label");
-      $sel_naf .= "\n<option value=\"$n_id\"";
-      if ($n_id == $naf) { $sel_naf .= " selected=\"selected\""; }
-      $sel_naf .= ">$n_code - $n_label</option>\n";
-    }
-    $sel_naf .= "</select>";
+    $sel_naf = dis_select_companynafcode($naf_q, "<option value=\"0\">$l_none</option>", $naf);
 
     $block_naf = "
     </tr><tr>      
@@ -2221,6 +2202,40 @@ function dis_company_display_pref($display_pref_q) {
   $block = $dis_pref->display();
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Company Naf Code select
+// Parameters:
+//   - $naf_q     : database object with nafcode list
+///////////////////////////////////////////////////////////////////////////////
+function dis_select_companynafcode($naf_q, $line1, $selected) {
+  global $cgp_hide;
+
+  $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
+
+  if ($show_naf) {
+    $sel_naf = "<select id=\"sel_naf\" name=\"sel_naf\">
+    $line1";
+    while ($naf_q->next_record()) {
+      $n_id = $naf_q->f("companynafcode_id");
+      $n_disabled = $naf_q->f("companynafcode_title");
+      $n_code = $naf_q->f("companynafcode_code");
+      $n_label = $naf_q->f("companynafcode_label");
+      $sel_naf .= "\n<option value=\"$n_id\"";
+      if ($n_disabled == '1') {
+	$sel_naf .= " disabled=\"disabled\"";
+      } else {
+	$n_code = "&nbsp;&nbsp;&nbsp; $n_code";
+      }
+      if ($n_id == $selected) { $sel_naf .= " selected=\"selected\""; }
+      $sel_naf .= ">$n_code $n_label</option>\n";
+    }
+    $sel_naf .= "</select>";
+  }
+
+  return $sel_naf;
 }
 
 

@@ -197,6 +197,7 @@ CREATE TABLE CompanyNafCode (
   companynafcode_timecreate  timestamp(14),
   companynafcode_userupdate  int(8),
   companynafcode_usercreate  int(8),
+  companynafcode_title       int(1) NOT NULL DEFAULT '0',
   companynafcode_code        varchar(4),
   companynafcode_label       varchar(128),
   PRIMARY KEY (companynafcode_id)

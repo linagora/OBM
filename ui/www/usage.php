@@ -34,8 +34,9 @@ If you are using OBM and want to be referenced here drop us a note.
     <li>Cellon - Philips
     <li><a href="http://www.igtech.fr/"><img src="images/logo-igtech.png"></a> IGTech
     <li><a href="http://www.gsi.univ-savoie.fr/"><img src="images/logo-gsi.png"></a> IUP Génie des Systèmes d'Information à Annecy (OBM pour gestion de la relation avec les entreprises)
+    <li>TAG'S Broadcasting Services (TBS Internet) 
     <li>...
-  </ul>
+ </ul>
   </p>
 
 <?php include("footer.html"); ?>

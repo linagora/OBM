@@ -30,6 +30,7 @@ $fieldnames["timetask_company_name"] = $l_company;
 $fieldnames["timetask_length"] = $l_length;
 $fieldnames["timetask_id"] = "";
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Time specific dataset fields                                      //
 // Parameters:

@@ -21,13 +21,13 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $company_id = $contact["company_id"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
-  $phone = stripslashes($contact["phone"]);
+  $phone = $contact["phone"];
   $email = $contact["email"];
   $company = $contact["company"];
   $market = $contact["marketing_manager"];
   $func = $contact["function"];
-  $zip = stripslashes($contact["zip"]);
-  $town = stripslashes($contact["town"]);
+  $zip = $contact["zip"];
+  $town = $contact["town"];
   $ctry = $contact["country"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];

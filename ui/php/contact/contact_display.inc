@@ -429,7 +429,7 @@ function dis_contact_consult($contact) {
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
-  if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
+  if (is_entity_visible("contact", $con_q) ) {
     $display["detailInfo"] = display_record_info($con_q);
     if($view != "") {
       $block .= html_contact_header($con_q);

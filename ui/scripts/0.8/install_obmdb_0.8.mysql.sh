@@ -36,6 +36,10 @@ mysql -u $U -p$P < create_obmdb_0.8.mysql.sql
 echo "Dictionnary data insertion"
 mysql -u $U -p$P $DB < obmdb_ref_0.8_$DATA_LANG.sql
 
+# Company Naf Code data insertion
+echo "Company Naf Code data insertion"
+mysql -u $U -p$P $DB < obmdb_nafcode_0.8_$DATA_LANG.sql
+
 # Test data insertion
 echo "Test data insertion"
 mysql -u $U -p$P $DB < obmdb_test_values_0.8.sql

@@ -34,15 +34,19 @@ psql -U $U $DB < create_obmdb_0.8.pgsql.sql
 
 # Dictionnary data insertion
 echo "Dictionnary data insertion"
-psql -U $U $DB < obmdb_ref_0.8_$DATA_LANG.sql
+cat postgres-pre.sql obmdb_ref_0.8_$DATA_LANG.sql | psql -U $U $DB
+
+# Company Naf Code data insertion
+echo "Company Naf Code data insertion"
+cat postgres-pre.sql obmdb_nafcode_0.8_$DATA_LANG.sql | psql -U $U $DB
 
 # Test data insertion
 echo "Test data insertion"
-psql -U $U $DB < obmdb_test_values_0.8.sql
+cat postgres-pre.sql obmdb_test_values_0.8.sql | psql -U $U $DB
 
 # Default preferences data insertion
 echo "Default preferences data insertion"
-psql -U $U $DB < obmdb_default_values_0.8.sql
+cat postgres-pre.sql obmdb_default_values_0.8.sql | psql -U $U $DB 
 
 # Default preferences propagation on created users
 echo "Default preferences propagation on created users"

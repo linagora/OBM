@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.2.tar.gz
-tar -C /var/www -xzvf obm-0.8.2.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.3.tar.gz
+tar -C /var/www -xzvf obm-0.8.3.tar.gz
 cd /var/www
-ln -s obm-0.8.2 obm
+ln -s obm-0.8.3 obm
 </pre>
   </td>
 </tr>
@@ -90,6 +90,17 @@ Globals must be registered automatically
 <tr>
   <td><pre>
 register_globals = On
+</pre>
+  </td>
+</tr>
+</table>
+<p>
+
+Magic quotes must be On
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+magic_quotes_gpc = On
 </pre>
   </td>
 </tr>
@@ -357,7 +368,9 @@ create database obm with owner = obm;
 </table>
 <p />
 
-If your Postgres server is not configured with latin1 character set, edit the file scripts/0.8/obmdb_test_values_0.8.sql and scripts/0.8/obmdb_ref_0.8_fr.sql (oe scripts/0.8/obmdb_ref_0.8_en.sql for english) and uncomment the lines
+<h5>4.2.3.1: For OBM 0.8.0 to 0.8.2</h5>
+If your Postgres server is not configured with latin1 character set:
+ edit the file scripts/0.8/obmdb_test_values_0.8.sql and scripts/0.8/obmdb_ref_0.8_fr.sql (or scripts/0.8/obmdb_ref_0.8_en.sql for english) and uncomment the lines
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -368,6 +381,20 @@ If your Postgres server is not configured with latin1 character set, edit the fi
 </table>
 <p />
 
+<h5>4.2.3.2: Since OBM 0.8.3</h5>
+If your Postgres server is not configured with latin1 character set:
+ edit the file scripts/0.8/postgres-pre.sql and uncomment the line (now uncommented by default)
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+\encoding latin1
+</pre>
+  </td>
+</tr>
+</table>
+<p />
+
+<h5>4.2.3.3: All OBM versions</h5>
 The script <i>install_obmdb_0.8.pgsql.sh</i> handle all the database creation steps.
 <br>
 Edit User / password (or DB) infos in this script and run it
@@ -476,6 +503,55 @@ mysql -u obm -pobm obm < scripts/0.8/update-0.8.1-0.8.2.mysql.sql
 <tr>
   <td><pre>
 psql -U obm obm < scripts/0.8/update-0.8.1-0.8.2.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<p />
+<a name="upgrade-0.8.3"><h1>UPGRADE OBM DATABASE 0.8.2 to 0.8.3 (MySQL and Postgres)</h1></a>
+<p />
+# MySQL Database has evolved from 0.8.2 to 0.8.3
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/update-0.8.2-0.8.3.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Database has evolved from 0.8.2 to 0.8.3
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/update-0.8.2-0.8.3.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+<p />
+A naf code dump is available (french naf codes). If you want to insert these reference data :
+# MySQL Naf code data
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Naf code data
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
 </pre>
   </td>
 </tr>
