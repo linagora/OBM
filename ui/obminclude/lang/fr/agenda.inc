@@ -35,7 +35,7 @@ $l_periodicity = "Fréquence";
 $l_repeatkind = "Type de répétition";
 $l_repeatdays = "Jours de répétition (type hebdomadaire)";
 $l_repeatdays2 = "Jours de répétition";
-
+$l_user_right = "Gérer les droits de";
 $l_use_endrepeat = "Date de fin de répétition";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
@@ -79,12 +79,9 @@ $l_repeat_update = "Mettre à jour toutes les répétitions à venir";
 $l_go_to = "Aller à";
 $l_refuse = "Refuser";
 $l_change_state = "Votre participation à l'évenement";
-$l_force_all = "Tout forcer";
-$l_replace_all = "Tout remplacer";
-$l_cancel_all = "Tout annuler";
-$l_force_event = "Forcer";
-$l_cancel_event = "Annuler";
-$l_replace_event = "Remplacer";
+$l_force_insert = "Forcer l'insertion";
+$l_refuse_insert = "Refuser l'évenement";
+$l_cancel_insert = "Ne rien faire";
 $l_too_much_user = "Vous ne pouvez sélectionner au maximum que six utilisateurs";
 $l_insert_ok = "Insertion effectuée avec succès";
 $l_update_ok = "Mise à jour effectuée avec succès";
@@ -177,9 +174,9 @@ $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
 //MAIL
 
-$l_add_event_mail_head = "Nouvel événement dans Obm : ";
-$l_update_event_mail_head = "Evénement mis à jour dans Obm : ";
-$l_delete_event_mail_head = "Evénement supprimé dans Obm : ";
+$l_add_event_mail_head = "Nouvel evenement dans Obm : ";
+$l_update_event_mail_head = "Evenement mis à jour dans Obm : ";
+$l_delete_event_mail_head = "Evenement supprime dans Obm : ";
 
 $l_add_event_mail_subject = "Nouvel événement sur Obm";
 $l_update_event_mail_subject = "Mise a jour d'un événement sur Obm";

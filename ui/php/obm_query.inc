@@ -32,18 +32,61 @@ function run_query_month_event_list() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the number of waitinf events
+// Return the number of waiting events
 // Parameters: 
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_waiting_events() {
   global $cdg_sql,$auth;
+
+  $writable_users = run_query_userobm_writable();
   $obm_db = new DB_OBM;
-  $query = "SELECT calendarsegment_eventid as num FROM  CalendarSegment WHERE calendarsegment_state = 'W' AND calendarsegment_customerid = '20' GROUP BY calendarsegment_eventid";
+  
+  $query = "SELECT calendarsegment_eventid as num FROM  CalendarSegment WHERE calendarsegment_state = 'W' ";
+  if(is_array($writable_users)) {
+    $query .= " AND calendarsegment_customerid IN (";
+    $num = count($writable_users);
+    for($i=0;$i<$num;$i++) {
+      $query.= "'".$writable_users[$i]."',";
+    }
+    $query.="".$auth->auth["uid"].")";
+  }
+  else {
+    $query.="AND calendarsegment_customerid = ".$auth->auth["uid"]."";
+  }
+  $query .= " GROUP BY calendarsegment_eventid";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db->nf()/1;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of writable agenda users for the current user
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_writable() {
+  global $cdg_sql,$auth;
+
+  $uid = $auth->auth["uid"];
+  $query = "SELECT u.userobm_id,
+      c.calendarright_write
+    FROM UserObm as u
+      LEFT OUTER JOIN CalendarRight as c 
+        ON u.userobm_id = c.calendarright_ownerid
+          AND c.calendarright_customerid = '$uid'
+    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') 
+    ORDER BY u.userobm_lastname";
+
+  $obm_db = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);
+  $ret_array = array();
+  while($obm_db->next_record()) {
+       $ret_array[] = $obm_db->f("userobm_id");
+  }
+  return $ret_array;
+}
+
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event.(hashed by day for year

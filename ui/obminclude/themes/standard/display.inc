@@ -136,7 +136,9 @@ function generate_menu($menu, $section) {
 <!-- Bandeau -->
 
 <div class='header'>
-<img src=\"/images/$set_theme/logo_obm.png\" alt=\"\" id='logo' />
+<a href=\"$path/obm.php\">
+<img src=\"/images/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' />
+</a>
 <span id='version'>OBM v.".$obm_version." Société Aliacom</span> 
 <!-- Login -->
 <ul class='login'>

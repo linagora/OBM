@@ -123,3 +123,8 @@ $ico_mini_cal       = "calendar.png";
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";
 $ico_rtf = "ico_label.png";
+
+//Portal Icons 
+
+$ico_agenda_portal = "ico_portal_agenda.gif";
+$ico_time_portal = "ico_portal_time.gif";

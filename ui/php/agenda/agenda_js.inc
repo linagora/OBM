@@ -30,33 +30,6 @@ function check_calendar(form) {
   
 }
   
-function check_all_force(form) {
-  var i='';
-  for(i=0;i<form.length;i++) {
-    if(form.elements[i].value.toString() == 'force') {
-      form.elements[i].checked = 1;
-
-    }
-  }
-} 
-function check_all_replace(form) {
-  var i='';
-  for(i=0;i<form.length;i++) {
-    if(form.elements[i].value.toString() == 'replace') {
-      form.elements[i].checked = 1;
-
-    }
-  }
-} 
-function check_all_cancel(form) {
-  var i='';
-  for(i=0;i<form.length;i++) {
-    if(form.elements[i].value == 'cancel') {
-      form.elements[i].checked = 1;
-    }
-  }
-} 
-
 
 
 function check_count_user(formulaire) {

@@ -147,7 +147,9 @@ function generate_menu($menu, $section) {
 
   $block = "
     <div class=\"header\">
-     <div class=\"logo\">&nbsp;</div>
+     <div class=\"logo\">
+     <a href=\"$path/obm.php\"><img src=\"/images/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' /></a>
+     </div>
 
      <!-- zone Login -->
      <div> 

@@ -387,7 +387,7 @@ function run_query_get_user_name($contacts_array) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_add_event($agenda,$contacts_array,&$event_id) {
   global $auth, $l_add_event_mail_head,$l_add_event_mail_subject,$l_event_mail_body,$l_from,$l_to;
-
+  $writable_user = run_query_userobm_writable(); 
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_begin"] , $day_array);  
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_end"] , $day_array2);    
   $force = $agenda["force"];
@@ -415,7 +415,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	}
       }
       foreach($contacts_array as $user_id) {
-	if($user_id == $auth->auth["uid"]) {
+	if($user_id == $auth->auth["uid"] || in_array($user_id,$writable_user)) {
 
     	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'A');	
 	}
@@ -443,15 +443,19 @@ function run_query_insert_decision($agenda) {
   global $auth;
 
   $return_info = array();
+  $user = $agenda["user_id"];
   $event_id = $agenda["id"];
+  $force = $agenda["force"];
   $state = $agenda["decision_event"];
   if ($state == 'A') {
-    $conflicts = run_query_get_latent_conflicts($event_id, $auth->auth["uid"]);
+    $conflicts = run_query_get_latent_conflicts($event_id, $user);
   }
   else{
     $conflicts = array();
   }
-  run_query_insert_occurence_state($event_id,$auth->auth["uid"],$state,$conflicts);
+  if ($force == 1 || count($conflicts) == 0){  
+    run_query_insert_occurence_state($event_id,$user,$state,$conflicts);
+  }
   return $conflicts;
 }
 
@@ -516,9 +520,9 @@ function run_query_insert_occurence_state($event_id,$user_id,$state, $conflicts)
 		  AND calendarsegment_state = 'W'
 		  AND calendarsegment_eventid = '$event_id'";
   if(count($conflicts) != 0) {
-    $query .= " AND $calendarsegment_date NOT IN ('".$conflicts[0]["date_begin"]."','".$conflicts[0]["date_end"]."'";
+    $query .= " AND $calendarsegment_date NOT IN (".$conflicts[0]["date_begin"].",".$conflicts[0]["date_end"]."";
     for ($i=1;$i<count($contacts_array);$i++) {
-      $query.= ",'".$conflicts[$i]["date_begin"]."','".$conflicts[$i]["date_end"]."'";
+      $query.= ",".$conflicts[$i]["date_begin"].",".$conflicts[$i]["date_end"]."";
     }
     $query.=")";
   }   
@@ -579,12 +583,17 @@ function run_query_manage_conflict($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_waiting_events() {
   global $auth, $cdg_sql;
+  
+  $writable_user = run_query_userobm_writable();
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat");  
   $calendarsegment_date_1 = sql_date_format($db_type,"cs1.calendarsegment_date");    
   $calendarsegment_date_2 = sql_date_format($db_type,"cs2.calendarsegment_date"); 
   $query = "SELECT DISTINCT
+                   userobm_id,
+		   userobm_lastname,
+		   userobm_firstname,
                    calendarevent_id,
                    calendarevent_title, 
 		   calendarcategory_label,
@@ -595,24 +604,40 @@ function run_query_waiting_events() {
 		   $calendarevent_endrepeat,
 		   MIN($calendarsegment_date_1) as datebegin,
 		   MIN($calendarsegment_date_2)	as dateend   
-            FROM CalendarEvent, CalendarCategory, CalendarSegment cs1, CalendarSegment cs2
+            FROM CalendarEvent, CalendarCategory, CalendarSegment cs1, CalendarSegment cs2,
+	    UserObm 
 	    WHERE calendarevent_category_id = calendarcategory_id
-	      	  AND cs1.calendarsegment_customerid = ".$auth->auth["uid"]."
+	          AND userobm_id = cs1.calendarsegment_customerid  
+	      	  AND cs1.calendarsegment_customerid = cs2.calendarsegment_customerid
 		  AND cs1.calendarsegment_state = 'W'
-  		  AND cs2.calendarsegment_customerid = ".$auth->auth["uid"]."
 		  AND cs2.calendarsegment_state = 'W'
 	          AND calendarevent_id = cs1.calendarsegment_eventid
 		  AND calendarevent_id = cs2.calendarsegment_eventid	
 		  AND cs1.calendarsegment_flag = 'begin'
-		  AND cs2.calendarsegment_flag = 'end'
-		 GROUP BY calendarevent_id,
+		  AND cs2.calendarsegment_flag = 'end' ";
+
+  if(is_array($writable_user)) {
+    $query .= " AND cs1.calendarsegment_customerid IN (";
+    $num = count($writable_user);
+    for($i=0;$i<$num;$i++) {
+      $query.= "'".$writable_user[$i]."',";
+    }
+    $query.="".$auth->auth["uid"].")";
+  }
+  else {
+    $query.="AND cs1.calendarsegment_customerid = ".$auth->auth["uid"]."";
+  }
+  $query .= "GROUP BY calendarevent_id,
 		 calendarevent_title,
 		 calendarcategory_label,
 		 calendarevent_privacy,
 		 calendarevent_priority,
 		 calendarevent_repeatkind,
 		 calendarevent_repeatdays,
-		 calendarevent_endrepeat
+		 calendarevent_endrepeat,
+		 userobm_id,
+		 userobm_lastname,
+	      	 userobm_firstname
 		 "; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -656,9 +681,9 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
   
   $query = "UPDATE CalendarSegment SET calendarsegment_state = '$state', calendarsegment_date = calendarsegment_date WHERE
             calendarsegment_customerid = $user_id AND calendarsegment_eventid = '$event_id'
-	    AND  $calendarsegment_date IN ('".$obm_db->f("calendarsegment_date")."'";
+	    AND  $calendarsegment_date IN (".$obm_db->f("calendarsegment_date")."";
   while ( $obm_db->next_record()) {
-    $query.= ",'".$obm_db->f("calendarsegment_date")."'";
+    $query.= ",".$obm_db->f("calendarsegment_date")."";
   }
   $query.=")";
   display_debug_msg($query, $cdg_sql);
@@ -746,7 +771,6 @@ function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
 //    - $date_end
 //    - $user_id :
 ////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
   global $cdg_sql;
   $obm_db = new DB_OBM;
@@ -798,8 +822,8 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type; 
   
-  $calendarsegment_date_l_1 = sql_date_format($db_type,"cs1.calendarsegment_date","datebegin");
-  $calendarsegment_date_l_2 = sql_date_format($db_type,"cs2.calendarsegment_date","dateend");
+  $calendarsegment_date_l_1 = sql_date_format($db_type,"cs1.calendarsegment_date","date_begin");
+  $calendarsegment_date_l_2 = sql_date_format($db_type,"cs2.calendarsegment_date","date_end");
   $calendarsegment_date_1 = sql_date_format($db_type,"cs1.calendarsegment_date");
   $calendarsegment_date_2 = sql_date_format($db_type,"cs2.calendarsegment_date");    
 
@@ -820,7 +844,7 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
     $query.= ",'".$contacts_array[$i]."'";
   }
   $query.=")";
-  $query .= " ORDER BY datebegin, cs1.calendarsegment_customerid";
+  $query .= " ORDER BY date_begin, cs1.calendarsegment_customerid";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   while ($obm_db->next_record()) {
@@ -906,6 +930,7 @@ function run_query_get_eventcategories() {
 function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   global $auth,$l_update_event_mail_head,$l_update_event_mail_subject,$l_event_mail_body,$l_update_event_mail_body,$l_to,$l_from;
 
+  $writable_user = run_query_userobm_writable(); 
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_begin"] , $day_array);  
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_end"] , $day_array2);   
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["old_begin"] , $day_array3);  
@@ -945,7 +970,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 	}
       }
       foreach($contacts_array as $user_id) {
-	if($user_id == $auth->auth["uid"]) {
+	if($user_id == $auth->auth["uid"] || in_array($user_id,$writable_user)) {
       	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'A');	
 	}
 	else{
@@ -1050,10 +1075,9 @@ function run_query_delete($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get active Users or archived with rights set with their permissions
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm_right() {
-  global $cdg_sql,$auth;
+function run_query_userobm_right($uid) {
+  global $cdg_sql;
 
-  $uid = $auth->auth["uid"];
   $query = "
     SELECT userobm_id,
       calendarright_customerid,
@@ -1104,7 +1128,7 @@ function run_query_userobm_writable() {
   global $cdg_sql,$auth;
 
   $uid = $auth->auth["uid"];
-  $query = "SELECT u.*,
+  $query = "SELECT u.userobm_id,
       c.calendarright_write
     FROM UserObm as u
       LEFT OUTER JOIN CalendarRight as c 
@@ -1116,9 +1140,39 @@ function run_query_userobm_writable() {
   $obm_db = new DB_OBM;
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);
-  return $obm_db;
+  $ret_array = array();
+  while($obm_db->next_record()) {
+       $ret_array[] = $obm_db->f("userobm_id");
+  }
+  return $ret_array;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of writable agenda users for the current user
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_label_writable() {
+  global $cdg_sql,$auth;
 
+  $uid = $auth->auth["uid"];
+  $query = "SELECT u.userobm_id,u.userobm_lastname,u.userobm_firstname,
+      c.calendarright_write
+    FROM UserObm as u
+      LEFT OUTER JOIN CalendarRight as c 
+        ON u.userobm_id = c.calendarright_ownerid
+          AND c.calendarright_customerid = '$uid'
+    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') 
+    ORDER BY u.userobm_lastname";
+
+  $obm_db = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);
+  $ret_array = array();
+  while($obm_db->next_record()) {
+       $ret_array[] = array("id"=>$obm_db->f("userobm_id"),
+       "firstname" => $obm_db->f("userobm_firstname"),
+       "lastname" => $obm_db->f("userobm_lastname"));
+  }
+  return $ret_array;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of writable agenda groups for the current user
 ///////////////////////////////////////////////////////////////////////////////
@@ -1220,11 +1274,16 @@ function run_query_get_group_users($groups) {
 function run_query_update_right($agenda) {
   global $cdg_sql,$auth;  
 
-  $uid = $auth->auth["uid"];
+  $uid = $agenda["user_id"];
   $accept_write = $agenda["accept_w"];
   $deny_write = $agenda["deny_w"];
   $deny_read = $agenda["deny_r"];
   $accept_read = $agenda["accept_r"];
+  if($uid != $auth->auth["uid"]){
+    $writable_user = run_query_userobm_writable();  
+    if(!in_array($uid,$writable_user)) 
+      return 0;
+  }
   $obm_db = new DB_OBM;
 
   if (is_array($accept_write)) {

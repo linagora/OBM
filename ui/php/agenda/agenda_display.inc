@@ -520,10 +520,10 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $td_begin .= "style=\"text-align: center;\" ";	
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		    }
-		    $event_head_display .= "</a>";	 
-		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+		    $event_head_display .= "</a>";	
+// Why? if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
 		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
-		    }
+//  }
 		  }
 		  elseif(!in_array($idOfEvent,$temp_array)) {	
 		    $event_head_display .= "<br />";
@@ -561,9 +561,9 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		    }
 		    $event_head_display .= "</a>";	 
-		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+// Why? if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
 		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
-		    }
+//}
 		  }
 		}
 		$rowspan_event++;
@@ -1873,6 +1873,15 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 
    return $block;
  }
+///////////////////////////////////////////////////////////////////////////////
+// Display Waiting events
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function dis_waiting_events($obm_wait) {
+
+  return html_waiting_events($obm_wait);
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1884,12 +1893,35 @@ function html_waiting_events($obm_wait) {
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
-
   while ($obm_wait->next_record()) {
+    $current_user = $obm_wait->f("userobm_id");
+    $current_lname = $obm_wait->f("userobm_lastname");
+    $current_fname = $obm_wait->f("userobm_firstname");
+    if($current_user != $old_user) {
+      $old_user = $current_user;
+      if($dis_waiting_events!="") {
+	$dis_waiting_events .= "</table>";
+      }
+      $dis_waiting_events .= "
+      <p/>
+      <div class=\"detailHead\">$current_fname $current_lname :</div>
+      <table class=\"detail\">
+       <tr>
+        <td class=\"detailText\">$l_title</td>
+        <td class=\"detailText\">$l_category</td>
+        <td class=\"detailText\">$l_priority</td>
+        <td class=\"detailText\">$l_repeatkind</td>
+	<td class=\"detailText\">$l_repeatdays2</td>
+	<td class=\"detailText\">$l_use_endrepeat</td>     
+	<td class=\"detailText\">$l_datebegin</td>
+	<td class=\"detailText\">$l_dateend</td>
+	<td></td>
+      </tr>";
+    }
     $kind = ${"l_".$obm_wait->f("calendarevent_repeatkind")};
     switch ($obm_wait->f("calendarevent_priority") ) {
       case 1 : 
-      	$priority = $l_low;
+	$priority = $l_low;
 	break;
       case 2 :
 	$priority = $l_medium;
@@ -1898,7 +1930,7 @@ function html_waiting_events($obm_wait) {
 	$priority = $l_high;
 	break;
     }
-
+	
     $start_week_day = strtotime($set_weekstart_default);
     $dis_repeat_days = "";
     for ($i=0; $i<7; $i++) {
@@ -1916,7 +1948,8 @@ function html_waiting_events($obm_wait) {
     $date_begin = datetime_format($obm_wait->f("datebegin"));
     $date_end = datetime_format($obm_wait->f("dateend"));
     $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
-    $dis_waiting_events .= "<tr>
+    $dis_waiting_events .= "
+    <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
      <td class=\"detailForm\">$priority</td>
@@ -1929,29 +1962,17 @@ function html_waiting_events($obm_wait) {
       <form method=\"get\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
+       <input type=\"hidden\" name=\"param_user\" value=\"$current_user\" />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onchange=\"this.form.submit()\" />$l_accept
        <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onchange=\"this.form.submit()\" />$l_wait
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse</td>
-     </form>
-     </tr>";
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse
+      </form>
+     </td>
+    </tr>";
   }
-
-
+  
   // --- HTML Template --------------------------------------------------------
   $block = "
-   <table class=\"detail\">
-    <tr>
-     <td class=\"detailText\">$l_title</td>
-     <td class=\"detailText\">$l_category</td>
-     <td class=\"detailText\">$l_priority</td>
-     <td class=\"detailText\">$l_repeatkind</td>
-     <td class=\"detailText\">$l_repeatdays2</td>
-     <td class=\"detailText\">$l_use_endrepeat</td>     
-     <td class=\"detailText\">$l_datebegin</td>
-     <td class=\"detailText\">$l_dateend</td>
-     <td></td>
-    </tr>
-   <p />
     $dis_waiting_events
    </table>
   ";
@@ -2114,20 +2135,24 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
 function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   global $set_theme,$set_weekstart_default,$auth;
   // -- Labels
-  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user,$l_force_all,$l_replace_all,$l_cancel_all,$l_validate;
-  global $l_force_event,$l_cancel_event, $l_replace_event;
+  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
+  global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
 
+  $user_id = $agenda["user_id"];
   if ($force == 1) { 
-    $dis_form_begin = "<form name=\"f_conflict\" method=\"post\"><input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
-                       <input type=\"hidden\" name=\"action\" value=\"insert_conflict\" />";
+    $dis_form_begin = "
+    <form name=\"f_conflict\" method=\"post\">
+     <input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
+     <input type=\"hidden\" name=\"action\" value=\"decision\" />
+     <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
+     <input type=\"hidden\" name=\"cb_force\" value=\"1\" />
+     <input type=\"hidden\" name=\"rd_decision_event\" value=\"\" />";
     $dis_form_button = "
-    <input type=\"button\" value=\"$l_force_all\" onclick=\"check_all_force(this.form)\" />
-    <input type=\"button\" value=\"$l_replace_all\" onclick=\"check_all_replace(this.form)\" /> 
-    <input type=\"button\" value=\"$l_cancel_all\" onclick=\"check_all_cancel(this.form)\" /><br />
-    <input type=\"submit\" value=\"$l_validate\" />";
+    <input type=\"submit\" value=\"$l_force_insert\" onclick=\"this.form.rd_decision_event.value='A';\"/>
+    <input type=\"submit\" value=\"$l_refuse_insert\" onclick=\"this.form.rd_decision_event.value='R';\"/> 
+    <input type=\"submit\" value=\"$l_cancel_insert\" onclick=\"this.form.rd_decision_event.value='W';\"/>
+    ";
     $dis_form_end = " </form>";
-    $dis_head = "<td class=\"detailText\">$l_force_event</td>
-                 <td class=\"detailText\">$l_replace_event</td><td class=\"detailText\">$l_cancel_event</td>";
   }
   foreach ($conflict as $data) {
     $id = $data["event_id"];
@@ -2146,16 +2171,7 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
         <td class=\"detailForm\">$date_b</td>
         <td class=\"detailForm\">$date_e</td>
         <td class=\"detailForm\">$user_name</td>";
-    if ($force == 1 && $user_id == $auth->auth["uid"]) {
-      $dis_conflict .= "
-        <td class=\"detailForm\">
-          <input type=\"radio\" checked=\"checked\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"force\" /></td>
-        <td class=\"detailForm\">
-          <input type=\"radio\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"replace\" /></td>
-        <td class=\"detailForm\">
-          <input type=\"radio\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"cancel\" />
-          <input type=\"hidden\" name=\"hd_conflict_end[$date_begin][$id]\" value=\"$date_end\" /></td>";
-    }
+
      $dis_conflict .= "</tr>";
   }
   $block= "
@@ -2167,7 +2183,6 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
     <td class=\"detailText\">$l_datebegin</td>
     <td class=\"detailText\">$l_dateend</td>
     <td class=\"detailText\">$l_user</td>    
-    $dis_head
    </tr>
    $dis_conflict
   </table>
@@ -2210,14 +2225,80 @@ function html_dis_delete($agenda) {
   ";
   return $block;
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Rights admin panel
 // Parameters:
 //   - $user_q :
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_right_admin($user_q) {
+
+function dis_right_admin($agenda) {
+  global $display,$auth;
+  if(isset($agenda["user_id"])) {
+    $user_id = $agenda["user_id"];
+  }else {
+    $user_id = $auth->auth["uid"];
+  }
+  $writable_user = run_query_userobm_label_writable(); 
+  $user_obm = run_query_userobm_right($user_id);
+  $display["features"] = html_userwritable_bar($writable_user,$user_id);
+  return html_dis_right_admin($user_obm,$user_id);
+}
+///////////////////////////////////////////////////////////////////////////////
+// User selection for agenda management admin panel
+// Parameters:
+//   - $writable_user : Array of user on who you can manage the calandar
+///////////////////////////////////////////////////////////////////////////////
+function html_userwritable_bar($writable_user,$user_id) {
+  global $l_user_right,$l_validate;
+// User Selection
+  if (count($writable_user) > 0) {  
+    $dis_sel_user .= "<select name=\"param_user\">";
+    foreach ($writable_user as $user) {
+      $u_id = $user["id"];
+      $u_lname =  $user["lastname"];
+      $u_fname = $user["firstname"];
+      $dis_sel_user .= "\n<option value=\"$u_id\"";
+      if ($u_id == $user_id ) {
+	$tag_user = " selected=\"selected\"";
+      }
+      $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
+      $tag_user = "";
+    }
+    $dis_sel_user .= "</select>
+    <br />
+    <input type=\"hidden\" name=\"action\" value=\"rights_admin\" />
+    $dis_duration
+    <input type=\"submit\" value=\"$l_validate\" />
+    ";
+
+    $block = "<div class=\"agendaBar\">
+      <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
+       <tr>
+        <td class=\"agendaHead2\">$l_user_right</td>
+       </tr>
+       <tr>
+        <td class=\"agendaVide\" align=\"left\">
+ 	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
+	  $dis_sel_user
+	 </form>
+	</td>
+       </tr>              
+      </table>
+     </div>";
+
+  }
+  return $block;
+} 
+
+
+
+  
+///////////////////////////////////////////////////////////////////////////////
+// Display Rights admin panel
+// Parameters:
+//   - $user_q :
+///////////////////////////////////////////////////////////////////////////////
+function html_dis_right_admin($user_q,$user_id) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
   global $l_everyone,  $l_list,$l_authorize,$l_deny;
   
@@ -2272,6 +2353,7 @@ function html_dis_right_admin($user_q) {
    <tr>
     <form method=\"post\" action=\"agenda_index.php\">    
      <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
       <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
       <select name=\"sel_accept_read[]\" multiple=\"multiple\" size=\"15\">
         $sel_read_no
@@ -2284,6 +2366,7 @@ function html_dis_right_admin($user_q) {
       <br /><input type=\"submit\" value=\"$l_authorize\" />
      </td>
      <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
       <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
       <select name=\"sel_deny_read[]\" multiple=\"multiple\" size=\"15\">
         $sel_read_ok  
@@ -2318,6 +2401,7 @@ function html_dis_right_admin($user_q) {
    <tr>
     <form method=\"post\" action=\"agenda_index.php\">
      <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
       <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
       <select name=\"sel_accept_write[]\" multiple=\"multiple\" size=\"15\">
         $sel_write_no
@@ -2330,6 +2414,7 @@ function html_dis_right_admin($user_q) {
       <br /><input size=\"30\" type=\"submit\" value=\"$l_authorize\" />
      </td>
      <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
       <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
       <select name=\"sel_deny_write[]\" multiple=\"multiple\" size=\"15\">
         $sel_write_ok

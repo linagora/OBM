@@ -3,11 +3,15 @@
 	width: 600px;
 }
 
+.portalPortal {
+	margin: 20px 5px;
+	width: 900px;
+}
 
 .portalModule {
 	margin: 10px;
 	background-color: #ffffff;
-	border: 1px solid #9ccbd6;
+	border: 2px solid #394D5A;
 	height: 200px;
 	width: 270px;
 	float : right;
@@ -16,15 +20,15 @@
 .portalModuleLeft {
   	height: 200px;
 	width: 65px;	
-	background-image: url(bg_portal_module.gif);
+	background-image:  url(../grey/bg_portal_module.gif);
 	background-position: left top;
 	float : left;
 }
      
 .portalContent {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 12px;
-	color: #009ec6;
+	font-size: 10px;
+	color: #394D5A;
 	text-align: center;
 	height : 120px;
 	margin-top : 10px;
@@ -36,17 +40,35 @@
 	text-align: center;
 	margin: auto;
 	margin-top: 10px;
+	font-weight: bold;
 }
 
 .portalTitle {
-	font-size: 18px;
+	font-size: 13px;
+	color: #FFFFFF;
+	font-weight: bold;
+	background-color: #39495A;
+	padding: 2px 0px;
+	margin: 0px;
+	text-transform: uppercase;
+
+	text-align: center;
+	background-image: 	url(fond_bandeau02.png);
+	
+/*	font-size: 18px;
 	font-weight: bold;
 	text-transform: uppercase;
 	color: #009EC6;
 	background-color: #eff3f7;
 	text-align: center;
-	font-family: Arial, Helvetica, sans-serif;
+	font-family: Arial, Helvetica, sans-serif;*/
 }
+
+
+
+
+
+
 
 /* //////////////////AGENDA////////////////// */
 /* ////// Agenda table style definition ///// */
@@ -61,17 +83,29 @@ td.agendaCell		{
 }
 
 td.agendaHead		{
- 	background-image: 	url(side_bg.gif); 
+/* 	background-image: 	 url(../standard/side_bg.gif); 
  	text-align: 		center; 
 	font-size: 		12px;
 	font-weight: 		800;
 	width:			20px;
-	border-bottom:		1px solid #009ec6;
+	border-bottom:		1px solid #009ec6; */
+	font-size: 		13px;
+	color: 			#FFFFFF;
+	font-weight:		bold;
+	background-color: 	#39495A;
+	padding: 		2px 2px;
+	margin: 		0px;
+ 	text-align: 		center;
+	text-transform: 	uppercase;
+	width: 			20px;
+	background-image: 	url(fond_bandeau02.png);
+
 }
 
 .agendaCalendar {
   	background-color: 	#eeeeee;
   	margin: 		auto;
+	border-spacing: 0;
 }
 
 	
