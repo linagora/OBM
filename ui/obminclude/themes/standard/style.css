@@ -32,46 +32,7 @@ p			{
         margin-left:		auto;
 	margin-right:		auto;
 }	
-/*
-.textLabel 		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	color:			#000000;
-}
 
-.textLabelForm	 	{
-	font-family:		sans-serif;
-	font-size:		10px;
-	color:			#000000;
-}
-
-.textContent 		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
-}
-
-.bookmark 		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
-}
-
-.modules		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#ffffff;
-	font-weight:		bold;
-}
-
-.sectionsInactive	{
-	font-family:		sans-serif;
-	font-size:		16px;
-	color:			#555555;
-	font-weight:		bold;
-}
-
-*/
 /*System Message*/
 .messageOk		{
         margin-left:		auto;
@@ -122,12 +83,11 @@ p			{
 table.global		{
 	width:			100%;
 	border-spacing:		0;
-	border:			3px solid red;
 }
 
 td.globalLogo		{
 	vertical-align:		top;
-	width:			18px;
+	width:			180px;
 	padding:		0;
 	margin:			0;
 }
@@ -146,7 +106,6 @@ td.globalHeader		{
 table.logo		{
 	vertical-align:		text-top;
 	color:			#ffffff;
-	width:			18px;
 	border-spacing:		0;
 	padding:		0;
 	margin:			0;
@@ -157,20 +116,26 @@ table.logo		{
 td.logoInside		{
 	background-color:	#ffffff;	
 	color:			#555555;
+	padding:		0;
+	margin:			0;
        
 }
 
 td.logoBottom		{
 	vertical-align:		text-top;
+	padding:		0;
+	margin:			0;
 }
 
 td.logoVersion		{
 	font-family:		sans-serif;
-	font-weight:		bold;	
+	font-weight:		bold;
 	font-size:		10px;
 	color:			#555555;
 	text-align:		right;
-	background-color:	#ffffff;		
+	background-color:	#ffffff;
+	padding:		0;
+	margin:			0;		
 }
 
 /* ////////////////HEADER MENU/////////////// */
@@ -261,12 +226,16 @@ img.menuBarIconG		{
 	float:			right;
 	border:			0;
 	text-align:		right;
+	margin:			0;
+	padding:		0;
 }
 
 img.menuBarIconD		{
 	float:			left;
 	border:			0;
 	text-align:		left;
+	margin:			0;
+	padding:		0;
 
 }
 

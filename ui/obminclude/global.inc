@@ -532,9 +532,9 @@ function display_error_visibility()
 	global $col_error;
 	global $l_error_visibility;
 
-	echo "<CENTER><FONT color=\"#$col_error\">";
-  	echo $l_error_visibility;
-  	echo "</FONT></CENTER><BR>";
+
+  	 display_err_msg($l_error_visibility);
+
 }
 
 

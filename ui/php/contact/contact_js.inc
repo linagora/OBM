@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -83,6 +83,6 @@ function verifie(form) {
 
 
 // -->
-</SCRIPT>
+</script>
 ";
 

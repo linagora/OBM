@@ -27,6 +27,7 @@ $l_town = "Town";
 $l_country = "Country";
 $l_comment = "Comment";
 $l_visibility ="Access";
+$l_coord = "Details";
 
 // Labels and texts
 $l_contact_name = "Contact Name";

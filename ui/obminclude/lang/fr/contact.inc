@@ -27,6 +27,7 @@ $l_town = "Ville";
 $l_country = "Pays";
 $l_comment = "Commentaire";
 $l_visibility ="Accès";
+$l_coord = "Coordonnées";
 
 //------------------------------------//
 // Fields that appear in result lists //

@@ -44,11 +44,11 @@ function generate_menu($menu, $section) {
   $profil = $auth->auth["perm"];
 
   echo "
-<table cellpading=\"0\" cellspacing=\"0\" class=\"global\">
+<table cellpadding=\"0\" cellspacing=\"0\" class=\"global\">
 <tr>
 <!-- Taleau du logo et identification société -->
   <td class=\"globalLogo\">
-    <table cellpading=\"0\" cellspacing=\"0\" class=\"logo\">
+    <table cellpadding=\"0\" cellspacing=\"0\" class=\"logo\">
     <tr>
       <td colspan=\"4\"><img src=\"/images/$set_theme/logo_obm.gif\" alt=\"\" /></td>
     </tr><tr>
@@ -68,7 +68,7 @@ function generate_menu($menu, $section) {
 <!-- Tableau partie droite du bandeau (Login, Onglets, menus) -->
 
   <td class=\"globalHeader\">
-    <table cellpading=\"0\" cellspacing=\"0\" class=\"header\">
+    <table cellpadding=\"0\" cellspacing=\"0\" class=\"header\">
     <tr>
     <!-- zone Login -->
 
@@ -88,7 +88,7 @@ function generate_menu($menu, $section) {
     </tr><tr>
 
     <!-- zone Onglets -->
-      <td colspan=\"2\" height=\"10\">";
+      <td colspan=\"2\">";
   display_tabs($section);
   echo "
       </td>
@@ -126,7 +126,7 @@ function display_menu_bar($section, $menu) {
   global $actions, $popup_width, $auth;
 
   echo "
-<table cellpading=\"0\" cellspacing=\"0\" class=\"menuBar\">
+<table cellpadding=\"0\" cellspacing=\"0\" class=\"menuBar\">
   <tr>
     <td><img class=\"menuBarIconG\" src=\"/images/$set_theme/barre_g.gif\" alt=\"\" /></td>
     <td class=\"menuBarLabel\">".$menus[$section][$menu]["Name"]."</td>
@@ -175,7 +175,7 @@ function display_menus($section) {
   global $path, $menus, $perm, $auth;
 
     echo "
-      <table cellpading=\"0\" cellspacing=\"0\"  class=\"menus\">
+      <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
         <tr>
     ";
   if(is_array($menus[$section])) {
@@ -208,7 +208,7 @@ function display_tabs($section) {
   global $menus, $auth, $perm;
 
   echo "
-        <table cellpading=\"0\" cellspacing=\"0\"  class=\"sections\">
+        <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
         <tr>
           ";
   foreach($menus as $key => $value) {
@@ -227,7 +227,7 @@ function display_tabs($section) {
      echo "
           <!-- Remplissage apres tabs -->
 	  <td class=\"sectionsfilling\">
-            <table cellpading=\"0\" cellspacing=\"0\"  class=\"sectionsfilling\">
+            <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sectionsfilling\">
             <tr>
               <td></td>
 	    </tr><tr>
@@ -252,7 +252,7 @@ function display_active_tab($tab) {
   global $set_theme;
 
   echo "
-    <table cellpading=\"0\" cellspacing=\"0\" class=\"sections\">
+    <table cellpadding=\"0\" cellspacing=\"0\" class=\"sections\">
       <tr>
         <td><img src=\"/images/$set_theme/tab_actif_hg.gif\" alt=\"\" /></td>
         <td><img src=\"/images/$set_theme/tab_actif_h.gif\" alt=\"\" /></td>
@@ -277,7 +277,7 @@ function display_inactive_tab($tab) {
 
 
   echo "
-    <table cellpading=\"0\" cellspacing=\"0\"  class=\"sections\">
+    <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
       <tr>
         <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hg.gif\" alt=\"\" /></td>
         <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_h.gif\" alt=\"\" /></td>

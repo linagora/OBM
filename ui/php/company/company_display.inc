@@ -719,7 +719,7 @@ function dis_check_links($p_id) {
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $display_linkd .="<tr><td class=\"détailText\">
+      $display_linkd .="<tr><td class=\"detailText\">
       <a class=\"details\" href=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
       $dlabel</a>
       </td></tr>";

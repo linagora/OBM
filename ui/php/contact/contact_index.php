@@ -27,16 +27,6 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
-$www ="   <p class=\"messageInfo\">
-    	<a href=\"http://validator.w3.org/check/referer\"><img
-        src=\"http://www.w3.org/Icons/valid-xhtml10\"
-        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
-	<a href=\"http://jigsaw.w3.org/css-validator/\">
- 	 <img style=\"border:0;width:88px;height:31px\"
-       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />
-	 </a>
-  	</p>";
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,15 +93,15 @@ if ($action == "index" || $action == "") {
   if ($set_display == "yes") {
     dis_contact_search_list($contact, $popup);
   } else {
-    display_ok_msg($l_no_display);
+    display_info_msg($l_no_display);
   }
-  echo $www;
+  
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
   dis_contact_search_list($contact, $popup);
-  echo $www;
+  
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,6 +111,7 @@ if ($action == "index" || $action == "") {
   $kind_q = run_query_kind();
   require("contact_js.inc");
   html_contact_form($action, $comp_q, $kind_q, $contact);
+  
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -137,6 +128,7 @@ if ($action == "index" || $action == "") {
       display_error_visibility();   
     }      
   }
+  
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,6 +143,7 @@ if ($action == "index" || $action == "") {
     display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("contact_timecreate"),$con_q->f("contact_timeupdate")); 
     html_contact_form($action, $con_q, $kind_q, $contact);
   }
+  
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,7 +181,7 @@ if ($action == "index" || $action == "") {
     $kind_q = run_query_kind();
     html_contact_form($action, "", $kind_q, $contact);
   }
-
+  
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $contact)) {
@@ -206,7 +199,7 @@ if ($action == "index" || $action == "") {
     $kind_q = run_query_kind();
     html_contact_form($action, "", $kind_q, $contact);
   }
-
+  
 } elseif ($action == "check_delete")  {
 //////////////////////////////////////////////////////////////////////////////
   require("contact_js.inc");
@@ -221,37 +214,30 @@ if ($action == "index" || $action == "") {
     display_err_msg($l_delete_error);
   }
   html_contact_search_form($contact);
-  
+    
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-   if ($auth->auth["perm"] != $perms_user) {  
-     echo "<CENTER><FONT color=\"#$col_error\">";
-     echo "Nothing admin here for now.";
-     echo "</FONT></CENTER><BR>";
-   }
-   else {
-     display_error_permission();
-   }	
-
+   display_err_msg("Nothing admin here for now.");
+   
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q); 
-  echo $www;
+  
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q);
-  echo $www;
+  
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q);
-  echo $www;
+  
 }
 
 
