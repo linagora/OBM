@@ -147,12 +147,13 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
+  $cat_q = run_query_companycat();
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country();
   $dsrc_q = run_query_datasource();
-  $block .= html_company_search_form($type_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
+  $block .= html_company_search_form($type_q, $cat_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -162,6 +163,7 @@ function dis_company_search_form($company="") {
 // Display Company search Form                                               //
 // Parameters:
 //   - $kind_q    : database object with kind list
+//   - $cats      : array of company categories
 //   - $act_q     : database object with activity list
 //   - $naf_q     : database object with nafcode list
 //   - $usr_q     : database object with userobm list
@@ -170,10 +172,10 @@ function dis_company_search_form($company="") {
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
+function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode;
+  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode, $l_category;
   global $c_all, $cgp_hide;
 
   $popup = $company["popup"];
@@ -182,6 +184,7 @@ function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsr
   $phone = stripslashes($company["phone"]);
   $town = stripslashes($company["town"]);
   $kind = $company["kind"];
+  $cat = $company["cat"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $ctry = $company["country"];
@@ -193,6 +196,7 @@ function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsr
   $fuzzy = ($company["fuzzy"] == "1" ? "checked = \"checked\"" : "");
 
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
+  $show_cat = (! $cgp_hide["company"]["category"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
 
@@ -211,6 +215,26 @@ function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsr
     $block_kind = "
     <div class=\"searchLabel\">$l_kind<br />
       $sel_kind
+    </div>";
+  }
+
+  // Category select
+  if ($show_cat) {
+    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\">
+    <option value=\"$c_all\">$l_all</option>";
+    foreach($cats as $one_cat) {
+      $c_id = $one_cat["id"];
+      $c_code = str_pad($one_cat["code"], 8, ".");
+      $c_label = $one_cat["label"];
+      $sel_cat .= "\n<option value=\"$c_id\"";
+      if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
+      $sel_cat .= ">$c_code $c_label</option>\n";
+    }
+    $sel_cat .= "</select>";
+
+    $block_cat = "
+    <div class=\"searchLabel\">$l_category<br />
+      $sel_cat
     </div>";
   }
 
@@ -314,6 +338,7 @@ function html_company_search_form($kind_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsr
       value=\"$phone\" />
     </div>
     $block_kind
+    $block_cat
     $block_act
     $block_naf
     <div class=\"searchLabel\">$l_postcode<br />
@@ -750,6 +775,8 @@ function html_company_consult($co_q, $cat_q) {
 //   - $act_q     : activity database result 
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
+//   - $cat_q     : category database result 
+//   - $compcat   : array of category referenced by the company
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
@@ -872,7 +899,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if ($show_cat) {
     $cat_a = get_ordered_category($cat_q);
     $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
-    $j =0;
+    $j = 0;
     if (is_array($cat_a)) {
       foreach ($cat_a as $cat_info) {
 	$c_id = $cat_info["id"];
@@ -1629,7 +1656,7 @@ function html_company_cat_form($cat_q) {
       $label = $cat_info["label"];
       $length = 8 - strlen($code);
       $label2 = $code;
-      for($i=0;$i<$length;$i++) {
+      for ($i=0;$i<$length;$i++) {
         $label2 .= "&nbsp;";
       }
       $label2 .= " ".$label;    
@@ -2269,9 +2296,10 @@ function html_select_company($comp_q, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_category_tree($company) {
   global $l_close,$l_add,$l_cat_no;
+
   $popup = $company["popup"];
   $obm_d = run_query_get_tree();
-  if($popup) {
+  if ($popup) {
     $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }

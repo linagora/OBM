@@ -23,6 +23,7 @@ $l_all = "All";
 $l_all_f = "All";
 $l_none = "---";
 $l_comment = "Comment";
+$l_lang = "Lang";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
 $l_date = "Date";

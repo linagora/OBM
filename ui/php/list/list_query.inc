@@ -306,10 +306,14 @@ function run_query_contacts_list($list, $entity="") {
          contact_usercreate,
          contact_company_id,
          contact_kind_id,
+         kind_minilabel,
+         kind_header,
+         kind_lang,
          contact_lastname,
          contact_firstname,
          contact_address1,
          contact_address2,
+         contact_address3,
          contact_zipcode,
          contact_town,
          contact_expresspostal,
@@ -336,6 +340,7 @@ function run_query_contacts_list($list, $entity="") {
            LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
            LEFT JOIN Country ON Contact.contact_country_id = country_id
            LEFT JOIN Function ON Contact.contact_function_id = function_id
+           LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       where ContactList_listid='$id'
          $order";
 
@@ -905,6 +910,11 @@ function make_query($list) {
         contact_id,
         contact_lastname,
         contact_firstname,
+        kind_minilabel,
+        kind_header,
+        kind_lang,
+        function_label,
+        contact_title,
         contact_phone,
         contact_homephone,
         contact_email,
@@ -920,6 +930,11 @@ function make_query($list) {
         contact_id,
         contact_lastname,
         contact_firstname,
+        kind_minilabel,
+        kind_header,
+        kind_lang,
+        function_label,
+        contact_title,
         contact_phone,
         contact_homephone,
         contact_email,
@@ -932,7 +947,9 @@ function make_query($list) {
         company_expresspostal,
         company_town";
 	
-  $join = " Contact left join Company on contact_company_id=company_id ";  
+  $join = " Contact left join Company on contact_company_id=company_id
+                    left join Kind on contact_kind_id = kind_id
+                    left join Function on contact_function_id = function_id";
 	     
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
@@ -990,7 +1007,7 @@ function make_query($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Make a query with the dynamic and static contact.
+// Make a query with the dynamic and static contact.
 // Parameters:
 //   - $query       : Dynamic query
 //   - $cont_q      : Statics users

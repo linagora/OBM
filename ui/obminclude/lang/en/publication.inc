@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
-//     - File     : publication.inc                                              //
+//     - File     : publication.inc                                          //
 // 1999-01-25 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -10,7 +10,6 @@
 // Database fields
 $l_publication_title = "Publication Title";
 $l_type = "Type";
-$l_lang = "Language";
 $l_year= "Year";
 $l_market = "Marketing manager";
 $l_desc = "Description";

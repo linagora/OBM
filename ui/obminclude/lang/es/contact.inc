@@ -36,7 +36,6 @@ $l_func_new = "Nueva Función";
 $l_kind_manage = "Manejo del tipo de Contacto";
 $l_kind_exist = "Tipos Existentes";
 $l_kind_new = "Nuevo Tipo";
-$l_lang = "Idioma";
 $l_header = "Encabezado";
 
 // Titles

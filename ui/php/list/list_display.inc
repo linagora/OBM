@@ -24,11 +24,19 @@ $fieldnames["timeupdate"] = $l_date_last_update;
 $fieldnames["list_nb_contact"] = "$l_nb_contact / $l_query";
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["contact_function"] = $l_function;
+$fieldnames["function_label"] = $l_function;
+$fieldnames["contact_title"] = $l_title;
+$fieldnames["kind_minilabel"] = $l_status;
+$fieldnames["kind_header"] = $l_letter;
+$fieldnames["kind_lang"] = $l_lang;
 $fieldnames["company_name"] = $l_company;
-$fieldnames["company_address1"] = $l_address;
-$fieldnames["company_zipcode"] = $l_postcode;
-$fieldnames["company_town"] = $l_town;
+$fieldnames["address"] = $l_address;
+$fieldnames["address1"] = "$l_address 1";
+$fieldnames["address2"] = "$l_address 2";
+$fieldnames["address3"] = "$l_address 3";
+$fieldnames["zipcode"] = $l_postcode;
+$fieldnames["town"] = $l_town;
+$fieldnames["expresspostal"] = $l_expresspostal;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_mobilephone"] = $l_hphone;
 $fieldnames["contact_email"] = $l_email;
@@ -46,6 +54,15 @@ $fieldnames["subscription_quantity"] = $l_quantity;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_list(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme;
+
+  // We set an indicator to tell if the contact has an address
+  if ( ($OD->data_set->f("contact_address1") != "")
+         || ($OD->data_set->f("contact_address2") != "")
+         || ($OD->data_set->f("contact_address3") != "") ) {
+    $contact_has_address = true;
+  } else {
+    $contact_has_address = false;
+  }
 
   if (($fieldname == "list_name")  && $link_ok) {
     $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
@@ -70,15 +87,113 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
   }
 
-  else if ($fieldname == "company_address1") {
-    if ($OD->data_set->f("company_address1") != "") {
-      $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+  else if ($fieldname == "address") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address1") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+      }
+      if ($OD->data_set->f("contact_address2") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+      }
+      if ($OD->data_set->f("contact_address3") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address1") != "") {
+	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+      }
+      if ($OD->data_set->f("company_address2") != "") {
+	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+      }
+      if ($OD->data_set->f("company_address3") != "") {
+	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+      }
     }
-    if ($OD->data_set->f("company_address2") != "") {
-      $res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+  }
+
+  else if ($fieldname == "address1") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address1") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address1") != "") {
+	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+      }
     }
-    if ($OD->data_set->f("company_address3") != "") {
-      $res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+  }
+
+  else if ($fieldname == "address2") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address2") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address2") != "") {
+	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+      }
+    }
+  }
+
+  else if ($fieldname == "address3") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address3") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address3") != "") {
+	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+      }
+    }
+  }
+
+  else if ($fieldname == "town") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_town") != "") {
+	$res["name"] .= $OD->data_set->f("contact_town")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_town") != "") {
+	$res["name"] .= $OD->data_set->f("company_town")."<br />\n";
+      }
+    }
+  }
+
+  else if ($fieldname == "zipcode") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("contact_zipcode")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("company_zipcode")."<br />\n";
+      }
+    }
+  }
+
+  else if ($fieldname == "expresspostal") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
+      }
     }
   }
   
@@ -402,6 +517,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_form($action, $list_q, $list) {
   global $l_insert, $l_update, $l_back;
+
 //  if(is_object($list_q)){
 //    $crit_q = $list_q->f("list_structure");
 //  }
@@ -544,7 +660,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat,$l_mailing;
-  global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
+  global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;
   global $l_update,$l_delete,$l_recept,$l_renew;
 
   
@@ -630,7 +746,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["subscription_reception_id"] = "$l_publication: $l_recept"; 
   $fields_label["subscription_renewal"] = "$l_publication: $l_renew";
 
-  if(is_array($criteria)) {
+  if (is_array($criteria)) {
     $cty_q = run_query_country();
     $dsr_q = run_query_datasource();
     $cat1_q = run_query_contactcategory1();
@@ -660,8 +776,8 @@ function html_list_graphical_form($action, $list_q, $list) {
     foreach($criteria as $module)
     foreach($module as $field => $criterion) {
       foreach($criterion as $line => $value) {
-        if($value != "") {
-	  if($field_kind[$field] == "tf") {
+        if ($value != "") {
+	  if ($field_kind[$field] == "tf") {
 	    $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
 	  }
 	  else {
@@ -669,7 +785,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 	    $data = $field_data[$field];
 	    $data_q = $data[0];
 	    while($data_q->next_record()) {
-	      if($value == $data_q->f($data[1])) {	
+	      if ($value == $data_q->f($data[1])) {	
 	        $input .= "<option selected=\"selected\" value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
 	      }
 	    }
@@ -690,9 +806,9 @@ function html_list_graphical_form($action, $list_q, $list) {
  
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
     <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
-    if(is_array($structure))
+    if (is_array($structure))
     foreach($structure as $key=>$line) {
-      if($bollean_criterion[$key] == "NOT") {
+      if ($bollean_criterion[$key] == "NOT") {
 	$not = "selected =\"true\"";
 	$empty = "";
       }
@@ -740,8 +856,13 @@ function html_list_graphical_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_add_criterion_form($list) {
   global $l_list_display, $l_contact_display,$l_add_criterion;
+
   $popup = $list["popup"];
-  if(isset($list["row_index"]))$row_index = $list["row_index"];else $row_index =-1;
+  if (isset($list["row_index"])) {
+    $row_index = $list["row_index"];
+  } else {
+    $row_index =-1;
+  }
 //  $ds_q =;
 //  $cat_q =;
   $cty_q = run_query_country();
@@ -786,14 +907,16 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
   global $l_all,$l_market,$l_datasource,$l_cat;
   global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
+
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
-  while($cty_q->next_record()) {
+  while ($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
   }
-  if($cty_q->nf()!=0) 
+  if ($cty_q->nf()!=0) { 
     $cty_q->seek(0);
+  }
   $sel_usr .= "\n<option value=\"\">$l_all</option>";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
   }
   if($usr_q->nf()!=0) 
@@ -806,7 +929,9 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     $dsr_q->seek(0);
   $sel_cat .= "\n<option value=\"\">$l_all</option>";
   while($cat_q->next_record()) {
-    $sel_cat .= "\n<option value=\"".$cat_q->f("companycategory_code")."\">".substr($cat_q->f("companycategory_label"),0,30)."</option>";
+    $cat_code = $cat_q->f("companycategory_code");
+    $cat_label = substr($cat_q->f("companycategory_label"),0,30);
+    $sel_cat .= "\n<option value=\"$cat_code\">$cat_code $cat_label</option>";
   }
   if($cat_q->nf()!=0) 
     $cat_q->seek(0);

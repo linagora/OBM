@@ -23,6 +23,7 @@ $l_all = "Todo";
 $l_all_f = "Todo";
 $l_none = "---";
 $l_comment = "Comentarios";
+$l_lang = "Idioma";
 $l_archive = "Archivo";
 $l_archive_first = "Arch";
 $l_date = "Fecha";

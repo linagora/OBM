@@ -47,12 +47,13 @@ $l_company = "Société";
 $l_hphone = "Tél perso";
 $l_contact = "Contact";
 $l_country = "Pays";
+$l_status = "Genre";
+$l_letter = "En tête";
 
 //Publication
 $l_publication = "Publication";
 $l_title = "Titre";
 $l_year = "Année";
-$l_lang = "Langue";
 $l_quantity = "Quantité";
 
 //Logical

@@ -64,7 +64,6 @@ $l_j_ctry_update = "You have to select a country and enter a new name to update 
 $l_j_ctry_create = "You have to enter a new country name to create it !";
 
 $l_iso_3166 = "Iso Code 3166";
-$l_lang = "Lang";
 
 // Task Type
 $l_tt_manage = "Countries management";

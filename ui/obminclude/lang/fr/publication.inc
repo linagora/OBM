@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
-//     - File     : publication.inc                                              //
-// 2004-01-29 Mehdi Rande                                               //
+//     - File     : publication.inc                                          //
+// 2004-01-29 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -13,7 +13,6 @@ $l_type = "Type";
 $l_renew = "Renouvellement automatique";
 $l_recept = "Mode de réception";
 $l_publication_type = "Type Publication";
-$l_lang = "Langue";
 $l_year = "Année";
 $l_desc = "Description";
 $l_quantity = "Quantité";

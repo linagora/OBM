@@ -26,6 +26,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $town = $company["town"];
   $ctry = $company["country"];
   $kind = $company["kind"];
+  $cat = $company["cat"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $market = $company["marketing_manager"];
@@ -73,9 +74,10 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       companynafcode_label,
       country_name
     from Company
+         LEFT JOIN CompanyType on company_type_id=companytype_id
+         LEFT JOIN CompanyCategoryLink on company_id=companycategorylink_company_id
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
-         LEFT JOIN CompanyType on company_type_id=companytype_id
          LEFT JOIN Country on company_country_id=country_id";
 
   $and = "";
@@ -85,6 +87,10 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
   if (($kind != $c_all) && ($kind != "")) { 
     $where .= " $and company_type_id='$kind'";
+    $and = "and";
+  }
+  if (($cat != $c_all) && ($cat != "")) { 
+    $where .= " $and companycategorylink_category_id='$cat'";
     $and = "and";
   }
   if (($act != $c_all) && ($act != "")) { 
@@ -436,7 +442,7 @@ function run_query_update($cid, $company) {
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
-  if($retour && is_array($compcat)) {
+  if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
 	companycategorylink_company_id,
@@ -731,24 +737,27 @@ function run_query_companycat() {
 
   $show_cat = (! $cgp_hide["company"]["category"]);
   if ($show_cat) {
-    $query = "select * from CompanyCategory"; 
+    $query = "select * from CompanyCategory order by companycategory_code";
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
+    $comps = get_ordered_category($obm_q);
   } else {
-    $obm_q = "";
+    $comps = "";
   }
 
-  return $obm_q;
+  return $comps;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// get detail from the Category of a company and sort it as a table
+// Get the Category of a company and sort it as a table
 // Parameters:
 //   - $id : Company ID
+// Return:
+//   - $links array of array : links[1]=[id, label, code]
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_companycat($id) { 
+function get_company_cat($id) { 
   global $cdg_sql, $cgp_hide;
 
   $show_cat = (! $cgp_hide["company"]["category"]);
@@ -757,12 +766,11 @@ function run_query_get_companycat($id) {
     from CompanyCategoryLink, CompanyCategory
     where companycategorylink_company_id = '$id' 
       and companycategorylink_category_id = companycategory_id
-    order by  companycategory_code"; 
+    order by companycategory_code"; 
 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     display_debug_msg($query, $cdg_sql);
-    $i=0;
     $links = get_ordered_category($obm_q);
   } else {
     $links = "";
@@ -787,7 +795,7 @@ function run_query_get_companycat_name($id) {
       CompanyCategory
     where companycategorylink_company_id = '$id' 
       and companycategorylink_category_id = companycategory_id
-    order by  companycategory_code"; 
+    order by companycategory_code"; 
 
     $obm_q = new DB_OBM;
     $obm_q->query($query);
@@ -1341,6 +1349,8 @@ function run_query_get_tree() {
 ///////////////////////////////////////////////////////////////////////////////
 // place Category in the correct order
 // Parameters: DB object of categories.
+// Return:
+//   - array of array [id, label, code]
 ///////////////////////////////////////////////////////////////////////////////
 function get_ordered_category($cat_q) {
 
@@ -1351,7 +1361,7 @@ function get_ordered_category($cat_q) {
     $label = $cat_q->f("companycategory_label");
     $doc_info = array(
       "id" =>$id,
-      "label" =>$cat_q->f("companycategory_label"),
+      "label" =>$label,
       "code" => $code);
     $categories[] = $doc_info;
   }
@@ -1359,7 +1369,8 @@ function get_ordered_category($cat_q) {
   if (count($categories) > 0) {
     usort($categories,"category_compare");
   }
-  return $categories;  
+
+  return $categories;
 }
 
 

@@ -46,12 +46,13 @@ $l_company = "Company";
 $l_hphone = "Home phone";
 $l_contact = "Contact";
 $l_country = "Country";
+$l_status = "Status";
+$l_letter = "L. Head";
 
 //Publication
 $l_publication = "Publication";
 $l_title = "Title";
 $l_year = "Year";
-$l_lang = "Language";
 $l_quantity = "Quantity";
 
 // Actions

@@ -64,4 +64,3 @@ $l_j_ctry_update = "Debe escoger un país e ingresar un nuevo nombre para actuali
 $l_j_ctry_create = "Debe ingresar el nombre del nuevo país para crearlo !";
 
 $l_iso_3166 = "Iso Code 3166";
-$l_lang = "Idioma";

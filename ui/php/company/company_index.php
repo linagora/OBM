@@ -149,7 +149,7 @@ if ($action == "ext_get_id") {
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_all_users_from_group($cg_com, $users);
       $cat_q = run_query_companycat();
-      $compcat = run_query_get_companycat($company["id"]);
+      $compcat = get_company_cat($company["id"]);
       $ctry_q = run_query_country();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);

@@ -64,7 +64,6 @@ $l_j_ctry_update = "Vous devez sélectionner un pays et entrer une modification a
 $l_j_ctry_create = "Vous devez saisir un nom de pays pour le créer !";
 
 $l_iso_3166 = "Code Iso 3166";
-$l_lang = "Langue";
 
 // Task Type
 $l_tt_manage = "Gestion des types de tâche";
