@@ -416,8 +416,8 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  $path = $obm_q->f("document_path");
-  $name = $obm_q->f("document_name");
+  $path = addslashes($obm_q->f("document_path"));
+  $name = addslashes($obm_q->f("document_name"));
   if(islink($name)) {
     $truename = $link_to.$obm_q->f("document_title");
   }  
@@ -471,7 +471,7 @@ function run_query_repository_links($document_id) {
   $obm_q->query($query);
   $obm_q->next_record();
   $doc_type = $obm_q->f("document_type");
-  $path = $obm_q->f("document_path").$obm_q->f("document_name");
+  $path = addslashes($obm_q->f("document_path").$obm_q->f("document_name"));
   
   if($path == $default_path || $doc_type == 1) {
     return 1;
@@ -1315,26 +1315,4 @@ function run_query_get_tree($display_file) {
   $obm_q->query($query);
   return $obm_q;  
 
-  /*
-  Pour avoir un joli arbre
-  CONCAT(
-    SUBSTRING(
-      REPLACE(
-	document_path,
-	'/',
-	'/0'
-      ),
-      1,
-      LENGTH(
-	REPLACE(
-      	  document_path,
-	  '/',
-	  '/0'
-	) 
-      )-1
-    ),
-      document_kind ,
-      document_name
-    )
-  */
 }

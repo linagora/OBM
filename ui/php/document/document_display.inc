@@ -1418,6 +1418,8 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     $content.= display_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file,$id);
     $bool = true;
   }
+  $current_dir_id = str_replace("'","_",$current_directory);
+  $current_dir_id = str_replace("\"","-",$current_dir_id);
   foreach($files as $id => $info) {
     $realpath = $current_directory.$info["name"];
     $bool = true;
@@ -1444,8 +1446,8 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\"> 
-	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
+	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
+	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
 	 </a>
 	 ".$name."
 	</td>
@@ -1453,7 +1455,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
 	<td class=\"documentInfo\">&nbsp;</td>
        </tr>
       </table>
-      <div id='$current_directory' style=\"display:none;\" >
+      <div id=\"$current_dir_id\" style=\"display:none;\" >
        $content
       </div>";
 
@@ -1464,7 +1466,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"document_index.php?action=folder_check_delete&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
-	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 ".$name."
 	</td>
@@ -1491,15 +1493,17 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     $content.= display_popup_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
     $bool = true;
   }
+  $current_dir_id = str_replace("'","_",$current_directory);
+  $current_dir_id = str_replace("\"","-",$current_directory);
   if($bool == true) {
     $block= 
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\"> 
-	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
+	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	 </a>
-	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('$current_directory');return false;\">
+	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>	 
 	</td>
@@ -1507,7 +1511,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 	<td class=\"documentInfo\">&nbsp;</td>
        </tr>
       </table>
-      <div id='$current_directory' style=\"display:none;\" >
+      <div id='$current_dir_id' style=\"display:none;\" >
        $content
       </div>";
   }
@@ -1516,8 +1520,8 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
-	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('$current_directory');return false;\">
+	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>
 	</td>
@@ -1528,122 +1532,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
   }
   return $block;
 }
-/*  
-  while($obm_d->next_record()) {
-    $path = $obm_d->f("document_path");
-    $begin_group ="";
-    if($kind === "0") {
-      if(substr($path,0,strlen($realpath)) == $realpath) {
-	$ico = $ico_directory_close;
-	$link_img = "<a href=\"\" onclick=\"show_hide_repo('$realpath');return false;\">";
-	$link_img_end = "</a>";
-	$begin_group = "<div id='$realpath' style=\"display:none;\" >";
 
-      }
-      else {
-	$ico = $ico_directory;
-      }
-      $class = "documentRepository";
-      if($popup) {
-	$link = "<a class=\"$class\" href=\"\" $fill>";
- 	$link_end ="</a>";
-      }      
-      for($i=0;$i<$end_group;$i++) {
-	$block.= "</div>";
-      }     
-      $block.= "
-      <table class=\"document\">
-       <tr>
-	<td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 $link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
-	 $link$name$link_end
-	</td>
-	<td class=\"documentInfo\">&nbsp;$title</td>
-	<td class=\"documentInfo\">&nbsp;$author</td>
-       </tr>
-      </table>
-      $begin_group
-      ";
-    }
-    $indent_save = $indent;
-    $indent = substr_count($path,'/')*15;
-    $end_group = ($indent_save - $indent)/15;
-    $name = $obm_d->f("document_name");
-    $title = $obm_d->f("document_title");
-    $kind = $obm_d->f("document_kind");
-    $author = $obm_d->f("document_author");
-    $id = $obm_d->f("document_id");
-    $realpath = $path.$name;
-    $link = "";
-    $link_end = "";
-    $link_img = "";
-    $link_img_end = "";
-
-    if($popup) {
-      $fill = " onclick=\"fill_ext_form('$realpath');return false;\"";
-    }
-
-    if($kind !=0) {
-      $ico = $ico_file;
-      $class = "documentFile";
-      $link_file = "\"document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1\" target=\"_blank\" ";
-      $link = "<a class=\"$class\" href=$link_file $fill>";
-      $link_end ="</a>";
-      $link_img = "<a href=\"document_index.php?action=detailconsult&amp;param_document=$id\" $fill>";
-      $link_img_end = "</a>";
-      for($i=0;$i<$end_group;$i++) {
-	$block.= "</div>";
-      }
-     
-     $block.= "
-     <table class=\"document\">
-      <tr>
-       <td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
-	$link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
-	$link$name$link_end
-       </td>
-       <td class=\"documentInfo\">&nbsp;$title</td>
-       <td class=\"documentInfo\">&nbsp;$author</td>
-      </tr>
-     </table>
-     ";
-    } 
-  }
-  if($kind === "0") {
-      $ico = $ico_directory;
-      $class = "documentRepository";
-      if($popup) {
-	$link = "<a class=\"$class\" href=\"\" $fill>";
- 	$link_end ="</a>";
-      }      
-      for($i=0;$i<$end_group;$i++) {
-	$block.= "</div>";
-      }     
-      $block.= "
-      <table class=\"document\">
-       <tr>
-	<td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 $link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
-	 $link$name$link_end
-	</td>
-	<td class=\"documentInfo\">&nbsp;$title</td>
-	<td class=\"documentInfo\">&nbsp;$author</td>
-       </tr>
-      </table>
-      ";
-    }
-  $end_group = ($indent)/15;
-  for($i=0;$i<$end_group;$i++) {
-    $block.= "</div>";
-  }
-  $block .= "</div>";
-  if($popup) {
-    $block.= "<a href=\"javascript:window.close();\">$l_close</a>";
-  }
-  return $block;
-  
-}
-*/
 ///////////////////////////////////////////////////////////////////////////////
 // Consult File
 /////////////////////////////////////////////////////////////////////////////
