@@ -26,6 +26,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   $company = sql_search_text_parse($contact["company"]);
   $market = $contact["marketing_manager"];
   $func = $contact["function"];
+  $title = $contact["title"];
   $zip = sql_search_text_parse($contact["zip"]);
   $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
@@ -120,6 +121,10 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // If a function has been set
   if (($func != $c_all) && ($func != "")) { 
     $where .= " and contact_function_id='$func'";
+  }
+  // If a title has been specified, get it 
+  if ($title != "") {
+    $where .= " and contact_title $like '$title%'";
   }
   // If a Category 1 has been set
   if (($cat1 != $c_all) && ($cat1 != "")) {
@@ -430,11 +435,15 @@ function run_query_contact_insert($contact) {
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
+  // In case company module not used, to avoid postgres error
+  if ($comp_id == "") {
+    $comp_id = "0";
+  }
 
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
-  $market = $contact["marketing_manager"];
+  $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $service = $contact["service"];
@@ -597,10 +606,14 @@ function run_query_contact_update($contact) {
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
+  // In case company module not used, to avoid postgres error
+  if ($comp_id == "") {
+    $comp_id = "0";
+  }
   $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
-  $market = $contact["marketing_manager"];
+  $market = ($contact["marketing_manager"] ? $contact["marketing_manager"] : 0);
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $service = $contact["service"];
@@ -1017,6 +1030,7 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
 //   - Contact Database object with list of similar contacts
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_context($cid, $contact) {
+  global $cgp_show;
 
   $lname = $contact["lname"];
   $fname = $contact["fname"];
@@ -1026,7 +1040,9 @@ function check_contact_context($cid, $contact) {
 
   // return contacts with same lastname and firstname or
   // within the same company with same lname
-  $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
+  if ($cgp_show["module"]["company"]) {
+    $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
+  }
 
   return $co_q;
 }

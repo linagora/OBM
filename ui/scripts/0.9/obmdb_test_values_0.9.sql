@@ -10,7 +10,7 @@
 -- Default User creation
 -------------------------------------------------------------------------------
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uadmin','6589c59cab273225e6662a1b1558e92b','admin', 'Admin Lastname', 'Admin Firstname');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uadmin','6589c59cab273225e6662a1b1558e92b','admin', 'Admin Lastname', 'Firstname');
 
 INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('ueditor','43e77d678db7b87c7b7494685419f7b6','editor', 'Itor', 'Ed');
 

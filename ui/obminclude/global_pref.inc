@@ -16,8 +16,8 @@ if ( (! headers_sent()) && ($mode != "txt"))
 if (($set_lang == "")  && ($mode != "txt")) {
   // We Load and make session variables from User preferences
   session_load_user_prefs();
-  if($cgp_show["module"]["todo"]) 
-    session_load_user_todos(); 
+  if ($cgp_show["module"]["todo"]) 
+    session_load_user_todos($set_todo); 
 
   // We update the last login date for the user
   run_query_userobm_update_lastaccess($auth->auth["uid"]);
@@ -142,13 +142,17 @@ $c_export_format[3]["icon"] = $ico_excel;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Sections defintions
+// Sections definitions
 ///////////////////////////////////////////////////////////////////////////////
 while (list($sec,$value) = each($cgp_show["section"])) {
   if ($value) {
+    $sec_right = $value["right"];
+    if ($sec_right == "") {
+      $sec_right = $cright_read;
+    }
     $sections[$sec] = array('Name' => ${"l_section_$sec"},
-                           'Url'  => $cgp_show["section"][$sec],
-                           'Right'=> $cright_read);
+                           'Url'  => $cgp_show["section"][$sec]["url"],
+                           'Right'=> $sec_right);
   }
 }
 

@@ -128,7 +128,7 @@ $l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio
 $l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');
 $l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sábado');
 $l_daysofweekshort = array ('Dom','Lun','Mar','Mie','Jue','Vie','Sab');
-$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
+$l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 
 //---------------------------------------------------------------------------//
 // Theme Header lang files
@@ -168,6 +168,7 @@ $l_module_admin_pref = "Pref";
 $l_module_admin_code = "Código";
 $l_module_admin_ref = "Referential";
 
+$l_header_admin = "Administración";
 $l_header_new_f = "Nuevo";
 $l_header_new = "Nuevo";
 $l_header_find = "Buscar";

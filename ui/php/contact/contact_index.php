@@ -144,7 +144,7 @@ if ($action == "ext_get_ids") {
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
       $obm_q = check_contact_context("", $contact);
-      if ($obm_q->num_rows() > 0) {
+      if ((is_object($obm_q)) && ($obm_q->num_rows() > 0)) {
 	$display["title"] = display_title("$l_contact : $l_insert");
         $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {

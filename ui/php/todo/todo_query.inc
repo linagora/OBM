@@ -29,18 +29,18 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
   $date = sql_date_format($db_type, "todo_date", "date_todo");
   $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
 
-  $whereq = "where todo_user = '$uid'";
+  $whereq = "WHERE todo_user = '$uid'";
 
-  $query = "select
+  $query = "SELECT
     todo_id as id,
     todo_id,
     $date,
     $deadline,
     todo_priority,
     todo_title
-  from Todo
+  FROM Todo
   $whereq
-  order by $order $p_order_dir
+  ORDER BY $order $p_order_dir
   $limit
   ";
 

@@ -232,7 +232,6 @@ function get_param_user() {
   if (isset ($param_user)) $obm_user["id"] = $param_user;
   if (isset ($tf_login)) $obm_user["login"] = $tf_login;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
-  if (isset ($tf_passwd)) $obm_user["passwd_crypt"] = md5($obm_user["passwd"]);
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
   if (isset ($tf_datebegin)) $obm_user["datebegin"] = $tf_datebegin;

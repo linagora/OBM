@@ -67,6 +67,8 @@ function run_query_userobm_writable() {
   }
   return $ret_array;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
 // and returns the date of that day. (ie: "sun" or "sunday" would be 
@@ -88,7 +90,6 @@ function dateOfWeek($Ymd, $day) {
   $ret = date('Ymd',$ret_unixtime);
   return $ret;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ function run_query_no_repeat_events($start,$end,$contacts_array) {
 	      AND $calendarevent_date >= $start - calendarevent_duration
 	      AND $calendarevent_date <= $end 
             ";	
-  if(is_array($contacts_array) && (count($contacts_array)>0) ) {
+  if (is_array($contacts_array) && (count($contacts_array)>0) ) {
     $query .= " AND calendaruser_user_id IN (";
     foreach($contacts_array as $id => $value) {
       $query.= "$coma'$id'";

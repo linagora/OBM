@@ -65,11 +65,10 @@ $l_to = "au";
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
-$l_back_mono = "Revenir à votre vue";
+$l_back_mono = "Revenir à ma vue";
 // actions 
 $l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer le rdv";
-$l_update = "Modifier le rdv";
 $l_accept = "Accepter";
 $l_reject = "Refuser";
 $l_select = "Sélectionner";
@@ -154,7 +153,8 @@ $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
 $l_unknown = "Inconnu";
-$l_user_calendar = "Utilisateurs";
+$l_calendar_visible = "Agendas Visibles";
+$l_calendar_displayed = "Agendas affichés";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "La durée ne peux pas être nulle";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

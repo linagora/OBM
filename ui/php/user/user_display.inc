@@ -26,6 +26,7 @@ $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
+$fieldnames["userobm_email"] = $l_desc;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -284,7 +285,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 function html_user_form($usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_user, $l_email, $l_archive, $l_insert, $l_update;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_desc;
   global $l_datebegin;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action;
@@ -302,6 +303,7 @@ function html_user_form($usr_q, $user) {
     $fax = $usr_q->f("userobm_fax");
     $fax2 = $usr_q->f("userobm_fax2");
     $email = $usr_q->f("userobm_email");
+    $desc = $usr_q->f("userobm_description");
     $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
   }
@@ -319,6 +321,7 @@ function html_user_form($usr_q, $user) {
   if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
+  if (isset($user["description"])) { $desc = $user["description"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
 
@@ -355,7 +358,7 @@ function html_user_form($usr_q, $user) {
       <td class=\"detailForm\"><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_password</td>
-      <td class=\"detailForm\"><input name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+      <td class=\"detailForm\"><input type=\"password\" name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
       <td class=\"detailForm\"><select name=\"sel_perms\">
@@ -388,6 +391,9 @@ function html_user_form($usr_q, $user) {
     </tr><tr>
       <td class=\"detailLabel\">$l_datebegin</td>
       <td class=\"detailForm\"><input name=\"tf_datebegin\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_desc</td>
+      <td class=\"detailForm\"><input name=\"tf_desc\" size=\"48\" maxlength=\"255\" value=\"$desc\" /></td>
     </tr>
     </table>
 

@@ -33,7 +33,8 @@ $l_repeatdays = "Repetition days (weekly type)";
 $l_use_endrepeat = "End repetition date";
 $l_too_much_user = "No more than six users";
 $l_waiting_events = "Waiting events";
-$l_user_calendar = "Multi-user view";
+$l_calendar_visible = "Select calendars";
+$l_calendar_displayed = "Calendars displayed";
 $l_repeatdays2 = "Repeatition days";
 
 $l_link_events = "linked events with this category.";

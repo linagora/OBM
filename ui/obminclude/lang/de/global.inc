@@ -99,6 +99,10 @@ $l_monthsofyear = array (	'January','February',
 				'December');
 $l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun',
 			      'jul','aug','sep','oct','nov','dec');
+$l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+$l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+$l_daysofweekfirst = array ('S','M','T','W','T','F','S');
+
 $l_invalid_perm = "keine Berechtigung";
 
 ////////////////////////////////////////////////////////

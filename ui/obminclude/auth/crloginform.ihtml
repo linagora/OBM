@@ -16,20 +16,49 @@ tr.logintable {
 -->
 </style>
 
-<?php include("$obminclude/auth/md5.js"); ?>
-<script type="text/javascript">
-<!--
-  function doChallengeResponse() {
-    str = document.login.login.value + ":" +
-          MD5(document.login.password.value) + ":" +
-          document.login.challenge.value;
 
-    document.login.response.value = MD5(str);
-    document.login.password.value = "";
-    document.login.submit();
+<?php
+if ($auth_encryption) {
+  if ($password_encryption == "md5") {
+    include("$obminclude/auth/md5.js");
+    $function_crypt = "
+function doChallengeResponse() {
+  str = document.login.login.value + \":\" +
+        MD5(document.login.password.value) + \":\" +
+        document.login.challenge.value;
+  document.login.response.value = MD5(str);
+  document.login.password.value = \"\";
+}
+";
+  } else {
+    // Crypt method : we do not handle javascript crypt encryption...
+    $function_crypt = "
+function doChallengeResponse() {
+  document.login.submit();
+}
+";
   }
+
+  echo "
+<script type=\"text/javascript\">
+<!--
+$function_crypt
 // -->
-</script>
+</script>";
+
+} else {
+  // No encryption we passe the parameters as they are
+  echo "
+<script type=\"text/javascript\">
+<!--
+function doChallengeResponse() {
+  document.login.submit();
+}
+// -->
+</script>";
+
+}
+?>
 
 </head>
 

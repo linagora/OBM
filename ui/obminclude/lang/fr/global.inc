@@ -12,6 +12,7 @@ $l_find = "Chercher";
 $l_back = "Retour";
 $l_cancel = "Annuler";
 $l_close = "Fermer la fenêtre";
+$l_update = "Valider les modifications";
 $l_validate = "Valider";
 $l_execute = "Exécuter";
 $l_confirm = "Confirmer";
@@ -136,7 +137,7 @@ $l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juille
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc');
 $l_daysofweek = array ('Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi');
 $l_daysofweekshort = array ('Dim','Lun','Mar','Mer','Jeu','Ven','Sam');
-$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
+$l_daysofweekfirst = array ('D','L','M','M','J','V','S');
 
 //---------------------------------------------------------------------------//
 // Theme headers lang files
@@ -182,6 +183,7 @@ $l_module_admin_code = "Code";
 $l_module_admin_ref = "Référentiel";
 $l_module_import = "Import";
 
+$l_header_admin = "Administration";
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
 $l_header_find = "Chercher";

@@ -55,10 +55,11 @@ if ($form_user_pref) {
     run_query_set_user_pref($uid, "set_rows", $set_rows);
   }
 
-  if ($param_todo != "") {
+  if (($param_todo != "") && ($param_todo != "$set_todo")) {
     $set_todo = $param_todo;
     $sess->register("set_todo");
     run_query_set_user_pref($uid, "set_todo", $set_todo);
+    session_load_user_todos($set_todo);
   }
 
   if ($param_dsrc != "") {

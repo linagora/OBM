@@ -1103,20 +1103,24 @@ function session_load_user_prefs() {
 // Get and register the user's todo into session
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
-function session_load_user_todos() {
-  global $cdg_sql, $cgp_todo_nb, $set_todo, $todos, $sess, $auth;
+function session_load_user_todos($set_todo="todo_priority") {
+  global $cdg_sql, $cgp_todo_nb, $todos, $sess, $auth;
 
   $uid = $auth->auth["uid"];
 
   $limit = sql_limit($db_type, $cgp_todo_nb, 0);
+  $order = ($set_todo != "" ? $set_todo : "todo_priority");
+  if ($order == "todo_priority") {
+    $order .= " desc";
+  }
 
   // create the todo list
-  $query = "select
+  $query = "SELECT
       todo_id,
       todo_title
-    from Todo
-    where todo_user = '$uid'
-    order by $set_todo desc
+    FROM Todo
+    WHERE todo_user = '$uid'
+    ORDER BY $order
     $limit";
 
   display_debug_msg($query, $cdg_sql);
@@ -1550,26 +1554,6 @@ function get_last_group_text($id) {
     $obm_q->query($query);
     $obm_q->next_record();
     return $obm_q->f("group_name");
-  }
-  return;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Todo label from the contract Id
-// Parameters:
-//   - $id : user id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_todo_title($id) {
-  global $cdg_sql;
-  
-  if ($id > 0) {
-    $query = "select todo_title from Todo where todo_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("todo_title");
   }
   return;
 }

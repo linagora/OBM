@@ -101,34 +101,15 @@ $l_saturday="Saturday";
 $l_sunday="Sunday";
 $l_go_to = "Go to";
 $l_waitings_events = " Waitings events";
-$l_daysofweek = array (	'Sunday',
-			'Monthday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday');
-$l_daysofweekshort = array (	'Sun',
-				'Mon',
-				'Tue',
-				'Wed',
-				'Thu',
-				'Fri',
-				'Sat');
-
-$l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
-
-
 
 $l_accept = "Accept";
 $l_wait = "Waiting";
 $l_refuse = "Refuse";
 $l_change_state = "Currently state of the event";
 			      
-
-
 $l_repeat_update ="Update all repetition (only after this day)";
-$l_user_calendar = "Multi-Users View";
+$l_calendar_visible = "Select calendars";
+$l_calendar_displayed = "Calendars displayed";
 $l_valid = "Validate";
 
 

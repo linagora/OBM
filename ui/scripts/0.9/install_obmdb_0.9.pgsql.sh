@@ -11,7 +11,7 @@
 U=obm
 P="obm"
 DB="obm"
-DATA_LANG="en"
+DATA_LANG="fr"
 
 # We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
 PHP=`which php4 2> /dev/null`

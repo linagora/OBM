@@ -137,12 +137,18 @@ function run_query_detail($p_id) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($user) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $password_encryption;
 
   $login = $user["login"];
   $passwd = $user["passwd"];
-  if ($passwd != "") {
-    $passwd_crypt = $user["passwd_crypt"];
+  if ($passwd != ""){
+    if ($password_encryption == "crypt") {
+      $passwd_crypt = crypt($passwd);
+    } else if ($password_encryption == "md5") {
+      $passwd_crypt = md5($passwd);
+    } else {
+      $passwd_crypt = $passwd;
+    }
   }
   $perms = $user["perms"];
   $archive = ($user["archive"] ? "1" : "0");
@@ -210,12 +216,18 @@ function run_query_insert($user) {
 //     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($p_id, $user) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $password_encryption;
 
   $login = $user["login"];
   $passwd = $user["passwd"];
-  if ($passwd != "") {
-    $passwd_crypt = $user["passwd_crypt"];
+  if ($passwd != ""){
+    if ($password_encryption == "crypt") {
+      $passwd_crypt = crypt($passwd);
+    } else if ($password_encryption == "md5") {
+      $passwd_crypt = md5($passwd);
+    } else {
+      $passwd_crypt = $passwd;
+    }
     $passwd_update = "userobm_password='$passwd_crypt',";
   }
   $perms = $user["perms"];

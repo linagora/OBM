@@ -107,7 +107,7 @@ function dis_logout_detail() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_portal() {
   global $ico_agenda_portal,$set_theme;
-  global $l_module_agenda,$l_daysofweekreallyshort,$l_your_agenda,$l_waiting_events;
+  global $l_module_agenda,$l_daysofweekfirst,$l_your_agenda,$l_waiting_events;
   global $auth,$set_weekstart_default;
 
   $num = run_query_waiting_events() ;
@@ -160,7 +160,7 @@ function dis_calendar_portal() {
 
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_day);
-    $day = $l_daysofweekreallyshort[$day_num];
+    $day = $l_daysofweekfirst[$day_num];
     $dis_minical_head .= "<td class=\"agendaHead\">$day</td>\n";
     $start_day = strtotime("+1 day", $start_day); 
   } 

@@ -153,7 +153,8 @@ $l_delete_event_mail_body = "Fecha : ";
 $l_confirm_mail = "Confirmar+Forzar notificación";
 
 $l_unknown="Desconocido";
-$l_user_calendar = "Vista Multi-usuario";
+$l_calendar_visible = "Select calendars";
+$l_calendar_displayed = "Calendars displayed";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_interval_null = "Duración no puede ser nula";
 $mj_fill_title_event = "\\n Debe ingresar un título al evento.";

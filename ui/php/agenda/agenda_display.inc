@@ -14,8 +14,10 @@
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono,$l_free,$l_possible,$l_go,$l_occupied;
-  global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate,$set_cal_interval,$l_meeting_legend;
+  global $set_theme, $set_weekstart_default, $set_cal_interval, $ico_spacer;
+  global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
+  global $l_free,$l_possible,$l_go,$l_occupied;
+  global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
   global $action,$auth;
  
   $getdate = $agenda["date"];
@@ -151,7 +153,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
-    $day = $l_daysofweekreallyshort[$day_num];
+    $day = $l_daysofweekfirst[$day_num];
     $dis_minical_head .= "<td align=\"center\" class=\"agendaHead2\">$day</td>\n";
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
@@ -201,7 +203,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     ";
   }
   else {
-    $l_legend = $l_user_calendar;
+    $l_legend = $l_calendar_displayed;
     foreach ($calendar_user as $user_id => $user_data) {
       $dis_leg_user .="
       <tr>
@@ -220,7 +222,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
      </div>
 <!-- User select -->
     <div class=\"last\">
-     <div class=\"lastTitle\">:: $l_user_calendar</div>
+     <div class=\"lastTitle\">:: $l_calendar_visible</div>
        <tr>
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
        <tr>

@@ -31,6 +31,8 @@ $l_use_endrepeat = "Data fine ripetizione";
 $l_interval = "Intervallo ";
 
 $l_waiting_events = "Appuntamento in attesa ";
+$l_calendar_visible = "Select calendars";
+$l_calendar_displayed = "Calendars displayed";
 
 $l_accepted = "accetta";
 $l_rejected = "respingi";

@@ -90,7 +90,7 @@ CREATE TABLE UserObm (
   userobm_local           integer DEFAULT 1,
   userobm_ext_id          varchar(16),
   userobm_login           varchar(32) DEFAULT '' NOT NULL,
-  userobm_password        varchar(32) DEFAULT '' NOT NULL,
+  userobm_password        varchar(64) DEFAULT '' NOT NULL,
   userobm_perms           varchar(254),
   userobm_calendar_version  timestamp,
   userobm_archive         char(1) not null DEFAULT '0',

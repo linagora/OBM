@@ -38,11 +38,17 @@ Liste des paramètres définis :\\
 \hline
 \textbf{Option} & \textbf{Valeur défaut} & \textbf{Description} \\
 \hline
+\multicolumn{3}{c}{Paramètres globaux}\\
+\hline
 \$cgp\_host & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
 \hline
-\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\$cgp\_site\_include & false & Si vrai OBM utilise le répertoire spécifique obminclude/site pour les langues.\\ 
 \hline
 \$cgp\_todo\_nb & 5 & Nombre de Todo affichés \\ 
+\hline
+\$popup\_width & 620 & Largeur en pixels des popus \\ 
+\hline
+\$popup\_height & 480 & Hauteur en pixels des popus \\ 
 \hline
 \$cak\_prev & P & ACCESSKEY pour page précédente \\ 
 \hline
@@ -56,19 +62,11 @@ Liste des paramètres définis :\\
 \hline
 \$cak\_prev & E & ACCESSKEY pour fin de résultat \\ 
 \hline
-\$cs\_lifetime & 720 & Duree de session. Temps d'inactivite avant deconnexion \\ 
-\hline
 \$cg\_adm & 1 & Groupe Administrateur utilisé par section Administration \\ 
 \hline
 \$cg\_com & 2 & Groupe Commercial utilisé par section Commercial \\ 
 \hline
 \$cg\_prod & 3 & Groupe Production utilisé par section Production \\ 
-\hline
-\$caf\_company\_name & false & Indicateur de formattage automatique du nom de société \\ 
-\hline
-\$caf\_town & false & Indicateur de formattage automatique du nom de ville \\ 
-\hline
-\$cgp\_sess\_db & false & Indication de stockage des sessions en base de données \\ 
 \hline
 \$cql\_max\_row & 50 000 & Maximum de lignes de résultat autorisé pour une requète manuelle utilisateur (module \List)\\ 
 \hline
@@ -78,13 +76,14 @@ Liste des paramètres définis :\\
 \hline
 \$ctu\_sql\_limit & false & Indique si les requètes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
 \hline
-\$cgp\_show & Voir \ref{cgp_show} et \ref{cgp_show_2} & Indicateurs d'affichage des sections et modules \\ 
+\$cgp\_mail\_enabled & false & Indique si l'envoi de mail est activé pour OBM\\
 \hline
-\$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
+\$cs\_lifetime & 7200 & Durée de session. Temps d'inactivité avant déconnexion \\ 
+\hline
+\$cgp\_sess\_db & false & Indication de stockage des sessions en base de données \\ 
 \hline
 \$auth\_kind\footnotemark[1] & 'standalone' & "standalone" pour gérer les
-authentifications dans la base OBM, "CAS" pour passer par un serveur
-CAS \\ 
+authentifications dans la base OBM, "CAS" pour passer par un serveur CAS \\ 
 \hline
 \$cas\_server & aucune & nom ou IP du serveur CAS. Utilisé seulement
 si le mode d'authentification est "CAS". \\ 
@@ -94,6 +93,42 @@ si le mode d'authentification est "CAS". \\
 \hline
 \$cas\_server\_uri & aucune  &  URI du service CAS sur le
 serveur. Utilisé seulement si le mode d'authentification est "CAS".\\  
+\hline
+\$auth\_encryption & true & Indique si la page de login doit chiffrer le mot de passe transmis (support de md5 uniquement) \\ 
+\hline
+\$password\_encryption & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
+
+
+\hline
+\multicolumn{3}{c}{Paramètres spéciques aux modules}\\
+\hline
+\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\hline
+\$cgp\_mailing\_default & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
+\hline
+\$ccontact\_private\_default & false & Indicateur contact sont privés par défaut \\ 
+\hline
+\$document\_path & /var/www/docs & Chemin du dépôt de document sur disque \\ 
+\hline
+\$default\_path & /Default & Répertoire par défaut dans le dépot de documents \\ 
+\hline
+\$default\_mime & application/octet-stream & Type mime par défaut des documents \\ 
+\hline
+\$caf\_company\_name & false & Indicateur de formattage automatique du nom de société \\ 
+\hline
+\$caf\_town & false & Indicateur de formattage automatique du nom de ville \\ 
+\hline
+\$tmp\_path & /tmp & Chemin pour stocake temporaire (module import) \\ 
+\hline
+\$c\_day\_fraction & 8 & Nombre de fractions d'une journée (gestion des temps)\\ 
+\hline
+\$c\_working\_days & 0,1,1,1,1,1,0 & Journées travaillées, débute à dimanche (gestion des temps)\\ 
+\hline
+\$c\_week\_first\_day & 1 & Premier jour de la semaine (0=dimanche, 1=lundi,..) (gestion des temps)\\ 
+\hline
+\$cgp\_show & Voir \ref{cgp_show} et \ref{cgp_show_2} & Indicateurs d'affichage des sections et modules \\ 
+\hline
+\$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
 \hline
 \end{longtable}
 
@@ -105,7 +140,7 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 \subsection{Le paramétrage des sections visibles et leur lien}
 \label{cgp_show}
 
-Le tableau \$cgp\_show[``section''] définit pour chaque section si celle-ci doit être affichée ou non et précise son lien (url) par défaut.
+Le tableau \$cgp\_show[``section''] définit les sections utilisées par OBM et pour chacune d'elle son lien (url) par défaut.
 Par défaut toutes les sections sont affichées et pointent vers le premier module affiché.
 
 \paragraph{La configuration des liens} des sections est disponible depuis OBM 0.8.1.\\
@@ -114,8 +149,10 @@ Pour ne pas afficher une section il faut insérer dans le fichier de configuratio
 
 \begin{verbatim}  
 $cgp_show[``section''][``com''] = false;
-\end{verbatim}  
+\end{verbatim}
 \vspace{0.3cm}
+
+A partir d'OBM 0.9.0, il suffit de ne pas définir la section.\\
 
 Pour modifier l'url par défaut d'une section il faut insérer dans le fichier de configuration la ligne (pour faire pointer la section Production vers le module Document) :
 
@@ -124,7 +161,7 @@ $cgp_show[``section''][``prod''] = ``$path/document/document_index.php'';
 \end{verbatim}  
 \vspace{0.3cm}
 
-Liste des sections disponibles :\\
+Liste des sections définies par défaut sont :\\
 \begin{itemize}
 \item com
 \item prod
@@ -133,19 +170,31 @@ Liste des sections disponibles :\\
 \item admin
 \item aliamin
 \end{itemize}
+\vspace{0.3cm}
+
+A partir d'OBM 0.9.0, aucune section n'est définie en dur dans le code et l'administrateur définit les sections et leurs modules uniquement via le fichier de configuration.
 
 
 \subsection{Le paramétrage des modules visibles}
 \label{cgp_show_2}
 
-Le tableau \$cgp\_show[``module''] définit pour chaque module si celui-ci doit être affiché ou non.
+Le tableau \$cgp\_show[``module''] définit pour chaque module si celui-ci doit être affiché et dans quelle section.
 Par défaut tous les modules sont affichés.
+L'ordre d'affichage des modules dans une section est leur ordre de définition dans le fichier de configuration.
 
 Pour ne pas afficher un module il faut insérer dans le fichier de configuration la ligne :
 
-\begin{verbatim}  
+\begin{verbatim}
 $cgp_show[``module''][``deal''] = false;
-\end{verbatim}  
+\end{verbatim}
+\vspace{0.3cm}
+
+ou bien re-définir l'ensemble des modules et ne définir que les modules souhaités : 
+
+\begin{verbatim}  
+$cgp_show[``module''] = "";
+$cgp_show[``module'']["contact"] = "com";
+\end{verbatim}
 \vspace{0.3cm}
 
 Liste des modules disponibles :\\
@@ -218,6 +267,7 @@ Liste des champs paramétrables (masquables) du module \contact :
 // Contact module
 $cgp_hide["contact"]["contact_function"] = true;  // fonction
 $cgp_hide["contact"]["contact_title"] = true;     // titre
+$cgp_hide["contact"]["responsible"] = true;       // responsible
 $cgp_hide["contact"]["category1"] = true;         // catégorie 1
 $cgp_hide["contact"]["category2"] = true;         // catégorie 2
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service

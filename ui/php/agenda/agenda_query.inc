@@ -1042,7 +1042,7 @@ function check_data_form($agenda) {
 //    - $timestamp : time to format
 ///////////////////////////////////////////////////////////////////////////////
 function localizeDate($format, $timestamp) {
- global $l_daysofweek, $l_daysofweekshort, $l_daysofweekreallyshort;
+ global $l_daysofweek, $l_daysofweekshort;
  global $l_monthsofyear,  $l_monthsofyearshort;
 
  $day = '%A %e %B';

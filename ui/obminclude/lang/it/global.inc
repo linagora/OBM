@@ -120,7 +120,7 @@ $l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno'
 $l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');
 $l_daysofweek = array ('Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato');
 $l_daysofweekshort = array ('Dom','Lun','Mar','Mer','Gio','Ven','Sab');
-$l_daysofweekreallyshort = array ('D','L','M','M','G','V','S');
+$l_daysofweekfirst = array ('D','L','M','M','G','V','S');
 
 //---------------------------------------------------------------------------//
 // Theme headers lang files
@@ -156,6 +156,7 @@ $l_module_payment = "Pagamenti";
 $l_module_time = "Gestione del Tempo" ;
 $l_module_agenda = "Calendario";
 
+$l_header_admin = "Amministrazione";
 $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";

@@ -144,7 +144,8 @@ class OBM_Challenge_Auth extends Auth {
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $sess, $obminclude, $obm_version, $module, $path, $challenge, $login_action;
+    global $sess, $obminclude, $obm_version, $module, $path, $login_action;
+    global $challenge, $auth_encryption, $password_encryption;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
@@ -155,6 +156,7 @@ class OBM_Challenge_Auth extends Auth {
   
   function auth_validatelogin() {
     global $login, $password, $challenge, $response;
+    global $auth_encryption, $password_encryption;
 
     if (isset($login)) {
       $this->auth["uname"] = $login; // provides access for loginform.ihtml
@@ -174,24 +176,61 @@ class OBM_Challenge_Auth extends Auth {
       $perm = $this->db->f("userobm_perms");
       $pass = $this->db->f("userobm_password");
     }
-    $exspected_response = md5("$login:$pass:$challenge");
-    // True when JS is disabled
-    if ($response == "") {
-      if ($password != $pass) {
-        return false;
+
+    if ($auth_encryption) {
+      if ($password_encryption == "md5") {
+
+        // Cas md5
+        $exspected_response = md5("$login:$pass:$challenge");
+        // True when JS is disabled
+        if ($response == "") {
+          if ($password != $pass) {
+            return false;
+          } else {
+            $this->auth["perm"] = $perm;
+            return $uid;
+          }
+        }
+        
+        // Response is set, JS is enabled
+        if ($exspected_response != $response) {
+          return false;
+        } else {
+          $this->auth["perm"] = $perm;
+          return $uid;
+        }
+      }
+
+      // No auth_encryption, password is given as plain
+    } else {
+      if ($password_encryption == "crypt") {
+        // cas crypt
+        $encrypted = crypt($password, $pass);
+        if ($encrypted == $pass) {
+          $this->auth["perm"] = $perm;
+          return $uid;
+        } else {
+          return false;
+        }      
+      } else if ($password_encryption == "md5") {
+        $encrypted = md5($password);
+        if ($encrypted == $pass) {
+          $this->auth["perm"] = $perm;
+          return $uid;
+        } else {
+          return false;
+        }      
       } else {
-        $this->auth["perm"] = $perm;
-        return $uid;
+        $encrypted = $password;
+        if ($encrypted == $pass) {
+          $this->auth["perm"] = $perm;
+          return $uid;
+        } else {
+          return false;
+        }      
       }
     }
-    
-    // Response is set, JS is enabled
-    if ($exspected_response != $response) {
-      return false;
-    } else {
-      $this->auth["perm"] = $perm;
-      return $uid;
-    }
+
   }
 }
 
@@ -461,11 +500,11 @@ class OBM_Perm {
     global $profiles;
 
     // Section position in profile ------------------------------------------//
-    $this->section_pos["COM"] = 0;
-    $this->section_pos["PROD"] = 1;
-    $this->section_pos["COMPTA"] = 2;
-    $this->section_pos["USER"] = 3;
-    $this->section_pos["ADMIN"] = 4;
+    $this->section_pos["com"] = 0;
+    $this->section_pos["prod"] = 1;
+    $this->section_pos["compta"] = 2;
+    $this->section_pos["user"] = 3;
+    $this->section_pos["admin"] = 4;
     $this->section_pos["ALIAMIN"] = 5;
 
     $mod_length = $this->mod_length;

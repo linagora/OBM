@@ -393,7 +393,7 @@ function display_last_visited($path="..") {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todo_toplist($path="..") {
-  global $todos, $l_header_todo;
+  global $todos, $l_module_todo;
 
   $nb = count($todos);
 
@@ -409,7 +409,7 @@ function display_todo_toplist($path="..") {
   if ($nb >= 1) {
     $block = "
     <div class=\"last\"> 
-    <div class=\"lastTitle\">:: $l_header_todo</div>
+    <div class=\"lastTitle\">:: $l_module_todo</div>
       <ul class=\"lastList\">
       $block_todo
      </ul>

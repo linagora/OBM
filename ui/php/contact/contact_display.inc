@@ -84,7 +84,15 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_function") {
-    $res["name"] = $OD->data_set->f("contact_function");
+    if ($cgp_show["module"]["contact_function"]) {
+      $res["name"] = $OD->data_set->f("contact_function");
+    }
+  }
+
+  else if ($fieldname == "contact_title") {
+    if ($cgp_show["module"]["contact_title"]) {
+      $res["name"] = $OD->data_set->f("contact_title");
+    }
   }
 
   else if ($fieldname == "contact_phone") {
@@ -296,8 +304,13 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 //   - $contact[] : hash with contact values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_form($contact="") {
+  global $cgp_hide;
 
-  $usr_q = run_query_userobm_active();
+  if ($cgp_hide["contact"]["responsible"]) {
+    $usr_q = "";
+  } else {
+    $usr_q = run_query_userobm_active();
+  }
   $func_q = run_query_function();
   $ctry_q = run_query_country_for_lang();
   $cat1_q = run_query_contactcategory1();
@@ -309,7 +322,7 @@ function dis_contact_search_form($contact="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: XHTML Contact search Form                                        //
+// Display: XHTML Contact search Form
 // Parameters:
 //   - $contact[] : default form values
 //     keys used  : name, company
@@ -322,8 +335,8 @@ function dis_contact_search_form($contact="") {
 function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, $cat2_q) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
-  global $l_function, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
-  global $l_category1, $l_category2;
+  global $l_function, $l_title, $l_market, $l_town, $l_postcode, $l_country;
+  global $l_archive, $l_category1, $l_category2;
 
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
@@ -334,6 +347,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
   $town = stripslashes($contact["town"]);
   $ctry = $contact["country"];
   $func = $contact["function"];
+  $title = $contact["title"];
   $mark = $contact["marketing_manager"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
@@ -341,6 +355,8 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
 
@@ -363,17 +379,33 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
     </div>";
   }
 
-  // Marketing manager select
-  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
-    <option value=\"$c_all\">$l_all</option>";
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $u_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-    $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">$u_name</option>";
+  // Title Block
+  if ($show_title) {
+    $block_title = "
+    <div class=\"searchLabel\">$l_title<br />
+      <input type=\"text\" name=\"tf_title\" id=\"tf_town\" size=\"16\"
+      value=\"$title\" />
+    </div>";
   }
-  $sel_market .= "</select>";
+
+  // Marketing manager select
+  if ($show_resp) {
+    $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+      <option value=\"$c_all\">$l_all</option>";
+    while ($usr_q->next_record()) {
+      $u_id = $usr_q->f("userobm_id");
+      $u_name = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+      $sel_market .= "\n<option value=\"$u_id\"";
+      if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+      $sel_market .= ">$u_name</option>";
+    }
+    $sel_market .= "</select>";
+
+    $block_resp = "
+    <div class=\"searchLabel\">$l_market<br />
+      $sel_market
+    </div>";
+  }
 
   // Country select
   $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
@@ -477,11 +509,10 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
       $sel_ctry
     </div>
     $block_func
+    $block_title
     $block_cat1
     $block_cat2
-    <div class=\"searchLabel\">$l_market<br />
-      $sel_market
-    </div>
+    $block_resp
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
     </div>
@@ -712,6 +743,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   // Conditionnal fields
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
@@ -732,6 +764,14 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_title</td>
       <td class=\"detailText\">$title</td>";
+  }
+
+  // Responsible field
+  if ($show_resp) {
+    $block_resp = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$market</td>";
   }
 
   // Service field
@@ -874,9 +914,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$dis_company</td>
     $block_func
     $block_title
-    </tr><tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailText\">$market</td>
+    $block_resp
     </tr>
     </table>
 
@@ -1073,17 +1111,22 @@ function html_contact_links($id) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
-  global $display, $cg_com;
+  global $display, $cg_com, $cgp_hide, $uid;
 
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();  
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
   $func_q = run_query_function();
-  if ($contact["marketing_manager"]) {
-    $users = array($contact["marketing_manager"]);
+  if (! $cgp_hide["contact"]["responsible"]) {
+    if ($contact["marketing_manager"]) {
+      $users = array($contact["marketing_manager"]);
+    }
+    $usr_q = run_query_all_users_from_group($cg_com, $users);
+  } else {
+    // We only get the connected user for comment user select
+    $usr_q = run_query_all_users_from_group("", array($uid));
   }
-  $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country_for_lang();
   $block = html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
@@ -1108,7 +1151,8 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
+  global $set_dsrc, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
+  global $cgp_mailing_default, $ccontact_private_default;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok;
@@ -1176,6 +1220,9 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     $mark = $auth->auth["uid"];
     $usercomment = $uid;
     $datecomment = isodate_format();
+    if ($ccontact_private_default) {
+      $private_c = " checked";
+    }
     if ($cgp_mailing_default) {
       $mailok = " checked";
     }
@@ -1239,6 +1286,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   // Conditionnal fields
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_resp = (! $cgp_hide["contact"]["responsible"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
@@ -1275,6 +1323,25 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     </tr><tr>
       <td class=\"detailLabel\">$l_title</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>";
+  }
+
+  // Responsible field
+  if ($show_resp) {
+    // Marketing manager select
+    $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
+      <option value=\"0\">$l_none</option>";
+    while ($usr_q->next_record()) {
+      $u_id = $usr_q->f("userobm_id");
+      $sel_market .= "\n<option value=\"$u_id\"";
+      if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+      $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+    }
+    $sel_market .= "</select>";
+
+    $block_resp = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailForm\">$sel_market</td>";
   }
 
   // data source select
@@ -1420,17 +1487,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       $k_kind_js
     </script>\n";
 
-  // Marketing manager select
-  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
-    <option value=\"0\">$l_none</option>";
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
-  }
-  $sel_market .= "</select>";
-
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
     <option value=\"\">$l_none</option>";
@@ -1515,9 +1571,10 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action=="detailupdate") || ($action=="update")) &&
          ($usercreate == $auth->auth["uid"]) ) ) {
-    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
-    if ($priv == '1') $display_private .= " checked=\"checked\"";
-    $display_private .= " />";
+    if ($priv == '1') {
+      $private_c = " checked";
+    }
+    $display_private = "<input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c />";
   }
 
   // UPDATE 
@@ -1526,8 +1583,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
       <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
-      <input type=\"submit\" value=\"$l_update\" />
-      ";
+      <input type=\"submit\" value=\"$l_update\" />";
 
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
@@ -1570,9 +1626,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       <td class=\"detailForm\">$dis_company</td>
     $block_func
     $block_title
-    </tr><tr>    
-      <td class=\"detailLabel\">$l_market</td> 
-      <td class=\"detailForm\">$sel_market</td>
+    $block_resp
     $block_cat1
     $block_cat2
     </tr>

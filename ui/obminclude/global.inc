@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre8";
+$obm_version = "0.9.0pre11";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -27,11 +27,10 @@ $c_focsys = 3;
 // To change site values => change these in obm_conf.inc 
 //---------------------------------------------------------------------------//
 
+// Global parameters --------------------------------------------------------//
+
 // OBM host (for mail links)
 $cgp_host = "http://jaguar.aliacom.local/";
-
-// Generic E-mail for Incident module
-$cmail_incident = "";
 
 // Todo lines to display
 $cgp_todo_nb = 5;
@@ -49,29 +48,10 @@ $cak_page_next = "6";
 $cak_begin = "B";
 $cak_end = "E";
 
-// Session Cookie lifetime (in seconds, 0=session cookie)
-$cs_lifetime = 720;
-
 // OBM System groups (groups id)
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
-
-
-// Document constants 
-$document_path = "/var/www/obmdocuments";    // Root of the document repository
-$default_path = "/Default";                  // Default directory
-$default_mime = "application/octet-stream";  // Default Mime Type
-
-// Import constants
-$tmp_path = "/tmp";
-
-// Auto format fields
-$caf_company_name = false;
-$caf_town = false;
-
-// Use Database sessions
-$cgp_sess_db = false;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned
@@ -82,6 +62,48 @@ $cgp_sql_star = true;
 
 // Tuning constants
 $ctu_sql_limit = false;
+
+// is Mail enabled (is a mail server configured for OBM)
+$cgp_mail_enabled = false;
+
+// Session Cookie lifetime (in seconds, 0=session cookie)
+$cs_lifetime = 7200;
+
+// Use Database sessions
+$cgp_sess_db = false;
+
+// authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
+// CAS specific parameters are in obm_conf.inc.
+$auth_kind="standalone"; 
+
+// Shall the login page encrypt authentication password
+$auth_encryption = 1;
+
+// encyption used to store password : "plain", "md5" or "crypt"
+$password_encryption = "md5";
+
+// Modules specific parameters ----------------------------------------------//
+
+// Generic E-mail for Incident module
+$cmail_incident = "";
+
+// is mailing enabled by default for a new contact
+$cgp_mailing_default = true;
+
+// is a new contact private by default
+$ccontact_private_default = false;
+
+// Document constants 
+$document_path = "/var/www/docs";            // Root of the document repository
+$default_path = "/Default";                  // Default directory
+$default_mime = "application/octet-stream";  // Default Mime Type
+
+// Auto format fields
+$caf_company_name = false;
+$caf_town = false;
+
+// Import constants
+$tmp_path = "/tmp";
 
 // In how many parts we split up a day (Time management)
 $c_day_fraction = 8;
@@ -95,25 +117,30 @@ $c_week_first_day = 1;
 // DST (Daily Saving Time) correction to avoid dates problems (2h)
 $c_dst_err = 7200;
 
-// task_status flag
-$c_task_notvalid = 0;    // task not valiated
-$c_task_uservalid = 1;   // validated by user (auto when day is full)
-$c_task_adminvalid = 2;  // validated by admin
-
-// authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
-$auth_kind="standalone"; 
-// CAS specific parameters are in obm_conf.inc.
+//---------------------------------------------------------------------------//
+// Default access rights bits meanings
+// 0 - read  : data
+// 1 - own   : owner data
+// 2 - write : data
+// 3 - read  : admin 
+// 4 - write : admin 
+$cright_read = 1;
+$cright_own = 2;
+$cright_write = 4;
+$cright_read_admin = 8;
+$cright_write_admin = 16;
 
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//
 // sections -- Urls
-$cgp_show["section"]["com"] = "$path/company/company_index.php";
-$cgp_show["section"]["prod"] = "$path/time/time_index.php";
-$cgp_show["section"]["compta"] = "$path/account/account_index.php";
-$cgp_show["section"]["user"] = "$path/settings/settings_index.php";
-$cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["aliamin"] = "http://aliamin/";
+$cgp_show["section"]["com"]["url"] = "$path/company/company_index.php";
+$cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
+$cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
+$cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
+$cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
+$cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
 // modules
 $cgp_show["module"]["company"] = "com";
@@ -260,6 +287,11 @@ $ctt_sales = '0';    // Sales Activity tasks
 $ctt_research = '1'; // Internal R&D tasks
 $ctt_others = '2';   // Tasks not related to production
 
+// task_status flag
+$c_task_notvalid = 0;    // task not valiated
+$c_task_uservalid = 1;   // validated by user (auto when day is full)
+$c_task_adminvalid = 2;  // validated by admin
+
 // Contract Kind
 $cck_customer = 0;
 $cck_supplier = 1;
@@ -273,19 +305,6 @@ $ccf_ticket = 2;
 $perms_user = "user";
 $perms_editor = "editor";
 $perms_admin = "admin";
-
-//---------------------------------------------------------------------------//
-// Default access rights bits meanings
-// 0 - read  : data
-// 1 - own   : owner data
-// 2 - write : data
-// 3 - read  : admin 
-// 4 - write : admin 
-$cright_read = 1;
-$cright_own = 2;
-$cright_write = 4;
-$cright_read_admin = 8;
-$cright_write_admin = 16;
 
 // JavaScript and PHP Fields masks (PCRE regexp)
 $js_regexp_phone="/^[0-9+x \(\)-\.]+$/"; // digits + SPACE ( ) - phone number
