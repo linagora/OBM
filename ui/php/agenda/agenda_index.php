@@ -239,6 +239,7 @@ if ($action == "index") {
     $cat_event = run_query_get_eventcategories();
     $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
+
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
@@ -247,6 +248,7 @@ if ($action == "index") {
     $display["detailInfo"] = display_record_info($eve_q);
     $display["detail"] = html_calendar_consult($eve_q, $cust_q,$obm_q_grp);
   }
+
 } elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 if ($param_event > 0) {  
@@ -261,6 +263,7 @@ if ($param_event > 0) {
   $display["detailInfo"] = display_record_info($eve_q);
   $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm,$grp_obm, $cat_event, $p_user_array);
   }
+
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($agenda)) {
@@ -296,6 +299,7 @@ if ($param_event > 0) {
     $cat_event = run_query_get_eventcategories();
     $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
+
 } elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update_occurence_state($agenda["id"],$auth->auth["uid"],$agenda["decision_event"]);
@@ -307,7 +311,8 @@ if ($param_event > 0) {
   $user_obm = run_query_userobm_readable();  
   $group_q = run_query_userobm_group();
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q, $group_q);
+
 } elseif ($action == "check_delete") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
@@ -330,6 +335,7 @@ if ($param_event > 0) {
   $group_q = run_query_userobm_group();
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
+
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");

@@ -1082,7 +1082,7 @@ function html_dis_delete($agenda) {
 
   $perms = $auth->auth["perm"];
   $event_id = $agenda["id"];
-  $e = get_event_info($id);
+  $e = get_event_info($event_id);
   $usercreate = $e["usercreate"];
 
   if (($uid != $usercreate) && ($perms != $perms_admin)) {

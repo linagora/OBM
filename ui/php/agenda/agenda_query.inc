@@ -41,7 +41,7 @@ function run_query_detail($param_event) {
       calendarevent_allday,
       $calendarevent_endrepeat,
       $calendarevent_date
-      FROM  
+    FROM  
       CalendarEvent
       LEFT JOIN CalendarUser ON calendarevent_id = calendaruser_event_id
       LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
@@ -71,6 +71,7 @@ function run_query_event_customers($param_event) {
   $obm_db->query($query);
   return $obm_db;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events users
@@ -112,6 +113,7 @@ function run_query_event_customers_array($param_event) {
   }
   return $p_arrayuserobm_id;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return events groups array
@@ -614,16 +616,16 @@ function run_query_delete($agenda) {
   $event_id = $agenda["id"];
   $mail = $agenda["mail"]; 
   
-  $query = "select calendaruser_user_id
-    from CalendarUser
-    where calendaruser_event_id = '$event_id'";
+  $query = "SELECT calendaruser_user_id
+    FROM CalendarUser
+    WHERE calendaruser_event_id = '$event_id'";
   $obm_db->query($query);
   while($obm_db->next_record()) {
     $contacts[] = $obm_db->f("calendaruser_user_id");
   }
-  $query = "select calendarevent_title
-    from CalendarEvent
-    where calendarevent_id = '$event_id'";
+  $query = "SELECT calendarevent_title
+    FROM CalendarEvent
+    WHERE calendarevent_id = '$event_id'";
   $obm_db->query($query); 
   $obm_db->next_record();
   $title = $obm_db->f("calendarevent_title");
@@ -938,7 +940,7 @@ function run_query_agendacategory() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// category insertion query construction and execution                           //
+// category insertion query construction and execution
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
@@ -967,7 +969,7 @@ function run_query_category_insert($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// category update query execution                                               //
+// category update query execution
 // Parameters:
 //   - $label     : label to set
 //   - $label_old : category label to update
@@ -995,7 +997,7 @@ function run_query_category_update($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// category deletion query execution                                             //
+// category deletion query execution
 // Parameters:
 //   - category_id     : category id to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -1013,7 +1015,7 @@ function run_query_category_delete($agenda) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// category deletion query execution                                             //
+// category deletion query execution
 // Parameters:
 //   - $label     : category label to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -1031,7 +1033,7 @@ function get_category_label($agenda) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// category - Company links query execution                                      //
+// category - Company links query execution
 // Parameters:
 //   - $p_id : category id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1094,7 +1096,7 @@ function get_event_info($id) {
     return false;
   }
 
-  $query = "select * from CalendarEvent where calendarevent_id='$id'";
+  $query = "SELECT * FROM CalendarEvent WHERE calendarevent_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
