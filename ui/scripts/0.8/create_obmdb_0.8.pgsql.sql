@@ -211,7 +211,7 @@ CREATE TABLE Company (
   company_contact_number       integer DEFAULT '0' NOT NULL,
   company_deal_number          integer DEFAULT '0' NOT NULL,
   company_deal_total           integer DEFAULT '0' NOT NULL,
-  company_comment text,
+  company_comment              text,
   PRIMARY KEY (company_id)
 );
 
@@ -579,6 +579,28 @@ CREATE TABLE RepeatKind (
   repeatkind_usercreate  integer,
   repeatkind_label       varchar(128),
   PRIMARY KEY(repeatkind_id)	
+);
+
+
+-------------------------------------------------------------------------------
+-- Todo
+-------------------------------------------------------------------------------
+--
+-- New table 'Todo'
+--
+CREATE TABLE Todo (
+  todo_id          serial,
+  todo_timeupdate  TIMESTAMP,
+  todo_timecreate  TIMESTAMP,
+  todo_userupdate  integer,
+  todo_usercreate  integer,
+  todo_user        integer,
+  todo_date        TIMESTAMP DEFAULT NULL,
+  todo_deadline    TIMESTAMP DEFAULT NULL,
+  todo_priority    integer DEFAULT NULL,
+  todo_title       varchar(80) DEFAULT NULL,
+  todo_content     text DEFAULT NULL,
+  PRIMARY KEY (todo_id)
 );
 
 
@@ -1088,24 +1110,22 @@ CREATE TABLE GroupGroup (
 
 
 -------------------------------------------------------------------------------
--- Todo
+-- Import module tables
 -------------------------------------------------------------------------------
 --
--- New table 'Todo'
+-- Table structure for table 'Import'
 --
-CREATE TABLE Todo (
-  todo_id          serial,
-  todo_timeupdate  TIMESTAMP,
-  todo_timecreate  TIMESTAMP,
-  todo_userupdate  integer,
-  todo_usercreate  integer,
-  todo_user        integer,
-  todo_date        TIMESTAMP DEFAULT NULL,
-  todo_deadline    TIMESTAMP DEFAULT NULL,
-  todo_priority    integer DEFAULT NULL,
-  todo_title       varchar(80) DEFAULT NULL,
-  todo_content     text DEFAULT NULL,
-  PRIMARY KEY (todo_id)
+CREATE TABLE Import (
+  import_id          serial,
+  import_timeupdate  timestamp,
+  import_timecreate  timestamp,
+  import_userupdate  integer,
+  import_usercreate  integer,
+  import_name        varchar(64) NOT NULL,
+  import_format      varchar(128),
+  import_desc        text,
+  PRIMARY KEY (import_id),
+  UNIQUE (import_name)
 );
 
 

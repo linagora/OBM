@@ -141,6 +141,7 @@ $l_header_admin_data = "Data";
 $l_header_admin_pref = "Prefs";
 $l_header_admin_code = "Code";
 $l_header_admin_ref = "Referential";
+$l_header_import = "Import";
 
 $l_header_new_f = "New";
 $l_header_new = "New";

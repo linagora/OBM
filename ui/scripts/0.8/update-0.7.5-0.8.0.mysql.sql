@@ -11,6 +11,7 @@
 -- Update preference : todo_order
 UPDATE UserObmPref set userobmpref_option='set_todo', userobmpref_value='priority' where userobmpref_option='todo_order';
 
+
 -------------------------------------------------------------------------------
 -- Update Calendar tables
 -------------------------------------------------------------------------------
@@ -23,6 +24,7 @@ ALTER TABLE CalendarEvent CHANGE calendarevent_endrepeat calendarevent_endrepeat
 UPDATE CalendarEvent SET calendarevent_endrepeat = CONCAT(calendarevent_endrepeat,"00");
 ALTER table CalendarEvent change column calendarevent_endrepeat calendarevent_endrepeat timestamp(14);
 ALTER table CalendarEvent change column calendarevent_length calendarevent_endrepeat INT(14);
+
 
 --
 -- Table structure for table 'ContactCategory1'
@@ -51,6 +53,7 @@ CREATE TABLE ContactCategory2 (
   PRIMARY KEY (contactcategory2_id)
 );
 
+
 --
 -- Table structure for table 'ContactCategory1Link'
 --
@@ -59,6 +62,7 @@ CREATE TABLE ContactCategory1Link (
   contactcategory1link_company_id   int(8) NOT NULL default '0',
   PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_company_id)
 );
+
 
 --
 -- Table structure for table 'ContactCategory2Link'

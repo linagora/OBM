@@ -222,10 +222,10 @@ if ($section == "COM") {
 
 } elseif ($section == "ADMINS") {
 
-  $menus["ADMINS"]["ADMIN"]      = array('Name'=> $l_header_admin,
-                                     'Ico' => "$ico_admin",
-			             'Url' => "$path/admin/admin_index.php?mode=html",
-			             'Right'=> $admin_read);
+  $menus["ADMINS"]["ADMIN"] = array('Name'=> $l_header_admin,
+                   'Ico' => "$ico_admin",
+                   'Url' => "$path/admin/admin_index.php?mode=html",
+                   'Right'=> $admin_read);
   $menus["ADMINS"]["ADMIN_CODE"] = array('Name'=> $l_header_admin_code,
                    'Ico' => "$ico_code",
 		   'Url' => "$path/admin_code/admin_code_index.php?mode=html",
@@ -246,6 +246,10 @@ if ($section == "COM") {
                    'Ico' => "$ico_ref",
                    'Url' => "$path/admin_ref/admin_ref_index.php",
                    'Right'=> $admini_ref_read);
+  $menus["ADMINS"]["IMPORT"] = array('Name'=> $l_header_import,
+                   'Ico' => "$ico_ref",
+                   'Url' => "$path/import/import_index.php",
+                   'Right'=> $import_read);
 
 } elseif ($section == "COMPTA") {
 
