@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : company.inc                                              //
@@ -25,6 +25,7 @@ $l_email = "E-Mail";
 $l_contact_new = "Nuovo Contatto";
 $l_deal_new = "Nuovo Deal";
 $l_project_new = "Nuovo Projet";
+$l_contract_new = "Nuovo Contratto";
 $l_kind_manage = "Azienda Tipo Management";
 $l_kind_exist = "Tipi esistente";
 $l_kind_new = "Nuovo Tipo";

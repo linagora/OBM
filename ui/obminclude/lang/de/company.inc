@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 //////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Deutsch (German)
 //     - File     : company.inc
@@ -31,6 +31,8 @@ $l_fax = "Telefax";
 $l_web = "Web";
 $l_contact_new = "Neuer Kontakt";
 $l_deal_new = "Neuer Vertrag";
+$l_project_new = "Neuer Project";
+$l_contract_new = "Neuer Contract";
 $l_kind_manage = "Verwaltung Firmenart";
 $l_kind_exist = "Vorhandene Firmenarten";
 $l_kind_new = "Neue Firmenart";

@@ -85,6 +85,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "company_deal_number") {
     $res["name"] = $OD->data_set->f("company_deal_number") . " / ";
     $res["name"] .= $OD->data_set->f("company_deal_total");
+    $res["txt_name"] .= $res["name"];
     $c_id = $OD->data_set->f("company_id");
     if ($res["name"] != "0 / 0") {
       $res["url"] = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
@@ -110,6 +111,11 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     if ($OD->data_set->f("company_town") != "" ) {
       $res["name"] .= $OD->data_set->f("company_town");
     }
+    $res["txt_name"] = trim($OD->data_set->f("company_address1") . " " .
+                       $OD->data_set->f("company_address2") . " " .
+                       $OD->data_set->f("company_address3") . " " .
+                       $OD->data_set->f("company_zipcode") . " " .
+		       $OD->data_set->f("company_town"));
   }
 
   return $res;
@@ -273,8 +279,7 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display: Company links menu                                               //
+///////////////////////////////////////////////////////////////////////////////// Display: Company links menu                                               //
 // Parameters:
 //   - $co_q : company database result 
 // Returns:
@@ -282,11 +287,10 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
-  global $ico_document,$ico_document_new, $ico_project;
-  global $l_header_contact, $l_contact_new;
-  global $l_header_deal, $l_deal_new;
+  global $ico_document,$ico_document_new, $ico_project, $ico_contract;
+  global $l_header_contact, $l_contact_new, $l_header_project, $l_project_new;
+  global $l_header_deal, $l_deal_new, $l_header_contract, $l_contract_new;
   global $l_header_document, $l_document_new, $l_document_add;
-  global $l_header_project, $l_project_new;
   global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
@@ -310,6 +314,8 @@ function html_company_links($co_q) {
   $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
   $nb_pro = run_query_linked_project_nb ($id,"company");
   $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+  $nb_ctra = run_query_linked_contract_nb ($id,"company");
+  $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
   
   $block = "<div class=\"link\"> 
   <div class=\"linkTitle\">:: $l_header_contact</div>
@@ -336,6 +342,14 @@ function html_company_links($co_q) {
         <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>
     <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
         <a href=\"$url_pro_new\">$l_project_new</a></li>
+  </ul>
+
+  <div class=\"linkTitle\">:: $l_header_contract</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_ctra\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+        <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
+    <li><a href=\"$url_ctra_new\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+        <a href=\"$url_ctra_new\">$l_contract_new</a></li>
   </ul>
 
   <div class=\"linkTitle\">:: $l_header_document</div>
@@ -563,29 +577,28 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   
   // cat select
   $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
-   $j =0;
-  foreach($cat_a as $cat_info) {
-    $c_id = $cat_info["id"];
-    $c_code = $cat_info["code"];
-    $c_label = $cat_info["label"];
-    if ($compcat[$j]["id"] == $c_id) { 
-      $sel_cat .= "\n<option value=\"$c_id\"";
-      $sel_cat .= " selected=\"selected\""; 
-      $j++;
-      $length = 8 - strlen($c_code);
-      $label = $c_code;
-      for($i=0;$i<$length;$i++) {
-	$label .= "&nbsp;";
+  $j =0;
+  if (is_array($cat_a)) {
+    foreach ($cat_a as $cat_info) {
+      $c_id = $cat_info["id"];
+      $c_code = $cat_info["code"];
+      $c_label = $cat_info["label"];
+      if ($compcat[$j]["id"] == $c_id) { 
+	$sel_cat .= "\n<option value=\"$c_id\"";
+	$sel_cat .= " selected=\"selected\""; 
+	$j++;
+	$length = 8 - strlen($c_code);
+	$label = $c_code;
+	for ($i=0;$i<$length;$i++) {
+	  $label .= "&nbsp;";
+	}
+	$label .= "$c_label";
+	$sel_cat .= ">$label</option>";
       }
-      $label .= "$c_label";
-      $sel_cat .= ">$label</option>";
     }
   }
-  $sel_kind .= "</select>";
+  $sel_cat .= "</select>";
 
-
-
-  
   // activity select
   $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
     <option value=\"0\">$l_none</option>";

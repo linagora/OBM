@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : company.inc                                              //
@@ -28,6 +28,7 @@ $l_comment = "Comment";
 $l_contact_new = "New Contact";
 $l_deal_new = "New Deal";
 $l_project_new = "New Projet";
+$l_contract_new = "New Contract";
 $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";

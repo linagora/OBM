@@ -488,12 +488,11 @@ elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-// re-read the actions in case some values have been updated (id after insert) 
-get_deal_action();
+// Update actions url in case some values have been updated (id after insert) 
+update_deal_action_url();
 if (! $popup) {
   $display["header"] = generate_menu($menu, $section);
 }
-
 $display["head"] = display_head($l_deal);
 $display["end"] = display_end();
 
@@ -740,7 +739,7 @@ function get_deal_action() {
     'Condition'=> array ('None') 
                                             );
 
-  // Delete
+  // Check Delete
   $actions["DEAL"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"]."",
@@ -848,6 +847,27 @@ function get_deal_action() {
     'Right'    => $deal_read, 
     'Condition'=> array ('None') 
                                       );
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Deal Actions URL updates (after processing, before displaying menu)  
+///////////////////////////////////////////////////////////////////////////////
+function update_deal_action_url() {
+  global $deal, $actions, $path;
+
+  // Detail Update
+  $actions["DEAL"]["detailupdate"]['Url'] = "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"];
+
+  // Parent Detail Update
+  $actions["DEAL"]["parent_detailupdate"]['Url'] = "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"];
+
+  // Check Delete
+  $actions["DEAL"]["check_delete"]['Url'] = "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"];
+
+  // Parent Check Delete
+  $actions["DEAL"]["parent_delete"]['Url'] = "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"];
 
 }
 

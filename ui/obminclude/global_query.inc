@@ -156,6 +156,29 @@ function run_query_linked_project_nb ($id, $entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of contract linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (deal, company)
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_linked_contract_nb ($id, $entity) {
+  global $cdg_sql;
+
+  $query = "select count(*) as nb from Contract
+    where contract_${entity}_id = '$id'";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of documents linked to an entity
 // Parameters:
 //   - $id     : Id of entity

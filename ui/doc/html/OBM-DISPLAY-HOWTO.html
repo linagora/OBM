@@ -12,10 +12,9 @@
 <h1>OBM-DISPLAY-LIST-HOWTO</h1>
 <i>Utilisation d'un affichage générique pour les tableaux de résutats</i>
 <br />
-Version 0.7.0 - 2003-07-24<br />
+Version 0.8.0 - 2004-01-10<br />
 </center>
 
-<i>Penser a documenter l'export csv</i>
 <hr>
 <h2><a href="#api">Référence de la classe OBM_DISPLAY et API</a></h2>
 <h2><a href="#util">Utilisation de la classe OBM_DISPLAY</a></h2>
@@ -187,12 +186,13 @@ Version 0.7.0 - 2003-07-24<br />
   <td>Affiche l'aide pour le panel de préférences</td>
 </tr>
 <tr>
-  <td colspan=2><b>dis_data_file($first_row, $nb_rows, $sep)</b></td>
+  <td colspan=2><b>dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity)</b></td>
   <td>Affiche les données au format CSV
     <ul>
-      <li>$first_row : 1ère ligne de résulat
-      <li>$nb_rows   : nombre de lignes souhaité
-      <li>$sep       : séparateur de colonnes utilisé
+      <li>$first_row       : 1ère ligne de résulat
+      <li>$nb_rows         : nombre de lignes souhaité
+      <li>$sep             : séparateur de colonnes utilisé
+      <li>$dis_data_entity : fonction gérant l'affichage spécifique de certaines colonnes
     </ul>
   </td>
 </tr>
@@ -531,12 +531,38 @@ La définition exacte est :
 
 <p>
 Cette fonctionne doit retourner un tableau (hashage) avec les paramètres renseignés possibles (aucun n'est obligatoire)
-<ul>
-  <li><i>$name</i> définit le texte ou contenu affiché. Ce peut $etre du texte ou image &lt;img ... &gt;
-  <li><i>$url</i> indique un lien et en définit l'url. Si $url est renseigné alors <i>$name</i> sera automatiquement encadré par des balises &lt;a href ...&gt; et &lt;/a&gt;.
-  <li><i>$align</i> définit l'alignement (gauche par défaut, peut prendre la valeur "center")
-  <li><i>$style</i> permet de définir un style particulier (pour un affichage en couleur par exemple)
-</ul>
+<table border=1>
+<tr>
+  <td><i>$name</i></td>
+  <td>définit le texte ou contenu affiché. Ce peut être du texte ou image &lt;img ... &gt;</td>
+</tr><tr>
+  <td><i>$txt_name</i></td>
+  <td>nom utilisé pour l'export CSV</td>
+</tr><tr>
+  <td><i>$url</i></td>
+  <td>indique un lien et en définit l'url. Si $url est renseigné alors <i>$name</i> sera automatiquement encadré par des balises &lt;a href ...&gt; et &lt;/a&gt;.</td>
+</tr><tr>
+  <td><i>$align</i></td>
+  <td>définit l'alignement (gauche par défaut, peut prendre la valeur "center")</td>
+</tr><tr>
+  <td><i>$style</i></td>
+  <td>
+    <ul>
+      <li>permet de définir un style particulier (pour un affichage en couleur par exemple) pour un champ
+      <li>permet de définir le style de la ligne si fieldname = "row_style"
+    </ul>
+  </td>
+</tr><tr>
+  <td><i>$popup</i></td>
+  <td>définit si le lien doit être lancé dans une fenêtre Popup</td>
+</tr><tr>
+  <td><i>$popup_width</i></td>
+  <td>largeur de la fenêtre de popup</td>
+</tr><tr>
+  <td><i>$popup_height</i></td>
+  <td>hauteur de la fenêtre de popup</td>
+</tr>
+</table>
 
 <p>
 <i><u>Exemple</u> :

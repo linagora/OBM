@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : exportcsv_index.php                                          //
 //     - Desc : OBM CSV export Index File (used by OBM_DISPLAY)              //
@@ -16,7 +16,6 @@ $section = "";
 $menu = "";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
@@ -75,7 +74,7 @@ if (($action == "index") || ($action == "")) {
   $export_d->data_set = $obm_q;
   header("Content-Type: text/plain");
   header("Content-Disposition: attachment; filename=\"$module.csv\"");
-  $export_d->dis_data_file($first_row, $nb_rows, $sep);
+  $export_d->dis_data_file($first_row, $nb_rows, $sep, $params["function"]);
 }
 
 
@@ -84,7 +83,7 @@ if (($action == "index") || ($action == "")) {
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_export() {
-  global $first_row, $nb_rows, $query, $query_pref, $call_module;
+  global $first_row, $nb_rows, $query, $query_pref, $call_module, $func_data;
   global $cdg_param;
 
   if (isset ($first_row)) $params["first_row"] = $first_row;
@@ -92,6 +91,7 @@ function get_param_export() {
   if (isset ($query)) $params["query"] = $query;
   if (isset ($query_pref)) $params["query_pref"] = $query_pref;
   if (isset ($call_module)) $params["module"] = $call_module;
+  if (isset ($func_data)) $params["function"] = $func_data;
 
   if ($debug > 0) {
     if ( $params ) {

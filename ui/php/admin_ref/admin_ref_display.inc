@@ -555,7 +555,7 @@ function html_tasktype_form($tt_q) {
 
   if ($tt_q->num_rows() > 0) {
     $sel_tt = "<select name=\"sel_tt\" onChange=\"
-      forms.form_tt_update.tf_label.value=this.options[this.selectedIndex].text;\" size=\"8\">";
+      forms.form_tt_update.tf_label.value=this.options[this.selectedIndex].text;\" size=\"16\">";
     while ($tt_q->next_record()) {
       $id = $tt_q->f("tasktype_id");
       $label = $tt_q->f("tasktype_label");

@@ -66,10 +66,6 @@ $perm->check();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if (! $company["popup"]) {
-  $display["header"] = generate_menu($menu, $section); // Menu
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -414,6 +410,11 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_company);
 $display["end"] = display_end();
+// Update actions url in case some values have been updated (id after insert) 
+if (! $company["popup"]) {
+  update_company_action_url();
+  $display["header"] = generate_menu($menu, $section);
+}
 
 display_page($display);
 
@@ -506,7 +507,7 @@ function get_param_company() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Action 
+// Company Actions 
 ///////////////////////////////////////////////////////////////////////////////
 function get_company_action() {
   global $company, $actions, $path;
@@ -618,8 +619,7 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-					       
-					       // Category Insert
+// Category Insert
   $actions["COMPANY"]["cat_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_insert",
     'Right'    => $company_admin_write,
@@ -703,6 +703,24 @@ function get_company_action() {
     'Right'    => $company_write,
     'Condition'=> array ('None')
   );     
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Company Actions URL updates (after processing, before displaying menu)
+///////////////////////////////////////////////////////////////////////////////
+function update_company_action_url() {
+  global $company, $actions, $path;
+
+  // Detail Consult
+  $actions["COMPANY"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"];
+
+  // Detail Update
+  $actions["COMPANY"]["detailupdate"]['Url'] = "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"];
+
+  // Check Delete
+  $actions["COMPANY"]["check_delete"]['Url'] = "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"];
 
 }
 

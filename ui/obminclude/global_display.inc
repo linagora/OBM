@@ -282,7 +282,7 @@ class OBM_DISPLAY {
 
     // We display page management only if enabled and a search url is given
     if (($this->data_page) && ($this->data_url != "")) {
-      $block .= $this->dis_data_index($this->data_url);
+      $block .= $this->dis_data_index($this->data_url, $dis_data_entity);
     }
 
     $block .= "<table class=\"resultTable\">";
@@ -350,7 +350,7 @@ class OBM_DISPLAY {
         //--------------------------------------------------
 	// Format dates
 	if (substr($fieldname,0,5) == "date_") {
-	  $name =date_format($this->data_set->f($fieldname));
+	  $name = date_format($this->data_set->f($fieldname));
 	}
 	elseif ($fieldname == "timeupdate") {
 	  $name = datetime_format($this->data_set->f($fieldname));
@@ -448,9 +448,10 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   // Display : Returns the dataset index display (page management)
   // Parameters:
-  //   - $url : URL with search fields to link to index pages
+  //   - $url             : URL with search fields to link to index pages
+  //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
-  function dis_data_index($url) {
+    function dis_data_index($url, $dis_data_entity) {
     global $path, $page, $new_order, $entity;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
@@ -527,8 +528,8 @@ class OBM_DISPLAY {
     $module = $this->display_module;
     $query = urlencode($this->data_set->obm_query);
     $query_pref = urlencode($this->display_pref->obm_query);
-    $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref";
-    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=0&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
+    $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref&amp;func_data=$dis_data_entity";
+    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=0&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref&amp;func_data=$dis_data_entity";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
       <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"resultIndexIcon\" alt=\"$l_export\"/></a>
@@ -630,7 +631,7 @@ class OBM_DISPLAY {
   // Function that display the dataset
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
-  function dis_data_file($first_row, $nb_rows, $sep) {
+    function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
     global $cdg_id, $set_debug;
 
     $this->dis_data_header_file($sep);
@@ -646,7 +647,17 @@ class OBM_DISPLAY {
       $this->display_pref->seek(0);
       while ($this->display_pref->next_record()) {
 	$fieldname = $this->display_pref->f("display_fieldname");
-        echo $this->data_set->f($fieldname) . $sep;
+        //--------------------------------------------------
+        // We call module specific field display disposition
+        //--------------------------------------------------
+	if (function_exists($dis_data_entity)) {
+	  $res = $dis_data_entity($this, $fieldname, $link_ok);
+	}	  
+	if ($res["txt_name"] != "") {
+	  echo $res["txt_name"] . $sep;
+	} else {
+	  echo $this->data_set->f($fieldname) . $sep;
+	}
       }
 
       echo "\n";

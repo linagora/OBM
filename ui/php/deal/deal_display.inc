@@ -552,6 +552,7 @@ function html_deal_links($deal_q, $inv_nb) {
      </ul>";
 
   // Contract
+  $contract_nb = run_query_contract_nb ($id);
   $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
   $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
 
@@ -559,7 +560,6 @@ function html_deal_links($deal_q, $inv_nb) {
   $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
   $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
   $nb_inv_arch = run_query_nb_archived_invoices ($id);
-  $contract_nb = run_query_contract_nb ($id);
 
   // Document
   $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
@@ -579,7 +579,7 @@ function html_deal_links($deal_q, $inv_nb) {
   <ul class=\"linkList\">
     <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
-    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract_new\" alt=\"\" /></a>
+    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_contract_new</a></li>
   </ul>
   <div class=\"linkTitle\">:: $l_header_invoice</div>
@@ -588,7 +588,7 @@ function html_deal_links($deal_q, $inv_nb) {
         <a href=\"$url_inv\">$l_header_invoice ($inv_nb)</a></li>
     <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv\">$l_archived_invoices ($nb_inv_arch)</a></li>
-    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice_new\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_invoice_new</a></li>
   </ul>
   <div class=\"linkTitle\">:: $l_header_document</div>
