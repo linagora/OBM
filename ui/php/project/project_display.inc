@@ -358,13 +358,13 @@ function html_project_links($p_q) {
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -380,10 +380,10 @@ function html_project_links($p_q) {
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";
   }
@@ -452,7 +452,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <td class=\"detailLabel\">$l_deal</td>
       <td class=\"detailText\">
         <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal")."\">
-        <img src=\"/images/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
         $deal_label
       </td>";
     }
@@ -463,7 +463,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$company")."\">
-        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         $company_name
       </td>
     $dis_deal
@@ -508,7 +508,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
       while ($tasks_q->next_record()) {
 	$tsk_name = $tasks_q->f("projecttask_label");
-	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
+	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />" : "";
 	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
@@ -640,7 +640,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
       } else {
 	$dis_member .= "<tr>\n<td class=\"projectCtask\">
-        <img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />
+        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />
         $t_label</td>\n";
       }
 
@@ -1306,7 +1306,7 @@ function html_project_tasklist($tasks_q, $project) {
            <input type=\"checkbox\" name=\"cb_task$t_id\" />
           </td>
 	  <td class=\"detailText\" colspan=\"2\">
-           <img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />$t_label
+           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />$t_label
           </td>
          </tr>";
       }
@@ -1509,7 +1509,7 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
       else
       	$dis_member .= "<tr>\n<td class=\"projectCtask\">
-          <img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />$t_label</td>\n";
+          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />$t_label</td>\n";
 
       //ecrit la ligne pour un tache sans enfants
       for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
@@ -1639,7 +1639,7 @@ function html_project_advance($members_q, $allo_q, $tasks_q, $project) {
       $classTask = "projectPtask";
       $classInput = "projectPtime";
     }else{
-      $img = "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />";
+      $img = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />";
       $classTask = "projectCtask";
       $classInput = "projectCtime";
     }

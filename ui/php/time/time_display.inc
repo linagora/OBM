@@ -68,7 +68,7 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
       $res["popup_width"] = 700;
       $res["popup_height"] = 210;
       $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;wbegin=".$time["date"];
-      $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\" alt=\"\" />";
+      $res["name"] = "<img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" />";
     } else {
       $res["name"] = "&nbsp;";
     }
@@ -160,7 +160,7 @@ function dis_time_nav_date($time) {
       <tr>
         <td>
           <a href=\"$url_prev\">
-          <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
+          <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/previous.png\" alt=\"\" />
           </a>
         </td>
         <td class=\"timePeriod\">
@@ -168,7 +168,7 @@ function dis_time_nav_date($time) {
         </td>
         <td>
           <a href=\"$url_next\">
-           <img border=\"0\" src=\"/images/$set_theme/next.png\" alt=\"\" />
+           <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/next.png\" alt=\"\" />
           </a>
         </td>
       </tr>
@@ -885,7 +885,7 @@ function html_time_month_users_total($time, $array_res) {
       $class = "timeValok";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
+       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
       $link_act = "$l_see";
     } else if ($fract != $tot_workingdays) {
       $class = "timeValunfilled";
@@ -895,7 +895,7 @@ function html_time_month_users_total($time, $array_res) {
       $class = "timeValfilled";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
+       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
       $link_act = "$l_see";
     }
 
@@ -910,7 +910,7 @@ function html_time_month_users_total($time, $array_res) {
       <td>&nbsp;&nbsp;</td>
       <td>
        <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
+       <img border=0 src=\"".C_IMAGE_PATH."/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
       </td>
       <td>$dis_validlink</td>
      </tr>

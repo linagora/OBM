@@ -10,7 +10,6 @@ $section = "";
 $module = "";
 $path = ".";
 $extra_css = "portal.css";
-
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,6 +17,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 include_once("obm_query.inc"); 
+
 
 page_open(array("sess" => "OBM_Session", "auth" => $auth_class_name, "perm" => "OBM_Perm"));
 
@@ -66,7 +66,6 @@ $display["detail"] = "
 </div>";
 
 $display["end"] = display_end();
-
 display_page($display);
 
 
@@ -79,7 +78,7 @@ function dis_logout_detail() {
 <table width=\"100%\">
 <tr>
   <td width=\"20%\">
-    <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"/images/standard/standard.jpg\"></a>$obm_version</td>
+    <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"".C_IMAGE_PATH."/standard/standard.jpg\"></a>$obm_version</td>
   <td width=\"5%\">&nbsp;</td>
   <td width=\"50%\" align=\"center\">
     <h1>OBM CONNECTION CLOSED</h1></td>
@@ -167,7 +166,7 @@ function dis_calendar_portal() {
   $block = "
     <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"/images/$set_theme/$ico_agenda_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda_portal\" />
    </div>
    <div class=\"portalTitle\">$l_header_agenda</div>
    <div class=\"portalContent\">
@@ -197,7 +196,7 @@ function dis_time_portal() {
   $block = "
   <div class=\"portalModule\"> 
    <div class=\"portalModuleLeft\">
-    <img src=\"/images/$set_theme/$ico_time_portal\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" />
    </div>
    <div class=\"portalTitle\">$l_header_time</div>
    <div class=\"portalContent\">

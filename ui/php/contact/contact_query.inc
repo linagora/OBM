@@ -58,7 +58,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       company_expresspostal,
       ctry2.country_name as company_country,";
   } else {
-    $company_fields = "contact_company as company_name,"
+    $company_fields = "contact_company as company_name,";
   }
 
   // If a lastname has been specified, get it 

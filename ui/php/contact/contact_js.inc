@@ -301,7 +301,7 @@ function add_element(fieldName,fieldValue,fieldLabel) {
   link.href = 'javascript: remove_element(\'$ext_target'+fieldValue+'\',\'$ext_target\');';
   link.onclick = '';
   image = target.createElement('img');
-  image.src = '/images/$set_theme/$ico_crow';
+  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_crow';
   link.appendChild(image);
   content = target.createTextNode(fieldLabel);
   row.appendChild(link);

@@ -190,7 +190,7 @@ ul.menu li img {
         vertical-align: bottom;
 }
 ul.menu li.activeTab { 
-        background: #eff3f7 url(/images/aliasuite/activeTab.gif) no-repeat top right;
+        background: #eff3f7 url(activeTab.gif) no-repeat top right;
 }
 ul.menu li.activeTab a { 
 	color: #000;
@@ -202,7 +202,7 @@ ul.menu li.activeTab a:hover {
 }
 
 ul.menu li.inactiveTab { 
-	background: #94919c url(/images/aliasuite/inactiveTab.gif)  no-repeat top right;
+	background: #94919c url(inactiveTab.gif)  no-repeat top right;
 }
 ul.menu li.inactiveTab a { 
 	color: #d7d6e0;

@@ -6,7 +6,7 @@
 <style type="text/css">
 <!--
 body {
-	background-image: url(/images/images/accueil_obm.png);
+	background-image: url(<?php echo C_IMAGE_PATH; ?>/images/accueil_obm.png);
 	background-repeat: no-repeat;
 	background-position: center top;
 }
@@ -65,7 +65,7 @@ tr.logintable {
   </td><td>
 
   <div align="center">
-  <input name="imageField" type="image" src="/images/images/bouton_login.gif" onclick="doChallengeResponse()">
+  <input name="imageField" type="image" src="<?php echo C_IMAGE_PATH; ?>/images/bouton_login.gif" onclick="doChallengeResponse()">
   </div>
   </td>
 </tr>

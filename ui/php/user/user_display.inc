@@ -53,7 +53,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\">$email";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\">$email";
       $res["txt_name"] = $email;
     }
   } 

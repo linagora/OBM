@@ -330,7 +330,7 @@ function html_incident_consult($inc_q) {
   <tr>
     <td class=\"detailLabel\">$l_company
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-      <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
     </td>
     <td class=\"detailText\">$comp_name</td>
   </tr><tr>
@@ -344,7 +344,7 @@ function html_incident_consult($inc_q) {
       <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"></a> 
       $con_label
       <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
-      <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
     </td>
     <td class=\"detailText\">
       # $con_num ($con_debut - $con_exp)
@@ -658,7 +658,7 @@ function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q,
               <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
               <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
-              <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
+              <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
               <input type=\"text\" name=\"contract_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
             </td>
           </tr><tr>

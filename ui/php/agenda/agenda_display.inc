@@ -258,7 +258,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
         </td>
        </tr>
        <tr>
-  	<td><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
+  	<td><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
        </tr>
        <tr>
 	<td >
@@ -450,7 +450,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       if (in_array($u_id, $p_user_array)) {
 	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
       <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
-      <img src=\"/images/$set_theme/$ico_delete\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
       <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
@@ -465,7 +465,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_user_id\">
@@ -481,7 +481,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add_group\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_group\" alt=\"[Add]\" />
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_group_id\">
@@ -589,7 +589,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\">
       <input onchange=\"changeDateEnd(this.form)\" \"type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1') ;\">
-       <img style=\"vertical-align:middle;\" src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
       $l_hour : $dis_hour_b : $dis_min_b
      </td>
@@ -599,7 +599,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\">
       <input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_end,'agenda_index.php?action=calendar&popup=1');\">
-       <img style=\"vertical-align:middle;\" src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
       $l_hour : $dis_hour_e : $dis_min_e
      </td>       
@@ -620,7 +620,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\">
       <input type=\"text\" id=\"tf_repeat_end\" name=\"tf_repeat_end\" maxlength=\"10\" size=\"12\" value=\"$repeat_end\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_repeat_end,'agenda_index.php?action=calendar&popup=1');\">
-       <img style=\"vertical-align:middle;\" src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img style=\"vertical-align:middle;\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>     
      </td>
     </tr>
@@ -964,11 +964,11 @@ function html_dis_delete($agenda) {
   <div class=\"detail\">
    <div class=\"messageWarning\">$l_confirm_delete</div>
    <div class=\"agendaDelete\">
-    <a href=\"agenda_index.php?action=delete&param_event=$event_id&cb_mail=1\"><img src=\"/images/$set_theme/$ico_confirm_mail\" alt=\"[ValidateMail]\"/></a>
+    <a href=\"agenda_index.php?action=delete&param_event=$event_id&cb_mail=1\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_confirm_mail\" alt=\"[ValidateMail]\"/></a>
      $l_confirm_mail
-    <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"/images/$set_theme/$ico_validate\" alt=\"[Validate]\"  width=\"16\"/></a>
+    <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_validate\" alt=\"[Validate]\"  width=\"16\"/></a>
      $l_confirm
-    <a href=\"agenda_index.php?action=detailconsult&param_event=$event_id&param_date=$getdate\"><img src=\"/images/$set_theme/$ico_cancel\" alt=\"[Cancel]\" width=\"16\" /></a>
+    <a href=\"agenda_index.php?action=detailconsult&param_event=$event_id&param_date=$getdate\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_cancel\" alt=\"[Cancel]\" width=\"16\" /></a>
      $l_cancel
    </div>
   </div>
@@ -1061,7 +1061,7 @@ function html_dis_right_admin($user_q,$user_id) {
     if ($user_q->f("calendarright_write") == 1) {
       $dis_write_ok .= "<div class=\"elementRow\" id=\"sel_accept_write$u_id\">
       <a href=\"javascript: remove_element('sel_accept_write$u_id','sel_accept_write');\">
-      <img src=\"/images/$set_theme/$ico_delete\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $lname $fname
      <input value=\"$u_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
@@ -1070,7 +1070,7 @@ function html_dis_right_admin($user_q,$user_id) {
     if ($user_q->f("calendarright_read") == 1) {
       $dis_read_ok .= "<div class=\"elementRow\" id=\"sel_accept_read$u_id\">
       <a href=\"javascript: remove_element('sel_accept_read$u_id','sel_accept_read');\">
-      <img src=\"/images/$set_theme/$ico_delete\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $lname $fname
      <input value=\"$u_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
@@ -1084,7 +1084,7 @@ function html_dis_right_admin($user_q,$user_id) {
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_accept_read\">
@@ -1099,7 +1099,7 @@ function html_dis_right_admin($user_q,$user_id) {
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_accept_write\">
@@ -1170,7 +1170,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
       if (in_array($u_id, $p_user_array)) {
 	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_meeting_id$u_id\">
       <a href=\"javascript: remove_element('sel_user_meeting_id$u_id','sel_user_meeting_id');\">
-      <img src=\"/images/$set_theme/$ico_delete\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
       <input value=\"$u_id\" name=\"sel_user_meeting_id[]\" type=\"hidden\" />
@@ -1185,7 +1185,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
     <a href=\"javascript: return false;\" 
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_user_meeting_id\">
@@ -1233,7 +1233,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
      <td class=\"detailForm\">
       <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
      </td>
     </tr>
@@ -1346,7 +1346,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
     <tr>
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user&amp;param_duration=$param_duration")."\">
-       <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>     
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
@@ -1354,7 +1354,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
      </td>  
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user&amp;param_duration=$param_duration")."\">
-       <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>
     </tr>
@@ -1407,7 +1407,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= 	"<tr>";
     $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
-    $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
+    $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++)  {
       $current_time = strtotime("+$j days $i hours",$start_week_day);
       $current_date = date("YmdHi",$current_time);
@@ -1432,7 +1432,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
     }
     $hour_day_list .=   "</tr>\n";
     for($k=1;$k<$set_cal_interval;$k++) {
-      $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
+      $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" alt=\"\" /></td>";
        for($j=0; $j<7;$j++) {	 
 	 $current_time = strtotime("+$j days $i hours".($k*$time_unit)." minutes",$start_week_day);
    	 $current_date = date("YmdHi",$current_time);
@@ -1467,7 +1467,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
        <tr>
         <td class=\"agendaHead\">
          <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=".$prev_week."&amp;param_duration=".$param_duration)."\">
-          <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
          </a>
         </td>
         <td class=\"agendaHead\">
@@ -1475,7 +1475,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
         </td>
         <td class=\"agendaHead\">
          <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=".$next_week."&amp;param_duration=".$param_duration)."\">
-          <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
          </a>
         </td>
        </tr>
@@ -1490,7 +1490,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
          <table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">
           <tr>
            <td class=\"agendaCell\" width=\"60\">
-            <img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" />
+            <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_spacer\" alt=\"\" />
            </td>
            <td width=\"1\">
            </td>
@@ -1944,9 +1944,9 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
 	  }
 	  if(is_array($events_data)) {
 	    $dis_event_cal .= "<td class=\"agendaEventYear\">";
-	    $dis_event_cal .= "<img src=\"/images/$set_theme/".$data["image"]."\" alt=\"\"/></td>";
+	    $dis_event_cal .= "<img src=\"".C_IMAGE_PATH."/$set_theme/".$data["image"]."\" alt=\"\"/></td>";
 	  }else {
-	    $dis_event_cal .= "<td class=\"agendaEventYear\"><img src=\"/images/$set_theme/$ico_calendar_nouser\" alt=\"\"/></td>";		
+	    $dis_event_cal .= "<td class=\"agendaEventYear\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_nouser\" alt=\"\"/></td>";		
 	  }
 	  $tr_users++;	   
 	}
@@ -2011,7 +2011,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
    <tr>
     <td class=\"agendaHead\">
      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$prev_year)."\">
-      <img src=\"/images/$set_theme/$ico_left_day\" alt=\"Previous Month\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"Previous Month\" />
      </a>
     </td>
     <td class=\"agendaHead\" colspan=\"3\">
@@ -2019,7 +2019,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
     </td>
     <td class=\"agendaHead\">
      <a href=\"".url_prepare("agenda_index.php?action=view_year&amp;param_date=".$next_year)."\">
-      <img src=\"/images/$set_theme/$ico_right_day\" alt=\"Next Month\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"Next Month\" />
      </a>
     </td>
    </tr> 
@@ -2106,7 +2106,7 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
       <a style=\"float:right;\" class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$current_day")."\">
       $date</a>      
       <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" />
-      <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
       </a>
       ";
     if(isset($events[$current_day])) {      
@@ -2147,7 +2147,7 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
     <tr>
      <td colspan=\"2\" class=\"agendaHead\">  	 
       <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$prev_month)."\">
-      <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Month]\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Month]\" />
       </a>
      </td>
      <td colspan=\"5\" class=\"agendaHead\">
@@ -2155,7 +2155,7 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
      </td>
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$next_month)."\">
-      <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Month]\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Month]\" />
       </a>
      </td>
     </tr>
@@ -2205,7 +2205,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
   if($nb_user == 1) {	      
     $event_head_display = date("H:i",$event["date"])."->".date("H:i",$event["date"] + $event["event"]->duration);
   }else {
-    $event_head_display = "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
+    $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
   }  
   $week_cal .=  "<a class=\"agendaLink\" 
   onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
@@ -2269,7 +2269,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$this_date")."\">$this_date_l</a>
       <br />
       <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > 
-       <img align=\"middle\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+       <img align=\"middle\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
       </a>	
      </td>";
   } 
@@ -2324,7 +2324,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
     <tr>
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$prev_week")."\">
-       <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>     
      </td>
      <td colspan=\"$col_span\" class=\"agendaHead\">
@@ -2332,7 +2332,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
      </td>  
      <td class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$next_week")."\">
-       <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>
     </tr>
@@ -2373,7 +2373,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
   if($nb_user == 1) {	      
     $event_head_display = "&#8226; $title";
   }else {
-    $event_head_display = "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
+    $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_event\" alt=\"[D]\" />";
   } 
   $week_cal .=  "<a class=\"agendaLink\" 
   onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
@@ -2472,10 +2472,10 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
     <tr>
      <td colspan=\"".($nb_user +1)."\" class=\"agendaHead\">
       <a style=\"float:left;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$yesterdays_date")."\">
-       <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
       </a>     
       <a style=\"float:right;\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$tomorrows_date")."\">
-       <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" />
       </a>      
       $display_date
      </td>
@@ -2488,7 +2488,7 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
      </td>
      <td style=\"width:460px;\" colspan=\"$nb_user\" class=\"agendaHead\">
       <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" >
-      <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
       </a>
      </td>
      </tr> 

@@ -33,7 +33,7 @@ function dis_menu_stats() {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 	    $ret .= "
         <li class=\"lastList\">
-	<a href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/".$value["Ico"]."\" alt=\"\"></a>
+	<a href=\"".$value["Url"]."\"><img src=\"".C_IMAGE_PATH."/$set_theme/".$value["Ico"]."\" alt=\"\"></a>
          <a href=\"".$value["Url"]."\">".$value["Name"]."</a></li>";
 	}
       }

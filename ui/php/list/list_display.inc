@@ -986,10 +986,10 @@ function html_list_graphical_form($action, $list_q, $list) {
       }
     }
     $del_cell= "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
-    <img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
  
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
-    <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
+    <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
     if (is_array($structure))
     foreach($structure as $key=>$line) {
       if ($bollean_criterion[$key] == "NOT") {
@@ -1134,7 +1134,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-     <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
   </tr>
   <tr>
@@ -1148,7 +1148,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timebefore\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
     </td> 
   </tr>
@@ -1162,7 +1162,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
     <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory_code\">$sel_cat</select>
      <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_cat_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"/images/$set_theme/$ico_add\" border=\"0\" />
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" border=\"0\" />
 
     </td>     
     <td class=\"detailForm\"><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>        
@@ -1242,7 +1242,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeafter\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-     <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
   <tr>  
     <td class=\"detailLabel\">$l_firstname</td>
@@ -1255,7 +1255,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
      <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timebefore\" value=\"\" />
      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
-       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
     </td>     
   </tr>
@@ -1541,7 +1541,7 @@ function dis_export_form($list) {
     $url_help = "export_format_$cpt.html";
     $d_format .= "<tr>
       <td class=\"adminLabel\"><a target=\"export\" href=\"$url\">$name</a></td>
-      <td class=\"adminDetail\"><img src=\"/images/$set_theme/$icon\" alt=\"I\" /></td>
+      <td class=\"adminDetail\"><img src=\"".C_IMAGE_PATH."/$set_theme/$icon\" alt=\"I\" /></td>
       <td class=\"adminDetail\">$info</td>
       <td class=\"adminDetail\"><a target=\"doc\" href=\"$url_help\">X</a></td>
       </tr>";

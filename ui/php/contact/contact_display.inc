@@ -111,7 +111,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("contact_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
     }
   }
@@ -771,14 +771,14 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   if ($email != "") {
     $link_email = "
       <a href=\"mailto:$email\">
-      <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"C\" />
       </a>";
   }
 
   if ($email2 != "") {
     $link_email2 = "
       <a href=\"mailto:$email2\">
-      <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"C\" />
       </a>";
   }
   
@@ -1024,13 +1024,13 @@ function html_contact_links($id) {
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -1044,9 +1044,9 @@ function html_contact_links($id) {
     $block_publi = "
   <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
+    <li><a href=\"$url_subscription\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
-    <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
+    <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
   </ul>";
   }
@@ -1326,7 +1326,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       if (in_array($c1_id, $cat1)) {
 	$sel_cat1 .= "<div class=\"elementRow\" id=\"data$c1_id\">
       <a href=\"javascript: remove_element('data$c1_id','sel_cat1');\">
-      <img src=\"/images/$set_theme/$ico_crow\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
       </a>
       ".$cat1_q->f("contactcategory1_label")."
       <input value=\"$c1_id\" name=\"sel_cat1[]\" type=\"hidden\" />
@@ -1341,7 +1341,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     <a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
       </a>
       $l_category1
      </td>    
@@ -1358,7 +1358,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       if (in_array($c2_id, $cat2)) {
 	$sel_cat2 .= "<div class=\"elementRow\" id=\"data$c2_id\">
       <a href=\"javascript: remove_element('data$c2_id','sel_cat2');\">
-      <img src=\"/images/$set_theme/$ico_crow\">
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\">
       </a>
       ".$cat2_q->f("contactcategory2_label")."
       <input value=\"$c2_id\" name=\"sel_cat2[]\" type=\"hidden\" />
@@ -1373,7 +1373,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
      <a href=\"javascript: return false;\" style=\"float:right;\"
       onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
       return false;\">
-       <img src=\"/images/$set_theme/$ico_add\" alt=\"[Add]\" />
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" alt=\"[Add]\" />
       </a>
       $l_category2      
      </td>    

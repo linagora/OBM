@@ -82,11 +82,11 @@ function add_criterion(form,index) {
   cell = labels.insertCell(3); 
   values.insertCell(0);
   cell = values.insertCell(1);
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
   cell = values.insertCell(2);  
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
-  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
   cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';

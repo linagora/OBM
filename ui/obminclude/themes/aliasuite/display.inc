@@ -6,8 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Function that display each page
 // Parameters:
@@ -91,7 +89,7 @@ function display_head($p_module) {
   global $l_obm_title, $set_theme, $obminclude, $extra_css, $extra_js;
 
   if (isset($extra_css))
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
 
   $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
@@ -101,7 +99,7 @@ function display_head($p_module) {
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
 
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" /> 
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" /> 
   <title>$l_obm_title - $p_module</title>
   $dis_extra_css
   $extra_js
@@ -149,7 +147,7 @@ function generate_menu($module) {
   $block = "
 <!-- Bandeau -->
 <a href=\"$path/obm.php\">
-<img src=\"/images/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' />
+<img src=\"".C_IMAGE_PATH."/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' />
 </a>
 <ul class=\"header\">
   <li class=\"first\">&nbsp;
@@ -232,7 +230,7 @@ function display_menus($section, $module) {
 	if ($fico) {
 	  $ico = $modules[$current_module]["Ico"];
 	  if ($ico) {
-	    $block .= "<a href='".$modules[$current_module]["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	    $block .= "<a href='".$modules[$current_module]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
 	  }
 	}
 	$block .= "<a href='".$modules[$current_module]["Url"]."'>";
@@ -260,7 +258,7 @@ function display_menu_bar($section, $module) {
   $name = $modules[$module]["Name"];
   $ico = $modules[$module]["Ico"];
   if ($ico != "")
-    $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
+    $dico = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else
     $dico = "";
 
@@ -325,7 +323,7 @@ function display_last_visited($path="..") {
 	global ${$l_ico};
 	$parentdeal_url = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$id");
 	$block .= "
-          <li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+          <li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
             <a href=\"$parentdeal_url\">$text</a></li>";
       }
     }
@@ -337,7 +335,7 @@ function display_last_visited($path="..") {
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;param_${module}=$id");
       $block .= "
-        <li class=\"lastList\"><a href=\"$mod_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+        <li class=\"lastList\"><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
           <a href=\"$mod_url\">$text</a></li>";
     }
   }

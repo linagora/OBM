@@ -607,7 +607,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
       ";
     $block_publi = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
@@ -707,7 +707,7 @@ function html_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
  $block_publi_dest = "      
     <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-     <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
     </a>
     <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"\" />
     <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"\" />
@@ -1386,12 +1386,12 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
       $display_write = "
     <td class=\"resultText\">
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"/images/$set_theme/$ico_update\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_update\" />
       </a>
     </td>    
     <td class=\"resultText\">
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-      <img src=\"/images/$set_theme/$ico_crow\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" />
       </a>
       </td>";
     }

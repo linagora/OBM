@@ -155,14 +155,14 @@ class OBM_DISPLAY {
 	$nb_field_hidden++;
 	$block .= "
       <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
-      <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
+      <img alt=\"$l_display_yes\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" /></a>";
       } else if ($disstatus == 1) {
 	$block .= "
       <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
-      <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
+      <img alt=\"$l_display_no\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_ball\" /></a>";
       } else if ($disstatus == 2) {
 	$block .= "
-      <img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
+      <img alt=\"$l_mandatory\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_forbidden\" />";
       }
 
       $block .= "
@@ -188,7 +188,7 @@ class OBM_DISPLAY {
       } else {
 	$block .= "
         <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
-          <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
+          <img alt=\"$l_down\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" /></a></td>";
       }
       
       // If first field we doesn't display the up arrow
@@ -199,7 +199,7 @@ class OBM_DISPLAY {
 	$block .= "
         <td>
           <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
-          <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
+          <img alt=\"$l_up\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "
       </tr>
@@ -237,7 +237,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"resultLabel\">
-          <img src=\"/images/$set_theme/$ico_ball\" alt=\"\" />
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_ball\" alt=\"\" />
         </td>
         <td class=\"resultText\">
           $l_help_display_yes
@@ -245,7 +245,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"resultLabel\">
-          <img src=\"/images/$set_theme/$ico_crow\" alt=\"\" />
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_crow\" alt=\"\" />
         </td>
         <td class=\"resultText\">
           $l_help_display_no
@@ -253,7 +253,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"resultLabel\">
-         <img src=\"/images/$set_theme/$ico_forbidden\" alt=\"\" />
+         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_forbidden\" alt=\"\" />
         </td>
         <td class=\"resultText\">
           $l_help_mandatory
@@ -261,7 +261,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"resultLabel\">
-         <img src=\"/images/$set_theme/$ico_arrow_down\" alt=\"\" />
+         <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_down\" alt=\"\" />
         </td>
         <td class=\"resultText\">
           $l_help_down
@@ -269,7 +269,7 @@ class OBM_DISPLAY {
       </tr>
       <tr>
         <td class=\"resultLabel\">
-          <img src=\"/images/$set_theme/$ico_arrow_up\" alt=\"\" />
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_arrow_up\" alt=\"\" />
         </td>
         <td class=\"resultText\">
           $l_help_up
@@ -525,7 +525,7 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
@@ -537,7 +537,7 @@ class OBM_DISPLAY {
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
@@ -554,7 +554,7 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
     }
 
     // Go to next $nb_page_dis pages
@@ -566,7 +566,7 @@ class OBM_DISPLAY {
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export
@@ -577,8 +577,8 @@ class OBM_DISPLAY {
     $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=0&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref&amp;func_data=$dis_data_entity";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"resultIndexIcon\" alt=\"$l_export\"/></a>
-      <a href=\"$export_all_url\"><img src=\"/images/$set_theme/$ico_export_all\" class=\"resultIndexIcon\" alt=\"$l_export_all\"/></a>
+      <a href=\"$export_page_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_export\" class=\"resultIndexIcon\" alt=\"$l_export\"/></a>
+      <a href=\"$export_all_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_export_all\" class=\"resultIndexIcon\" alt=\"$l_export_all\"/></a>
     </div>
 ";
 

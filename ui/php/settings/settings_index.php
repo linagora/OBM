@@ -190,7 +190,7 @@ while ($entry=$lang_dir->read()) {
     $dis_lang .= "<tr>
       <td class=\"adminLabel\">
         <a href=\"" . url_prepare("settings_index.php?param_lang=$entry") ."\">
-        <img src=\"/images/images/flag-$entry.gif\" /></a>
+        <img src=\"".C_IMAGE_PATH."/images/flag-$entry.gif\" /></a>
       </td>
       </tr>";
   }
@@ -212,7 +212,7 @@ while ($entry = $theme_dir->read()) {
     $dis_theme .= "<tr>
       <td class=\"adminLabel\">
         <a href=\"".url_prepare("settings_index.php?param_theme=$entry") .
-        "\"><img src=\"/images/$entry/$entry.jpg\" /></a>
+        "\"><img src=\"".C_IMAGE_PATH."/$entry/$entry.jpg\" /></a>
       </td>
       </tr>";
   }
@@ -321,10 +321,10 @@ $display["detail"] .= " /></td>
     <td class=\"adminHead\">$l_cur_theme</td>
   </tr><tr>
     <td class=\"adminLabel\">
-      <img src=\"/images/images/flag-$set_lang.gif\" />
+      <img src=\"".C_IMAGE_PATH."/images/flag-$set_lang.gif\" />
     </td>
     <td class=\"adminLabel\">
-      <img src=\"/images/$set_theme/$set_theme.jpg\" />
+      <img src=\"".C_IMAGE_PATH."/$set_theme/$set_theme.jpg\" />
     </td>
   </tr>
   </table>

@@ -361,7 +361,7 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
   if ($last > 0) {
     $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_contract=$id&amp;param_incident=$last");
     $dis_last = "<li>
-    <a href=\"$url_inc_last\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_last\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_last\">$l_last</a></li>";
   }
 
@@ -369,19 +369,19 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
   <div class=\"linkTitle\">:: $l_header_incident</div>
   <ul class=\"linkList\">
   <li>
-    <a href=\"$url_inc\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc\">$l_incident_list ($inc_nb)</a>
   </li>
     $dis_last
   <li>
-    <a href=\"$url_inc_new\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
 
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
   <li>
-    <a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+    <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
     <a href=\"$url_deal\">$l_deal</a>
   </li>
   </ul>";
@@ -396,13 +396,13 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
     $block .= "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul> </div>";
@@ -555,19 +555,19 @@ function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, 
       <tr>
         <td class=\"detailLabel\">$l_company
           <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-          <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
         </td>
         <td class=\"detailText\">$comp_name</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_client_manager 1
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
-          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
         </td>
         <td class=\"detailText\">$con1</td> 
       </tr><tr>
         <td class=\"detailLabel\">$l_client_manager 2
           <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
-          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+          <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
         </td>
         <td class=\"detailText\">$con2</td>
       </tr>
@@ -990,7 +990,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   
   if ($action == "detailupdate") {
     $dis_con1 = "
-      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
   }
 
   if ($contact_q->nf()>0) {
@@ -1012,7 +1012,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
 
   if ($action == "detailupdate") {
     $dis_con2 = "
-      <a href=\"".url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+      <a href=\"".url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
   }
 
   $dis_sub = "
@@ -1046,7 +1046,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     <tr>
       <td class=\"detailLabel\">
         <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
-        <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
         $comp_name
       </td>
       <td class=\"detailText\">$ad1
@@ -1066,7 +1066,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailForm\">
         <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
         <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contract_select_deal)."&amp;ext_widget=form_contract.deal_new_id&amp;ext_widget_text=form_contract.deal_label&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
-        <img src=\"/images/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"$l_contract_select_deal\" /></a>
         <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
       </td>
     </tr>

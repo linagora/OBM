@@ -73,7 +73,7 @@ function add_element(fieldName,fieldValue,fieldLabel) {
   link.href = 'javascript: remove_element(\'$ext_element'+fieldValue+'\',\'$ext_element\');';
   link.onclick = '';
   image = target.createElement('img');
-  image.src = '/images/$set_theme/$ico_delete';
+  image.src = '".C_IMAGE_PATH."/$set_theme/$ico_delete';
   link.appendChild(image);
   content = target.createTextNode(fieldLabel);
   row.appendChild(link);

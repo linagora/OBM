@@ -442,7 +442,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <td class=\"detailForm\">
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
-      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a></span>
+      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a></span>
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
@@ -506,7 +506,7 @@ function html_repository_form($action, $document) {
       <td class=\"detailLabel\">$l_path</td>
       <td class=\"detailForm\">
      <input type=\"text\" id=\"tf_repository_path\" name=\"tf_repository_path\" value=\"$re_path\" size=\"50\"/>
-       <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a>
+       <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_browse\" alt=\"\" /></a>
       </td>
     </tr>
     </table>
@@ -1440,7 +1440,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentFile\" style=\"padding-left:".$indent_file."px;text-align:left;\">
 	 <a  href=\"document_index.php?action=detailconsult&amp;param_document=$id\" >
-	  <img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
+	  <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_file\" alt=\"\" />
 	 </a>
 	 <a class=\"documentFile\" 
 	  href=\"document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1\" 
@@ -1459,7 +1459,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"[Dir]\"/>
 	 </a>
 	 ".$name."
 	</td>
@@ -1478,7 +1478,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"document_index.php?action=folder_check_delete&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 ".$name."
 	</td>
@@ -1513,7 +1513,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	 <a href=\"\" onclick=\"show_hide_repo('$current_dir_id');return false;\"> 
-	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	 </a>
 	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
@@ -1532,7 +1532,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$current_dir_id\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	  <img id=\"img_$current_dir_id\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
 	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('".addslashes($current_directory)."');return false;\">
 	  $name
 	 </a>

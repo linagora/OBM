@@ -198,15 +198,15 @@ function hide ( name ) {
   if (W3C) {
     document.getElementById(name).style.display = \"none\";
     document.getElementById(name).style.height = \"0px\";
-    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_close\";    
+    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
   } else if (NS4) {
     document.layers[name].display = \"hide\";
     document.layers[name].height = \"0px\";
-    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";    
+    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";    
   } else {
     document.all[name].style.display = \"none\";
     document.all[name].style.height = \"0px\";
-    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";
+    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\";
   }
 }
 
@@ -214,15 +214,15 @@ function show ( name ) {
   if (W3C) {
     document.getElementById(name).style.display = \"\";
     document.getElementById(name).style.height = \"auto\"; 
-    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_open\";
+    document.getElementById('img_'+name).src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
   } else if (NS4) {
     document.layers[name].display = \"\";
     document.layers[name].height = \"auto\";
-    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+    document.layers['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
   } else {
     document.all[name].style.display = \"\";
     document.all[name].style.height = \"auto\";
-    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+    document.all['img_'+name].src = \"".C_IMAGE_PATH."/$set_theme/$ico_directory_open\";
   }
 }
 

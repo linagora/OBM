@@ -31,6 +31,8 @@ $c_focsys = 3;
 // OBM host (for mail links)
 $cgp_host = "http://obm/";
 
+
+define("C_IMAGE_PATH",$cgp_host."images");
 // Generic E-mail for Incident module
 $cmail_incident = "";
 
@@ -57,6 +59,7 @@ $cs_lifetime = 720;
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
+
 
 // Document constants 
 $document_path = "/var/www/obmdocuments";    // Root of the document repository
@@ -679,8 +682,8 @@ function display_record_info($obm_q) {
     $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
     $datasource = $obm_q->f("datasource_name");
     
-    $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
-    $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
+    $created = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
+    $updated = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
     
     if ($datasource != "") {
       $dis_dsrc = "<br />$datasource";

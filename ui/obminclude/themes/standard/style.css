@@ -92,7 +92,7 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header		{
-	background-image: url('/images/standard/header_bg.png');
+	background-image: url('header_bg.png');
 	background-repeat: repeat-x;
 	background-color: #fff;
 	height: 80px;
@@ -162,7 +162,7 @@ p			{
 }
 
 .header .section p.inactif	{
-	background-image: 	url("/images/standard/onglet_inactif_bg.png");
+	background-image: 	url("onglet_inactif_bg.png");
 }
 
 .header .section p.inactif a	{
@@ -170,7 +170,7 @@ p			{
 }
 
 .header .section p.actif	{
-	background-image: 	url("/images/standard/onglet_actif_bg.png");
+	background-image: 	url("onglet_actif_bg.png");
 }
 
 /* ------------------------------------------------------------------------- */

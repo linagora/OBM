@@ -546,7 +546,7 @@ function html_deal_links($deal_q) {
     $plabel = get_parent_label($pid);
     $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$pid");
     $dis_pdeal = "
-    <li><a href=\"$url_pdeal\"><img src=\"/images/$set_theme/$ico_pdeal\" alt=\"\" /></a>
+    <li><a href=\"$url_pdeal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_pdeal\" alt=\"\" /></a>
         <a href=\"$url_pdeal\">$l_parentdeal ($plabel)</a></li>";
   }
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid&amp;param_deal=$id");
@@ -556,14 +556,14 @@ function html_deal_links($deal_q) {
     $nb_pro = run_query_linked_project_nb ($id, "deal");
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
     $dis_ico_project = "
-        <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+        <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>";
 
     // New project allowed only if hitrate = 100
     if ($hitrate == "100") {
       $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
       $dis_ico_project .= "
-        <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+        <li><a href=\"$url_pro_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_new</a></li>";
     }
     
@@ -582,9 +582,9 @@ function html_deal_links($deal_q) {
     $block_contract = "
   <div class=\"linkTitle\">:: $l_header_contract</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
+    <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
-    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
+    <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_new</a></li>
   </ul>";
   }
@@ -599,10 +599,10 @@ function html_deal_links($deal_q) {
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";
   }
@@ -616,13 +616,13 @@ function html_deal_links($deal_q) {
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -633,7 +633,7 @@ function html_deal_links($deal_q) {
   <div class=\"linkTitle\">:: $l_parentdeal</div>
   <ul class=\"linkList\">
     $dis_pdeal
-    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
+    <li><a href=\"$url_pdeal_upd\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"\" /></a>
         <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
   $block_project
@@ -808,20 +808,20 @@ function html_deal_consult($deal_q) {
       <tr>
         <td class=\"detailLabel\">$l_company 
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$comp<br />$ad1<br/>$zip $town</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_contact 1
         <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
-        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$dis_con1 - $phone_con1
         </td>
       </tr><tr>
         <td class=\"detailLabel\">$l_contact 2
         <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
-        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$dis_con2 - $phone_con2
         </td>
@@ -1179,7 +1179,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
 	</td><td>
 	  <a href=\"javascript: return false;\" style=\"float:right;\"
 	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"/images/$set_theme/$ico_add\" /></a>
+	   <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" /></a>
 	</td></tr>
        </table>      
       </td>";
@@ -1262,10 +1262,10 @@ $js_state_loop
 
   if ($action == "detailupdate") {
     $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
-             <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+             <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
     $dis_contact_1 = "<a href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\">
-             <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+             <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
   }
   if (($action == "detailupdate") || ($action == "update")) {
@@ -1304,7 +1304,7 @@ $js_state_loop
     <tr>
       <td class=\"detailLabel\">
         <a href=\"" . url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
-        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         $comp
       </td>
       <td class=\"detailText\">

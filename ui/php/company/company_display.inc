@@ -32,9 +32,9 @@ $fieldnames["company_web"] = $l_web;
 $fieldnames["companytype_label"] = $l_kind;
 $fieldnames["companyactivity_label"] = $l_activity;
 $fieldnames["companynafcode_code"] = $l_nafcode;
-$fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact\" alt=\"C\" />";
-$fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
-$fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" alt=\"D\" />";
+$fieldnames["company_contact_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" alt=\"C\" />";
+$fieldnames["company_new_contact"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"NC\" />";
+$fieldnames["company_deal_number"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" alt=\"D\" />";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("company_email");
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
-      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
       $res["txt_name"] = $email;
     }
   }
@@ -94,7 +94,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["window"] = true;
       $res["popup_width"] = 800;
       $res["popup_height"] = 600;
-      $res["name"] = "<img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" />";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\" alt=\"$web\" />";
       $res["txt_name"] = $web;
     }
   }
@@ -113,7 +113,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $email = $OD->data_set->f("company_email");
     $ctry = $OD->data_set->f("company_country_iso3166");
     $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email";
-    $res["name"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
+    $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
 
@@ -540,9 +540,9 @@ function html_company_links($co_q) {
     $block_contact = "
   <div class=\"linkTitle\">:: $l_header_contact</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_con_list\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
+    <li><a href=\"$url_con_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" /></a>
         <a href=\"$url_con_list\">$l_header_contact ($con_num)</a></li>
-    <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
+    <li><a href=\"$url_con_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" /></a>
         <a href=\"$url_con_new\">$l_new</a></li>
   </ul>";
   }
@@ -555,11 +555,11 @@ function html_company_links($co_q) {
     $block_deal = "
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+    <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
         $l_header_deal (
         <a href=\"$url_deal_list\">$deal_num</a> /
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
-    <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
+    <li><a href=\"$url_deal_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_new</a></li>
   </ul>";
   }
@@ -573,13 +573,13 @@ function html_company_links($co_q) {
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>";
@@ -595,10 +595,10 @@ function html_company_links($co_q) {
     $block_project = "
   <div class=\"linkTitle\">:: $l_header_project</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+    <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
         $l_header_project ( <a href=\"$url_pro\">$nb_pro</a> /
         <a href=\"$url_pro_tot\">$nb_pro_total</a> )</li>
-    <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+    <li><a href=\"$url_pro_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
         <a href=\"$url_pro_new\">$l_new</a></li>
   </ul>";
   }
@@ -612,9 +612,9 @@ function html_company_links($co_q) {
      $block_contract = "
   <div class=\"linkTitle\">:: $l_header_contract</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_ctra\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+    <li><a href=\"$url_ctra\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
         <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
-    <li><a href=\"$url_ctra_new\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+    <li><a href=\"$url_ctra_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
         <a href=\"$url_ctra_new\">$l_new</a></li>
   </ul>";
   }
@@ -629,10 +629,10 @@ function html_company_links($co_q) {
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
-    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";
   }
@@ -783,7 +783,7 @@ function html_company_consult($co_q, $cat_q) {
   // Email link
   if ($email != "") {
     $link_email = "<a href=\"mailto:$email\">
-      <img border=\"0\" src=\"/images/$set_theme/$ico_mail\"
+      <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\"
       alt=\"$email\" /></a>";
   } else {
     $link_email = "&nbsp;";
@@ -826,7 +826,7 @@ function html_company_consult($co_q, $cat_q) {
       $link_web .= "http://";
     }
     $link_web .= "$web\">
-      <img border=\"0\" src=\"/images/$set_theme/$ico_web\"
+      <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\"
       alt=\"$web\" /></a>";
   } else {
     $link_web = "&nbsp;";
@@ -1035,7 +1035,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 	</td><td>
 	  <a href=\"javascript: return false;\" style=\"float:right;\"
 	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"/images/$set_theme/$ico_add\" /></a>
+	   <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add\" /></a>
 	</td></tr>
        </table>
       </td>";
@@ -1125,7 +1125,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (($action=="detailupdate") || ($action=="update")) { 
     if ($email != "") {
       $link_email = "<a href=\"mailto:$email\">
-        <img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" /></a>";
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" /></a>";
     } else { $link_email = "&nbsp;"; }
   } else { $link_email = "&nbsp;"; }
 
@@ -1133,7 +1133,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if (($action=="detailupdate") || ($action=="update")) {
     if ($web != "") {
       $link_web = "<a target=\"_blank\" href=\"$web\">
-        <img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" /></a>";
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_web\" alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
 
@@ -2512,7 +2512,7 @@ function display_popup_tree($tree,$indent) {
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\"> 
-	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
 	  <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
@@ -2527,7 +2527,7 @@ function display_popup_tree($tree,$indent) {
       "<table class=\"category\">
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
 	     <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
 	 </tr>
@@ -2626,7 +2626,7 @@ function display_popup_code_tree($tree,$indent) {
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" > 
-	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
 	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
@@ -2640,7 +2640,7 @@ function display_popup_code_tree($tree,$indent) {
       "<table class=\"category\">
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	    <img id=\"img_$code\"  src=\"".C_IMAGE_PATH."/$set_theme/$ico_directory\" alt=\"\"/>
 	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
 	 </tr>

@@ -97,7 +97,7 @@ function display_head($p_module) {
   global $l_obm_title, $set_theme, $obminclude, $extra_css, $extra_js;
 
   if (isset($extra_css))
-    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
 
   $headers_e = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
 \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
@@ -107,7 +107,7 @@ function display_head($p_module) {
 <head>
   <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
   <title>$l_obm_title - $p_module</title>
-  <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
+  <link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/style.css\" />
   $dis_extra_css
   $extra_js
 </head>
@@ -149,7 +149,7 @@ function generate_menu($module, $section) {
   $block = "
     <div class=\"header\">
      <div class=\"logo\">
-     <a href=\"$path/obm.php\"><img src=\"/images/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' /></a>
+     <a href=\"$path/obm.php\"><img src=\"".C_IMAGE_PATH."/$set_theme/logo_obm.png\" alt=\"Welcome\" id='logo' /></a>
      </div>
 
      <!-- zone Login -->
@@ -217,7 +217,7 @@ function display_active_tab($tab) {
   $block = "
     <font color=\"#FFCF00\">".$tab["Name"]."</font>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
     &nbsp;&nbsp;&nbsp;&nbsp;";
 
   return $block;
@@ -235,7 +235,7 @@ function display_inactive_tab($tab) {
   $block = "
     <a class=\"sections\" href=\"".$tab["Url"]."\">".$tab["Name"]."</a>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
+    <img src=\"".C_IMAGE_PATH."/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
     &nbsp;&nbsp;&nbsp;&nbsp;";
 
   return $block;
@@ -266,9 +266,9 @@ function display_menus($section) {
 	if ($fico) {
 	  $ico = $value["Ico"];
 	  if ($ico)
-	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/$ico\" alt=\"\" /></a>\n";
+	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico\" alt=\"\" /></a>\n";
 	  else
-	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/puce.gif\" alt=\"\" /></a>\n";
+	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"".C_IMAGE_PATH."/$set_theme/puce.gif\" alt=\"\" /></a>\n";
 	}
 
 	if ($ftext) {
@@ -297,7 +297,7 @@ function display_menu_bar($section, $module) {
   $name = $menus[$section][$module]["Name"];
   $ico = $menus[$section][$module]["Ico"];
   if ($ico != "")
-    $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
+    $dico = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else
     $dico = "";
 
@@ -365,7 +365,7 @@ function display_last_visited($path="..") {
 	global ${$l_ico};
 	$parentdeal_url = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$id");
 	$block .= "
-          <li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+          <li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
             <a href=\"$parentdeal_url\">$text</a></li>";
       }
     }
@@ -377,7 +377,7 @@ function display_last_visited($path="..") {
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;param_${module}=$id");
       $block .= "
-        <li class=\"lastList\"><a href=\"$mod_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+        <li class=\"lastList\"><a href=\"$mod_url\"><img src=\"".C_IMAGE_PATH."/$set_theme/${$l_ico}\" alt=\"\" /></a>
           <a href=\"$mod_url\">$text</a></li>";
     }
   }
