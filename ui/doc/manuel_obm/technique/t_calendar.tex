@@ -1,12 +1,12 @@
 % Documentation technique d'OBM : module Calendar
 % ALIACOM Medhi Rande
-% $Id:
+% $Id
+
+\clearpage
 
 \section{Calendar}
 
 Le \calendar \obm  est un agenda partagé permettant d'inserer, modifier, consulter ou supprimer des évenements pour un ou plusieurs utilisateurs simultané.
-
-\clearpage
 
 \subsection{Organisation de la base de données}
 
@@ -145,6 +145,7 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
   <update\_decision> & agenda\_write & Droits d'Utilisateur en ecriture. \\
  \hline
 \end{tabular}
+
 \subsubsection{Fonctions}
  Ci-dessous le tableau présentant la ou les fonctions appelées pour chacune des actions. \\
 \begin{tabular}{|c|c|}
@@ -371,6 +372,7 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
 		     & html\_dis\_conflict() \\
  \hline
 \end{tabular}
+
 \subsection{Fonctionalité}
  Dans cette partie seront abordées les fonctionnalités du module \calendar. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus etre sujet du fonctionnement que de l'utilité et de l'utilisation du module.
 
@@ -519,6 +521,3 @@ On à terminé la boucle sur les unités de temps. On affiche donc la vue qui resse
 
 \textbf{Fin exemple}\\
 En ce qui concerne les vues annuelles et mensuelles, la difference se situe au niveau de la constitution du tableau \variable{current\_events}. Ce tableau est indexé sur les jours et non sur les unités de temps ( la fonction utilisé pour ce faire est la fonction \fonction{store\_daily\_events}). Ceci est du au fait que la vue pour ces affichages là est faites par jour et non par unité de temps. A part cela le fonctionnement est strictement le même.
-
-\subsubsection{Insertion}
-

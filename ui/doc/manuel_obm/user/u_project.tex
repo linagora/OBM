@@ -1,175 +1,171 @@
 % Manuel d'utilisation d'OBM : module Project
 % ALIACOM Bastien Continsouzas
-% $Id:
+% $Id
 
-\subsection{Le module Projets}
+\section{Le module Projets}
 
-Ce module permet de suivre l'activit-bé des différents utilisateurs et leur participation aux.\\-A
+Ce module permet de suivre la participation des differents utilisateurs aux projets en cours et leur activité.\\
 
-Les principales entit-bés du module \project sont décrites ci-dessous :-A
+Les principales entités du module \project sont décrites ci-dessous :
 
-\subsubsection{Description d'un projet}
+\subsection{Description d'un projet}
 
-Les projets peuvent -bêtre de deux types :-A
+Les projets peuvent être de deux types :\\
 
 \begin{itemize}
 \item Commerciaux : il s'agit d'une affaire conclue ....
-\item Internes : .
+\item Internes : .\\
 \end{itemize}
 
-Composantes d'un projet :
+Composantes d'un projet :\\
 
-\paragraph{Id} Non modifiable, num-béro technique géré par l'application.-A
+\begin{itemize}
+\item{\textbf{Id}} Non modifiable, numéro technique géré par l'application.
+\item{\textbf{Nom}} Nom du projet : c'est aussi le nom de l'affaire qui est à l'origine du projet.
+\item{\textbf{Catégorie}} C'est le type de tâche qui va être éffectué lors de la réalisation de ce projet. On différencie les catégories de tâches facturées pour les projets commerciaux et les tâches propres aux projets internes.
+\item{\textbf{Société}} S'il s'agit d'un projet commercial, on indique pour le compte de qui il va être réalisé.
+\item{\textbf{Temps vendu/prévu}} C'est l'évaluation qui a été faite du temps nécessaire à la réalisation du projet. Il est intéressant de comparer ce nombre au temps réel qui a été consommé pour sa réalisation.
+\item{\textbf{Archive}} Indique si le projet (ou l'affaire qui lui est associée) a été archivé. A partir du moment ou un projet a été archivé, il n'est plus possible de réaliser une tâche qui lui est associée.
+\end{itemize}
 
-\paragraph{Nom} Nom du projet : c'est aussi le nom de l'affaire qui est -bà l'origine du projet.-A
+\subsection{Description d'une tâche}
 
-\paragraph{Cat-bégorie} C'est le type de tâche qui va être éffectué lors de la réalisation de ce projet. On différencie les catégories de tâches facturées pour les projets commerciaux et les tâches propres aux projets internes.-A
+Un projet va être divisé en différentes tâches qui vont permettre un suivi plus précis de l'activité des participants au projet. Il est possible de regrouper un certain nombre de tâches au sein d'une tâche de niveau supérieur pour ...\\
 
-\paragraph{Soci-bété} S'il s'agit d'un projet commercial, on indique pour le compte de qui il va être réalisé.-A
+Composantes d'une tâche :
 
-\paragraph{Temps vendu/pr-bévu} C'est l'évaluation qui a été faite du temps nécessaire à la réalisation du projet. Il est intéressant de comparer ce nombre au temps réel qui a été consommé pour sa réalisation.-A
+\begin{itemize}
+\item{\textbf{Id}} Non modifiable, numéro technique géré par l'application.
+\item{\textbf{Nom}} Nom de la tâche.
+\item{\textbf{Tâche parent}} Si cette tâche est ratachée a une tâche de niveau supérieur, indique de quel groupe de tâche elle fait partie.
+\end{itemize}
 
-\paragraph{Archive} Indique si le projet (ou l'affaire qui lui est associ-bée) a été archivé. A partir du moment ou un projet a été archivé, il n'est plus possible de réaliser une tâche qui lui est associée.-A
+\subsection{Description d'un participant}
 
-\subsubsection{Description d'une t-bâche}-A
-
-Un projet va -bêtre divisé en différentes tâches qui vont permettre un suivi plus précis de l'activité des participants au projet. Il est possible de regrouper un certain nombre de tâches au sein d'une tâche de niveau supérieur pour ...-A
-
-Composantes d'une t-bâche :-A
-
-\paragraph{Id} Non modifiable, num-béro technique géré par l'application.-A
-
-\paragraph{Nom} Nom de la t-bâche.-A
-
-\paragraph{T-bâche parent} Si cette tâche est ratachée a une tâche de niveau supérieur, indique de quel groupe de tâche elle fait partie.-A
-
-\subsubsection{Description d'un participant}
-
-Des personnes vont pouvoir -bêtre affectées à la réalisation des différentes tâches du projet :-A
+Des personnes vont pouvoir être affectées à la réalisation des différentes tâches du projet :
 
 Composantes d'un participant :
 
-\paragraph{Id utilisateur} Indique l'utilisateur qui va -bêtre affecté à une tâche.-A
+\begin{itemize}
+\item{\textbf{Id utilisateur}} Indique l'utilisateur qui va être affecté à une tâche.
+\item{\textbf{Id tâche}} Indique à quel tâche il va être affecté.
+\item{\textbf{Temps prévu}} C'est une estimation du temps qu'il faudra à cet utilisateur pour réaliser cette tâche.
+\item{\textbf{Temps estimé restant}} C'est une estimation du temps dui manque à cet utilisateur pour terminer la réalisation de la tâche. En mettant cette information à jour régulièrement, il est possible de détecter les avances et retards prévisibles.
+\end{itemize}
 
-\paragraph{Id t-bâche} Indique à quel tâche il va être affecté.-A
-
-\paragraph{Temps pr-bévu} C'est une estimation du temps qu'il faudra à cet utilisateur pour réaliser cette tâche.-A
-
-\paragraph{Temps estim-bé restant} C'est une estimation du temps dui manque à cet utilisateur pour terminer la réalisation de la tâche. En mettant cette information à jour régulièrement, il est possible de détecter les avances et retards prévisibles.-A
-
-\subsubsection{Les sous-menus du module Gestion des temps}
+\subsection{Les sous-menus du module Gestion des temps}
 
 Le module \project comporte 8 sous-menus :
 
 \begin{itemize}
-\item Chercher : qui permet une recherche multicrit-bère des projets.-A
+\item Chercher : qui permet une recherche multicritère des projets.
 \item Nouveau : qui permet de creer un nouveau projet interne.
-\item Modifier : qui permet de modifier les informations g-bénérales du projet.-A
-\item T-bâches : qui permet de créer des tâches pour le projet.-A
-\item Participants : qui permet de choisir les utilisateurs qui seront affect-bés au projet.-A
-\item Affectation : qui permet d'assigner des participants aux diff-bérentes tâches du projet.-A
-\item Avancement : qui permet de r-béactualiser l'état d'avancement des différents participants au projet-A
+\item Modifier : qui permet de modifier les informations générales du projet.
+\item Tâches : qui permet de créer des tâches pour le projet.
+\item Participants : qui permet de choisir les utilisateurs qui seront affectés au projet.
+\item Affectation : qui permet d'assigner des participants aux différentes tâches du projet.
+\item Avancement : qui permet de réactualiser l'état d'avancement des différents participants au projet
 \item Affichage : qui permet de personnaliser l'affichage de la liste de projets.
 \end{itemize}
 
 \subsubsection{Le sous-menu : Chercher}
 
-Ce menu permet d'effectuer une recherche selon diff-bérents critères :-A
+Ce menu permet d'effectuer une recherche selon différents critères :
 
 \begin{itemize}
 \item Nom
-\item Nom de la soci-bété-A
-\item Cat-bégorie-A
+\item Nom de la société
+\item Catégorie
 \item Chef de projet
 \item Participant
 \end{itemize}
 
-Il est possible d'inclure les projets archiv-bés et ceux qui n'ont pas été initialisés dans les résultats de recherche.-A
+Il est possible d'inclure les projets archivés et ceux qui n'ont pas été initialisés dans les résultats de recherche.
 
 \subsubsection{Le sous-menu : Nouveau}
 
-Ce menu permet de cr-béer un projet interne-A
+Ce menu permet de créer un projet interne
 Un formulaire vierge de projet propose la saisie des champs :
 
 \begin{itemize}
 \item Nom,
-\item Cat-bégorie,-A
-\item Temps pr-bévu,-A
+\item Catégorie,
+\item Temps prévu,
 \end{itemize}
 
-L'insertion du nouveau projet s'effectue en validant le formulaire par le bouton ``Cr-béer le projet''.-A
+L'insertion du nouveau projet s'effectue en validant le formulaire par le bouton ``Créer le projet''.
 
-Si le projet est valide, il est ins-béré dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouveau projet est affiché de nouveau avec un message indiquant la cause de non validité.-A
+Si le projet est valide, il est inséré dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouveau projet est affiché de nouveau avec un message indiquant la cause de non validité.
 
 \subsubsection{Le sous-menu : Modifier}
 
-L'-bécran de modification affiche les informations du projet dans un formulaire.-A
+L'écran de modification affiche les informations du projet dans un formulaire.
 Il est possible de modifier les informations suivantes :
 
 \begin{itemize}
 \item Nom,
-\item Cat-bégorie,-A
-\item Temps pr-bévu/vendu.-A
+\item Catégorie,
+\item Temps prévu/vendu.
 \end{itemize}
 
-Pour valider les modifications effectu-bées il faut cliquer sur le bouton``valider les modifications''.-A
+Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
 
-\subsubsection{Le sous-menu : T-bâches}-A
+\subsubsection{Le sous-menu : Tâches}
 
-Ce menu permet de visualiser la liste des t-bâches déjà ratachées à ce projet et d'en saisir de nouvelles ou d'en supprimer.-A
+Ce menu permet de visualiser la liste des tâches déjà ratachées à ce projet et d'en saisir de nouvelles ou d'en supprimer.
 
 \subsubsection{Le sous-menu : Participants}
 
-Ce menu permet de visualiser la liste des personnes qui participent d-béjà au projet. A partir de cet écran, il est possible d'ouvrir une fenêtre qui permet de rajouter des participants.-A
+Ce menu permet de visualiser la liste des personnes qui participent déjà au projet. A partir de cet écran, il est possible d'ouvrir une fenêtre qui permet de rajouter des participants.
 
 \subsubsection{Le sous-menu : Affectation}
 
-Ce menu permet de modifier l'affectation des participants aux diff-bérentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait necessiter la réalisation de la tâche en question.-A
+Ce menu permet de modifier l'affectation des participants aux différentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait necessiter la réalisation de la tâche en question.
 
 \subsubsection{Le sous-menu : Avancement}
 
-Ce menu permet de mettre -bà jour l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards qui pourraient -A
+Ce menu permet de mettre à jour l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards qui pourraient 
 
 \subsubsection{Le sous-menu : Affichage}
 
-Ce menu permet de param-bétrer l'affichage de la liste des projets. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.-A
+Ce menu permet de paramétrer l'affichage de la liste des projets. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
 
-\subsubsection{La consultation d'un projet}
+\subsection{La consultation d'un projet}
 
-L'acc-bès à l'écran de consultation d'un projet se fait soit depuis l'écran de recherche, soit depuis les bookmarks.-A
+L'accès à l'écran de consultation d'un projet se fait soit depuis l'écran de recherche, soit depuis les bookmarks.
 
-La consultation du projet affiche diff-bérents types d'informations :-A
-
-\begin{itemize}
-\item les informations g-bénérales : le nom du projet, la société pour qui il est réalisé.-A
-\item les indicateurs d'avancement : ces indicateurs permettent d'-bévaluer globalement l'état de réalisation du projet (cf les indicateurs).-A
-\item le tableau de d-bétail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).-A
-\end{itemize}
-
-\subsubsection{Les indicateurs}
-
-Ils sont destin-bés à permettre un suivi global de l'état d'avancement du projet.-A
-Les diff-bérents indicateurs présents sont :-A
+La consultation du projet affiche différents types d'informations :
 
 \begin{itemize}
-\item temps vendu/pr-bévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.-A
-\item temps attribu-bé : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.-A
-\item temps utilis-bé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.-A
-\item temps estim-bé restant : c'est la somme des temps estimé restant qui ont été saisi dans l'écran d'avancement du projet.-A
-\item Attribution du temps pr-bévu : c'est le rapport entre le temps attribué et le temps prévu.-A
-\item Utilisation du temps pr-bévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.-A
-\item Avancement du projet : c'est le rapport entre le temps utilis-bé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).-A
-\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps pr-bévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.-A
+\item les informations générales : le nom du projet, la société pour qui il est réalisé.
+\item les indicateurs d'avancement : ces indicateurs permettent d'évaluer globalement l'état de réalisation du projet (cf les indicateurs).
+\item le tableau de détail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).
 \end{itemize}
 
-\subsubsection{D-bétail de l'avancement}-A
+\subsection{Les indicateurs}
 
-Il s'agit d'un tableau indiquant pour chaque participant affect-bé à une tâche :-A
+Ils sont destinés à permettre un suivi global de l'état d'avancement du projet.
+Les différents indicateurs présents sont :
 
 \begin{itemize}
-\item le temps utilis-bé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.-A
-\item temps estim-bé restant : cette valeur est saisie à l'écran de mise à jour de l'avancement.-A
-\item temps pr-bévu : c'est la valeur saisie à l''écran d'affectation.-A
+\item temps vendu/prévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.
+\item temps attribué : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.
+\item temps utilisé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.
+\item temps estimé restant : c'est la somme des temps estimé restant qui ont été saisi dans l'écran d'avancement du projet.
+\item Attribution du temps prévu : c'est le rapport entre le temps attribué et le temps prévu.
+\item Utilisation du temps prévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.
+\item Avancement du projet : c'est le rapport entre le temps utilisé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).
+\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.
 \end{itemize}
 
-Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de t-bâches.-A
+\subsection{Détail de l'avancement}
+
+Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
+
+\begin{itemize}
+\item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
+\item temps estimé restant : cette valeur est saisie à l'écran de mise à jour de l'avancement.
+\item temps prévu : c'est la valeur saisie à l''écran d'affectation.
+\end{itemize}
+
+Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.

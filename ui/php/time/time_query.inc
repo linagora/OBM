@@ -562,9 +562,6 @@ function run_query_short_month($time) {
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
   $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
 
-  //bcontins probablement inutile
-  //  $user_id = $time["user_id"];
-
   $query = "
     select
       userobm_lastname,

@@ -1,10 +1,10 @@
 % Documentation technique d'OBM : module Project
 % ALIACOM Bastien Continsouzas
-% $Id: 
+% $Id
 
-\section{Calendar}
+\section{Project}
 
-Le module \project \obm  est un agenda partagé permettant d'inserer, modifier, consulter ou supprimer des évenements pour un ou plusieurs utilisateurs simultané.
+Le module \project \obm  .
 
 \clearpage
 
@@ -179,21 +179,21 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
  \hline
   <ext\_get\_ids> &  user\_write & Droits d'Utilisateur en ecriture. \\
  \hline
-  <task_add> & project\_write & Droits d'Utilisateur en ecriture. \\
+  <task\_add> & project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
-  <task_del> & project\_write & Droits d'Utilisateur en ecriture. \\
+  <task\_del> & project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
-  <member_add> & project\_write & Droits d'Utilisateur en ecriture. \\
+  <member\_add> & project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
-  <member_del> & project\_write & Droits d'Utilisateur en ecriture. \\
+  <member\_del> & project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
-  <member_change> & project\_write & Droits d'Utilisateur en ecriture. \\
+  <member\_change> & project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
   <display> & project\_read & Droits d'Utilisateur en ecriture. \\
  \hline
-  <dispref_display> & project\_read & Droits d'Utilisateur en ecriture. \\
+  <dispref\_display> & project\_read & Droits d'Utilisateur en ecriture. \\
  \hline
-  <dispref_level> & project\_read & Droits d'Utilisateur en ecriture. \\
+  <dispref\_level> & project\_read & Droits d'Utilisateur en ecriture. \\
  \hline
 \end{tabular}
 Les 
@@ -324,12 +324,12 @@ Les
 	          & run\_query\_members() \\
 	          & html\_project\_member\_form() \\
  \hline
-  <display> & run\_query\_display_pref() \\
-            & dis\_project\_display_pref() \\
+  <display> & run\_query\_display\_pref() \\
+            & dis\_project\_display\_pref() \\
  \hline
-  <dispref\_display> & run_query\_display\_pref\_update() \\
-                     & run_query\_display\_pref() \\
-                     & dis_project\_display\_pref() \\
+  <dispref\_display> & run\_query\_display\_pref\_update() \\
+                     & run\_query\_display\_pref() \\
+                     & dis\_project\_display\_pref() \\
  \hline
   <dispref\_level> & run\_query\_display\_pref\_level\_update() \\
                    & run\_query\_display\_pref() \\
@@ -338,8 +338,41 @@ Les
 \end{tabular}
 
 \subsection{Fonctionalité}
- Dans cette partie seront abordées les fonctionnalités du module \timemanager. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus être sujet du fonctionnement que de l'utilité et de l'utilisation du module.
+ Dans cette partie seront abordées les fonctionnalités du module \project. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus être sujet du fonctionnement que de l'utilité et de l'utilisation du module.
 
-\subsubsection{Affichage}
+\subsubsection{Création du projet}
 
-\subsubsection{Insertion}
+ Deux cas de figure sont possibles :
+ \begin{description}
+  \item{Projet relié à une affaire} : on modifie juste les informations relatives au projet dans la table Deal avec \fonction{run\_query\_create}
+  \item{Projet interne} : on crée une nouvelle entrée dans la table Deal avec \fonction{run\_query\_insert}
+ \end{description}
+
+\subsubsection{Affichage du projet}
+
+ Il se fait en deux temps
+ \begin{itemize}
+  \item{Récupération des informations dans la table} 
+  \item{Affichage des différentes informations}
+ \end{itemize}
+
+ On récupère donc les données suivantes
+ \begin{itemize}
+  \item{\fonction{run\_query\_detail}} : informations qui caractérisent le projet (nom, société, type de projet, temps vendu/prévu)
+  \item{\fonction{run\_query\_tasks}} : liste des sous-tâches du projet et les informations sur leur arborescence.
+  \item{\fonction{run\_query\_members}} : liste des participants au projet et leur statut (chef de projet/participant)
+  \item{\fonction{run\_query\_membertime}} : liste des affectations de personnes au sous-tâches du projet.
+ \end{itemize}
+
+ On affiche ces informations avec \fonction{html\_project\_consult}
+
+\subsubsection{Modifications}
+
+ Les informations susceptibles d'évoluer sont :
+ \begin{itemize}
+  \item{informations générales} : \fonction{run\_query\_update} modifie le nom, le temps vendu/prévu
+  \item{liste des sous-tâches} : \fonction{run\_query\_tasklist\_insert} ajoute une sous-tâche et \fonction{run\_query\_tasklist\_delete} en enlève.
+  \item{liste des participants} : \fonction{run\_query\_memberlist\_insert} ajoute un (ou plusieurs)  participant, \fonction{run\_query\_memberlist\_delete} en enlève et \fonction{run\_query\_memberstatus\_change} modifie le statut (chef de projet/participant).
+  \item{liste des affectations} : \fonction{run\_query\_projectupdate} met à jour la liste des affectations.
+  \item{liste des affectations} : \fonction{run\_query\_advanceupdate} met à jour l'état d'avancement des participants.
+ \end{itemize}

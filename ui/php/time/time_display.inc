@@ -1139,7 +1139,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_tt .= "             this.form.sel_projecttask, -1) \">";
   $sel_tt .= "<option value=\"0\">$l_none</option>";
 
-  //bcontins debut modif
   for ($i=0; $i<2; $i++) {
     $tt_q = $taskt_q[$i];
 
@@ -1156,7 +1155,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
   }
-  //bcontins fin modif
 
   $sel_tt .= "</select>";
 
@@ -1197,8 +1195,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $block .= "<p></p>";
 
   if ($action == "insert") {
-    //bcontins faudra les virer
-    //    dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
     $block .= "
       <form method=post name=\"f_add_task\"
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
@@ -1207,7 +1203,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       <input type=\"hidden\" name=\"popup\" value=\"0\" />\n";
   }
   else {
-    //dis_table_title($l_update_task);
     $block .= "
       <form method=post  name=\"f_add_task\" 
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\"

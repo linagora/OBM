@@ -651,7 +651,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   //  if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
   if (!($has_tasks) or !($has_members)) {
 
-    $action = "consultnoadv";
     $tab_style = "class=\"detail\"";
 
     $dis_advance = "
@@ -749,6 +748,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
       $cpt_t++; 
     }
   
+    if ($membertime_q->nf() == 0) $action = "consultnoadv";
+
     // list the members of the project
     while ($membertime_q->next_record()) {
       

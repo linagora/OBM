@@ -1,6 +1,6 @@
 % Documentation technique d'OBM : module Time manager
 % ALIACOM Bastien Continsouzas
-% $Id:
+% $Id
 
 \section{Time}
 
@@ -12,24 +12,24 @@ Le \timemanager \obm  est un module permettant.
 
 Le \timemanager utilise une table :
 \begin{itemize}
- \item TimeTask
+ \item{TimeTask}
 \end{itemize}
 
 \subsubsection{TimeTask}
 Cette table stocke toutes les informations concernant une tâche qui a été saisie par l'utilisateur..
 \begin{description}
- \item[timetask\_id] int(8) : C'est la clé primaire de la table.
- \item[timetask\_timeupdate] timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
- \item[timetask\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
- \item[timetask\_userupdate] int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
- \item[timetask\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
- \item[timetask\_user_id] int(8) : Clé étrangère pointant vers UserObm indiquant l'utilisateur qui a effectué cette tâche.
- \item[timetask\_date] timestamp(14) : Date à laquelle a eu lieu cette tâche.
- \item[timetask\_projecttask\_id] int(8) : Clé étrangère pointant vers ProjectTask indiquant la tâche (et par ce biais le projet) ----
- \item[timetask\_length] int(2) : Durée de la tâche en fractions de journées.
- \item[timetask\_tasktype\_id] int(8) : Clé étrangère pointant vers TaskType indiquant le type de le tâche effectuée.
- \item[timetask\_label] varchar(255) : Commentaires saisis par l'utilisateur pour cette tâche.
- \item[timetask\_status] varchar(1) : Etat de validation de cette tâche.
+ \item{timetask\_id} int(8) : C'est la clé primaire de la table.
+ \item{timetask\_timeupdate} timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
+ \item{timetask\_timecreate} timestamp(14) : Donne au format Unix la date de création du tuple.
+ \item{timetask\_userupdate} int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
+ \item{timetask\_usercreate} int(8) : Id de l'utilisateur qui à créé le tuple.
+ \item{timetask\_user\_id} int(8) : Clé étrangère pointant vers UserObm indiquant l'utilisateur qui a effectué cette tâche.
+ \item{timetask\_date} timestamp(14) : Date à laquelle a eu lieu cette tâche.
+ \item{timetask\_projecttask\_id} int(8) : Clé étrangère pointant vers ProjectTask indiquant la tâche (et par ce biais le projet) ----
+ \item{timetask\_length} int(2) : Durée de la tâche en fractions de journées.
+ \item{timetask\_tasktype\_id} int(8) : Clé étrangère pointant vers TaskType indiquant le type de le tâche effectuée.
+ \item{timetask\_label} varchar(255) : Commentaires saisis par l'utilisateur pour cette tâche.
+ \item{timetask\_status} varchar(1) : Etat de validation de cette tâche.
 \end{description}
 
 \clearpage
@@ -93,6 +93,12 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
   <delete> & time\_write & Droits d'Utilisateur en écriture. \\ 
  \hline
   <detailupdate> & time\_write & Droits d'Utilisateur en écriture. \\ 
+ \hline
+  <display> & project\_read & Droits d'Utilisateur en ecriture. \\
+ \hline
+  <dispref\_display> & project\_read & Droits d'Utilisateur en ecriture. \\
+ \hline
+  <dispref\_level> & project\_read & Droits d'Utilisateur en ecriture. \\
  \hline
 \end{tabular}
 
@@ -165,6 +171,17 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
                  & ou \\
 	         & run\_query\_update() \\
 	         & run\_query\_validate() \\
+ \hline
+  <display> & run\_query\_display\_pref() \\
+            & dis\_time\_display\_pref() \\
+ \hline
+  <dispref\_display> & run\_query\_display\_pref\_update() \\
+                     & run\_query\_display\_pref() \\
+                     & dis\_time\_display\_pref() \\
+ \hline
+  <dispref\_level> & run\_query\_display\_pref\_level\_update() \\
+                   & run\_query\_display\_pref() \\
+                   & dis\_time\_display\_pref() \\
  \hline 
 \end{tabular}
 
@@ -177,8 +194,8 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
 
  Les etapes de la production de cet affichage sont les suivantes : 
  \begin{itemize}
-  \item{Récupération des informations en base de données}
-  \item{}
+  \item{Récupération des informations sur le remplissage de la semaine}
+  \item{Récupération des informations nécessaires à la création du formulaire de saisie}
   \item{Affichage de la vue}
  \end{itemize}
 
@@ -201,7 +218,7 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
   \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les semaines précédentes et suivantes.
   \item{\fonction{dis\_time\_index}} : qui affiche une vue synthétique de la semaine : cet affichage met en évidence l'état de remplissage des différents jours et permet de faire ressortir de façon visible celles qui restent à compléter.
   \item{\fonction{dis\_form\_addtask}} : qui affiche le formumlaire de saisie si il reste des journées à remplir (cf formulaire de saisie des tâches)
-  \item{\fonction{dis\_time\_list\_result}} : qui affiche la liste des tâches déjà saisies pour la semaine. Il s'agit d'une instance de la classe OBM_DISPLAY ; l'affichage de cette liste est donc paramétrable depuis l'écran affichage.
+  \item{\fonction{dis\_time\_list\_result}} : qui affiche la liste des tâches déjà saisies pour la semaine. Il s'agit d'une instance de la classe OBM\_DISPLAY ; l'affichage de cette liste est donc paramétrable depuis l'écran affichage.
   \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sélection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
  \end{description}
 
@@ -230,28 +247,28 @@ Deux éléments sont nécessaires pour permettre ce comportement :
 
 On va donc commencer par génerer deux tableaux de donnés qui seront inclus dans la source de la page html : un pour les projets qui pourront apparaitre dans la liste déroulantes, un pour les sous-tâches qui composent ces mêmes projets.
 
-Ces deux tableaux seront exploités par les scripts qui seront appelés quand l'utilisateur agira sur la liste des catégories ou sur celle des projets :
-\begin{itemize}
-\item{fill\_tasktype} : met à jour la valeur sélectionnée pour la rendre cohérente avec le projet sélectionnée.
-\item{fill\_projectall} : remplit la liste des projets avec tous les projets auquels l'utilisateur prend part.
-\item{fill\_project} : remplit cette même liste mais avec seulement les projets qui correspondent au type de tâche sélectionné.
-\item{fill\_projecttask} : remplit la liste des sous-tâches en fonction du projet sélectionné.
-\item{select\_default} : sélectionne les valeurs adéquates lors du chargement de l'écran permettant la modification d'un tâche.
-\end{itemize}
+ Ces deux tableaux seront exploités par les scripts qui seront appelés quand l'utilisateur agira sur la liste des catégories ou sur celle des projets :
+ \begin{itemize}
+  \item{fill\_tasktype} : met à jour la valeur sélectionnée pour la rendre cohérente avec le projet sélectionnée.
+  \item{fill\_projectall} : remplit la liste des projets avec tous les projets auquels l'utilisateur prend part.
+  \item{fill\_project} : remplit cette même liste mais avec seulement les projets qui correspondent au type de tâche sélectionné.
+  \item{fill\_projecttask} : remplit la liste des sous-tâches en fonction du projet sélectionné.
+  \item{select\_default} : sélectionne les valeurs adéquates lors du chargement de l'écran permettant la modification d'un tâche.
+ \end{itemize}
 
 \subsubsection{Insertion/modification d'une tâche}
 
-La modification des informations dans la base de données se fait en deux étapes
-\begin{itemize}
-\item{mise à jour de la base de données} : \fonction{run\_query\_insert} ajoute cette tâche dans la base de données ou \fonction{run\_query\_update} mets à jour la tâche modifiée.
-\item{validation des journées} : \fonction{run\_query\_validate} marque comme complets les jours que cette modification a fini de remplire ou, au contraire, détecte si une modification a remis en cause le fait qu'une journée soit validée.
-\end{itemize}
+ La modification des informations dans la base de données se fait en deux étapes
+ \begin{itemize}
+  \item{mise à jour de la base de données} : \fonction{run\_query\_insert} ajoute cette tâche dans la base de données ou \fonction{run\_query\_update} mets à jour la tâche modifiée.
+  \item{validation des journées} : \fonction{run\_query\_validate} marque comme complets les jours que cette modification a fini de remplire ou, au contraire, détecte si une modification a remis en cause le fait qu'une journée soit validée.
+ \end{itemize}
 
 \subsubsection{Validation d'un mois}
 
-Cette fonctionnalité n'est disponible que pour l'administrateur. Il peut :
-\begin{itemize}
-\item{compléter un mois incomplet}
-\item{valider un mois} : \fonction{run\_query\_adminvalidate} marque comme validé un mois. Il ne sera alors plus possible de modifier les tâches qui ont été validées.
-\item{annuler la validation} : \fonction{run\_query\_adminunvalidate} annule cette validation. C'est la seule solution pour pouvoir corriger à nouveau des tâches précedemment vérouillées.
-\end{itemize}
+ Cette fonctionnalité n'est disponible que pour l'administrateur. Il peut :
+ \begin{itemize}
+  \item{compléter un mois incomplet}
+  \item{valider un mois} : \fonction{run\_query\_adminvalidate} marque comme validé un mois. Il ne sera alors plus possible de modifier les tâches qui ont été validées.
+  \item{annuler la validation} : \fonction{run\_query\_adminunvalidate} annule cette validation. C'est la seule solution pour pouvoir corriger à nouveau des tâches précedemment vérouillées.
+ \end{itemize}

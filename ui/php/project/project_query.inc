@@ -253,22 +253,22 @@ function run_query_update($pid, $project) {
 // Parameters:
 //   - $pid       : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_close($pid) {
-  global $auth, $cdg_sql;
+// function run_query_close($pid) {
+//   global $auth, $cdg_sql;
 
-  $query = "update Deal
-    set
-      deal_timeupdate='". date("Y-m-d H:i:s") ."',
-      deal_userupdate='". $auth->auth["uid"] ."',
-      deal_project_status=3
-    where deal_id='$pid'";
+//   $query = "update Deal
+//     set
+//       deal_timeupdate='". date("Y-m-d H:i:s") ."',
+//       deal_userupdate='". $auth->auth["uid"] ."',
+//       deal_project_status=3
+//     where deal_id='$pid'";
 
-  display_debug_msg($query, $cdg_sql, "run_query_close");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
+//   display_debug_msg($query, $cdg_sql, "run_query_close");
+//   $obm_q = new DB_OBM;
+//   $obm_q->query($query);
 
-  return $obm_q;
-}
+//   return $obm_q;
+// }
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserList conditionnal insertion                         //
@@ -313,8 +313,6 @@ function run_query_tasklist_insert($project) {
 
   $search_q = new DB_OBM;
 
-
-  //bcontins verifie que la tache n'apparait pas dans projectuser (verifier timetask aussi ?)
   if (!(isset($ptask)))
     $ptask = 0;
   else {

@@ -5,7 +5,7 @@
 %
 % Packages supplementaires utilises
 %
-\usepackage[right]{eurosym}
+%\usepackage[right]{eurosym}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
 \usepackage{indentfirst}
@@ -70,14 +70,16 @@
 % === Table des matières ===
 %
 \clearpage
-\setcounter{tocdepth}{1}
+\setcounter{tocdepth}{2}
 \tableofcontents
+\setcounter{page}{0}
 %
 % === Corps du document ===
 %
 
 \clearpage
-\input{technique/t_manuel.tex}
 \input{user/u_manuel.tex}
+\clearpage
+\input{technique/t_manuel.tex}
 
 \end{document}

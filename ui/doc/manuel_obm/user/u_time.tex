@@ -1,24 +1,25 @@
 % Manuel d'utilisation d'OBM : module Time manager
 % ALIACOM Bastien Continsouzas
-% $Id:
+% $Id
 
-\subsection{Le module Gestion des temps}
+\section{Le module Gestion des temps}
 
 Ce module permet de suivre l'activité des différents utilisateurs et leur participation aux projets en cours.\\
 
 Les principales entités du module \timemanager sont décrites ci-dessous :
 
-\subsubsection{Description d'une tâche}
+\subsection{Description d'une tâche}
 
 Composantes d'une tâche :
 
-\paragraph{Id} Non modifiable, numéro technique géré par l'application.
+\begin{itemize}
+\item{\textbf{Id}} Non modifiable, numéro technique géré par l'application.
 
-\paragraph{Date} Date à laquelle a été effectuée la tâche.
+\item{\textbf{Date}} Date à laquelle a été effectuée la tâche.
 
-\paragraph{Durée} Durée de la tâche exprimée en fraction de journée.
+\item{\textbf{Durée}} Durée de la tâche exprimée en fraction de journée.
 
-\paragraph{Catégorie} La catégorie d'activité de cette tâche. Celles-ci sont divisées en trois groupes :
+\item{\textbf{Catégorie}} La catégorie d'activité de cette tâche. Celles-ci sont divisées en trois groupes :
 
 \begin{itemize}
 \item Tâches facturées
@@ -26,21 +27,22 @@ Composantes d'une tâche :
 \item Tâches non facturées
 \end{itemize}
 
-\paragraph{Projet/Affaire} Indique le projet pour lequel cette tâche a été réalisée. Cette information n'est présente que pour les tâches facturées et les projets internes.
+\item{\textbf{Projet/Affaire}} Indique le projet pour lequel cette tâche a été réalisée. Cette information n'est présente que pour les tâches facturées et les projets internes.
 
-\paragraph{Société} Indique la société pour le compte de qui cette tâche a été effectuée. Cette information n'a de sens que pour les tâches facturées.
+\item{\textbf{Société}} Indique la société pour le compte de qui cette tâche a été effectuée. Cette information n'a de sens que pour les tâches facturées.
 
-\paragraph{Commentaire} Court descriptif de la tâche permettant de mieux  le travail effectué.
+\item{\textbf{Commentaire}} Court descriptif de la tâche permettant de mieux  le travail effectué.
 
-\paragraph{Statut} Les tâches ont un statut différent en fonction de leur niveau de validation :
+\item{\textbf{Statut}} Les tâches ont un statut différent en fonction de leur niveau de validation :
 
 \begin{itemize}
 \item Non validée : c'est le cas lorsque la tâche vient d'être saisie.
 \item Validation utilisateur : elle est réalisée automatiquement lorsqu'une journée est complètement remplie.
 \item Validation administrateur elle est réalisée manuellement par l'administrateur qui veut valider le mois d'un utilisateur lorsque celui-çi est entièrement rempli. Il n'est alors plus possible de modifier ces tâches.
 \end{itemize}
+\end{itemize}
 
-\subsubsection{Les sous-menus du module Gestion des temps}
+\subsection{Les sous-menus du module Gestion des temps}
 
 Le module \timemanager comporte 5 sous-menus :
 
@@ -74,7 +76,7 @@ Ce menu permet de visualiser les informations concernant la répartition du temps
 
 Ce menu permet de paramétrer l'affichage de la liste des tâches. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
 
-\subsubsection{Saisir une tâche}
+\subsection{Saisir une tâche}
 
 A partir de l'écran de vue hebdomadaire, il est possible de saisir une tâche pour la semaine en cours.
 Le formulaire permet de remplir les informations suivantes :
@@ -98,16 +100,16 @@ Afin de faciliter la saisie, l'action sur les listes catégorie ou projet modifie
 
 L'administrateur a la possibilité de visualiser les informations de n'importe quel utilisateur.
 
-\subsubsection{Visualiser un mois}
+\subsection{Visualiser un mois}
 
 La vue mensuelle permet d'avoir une vue plus globale de l'état de remplissage pour le mois en cours. les jours qui n'ont pas été entièrement remplis apparaissent de façon différente des autres et il est possible de se rendre directement à l'écran de vue hebdomadaire de la semaine voulue.
 
 L'administrateur, ici aussi, a la possibilité de visualiser le mois de n'importe quel utilisateur.
 
-\subsubsection{Valider}
+\subsection{Valider}
 
 Cette fonctionnalité n'est disponible que pour l'administrateur. Quand un utilisateur a terminé le remplissage des informations pour un mois, l'administrateur peut décider de valider ce mois. Il ne sera alors plus possible de modifier les informations qui ont été validées.
 
-\subsubsection{Consulter les statistiques}
+\subsection{Consulter les statistiques}
 
 L'écran de statistiques permet à l'administrateur de consulter une vue de synthèse des activités des utilisateurs d'\obm sur un mois. Il est possible d'afficher la répartition de l'activité d'un ou de plusieurs utilisateurs par projet ou par type de tâche.
