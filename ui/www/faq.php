@@ -18,6 +18,7 @@
     <li><a href="#no_text">I can log in but no text are displayed (in tabs, menus...)</a>
     <li><a href="#doc_size">I can't insert document of size over 2 or 4 Mb</a>
     <li><a href="#user_pref">OBM seems to work but each search results in a mysql error</a>
+    <li><a href="#sys_group">How to fill managers to allow inserting Companies, contacts, deals,... OBM System groups</a>
   </ul>
   </p>
 
@@ -59,6 +60,7 @@ On some distrib (eg: Redhat) check the php configuration for apache (conf.d/php.
 LimitRequestBody 16000000
 </pre>
 
+
 <a name="user_pref">
 <h2>OBM seems to work but each search results in a mysql error</h2>
 
@@ -75,6 +77,28 @@ Insert the defaut preferences (see install doc) and then propagate these prefere
 In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
 
 <p />
+
+
+<a name="#sys_group">
+<h2>How to fill managers to allow inserting Companies, contacts, deals,... OBM System groups</h2>
+
+OBM handles System groups (As of OBM 0.8, 3 are defined by default).
+The admin, commercial and production groups.
+The commercial group is the source of marketing manager selects.
+The production group is the source of technical manager selects.
+
+These groups are created by the default obm install but can be changed.
+
+3 constants indicates which effective groups these groups are mapped to. This id defined in obminclude/global.inc but can be personalized in the specific site config file obm_conf.inc.
+<pre>
+$cg_adm = 1;
+$cg_com = 2;
+$cg_prod = 3;
+</pre>
+The values should referenced existing group id.
+
+<p />
+
 
 <?php include("footer.html"); ?>
 

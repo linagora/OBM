@@ -2000,8 +2000,9 @@ function html_contact_function_form($func_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the cat1 links                                               //
+// Display: the cat1 links
 // Parameters:
 //   - $contact : contact hash info : keys used : cat1
 ///////////////////////////////////////////////////////////////////////////////
@@ -2510,14 +2511,14 @@ function dis_kind_links($ref) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category1_list($contact) {
-  global $l_close,$l_add_cats1,$l_cat_no;
+  global $l_close, $l_add_cats1, $l_cat_no;
+
   $popup = $contact["popup"];
   $cat_q = run_query_contactcategory1();
-  
+
   $block.= "
   <div class=\"categoryTree\">
-   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
-   ";
+    <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">";
   while ($cat_q->next_record()) {
     $label = $cat_q->f("contactcategory1_label");
     $id = $cat_q->f("contactcategory1_id"); 
@@ -2539,15 +2540,17 @@ function html_category1_list($contact) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: category 2 List
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category2_list($contact) {
   global $l_close,$l_add_cats2,$l_cat_no;
+
   $popup = $contact["popup"];
   $cat_q = run_query_contactcategory2();
-  if($popup) {
+  if ($popup) {
     $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
     $link_end ="</a>";
   }
@@ -2578,6 +2581,8 @@ function html_category2_list($contact) {
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Display preference screen                             //
 // Parameters:

@@ -24,12 +24,26 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-07-13</b> : version <b>0.8.3</b> released (fixes and minors enhancements)
+        <ol>
+          <li> New multiple categories for deals
+          <li> A Contract can now be archived
+          <li> More fields in List export to allow better mail merge
+          <li> Fixes in Company, Contact, Project, Incident
+          <li> Enhancements in Company, List, Contact, Incident, Contract
+          <li> French Company Naf code data provided
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-06-14</b> :  New FAQ section on obm community site</div>
         <br />
       </li>
 
       <li>
-        <div align="left"><b>2004-06-14</b> : version <b>0.8.2</b> released (fixes and minors enhancments)
+        <div align="left"><b>2004-06-14</b> : version <b>0.8.2</b> released (fixes and minors enhancements)
         <ol>
           <li> New field NAF code on Company, can be hidden
           <li> A project task can now be updated
@@ -59,7 +73,7 @@
       </li>
 
       <li>
-        <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
+        <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancements, fixes)
         <ol>
           <li> PostreSQL support (except time and document)
           <li> Spanish translation added

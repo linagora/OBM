@@ -34,6 +34,9 @@ ALTER TABLE Contract ADD column contract_archive int(1) after contract_marketman
 -------------------------------------------------------------------------------
 -- New table DealCategory
 -------------------------------------------------------------------------------
+-- Drop old DealCategory table if still there (deprecated long ago)
+Drop table IF EXISTS DealCategory;
+
 --
 -- Table structure for table 'DealCategory'
 --

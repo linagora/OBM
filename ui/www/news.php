@@ -19,6 +19,20 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-07-13</b> : version <b>0.8.3</b> released (fixes and minors enhancements)
+        <ol>
+          <li> New multiple categories for deals
+          <li> A Contract can now be archived
+          <li> More fields in List export to allow better mail merge
+          <li> Fixes in Company, Contact, Project, Incident
+          <li> Enhancements in Company, List, Contact, Incident, Contract
+          <li> French Company Naf code data provided
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-06-14</b> :  New FAQ section on obm community site</div>
         <br />
       </li>
