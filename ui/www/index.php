@@ -23,7 +23,7 @@
 
     <ul class="detailList">
       <li> 
-        <div align="left"><b>2003-09-08</b> : version <b>0.7.0</b> released (major enhancement, functionnality update)</b> !
+        <div align="left"><b>2003-09-09</b> : version <b>0.7.0</b> released (major enhancement, functionnality update)</b> !
         <ol>
           <li> New module : <b>Project management</b>. Tasks, members and progress tracking.
           <li> <b>Time management</b> total rewrite to interact with new Project management. 

@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <html>
 <head>
-<title>Document sans titre</title>
+<title>OBM Documentation</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="style01.css" rel="stylesheet" type="text/css">
 </head>

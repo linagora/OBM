@@ -11,11 +11,11 @@ body {
 }
 
 .center {
-	margin-left: 220px;
+	margin-left: 200px;
 }
 
 h1 {
-	font-size: 36px;
+	font-size: 26px;
 	color: #C5EBCA;
 	text-transform: uppercase;
 }
@@ -52,7 +52,7 @@ a:active {
 
 .menuList {
 	float: left;
-	width: 200px;
+	width: 180px;
 	margin: 0px;
 	padding: 0px;
 	background-color: #E7F7FF;

@@ -2,7 +2,7 @@
 <!-- $Id$ -->
 <html>
 <head>
-<title>Document sans titre</title>
+<title>OBM usage</title>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 <link href="style01.css" rel="stylesheet" type="text/css">
 </head>
@@ -12,11 +12,15 @@
 
 <div class="center"> 
   <h1>OBM in use</h1>
+These entities have contributed, helped or are using OBM.
   <p>
   <ul>
     <li>Pôle universitaire Léonard De Vinci
-    <li>Observatoire Européen de l'Audiovisuel
-    <li><img src="images/logo_aliacom.png">Aliacom - gestion interne de la société
+    <li><a href="http://www.obs.coe.int/"><img src="images/logo-oea.png"></a>
+        Observatoire Européen de l'Audiovisuel -
+        European Audiovisual Observatory
+    <li><a href="http://www.aliacom.fr/"><img src="images/logo-aliacom.jpg"></a>
+         Aliacom - gestion interne de la société
     <li>GMX
     <li>...
   </ul>
