@@ -446,7 +446,14 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	text-align: center;
 }
 
-
+.elementRow {
+  color: #7B9EAD;  
+  background-color: #FFFFFF;  
+  overflow : hidden;
+  width : 150px;
+  float : left; 
+  white-space: nowrap;
+}
 /* ------------------------------------------------------------------------- */
 /* link */
 /* ------------------------------------------------------------------------- */
