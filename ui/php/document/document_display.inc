@@ -1265,7 +1265,7 @@ function html_documents_tree($document,$display_file) {
   $name = '/';
   $kind = "0";
   $realpath = $path.$name;
-  $block = "
+  $block.= "
   <div class=\"documentTree\">
   ";
   if($popup) {
@@ -1294,11 +1294,14 @@ function html_documents_tree($document,$display_file) {
     }
   }
   if($display_file == "true") {
-    $block = @display_tree($tree,'/','/',0);
+    $block .= @display_tree($tree,'/','/',0);
   }
   else {
-    $block = @display_popup_tree($tree,'/','/',0);
+    $block .= @display_popup_tree($tree,'/','/',0);
   }
+$block.= "
+  </div>
+  ";
 
   return $block;
 } 

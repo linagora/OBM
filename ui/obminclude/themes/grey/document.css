@@ -13,7 +13,8 @@
 
 .documentTree {
         background-color: #ffffff;
-        border: 1px solid #009ec6;
+        border: 2px solid #009ec6;
+	border-bottom: 2px solid #009ec6;
         width: 100%;
 	padding : 10px;
       }
