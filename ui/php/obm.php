@@ -109,13 +109,19 @@ function dis_calendar_portal() {
   global $l_header_agenda,$l_daysofweekreallyshort,$l_youre_agenda,$l_waiting_events;
   global $auth,$set_weekstart_default;
 
-  $agenda_q = run_query_month_event_list() ;
   $num = run_query_waiting_events() ;
 
-  $events_list = store_daily_events($agenda_q);
+  $unix_time = time();  
+ 
+  $first_of_month = date("Ym01",$unix_time);
+  $next_month = date( "Ym01", strtotime("+1 month",  $unix_time));
+  $start_month_day = dateOfWeek($first_of_month,$set_weekstart_default);  
+  $start_time = strtotime($start_month_day);
+  $end_time = strtotime($next_month);
+  $calendar_user = array ($auth->auth["uid"] => "dummy"); 
+  $events_list = events_model($start_time,$end_time,$calendar_user);
   $minical_month = date("m");
   $minical_year = date("Y");
-  $first_of_month = $minical_year.$minical_month."01";
   $start_day = strtotime(dateOfWeek($first_of_month, $set_weekstart_default));
   $whole_month = TRUE;
   $num_of_events = 0;
@@ -126,13 +132,14 @@ function dis_calendar_portal() {
     $check_month = date ("m", $start_day);
     if ($check_month != $minical_month) 
       $day= "<a class=\"agendaLink2\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-    else
-      if(is_array($events_list[$daylink])) {  
-	$day= "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-      } else {
-	$day= "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
-      }
-     
+    else {
+      if(isset($events_list[$daylink]) && $dayObj = $events_list[$daylink]) { 
+	$events_data = $dayObj->get_events($id);
+	  $day= "<a class=\"agendaLink3\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
+	} else {
+	  $day= "<a class=\"agendaLink\" href=\"".url_prepare("agenda/agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">$day</a>";
+	}
+    }
     if ($i == 0) $dis_minical .=  "<tr>\n";
     $dis_minical .= "<td class=\"agendaCell\">\n";
     $dis_minical .=  "$day\n";

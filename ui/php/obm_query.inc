@@ -8,65 +8,391 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all not rejected events in a month for current user in current month
-// Parameters: 
+// Return all not rejected events in a week of users or/and groups
+// Parameters:
+//   - $agenda : agenda params
+//   - $contacts_array : contact id array, the event is assigned to 
+//   - $groups_array   : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_month_event_list() {
-  global $cdg_sql, $set_start_time, $set_stop_time,$set_weekstart_default,$auth;
-  $start_month = date("Ym01");
-  $start_month_time = strtotime("+$set_start_time hours",strtotime($start_month));
-  $end_month_time = strtotime("+1 month",$start_month_time);
+function run_query_no_repeat_events($start,$end,$contacts_array) {
+  global $cdg_sql, $auth;
+  
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type;
-  $calendarsegment_date = sql_date_format($db_type,"calendarsegment_date");
-  $calendarsegment_date_l = sql_date_format($db_type,"calendarsegment_date","calendarsegment_date");  
-  $query = "SELECT $calendarsegment_date_l,
-		   calendarsegment_flag
-            FROM CalendarEvent, CalendarSegment
-	    WHERE calendarevent_id = calendarsegment_eventid
-	      AND calendarsegment_state = 'A'
-	      AND ((calendarsegment_flag = 'begin' AND $calendarsegment_date < $end_month_time AND
-	            $calendarsegment_date + calendarevent_length > $start_month_time)
-	        OR (calendarsegment_flag = 'end' AND $calendarsegment_date > $start_month_time AND	    
-		    $calendarsegment_date - calendarevent_length < $end_month_time))
-             ";
-  $query .= "AND calendarsegment_customerid = '".$auth->auth["uid"]."'";
-  $query.=" ORDER BY calendarsegment_date"; 
+  $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
+  $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
+  $uid = $auth->auth["uid"];
+  $query = "SELECT calendarevent_id,
+		   calendarevent_title,
+		   calendarevent_privacy,
+		   calendarevent_description, 
+		   calendaruser_user_id,
+		   calendarcategory_label,
+		   $calendarevent_date_l,
+		   calendarevent_duration
+	      FROM CalendarEvent, CalendarCategory, CalendarUser 
+	      WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = calendaruser_event_id
+	      AND calendaruser_state = 'A'
+	      AND calendarevent_repeatkind = 'none'
+	      AND $calendarevent_date >= $start - calendarevent_duration
+	      AND $calendarevent_date <= $end 
+            ";	
+  if(is_array($contacts_array) && (count($contacts_array)>0) ) {
+    $query .= " AND calendaruser_user_id IN (";
+    foreach($contacts_array as $id => $value) {
+      $query.= "$coma'$id'";
+      $coma = ",";
+    }
+    $query.=")";
+  }   	     	    
+  $query.=" ORDER BY calendarevent_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
-  
   return $obm_db;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Return the number of waiting events
-// Parameters: 
+// Return all not rejected events in a week of users or/and groups
+// Parameters:
+//   - $agenda : agenda params
+//   - $contacts_array : contact id array, the event is assigned to 
+//   - $groups_array   : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_waiting_events() {
-  global $cdg_sql,$auth;
-
-  $writable_users = run_query_userobm_writable();
-  $obm_db = new DB_OBM;
+function run_query_repeat_events($start,$end,$contacts_array) {
+  global $cdg_sql, $set_start_time, $set_stop_time,$set_weekstart_default,$auth;
   
-  $query = "SELECT calendarsegment_eventid as num FROM  CalendarSegment WHERE calendarsegment_state = 'W' ";
-  if(is_array($writable_users)) {
-    $query .= " AND calendarsegment_customerid IN (";
-    $num = count($writable_users);
-    for($i=0;$i<$num;$i++) {
-      $query.= "'".$writable_users[$i]."',";
+  $obm_db = new DB_OBM;
+  $db_type = $obm_db->type;
+  $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat");
+  $calendarevent_date = sql_date_format($db_type,"calendarevent_date");
+  $calendarevent_date_l = sql_date_format($db_type,"calendarevent_date","calendarevent_date");
+  $calendarevent_endrepeat_l = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat");
+  $uid = $auth->auth["uid"];
+
+  $query = "SELECT calendarevent_id,
+		   calendarevent_title,
+		   calendarevent_privacy,
+		   calendarevent_description, 
+		   calendarcategory_label,
+		   $calendarevent_date_l,
+		   calendarevent_duration,
+		   calendarevent_repeatkind,
+		   $calendarevent_endrepeat_l,
+		   calendarevent_repeatfrequence,
+		   calendaruser_user_id,
+		   calendarevent_repeatdays
+	      FROM CalendarEvent, CalendarCategory, CalendarUser 
+	      WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = calendaruser_event_id
+	      AND calendaruser_state = 'A'
+	      AND calendarevent_repeatkind != 'none'
+	      AND $calendarevent_date <= $end  - calendarevent_duration
+	      AND $calendarevent_endrepeat >= $start
+            ";		  
+  if(is_array($contacts_array) && (count($contacts_array)>0) ) {
+    $query .= " AND calendaruser_user_id IN (";
+    foreach($contacts_array as $id => $value) {
+      $query.= "$coma'$id'";
+      $coma = ",";
     }
-    $query.="".$auth->auth["uid"].")";
+    $query.=")";
   }
-  else {
-    $query.="AND calendarsegment_customerid = ".$auth->auth["uid"]."";
-  }
-  $query .= " GROUP BY calendarsegment_eventid";
+  $query.=" ORDER BY calendarevent_date";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
-  return $obm_db->nf()/1;
+  return $obm_db;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// Return a table of Events.
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+/////////////////////////////////////////////////////////////////////////////
+function events_model($start_time, $end_time,$calendar_user) {
+  global $set_start_time, $set_stop_time,$set_weekstart_default;
+
+  $day_duration = 86400;
+  $obm_no_repeat = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
+  while($obm_no_repeat->next_record()) {
+    $multiday = false; 
+    $id = $obm_no_repeat->f("calendarevent_id");
+    $title = $obm_no_repeat->f("calendarevent_title");
+    $privacy = $obm_no_repeat->f("calendarevent_privacy");
+    $description = $obm_no_repeat->f("calendarevent_description"); 
+    $category = $obm_no_repeat->f("calendarcategory_label");
+    $date = $obm_no_repeat->f("calendarevent_date");
+    $duration = $obm_no_repeat->f("calendarevent_duration");
+    $user_id = $obm_no_repeat->f("calendaruser_user_id");
+    
+    $end_event = $date + $duration;
+    $event = &new Event($id,$duration,$title,$category,$privacy,$description);
+    do {
+      $day = &$day_events[date("Ymd",$date)];
+      if(!is_object($day) || !$day->is_same_day($date)) {
+	$day = &new Day($date);
+	$day_events[date("Ymd",$date)] = &$day;
+      }
+      $day->add_event(&$event,$date,$user_id);
+      if(!$multiday) {
+        $date = mktime ($set_start_time ,0,0,date("m",$date),date("d",$date),date("Y",$date));
+	$multiday = true;
+      } 
+      $date = strtotime("+1 day",$date);
+    }while($end_event > $date && $date < $end_time);
+  }
+  
+  $obm_repeat = run_query_repeat_events($start_time,$end_time,$calendar_user);
+
+  while($obm_repeat->next_record()) {
+    $id = $obm_repeat->f("calendarevent_id");
+    $title = $obm_repeat->f("calendarevent_title");
+    $privacy = $obm_repeat->f("calendarevent_privacy");
+    $description = $obm_repeat->f("calendarevent_description"); 
+    $category = $obm_repeat->f("calendarcategory_label");
+    $date = $obm_repeat->f("calendarevent_date");
+    $duration = $obm_repeat->f("calendarevent_duration");
+    $repeatkind = $obm_repeat->f("calendarevent_repeatkind");
+    $endrepeat = $obm_repeat->f("calendarevent_endrepeat");
+    $repeatfrequence = $obm_repeat->f("calendarevent_repeatfrequence");
+    $repeatdays = $obm_repeat->f("calendarevent_repeatdays");
+    $user_id = $obm_repeat->f("calendaruser_user_id");    
+
+    $event = &new Event($id,$duration,$title,$category,$privacy,$description);
+    $temp_date = $date;
+    $end_date = ($endrepeat < $end_time)?$endrepeat:$end_time;
+    $end_date += $day_duration;
+    switch($repeatkind) {
+      case "daily" :
+	if($temp_date < $start_time) {
+	  $temp_date = ceil(($start_time - $date) / $day_duration);
+	  $hour_diff = date("H",$date) - date("H",$start_time);
+	  $min_diff = date("i",$date) - date("i",$start_time);
+	  if($temp_date > 0) {	  
+	    $temp_date = $repeatfrequence -($temp_date % $repeatfrequence);
+	  }	    
+	  $temp_date = strtotime("+$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+	}
+	while($temp_date <= $end_date) {
+	  $day = &$day_events[date("Ymd",$temp_date)];
+	  if(!is_object($day)) {
+	    $day = &new Day($temp_date);
+	    $day_events[date("Ymd",$temp_date)] = &$day;
+	  }
+	  $day->add_event(&$event,$temp_date,$user_id);
+	  $temp_date = strtotime("+$repeatfrequence days",$temp_date);
+	}
+        break; 
+      case "weekly" :
+	$temp_date = strtotime(dateOfWeek(date("YmdHis",$date), $set_weekstart_default));
+	if($temp_date < $start_time) {
+	  $temp_date = ceil(($start_time - $temp_date) / $day_duration);
+	  $hour_diff = date("H",$date) - date("H",$start_time);
+	  $min_diff = date("i",$date) - date("i",$start_time);
+	  $temp_date = ($temp_date % ($repeatfrequence * 7));
+	  if($temp_date == "") $temp_date = 0;
+	  $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+	}
+        for($i=0; $i<strlen($repeatdays);$i++) {
+          $repeat_days[$i]=substr($repeatdays, $i, 1);
+	}	
+	while($temp_date <= $end_date) {
+	  foreach($repeat_days as $delta_day => $repeatition) {	   
+	    if($repeatition == 1) {
+	      $current_date = strtotime("+$delta_day days",$temp_date);
+	      $day = &$day_events[date("Ymd",$current_date)];
+	      if(!is_object($day)) {
+		$day = &new Day($current_date);
+		$day_events[date("Ymd",$current_date)] = &$day;
+	      }
+	      $day->add_event(&$event,$current_date,$user_id);
+	    }	  
+	  }	  
+	  $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
+	}		
+	break;
+      case "monthlybyday" :
+        break;
+      case "monthlybydate" :
+	while($temp_date < $start_time) {
+	  $temp_date = strtotime("$repeatfrequence months",$temp_date);
+	}
+	while($temp_date <= $end_date) {
+	  $day = &$day_events[date("Ymd",$temp_date)];
+	  if(!is_object($day)) {
+	    $day = &new Day($temp_date);
+	    $day_events[date("Ymd",$temp_date)] = &$day;
+	  }
+	  $day->add_event(&$event,$temp_date,$user_id);
+	  $temp_date = strtotime("+$repeatfrequence months",$temp_date);
+	}
+	break;
+    }
+  }
+  
+  return $day_events; 
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Class Event :
+// Describe an event.
+//////////////////////////////////////////////////////////////////////////////
+class Event {
+  
+  var $id;
+  var $start;
+  var $end;
+  var $duration;
+  var $title;
+  var $category;
+  var $privacy;
+  var $description;
+  var $day;
+
+  function Event($id,$duration,$title,$category,$privacy,$description) {
+    $this->id = $id;
+    $this->duration = $duration;
+    $this->title = $title;
+    $this->category = $category;
+    $this->privacy = $privacy;
+    $this->description = $description;
+  }
+
+}
+  
+///////////////////////////////////////////////////////////////////////////////
+// Class Day :
+// Manage a list of event in a day
+///////////////////////////////////////////////////////////////////////////////
+class Day {
+
+  var $day;
+  var $events;
+  var $index;
+
+  function Day($day) {
+    $this->day = $day;
+  }
+
+  function is_same_day($date) {
+    if(date("Ymd",$this->day) == date("Ymd",$date)) {
+      return true;
+    }
+    return false;
+  }
+
+  function add_event(&$event,$begin_date,$uid) {
+    $date = date("His",$begin_date);
+    if(!isset($this->events[$date.".".$event->id])) {
+      $this->events[$date.".".$event->id] = array("event"=>&$event,"date"=>$begin_date,"users"=>array($uid));
+      ksort($this->events);
+    }
+    else {
+      $this->events[$date.".".$event->id]["users"][] = $uid;
+    }
+  }
+
+  function get_events($uid) {
+    foreach($this->events as $event) {
+      if(!in_array($uid,$event["users"])) {
+	continue;
+      }  
+      else {
+	$return[] = $event;
+      }
+    }
+    return $return; 
+  }
+  
+  function have_events_between($start,$end) {
+    foreach($this->events as $event) {
+      $ev_start = $event["date"];
+      $ev_end = $event["event"]->duration + $ev_start;
+      if($ev_start < $end && $ev_end > $start) {
+	return true;
+      }
+    }
+    return false;
+  }
+
+  
+  function get_events_between($start, $end, $uid) {
+    foreach($this->events as $event) {
+      $ev_start = $event["date"];
+      $ev_end = $event["event"]->duration + $ev_start;  
+      if($ev_end < $start) {
+	continue;
+      }
+      if($ev_start > $end) {
+	break;
+      }
+      if(!in_array($uid,$event["users"])) {
+	continue;
+      }      
+      if($ev_end > $start && $ev_start < $start) {
+	return -1;
+      }
+      if($ev_start < $end && $ev_end > $start) {
+	$return[] = $event;
+	if($ev_end > $end) {
+	  $end = $ev_end;
+	}
+      }
+      
+    }
+    if($return != null) {
+      $return = array("duration"=>$end - $start,"events"=>$return);
+    }
+    return $return; 
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Select All waiting Events
+///////////////////////////////////////////////////////////////////////////////
+function run_query_waiting_events() {
+  global $auth, $cdg_sql;
+  
+  $writable_user = run_query_userobm_writable();
+  $obm_db = new DB_OBM;
+  $db_type = $obm_db->type;
+  $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
+  $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");    
+  $query = "SELECT userobm_id,
+		   userobm_lastname,
+		   userobm_firstname,
+                   calendarevent_id,
+                   calendarevent_title, 
+		   calendarcategory_label,
+		   calendarevent_privacy,
+		   calendarevent_priority,
+		   calendarevent_repeatkind,
+		   calendarevent_repeatdays,
+		   calendarevent_duration,
+		   $calendarevent_endrepeat,
+		   $calendarevent_date		   
+            FROM CalendarEvent LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
+	    LEFT JOIN CalendarUser ON calendarevent_id  = calendaruser_event_id
+	    LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
+	    WHERE calendaruser_state = 'W'";
+
+  if(is_array($writable_user)) {
+    $query .= " AND calendaruser_user_id IN (";
+    $num = count($writable_user);
+    foreach($writable_user as $user) {
+      $query.= "'$user',";
+    }
+    $query.="'".$auth->auth["uid"]."')";
+  }
+  else {
+    $query.="AND calendaruser_user_id = '".$auth->auth["uid"]."'";
+  }
+  $query .= "ORDER BY userobm_id"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db->nf();
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of writable agenda users for the current user
@@ -96,66 +422,7 @@ function run_query_userobm_writable() {
 
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Return tables of hashed events and of data event.(hashed by day for year
-//                 and month view)
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    - $pbm_q  : DB Object which contain the event of current month
-/////////////////////////////////////////////////////////////////////////////
-function store_daily_events($obm_q) {
-  global $set_cal_interval;
-  global $set_start_time;
-
-  $obm_q->next_record();
-  $start_month = date("Ym01");
-  $p_date_begin = strtotime("+$set_start_time hours",strtotime($start_month));
-  $p_date_end = strtotime("+1 month",$p_date_begin);
-
-  for($current_time=$p_date_begin;$current_time<$p_date_end;$current_time = strtotime("+1 day",$current_time)) {
-    $current_date = date("Ymd",$current_time);
-    $db_date = $obm_q->f("calendarsegment_date");
-    $db_id = $obm_q->f("calendarevent_id");
-    $db_flag = $obm_q->f("calendarsegment_flag");	    
-
-    while($db_date && $db_date < $current_time) {
-      $current_event[$current_date][] = $db_id;
-      $obm_q->next_record(); 
-      $db_date = $obm_q->f("calendarsegment_date");
-      $db_id = $obm_q->f("calendarevent_id");
-      $db_flag = $obm_q->f("calendarsegment_flag");	    
-    }
-    if(is_array($current_event[$past_date])) {
-      if(is_array($end_event)){
-	if(count($current_event[$current_date] = array_diff($current_event[$past_date],$end_event))==0){
-	  $current_event[$current_date]="";
-	}
-      }
-      else {
-	$current_event[$current_date]=$current_event[$past_date];
-      }
-    }
-    $end_event ="";
-    while($current_date == date("Ymd",$db_date)) {
-      if($db_flag == "begin") {
-	  $current_event[$current_date][] = $db_id;
-	  $obm_q->next_record(); 
-      }elseif($db_flag == "end"){
-	$end_event[] = $db_id;
-	$obm_q->next_record();
-      }       
-      $db_date = $obm_q->f("calendarsegment_date");
-      $db_id = $obm_q->f("calendarevent_id");
-      $db_flag = $obm_q->f("calendarsegment_flag");	    
-    }
-    $past_date = $current_date;
-  }   
-  return $current_event;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////////////
 // dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
 // and returns the date of that day. (ie: "sun" or "sunday" would be 
 // acceptable values of $day but not "su")

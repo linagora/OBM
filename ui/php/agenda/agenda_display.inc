@@ -1696,16 +1696,15 @@ function dis_category_links($agenda) {
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
 function dis_export_handle($agenda) {
-  global $obm_version,$set_weekstart_default;
+  global $obm_version,$set_weekstart_default,$auth;
+
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);  
  
-  $first_of_year = date("Y0101",$unix_time);
-  $next_year = date( "Y0101", strtotime("+1 year",  $unix_time));
+  $start_time = strtotime("-1 year",  $unix_time);
+  $end_time = strtotime("+1 year",  $unix_time);
 
-  $start_time = strtotime($first_of_year);
-  $end_time = strtotime($next_year);
-  
+  $calendar_user = array ($auth->auth["uid"] => "dummy");  
   $obm_event = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
 
   header("Content-Type: text/x-vCalendar");
@@ -1727,6 +1726,9 @@ METHOD:PUBLISH";
       $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f("calendarevent_description"));
       $description = "DESCRIPTION:" . $description;
       $description = "\n" . wordwrap($description,74,"\n ",1);
+    }
+    else {
+      $description = "";
     }
     $date_b = $obm_event->f("calendarevent_date");
     $date_b = gmdate("Ymd\THis\Z",$date_b);
@@ -1758,7 +1760,7 @@ DTEND:$date_e
 END:VEVENT";
   }
   
-  $obm_event = run_query_get_vevent_repeat($agenda);
+  $obm_event = run_query_repeat_events($start_time,$end_time,$calendar_user);
   
   while($obm_event->next_record()) {
     $id = $obm_event->f("calendarevent_id");
@@ -1767,19 +1769,22 @@ END:VEVENT";
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     if($obm_event->f("calendarevent_description") != "") {
       $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
-    } 
-    $date_b = $obm_event->f("calendarsegment_date");
+    }
+    else {
+      $description = "";
+    }
+    $date_b = $obm_event->f("calendarevent_date");
     $date_b = date("Ymd",$date_b)."T".date("His",$date_b);
     $start_date = $date_b;
-    $obm_event->next_record();
-    $date_e = $obm_event->f("calendarsegment_date");
+    $date_e = $obm_event->f("calendarevent_date") + $obm_event->f("calendarevent_duration") ;
     $date_e = date("Ymd",$date_e)."T".date("His",$date_e);
     $kind = $obm_event->f("calendarevent_repeatkind");
-    $end = substr($obm_event->f("calendarevent_endrepeat"),0,8)."T".substr($obm_event->f("calendarevent_endrepeat"),8,4)."00";
+    $end = $obm_event->f("calendarevent_endrepeat");
+    $end = date("Ymd",$end)."T".date("His",$end);
     $repeat_days = $obm_event->f("calendarevent_repeatdays");
+    $repeat_frequence = $obm_event->f("calendarevent_repeatfrequence");
     switch($priority) {
       case 1 : $priority = 3;
-	
 	break;
       case 3 : $priority = 1;
 	break;
@@ -1792,7 +1797,7 @@ END:VEVENT";
 	break;
     }   
     if($kind == "daily") {
-      $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=1";
+      $repeat = "FREQ=DAILY;UNTIL=$end;INTERVAL=$repeat_frequence";
     }
     elseif($kind == "weekly") {
       $l_day_repeat = array("SU","MO","TU","WE","TH","FR","SA");
@@ -1812,18 +1817,18 @@ END:VEVENT";
     }
     elseif($kind == "monthlybydate") {
       $day = date("d",$start_date);
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=1;BYDAY=$day"; 
+      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$day"; 
     }
     elseif($kind == "monthlybyday") {
       $start_week_day = date("w",$start_date);
       $daypos = ceil(substr($start_date,6,2)/7);
       $day_num = date("w",strtotime("+ $start_week_day days",$start_date,0,8));
       $day = $l_day_repeat[$day_num];
-      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=1;BYDAY=$daypos$day";
+      $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
     }
     elseif($kind == "yearly") {
       $monthpos = date("m",$start_date);
-      $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=1;BYMONTH=$monthpos";
+      $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYMONTH=$monthpos";
     }
     echo "
 BEGIN:VEVENT
@@ -2223,18 +2228,14 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"agendaHidden\">
-   <table class=\"agendaHidden\">
-   <tr><td  class=\"agendaHead2\">$title</td></tr>
-    <tr><td>
-    $category
-    </td></tr>
-    <tr><td>    
-    ".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."
-    </td></tr>
-    <tr><td>$description</td></tr>
-   </table>
-  </div>";	
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+   <div class=\"lastTitle\">:: $title</div>
+   <ul class=\"lastList\">  
+    <li class=\"lastList\">$category</li>
+    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
+    <li class=\"lastList\">$description</li    >
+   </ul>
+  </div>  ";	
 
 }
 
@@ -2395,18 +2396,14 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"agendaHidden\">
-   <table class=\"agendaHidden\">
-   <tr><td  class=\"agendaHead2\">$title</td></tr>
-    <tr><td>
-    $category
-    </td></tr>
-    <tr><td>    
-    ".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."
-    </td></tr>
-    <tr><td>$description</td></tr>
-   </table>
-  </div>";	
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+   <div class=\"lastTitle\">:: $title</div>
+   <ul class=\"lastList\">  
+    <li class=\"lastList\">$category</li>
+    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
+    <li class=\"lastList\">$description</li    >
+   </ul>
+  </div>  ";	  
 }
 
 
@@ -2556,16 +2553,12 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) 
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"agendaHidden\">
-   <table class=\"agendaHidden\">
-   <tr><td class=\"agendaHead2\">$title</td></tr>
-    <tr><td>
-    $category
-    </td></tr>
-    <tr><td>    
-    ".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."
-    </td></tr>
-    <tr><td>$description</td></tr>
-   </table>
-  </div>";	
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+   <div class=\"lastTitle\">:: $title</div>
+   <ul class=\"lastList\">  
+    <li class=\"lastList\">$category</li>
+    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
+    <li class=\"lastList\">$description</li    >
+   </ul>
+  </div>  ";	   
 }
