@@ -37,6 +37,7 @@ $l_error_permission = "Non hai i permessi di accesso alla pagina.";
 $l_error_visibility = "Le informazioni della pagina sono private - Non consultabili";
 $l_color = "Colore";
 $l_phone = "Telefono";
+$l_fax = "Fax";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
 $l_town = "Citta";

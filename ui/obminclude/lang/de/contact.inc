@@ -22,7 +22,6 @@ $l_minitelp = "(Home)";
 $l_minitelm = "(Mobile)";
 $l_mobilephone = "Mobile";
 $l_homephone = "Home"; 
-$l_fax = "Telefax";
 $l_address = "Adresse";
 
 $l_contact_select_company = "Firmenauswahl für den Kontakt";

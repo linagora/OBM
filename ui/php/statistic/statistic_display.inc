@@ -140,7 +140,11 @@ function dis_cat_stats($comp_q,$tot) {
       $cat_id = $comp_q->f("companycategory_id");
       $cat_c = $code; 
       $cat_d = $comp_q->f("companycategory_label");
-      $cat_s_c = substr($code,0,strpos($code,'.'));
+      $cat_major_code = substr($code,0,strpos($code,'.'));
+      // If code is a major code (not .)
+      if ($cat_major_code == "") {
+	$cat_major_code = $code;
+      }
     }
     if ($comp_q->f("country_iso3166") == NULL || $comp_q->f("country_iso3166") == "") {
       $cty_iso = $l_null;
@@ -151,18 +155,22 @@ function dis_cat_stats($comp_q,$tot) {
     $nb = $comp_q->f("nb");
     $stat[$cty_iso][$cat_id] += $nb;
     $cty_count[$cty_iso] += $nb;
-    if (!$cat_count[$cat_id] && $cat_id !=0) {
-      $cat_s_n[$cat_s_c] += 1;
+    
+    if ((!$cat_count[$cat_id]) && ($cat_id != 0)) {
+      $cat_major_col[$cat_major_code] += 1;
     }
     $cat_count[$cat_id] += $nb;
     if ($cat_id != 0) {
-      $cat_s_count[$cat_s_c] += $nb;
+      $cat_major_count[$cat_major_code] += $nb;
     }
     $cat[$cat_id] = $cat_c;
     $cty_desc[$cty_iso] = $cty_d;
     $cat_desc[$cat_id] = $cat_d;
   }
-  ksort($cat);
+
+  $cat_link_total = array_sum($cat_count);
+
+  natsort($cat);
   $block .= "
   <div class=\"classic\">
   <table class=\"classic\">
@@ -177,13 +185,11 @@ function dis_cat_stats($comp_q,$tot) {
     } else {
       $onOver = "";
     }
-    $cat_label .= "<th $onOver>
-    ".$cat_name."
-    </th >";
-    $percent = round(($cat_count[$cat_id])*100/$tot,1);    
-    $cat_percent .= "<td  class=\"totals\">$percent</td>";
+    $cat_label .= "<th $onOver>$cat_name</th>";
+    $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
+    $cat_percent .= "<td class=\"totals\">$percent</td>";
     $cat_tots .= "<td class=\"totals\">".$cat_count[$cat_id]."</td>";
-    $infos .= "<span class=\"hiddenLegend\"  id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
+    $infos .= "<span class=\"hiddenLegend\" id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
 
   $pair = 0;
@@ -203,28 +209,28 @@ function dis_cat_stats($comp_q,$tot) {
       $pair = 0;
       $block .= "<tr class=\"impair\">";
     }
-    $block .= " <th $onOver>$cty_iso</th>";
+    $block .= "<th $onOver>$cty_iso</th>";
     foreach($cat as $cat_id => $cat_name) {
       $block .= "<td>".$data[$cat_id]."</td >";
     }
-    $percent = round(($cty_count[$cty_iso])*100/$tot,1);
+    $percent = round(($cty_count[$cty_iso])*100/$cat_link_total,1);
     $block .= "<td class=\"totals\">".$cty_count[$cty_iso]."</td>";
     $block .= "<td class=\"totals\">$percent</td>";
     $block .= "</tr>";
   }
-  if (is_array($cat_s_count)) {
-    foreach($cat_s_count as $code => $value) {
-      $super_cat .= "<td colspan=\"".$cat_s_n[$code]."\">$value</td>";
-      $percent = round(($value)*100/$tot,1);
-      $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_s_n[$code]."\">$percent</td>";
+  if (is_array($cat_major_count)) {
+    foreach($cat_major_count as $code => $value) {
+      $super_cat .= "<td colspan=\"".$cat_major_col[$code]."\">$value</td>";
+      $percent = round(($value)*100/$cat_link_total,1);
+      $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_major_col[$code]."\">$percent</td>";
     }
   }
   $block .= "
-  <tr><th>$l_totals</th>$cat_tots<td>$tot</td><td></td></tr>
+  <tr><th>$l_totals</th>$cat_tots<td>$cat_link_total</td><td></td></tr>
   <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
   <tr><th></th>$cat_label<th>$l_totals</th><th>%</th></tr>
-  <tr><th></th><th></th>$super_cat<th></th><th></th></tr>
-  <tr><th>%</th><th></th>$super_cat_p<th></th><th></th></tr>
+  <tr><th></th>$super_cat<th></th></th><th><th></th></tr>
+  <tr><th>%</th>$super_cat_p<th></th></th><th><th></th></tr>
    </table>
    </div>
    <br />

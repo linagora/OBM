@@ -27,6 +27,7 @@ $l_date = "Date";
 $l_name = "Namn";
 $l_label = "Namn";
 $l_phone = "Telefon";
+$l_fax = "Fax";
 $l_invalid_data = "Ugyldig data";
 $l_postcode = "Postnummer";
 $l_town = "By";

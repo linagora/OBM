@@ -909,7 +909,9 @@ function run_query_language() {
 function run_query_publication() {
   global $cdg_sql;
 
-  $query = "select publication_title, publication_id from Publication";
+  $query = "select publication_title, publication_id
+    from Publication
+    order by publication_year desc, publication_type_id, publication_title";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -1051,6 +1053,7 @@ function make_query_from_criteria($list) {
         country_name,
         contact_phone,
         contact_homephone,
+        contact_fax,
         contact_email,
         company_id,
         company_name,
@@ -1080,6 +1083,7 @@ function make_query_from_criteria($list) {
         country_name,
         contact_phone,
         contact_homephone,
+        contact_fax,
         contact_email,
         company_id,
         company_name,

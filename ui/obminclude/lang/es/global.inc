@@ -38,6 +38,7 @@ $l_error_visibility = "Ud. NO puede tiene acceso a esta información, es privada.
 $l_query_error = "Error mientras se ejecuta la búsqueda";
 $l_color = "Color";
 $l_phone = "Teléfono";
+$l_fax = "Fax";
 $l_address = "Dirección";
 $l_postcode = "Código Postal";
 $l_town = "Ciudad";

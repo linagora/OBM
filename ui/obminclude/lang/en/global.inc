@@ -38,6 +38,7 @@ $l_error_visibility = "You can't access this information, it is private.";
 $l_query_error = "Error while executing the query";
 $l_color = "Color";
 $l_phone = "Phone";
+$l_fax = "Fax";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";

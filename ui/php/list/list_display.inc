@@ -40,6 +40,7 @@ $fieldnames["town"] = $l_town;
 $fieldnames["expresspostal"] = $l_expresspostal;
 $fieldnames["country_name"] = $l_country;
 $fieldnames["contact_phone"] = $l_phone;
+$fieldnames["contact_fax"] = $l_fax;
 $fieldnames["contact_mobilephone"] = $l_hphone;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["subscription_quantity"] = $l_quantity;

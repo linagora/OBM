@@ -36,6 +36,7 @@ $l_error_permission = "keine Berechtigung";
 $l_error_visibility = "private Information";
 $l_color = "Farbe";
 $l_phone = "Telefon";
+$l_fax = "Telefax";
 $l_address = "Adresse";
 $l_postcode = "Postleitzahl";
 $l_town = "Ort";

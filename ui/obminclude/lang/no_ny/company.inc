@@ -21,7 +21,6 @@ $l_newdoc_first = "NA";
 $l_kind = "Kategori";
 $l_address = "Adresse";
 $l_postcode_first = "ZIP";
-$l_fax = "Fax";
 $l_email = "E-post";
 $l_web = "Web";
 $l_comment = "Kommentar";

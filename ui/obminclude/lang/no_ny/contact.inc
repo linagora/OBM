@@ -20,7 +20,6 @@ $l_telm = "Mobiltelefon";
 $l_telother = "Alt. telefon";
 $l_mobilephone = "Mobile";
 $l_homephone = "Home"; 
-$l_fax = "Fax";
 $l_address = "Adresse";
 $l_email = "E-post";
 

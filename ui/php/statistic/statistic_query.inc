@@ -24,9 +24,10 @@ function run_query_contact_per_resp() {
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
-  return $obm_q;
-  
+
+  return $obm_q; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // statistic Company Per responsible query execution                         //
@@ -43,9 +44,10 @@ function run_query_company_per_resp() {
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
-  
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // statistic about category and country
@@ -75,24 +77,26 @@ function run_query_company_per_country_per_cat() {
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
-  
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// statistic about category and country                         //
+// return Company number
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_nb_company() {
   global $cdg_sql;
  
-  $query = "Select  count(*) as nb from Company";
+  $query = "Select count(*) as nb from Company";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+
   return $obm_q->f("nb");
-  
 }
+
 </script>

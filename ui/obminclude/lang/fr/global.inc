@@ -38,6 +38,7 @@ $l_error_visibility = "Les informations contenues dans cette page sont privées. 
 $l_query_error = "Problème en executant la requete";
 $l_color = "Couleur";
 $l_phone = "Tel.";
+$l_fax = "Fax";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";

@@ -20,7 +20,6 @@ $l_mphone = "Teléfono Celular";
 $l_minimphone = "(Celular)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Correo habilitado";
-$l_fax = "Fax";
 $l_coord = "Detalles";
 $l_contact_name = "Nombre contacto";
 $l_from_company = "De la Compañía";

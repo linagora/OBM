@@ -15,7 +15,6 @@ $l_category = "Categorías";
 $l_activity = "Actividad";
 $l_market = "Gerente de Mercadeo";
 $l_company_kind = "Tipo de Compañía";
-$l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Detalles";

@@ -22,7 +22,6 @@ $l_minimphone = "(Mobile)";
 $l_email = "E-Mail";
 $l_email_other = "Other E-Mail";
 $l_mailing_ok = "Mailing enabled";
-$l_fax = "Fax";
 $l_coord = "Details";
 $l_code = "Code";
 $l_letter = "Letter Head";
