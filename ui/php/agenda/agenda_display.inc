@@ -382,10 +382,10 @@ echo "
 ////////////////////////////////////////////////////////////////////////////////////
 // Arguments :
 // -----------
-//    $agenda: agenda parameters
-//    $obm_q_events : list of event's records 
-//    $contacts_array : array of selected contacts 
-//    $groups_array : array of selected groups 
+//    - $agenda: agenda parameters
+//    - $obm_q_events : list of event's records 
+//    - $contacts_array : array of selected contacts 
+//    - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
@@ -581,10 +581,10 @@ echo "
 ////////////////////////////////////////////////////////////////////////////////////
 // Arguments :
 // -----------
-//    $agenda: agenda parameters
-//    $obm_q_events : list of event's records 
-//    $contacts_array : array of selected contacts 
-//    $groups_array : array of selected groups 
+//    - $agenda: agenda parameters
+//    - $obm_q_events : list of event's records 
+//    - $contacts_array : array of selected contacts 
+//    - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
@@ -872,7 +872,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   } 
   $dis_sel_user .= "</select>
     <br />
-    <input type=\"hidden\" name=\"action\" value=\"view_week\" />
+    <input type=\"hidden\" name=\"action\" value=\"$new_action\" />
     <input type=\"submit\" value=\"$l_validate\" />";
 
 
@@ -1082,10 +1082,10 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
-//    $agenda: agenda parameters
-//    $obm_q_events : list of event's records 
-//    $contacts_array : array of selected contacts 
-//    $groups_array : array of selected groups 
+//    -$agenda: agenda parameters
+//    -$obm_q_events : list of event's records 
+//    -$contacts_array : array of selected contacts 
+//    -$groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
@@ -1619,8 +1619,8 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
 // Parameters:
 //   - $inc_q : DBO : incident result
 //   - $con_q : DBO : contract result
-//      $obm_q_company : list of companies
-//      $contact_q : list of contact from the company 
+//   - $obm_q_company : list of companies
+//   - $contact_q : list of contact from the company 
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   global $set_theme,$set_weekstart_default,$auth;

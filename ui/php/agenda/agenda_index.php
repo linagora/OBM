@@ -30,7 +30,7 @@ $www = "   <p class=\"messageInfo\">
 	<a href=\"http://jigsaw.w3.org/css-validator/\">
  	 <img style=\"border:0;width:88px;height:31px\"
        src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />
+       alt=\"Valid CSS!\" />²
 	 </a>
   	</p>";
 
@@ -49,9 +49,12 @@ include("$obminclude/global_pref.inc");
 
 require("agenda_query.inc");
 require("agenda_display.inc");
-
+if(count($sel_user_id) != 0 ) {
+  $agenda_user_view = $sel_user_id;
+}
+$sess->register("agenda_user_view");
 page_close();
-
+$sel_user_id = $agenda_user_view;
 $agenda = get_param_agenda();
 get_agenda_action();
 $perm->check();
