@@ -629,12 +629,43 @@ CREATE TABLE Incident (
   PRIMARY KEY  (incident_id)
 ) TYPE=MyISAM;
 
+
+--
+-- New table 'IncidentPriority'
+--
+CREATE TABLE IncidentPriority (
+  incidentpriority_id int(8) NOT NULL auto_increment,
+  incidentpriority_timeupdate timestamp(14) NOT NULL,
+  incidentpriority_timecreate timestamp(14) NOT NULL,
+  incidentpriority_userupdate int(8) default NULL,
+  incidentpriority_usercreate int(8) default NULL,
+  incidentpriority_order int(2),
+  incidentpriority_label varchar(32) default NULL,
+  PRIMARY KEY (incidentpriority_id)
+) TYPE=MyISAM;
+
+
+--
+-- New table 'IncidentStatus'
+--
+CREATE TABLE IncidentStatus (
+  incidentstatus_id int(8) NOT NULL auto_increment,
+  incidentstatus_timeupdate timestamp(14) NOT NULL,
+  incidentstatus_timecreate timestamp(14) NOT NULL,
+  incidentstatus_userupdate int(8) default NULL,
+  incidentstatus_usercreate int(8) default NULL,
+  incidentstatus_order int(2),
+  incidentstatus_label varchar(32) default NULL,
+  PRIMARY KEY (incidentstatus_id)
+) TYPE=MyISAM;
     
 
+-------------------------------------------------------------------------------
+-- Timemanagement tables
+-------------------------------------------------------------------------------
 --
--- Timemanagement module
+-- Task table
 --
-
 CREATE TABLE Task (
   task_id int(8) NOT NULL auto_increment,
   task_timeupdate timestamp(14) NOT NULL,
@@ -652,6 +683,9 @@ CREATE TABLE Task (
 ) TYPE=MyISAM;
 
 
+--
+-- TaskType table
+--
 CREATE TABLE TaskType (
   tasktype_id int(8) NOT NULL auto_increment,
   tasktype_timeupdate timestamp(14) NOT NULL,

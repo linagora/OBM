@@ -57,7 +57,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $req .= " and Incident.incident_label like '$lincident%'";
   }
   if (($priority != $c_all) && ($priority != "")) { 
-     $req .= " and Incident.incident_priority ='$priority'";
+     $req .= " and Incident.incident_priority_id ='$priority'";
   }
   if($param_contract != "") {
      $req .= " and Contract.contract_id = '$param_contract'";
@@ -75,7 +75,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
      $req .= " and Contract.contract_label like '$lcontract%'";
   }
   if (($status != $c_all) && ($status != "")) { 
-     $req .= " and Incident.incident_state = '$status'";
+     $req .= " and Incident.incident_status_id = '$status'";
   }
   if ($archive == "0") {
      $req .= " and Incident.incident_archive != '1'";
@@ -107,12 +107,16 @@ function run_query_detail($id) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+        p.incidentpriority_label,
+        s.incidentstatus_label,
         UNIX_TIMESTAMP(incident_date) as date,
         UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
         UNIX_TIMESTAMP(incident_timecreate) as timecreate
-      from (Incident
+      from (((Incident
               left join UserObm u1 on incident_logger=u1.userobm_id)
-              left join UserObm u2 on incident_owner=u2.userobm_id
+              left join UserObm u2 on incident_owner=u2.userobm_id)
+              left join IncidentPriority p on incident_priority_id=p.incidentpriority_id)
+              left join IncidentStatus s on incident_status_id=s.incidentstatus_id
       where incident_id='$id'";
   }
   else if ($connect_db->type == $db_type_pgsql) {
@@ -298,20 +302,33 @@ function run_query_delete($i_id) {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Requete : Type du contract  : Table ContractType                  	    //
-// Query   :  kind of The Contract          : Table ContractType             //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_contracttype($type_id) {
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Incident Priority list                                  //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_priority() {
   global $cdg_sql;
 
-  $query = "select contracttype_label,contracttype_id from ContractType where contracttype_id=".$type_id."";
+  $query = "select * from IncidentPriority order by incidentpriority_order";
 
-  $con_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
-  $con_q->query($query);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
 
-  return $con_q;
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Incident Status list                                    //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_status() {
+  global $cdg_sql;
+
+  $query = "select * from IncidentStatus order by incidentstatus_order";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
 }
 
 

@@ -27,10 +27,12 @@ $fieldnames["incident_company_name"] = $l_company;
 // Display Incident search Form                                              //
 // Parameters:
 //   - $usr_q      : DB result object (userobm list)
+//   - $pri_q      : DB result object (incident priority list)
+//   - $sta_q      : DB result object (incident status list)
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_form ($usr_q, $incident) {
+function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
   global $l_label,$l_contract,$l_priority,$l_status, $l_find,$l_owner;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$c_all,$l_all;
   global $l_date_after,$l_date_before,$l_archive;
@@ -48,50 +50,38 @@ function html_incident_search_form ($usr_q, $incident) {
     <option value=\"$c_all\">$l_all</option>";
   while($usr_q->next_record()) {
     $id = $usr_q->f("userobm_id");
-   $dis_sel_owner.="\n<option value=\"$id\"";
-   if ($id == $owner) 
-     $dis_sel_owner.=" selected=\"selected \"";
-   $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+    $dis_sel_owner.="\n<option value=\"$id\"";
+    if ($id == $owner) 
+      $dis_sel_owner.=" selected=\"selected \"";
+    $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
   $dis_sel_owner.="</select>";
 
-  $dis_sel_prio="<select name=\"sel_priority\">
-    <option value=\"$c_all\">$l_all</option>
-    <option value=\"redhot\"";
-  if ($priority == "redhot") 
-    $dis_sel_prio.= " selected=\"selected\"";
-  $dis_sel_prio.=">$l_redhot</option>
-    <option value=\"hot\"";
-  if ($priority == "hot") 
-    $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.=">$l_hot</option>
-    <option value=\"normal\"";
-  if ($priority == "normal") 
-    $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.= ">$l_normal</option>
-    <option value=\"low\"";
-  if ($priority == "low") 
-    $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.=">$l_low</option>
-  </select>";
+  $sel_pri = "<select name=\"sel_priority\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($pri_q->next_record()) {
+    $id = $pri_q->f("incidentpriority_id");
+    $label = $pri_q->f("incidentpriority_label");
+    $sel_pri .= "\n<option value=\"$id\"";
+    if ($id == $priority) 
+      $sel_pri .= " selected=\"selected \"";
+    $sel_pri .= ">$label</option>";
+  }
+  $sel_pri .= "</select>";
 
-  $dis_sel_stat="<select name=\"sel_status\">\n<option value=\"$c_all\">$l_all</option>\n<option value=\"open\"";
-  if ($status == "open") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.= ">$l_open</option>\n<option value=\"call\"";
-  if ($status == "call") 
-   $dis_sel_stat.=" selected";
-  $dis_sel_stat.= ">$l_call</option>\n<option value=\"waitcall\"";
-  if ($status == "waitcall") 
-   $dis_sel_stat.= " selected=\"selected\"";
-  $dis_sel_stat.=">$l_waitcall</option>\n<option value=\"paused\"";
-  if ($status == "paused") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.=">$l_paused</option>\n<option value=\"closed\"";
-  if ($status == "closed") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.=">$l_closed</option>\n</select>";
- 
+  $sel_sta = "<select name=\"sel_status\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($sta_q->next_record()) {
+    $id = $sta_q->f("incidentstatus_id");
+    $label = $sta_q->f("incidentstatus_label");
+    $sel_sta .= "\n<option value=\"$id\"";
+    if ($id == $status) 
+      $sel_sta .= " selected=\"selected \"";
+    $sel_sta .= ">$label</option>";
+  }
+  $sel_sta .= "</select>";
+
+
   // --- html template --------------------------------------------------------
 
   echo "
@@ -127,10 +117,10 @@ function html_incident_search_form ($usr_q, $incident) {
       <table class=\"details\">     	
       <tr>
         <td class=\"textLabelForm\">$l_priority<br />
-          $dis_sel_prio</td>
+          $sel_pri</td>
         <td>&nbsp;&nbsp;</td>
         <td class=\"textLabelForm\">$l_status<br />
-          $dis_sel_stat</td>
+          $sel_sta</td>
         <td>&nbsp;&nbsp;</td>
         <td class=\"textLabelForm\">$l_owner<br />
           $dis_sel_owner</td>
@@ -225,8 +215,9 @@ function html_incident_consult($inc_q,$con_q) {
   global $path;
 
   $label = $inc_q->f("incident_label");
-  $pri = $inc_q->f("incident_priority");
+  $priority = $inc_q->f("incidentpriority_label");
   $state = $inc_q->f("incident_state");
+  $status = $inc_q->f("incidentstatus_label");
   $date = datetime_format($inc_q->f("date"));
   $inc_id = $inc_q->f("incident_id");
   $inc_desc = nl2br($inc_q->f("incident_description"));
@@ -321,10 +312,10 @@ function html_incident_consult($inc_q,$con_q) {
   <td class=\"detailText\">$owner</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_priority</td>
-  <td class=\"detailText\">$pri</td>
+  <td class=\"detailText\">$priority</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_status</td>
-  <td class=\"detailText\">$state</td>
+  <td class=\"detailText\">$state $status</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_date</td>
   <td class=\"detailText\">$date</td>

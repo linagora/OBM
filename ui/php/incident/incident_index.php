@@ -70,7 +70,7 @@ generate_menu($menu,$section); // Menu
 if ($action == "index" || $action == "") {
 //////////////////////h////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(),$incident);
+  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
   if ($set_display == "yes") {
     dis_incident_search_list($incident);
   } else {
@@ -80,7 +80,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(),$incident);
+  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
   dis_incident_search_list($incident);
 
 } elseif ($action == "new")  {
@@ -112,7 +112,7 @@ if ($action == "index" || $action == "") {
       html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), $incident);
     } else {
       display_err_msg($l_query_error . " - " . $con_q->query . " !");
-      html_incident_search_form(run_query_userobm(),$incident);
+      html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
     }
   }
 
@@ -122,7 +122,7 @@ if ($action == "index" || $action == "") {
     run_query_insert($incident);
     display_ok_msg($l_insert_ok);
     require("incident_js.inc");
-    html_incident_search_form(run_query_userobm(),$incident);
+    html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   } else {
     require("incident_js.inc");
     display_warn_msg($err_msg);
@@ -135,11 +135,11 @@ if ($action == "index" || $action == "") {
     run_query_update($incident);         
     display_ok_msg($l_update_ok);
     require("incident_js.inc");
-    html_incident_search_form(run_query_userobm(),$incident);
+    html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   } else {
     require("incident_js.inc");
     display_warn_msg($err_msg);
-    html_incident_search_form(run_query_userobm(),$incident);
+    html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
  }
  
 } elseif ($action == "delete")  {
@@ -147,7 +147,7 @@ if ($action == "index" || $action == "") {
   run_query_delete($param_incident);
   display_ok_msg($l_delete_ok);
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(),$incident);
+  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
