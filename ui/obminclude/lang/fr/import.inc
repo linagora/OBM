@@ -37,23 +37,23 @@ $l_hphone = "Tél perso";
 $l_town = "Ville";
 
 // Actions
-$l_insert = "Enregistrer la liste";
-$l_update = "Modifier la liste";
-$l_delete = "Supprimer la liste";
-$l_add = "Ajouter ces listes";
+$l_insert = "Enregistrer l'import";
+$l_update = "Modifier l'import";
+$l_delete = "Supprimer l'import";
+$l_sample_file = "Vérifier avec fichier exemple";
+$l_test_file = "Tester ce fichier";
 
 // Messages
-$l_insert_ok = "L'insertion de la liste a été correctement effectuée.";
-$l_insert_error = "L'insertion de la liste a échoué !";
-$l_update_ok = "La modification de la liste a été correctement effectuée.";
-$l_update_error = "La modification de la liste a échoué !";
-$l_delete_ok = "La suppression de la liste a été correctement effectuée.";
-$l_delete_error = "La suppression de la liste a échoué !";
-$l_name_list_nomatch = "Le nom de la liste n'est pas valide";
-$l_check_samelist = "Ces listes sembles similaires à la nouvelle !";
-$l_list_exists = "Cette liste existe déjà !";
-$l_j_check_email = "L'adresse e-mail n'est pas valide !";
-$l_warn_delete = "contacts enregistrés dans cette liste";
+$l_insert_ok = "L'insertion de l'import a été correctement effectuée.";
+$l_insert_error = "L'insertion de l'import a échoué !";
+$l_update_ok = "La modification de l'import a été correctement effectuée.";
+$l_update_error = "La modification de l'import a échoué !";
+$l_delete_ok = "La suppression de l'import a été correctement effectuée.";
+$l_delete_error = "La suppression de l'import a échoué !";
+$l_name_import_nomatch = "Le nom de l'import n'est pas valide";
+$l_import_exists = "Cet import existe déjà !";
+$l_check_sameimport = "Ces imports sembles similaires au nouveau !";
+$l_warn_delete = "Effacer cet import ?";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les listes correspondantes.";
 $l_found = "listes trouvées.";

@@ -155,8 +155,8 @@ function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
 //   - $import_q : Import database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_consult($import_q) {
-  global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
-  global $l_enclosed;
+  global $l_import, $l_name, $l_datasource,$l_csv_sep, $l_enclosed;
+  global $l_file, $l_sample_file, $l_test_file;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_address, $l_postcode, $l_town;
   global $l_phone, $l_fax, $l_web, $l_email, $l_comment;
@@ -253,7 +253,21 @@ function html_import_consult($import_q) {
 
     <div class=\"detailHead\">$l_file</div>
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
-      <input type=\"hidden\" name=\"action\" value=\"test_file\" />
+      <input type=\"hidden\" name=\"action\" value=\"file_sample\" />
+      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_sample_file</td>
+      <td class=\"detailForm\">
+        <input type=\"file\" name=\"sample_file\" id=\"sample_file\" size=\"30\" value=\"\" />
+        <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
+    </tr>
+    </table>
+    </form>
+
+    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
+      <input type=\"hidden\" name=\"action\" value=\"file_test\" />
       <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
     <table class=\"detail\">
     <tr>
@@ -271,13 +285,13 @@ function html_import_consult($import_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Import Test File
+// HTML Display Import Sample File block
 // Parameters:
 //   - $import_q : Import database result 
 //   - $import[] : import hash values
 //   - $max_rows : max rows displayed from test file
 ///////////////////////////////////////////////////////////////////////////////
-function html_import_test_file($import_q, $import, $max_rows) {
+function html_import_file_sample($import_q, $import, $max_rows) {
   global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
@@ -287,10 +301,11 @@ function html_import_test_file($import_q, $import, $max_rows) {
   $file_name = $import["file_name"];
   $file_size = $import["file_size"];
   $csv_sep = $import_q->f("import_separator");
-  $enclosed = $import_q->f("import_enclosed");
+  $enclosed = trim($import_q->f("import_enclosed"));
 
   $map = get_import_field_mapping($import_q);
 
+  // Sample header
   $mapping_head .= "<tr>";
   while (list($num, $el) = each($map)) {
     $label = $el["label"];
@@ -298,15 +313,73 @@ function html_import_test_file($import_q, $import, $max_rows) {
   }
   $mapping_head .= "</tr>";
 
+  // Sample file display
   $regexp_sep = "/$enclosed$csv_sep$enclosed/";
   $r = file($file);
   while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
-    $tok = preg_split($regexp_sep, $line);
+    $rows = get_file_row_fields($line, $csv_sep, $enclosed);
+
     $mapping .= "<tr>";
-    while (list($num, $el) = each($tok)) {
-      $idx = $num + 1;
-      if ($map[$idx]["label"] != "") {
-	$mapping .= "<td class=\"detailForm\">$el</td>";
+    while (list($num, $value) = each($rows)) {
+      if ($map[$num]["label"] != "") {
+	$mapping .= "<td class=\"detailForm\">$value</td>";
+      }
+    }
+    $mapping .= "</tr>";
+  }
+
+  $block = "
+    <div class=\"detailHead\">$file_name</div>
+    <table class=\"detail\">
+    <tr>
+      $mapping_head
+    </tr>
+      $mapping
+    </table>
+    </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Import Test File block
+// Parameters:
+//   - $import_q : Import database result 
+//   - $import[] : import hash values
+///////////////////////////////////////////////////////////////////////////////
+function html_import_file_test($import_q, $import) {
+  global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
+  global $l_mapping, $l_field_num, $l_field, $l_default;
+  global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
+  global $display, $perm, $action;
+
+  $file = $import["file"];
+  $file_name = $import["file_name"];
+  $file_size = $import["file_size"];
+  $csv_sep = $import_q->f("import_separator");
+  $enclosed = trim($import_q->f("import_enclosed"));
+
+  $map = get_import_field_mapping($import_q);
+
+  // Sample header
+  $mapping_head .= "<tr>";
+  while (list($num, $el) = each($map)) {
+    $label = $el["label"];
+    $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
+  }
+  $mapping_head .= "</tr>";
+
+  // Sample file display
+  $regexp_sep = "/$enclosed$csv_sep$enclosed/";
+  $r = file($file);
+  while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
+    $rows = get_file_row_fields($line, $csv_sep, $enclosed);
+
+    $mapping .= "<tr>";
+    while (list($num, $value) = each($rows)) {
+      if ($map[$num]["label"] != "") {
+	$mapping .= "<td class=\"detailForm\">$value</td>";
       }
     }
     $mapping .= "</tr>";
@@ -363,6 +436,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
   if (isset($import["enclosed"])) { $enc = $import["enclosed"]; }
 
   eval ($desc);
+  $enc = htmlspecialchars(trim($enc));
 
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
@@ -405,7 +479,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
   </tr><tr>
     <td class=\"detailLabel\">$l_enclosed</td>
     <td class=\"detailForm\">
-      <input type=\"text\" name=\"tf_enclosed\" size=\"1\" value=\"$enc\" /></td>
+      <input type=\"text\" name=\"tf_enclosed\" size=\"1\" maxlength=\"1\" value=\"$enc\" /></td>
   </tr>
   </table>
 

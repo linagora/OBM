@@ -32,6 +32,7 @@ $l_default = "Default value";
 $l_insert = "Insert the import";
 $l_update = "Update the import";
 $l_delete = "Delete the import";
+$l_sample_file = "Sample file to check";
 $l_test_file = "Test this file";
 
 // Messages

@@ -314,6 +314,9 @@ function check_data_form($id, $import) {
 // Get Import field mapping sorted like file fields order
 // Parameters:
 //   - $import_q : Import database result 
+// Returns:
+//   hash : $map[1]["label"] = "Company"
+//        : $map[1]["field"] = comp_name
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_field_mapping($import_q) {
   global $l_company, $l_number, $l_address, $l_postcode, $l_town;
@@ -330,7 +333,7 @@ function get_import_field_mapping($import_q) {
     $default = $el["default"];
     if (($label != "") && ($value != "")) {
       $map["$value"]["label"] = $label;
-      $map["$value"]["col"] = $field;
+      $map["$value"]["field"] = $field;
     }
   }
 
@@ -349,6 +352,37 @@ function get_import_field_mapping($import_q) {
   ksort($map);
 
   return $map;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get fields from a file row and return it in an array
+// Parameters:
+//   - $row      : row from file
+//   - $sep      : field separator
+//   - $enclosed : enclosed by char
+// Returns:
+//   hash : $row[1] = value
+///////////////////////////////////////////////////////////////////////////////
+function get_file_row_fields($row, $sep, $enclosed) {
+
+  $regexp_sep = "/$enclosed$sep$enclosed/";
+
+  // Delete the edges enclosed characters "f1";"f2";"f3" => f1";"f2";"f3
+  if ($enclosed != "") {
+    $pattern = "/^$enclosed{1}(.*)$enclosed{1}\$/";
+    $line = preg_replace($pattern, "$1", $row);
+  } else {
+    $line = $row;
+  }
+
+  $tok = preg_split($regexp_sep, $line);
+  while (list($num, $value) = each($tok)) {
+    $idx = $num + 1;
+    $rows[$idx]= "$value";
+  }
+
+  return $rows;
 }
 
 

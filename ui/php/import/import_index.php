@@ -15,7 +15,8 @@
 // - insert          -- form fields    -- insert the list
 // - update          -- form fields    -- update the list
 // - delete          -- $param_list    -- delete the list
-// - test_file       -- 
+// - file_sample     -- 
+// - file_test       -- 
 // - contact_del     -- 
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
@@ -80,6 +81,7 @@ get_import_action();
 $perm->check_permissions($menu, $action);
 
 require("import_js.inc");
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -193,11 +195,17 @@ if (($action == "index") || ($action == "")) {
   $dsrc_q = run_query_datasource();
   $display["search"] = html_import_search_form($import, $dsrc_q);
 
-} elseif ($action == "test_file")  {
+} elseif ($action == "file_sample")  {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_detail($import["id"]);
   $display["detail"] = html_import_consult($import_q);
-  $display["detail"] .= html_import_test_file($import_q, $import, 5);
+  $display["detail"] .= html_import_file_sample($import_q, $import, 5);
+
+} elseif ($action == "file_test")  {
+///////////////////////////////////////////////////////////////////////////////
+  $import_q = run_query_detail($import["id"]);
+  $display["detail"] = html_import_consult($import_q);
+  $display["detail"] .= html_import_file_test($import_q, $import);
 }
 
 
@@ -376,6 +384,7 @@ function get_param_import() {
   global $tf_con_hpho, $tf_con_hpho_d, $tf_con_mpho, $tf_con_mpho_d;
   global $tf_con_fax, $tf_con_fax_d, $tf_con_mail, $tf_con_mail_d;
   global $tf_con_com, $tf_con_com_d;
+  global $sample_file, $sample_file_name, $sample_file_size;
   global $test_file, $test_file_name, $test_file_size;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
@@ -445,6 +454,10 @@ function get_param_import() {
   if (isset ($tf_con_com_d)) $import["con_com_d"] = trim($tf_con_com_d);
 
   // File
+  if (isset ($sample_file)) $import["file"] = $sample_file;
+  if (isset ($sample_file_name)) $import["file_name"] = $sample_file_name;
+  if (isset ($sample_file_size)) $import["file_size"] = $sample_file_size;
+
   if (isset ($test_file)) $import["file"] = $test_file;
   if (isset ($test_file_name)) $import["file_name"] = $test_file_name;
   if (isset ($test_file_size)) $import["file_size"] = $test_file_size;
@@ -496,7 +509,7 @@ function get_param_import() {
 function get_import_action() {
   global $import, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_import,$l_header_display,$l_header_test_file;
+  global $l_import,$l_header_display;
   global $l_header_consult, $l_header_add_contact;
   global $l_select_list, $l_add_contact;
   global $cright_read_admin, $cright_write_admin;
@@ -536,7 +549,7 @@ function get_import_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'update', 'test_file') 
+     'Condition'=> array ('detailconsult', 'update', 'file_sample') 
                                            );
 
 // Insert
@@ -568,10 +581,16 @@ function get_import_action() {
     'Condition'=> array ('None') 
                                       );
 
+// Sample File
+  $actions["IMPORT"]["file_sample"] = array (
+    'Url'      => "$path/import/import_index.php?action=file_sample&amp;param_import=".$import["id"]."",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult') 
+                                      );
+
 // Test File
-  $actions["IMPORT"]["test_file"] = array (
-    'Name'     => $l_header_test_file,
-    'Url'      => "$path/import/import_index.php?action=test_file&amp;param_import=".$import["id"]."",
+  $actions["IMPORT"]["file_test"] = array (
+    'Url'      => "$path/import/import_index.php?action=file_test&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
