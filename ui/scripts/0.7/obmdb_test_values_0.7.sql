@@ -13,9 +13,9 @@
 
 INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uadmin','padmin','admin', 'Admin Lastname', 'Admin Firstname');
 
-INSERT INTO UserObm (userobm_login,userobm_password,userobm_perms) VALUES ('ueditor','peditor','editor');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('ueditor','peditor','editor', 'Itor', 'Ed');
 
-INSERT INTO UserObm (userobm_login,userobm_password,userobm_perms) VALUES ('uuser','puser','user');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uuser','puser','user', 'User', 'John');
 
 
 -------------------------------------------------------------------------------

@@ -1139,18 +1139,26 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_tt .= "  onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,";
   $sel_tt .= "             this.form.sel_projecttask, -1) \">";
   $sel_tt .= "<option value=\"0\">$l_none</option>";
-  while($taskt_q->next_record()) {
-    //put menu titles
-    if (($task_i = $taskt_q->f("tasktype_internal")) != $type_prec) {
-      $sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
-      $type_prec = $task_i;
+
+  //bcontins debut modif
+  for ($i=0; $i<2; $i++) {
+    $tt_q = $taskt_q[$i];
+
+    while($tt_q->next_record()) {
+      //put menu titles
+      if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
+	$sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
+	$type_prec = $task_i;
+      }
+      $tt_id = $tt_q->f("tasktype_id");
+      $tt_label = $tt_q->f("tasktype_label");
+      $sel_tt .= "\n<option value=\"$tt_id\"";
+      if ($is_tt == $tt_id) $sel_tt .= " selected"; 
+      $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
-    $tt_id = $taskt_q->f("tasktype_id");
-    $tt_label = $taskt_q->f("tasktype_label");
-    $sel_tt .= "\n<option value=\"$tt_id\"";
-    if ($is_tt == $tt_id) $sel_tt .= " selected"; 
-    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
   }
+  //bcontins fin modif
+
   $sel_tt .= "</select>";
 
   // Project select construction

@@ -669,29 +669,53 @@ function run_query_tasktype($uid = 0) {
   if ($uid) {
     $query = "
       select distinct TaskType.*
-      from TaskType
-        left join Deal on (tasktype_id = deal_tasktype_id
-                           and deal_archive = 0
-                           and deal_project_status != 0)
-        left join ProjectUser on (deal_id=projectuser_deal_id
-                                  and projectuser_projectedtime != 0)
-      where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
-        or tasktype_internal=2
+      from TaskType, Deal, ProjectUser
+      where tasktype_id = deal_tasktype_id
+        and deal_id = projectuser_deal_id
+        and projectuser_user_id = $uid
       order by tasktype_internal, tasktype_label";
+
+    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    $obm1_q= new DB_OBM;
+    $obm1_q->query($query);
+
+    $query = "
+      select  TaskType.*
+      from TaskType
+      where tasktype_internal=2
+      order by tasktype_internal, tasktype_label";
+
+    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    $obm2_q= new DB_OBM;
+    $obm2_q->query($query);
+
+    $obm_q = Array($obm1_q, $obm2_q);
+
   } else {
     $query = "
       select *
       from TaskType
       order by tasktype_internal, tasktype_label";
-  }
 
-  display_debug_msg($query, $cdg_sql, "run_query_tasktype");
-  $obm_q= new DB_OBM;
-  $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    $obm_q= new DB_OBM;
+    $obm_q->query($query);
+  }
 
   return $obm_q;
 }
 
+//     $query = "
+//       select distinct TaskType.*
+//       from TaskType
+//         left join Deal on (tasktype_id = deal_tasktype_id
+//                            and deal_archive = 0
+//                            and deal_project_status != 0)
+//         left join ProjectUser on (deal_id=projectuser_deal_id
+//                                   and projectuser_projectedtime != 0)
+//       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
+//         or tasktype_internal=2
+//       order by tasktype_internal, tasktype_label";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: Project select query execution                              //
