@@ -33,17 +33,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session, Auth, Perms  Management                                          //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="COMPANY";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
+include("$obminclude/global_pref.inc");
+
 
 require("company_query.inc");
 require("company_display.inc");
 
-$menu="COMPANY";
-include("$obminclude/global.inc");
-include("$obminclude/global_pref.inc");
 
 // updating the company bookmark : 
 if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {

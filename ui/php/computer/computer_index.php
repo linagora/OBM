@@ -12,16 +12,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="COMPUTER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
 page_close();
 $sess->start() ;//To call the method for headers (no-cache)  and so much... :)
 
-$menu="COMPUTER";
-require("$obminclude/global.inc");
+
 include("$obminclude/global_pref.inc") ;
 include("computer_display.inc");
 include("computer_query.inc");

@@ -33,6 +33,7 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
+   require("$obminclude/phplib/obmlib.inc");
    include("$obminclude/global.inc"); 
    include("$obminclude/global_pref.inc"); 
    require("$obminclude/phplib/obmlib.inc");

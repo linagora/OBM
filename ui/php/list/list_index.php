@@ -30,10 +30,10 @@ $menu="LIST";
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
-require("$obminclude/global.inc");
 require("$obminclude/global_pref.inc");
 include("list_display.inc");
 include("list_query.inc");

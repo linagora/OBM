@@ -13,15 +13,16 @@
 
 // light OBM environment (no menu in the exported files)
 global $perm, $menu;
+$menu="LIST";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+require("$obminclude/global.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 page_close(); //?usefull?
-$menu="LIST";
-require("$obminclude/global.inc");
-include("$obminclude/global_pref.inc") ;
+
+include("$obminclude/global_pref.inc");
 include("list_query.inc") ;
 include($lang_file);
 

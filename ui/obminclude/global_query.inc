@@ -297,8 +297,6 @@ function run_query_set_options_user($p_user_id, $option, $new_value) {
 
 /////////////////////////////////////////////////////////////////////////////
 // Return all the preferences of the specified user
-// Can not display debug info because called before include global.inc
-// in the setting module
 /////////////////////////////////////////////////////////////////////////////
 function run_query_get_all_options_user($p_user_id) {
   global $sess, $cdg_sql;
@@ -312,6 +310,40 @@ function run_query_get_all_options_user($p_user_id) {
   return $obm_q_pref;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+// Return all the global preferences
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_get_all__global_options() {
+  $cdg_sql;
+
+  $query = "select * from GlobalPref";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q_pref = new DB_OBM;
+  $obm_q_pref->query($query);
+
+  return $obm_q_pref;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get and register into session the global preferences
+// This must be called in before page_open 
+///////////////////////////////////////////////////////////////////////////////
+function session_load_params() {
+  global $sess;
+  $obm_q_name_var = run_query_get_all__global_options();
+  while ($obm_q_name_var->next_record()) {
+    $tab[0]=$obm_q_name_var->f("globalpref_option");
+    $tab[1]=$obm_q_name_var->f("globalpref_value");
+// Define the variable in the database as global ($tab[0] contain the name of
+// the variable so ${$tab[0]} while be a variable which label while be the 
+// value of $tab[0].
+    global ${$tab[0]};
+    ${$tab[0]}=$tab[1];
+    $sess->register("$tab[0]");
+  }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get and register into session the user's preferences
@@ -322,8 +354,9 @@ function session_load_preferences() {
   global $set_theme, $set_lang, $set_display, $set_rows, $set_debug;
   global $last_company, $last_contact, $last_deal,$last_contract;
   global $last_payment, $last_account, $last_invoice,$last_incident;
-  global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
-  global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
+  global $last_company_name, $last_contact_name, $last_deal_name;
+  global $last_contract_name ,$last_incident_name;
+  global $last_payment_name, $last_account_name, $last_invoice_name;  
   global $order_contactslist, $order_servicecomputer, $set_day_weekstart;
 
   $obm_q_name_var = run_query_get_all_options_user($auth->auth["uid"]);

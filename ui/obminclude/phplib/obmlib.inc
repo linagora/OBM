@@ -143,16 +143,16 @@ class OBM_User_Sql extends CT_Sql {
 #}
 
 class OBM_Session extends Session {
-  var $classname = "OBM_Session";
+  var $classname 	= "OBM_Session";
 
-  var $cookiename     = "";                ## defaults to classname
-  var $magic          = "Falcon030";       ## ID seed
-  var $mode           = "cookie";          ## We propagate session IDs with cookies
-  var $fallback_mode  = "get";
-  var $lifetime       = 14400;                 ## 0 = do session cookies, else minutes
-  var $that_class     = "OBM_CT_Sql";      ## Which database to connect...
-  var $gc_probability = 5;
-  var $allowcache = "" ;
+  var $cookiename     	= "";                ## defaults to classname
+  var $magic          	= "Falcon030";       ## ID seed
+  var $mode           	= "cookie";          ## We propagate session IDs with cookies
+  var $fallback_mode  	= "get";
+  var $lifetime_default = 14400;                 ## 0 = do session cookies, else minutes
+  var $that_class     	= "OBM_CT_Sql";      ## Which database to connect...
+  var $gc_probability 	= 5;
+  var $allowcache	= "" ;
 }
 
 class OBM_User extends User {

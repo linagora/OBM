@@ -117,3 +117,29 @@ $l_too_much = "You have used more money than you actually have !<BR>";
 $l_trouble_invoice = "At least one invoice has received too much money.<BR>Its status will become \"trouble\".<BR>Are you sure you want to do that ?<BR>";
 $l_bank_anyway = "Bank that Payment";
 $l_bank_again = "Restart that banking from the beginning";
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["payment_label"] = $l_label;
+$fieldnames["payment_amount"] = $l_amount;
+$fieldnames["payment_date"] = $l_date;
+$fieldnames["payment_expect_date"] = $l_expected_date;
+$fieldnames["payment_number"] = $l_number;
+$fieldnames["payment_account_lbl"] = $l_payment_account;
+$fieldnames["invoice_label"] = $l_invoice_label;
+$fieldnames["invoice_date"] = $l_invoice_date;
+$fieldnames["invoice_amount_TTC"] = $l_invoice_TTC;
+$fieldnames["invoice_amount_HT"] = $l_invoice_HT;
+$fieldnames["invoice_number"] = $l_invoice_number;
+$fieldnames["invoice_paid"] = $l_invoice_paid;
+$fieldnames["invoice_company"] = $l_invoice_company;
+$fieldnames["invoice_status"] = $l_invoice_status;
+$fieldnames["invoice_deal"] = $l_invoice_deal;
+// for the temp. entries :
+$fieldnames["entrytemp_date"] = $l_entrytemp_date ;
+$fieldnames["entrytemp_type"] = $l_entrytemp_type ;
+$fieldnames["entrytemp_amount"] = $l_entrytemp_amount ;
+$fieldnames["entrytemp_realdate"] = $l_entrytemp_realdate ;
+$fieldnames["entrytemp_label"] = $l_entrytemp_label ;
+$fieldnames["entrytemp_comment"] = $l_entrytemp_comment;

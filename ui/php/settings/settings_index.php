@@ -11,7 +11,9 @@ $path="..";
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="SETTINGS";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+include("$obminclude/global.inc");
 require("$obminclude/phplib/obmlib.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
@@ -51,7 +53,6 @@ if ($param_rows != "") {
 }
 page_close();
 
-$menu="SETTINGS";
 require("$obminclude/global_pref.inc");
 require("settings_display.inc");
 

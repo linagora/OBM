@@ -22,18 +22,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
+$menu = "TIME";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
-require("$obminclude/global.inc");
 require("../agenda/agenda_functions.inc");
 
 require("time_display.inc");
 require("time_query.inc");
 
-$menu = "TIME";
+
 $uid = $auth->auth["uid"]; //current user uid
 
 page_close();

@@ -84,7 +84,6 @@ function run_query_passive_user($delay) {
 
   $date_limit = date("YmdHis",time() - $delay);
   $query = "select UserObm.userobm_username,
-                   UserObm.userobm_timelastaccess,
                    ActiveUserObm.*
             from UserObm, ActiveUserObm
             where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id

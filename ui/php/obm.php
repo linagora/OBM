@@ -13,13 +13,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-
-
-// script continues here only if the user is authenticate
-include("$obminclude/global.inc");
 // make session variables from all the current user's preferences
+session_load_params();
 session_load_preferences();
 include("$obminclude/global_pref.inc");
 $menu="";

@@ -29,17 +29,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="CONTRACT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-
+include("$obminclude/global_pref.inc");
 require("contract_query.inc");
 require("contract_display.inc");
 
-$menu="CONTRACT";
-include("$obminclude/global.inc");
-include("$obminclude/global_pref.inc");
 
 
 // Updating the "last contract" bookmark 

@@ -10,18 +10,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="AGENDA";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
+include("$obminclude/global_pref.inc");
 
 require("agenda_query.inc");
 require("agenda_display.inc");
 
-
-$menu="AGENDA";
-include("$obminclude/global.inc");
-include("$obminclude/global_pref.inc");
 
 page_close();
 

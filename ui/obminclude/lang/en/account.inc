@@ -89,3 +89,17 @@ $l_up_option = "To assemble this option of a notch" ;
 $l_up_option_help = "Click on this button to move up the field" ;
 $l_back_tolist = "Back to list display" ;
 $l_help_options = "Contextual help" ;
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["account_bank"] = $l_bank;
+$fieldnames["account_number"] = $l_number;
+$fieldnames["account_label"] = $l_label;
+$fieldnames["account_balance"] = $l_initial_balance;
+$fieldnames["account_today"] = $l_balance;
+$fieldnames["payment_label"] = $l_label;
+$fieldnames["payment_number"] = $l_number;
+$fieldnames["payment_date"] = $l_date;
+$fieldnames["payment_expect_date"] = $l_expected_date;
+$fieldnames["payment_amount"] = $l_amount;

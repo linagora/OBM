@@ -31,14 +31,12 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
+$menu = "CONTACT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
-
 require("$obminclude/phplib/obmlib.inc");
-
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-$menu = "CONTACT";
-include("$obminclude/global.inc");
 include("$obminclude/global_pref.inc");
 require("contact_display.inc");
 require("contact_query.inc");

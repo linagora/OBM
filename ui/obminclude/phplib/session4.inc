@@ -501,6 +501,12 @@ class Session {
   ## Initialization
   ##
 
+  function setcookie() {
+   global $lifetime;
+   if($lifetime == 0) $lifetime = $this->lifetime_default;
+   session_set_cookie_params($lifetime);
+  }
+
   function start($sid = "") {
     global $HTTP_COOKIE_VARS;
 
@@ -518,7 +524,7 @@ class Session {
     } else {
       $this->mode = "get";
     }
-    session_set_cookie_params($this->lifetime);
+//    session_set_cookie_params(2);
     session_start();
     $this->id = session_id();
   }

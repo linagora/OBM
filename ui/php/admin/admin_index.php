@@ -11,12 +11,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="ADMIN";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
 $actions = array ('help', 'index', 'data_show', 'data_update','clear_sess');
-
-$menu="ADMIN";
 
 require("$obminclude/phplib/obmlib.inc");
 require("admin_display.inc");
@@ -36,8 +35,8 @@ switch ($mode) {
    break;
  case "html":
    $menu = "ADMIN";
-   page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global.inc");
+   page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
 //   if($action!="clear_sess") {

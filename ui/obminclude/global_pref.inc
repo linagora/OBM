@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
+$sess->setcookie();
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;
@@ -25,12 +25,6 @@ if ($last_incident=="") $last_incident=$last_incident_default;
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
-
-if ($menu == "")
-  $path = "";
-else 
-  $path = "../";
-
 $theme_file = "$obminclude/themes/$set_theme/theme.inc";
 if (file_exists("$path/../$theme_file")) {
   include("$theme_file");
@@ -49,128 +43,14 @@ if (file_exists("$path/../".$lang_file))
   include("$lang_file");
 }
 
-if ($menu == "ADMIN") {
-  $lang_file = "$obminclude/lang/$set_lang/admin.inc";
+if ($menu != "") {
+  $lang_file = "$obminclude/lang/$set_lang/".strtolower($menu).".inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
   } else {
-    include("$obminclude/lang/$set_lang_default/admin.inc");
+    include("$obminclude/lang/$set_lang_default/".strtolower($menu).".inc");
   }
 }
-else if ($menu == "COMPANY") {
-  $lang_file = "$obminclude/lang/$set_lang/company.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/company.inc");
-  }
-}
-else if ($menu == "CONTACT") {
-  $lang_file = "$obminclude/lang/$set_lang/contact.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/contact.inc");
-  }
-}
-else if ($menu == "DEAL") {
-  $lang_file = "$obminclude/lang/$set_lang/deal.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/deal.inc");
-  }
-}
-else if ($menu == "LIST") {
-  $lang_file = "$obminclude/lang/$set_lang/list.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/deal.inc");
-  }
-}
-else if ($menu == "USER") {
-  $lang_file = "$obminclude/lang/$set_lang/user.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/user.inc");
-  }
-}
-else if ($menu == "TIME") {
-  $lang_file = "$obminclude/lang/$set_lang/time.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/time.inc");
-  }
-}
-else if ($menu == "COMPUTER") {
-  $lang_file = "$obminclude/lang/$set_lang/computer.inc";
-  if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/computer.inc");
-  }
-}
-else if ($menu == "SETTINGS") {
-  $lang_file = "$obminclude/lang/$set_lang/settings.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/settings.inc");
-  }
-}
-else if ($menu == "AGENDA") {
-  $lang_file = "$obminclude/lang/$set_lang/agenda.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/agenda.inc");
-  }
-}
-else if ($menu == "ACCOUNT") {
-  $lang_file = "$obminclude/lang/$set_lang/account.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/account.inc");
-  }
-}
-else if ($menu == "INVOICE") {
-  $lang_file = "$obminclude/lang/$set_lang/invoice.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/invoice.inc");
-  }
-}
-else if ($menu == "PAYMENT") {
-  $lang_file = "$obminclude/lang/$set_lang/payment.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/payment.inc");
-  }
-}
-else if ($menu == "CONTRACT") {
-  $lang_file = "$obminclude/lang/$set_lang/contract.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/contract.inc");
-  }
-}
-else if ($menu == "INCIDENT") {
-  $lang_file = "$obminclude/lang/$set_lang/incident.inc";
-   if (file_exists("$path/../".$lang_file)) {
-    include("$lang_file");
-  } else {
-    include("$obminclude/lang/$set_lang_default/incident.inc");
-  }
-
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Menu (function generate_menu($menu) in menu.inc) //

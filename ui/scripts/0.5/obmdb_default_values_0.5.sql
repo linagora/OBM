@@ -166,3 +166,10 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_totallength',4,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_deal_label',3,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_company_name',2,1);
+
+#
+# Dumping data for table `GlobalPref`
+#
+
+INSERT INTO GlobalPref VALUES ('lifetime', '14400');
+

@@ -61,7 +61,7 @@ function html_admin_status( $nb_user_ses, $obm_u) {
   $nbua= $obm_u->nf();
   $list_user="";
   while($obm_u->next_record()) {
-    $a = $obm_u->f("userobm_timelastaccess");
+    $a = $obm_u->f("activeuserobm_timecreate");
     $username = $obm_u->f("userobm_username");
     $nb_con = $obm_u->f("activeuserobm_nb_connexions");
     $lastpage = $obm_u->f("activeuserobm_lastpage");

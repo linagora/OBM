@@ -810,10 +810,11 @@ CREATE TABLE Incident (
   incident_logger int(8) default NULL,
   incident_owner int(8) default NULL,
   incident_resolution text,
+  incident_archive int(2) NOT NULL default '0',
   PRIMARY KEY  (incident_id)
 ) TYPE=MyISAM;
 
-
+    
 
 --
 -- Timemanagement module
@@ -846,4 +847,16 @@ CREATE TABLE TaskType (
   tasktype_label varchar(32) default NULL,
   PRIMARY KEY  (tasktype_id)
 ) TYPE=MyISAM;
+
+#
+# Table structure for table `GlobalPref`
+#
+
+CREATE TABLE GlobalPref (
+  globalpref_option varchar(255) NOT NULL default '',
+  globalpref_value varchar(255) NOT NULL default '',
+  PRIMARY KEY  (globalpref_option),
+  UNIQUE KEY globalpref_option (globalpref_option)
+) TYPE=MyISAM;
+
 

@@ -26,18 +26,19 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
+$menu="INCIDENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+include("$obminclude/global.inc");
 require("$obminclude/phplib/obmlib.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
+
+include("$obminclude/global_pref.inc");
 
 require("incident_query.inc");
 require("incident_display.inc");
 
 $uid = $auth->auth["uid"];
-$menu="INCIDENT";
-include("$obminclude/global.inc");
-include("$obminclude/global_pref.inc");
 
 // Updating the "last incident" bookmark 
 if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
