@@ -179,7 +179,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   global $set_theme,$ico_contact_list,$ico_contact_new;
   // -- Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
-  global $perms_user,$l_perms_user;  
+  global $perms_user,$l_perms_user,$ico_deal_new,$ico_deal_list;  
   global $auth;
 
   $uname = urlencode($name);
@@ -204,7 +204,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -------| Menu Liste Affaires
   $r .= "<br>
          <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
-         <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
+         <img border=0 src=\"/images/$set_theme/$ico_deal_list\"></a>
          <font size=-1>
          <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          $l_deal_list</a> ($deal_num)</font>";
@@ -213,7 +213,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
       <a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
-        src=\"/images/$set_theme/$ico_contact_new\"></a>
+        src=\"/images/$set_theme/$ico_deal_new\"></a>
       <font size=-1><a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
   }
 
@@ -291,6 +291,12 @@ function html_company_consult($co_q) {
   // --- HTML Template --------------------------------------------------------
   echo "
     <table class=\"details\">
+    <tr>
+      <td rowspan=\"25\">$links</td>
+    </tr>
+    <tr>
+      <td rowspan=\"25\">&nbsp;&nbsp;&nbsp;</td>
+    </tr>
     <tr>
       <td class=\"detailHead\" colspan=\"2\">$l_company</td>
     </tr><tr>

@@ -395,7 +395,7 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_company_id,$deal_q) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact,$ico_contact_list,$ico_contact_new;
+  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact,$ico_contact_list,$ico_contact_new,$ico_deal_list;
   // - labels
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_clause,$l_project_manager,$l_marketing_manager,$l_technical_manager,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_visibility,$l_public,$l_private,$l_dateexp,$l_client_manager;
@@ -437,12 +437,14 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
 
 
   // --- HTML Template --------------------------------------------------------
-/*
+echo "
+<table class=\"details\">
+<tr>";
 //////////////////
 //Liens Externes//
 //////////////////
 echo "
-    <td valign=top> 
+    <td rowspan=\"25\"> 
       <A HREF=\"".url_prepare("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\">
       <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
       <font SIZE=-1>
@@ -455,16 +457,15 @@ echo "
       $l_incident_new</A></FONT>
       <BR>
       <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
-      <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A></FONT>
+      <img BORDER=0  SRC=\"/images/$set_theme/$ico_deal_list\"></A></FONT>
       <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
       ".$deal_q->f("deal_label")."</A></FONT>
       </TD>";
 //////////////////////
 //Fin Liens Externes//
 //////////////////////
-*/
 echo "
-<table class=\"details\">
+
  <tr>
    <td class=\"detailHead\" colspan=\"2\">$l_contract_company</td>
  </tr><tr>
