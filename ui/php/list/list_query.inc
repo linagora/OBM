@@ -793,26 +793,144 @@ function get_list_info($id) {
 function get_list_query_num_rows($query="") {
   global $cdg_sql;
 
-  // Construct count query to optimize performance (instead of counting rows)
-  // Get the From ... Where clauses
-  // IF 'Group by' present, take between From and group by (ungreedy)
-  // else get between From and the end
-  if (preg_match('/(FROM (.*))($)/Uis', $query, $matches)) {
-    $query_c = "select contact_id " . $matches[1];
-    display_debug_msg($query_c, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $r = $obm_q->query($query_c, 1);
-    if (is_string($r)) {
-      $ret = -1;
+  // We distinguinsh simple queries to queries with sub-query for optimization
+  $pos = strpos(strtolower($query), 'select', 5);
+
+  if ($pos > 1) {
+    // The query is has a sub-query
+    if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+      $query_c = "select count(contact_id) as nb " . $matches[1];
     } else {
-      $obm_q->next_record();
-      $ret = $obm_q->nf();
+      return 0;
     }
+
   } else {
-    $ret = 0;
-  }  
+    // The query is a standard query (no sub-qurey)
+
+    // Get the From ... Where clauses
+    // IF 'Group by' present, take between From and group by (ungreedy)
+    // else get between From and the end
+    if (preg_match('/(FROM (.*))(ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
+      $query_c = "select count(contact_id) as nb " . $matches[1];
+    } else {
+      return 0;
+    }
+  }
+
+  display_debug_msg($query_c, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $r = $obm_q->query($query_c, 1);
+  if (is_string($r)) {
+    $ret = -1;
+  } else {
+    $obm_q->next_record();
+    $ret = $obm_q->f("nb");
+  }
 
   return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the rows number for the query given
+// Parameters:
+//   - $query : query to run
+///////////////////////////////////////////////////////////////////////////////
+function get_list_dynamic_contact_nb($query="") {
+  global $cdg_sql;
+
+  // We distinguinsh simple queries to queries with sub-query for optimization
+  $pos = strpos(strtolower($query), 'select', 5);
+ 
+  if ($pos > 1) {
+    // The query is has a sub-query
+    if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+      $query_c = "select count(distinct contact_id) as nb " . $matches[1];
+    } else {
+      return 0;
+    }
+
+  } else {
+    // The query is a standard query (no sub-qurey)
+    if (preg_match('/(FROM (.*))(GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+      $query_c = "select count(distinct contact_id) as nb " . $matches[1];
+    } else {
+      return 0;
+    }
+  }
+
+  display_debug_msg($query_c, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $r = $obm_q->query($query_c, 1);
+  if (is_string($r)) {
+    $ret = -1;
+  } else {
+    $obm_q->next_record();
+    $ret = $obm_q->f("nb");
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the number of company from a dynamic query
+// Parameters:
+//   - $query : the dynamic query
+// Returns:
+//   - amount of companies
+///////////////////////////////////////////////////////////////////////////////
+function get_list_dynamic_company_nb($query) {
+  global $cdg_sql;
+
+  // We distinguinsh simple queries to queries with sub-query for optimization
+  $pos = strpos(strtolower($query), 'select', 5);
+
+  if ($pos > 1) {
+    // The query is has a sub-query
+    if (preg_match('/FROM .* (FROM (.*))(\) AS FOO|GROUP BY|ORDER BY)?(?(3)|$)/Uis', $query, $matches)) {
+      $query_f = "select count(distinct(company_id)) as nb ". $matches[1];
+    } else {
+      return 0;
+    }
+
+  } else {
+    // The query is a standard query (no sub-qurey)
+    if (preg_match('/(FROM (.*))( ORDER BY|GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
+      $query_f = "select count(distinct(company_id)) as nb ". $matches[1];
+    } else {
+      return 0;
+    }
+  }
+
+  display_debug_msg($query_f, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_f);
+  $obm_q->next_record();
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the number of company from the static contact
+// of a list
+// Parameters:
+//   - $id : Id of the list
+// Returns:
+//   - amount of companies
+///////////////////////////////////////////////////////////////////////////////
+function get_list_static_company_nb($id) {
+
+  $query_c = "select count(distinct(company_id)) as nb from ContactList
+         LEFT JOIN Contact ON contactlist_contact_id=contact_id
+         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+	 where
+         contactlist_list_id='$id'";
+  display_debug_msg($query_f, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_c);
+  $obm_q->next_record();
+  return $obm_q->f("nb");
 }
 
 
@@ -1121,19 +1239,6 @@ function make_query_from_criteria($list) {
     "contactcategory2link_category_id" => " left join ContactCategory2Link cc2l%j on contact_id = cc2l%j.contactcategory2link_contact_id ",
   );
 
-  //If publication info must be displayed we add these fields
-  if ($info_pub == 1) {
-    $add_select = array (
-      "publication" => ", SUM(subscription_quantity) as subscription_quantity
-                        ,publication_lang
-                        ,publication_title"
-      );
-  
-    $add_group = array (
-      "publication" => ",publication_lang
-                        ,publication_title"
-      );
-  }
 
   $select = "
         contact_id,
@@ -1152,7 +1257,7 @@ function make_query_from_criteria($list) {
         contact_town,
         contact_expresspostal,
         contact_country_iso3166,
-        ctry1.country_name,
+        ctry1.country_name as contact_country,
         contact_phone,
         contact_homephone,
         contact_fax,
@@ -1168,44 +1273,41 @@ function make_query_from_criteria($list) {
         company_expresspostal,
         ctry2.country_name as company_country";
 
-  $group = "
-        contact_id,
-        contact_lastname,
-        contact_firstname,
-        kind_minilabel,
-        kind_header,
-        kind_lang,
-        function_label,
-        contact_title,
-        contact_service,
-        contact_address1,
-        contact_address2,
-        contact_address3,
-        contact_zipcode,
-        contact_town,
-        contact_expresspostal,
-        contact_country_iso3166,
-        ctry1.country_name,
-        contact_phone,
-        contact_homephone,
-        contact_fax,
-        contact_email,
-        contact_archive,
-        company_id,
-        company_name,
-        company_address1,
-        company_address2,
-        company_address3,
-        company_zipcode,
-        company_town,
-        company_expresspostal,
-        ctry2.country_name";
-	
+ 
   $join = " Contact left join Company on contact_company_id=company_id
                     left join Country as ctry1 on Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
                     left join Country as ctry2 on Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
+
+  //--------------------------------------------------------------------------
+  // If publication info must be displayed we prepare a Subquery
+  // SELECT $over_select FROM (SELECT $select ...) AS FOO GROUP BY $over_group
+  if ($info_pub == 1) {
+    $add_select = array (
+      "publication" => ", subscription_id, subscription_quantity
+                        ,publication_lang
+                        ,publication_title"
+      );
+    $info_over_select = ",
+        SUM(subscription_quantity) as subscription_quantity,
+        publication_lang,
+        publication_title";
+    $info_over_group = ",
+        publication_lang,
+        publication_title";
+    // We transform field "column_name as col" to col
+    $conv_select .= preg_replace('/^(.* as) (.*)$/mi', '$2', $select);
+    // We add extra info to the Over select
+    $over_select .= "$conv_select $info_over_select";
+    $over_select = "SELECT $over_select FROM (";
+
+    $over_end = ") AS FOO
+        GROUP BY
+        $conv_select
+        $info_over_group";
+  }
+
 
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
@@ -1215,8 +1317,8 @@ function make_query_from_criteria($list) {
             foreach($criterion as $line => $value) {
               if ($value != "") {
 		$select .= $add_select[$field];
-		$group .= $add_group[$field];
-		if(!isset($join_name[$field])) {
+		// $group .= $add_group[$field];
+		if (!isset($join_name[$field])) {
 		  $join_name[$field] = 0;
 		  $join .= str_replace('%j',$join_name[$field],$add_join[$field]);
 		}
@@ -1293,7 +1395,7 @@ function make_query_from_criteria($list) {
     }
   }
 
-  $query = trim("SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname");
+  $query = trim("$over_select SELECT distinct $select FROM $join $where $over_end ORDER BY contact_lastname");
   return $query;
 }
 
@@ -1381,50 +1483,6 @@ function run_query_contacts_for_letter($list_ids) {
     $connect_db->query($query);
   }
   return $connect_db;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the number of company from a dynamic query.       //
-// Parameters:
-//   - $query : the dynamic query
-// Returns:
-//   - amount of companies
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dynamic_company($query) {
-  global $cdg_sql;
-  if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
-   $query_f = "select count(distinct(company_id)) as nb ". $matches[1];
-  }
-  display_debug_msg($query_f, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query_f);
-  $obm_q->next_record();
-  return $obm_q->f("nb");
-
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the number of company from the static contact.      //
-// of a list
-// Parameters:
-//   - $id : Id of the list
-// Returns:
-//   - amount of companies
-///////////////////////////////////////////////////////////////////////////////
-function run_query_get_static_company($id) {
-
-  $query_c = "select count(distinct(company_id)) as nb from ContactList
-         LEFT JOIN Contact ON contactlist_contact_id=contact_id
-         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-	 where
-         contactlist_list_id='$id'";
-  display_debug_msg($query_f, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query_c);
-  $obm_q->next_record();
-  return $obm_q->f("nb");
-	 
 }
 
 </script>

@@ -563,10 +563,7 @@ function check_invoice_data_form($id, $invoice) {
   }
 
   // Payment Date check
-  if ($pdate == "") {
-    $err_msg = "$l_payment_date : $l_fill_date";
-    return false;
-  } else if (preg_match($php_regexp_isodate, $pdate) == 0) {
+  if (($pdate != "") && (preg_match($php_regexp_isodate, $pdate) == 0)) {
     $err_msg = "$l_payment_date : $pdate : $l_invalid_date"; 
     return false;
   }

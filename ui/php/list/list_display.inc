@@ -128,9 +128,9 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
       }
-      if ($OD->data_set->f("country_name") != "") {
-	$res["name"] .= $OD->data_set->f("country_name")."<br />\n";
-	$res["txt_name"] .= $OD->data_set->f("country_name");
+      if ($OD->data_set->f("contact_country") != "") {
+	$res["name"] .= $OD->data_set->f("contact_country")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_country");
       }
       // else we get the contact Company address
     } else {
@@ -256,8 +256,8 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "country_name") {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
-      if ($OD->data_set->f("country_name") != "") {
-	$res["name"] .= $OD->data_set->f("country_name");
+      if ($OD->data_set->f("contact_country") != "") {
+	$res["name"] .= $OD->data_set->f("contact_country");
       }
       // else we get the contact Company address
     } else {
@@ -523,18 +523,26 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   }
 
   if ($query != "") {
-    $comp_query_nb = run_query_get_dynamic_company($query);
     $query_nb = get_list_query_num_rows($query);
     if ($query_nb >= 0) {
       run_query_update_num_rows($id, $query_nb);
     } else {
       $query_nb = $l_invalid_query;
     }
+    // Company query nb
+    $comp_query_nb = get_list_dynamic_company_nb($query);
+
+    // Contact query nb (= query_nb if no supplement info needed as pub)
+    if ($dis_info_pub == $l_yes) {
+      $con_query_nb = get_list_dynamic_contact_nb($query);
+    } else {
+      $con_query_nb = $query_nb;
+    }
   } else {
     $query_nb = "0";
     $comp_query_nb = "0";
   }
-  $comp_static_nb = run_query_get_static_company($id);
+  $comp_static_nb = get_list_static_company_nb($id);
   // If no search criteria, we display the query (empty or manual)
   if ($criteria == "") {
     $d_query = nl2br($query);
@@ -573,7 +581,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     </tr>
     <tr>
       <td class=\"detailLabel\"># $l_contact : $l_static / $l_query</td>
-      <td class=\"detailText\">$static_nb / $query_nb</td>
+      <td class=\"detailText\">$static_nb / $con_query_nb</td>
     </tr>
       <td class=\"detailLabel\"># $l_company : $l_static / $l_query</td>
       <td class=\"detailText\">$comp_static_nb / $comp_query_nb</td>
@@ -626,7 +634,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
   // Dynamic Contacts
   if ($query_nb != 0) {
-    $message = "$nb_conq $l_dyn_con_found";
+    $message = "$query_nb $l_dyn_con_found";
     $block .= display_info_msg($message);
 
     $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
