@@ -490,6 +490,7 @@ CREATE TABLE List (
   list_name        varchar(32) NOT NULL,
   list_subject     varchar(70),
   list_email       varchar(128),
+  list_mailing_ok  integer DEFAULT 0,
   list_query_nb    integer DEFAULT 0,
   list_query       text,
   list_structure   text,

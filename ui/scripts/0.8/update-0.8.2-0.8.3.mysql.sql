@@ -12,3 +12,10 @@ ALTER TABLE Contact ADD column contact_service varchar(64) after contact_firstna
 
 -- Add column : contact_email2
 ALTER TABLE Contact ADD column contact_email2 varchar(128) after contact_email;
+
+-------------------------------------------------------------------------------
+-- Update List table
+-------------------------------------------------------------------------------
+-- Add column : list_mailing_ok
+ALTER TABLE List ADD column list_mailing_ok int(1) after list_email;
+

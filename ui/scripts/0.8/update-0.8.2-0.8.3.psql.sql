@@ -12,3 +12,9 @@ ALTER TABLE Contact ADD column contact_service varchar(64);
 
 -- Add column : contact_email2
 ALTER TABLE Contact ADD column contact_email2 varchar(128);
+
+-------------------------------------------------------------------------------
+-- Update List table
+-------------------------------------------------------------------------------
+-- Add column : list_mailing_ok
+ALTER TABLE List ADD column list_mailing_ok integer;
