@@ -388,7 +388,6 @@ function dis_list_form($action, $list_q, $list) {
     </p>
     </div>
     </form>";
-  $block .= "</form>";
   return $block; 
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -449,8 +448,9 @@ function html_list_form($action, $list_q, $list) {
       <td class=\"detailForm\">
       <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
     </tr>
-    </table>";
+    ";
   }
+  $block .= " </table>";
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
   }
@@ -469,7 +469,8 @@ function html_list_form($action, $list_q, $list) {
 function html_list_graphical_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
-  global $l_company, $l_country,$l_zipcode,$l_town,$l_contact,$l_lastname,$l_firstname;
+  global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
+  global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete;
 
   // if update mode and first time, values are taken from db
@@ -480,6 +481,9 @@ function html_list_graphical_form($action, $list_q, $list) {
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
     $criteria = unserialize($list_q->f("list_structure"));
+    $bollean_criterion = $criteria["logical"]["NOT"];
+    $logical_criterion = $criteria["logical"]["AND"];      
+    $criteria = $criteria["modules"]; 
 
   }
   
@@ -488,56 +492,88 @@ function html_list_graphical_form($action, $list_q, $list) {
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
-  if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
-  if(!is_array($criteria)) {
-    $criteria = unserialize($criteria);
+  if (isset($list["criteria"])) { 
+    $criteria = $list["criteria"];
+    if(!is_array($criteria)) {
+      $criteria = unserialize($criteria);
+    }
+    $bollean_criterion = $criteria["logical"]["NOT"];
+    $logical_criterion = $criteria["logical"]["AND"];      
+    $criteria = $criteria["modules"]; 
   }
+
+  $fields_label["company_name"] = $l_company; 
+  $fields_label["company_country"] = "$l_company: $l_country"; 
+  $fields_label["company_zipcode"] = "$l_company: $l_postcode"; 
+  $fields_label["company_town"] = "$l_company: $l_town"; 
+  $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
+  $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
+  $fields_label["contact_country"]= "$l_contact: $l_country";  
+  $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";  
+  $fields_label["contact_town"] = "$l_contact: $l_town";  
+  $fields_label["publication_title"] = "$l_publication: $l_title"; 
+  $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
+  $fields_label["publication_year"] = "$l_publication: $l_year"; 
+
   if(is_array($criteria)) {
     foreach($criteria as $module)
     foreach($module as $field => $criterion) {
       foreach($criterion as $line => $value) {
-        if($field == "cs1.country_name") {
-          $field= "company_country";
-        }elseif($field == "cs2.country_name") {
+        if($field == "c1.country_name") {
+	  $field= "company_country";
+        }elseif($field == "c2.country_name") {
           $field= "contact_country";
         }
         if($value != "") {
           $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
+	  $structure[$line] .= "<td>$input</td>";
+	  $labels[$line] .= "<td>".$fields_label[$field]."</td>";
         }
         else {
-          $input = "<input type=\"hidden\" name=\"tf_".$field."[]\" value=\"\" />";
+	  $hid_cell[$line] .= "<input type=\"hidden\" name=\"tf_".$field."[]\" value=\"\" />";
         }
-        $structure[$line] .= "<td>$input</td>";
       }
     }
     $del_cell= "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
     <img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
  
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
-    <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>";  
-    foreach($structure as $line) {
-      $dis_criteria .="<tr>$del_cell$upd_cell$line</tr>";
+    <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
+    foreach($structure as $key=>$line) {
+      if($bollean_criterion[$key] == "NOT") {
+	$not = "selected =\"true\"";
+	$empty = "";
+      }
+      else {
+	$empty = "selected =\"true\"";
+	$not = "";
+      }
+      $logical_criterion;      
+      $dis_no_boolean = "<select name=\"sel_log_not[]\"><option value=\"\" $empty >$l_empty</option><option value=\"NOT\" $not>$l_not</option></select></td>";
+      $dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
+      if($key == 0) {
+        $dis_logical = "<td><input type=\"hidden\" name=\"sel_log_and[]\" value=\"\" />";	
+	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";
+      }else {
+	if($logical_criterion[$key] == "AND") {
+	  $and = "selected =\"true\"";
+	  $or = "";
+	}
+	else {
+	  $or = "selected =\"true\"";
+	  $and = "";
+	}	
+        $dis_logical = "<td><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
+	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";
+      }
+      
     }
   }
-
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
 
   $block = "
    <div class=\"detailHead\">$l_criterion</div> 
   <table class=\"search\" id=\"list_criterion\">
-  <tr>
-    <td class=\"detailLabel\" style=\"width:5%;\" >$l_delete</td>
-    <td class=\"detailLabel\" style=\"width:5%;\">$l_update</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_company</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_country</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_zipcode</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_town</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_lastname</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_firstname</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_country</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_zipcode</td>
-    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_town</td>    
-  </tr>  
       $dis_criteria
   </table>
   ";
@@ -561,6 +597,7 @@ function dis_add_criterion_form($list) {
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
   $block .= html_company_criterion();
   $block .= html_contact_criterion();
+  $block .= html_publication_criterion();
   $block .= "
   <div class=\"detailButton\">
   <p class=\"detailButtons\">
@@ -585,14 +622,14 @@ function dis_add_criterion_form($list) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_criterion(){
-  global $l_company,$l_country,$l_zipcode,$l_town;
+  global $l_company,$l_country,$l_postcode,$l_town;
   $block .= "
   <div class=\"detailHead\">$l_company</div>    
   <table class=\"search\">
   <tr>
     <td class=\"detailLabel\">$l_company</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_zipcode</td>
+    <td class=\"detailLabel\">$l_postcode</td>
     <td class=\"detailLabel\">$l_town</td>
   </tr>
   <tr>
@@ -611,7 +648,7 @@ function html_company_criterion(){
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_criterion(){
-  global $l_lastname,$l_firstname,$l_country,$l_zipcode,$l_town,$l_contact;
+  global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   $block = "
   <div class=\"detailHead\">$l_contact</div>    
   <table class=\"search\">
@@ -619,7 +656,7 @@ function html_contact_criterion(){
     <td class=\"detailLabel\">$l_lastname</td>
     <td class=\"detailLabel\">$l_firstname</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_zipcode</td>
+    <td class=\"detailLabel\">$l_postcode</td>
     <td class=\"detailLabel\">$l_town</td>    
   </tr>
   <tr>
@@ -629,6 +666,30 @@ function html_contact_criterion(){
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_zipcode\" value=\"\" /></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
   </tr>
+  </table>
+  ";
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Contact Criterion Form //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_publication_criterion(){
+  global $l_publication,$l_title,$l_lang,$l_year;
+  $block = "
+  <div class=\"detailHead\">$l_publication</div>    
+  <table class=\"search\">
+  <tr>
+    <td class=\"detailLabel\">$l_title</td>
+    <td class=\"detailLabel\">$l_lang</td>
+    <td class=\"detailLabel\">$l_year</td>
+  
+  </tr>
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_title\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_lang\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_year\" value=\"\" /></td>  </tr>
   </table>
   ";
   return $block;

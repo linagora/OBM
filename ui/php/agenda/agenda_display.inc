@@ -2427,7 +2427,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
     <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format</td>
      <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_date_begin\" name=\"param_date\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
+      <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1');\">
        <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>

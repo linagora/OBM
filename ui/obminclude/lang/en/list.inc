@@ -26,7 +26,7 @@ $l_list_set = "List Set";
 $l_export_format = "Available export formats";
 $l_desc = "Description";
 $l_export_intro = "Select the export format needed";
-$l_criterion = "Searching criteria";
+$l_criterion = "Search criteria";
 $l_select_list = "Select the lists to be exported";
 
 // Contact
@@ -37,13 +37,27 @@ $l_company = "Company";
 $l_hphone = "Home phone";
 $l_contact = "Contact";
 $l_country = "Country";
-$l_zipcode = "Zip code";
+
+//Publication
+$l_publication = "Publication";
+$l_title = "Titre";
+$l_year = "Année";
+$l_lang = "Langue";
+
+
 // Actions
 $l_insert = "Insert";
 $l_update = "Update";
 $l_delete = "Delete";
 $l_add = "Add these lists";
 $l_add_criterion = "Add a criterion";
+
+//Logical
+$l_or = "OR";
+$l_not = "NOT";
+$l_and = "AND";
+$l_empty = "&nbsp;";
+
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";
 $l_insert_error = "The list insertion has failed !";

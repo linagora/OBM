@@ -298,7 +298,8 @@ function get_param_list() {
   global $new_order, $order_dir,$popup,$row_index;
   global $tf_company_name,$tf_company_country,$tf_company_zipcode,$tf_company_town;
   global $tf_contact_firstname,$tf_contact_lastname,$tf_contact_country;
-  global $tf_contact_zipcode,$tf_contact_town;
+  global $tf_contact_zipcode,$tf_contact_town,$sel_log_and,$sel_log_not;
+  global $tf_publication_title,$tf_publication_lang,$tf_publication_year;
   global $se_criteria;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
@@ -332,20 +333,25 @@ function get_param_list() {
 
   //Criteria params :
   //Company
-
-  if (isset ($tf_company_name)) $list["criteria"]["company"]["company_name"] = $tf_company_name;
-  if (isset ($tf_company_country)) $list["criteria"]["company"]["c1.country_name"] = $tf_company_country;
-  if (isset ($tf_company_zipcode)) $list["criteria"]["company"]["company_zipcode"] = $tf_company_zipcode;
-  if (isset ($tf_company_town)) $list["criteria"]["company"]["company_town"] = $tf_company_town;
+  if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
+  if (isset ($tf_company_country)) $list["criteria"]["modules"]["company"]["c1.country_name"] = $tf_company_country;
+  if (isset ($tf_company_zipcode)) $list["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
+  if (isset ($tf_company_town)) $list["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
   //Contact
-  if (isset ($tf_contact_firstname)) $list["criteria"]["contact"]["contact_firstname"] = $tf_contact_firstname;
-  if (isset ($tf_contact_lastname)) $list["criteria"]["contact"]["contact_lastname"] = $tf_contact_lastname;
-  if (isset ($tf_contact_country)) $list["criteria"]["contact"]["c2.country_name"] = $tf_contact_country;
-  if (isset ($tf_contact_zipcode)) $list["criteria"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
-  if (isset ($tf_contact_town)) $list["criteria"]["contact"]["contact_town"] = $tf_contact_town;
-  
-  if (isset ($se_criteria)){$list["criteria"] = unserialize( urldecode($se_criteria)); }
+  if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
+  if (isset ($tf_contact_lastname)) $list["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
+  if (isset ($tf_contact_country)) $list["criteria"]["modules"]["contact"]["c2.country_name"] = $tf_contact_country;
+  if (isset ($tf_contact_zipcode)) $list["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
+  if (isset ($tf_contact_town)) $list["criteria"]["modules"]["contact"]["contact_town"] = $tf_contact_town;
+  //Publication
+  if (isset ($tf_publication_title)) $list["criteria"]["modules"]["publication"]["publication_title"] = $tf_publication_title;
+  if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
+  if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
 
+  if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;
+  if (isset ($sel_log_and)) $list["criteria"]["logical"]["AND"] = $sel_log_and;
+
+  if (isset ($se_criteria)){$list["criteria"] = unserialize( urldecode($se_criteria)); }
   if (isset ($http_obm_vars)) {
     $nb_con = 0;
     $nb_list = 0;

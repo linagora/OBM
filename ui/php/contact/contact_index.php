@@ -144,7 +144,24 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
   }
-
+} elseif ($action == "externaldetail")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($param_contact > 0 && $module !="") {
+    include("$path/$module/".$module."_display.inc");
+    $con_q = run_query_detail($param_contact);
+    if ($con_q->num_rows() != 1) {
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+    }
+    if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
+      $display["detailInfo"] = display_record_info($con_q);
+      $display["detail"] = html_contact_header($con_q);
+      $display["detail"] .= dis_subscription_external_list();
+    } else {
+      // this contact's page has "private" access
+      $display["msg"] .= display_err_msg($l_error_visibility);
+    }      
+  }
+  
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $contact)) {
@@ -227,7 +244,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("contact_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_contact_admin_index();
 
 } elseif ($action == "cat1_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,7 +255,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat1_insert_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "cat1_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -249,7 +266,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat1_update_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "cat1_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -264,7 +281,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat1_delete_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "cat2_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -275,7 +292,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat2_insert_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "cat2_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -286,7 +303,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat2_update_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "cat2_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,7 +318,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_cat2_delete_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 }elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -312,7 +329,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_func_insert_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -323,13 +340,13 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_func_update_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_function_links($contact);
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -340,7 +357,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_func_delete_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -351,7 +368,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_kind_insert_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -362,13 +379,13 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_kind_update_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_kind_links($contact);
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,7 +396,7 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_kind_delete_error);
   }
   require("contact_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_contact_admin_index();
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////

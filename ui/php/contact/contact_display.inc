@@ -466,6 +466,58 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Contact Consultation                                         //
+// Parameters:
+//   - $co_q : contact database result
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_header($co_q) {
+  global $l_company,$l_lastname,$l_firstname,$l_kind;
+  global $l_update,$l_delete,$l_insert,$l_contact;
+  global $c_yes, $c_no, $set_theme;
+  global $display, $path, $action, $auth;
+  global $perms_user, $l_perms_user;
+
+  $usercreate = $co_q->f("contact_usercreate");
+  $c_id = $co_q->f("contact_company_id");
+  $c_name = $co_q->f("company_name");
+  $id = $co_q->f("contact_id");
+  $kind = $co_q->f("kind_minilabel");
+  $kind_header = $co_q->f("kind_header");
+  if ($kind_header != $kind) $kind .= " ($kind_header)";
+  $title = $co_q->f("contact_title");
+  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
+  $lname = $co_q->f("contact_lastname");
+  $fname = $co_q->f("contact_firstname");
+  $display["link"] = html_contact_links($id);
+  
+  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <div class=\"detailHead\">$l_contact</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_lastname</td>
+      <td class=\"detailText\">$lname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_firstname</td>
+      <td class=\"detailText\">$fname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$kind</td>
+    $l_priv
+    </tr><tr>
+      <td class=\"detailLabel\">$l_company</td>
+      <td class=\"detailText\">
+      <a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
+      </td>
+    </tr>
+    </table>"; 
+
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact links menu
@@ -488,8 +540,8 @@ function html_contact_links($id) {
   $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contact");
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
   $nb_document = run_query_document_nb ($id,"Contact");
- // $nb_subscription = run_query_subscription_nb ($id);
-  $url_subscription = url_prepare("$path/publication/distribution_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
+  $nb_subscription = run_query_subscription_nb ($id);
+  $url_subscription = url_prepare("$path/contact/contact_index.php?action=externaldetail&amp;module=publication&amp;param_contact=$id");
   $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id");
 
   
@@ -506,13 +558,13 @@ function html_contact_links($id) {
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
-  <!-- <div class=\"linkTitle\">:: $l_subscription</div>
+  <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription ($nb_subscription)</a></li>
     <li><a href=\"$url_subscription_new\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
         <a href=\"$url_subscription_new\">$l_subscription_new</a></li>
-  </ul> -->
+  </ul>
  </div>
  ";
 
@@ -1072,7 +1124,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
+function dis_check_contact_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
   global $l_link_list, $l_link_list_no;
@@ -1160,7 +1212,7 @@ function dis_check_links($p_id) {
     $display["msg"] .= display_ok_msg($l_can_delete);
     $block .= "
       <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">" . dis_contact_delete_form($p_id) . "</p>
         <p class=\"detailButtons\">$dis_back</p>
       </div>";
   } else {
@@ -1180,7 +1232,7 @@ function dis_check_links($p_id) {
 // Parameters:
 //   - $p_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
+function dis_contact_delete_form($p_id) {
   global $l_delete;
 
   // --- HTML Template --------------------------------------------------------
@@ -1197,7 +1249,7 @@ function dis_delete_form($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the contact administration index                                  //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_contact_admin_index() {
 
   $func_q = run_query_function();
   $kind_q = run_query_kind();

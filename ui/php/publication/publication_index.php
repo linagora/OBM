@@ -207,7 +207,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("publication_js.inc");
-  $display["detail"] = dis_check_links($param_publication);
+  $display["detail"] = dis_check_publication_links($param_publication);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("publication_js.inc");
-  $display["detail"] = dis_admin_index();
+  $display["detail"] = dis_publication_admin_index();
 
 } elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////

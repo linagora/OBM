@@ -36,10 +36,20 @@ $l_firstname = "Prénom";
 $l_function = "Fonction";
 $l_company = "Société";
 $l_hphone = "Tél perso";
-$l_town = "Ville";
 $l_contact = "Contact";
 $l_country = "Pays";
-$l_zipcode = "Code Postal";
+
+//Publication
+$l_publication = "Publication";
+$l_title = "Title";
+$l_year = "Year";
+$l_lang = "Language";
+
+//Logical
+$l_or = "OU";
+$l_not = "NON";
+$l_and = "ET";
+$l_empty = "&nbsp;";
 
 // Actions
 $l_insert = "Enregistrer";

@@ -124,4 +124,8 @@ $ico_mini_cal       = "calendar.png";
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";
 $ico_rtf = "ico_label.png";
-
+//List
+$ico_minus_on = "ico_minus_on.png";
+$ico_minus_off = "ico_minus_off.png";
+$ico_plus_on = "ico_plus_on.png";
+$ico_plus_off = "ico_plus_off.png";

@@ -202,6 +202,51 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Returns the XHTML result display
+// Parameters : 
+//   - $comp_q     : list of companies
+//   - $pref_q     : the fields which have to be displayed
+//   - $nb_publication : nb companies returned by the search query
+//   - $publication[]  : publication search criteria
+//     keys used   : archive, name, type, zip
+///////////////////////////////////////////////////////////////////////////////
+function html_subscription_search_list($comp_q, $pref_q, $nb_publication,$publication,$popup) {
+  global $display, $l_found,$l_close;
+
+  // we urlencode to avoid breakage for space char
+  $archive = $publication["archive"];
+  $title = urlencode(stripslashes($publication["name"]));
+  $phone = urlencode(stripslashes($publication["phone"]));
+  $type = $publication["type"];
+  $act = $publication["activity"];
+  $zip = urlencode(stripslashes($publication["zip"]));
+  $market = $publication["marketing_manager"];
+  $popup = $publication["popup"]; 
+  
+  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
+
+  $comp_q->seek($first_row);
+
+  $comp_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
+  if ($popup) {
+    $comp_d->data_specialfield = "ext_get_id";
+    $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+  
+  $comp_d->data_set = $comp_q;
+  $comp_d->data_url = $url;
+  $comp_d->data_header = "both";
+  $display["msg"] = display_info_msg("$nb_publication $l_found");
+  $block = $comp_d->display("dis_data_publication");
+  $block .= $display_popup_end;  
+
+  return $block;
+}
+
 ///////////////////////////////////////////////////////////////////////////////// Display: Publication links menu                                               //
 // Parameters:
 //   - $pub_q : publication database result 
@@ -599,7 +644,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
 // Parameters:
 //   - $p_id : publication id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_check_links($p_id) {
+function dis_check_publication_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
   global $l_link_contract, $l_link_contract_no, $l_link_project, $l_link_project_no;
@@ -720,7 +765,7 @@ function dis_check_links($p_id) {
     $display["msg"] .= display_ok_msg($l_can_delete);
     $block .= "
       <div class=\"detailButton\">
-        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">" . dis_publication_delete_form($p_id) . "</p>
         <p class=\"detailButtons\">$dis_back</p>
       </div>";
   } else {
@@ -810,7 +855,7 @@ function dis_publication_warn_insert($cid, $pub_q, $publication) {
 // Parameters:
 //   - $p_id : publication Id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_delete_form($p_id) {
+function dis_publication_delete_form($p_id) {
   global $l_delete;
 
   $ret = "<form name=\"form_delete\" method=\"post\"
@@ -828,7 +873,7 @@ function dis_delete_form($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the publication administration index                                  //
 ///////////////////////////////////////////////////////////////////////////////
-function dis_admin_index() {
+function dis_publication_admin_index() {
 
   $type_q = run_query_publicationtype();
   $block = html_publication_type_form($type_q);
@@ -1393,5 +1438,88 @@ function dis_publication_display_pref($display_pref_q) {
 
   return $block;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Subscription search result in an external module               //
+// Parameters:
+//   - $publication[] : publication search criteria
+//     keys used  : name, type, zip
+///////////////////////////////////////////////////////////////////////////////
+function dis_subscription_external_list() {
+  global $display, $l_no_found;
+  global $auth, $new_order, $order_dir;
+
+  $pref_q = run_query_display_pref($auth->auth["uid"], "subscription");
+  $obm_q = run_query_search($publication, $new_order, $order_dir);
+  $nb_publication = $obm_q->num_rows();
+  if ($nb_publication == 0) {
+    $display["msg"] = display_warn_msg($l_no_found);
+  } else {
+    $block = html_publication_search_list($obm_q,$pref_q,$nb_publication,$publication,$popup);
+  }
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Time Task  result                                        //
+// Parameters : 
+//   - $obm_q    : list of tasks to be displayed
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//   - $time[]   : time search criteria
+//     keys used : week
+///////////////////////////////////////////////////////////////////////////////
+function dis_subscription_list_result($task_q,$pref_q,$time) {
+  //-- Themes
+  global $set_theme,$ico_mail;
+  //-- Labels
+  global $l_date_task, $l_company;
+  global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
+  global $l_update, $l_length, $l_task_list;
+
+  //  dis_table_title($l_found_task) ;
+
+  //oldstart
+  //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
+ 
+  $block .= "
+     <form method=\"post\" name=\"f_task_del\" action=\"".url_prepare("time_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
+     ";
+
+  $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
+  $dis_task_list->data_set = $task_q;
+  $dis_task_list->data_header = "top";
+  $dis_task_list->data_page = false;
+  //  $dis_task_list->data_url = $url; 
+  $dis_task_list->data_cb_text = $l_task_del;
+  $dis_task_list->data_idfield = "timetask_id"; 
+  $dis_task_list->data_order = false; 
+  $dis_task_list->data_cb_side = "left";
+  $dis_task_list->data_cb_name = "delete_";
+  $dis_task_list->data_cb_show = "test_status";
+
+  $block .= "<div class=\"detailHead\">$l_task_list</div>\n";
+  $block .= $dis_task_list->display("dis_data_time");
+
+  $dis_button = "
+    <input type=\"hidden\" name=\"user_id\" value=\"".$time["user_id"]."\" />
+    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
+
+  $block .= "
+     <p class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_button</p>
+     </p>
+
+     </form>
+     ";
+
+  return $block;
+}
+
+
 
 </SCRIPT>

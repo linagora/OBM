@@ -718,8 +718,10 @@ function run_query_contacts_for_letter($list_ids) {
 ///////////////////////////////////////////////////////////////////////////////
 function make_query($list) {
   global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
-  $criteria = $list["criteria"];
+  $criteria = $list["criteria"]["modules"];
   $query_kind = $list["query_kind"];
+  $bollean_criterion = $list["criteria"]["logical"]["NOT"];
+  $logical_criterion = $list["criteria"]["logical"]["AND"];
   $query = "
         SELECT DISTINCT
         contact_id,
@@ -741,7 +743,10 @@ function make_query($list) {
         Contact
              left join Company on contact_company_id=company_id
              left join Country as c1 on contact_country_id=c1.country_id
-             left join Country as c2 on company_country_id=c2.country_id ";   
+             left join Country as c2 on company_country_id=c2.country_id 
+	     left join Subscription on subscription_contact_id = contact_id
+	     left join Publication on publication_id = subscription_publication_id";  
+  
 /*
   if(is_array($criteria)) {
     $and = "";
@@ -770,6 +775,7 @@ function make_query($list) {
     }
   }
 */
+
   if(is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
       if(is_array($module_criteria)) {
@@ -787,9 +793,8 @@ function make_query($list) {
     }
   }
 
-  foreach($condition as $value) {
-    $where .= "$or ($value)";
-    $or = " OR";
+  foreach($condition as $line=>$value) {
+    $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
   }
 
 
