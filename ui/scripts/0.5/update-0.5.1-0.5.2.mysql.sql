@@ -160,3 +160,19 @@ CREATE TABLE ActiveUserObm (
   PRIMARY KEY  (activeuserobm_sid)
 );
 
+--
+-- Table structure for table 'UserObm_SessionLog'
+--
+CREATE TABLE UserObm_SessionLog (
+  userobm_sessionlog_sid varchar(32) NOT NULL default '',
+  userobm_sessionlog_session_name varchar(32) NOT NULL default '',
+  userobm_sessionlog_user_obm_id int(11) default NULL,
+  userobm_sessionlog_timeupdate varchar(14) NOT NULL default '',
+  userobm_sessionlog_timecreate varchar(14) NOT NULL default '0',
+  userobm_sessionlog_nb_connexions int(11) NOT NULL default '0',
+  userobm_sessionlog_lastpage varchar(32) NOT NULL default '0',
+  userobm_sessionlog_ip varchar(32) NOT NULL default '0',
+  PRIMARY KEY  (userobm_sessionlog_sid)
+);
+
+
