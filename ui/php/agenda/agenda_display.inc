@@ -800,7 +800,7 @@ return $block;
 function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $set_start_time, $set_stop_time,$set_cal_interval,$l_description,$set_weekstart_default;
-  global $l_private,$l_private_description;
+  global $l_private,$l_private_description,$auth;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
