@@ -54,12 +54,12 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
   global $l_all, $l_find, $l_author, $l_category2; 
   global $c_all;
 
-  $title = $document["title"];
+  $title = stripslashes($document["title"]);
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];
-  $author = $document["author"];
+  $author = stripslashes($document["author"]);
   $mime = $document["mime"];
-  $name = $document["filename"];
+  $name = stripslashes($document["filename"]);
   
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
@@ -168,13 +168,14 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
   global $display, $l_found;
 
   // we urlencode to avoid breakage for space char
-  $title = $document["title"];
+  $title = stripslashes($document["title"]);
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];
-  $author = $document["author"];
+  $author = stripslashes($document["author"]);
   $mime = $document["mime"];
-
-  $url = url_prepare("document_index.php?tf_title=$title&sel_cat1=$cat1&sel_cat2=$cat2&tf_author=$author&sel_mime=$mime&action=search");
+  $name = stripslashes($document["name"]);
+  
+  $url = url_prepare("document_index.php?tf_title=$title&sel_cat1=$cat1&sel_cat2=$cat2&tf_author=$author&tf_name=$name&sel_mime=$mime&action=search");
 
   $doc_q->seek($first_row);
 
@@ -230,14 +231,14 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   }
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
-  if (isset($document["title"])) { $title = $document["title"]; }
+  if (isset($document["title"])) { $title = stripslashes($document["title"]); }
   if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked" : ""); }
   if (isset($document["category1"])) { $cat1 = $document["category1"]; }
   if (isset($document["category2"])) { $cat2 = $document["category2"]; }
-  if (isset($document["author"])) { $author = $document["author"]; }
+  if (isset($document["author"])) { $author = stripslashes($document["author"]); }
   if (isset($document["mime"])) { $mime = $document["mime"]; }
-  if (isset($document["path"])) { $fi_path = $document["path"]; }
-  if (isset($document["file"])) { $file = $document["file"]; } 
+  if (isset($document["path"])) { $fi_path = stripslashes($document["path"]); }
+  if (isset($document["file"])) { $file = stripslashes($document["file"]); } 
   if (isset($document["kind"])) { $kind = $document["kind"]; }
 
   // category 1 select
@@ -337,9 +338,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </tr><tr>
       <td class=\"detailLabel\">$l_author</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
-    </tr><tr>
+<!--    </tr><tr>
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> -->
     </tr><tr>
       <td class=\"detailLabel\">$l_category1</td>
       <td class=\"detailForm\">$sel_cat1</td>
@@ -523,6 +524,84 @@ function html_document_consult($doc_q) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Display and check the document links (and delete form if ok)
+// Parameters:
+//   - $p_id : document id
+///////////////////////////////////////////////////////////////////////////////
+function dis_check_links($p_id) {
+  global $l_can_delete, $l_cant_delete, $l_back;
+  global $l_have_link,$l_have_no_link;
+  global $path, $display;
+
+  $delete_ok = true;
+
+  // Links from Contact
+  $obm_q = run_query_document_links($p_id);
+
+  if ($obm_q > 0) {
+    $delete_ok = false;
+    $display_linkc ="
+      <tr>
+        <td class=\"detailHead\">$l_have_link</td>
+      </tr>";
+  } else {
+    $display_linkc = "
+      <tr>
+        <td class=\"detailHead\">$l_have_no_link</td>
+      </tr>";
+  }
+
+ 
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+    action=\"".url_prepare("document_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_document\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $block .= "<table class=\"detail\">
+   $display_linkc
+   $display_linkd
+   </table>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the delete form (button)                                         //
+// Parameters:
+//   - $p_id : document Id
+///////////////////////////////////////////////////////////////////////////////
+function dis_delete_form($p_id) {
+  global $l_delete;
+
+  $ret = "<form name=\"form_delete\" method=\"post\"
+      action=\"" . url_prepare("document_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"hd_document_id\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
+
+  return $ret;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the document administration index                                  //
@@ -1185,10 +1264,10 @@ function dis_repository_rec($document,$repository,$display_file) {
     if($popup) {
       $js = "onclick=\"fill_ext_form('$relative_path/$file');return false;\"";
     }
-
+    $file = stripslashes($file);
     $block .= "<div class=\"documentFile\"><img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
      <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>
-      ".stripslashes($file)."</a><br /></div>";
+      $file</a><br /></div>";
   }
   $block .= "</div>";
   return $block;

@@ -177,7 +177,23 @@ elseif ($action == "insert")  {
     $mime_q = run_query_documentmime();
     $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
   }
-
+}elseif ($action == "check_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("document_js.inc");
+  $display["detail"] = dis_check_links($param_document);
+} elseif ($action == "delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_delete($hd_document_id);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_delete_error);
+  }
+  $cat1_q = run_query_documentcategory1();
+  $cat2_q = run_query_documentcategory2();
+  $mime_q = run_query_documentmime();
+  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
+  $display["result"] = dis_document_search_list($document);
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
@@ -327,10 +343,12 @@ function get_param_document() {
   global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_repository_path;
   global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype,$tf_repository_name,$popup;
   global $param_document,$fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
-  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url;
+  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url,$hd_document_id;
   global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
   
   if (isset ($param_document)) $document["id"] = $param_document;
+
+  if (isset ($hd_document_id)) $document["id"] = $hd_document_id;
   
   if (isset ($tf_url)) $document["url"] = $tf_url;
  
@@ -395,6 +413,7 @@ function get_document_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_tree;
   global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_repository;
   global $document_read, $document_write, $document_admin_read, $document_admin_write;
+  global $l_header_delete;
 
 // Display Level
   $actions["DOCUMENT"]["tree"]  = array (
@@ -454,9 +473,27 @@ function get_document_action() {
     'Right'    => $document_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
+// Update
+  $actions["DOCUMENT"]["update"] = array (
+    'Url'      => "$path/document/document_index.php?action=update",
+    'Right'    => $document_write,
+    'Condition'=> array ('None') 
+                                     	      );
 
+// CheckDelete
+  $actions["DOCUMENT"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/document/document_index.php?action=check_delete&amp;param_document=".$document["id"]."",
+    'Right'    => $document_write,
+    'Condition'=> array ('detailconsult', 'update') 
+                                     	      );
 
-
+// Update
+  $actions["DOCUMENT"]["delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=delete",
+    'Right'    => $document_write,
+    'Condition'=> array ('None') 
+                                     	      );
 // Insert
   $actions["DOCUMENT"]["insert"] = array (
     'Url'      => "$path/document/document_index.php?action=insert",

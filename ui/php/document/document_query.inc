@@ -175,11 +175,11 @@ function run_query_insert(&$document) {
   }
 
   if($kind == "file") {
+    $file_info = stat($document_path.'/'.$path);
     $name = substr($path,strrpos($path,'/')+1);
     $document["name"]=$name;
     $path = substr($path,0,strrpos($path,'/'));
-    $document["path"]=$path;
-    $file_info = stat($document_path.'/'.$path);
+    $document["path"]=$path; 
     $size=$file_info["size"];
     $document["size"] = $size ;
   }
@@ -240,6 +240,7 @@ function run_query_insert(&$document) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_mime($document){
+  global $default_mime;
   $path = $document["path"];
   $file = $document["name"];
   $mime = $document["mime_file"];
@@ -275,7 +276,7 @@ function run_query_get_mime($document){
     }
   }
 
-  $return = run_query_get_type_by_ext("html");
+  $return = run_query_get_type_by_mime($default_mime);
   return $return ;
 }
 
@@ -287,15 +288,61 @@ function run_query_get_mime($document){
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_mimetype($path){
+  global $default_mime;
   $ext = substr(strrchr($path,'.'),1);
   $return = run_query_get_type_mime_by_ext($ext);
   if($return) {
     return $return;
   }
-  $return = run_query_get_type_mime_by_ext("html");
+  $return = run_query_get_type_mime_by_mime($default_mime);
   return $return ;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Deletion query execution                                                  //
+// Parameters:
+//   - $p_id : document id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete($p_id) {
+  global $cdg_sql,$link_to;
+  $query = "select * from Document where document_id ='$p_id'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $path = $obm_q->f("document_path");
+  $name = $obm_q->f("document_name");
+  if(islink($name)) {
+    $truename = $link_to.$obm_q->f("document_title");
+  }  
+  $query = "select count(*) as link from Document where document_path =
+           '$path' and document_name ='$name'";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  if($truename != "") {
+    $name = $truename;
+  }
+  if($obm_q->f("link") == 1) {
+    run_query_delete_file($path,$name);
+ 
+  }
+  $query = "delete from Document where document_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Get the Mime Type of a file
+// Parameters:
+//   - $type : Mime-Type
+///////////////////////////////////////////////////////////////////////////////
+
+function run_query_document_links($document_id) {
+return 0;
+
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
@@ -358,9 +405,18 @@ function run_query_get_type_mime_by_ext($ext) {
     return false;
 }   
 
-  
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query execution                                                 //
+// Delete File query execution                                                 //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+
+function run_query_delete_file($path,$name) {
+  global $document_path;
+  unlink($document_path.'/'.$path.'/'.$name);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Create File query execution                                                 //
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
@@ -399,7 +455,7 @@ function run_query_create_file($document) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query execution                                                 //
+// Create Link query execution                                                 //
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
@@ -1098,7 +1154,7 @@ function islink($filename) {
 
 function getlink($name,$path) {
   global $document_path;
-  $final_path = $document_path.'/'.$path.'/'.stripslashes($name);
+  $final_path = $document_path.'/'.$path.'/'.$name;
   $handle = fopen ($final_path, "r");
   $link = fread($handle,filesize ($final_path));
   fclose($handle);
