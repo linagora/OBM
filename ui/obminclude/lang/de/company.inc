@@ -12,7 +12,6 @@
 
 // Labels and texts
 $l_number = "Nummer";
-$l_name = "Name";
 $l_aka = "Also known as";
 $l_company_name = "Firma";
 $l_kind = "Firmenart";
@@ -28,7 +27,6 @@ $l_address = "Adresse";
 $l_postcode_first = "PLZ";
 $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
-$l_phone = "Telefon";
 $l_fax = "Telefax";
 $l_web = "Web";
 $l_contact_new = "Neuer Kontakt";

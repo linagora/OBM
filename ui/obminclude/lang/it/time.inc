@@ -32,7 +32,6 @@ $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_kind = "Tipo";
 $l_function = "Funzione";
-$l_phone = "Tel";
 $l_hphone = "Tel. personale";
 $l_minihphone = "(Perso)";
 $l_mphone = "Cellulare";

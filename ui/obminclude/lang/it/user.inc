@@ -13,7 +13,6 @@ $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_password = "Password";
 $l_lastaccess = "Ultimo Accesso";
-$l_phone = "Telefono";
 $l_email = "@M";
 $l_perms_user = "Utente";
 $l_perms_editor = "Editor";

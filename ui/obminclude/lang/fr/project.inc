@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_name = "Nom";
 $l_company = "Société";
 $l_tasktype = "Catégorie";
 $l_task = "Tâche";

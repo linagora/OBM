@@ -8,7 +8,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_list_name = "Name" ;
 $l_list_subject = "Betreff";
 $l_list_insert = "speichern";
 $l_name_list_empty = "Der Listenname muß eingegeben werden" ;
@@ -26,7 +25,6 @@ $l_list_contact = "Kontakt" ;
 $l_no_list = "Keine Mailliste gefunden" ;
 $l_no_contact_found = "Kein Kontakt gefunden" ;
 $l_list_found = "Maillisten gefunden";
-$l_name = "Name" ;
 
 $l_nb_contact = "Kontakt-Nummer" ;
 $l_date_creation = "Erstellungsdatum" ;

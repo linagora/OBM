@@ -10,7 +10,6 @@
 $l_group = "Groupe";
 
 // Database fields
-$l_name = "Nom";
 $l_system = "Systeme";
 $l_desc = "Description";
 $l_email = "E-mail";
@@ -30,7 +29,6 @@ $l_desc = "Description";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
-$l_phone = "Tél";
 
 // Actions
 $l_insert = "Enregistrer le groupe";

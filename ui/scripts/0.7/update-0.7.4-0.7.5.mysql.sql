@@ -34,7 +34,7 @@ CREATE TABLE Country (
   country_iso3166 char(2),
   country_name varchar(64) UNIQUE,
   country_lang char(2),
-  country_tel varchar(4),
+  country_phone varchar(4),
   PRIMARY KEY (country_id)
 );
 

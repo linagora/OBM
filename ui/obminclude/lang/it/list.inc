@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_name = "Nome";
 $l_subject = "Oggetto";
 $l_email = "E-mail";
 $l_query = "Query";
@@ -34,7 +33,6 @@ $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_function = "Funzione";
 $l_company = "Azienda";
-$l_phone = "Tel.";
 $l_hphone = "Tel. casa";
 $l_town = "Città";
 
@@ -67,7 +65,6 @@ $l_del_contact_sel = "Elimina questi contatti";
 $l_contact_added = "Contatti inseriti";
 $l_contact_removed = "Contatti eliminati";
 
-$l_fill_name = "The list Name must be filled !";
 $l_fill_subject = "Oggeto non valido";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";

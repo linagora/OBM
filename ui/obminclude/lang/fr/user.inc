@@ -10,7 +10,6 @@
 $l_login = "Login";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
-$l_phone = "Tel";
 $l_user_perms = "Permissions";
 $l_password = "Password";
 $l_lastaccess = "Dernier accès";

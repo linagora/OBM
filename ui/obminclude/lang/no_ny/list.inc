@@ -26,7 +26,6 @@ $l_no_display = "Fill the search fields and press < Find > to retrieve the conta
 $l_no_list = "No list can be found with these criterias." ;
 $l_no_contact_found = "No contact found matching the query " ;
 $l_list_found = "lists found.";
-$l_name = "Name" ;
 $l_subject = "Subject" ;
 $l_nb_contact = "Number of contact" ;
 $l_date_creation = "Date creation" ;

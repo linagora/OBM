@@ -9,7 +9,6 @@
 
 // Database fields
 $l_number = "Numero";
-$l_name = "Nome";
 $l_aka = "Altri nome";
 $l_company_name = "Nome Azienda";
 $l_kind = "Tipo";
@@ -17,7 +16,6 @@ $l_activity = "Activita";
 $l_company_kind = "Tipo Azienda";
 $l_expresspostal = "CAP 2";
 $l_country = "Nazione";
-$l_phone = "Telefono";
 $l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";

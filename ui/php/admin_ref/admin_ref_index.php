@@ -13,6 +13,11 @@
 // - datasource_update    -- form fields    -- update the Data Source
 // - datasource_checklink --                -- check if Data Source is used
 // - datasource_delete    -- $sel_kind      -- delete the Data Source
+// - country              --                -- Data Source index
+// - country_insert       -- form fields    -- insert the Country
+// - country_update       -- form fields    -- update the Country
+// - country_checklink    --                -- check if Country is used
+// - country_delete       --                -- delete the Country
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -42,43 +47,48 @@ if ($action == "index")  {
   require("admin_ref_js.inc");
   $display["detail"] = dis_ref_index();
 
-} elseif ($action == "kind_insert")  {
+} elseif ($action == "country")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_insert($company);
+  require("admin_ref_js.inc");
+  $display["detail"] = dis_country_index();
+
+} elseif ($action == "country_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_country_insert($ref);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_insert_ok);
+    $display["msg"] .= display_ok_msg($l_country_insert_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_kind_insert_error);
+    $display["msg"] .= display_err_msg($l_country_insert_error);
   }
-  require("company_js.inc");
+  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_update")  {
+} elseif ($action == "country_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_update($company);
+  $retour = run_query_country_update($ref);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_update_ok);
+    $display["msg"] .= display_ok_msg($l_country_update_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_kind_update_error);
+    $display["msg"] .= display_err_msg($l_country_update_error);
   }
-  require("company_js.inc");
+  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_checklink")  {
+} elseif ($action == "country_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_kind_links($company);
-  require("company_js.inc");
+  $display["detail"] .= dis_country_links($ref);
+  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_index();
 
-} elseif ($action == "kind_delete")  {
+} elseif ($action == "country_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_kind_delete($company["kind"]);
+  $retour = run_query_country_delete($ref);
   if ($retour) {
-    $display["msg"] .= display_ok_msg($l_kind_delete_ok);
+    $display["msg"] .= display_ok_msg($l_country_delete_ok);
   } else {
-    $display["msg"] .= display_err_msg($l_kind_delete_error);
+    $display["msg"] .= display_err_msg($l_country_delete_error);
   }
-  require("company_js.inc");
+  require("admin_ref_js.inc");
   $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "datasource")  {
@@ -168,13 +178,13 @@ function get_param_ref() {
 //////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_action() {
   global $actions, $path;
-  global $l_header_index,$l_header_help;
+  global $l_header_datasource, $l_header_country;
   global $admin_ref_read, $admin_ref_write;
 
   // index
-  $actions["ADMIN_REF"]["index"] = array (
-     'Name'     => $l_header_index,
-     'Url'      => "$path/admin_ref/admin_ref_index.php?action=index&amp;mode=html",
+  $actions["ADMIN_REF"]["datasource"] = array (
+     'Name'     => $l_header_datasource,
+     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource&amp;mode=html",
      'Right'    => $admin_ref_read,
      'Condition'=> array ('all')
                                     	  );
@@ -203,6 +213,42 @@ function get_admin_ref_action() {
 // DataSource Delete
   $actions["ADMIN_REF"]["datasource_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+  // index
+  $actions["ADMIN_REF"]["country"] = array (
+     'Name'     => $l_header_country,
+     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country&amp;mode=html",
+     'Right'    => $admin_ref_read,
+     'Condition'=> array ('all')
+                                    	  );
+
+// Country Insert
+  $actions["ADMIN_REF"]["country_insert"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_insert",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Country Update
+  $actions["ADMIN_REF"]["country_update"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_update",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Country Check Link
+  $actions["ADMIN_REF"]["country_checklink"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_checklink",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Country Delete
+  $actions["ADMIN_REF"]["country_delete"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_delete",
     'Right'    => $admin_ref_write,
     'Condition'=> array ('None') 
                                      	       );

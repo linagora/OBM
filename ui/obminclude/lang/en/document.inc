@@ -34,7 +34,6 @@ $l_updatetime = "Update time";
 $l_document_display = "Display options for documents list";
 $l_size = "Size";
 $l_bytes = "bytes";
-$l_name = "Name";
 $l_header_new_repository = "New directory";
 $l_repository = "Directory";
 $l_add_repos = "Create directory";

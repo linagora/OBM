@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref.inc                                                //
 //     - Desc : English language for Admin Referential                       //
@@ -31,10 +31,38 @@ $l_dsrc_link_contact_no = "No contacts referenced by this Data Source";
 $l_dsrc_cant_delete = "The Data Source can't be deleted !";
 $l_dsrc_can_delete = "The Data Source can be deleted.";
 
-$l_j_dsrc_delete = "Sélectionnez une source de données pour la vérifier ou supprimer !";
-$l_j_dsrc_update = "Vous devez sélectionner une source de données et entrer une modification avant de valider !";
-$l_j_dsrc_create = "Vous devez saisir un nom de source de données pour la créer !";
-
 $l_j_dsrc_delete = "You have to select a data source to check or delete it !";
 $l_j_dsrc_update = "You have to select a data source and enter a new name to update it !";
 $l_j_dsrc_create = "You have to enter a new data source name to create it !";
+
+
+// Country
+$l_ctry_manage = "Countries management";
+$l_ctry_exist = "Existing Countries";
+$l_ctry_new = "New Country";
+$l_ctry_no = "No Country defined";
+$l_ctry_update = "Update Country";
+$l_ctry_checkdelete = "Check or Delete Country";
+$l_ctry_delete = "Delete Country";
+$l_ctry_insert = "Insert Country";
+
+$l_ctry_delete_ok = "The Country has been deleted successfully.";
+$l_ctry_delete_error = "The deletion of the Country has failed !";
+$l_ctry_insert_ok = "The Country has been inserted successfully.";
+$l_ctry_insert_error = "The insertion of the Country has failed !";
+$l_ctry_update_ok = "The Country has been updated successfully";
+$l_ctry_update_error = "The update of the Country has failed !";
+
+$l_ctry_link_company = "These companies reference this Country";
+$l_ctry_link_company_no = "No companies referenced by this Country";
+$l_ctry_link_contact = "These contacts reference this Country";
+$l_ctry_link_contact_no = "No contacts referenced by this Country";
+$l_ctry_cant_delete = "The Country can't be deleted !";
+$l_ctry_can_delete = "The Country can be deleted.";
+
+$l_j_ctry_delete = "You have to select a country to check or delete it !";
+$l_j_ctry_update = "You have to select a country and enter a new name to update it !";
+$l_j_ctry_create = "You have to enter a new country name to create it !";
+
+$l_iso_3166 = "Iso Code 3166";
+$l_lang = "Lang";

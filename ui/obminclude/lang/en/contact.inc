@@ -13,7 +13,6 @@ $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_kind = "Kind";
 $l_function = "Function";
-$l_phone = "Phone";
 $l_hphone = "Home Phone";
 $l_minihphone = "(Home)";
 $l_mphone = "Mobile Phone";

@@ -9,7 +9,6 @@
 
 // Database fields
 $l_number = "Number";
-$l_name = "Name";
 $l_aka = "Also known as";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
@@ -18,7 +17,6 @@ $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
 $l_expresspostal = "Express postal";
 $l_country = "Country";
-$l_phone = "Phone";
 $l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";

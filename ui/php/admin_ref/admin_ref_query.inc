@@ -153,3 +153,150 @@ function get_datasource_name($id) {
   $retour = $obm_q->f("datasource_name");
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Country insertion query construction and execution
+// Parameters:
+//   - $ctry : data source hash info : keys used : name
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_insert($ctry) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $name = $ctry["name"];
+
+  $query = "insert into Country (
+      country_timecreate,
+      country_usercreate,
+      country_name)
+    values (
+      '$timecreate',
+      '$usercreate',
+      '$name')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Country update query execution                                        //
+// Parameters:
+//   - $ctry : data source hash info : keys used : act, name
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_update($ctry) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $ctry["country"];
+  $name = $ctry["name"];
+
+  $query = "update Country set
+      country_name='$name',
+      country_timeupdate='$timeupdate',
+      country_userupdate='$userupdate'
+    where
+      country_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Country deletion query execution                                      //
+// Parameters:
+//   - $ctry : data source hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_delete($ctry) {
+  global $cdg_sql;
+
+  $id = $ctry["country"];
+
+  $query = "delete from Country where country_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Country - Company links query execution                               //
+// Parameters:
+//   - $ctry : data source hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_company_links($ctry) {
+  global $cdg_sql;
+
+  $id = $ctry["country"];
+
+  $query = "select company_id,
+      company_name,
+      company_country_id
+    from Company
+    where company_country_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Country - Contact links query execution                               //
+// Parameters:
+//   - $ctry : data source hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_country_contact_links($ctry) {
+  global $cdg_sql;
+
+  $id = $ctry["country"];
+
+  $query = "select contact_id,
+      contact_lastname,
+      contact_firstname,
+      contact_country_id
+    from Contact where contact_country_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the name of a Country from its id                                 //
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_country_name($id) {
+  global $cdg_sql;
+
+  $query = "select country_name
+    from Country
+    where country_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("country_name");
+  return $retour;
+}

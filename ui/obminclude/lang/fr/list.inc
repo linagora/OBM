@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_name = "Nom";
 $l_subject = "Sujet";
 $l_email = "E-mail";
 $l_query = "Requête";
@@ -34,7 +33,6 @@ $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
 $l_company = "Société";
-$l_phone = "Tél";
 $l_hphone = "Tél perso";
 $l_town = "Ville";
 

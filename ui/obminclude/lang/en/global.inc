@@ -26,10 +26,12 @@ $l_comment = "Comment";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
 $l_date = "Date";
+$l_name = "Name";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
 $l_color = "Color";
+$l_phone = "Phone";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";
@@ -162,7 +164,6 @@ $l_header_dupplicate = "Dupplicate";
 
 $l_header_add_contact = "Add contact";
 
-$l_header_reset = "Défault Préferences";
 
 // Project headers
 $l_header_man_task = "Tasks";
@@ -178,6 +179,9 @@ $l_header_amp = "Show amp";
 $l_header_func_unused = "Functions";
 $l_header_clear_sess = "Clear sessions";
 $l_header_pref_update = "Reset users preferences";
+$l_header_reset = "Défault Préferences";
+$l_header_country = "Country";
+$l_header_datasource = "Data Source";
 
 $l_header_year = "Year";
 $l_header_day = "Day";

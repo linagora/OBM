@@ -36,7 +36,6 @@ $l_updatetime = "Dernière modification";
 $l_document_display = "Options d'affichage des listes de documents";
 $l_size = "Taille";
 $l_bytes = "octets";
-$l_name = "Nom";
 $l_header_new_repository = "Nouveau répertoire";
 $l_repository = "Répertoire";
 $l_add_repos = "Créer le répertoire";

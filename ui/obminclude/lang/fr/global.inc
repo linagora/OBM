@@ -26,10 +26,12 @@ $l_comment = "Commentaire";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
 $l_date = "Date";
+$l_name = "Nom";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
 $l_color = "Couleur";
+$l_phone = "Tel.";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
@@ -162,7 +164,6 @@ $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
 
-$l_header_reset = "Préférence par défaut";
 
 // Project headers
 $l_header_man_task = "Tâches";
@@ -178,6 +179,9 @@ $l_header_amp = "Afficher les esperluettes";
 $l_header_func_unused = "Fonctions";
 $l_header_clear_sess = "Nettoyer les sessions";
 $l_header_pref_update = "Réinitialiser les préférences utilisateur";
+$l_header_reset = "Préférence par défaut";
+$l_header_country = "Pays";
+$l_header_datasource = "Source de données";
 
 $l_header_day = "Jour";
 $l_header_week = "Semaine";
