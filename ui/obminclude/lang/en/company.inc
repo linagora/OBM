@@ -12,6 +12,7 @@ $l_number = "Number";
 $l_aka = "Also known as";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
+$l_category = "Categories";
 $l_activity = "Activity";
 $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
@@ -31,6 +32,11 @@ $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
 $l_internal = "Internal";
+$l_cat_manage = "Company Category Management";
+$l_cat_exist = "Existing Categories";
+$l_cat_new = "New Category";
+$l_cat_label = "Label";
+$l_cat_code = "Code";
 $l_act_manage = "Company Activity Management";
 $l_act_exist = "Existing Activities";
 $l_act_new = "New Activity";
@@ -47,6 +53,12 @@ $l_kind_update = "Update Kind";
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
 $l_kind_insert = "Insert Kind";
+
+$l_cat_update = "Update Category";
+$l_cat_checkdelete = "Check or Delete category";
+$l_cat_delete = "Delete category";
+$l_cat_insert = "Insert category";
+
 $l_act_update = "Update Activity";
 $l_act_checkdelete = "Check or Delete Activity";
 $l_act_delete = "Delete Activity";
@@ -85,6 +97,18 @@ $l_kind_link_company = "These companies are referenced as";
 $l_kind_link_company_no = "No company referenced as";
 $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_can_delete = "The Kind can be deleted.";
+
+$l_cat_insert_ok = "The category has been inserted successfully.";
+$l_cat_insert_error = "The insertion of the category has failed !";
+$l_cat_delete_ok = "The category has been deleted successfully.";
+$l_cat_delete_error = "The deletion of the category has failed !";
+$l_cat_update_ok = "The category has been updated successfully.";
+$l_cat_update_error = "The update of the category has failed !";
+$l_cat_link_company = "These companies are referenced as";
+$l_cat_link_company_no = "No company referenced as";
+$l_cat_cant_delete = "The category can't be deleted !";
+$l_cat_can_delete = "The category can be deleted.";
+
 $l_act_delete_ok = "Activity has been deleted successfully.";
 $l_act_delete_error = "Activity deletion has failed !";
 $l_act_insert_ok = "Activity has been inserted successfully.";
@@ -107,6 +131,12 @@ $l_j_check_web = "The web adress is not valid.";
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
 $l_j_kind_create = "You have to enter a new kind name to create it !";
+
+$l_j_cat_delete = "You have to select a category to check or delete it !";
+$l_j_cat_update = "You have to select a category and enter a new name to update it !";
+$l_j_cat_create = "You have to enter a new category name and code to create it !";
+$l_j_cat_deep = "Categories can only have three levels.";
+
 $l_j_act_delete = "You have to select an activity to check or delete it !";
 $l_j_act_update = "You have to select an activity and enter a new name to update it !";
 $l_j_act_create = "You have to enter a new activity name to create it !";

@@ -129,6 +129,11 @@ $l_j_check_web = "L'adresse web n'est pas valide.";
 $l_j_kind_delete = "Sélectionnez un type pour le vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
 $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
+$l_j_cat_delete = "Sélectionnez une catégorie pour la vérifier ou supprimer !";
+$l_j_cat_update = "Vous devez sélectionner une catégorie et entrer une modification avant de valider !";
+$l_j_cat_create = "Vous devez saisir un nom de catégorie et un code pour le créer !";
+$l_j_cat_deep = "Les catégories ne peuvent pas avoir plus de trois niveaux de profondeurs";
+
 $l_j_act_delete = "Sélectionnez un secteur d'activité pour le vérifier ou supprimer !";
 $l_j_act_update = "Vous devez sélectionner un secteur d'activité et entrer une modification avant de valider !";
 $l_j_act_create = "Vous devez saisir un nom de secteur d'activité pour le créer !";

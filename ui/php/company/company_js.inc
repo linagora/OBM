@@ -166,7 +166,13 @@ function check_cat_checkdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 function check_cat_new(form)
 {
-   if (form.tf_cat.value != \"\")
+   var reg=new RegExp(\"[ .;]+\", \"g\");
+   var tableau=form.tf_cat_code.value.split(reg);
+   if(tableau.length > 2) {
+      alert(\"$l_j_cat_deep\");
+      return false;
+   }
+   if (form.tf_cat.value != \"\" && form.tf_cat_code.value != \"\")
       return true;
    else
    {
@@ -184,7 +190,7 @@ function check_cat_new(form)
 function check_cat_upd(form,formd)
 {
   cat_pos = formd.sel_cat.selectedIndex;
-  if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
+  if ((cat_pos >= 0) && (form.tf_cat.value != \"\" && form.tf_cat.value != \"tf_cat_code\")) {
     form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
     return true;
   } else {
@@ -197,13 +203,13 @@ function check_cat_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the cat creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
-function check_cat_new(form)
+function check_kind_new(form)
 {
-   if (form.tf_cat.value != \"\")
+   if (form.tf_kind.value != \"\")
       return true;
    else
    {
-      alert(\"$l_j_cat_create\");
+      alert(\"$l_j_kind_create\");
       return false;
    }
 }

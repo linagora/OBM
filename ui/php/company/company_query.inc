@@ -616,9 +616,9 @@ function run_query_companycat() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query to build the file tree
+// get detail from the Category of a company and sort it as a table
 // Parameters:
-//   - $display_file : bolean
+//   - $id : Company ID
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_companycat($id) { 
   global $cdg_sql;
@@ -639,11 +639,10 @@ function run_query_get_companycat($id) {
   return $links;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Query to build the file tree
+// get detail from the Category of a company 
 // Parameters:
-//   - $display_file : bolean
+//   - $id : Company ID
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_companycat_name($id) { 
   global $cdg_sql;
@@ -697,7 +696,7 @@ function run_query_cat_insert($company) {
 ///////////////////////////////////////////////////////////////////////////////
 // Categorie update query execution                                               //
 // Parameters:
-//   - $company : company hash info : keys used : cat, cat_label
+//   - $company : company hash info : keys used : cat, cat_label,cat_code
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_update($company) {
   global $auth, $cdg_sql;
@@ -895,7 +894,7 @@ function get_kind_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Kind from its id                                       //
+// Get the label of a Category from its id                                       //
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1028,9 +1027,8 @@ function check_data_form($cid, $company) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query to build the file tree
+// Query to build the category tree
 // Parameters:
-//   - $display_file : bolean
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_tree() {
   global $cdg_sql,$auth;

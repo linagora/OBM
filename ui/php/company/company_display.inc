@@ -422,11 +422,7 @@ function html_company_consult($co_q, $cat_q) {
     if ($i==0) {
       $cat_disp .= "<tr>";
     }
-    $length = 8 - strlen($cat_q->f("companycategory_code"));
     $label = $cat_q->f("companycategory_code");
-    for($i=0;$i<$length;$i++) {
-      $label .= "-";
-    }
     $label .= "-".$cat_q->f("companycategory_label");    
     $i++;
     $cat_disp .= "<td class=\"detailText\"> $label </td>";
@@ -557,21 +553,21 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   $sel_kind .= "</select>";
 
   // cat select
-  $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;\">";
-  $i = 0;
+  $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
+   $j =0;
   while($cat_q->next_record()) {
     $c_id = $cat_q->f("companycategory_id");
     $c_code = $cat_q->f("companycategory_code");
     $c_label = $cat_q->f("companycategory_label");
     $sel_cat .= "\n<option value=\"$c_id\"";
-    if ($compcat[$i] == $c_id) { 
+    if ($compcat[$j] == $c_id) { 
       $sel_cat .= " selected=\"selected\""; 
-      $i++;
+      $j++;
     }
     $length = 8 - strlen($c_code);
     $label = $c_code;
     for($i=0;$i<$length;$i++) {
-      $label .= "-";
+      $label .= "&nbsp;";
     }
     $label .= "-$c_label";
     $sel_cat .= ">$label</option>";
@@ -640,7 +636,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   } else { $link_web = "&nbsp;"; }
 
   if (($action == "detailupdate") || ($action == "update")) {
-    $links = html_company_links($co_q);
+    //$links = html_company_links($id, $name, $con_num, $deal_num);
   }
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -1125,21 +1121,21 @@ function html_company_cat_form($cat_q) {
 
   $sel_cat = "<select name=\"sel_cat\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
-    pos = mytext.indexOf('-');
+    pos = mytext.indexOf('&nbsp;');
     pos2 = mytext.indexOf(' ');
     ext = mytext.substr(0, pos);
     mytext = mytext.substr(pos2+1); 
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
-    size=\"10\" style=\"font-family:monospace;\">";
+    size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
   while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory_id");
     $code = $cat_q->f("companycategory_code");
     $label = $cat_q->f("companycategory_label");
     $length = 8 - strlen($cat_q->f("companycategory_code"));
     $label2 = $cat_q->f("companycategory_code");
-    for ($i=0;$i<$length;$i++) {
-      $label2 .= "-";
+    for($i=0;$i<$length;$i++) {
+      $label2 .= "&nbsp;";
     }
     $label2 .= " ".$cat_q->f("companycategory_label");    
     $sel_cat .= "\n<option value=\"$id\">$label2</option>";
@@ -1676,7 +1672,7 @@ function html_category_tree($category) {
   <br />
   <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
   <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  <input type=\"submit\" value=\"$l_add\" />  
+  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
   </form>
   </div>
   ";
