@@ -1,74 +1,70 @@
-\subsection{Le module Gestion des temps}
+\subsection{Le module Projets}
 
-Ce module permet.\\
+Ce module permet de suivre l'activité des différents utilisateurs et leur participation aux.\\
 
-Les principales entités du module \timemanager sont décrites ci-dessous :
+Les principales entités du module \project sont décrites ci-dessous :
 
-\subsubsection{Description d'une tâche}
+\subsubsection{Description d'un projet}
 
+Composantes d'un projet :
 
+\paragraph{Id} Non modifiable, numéro technique géré par l'application.
 
-\subsubsection{Les sous-menus de la section DIOR}
+\paragraph{Date} Date à laquelle a été effectuée la tâche.
 
-Le module \timemanager comporte 15 sous-menus :
+\paragraph{Durée} Durée de la tâche exprimée en fraction de journée.
+
+\paragraph{Catégorie} La catégorie d'activité de cette tâche. Celles-ci sont divisées en trois groupes :
 
 \begin{itemize}
-\item Créer, qui permet de créer un nouvel accord.
-\item Chercher, qui permet de chercher des accords suivant plusieurs critères.
-\item Chercher par Activité, qui permet de chercher des accords par activités,
+\item Tâches facturées
+\item Projets internes,
+\item Tâches non facturées
+\end{itemize}
+
+\paragraph{Projet/Affaire} Indique le projet pour lequel cette tâche a été réalisée. Cette information n'est présente que pour les tâches facturées et les projets internes.
+
+\paragraph{Société} Indique la société pour le compte de qui cette tâche a été effectuée. Cette information n'a de sens que pour les tâches facturées.
+
+\paragraph{Commentaire} Court descriptif de la tâche permettant de mieux  le travail effectué.
+
+\paragraph{Statut} Les tâches ont un statut différent en fonction de leur niveau de validation :
+
+\begin{itemize}
+\item Non validée : c'est le cas lorsque la tâche vient d'être saisie.
+\item Validation utilisateur : elle est réalisée automatiquement lorsqu'une journée est complètement remplie.
+\item Validation administrateur elle est réalisée manuellement par l'administrateur qui veut valider le mois d'un utilisateur lorsque celui-çi est entièrement rempli. Il n'est allors plus possible de modifier ces tâches.
+\end{itemize}
+
+\subsubsection{Les sous-menus du module Gestion des temps}
+
+Le module \timemanager comporte 5 sous-menus :
+
+\begin{itemize}
+\item Semaine, qui permet de voir l'état de remplissage de la gestion des temps pour une semaine choisie, la liste des tâches déjà saisies et de saisir d'autres tâches.
+\item Mois, qui permet de visualiser l'état de remplissage de la gestion des temps pour un mois complet.
+\item Validation, qui permet de chercher des accords par activités,
 de chercher, consulter et modifier l'arborescence des activités de DIOR. 
-\item Segmentation, qui permet de consulter, modifier, supprimer et de chercher
+\item Statistiques, qui permet de consulter, modifier, supprimer et de chercher
 les segments d'après leur libellé et département.
-\item Créer Segment, qui permet la création d'un nouveau segment.
-\item Organisme, qui permet de consulter, modifier, supprimer et de chercher
-les organismes d'après leur nom, numéro ou adresse.
-\item Créer Organisme, qui permet la création d'un nouvel organisme.
-\item Rep. Géo., qui permet de consulter, modifier, supprimer et de chercher
-les entrées du répertoire géographique d'après leur département,
-arrondissement, lieu et organisme.
-\item Créer Rep. Géo., qui permet la création d'une nouvelle entrée dans le
-répertoire géographique.
-\item Activité Agri., qui permet de consulter, modifier, supprimer et de
-chercher les activités agricoles d'après leur libellé.
-\item Créer Act. Agri., qui permet la création d'une nouvelle activité
-agricole.
-\item Rep. Agri., qui permet de consulter, modifier, supprimer et de chercher
-les entrées du répertoire agricole d'après leur département, commune, organisme
-et activité agricole.
-\item Créer Rep. Agri., qui permet la création d'une nouvelle entrée dans le
-répertoire agricole.
-\item Cat. Dior, qui permet de consulter les catégories Dior.
-\item Créer Cat. Dior, qui permet la création d'une nouvelle catégorie Dior.
+\item Affichage, qui permet la création d'un nouveau segment.
 
 \end{itemize}
 
+\subsubsection{Le sous-menu : Semaine}
 
-\subsubsection{Le sous-menu : Créer}
+Ce menu permet d'afficher une vue de la semaine, le formulaire permettant la saisie d'une tâche et la liste déjà saisies pour la semaine.
 
-Ce menu permet de créer un nouvel accord.
-Un formulaire vierge d'accord propose la saisie des champs :
+\subsubsection{Le sous-menu : Mois}
 
-\begin{itemize}
-\item Titre,
-\item Numéro,
-\item Indicateur de message,
-\item Type,
-\item Départements,
-\item Segment,
-\item Texte lié au régime supplémentaire,
-\item Indicateur du tableau ARRCO libre,
-\item Texte du tableau ARRCO libre,
-\item du Tableau ARRCO,
-\item du Tableau AGIRC.
-\end{itemize}
+Ce menu permet d'afficher une vue de l'état de la saisie pour un mois. Elle permet de visualiser les parties du mois pour lesquelles la gestion des temps a été remplie.
 
-L'insertion du nouvel accord s'effectue en validant le formulaire par
-le bouton ``Enregistrer l'Accord''.
+\subsubsection{Le sous-menu : Validation}
 
-Pour être valide un nouvel accord doit avoir un numéro non déjà utilisé par
-un autre accord.
+Ce menu affiche un écran qui permet de visualiser, pour un mois,  l'état de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entièrement rempli le mois.
 
-Si l'accord est valide, il est inséré dans la base de données et un message
-d'acceptation est affiché;
-sinon le formulaire de saisie de nouvel accord est affiché de nouveau
-avec un message indiquant la cause de non validité.
+\subsubsection{Le sous-menu : Statistiques}
+
+Ce menu permet de visualiser les informations concernant la répartition du temps de travail entre les différents projets et les différents types de tâches.
+
+\subsubsection{Le sous-menu : Affichage}

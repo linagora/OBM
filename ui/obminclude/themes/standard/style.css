@@ -77,23 +77,23 @@
 /* ------------------------------------------------------------------------- */
 
 .last {
-	width: 170px;
-	padding: 0px 1px 1px;
-	font-size: 10px;
-	font-weight: normal;
-	margin: 0px 2px 0px;
-	border: 1px solid #009EC6;
-/*	background-color: #FFFFFF;*/
+	padding-right:		5px;
+	padding-left:		5px;
+	font-weight:		normal;
+	font-size:		10px;
+	padding-bottom:		2px;
+	margin:			0px 2px;
+	width:			170px;
+	padding-top:		3px;
+	background-color:	#ffffff;
+	border:			1px solid #009ec6; 
 }
 
 .lastTitle {
-	font-size: 13px;
-	color: #7B9EAD;
-	font-weight: bold;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #009EC6;
-	background-color: #FFFFFF;
+	font-weight:		bold;
+	font-size:		13px;
+	color:			#7b9ead;
+	background-color:	#eff3f7; 
 }
 
 .lastList {
@@ -148,7 +148,7 @@ select {
 	margin-bottom: 20px;
 	font-style: italic;
 	color: #7B9EAD;
-/*	background-color: #FFFFFF;*/
+	background-color: #eff3f7;
 }
 
 .searchLabel {
@@ -290,7 +290,7 @@ table.resultTable	 {
 	color:			#000000;
 	width:			100%;
 	border:			0;
-	border-spacing:0px;
+	border-spacing:1px;
 	border:1px solid #009ec6;
 }
 
@@ -336,8 +336,8 @@ td.resultText  	{
 	text-align:		left;
 	color:			#000000;
 	background-color:	#ffffff;
-border-right:1px dashed #009ec6;
-border-top:1px solid #009ec6;
+/*border-right:1px solid #009ec6;
+border-top:1px solid #009ec6;*/
 }
 
 td.resultTextC  {
@@ -346,8 +346,8 @@ td.resultTextC  {
 	text-align:		center;
 	color:			#000000;
 	background-color:	#ffffff;
-border-right:1px dashed #009ec6;
-border-top:1px solid #009ec6;
+/*border-right:1px solid #009ec6;
+border-top:1px solid #009ec6;*/
 }
 
 table.resultPref	 {
@@ -388,8 +388,8 @@ a.resultText:visited { color: #0ba589; background-color: transparent;}
 /* ///// Globals items style definition ///// */
 /* ////////////////////////////////////////// */
 body 			{
-	background-color: #EFF3F7;
-//	background-color: 	#d7dfe7;
+/*	background-color: #d6dfe7;*/
+	background-color: 	#d7dfe7;
 	color:			#000000;
         border:                 0px;
         margin:                 0px;

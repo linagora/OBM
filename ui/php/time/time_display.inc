@@ -1063,7 +1063,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // the generated array is used by fill_project()
   if ($project_q->num_rows() != 0) {
     $previous_tt = 0;
-    $proj_data = "\nproject = new Array (";
 
     while($project_q->next_record()) {
       $proj_tt  = $project_q->f("deal_tasktype_id");
@@ -1090,18 +1089,13 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       }
       $proj_data .= "new Array(". $proj_label .", ". $proj_id .")";  
     }
-    $proj_data .= "\n)\n);\n\n";
-
-    $script = "\n\n<script language=\"JavaScript\">\n";
-    $script .= $proj_data;
-    $script .= "\n</script>\n\n";
+    $proj_data .= "\n)\n";
   }
 
   // data array for the projecttask dynamic list construction
   // the generated array is used by fill_projecttask()
   if ($projecttask_q->num_rows() != 0) {
     $previous_dl = 0;
-    $projtask_data = "\nprojecttask = new Array (";
 
     while($projecttask_q->next_record()) {
       $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
@@ -1124,12 +1118,20 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       }
       $projtask_data .= "new Array(". $projtask_label .", ". $projtask_id .")";
     }
-    $projtask_data .= "\n)\n);\n\n";
-
-    $script2 = "\n\n<script language=\"JavaScript\">\n";
-    $script2 .= $projtask_data;
-    $script2 .= "\n</script>\n\n";
+    $projtask_data .= "\n)\n";
   }
+
+  $script = "
+    <script language=\"JavaScript\">
+      project = new Array (
+        $proj_data
+      )
+
+      projecttask = new Array (
+        $projtask_data
+      )
+    </script>\n";
+
 
   // TaskType select construction
   $type_prec = -1;
