@@ -49,7 +49,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
-  $orderq .= " order by $order $p_order_dir";
+
+  $orderq .= " order by $order $p_order_dir $order_next";
 
   $query = "select distinct List.*, list_id as id,
     $timecreate,
@@ -381,11 +382,36 @@ function run_query_contacts_list($list, $entity="") {
   $order_dir = $list["order_dir"];
   $lang = get_lang();
 
-  if ( ($entity == "list_contact") && (trim($new_order) != "") ) {
-    $order = "order by $new_order $order_dir";
-  } else {
-    $order = "order by contact_lastname";
+  // Order exceptions (order on calculated rows)
+  // Addresses are taken from contact or from company (if empty for contact)
+
+  if ( (strcmp($new_order,"address")==0) ) {
+    $order = "contact_address1";
+    $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town, company_address1, company_address2, company_address3, company_zipcode, company_town";
+  } else if (strcmp($new_order,"address1")==0) {
+    $order = "contact_address1";
+    $order_next = ", company_address1";
+  } else if (strcmp($new_order,"address2")==0) {
+    $order = "contact_address2";
+    $order_next = ", company_address2";
+  } else if (strcmp($new_order,"address3")==0) {
+    $order = "contact_address3";
+    $order_next = ", company_address3";
+  } else if (strcmp($new_order,"zipcode")==0) {
+    $order = "contact_zipcode";
+    $order_next = ", company_zipcode";
+  } else if (strcmp($new_order,"town")==0) {
+    $order = "contact_town";
+    $order_next = ", company_town";
+  } else if (trim($new_order) == "") {
+    $order = "contact_lastname";
   }
+
+  if ($entity != "list_contact") {
+    $order = "contact_lastname";
+  }
+
+  $orderq = "order by $order $order_dir $order_next";
 
   $query = "select contactlist_contact_id as contact_id,
          contactlist_contact_id as id,
@@ -435,7 +461,7 @@ function run_query_contacts_list($list, $entity="") {
          LEFT JOIN Function ON Contact.contact_function_id = function_id
          LEFT JOIN Kind ON Contact.contact_kind_id = kind_id
       where contactlist_list_id='$id'
-         $order";
+      $orderq";
 
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);

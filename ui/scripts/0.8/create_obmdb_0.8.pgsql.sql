@@ -164,9 +164,9 @@ CREATE TABLE Country (
   country_timecreate  timestamp,
   country_userupdate  integer,
   country_usercreate  integer,
-  country_iso3166     char(2),
+  country_iso3166     char(2) NOT NULL,
   country_name        varchar(64),
-  country_lang        char(2),
+  country_lang        char(2) NOT NULL,
   country_phone       varchar(4),
   PRIMARY KEY (country_iso3166, country_lang)
 );

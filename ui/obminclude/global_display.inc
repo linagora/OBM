@@ -24,7 +24,7 @@ class OBM_DISPLAY {
   //----------- TYPE SECTION : DATA -----------//
   var $data_set;              // Data set :DB_OBM: data rows to be displayed
   var $data_header = "top";   // Table header location (top|both) (+bottom)
-  var $data_page = "true";    // Page management (true | false)
+  var $data_page = true;      // Page management (true | false)
   var $data_url = "";         // Base URL (with search) used for links in Index
   var $data_order = true;     // Order can be changed (click on column title)
   var $data_cb_text = "";     // Checkbox column text
@@ -653,18 +653,21 @@ class OBM_DISPLAY {
   // for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header_file($sep) {
-    global $fieldnames, $cdg_id, $set_debug;
+    global $cgp_hide, $fieldnames, $cdg_id, $set_debug;
 
+    $module = $this->display_module;
     $this->display_pref->seek(0);
     
     while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
-      $label = $fieldnames[$fieldname];
-      // if label empty or is an image or a link, we display the column name
-      if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
-	$label = $fieldname;
+      if (! $cgp_hide[$module][$fieldname]) {
+	$label = $fieldnames[$fieldname];
+	// if label empty or is an image or a link, we display the column name
+	if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
+	  $label = $fieldname;
+	}
+	echo "$label$sep";
       }
-      echo "$label$sep";
     }
     echo "\n";
   }
@@ -675,8 +678,9 @@ class OBM_DISPLAY {
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($first_row, $nb_rows, $sep, $dis_data_entity) {
-    global $cdg_id, $set_debug, $ctu_sql_limit;
+    global $cgp_hide, $cdg_id, $set_debug, $ctu_sql_limit;
 
+    $module = $this->display_module;
     $this->dis_data_header_file($sep);
 
     // If limit is not used, we seek to the first row to display

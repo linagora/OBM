@@ -483,7 +483,7 @@ function dis_data_list($action, $mode) {
     $new_sta_nb = get_list_static_contact_nb($id);
     $new_dyn_nb = $query_nb;
 
-    if ($query != $new_query) {
+    if (($sta_nb != $new_sta_nb) || ($query != $new_query)) {
       $query_diff = true;
       $query_diff_txt = "X";
     } else {

@@ -61,7 +61,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
          || ($OD->data_set->f("contact_address2") != "")
-         || ($OD->data_set->f("contact_address3") != "") ) {
+         || ($OD->data_set->f("contact_address3") != "")
+         || ($OD->data_set->f("contact_zipcode") != "")
+         || ($OD->data_set->f("contact_town") != "")
+         || ($OD->data_set->f("contact_expresspostal") != "") ) {
     $contact_has_address = true;
   } else {
     $contact_has_address = false;
@@ -104,6 +107,18 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("contact_address3");
       }
+      if ($OD->data_set->f("contact_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("contact_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_zipcode");
+      }
+      if ($OD->data_set->f("contact_town") != "") {
+	$res["name"] .= $OD->data_set->f("contact_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_town");
+      }
+      if ($OD->data_set->f("contact_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
+      }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address1") != "") {
@@ -117,6 +132,18 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       if ($OD->data_set->f("company_address3") != "") {
 	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("company_address3");
+      }
+      if ($OD->data_set->f("company_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("company_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_zipcode");
+      }
+      if ($OD->data_set->f("company_town") != "") {
+	$res["name"] .= $OD->data_set->f("company_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_town");
+      }
+      if ($OD->data_set->f("company_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
       }
     }
   }

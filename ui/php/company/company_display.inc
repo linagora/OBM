@@ -507,6 +507,7 @@ function html_company_links($co_q) {
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
   $market = $co_q->f("company_marketingmanager_id");
+  $email = $co_q->f("company_email");
   $ctry = $co_q->f("company_country_iso3166");
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
@@ -517,7 +518,7 @@ function html_company_links($co_q) {
   // Contact
   if ($cgp_show["module"]["contact"]) {
     $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
-    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
+    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email");
     $block_contact = "
   <div class=\"linkTitle\">:: $l_header_contact</div>
   <ul class=\"linkList\">
