@@ -59,3 +59,14 @@ CREATE TABLE Import (
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_name', 1, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_datasource', 2, 2);
+
+-- module 'Contact'
+--
+-- Table structure for table 'ContactCategory1'
+--
+ALTER TABLE ContactCategory1 CHANGE COLUMN contactcategory1_order contactcategory1_code int(4) default '0';
+--
+-- Table structure for table 'ContactCategory2'
+--
+ALTER TABLE ContactCategory2 CHANGE COLUMN contactcategory2_order contactcategory2_code int(4) default '0';
+
