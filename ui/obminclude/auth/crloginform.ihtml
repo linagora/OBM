@@ -1,40 +1,23 @@
-<!--
-///////////////////////////////////////////////////////////////////////////////
-// OBM - File : crloginform.ihtml                                            //
-//     - Desc : OBM Login Page                                               //
-// 1999-03-19 Pierre Baudracco                                               //
-///////////////////////////////////////////////////////////////////////////////
-// $Id$ //
-///////////////////////////////////////////////////////////////////////////////
-
-  This loginform uses a challenge/response mechanism to
-  authenticate the user. The password does not travel over the
-  network if the client browser has JavaScript enabled.
-
-  $auth->auth_loginform() creates a challenge value which is incorporated
-  into this form. When the user tries to submit the form,
-  md5("login:password:challenge") is calculated and filled
-  into the reply field. The password field is erased. The server
-  can calculate the exspected reply and compare it to the actual
-  reply value. If they match, the user is authenticated.
-
-  If the reply field is empty and password is set, the server
-  knows that the client cannot do JS. The user can still be
-  authenticated, but the password is visible on the network.
-
-  $Id$
--->
-
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
 <head>
-  <TITLE>Login - O.B.M.</TITLE>
+<title>Document sans titre</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<style type="text/css">
+<!--
+body {
+	background-image: url(/images/images/accueil_fond.gif);
+	background-repeat: no-repeat;
+	background-position: center top;
+}
+tr.logintable {
+	border: 1px dashed #CCCCCC;
+	}
+-->
+</style>
 
-  <style type="text/css">
-  <!--
-    body { font-family: Arial, Helvetica, sans-serif }
-    td   { font-family: Arial, Helvetica, sans-serif }
-  -->
-  </style>
+<style type="text/css">
+<!--
 <?php include("$obminclude/auth/md5.js"); ?>
 <script language="javascript">
 <!--
@@ -49,89 +32,77 @@
   }
 // -->
 </script>
+
 </head>
 
+<body>
+<div align="center"><font color="#0892B5" size="2" face="sans-serif, Verdana, Arial"><strong>OBM 
+<?php print $obm_version; ?>- DEMO</strong></font> </div>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center">&nbsp;</p>
+<p align="center"><font size="2" face="sans-serif, Verdana, Arial"><em>Please 
+  identify yourself with a Login and a password :</em></font></p>
+<form name="form1" method="post" action="<?echo $form_action;?>">
+  <table width="199" border="0" align="center" cellpadding="0" cellspacing="0">
+  <tr>
+    <td width="118"><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>LOGIN 
+          :&nbsp;</strong></font> </div></td>
+    <td width="81"><input name="login" type="text" size="10" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>"></td>
+  </tr>
+  <tr>
+    <td><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>PASSWORD 
+          :&nbsp;</strong></font></div></td>
+    <td><input name="password" type="password" size="10"></td>
+  </tr>
 
-<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCCC" VLINK="#00CCCC">
-<CENTER>
-<table Width=100% BORDER=0>
-<tr>
-  <td WIDTH="24%"><A HREF="http://www.aliacom.fr/">
-    <IMG align=middle border=0 SRC="/images/images/obm.jpg"></A>
-    <?php print $obm_version; ?>
-  </td>
-  <td WIDTH="18%" align=center>&nbsp;</td>
-  <td WIDTH="40%" align=center><H1>DEMO</H1></td>
-  <td WIDTH="18%" align=center>&nbsp;</td>
-  <td WIDTH="18%" align=right>
-    <table BORDER=0>
-    <tr>
-      <td ALIGN=center><A HREF="obm.php" TARGET="_top">
-        <IMG BORDER=0 SRC="/images/standard/obm.jpg"></A>
-      </td>
-    </tr>
-    <tr>
-      <td ALIGN=center>&nbsp;</td>
-    </tr>
-    <tr>
-      <td ALIGN=center>&nbsp;</td>
-    </tr>
-    </table>
-  </td>
-</tr>
-<tr>
-  <td COLSPAN=4><HR></td>
-</tr>
 </table>
+  <br>
+  <div align="center">
+  <input name="imageField" type="image" src="/images/images/bouton_login.gif" width="143" height="32" border="0">
 
+</div></form>
+<p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </font><font size="2" face="sans-serif, Verdana, Arial"><br>
+  <em>Available login and pass for Demo :</em></font></p>
+<div align="center">
+  <table width="306" cellpadding="0" cellspacing="0">
+    <tr bgcolor="#7BBACE" class="logintable">
+      <td width="137"> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">Authorization 
+          </font></div></td>
+      <td width="77" height="17"> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">Login</font></div></td>
+      <td width="90"> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">Password</font></div></td>
+    </tr>
+    <tr bgcolor="#F2F2F2" class="logintable">
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial"><strong>USER</strong></font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">uuser</font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">puser</font></div></td>
+    </tr>
+    <tr bgcolor="#E9E9E9" class="logintable">
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial"><strong>EDITOR</strong></font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">ueditor</font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">peditor</font></div></td>
+    </tr>
+    <tr bgcolor="#F2F2F2" class="logintable">
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial"><strong>ADMINISTRATOR</strong></font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">uadmin</font></div></td>
+      <td> <div align="center"><font size="2" face="sans-serif, Verdana, Arial">padmin</font></div></td>
+    </tr>
+  </table>
 
-Please identify yourself with a Login and a password:<br>
-<? $form_action="$path/obm.php"; ?>
+  <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial">- - - - - - 
+  - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  </font><br>
+  <font size="2" face="sans-serif, Verdana, Arial"><a href="http://www.alaicom.fr" target="_blank">Aliacom</a></font> 
+  <font size="2" face="sans-serif, Verdana, Arial">- 2002</font></div>
 
-<form name="login" action=<?echo $form_action;?>  method=post>
-<table border=0 bgcolor="#000000" align="center" cellspacing=0 cellpadding=4>
- <tr valign=top align=left>
-  <td>Login:</td>
-  <td><input type="text" name="login" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>" size=32 maxlength=32></td>
- </tr>
-
- <tr valign=top align=left>
-  <td>Password:</td>
-  <td><input type="password" name="password" size=32 maxlength=32></td>
- </tr>
-
- <tr>
-  <td>&nbsp;</td>
-  <td align=right><input onClick="doChallengeResponse(); return false;" type="submit" name="submitbtn" value="Login now"></td>
- </tr>
-</table>
-
-<br>
-Available login and pass for Demo
-<br>
-<br>
-<table border =1>
-  <tr>
-    <th>Login</th>
-    <th>Password</th>
-    <th>Authorization</th>
-  </tr>
-  <tr>
-    <td>uuser</td>
-    <td>puser</td>
-    <td>user</td>
-  </tr>
-  <tr>
-    <td>ueditor</td>
-    <td>peditor</td>
-    <td>editor</td>
-  </tr>
-  <tr>
-    <td>uadmin</td>
-    <td>padmin</td>
-    <td>admin</td>
-  </tr>
-</table>
 
  <?php global $login; if ( isset($login) ): ?>
  <!-- failed login code -->
@@ -164,6 +135,6 @@ Available login and pass for Demo
   }
 // -->
 </script>
+
+</body>
 </html>
-
-

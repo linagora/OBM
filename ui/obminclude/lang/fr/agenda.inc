@@ -25,16 +25,19 @@ $l_medium = "Normale";
 
 $l_datebegin = "Date de d&eacute;but";
 $l_dateend = "Date de fin";
-$l_timebegin = "Heure de d&eacute;but";
-$l_timeend = "Heure de fin";
+$l_timebegin = "Heure de d&eacute;but (HH:MM)";
+$l_timeend = "Heure de fin (HH:MM)";
 $l_occupied_day = "Journ&eacute;e entiere";
 
-$l_repeat = "REPETITION";
+$l_format = "(AAAA-MM-JJ)";
+$l_repeat = "Répétition";
 $l_periodicity = "Fr&eacute;quence";
 $l_repeatkind = "Type de r&eacute;p&eacute;tition";
 $l_repeatdays = "Jours de r&eacute;p&eacute;tition (type hebdomadaire)";
 $l_use_endrepeat = "Date de fin de r&eacute;p&eacute;tition";
-$l_interval = "Intervalle ";
+$l_interval = "Intervalle (en jours)";
+$l_carac = "Propriétés";
+$l_force = "Forcer l'insertion de l'evenement";
 
 $l_waiting_events = "Rendez-vous en attente";
 
@@ -47,8 +50,7 @@ $l_short_waiting  = "Att";
 
 $l_daily = "quotidienne";
 $l_weekly = "hebdomadaire";
-$l_monthlybydate = "mensuelle (date)";
-$l_monthlybyday = "mensuelle(jour)";
+$l_monthly = "mensuelle";
 $l_yearly = "annuelle";
 
 $l_from = "du";
@@ -83,6 +85,13 @@ $l_event_approve_error = "L'enregistrement de vos choix a &eacute;chou&eacute;";
 $l_event_update_cancel_ok = "La modification du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
 $l_event_insert_cancel_ok = "L'insertion du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
 $l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
+
+$l_fill_title = "Veuillez remplir le champ <Titre>";
+$l_fill_dateend = "Veuillez remplir le champ <Date de fin>";
+$l_fill_datebegin = "Veuillez remplir le champ <Date de debut>";
+$l_incorect_datebegin = "Format du champ <Date de debut> incorrecte";
+$l_incorect_dateend = "Format du champ <Date de Fin> incorrecte";
+$l_incorect_repeat = "Format du champ <Date de fin de répétition> incorrecte";
 
 $l_monday="Lundi";
 $l_tuesday="Mardi";

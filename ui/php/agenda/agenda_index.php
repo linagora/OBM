@@ -78,17 +78,36 @@ elseif ($action == "view_week") {
 }
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
-
-  dis_month_planning($agenda);
+  $p_user_array = array($auth->auth["uid"],6);
+  $obm_q = run_query_month_event_list($agenda,$p_user_array);
+  $user_q = run_query_get_user_name($p_user_array);
+  dis_month_planning($agenda,$obm_q,$user_q);
 }
 elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
-
-  dis_year_planning($agenda);
+  $p_user_array = array($auth->auth["uid"],6);
+  $obm_q = run_query_year_event_list($agenda,$p_user_array);
+  $user_q = run_query_get_user_name($p_user_array);
+  dis_year_planning($agenda,$obm_q,$user_q);
 }
+elseif ($action == "new") {
+///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
+  $user_obm = run_query_userobm();
+  $cat_event = run_query_get_eventcategories();
+  $p_user_array = array($auth->auth["uid"]);
+  dis_event_form($action, $agenda, $user_obm, $cat_event, $p_user_array);
 
-
-
+}
+elseif ($action == "insert") {
+///////////////////////////////////////////////////////////////////////////////
+  if(check_data_form($agenda)){    
+    $user_obm = run_query_userobm();
+//    $cat_event = run_query_get_eventcategories();
+    $p_user_array = array($auth->auth["uid"],6);
+    dis_event_form($action, $agenda, $user_obm, $cat_event, $p_user_array);
+  }
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
@@ -96,14 +115,45 @@ elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
 
 function get_param_agenda() {
-  global $param_date;
-
-  global $cdg_param;
+  global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
+  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$sel_repeat_kind,$tf_interval;
+  global $cdg_param,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
+  global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy;
 
 
   // Deal fields
   if (isset ($param_date)) $agenda["date"] = $param_date; 
   else $agenda["date"] = date("Ymd",time());
+  if (isset($param_event)) $agenda["id"] = $param_event;
+  if (isset($tf_title)) $agenda["title"] = $tf_title;
+  if (isset($sel_category_id)) $agenda["category"] = $sel_category_id;
+  if (isset($sel_priority)) $agenda["priority"] = $sel_priority;
+  if (isset($ta_event_description)) $agenda["description"] = $ta_event_description;
+  if (isset($cb_force))  $agenda["force"] = $cb_force;
+  if (isset($cb_privacy))  $agenda["privacy"] = $cb_privacy;
+  if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;  
+  if (isset($tf_date_begin)) {
+    if (isset($tf_time_begin)) {
+      $agenda["date_begin"] = $tf_date_begin.substr($tf_time_begin,0,2).substr($tf_time_begin,3,2);
+    }
+    else {
+      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",$tf_date_begin));
+    }
+  }
+  if (isset($tf_date_end)) {
+    if (isset($tf_time_end)) {
+      $agenda["date_end"] = $tf_date_begin.substr($tf_time_end,0,2).substr($tf_time_end,3,2);
+    }
+    else {
+      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",$tf_date_end));
+    }
+  }
+  if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
+  if (isset($tf_interval)) $agenda["interval"] = $tf_interval;
+  for ($i=0; $i<7; $i++) {
+    if (isset(${"cb_repeatday_".$i})) 
+      $agenda["repeat_days"] .= ${"cb_repeatday_".$i};
+  }
 
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {
@@ -151,7 +201,7 @@ function get_agenda_action() {
     'Url'      => "$path/agenda/agenda_index.php?action=new",
     'Right'    => $agenda_write,
     'Condition'=> array ('index','detailconsult','
-                         view_month','view_week','view_day','view_year') 
+                         view_month','view_week','view_day','view_year','view_month') 
                                     );
 
 
