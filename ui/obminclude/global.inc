@@ -6,18 +6,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
 $obm_version="0.5.2pre6";
 //$set_debug=0;
 $l_title="O.B.M.";
 $status="";
-
 // VARS that go in session
 $set_lang_default="en";
 $set_theme_default="aliacom";
 $set_rows_default=10;
 $set_display_default="no";
-$set_debug_default=0;
+//$set_debug_default=0;
 $last_deal_default=0;
 $last_company_default=0;
 $last_contact_default=0;
@@ -32,7 +30,8 @@ $order_contactslist_default="contact_lastname";
 $set_weekstart_default="monday";
 //Time of inactivity during which a user is regarded as active (second), you 
 //can modify it or modify the php session time in the session4.inc file.
-$time_active_session = "1440";
+global $sess;
+$time_active_session = $sess->lifetime;
 //Timemanager module
 // In how many parts we can chop a day
 $fraction_jour = 8;
@@ -102,13 +101,19 @@ if ($set_debug > 0) {
   echo "last deal=$last_deal ";
   echo "last_contact=$last_contact<br>";
 }
-*/
+	*/ 
+$obminclude = getenv("OBM_INCLUDE_VAR");
+//include("$obminclude/global_query.inc");
 
+//$config_var = run_query_get_config_var();
+
+//while($config_var->next_record())
+//  ${$config_var->f("ConfigObmVars_name")} = $config_var->f("ConfigObmVars_value");
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
 ///////////////////////////////////////////////////////////////////////////////
-$obminclude = getenv("OBM_INCLUDE_VAR");
+
 if ($menu == "")
   $path = "";
 else 

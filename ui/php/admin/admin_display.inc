@@ -178,7 +178,6 @@ function dis_clear_sess($mode) {
 
   if($mode == "html")
     dis_index($mode);
-//   header("location: admin_index.php?mode=html&action=index");
 
 }
 

@@ -19,7 +19,6 @@ class Session {
   var $mode = "";               ## We propagate session IDs with cookies
   var $cookiename = "";			## Name of the session cookie, defaults to classname
 //  var $fallback_mode;                 ## If this doesn't work, fall back...
-  var $lifetime = 7200;                  ## 0 = do session cookies, else minutes
 
 //  var $cookie_domain = "";            ## If set, the domain for which the
                                       ## session cookie is set.
@@ -36,6 +35,7 @@ class Session {
   var $allowcache_expire = 1440;      ## If you allowcache, data expires in this
                                       ## many minutes.
 //  var $that_class = "";               ## Name of data storage container
+  var $lifetime = 7200;                  ## 0 = do session cookies, else minutes
 
   ##
   ## End of parameters.

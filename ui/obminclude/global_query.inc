@@ -68,10 +68,12 @@ function run_query_contactid_user($user_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_default_preferences_insert($user_id) {
   global $cdg_sql;
-  global $set_lang_default, $set_theme_default, $set_display_default, $set_rows_default, $set_debug_default;
-  global $last_company_default, $last_deal_default, $last_contact_default, $last_invoice_default, $last_account_default, $last_payment_default;
+  global $set_lang_default, $set_theme_default, $set_display_default, $set_rows_default;
+  global $last_company_default, $last_deal_default, $last_contact_default, $last_invoice_default;
+  global $last_account_default, $last_payment_default;
   global $set_day_weekstart_default;
-  	       	
+
+  $set_debug_default = 0;	       	
   $obm_q = new DB_OBM;
 
   //-- Drop current user preferences
@@ -149,6 +151,16 @@ function run_query_default_preferences_insert($user_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
    
+  //-- Default "last visited" payment
+  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_contract','$last_contract_default')";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  //-- Default "last visited" invoice
+  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_incident','$last_incident_default')";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
 
   //---------------------------------------------------------------------------
   // Default Display Parameters
@@ -524,6 +536,22 @@ function get_company_active_deal_number($id) {
   $retour = $obm_q->f("count(deal_id)");
   return $retour;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Get the configuration variable in the database this variable could be set
+// in the administration module.
+// Parameters:
+//   - none   
+///////////////////////////////////////////////////////////////////////////////
 
+function run_query_get_config_var() {
+  global $cdg_sql;
+
+  $query = "select * from ConfigObmVars";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
 
 ?>
