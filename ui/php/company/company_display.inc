@@ -1744,22 +1744,22 @@ function html_category_tree($category) {
    <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
    ";
    $cat_a = run_query_ordered_category($obm_d);
-   foreach($cat_a as $cat_info) {
-     $hash_code = explode(".",$cat_info["code"]);
-     $deep = count($hash_code);
-     switch ($deep) {
-       	case 1:
-	  $tree[$hash_code[0]] = $cat_info;
-	  break;
-	case 2:
-	  $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
-	  break;
-	case 3:
-	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
-	  break;
+   if(is_array($tree)) {
+     foreach($cat_a as $cat_info) {
+       $hash_code = explode(".",$cat_info["code"]);
+       $deep = count($hash_code);
+       switch ($deep) {
+	 case 1:
+	   $tree[$hash_code[0]] = $cat_info;
+	   break;
+	 case 2:
+	   $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
+	   break;
+	 case 3:
+	   $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
+	   break;
+	 }
     }
-  }
-  if(is_array($tree)) {
     foreach($tree as $level => $info) { 
       $block .= @display_popup_tree($info,0);
     }
