@@ -11,7 +11,6 @@
 // payment only stuff
 $l_label = "Label";
 $l_label_start = "Début du Label";
-$l_last_payment = "Dernier Paiement";
 $l_number = "Numéro";
 $l_amount = "Montant"; 
 $l_comment = "Commentaire";

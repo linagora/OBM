@@ -428,8 +428,8 @@ function get_list_action() {
     'Condition'=> array ('None') 
                                       );
 
-// Ext get Ids : Lists selection
-  $actions["LIST"]["ext_get_ids"] = array (
+// Sel list contacts : Contacts selection
+  $actions["LIST"]["sel_list_contact"] = array (
     'Name'     => $l_header_add_contact,
     'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
     'Right'    => $list_write,
@@ -465,7 +465,7 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
     'Right'    => $list_write,
     'Popup'    => 1,
-    'Target'    => $l_list,
+    'Target'   => $l_list,
     'Condition'=> array ('all') 
                                      	 );
 

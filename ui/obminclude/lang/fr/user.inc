@@ -10,6 +10,7 @@
 $l_login = "Login";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
+$l_phone = "Tel";
 $l_user_perms = "Permissions";
 $l_password = "Password";
 $l_lastaccess = "Dernier accès";
@@ -30,7 +31,7 @@ $l_update = "Modifier l'utilisateur";
 $l_checkdelete = "Vérifier ou Supprimer l'utilisateur";
 $l_reset = "Préférences par défaut";
 $l_delete = "Supprimer l'utilisateur";
-$l_confirm= "Confirmer l'action";
+$l_add = "Ajouter ces utilisateurs";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des utilisateurs correspondants.";
@@ -56,3 +57,5 @@ $l_fill_login = "Vous devez renseigner le login avant de valider.";
 $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de l'utilisateur ?";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+
+$l_user_display = "Options d'affichage des listes d'utilisateurs";

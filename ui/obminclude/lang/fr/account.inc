@@ -10,7 +10,6 @@
 // Labels et textes
 $l_label = "Label";
 $l_label_start = "Début du Label";
-$l_last_account = "Dernier Compte";
 $l_bank = "Banque"; 
 $l_number = "Numéro";
 $l_balance = "Solde";

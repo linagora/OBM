@@ -29,9 +29,6 @@ $l_country = "Nazione";
 $l_visibility ="Accesso";
 
 // Labels and texts
-$l_last_contact = "Ultimo contatto";
-$l_last_company = "Ultima azienda";
-$l_last_deal="Ultimo  deal";
 $l_contact_name = "Nome Contatto";
 $l_from_company = "Azienda";
 $l_telother = "Altro Tel";
@@ -47,7 +44,6 @@ $l_insert = "Inserisci Contatto ";
 $l_update = "Modifica Contatto";
 $l_checkdelete = "Controlla o elimina il Contatto";
 $l_delete = "Elimina il ";
-$l_confirm= "Conferma azione";
 $l_add = "Aggiungi i contatti";
 
 // Messages

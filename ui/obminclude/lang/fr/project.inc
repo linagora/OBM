@@ -74,7 +74,6 @@ $l_act_update = "Modifier le secteur d'activité";
 $l_act_checkdelete = "Vérifier ou Supprimer le secteur d'activité";
 $l_act_delete = "Supprimer le secteur d'activité";
 $l_act_insert = "Créer le secteur d'activité";
-$l_confirm = "Confirmer l'action";
 $l_select_company = "Sélectionner la société";
 
 // Messages

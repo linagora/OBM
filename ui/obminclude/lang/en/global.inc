@@ -29,10 +29,6 @@ $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
 $l_color = "Color";
 
-// Mysql Date format
-$l_datetime_format = "%m-%d-%Y %H:%i:%s"; // Complete Date + Time
-$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
-
 // OBM_DISPLAY
 $l_entries = "Entries";
 $l_page_res = "Result pages";
@@ -129,11 +125,13 @@ $l_header_export = "Export";
 $l_header_consult = "Consult";
 $l_header_update = "Update";
 $l_header_delete = "Delete";
+$l_header_add_contact = "Add contact";
+$l_header_add_user = "Add user";
+$l_header_add_group = "Add group";
 
 $l_header_new_child = "New linked Deal";
 $l_header_new_parent = "New ParentDeal";
 
-$l_header_add_contact = "Add contact";
 
 $l_header_reconcile = "Reconcile";
 $l_header_compute_balance = "Compute balance";

@@ -46,6 +46,8 @@ $group = get_param_group();
 get_group_action();
 $perm->check();
 
+$uid = $auth->auth["uid"];
+
 // updating the group bookmark : 
 if ( ($param_group == $last_group) && (strcmp($action,"delete")==0) ) {
   $last_group = $last_group_default;
@@ -74,7 +76,7 @@ if ($action == "ext_get_ids") {
   if ($set_display == "yes") {
     $display["result"] = dis_group_search_group($group, $popup);
   } else {
-    $display["msg"] .= display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
@@ -85,7 +87,7 @@ elseif (($action == "index") || ($action == "")) {
   if ($set_display == "yes") {
     $display["msg"] .= dis_group_search_group("", $popup);
   } else {
-    $display["msg"] .= display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
@@ -220,11 +222,11 @@ else if ($action == "insert") {
     } else {
       $display["msg"] .= display_err_msg($l_no_user_added);
     }
-    $group_q = run_query_detail($param_group);
+    $group_q = run_query_detail($group["id"]);
     $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($param_group);
+    $u_q = run_query_user_group($group["id"]);
     $pref_g_q = run_query_display_pref($uid, "group_group");
-    $g_q = run_query_group_group($param_group);
+    $g_q = run_query_group_group($group["id"]);
     $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
   } else {
     $display["msg"] .= display_error_permission();
@@ -291,7 +293,7 @@ else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  dis_group_display_pref($pref_q, $pref_u_q);
+  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
 }
 
 else if($action == "dispref_display") {
@@ -299,7 +301,7 @@ else if($action == "dispref_display") {
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  dis_group_display_pref($pref_q, $pref_u_q);
+  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
 }
 
 else if($action == "dispref_level") {
@@ -307,7 +309,7 @@ else if($action == "dispref_level") {
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
-  dis_group_display_pref($pref_q, $pref_u_q);
+  $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
 }
 
 
@@ -327,7 +329,7 @@ display_page($display);
 function get_param_group() {
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
   global $param_group, $cdg_param, $popup;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_title;
+  global $action, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   // Group fields
@@ -342,7 +344,9 @@ function get_param_group() {
   if (isset ($ext_action)) $group["ext_action"] = $ext_action;
   if (isset ($ext_url)) $group["ext_url"] = $ext_url;
   if (isset ($ext_id)) $group["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $group["id"] = $ext_id;
   if (isset ($ext_title)) $group["ext_title"] = $ext_title;
+  if (isset ($ext_target)) $group["ext_target"] = $ext_target;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -385,9 +389,10 @@ function get_param_group() {
 // Group Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_action() {
-  global $group, $actions, $path;
+  global $group, $actions, $path, $l_group;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin;
+  global $l_header_add_user, $l_add_user, $l_header_add_group, $l_add_group;
   global $group_read, $group_write, $group_admin_read, $group_admin_write;
 
 // Index
@@ -410,7 +415,7 @@ function get_group_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/group/group_index.php?action=new",
     'Right'    => $group_write,
-    'Condition'=> array ('search','index','admin','detailconsult','reset','display') 
+    'Condition'=> array ('search','index','admin','detailconsult','reset','display', 'user_add', 'user_del', 'group_add', 'group_del')
                                   );
 
 // Detail Consult
@@ -426,7 +431,7 @@ function get_group_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
      'Right'    => $group_write,
-     'Condition'=> array ('detailconsult', 'reset') 
+     'Condition'=> array ('detailconsult', 'reset', 'user_add', 'user_del', 'group_add', 'group_del') 
                                      	   );
 
 // Insert
@@ -448,7 +453,7 @@ function get_group_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"]."",
     'Right'    => $group_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'reset') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'reset', 'user_add', 'user_del', 'group_add', 'group_del') 
                                      	   );
 
 // Delete
@@ -458,11 +463,37 @@ function get_group_action() {
     'Condition'=> array ('None') 
                                      );
 
+// Ext get Ids : external Group selection
+  $actions["GROUP"]["ext_get_ids"] = array (
+    'Right'    => $group_write,
+    'Condition'=> array ('None') 
+                                    	  );
+
+// sel group add : Groups selection
+  $actions["GROUP"]["sel_group_add"] = array (
+    'Name'     => $l_header_add_group,
+    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group",
+    'Right'    => $group_write,
+    'Popup'    => 1,
+    'Target'   => $l_group,
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del') 
+                                    	  );
+
+// Sel user add : Users selection
+  $actions["GROUP"]["sel_user_add"] = array (
+    'Name'     => $l_header_add_user,
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group",
+    'Right'    => $group_write,
+    'Popup'    => 1,
+    'Target'   => $l_group,
+    'Condition'=> array ('detailconsult','user_add','user_del', 'group_add','group_del') 
+                                    	  );
+
 // User add
   $actions["GROUP"]["user_add"] = array (
     'Url'      => "$path/group/group_index.php?action=user_add",
     'Right'    => $group_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('None')
                                      );
 
 // User del

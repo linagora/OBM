@@ -53,7 +53,6 @@ $l_act_update = "Aggiorna Activita";
 $l_act_checkdelete = "Controlla o Elimina Activita";
 $l_act_delete = "Elimina Activita";
 $l_act_insert = "Inserisci Activita";
-$l_confirm = "Conferma azione";
 $l_select_company = "Seleziona Azienda";
 
 // Messages
@@ -109,9 +108,9 @@ $l_j_kind_create = "Inserisci nuovo tipo per crearlo  !";
 $l_j_act_delete = "Scegli una activita da controllare o eliminare !";
 $l_j_act_update = "Scegli una activita e inserisci il nuovo nome per la modifica !";
 $l_j_act_create = "Inserisci nuova activita per crearla !";
-$l_j_select_company = "Scegli  Azienda !";
+$l_j_select_company = "Scegli Azienda !";
 
 // For the display parameters modification screen
-$l_company_display = "Mostra opzioni lista  Aziende ";
+$l_company_display = "Mostra opzioni lista Aziende";
 
 </script>

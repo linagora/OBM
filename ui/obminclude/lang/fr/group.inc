@@ -2,12 +2,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 // ALIAMIN - Language : French                                               //
 //         - File     : group.inc                                            //
-// 2002-10-30 Pierre Baudracco                                               //
+// 2003-08-22 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$menus[$menu] = "GROUPE";
 $l_group = "Groupe";
 
 // Database fields
@@ -39,9 +38,6 @@ $l_hphone = "Tél perso";
 $l_insert = "Enregistrer le groupe";
 $l_update = "Modifier le groupe";
 $l_delete = "Supprimer le groupe";
-$l_find = "Chercher";
-$l_back = "Retour";
-$l_confirm = "Confirmer l'action";
 $l_add = "Ajouter ces groupes";
 
 // Messages
@@ -59,7 +55,7 @@ $l_j_check_email = "L'adresse e-mail n'est pas valide !";
 $l_warn_delete = "utilisateurs enregistrés dans ce groupe";
 $l_email_exist = "L'adresse E-mail saisie est déjà utilisée !";
 
-$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les groupes correspondants.";
 $l_no_group = "Aucun groupe ne correspond à ces critères.";
 $l_no_user = "Il n'y a pas d'utilisateurs membres.";
 $l_no_group_group = "Il n'y a pas de groupes membres.";

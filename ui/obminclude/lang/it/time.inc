@@ -47,9 +47,6 @@ $l_town = "Città";
 $l_country = "Stato";
 $l_visibility ="Accesso";
 
-$l_last_contact = "Ultimo Contatto";
-$l_last_company = "Ultima Azienda";
-$l_last_deal = "Ultimo Deal";
 $l_week_sel = "Settimana di ricerca";
 $l_from_company = "&nbsp;&nbsp;Azienda";
 $l_telother = "Altri tel";
@@ -72,7 +69,6 @@ $l_insert = "Registra il contatto";
 $l_update = "Modifica il contatto";
 $l_checkdelete = "Verifica o elimina il contatto";
 $l_select_company = "Scegli l'azienda";
-$l_confirm= "Conferma";
 
 // Messages
 $l_projects_manager = "Projects managers conferma tasks qui:";

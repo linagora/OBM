@@ -42,7 +42,6 @@ $l_town = "Town";
 $l_insert = "Insert the list";
 $l_update = "Update the list";
 $l_delete = "Delete the list";
-$l_confirm = "Confirm the action";
 $l_add = "Add these lists";
 
 // Messages

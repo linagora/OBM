@@ -14,6 +14,7 @@ $l_cancel = "Cancella";
 $l_close = "Chiudi";
 $l_validate = "Valida";
 $l_execute = "Esegui azione";
+$l_confirm = "Conferma azione";
 
 // Common messages
 $l_yes = "Si";
@@ -138,6 +139,9 @@ $l_header_consult = "Consulta";
 $l_header_update = "Modifica";
 $l_header_delete =  "Word to define";
 $l_header_display = "Visualizza";
+$l_header_add_contact = "Add contact";
+$l_header_add_user = "Add user";
+$l_header_add_group = "Add group";
 
 $l_header_new_child = "Nuovo linked Deal";
 $l_header_new_parent = "Nuovo ParentDeal";
@@ -150,7 +154,6 @@ $l_header_compute_balance =  "Word to define";
 $l_header_export = "Esporta";
 $l_header_global_export = "Esporta";
 
-$l_header_add_contact = "Word to define";
 
 $l_header_reset = "Word to define";
 

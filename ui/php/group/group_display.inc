@@ -28,25 +28,54 @@ $fieldnames["group_user_email"] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Group specific dataset fields                                     //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_group(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+
+  if (($fieldname == "group_name") && $link_ok) {
+    $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;param_group=".$OD->data_set->f("group_id");
+  }
+
+  // For User member lists
+  elseif (($fieldname == "group_user_lastname")  && $link_ok) {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
+  }
+
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Group search Form                                                 //
 // Parameters : 
 //   - $group[]   : default form values
 //     keys used  : name, user
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
-  global $l_name, $l_group_user, $l_email, $l_find;
+  global $display, $l_name, $l_group_user, $l_email, $l_find;
 
   $popup = $group["popup"];
 
   if ($popup) {
     $ext_action = $group["ext_action"];
+    $ext_target = $group["ext_target"];
     $ext_url = $group["ext_url"];
     $ext_id = $group["ext_id"];
     $ext_title = stripslashes($group["ext_title"]);
     $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
       <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+      <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["msg"] .= display_info_msg($ext_title);
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -56,7 +85,6 @@ function html_group_search_form ($group) {
   $user = stripslashes($group["user"]);
 
   // --- HTML Page display ----------------------------------------------------
-  $display["msg"] .= display_info_msg($ext_title);
 
   $block = "
   <form method=\"get\" name=\"f_group\" action=\"".url_prepare("group_index.php")."\">
@@ -130,6 +158,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   if ($popup) {
     $ext_action = $group["ext_action"];
     $ext_url = $group["ext_url"];
+    $ext_target = $group["ext_target"];
     $ext_id = $group["ext_id"];
     $ext_title = urlencode(stripslashes($group["ext_title"]));
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title";
@@ -146,7 +175,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
     $dis_group->data_cb_text = "X";
     $dis_group->data_idfield = "group_id";
     $dis_group->data_cb_name = "cb_g";
-    $display_popup_head = "<form target=\"root\" method=\"get\" action=\"$ext_url\">";
+    $display_popup_head = "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
     $display_popup_end = "
     <p class=\"detailButton\">
     <p class=\"detailButtons\">
@@ -165,7 +194,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   // --- HTML Template --------------------------------------------------------
   $display["msg"] .= display_ok_msg("$nb_group $l_found");
   $block .= $display_popup_head;
-  $block .= $dis_group->display();
+  $block .= $dis_group->display("dis_data_group");
   $block .= $display_popup_end;
 
   return $block;
@@ -209,15 +238,15 @@ function html_group_form($action, $group_q, $group) {
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input name=\"tf_name\" maxlength=\"32\" size=\"32\" value=\"$name\" /></td>
   </tr><tr>
     <td class=\"detailLabel\">$l_desc</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input name=\"tf_desc\" value=\"$desc\" size=\"32\" maxlength=\"70\" /></td>
   </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
   </table>";
@@ -319,7 +348,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       $block .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block .= $dis_infos->display();
+    $block .= $dis_infos->display("dis_data_group");
 
     if ($perm->have_perm("editor")) {
       $block .= "
@@ -340,14 +369,14 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   if ($nb_u == 0) {
     $message = $l_no_user;
   } else {
-    $message = "$nb_u $l_user_member<br>";
+    $message = "$nb_u $l_user_member";
   }
 
   $block .= display_info_msg($message);
 
   if ($nb_u != 0) {
 
-    $url= url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
+    $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
     
     $dis_infos = new OBM_DISPLAY("DATA", $pref_u_q);
     $dis_infos->data_set = $u_q;
@@ -363,7 +392,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       $block .= "<form method=\"get\" action=\"group_index.php\">";
     }
 
-    $block .= $dis_infos->display();
+    $block .= $dis_infos->display("dis_data_group");
 
     if ($perm->have_perm("editor")) {
       $block .= "

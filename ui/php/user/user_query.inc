@@ -105,6 +105,7 @@ function run_query_insert($user) {
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $phone = $user["phone"];
   $email = $user["email"];
 
   $query = "insert into UserObm (userobm_timeupdate,
@@ -117,6 +118,7 @@ function run_query_insert($user) {
     userobm_archive,
     userobm_lastname,
     userobm_firstname,
+    userobm_phone,
     userobm_email,
     userobm_timelastaccess)
   values (
@@ -130,6 +132,7 @@ function run_query_insert($user) {
     '$archive',
     '$lname',
     '$fname',
+    '$phone',
     '$email',
     null)";
 
@@ -157,6 +160,7 @@ function run_query_update($p_id, $user) {
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $phone = $user["phone"];
   $email = $user["email"];
 
   $query = "update UserObm set
@@ -168,6 +172,7 @@ function run_query_update($p_id, $user) {
     userobm_archive='$archive',
     userobm_lastname='$lname',
     userobm_firstname='$fname',
+    userobm_phone='$phone',
     userobm_email='$email'
   where userobm_id='$p_id'";
 
@@ -212,6 +217,7 @@ function check_user_context($p_id, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $phone = $user["phone"];
   $email = $user["email"];
 
   // if a user with same name exists, return false
@@ -259,6 +265,7 @@ function check_data_form($p_id, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $phone = $user["phone"];
   $email = $user["email"];
 
   // MANDATORY: Login

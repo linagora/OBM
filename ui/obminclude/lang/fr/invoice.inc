@@ -11,7 +11,6 @@
 // invoice only 
 $l_label = "Label";
 $l_label_start = "Début de Label";
-$l_last_invoice = "Dernière Facture";
 $l_number = "Numéro";
 $l_amount = "Montant";
 $l_amount_HT = "Montant HT";

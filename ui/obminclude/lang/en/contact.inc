@@ -46,7 +46,6 @@ $l_insert = "Insert the Contact";
 $l_update = "Update the Contact";
 $l_checkdelete = "Check or Delete the Contact";
 $l_delete = "Delete the Contact";
-$l_confirm= "Confirm the action";
 $l_add = "Add these contacts";
 
 // Messages

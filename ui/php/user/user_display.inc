@@ -17,6 +17,7 @@ $fieldnames["userobm_perms"] = $l_user_perms;
 $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
+$fieldnames["userobm_phone"] = $l_phone;
 $fieldnames["userobm_timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
@@ -68,7 +69,7 @@ function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
   global $perms_user, $perms_admin, $perms_editor;
   global $l_perms_user, $l_perms_admin, $l_perms_editor;
-  global $c_all;
+  global $display, $c_all;
 
   $login = $user["login"];
   $lname = $user["lastname"];
@@ -78,13 +79,16 @@ function html_user_search_form($user) {
 
   if ($popup) {
     $ext_action = $user["ext_action"];
+    $ext_title = $user["ext_title"];
     $ext_url = $user["ext_url"];
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["msg"] .= display_info_msg($ext_title);
   }
 
   $block = "
@@ -161,7 +165,7 @@ function dis_user_search_list($user) {
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
-  global $display, $l_found, $l_close;
+  global $display, $l_found, $l_close, $l_add;
 
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
@@ -183,17 +187,17 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";
     $user_d->data_idfield = "userobm_id";
-    $user_d->data_cb_name = "cb_user";
+    $user_d->data_cb_name = "cb_u";
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
-      <div class=\"detailButton\">
+      <p class=\"detailButton\">
         <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_add\" />
-        <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
         <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </p>
-      </div>
+      </p>
       </form>
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -223,7 +227,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($first_try, $usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
+  global $l_phone, $l_user, $l_email, $l_archive, $l_insert, $l_update;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action;
 
@@ -235,6 +239,7 @@ function html_user_form($first_try, $usr_q, $user) {
     $perms = $usr_q->f("userobm_perms");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
+    $phone = $usr_q->f("userobm_phone");
     $email = $usr_q->f("userobm_email");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
   }
@@ -246,6 +251,7 @@ function html_user_form($first_try, $usr_q, $user) {
   if (isset($user["perms"])) { $perms = $user["perms"]; }
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
+  if (isset($user["phone"])) { $phone = $user["phone"]; }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
@@ -300,6 +306,9 @@ function html_user_form($first_try, $usr_q, $user) {
       <td class=\"detailLabel\">$l_firstname</td>
       <td class=\"detailForm\"><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td class=\"detailForm\"><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailForm\"><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr>
@@ -321,7 +330,7 @@ function html_user_form($first_try, $usr_q, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_email, $l_lastaccess, $l_archive;
+  global $l_user, $l_phone, $l_email, $l_lastaccess, $l_archive;
   global $l_insert,$l_update,$l_delete;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $display, $action, $c_yes, $c_no;
@@ -332,6 +341,7 @@ function html_user_consult($obm_q) {
   $perms = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
+  $phone = $obm_q->f("userobm_phone");
   $email = $obm_q->f("userobm_email");
   $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"));
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
@@ -365,6 +375,9 @@ function html_user_consult($obm_q) {
       <td class=\"detailLabel\">$l_firstname</td>
       <td class=\"detailText\">$fname</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td class=\"detailText\">$phone</td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
     </tr><tr>
@@ -395,6 +408,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $perms = $user["perms"];
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $phone = $user["phone"];
   $email = $user["email"];
   $archive = $user["archive"];
 
@@ -423,6 +437,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
     <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
@@ -437,6 +452,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
     <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" value=\"$l_back\" />
@@ -535,6 +551,25 @@ function dis_delete_form($p_id) {
     <input type=\"submit\" value=\"$l_delete\"
     onClick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: the User Display preference screen                               //
+// Parameters:
+//   - $pref_q : DBO : Field list to display
+///////////////////////////////////////////////////////////////////////////////
+function dis_user_display_pref($pref_q) {
+  global $l_user_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
+  $dis_pref->display_entity = "user"; 
+  $dis_pref->pref_title = $l_user_display;
+  $dis_pref->pref_dis_help = 1;
+
+  $block = $dis_pref->display();
 
   return $block;
 }

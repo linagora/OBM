@@ -19,6 +19,7 @@ function display_page(&$display) {
   if ($display["header"] == "") {
     echo $display["head"] . "
       <div class=\"detailpanelalone\">" .
+      $display["msg"] .
       $display["search"] .
       $display["result"] .
       $display["detail"] . "
@@ -363,14 +364,17 @@ function display_inactive_tab($tab) {
 function display_last_visited($path="..") {
   global $set_theme, $ico_project;
   global $ico_company, $ico_contact, $ico_parentdeal, $ico_deal, $ico_list;
-  global $ico_contract, $ico_incident, $ico_account, $ico_invlice, $ico_payment;
+  global $ico_contract, $ico_incident, $ico_account, $ico_invlice,$ico_payment;
+  global $ico_user, $ico_group;
   global $last_company,$last_contact,$last_deal,$last_parentdeal,$last_list;
   global $last_contract, $last_incident, $last_project;
   global $last_account,$last_invoice, $last_payment;
+  global $last_user, $last_group;
   global $last_company_name, $last_contact_name, $last_deal_name;
   global $last_parentdeal_name, $last_list_name, $last_contract_name;
   global $last_incident_name, $last_project_name;
   global $last_payment_name, $last_account_name, $last_invoice_name;
+  global $last_user_name, $last_group_name;
 
   $block = "
   <div class=\"last\"> 
@@ -452,6 +456,20 @@ function display_last_visited($path="..") {
     $incident_name = substr($last_incident_name,0,30);
     $block .= "<li class=\"lastList\"><a href=\"$incident_url\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
         <a href=\"$incident_url\">$incident_name</a></li>";
+  }
+
+  if ($last_user_name != "") {
+    $user_url = url_prepare("$path/user/user_index.php?action=detailconsult&amp;param_user=".$last_user);
+    $user_name = substr($last_user_name,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$user_url\"><img src=\"/images/$set_theme/$ico_user\" /></a>
+        <a href=\"$user_url\">$user_name</a></li>";
+  }
+
+  if ($last_group_name != "") {
+    $group_url = url_prepare("$path/group/group_index.php?action=detailconsult&amp;param_group=".$last_group);
+    $group_name = substr($last_group_name,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$group_url\"><img src=\"/images/$set_theme/$ico_group\" /></a>
+        <a href=\"$group_url\">$group_name</a></li>";
   }
 
   $block .= "

@@ -17,9 +17,6 @@ $l_compu_datecreation = "Data creazione" ;
 $l_compu_lastupdater = "Ultimo pezzo sostitutito" ;
 $l_compu_date_lastupdate = "Data ultima sostituzione" ;
 
-$l_last_deal = "Ultimo  affaire";
-$l_last_contact = "ultimo contatto";
-$l_last_company = "ultima società";
 
 //Options;
 $l_compu_option = "Opzioni d'affichage des ordinateurs" ;

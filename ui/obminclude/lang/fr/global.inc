@@ -14,6 +14,7 @@ $l_cancel = "Annuler";
 $l_close = "Fermer la fenêtre";
 $l_validate = "Valider";
 $l_execute = "Exécute action";
+$l_confirm = "Confirmer l'action";
 
 // Common messages
 $l_yes = "Oui";
@@ -28,10 +29,6 @@ $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
 $l_color = "Couleur";
-
-// Mysql Date format
-$l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
-$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
 
 // OBM_DISPLAY
 $l_entries = "Entrées";
@@ -139,6 +136,9 @@ $l_header_consult = "Consulter";
 $l_header_update = "Modifier";
 $l_header_display = "Affichage";
 $l_header_delete = "Supprimer";
+$l_header_add_contact = "Ajouter contact";
+$l_header_add_user = "Ajouter utilisateur";
+$l_header_add_group = "Ajouter groupe";
 
 $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";
@@ -148,8 +148,6 @@ $l_header_export = "Exporter";
 $l_header_reconcile = "Rapprocher";
 $l_header_dupplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
-
-$l_header_add_contact = "Ajouter contact";
 
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";

@@ -344,6 +344,7 @@ function session_load_user_prefs() {
   global $last_company_name,$last_contact_name,$last_deal_name,$last_list_name;
   global $last_parentdeal_name, $last_contract_name, $last_incident_name;
   global $last_account_name, $last_invoice_name, $last_payment_name;
+  global $last_user_name, $last_group_name;
   global $last_project_name;
 
   $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
@@ -376,6 +377,10 @@ function session_load_user_prefs() {
   $sess->register("last_project_name");
   $last_incident_name = run_query_global_incident_label ($last_incident); 
   $sess->register("last_incident_name");
+  $last_user_name = run_query_global_user_name ($last_user); 
+  $sess->register("last_user_name");
+  $last_group_name = run_query_global_group_name ($last_group); 
+  $sess->register("last_group_name");
 }
 
 
@@ -547,6 +552,41 @@ function run_query_global_list_name($l_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the contract label from the contract Id
+// Parameters:
+//   - $c_id : contract id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_contract_label($c_id) {
+  global $cdg_sql;
+  
+  $query = "select contract_label from Contract where contract_id='$c_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+  return $obm_db->f("contract_label");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the incident label from the incident Id
+// Parameters:
+//   - $i_id : incident id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_incident_label($i_id) {
+  global $cdg_sql;
+  
+  $query = "select incident_label from Incident where incident_id='$i_id'";
+  // Problem because called before include global.inc in setting module
+  display_debug_msg($query, $cdg_sql);
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+  return $obm_db->f("incident_label");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the account label from the account Id
 // Parameters:
 //   - $a_id : account id 
@@ -617,35 +657,34 @@ function run_query_global_project_label($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the contract label from the contract Id
 // Parameters:
-//   - $c_id : contract id 
+//   - $id : user id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_contract_label($c_id) {
+function run_query_global_user_name($id) {
   global $cdg_sql;
   
-  $query = "select contract_label from Contract where contract_id='$c_id'";
+  $query = "select userobm_login from UserObm where userobm_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
-  return $obm_db->f("contract_label");
+  return $obm_db->f("userobm_login");
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the incident label from the incident Id
+// Get the Group name from the group Id
 // Parameters:
-//   - $i_id : incident id 
+//   - $id : group id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_incident_label($i_id) {
+function run_query_global_group_name($id) {
   global $cdg_sql;
   
-  $query = "select incident_label from Incident where incident_id='$i_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select group_name from UGroup where group_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
-  return $obm_db->f("incident_label");
+  return $obm_db->f("group_name");
 }
 
 

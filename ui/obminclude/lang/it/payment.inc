@@ -11,7 +11,6 @@
 
 $l_label = "Etichetta";
 $l_label_start = "Etichetta inizio";
-$l_last_payment = "Ultimo pagamento";
 $l_number = "Numero";
 $l_amount = "Importo";
 $l_date = "Data";

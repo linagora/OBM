@@ -10,7 +10,6 @@
 // Labels et textes
 $l_label = "Etichetta";
 $l_label_start = "Inizio Etichetta";
-$l_last_account = "Ultimo account";
 $l_bank = "Banca";
 $l_number = "Numero";
 $l_balance = "Saldo";

@@ -10,7 +10,6 @@
 // Labels et textes
 $l_label = "Label";
 $l_label_start = "Label start";
-$l_last_account = "Last account";
 $l_number = "Number";
 $l_balance = "Balance";
 $l_initial_balance = "Creation Balance";

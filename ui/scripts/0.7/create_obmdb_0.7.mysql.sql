@@ -66,6 +66,7 @@ CREATE TABLE UserObm (
   userobm_archive           char(1) not null default '0',
   userobm_lastname          varchar(32),
   userobm_firstname         varchar(32),
+  userobm_phone             varchar(20),
   userobm_email             varchar(60),
   userobm_timelastaccess    timestamp(14),
   PRIMARY KEY (userobm_id),

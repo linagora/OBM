@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// ALIAMIN - File : group_query.inc                                          //
-//         - Desc : group query File                                         //
-// 2002-10-30 Aliacom                                                        //
+// OBM - File : group_query.inc                                              //
+//     - Desc : group query File                                             //
+// 2003-08-22 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($group, $p_new_order, $p_order_dir) {
-  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
   
   $name = $group["name"];
   $email = $group["email"];
@@ -33,8 +33,8 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
   }
   
   $query = "select distinct UGroup.*, group_id as Id,
-      DATE_FORMAT(UGroup.group_timecreate,'$l_date_format') as timecreate,
-      DATE_FORMAT(UGroup.group_timeupdate,'$l_date_format') as timeupdate,
+      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
+      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
@@ -66,7 +66,7 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search_possible_children($group, $p_new_order, $p_order_dir) {
-  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
   
   $id = $group["ext_id"];
   $name = $group["name"];
@@ -90,8 +90,8 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
   }
     
   $query = "select distinct UGroup.*, group_id as Id,
-      DATE_FORMAT(UGroup.group_timecreate,'$l_date_format') as timecreate,
-      DATE_FORMAT(UGroup.group_timeupdate,'$l_date_format') as timeupdate,
+      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
+      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
@@ -120,12 +120,12 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_date_format, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $query = "select *,
-      DATE_FORMAT(UGroup.group_timecreate,'$l_date_format') as timecreate,
-      DATE_FORMAT(UGroup.group_timeupdate,'$l_date_format') as timeupdate
+      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
+      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate
     from UGroup where group_id = '$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;

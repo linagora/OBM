@@ -216,3 +216,8 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'group_group', 'group_email', 3, 1);
 
 
+-------------------------------------------------------------------------------
+-- UserObm
+-------------------------------------------------------------------------------
+-- Add new column : userobm_phone
+ALTER table UserObm add column userobm_phone varchar(20) AFTER userobm_firstname;

@@ -988,7 +988,7 @@ function auto_set_hitrate(select, targetField, pos) {
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-    $sel_usercomment .= "<option value=\"$cname\"";
+    $sel_usercomment .= "<option value=\"$cid\"";
     if ($usercomment == $cid) $sel_usercomment .= " selected = \"selected\""; 
     $sel_usercomment .= ">$cname</option>\n";
   }

@@ -9,8 +9,11 @@
 
 $l_user_name = "Utente";
 $l_user_perms = "Autorizzazione";
+$l_lastname = "Cognome";
+$l_firstname = "Nome";
 $l_password = "Password";
 $l_lastaccess = "Ultimo Accesso";
+$l_phone = "Telefono";
 $l_email = "@M";
 $l_perms_user = "Utente";
 $l_perms_editor = "Editor";
@@ -18,10 +21,6 @@ $l_perms_admin = "Amministratore";
 $l_check_usercreate = " voci dell'utente.";
 $l_check_userupdate = " voci aggiornate dall'utente.";
 $l_no_user = "No campi utente nella tabella";
-
-$l_last_deal="Ultimo deal";
-$l_last_company = "Ultima azienda";
-$l_last_contact = "Ultimo contatto";
 
 // Titres
 $l_user = "Utente";
@@ -32,7 +31,7 @@ $l_update = "Modifica utente";
 $l_checkdelete = "Controlla o elimina utente";
 $l_reset = "Reset impostazioni utente";
 $l_delete = "Elimina utente";
-$l_confirm= "Conferma";
+$l_add = "Aggiungi i utenti";
 
 // Messages
 $l_no_display = "Riempi i campi e premi <TROVA> per la ricerca";
@@ -58,3 +57,5 @@ $l_fill_username = "Scrivi prima il nome utente.";
 $l_fill_password = "Scrivi prima la password.";
 $l_delete_confirm = "Confermi eliminazione utente?";
 $l_j_check_email = "Email non valida";
+
+$l_user_display = "Mostra opzioni lista Utenti";

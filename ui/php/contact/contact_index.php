@@ -58,7 +58,7 @@ if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
 $perm->check();

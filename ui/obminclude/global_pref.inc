@@ -64,6 +64,8 @@ if ($last_payment == "") $last_payment=$last_payment_default;
 if ($last_project == "") $last_project=$last_project_default;
 if ($last_contract == "") $last_contract=$last_contract_default;
 if ($last_incident == "") $last_incident=$last_incident_default;
+if ($last_user == "") $last_user = $last_user_default;
+if ($last_group == "") $last_group = $last_group_default;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //

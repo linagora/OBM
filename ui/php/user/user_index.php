@@ -43,6 +43,15 @@ $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
 $perm->check();
 
+// updating the user bookmark : 
+if ( ($param_user == $last_user) && (strcmp($action,"delete")==0) ) {
+  $last_user = $last_user_default;
+} else if ( ($param_user > 0) && ($last_user != $param_user) ) {
+  $last_user = $param_user;
+  run_query_set_user_pref($uid, "last_user", $param_user);
+  $last_user_name = run_query_global_user_name($last_user);
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -189,6 +198,23 @@ elseif ($action == "index" || $action == "") {
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = "<center>Nothing here</center><br />";
+
+}  elseif ($action == "display") {
+///////////////////////////////////////////////////////////////////////////////
+  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($pref_q);
+
+} else if ($action == "dispref_display") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
+  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($pref_q);
+
+} else if ($action == "dispref_level") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
+  $pref_q = run_query_display_pref($auth->auth["uid"], "user", 1);
+  $display["detail"] = dis_user_display_pref($pref_q);
 }
 
 
@@ -206,10 +232,10 @@ display_page($display);
 // returns : $obm_user hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
-  global $cdg_param;
+  global $cdg_param, $popup;
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
-  global $tf_lastname, $tf_firstname, $cb_archive;
-  global $popup, $param_ext, $ext_action, $ext_url, $ext_id, $ext_target;
+  global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
+  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
@@ -220,11 +246,13 @@ function get_param_user() {
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;
+  if (isset ($tf_phone)) $obm_user["phone"] = $tf_phone;
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
 
   // External param
   if (isset ($popup)) $obm_user["popup"] = $popup;
   if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
+  if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
   if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
   if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;

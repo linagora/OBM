@@ -76,9 +76,6 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- List bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_list','0');
 
--- User bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_user','0');
-
 -- Contract bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_contract','0');
 
@@ -93,6 +90,12 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 
 -- Payment bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_payment','0');
+
+-- User bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_user','0');
+
+-- Group bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_group','0');
 
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
@@ -270,7 +273,8 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_firstname', 4, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_perms', 5, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_timelastaccess', 6, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_email', 7, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_phone', 7, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_email', 8, 1);
 
 -- module 'group'
 

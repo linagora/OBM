@@ -10,6 +10,7 @@
 $l_login = "Login";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
+$l_phone = "Phone";
 $l_user_perms = "Authorization";
 $l_password = "Password";
 $l_lastaccess = "Last access";
@@ -30,7 +31,7 @@ $l_update = "Update the User";
 $l_checkdelete = "Check or Delete the User";
 $l_reset = "Reset user's preferences";
 $l_delete = "Delete the User";
-$l_confirm= "Confirm the action";
+$l_add = "Add these users";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the users";
@@ -56,3 +57,5 @@ $l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";
 $l_delete_confirm = "Really delete the user?";
 $l_j_check_email = "The email adress is not valid.";
+
+$l_user_display = "Display options for users lists"; 

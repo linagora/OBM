@@ -56,7 +56,6 @@ $l_act_update = "Update Activity";
 $l_act_checkdelete = "Check or Delete Activity";
 $l_act_delete = "Delete Activity";
 $l_act_insert = "Insert Activity";
-$l_confirm = "Confirm the action";
 $l_select_company = "Select the Company";
 
 // Messages
@@ -115,4 +114,4 @@ $l_j_act_create = "You have to enter a new activity name to create it !";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen
-$l_company_display = "Display options for companies list"; 
+$l_company_display = "Display options for companies lists"; 

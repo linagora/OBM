@@ -11,7 +11,6 @@
 
 $l_label = "Label";
 $l_label_start = "Label start";
-$l_last_payment = "Last payment";
 $l_number = "Number";
 $l_amount = "Amount"; 
 $l_comment = "Comment";

@@ -45,7 +45,6 @@ $l_insert = "Enregistrer le Contact";
 $l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
 $l_delete = "Supprimer le Contact";
-$l_confirm= "Confirmer l'action";
 $l_add = "Ajouter ces contacts";
 
 // Messages
