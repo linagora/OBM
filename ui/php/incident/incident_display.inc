@@ -127,7 +127,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
   // --- html template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_incident\" action=\"" .
+    <form method=\"get\" name=\"f_search\" action=\"" .
     url_prepare("incident_index.php") . " \" onsubmit=\"if (check_search_inc(this)) return true; else return false;\">
 
     <div class=\"search\">

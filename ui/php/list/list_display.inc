@@ -306,7 +306,7 @@ function html_list_search_form ($list, $usr_q) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_list\"
+  <form method=\"get\" name=\"f_search\"
     action=\"".url_prepare("list_index.php")."\">
 
   <div class=\"search\">

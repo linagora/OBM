@@ -61,31 +61,43 @@ $cgp_host = "http://obm/";
 // Generic E-mail for Incident module
 $cmail_incident = "";
 
-// Query limits (for user queries)
-$cql_max_row = 50000;    // Maximum rows to be returned
-$cql_max_cost = 100000;  // Maximum query cost (Postgres)
+// Todo lines to display
+$cgp_todo_nb = 5;
 
 // Popup Display size
 $popup_width = 620;
 $popup_height = 480;
 $popup_contact_height = 600;
 
+// Access Keys
+$cak_prev = "P";
+$cak_next = "N";
+$cak_page_prev = "4";
+$cak_page_next = "6";
+$cak_begin = "B";
+$cak_end = "E";
+
 // OBM System groups (groups id)
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
 
+// Auto format fields
+$caf_company_name = false;
+$caf_town = false;
+
 // Use Database sessions
 $cgp_sess_db = false;
 
+// Query limits (for user queries)
+$cql_max_row = 50000;    // Maximum rows to be returned
+$cql_max_cost = 100000;  // Maximum query cost (Postgres)
+
 // Allow * in search field
-$ctu_sql_star = false;
+$cgp_sql_star = true;
 
 // Tuning constants
 $ctu_sql_limit = false;
-
-// Todo lines to display
-$cgp_todo_nb = 5;
 
 //-------------------------//
 // Default Displayed Infos //
@@ -656,29 +668,70 @@ function check_privacy($menu, $table, $action, $id, $p_uid="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transform a name in a simplified version (suppress .,-,',accent)
-// Used for aka (Also Know As) names
+// Transform a name in a simplified version according to parameters given
+// Used for fields auto format
 // Parameters:
-//   - $name : name to transform
+//   - $name   : name to transform
+//   - $up     : 0 : as is, 1 lower case, 2 upper case
+//   - $accent : if true, suppress Accents
+//   - $dot    : if true, suppress dot, -, '
 // Returns:
 //   - $result : name converted
 ///////////////////////////////////////////////////////////////////////////////
-function reduce_name($name) {
+function format_name($name, $up, $accent, $dot=false) {
 
-  $res = preg_replace("/[ËÎÈÍ]/i", "e", $name);
-  $res = preg_replace("/[‡‰]/i", "a", $res);
-  $res = preg_replace("/[ÓÔ]/i", "i", $res);
-  $res = preg_replace("/[Ùˆ]/i", "o", $res);
-  $res = preg_replace("/[˚¸˘]/i", "u", $res);
-  $res = preg_replace("/[Á]/i", "c", $res);
-  $res = preg_replace("/[\.\-\'\\\]/", "", $res);
+  $res = $name;
+
+  if ($accent) {
+    $res = preg_replace("/[ËÎÈÍ]/i", "e", $name);
+    $res = preg_replace("/[»À… ]/i", "E", $res);
+    $res = preg_replace("/[‡‰]/i", "a", $res);
+    $res = preg_replace("/[¿ƒ]/i", "A", $res);
+    $res = preg_replace("/[ÓÔ]/i", "i", $res);
+    $res = preg_replace("/[Œœ]/i", "I", $res);
+    $res = preg_replace("/[Ùˆ]/i", "o", $res);
+    $res = preg_replace("/[‘÷]/i", "O", $res);
+    $res = preg_replace("/[˚¸˘]/i", "u", $res);
+    $res = preg_replace("/[€‹Ÿ]/i", "U", $res);
+    $res = preg_replace("/[Á]/i", "c", $res);
+    $res = preg_replace("/[«]/i", "C", $res);
+  }
+
+  if ($dot) {
+    $res = preg_replace("/[\.\-\'\\\]/", "", $res);
+  }
+
+  if ($up == 1) {
+    $res = strtolower($res);
+  } else if ($up == 2) {
+    $res = strtoupper($res);
+  }
 
   return $res;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Wrapper around phonetic encoding (to ease phonetic algo change)           //
+// Auto transform Town (should become a HOOK)
+// Parameters:
+//   - $name : town name
+// Returns:
+//   $name formatted
+///////////////////////////////////////////////////////////////////////////////
+function get_format_town($name) {
+  global $caf_town;
+
+  $res = $name;
+  if ($caf_town) {
+    $res = format_name($res, 2, true, false);
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Wrapper around phonetic encoding (to ease phonetic algo change)
 // Parameters:
 //   - $name : name to encode
 // Returns:

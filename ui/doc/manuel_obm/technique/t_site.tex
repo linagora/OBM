@@ -2,6 +2,7 @@
 % ALIACOM Pierre Baudracco
 % $Id$
 
+
 \section{Configuration spécifique d'un site}
 
 Depuis la version 0.8, OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
@@ -16,7 +17,75 @@ Répertoire de configuration spécifique & obminclude/site \\
 \hline
 \end{tabular}
 
+
+\subsection{Les options de paramétrage}
+
+Ces paramètres sont définis en valeur par défaut dans le fichier global.inc mais peuvent être modifiées dans le fichier spécifique au site obm\_conf.inc :\\
+
+\begin{tabular}{|p{7cm}|p{5cm}|}
+\hline
+Fichier de défintion des valeurs par défaut & obminclude/global.inc \\
+\hline
+Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+Liste des paramètres définis :\\
+
+
+\begin{longtable}{|p{3.5cm}|p{2.5cm}|p{8cm}|}
+\hline
+\textbf{Option} & \textbf{Valeur défaut} & \textbf{Description} \\
+\hline
+\$cgp\_host & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
+\hline
+\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\hline
+\$cgp\_todo\_nb & 5 & Nombre de Todo affichés \\ 
+\hline
+\$cak\_prev & P & ACCESSKEY pour page précédente \\ 
+\hline
+\$cak\_next & N & ACCESSKEY pour page suivante \\ 
+\hline
+\$cak\_page\_prev & 4 & ACCESSKEY pour groupe de pages précédent \\ 
+\hline
+\$cak\_page\_prev & 6 & ACCESSKEY pour groupe de pages suivant \\ 
+\hline
+\$cak\_begin & B & ACCESSKEY pour début de résultat \\ 
+\hline
+\$cak\_prev & E & ACCESSKEY pour fin de résultat \\ 
+\hline
+\$cg\_adm & 1 & Groupe Administrateur utilisé par section Administration \\ 
+\hline
+\$cg\_com & 2 & Groupe Commercial utilisé par section Commercial \\ 
+\hline
+\$cg\_prod & 3 & Groupe Production utilisé par section Production \\ 
+\hline
+\$caf\_company\_name & false & Indicateur de formattage automatique du nom de société \\ 
+\hline
+\$caf\_town & false & Indicateur de formattage automatique du nom de ville \\ 
+\hline
+\$cgp\_sess\_db & false & Indication de stockage des sessions en base de données \\ 
+\hline
+\$cql\_max\_row & 50 000 & Maximum de lignes de résultat autorisé pour une requète manuelle utilisateur (module \List)\\ 
+\hline
+\$cql\_max\_cost & 100 000 & Coût maximum autorisé pour une requète manuelle utilisateur (module \List)\\ 
+\hline
+\$cgp\_sql\_star & true & Traite le caractère * comme un joker dans les recherches \\ 
+\hline
+\$ctu\_sql\_limit & false & Indique si les requètes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
+\hline
+\$cgp\_show & Voir \ref{cgp_show} et \ref{cgp_show_2} & Indicateurs d'affichage des sections et modules \\ 
+\hline
+\$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
+\hline
+\end{longtable}
+
+
+
 \subsection{Le paramétrage des sections visibles et leur lien}
+\label{cgp_show}
 
 Le tableau \$cgp\_show[``section''] définit pour chaque section si celle-ci doit être affichée ou non et précise son lien (url) par défaut.
 Par défaut toutes les sections sont affichées et pointent vers le premier module affiché.
@@ -49,6 +118,7 @@ Liste des sections disponibles :\\
 
 
 \subsection{Le paramétrage des modules visibles}
+\label{cgp_show_2}
 
 Le tableau \$cgp\_show[``module''] définit pour chaque module si celui-ci doit être affiché ou non.
 Par défaut tous les modules sont affichés.
@@ -84,6 +154,7 @@ Liste des modules disponibles :\\
 
 
 \subsection{Le paramétrage des champs visibles}
+\label{cgp_hide}
 
 Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent être paramétrés afin de ne pas afficher et gérer tous les champs prévus.
 

@@ -482,6 +482,7 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
     global $path, $page, $new_order, $order_dir, $entity, $ctu_sql_limit;
+    global $cak_prev, $cak_next, $cak_page_prev, $cak_page_next, $cak_begin, $cak_end;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end, $ico_previous, $ico_next;
@@ -521,19 +522,19 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_begin\" href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_page_prev\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;";
     }
 
     // Previous page
     if ($lpage > 1) {
       $tmppage = $lpage - 1;
-      $content .= "<a href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
+      $content .= "<a accesskey=\"$cak_prev\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_previous\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;";
     }
 
     $i = $start_page;
@@ -550,19 +551,19 @@ class OBM_DISPLAY {
     // Next page
     if ($lpage < $nb_page) {
       $tmppage = $lpage + 1;
-      $content .= "&nbsp;&nbsp;<a href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_next\" href=\"$url&amp;page=$tmppage&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_next\" class=\"resultIndexIcon\" alt=\"|<\"></a>";
     }
 
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;<a accesskey=\"$cak_page_next\" href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a accesskey=\"$cak_end\" href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export

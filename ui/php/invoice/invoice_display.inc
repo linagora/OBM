@@ -166,7 +166,7 @@ function html_invoice_search_form($sta_q, $invoice) {
   }
 
   $block = "
-    <form method=\"get\" name=\"form_invoice\"
+    <form method=\"get\" name=\"f_search\"
         onSubmit=\"if (check_search_form(this) == false) return false;
         else return true;\" action=\"$url_form\">
       <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />

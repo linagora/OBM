@@ -358,7 +358,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"$url\">
+  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
   <div class=\"search\">
     <div class=\"searchLabel\">$l_company_name<br />
       <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"24\"

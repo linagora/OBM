@@ -492,7 +492,7 @@ function get_param_company() {
   if (isset ($tf_num)) $company["num"] = $tf_num;
   if (isset ($tf_vat)) $company["vat"] = $tf_vat;
   if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
-  if (isset ($tf_name)) $company["name"] = $tf_name;
+  if (isset ($tf_name)) $company["name"] = get_format_company_name($tf_name);
   if (isset ($tf_aka)) $company["aka"] = $tf_aka;
   if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
@@ -505,7 +505,7 @@ function get_param_company() {
   if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
   if (isset ($tf_ad3)) $company["ad3"] = $tf_ad3;
   if (isset ($tf_zip)) $company["zip"] = $tf_zip;
-  if (isset ($tf_town)) $company["town"] = $tf_town;
+  if (isset ($tf_town)) $company["town"] = get_format_town($tf_town);
   if (isset ($tf_cdx)) $company["cdx"] = $tf_cdx;
   if (isset ($sel_ctry)) $company["country"] = $sel_ctry;
   if (isset ($tf_phone)) $company["phone"] = $tf_phone;

@@ -39,6 +39,10 @@ $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
 
+// Auto format fields
+$caf_company_name = true;
+$caf_town = true;
+
 // Allow * in search field
 $cgp_sql_star = true;
 

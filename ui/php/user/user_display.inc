@@ -107,7 +107,7 @@ function html_user_search_form($user) {
   }
 
   $block = "
-  <form method=\"get\" name=\"f_user\"
+  <form method=\"get\" name=\"f_search\"
     action=\"". url_prepare("user_index.php")."\">
 
   <div class=\"search\">

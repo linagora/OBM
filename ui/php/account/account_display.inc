@@ -92,7 +92,7 @@ function html_account_search_form ($p_action, $account) {
   $url = url_prepare("account_index.php");
 
   $block .= "
-  <form method=\"get\" name=\"form_account\"
+  <form method=\"get\" name=\"f_search\"
     onsubmit=\"if (check_form(this) == false) return false; else return true;\"
     action=\"$url\">
   <div class=\"search\">

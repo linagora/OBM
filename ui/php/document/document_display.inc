@@ -44,7 +44,7 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document search Form                                               //
+// Display Document search Form
 // Parameters:
 //   - $cat1_q    : database object with cat1 list
 //   - $cat2_q     : database object with cat2ivity list
@@ -117,7 +117,7 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_document\" id=\"f_document\" action=\"$url\">
+  <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
   <div class=\"search\">
     <div class=\"searchLabel\">$l_title<br />
       <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"16\" value=\"$title\" />

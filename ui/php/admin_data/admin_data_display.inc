@@ -876,7 +876,7 @@ function dis_sound_aka_update($mode) {
     $name = $c_q->f("company_name");
     $aka = $c_q->f("company_aka");
     // If reduced version of name not in aka (and not same as name), we add it
-    $auto_aka = reduce_name($name);
+    $auto_aka = format_name($name, 0, true, true);
     if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
       $aka .= " $auto_aka";
     }

@@ -106,7 +106,8 @@ function display_head($p_module) {
   $extra_js
 </head>
 
-<body>";
+<body onload=\"if (document.f_search) { document.f_search.submit.focus();} \">
+";
 }
 
 

@@ -397,7 +397,7 @@ function run_query_contact_insert($contact) {
   $town = $contact["town"];
   $cdx = $contact["cdx"];
   $ctry = $contact["country"];
-  $func = $contact["function"];
+  $func = ($contact["function"] ? $contact["function"] : 0);
   $title = $contact["title"];
   $phone = $contact["phone"];
   $hphone = $contact["hphone"];
@@ -558,7 +558,7 @@ function run_query_contact_update($contact) {
   $town = $contact["town"];
   $cdx = $contact["cdx"];
   $ctry = $contact["country"];
-  $func = $contact["function"];
+  $func = ($contact["function"] ? $contact["function"] : 0);
   $title = $contact["title"];
   $phone = $contact["phone"];
   $hphone = $contact["hphone"];

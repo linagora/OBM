@@ -410,7 +410,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
 
   // --- HTML Template --------------------------------------------------------
   $block = "
-  <form method=\"get\" name=\"f_contact\" action=\"".url_prepare("contact_index.php")."\">
+  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("contact_index.php")."\">
   <div class=\"search\">
 
     <div class=\"searchLabel\">$l_contact_name<br />

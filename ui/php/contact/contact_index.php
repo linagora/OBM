@@ -455,7 +455,7 @@ function get_param_contact() {
   if (isset ($tf_ad2)) $contact["ad2"] = $tf_ad2;
   if (isset ($tf_ad3)) $contact["ad3"] = $tf_ad3;
   if (isset ($tf_zip)) $contact["zip"] = $tf_zip;
-  if (isset ($tf_town)) $contact["town"] = $tf_town;
+  if (isset ($tf_town)) $contact["town"] = get_format_town($tf_town);
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
   if (isset ($sel_ctry)) $contact["country"] = $sel_ctry;
   if (isset ($sel_func)) $contact["function"] = $sel_func;

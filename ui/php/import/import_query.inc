@@ -541,7 +541,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $num = addslashes($fields["comp_num"]);
   $archive = "0";
   $name = addslashes($fields["comp_name"]);
-  $auto_aka = reduce_name($name);
+  $auto_aka = format_name($name, 0, true, true);
   $aka = $auto_aka;
   $sound = phonetic_key($name);
 

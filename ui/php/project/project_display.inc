@@ -202,7 +202,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"$url\">
+    <form method=\"get\" name=\"f_search\" id=\"f_search\" action=\"$url\">
 
     <div class=\"search\">
       <div class=\"searchLabel\">$l_name<br />

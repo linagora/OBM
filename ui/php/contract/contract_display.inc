@@ -122,7 +122,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"form_contract\" 
+  <form method=\"get\" name=\"f_search\" 
   onsubmit=\"if (check_search_form(this) == false) return false;
   else return true;\" action=\"".url_prepare("contract_index.php")."\">
 
@@ -305,23 +305,13 @@ function html_contract_consult($contract_q) {
   $con2_id = $contract_q->f("contract_contact2_id");
   $archive = $contract_q->f("contract_archive");
  
- if ($archive == 1) { $archive = $l_yes;}
-    else $archive= $l_no;
+  if ($archive == 1) { $archive = $l_yes;}
+  else $archive= $l_no;
 
-$con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
+  $con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
           " - " . $contract_q->f("cphone1"); 
   $con2 = $contract_q->f("clname2") . " " . $contract_q->f("cfname2") .
           " - " . $contract_q->f("cphone2"); 
-
-  $dis_update = "<form method=\"get\" name=\"form_contract_update\"
-      action=\"".url_prepare("contract_index.php")."\">
-    <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
-    <input type=\"hidden\" name=\"param_contract\" value=\"$id\">
-    <input type=\"submit\" value=\"$l_update\">
-
-
-</form>";
-
 
   // --- HTML Template --------------------------------------------------------
 

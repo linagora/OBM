@@ -301,7 +301,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"form_deal\"
+  <form method=\"get\" name=\"f_search\"
   onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
   action=\"$url\">
   <div class=\"detailHead\">$l_deal</div>

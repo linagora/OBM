@@ -111,7 +111,7 @@ function html_group_search_form ($group) {
   // --- HTML Page display ----------------------------------------------------
 
   $block = "
-  <form method=\"get\" name=\"f_group\" action=\"".url_prepare("group_index.php")."\">
+  <form method=\"get\" name=\"f_search\" action=\"".url_prepare("group_index.php")."\">
   <div class=\"search\">
 
     <div class=\"searchLabel\">$l_name<br />

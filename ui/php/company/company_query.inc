@@ -40,7 +40,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   // If a name has been given we search its sound too
   if ($name != "") {
-    $auto_aka = reduce_name($name);
+    $auto_aka = format_name($name, 0, true, true);
     $sound = phonetic_key($name);
   }
 
@@ -299,7 +299,7 @@ function run_query_insert($company) {
   $aka = trim($company["aka"]);
   // If aka is empty we auto fill it
   if ($aka == "") {
-    $auto_aka = reduce_name($name);
+    $auto_aka = format_name($name, 0, true, true);
     if ($auto_aka != $name) {
       $aka = $auto_aka;
     }
@@ -446,7 +446,7 @@ function run_query_update($cid, $company) {
   $aka = trim($company["aka"]);
   // If aka is empty we auto fill it
   if ($aka == "") {
-    $auto_aka = reduce_name($name);
+    $auto_aka = format_name($name, 0, true, true);
     if ($auto_aka != $name) {
       $aka = $auto_aka;
     }
@@ -536,7 +536,7 @@ function run_query_update($cid, $company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : company id
 ///////////////////////////////////////////////////////////////////////////////
@@ -556,6 +556,25 @@ function run_query_delete($p_id) {
   $obm_q->query($query);
 
   return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Auto transform company name (could become a HOOK)
+// Parameters:
+//   - $name : company name
+// Returns:
+//   $name formatted
+///////////////////////////////////////////////////////////////////////////////
+function get_format_company_name($name) {
+  global $caf_company_name;
+
+  $res = $name;
+  if ($caf_company_name) {
+    $res = format_name($res, 2, true, false);
+  }
+
+  return $res;
 }
 
 
@@ -1209,7 +1228,7 @@ function run_query_nafcode_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Kind from its id                                       //
+// Get the label of a Kind from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
