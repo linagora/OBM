@@ -468,13 +468,14 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
 //     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_subscription_form($action,$cat1_q, $publication) {
+function html_group_subscription_form($action,$pub_q, $cat1_q, $publication) {
   global $display, $auth, $set_dsrc;
   global $set_theme,$l_category;
-  global $l_insert, $l_publication;
+  global $l_publication;
   global $l_contact_category1,$l_auto_sub;
 
   $auto_sub = array();
+  $title = $pub_q->f("publication_title");
   // If parameters have been given, they supercede the default action value
   if (isset($publication["id"])) { $id = $publication["id"]; }
   if (isset($publication["auto_sub"])) {  $auto_sub = $publication["auto_sub"]; }
@@ -483,7 +484,7 @@ function html_group_subscription_form($action,$cat1_q, $publication) {
   $dis_button = "
     <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />  
     <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_group_subscription\" />
-    <input type=\"submit\" value=\"$l_insert\" />
+    <input type=\"submit\" value=\"$l_auto_sub\" />
     ";
   $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
   while($cat1_q->next_record()) {

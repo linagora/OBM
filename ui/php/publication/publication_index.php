@@ -210,8 +210,9 @@ if ($action == "ext_get_id") {
   }
 } elseif ($action == "new_group_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
+  $pub_q = run_query_detail($param_publication);
   $concat1_q = run_query_publication_contactcategory1();
-  $display["detail"] = html_group_subscription_form($action, $concat1_q,$publication);
+  $display["detail"] = html_group_subscription_form($action,$pub_q, $concat1_q,$publication);
 } elseif ($action == "insert_group_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
   // If the context (same publications) was confirmed ok, we proceed
@@ -523,7 +524,7 @@ function get_publication_action() {
     'Name'     => $l_header_new_auto,
     'Url'      => "$path/publication/publication_index.php?action=new_auto&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update','insert_auto')
+    'Condition'=> array ('insert_group_subscription','detailconsult', 'update','insert_auto')
                                      );
 	     
 // Detail Consult
@@ -531,7 +532,7 @@ function get_publication_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('insert_group_subscription','new_group_subscription','insert_auto','detailupdate') 
                                      		 );
 
 // Detail Update
@@ -539,7 +540,7 @@ function get_publication_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update','insert_auto') 
+    'Condition'=> array ('insert_group_subscription','new_group_subscription','detailconsult', 'update','insert_auto') 
                                      	      );
 
 // Subscribe a group of contact to a publication.
@@ -547,7 +548,7 @@ function get_publication_action() {
     'Name'     => $l_subscription,
     'Url'      => "$path/publication/publication_index.php?action=new_group_subscription&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update','insert_auto', 'insert')
+    'Condition'=> array ('insert_group_subscription','new_group_subscription','detailconsult', 'update','insert_auto')
                                      );		
 // Subscribe a group of contact to a publication.
   $actions["PUBLICATION"]["insert_group_subscription"] = array (
@@ -586,7 +587,7 @@ function get_publication_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
+    'Condition'=> array ('insert_group_subscription','new_group_subscription','detailconsult', 'detailupdate', 'update') 
                                      	      );
 
 // Delete
