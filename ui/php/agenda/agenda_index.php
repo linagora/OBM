@@ -81,6 +81,7 @@ if ($action == "index") {
     else {
       $p_user_array =  array($auth->auth["uid"]);
     }
+    require("agenda_js.inc");
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
     $user_q = run_query_get_user_name($p_user_array);
     $user_obm = run_query_userobm();  
@@ -92,6 +93,7 @@ elseif($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   $conflict = run_query_insert_decision($agenda);
   if (count($conflict) == 0) {
+    require("agenda_js.inc");
     display_ok_msg($l_update_ok);  
     $p_user_array = array($auth->auth["uid"]);
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -180,6 +182,7 @@ elseif ($action == "insert") {
   if (check_data_form($agenda)){    
     $conflict = run_query_add_event($agenda,$sel_user_id,$event_id);
     if (count($conflict) == 0) {
+      require("agenda_js.inc");
       $p_user_array = array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
@@ -250,6 +253,7 @@ elseif ($action == "update") {
   if (check_data_form($agenda)) {
     $conflict = run_query_modify_event($agenda,$sel_user_id,$event_id);
     if(count($conflict) == 0) {
+      require("agenda_js.inc");
       display_ok_msg($l_update_ok);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -263,6 +267,7 @@ elseif ($action == "update") {
       html_dis_conflict($agenda,$conflict,$event_id,1);
     }
     else{
+      require("agenda_js.inc");
       display_error_msg($l_update_error); 
       html_dis_conflict($agenda,$conflict,'',0);
       $p_user_array =  array($auth->auth["uid"]);
@@ -285,6 +290,7 @@ elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
   $conflict = run_query_change_decision($agenda);
   if(count($conflict) == 0) {
+    require("agenda_js.inc");
     display_ok_msg($l_update_ok);  
     $p_user_array =  array($auth->auth["uid"]);
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -308,6 +314,7 @@ elseif ($action == "check_delete") {
 }
 elseif ($action == "delete") {
 ///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
   if ($param_event > 0) {
      run_query_delete($agenda);
   }
@@ -435,7 +442,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=decision",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -447,10 +454,9 @@ function get_agenda_action() {
     'Right'    => $agenda_write,
     'Condition'=> array ('index','detailconsult',
                   'view_month','view_week','view_day','view_year',
-                  'insert','insert_conflict','cancel_insert','confirm_insert',
+                  'insert','insert_conflict',
 		  'update_decision','decision') 
                                     );
-
 
 //Insert
 
@@ -463,22 +469,6 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["insert_conflict"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=insert_conflict",
-    'Right'    => $agenda_write,
-    'Condition'=> array ('None') 
-                                         );
-
-//Cancel Insert
-
-  $actions["AGENDA"]["cancel_insert"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=cancel_insert",
-    'Right'    => $agenda_write,
-    'Condition'=> array ('None') 
-                                         );
-
-//Confirm Insert
-
-  $actions["AGENDA"]["confirm_insert"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=confirm_insert",
     'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );

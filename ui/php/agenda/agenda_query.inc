@@ -981,7 +981,12 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	substr($obm_q->f("calendarsegment_date"),10,2),"status" => $status);
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
-	$current_event[$current_time][$obm_q->f("calendarsegment_customerid")] = array_diff($current_event[$current_time][$obm_q->f("calendarsegment_customerid")],array($obm_q->f("calendarevent_id")));
+	if(is_array($current_event[$current_time][$obm_q->f("calendarsegment_customerid")])) {
+	  $current_event[$current_time][$obm_q->f("calendarsegment_customerid")] = array_diff($current_event[$current_time][$obm_q->f("calendarsegment_customerid")],array($obm_q->f("calendarevent_id")));
+	}
+       	else {
+  	  $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = array();
+	}
 	if(count($current_event[$current_time][$obm_q->f("calendarsegment_customerid")]) == 0) {
 	  $current_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
 	}
