@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.1.tar.gz
-tar -C /var/www -xzvf obm-0.8.1.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.2.tar.gz
+tar -C /var/www -xzvf obm-0.8.2.tar.gz
 cd /var/www
-ln -s obm-0.8.1 obm
+ln -s obm-0.8.2 obm
 </pre>
   </td>
 </tr>
@@ -238,9 +238,13 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 
 
 <h3>Complete virtual host block example</h3>
+
+Be sure that your ip is defined as a named virtual host and enter this block
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
+NameVirtualHost 127.0.0.1
+
 &lt;VirtualHost 192.168.1.5>
     ServerAdmin root@localhost
     DocumentRoot /var/www/obm/php
@@ -452,6 +456,30 @@ psql -U obm obm < scripts/0.8/update-0.8.0-0.8.1.pgsql.sql
 
 <p />
 # Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+
+<p />
+<a name="upgrade-0.8.2"><h1>UPGRADE OBM DATABASE 0.8.1 to 0.8.2 (MySQL and Postgres)</h1></a>
+<p />
+# MySQL Database has evolved from 0.8.1 to 0.8.2
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/update-0.8.1-0.8.2.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Database has evolved from 0.8.1 to 0.8.2
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/update-0.8.1-0.8.2.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
 
 
 <p />

@@ -486,6 +486,7 @@ function get_similar_company($fields, $map) {
   if ($name == "") {
     $name = $map["default"]["comp_name"];
   }
+  $name = addslashes($name);
   $zip = $fields["comp_zip"];
 
   $query = "select distinct company_id, company_name, company_zipcode 

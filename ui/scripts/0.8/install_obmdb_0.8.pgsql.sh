@@ -13,13 +13,15 @@ P="obm"
 DB="obm"
 DATA_LANG="en"
 
-# We search for the PHP interpreter (different name on Debian, RedHat)
+# We search for PHP interpreter (different name on Debian, RedHat, Mandrake)
 PHP=`which php4 2> /dev/null`
 if [ $? != 0 ]; then
   PHP=`which php 2> /dev/null`
   if [ $? != 0 ]; then
-    echo "Can't find php interpreter"
-    exit
+    PHP=`which php-cgi 2> /dev/null`
+    if [ $? != 0 ]; then
+      echo "Can't find php interpreter"
+      exit
   fi
 fi
 echo $PHP : PHP interpreter found
