@@ -343,7 +343,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link,$ico_contact_list;
+  global $set_theme,$ico_company,$ico_contact, $ico_contact_list;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
@@ -383,8 +383,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $town = $deal_q->f("company_town");
  
   if ($usercreate == $auth->auth["uid"]) {   
-   $visibility = "<td><font color=\"#$col_label\">$l_visibility</font></td>
-                 <td>$lvis</td>";
+   $visibility = "<tr><td class=\"detailLabel\">$l_visibility</td>
+                 <td class=\"detailText\">$lvis</td>";
   }
 
     // contact 1
@@ -438,11 +438,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<br><br><font color=\"#$col_link\">".
       $nb_arch_invoices." ".$l_archived_invoices_connected.
       "</font>";
-  }else { /* echo "et merde..."; */ //}
+  }else { echo "et merde...";  //}
 //////////////////////
 //FIN LIENS EXTERNES//
 //////////////////////
-
+*/
   echo "
       <table class=\"details\">
         <tr>
@@ -949,8 +949,7 @@ function html_deal_affect($parent_q, $p_deal_id) {
 //   - $status_q : DBO : Deal Status list
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_admin_form($kind_q, $cat_q, $status_q) {
-  global $col_a_table, $col_a_tableh, $col_textem;
-  // Labels : 
+   // Labels : 
   global $l_kind_manage,$l_kind_new,$l_kind_exist;
   global $l_status_manage,$l_status_exist,$l_status_new;
   global $l_category_manage,$l_category_exist,$l_category_new;
@@ -1474,7 +1473,7 @@ function dis_parentdeal_search_list($deal) {
 // Display the results of the parentdeal search
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $deal) {
-  global $l_found_parent,$col_textem; 
+  global $l_found_parent; 
   global $sess;
 
   $plabel = stripslashes($deal["plabel"]);
@@ -1506,7 +1505,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
   // -- Themes
-  global $col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  global $ico_company,$ico_contact;
   // -- Labels
   global $l_update_parent,$l_delete_parent,$l_insert_parent,$l_label,$l_marketing_manager;
   global $l_parentdeal,$l_technical_manager,$l_comment;
@@ -1614,7 +1613,6 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
-  global $col_textem,$col_label,$col_ok; 
   global $path,$sess,$auth,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_comment,$l_marketing_manager,$l_state;
@@ -1716,7 +1714,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   //-----> deal list
   // if no record found, display it and stop
   if ($nb_deals == 0) {
-    echo "<font color=\"#$col_ok\">$l_no_found</font><br>";
+     display_info_msg($l_no_found)";
     return;
   }
 

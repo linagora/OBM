@@ -533,8 +533,9 @@ class Session {
     } else {
       $this->mode = "get";
     }
-   session_start();
+ session_start();
     $this->id = session_id();
+
    }
 }
 ?>
