@@ -89,7 +89,7 @@ include("$obminclude/global.inc");
     $allday = 0;
     $repeatfrequence = 1;
     $endrepeat = $obm_db->f("calendarevent_endrepeat");  
-    if($endrepeat >= "20100101000000" || $endrepeat == "00000000000000") {
+    if(($endrepeat >= "20100101000000" || $endrepeat == "00000000000000") && $repeatkind != 'none') {
      $query = "SELECT calendarsegment_customerid, calendarsegment_state, calendarsegment_date
 		FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
 		GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date
@@ -145,8 +145,6 @@ include("$obminclude/global.inc");
 	  
       }
       else {
-	if($rec_state == "")
-	  $rec_state = $state;
         $query = "INSERT INTO CalendarUser VALUES('".addslashes($timeupdate)."', '".addslashes($timecreate)."',
                                                 '".addslashes($userupdate)."', '".addslashes($usercreate)."',
 						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
@@ -156,8 +154,6 @@ include("$obminclude/global.inc");
       }
       $old_u = $user_id ;
     }
-    if($rec_state == "")
-      $rec_state = $state;
     $query = "INSERT INTO CalendarUser VALUES('".addslashes($timeupdate)."', '".addslashes($timecreate)."',
                                                 '".addslashes($userupdate)."', '".addslashes($usercreate)."',
 						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
