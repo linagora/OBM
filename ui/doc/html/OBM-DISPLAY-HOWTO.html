@@ -12,7 +12,7 @@
 <h1>OBM-DISPLAY-LIST-HOWTO</h1>
 <i>Utilisation d'un affichage générique pour les tableaux de résutats</i>
 <br />
-Version 0.8.0 - 2004-01-10<br />
+Version 0.8.1 - 2004-03-22<br />
 </center>
 
 <hr>
@@ -533,19 +533,19 @@ La définition exacte est :
 Cette fonctionne doit retourner un tableau (hashage) avec les paramètres renseignés possibles (aucun n'est obligatoire)
 <table border=1>
 <tr>
-  <td><i>$name</i></td>
+  <td><i>name</i></td>
   <td>définit le texte ou contenu affiché. Ce peut être du texte ou image &lt;img ... &gt;</td>
 </tr><tr>
-  <td><i>$txt_name</i></td>
+  <td><i>txt_name</i></td>
   <td>nom utilisé pour l'export CSV</td>
 </tr><tr>
-  <td><i>$url</i></td>
+  <td><i>url</i></td>
   <td>indique un lien et en définit l'url. Si $url est renseigné alors <i>$name</i> sera automatiquement encadré par des balises &lt;a href ...&gt; et &lt;/a&gt;.</td>
 </tr><tr>
-  <td><i>$align</i></td>
+  <td><i>align</i></td>
   <td>définit l'alignement (gauche par défaut, peut prendre la valeur "center")</td>
 </tr><tr>
-  <td><i>$style</i></td>
+  <td><i>style</i></td>
   <td>
     <ul>
       <li>permet de définir un style particulier (pour un affichage en couleur par exemple) pour un champ
@@ -553,13 +553,16 @@ Cette fonctionne doit retourner un tableau (hashage) avec les paramètres renseig
     </ul>
   </td>
 </tr><tr>
-  <td><i>$popup</i></td>
-  <td>définit si le lien doit être lancé dans une fenêtre Popup</td>
+  <td><i>window</i></td>
+  <td>définit si le lien doit être lancé dans une fenêtre externe</td>
 </tr><tr>
-  <td><i>$popup_width</i></td>
+  <td><i>popup</i></td>
+  <td>définit si le lien doit être lancé dans une fenêtre Popup (pas de menus,,...)</td>
+</tr><tr>
+  <td><i>popup_width</i></td>
   <td>largeur de la fenêtre de popup</td>
 </tr><tr>
-  <td><i>$popup_height</i></td>
+  <td><i>popup_height</i></td>
   <td>hauteur de la fenêtre de popup</td>
 </tr>
 </table>

@@ -692,8 +692,8 @@ function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
 function run_query_set_user_pref($user_id, $option, $value) {
   global $cdg_sql;
 
-  $query = "update UserObmPref
-            set userobmpref_value='$value'
+  // Delete actual value
+  $query = "delete from UserObmPref
             where userobmpref_user_id ='$user_id'
               and userobmpref_option = '$option'";   
 
@@ -701,14 +701,12 @@ function run_query_set_user_pref($user_id, $option, $value) {
   $obm_q = new DB_OBM ;
   $ret = $obm_q->query($query);
 
-  // If nothing updated, we insert
-  if ($obm_q->affected_rows() == 0) {
-    $query = "insert into UserObmPref
-              (userobmpref_user_id, userobmpref_option, userobmpref_value)
-              values ('$user_id', '$option', '$value')";
-    display_debug_msg($query, $cdg_sql);
-    $ret = $obm_q->query($query);
-  }
+  // Insert new value
+  $query = "insert into UserObmPref
+            (userobmpref_user_id, userobmpref_option, userobmpref_value)
+            values ('$user_id', '$option', '$value')";
+  display_debug_msg($query, $cdg_sql);
+  $ret = $obm_q->query($query);
 
   return $ret;
 }
@@ -1112,7 +1110,7 @@ function get_last_account_text($id) {
     $obm_q = new DB_OBM;
     $obm_q->query($query);
     $obm_q->next_record();
-    return $obm_db->f("account_label");
+    return $obm_q->f("account_label");
   }
   return;
 }

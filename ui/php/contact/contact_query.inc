@@ -137,7 +137,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 function run_query_contact_company($c_id) {
   global $cdg_sql;
 
-  $query = "select company_id, company_name, company_phone
+  $query = "select company_id,
+      company_name,
+      company_phone,
+      company_address1,
+      company_address2,
+      company_address3,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
+      company_country_id
     from Company
     where company_id='$c_id'";
 
@@ -241,6 +250,7 @@ function run_query_contact_detail($p_id) {
         $timeupdate,
         $timecreate,
         company_id, company_name, company_phone,
+        kind_lang,
         kind_minilabel,
         kind_header,
         m.userobm_lastname as market_lname,

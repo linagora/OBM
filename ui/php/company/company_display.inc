@@ -60,18 +60,22 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
     }
-  } 
+  }
 
   else if ($fieldname == "company_web") {
     $web = $OD->data_set->f("company_web");
     if (strcmp($web,"") != 0) {
       if ( (strcmp(substr($web,0,7), "http://") == 0)
            || (strcmp(substr($web,0,8), "https://") == 0) ) {
-	$res["url"] = "";
+	$link_web = "";
       } else {
-	$res["url"] = "http://";
+	$link_web = "http://";
       }
-      $res["url"] .= $web;
+      $link_web .= "$web";
+      $res["url"] = $link_web;
+      $res["window"] = true;
+      $res["popup_width"] = 800;
+      $res["popup_height"] = 600;
       $res["name"] = "<img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" />";
     }
   }
@@ -268,7 +272,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
       value=\"$name\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
+      <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"10\"
       value=\"$phone\" />
     </div>
     $block_kind
@@ -764,6 +768,11 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["address3"]);
 
+  // some constants
+  $csize_add = "48";
+  $cmax_add = "64";
+  $csize_phone = "24";
+
   // Number field
   if ($show_number) {
     $block_num = "
@@ -878,7 +887,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $block_ad3 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>";
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
   }
 
   // Country select
@@ -980,10 +989,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_address 1</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"30\" size=\"30\" value=\"$ad1\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad1\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad2\" /></td>
     $block_ad3
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
@@ -999,10 +1008,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <td class=\"detailForm\">$sel_ctry</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"$csize_phone\" size=\"$csize_phone\" value=\"$phone\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"16\" size=\"16\" value=\"$fax\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"24\" size=\"$csize_phone\" value=\"$fax\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>

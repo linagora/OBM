@@ -385,6 +385,7 @@ class OBM_DISPLAY {
 	    $url = $res["url"];
 	    $align = $res["align"];
 	    $style = $res["style"];
+	    $window = $res["window"];
 	    $popup = $res["popup"];
 	    $popup_width = $res["popup_width"];
 	    $popup_height = $res["popup_height"];
@@ -408,7 +409,9 @@ class OBM_DISPLAY {
 	  
 	  // Pre cell display (open popup, link)
 	  if ($popup) {
-	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	  } else if ($window) {
+	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes,toolbar=yes,menubar=yes,location=yes,resizable=yes'); return false;\">";
 	  } else if ($url != "") {
 	    $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
 	  }

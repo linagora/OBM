@@ -187,7 +187,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
       <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"16\" value=\"$phone\" />
+      <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"24\" value=\"$phone\" />
     </div>
     <div class=\"searchLabel\">$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
@@ -380,7 +380,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
   $id = $co_q->f("contact_id");
-  $kind = $co_q->f("kind_minilabel");
+  $kind = "[" . $co_q->f("kind_lang") . "] " . $co_q->f("kind_minilabel");
   $kind_header = $co_q->f("kind_header");
   if ($kind_header != $kind) $kind .= " ($kind_header)";
   $function = $co_q->f("function_label");
@@ -739,6 +739,7 @@ function html_contact_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com;
+
   $cat1_q = run_query_contactcategory1();
   $cat2_q = run_query_contactcategory2();  
   $dsrc_q = run_query_datasource();
@@ -822,6 +823,13 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     if (is_object($co_q)) {
       // fill the phone with company one
       $phone = $co_q->f("company_phone");
+      $ad1 = $co_q->f("company_address1");
+      $ad2 = $co_q->f("company_address2");
+      $ad3 = $co_q->f("company_address3");
+      $zip = $co_q->f("company_zipcode");
+      $town = $co_q->f("company_town");
+      $cdx = $co_q->f("company_expresspostal");
+      $ctry = $co_q->f("company_country_id");
       $c_id = $co_q->f("company_id");
       $c_name = $co_q->f("company_name");
       $c_new_id = $c_id;
@@ -870,6 +878,11 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_ad3 = (! $cgp_hide["contact"]["address3"]);
+
+  // some constants
+  $csize_add = "48";
+  $cmax_add = "64";
+  $csize_phone = "24";
 
   // Function field
   if ($show_func) {
@@ -1042,7 +1055,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $block_ad3 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>";
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
   }
 
 
@@ -1127,22 +1140,22 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     <table class=\"detail\">
     <tr>
     <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"16\" maxlength=\"16\" value=\"$phone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_hphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"16\" maxlength=\"16\" value=\"$hphone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"16\" maxlength=\"16\" value=\"$fax\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mphone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"16\" maxlength=\"16\" value=\"$mphone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_address 1</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"30\" value=\"$ad1\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_address 2</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"30\" value=\"$ad2\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
     $block_ad3
     </tr><tr>
     <td class=\"detailLabel\">$l_postcode</td>
