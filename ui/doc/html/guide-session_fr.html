@@ -1,0 +1,111 @@
+<HTML>
+<HEAD>
+<TITLE>Les sessions OBM </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER>
+<H1>les sessions OBM</H1>
+</CENTER>
+
+<br>
+<H2>Présentation du Module : </H2>
+
+Le module doit gérer les sessions, ce sur deux niveau, le niveau web et le niveau utilisateur.
+Ce module se trouve dans la partie administration. Elle est consultable en cliquant sur "(Administration)"
+à côté du login.
+<H2>Fonctionnalités : </H2>
+
+<ul>
+<li><b>DONNEES DE SESSIONS : </b> Les données sur les sessions se trouvent dans le tableau statistiques sur les sessions.
+<ul>
+<li><b>Entrées dans ActiveUserObm : </b> Nombres total de sessions "ouvertes" sur OBM. Par ouverte on entend toutes les sessions dont 
+dont l'utilisateur ne c'est pas déconnecté via le lien <b>logout</b>.
+<li><b>Utilisateurs actuellement actifs : </b> Ce sont les pseudonymes des utilisateurs dit actifs, c'est à dire qui ont éxécuté 
+une action sur OBM depuis moins de X secondes ( X étant la valeur données à la variable <b>$time_actif_session</b>., par défaut 14400).
+<li><b>Date de Login : </b> Date de dernier login de l'utilisateur sur OBM.
+<lI><b>Nombre de hit :</b> Nombre d'appel de fichier fait par l'utilisateur lors de la session courante.
+<li><b>Dernière page consultée : </b> Page sur laquelle l'utilisateur se trouve actuellement ( ou qu'il à appelé en dernier si il s'est déconnecté du site sans passer par la fonction de <b>logout</b>).
+De plus, dans le planning, le creneau est bien colore mais en lieu et place du titre du rendez vous apparait "prive".
+<li><b>IP : </b> Adresse IP de l'utilisateur (Si l'utilisateur se trouve derrière un Firewall, cette adresse sera l'adresse du Firewall).
+</ul>
+<li><b>ACTION : </b> Actuellement une action est disponible, elle se trouve en dessous du tableau des données de session.
+<ul>
+<li><b>Clear all passive users sessions : </b> Cette fonction permet de nettoyer la base de données des sessions des utilisateurs
+inactifs, qui ne se sont pas déllogués. Ces sessions sont loguées dans la table UserSessionLog.
+</ul>
+</ul>
+
+<H2>Les sessions web : </H2>
+
+<p>
+Les sessions web sont utilisées pour permettre le passage de variables de sessions lors de la naviguation de l'utilisateur.
+Ces sessions sont gérées par php4 grâce aux fonctions commençant par session_ .
+<p>
+<p>
+Les sessions web sont gérées au sein d'OBM par l'Objet OBM_Session (obmlib.inc) et Session (session4.inc).
+<p>
+Les sessions sont gérées grâce à deux outils, les fichiers de sessions, et les cookies.
+Le cookie permettant de faire transitté entre les pages l'identificateur de la session, le fichier permettant
+de stocker les variables de session.
+La gestion des accès au fichier est totalement trasparente, les paramètres de la session, et notemment sa durée de vie
+seront configurés via les paramètres passés au cookie. Ainsi la variable <b>$lifetime</b> définit dans l'Objet OBM_Session (obmlib.inc)
+définit le temps (en secondes) pendant lequel une session est valide. Si l'utilisateur ne fait aucune requête au delà de ce delai, le cookie sera perdu et donc la session perdue (cela se traduira par une déconnexion au niveau d'OBM).
+La session web sera également détruite lors de l'utilisation de la fonction <b>logout</b>. Ici le cookie <b> et </b> le fichier de session seront detruits.
+<p>
+Enfin les sessions web servent à faire transitter des variables nécessaire à l'execution du code, et ne contienne pas d'information exploitable en termes de statistiques, ou d'administration.
+<p>
+
+<br>
+
+
+<h2>Les sessions utilisateur : </h2>
+
+<p>
+Les sessions utilisateur sont utilsées pour récolter des informations sur les utilisateurs connectés à l'application OBM.
+Ces sessions sont gérées au sein du code, par des fonctionnalités programmées par les developpeurs OBM.
+<p>
+Les sessions web sont gérées via deux tables, <b>ActiveUserObm</b> qui stock les sessions utilisateurs n'ayant pas été supprimées (utilisateurs actif ou ne s'étant pas déconnectés correctement), et <b>ObmSessionLog</b> qui log toutes les sessions détruites (utilisateurs s'étant déconnectés corectement, ou après l'execution de la routine <b>Clear all passive users sessions</b>).
+<p>
+Ces sessions sont gérées au niveau de la fonction <b>page_close()</b> (page4.inc). Elles sont consultables dans le module d'administration de l'application OBM. La variable <b>$time_actif_session</b> définit la durée d'une session utilisateur. Par défaut celle-ci est synchronisée sur la variable <b>$lifetime</b>.
+ Si l'utilisateur ne fait aucune requête au delà de ce delai, il sera alors considéré comme inactif.
+Les sessions utilisateurs lorsqu'elles sont détruites sont archivées dans la table <b>ObmSessionLog</b>. Ces sessions sont détruites lorsque l'utilisateur se déconnecte via la fonction <b>logout</b> et lorsque la routine <b>Clear all passive users sessions</b> est lancée.
+La routine <b>Clear all passive users sessions</b> ne detruit que les sessions passives.
+<br>
+La destruction d'une session utilisateur n'a aucune influence sur sa session web. Ces sessions servent à obtenir des informations "humainement exploitables" sur les utilisateurs connectés (IP, pages visités, nombre de requêtes...).
+<p>
+<br>
+
+
+<h2>Fonctionnement des sessions au travers du suivie de l'uitilisation d'OBM : </h2>
+ Ici nous allons étudier le fonctionnement des deux types de sessions dans l'application OBM, en commençant juste après l'identification.
+<h3>Connection : </h3>
+<p>
+ En debut de page, lors de l'appel de la fonction <b>page_open()</b>, la session web est alors créée, ainsi que le cookie. Les paramètres de l'utilisateur ( langue, thème, favoris ) sont alors enregistrés dans les variables de sessions.
+<p>
+ A la fin de l'envoie des headers html, le script appel la fonction <b>page_close()</b> dans laquelle est créée la session utilisateur.
+On enregistre alors dans la table <b>ActiveUserObm</b> l'identifiant de l'utilisateur, son ip, on initialise le nombre de requête à 1, et positionne la date de dernier login à l'heure du serveur.
+<p>
+Ensuite le contenu de la page est envoyé.
+<p>
+<h3>Navigation : </h3>
+<p>
+ Au debut de chaque page la session web est rappelé, reinitialisant le cookie de session. Les variables de sessions sont alors chargés initialisant ainsi les paramètres de l'utilisateur.
+<p>
+ A la fin de l'envoie des headers html sur chaque page, la session utilisateur est mise à jour ( IP, page en cours de consultation, nombre de requête incrémenté de 1).
+<p>
+<h3>Inactivité : </h3>
+<p>
+ Si la temps durant lequel l'utilisateur n'émet aucune requête dépasse la durée définit dans la variable <b>$lifetime</b> alors le cookie de session se detruit automatiquement. L'utilisateur perd alors sa connection à l'application OBM, et devra donc se reconnecter.
+<p>
+ La session utilisateur sera elle considérée comme inactive (si <b>$lifetime</b>  = <b>$time_actif_session</b>), sans pour autant etre detruit.
+<p>
+<h3>Déconnexion : </h3>
+ Au moment du "logout" la fonction $sess->delete() est appellée. Elle detruit physiquement et le cookie de session et le fichier de session. Est aussi appellé a ce moment la fonction run_query_store() qui permet de supprimer la session utilisateur de la table <b>ActiveUserObm</b>et de d'archiver dans la table <b>ObmSessionLog</b>.
+<p>
+<h3>Administration : </h3>
+<p>
+ Lorsque un administrateur ira consulter les données relatives aux sessions, OBM affichera alors deux informations majeures, le nombre de sessions utilisateurs total (actives + inactives) et les données relatives aux sessions utilisateurs actives. Les sessions utilisateurs actives sont séléctionnés en selectionnant toute les sessions utilisateurs dont le laps de temps depuis la dernière modification est inférieur à <b>$time_actif_session</b>.
+Lorsque la routine <b>Clear all passive users sessions</b> est lancée les session utilisateur inactives seront alors supprimées de la table <b>ActiveUserObm</b>et seront d'archivées dans la table <b>ObmSessionLog</b>.
+<p>
+</body>
+</html>
