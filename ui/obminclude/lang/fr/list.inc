@@ -27,7 +27,7 @@ $l_export_format = "Formats d'export disponibles";
 $l_desc = "Description";
 $l_export_intro = "Sélectionner le format d'export souhaité";
 $l_select_list = "Sélectionner les listes cibles de l'export";
-
+$l_list_wizard = "Recherche global";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
@@ -35,13 +35,16 @@ $l_function = "Fonction";
 $l_company = "Société";
 $l_hphone = "Tél perso";
 $l_town = "Ville";
+$l_contact = "Contact";
+$l_country = "Pays";
+$l_zipcode = "Code Postal";
 
 // Actions
-$l_insert = "Enregistrer la liste";
-$l_update = "Modifier la liste";
-$l_delete = "Supprimer la liste";
+$l_insert = "Enregistrer";
+$l_update = "Modifier";
+$l_delete = "Supprimer";
 $l_add = "Ajouter ces listes";
-$l_add_criterion = "Ajouter un critère de recherche";
+$l_add_criterion = "Ajouter un critère";
 
 // Messages
 $l_insert_ok = "L'insertion de la liste a été correctement effectuée.";

@@ -466,6 +466,7 @@ CREATE TABLE List (
   list_email       varchar(128),
   list_query_nb    int(10) DEFAULT 0,
   list_query       text,
+  list_structure   text,
   PRIMARY KEY (list_id),
   UNIQUE list_name (list_name)
 );

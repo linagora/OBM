@@ -35,14 +35,15 @@ $l_function = "Function";
 $l_company = "Company";
 $l_hphone = "Home phone";
 $l_town = "Town";
-
+$l_contact = "Contact";
+$l_country = "Country";
+$l_zipcode = "Zip code";
 // Actions
-$l_insert = "Insert the list";
-$l_update = "Update the list";
-$l_delete = "Delete the list";
+$l_insert = "Insert";
+$l_update = "Update";
+$l_delete = "Delete";
 $l_add = "Add these lists";
 $l_add_criterion = "Add a criterion";
-
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";
 $l_insert_error = "The list insertion has failed !";
@@ -50,12 +51,13 @@ $l_update_ok = "The list has been updated successfully.";
 $l_update_error = "The list update has failed !";
 $l_delete_ok = "The list has been deleted successfully.";
 $l_delete_error = "The list deletion has failed !";
+$l_fill_name = "You have to fill the list name";
 $l_name_list_nomatch = "List name is not valid";
 $l_list_exists = "Sorry but this list already exists";
 $l_check_samelist = "These lists seem similar to this new entry !";
 $l_j_check_email = "The email address is not valid.";
 $l_warn_delete = "registered contacts in this list";
-
+$l_list_wizard = "Global search";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the lists";
 $l_found = "lists found.";
 $l_no_found = "No lists found matching the query";

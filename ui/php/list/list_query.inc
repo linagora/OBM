@@ -99,13 +99,14 @@ function run_query_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($list) {
   global $auth, $cdg_sql;
-
   $id = $list["id"];
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
-
+  if(isset($list["criteria"])) {
+    $list_critery = serialize($list["criteria"]);
+  }
   $query = "insert into List (list_timeupdate,
     list_timecreate,
     list_userupdate,
@@ -113,7 +114,8 @@ function run_query_insert($list) {
     list_name,
     list_subject,
     list_email,
-    list_query)
+    list_query,
+    list_structure)
   values (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
@@ -121,8 +123,8 @@ function run_query_insert($list) {
     '$name',
     '$subject',
     '$email',
-    '$list_query')";
-
+    '$list_query',
+     '$list_critery')";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -144,13 +146,16 @@ function run_query_update($list) {
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
-  
+  if(isset($list["criteria"])) {
+    $list_critery = serialize($list["criteria"]);
+  }
   $query = "update List set list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
     list_name='$name',
     list_subject='$subject',
     list_email='$email',
-    list_query='$list_query'
+    list_query='$list_query',
+    list_structure='$list_critery'
   where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -528,7 +533,6 @@ function check_data_form($id, $list) {
       }
     }
   }
-
   return true;
 }
 
@@ -706,5 +710,69 @@ function run_query_contacts_for_letter($list_ids) {
   return $connect_db;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Make an SQL Query with the list of criteria.        //
+// Parameters:
+//   - $list[]       : list search criteria
+//     keys used     : $criteria.
+///////////////////////////////////////////////////////////////////////////////
+function make_query($list) {
+  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+  $criteria = $list["criteria"];
+  $query_kind = $list["query_kind"];
+  $query = "
+        SELECT DISTINCT
+        contact_id,
+        contact_lastname,
+        contact_firstname,
+        contact_expresspostal,
+        c1.country_name,
+        contact_phone,
+        contact_homephone,
+        contact_mobilephone,
+        contact_email,
+        company_id,
+        company_name,
+        company_zipcode,
+        company_town,
+        c1.country_name,
+        c2.country_name
+        FROM
+        Contact
+             left join Company on contact_company_id=company_id
+             left join Country as c1 on contact_country_id=c1.country_id
+             left join Country as c2 on company_country_id=c2.country_id ";   
 
+  if(is_array($criteria)) {
+    $and = "";
+    foreach($criteria as $module => $module_criteria) {
+      if(is_array($module_criteria)) {
+        foreach($module_criteria as $field => $criterion) {
+          $begin_condition = "$and ";
+          if(is_array($criterion)) {
+            $begin_condition .= " (";
+            $or = "";
+            $condition = "";
+            foreach($criterion as $value) {
+              if($value != "") {
+                $condition .= "$or $field LIKE '$value%'";
+                $or = " OR";
+              }
+            }
+            $end_condition = ") ";
+            if($condition !="") {
+              $where .= $begin_condition.$condition.$end_condition;
+              $and = " AND";
+            }
+          }        
+        } 
+      }
+    }
+  }
+  if($where != "") {
+    $where = " WHERE $where";
+  }
+  $query = $query.$where." ORDER BY contact_lastname";
+  return trim(addslashes($query));
+}
 </script>

@@ -27,6 +27,13 @@ ALTER table CalendarEvent change column calendarevent_endrepeat calendarevent_en
 
 ALTER table CalendarEvent change column calendarevent_length calendarevent_length INT(14);
 
+-------------------------------------------------------------------------------
+-- Update List tables
+-------------------------------------------------------------------------------
+-- added column : list_structure
+
+ALTER TABLE List ADD COLUMN list_structure text;
+ 
 
 -------------------------------------------------------------------------------
 -- Import module tables

@@ -348,8 +348,25 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
   return $block;
 }
-
-
+///////////////////////////////////////////////////////////////////////////////
+// Display List Form (graphical or not)                                     //
+// Parameters :
+//   - $action    : action called
+//   - $list_q    : DBO : information about the list (null for new list)
+//   - $list[]    : default or transmitted values
+//     keys used  : name, subject, usercreate
+///////////////////////////////////////////////////////////////////////////////
+function dis_list_form($action, $list_q, $list) {
+  if(is_object($list_q)){
+    $crit_q = $list_q->f("list_structure");
+  }
+  if($list["criteria"] == "" && $crit_q =="") {
+    return html_list_form($action, $list_q, $list);
+  }
+  else {
+    return html_list_graphical_form($action, $list_q, $list);
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display List Form                                                         //
 // Parameters :
@@ -377,11 +394,10 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
-
   $url = url_prepare("list_index.php");
 
   $block = "
-  <form method=\"get\" name=\"f_new action=\"$url\"
+  <form method=\"get\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
 
   <table class=\"detail\">
@@ -445,7 +461,10 @@ function html_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
-  global $popup_height,$popup_width;
+  global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
+  global $l_company, $l_country,$l_zipcode,$l_town,$l_contact,$l_lastname,$l_firstname;
+  global $l_update,$l_delete;
+
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $list_q->f("list_id");
@@ -453,25 +472,56 @@ function html_list_graphical_form($action, $list_q, $list) {
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
-    $query = $list_q->f("list_query");
-  }
+    $criteria = unserialize($list_q->f("list_structure"));
 
+  }
+  
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
-  if (isset($list["query"])) { $query = stripslashes($list["query"]); }
+  if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
+  if(!is_array($criteria)) {
+    $criteria = unserialize($criteria);
+  }
+  if(is_array($criteria)) {
+    foreach($criteria as $module)
+    foreach($module as $field => $criterion) {
+      foreach($criterion as $line => $value) {
+        if($field == "cs1.country_name") {
+          $field= "company_country";
+        }elseif($field == "cs2.country_name") {
+          $field= "contact_country";
+        }
+        if($value != "") {
+          $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
+        }
+        else {
+          $input = "<input type=\"hidden\" name=\"tf_".$field."[]\" value=\"\" />";
+        }
+        $structure[$line] .= "<td>$input</td>";
+      }
+    }
+    $del_cell= "<td><a href=\"javascript:void(0);\" onclick=\"del_row(this.parentNode.parentNode);return false;\">
+    <img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a></td>";
+ 
+    $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
+    <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>";  
+    foreach($structure as $line) {
+      $dis_criteria .="<tr>$del_cell$upd_cell$line</tr>";
+    }
+  }
 
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
   $url = url_prepare("list_index.php");
 
   $block = "
-  <form method=\"get\" name=\"f_new action=\"$url\"
+  <form method=\"post\" name=\"f_new action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
 
   <table class=\"detail\">
-  <tr>
+    <tr>
     <td class=\"detailLabel\">$l_name</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
@@ -480,15 +530,29 @@ function html_list_graphical_form($action, $list_q, $list) {
     <td class=\"detailLabel\">$l_subject</td>
     <td class=\"detailForm\">
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
-  </tr>
+    </tr>
+  </table>
+  
+  <table class=\"search\" id=\"list_criterion\">
   <tr>
-    <td>
-    </td>
-  </tr>
-  </table>";
+    <td class=\"detailLabel\" style=\"width:5%;\" >$l_delete</td>
+    <td class=\"detailLabel\" style=\"width:5%;\">$l_update</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_company</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_country</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_zipcode</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_company: $l_town</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_lastname</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_firstname</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_country</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_zipcode</td>
+    <td class=\"detailLabel\" style=\"width:9%;\">$l_contact: $l_town</td>    
+  </tr>  
+      $dis_criteria
+  </table>
+  ";
 
   $dis_but .= "<input type=\"submit\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"/>";
+  onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>";
 
   if (($action == "detailupdate") || ($action == "update")) {
      $dis_but .= "
@@ -504,7 +568,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       </form>";
    } else {
     $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
+      <input type=\"submit\" value=\"$l_insert\"/>";
   }
 
   $block .= "<div class=\"detailButton\">
@@ -517,6 +581,91 @@ function html_list_graphical_form($action, $list_q, $list) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display the Form to make a Criterion //
+// Parameters:
+//   - $pref_list_q    : DBO : List Field list to display
+//   - $pref_contact_q : DBO : Contact Field list to display
+///////////////////////////////////////////////////////////////////////////////
+function dis_add_criterion_form($list) {
+  global $l_list_display, $l_contact_display,$l_add_criterion;
+  $popup = $list["popup"];
+  if(isset($list["row_index"]))$row_index = $list["row_index"];else $row_index =-1;
+  $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
+  $block .= html_company_criterion();
+  $block .= html_contact_criterion();
+  $block .= "
+  <div class=\"detailButton\">
+  <p class=\"detailButtons\">
+  <input type=\"submit\" value=\"$l_add_criterion\"/>
+  </p>
+  </div>
+";
+  $block.="<input type=\"hidden\" name=\"ext_target\" value=\"$ext_target\" />";
+  $block .= "</form>";
+  if($row_index != -1) {
+    $block .= "
+    <script type=\"text/javascript\">
+      get_values(window.document.f_new_criterion);
+    </script>
+    ";
+  }
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Company Criterion Form //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_company_criterion(){
+  global $l_company,$l_country,$l_zipcode,$l_town;
+  $block .= "
+  <div class=\"detailHead\">$l_company</div>    
+  <table class=\"search\">
+  <tr>
+    <td class=\"detailLabel\">$l_company</td>
+    <td class=\"detailLabel\">$l_country</td>
+    <td class=\"detailLabel\">$l_zipcode</td>
+    <td class=\"detailLabel\">$l_town</td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_country\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_zipcode\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
+  </tr>
+  </table>
+  ";
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Contact Criterion Form //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_criterion(){
+  global $l_lastname,$l_firstname,$l_country,$l_zipcode,$l_town,$l_contact;
+  $block = "
+  <div class=\"detailHead\">$l_contact</div>    
+  <table class=\"search\">
+  <tr>
+    <td class=\"detailLabel\">$l_lastname</td>
+    <td class=\"detailLabel\">$l_firstname</td>
+    <td class=\"detailLabel\">$l_country</td>
+    <td class=\"detailLabel\">$l_zipcode</td>
+    <td class=\"detailLabel\">$l_town</td>    
+  </tr>
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lname\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_fname\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_country\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_zipcode\" value=\"\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
+  </tr>
+  </table>
+  ";
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the List Display preference screen                                //
@@ -602,7 +751,10 @@ function dis_list_warn_insert($list_q, $list) {
 
   $name = $list["name"];
   $subject = $list["subject"];
-
+  $query = stripslashes($list["query"]);
+  if(isset($list["criteria"])) {
+    $criteria = urlencode(serialize($list["criteria"]));
+  }
   $display["msg"] .= display_warn_msg($l_check_samelist);
   while ($list_q->next_record()) {
     $id = $list_q->f("list_id");
@@ -627,6 +779,8 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
       <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
+      <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
+      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" /
       <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
     </form>
     </p>
@@ -636,6 +790,8 @@ function dis_list_warn_insert($list_q, $list) {
       <input type=\"hidden\" name=\"action\" value=\"new\" />
       <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
       <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
+      <input type=\"hidden\" name=\"ta_query\" value=\"$query\" />
+      <input type=\"hidden\" name=\"se_criteria\" value=\"$criteria\" /
       <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>

@@ -84,9 +84,13 @@ require("list_js.inc");
 if (! $popup) {
   $display["header"] = generate_menu($menu, $section); // Menu
 }
-
-
-if (($action == "index") || ($action == "")) {
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+if ($action == "new_criterion") {
+  $display["detail"] = dis_add_criterion_form($list);
+}
+elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_list_search_form($list);
   if ($set_display == "yes") {
@@ -104,7 +108,7 @@ else if ($action == "search") {
 
 else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_list_form($action, "", $list);
+  $display["detail"] = dis_list_form($action, "", $list);
 }
 
 else if ($action == "new_graphical") {
@@ -123,13 +127,15 @@ else if ($action == "detailconsult") {
 else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($list["id"]);
-  $display["detail"] = html_list_form($action, $obm_q, $list);
+  $display["detail"] = dis_list_form($action, $obm_q, $list);
 }
 
 else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
+  if(isset($list["criteria"])) {
+    $list["query"] = make_query($list);
+  }
   if (check_data_form("", $list)) {
-
     // If the context (same list) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
       $retour = run_query_insert($list);
@@ -159,11 +165,15 @@ else if ($action == "insert") {
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
-    $display["detail"] = html_list_form($action, "", $list);
+    $display["detail"] = dis_list_form($action, "", $list);
   }
+
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
+  if(isset($list["criteria"])) {
+    $list["query"] = make_query($list);
+  }
   if (check_data_form($list["id"], $list)) {
     $retour = run_query_update($list);
     if ($retour) {
@@ -178,7 +188,7 @@ else if ($action == "insert") {
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $list_q = run_query_detail($list["id"]);
-    $display["detail"] = html_list_form($action, $list_q, $list);
+    $display["detail"] = dis_list_form($action, $list_q, $list);
   }
 
 } elseif ($action == "check_delete")  {
@@ -281,7 +291,7 @@ $display["head"] = display_head($l_list);
 $display["end"] = display_end();
 
 display_page($display);
-
+exit(0);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $list hash, List parameters transmited
@@ -291,7 +301,11 @@ function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
-  global $new_order, $order_dir;
+  global $new_order, $order_dir,$popup,$row_index;
+  global $tf_company_name,$tf_company_country,$tf_company_zipcode,$tf_company_town;
+  global $tf_contact_firstname,$tf_contact_lastname,$tf_contact_country;
+  global $tf_contact_zipcode,$tf_contact_town;
+  global $se_criteria;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // List fields
@@ -302,13 +316,14 @@ function get_param_list() {
   if (isset ($tf_email)) $list["email"] = $tf_email;
   if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
+  if (isset ($row_index)) $list["row_index"] = $row_index;
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
 
   if (isset ($new_order)) $list["new_order"] = $new_order;
   if (isset ($order_dir)) $list["order_dir"] = $order_dir;
-
+  if (isset ($popup)) $list["popup"] = $popup;
   // External param
   if (isset ($ext_action)) $list["ext_action"] = $ext_action;
   if (isset ($ext_url)) $list["ext_url"] = $ext_url;
@@ -320,6 +335,22 @@ function get_param_list() {
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
     $http_obm_vars = $HTTP_GET_VARS;
   }
+
+  //Criteria params :
+  //Company
+
+  if (isset ($tf_company_name)) $list["criteria"]["company"]["company_name"] = $tf_company_name;
+  if (isset ($tf_company_country)) $list["criteria"]["company"]["c1.country_name"] = $tf_company_country;
+  if (isset ($tf_company_zipcode)) $list["criteria"]["company"]["company_zipcode"] = $tf_company_zipcode;
+  if (isset ($tf_company_town)) $list["criteria"]["company"]["company_town"] = $tf_company_town;
+  //Contact
+  if (isset ($tf_contact_firstname)) $list["criteria"]["contact"]["contact_firstname"] = $tf_contact_firstname;
+  if (isset ($tf_contact_lastname)) $list["criteria"]["contact"]["contact_lastname"] = $tf_contact_lastname;
+  if (isset ($tf_contact_country)) $list["criteria"]["contact"]["c2.country_name"] = $tf_contact_country;
+  if (isset ($tf_contact_zipcode)) $list["criteria"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
+  if (isset ($tf_contact_town)) $list["criteria"]["contact"]["contact_town"] = $tf_contact_town;
+  
+  if (isset ($se_criteria)){$list["criteria"] = unserialize( urldecode($se_criteria)); }
 
   if (isset ($http_obm_vars)) {
     $nb_con = 0;
@@ -361,7 +392,7 @@ function get_list_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
   global $l_header_consult, $l_header_add_contact;
-  global $l_select_list, $l_add_contact;
+  global $l_select_list, $l_add_contact,$l_list_wizard;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 
 // Index
@@ -388,13 +419,18 @@ function get_list_action() {
                                   );
 
 // New
-/*  $actions["LIST"]["new_graphical"] = array (
-    'Name'     => "pouic",
+  $actions["LIST"]["new_graphical"] = array (
+    'Name'     => "$l_list_wizard",
     'Url'      => "$path/list/list_index.php?action=new_graphical",
     'Right'    => $list_write,
-    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+    'Condition'=> array ('','new','update','insert','search','index','detailconsult','admin','display') 
                                   );
-*/				  
+// New
+  $actions["LIST"]["add_criterion"] = array (
+    'Url'      => "$path/list/list_index.php?action=new_graphical",
+    'Right'    => $list_write,
+    'Condition'=> array ('None') 
+                                  );				  
 // Detail Consult
   $actions["LIST"]["detailconsult"] = array (
      'Name'     => $l_header_consult,
