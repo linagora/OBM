@@ -50,7 +50,7 @@ $l_short_waiting  = "Att";
 
 $l_daily = "quotidienne";
 $l_weekly = "hebdomadaire";
-$l_monthlybyday = "mensuelle";
+$l_monthlybyday = "mensuelle(jour)";
 $l_monthlybydate = "mensuelle(date)";
 $l_yearly = "annuelle";
 

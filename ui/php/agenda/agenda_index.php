@@ -102,7 +102,7 @@ elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if(check_data_form($agenda)){    
     $conflict = run_query_add_event($agenda,$sel_user_id);
-    $p_user_array = array($auth->auth["uid"],6);
+    $p_user_array = array($auth->auth["uid"],30);
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
     $user_q = run_query_get_user_name($p_user_array);
     dis_week_planning($agenda,$obm_q,$user_q);
@@ -115,7 +115,8 @@ elseif ($action == "insert") {
     dis_event_form($action, $agenda, $user_obm, $cat_event, $sel_user_id);
   }
 }
-
+elseif ($action == "detailconsult") {
+  }
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
