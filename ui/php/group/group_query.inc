@@ -239,7 +239,6 @@ function run_query_update($group) {
     group_desc='$desc',
     group_email='$email'
   where group_id='$id'";
-echo $query;
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
