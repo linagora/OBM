@@ -69,7 +69,8 @@ table.agendaCalWeek		{
 	border: 		1px #a1a5a9 solid; 
 	width:			554px;
 	border-collapse:	separate;	
-	border-spacing:		0;
+	border-spacing:		0;!important;
+	border-collapse:	collapse;	
 }
 
 table.agendaCalDay		{
