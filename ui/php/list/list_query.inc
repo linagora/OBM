@@ -1207,8 +1207,6 @@ function make_query_from_criteria($list) {
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
 
-  $join_name = "a1";
-
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
       if (is_array($module_criteria)) {
@@ -1216,25 +1214,28 @@ function make_query_from_criteria($list) {
           if (is_array($criterion)) {
             foreach($criterion as $line => $value) {
               if ($value != "") {
-		$field_fill = 1;
+		$select .= $add_select[$field];
+		$group .= $add_group[$field];
+		if(!isset($join_name[$field])) {
+		  $join_name[$field] = 0;
+		  $join .= str_replace('%j',$join_name[$field],$add_join[$field]);
+		}
+		elseif($logical_criterion[$line] == "AND" && $line == $old_line + 1) {
+		  $join_name[$field] ++;
+		  $join .= str_replace('%j',$join_name[$field],$add_join[$field]);
+		}
 		$module_fill = 1;
 		$operation = $operateurs[$field];
-		$operation = str_replace('%j',$join_name,$operation);
+		$operation = str_replace('%j',$join_name[$field],$operation);
 		$operation = str_replace('%f',$field,$operation);
 		$operation = str_replace('%v',$value,$operation);
 		$condition[$line] .= $and[$line]." ". $operation;
-		$and[$line] = " AND";
-		if ($field_fill == 1) {
-		  $join .= str_replace('%j',$join_name,$add_join[$field]);
-		  $select .= $add_select[$field];
-		  $group .= $add_group[$field];
-		  $field_fill = 0;
-		  $join_name ++;
-		}		
+		$and[$line] = " AND";	
 	      }
 	      else {
 		$condition[$line] .= "";
 	      }
+	      $old_line = $line;
             }
           }
         }
