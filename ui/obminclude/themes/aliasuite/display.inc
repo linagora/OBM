@@ -119,17 +119,17 @@ function display_head($p_module) {
 //   - $tab    : active tab 
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
-function generate_menu($module, $section) {
+function generate_menu($module) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $popup_width, $popup_height, $l_home;
   global $auth, $obminclude, $display; 
-  global $path, $obm_version;
+  global $path, $obm_version , $cgp_module_link;
   global $aliamin_link, $aliacms_link, $blogs_link;
   
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
   $profil = $auth->auth["perm"];
-
+  $section = $cgp_module_link[$module];
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section, $module);
   $display["action"] = display_menu_bar($section, $module);
@@ -205,7 +205,7 @@ function display_sections($section) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menus($section, $module) {
   global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
-  global $path, $menus, $perm;
+  global $path, $modules, $perm, $cgp_module_link;
 
   if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
     $fico = true;
@@ -214,26 +214,28 @@ function display_menus($section, $module) {
   if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
     $ftext = true;
   else $ftext = false;
+  
+  $section_link = array_keys($cgp_module_link,$section);
 
-  if (is_array($menus[$section])) {
+  if (is_array($section_link)) {
     $block .= "<ul class='menu'>\n";
 
-    foreach ($menus[$section] as $menu => $value) {
-      $module_name = $value["Name"];
-      $module_right = $perm->get_module_rights($menu); 
-      if (($module_right & $value["Right"]) == $value["Right"]) {
-	if($menu == $module) {
+    foreach ($section_link as $current_module) {
+      $module_name = $modules[$current_module]["Name"];
+      $module_right = $perm->get_module_rights($current_module); 
+      if (($module_right & $modules[$current_module]["Right"]) == $modules[$current_module]["Right"]) {
+	if($current_module == $module) {
           $block .= "<li class=\"activeTab\">";
 	} else {
 	  $block .= "<li class=\"inactiveTab\">";
 	}
 	if ($fico) {
-	  $ico = $value["Ico"];
+	  $ico = $modules[$current_module]["Ico"];
 	  if ($ico) {
-	    $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	    $block .= "<a href='".$modules[$current_module]["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
 	  }
 	}
-	$block .= "<a href='".$value["Url"]."'>";
+	$block .= "<a href='".$modules[$current_module]["Url"]."'>";
 	if ($ftext) $block .= $module_name;
         $block .= "</a></li>\n";
       }
@@ -252,11 +254,11 @@ function display_menus($section, $module) {
 //   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $module) {
-  global $set_theme, $menus, $action, $popup_height;
+  global $set_theme, $modules, $action, $popup_height;
   global $actions, $popup_width, $perm;
 
-  $name = $menus[$section][$module]["Name"];
-  $ico = $menus[$section][$module]["Ico"];
+  $name = $modules[$module]["Name"];
+  $ico = $modules[$module]["Ico"];
   if ($ico != "")
     $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else

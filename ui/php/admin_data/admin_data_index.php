@@ -37,8 +37,8 @@ if ($mode != "html") {
   $document_path = $db->f("globalpref_value");	
 }
 
-$modules = array ('company', 'deal', 'list', 'document');
-//$modules = get_modules_array();
+$target_modules = array ('company', 'deal', 'list', 'document');
+//$target_modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_data_index($mode, $acts, $modules, $langs, $themes);
+    dis_data_index($mode, $acts, $target_modules, $langs, $themes);
     break;
   case "data_show":
     dis_data($action, $mode, $module);
@@ -104,13 +104,13 @@ switch ($mode) {
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $acts, $modules;
+  global $acts, $target_modules;
 
   while (list($nb, $val) = each ($acts)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
   }
-  while (list($nb, $val) = each ($modules)) {
+  while (list($nb, $val) = each ($target_modules)) {
     if ($nb == 0) $lmodules .= "$val";
     else $lmodules .= ", $val";
   }
@@ -131,7 +131,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $acts, $modules;
+  global $debug, $acts, $target_modules;
   global $action, $module;
 
   // We skip the program name [0]
@@ -145,7 +145,7 @@ function parse_arg($argv) {
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
-      if (in_array($val2, $modules)) {
+      if (in_array($val2, $target_modules)) {
         $module = $val2;
         if ($debug > 0) { echo "-m -> \$module=$val2\n"; }
       }

@@ -80,7 +80,7 @@ switch ($mode) {
 // Display command use                                                       //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $acts, $modules, $langs, $themes;
+  global $acts, $target_modules, $langs, $themes;
 
   while (list($nb, $val) = each ($acts)) {
     if ($nb == 0) $lactions .= "$val";
@@ -102,7 +102,7 @@ Ex: php4 admin_index.php -a clear_sess
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $acts, $modules;
+  global $debug, $acts, $target_modules;
   global $action, $module;
 
   // We skip the program name [0]

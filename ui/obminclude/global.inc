@@ -139,6 +139,36 @@ $cgp_show["module"]["settings"] = true;
 $cgp_show["module"]["user"] = true;
 $cgp_show["module"]["group"] = true;
 
+$cgp_module_link["company"] = "COM";
+$cgp_module_link["contact"] = "COM";
+$cgp_module_link["deal"] = "COM";
+$cgp_module_link["list"] = "COM";
+$cgp_module_link["agenda"] = "COM";
+$cgp_module_link["todo"] = "COM";
+$cgp_module_link["publication"] = "COM";
+$cgp_module_link["statistic"] = "COM";
+$cgp_module_link["time"] = "PROD";
+$cgp_module_link["project"] = "PROD";
+$cgp_module_link["contract"] = "PROD";
+$cgp_module_link["incident"] = "PROD";
+$cgp_module_link["document"] = "PROD";
+$cgp_module_link["account"] = "COMPTA";
+$cgp_module_link["invoice"] = "COMPTA";
+$cgp_module_link["payment"] = "COMPTA";
+$cgp_module_link["settings"] = "USER";
+$cgp_module_link["user"] = "USER";
+$cgp_module_link["group"] = "USER";
+$cgp_module_link["admin"] = "ADMIN";
+$cgp_module_link["admin_code"] = "ADMIN";
+$cgp_module_link["admin_pref"] = "ADMIN";
+$cgp_module_link["admin_data"] = "ADMIN";
+$cgp_module_link["admin_lang"] = "ADMIN";
+$cgp_module_link["admin_ref"] = "ADMIN";
+$cgp_module_link["import"] = "ADMIN";
+
+
+
+
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 

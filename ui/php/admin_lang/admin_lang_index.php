@@ -47,7 +47,7 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_lang_index($mode, $actions, $modules, $langs, $themes);
+    dis_lang_index($mode, $actions, $target_modules, $langs, $themes);
     break;
   case "show_src":
     dis_src_vars($mode, $module);
@@ -83,13 +83,13 @@ switch ($mode) {
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $argv, $actions, $modules, $langs, $themes;
+  global $argv, $actions, $target_modules, $langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
   }
-  while (list($nb, $val) = each ($modules)) {
+  while (list($nb, $val) = each ($target_modules)) {
     if ($nb == 0) $lmodules .= "$val";
     else $lmodules .= ", $val";
   }
@@ -120,7 +120,7 @@ Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions, $modules, $langs, $themes;
+  global $debug, $actions, $target_modules, $langs, $themes;
   global $action, $module, $lang, $theme;
 
   // We skip the program name [0]
@@ -134,7 +134,7 @@ function parse_arg($argv) {
       break;
     case '-m':
       list($nb2, $val2) = each ($argv);
-      if (in_array($val2, $modules)) {
+      if (in_array($val2, $target_modules)) {
         $module = $val2;
         if ($debug > 0) { echo "-m -> \$module=$val2\n"; }
       }
