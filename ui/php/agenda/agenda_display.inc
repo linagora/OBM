@@ -962,29 +962,33 @@ echo "
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 
-function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array) {
+function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
   global $set_theme,$set_weekstart_default;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
-  global $l_checkdelete,$l_insert,$l_force;
+  global $l_checkdelete,$l_insert,$l_force,$l_repeat_update;
   
   if($action == "detailupdate") {
     $title = $obm_q_event->f("calendarevent_title");
     $category_id = $obm_q_event->f("calendarevent_category_id");
     $priority = $obm_q_event->f("calendarevent_priority");
     $description = $obm_q_event->f("calendarevent_description");
-    $datebegin = substr($obm_q_event->f("calendarevent_datebegin"),0,8);
-    $timebegin = substr($obm_q_event->f("calendarevent_datebegin"),8,4);
-    $dateend = substr($obm_q_event->f("calendarevent_dateend"),0,8);
-    $timeend = substr($obm_q_event->f("calendarevent_dateend"),8,6);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("datebegin") , $day_array);
+    $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
+    $timebegin = $day_array[4].":".$day_array[5];
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("dateend") , $day_array2);
+    $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
+    $timeend = $day_array2[4].":".$day_array2[5];
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
-    $repeat_end = $obm_q_event->f("calendarevent_endrepeat");
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
+    $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+    
   } else {
     if (isset($agenda["id"])) { $id = $agenda["id"]; }
     $title = $agenda["title"];
@@ -1012,6 +1016,9 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
 
   
   if (($action == "detailupdate") || ($action == "update")) {
+    $dis_repeat_update = "<tr><td class=\"detailLabel\">$l_repeat_update</td>";
+    $dis_repeat_update .= "<td><input type=\"checkbox\" name=\"cb_repeat_update\" value=\"1\"</td> </tr> "; 
+
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
@@ -1196,6 +1203,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
      <td class=\"detailLabel\">$l_repeatdays</td>
      <td >$dis_repeat_day</td>
     </tr>
+    $dis_repeat_update
     <tr>
      <td colspan=\"2\" class=\"detailHead\">$l_description</td>
     </tr>       
@@ -1214,4 +1222,133 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     $dis_delete
    ";
  }
+///////////////////////////////////////////////////////////////////////////////
+// Display Incident Consult                                                  //
+// Parameters:
+//   - $inc_q : DBO : incident result
+//   - $con_q : DBO : contract result
+//      $obm_q_company : list of companies
+//      $contact_q : list of contact from the company 
+///////////////////////////////////////////////////////////////////////////////
+function html_calendar_consult($obm_q_event,$obm_q_cust) {
+  global $set_theme,$set_weekstart_default;
+  // -- Labels
+  global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
+  
+  $title = $obm_q_event->f("calendarevent_title");
+  $category = $obm_q_event->f("calendarcategory_label");
+  $priority = $obm_q_event->f("calendarevent_priority"); 
+  $description = $obm_q_event->f("calendarevent_description");
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("datebegin") , $day_array);
+  $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
+  $timebegin = $day_array[4].":".$day_array[5];
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("dateend") , $day_array2);
+  $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
+  $timeend = $day_array2[4].":".$day_array2[5];
+  $privacy = $obm_q_event->f("calendarevent_privacy");
+  $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
+  $kind = ${"l_".$obm_q_event->f("calendarevent_repeatkind")};
+  $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
+  $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+
+  switch ($priority ) {
+    case 1 : 
+      $priority = $l_low;
+      break;
+    case 2 :
+      $priority = $l_medium;
+      break;
+    case 3 :
+      $priority = $l_high;
+      break;
+      
+    }
+    
+  $start_week_day = strtotime($set_weekstart_default);
+  for ($i=0; $i<7; $i++) {
+    $day_num = date("w", $start_week_day);
+    $day = $l_daysofweekshort[$day_num];
+    if (strcmp(substr($repeat_days,$i,1),"1")==0) {
+      $dis_repeat_days .= "$day ";
+    }
+    $start_week_day = strtotime("+1 day", $start_week_day); 
+  }
+    
+  while($obm_q_cust->next_record()) {
+    $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."<br />";
+  }
+  // --- HTML Template --------------------------------------------------------
+  echo "
+  <table class=\"details\">
+   <tr>
+    <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
+   </tr>
+   <tr>
+    <td class=\"detailLabel\">$l_title</td>
+    <td class=\"detailText\">$title</td>
+   </tr>  
+   <tr>
+    <td class=\"detailLabel\">$l_private</td>
+    <td class=\"detailText\">$privacy</td>
+   </tr> 
+   <tr>
+    <td class=\"detailLabel\">$l_category</td>
+    <td class=\"detailText\">$category</td>
+   </tr>    
+   <tr>
+    <td class=\"detailLabel\">$l_users</td>
+    <td class=\"detailText\">$dis_user_list</td>
+   </tr>
+   <tr>
+    <td colspan=\"2\" class=\"detailHead\">$l_carac</td>
+   </tr>   
+   <tr>
+    <td class=\"detailLabel\">$l_datebegin</td>
+    <td class=\"detailText\">$datebegin</td>
+   </tr>
+   <tr>
+    <td class=\"detailLabel\">$l_timebegin</td>
+    <td class=\"detailText\">$timebegin</td>
+   </tr>
+   <tr>
+    <td class=\"detailLabel\">$l_dateend</td>
+    <td class=\"detailText\">$dateend</td>       
+   </tr>
+   <tr>    
+    <td class=\"detailLabel\">$l_timeend</td>
+    <td class=\"detailText\">$timeend</td>
+   </tr>
+   <tr>
+    <td class=\"detailLabel\">$l_priority</td>
+    <td class=\"detailText\">$priority</td>
+   </tr>      
+   <tr>
+    <td colspan=\"2\" class=\"detailHead\">$l_repeat</td>
+   </tr>   
+   <tr>    
+    <td class=\"detailLabel\">$l_repeatkind</td> 
+    <td class=\"detailText\">$kind</td>
+   </tr>
+   <tr>    
+    <td class=\"detailLabel\">$l_use_endrepeat</td> 
+    <td class=\"detailText\">$repeat_end</td>
+   </tr>
+   <tr>  
+    <td class=\"detailLabel\">$l_repeatdays</td>
+    <td class=\"detailText\">$dis_repeat_days</td>
+   </tr>
+   <tr>
+    <td colspan=\"2\" class=\"detailHead\">$l_description</td>
+   </tr>       
+   <tr>    
+    <td colspan=\"2\" class=\"detailText\">$description</td>
+   </tr>     
+  </table>
+  
+  ";
+}
  

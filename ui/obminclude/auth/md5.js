@@ -1,4 +1,4 @@
-<SCRIPT language=javascript>
+<script type="text/javascript">
 /*
  *  md5.jvs 1.0b 27/06/96
  *

@@ -138,7 +138,8 @@ $l_short_saturday="Sam";
 $l_short_sunday="Dim";
 
 $l_unknown="Inconnu";
-
+$l_checkdelete ="Supprimer";
+$l_repeat_update ="Mettre à jour les répétitions";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

@@ -16,10 +16,8 @@ tr.logintable {
 -->
 </style>
 
-<style type="text/css">
-<!--
 <?php include("$obminclude/auth/md5.js"); ?>
-<script language="javascript">
+<script type="text/javascript">
 <!--
   function doChallengeResponse() {
     str = document.login.login.value + ":" +
@@ -66,7 +64,7 @@ tr.logintable {
 </table>
   <br>
   <div align="center">
-  <input name="imageField" type="image" src="/images/images/bouton_login.gif" width="143" height="32" border="0">
+  <input name="imageField" type="image" src="/images/images/bouton_login.gif">
 
 </div>
 <p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
@@ -118,14 +116,12 @@ tr.logintable {
 
  <?php endif ?>
 
-</table>
 <input type="hidden" name="action" value="login">
 <!-- Set up the form with the challenge value and an empty reply value -->
 <input type="hidden" name="challenge" value="<?php print $challenge ?>">
 <input type="hidden" name="response"  value="">
 </form>
-</body>
-<script language="JavaScript">
+<script type="text/javascript">
 <!--
   // Activate the appropriate input form field.
   if (document.login.login.value == '') {
@@ -134,7 +130,6 @@ tr.logintable {
     document.login.password.focus();
   }
 // -->
-</script>
-
+</script><
 </body>
 </html>

@@ -95,8 +95,7 @@ elseif ($action == "new") {
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
   $p_user_array = array($auth->auth["uid"]);
-  dis_event_form($action, $agenda, $user_obm, $cat_event, $p_user_array);
-
+  dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }
 elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -112,11 +111,32 @@ elseif ($action == "insert") {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm();
     $cat_event = run_query_get_eventcategories();
-    dis_event_form($action, $agenda, $user_obm, $cat_event, $sel_user_id);
+    dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
   }
 }
 elseif ($action == "detailconsult") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($param_event > 0) {
+    $eve_q = run_query_detail($param_event,$agenda["date"]);
+    $cust_q = run_query_event_customers($param_event,$agenda["date"]);
+    display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
+    html_calendar_consult($eve_q, $cust_q);
   }
+}
+elseif ($action == "detailupdate") {
+///////////////////////////////////////////////////////////////////////////////
+if ($param_event > 0) {  
+  require("agenda_js.inc");
+  $user_obm = run_query_userobm();
+  $cat_event = run_query_get_eventcategories();
+  $user_obm = run_query_userobm();
+  $cat_event = run_query_get_eventcategories();
+  $eve_q = run_query_detail($param_event,$agenda["date"]);  
+  $p_user_array = run_query_event_customers_array($param_event,$agenda["date"]);
+  display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
+  dis_event_form($action, $agenda,$eve_q, $user_obm, $cat_event, $p_user_array);
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
@@ -126,7 +146,7 @@ function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
   global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$tf_time_end,$tf_date_end,$sel_repeat_kind;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
-  global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy;
+  global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update;
 
 
   // Deal fields
@@ -142,7 +162,7 @@ function get_param_agenda() {
   if (isset($cb_force))  $agenda["force"] = $cb_force;
   if (isset($cb_privacy))  $agenda["privacy"] = $cb_privacy;
   if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;  
-
+  if (isset($cb_repeat_update)) $agenda["repeat_update"] = 1;
   if (isset($tf_date_begin)) {
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_begin , $day_array2);
     $agenda["date_begin"] .=  $day_array2[1].$day_array2[2].$day_array2[3];
@@ -171,10 +191,14 @@ function get_param_agenda() {
   }
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
-    if (isset(${"cb_repeatday_".$i})) 
-      $agenda["repeat_days"] .= ${"cb_repeatday_".$i};
-  }
-  
+    if (isset(${"cb_repeatday_".$i}))  {
+      $agenda["repeat_days"] .= '1';
+    }
+    else {
+      $agenda["repeat_days"] .= '0';
+    }
+      
+  }  
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {
       while ( list( $key, $val ) = each( $agenda ) ) {
