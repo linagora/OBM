@@ -1826,7 +1826,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
   global $path,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
-  global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_comment,$l_marketing_manager,$l_state;
+  global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
   global $l_invoices_connected,$l_no_invoices_connected, $l_infos;
   global $popup_width, $popup_height, $l_deal_select_company;
 
@@ -1843,6 +1843,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $p_datealarm = get_parent_datealarm($parent);
   $p_expense = get_parent_expense($parent);
   $p_income = get_parent_income($parent);
+  $p_potential = get_parent_potential($parent);
 
   $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
   $title = urlencode($l_deal_select_company);
@@ -1889,16 +1890,20 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
         <td class=\"detailText\">$p_status</td>
         </tr>
         <tr>
-          <td class=\"detailLabel\">$l_date_alarm :</td>
+          <td class=\"detailLabel\">$l_date_alarm</td>
           <td class=\"detailText\">$p_datealarm</td>
         </tr>
         <tr>
-          <td class=\"detailLabel\">$l_amount_out :</td>
+          <td class=\"detailLabel\">$l_amount_out</td>
           <td class=\"detailText\">$p_expense</td>
         </tr>
         <tr>
-          <td class=\"detailLabel\">$l_amount_in :</td>
+          <td class=\"detailLabel\">$l_amount_in</td>
           <td class=\"detailText\">$p_income</td>
+        </tr>
+        <tr>
+          <td class=\"detailLabel\">$l_potential</td>
+          <td class=\"detailText\">$p_potential</td>
         </tr>
        </table>
       </td>

@@ -49,6 +49,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       deal_marketingmanager_id,
       deal_technicalmanager_id,
       deal_amount,
+      deal_hitrate,
       deal_status_id,
       deal_datealarm,
       deal_archive,
@@ -1376,12 +1377,12 @@ function get_parent_label($p_id) {
 function get_parent_status($p_id) {
   global $cdg_sql;
 
-  // We group by, to only have one row result
-  $query = "select min(dealstatus_order), dealstatus_label
+  // We order by dealstatus_id to get the min
+  $query = "select dealstatus_order, dealstatus_label
     from DealStatus,Deal
     where deal_parentdeal_id='$p_id'
       and deal_status_id=dealstatus_id
-    group by deal_parentdeal_id";
+    order by dealstatus_order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1401,16 +1402,17 @@ function get_parent_status($p_id) {
 function get_parent_dateproposal($p_id)  {
   global $cdg_sql;
 
-  $query = "select min(deal_dateproposal) from Deal
-    where deal_parentdeal_id='$p_id'
-    group by deal_parentdeal_id";
+  $query = "select deal_dateproposal from Deal
+    where deal_parentdeal_id='$p_id' and deal_archive != '1'
+      and deal_dateproposal != '0000-00-00'
+    order by deal_dateproposal";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return $obm_q->f("min(deal_dateproposal)");
+  return $obm_q->f("deal_dateproposal");
 }
 
 
@@ -1423,16 +1425,16 @@ function get_parent_dateproposal($p_id)  {
 function get_parent_datealarm($p_id)  {
   global $cdg_sql;
 
-  $query = "select min(deal_datealarm) from Deal
-    where deal_parentdeal_id='$p_id'
-    group by deal_parentdeal_id";
+  $query = "select deal_datealarm from Deal
+    where deal_parentdeal_id='$p_id' and deal_archive != '1'
+    order by deal_datealarm";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  return $obm_q->f("min(deal_datealarm)");
+  return $obm_q->f("deal_datealarm");
 }
 
 
@@ -1445,8 +1447,10 @@ function get_parent_datealarm($p_id)  {
 function get_parent_expense($p_id)  {
   global $cdg_sql;
 
-  $query = "select sum(deal_amount) from Deal,DealType
+  $query = "select sum(deal_amount) as res
+    from Deal,DealType
     where deal_parentdeal_id='$p_id'
+      and deal_hitrate = '100'
       and deal_type_id=dealtype_id
       and dealtype_inout='-'
     group by deal_parentdeal_id"; 
@@ -1461,16 +1465,18 @@ function get_parent_expense($p_id)  {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the total income of the deals of the parentdeal
-// Calculated : sum of amount fields noted "+"
+// Return the total income done of the deals of the parentdeal
+// Calculated : sum of amount fields noted "+" where hitrate is 100 %
 // Parameters:
 //   - $p_id : parent deal id
 ///////////////////////////////////////////////////////////////////////////////
 function get_parent_income($p_id)  {
   global $cdg_sql;
 
-  $query = "select sum(deal_amount) from Deal,DealType
+  $query = "select sum(deal_amount) as res
+    from Deal,DealType
     where deal_parentdeal_id='$p_id'
+      and deal_hitrate = '100'
       and deal_type_id=dealtype_id
       and dealtype_inout='+'
     group by deal_parentdeal_id"; 
@@ -1480,7 +1486,34 @@ function get_parent_income($p_id)  {
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("sum(deal_amount)");
+  return $obm_q->f("res");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the potential income of the deals of the parentdeal
+// Calculated : sum of amount fields noted "+" where hitrate < 100 %
+// Parameters:
+//   - $p_id : parent deal id
+///////////////////////////////////////////////////////////////////////////////
+function get_parent_potential($p_id)  {
+  global $cdg_sql;
+
+  $query = "select sum(deal_amount * deal_hitrate / 100) as res_balanced,
+      sum(deal_amount) as res
+    from Deal,DealType
+    where deal_parentdeal_id='$p_id'
+      and deal_hitrate < 100
+      and deal_type_id=dealtype_id
+      and dealtype_inout='+'
+    group by deal_parentdeal_id"; 
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q->f("res_balanced") . " / " .$obm_q->f("res") ;
 }
 
 

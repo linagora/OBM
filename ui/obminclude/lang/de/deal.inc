@@ -17,6 +17,7 @@ $l_todo = "To Do";
 $l_date_proposal="Angebotsdatum";
 $l_amount_in="Amout of inputs";
 $l_amount_out="Amout of outputs";
+$l_potential = "Weighted Potential";
 $l_label = "Label";
 $l_label_start = "Label start with";
 $l_kind = "Branche";

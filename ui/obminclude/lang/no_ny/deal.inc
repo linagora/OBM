@@ -18,6 +18,7 @@ $l_todo = "To Do";
 $l_date_proposal="Proposal Date";
 $l_amount_in="Amout of inputs";
 $l_amount_out="Amout of outputs";
+$l_potential = "Weighted Potential";
 $l_label = "Namn";
 $l_label_start = "namnet starter med";
 $l_kind = "Type";

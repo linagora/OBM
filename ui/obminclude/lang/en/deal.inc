@@ -40,6 +40,7 @@ $l_plus = "+";
 $l_order = "Order";
 $l_amount_in = "Amout of inputs";
 $l_amount_out = "Amout of outputs";
+$l_potential = "Weighted Potential";
 $l_label_start = "Label start";
 $l_manager = "Manager";
 $l_proposition = "Proposal";

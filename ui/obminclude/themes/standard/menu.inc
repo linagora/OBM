@@ -300,8 +300,9 @@ function display_inactive_tab($tab) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_bookmarks($path="..") {
   global $set_theme;
-  global $last_company,$last_contact,$last_deal, $last_contract;
-  global $last_account,$last_invoice, $last_payment, $last_incident;
+  global $last_company,$last_contact,$last_deal,$last_parentdeal;
+  global $last_contract, $last_incident;
+  global $last_account,$last_invoice, $last_payment;
   global $last_company_name, $last_contact_name, $last_deal_name;
   global $last_parentdeal_name, $last_contract_name, $last_payment_name;
   global $last_account_name, $last_invoice_name,$last_incident_name;

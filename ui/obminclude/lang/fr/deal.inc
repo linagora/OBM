@@ -42,6 +42,7 @@ $l_plus = "+";
 $l_order = "Ordre";
 $l_amount_in = "Montant des entrées";
 $l_amount_out = "Montant des sorties";
+$l_potential = "Potentiel pondéré";
 $l_label_start = "Nom Affaire";
 $l_manager= "Responsable";
 $l_proposition = "Proposition";

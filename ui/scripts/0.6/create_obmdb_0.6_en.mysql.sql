@@ -33,13 +33,15 @@ INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercr
 -- Dumping data for table 'DealStatus'
 --
 INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'CONTACT',1);
-INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'Waiting for Proposal',2);
-INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'PROPOSAL',3);
-INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'SIGNED',4);
-INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'LOST',5);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'RDV',2);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'Waiting for Proposal',3);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'PROPOSAL',4);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'SIGNED',5);
 INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null,'DONE',6);
 INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null,'INVOICE',7);
-INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null,'CLOSED',8);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null,'PAYED',8);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'LOST',9);
+INSERT INTO DealStatus (dealstatus_timeupdate, dealstatus_timecreate, dealstatus_userupdate, dealstatus_usercreate, dealstatus_label,dealstatus_order) VALUES (null,null,2,null, 'DISCONTINUED',10);
 
 --
 -- Dumping data for table 'DealType'

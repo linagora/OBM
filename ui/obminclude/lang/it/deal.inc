@@ -42,6 +42,7 @@ $l_last_company = "Ultima Azienda";
 $l_last_contact = "ultimo contatto";
 $l_amount_in = "Totale entrate";
 $l_amount_out = "Totale uscite";
+$l_potential = "Weighted Potential";
 $l_label_start = "Nome inizio";
 $l_manager = "Resp. ";
 $l_proposition = "Proposta";
