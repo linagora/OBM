@@ -1047,6 +1047,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
     ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
     $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+    $id = $obm_q_event->f("calendarevent_id");
     
   } else {
     if (isset($agenda["id"])) { $id = $agenda["id"]; }
@@ -1086,6 +1087,8 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
+      <input type=\"hidden\" name=\"hd_old_begin\" id=\"hd_old_begin\" value=\"".$day_array[0]."\" />
+      <input type=\"hidden\" name=\"hd_old_end\" id=\"hd_old_end\" value=\"".$day_array[0]."\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -1473,34 +1476,63 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
 //      $obm_q_company : list of companies
 //      $contact_q : list of contact from the company 
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_conflict($agenda,$conflict) {
+function html_dis_conflict($agenda,$conflict,$event_id='') {
   global $set_theme,$set_weekstart_default,$auth;
   // -- Labels
-  global $l_title, $l_conflicts, $l_date, $l_user;
-  foreach($conflict as $data) {
-    $day_array="";
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$data["date"] , $day_array); 
-    $dis_conflict .= "<tr><td class=\"detailText\">".$data["event_title"]."</td>";
-    $dis_conflict .= "<td class=\"detailText\">".$day_array[1]."-".$day_array[2]."-".$day_array[3]." ".$day_array[4].":".$day_array[5]."</td>";
-    $dis_conflict .= "<td class=\"detailText\">".$data["user_name"]."</td></tr>";
-    if($agenda["force"] == 1 && $data["user_id"] == $auth->auth["uid"]) {
-      $dis_conflict .= "<td class=\"detailText\"><input type=\"radio\" name=\"ch_force_event\" value=\"force\" /></td>";
-      $dis_conflict .= "<td class=\"detailText\"><input type=\"radio\" name=\"ch_force_event\" value=\"replace\" /></td>";
-      $dis_conflict .= "<td class=\"detailText\"><input type=\"radio\" name=\"ch_force_event\" value=\"cancel\" /></td>";
-    }
+  global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user,$l_force_all,$l_replace_all,$l_cancel_all,$l_validate;
+  global $l_force_event,$l_cancel_event, $l_replace_event;
+
+  if($agenda["force"] == 1) { 
+    $dis_form_begin = "<form name=\"f_conflict\" method=\"post\"><input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
+                       <input type=\"hidden\" name=\"action\" value=\"insert_conflict\" />";
+    $dis_form_button = "<tr><td class=\"detailHead\" colspan=\"7\">
+			<input type=\"button\" value=\"$l_force_all\" onclick=\"check_all_force(this.form)\" />
+                        <input type=\"button\" value=\"$l_replace_all\" onclick=\"check_all_replace(this.form)\" /> 
+		        <input type=\"button\" value=\"$l_cancel_all\" onclick=\"check_all_cancel(this.form)\" /></td</tr>
+		        <tr><td class=\"detailHead\" colspan=\"7\"><input type=\"submit\" value=\"$l_validate\" /></td</tr>";
+    $dis_form_end = " </form>";
+    $dis_head = "<td class=\"detailLabel\">$l_force_event</td>
+                 <td class=\"detailLabel\">$l_replace_event</td><td class=\"detailLabel\">$l_cancel_event</td>";
   }
- echo "
+  foreach($conflict as $data) {
+    $day_array = "";
+    $day_array2 = "";
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$data["date_begin"] , $day_array); 
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$data["date_end"] , $day_array2); 
+    $date_b = $day_array[1]."-".$day_array[2]."-".$day_array[3]." ".$day_array[4].":".$day_array[5];
+    $date_e = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." ".$day_array2[4].":".$day_array2[5];
+    $dis_conflict .= "<tr><td class=\"detailText\">".$data["event_title"]."</td>";
+    $dis_conflict .= "<td class=\"detailText\">$date_b</td>";
+    $dis_conflict .= "<td class=\"detailText\">$date_e</td>";     
+    $dis_conflict .= "<td class=\"detailText\">".$data["user_name"]."</td>";
+    if($agenda["force"] == 1 && $data["user_id"] == $auth->auth["uid"]) {
+      $dis_conflict .= "<td class=\"detailText\">";
+      $dis_conflict .= "<input type=\"radio\" checked=\"checked\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"force\" /></td>";
+      $dis_conflict .= "<td class=\"detailText\">";
+      $dis_conflict .= "<input type=\"radio\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"replace\" /></td>";
+      $dis_conflict .= "<td class=\"detailText\">";
+      $dis_conflict .= "<input type=\"radio\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"cancel\" />";
+      $dis_conflict .= "<input type=\"hidden\" name=\"hd_conflict_end[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"".$data["date_end"]."\" /></td>";
+    }
+     $dis_conflict .= "</tr>";
+  }
+  echo "
+  $dis_form_begin
   <table class=\"details\">
    <tr>
-    <td colspan=\"3\" class=\"detailHead\">$l_conflicts 
+    <td colspan=\"7\" class=\"detailHead\">$l_conflicts 
     </td>
    </tr>
    <tr>
     <td class=\"detailLabel\">$l_title</td>
-    <td class=\"detailLabel\">$l_date</td>
+    <td class=\"detailLabel\">$l_datebegin</td>
+    <td class=\"detailLabel\">$l_dateend</td>
     <td class=\"detailLabel\">$l_user</td>    
+    $dis_head
    </tr>
    $dis_conflict
+   $dis_form_button
   </table>
+  $dis_form_end
   ";
 } 

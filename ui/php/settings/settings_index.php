@@ -156,7 +156,7 @@ $theme_dir->close();
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
 echo "
-<!-- User preferences current config -------------------------------------- -->
+<!--User preferences current config -->
 
   <center>
   <form action=\"".$sess->url("settings_index.php")."\" method=get>

@@ -99,6 +99,12 @@ $l_incorect_end_repeat = "La fin de répétition doit etre supérieure à la date de
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
+$l_force_all = "Tout forcer";
+$l_replace_all = "Tout remplacer";
+$l_cancel_all = "Tout annuler";
+$l_force_event = "Forcer";
+$l_cancel_event = "Annuler";
+$l_replace_event = "Remplacer";
 
 $l_monday="Lundi";
 $l_tuesday="Mardi";
