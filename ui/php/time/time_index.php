@@ -109,10 +109,10 @@ $stats_users = array( '6' , '7' , '8','23' ) ;
 
 
 if (debug_level_isset($cdg_param)) {
-  if ( $actions ) {
-    echo "<br>\$actions : <br>";
-    print_r($actions);
-  }
+	//  if ( $actions ) {
+	//    echo "<br>\$actions : <br>";
+	//    print_r($actions);
+	//  }
 
   if ( $time ) {
     echo "<br>\$time : <br>";

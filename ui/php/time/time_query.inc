@@ -51,13 +51,10 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
       deal_label as task_deal_label,
       company_name as task_company_name,
       0=task_status as test_status
-    from Task,
-      TaskType,
-      Deal,
-      Company
-    where task_tasktype_id = tasktype_id
-      and task_deal_id = deal_id
-      and deal_company_id = company_id ";
+    from (Task left join Deal on task_deal_id = deal_id) 
+      left join Company on deal_company_id = company_id,
+      TaskType
+    where task_tasktype_id = tasktype_id ";
 
  
   // If a time interval has been specified, get it 
