@@ -1468,8 +1468,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   $dis_hour_e .= "</select>";  
 
   $dis_min_b = "<select name=\"sel_min_begin\">";
-   for($i=$set_cal_interval;$i>=1;$i--) {
-    $current_min = substr("0".(60 - ($time_unit*$i)),-2);
+  for($i=4;$i>=1;$i--) {
+    $current_min = substr("0".(60 - (15*$i)),-2);
     if($current_min  == $minbegin) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     }
@@ -1480,8 +1480,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   $dis_min_b .= "</select>";  
 
  $dis_min_e = "<select name=\"sel_min_end\">";
-  for($i=$set_cal_interval;$i>=1;$i--) {
-    $current_min = substr("0".(60 - ($time_unit*$i)),-2);
+  for($i=4;$i>=1;$i--) {
+    $current_min = substr("0".(60 - (15*$i)),-2);
     if($current_min  == $minend){
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     }
@@ -1924,6 +1924,136 @@ function html_dis_delete($agenda) {
      $l_cancel
     </td>
    </tr>
+  </table>
+  ";
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display the new event form
+// Parameters:
+//    -$agenda: agenda parameters
+//    -$obm_q_events : list of event's records 
+//    -$contacts_array : array of selected contacts 
+//    -$groups_array : array of selected groups 
+///////////////////////////////////////////////////////////////////////////////
+function html_dis_right_model($user_q) {
+  global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
+  global $l_everyone, $l_noone, $l_list,$l_authorize,$l_deny;
+  
+  $sel_mul_gene = "";
+  $sel_mul_write = "";
+  while($user_q->next_record()) {
+    if($user_q->f("calendarright_write") == NULL) {
+      $sel_mul_gene_r .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      $sel_mul_gene_w .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      
+    }else{
+      if($user_q->f("calendarright_write") == 1) {
+	$sel_mul_write .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      }
+      if($user_q->f("calendarright_read") == 1) {
+	$sel_mul_read .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      }
+      if($user_q->f("calendarright_read") == 0) { 
+	$sel_mul_gene_r .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";      
+      }
+      if($user_q->f("calendarright_write") == 0) {
+	$sel_mul_gene_w .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      }
+    }
+  }
+  echo "
+  <table class=\"details\">
+   <tr>
+    <td colspan=\"3\" class=\"detailLabel\">
+     &nbsp;
+    </td>
+   </tr>
+   <tr>
+    <td colspan=\"3\" class=\"detailHead\">$l_read_permission</td>
+   </tr>
+   <tr>
+    <td colspan=\"3\" class=\"detailLabel\">
+     &nbsp;
+    </td>
+   </tr>
+   <tr>
+    <td class=\"detailHead\">
+     $l_authorize_list
+    </td>
+    <td class=\"detailHead\">
+    </td>
+    <td class=\"detailHead\">
+     $l_denie_list
+    </td>
+   </tr>
+   <tr>
+    <form method=\"post\" action=\"agenda_index.php\">    
+     <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
+      <select name=\"sel_deny_read[]\" multiple=\"multiple\" size=\"15\">
+       $sel_mul_gene_r 
+      </select>
+     </td>
+     <td class=\"detailHead\">
+      <input type=\"submit\" value=\"$l_deny\" /><br />
+     </form>
+     <form method=\"post\" action=\"agenda_index.php\">        
+      <br /><input type=\"submit\" value=\"$l_authorize\" />
+     </td>
+     <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
+      <select name=\"sel_accept_read[]\" multiple=\"multiple\" size=\"15\">
+       $sel_mul_read  
+      </select>
+    </td>  
+    </form>
+   </tr>
+   <tr>
+    <td colspan=\"3\" class=\"detailLabel\">
+     &nbsp;
+    </td>
+   </tr>   
+   <tr>
+    <td colspan=\"3\" class=\"detailHead\">$l_write_permission</td>
+   </tr>
+   <tr>
+   <tr>
+    <td colspan=\"3\" class=\"detailLabel\">
+     &nbsp;
+    </td>
+   </tr>    
+   <tr>
+    <td class=\"detailHead\">
+     $l_authorize_list
+    </td>
+    <td class=\"detailHead\">
+    </td>
+    <td class=\"detailHead\">
+     $l_denie_list
+    </td>
+   </tr>
+   <tr>
+    <form method=\"post\" action=\"agenda_index.php\">
+     <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
+      <select name=\"sel_deny_write[]\" multiple=\"multiple\" size=\"15\">
+       $sel_mul_gene_w 
+      </select>
+     </td>
+     <td class=\"detailHead\">
+      <input size=\"30\" type=\"submit\" value=\"$l_deny\" /><br />
+     </form>
+     <form method=\"post\" action=\"agenda_index.php\">      
+      <br /><input size=\"30\" type=\"submit\" value=\"$l_authorize\" />
+     </td>
+     <td class=\"detailHead\">
+      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
+      <select name=\"sel_accept_write[]\" multiple=\"multiple\" size=\"15\">
+       $sel_mul_write  
+      </select>
+     </td>
+    </form>
+   </tr>   
   </table>
   ";
 } 

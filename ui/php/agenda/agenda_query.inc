@@ -324,7 +324,6 @@ function run_query_get_user_name($contacts_array) {
   return $obm_db;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the addiction of a event
 // Parameters: 
@@ -946,7 +945,115 @@ function run_query_delete($agenda) {
     $message = $l_delete_event_mail_head.$titre;          
     send_mail($l_delete_event_mail_subject,$message,$contacts);
   }  
+} 
+
+/////////////////////////////////////////////////////////////////////////////
+// Retunr Users with their permissions.
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_userobm_right() {
+  global $cdg_sql,$auth;
+  $obm_db = new DB_OBM;
+  $query = "SELECT userobm_id,calendarright_customerid,u.userobm_lastname,u.userobm_firstname,c.calendarright_write,c.calendarright_read 
+            FROM UserObm as u LEFT OUTER JOIN CalendarRight as c ON c.calendarright_ownerid = ".$auth->auth["uid"]." AND c.calendarright_customerid = userobm_id 
+	    WHERE userobm_id != ".$auth->auth["uid"]." ORDER BY u.userobm_lastname";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
 }  
+
+/////////////////////////////////////////////////////////////////////////////
+// Retunr User which permit the current user to read their calendar.
+//////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_userobm_readable() {
+  global $cdg_sql,$auth;
+  $obm_db = new DB_OBM;
+  $query = "SELECT u.*,c.calendarright_read FROM UserObm as u LEFT OUTER JOIN CalendarRight as c 
+            ON c.calendarright_customerid = ".$auth->auth["uid"]." AND u.userobm_id = c.calendarright_ownerid 
+            WHERE  c.calendarright_read IS NULL OR c.calendarright_read = 0 
+	    ORDER BY u.userobm_lastname";
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);
+  return $obm_db;
+}  
+
+/////////////////////////////////////////////////////////////////////////////
+// Retunr User which permit the current user to write into their calendar.
+//////////////////////////////////////////////////////////////////////////////
+
+function run_query_userobm_writable() {
+  global $cdg_sql,$auth;
+  $obm_db = new DB_OBM;
+  $query = "SELECT u.*,c.calendarright_write FROM UserObm as u LEFT OUTER JOIN CalendarRight as c 
+            ON u.userobm_id = c.calendarright_ownerid AND c.calendarright_customerid = ".$auth->auth["uid"]."
+            WHERE  c.calendarright_write IS NULL OR c.calendarright_write = 0 
+	    ORDER BY u.userobm_lastname";
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);
+  return $obm_db;
+}  
+
+/////////////////////////////////////////////////////////////////////////////
+// Update the list of the rights give to users. 
+//////////////////////////////////////////////////////////////////////////////
+
+function run_query_update_right($agenda) {
+  global $cdg_sql,$auth;  
+  $accept_write = $agenda["accept_w"];
+  $deny_write = $agenda["deny_w"];
+  $deny_read = $agenda["deny_raccept_r"];
+  $accept_read = $agenda["accept_r"];
+  $obm_db = new DB_OBM;
+  if(is_array($accept_write)){
+    foreach($accept_write as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_write = 0 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
+                                     AND calendarright_customerid = $id";
+      display_debug_msg($query, $cdg_sql);	    
+      $obm_db->query($query);
+    }
+  }
+  if(is_array($deny_write)){
+    foreach($deny_write as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_write = 1 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
+                                     AND calendarright_customerid = $id";
+      display_debug_msg($query, $cdg_sql);	    
+      $obm_db->query($query);
+      if($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES(".$auth->auth["uid"].",$id,1,0)";
+      	display_debug_msg($query, $cdg_sql);	    
+       	$obm_db->query($query);
+      }
+    }
+  }
+  if(is_array($deny_read)){
+    foreach($deny_read as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_read = 1 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
+                                     AND calendarright_customerid = $id";
+      display_debug_msg($query, $cdg_sql); 
+      $obm_db->query($query);
+      if($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES(".$auth->auth["uid"].",$id,0,1)";
+      	display_debug_msg($query, $cdg_sql);	    
+       	$obm_db->query($query);
+      }
+    }
+  }
+  if(is_array($accept_read)){
+    foreach($accept_read as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_read = 0 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
+                                     AND calendarright_customerid = $id";
+      display_debug_msg($query, $cdg_sql);	    
+      $obm_db->query($query);
+    } 
+  }
+  $query = "DELETE FROM CalendarRight WHERE calendarright_read = 0 AND calendarright_write = 0";
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);  
+}
+  
 /////////////////////////////////////////////////////////////////////////////
 // Return if the event is valid or not. It permit to keep only valid event in
 // a table.
@@ -1178,7 +1285,6 @@ function store_users($user_q) {
   }
   return $user_tab;
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 // Agenda Form Data checking and formatting                                 //
 // Parameters:
@@ -1262,15 +1368,17 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "yearly") {
-    $err_msg =  $l_err_end_repeat2;
-    return false;
-  }  
-
   if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
     $err_msg =  $l_err_end_repeat3;
     return false;
   }  
+  
+  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
+    $err_msg =  $l_err_end_repeat2;
+    return false;
+  }  
+
+  
   if($kind != "none" && $dateend > $datebegin) {
     $err_msg =  $l_err_repeat;
     return false;

@@ -14,7 +14,7 @@ $l_title = "Title";
 $l_priority = "Priority";
 $l_private = "Private";
 $l_public  = "Public";
-$l_category = "Catégory";
+$l_category = "Category";
 $l_description = "Description";
 $l_state = "Status";
 $l_back_mono = "Back to your own view";
@@ -81,7 +81,7 @@ $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 
 
-$l_confirm_delete ="This operation will remove all the events of this évenement for all the users, are you sure to want to continue?";
+$l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
 $l_confirm = "Confirm";
 $l_cancel = "Cancel";
 $l_insert_ok = "Insertion successful";

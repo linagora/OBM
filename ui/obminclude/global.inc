@@ -30,8 +30,8 @@ $last_contract_default = 0;
 $last_incident_default = 0;
 //Agenda constants
 $set_weekstart_default = "monday"; //First day of the week, in english
-$set_start_time = '5'; // first hour of the day
-$set_stop_time = '23'; // last hour of the day
+$set_start_time = '8'; // first hour of the day
+$set_stop_time = '20'; // last hour of the day
 //Timemanager module CONSTANTS
 // In how many parts we can chop a day
 $c_day_fraction = 8;

@@ -150,6 +150,16 @@ $l_short_friday="Ven";
 $l_short_saturday="Sam";
 $l_short_sunday="Dim";
 
+$l_header_right = "Gestion des droits";
+$l_authorize_list = "Personnes authorisées";
+$l_denie_list = "Personnes non-authorisées";
+$l_read_permission = "Gestion des permissions de lecture de votre agenda";
+$l_write_permission = "Gestion des permissions d'ecriture sur votre agenda";
+$l_everyone = "Authoriser tout le monde";
+$l_noone = "N'authoriser personne";
+$l_list = "Authoriser les personnes de la liste";
+$l_authorize = "&lt;&lt;&lt;&lt;";
+$l_deny = "&gt;&gt;&gt;&gt;";
 //MAIL
 
 $l_add_event_mail_head = "Un nouvel évenement a été programmé pour vous sur Obm.\nIl a pour titre : ";
