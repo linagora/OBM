@@ -57,8 +57,7 @@ function dis_menu_stats() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resp_stats($cont_q,$comp_q) {
   global $path, $set_theme;
-  global $set_theme, $action,$l_header_company,$l_header_contact,$l_key;
-  global $actions,$menu, $perm;
+  global $set_theme, $l_header_company,$l_header_contact,$l_key;
 
   $max = 1;
   while($cont_q->next_record()) {
@@ -120,16 +119,51 @@ function dis_resp_stats($cont_q,$comp_q) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About the companies 
+// Parameters:
+// Returns:
+///////////////////////////////////////////////////////////////////////////////
+function dis_list_select($list_q) {
+  global $l_select_list, $c_all, $l_all,$l_generate_stats;
+  
+  $select_list = "
+  <select name=\"sel_list\">
+  <option value=\"$c_all\">$l_all</option>";
+  while($list_q->next_record()) {
+    $id = $list_q->f("list_id");
+    $label = $list_q->f("list_name");
+    $select_list .= "<option value=\"$id\">$label</option>";
+  }
+  $select_list .= "</select>";
+  $block .= "
+  <form action=\"statistic_index.php\">
+  <table class=\"detail\" >
+   <tr>
+    <td class=\"detailLabel\">$l_select_list</td>
+    <td class=\"detailForm\">$select_list</td>
+   </tr>
+  </table>
+  <div class=\"detailButton\">
+  <p class=\"detailButtons\">  
+  <input type=\"hidden\" name=\"action\" value=\"company_statistic\" />
+  <input type=\"submit\" value=\"$l_generate_stats\" />
+  </p>
+  </div>
+  </form>
+  ";
+  return $block; 
+}
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Statistics About the responsibles
+// Display Statistics About the companies 
 // Parameters:
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
-  global $set_theme, $action,$l_header_company,$l_header_contact,$l_key;
-  global $actions,$menu, $perm,$l_null,$l_totals, $l_header_country,$l_compcat;
+  global $l_header_company,$l_header_contact,$l_key;
+  global $l_null,$l_totals, $l_header_country,$l_compcat;
 
   while ($comp_q->next_record()) {
     if ($comp_q->f("companycategory_id") == NULL) {

@@ -57,14 +57,27 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "company") {
 ///////////////////////////////////////////////////////////////////////////////
+  $list_q = run_query_get_lists();
+  $display["detail"] = dis_list_select($list_q);
+  $display["features"] = dis_menu_stats();
+  $display["title"] = display_title($l_header_comp_stats);
+} elseif ($action == "company_statistic") {
+///////////////////////////////////////////////////////////////////////////////  
   require("statistic_js.inc");
-  $cat_q = run_query_company_per_country_per_cat();
-  $nb_comp = run_query_nb_company();
+  if($statistic["list"] == $c_all) {
+    $cat_q = run_query_company_per_country_per_cat();
+    $nb_comp = run_query_nb_company();
+  }
+  else {
+    $query = run_query_get_list_query($statistic["list"]);
+    $com_q = run_query_get_selected_company($query,$statistic["list"]);
+    $cat_q = run_query_selected_company_per_country_per_cat($com_q);
+    $nb_comp = $com_q->nf();
+  }
   $display["title"] = display_title($l_header_comp_stats);
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -79,8 +92,10 @@ display_page($display);
 // returns : $statistic hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_statistic() {
-  global $action;
+  global $action,$sel_list;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
+
+  if (isset ($sel_list)) $statistic["list"] = $sel_list;  
 
   return $statistic;
 }
@@ -118,6 +133,21 @@ function get_statistic_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('content') 
                                         );
-}
 
+// 
+  $actions["STATISTIC"]["company_statistic"] = array (
+    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                        );
+
+
+// Sel user add : Users selection
+  $actions["GROUP"]["sel_statistic"] = array (
+    'Url'      => "$path/list/list_index?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=company_statistic",
+    'Popup'    => 1,
+    'Target'   => $l_statistic
+  );
+
+}
 </script>

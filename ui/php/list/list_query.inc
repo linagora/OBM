@@ -1338,5 +1338,49 @@ function run_query_contacts_for_letter($list_ids) {
   return $connect_db;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the number of company from a dynamic query.       //
+// Parameters:
+//   - $query : the dynamic query
+// Returns:
+//   - amount of companies
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_dynamic_company($query) {
+  global $cdg_sql;
+  if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
+   $query_f = "select count(distinct(company_id)) as nb ". $matches[1];
+  }
+  display_debug_msg($query_f, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_f);
+  $obm_q->next_record();
+  return $obm_q->f("nb");
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the number of company from the static contact.      //
+// of a list
+// Parameters:
+//   - $id : Id of the list
+// Returns:
+//   - amount of companies
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_static_company($id) {
+
+  $query_c = "select count(distinct(company_id)) as nb from ContactList
+         LEFT JOIN Contact ON contactlist_contact_id=contact_id
+         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+	 where
+         contactlist_list_id='$id'";
+  display_debug_msg($query_f, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query_c);
+  $obm_q->next_record();
+  return $obm_q->f("nb");
+	 
+}
+
 </script>
 

@@ -472,6 +472,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   }
 
   if ($query != "") {
+    $comp_query_nb = run_query_get_dynamic_company($query);
     $query_nb = get_list_query_num_rows($query);
     if ($query_nb >= 0) {
       run_query_update_num_rows($id, $query_nb);
@@ -480,8 +481,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     }
   } else {
     $query_nb = "0";
+    $comp_query_nb = "0";
   }
-
+  $comp_static_nb = run_query_get_static_company($id);
   // If no search criteria, we display the query (empty or manual)
   if ($criteria == "") {
     $d_query = nl2br($query);
@@ -515,6 +517,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     <tr>
       <td class=\"detailLabel\">$l_nb_contact : $l_static / $l_query</td>
       <td class=\"detailText\">$static_nb / $query_nb</td>
+    </tr>
+      <td class=\"detailLabel\">$l_nb_company : $l_static / $l_query</td>
+      <td class=\"detailText\">$comp_static_nb / $comp_query_nb</td>
     </tr>
     $dis_query
     </table>";
