@@ -21,6 +21,7 @@ ALTER table Company add column company_deal_number int(5) NOT NULL default '0' A
 -- // Table structure creation for tables 'Task' and 'TaskType'              //
 -- ////////////////////////////////////////////////////////////////////////////
 
+Drop table Task;
 CREATE TABLE Task (
   task_id int(8) NOT NULL auto_increment,
   task_timeupdate timestamp(14) NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE Task (
 ) TYPE=MyISAM;
 
 
+Drop table TaskType;
 CREATE TABLE TaskType (
   tasktype_id int(8) NOT NULL auto_increment,
   tasktype_timeupdate timestamp(14) NOT NULL,
@@ -57,25 +59,25 @@ CREATE TABLE TaskType (
 -- Insert new Tasktypes
 
 -- FRENCH VERSION
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (1,'Développement',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (2,'Sav / Maintenance',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (3,'Formation',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (4,'Etudes / Conseil',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (5,'Réseau / Intégration',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (6,'Infographie',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (7,'Hébergement',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (8,'Matériel',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (9,'Autres',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (11,'Avant vente',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (12,'Préparation formation',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (13,'Développements internes',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (14,'Projets internes',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (15,'Auto-Formations,Veille',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (16,'Garantie contractuelle projets',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17,'Divers(direction,autres)',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) TaskType VALUES (18,'Congés , absences , maladie',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Déplacements',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Infographie/Communication',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (1,'Développement',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (2,'Sav / Maintenance',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (3,'Formation',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (4,'Etudes / Conseil',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (5,'Réseau / Intégration',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (6,'Infographie',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (7,'Hébergement',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (8,'Matériel',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (9,'Autres',0);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (11,'Avant vente',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (12,'Préparation formation',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (13,'Développements internes',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (14,'Projets internes',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (15,'Auto-Formations,Veille',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (16,'Garantie contractuelle projets',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17,'Divers(direction,autres)',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Congés , absences , maladie',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Déplacements',1);
+-- INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Infographie/Communication',1);
 
 
 -- ENGLISH VERSION
