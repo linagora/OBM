@@ -713,7 +713,8 @@ function check_group_context($id, $group) {
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($group) {
-  global $php_regexp_email_name, $l_fill_name, $l_group_exists, $l_email_exist;
+  global $php_regexp_email_name, $php_regexp_email, $l_fill_name;
+  global $l_group_exists, $l_email_exist;
   global $uid, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
 
   $id = $group["id"];
@@ -738,7 +739,8 @@ function check_data_form($group) {
   }
 
   // Group email
-  if (($email != "") && (! preg_match($php_regexp_email_name, $email))) {
+  if (($email != "") && (! preg_match($php_regexp_email_name, $email))
+      && (! preg_match($php_regexp_email, $email))) {
     $err_msg = " $email : $l_j_check_email";
     return false;
   }

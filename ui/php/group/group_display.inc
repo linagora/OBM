@@ -84,6 +84,15 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("group_user_id");
   }
 
+  else if ($fieldname == "group_email") {
+    $email = $OD->data_set->f("group_email");
+    if (strcmp($email,"") != 0) {
+      $res["url"] = "mailto:$email";
+      $res["name"] = "<img src=\"".C_IMAGE_PATH."/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["txt_name"] = $email;
+    }
+  }
+
 
   return $res;
 }
@@ -326,7 +335,7 @@ function html_group_form($action, $group_q, $group) {
   </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
-      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" />@</td>
+      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
   </tr>
   </tr><tr>
     <td class=\"detailLabel\">$l_private</td>
@@ -456,7 +465,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       <td class=\"detailText\">$desc</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$email@</td>
+      <td class=\"detailText\">$email</td>
     </tr>
     </table>";
 
