@@ -552,7 +552,7 @@ function get_param_deal() {
   global $cb_archive, $tf_todo, $cb_vis;
   global $tf_plabel, $sel_pmanager, $cb_parchive;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
-  global $tf_company_name, $sel_manager, $tf_dateafter, $tf_datebefore;
+  global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent, $ch_contrat;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat;
@@ -601,6 +601,7 @@ function get_param_deal() {
 
   // Search fields
   if (isset ($tf_company_name)) $deal["company_name"] = $tf_company_name;
+  if (isset ($tf_zip)) $deal["company_zip"] = $tf_zip;
   if (isset ($sel_manager)) $deal["manager"] = $sel_manager;
   if (isset ($tf_dateafter)) $deal["dateafter"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $deal["datebefore"] = $tf_datebefore;

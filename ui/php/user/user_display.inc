@@ -130,6 +130,7 @@ function html_user_form($first_try, $usr_q, $user) {
     $perms = $usr_q->f("userobm_perms");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
+    $email = $usr_q->f("userobm_email");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
   } else {
     $id = $user["id"];

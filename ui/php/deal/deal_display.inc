@@ -33,7 +33,7 @@ function dis_deal_index($deal="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $obm_q_manager) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_category, $l_state;
-  global $l_after, $l_before, $l_manager, $l_show_archive;
+  global $l_after, $l_before, $l_manager, $l_show_archive, $l_zipcode;
   global $l_all, $l_all_f, $l_find; 
   global  $sess, $c_all;
 
@@ -42,6 +42,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
+  $zip = stripslashes($deal["company_zip"]);
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
   $cat = $deal["cat"];
@@ -123,7 +124,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
       <td>&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_company</td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_show_archive</td>
+      <td class=\"textLabelForm\">$l_zipcode</td>
       <td>&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_after</td>
       <td>&nbsp;&nbsp;</td>
@@ -136,8 +137,8 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 <!-- Name -->
       <td><input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" /></td>
       <td>&nbsp;&nbsp;</td>
-<!-- Archive -->
-      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+<!-- Zipcode -->
+      <td><input name=\"tf_zip\" size=\"14\" value=\"$zip\" /></td>
       <td>&nbsp;&nbsp;</td>
 <!-- Alarm date after -->
       <td><input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\" value=\"$dateafter\" /></td>
@@ -163,6 +164,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
       <td>&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_manager</td>
       <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_show_archive</td>
     </tr>
     <tr>
       <td>
@@ -183,6 +185,9 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
       <td>
       $sel_manager
       </td>
+      <td>&nbsp;&nbsp;</td>
+<!-- Archive -->
+      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr>
     </table>
   </form>
@@ -308,6 +313,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
+  $zip = stripslashes($deal["company_zip"]);
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $cat = $deal["cat"];
@@ -318,7 +324,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   $obm_q_deals->seek($first_row);
   
-  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q);
   $dis_deals_list->data_set = $obm_q_deals;

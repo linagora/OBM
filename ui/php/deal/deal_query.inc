@@ -28,6 +28,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $label = $deal["label"];
   $company_id = $deal["company"];
   $name = $deal["company_name"];
+  $zip = $deal["company_zip"];
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $cat = $deal["cat"];
@@ -39,6 +40,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $query = "select Deal.*, deal_id as Id,
      dealtype_label,
      company_name as deal_company_name,
+     company_zipcode as deal_company_zipcode,
      tasktype_label,
      dealstatus_label,
      DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
@@ -63,6 +65,9 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   }
   if ($name != "") {
     $query .= " and company_name like '$name%'";
+  }
+  if ($zip != "") {
+    $query .= " and company_zipcode like '$zip%'";
   }
   if ($company_id != "") {
     $query .= " and company_id='$company_id'";
