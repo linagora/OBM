@@ -541,9 +541,9 @@ function html_document_consult($doc_q) {
   $name = $doc_q->f("document_name");
 
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
-
   // --- HTML Template --------------------------------------------------------
     $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
+    $url = "document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1";
   $block = "
     <div class=\"detailHead\">$l_document</div>
 
@@ -1537,11 +1537,11 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 // Consult File
 /////////////////////////////////////////////////////////////////////////////
 
-function dis_file($document) {
+function dis_file($doc_q) {
   global $document_path,$link_to;
   global $obm_version,$set_weekstart_default;
-  $path = $document["path"];
-  $name = $document["name"];
+  $path = $doc_q->f("document_path");
+  $name = $doc_q->f("document_name");  
   if(islink($name)) {
     $link = getlink($name,$path);
     header("location: $link");

@@ -41,8 +41,16 @@ if ($action == "ext_get_path") {
   require("document_js.inc");
   $display["detail"] = html_documents_tree($document,$ext_disp_file);
 } elseif ($action == "accessfile") {
-  dis_file($document);
-  exit();
+  if ($param_document > 0) {
+    $doc_q = run_query_detail($document);
+    if ($doc_q->num_rows() == 1) {
+      $doc_q = run_query_detail($document);
+      dis_file($doc_q);
+      exit();
+    }
+  } else {
+    $display["msg"] .= display_err_msg("$l_no_document !");
+  }  
 } elseif ($action == "ext_get_ids") {
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
