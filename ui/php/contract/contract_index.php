@@ -79,12 +79,12 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
   if ($action == "ext_get_id") {
     require("contract_js.inc");
-    $cont_q = run_query_contract();
-    html_select_contract($cont_q, stripslashes($title));
+    $con_q = run_query_contract();
+    html_select_contract($con_q, stripslashes($title));
   } elseif ($action == "ext_get_id_url") {
     require("contract_js.inc");
-    $cont_q = run_query_contract();
-    html_select_contract($cont_q, stripslashes($title), $url);
+    $con_q = run_query_contract();
+    html_select_contract($con_q, stripslashes($title), $url);
   } else {
     display_err_msg($l_error_permission);
   }

@@ -848,8 +848,8 @@ function dis_contract_display_pref($pref_q) {
 //   - $title  : title to be displayed
 //   - $url    : url to call with parameter company
 ///////////////////////////////////////////////////////////////////////////////
-function html_select_contract($contr_q, $title, $url="") {
-  global $l_select_contract;
+function html_select_contract($con_q, $title, $url="") {
+  global $l_select_contract, $l_close;
 
   if ($url != "") {
     $jsfunc = "check_get_id_url(this, '$url')";
@@ -861,10 +861,11 @@ function html_select_contract($contr_q, $title, $url="") {
   $display_cont = "
     <select name=\"param_contract\" size=\"10\" style=\"font-family:fixed,courier\">";
 
-  while($contr_q->next_record()) {
-    $id = $contr_q->f("contract_id");
-    $name = $contr_q->f("contract_label");
-    $display_cont .= "\n<option value=\"$id\">$name</option> ";
+  while($con_q->next_record()) {
+    $id = $con_q->f("contract_id");
+    $name = $con_q->f("contract_label");
+    $company = $con_q->f("company_name");
+    $display_cont .= "\n<option value=\"$id\">$company - $name</option> ";
   }
    $display_cont.="</select>";
 
@@ -883,7 +884,10 @@ function html_select_contract($contr_q, $title, $url="") {
     </form>
       </td>
     </tr>
-  </table>";
+  </table>
+
+  <a href=\"\" onclick='window.close();'>$l_close</a>
+";
 }
  
 </script>

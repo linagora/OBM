@@ -357,11 +357,14 @@ function run_query_contact_contract($p_company_id) {
 function run_query_contract() {
   global $cdg_sql;
 
-  $connect_db=new DB_OBM;
-  $query = "select * from Contract";
+  $query = "select *, company_name
+    from Contract Left Join Company on contract_company_id=company_id
+    order by company_name";
+
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
+  $con_q = new DB_OBM;
+  $con_q->query($query);
+  return $con_q;
 }
 
 

@@ -1139,7 +1139,7 @@ function dis_company_display_pref($display_pref_q) {
 //   - $url    : URL to call with parameter company
 ///////////////////////////////////////////////////////////////////////////////
 function html_select_company($comp_q, $title, $url="") {
-  global $l_select_company;
+  global $l_select_company, $l_close;
 
   if ($url != "") {
     $jsfunc = "check_get_id_url(this, '$url')";
@@ -1176,6 +1176,8 @@ function html_select_company($comp_q, $title, $url="") {
       </td>
     </tr>
   </table>
+
+  <a href=\"\" onclick='window.close();'>$l_close</a>
     ";
 }
 
