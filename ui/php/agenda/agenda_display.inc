@@ -1868,7 +1868,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
-  global $l_private,$l_private_description;
+  global $l_private;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);  
@@ -2047,7 +2047,7 @@ return $block;
 function dis_month_planning($agenda,$calendar_user,$usr_q) { 
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
-  global $l_private,$l_private_description,$l_daysofweek;
+  global $l_private,$l_daysofweek;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);  
@@ -2237,7 +2237,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
 function dis_week_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
-  global $l_private,$l_private_description,$l_all_day, $ico_agenda;
+  global $l_private,$l_all_day, $ico_agenda;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -2434,7 +2434,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
 function dis_day_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $set_start_time, $set_stop_time,$set_cal_interval,$set_weekstart_default;
-  global $l_private,$l_private_description,$auth,$l_all_day,$ico_agenda;
+  global $l_private,$auth,$l_all_day,$ico_agenda;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -2567,7 +2567,7 @@ return $block;
 //    - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function day_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) {
-  global $l_duration, $path, $l_private, $l_private_description, $set_theme,$ico_event;
+  global $l_duration, $path, $l_private, $set_theme,$ico_event;
   global $auth,$l_begin,$l_end;
   $id = $event["event"]->id;
   $usr_id = $properties["id"];

@@ -410,6 +410,14 @@ function run_query_insert_event_data($agenda) {
 /////////////////////////////////////////////////////////////////////////
 
 function check_for_conflict($agenda,$sel_user_id) {
+  
+  preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_begin"] , $begin_array);      
+  $stamp_beg = mktime($begin_array[4],$begin_array[5],00,$begin_array[2],$begin_array[3],$begin_array[1] );
+  preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_end"] , $end_array);        
+  $stamp_end = mktime($end_array[4],$end_array[5], 00,$end_array[2],$end_array[3],$end_array[1] );
+  
+  run_query_no_repeat_events($stamp_beg,$stamp_end,$contacts_array);
+  run_query_no_repeat_events($stamp_beg,$stamp_end,$contacts_array);
 
 }
 /////////////////////////////////////////////////////////////////////////

@@ -191,12 +191,12 @@ if ($action == "index") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($agenda)){ 
-    if (!$agenda["force_insert"] && $conflicts = check_for_conflict($agenda,$sel_user_id)) {
+      $sel_user_id = array($uid);      
+      $p_user_array = $sel_user_id ;    
+    if (!$agenda["force_insert"] && $conflicts = check_for_conflict($agenda,$p_user_array)) {
     } else {
       run_query_add_event($agenda,$sel_user_id,$event_id);
       require("agenda_js.inc");
-      $sel_user_id = array($uid);      
-      $p_user_array = $sel_user_id ;
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
