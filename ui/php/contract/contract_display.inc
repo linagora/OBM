@@ -195,7 +195,7 @@ function dis_contract_search_list($contract) {
 //   - $contract[]  : contract search criteria
 //     keys used    : label, type, dateafter, datebefore, company_name, market
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contract,$contract) {
+function html_contract_search_list($contract_q, $pref_q, $nb_contract,$contract) {
   global $l_found;
 
   $num = urlencode($contract["number"]); 
@@ -211,7 +211,7 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
 
   $contract_q->seek($first_row);
 
-  $dis_contracts_list = new OBM_DISPLAY("DATA", $obm_q_display_options);
+  $dis_contracts_list = new OBM_DISPLAY("DATA", $pref_q, "contract");
   $dis_contracts_list->data_set = $contract_q;
   $dis_contracts_list->data_url = $url;
   $dis_contracts_list->data_header = "both";

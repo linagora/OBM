@@ -539,7 +539,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
 		    "&amp;tf_deal=$deal".
 		    "&amp;rd_inout=$inout"); 
 
-  $dis_invoice = new OBM_DISPLAY ("DATA", $q_display_options);
+  $dis_invoice = new OBM_DISPLAY ("DATA", $q_display_options, "invoice");
   $dis_invoice->data_set = $q_invoices;
   $dis_invoice->data_header = "top";
   $dis_invoice->data_url = $url;
@@ -660,7 +660,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
       $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=".$q_invoice->f('invoice_id'));
     }
     
-    $dis_deal = new OBM_DISPLAY("DATA", $options_deals);
+    $dis_deal = new OBM_DISPLAY("DATA", $options_deals, "invoice");
     $dis_deal->data_set = $q_deal;
     $dis_deal->data_header = "top";
     $dis_deal->data_url = $url;
@@ -712,7 +712,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
     $url = url_prepare("invoice_index.php?action=detailconsult".
 		      "&amp;param_invoice=".$q_invoice->f("invoice_id"));
 
-    $dis_payment = new OBM_DISPLAY("DATA",$options_payments);
+    $dis_payment = new OBM_DISPLAY("DATA",$options_payments, "invoice");
     $dis_payment->data_set = $q_payment;
     $dis_payment->data_header = "top";
     $dis_payment->data_url = $url;
@@ -768,7 +768,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
 		      "&amp;tf_deal_label=$p_deal_label".
 		      "&amp;tf_deal_company=$p_deal_company");
     
-    $dis_deal = new OBM_DISPLAY ("DATA", $dis_option_deal);
+    $dis_deal = new OBM_DISPLAY ("DATA", $dis_option_deal, "invoice");
     $dis_deal->data_set = $q_deal;
     $dis_deal->data_header = "top";
     $dis_deal->data_url = $url;

@@ -39,18 +39,22 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
   // Parameters:
-  //   - $type : display type
-  //   - $pref : display pref : DBO
+  //   - $type   : display type
+  //   - $pref   : display pref : DBO
+  //   - $module : calling module
   /////////////////////////////////////////////////////////////////////////////
-  function OBM_DISPLAY($type, $pref) {
-    if( ($type != "PREFERENCES") && 
+  function OBM_DISPLAY($type, $pref, $module="") {
+    if ( ($type != "PREFERENCES") && 
 	($type != "DATA") ) {
       die("ERROR: the type MUST be PREFERENCES or DATA");
     } else {
       $this->display_type = $type;
     }
-    if(isset($pref)) {
+    if (isset($pref)) {
       $this->display_pref = $pref;
+    }
+    if (isset($module)) {
+      $this->display_module = $module;
     }
   }
   
@@ -496,10 +500,11 @@ class OBM_DISPLAY {
     }
 
     // Export
+    $module = $this->display_module;
     $query = urlencode($this->data_set->obm_query);
     $query_pref = urlencode($this->display_pref->obm_query);
-    $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref";
-    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;first_row=$first_row&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
+    $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref";
+    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
       <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"indexIcon\" alt=\"$l_export\"/></a>
@@ -579,10 +584,12 @@ class OBM_DISPLAY {
     
     while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
-      // Can not be used as module.inc is not included for now in export_index
       $label = $fieldnames[$fieldname];
-
-      echo "$fieldname$sep";
+      // if label empty or is an image or a link, we display the column name
+      if ( ($label == "") || (preg_match("/.*<.*>.*/", $label) ) ) {
+	$label = $fieldname;
+      }
+      echo "$label$sep";
     }
     echo "\n";
   }

@@ -511,7 +511,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 ///////////////////////////////////////////////////////////////////////////////
 // matching payment found display
 ///////////////////////////////////////////////////////////////////////////////
-function html_payment_search_list ($q_payment, $payment_options, $nb_payment, $payment){
+function html_payment_search_list ($payment_q, $pref_q, $nb_payment, $payment){
   global $col_frs, $col_client;
   global $l_found;
 
@@ -533,8 +533,8 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payment, $p
 		    "&amp;tf_date_after=$date_after".
 		    "&amp;rd_inout=$inout");
 
-  $dis_payment = new OBM_DISPLAY("DATA",$payment_options);
-  $dis_payment->data_set = $q_payment;
+  $dis_payment = new OBM_DISPLAY("DATA", $pref_q, "payment");
+  $dis_payment->data_set = $payment_q;
   $dis_payment->data_header = "top";
   $dis_payment->data_url = $url;
 
@@ -692,7 +692,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
       $url = url_prepare("payment_index.php?action=detailconsult".
 			"&amp;param_payment=".$q_payment->f("payment_id"));
       
-      $dis_invoice = new OBM_DISPLAY("DATA", $invoices_options);
+      $dis_invoice = new OBM_DISPLAY("DATA", $invoices_options, "payment");
       $dis_invoice->data_set = $q_invoices;
       $dis_invoice->data_header = "top";
       $dis_invoice->data_url = $url;
@@ -780,7 +780,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
 		     "&amp;param_payment=".$payment["payment"].
 		     "&amp;tf_invoice_label=$tf_invoice_label");
    
-   $dis_invoice = new OBM_DISPLAY("DATA", $dis_options_invoice);
+   $dis_invoice = new OBM_DISPLAY("DATA", $dis_options_invoice, "payment");
    $dis_invoice->data_set = $q_invoice;
    $dis_invoice->data_header = "top";
    $dis_invoice->data_url = $url;
@@ -1043,7 +1043,7 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
   $url = url_prepare("payment_index.php?action=break_asso".
 		    "&amp;param_payment=".$q_payment->f("payment_id"));
 
-  $dis_invoices = new OBM_DISPLAY ("DATA", $invoices_display);
+  $dis_invoices = new OBM_DISPLAY ("DATA", $invoices_display, "payment");
   $dis_invoices->data_set = $q_connected_invoices;
   $dis_invoices->data_header = "top";
   $dis_invoices->data_url = $url;
@@ -1164,7 +1164,7 @@ function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
   $url_dm = url_prepare("payment_index.php?action=reconcile_import".
 		       "&amp;import_file=no");
 
-  $et_dis = new OBM_DISPLAY ("DATA", $q_et_prefs);
+  $et_dis = new OBM_DISPLAY ("DATA", $q_et_prefs, "payment");
   $et_dis->data_set = $q_entrytemp;
   $et_dis->data_header = "top";
   $et_dis->data_order=false;
@@ -1204,7 +1204,7 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   $url = url_prepare ("payment_index.php?action=select_reconcile");
 
   // preparing the payments display :
-  $pay_dis = new OBM_DISPLAY("DATA", $q_pay_pref);
+  $pay_dis = new OBM_DISPLAY("DATA", $q_pay_pref, "payment");
   $pay_dis->data_set = $q_payments;
   $pay_dis->data_header = "both";
   $pay_dis->data_order = false; // 2 simultaneous displays => trouble on sight
@@ -1217,7 +1217,7 @@ function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   $pay_dis->data_cb_name = "check_pay_";
   
   // preparing the entrytemp display :
-  $et_dis = new OBM_DISPLAY ("DATA", $q_et_pref);
+  $et_dis = new OBM_DISPLAY ("DATA", $q_et_pref, "payment");
   $et_dis->data_set = $q_et;
   $et_dis->data_header = "both";
   $et_dis->data_order=false;

@@ -176,7 +176,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive&amp;$url_ext");
 
-  $user_d = new OBM_DISPLAY("DATA", $pref_q);
+  $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
   if ($popup) {
     $user_d->display_link = false;
     $user_d->data_cb_text = "X";

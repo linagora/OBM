@@ -9,10 +9,11 @@
 
 <center>
 
-<H1>OBM-DISPLAY-LIST-HOWTO</H1>
-<I>Comment utiliser un affichage générique pour les tableaux de résutats</I><BR>
-Version 0.6.4 - 2003-05-09<BR>
-</CENTER>
+<h1>OBM-DISPLAY-LIST-HOWTO</h1>
+<i>Comment utiliser un affichage générique pour les tableaux de résutats</i>
+<br />
+Version 0.7.0 - 2003-07-24<br />
+</center>
 
 <hr>
 <h2><a href="#api">Référence de la classe OBM_DISPLAY et API</a></h2>
@@ -24,6 +25,7 @@ Version 0.6.4 - 2003-05-09<BR>
 <li><a href="#tri">Tri de la liste selon les colonnes</a>
 <li><a href="#cb">Association d'une action (checkbox) aux éléments de la liste</a><br>
 <li><a href="#page">Gestion de la pagination</a><br>
+<li><a href="#export">Exportation des données en CSV</a><br>
 <li><a href="#pref">Affichage et gestion des préférences</a>
 </ul>
 <h2><a href="#spec">Spécifications techniques</a></h2>
@@ -32,7 +34,7 @@ Version 0.6.4 - 2003-05-09<BR>
 <li><a href="#displaypref">DisplayPref : table de stockage</a>
 <li><a href="#defaut">Préférences d'affichage par défaut</a>
 <li><a href="#action">Actions à implémenter</a>
-<li><a href="#inserer_lien">Insérer des liens ou des images dans la liste</a><br>
+<li><a href="#inserer_lien">Formater, insérer des liens ou des images dans la liste</a><br>
 <li><a href="#mod_ent">Modules gérant plusieurs entités</a><br>
 </ul>
 
@@ -162,21 +164,36 @@ Version 0.6.4 - 2003-05-09<BR>
   <td>Description</td>
 </tr>
 <tr>
-  <td colspan=2><b>OBM_DISPLAY($type, $pref)</b></td>
+  <td colspan=2><b>OBM_DISPLAY($type, $pref, $module="")</b></td>
   <td>Constructeur
     <ul>
-      <li>$type : type de représentation (display_type)
-      <li>$pref : préférences utilisateur (display_pref)
+      <li>$type   : type de représentation (display_type)
+      <li>$pref   : préférences utilisateur (display_pref)
+      <li>$module : module appelant (display_module), utile pour l'export csv; nécessaire que pour le type "DATA"
     </ul>
   </td>
 </tr>
 <tr>
-  <td colspan=2><b>display()</b></td>
-  <td>Affiche les données</td>
+  <td colspan=2><b>display($module_function)</b></td>
+  <td>Affiche les données
+    <ul>
+      <li>$module_function : nom de la fonction d'affichage spécifique du module
+    </ul>
+  </td>
 </tr>
 <tr>
   <td colspan=2><b>dis_pref_help()</b></td>
   <td>Affiche l'aide pour le panel de préférences</td>
+</tr>
+<tr>
+  <td colspan=2><b>dis_data_file($first_row, $nb_rows, $sep)</b></td>
+  <td>Affiche les données au format CSV
+    <ul>
+      <li>$first_row : 1ère ligne de résulat
+      <li>$nb_rows   : nombre de lignes souhaité
+      <li>$sep       : séparateur de colonnes utilisé
+    </ul>
+  </td>
 </tr>
 
 <tr bgcolor=\"#AAAAAA\">
@@ -222,16 +239,16 @@ On peut aussi associer une <i>checkbox</i> à chaque ligne afin d'intégrer la lis
 <a name="crea"><h3>Création d'un objet OBM_DISPLAY</h3>
 
 <b><u>Spécification du constructeur de la classe OBM_DISPLAY : </u></b><br><br>
-<i>function OBM_DISPLAY($display_type, $display_pref)</i><br>
+<i>function OBM_DISPLAY($display_type, $display_pref, $display_module="")</i><br>
 <ul>
-<li>$display_type : type d'affichage. Il y a trois valeurs possibles 
-<ul>
-<li><i>"DATA"</i> indique au constructeur de la classe que l'objet servira à afficher une liste
-<li><i>"PREFERENCES"</i> indique que l'objet servira a générer l'écran de préférences d'affichage
-<li><i>"INFORMATIONS"</i><b>DEPRECATED</b> indique que l'on veut generer la fiche detaillee d'un element (contact, societe, affaire .... ). Il s'agit d'une relique de la première version d'OBM_DISPLAY à ne pas utiliser. Elle sera supprimée dès que sortie des modules List (quasi fait) et Computer.
-</ul>
+<li>$display_type : type d'affichage. Il y a deux valeurs possibles 
+  <ul>
+  <li><i>"DATA"</i> indique au constructeur de la classe que l'objet servira à afficher une liste
+  <li><i>"PREFERENCES"</i> indique que l'objet servira a générer l'écran de préférences d'affichage
+  </ul>
 <li>$display_pref : liste des noms de champs à afficher avec l'ordre.<br>
 C'est le résultat de la requête de récuperation des paramètres d'affichage de l'utilisateur. Elle doit contenir <b>le nom, dans l'ordre, de tous les champs à afficher </b>. <i>(voir plus loin ...)</i>. Il peut s'agir indifféremment de champs déterminés ou calculés.
+<li>$display_module : nom du module appelant (nécessaire pour le type "DATA")
 </ul>
 
 <hr>
@@ -245,9 +262,10 @@ Quelques attributs permettent de paramétrer plus finement l'affichage comme dans
 <i>
 include("obminclude/global_display.inc");<br>
 <br>
-$dis_deals_list=new OBM_DISPLAY("DATA",$obm_q_display_options);<br>
-$dis_deals_list->data_set = $obm_q_deals ;<br>
+$dis_deals_list=new OBM_DISPLAY("DATA", $pref_q, "deal");<br>
+$dis_deals_list->data_set = $deal_q ;<br>
 $dis_deals_list->data_header = "both";<br>
+$dis_deals_list->display("dis_data_deal");<br>
 </i>
 <p>
 
@@ -256,8 +274,16 @@ $dis_deals_list->data_header = "both";<br>
 <li><i>si l'attribut </i>data_header</i> vaut 'both' les titres des colonnes seront affichés à la fois en haut et en bas du tableau.
 Sinon ils ne seront affichés qu'en haut.
 </ul>
-<br>
 
+<p>
+L'affichage des données se fait par un simple appel a la methode <i>display()</i> de la classe. C'est elle qui va generer le tableau.<br>
+<i>$dis_deals_list->display("dis_data_deal");</i>
+<ul>
+  <li>le paramètre <i>"dis_data_deal"</i> est le nom de la fonction définie dans le module deal gérant l'affichage spécifique des colonnes de ce module.
+</ul>
+
+
+<p>
 <a name="nom_col"><h3>Spécifier le titre des colonnes</h3>
 <p>Pour déterminer le titre des colonnes de la liste correspondant aux champs à afficher, les méthodes <i>dis_preferences(), dis_data_header()</i> utilisent le tableau global $fieldnames[], qui doit être défini dans les fichiers _display.inc du module correspondant et qui à un nom de champ à afficher fait correspondre un titre.
 <br><u>Note</u>: Exit la pénible fontion <i>dis_name_fieldname($fieldname)</i> nécessitant de connaître l'ensemble des champs de tous les modules.
@@ -290,12 +316,12 @@ Il est possible de désactiver cette fonctionnalité en donnant la valeur "false" 
 <i><pre>
 $url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_company=".urlencode($company)."&amp;param_company=".$company_id);
 
-$dis_contacts_list = new OBM_DISPLAY("DATA",$pref_q);
-$dis_contacts_list->data_set = $obm_q_contacts;
+$dis_contacts_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
+$dis_contacts_list->data_set = $contact_q;
 $dis_contacts_list->data_order = false;
 $dis_contacts_list->data_header = "top";
 $dis_contacts_list->data_url = $url;
-$dis_contacts_list->display();
+$dis_contacts_list->display("dis_data_contact");
 </pre></i>
 
 <p>La requête de sélection des données doit accepter 2 paramètres de tris :
@@ -328,12 +354,10 @@ $dis_deals_list->data_cb_field = "deal_archive";<br>
 </UL>
 
 <b>Remarque : </b>ni le code de creation du formulaire contenant les checkbox, ni le code de creation des boutons submit, ne sont generes par OBM_DISPLAY.
-C'est donc au developpeur de l'ecrire. <br><br><br>
-
-<p>L'affichage des données se fait par un simple appel a la methode <i>display()</i> de la classe. C'est elle qui va generer le tableau.<br>
-<i>$dis_deals_list->display();</i><p>
+C'est donc au developpeur de l'ecrire.
 
 
+<p>
 <a name="page"><h3>Gestion de la pagination</h3>
 La pagination (simulation de curseur) est maintenant intégrée à OBM_DISPLAY.
 <p>
@@ -348,12 +372,24 @@ Si l'url n'est pas renseignée ou le nombre d'enregistrements à afficher est infé
 <i><pre>
 $url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_company=".urlencode($company)."&amp;param_company=".$company_id);
 
-$dis_contacts_list = new OBM_DISPLAY("DATA",$pref_q);
-$dis_contacts_list->data_set = $obm_q_contacts;
+$dis_contacts_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
+$dis_contacts_list->data_set = $contact_q;
 $dis_contacts_list->data_header = "top";
 $dis_contacts_list->data_url = $url;
-$dis_contacts_list->display();
+$dis_contacts_list->display("dis_data_contact");
 </pre></i>
+
+<p>
+<a name="export"><h3>Exportation des données en CSV</h3>
+
+Depuis la version 0.7.0 d'OBM, la classe OBM_DISPLAY, associée au module "exportcsv" permettent d'exporter au format CSV tous les résultats affichés.
+<br>
+Il n'y pas de code spécifique à écrire dans un module pour utiliser cette fonctionnalité.
+<p>
+L'export tient compte des colonnes séléctionnées et de leur ordre d'affichage.
+<br>
+Il est possible d'exporter uniquement les données de la page courante de résultat ou les données de l'ensemble des pages du résultat.
+
 
 <p>
 <a name="pref"><h3>Affichage et gestion des préferences d'affichage</h3>
@@ -365,14 +401,14 @@ include("obminclude/global_display.inc");
 &nbsp;
 $dis_pref = new OBM_DISPLAY("PREFERENCES",$display_pref_q) ;
 $dis_pref->display_entity = "deal"; 
-$dis_pref->pref_title = "Display options for the lists of deals"; 
-$dis_pref->pref_dis_help = 1 ;
-$dis_pref->display() ;
+$dis_pref->pref_title = "Préférences d'affichage pour les affaires"; 
+$dis_pref->pref_dis_help = 1;
+$dis_pref->display();
 </pre></i>
 <br>
 
-<UL>
-<LI><i>$display_pref_q</i> est la liste de tous les noms des champs qui sont affichés ou pas dans la liste, avec l'ordre d'affichage.
+<ul>
+<li><i>$display_pref_q</i> est la liste de tous les noms des champs qui sont affichés ou pas dans la liste, avec l'ordre d'affichage.
 <LI><i>display_entity</i> est l'entité gérée par l'objet OBM_DISPLAY.
 <LI><i>pref_title</i> est le titre du panel d'affichage des préférences.
 <LI><i>pref_dis_help</i> est l'indicateur d'affichage de l'aide (0 ou 1).
@@ -473,26 +509,61 @@ A la suppression d'un utilisateur, les entrées de la table DisplayPref de cet ut
 
 <br>
 
-<a name="inserer_lien"><h3>Insérer des liens ou des images dans la liste</h3>
-<p>Par défaut, pour chaque tuple, la fonction <i>dis_data()</i> définie dans la classe OBM_DISPLAY (et appelée en interne par la méthode publique <i>display()</i>) prend chaque champ à afficher dans la liste des champs (passée en paramètre au constructeur), et pour chacun d'eux, affiche la valeur telle que retournée par la requête de sélection. 
+<a name="inserer_lien"><h3>Formater, insérer des liens, des images dans la liste</h3>
+<p>
+Par défaut, aucun formatage des champs récupérés en base de données n'est effectué sauf pour les champs timecreate et timeupdate qui sont convertis au format de date choisis dans les préférences de l'utilisateur.
+<br>
 Or dans le cas du label d'une affaire par exemple, on veut que ce soit un lien vers la fiche de l'affaire en question.<br>
-Pour cela on dispose de deux variables <i>$name</i> et <i>$url</i>, qui seront affichées si elles sont valorisées : <p>
 
-<UL>
-<LI><i>$name</i> contient le code html à afficher à la place de la valeur du champ. Cela peut être une image "IMG SRC=..." ou le label correspondant à un identifiant.
-<LI><i>$url</i> est utilisée dans le cas d'un lien et contient l'url de ce lien. A noter que si <i>$url</i> est valorisée, alors <i>$name</i> sera automatiquement encadré par des balises "A HREF=..." et "/A".
-</UL>
+<p>
+Il est donc possible et souvent utile de définir pour un module une fonction dédiée au formatage des champs de résultat, afin d'insérer des liens, d'ajouter des images ou d'effectuer des traitements (champs calculés).
+<br>
+Par convention cette fonction est nommée <b>dis_data_module()</b>. et définie dans le fichier <i>module_display.inc</i>.
+La définition exacte est :
+<p>
+<i>dis_data_module(&$OD, $fieldname, $link_ok)</i> ou
+<ul>
+  <li>&$OD est l'objet OBM_DISPLAY passé en référence,
+  <li>$fieldname est le nom du champ à afficher
+  <li>$link_ok est l'indicateur d'affichage des liens
+</ul>
 
-<p><i><u>Exemple</u> :
+<p>
+Cette fonctionne doit retourner un tableau (hashage) avec les paramètres renseignés possibles (aucun n'est obligatoire)
+<ul>
+  <li><i>$name</i> définit le texte ou contenu affiché. Ce peut $etre du texte ou image &lt;img ... &gt;
+  <li><i>$url</i> indique un lien et en définit l'url. Si $url est renseigné alors <i>$name</i> sera automatiquement encadré par des balises &lt;a href ...&gt; et &lt;/a&gt;.
+  <li><i>$align</i> définit l'alignement (gauche par défaut, peut prendre la valeur "center")
+  <li><i>$style</i> permet de définir un style particulier (pour un affichage en couleur par exemple)
+</ul>
+
+<p>
+<i><u>Exemple</u> :
 <pre>
-$fieldname = $this->display_pref->f("display_fieldname");
-if ($fieldname == "company_name") {
-     $url = "./company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
+///////////////////////////////////////////////////////////////////////////////
+// Display Deal specific dataset fields                                      //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_deal(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $col_ok, $col_error, $col_client, $col_frs;
+
+  if ($fieldname == "parentdeal_label") {
+    $res["url"] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$OD->data_set->f("parentdeal_id");
+  }
+
+  else if ($fieldname == "parentdeal_marketing_lastname") {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_marketingmanager_id");
+  }
+
+  ...
+  
+  return $res;
 }
-else if ($fieldname == "company_email") {
-     $url = "mailto:".$this->data_set->f("company_email");
-     $name = "IMG BORDER=0 SRC=\"../obminclude/themes/$set_theme/$ico_mail\" ALT=\"".$this->data_set->f("company_email")."\">";
-} 
 </pre></i>
 <p>
 
@@ -510,7 +581,7 @@ Lorsqu'une entité de nom différent de son module est gérée par OBM_DISPLAY, il f
 <i><pre>
 include("obminclude/global_display.inc");
 &nbsp;
-$dis_pref = new OBM_DISPLAY("PREFERENCES",$display_pref_q) ;
+$dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
 $dis_pref->display_entity = "parentdeal"; 
 $dis_pref->display_module = "deal"; 
 $dis_pref->pref_title = "Display options for ParentDeal"; 
@@ -537,7 +608,8 @@ Cette fonction aura comme paramètres le résultat de la requête de sélection, et 
 <br><br>
 
 <b><LI></b>
-Modifier la fonction dis_data() dans la classe OBM_DISPLAY pour intégrer les spécificités de la liste (liens, des images, etc). (Ce point est sujet à améliorations afin d'éliminer toute nécessité d'insertion de code hors du module concerné). <br><br>
+Créer si nécessaire la fonction dis_data_module() dans le fichier module_display.inc pour intégrer les spécificités de la liste (liens, des images, dates, etc). Les champs non traités en cas particuliers sont repris tel quel de la base de données.
+<br><br>
 
 <b><LI></b>
 Implémenter les actions display, dispref_display et dispref_level dans le module_index.php.
@@ -567,6 +639,7 @@ Ainsi que tous les tests et cas particuliers engendrés par cet état.
 <li> Pas de code à rajouter dans les fonctions d'insertion et de suppression d'un utilisateur
 <li> Paramètres par défaut stockés dans la table DisplayPref (utilisateur 0) d'ou facilité d'initialiser ou de reinitialiser les préférences d'un utilisateur.
 <li> Intégration de la gestion de la pagination.
+<li> <b>0.7.0</b>. Suppression (enfin) de la gestion des cas particuliers d'affichage des modules dans la fonction dis_data(). Chaque module doit maintenant (si nécessaire) implémenter la fonction dis_data_module() afin de traiter ses propres cas particuliers.
 </ul>
 
 <br /><br />

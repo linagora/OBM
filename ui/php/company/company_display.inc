@@ -240,7 +240,7 @@ function dis_company_search_list($company) {
 //   - $company[]  : company search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
+function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
   global $l_found;
 
   // we urlencode to avoid breakage for space char
@@ -254,10 +254,10 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   
   $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market");
 
-  $obm_q_comp->seek($first_row);
+  $comp_q->seek($first_row);
 
-  $comp_d = new OBM_DISPLAY("DATA", $pref_q);
-  $comp_d->data_set = $obm_q_comp;
+  $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
+  $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
   $comp_d->data_header = "both";
   display_info_msg("$nb_company $l_found");

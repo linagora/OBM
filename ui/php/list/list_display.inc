@@ -183,7 +183,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 
   $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
   
-  $dis_list = new OBM_DISPLAY("DATA",$pref_q);
+  $dis_list = new OBM_DISPLAY("DATA", $pref_q, "list");
   if ($popup) {
     $dis_list->display_link = false;
     $dis_list->data_cb_text = "X";
@@ -257,7 +257,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     $url= url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
-    $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q);
+    $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
     $dis_infos->data_set = $con_q;
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";

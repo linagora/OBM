@@ -46,7 +46,12 @@ if (($action == "index") || ($action == "")) {
   $query_pref = stripslashes($params["query_pref"]);
   $first_row = $params["first_row"];
   $nb_rows = $params["nb_rows"];
-
+  $module = $params["module"];
+  if ($module != "") {
+    require_once("$obminclude/lang/$set_lang/${module}.inc");
+    require_once("$path/$module/${module}_display.inc");
+  }
+  
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -58,7 +63,6 @@ if (($action == "index") || ($action == "")) {
   $export_d = new OBM_DISPLAY("DATA", $pref_q);
   $export_d->data_set = $obm_q;
   header("Content-Type: text/plain");
-  echo "\n\n";
   $export_d->dis_data_file($first_row, $nb_rows, ';');
 
 }
@@ -69,13 +73,14 @@ if (($action == "index") || ($action == "")) {
 // returns : $params hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_export() {
-  global $first_row, $nb_rows, $query, $query_pref;
+  global $first_row, $nb_rows, $query, $query_pref, $call_module;
   global $cdg_param;
 
   if (isset ($first_row)) $params["first_row"] = $first_row;
   if (isset ($nb_rows)) $params["nb_rows"] = $nb_rows;
   if (isset ($query)) $params["query"] = $query;
   if (isset ($query_pref)) $params["query_pref"] = $query_pref;
+  if (isset ($call_module)) $params["module"] = $call_module;
 
   if ($debug > 0) {
     if ( $params ) {

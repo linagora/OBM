@@ -232,7 +232,7 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 
   $in_q->seek($first_row);
 
-  $dis_incidents_list=new OBM_DISPLAY("DATA", $pref_q);
+  $dis_incidents_list=new OBM_DISPLAY("DATA", $pref_q, "incident");
   $dis_incidents_list->data_set = $in_q;
   $dis_incidents_list->data_url = $url;
   $dis_incidents_list->data_header = "both";

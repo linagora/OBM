@@ -157,7 +157,7 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
 
   $url = url_prepare("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
 
-  $dis_account = new OBM_DISPLAY("DATA", $pref_q);
+  $dis_account = new OBM_DISPLAY("DATA", $pref_q, "account");
   $dis_account->data_set = $acc_q;
   $dis_account->data_url = $url;
 
@@ -615,7 +615,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
     $url_expect = url_prepare ("account_index.php?action=compute_balance".
 			      "&amp;param_account=".$p_account["account"]);
 
-    $dis_expect  = new OBM_DISPLAY ("DATA", $payments_options);
+    $dis_expect  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_expect->data_set = $q_expected;
     $dis_expect->data_header = "top";
     $dis_expect->data_url = $url_expect;
@@ -630,7 +630,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
     $url_done = url_prepare ("account_index.php?action=compute_balance".
 			      "&amp;param_account=".$p_account["account"]);
 
-    $dis_done  = new OBM_DISPLAY ("DATA", $payments_options);
+    $dis_done  = new OBM_DISPLAY ("DATA", $payments_options, "account");
     $dis_done->data_set = $q_payments;
     $dis_done->data_header = "top";
     $dis_done->data_url = $url_done;

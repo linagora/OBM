@@ -193,7 +193,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 
   $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id$url_ext");
 
-  $dis_contact_list = new OBM_DISPLAY("DATA",$pref_q);
+  $dis_contact_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
   if ($popup) {
     $dis_contact_list->display_link = false;
     $dis_contact_list->data_cb_text = "X";
@@ -217,8 +217,8 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
       </p>";
   }
   $dis_contact_list->data_set = $obm_q;
-  $dis_contact_list->data_header = "both";
   $dis_contact_list->data_url = $url;
+  $dis_contact_list->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
   display_info_msg("$nb_con $l_found");
