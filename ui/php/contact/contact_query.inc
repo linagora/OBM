@@ -19,15 +19,15 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
 
   $company_id = $contact["company_id"];
-  $lname = $contact["lname"];
-  $fname = $contact["fname"];
-  $phone = $contact["phone"];
-  $email = $contact["email"];
-  $company = $contact["company"];
+  $lname = sql_search_text_parse($contact["lname"]);
+  $fname = sql_search_text_parse($contact["fname"]);
+  $phone = sql_search_text_parse($contact["phone"]);
+  $email = sql_search_text_parse($contact["email"]);
+  $company = sql_search_text_parse($contact["company"]);
   $market = $contact["marketing_manager"];
   $func = $contact["function"];
-  $zip = $contact["zip"];
-  $town = $contact["town"];
+  $zip = sql_search_text_parse($contact["zip"]);
+  $town = sql_search_text_parse($contact["town"]);
   $ctry = $contact["country"];
   $cat1 = $contact["category1"];
   $cat2 = $contact["category2"];
@@ -138,6 +138,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_address3,
       contact_zipcode,
       contact_town,
+      contact_expresspostal,
       contact_phone,
       contact_homephone,
       contact_mobilephone,
@@ -147,6 +148,12 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_privacy,
       company_name as contact_company_name,
       company_phone,
+      company_address1,
+      company_address2,
+      company_address3,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
       function_label as contact_function,
       country_name
     from Contact
@@ -193,13 +200,16 @@ function run_query_contact_detail($p_id) {
         $timeupdate,
         $timecreate,
         company_id, company_name, company_phone, company_fax,
+        company_address1, company_address2, company_address3, company_zipcode,
+        company_town, company_expresspostal, company_country_iso3166,
+        C2.country_name as company_country_name,
         kind_lang,
         kind_minilabel,
         kind_header,
         m.userobm_lastname as market_lname,
         m.userobm_firstname as market_fname,
         function_label,
-        country_name,
+        C1.country_name,
         datasource_name,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
@@ -209,8 +219,10 @@ function run_query_contact_detail($p_id) {
         left join Kind on kind_id=contact_kind_id
         left join UserObm as m on contact_marketingmanager_id=m.userobm_id
         left join Function on contact_function_id=function_id
-        left join Country on contact_country_iso3166=country_iso3166
-                  and country_lang='$lang'
+        left join Country as C1 on contact_country_iso3166=C1.country_iso3166
+                  and C1.country_lang='$lang'
+        left join Country as C2 on company_country_iso3166=C2.country_iso3166
+                  and C2.country_lang='$lang'
         left join DataSource on contact_datasource_id=datasource_id
         left join UserObm as c on contact_usercreate=c.userobm_id
         left join UserObm as u on contact_userupdate=u.userobm_id
@@ -234,6 +246,8 @@ function run_query_contact_detail($p_id) {
 function run_query_contact_company($c_id) {
   global $cdg_sql;
 
+  $lang = get_lang();
+
   $query = "select company_id,
       company_name,
       company_phone,
@@ -245,7 +259,7 @@ function run_query_contact_company($c_id) {
       company_town,
       company_expresspostal,
       company_country_iso3166,
-      country_name
+      country_name as company_country_name
     from Company
     left join Country on company_country_iso3166 = country_iso3166
                          and country_lang='$lang'

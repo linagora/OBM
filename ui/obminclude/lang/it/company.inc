@@ -31,6 +31,7 @@ $l_act_manage = "Attività Gestione Azienda";
 $l_act_exist = "Attività esistente";
 $l_act_new = "Nuova Attività";
 $l_internal = "Interno";
+$l_cat_tree = "Category tree";
 
 // Actions
 $l_insert = "Inserisci Azienda";

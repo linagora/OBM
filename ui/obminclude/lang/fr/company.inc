@@ -31,6 +31,7 @@ $l_contract_new = "Nouveau Contrat";
 $l_kind_manage = "Gestion des Types de Société";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";
+$l_cat_tree = "Sous Catégories";
 $l_cat_manage = "Gestion des Catégories de Société";
 $l_cat_exist = "Catégories existantes";
 $l_cat_new = "Nouvelle Catégorie";

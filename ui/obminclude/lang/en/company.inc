@@ -30,6 +30,7 @@ $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
 $l_internal = "Internal";
+$l_cat_tree = "Category tree";
 $l_cat_manage = "Company Category Management";
 $l_cat_exist = "Existing Categories";
 $l_cat_new = "New Category";

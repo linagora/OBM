@@ -9,7 +9,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Publication search query execution                                            //
+// Publication search query execution
 // Parametes:
 //   - $publication[]    : publication search criteria
 //     keys used       archive, title, phone, type, zip
@@ -20,10 +20,10 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $archive = $publication["archive"];
-  $title = $publication["title"];
-  $lang = $publication["lang"];
+  $title = sql_search_text_parse($publication["title"]);
+  $lang = sql_search_text_parse$publication["lang"]);
   $type = $publication["type"];
-  $year = $publication["year"];
+  $year = sql_search_text_parse$publication["year"]);
   $market = $publication[""];
   $zip = $publication["zip"];
 

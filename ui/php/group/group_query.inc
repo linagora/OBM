@@ -17,9 +17,9 @@
 function run_query_search($group) {
   global $cdg_sql, $ctu_sql_limit;
   
-  $name = $group["name"];
-  $email = $group["email"];
-  $user = $group["user"];
+  $name = sql_search_text_parse($group["name"]);
+  $email = sql_search_text_parse($group["email"]);
+  $user = sql_search_text_parse($group["user"]);
   $new_order = $group["new_order"];
   $order_dir = $group["order_dir"];
 

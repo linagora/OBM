@@ -18,10 +18,10 @@
 function run_query_search($user, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $login = $user["login"];
+  $login = sql_search_text_parse($user["login"]);
   $perms = $user["perms"];
-  $lname = $user["lastname"];
-  $email = $user["email"];
+  $lname = sql_search_text_parse($user["lastname"]);
+  $email = sql_search_text_parse($user["email"]);
   $archive = $user["archive"];
 
   $obm_q = new DB_OBM;

@@ -44,9 +44,10 @@ Catégorie 1 & 1ère classification du contact par Catégories. Voir la description
 \hline
 Catégorie 2 & 2ème classification du contact par Catégories. Voir la description des catégories.\\
 \hline
-Coordonnées & Adresse, service, code postal, cedex, ville et pays.\\
+Coordonnées & Adresse, service, code postal, cedex, ville et pays.
+Si aucune information n'est diponible au niveau du contact, ces informations sont récupées de la société du contact et préfixées par "(Société) - ".\\
 \hline
-Tel et Fax & Téléphone et fax. Le téléphone ou le fax de la personne sont affichés entre parenthèses lorsque ils sont identiques à ceux de la société.\\
+Tel et Fax & Téléphone et fax. Le téléphone ou le fax de la personne sont affichés entre parenthèses lorsque ils sont issus de la société.\\
 \hline
 Email & Adresse e-mail du contact (2 adresses sont possibles).\\
 \hline
@@ -66,7 +67,8 @@ Les attribus suivant peuvent être désactivés si non utiles dans une installation
 \item Catégories 1
 \item Catégories 2
 \item Service
-\item Ligne Adresse 3
+\item Ligne Adresse 3 (dépendant de celui du module \company)
+\item Cedex (dépendant de celui du module \company)
 \end{itemize}
 
 
@@ -91,6 +93,23 @@ Le module \contact étant central à OBM de nombreux liens sont disponibles depuis
 \item Document
 \item Abonnements aux publications
 \end{itemize}
+
+
+\subsection{La gestion des coordonnées des contacts}
+
+Les coordonnées affichées des contacts (téléphone, fax, adresse) sont soit ceux du contact directement soit ceux de la société du contact.\\
+
+Si le contact a une de ses coordonnées non remplie c'est la coordonnée correspondante de la société qui est affichée, avec une indication.\\
+
+L'adresse est traitée dans sa globalité (adresse1 + adresse2 + adresse3 + code postal + ville + cédex + pays).
+
+\paragraph{Par exemple} si le téléphone du contact est vide, c'est le téléphone de la société qui est affiché entre parenthèses.
+Si l'adresse (complète) du contact est vide c'est l'adresse de la société qui est affichée, préfixée du texte : "(Société) - ".\\
+
+Ceci est valable dans les fiches de détail et les listes de résultats de recherche de contacts (excepté pour l'export CSV des résultats de recherche pour lequel l'indication n'est pas présente).\\
+
+En mode mise à jour, les coordonnées de la société sont indiquées à la suite des champs de saisie des coordonnées du contact afin de faciliter les modifications en permettant le copier / coller.
+
 
 \subsection{Les sous-menus du module \contact}
 

@@ -18,9 +18,9 @@
 function run_query_search($project, $p_new_order="", $p_order_dir) {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $name = $project["name"];
+  $name = sql_search_text_parse($project["name"]);
   $tt = $project["tt"];
-  $company_name = $project["company_name"];
+  $company_name = sql_search_text_parse($project["company_name"]);
   $company = $project["company"];
   $deal = $project["deal"];
   $manager = $project["manager"];

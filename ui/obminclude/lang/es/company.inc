@@ -28,6 +28,7 @@ $l_kind_manage = "Manejo Tipo de Compañía";
 $l_kind_exist = "Tipos Existentes";
 $l_kind_new = "Nuevo Kind";
 $l_internal = "Interno";
+$l_cat_tree = "Category tree";
 $l_cat_manage = "Manejo Actividad de Compañía";
 $l_cat_exist = "Actividades Existentes";
 $l_cat_new = "Nueva Actividad";

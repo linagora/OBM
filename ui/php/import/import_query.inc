@@ -19,7 +19,7 @@
 function run_query_search($import, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all;
   
-  $name = $import["name"];
+  $name = sql_search_text_parse($import["name"]);
   $dsrc = $import["datasource"];
   $market = $import["market"];
 

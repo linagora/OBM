@@ -20,12 +20,12 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
 
   $uid = $auth->auth["uid"];
 
-  $title = $document["title"];
+  $title = sql_search_text_parse($document["title"]);
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];
-  $author = $document["author"];
+  $author = sql_search_text_parse($document["author"]);
   $mime = $document["mime"];
-  $name = $document["filename"];
+  $name = sql_search_text_parse($document["filename"]);
   $entity =$document["entity"];
   $entity_id = $document["entity_id"];  
 

@@ -21,9 +21,9 @@
 function run_query_search ($account, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql, $ctu_sql_limit;
 
-  $label = $account["label"];
-  $bank = $account["bank"];
-  $number = $account["number"];
+  $label = sql_search_text_parse($account["label"]);
+  $bank = sql_search_text_parse($account["bank"]);
+  $number = sql_search_text_parse($account["number"]);
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

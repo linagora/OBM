@@ -18,9 +18,9 @@
 function run_query_search($list, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
   
-  $name = $list["name"];
-  $email = $list["email"];
-  $contact = $list["contact"];
+  $name = sql_search_text_parse($list["name"]);
+  $email = sql_search_text_parse($list["email"]);
+  $contact = sql_search_text_parse($list["contact"]);
   $market = $list["marketing_manager"];
 
   $obm_q = new DB_OBM;

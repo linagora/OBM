@@ -195,9 +195,9 @@ function dis_company_search_form($company="") {
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company) {
-  global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
-  global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode, $l_category;
+  global $l_company_name, $l_postcode, $l_town, $l_kind, $l_archive, $l_phone;
+  global $l_market, $l_activity, $l_country, $l_after, $l_before, $l_nafcode; 
+  global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_category, $l_cat_tree;
   global $display, $c_all, $cgp_hide, $l_select_company;
 
   $popup = $company["popup"];
@@ -207,6 +207,8 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   $town = stripslashes($company["town"]);
   $kind = $company["kind"];
   $cat = $company["cat"];
+  $cat_code = $company["cat_code"];
+  $cat_tree = ($company["cat_tree"] == "1" ? "checked = \"checked\"" : "");
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $ctry = $company["country"];
@@ -242,12 +244,19 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
 
   // Category select
   if ($show_cat) {
-    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\">
+    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\"
+      onChange=\"if (this.options[this.selectedIndex].value != '$c_all') {
+          mytext = this.options[this.selectedIndex].text;
+          pos = mytext.indexOf(' ');
+          code = mytext.substr(0, pos);
+          this.form.tf_cat_code.value = code + '.';
+        }
+      \">
     <option value=\"$c_all\">$l_all</option>";
     if (is_array($cats)) {
       foreach ($cats as $one_cat) {
 	$c_id = $one_cat["id"];
-	$c_code = str_pad($one_cat["code"], 8, ".");
+	$c_code = str_pad($one_cat["code"] . " ", 10, ".");
 	$c_label = $one_cat["label"];
 	$sel_cat .= "\n<option value=\"$c_id\"";
 	if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
@@ -259,6 +268,9 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
     $block_cat = "
     <div class=\"searchLabel\">$l_category<br />
       $sel_cat
+    </div>
+    <div class=\"searchLabel\">$l_cat_tree<br />
+      <input type=\"checkbox\" name=\"cb_cat_tree\" value=\"1\" $cat_tree />
     </div>";
   }
 
@@ -392,6 +404,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
       <input type=\"checkbox\" name=\"cb_fuzzy\" value=\"1\" $fuzzy />
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
+      <input name=\"tf_cat_code\" type=\"hidden\" value=\"$cat_code\" />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      

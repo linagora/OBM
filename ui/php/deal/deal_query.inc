@@ -21,10 +21,10 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $parent = $deal["parent"];
-  $label = $deal["label"];
+  $label = sql_search_text_parse($deal["label"]);
   $company_id = $deal["company"];
-  $name = $deal["company_name"];
-  $zip = $deal["company_zip"];
+  $name = sql_search_text_parse($deal["company_name"]);
+  $zip = sql_search_text_parse($deal["company_zip"]);
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
@@ -1385,7 +1385,7 @@ function check_parent_has_deal($pid) {
 function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   global $auth, $c_all, $cdg_sql, $ctu_sql_limit;
 
-  $plabel = $deal["plabel"];
+  $plabel = sql_search_text_parse($deal["plabel"]);
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
 

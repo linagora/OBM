@@ -46,7 +46,19 @@ $fieldnames["contact_company_name"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail;
+  global $path, $set_theme, $ico_mail, $l_company;
+
+  // We set an indicator to tell if the contact has an address
+  if ( ($OD->data_set->f("contact_address1") != "")
+         || ($OD->data_set->f("contact_address2") != "")
+         || ($OD->data_set->f("contact_address3") != "")
+         || ($OD->data_set->f("contact_zipcode") != "")
+         || ($OD->data_set->f("contact_town") != "")
+         || ($OD->data_set->f("contact_expresspostal") != "") ) {
+    $contact_has_address = true;
+  } else {
+    $contact_has_address = false;
+  }
 
   if (($fieldname == "contact_lastname") && $link_ok) {
     $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
@@ -89,38 +101,154 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_address") {
-    if ($OD->data_set->f("contact_service") != "") {
-      $res["name"] .= $OD->data_set->f("contact_service")."<br />\n";
-    }
-    if ($OD->data_set->f("contact_address1") != "") {
-      $res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
-    }
-    if ($OD->data_set->f("contact_address2") != "") {
-      $res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
-    }
-    if ($OD->data_set->f("contact_address3") != "") {
-      $res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
-    }
-    if ($OD->data_set->f("contact_zipcode") != "" ) {
-      $res["name"] .= $OD->data_set->f("contact_zipcode") . " ";
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_service") != "") {
+	$res["name"] .= $OD->data_set->f("contact_service")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_service") . " ";
+      }
+      if ($OD->data_set->f("contact_address1") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address1") . " ";
+      }
+      if ($OD->data_set->f("contact_address2") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address2") . " ";
+      }
+      if ($OD->data_set->f("contact_address3") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_address3");
+      }
+      if ($OD->data_set->f("contact_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("contact_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_zipcode");
+      }
+      if ($OD->data_set->f("contact_town") != "") {
+	$res["name"] .= $OD->data_set->f("contact_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_town");
+      }
+      if ($OD->data_set->f("contact_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
+      }
+      // else we get the contact Company address
     } else {
-      $res["name"] .= " ";
+      $res["name"] = "($l_company) ";
+      if ($OD->data_set->f("company_address1") != "") {
+	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address1") . " ";
+      }
+      if ($OD->data_set->f("company_address2") != "") {
+	$res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address2") . " ";
+      }
+      if ($OD->data_set->f("company_address3") != "") {
+	$res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_address3");
+      }
+      if ($OD->data_set->f("company_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("company_zipcode")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_zipcode");
+      }
+      if ($OD->data_set->f("company_town") != "") {
+	$res["name"] .= $OD->data_set->f("company_town")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_town");
+      }
+      if ($OD->data_set->f("company_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
+      }
     }
-    if ($OD->data_set->f("contact_town") != "" ) {
-      $res["name"] .= $OD->data_set->f("contact_town");
-    }
-    if ($OD->data_set->f("country_name") != "" ) {
-      $res["name"] .= " " . $OD->data_set->f("country_name");
-    }
-    $res["txt_name"] = trim($OD->data_set->f("contact_service") . " " .
-                       $OD->data_set->f("contact_address1") . " " .
-                       $OD->data_set->f("contact_address2") . " " .
-                       $OD->data_set->f("contact_address3") . " " .
-                       $OD->data_set->f("contact_zipcode") . " " .
-                       $OD->data_set->f("contact_town") . " " .
-		       $OD->data_set->f("country_name"));
   }
-  
+
+  else if ($fieldname == "contact_service") {
+    $res["name"].= $OD->data_set->f("contact_service");
+  }
+
+  else if ($fieldname == "contact_address1") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address1") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address1");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address1") != "") {
+	$res["name"] .= $OD->data_set->f("company_address1");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_address2") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address2") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address2");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address2") != "") {
+	$res["name"] .= $OD->data_set->f("company_address2");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_address3") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_address3") != "") {
+	$res["name"] .= $OD->data_set->f("contact_address3");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_address3") != "") {
+	$res["name"] .= $OD->data_set->f("company_address3");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_town") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_town") != "") {
+	$res["name"] .= $OD->data_set->f("contact_town");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_town") != "") {
+	$res["name"] .= $OD->data_set->f("company_town");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_zipcode") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("contact_zipcode");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_zipcode") != "") {
+	$res["name"] .= $OD->data_set->f("company_zipcode");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_expresspostal") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("contact_expresspostal");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_expresspostal") != "") {
+	$res["name"] .= $OD->data_set->f("company_expresspostal");
+      }
+    }
+  }
+
   return $res;
 }
 
@@ -485,6 +613,13 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
   $c_fax = $co_q->f("company_fax");
+  $c_ad1 = $co_q->f("company_address1");
+  $c_ad2 = $co_q->f("company_address2");
+  $c_ad3 = $co_q->f("company_address3");
+  $c_zip = $co_q->f("company_zipcode");
+  $c_town = $co_q->f("company_town");
+  $c_cdx = $co_q->f("company_expresspostal");
+  $c_ctry_name = $co_q->f("company_country_name");
   $id = $co_q->f("contact_id");
   $kind = "[" . $co_q->f("kind_lang") . "] " . $co_q->f("kind_minilabel");
   $kind_header = $co_q->f("kind_header");
@@ -502,16 +637,29 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
   $ctry_name = $co_q->f("country_name");
+  if (($ad1 == "") && ($ad2 == "") && ($ad3 == "") && ($zip == "")
+      && ($town == "") && ($cdx == "") && ($ctry_name == "")) {
+    $l_comp_ad = "($l_company) - ";
+    $ad1 = "$c_ad1";
+    $ad2 = "$c_ad2";
+    $ad3 = "$c_ad3";
+    $zip = "$c_zip";
+    $town = "$c_town";
+    $cdx = "$c_cdx";
+    $ctry_name = $c_ctry_name;
+  }
   $func = $co_q->f("contact_function");
-  $phone = $co_q->f("contact_phone");
-  if ( (trim($phone) != "") && ($phone == $c_phone)) {
-    $phone = "( $phone )";
+  $phone = trim($co_q->f("contact_phone"));
+  if ( (($phone == "") && ($c_phone != "")) ||
+       (($phone != "") && ($phone == $c_phone)) ) {
+    $phone = "( $c_phone )";
   }
   $hphone = $co_q->f("contact_homephone");
   $mphone = $co_q->f("contact_mobilephone");
   $fax = $co_q->f("contact_fax");
-  if ( (trim($fax) != "") && ($fax == $c_fax)) {
-    $fax = "( $fax )";
+  if ( (($fax == "") && ($c_fax != "")) ||
+       (($fax != "") && ($fax == $c_fax)) ) {
+    $fax = "( $c_fax )";
   }
   $email = $co_q->f("contact_email");
   $email2 = $co_q->f("contact_email2");
@@ -559,7 +707,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_ad3 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$ad3</td>";
+      <td class=\"detailText\">$l_comp_ad$ad3</td>";
   }
 
   // Cedex field
@@ -567,7 +715,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_cdx = "
     </tr><tr>
       <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$cdx</td>";
+      <td class=\"detailText\">$l_comp_ad$cdx</td>";
   }
 
   if ($usercreate == $auth->auth["uid"]) {
@@ -706,21 +854,21 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_service
     </tr><tr>
       <td class=\"detailLabel\">$l_address 1</td>
-      <td class=\"detailText\">$ad1</td>
+      <td class=\"detailText\">$l_comp_ad$ad1</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailText\">$ad2</td>
+      <td class=\"detailText\">$l_comp_ad$ad2</td>
     $block_ad3
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailText\">$zip</td>
+      <td class=\"detailText\">$l_comp_ad$zip</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
-      <td class=\"detailText\">$town</td>
+      <td class=\"detailText\">$l_comp_ad$town</td>
     $block_cdx
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailText\">$ctry_name</td>
+      <td class=\"detailText\">$l_comp_ad$ctry_name</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$link_email $email</td>
@@ -962,6 +1110,16 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     $datecomment = isodate_format();
     $cat1 = run_query_get_contactcategory1($id);
     $cat2 = run_query_get_contactcategory2($id);
+    $c_phone = $co_q->f("company_phone");
+    $c_fax = $co_q->f("company_fax");
+    $c_ad1 = $co_q->f("company_address1");
+    $c_ad2 = $co_q->f("company_address2");
+    $c_ad3 = $co_q->f("company_address3");
+    $c_zip = $co_q->f("company_zipcode");
+    $c_town = $co_q->f("company_town");
+    $c_cdx = $co_q->f("company_expresspostal");
+    $c_ctry = $co_q->f("company_country_iso3166");
+    $c_ctry_name = $co_q->f("company_country_name");
 
   // New form and first time
   } elseif ($action == "new") {
@@ -975,15 +1133,15 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one
-      $phone = $co_q->f("company_phone");
-      $fax = $co_q->f("company_fax");
-      $ad1 = $co_q->f("company_address1");
-      $ad2 = $co_q->f("company_address2");
-      $ad3 = $co_q->f("company_address3");
-      $zip = $co_q->f("company_zipcode");
-      $town = $co_q->f("company_town");
-      $cdx = $co_q->f("company_expresspostal");
-      $ctry = $co_q->f("company_country_iso3166");
+      $c_phone = $co_q->f("company_phone");
+      $c_fax = $co_q->f("company_fax");
+      $c_ad1 = $co_q->f("company_address1");
+      $c_ad2 = $co_q->f("company_address2");
+      $c_ad3 = $co_q->f("company_address3");
+      $c_zip = $co_q->f("company_zipcode");
+      $c_town = $co_q->f("company_town");
+      $c_cdx = $co_q->f("company_expresspostal");
+      $c_ctry_name = $co_q->f("company_country_name");
       $c_id = $co_q->f("company_id");
       $c_name = $co_q->f("company_name");
       $c_new_id = $c_id;
@@ -1243,7 +1401,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
       <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" />
+      <input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /> $c_ad3
       </td>";
   }
 
@@ -1252,7 +1410,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     $block_cdx = "
     </tr><tr>
       <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>";
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /> $c_cdx</td>";
   }
 
   // User comment select construction
@@ -1364,34 +1522,34 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     <table class=\"detail\">
     <tr>
     <td class=\"detailLabel\">$l_phone</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$phone\" /> $c_phone</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_hphone</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$hphone\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_fax</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$fax\" /> $c_fax</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mphone</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
     $block_service
     </tr><tr>
     <td class=\"detailLabel\">$l_address 1</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /> $c_ad1</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_address 2</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad2\" /> $c_ad2</td>
     $block_ad3
     </tr><tr>
     <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /> $c_zip</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /> $c_town</td>
     $block_cdx
     </tr><tr>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailForm\">$sel_ctry</td>
+    <td class=\"detailForm\">$sel_ctry $c_ctry_name</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" maxlength=\"128\" value=\"$email\" /></td>

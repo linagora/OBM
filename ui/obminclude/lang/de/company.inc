@@ -37,6 +37,7 @@ $l_internal = "Intern";
 $l_act_manage = "Company Activity Management";
 $l_act_exist = "Existing Activities";
 $l_act_new = "New Activity";
+$l_cat_tree = "Category tree";
 
 // Titres
 $l_company_detail = "Firmen-Daten";

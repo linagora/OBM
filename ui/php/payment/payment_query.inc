@@ -13,8 +13,8 @@
 function run_query_search($p_payment, $p_new_order="") {
   global $auth, $cdg_sql, $c_all;
 
-  $label = $p_payment["label"];
-  $number = $p_payment["number"];
+  $label = sql_search_text_parse($p_payment["label"]);
+  $number = sql_search_text_parse($p_payment["number"]);
   $amount = $p_payment["amount"];
   $date_after = $p_payment["date_after"];
   $date_before = $p_payment["date_before"];
@@ -22,8 +22,8 @@ function run_query_search($p_payment, $p_new_order="") {
   $kind = $p_payment["kind"];
   $account = $p_payment["account"];
   $paid = $p_payment["paid"];
-  $deal = $p_payment["deal"];
-  $company = $p_payment["company"];
+  $deal = sql_search_text_parse($p_payment["deal"]);
+  $company = sql_search_text_parse($p_payment["company"]);
   $checked = $p_payment["checked"];
 
   $obm_q = new DB_OBM;

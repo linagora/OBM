@@ -27,6 +27,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $ctry = $company["country"];
   $kind = $company["kind"];
   $cat = $company["cat"];
+  $cat_tree = $company["cat_tree"];
+  $cat_code = $company["cat_code"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $market = $company["marketing_manager"];
@@ -56,9 +58,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where .= " $and company_type_id='$kind'";
     $and = "and";
   }
-  if (($cat != $c_all) && ($cat != "")) { 
+  if (($cat != $c_all) && ($cat != "")) {
     $join_cat = "LEFT JOIN CompanyCategoryLink on company_id=companycategorylink_company_id";
-    $where .= " $and companycategorylink_category_id='$cat'";
+    if ($cat_tree) {
+      $join_cat .= " LEFT JOIN CompanyCategory on companycategorylink_category_id=companycategory_id";
+      $where_cat = " or companycategory_code like '$cat_code%'";
+    }
+    $where .= " $and (companycategorylink_category_id='$cat'$where_cat)";
     $and = "and";
   }
   if (($act != $c_all) && ($act != "")) { 
@@ -111,7 +117,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
 
   if (($where != "") || ($where_name != "")) {
-    $whereq = " where $where_name $where";
+    $whereq = " WHERE $where_name $where";
   }
 
   // ORDER construction
@@ -127,7 +133,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $order_next = ", company_address2, company_address3, company_zipcode, company_town";
   }
 
-  $req = "select
+  $req = "SELECT
       company_id as id,
       company_id,
       company_name,
@@ -157,7 +163,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       companynafcode_code,
       companynafcode_label,
       country_name
-    from Company
+    FROM Company
          LEFT JOIN CompanyType on company_type_id=companytype_id
          $join_cat
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
@@ -165,13 +171,44 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
          LEFT JOIN Country on company_country_iso3166=country_iso3166
                    and country_lang='$lang'";
 
+  $group_by = "GROUP BY
+      id,
+      company_id,
+      company_name,
+      company_number,
+      company_vat,
+      company_archive,
+      company_type_id,
+      company_activity_id,
+      company_nafcode_id,
+      company_marketingmanager_id,
+      company_address1,
+      company_address2,
+      company_address3,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
+      company_country_iso3166,
+      company_phone,
+      company_fax,
+      company_web,
+      company_email,
+      company_contact_number,
+      company_deal_number,
+      company_deal_total,
+      companytype_label,
+      companyactivity_label,
+      companynafcode_code,
+      companynafcode_label,
+      country_name";
+
   if ((! $fuzzy) || ($name == "")) {
     if ($ctu_sql_limit) {
-      $count = get_query_count("select count(*) from Company $join_cat $whereq");
+      $count = get_query_count("select count(*) FROM Company $join_cat $whereq $group_by");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0) || (! $ctu_sql_limit)) {
-      $query = "$req $whereq order by $order $p_order_dir $order_next $limit";
+      $query = "$req $whereq $group_by ORDER BY $order $p_order_dir $order_next $limit";
       display_debug_msg($query, $cdg_sql, "company_search(1)");
       $obm_q->query($query);
       if (! $ctu_sql_limit) {
@@ -184,13 +221,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   if ( ( ($fuzzy) || ($count == 0) ) && ($name != "") ) {
     $where_name = " ($where_name or company_aka $like '%$auto_aka%'
                  or company_sound = '$sound')";
-    $whereq = " where $where_name $where";
+    $whereq = " WHERE $where_name $where";
     if ($ctu_sql_limit) {
-      $count = get_query_count("select count(*) from Company $whereq");
+      $count = get_query_count("select count(*) FROM Company $whereq $group_by");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0)  || (! $ctu_sql_limit)) {
-      $query = "$req $whereq order by $order $p_order_dir $order_next $limit";
+      $query = "$req $whereq $group_by ORDER BY $order $p_order_dir $order_next $limit";
       display_debug_msg($query, $cdg_sql, "company_search(2)");
       $obm_q->query($query);
     }

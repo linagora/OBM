@@ -19,12 +19,12 @@
 function run_query_search($contract, $p_new_order, $p_order_dir) {
   global $cdg_sql, $c_all, $ctu_sql_limit;
 
-  $p_label = $contract["label"];
+  $p_label = sql_search_text_parse($contract["label"]);
   $p_type = $contract["type"];
   $p_dateafter = $contract["dateafter"];
   $p_datebefore = $contract["datebefore"];
-  $comp = $contract["company_name"];
-  $p_num = $contract["number"];
+  $comp = sql_search_text_parse($contract["company_name"]);
+  $p_num = sql_search_text_parse($contract["number"]);
   $manager = $contract["manager"];
   $p_deal = $contract["deal_id"];
   $company_id = $contract["company_id"];

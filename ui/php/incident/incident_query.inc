@@ -20,9 +20,9 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql, $ctu_sql_limit;
 
   $status = $incident["status"];
-  $lincident = $incident["lincident"];
-  $lcontract = $incident["lcontract"];
-  $company = $incident["company"];
+  $lincident = sql_search_text_parse($incident["lincident"]);
+  $lcontract = sql_search_text_parse($incident["lcontract"]);
+  $company = sql_search_text_parse($incident["company"]);
   $priority = $incident["priority"];
   $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];

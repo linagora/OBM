@@ -13,16 +13,16 @@
 function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql, $c_all, $ctu_sql_limit;
 
-  $label = $invoice["label"];
-  $number = $invoice["number"];
+  $label = sql_search_text_parse($invoice["label"]);
+  $number = sql_search_text_parse($invoice["number"]);
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $inout = $invoice["inout"];
-  $company = $invoice["company"];
-  $deal = $invoice["deal"];
+  $company = sql_search_text_parse($invoice["company"]);
+  $deal = sql_search_text_parse($invoice["deal"]);
   $archive = $invoice["archive"];
   $comp_id = $invoice["company_id"];
   $deal_id = $invoice["deal_id"];

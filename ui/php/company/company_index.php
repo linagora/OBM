@@ -452,7 +452,7 @@ function get_param_company() {
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
   global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
-  global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
+  global $tf_dateafter, $tf_datebefore, $cb_cat_tree, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title, $tf_vat;
   global $action, $param_company, $cdg_param;
@@ -497,6 +497,7 @@ function get_param_company() {
   if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
   if (isset ($sel_cat)) $company["cat"] = $sel_cat;
+  if (isset ($cb_cat_tree)) $company["cat_tree"] = ($cb_cat_tree == 1 ? 1 : 0);
   if (isset ($sel_act)) $company["activity"] = $sel_act;
   if (isset ($sel_naf)) $company["nafcode"] = $sel_naf;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
