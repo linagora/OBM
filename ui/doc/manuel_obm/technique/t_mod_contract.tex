@@ -1,0 +1,274 @@
+% Documentation technique d'OBM : module Contrat
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Contrat}
+
+Le module \contract \obm.
+
+
+\subsection{Organisation de la base de données}
+
+Le module \contract utilise 4 tables :
+\begin{itemize}
+ \item Contrat
+ \item ContractPriority
+ \item ContractStatus
+ \item ContractType
+\end{itemize}
+
+
+\subsection{Contract}
+Table principale des informations d'un contrat.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_deal\_id & int 8 & Affaire liée au contrat & Facultatif \\
+\hline
+\_company\_id & int 8 & Société contractante & Client ou fournisseur \\
+\hline
+\_label & varchar 128 & Nom du contrat & \\
+\hline
+\_number & varchar 20 & Numéro ou référence du contrat & \\
+\hline
+\_datesignature & date & Date de signature & \\
+\hline
+\_datebegin & date & Date de début & \\
+\hline
+\_dateexp & date & Date d'expiration & \\
+\hline
+\_daterenew & date & Date de renouvellement & \\
+\hline
+\_datecancel & date & Date de résiliation & Aspect client \\
+\hline
+\_type\_id & int 8 & Type de contrat & \\
+\hline
+\_priority\_id & int 8 & Priorité du contrat & \\
+\hline
+\_status\_id & int 8 & Etat du contrat & (En cours, terminé)\\
+\hline
+\_kind & int 2 & Indicateur : Client ou fournisseur & \$cck\_customer=0, \$cck\_supplier=1\\
+\hline
+\_format & int 2 & Indicateur : par période, durée ou coupons & \$ccf\_period=0, \$ccf\_duration=1, \$ccf\_ticket=2\\
+\hline
+\_ticketnumber & int 8 & Nombre de coupons & (cas contrat par coupons)\\
+\hline
+\_duration & int 8 & Durée du contrat (en Heure) & (cas contrat par durée)\\
+\hline
+\_autorenewal & int 2 & Indicateur de renouvellement automatique & 1 = oui\\
+\hline
+\_contact1\_id & int 8 & Contact 1 chez le contractant &\\
+\hline
+\_contact2\_id & int 8 & Contact 2 chez le contractant &\\
+\hline
+\_techmanager\_id & int 8 & Responsable technique interne &\\
+\hline
+\_marketmanager\_id & int 8 & Responsable commercial interne &\\
+\hline
+\_privacy & int 2 & Visibilité du contrat & 0=public, 1=privé\\
+\hline
+\_archive & int 1 & Indicateur d'archivage & (1 = 0ui)\\
+\hline
+\_clause & text (64k) & Clauses particulières &\\
+\hline
+\_comment & text (64k) & Commentaire &\\
+\hline
+\end{tabular}
+	 
+	
+\subsection{ContractType}
+
+Table de catégorisation de contrats (table de référence).
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 40 & Label & \\
+\hline
+\end{tabular}
+
+
+\subsection{ContractPriority}
+
+Table des informations de priorité des contrats (table de référence).\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_color & varchar 6 & Code couleur associé à la priorité \\
+\hline
+\_order & int 2 & Ordre d'affichage & \\
+\hline
+\_label & varchar 32 & Label & \\
+\hline
+\end{tabular}
+
+
+\subsection{ContractStatus}
+
+Table des états des contrats (table de référence).\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_order & int 2 & Order & \\
+\hline
+\_label & varchar 32 & Label \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \contract, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche de contrats. \\ 
+ \hline
+  search & read & Résultat de recherche de contrats. \\
+ \hline
+  new & write & Formulaire de création d'un contrat. \\
+ \hline
+  detailconsult & read & Fiche détail d'un contrat. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'un contrat. \\
+ \hline
+  insert & write & Insertion d'un contrat. \\
+ \hline
+  update & write & Mise à jour du contrat. \\
+ \hline
+  check\_delete & write & Vérification avant suppression du contrat. \\
+ \hline
+  delete & write & Suppression du contrat. \\
+ \hline
+  priorite & write & Liste des priorites définies et formulaire de nouvelle priorite. \\
+ \hline
+  priorite\_add & write & Ajout d'une priorite . \\
+ \hline
+  priorite\_update & write & Modification d'une priorite. \\
+ \hline
+  priorite\_del & write & Suppression d'une priorite. \\
+ \hline
+  status & write & Liste des etats définies et formulaire de nouveau etat. \\
+ \hline
+  status\_add & write & Ajout d'un etat . \\
+ \hline
+  status\_update & write & Modification d'un etat. \\
+ \hline
+  status\_del & write & Suppression d'un etat. \\
+ \hline
+  type & write & Liste des types définies et formulaire de nouveau type. \\
+ \hline
+  type\_add & write & Ajout d'un type. \\
+ \hline
+  type\_update & write & Modification d'un type. \\
+ \hline
+  type\_del & write & Suppression d'un type. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ \hline
+  document\_add & write & Ajout de liens vers des documents. \\
+ \hline
+\end{tabular}
+
+
+\subsubsection{Catégories d'un contrat}
+composantes d'un contrat\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline\textbf{Code catégorie} & \textbf{Label catégorie} \\
+\hline
+Priorite & categorie ou on retrouvent les priorites des contrats qui ont ete insere dans le module administration\\
+\hline
+Etat & categorie ou on retrouvent les etats des contrats qui ont ete insere dans le module administration\\
+\hline
+Type & categorie ou on retrouvent les types des contrats qui ont ete insere dans le module administration\\
+\hline
+
+Contract type & categorie ou on peut choisir entre les contrats de type Client ou Fournisseurs 
+Dans la base de donnee on a reserve le champ contract\_kind, ce champ peut avoir les valeurs
+1 (client) ou 2 (fournisseur) ou 0 pour les anciens contrat qui ont ete pas actualise.
+Dans le formulaire d'inscription d'un nouveau contrat on trouvent dans cette zone deux boutons de type radio
+avec le nom de la variable radio\_kind. On a utilise la variable contract\_kind pour garder la variable qui sort de la base de donnee. Si contract\_kind est egale a 2 alors le bouton avec l'etiquette fournisseur doit etre selecte, et dans le cas contraire le bouton avec l'etiquette client doit etre selecte. Donc le bouton client est selecte aussi 'par default'.
+Dans le module de consultation on trouve cette categorie ou dessus de module avec les informations de la company sous la forme d'une labelle 'client' ou 'fournisseur'.
+ 
+\\
+\hline
+Contract type & categorie ou on peut choisir entre les contracts de type Coupons ou Duree
+ pour la categorie Coupons on doit remplir aussi le champ avec le nombre de coupons du contract
+ pour la categorie Duree on doit remplir aussi le champ avec la duree du suport (h)
+On a considere que un coupon est egale avec une heure du support. Le temps du support du module incident est transformee
+ en coupons ou en heures du support pour le module contrat.
+La duree disponible du support d'un contrat est egale avec la difference entre la duree du suport initiale (les nombres 
+ des heures qui ont ete vendus) et la duree utilisee (le nombre d'heures qui ont ete necessaires pour resoudre les incidents)
+Le nombre des coupons disponible d'un contrat est egale avec la difference entre le nombre de coupons initiale ( qui ont ete vendus) et la duree utilisee (le nombre d'heures qui ont ete necessaires pour resoudre les incidents).
+Pour gerer le type du contract (par coupons ou par duree) nous avons utilise dans la base de donnee le champ
+contract\_ticket , qui peut prendre des valeurs 1 si on a un contrat par coupons ou 2  si on a un contract par duree.
+Pour garder les nombres des coupons ou le nombre des heures du support vendues on a utilise 2 champs dans la base de donnee:
+contract\_ticketnumber et contract\_supportduration. Les deux champs ne peuvent etre rempli dans le meme temps avec valeurs differents de zero. Pour le moment n'est pas vraiment necessaire d'utilise 2 champs dans la base de done pour la meme chose (parce que no coupons = no heures) mais sera utile quand on va decider qu'un coupon peut signifier plus ou moins d'une heure.
+Dans le formulaire d'inscription d'un nouveau contrat on trouvent un champ de type select avec deux radio buttons,
+avec les etiquettes 'Duree' et 'Coupons'. Le champ selecte au commencement est le champ 'Duree'. 
+Quand cet champ est selecte on 	a aussi un champ de type 'text' avec l'etiquette 'Duree du suport'.
+Si le champ 'Coupons' est selecte on 	a aussi un champ de type 'text' avec l'etiquette 'Nombre coupons'.
+Ces champs ('Duree du suport' et 'Nombre coupons') doivent etre rempli (les valeurs doivent etre superieure a zero).
+Dans le module de consultation on ces informations dans la zone 'etat'. On a aussi le nombre des 'coupons' ou des heures' consommees ou disponibles (en foction des heures necessaires pour la resolution des incidents).
+Si on a pas des incidents alors le nombre des heures ou des coupons consommee est egale a zero.
+
+\\
+\hline
+\end{tabular}

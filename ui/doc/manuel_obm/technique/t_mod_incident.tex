@@ -1,0 +1,198 @@
+% Documentation technique d'OBM : module Contrat
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Incident}
+
+Le module \incident \obm.
+
+
+\subsection{Organisation de la base de données}
+
+Le module \incident utilise 4 tables :
+\begin{itemize}
+ \item Incident
+ \item IncidentPriority
+ \item IncidentSolutionType
+ \item IncidentStatus
+\end{itemize}
+
+
+\subsection{Incident}
+Table principale des informations d'un incident.\\
+
+
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 100 & Nom d'incident & \\
+\hline
+\_date & timestamp 14 & Date  & \\
+\hline
+\_logger & int 8 & Id d'user courant & \\
+\hline
+\_owner  & int 8 & Id d'user qui a cree l'incident & \\
+\hline
+\_duration & varchar 4 & Temps totale pour la resolution d'un incident & \\
+\hline
+\_resolution & text & Solution trouvee.& \\
+\hline
+\_comment  & text & Commentaire & \\
+\hline
+\_solutiontype\_id & int 8 & Type de solution & \\
+\hline
+\_priority\_id & int 8 & Priorite & \\
+\hline
+\_status\_id & int 8 & Etat & \\
+\hline
+\_contract\_id & int 8 & Contract  d'origine & \\
+\_archive  & int 2 & Indicateur d'archivage & \\
+\hline
+\end{tabular}
+	 
+	
+
+
+\subsection{IncidentPriority}
+Table des informations de priorite des incidents.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 32 & Label d& \\
+\hline
+\_color & varchar 6 & Color \\
+\hline
+\_order & int 2 & Order & \\
+\hline
+\end{tabular}
+
+
+\subsection{IncidentStatus}
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_order & int 2 & Order & \\
+\hline
+\_label & varchar 32 & Label \\
+\hline
+\end{tabular}
+
+
+\subsection{IncidentSolutionType}
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 40 & Label & \\
+\hline
+\_order & int 2 & Order & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \incident, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche des incident. \\ 
+ \hline
+  search & read & Résultat de recherche des incidents. \\
+ \hline
+  new & write & Formulaire de création d'un incident. \\
+ \hline
+  detailconsult & read & Fiche détail d'un incident. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'un incident. \\
+ \hline
+  insert & write & Insertion d'un incident. \\
+ \hline
+  update & write & Mise à jour d'incident. \\
+ \hline
+  delete & write & Suppression d'incident. \\
+ \hline
+  priorite & write & Liste des priorites définies et formulaire de nouvelle priorite. \\
+ \hline
+  priorite\_add & write & Ajout d'une priorite . \\
+ \hline
+  priorite\_update & write & Modification d'une priorite. \\
+ \hline
+  priorite\_del & write & Suppression d'une priorite. \\
+ \hline
+  status & write & Liste des etats définies et formulaire de nouveau etat. \\
+ \hline
+  status\_add & write & Ajout d'un etat . \\
+ \hline
+  status\_update & write & Modification d'un etat. \\
+ \hline
+  status\_del & write & Suppression d'un etat. \\
+ \hline
+  solutiontype & write & Liste des solutiontype définies et formulaire de nouvelle solutiontype. \\
+ \hline
+  solutiontype\_add & write & Ajout d'une solutiontype. \\
+ \hline
+  solutiontype\_update & write & Modification d'une solutiontype. \\
+ \hline
+  solutiontype\_del & write & Suppression d'une solutiontype. \\
+ \hline
+  display & read & Ecran de modification des préférences d'affichage. \\
+ \hline
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
+ \hline
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
+ 
+ \hline
+\end{tabular}

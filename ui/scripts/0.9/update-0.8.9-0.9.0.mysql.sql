@@ -14,13 +14,12 @@ UPDATE ObmInfo set obminfo_value='0.9.0' where obminfo_name='db_version';
 -------------------------------------------------------------------------------
 -- Global Preferences update
 -------------------------------------------------------------------------------
-DELETE FROM GlobalPref where globalpref_option='document_path';
+DROP TABLE GlobalPref;
 
 
 -------------------------------------------------------------------------------
 -- Update Contract tables
 -------------------------------------------------------------------------------
-
 -- Update Contract table
 
 ALTER TABLE Contract ADD COLUMN contract_datesignature date DEFAULT NULL after contract_number;

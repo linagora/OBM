@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre1";
+$obm_version = "0.9.0pre3";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -49,6 +49,9 @@ $cak_page_prev = "4";
 $cak_page_next = "6";
 $cak_begin = "B";
 $cak_end = "E";
+
+// Session Cookie lifetime (in seconds, 0=session cookie)
+$cs_lifetime = 720;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
@@ -260,7 +263,6 @@ $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
-$php_regexp_lifetime = "/^[0-9]{1,6}$/";
 
 
 // Path to the OBM php root (if not set)
@@ -348,9 +350,8 @@ function get_template($tpl) {
 //   - $ret_url : prepared URL
 ///////////////////////////////////////////////////////////////////////////////
 function url_prepare($url) {
-  global $sess;
 
-  $ret_url = $sess->url($url);
+  $ret_url = $url;
 
   return $ret_url;
 }

@@ -47,22 +47,15 @@ switch ($mode) {
 }
 
 
-if ($action != "help") {
-  // We get lifetime from the database and not from the session variable
-  // in case it has been updated since (session value last during the session)
-  $lifetime = get_global_pref_lifetime();
-}
-
-
 switch ($action) {
   case "help":
     dis_help($mode);
     break;
   case "index":
-    dis_index($mode, $lifetime);
+    dis_index($mode, $cs_lifetime);
     break;
   case "clear_sess":
-    dis_clear_sess($mode, $lifetime);
+    dis_clear_sess($mode, $cs_lifetime);
     break;
   default:
     echo "No action specified !";

@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -20,7 +20,7 @@ $obmdb_password = "obm";
 $cgp_host = "http://obm/";
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // Use Database sessions
 //$cgp_sess_db = true;
@@ -33,6 +33,9 @@ $cgp_mail_enabled = true;
 
 // is mailing enabled by default for a new user
 $cgp_mailing_default = true;
+
+// Session Cookie lifetime (in seconds, 0=session cookie)
+$cs_lifetime = 7200;
 
 // OBM System groups (groups id)
 $cg_adm = 1;

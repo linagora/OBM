@@ -10,7 +10,6 @@
 // - index
 // - user_pref_update
 // - user_pref_update_one -- update one preference for all users
-// - global_pref_update
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +25,7 @@ require("admin_pref_display.inc");
 require("admin_pref_query.inc");
 
 $debug=1;
-$actions = array ('help', 'index', 'user_pref_update', 'user_pref_update_one', 'global_pref_update');
+$actions = array ('help', 'index', 'user_pref_update', 'user_pref_update_one');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -72,25 +71,6 @@ switch ($action) {
     $value = $pref["up_value"];
     if (! $value) $value = get_userpref_value($option); 
     dis_user_pref_update_one($mode, $option, $value);
-    break;
-  case "global_pref_update":
-    if (check_data_form($pref)) {
-      $retour = update_global_pref($pref);
-      if ($retour) {
-        $msg = $l_update_ok;
-        $display["msg"] .= display_ok_msg($msg);
-      } else {
-        $msg = $l_update_error;
-        $display["msg"] .= display_err_msg($msg);
-      }
-      echo (($mode == "txt") ? $msg : $display["msg"]);
-      dis_pref_index($mode);
-    } else {
-      $msg = "$l_invalid_data : ($err_msg)";
-      $display["msg"] .= display_err_msg("$msg");
-      echo (($mode == "txt") ? $msg : $display["msg"]);
-      dis_pref_index($mode);
-    }
     break;
   default:
     $msg = "$action : Action not implemented !";
@@ -145,13 +125,10 @@ Usage: $argv[0] [Options]
 where Options:
 -h, --help help screen
 -a action  ($lactions)
--l lifetime, --lifetime lifetime : session lifetime (seconds)
--s session_cookie, --session-cookie session_cookie : session_cookie (1=true |0)
 -o option, --option option
 -v value, --value value
 
 Ex: php4 admin_pref_index.php -a user_pref_update
-Ex: php4 admin_pref_index.php -a global_pref_update -l 3600 -s 1
 Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ";
 }
@@ -161,8 +138,7 @@ Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions;
-  global $action, $tf_lifetime, $cb_session_cookie;
+  global $debug, $actions, $action;
   global $sel_userpref, $tf_pref_value;
 
   // We skip the program name [0]
@@ -184,18 +160,6 @@ function parse_arg($argv) {
 	dis_command_use("Invalid action ($val2)");
 	return false;
       }
-      break;
-    case '-l':
-    case '--lifetime':
-      list($nb2, $val2) = each ($argv);
-      $tf_lifetime = $val2;
-      if ($debug > 0) { echo "-l -> \$tf_lifetime=$val2\n"; }
-      break;
-    case '-s':
-    case '--session-cookie':
-      list($nb2, $val2) = each ($argv);
-      $cb_session_cookie = $val2;
-      if ($debug > 0) { echo "-s -> \$cb_session_cookie=$val2\n"; }
       break;
     case '-o':
     case '--option':
@@ -221,11 +185,8 @@ function parse_arg($argv) {
 // returns : $pref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_pref() {
-  global $tf_lifetime, $cb_session_cookie, $sel_userpref, $tf_pref_value;
-  global $cdg_param;
+  global $cdg_param, $sel_userpref, $tf_pref_value;
 
-  if (isset ($tf_lifetime)) $pref["lifetime"] = $tf_lifetime;
-  if (isset ($cb_session_cookie)) $pref["session_cookie"] = 1;
   if (isset ($sel_userpref)) $pref["up_option"] = $sel_userpref;
   if (isset ($tf_pref_value)) $pref["up_value"] = $tf_pref_value;
 
@@ -277,14 +238,7 @@ function get_admin_pref_action() {
      'Right' 	=> $cright_write_admin,
      'Condition'=> array ('None') 
                                     	);
-  // global_pref_update : global preferences update
-  $actions["ADMIN_PREF"]["global_pref_update"] = array (
-     'Url'     => "$path/admin_pref/admin_pref_index.php?action=global_pref_update&amp;mode=html",
-     'Right' 	=> $cright_write_admin,
-     'Condition'=> array ('None') 
-                                    	);
 
 }
 
 </script>
-

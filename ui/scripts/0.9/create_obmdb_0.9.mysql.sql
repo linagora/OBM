@@ -127,17 +127,6 @@ CREATE TABLE DisplayPref (
 ) TYPE=MyISAM;
 
 
---
--- Table structure for table `GlobalPref`
---
-CREATE TABLE GlobalPref (
-  globalpref_option  varchar(255) NOT NULL default '',
-  globalpref_value   varchar(255) NOT NULL default '',
-  PRIMARY KEY (globalpref_option),
-  UNIQUE KEY globalpref_option (globalpref_option)
-) TYPE=MyISAM;
-
-
 -------------------------------------------------------------------------------
 -- References Tables
 -------------------------------------------------------------------------------

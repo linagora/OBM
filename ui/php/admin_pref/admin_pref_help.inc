@@ -6,10 +6,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-The prefs administration module is a tool to manage OBM preferences.
-There are two sorts of preferences.
-- Global preferences, with global OBM scope like sessions lifetime value.
-- User preferences, specific to each user.
+The prefs administration module is a tool to manage OBM Users preferences.
 
 The user_pref_update action allow to update all OBM users preferences in one
 shot.
@@ -35,18 +32,13 @@ user_pref_update     |        | Update Users preferences (default values)
 -------------------------------------------------------------------------------
 user_pref_update_one | -o -v  | Update one User preference (default values)
 -------------------------------------------------------------------------------
-global_pref_update   | -l -s  | Update Global preferences (values as params)
--------------------------------------------------------------------------------
 txt: php admin_pref_index.php -a user_pref_update
 txt: php admin_pref_index.php -a user_pref_update_one -o last_account -v 0
-txt: php4 admin_pref_index.php -a global_pref_update -lf 3600
 ===============================================================================
 
 txt mode Usage: php admin_pref_index.php [Options]
 where Options:
 -h, --help help screen
 -a action  (avalaible actions)
--lifetime lifetime, -l lifetime : session lifetime (seconds)
--s session_cookie, --session-cookie session_cookie : session_cookie (1=true |0)
 -o option, --option option
 -v value, --value value

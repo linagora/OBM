@@ -127,25 +127,3 @@ function run_query_activeuserobm_delete($sid) {
   $obm_q->query($query);
 
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the lifetime global pref value                                        //
-// Returns:
-//   - $lifetime value
-///////////////////////////////////////////////////////////////////////////////
-function get_global_pref_lifetime() {
-  global $cdg_sql;
-
-  $query = "select globalpref_value
-            from GlobalPref
-            where globalpref_option = 'lifetime'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("globalpref_value");
-  return $retour;
-}

@@ -1,0 +1,171 @@
+% Manuel d'utilisation d'OBM : module Incident
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Le module \incident}
+
+\subsection{Présentation du module \incident}
+
+Ce module est une gestion des incidents d'un contract, souvent appelée \textbf{....} permettant de gérer les incidents des contracts avec les clients, fournisseurs, partenaires...\\
+
+Ce module \incident est  utilisee seulument par le module Contrat
+
+
+De nombreux attributs permettent de décrire un incident.
+Afin de couvrir des utilisations diverses plusieurs attributs peuvent être désactivés et ne pas apparaître dans l'application.
+
+
+\subsection{Description d'un incident}
+
+Composantes d'un incident :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Label \\
+\hline
+Récepteur\\
+\hline
+Responsable Technique.\\
+\hline
+Archiver (selection si un incident doit etre achiver ou pas)\\
+\hline
+Contrat (liaison avec le contrat , selection de label du contrat).\\
+\hline
+Priorité\\
+\hline
+Etat\\
+\hline
+Type de solution.\\
+\hline
+Date \\
+\hline
+Durée totale de résolution.\\
+\hline
+Solution apportée.\\
+\hline
+Historique.\\
+\hline
+Ajouter un commentaire.\\
+\hline
+Durée de résolution (partielle)\\
+\hline
+
+\end{tabular}
+\vspace{0.3cm}
+
+
+Plusieurs attributs peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application 
+
+
+\subsubsection{Catégories d'un incident}
+composantes d'un incident\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline \textbf{Label catégorie} \\
+\hline
+Type de solution -categorie ou on retrouvent les types des solutions qui ont ete insere dans le module administration\\
+\hline
+Priorite -categorie ou on retrouvent les priorites qui ont ete insere dans le module administration\\
+\hline
+Etat -categorie ou on retrouvent les etats qui ont ete insere dans le module administration\\
+\end{tabular}
+
+
+\subsubsection{Les liens d'un incident}
+
+
+\begin{itemize}
+\item Company
+\item Contrat
+\end{itemize}
+
+
+\subsection{Les sous-menus du module \incident}
+
+Le module \contract comporte  sous-menus (accessibles selon les droits d'accès) :\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritère des incidents \\
+\hline
+Nouveau & Créer un nouveau incident.\\
+\hline
+Consulter & Consulter les informations d'un incident.\\
+\hline
+Modifier & Modifier les informations d'un incident.\\
+\hline
+Supprimer un incident.\\
+\hline
+Administrer & Administration des informations annexes (type du solution, status, priorite).\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des incidents.\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche selon différents critères :
+
+\begin{itemize}
+\item Label
+\item Societe
+\item Contrat
+\item Date Après
+\item Date Avant
+\item Priorite
+\item Etat
+\item Responsable Technique
+\item Archive
+\item Contract kind
+\item Archive
+\end{itemize}
+
+Il est possible d'inclure les incidents archivées dans les résultats de recherche.
+
+
+\subsubsection{Le sous-menu : Nouveau}
+
+Ce menu permet de créer un incident.
+
+Pour insérer l'incident saisie, il faut cliquer sur le bouton ``Enregistrer l'incident''.
+
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de consulter la fiche d'un incident .
+Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur l'incident sélectionné, ou immediatement apres l'insertion du nouveau incident.
+
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations d'incident dans un formulaire.
+Toutes les informations sont modifiables.
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton ``valider les modifications''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+
+Ce menu permet supprimée l'incident.
+
+
+\subsubsection{Le sous-menu : Administrer}
+
+Ce menu permet l'administration des informations annexes des incidents :\\
+
+\begin{itemize}
+\item Type du solution
+\item Etat 
+\item Priorite
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des contrats. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.

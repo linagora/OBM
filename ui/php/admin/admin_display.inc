@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_display.inc                                            //
 //     - Desc : Admin Display File                                           //
@@ -179,7 +179,7 @@ function dis_clear_sess($mode, $lifetime) {
     echo "Sessions are unlimited (lifetime = 0) !";
   }
 
-  if($mode == "html")
+  if ($mode == "html")
     dis_index($mode, $lifetime);
 
 }

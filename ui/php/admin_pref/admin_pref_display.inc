@@ -37,17 +37,12 @@ function dis_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_pref_index($mode) {
 
-  // We get lifetime from the database and not from the session variable
-  // in case it has been updated since (session value last during the session)
-  $lifetime = get_global_pref_lifetime();
-  $session_cookie = get_global_pref_session_cookie();
-
   switch ($mode) {
   case "txt":
     echo "\ntry -h for help\n";
     break;
   case "html":
-    html_pref_index($lifetime, $session_cookie);
+    html_pref_index();
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -58,19 +53,10 @@ function dis_pref_index($mode) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the HTML index screen for the pref admin module
-// Parameters:
-//   - $plifetime       : $lifetime value (taken from database)
-//   - $psession_cookie : flag to do session_cookie : 1 or true = yes
 ///////////////////////////////////////////////////////////////////////////////
-function html_pref_index($plifetime, $psession_cookie) {
-  global $l_validate, $l_execute, $l_help, $l_user_pref, $l_global_pref;
-  global $l_session_lifetime, $l_session_cookie;
+function html_pref_index() {
+  global $l_validate, $l_execute, $l_help, $l_user_pref;
   global $l_user_pref_update, $l_user_pref_update_one;
-
-  if ($psession_cookie)
-    $sc = "checked";
-  else
-    $sc = "";
 
   $userpref_q = get_default_user_pref();
   // User preferences SELECT
@@ -119,32 +105,6 @@ function html_pref_index($plifetime, $psession_cookie) {
         $sel_userpref</td>
       <td class=\"adminText\">
         <input type=\"text\" name=\"tf_pref_value\" value=\"\" maxlength=\"20\" size=\"8\"/></td>
-    </tr>
-    </table>
-    </form>
-
-    <form method=\"get\" action=\"" . url_prepare("admin_pref_index.php"). "\">
-    <table class=\"admin\">
-    <tr>
-      <td class=\"adminHead\" colspan=\"2\">$l_global_pref</td>
-    </tr>
-    <tr>
-      <td class=\"adminText\">$l_session_lifetime</td>
-      <td class=\"adminLabel\">
-        <input name=\"tf_lifetime\" size=\"6\" maxlength=\"6\"
-          value=\"$plifetime\" /></td>
-    </tr>
-    <tr>
-      <td class=\"adminText\">$l_session_cookie</td>
-      <td class=\"adminLabel\">
-        <input type=\"checkbox\" name=\"cb_session_cookie\" value=\"1\"
-          \"$sc\" /></td>
-    </tr>
-    <tr>
-      <td class=\"adminLabel\" colspan=\"2\">
-        <input type=\"hidden\" name=\"mode\" value=\"html\" />
-        <input type=\"hidden\" name=\"action\" value=\"global_pref_update\" />
-        <input type=\"submit\" value=\"$l_validate\" /></td>
     </tr>
     </table>
     </form>

@@ -1039,42 +1039,6 @@ function run_query_get_user_prefs($p_user_id) {
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Return all the global preferences
-/////////////////////////////////////////////////////////////////////////////
-function run_query_get_global_prefs() {
-  global $cdg_sql;
-
-  $query = "select * from GlobalPref";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q_pref = new DB_OBM;
-  $obm_q_pref->query($query);
-
-  return $obm_q_pref;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get and register the global preferences into session at login 
-// This must be called in before page_open 
-///////////////////////////////////////////////////////////////////////////////
-function session_load_global_prefs() {
-  global $sess;
-
-  $obm_q = run_query_get_global_prefs();
-  while ($obm_q->next_record()) {
-    $option = $obm_q->f("globalpref_option");
-    $value = $obm_q->f("globalpref_value");
-
-    // Define the variable in the database as global ($tab[0] contain the
-    // variable name so ${$tab[0]} will define the var
-    global $$option;
-    $$option = $value;
-    $sess->register("$option");
-  }
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Get and register the user's preferences into session
 // This must be called in an open session (between page_open and page_close )

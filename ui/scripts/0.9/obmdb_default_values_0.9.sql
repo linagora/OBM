@@ -17,18 +17,6 @@ INSERT INTO ObmInfo (obminfo_name, obminfo_value) VALUES ('db_version', '0.9.0')
 
 
 -------------------------------------------------------------------------------
--- Default Global preferences values (table GlobaPref)
--------------------------------------------------------------------------------
-
--- Delete current default values
-DELETE FROM GlobalPref;
-
--- Session lifetime
-INSERT INTO GlobalPref VALUES ('lifetime', '14400');
-INSERT INTO GlobalPref VALUES ('session_cookie', '1');
-
-
--------------------------------------------------------------------------------
 -- Default User preferences values (table UserObmPref)
 -------------------------------------------------------------------------------
 -- user 0 represent default values (affected to new users for ex:)

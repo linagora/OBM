@@ -128,17 +128,6 @@ create INDEX DisplayPref_user_id_index ON DisplayPref (display_user_id);
 create INDEX DisplayPref_entity_index ON DisplayPref (display_entity);
 
 
---
--- Table structure for table `GlobalPref`
---
-CREATE TABLE GlobalPref (
-  globalpref_option  varchar(255) NOT NULL DEFAULT '',
-  globalpref_value   varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (globalpref_option),
-  UNIQUE (globalpref_option)
-);
-
-
 -------------------------------------------------------------------------------
 -- References Tables
 -------------------------------------------------------------------------------

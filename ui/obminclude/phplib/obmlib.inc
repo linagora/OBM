@@ -22,9 +22,8 @@ if ($obmdb_dbtype == $db_type_pgsql) {
   require_once("$obminclude/phplib/db_mysql.inc");
 }
 require("$obminclude/phplib/ct_sql.inc");
-require("$obminclude/phplib/session4.inc");
+require("$obminclude/of/of_session.inc");
 require("$obminclude/phplib/auth.inc");
-require("$obminclude/phplib/page4.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 // OBM Classes                                                               //
@@ -64,11 +63,6 @@ class DB_OBM extends DB_Sql {
   }
 }
 
-
-class OBM_CT_Sql extends CT_Sql {
-  var $database_class = "DB_OBM";          // Which database to connect...
-  var $database_table = "ActiveSessions";  // our session data in this table.
-}
 
 
 class OBM_User_Sql extends CT_Sql {
@@ -155,9 +149,6 @@ class OBM_User_Sql extends CT_Sql {
 class OBM_Session extends Session {
   var $cookie_name     	= "OBM_Session";
 //  var $cookie_domain  	= "aliacom.local";
-  var $mode           	= "cookie";     // We propagate session ID with cookies
-  var $lifetime_default = 0x7fffffff;   // session cookie if global lifetime=0
-  var $allowcache	= "" ;
 }
 
 
