@@ -51,7 +51,8 @@ $l_affect_deal= "Change Parent Deal";
 $l_project_new = "New project";
 $l_no_invoice = "No invoice connected";
 $l_invoice_new = "New invoice";
-$l_archived_invoices = " Archived Invoices";
+$l_invoice_active = "Actives Invoices";
+$l_invoice_total = "Total Invoices";
 $l_see_archived_invoices = "See archived invoices too";
 $l_kind_manage = "Deal Kind Management";
 $l_kind_exist = "Existing Kinds";
@@ -160,6 +161,7 @@ $l_cat_link_deal = "These deals are referenced as";
 $l_cat_link_deal_no = "No deals referenced as";
 $l_cat_cant_delete = "The category can't be deleted !";
 $l_cat_can_delete = "The category can be deleted.";     
+$l_cat_no = "No categories !";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

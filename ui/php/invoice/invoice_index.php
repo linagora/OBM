@@ -22,20 +22,10 @@ update_last_visit("invoice", $param_invoice, $action);
 
 page_close();
 
-// $invoice is a hash table containing, for each form field set 
-// in the calling page, a couple var_name => var_value...
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $invoice = get_param_invoice();
 get_invoice_action();
 $perm->check_permissions($menu, $action);
-
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-//display_head($l_payment);  // Head & Body
-
-$display["head"] = display_head("$l_invoice");
-$display["header"] = generate_menu($menu, $section);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -421,6 +411,8 @@ elseif ($action == "delete")  { // delete means delete an invoice
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
+$display["head"] = display_head("$l_invoice");
+$display["header"] = generate_menu($menu, $section);
 $display["end"] = display_end();
 display_page($display);
 
@@ -433,7 +425,7 @@ function get_param_invoice() {
   global $tf_label, $tf_number, $tf_amount_HT, $tf_amount_TTC;
   global $ta_comment, $sel_status, $param_invoice, $tf_date;
   global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
-  global $tf_deal, $tf_company, $cb_archive, $hd_param_deal;
+  global $tf_deal, $tf_company, $cb_archive, $param_deal;
   global $set_debug, $cdg_param, $action;
 
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
@@ -451,15 +443,15 @@ function get_param_invoice() {
   if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
   if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
-  if (isset ($hd_param_deal)) $invoice["param_deal"]= $hd_param_deal;
+  if (isset ($param_deal)) $invoice["param_deal"]= $param_deal;
   if (isset ($tf_company)) $invoice["company"] = $tf_company;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
 
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
-    echo "<BR>action = $action";
+    echo "<br />action = $action";
     if ( $invoice ) {
       while ( list( $key, $val ) = each( $invoice ) ) {
-        echo "<BR>invoice[$key]=$val";
+        echo "<br />invoice[$key]=$val";
       }
     }
   }

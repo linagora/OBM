@@ -87,7 +87,7 @@ Liste des modules disponibles :\\
 
 Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent être paramétrés afin de ne pas afficher et gérer tous les champs prévus.
 
-A partir de la version 0.8 d'\obm, les modules \company et \contact ont des champs paramétrables.\\
+A partir de la version 0.8 d'\obm, les modules \company, \contact et \deal ont des champs paramétrables.\\
 
 Le tableau \$cgp\_hide[``module''] définit pour les modules cibles les champs devant être cachés.
 Par défaut tous les champs sont affichés et il faut donc préciser explicitement les champs non souhaités.
@@ -130,3 +130,12 @@ $cgp_hide["contact"]["service"] = true;           // ligne service
 $cgp_hide["contact"]["address3"] = true;          // ligne adresse 3
 \end{verbatim}  
 
+
+\subsubsection{Les champs paramétrables du module \deal}
+
+Liste des champs paramétrables (masquables) du module \deal :
+
+\begin{verbatim}
+// Company module
+$cgp_hide["deal"]["category1"] = true;                 // catégorie
+\end{verbatim}  

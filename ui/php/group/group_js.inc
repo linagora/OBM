@@ -12,7 +12,9 @@ $extra_js .= "
 
 require("obminclude/javascript/check_js.inc");
 
-$extra_js .= "
+// to avoid a javascript error
+if ($ext_widget != "") {
+  $extra_js .= "
 
 function fill_ext_form(int_form) {
    size = int_form.length;
@@ -29,9 +31,8 @@ function fill_ext_form(int_form) {
        }
      }
    }
+}";
 }
+
+  $extra_js .= "
 </script>" ;
-
-
-
-

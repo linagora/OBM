@@ -25,7 +25,7 @@ $l_hitrate = "% Réussite";
 $l_state = "Etat";
 $l_date_alarm = "Date Alarme";
 $l_todo = "A faire";
-$l_category = "Categorie";
+$l_category = "Catégorie";
 $l_code = "Code";
 
 // Labels et textes
@@ -50,7 +50,8 @@ $l_affect_deal = "Affecter à une surAffaire";
 $l_project_new = "Nouveau Projet";
 $l_invoice_new = "Nouvelle facture";
 $l_no_invoice = "Pas de factures";
-$l_archived_invoices = "Factures archivées";
+$l_invoice_active = "Factures en cours";
+$l_invoice_total = "Total Factures";
 $l_see_archived_invoices = "Voir aussi les factures archivées";
 $l_kind_manage = "Gestion des Types d'Affaires";
 $l_kind_exist = "Types existants";
@@ -163,6 +164,7 @@ $l_cat_link_deal = "La catégorie est référencée par ces affaires";
 $l_cat_link_deal_no = "La catégorie n'est référencée par aucune affaire";
 $l_cat_can_delete = " La catégorie peut être supprimée"; 
 $l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
+$l_cat_no = "Pas de catégories enregistrées !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";

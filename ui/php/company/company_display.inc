@@ -436,13 +436,14 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $town = stripslashes($company["town"]);
   $ctry = $company["country"];
   $kind = $company["kind"];
+  $cat = $company["cat"];
   $act = $company["activity"];
   $naf = $company["nafcode"];
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
 
   $comp_q->seek($first_row);
 

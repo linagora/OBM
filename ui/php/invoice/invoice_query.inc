@@ -11,7 +11,7 @@
 // Invoice search query :
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search ($invoice, $p_new_order, $p_order_dir) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $c_all;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -24,15 +24,18 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $company = $invoice["company"];
   $deal = $invoice["deal"];
   $archive = $invoice["archive"];
+  $deal_id = $invoice["param_deal"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $date = sql_date_format($db_type, "Invoice.invoice_date", "date");
 
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
   
-  $query = "select Invoice.*, Invoice.invoice_id as Id,
-      UNIX_TIMESTAMP(Invoice.invoice_date) as date,
+  $query = "select Invoice.*,
+      Invoice.invoice_id as Id,
+      $date,
       company_id, company_name as invoice_company,
       deal_id, deal_label as invoice_deal,
       invoicestatus_id, invoicestatus_label as invoice_status,
@@ -45,48 +48,49 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
         left outer join Deal on dealinvoice_deal_id = deal_id
         left outer join Company on deal_company_id = company_id";
   
-  $query .= " where Invoice.invoice_invoicestatus_id = invoicestatus_id ".
-  " and Invoice.invoice_id = I2.invoice_id ";
-  //" and deal_id = dealinvoice_deal_id ";
-  //" and deal_company_id = company_id ";
+  $query .= " where Invoice.invoice_invoicestatus_id = invoicestatus_id
+      and Invoice.invoice_id = I2.invoice_id";
 
   // fields to use 
   if ($label != ""){
-    $query .= " and Invoice.invoice_label $like '%$label%' ";
+    $query .= " and Invoice.invoice_label $like '%$label%'";
   }
   if ($number != ""){
-    $query .= " and Invoice.invoice_number $like '%$number%' ";
+    $query .= " and Invoice.invoice_number $like '%$number%'";
   }
   if ($amount_HT != ""){
-    $query .= " and Invoice.invoice_amount_HT ='$amount_HT' ";
+    $query .= " and Invoice.invoice_amount_HT ='$amount_HT'";
   }
   if ($amount_TTC != ""){
-    $query .= " and Invoice.invoice_amount_TTC ='$amount_TTC' ";
+    $query .= " and Invoice.invoice_amount_TTC ='$amount_TTC'";
   }
-  if (($status != '') && ($status != "_TOUT_")){
-    $query .= " and invoicestatus_id ='$status' ";
+  if (($status != '') && ($status != "$c_all")){
+    $query .= " and invoicestatus_id ='$status'";
   }
   if ($date_after != ""){
-    $query .= " and Invoice.invoice_date >='$date_after' ";
+    $query .= " and Invoice.invoice_date >= '$date_after'";
   }
   if ($date_before != ""){
-    $query .= " and Invoice.invoice_date <='$date_before' ";
+    $query .= " and Invoice.invoice_date <= '$date_before'";
   }
-  if (($inout != "")&&($inout!="_TOUT_")){
-    $query .= " and Invoice.invoice_inout ='$inout' ";
+  if (($inout != "") && ($inout != "$c_all")){
+    $query .= " and Invoice.invoice_inout ='$inout'";
   }
   if ($company != "") {
-    $query .= " and company_name $like '$company%' ";
+    $query .= " and company_name $like '$company%'";
   }
   if ($deal != "") {
-    $query .= " and deal_label $like '$deal%' ";
+    $query .= " and deal_label $like '$deal%'";
   }
-  if ($archive != 'y') {
-    $query .= " and Invoice.invoice_archive = '0' ";
+  if ($deal_id != "") {
+    $query .= " and deal_id = '$deal_id'";
+  }
+  if ($archive != "1") {
+    $query .= " and Invoice.invoice_archive = '0'";
   }
 
-  $query .= " group by invoice_id ";
-  $query .= "order by $order $order_dir";
+  $query .= " group by invoice_id";
+  $query .= " order by $order $order_dir";
   
   display_debug_msg ("<b>run_query_search() :</b>$query", $cdg_sql); 
   $obm_q->query($query);
@@ -98,36 +102,30 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 // Invoice: Select query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_invoice_id) {
-  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql, $db_type_pgsql;  
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(Invoice.invoice_date) as date,
-        UNIX_TIMESTAMP(invoice_timeupdate) as datemodif,
-        UNIX_TIMESTAMP(invoice_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(invoice_timecreate) as timecreate,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate,
-        sum(paymentinvoice_amount) as invoice_paid
-      from Invoice
-        left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
-        left join UserObm as c on invoice_usercreate=c.userobm_id
-        left join UserObm as u on invoice_userupdate=u.userobm_id
-      where invoice_id='$p_invoice_id'
-      group by paymentinvoice_invoice_id";
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+  $date = sql_date_format($db_type, "Invoice.invoice_date", "date");
+  $datemodif = sql_date_format($db_type, "invoice_timeupdate", "datemodif");
+  $timeupdate = sql_date_format($db_type, "invoice_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "invoice_timecreate", "timecreate");
 
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select * ".
-       ", invoice_timeupdate as datemodif ".
-       ", invoice_timeupdate as timeupdate ".
-       ", invoice_timecreate as timecreate ".
-       ", sum(paymentinvoice_amount) as invoice_paid ".
-       " from Invoice left outer join PaymentInvoice ".
-       " on (invoice_id = paymentinvoice_invoice_id) ".
-       " where invoice_id=".$p_invoice_id.
-       " group by paymentinvoice_invoice_id";
-  }
+  $query = "select *,
+      $date,
+      $datemodif,
+      $timeupdate,
+      $timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate,
+      sum(paymentinvoice_amount) as invoice_paid
+    from Invoice
+      left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
+      left join UserObm as c on invoice_usercreate=c.userobm_id
+      left join UserObm as u on invoice_userupdate=u.userobm_id
+    where invoice_id='$p_invoice_id'
+    group by paymentinvoice_invoice_id";
 
   display_debug_msg ("<b>run_query_detail() :</b>$query", $cdg_sql); 
   $obm_q->query($query);
@@ -145,42 +143,44 @@ function run_query_insert($invoice) {
 
   $label = $invoice["label"];
   $number = $invoice["number"];
-  $amount_HT = $invoice["HT"];
-  $amount_TTC = $invoice["TTC"];
+  $amountHT = $invoice["HT"];
+  $amountTTC = $invoice["TTC"];
   $status = $invoice["status"];
   $comment = $invoice["comment"];
   $date = $invoice["date"];
   $inout = $invoice["inout"];
-
+  $now = date("Y-m-d H:i:s");
+  $uid = $auth->auth["uid"];
   if ($status == ""){
     $status = "0";
   }
 
-  $query = "insert into Invoice ".
-     "(invoice_timeupdate,".
-     " invoice_timecreate,".
-     " invoice_userupdate,".
-     " invoice_usercreate,".
-     " invoice_number,".
-     " invoice_label,".
-     " invoice_amount_HT,".
-     " invoice_amount_TTC,".
-     " invoice_invoicestatus_id,".
-     " invoice_comment,".
-     " invoice_date,".
-     " invoice_inout".
-     ") values (null,".
-     "'".date("Y-m-d H:i:s") ."',".
-     "null,".
-     $auth->auth["uid"].",".
-     "'".$number."',".
-     "'".$label."',".
-     "'".$amount_HT."',". 
-     "'".$amount_TTC."',".
-     "'".$status."',".
-     "'".$comment."',".
-     "'".$date."',".
-     "'".$inout."')"; 
+  $query = "insert into Invoice (
+      invoice_timeupdate,
+      invoice_timecreate,
+      invoice_userupdate,
+      invoice_usercreate,
+      invoice_number,
+      invoice_label,
+      invoice_amount_HT,
+      invoice_amount_TTC,
+      invoice_invoicestatus_id,
+      invoice_comment,
+      invoice_date,
+      invoice_inout
+    ) values (
+      null,
+     '$now',
+     null,
+     '$uid',
+     '$number',
+     '$label',
+     '$amountHT', 
+     '$amountTTC',
+     '$status',
+     '$comment',
+     '$date',
+     '$inout')"; 
 
   display_debug_msg($query, $cdg_sql);
   $obm_q=new DB_OBM;

@@ -81,7 +81,7 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "invoice_date") {
-    $res["name"] = $OD->data_set->f("date");
+    $res["name"] = date_format($OD->data_set->f("date"));
   }
 
   return $res;
@@ -95,10 +95,11 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 //  $q_status : infos concernant les != status
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_form ($p_action,$q_status, $invoice) {
+  global $c_all, $l_all_f;
   global $l_label_start, $l_number, $l_amount_HT, $l_amount_TTC;
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
-  global $l_find, $l_all_f, $l_both, $l_client, $l_fournisseur;
+  global $l_find, $l_both, $l_client, $l_fournisseur;
   global $cellspacing, $border;
 
   $cellspacing = 10;
@@ -112,13 +113,14 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   $date_before = $invoice["date_before"];
   $inout = $invoice["inout"];
   $deal = $invoice["deal"];
+  $deal_id = $invoice["param_deal"];
   $company = $invoice["company"];
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
   $url_form = url_prepare("invoice_index.php?action=search");
 
   $sel_status = "<select name=\"sel_status\">
-     <option value=\"_TOUT_\">$l_all_f</option>";
+     <option value=\"$c_all\">$l_all_f</option>";
   while ($q_status->next_record()) {
     $s_id = $q_status->f("invoicestatus_id");
     $s_label = $q_status->f("invoicestatus_label");
@@ -138,21 +140,20 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
     $rb_four = " checked ";
   }
 
-  ///////////////////////////////////////////////////
+
   $block = "
     <form method=\"post\" name=\"form_invoice\"
         onSubmit=\"if (check_form(this) == false) return false ;
         else return true;\" action=\"$url_form\">
+      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
 
     <div class=\"search\">
       <div class=\"searchLabel\">$l_label_start<br />
-       <input type=\"text\" name=\"tf_label\" size=\"20\"
-              value=\"$label\" />
+       <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
       </div>
 
       <div class=\"searchLabel\">$l_number<br />
-       <input type=\"text\" name=\"tf_number\" size=\"12\"
-              value=\"$number\" />
+       <input type=\"text\" name=\"tf_number\" size=\"12\" value=\"$number\" />
       </div>
 
       <div class=\"searchLabel\">$l_amount_HT<br />
@@ -180,12 +181,12 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
       </div>
 
       <div class=\"searchLabel\">$l_include_archive<br />
-       <input type=\"checkbox\" name=\"cb_archive\" value=\"y\" $archive> 
+       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive> 
       </div>
 
       <div class=\"searchLabel\">$l_inout<br />
        $l_both &nbsp;
-       <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\" $rb_both />
+       <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $rb_both />
        $l_client &nbsp;
        <input type=\"radio\" name=\"rd_inout\" value=\"+\" $rb_client />
        $l_fournisseur &nbsp;
@@ -569,7 +570,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
   $inout = $invoice["inout"];
   $deal = urlencode($invoice["deal"]);
   $company = urlencode($invoice["company"]);
-  $archive=$invoice["archive"];
+  $archive = $invoice["archive"];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".

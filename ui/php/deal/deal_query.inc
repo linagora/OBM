@@ -32,6 +32,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
+  $cat = $deal["category"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = $deal["dateafter"];
@@ -42,6 +43,59 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 
   $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
   $like = sql_casei_like($db_type);
+
+  if ($all == 0) {
+    $where .= " and (deal_visibility=0
+                      or deal_usercreate='" . $auth->auth["uid"] . "')";
+  }
+  if ($label != "") {
+    $where .= " and deal_label $like '%$label%'";
+  }
+  if (($kind != $c_all) && ($kind != "")) {
+    $where .= " and dealtype_id='$kind'";
+  }
+  if (($tt != $c_all) && ($tt != "")) {
+    $where .= " and deal_tasktype_id='$tt'";
+  }
+  if (($cat != $c_all) && ($cat != "")) {
+    $join_cat = "LEFT JOIN DealCategoryLink on deal_id=dealcategorylink_deal_id";
+    $where .= " and dealcategorylink_category_id='$cat'";
+  }
+  if ($name != "") {
+    $where .= " and company_name $like '$name%'";
+  }
+  if ($zip != "") {
+    $where .= " and company_zipcode $like '$zip%'";
+  }
+  if ($company_id != "") {
+    $where .= " and company_id='$company_id'";
+  }
+  if (($state != $c_all) && ($state != "")) {
+    $where .= " and dealstatus_id='$state'";
+  }
+  if ($dateafter != "") {
+    $where .= " and deal_datealarm > '$dateafter'";
+  }
+  if ($datebefore != "") {
+    $where .= " and deal_datealarm < '$datebefore'";
+  }
+  if ($archive != "1") {
+    $where .= " and deal_archive=0";
+  }
+  if ($param_company != "") {
+    $where .= " and deal_company_id='$param_company'";
+  }
+  if (($manager != $c_all) && ($manager != "")) {
+    $where .= " and (deal_technicalmanager_id='$manager'
+                    or deal_marketingmanager_id='$manager') ";
+  } 
+  if ($parent != "") {
+    $where .= " and deal_parentdeal_id='$parent'";
+  }
+
+  // Order by clause
+  $field = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Deal.deal_datealarm";
+  $order .= " order by $field $p_order_dir";
 
   $query = "select 
       deal_id as Id,
@@ -68,61 +122,15 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       dealstatus_label,
       userobm_lastname as deal_marketingmanager,
       $datealarm
-    from Deal, DealType, TaskType, Company, DealStatus, UserObm
+    from Deal $join_cat,
+       DealType, TaskType, Company, DealStatus, UserObm
     where deal_type_id=dealtype_id
-     and tasktype_id=deal_tasktype_id
-     and deal_company_id=company_id
-     and deal_status_id=dealstatus_id
-     and deal_marketingmanager_id=UserObm.userobm_id";
-
-  if ($all == 0) {
-    $query .= " and (deal_visibility=0
-                      or deal_usercreate='" . $auth->auth["uid"] . "')";
-  }
-  if ($label != "") {
-    $query .= " and deal_label $like '%$label%'";
-  }
-  if (($kind != $c_all) && ($kind != "")) {
-    $query .= " and dealtype_id='$kind'";
-  }
-  if (($tt != $c_all) && ($tt != "")) {
-    $query .= " and deal_tasktype_id='$tt'";
-  }
-  if ($name != "") {
-    $query .= " and company_name $like '$name%'";
-  }
-  if ($zip != "") {
-    $query .= " and company_zipcode $like '$zip%'";
-  }
-  if ($company_id != "") {
-    $query .= " and company_id='$company_id'";
-  }
-  if (($state != $c_all) && ($state != "")) {
-    $query .= " and dealstatus_id='$state'";
-  }
-  if ($dateafter != "") {
-    $query .= " and deal_datealarm > '$dateafter'";
-  }
-  if ($datebefore != "") {
-    $query .= " and deal_datealarm < '$datebefore'";
-  }
-  if ($archive != "1") {
-    $query .= " and deal_archive=0";
-  }
-  if ($param_company != "") {
-    $query .= " and deal_company_id='$param_company'";
-  }
-  if (($manager != $c_all) && ($manager != "")) {
-    $query .= " and (deal_technicalmanager_id='$manager'
-                    or deal_marketingmanager_id='$manager') ";
-  } 
-  if ($parent != "") {
-    $query .= " and deal_parentdeal_id='$parent'";
-  }
-
-  // Order by clause
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "Deal.deal_datealarm";
-  $query .= " order by $order $p_order_dir";
+      and tasktype_id=deal_tasktype_id
+      and deal_company_id=company_id
+      and deal_status_id=dealstatus_id
+      and deal_marketingmanager_id=UserObm.userobm_id
+      $where
+      $order";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -588,6 +596,7 @@ function run_query_get_dealcategory($d_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  $categories = array();
   while ($obm_q->next_record()) {
     $id = $obm_q->f("dealcategory_id");
     $categories[] = $id;
@@ -1749,22 +1758,25 @@ function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
 
 
 //////////////////////////////////////////////////////////////////////////////
-// returns the number of archived invoices connected to a deal
+// returns the number of total (active + archived) invoices connected to a deal
+// Parameters:
+//   - $id : deal id
+// Returns:
+//   number of invoices connected to the deal
 //////////////////////////////////////////////////////////////////////////////
-function run_query_nb_archived_invoices ($p_deal_id) {
+function run_query_nb_total_invoices($id) {
   global $cdg_sql;
 
-  $go = new DB_OBM;
+  $obm_q = new DB_OBM;
 
   $query = "select invoice_id from DealInvoice, Invoice
     where dealinvoice_invoice_id = invoice_id
-      and dealinvoice_deal_id = '$p_deal_id'
-      and invoice_archive = '1'";
+      and dealinvoice_deal_id = '$id'";
 
-  display_debug_msg ("<b> run_query_nb_archived_invoices() : </b>".$query, $cdg_sql);
-  $go->query ($query);
+  display_debug_msg("<b>run_query_nb_total_invoices():</b> $query", $cdg_sql);
+  $obm_q->query($query);
 
-  return $go->nf();
+  return $obm_q->nf();
 }
 
 

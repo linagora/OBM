@@ -134,8 +134,12 @@ function dis_deal_index($deal="") {
   global $display, $ctt_sales;
 
   $usr_q = run_query_userobm();
+  $type_q = run_query_dealtype();
+  $tt_q = run_query_tasktype($ctt_sales);
+  $cat_q = run_query_dealcategory();
+  $status_q = run_query_dealstatus();
   $block .= html_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, run_query_dealtype(), run_query_tasktype($ctt_sales), run_query_dealstatus(), $usr_q);
+  $block .= html_deal_search_form($deal, $type_q, $tt_q, $cat_q, $status_q, $usr_q);
 
   return $block;
 }
@@ -149,10 +153,11 @@ function dis_deal_index($deal="") {
 //                   manager, dateafter, datebefore
 //   - $kind_q     : DB result object (deal kind list)
 //   - $tt_q       : DB result object (deal task type list)
+//   - $cat_q      : DB result object (deal category list)
 //   - $stat_q     : DB result object (deal status list)
 //   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $kind_q, $tt_q, $stat_q, $manager_q) {
+function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_q) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
   global $l_all, $l_all_f, $l_find, $c_all, $l_category;
@@ -166,6 +171,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $stat_q, $manager_q) {
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
+  $cat = $deal["category"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
@@ -198,6 +204,20 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $stat_q, $manager_q) {
     $sel_tt .= ">$tt_label</option>\n";
   }
   $sel_tt .= "</select>";
+
+  // Category select construction
+  $sel_cat = "<select name=\"sel_cat\">
+              <option value=\"$c_all\">$l_all</option>";
+  while ($cat_q->next_record()) {
+    //put menu titles
+    $id = $cat_q->f("dealcategory_id");
+    $cat_code = $cat_q->f("dealcategory_code");
+    $cat_label = $cat_q->f("dealcategory_label");
+    $sel_cat .= "\n<option value=\"$id\"";
+    if ($cat == $id) $sel_cat .= "selected =\"selected\"";
+    $sel_cat .= ">$cat_code - $cat_label</option>\n";
+  }
+  $sel_cat .= "</select>";
 
   // State select construction
   $sel_state = "<select name=\"sel_state\">
@@ -256,6 +276,9 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $stat_q, $manager_q) {
     </div>
     <div class=\"searchLabel\">$l_tt<br />
       $sel_tt
+    </div>
+    <div class=\"searchLabel\">$l_category<br />
+      $sel_cat
     </div>
     <div class=\"searchLabel\">$l_state<br />
       $sel_state
@@ -384,6 +407,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $tt = $deal["tasktype"];
+  $cat = $deal["category"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
@@ -399,7 +423,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
 
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q, "deal");
   $dis_deals_list->data_set = $obm_q_deals;
@@ -431,7 +455,7 @@ function html_deal_links($deal_q, $inv_nb) {
   global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
   global $l_project_new, $l_header_project;
   global $l_header_document,$ico_document,$l_deal, $l_header_project;
-  global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
+  global $l_header_invoice, $l_invoice_active, $l_invoice_total,$l_invoice_new;
   global $l_document_new,$l_document_add,$ico_document_new;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
@@ -448,7 +472,7 @@ function html_deal_links($deal_q, $inv_nb) {
   $market = $deal_q->f("deal_marketingmanager_id");
   $tech = $deal_q->f("deal_technicalmanager_id");
 
-  // parent de$deal_qal
+  // parent deal
   if ($pid > 0) {
     $plabel = get_parent_label($pid);
     $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$pid");
@@ -499,15 +523,16 @@ function html_deal_links($deal_q, $inv_nb) {
   // Invoice
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
-    $nb_inv_arch = run_query_nb_archived_invoices ($id);
+    $nb_inv_arch = run_query_nb_total_invoices ($id);
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv\">$l_header_invoice ($inv_nb)</a></li>
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv\">$l_archived_invoices ($nb_inv_arch)</a></li>
+        <a href=\"$url_inv\">$l_invoice_active ($inv_nb)</a></li>
+    <li><a href=\"$url_inv_tot\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        <a href=\"$url_inv_tot\">$l_invoice_total ($nb_inv_arch)</a></li>
     <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_invoice_new</a></li>
   </ul>";
@@ -802,21 +827,27 @@ function html_category_list($deal) {
   <div class=\"categoryTree\">
    <form onsubmit=\"fill_ext_form2(this);window.close(); return false;\">
    ";
-  while ($cat_q->next_record()) {
-    $label = $cat_q->f("dealcategory_label");
-    $id = $cat_q->f("dealcategory_id"); 
-    $block .= "
+
+  if ($cat_q->num_rows() > 0) {
+    $button_add = "<input type=\"submit\" value=\"$l_add_cats\" />";
+    while ($cat_q->next_record()) {
+      $label = $cat_q->f("dealcategory_label");
+      $id = $cat_q->f("dealcategory_id"); 
+      $block .= "
     <div class=\"category\">
       <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$label</span>
-    </div>
-    ";
-  } 
-  
+    </div>";
+    }
+  } else {
+    $block .= display_info_msg($l_cat_no);
+  }
+
   $block.= "
   <br />
   <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
   <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  <input type=\"submit\" value=\"$l_add_cats\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+  $button_add  &nbsp;&nbsp;&nbsp;
+  <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
   </form>
   </div>";
 
@@ -1025,7 +1056,7 @@ function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$
   if ($show_cat) {
     $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat[]\"  multiple=\"multiple\" style=\"font-family:monospace;font1-weight:400;\">";
     if (is_object($cat1_q)) {
-      while($cat1_q->next_record()) {
+      while ($cat1_q->next_record()) {
         $c_id = $cat1_q->f("dealcategory_id");
         $sel_cat .= "\n<option value=\"$c_id\"";
         if (in_array($c_id, $cat_m)) { $sel_cat .= " selected=\"selected\"";}
@@ -1685,10 +1716,12 @@ function html_deal_admin_form($kind_q, $status_q) {
 //   - $cat1_q : DealCategory list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_cat_form($cat_q) {
-  global $l_cat_manage,$l_cat_exist,$l_code,$l_label ;
+  global $l_cat_manage,$l_cat_exist,$l_cat_no,$l_code,$l_label ;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
 
-  $sel_cat = "<select name=\"sel_cat\" onChange=\"
+
+  if ( (is_object($cat_q)) && ($cat_q->num_rows() > 0) ) {
+    $sel_cat = "<select name=\"sel_cat\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
     pos = mytext.indexOf(' ');
     ext = mytext.substr(0, pos);
@@ -1698,15 +1731,24 @@ function html_deal_cat_form($cat_q) {
     \"
     size=\"4\" >";
   
-  if ( is_object($cat_q)) {
     while ($cat_q->next_record()) {
       $id = $cat_q->f("dealcategory_id");
       $label = $cat_q->f("dealcategory_label");
       $code = $cat_q->f("dealcategory_code");
       $sel_cat .= "\n<option value=\"$id\">$code $label</option>";
     }
+
+    $sel_cat .= "</select>";
+    $button_check = "<input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />";
+    $button_upd = "<input type=\"text\" size=\"2\" name=\"tf_code\" />
+   	    <input type=\"text\" name=\"tf_cat\" />
+            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_update\"
+              onclick=\"if (check_cat_upd(this.form,document.form_cat_delete)) return true; else return false;\" />";
+
+  } else {
+    $no_cat = true;
+    $sel_cat = display_info_msg($l_cat_no);
   }
-  $sel_cat .= "</select>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1732,7 +1774,7 @@ function html_deal_cat_form($cat_q) {
               <td class=\"adminLabel\">$sel_cat</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"cat_checklink\" />
-              <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />
+              $button_check
               </td>
             </tr>
             </table>
@@ -1748,10 +1790,7 @@ function html_deal_cat_form($cat_q) {
               action=\"" . url_prepare("deal_index.php") . "\">
             <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"cat_update\" />
-	    <input type=\"text\" size=\"2\" name=\"tf_code\" />
-   	    <input type=\"text\" name=\"tf_cat\" />
-            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_update\"
-              onclick=\"if (check_cat_upd(this.form,document.form_cat_delete)) return true; else return false;\" />
+            $button_upd
             </form>
           </td>
           <td>&nbsp;</td>

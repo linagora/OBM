@@ -29,16 +29,18 @@ Pour chaque appel, divers paramètres sont à fournir.\\
 \hline
 \textbf{Action} & \textbf{Commentaire} \\
 \hline
-ext\_get\_ids & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer les entités sélectionnées à une url \\
+ext\_get\_ids & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer les entités sélectionnées par des cases à cocher à une url \\
 \hline
-list & 0.8.2 \\
+ext\_get\_id & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer l'entité sélectionnée en cliquant dessus à une url \\
+\hline
+ext\_get\_id\_url & Voir difference reelle avec ext\_get\_id ? uniquement param ext\_url ? \\
 \hline
 \end{tabular}
 
 \subsubsection{Spécifications de l'action ext\_get\_ids}
 
 L'exemple donné est l'ajout d'utilisateurs à un groupe.
-Le module appelant est groupe, le module appelé est utilisateur.
+Le module appelant est \group, le module appelé est \user.
 Depuis un groupe, on sélection l'ajout d'utilisateurs. Une fenêtre externe popup de recherche d'utilisateurs s'ouvre.\\
 
 L'action ``Ajout d'utilisateurs'' doit donc être définie dans le module groupe comme un appel externe au module utilisateur.
@@ -62,9 +64,43 @@ ext\_action & Action appelée par la fenêtre externe & user\_add\\
 \hline
 ext\_target & Fenêtre cible de retour (target) & Groupe \\
 \hline
-ext\_url & Url appelée par la fenêtre externe & ../group/group\_index.php \\
+ext\_url & Url appelée par la fenêtre externe & \$path/group/group\_index.php \\
 \hline
 ext\_id & Id de l'entité réceptionnant la réponse & Id du groupe origine \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres : retour par widget (select)}}\\
+\hline
+ext\_widget & Indique le widget (select) devant sélectionner les données \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Spécifications de l'action ext\_get\_id}
+
+L'exemple donné est la sélection d'une société lors de la création d'une affaire ou contact.
+Le module appelant est \deal, le module appelé est \company.
+Depuis le module \deal, on sélection la création d'une nouvelle affaire. Une fenêtre externe popup de recherche de société s'ouvre.\\
+
+L'action ``Nouvelle'' doit donc être définie dans le module \deal comme un appel externe au module \company.
+Des paramètres doivent être passés.\\
+
+\begin{tabular}{|p{2.5cm}|p{6cm}|p{4.5cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Commentaire} & \textbf{Exemple} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres de configuration du module appelé}}\\
+\hline
+action & ext\_get\_id & \\
+\hline
+popup & (0 | 1) affichage en popup (sans menu) & 1 \\
+\hline
+ext\_title & Titre affiché dans la fenêtre externe & Sélectionner une société\\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres : retour par url + action}}\\
+\hline
+ext\_target & Fenêtre cible de retour (target) & Groupe \\
+\hline
+ext\_url & Url appelée par la fenêtre externe (l'url n'est pas fermée car elle recevra l'id de l'entité sélectionnée) & \$path/deal/deal\_index.php? action=new\&amp; param\_company= \\
 \hline
 \multicolumn{3}{|c|}{\textbf{Paramètres : retour par widget (select)}}\\
 \hline

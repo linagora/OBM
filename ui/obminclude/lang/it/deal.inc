@@ -50,6 +50,8 @@ $l_deal_select_parentdeal = "Scegli il Sub-impegno al quale l'impegno deve esser
 $l_affect_deal= "Cambia Sub-Impegno ";
 // about invoice...
 $l_invoice_new = "Nuova Fattura";
+$l_invoice_active = "Attive Fatture";
+$l_invoice_total = "Fatture";
 $l_archived_invoices = "Fatture in archivio";
 $l_no_invoices = "Non sono presenti fatture collegate";
 $l_see_archived_invoices = "Vedi Elenco fatture in archivio";

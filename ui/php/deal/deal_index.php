@@ -62,16 +62,6 @@ $uid = $auth->auth["uid"];
 update_last_visit("deal", $param_deal, $action);
 update_last_visit("parentdeal", $param_parent, $action);
 
-
-// Updating the "last parentdeal" bookmark 
-if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0) ) {
-  $last_parentdeal = $last_parentdeal_default;
-} elseif ( ($param_parent > 0) && ($last_parentdeal != $param_parent) ) {
-  $last_parentdeal = $param_parent;
-  run_query_set_user_pref($uid, "last_parentdeal", $param_parent);
-  $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
-}
-
 page_close();
 if ($action == "") $action = "index";
 $deal = get_param_deal();
@@ -86,8 +76,6 @@ if (($action == "search") && ($deal["parent"])) {
 ///////////////////////////////////////////////////////////////////////////////
   $action = "parent_detailconsult";
 }
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -132,7 +120,8 @@ elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm();
-  $display["search"] = html_deal_search_form($deal, run_query_dealtype(), run_query_tasktype($ctt_sales), run_query_dealstatus(), $usr_q);
+  $cat_q = run_query_dealcategory();
+  $display["search"] = html_deal_search_form($deal, run_query_dealtype(), run_query_tasktype($ctt_sales), $cat_q, run_query_dealstatus(), $usr_q);
   $display["result"] = dis_deal_search_list($deal);
   
 } elseif ($action == "new")  {
@@ -766,7 +755,7 @@ function get_deal_action() {
   // New
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 

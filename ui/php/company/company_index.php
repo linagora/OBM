@@ -79,11 +79,6 @@ if ($action == "ext_get_id") {
     $display["msg"] = display_info_msg($l_no_display);
   }
 
-
-/*  require("company_js.inc");
-  $comp_q = run_query_active_company();
-  $display["detail"] = html_select_company($comp_q, $company);
-*/
 } elseif ($action == "ext_get_id_url") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
