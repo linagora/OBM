@@ -562,7 +562,7 @@ function dis_data_list($action, $mode) {
 //   - $mode : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_document($action, $mode) {
-  global $debug, $c_all, $php_regexp_number,$document_path,$link_to;
+  global $debug, $c_all, $php_regexp_number,$document_path;
 
   // Get the deal list
   $d_q = get_document_list();
@@ -639,11 +639,6 @@ at least as much in the file system.
 	    $kind = 0;
 	    $author = "";
 	    $bd_name = "";
-	  }
-	  elseif(substr_count($file_name,$link_to) == 1) {
-	    $type = "Link";
-	    $kind = 2;
-	    $bd_name = $file_name;
 	  }
 	  else {
 	    $type = "File";

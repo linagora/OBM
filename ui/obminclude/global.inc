@@ -11,9 +11,6 @@
 $obm_version = "0.9.0pre1";
 $l_obm_title = "O.B.M.";
 
-// Document constants 
-$link_to = "Link : "; // Deprecated but necessary for update from older version
-                     //Name of the prefix of a link document
 // Agenda constants
 $set_weekstart_default = "monday + 2 hours"; // First day of the week, 
 //english The +2 hours is a quick fix

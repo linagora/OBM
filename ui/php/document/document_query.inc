@@ -454,12 +454,12 @@ function run_query_update($did, &$document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : document id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($p_id) {
-  global $cdg_sql, $link_to;
+  global $cdg_sql;
 
   $query = "select * from Document where document_id ='$p_id'";
   $obm_q = new DB_OBM;
@@ -467,17 +467,13 @@ function run_query_delete($p_id) {
   $obm_q->next_record();
   $path = addslashes($obm_q->f("document_path"));
   $name = addslashes($obm_q->f("document_name"));
-  if (islink($name)) {
-    $truename = $link_to.$obm_q->f("document_title");
-  }  
+
   $query = "select count(*) as link from Document
     where document_path = '$path'
       and document_name ='$name'";
   $obm_q->query($query);
   $obm_q->next_record();
-  if ($truename != "") {
-    $name = $truename;
-  }
+
   if ($obm_q->f("link") == 1) {
     run_query_delete_file($path,$name);
   }
