@@ -70,7 +70,7 @@ if ($action == "index" || $action == "") {
   }
   else {
     $obm_q = run_query_get_list($statistic["list"]);
-    $query = $obm_q->f("list_query");
+    $query = stripslashes($obm_q->f("list_query"));
     $com_q = run_query_get_selected_company($query,$statistic["list"]);
     $cat_q = run_query_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();

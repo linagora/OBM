@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -19,7 +19,7 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm-panthere/";
+$cgp_host = "http://obm/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
@@ -52,6 +52,7 @@ $cgp_mail_enabled = true;
 $cs_lifetime = 0;
 
 // Use Database sessions
+$cgp_sess_db = false;
 //$cgp_sess_db = true;
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
@@ -113,6 +114,7 @@ $profiles["editor"] = array (
 //$cgp_show["section"]["com"]["url"] = "$path/agenda/agenda_index.php";
 $cgp_show["section"]["aliamin"]["url"] = "http://aliamin-panthere.aliacom.local/aliamin.php";
 
+$cgp_show["section"]["aliamin"] = false; 
 // modules -- false to hide, otherwise section
 //$cgp_show["module"] = ""; // Needed if module order to change
 //$cgp_show["module"]["company"] = "com";

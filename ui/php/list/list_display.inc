@@ -543,7 +543,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   if ($criteria != "") {
     $query = make_query_from_db($list_q);
   } else {
-    $query = $list_q->f("list_query");
+    $query = stripslashes($list_q->f("list_query"));
   }
 
   if ($query != "") {
@@ -754,7 +754,7 @@ function html_list_form($action, $list_q, $list) {
     $email = $list_q->f("list_email");
     $structure = $list_q->f("list_structure");
     $criteria = unserialize($structure);
-    $query = $list_q->f("list_query");
+    $query = stripslashes($list_q->f("list_query"));
     $priv = ($list_q->f("list_privacy") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
     $contact_arch = ($list_q->f("list_contact_archive") == 0 ? "0" : "1");
@@ -881,7 +881,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $list_q->f("list_id");
-    $query = $list_q->f("list_query");
+    $query = stripslashes($list_q->f("list_query"));
     $criteria = unserialize($list_q->f("list_structure"));
     $bollean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
