@@ -1819,7 +1819,7 @@ function html_contact_cat1_form($cat1_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Category2 section                                             //
+// Display: Contact Category2 section
 // Parameters:
 //   - $cat2_q : Category2 list database object
 ///////////////////////////////////////////////////////////////////////////////

@@ -588,8 +588,10 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Subscription Form                                                      //
+// Display Subscription Form
 // Parameters:
 //   - $action    : action called
 //   - $pub_q      : publication database result 
@@ -608,8 +610,8 @@ function html_auto_subscription_form($action,$pub_q,$recept_q, $publication) {
   
   $popup = $publication["popup"];
 
-   $pub_id = $pub_q->f("publication_id"); 
-   $title = $pub_q->f("publication_title"); 
+  $pub_id = $pub_q->f("publication_id"); 
+  $title = $pub_q->f("publication_title"); 
   
 
   // reception mode select
@@ -1229,7 +1231,7 @@ function dis_publication_display_pref($display_pref_q) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Subscription search result in an external module               //
+// Display the Subscription search result in an external module
 // Parameters:
 //   - $publication[] : publication search criteria
 //     keys used  : name, type, zip
@@ -1261,16 +1263,16 @@ function dis_subscription_external_list($hash_table) {
 //     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
 function html_subscription_list_result($sub_q,$nb_subscription) {
-  global $set_theme,$ico_update;
-  global $l_timecreate, $l_timeupdate,$l_publication_title;
+  global $set_theme, $ico_update, $ico_delete, $ico_crow;
+  global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
-  global  $path, $auth,$popup_height,$popup_width,$ico_crow;
-  global $cright_write_admin,$menu,$ico_delete,$perm,$l_yes,$l_no;
+  global $path, $auth, $popup_height, $popup_width;
+  global $cright_write, $menu, $perm;
 
-  $module_right = $perm->get_module_rights($menu);
-  if (($module_right & $cright_write_admin) == $cright_write_admin) {  
-    $is_admin = true;
-    $display_del .= "<td class=\"resultHead\"></td>";
+  if ($perm->check_right($menu, $cright_write)) {  
+    $has_write_right = true;
+    $display_write .= "<td class=\"resultHead\"></td>
+    <td class=\"resultHead\"></td>";
   }
   
   $block = " 
@@ -1284,8 +1286,7 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     <td class=\"resultHead\">$l_quantity</td>
     <td class=\"resultHead\">$l_timecreate</td>    
     <td class=\"resultHead\">$l_timeupdate</td>
-    <td class=\"resultHead\"></td>
-    $display_del
+    $display_write
    </tr>
    ";
   while($sub_q->next_record()) {
@@ -1296,15 +1297,22 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
       $date_update = datetime_format($sub_q->f("timeupdate"));
     }
     $url_publication_consult = url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$p_id");
-    $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1");
-    $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
 
-    if($is_admin) {
-      $display_del = "<td class=\"resultText\">
+    if ($has_write_right) {
+      $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_subscription=$s_id&amp;popup=1");
+      $url_subscription_delete = url_prepare("$path/publication/publication_index.php?action=delete_subscription&amp;param_subscription=$s_id&amp;popup=1");
+
+      $display_write = "
+    <td class=\"resultText\">
+      <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+      <img src=\"/images/$set_theme/$ico_update\" />
+      </a>
+    </td>    
+    <td class=\"resultText\">
       <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_delete','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
       <img src=\"/images/$set_theme/$ico_crow\" />
       </a>
-      </td>  ";
+      </td>";
     }
 
     if($sub_q->f("subscription_renewal") == "1") {
@@ -1326,12 +1334,7 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     <td class=\"resultText\">".$sub_q->f("subscription_quantity")."</td>
     <td class=\"resultText\">".datetime_format($sub_q->f("timecreate"))."</td>
     <td class=\"resultText\">$date_update</td>    
-    <td class=\"resultText\">
-    <a href=\"javascript: void(0);\" onclick=\"window.name='$l_subscription'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
-    <img src=\"/images/$set_theme/$ico_update\" />
-    </a>
-    </td>    
-    $display_del 
+    $display_write
     </tr>
     ";
   }

@@ -42,7 +42,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     $where .= " and list_email $like '%$email%'";
   }
   if (($market != $c_all) && ($market != "")) { 
-    $where .= " and (list_usercreate='$market' or list_userupdate='$market')";
+    $where .= " and (list_usercreate='$market')";
   }
 
   $whereq = "where $where";
@@ -405,6 +405,8 @@ function run_query_contacts_list($list, $entity="") {
     $order_next = ", company_town";
   } else if (trim($new_order) == "") {
     $order = "contact_lastname";
+  } else {
+    $order = $new_order;
   }
 
   if ($entity != "list_contact") {
@@ -676,6 +678,7 @@ function check_data_form($id, $list) {
 	return false;
       }
     }
+
     // Check if query is syntaxically correct
     display_debug_msg("explain $query", $cdg_sql);
     $obm_q = new DB_OBM;

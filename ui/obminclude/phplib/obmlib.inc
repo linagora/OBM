@@ -363,8 +363,7 @@ class OBM_Perm {
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $right) != $right)
          || ($right == "") ) {
-      echo "<p>check_right : ACCESS DENIED, mod_right=$module_right, right=$right";
-      exit();
+      return false;
     } else {
       return true;
     }

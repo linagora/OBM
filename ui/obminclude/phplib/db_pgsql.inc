@@ -79,11 +79,13 @@ class DB_Sql {
     if ($this->Debug)
       printf("<br>Debug: query = %s<br>\n", $Query_String);
 
-    $this->Query_ID = pg_Exec($this->Link_ID, $Query_String);
+    // This echoes en error
+    $this->Query_ID = pg_query($this->Link_ID, $Query_String);
     $this->Row   = 0;
 
     $this->Error = pg_ErrorMessage($this->Link_ID);
     $this->Errno = ($this->Error == "")?0:1;
+
     if (!$this->Query_ID) {
       // Added test (! $hide_error) - Aliacom - PB
       if ($hide_error) {
@@ -116,7 +118,7 @@ class DB_Sql {
 
   function lock($table, $mode = "write") {
     if ($mode == "write") {
-      $result = pg_Exec($this->Link_ID, "lock table $table");
+      $result = pg_query($this->Link_ID, "lock table $table");
     } else {
       $result = 1;
     }
@@ -124,7 +126,7 @@ class DB_Sql {
   }
   
   function unlock() {
-    return pg_Exec($this->Link_ID, "commit");
+    return pg_query($this->Link_ID, "commit");
   }
 
 
@@ -137,7 +139,7 @@ class DB_Sql {
       $q  = sprintf("select nextid from %s where seq_name = '%s'",
                 $this->Seq_Table,
                 $seq_name);
-      $id  = @pg_Exec($this->Link_ID, $q);
+      $id  = @pg_query($this->Link_ID, $q);
       $res = @pg_Fetch_Array($id, 0);
       
       /* No current value, make one */
@@ -147,7 +149,7 @@ class DB_Sql {
                  $this->Seq_Table,
                  $seq_name,
                  $currentid);
-        $id = @pg_Exec($this->Link_ID, $q);
+        $id = @pg_query($this->Link_ID, $q);
       } else {
         $currentid = $res["nextid"];
       }
@@ -156,7 +158,7 @@ class DB_Sql {
                $this->Seq_Table,
                $nextid,
                $seq_name);
-      $id = @pg_Exec($this->Link_ID, $q);
+      $id = @pg_query($this->Link_ID, $q);
       $this->unlock();
     } else {
       $this->halt("cannot lock ".$this->Seq_Table." - has it been created?");
