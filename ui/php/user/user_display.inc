@@ -87,41 +87,41 @@ function html_user_search_form($user) {
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
   }
 
-  echo "
+  $block = "
   <form method=\"get\" name=\"f_user\"
     action=\"". url_prepare("user_index.php")."\">
-  <table class=\"detail\">
-  <tr>
-    <td class=\"textLabelForm\">$l_login<br />
-    <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
-      value=\"$login\" /></td>
-    <td>&nbsp;&nbsp;</td>
-    <td class=\"textLabelForm\">$l_lastname<br />
-    <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"32\"
-      value=\"$lname\" /></td>
-    <td>&nbsp;&nbsp;</td>
-    <td  class=\"textLabelForm\">$l_user_perms<br />
+
+  <div class=\"search\">
+    <div class=\"searchLabel\">$l_login<br />
+      <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
+      value=\"$login\" />
+    </div>
+    <div class=\"searchLabel\">$l_lastname<br />
+      <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"32\"
+      value=\"$lname\" />
+    </div>
+    <div class=\"searchLabel\">$l_user_perms<br />
       <select type=\"text\" name=\"sel_perms\">
         <option value=\"$c_all\" /> $l_all
         <option value=\"$perms_user\" /> $l_perms_user
         <option value=\"$perms_editor\" /> $l_perms_editor
         <option value=\"$perms_admin\" /> $l_perms_admin
       </select>
-    </td>
-    <td>&nbsp;&nbsp;</td>
-    <td class=\"textLabelForm\">$l_archive<br />
+    </div>
+    <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive>
-    </td>
-    <td valign=bottom>&nbsp;&nbsp;
+    </div>
+    <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\">
       <input name=\"submit\" type=\"submit\" value=\"$l_find\">
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext&nbsp;
-    </td>
-  </tr>
-  </table>
-  </form>
-  <hr />";
+    </div>
+    <div class=\"searchEnd\"></div>
+  </div>
+  </form>";
+
+  return $block;
 }
 
 
@@ -133,7 +133,7 @@ function html_user_search_form($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_user_search_list($user) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $display, $auth, $new_order, $order_dir;
 
   $popup = $user["popup"];
 
@@ -141,10 +141,12 @@ function dis_user_search_list($user) {
   $obm_q = run_query_search($user, $new_order, $order_dir);
   $nb_user = $obm_q->num_rows();
   if ($nb_user == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup);
+    $block = html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup);
   }
+
+  return $block;
 }
 
 
@@ -159,7 +161,7 @@ function dis_user_search_list($user) {
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
-  global $l_found, $l_close;
+  global $display, $l_found, $l_close;
 
   $login = urlencode($user["login"]);
   $lname = urlencode($user["lastname"]);
@@ -185,15 +187,13 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
-      <table class=\"detail\">
-      <tr>
-        <td>
-      <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </td>
-      </tr>
-      </table>
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </div>
       </form>
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
@@ -204,11 +204,12 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   $user_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  display_info_msg("$nb_user $l_found");
-  echo $display_popup_head;
-  $user_d->display("dis_data_user");
-  echo $display_popup_end;
+  $dislay["msg"] .= display_info_msg("$nb_user $l_found");
+  $block = $display_popup_head;
+  $block .= $user_d->display("dis_data_user");
+  $block .= $display_popup_end;
 
+  return $block;
 }
 
 

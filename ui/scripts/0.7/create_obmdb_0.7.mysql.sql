@@ -690,6 +690,7 @@ CREATE TABLE IncidentPriority (
   incidentpriority_userupdate int(8) default NULL,
   incidentpriority_usercreate int(8) default NULL,
   incidentpriority_order int(2),
+  incidentpriority_color char(6),
   incidentpriority_label varchar(32) default NULL,
   PRIMARY KEY (incidentpriority_id)
 ) TYPE=MyISAM;

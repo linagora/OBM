@@ -1230,8 +1230,7 @@ function html_select_company($comp_q, $title, $url="") {
   </div>
   </form>
 
-  <a href=\"\" onclick='window.close();'>$l_close</a>
-    ";
+  <a href=\"\" onclick='window.close();'>$l_close</a>";
 
   return $block;
 }

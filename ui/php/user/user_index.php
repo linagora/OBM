@@ -24,7 +24,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "USERS";
-$menu="USER";
+$menu = "USER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -42,40 +42,40 @@ if($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
 $perm->check();
+
 ///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
+// Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_user);           // Head & Body
 
 if (! $obm_user["popup"]) {
-  generate_menu($menu,$section); // Menu
+  $display["header"] = generate_menu($menu,$section);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  html_user_search_form($obm_user);
+  $display["search"] = html_user_search_form($obm_user);
   if ($set_display == "yes") {
-    dis_user_search_list($obm_user);
+    $display["result"] = dis_user_search_list($obm_user);
   } else {
-    display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  html_user_search_form($obm_user);
+  $display["search"] = html_user_search_form($obm_user);
   if ($set_display == "yes") {
-    dis_user_search_list($obm_user);
+    $display["result"] = dis_user_search_list($obm_user);
   } else {
-    display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  html_user_search_form($obm_user);
-  dis_user_search_list($obm_user);
+  $display["search"] = html_user_search_form($obm_user);
+  $display["result"] = dis_user_search_list($obm_user);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ if ($action == "index" || $action == "") {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
     html_user_consult($obm_q);
   } else {
-    display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
 } elseif ($action == "detailupdate")  {
@@ -100,7 +100,7 @@ if ($action == "index" || $action == "") {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
     html_user_form(1, $obm_q, $obm_user);
   } else {
-    display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
 } elseif ($action == "insert")  {
@@ -111,14 +111,14 @@ if ($action == "index" || $action == "") {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_insert($obm_user);
       if ($retour) {
-        display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg($l_insert_ok);
         // insertion of his default preferences : 
         $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
         run_query_default_preferences_insert($user_id);
       } else {
-      display_err_msg($l_insert_error);
+      $display["msg"] .= display_err_msg($l_insert_error);
       }
-      html_user_search_form($obm_user);
+      $display["search"] = html_user_search_form($obm_user);
 
     // If it is the first try, we warn the user if some user seem similar
     } else {
@@ -131,17 +131,17 @@ if ($action == "index" || $action == "") {
           // insertion of his default preferences : 
           $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
           run_query_default_preferences_insert($user_id);
-          display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
-          display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg($l_insert_error);
         }
-        html_user_search_form($obm_user);
+        $display["search"] = html_user_search_form($obm_user);
       }
     }
 
   // Form data are not valid
   } else {
-    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     html_user_form(0, "", $obm_user);
   }
 
@@ -149,13 +149,13 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_default_preferences_insert($obm_user["id"]);
   session_load_user_prefs();
-  display_ok_msg($l_reset_ok);
+  $display["msg"] .= display_ok_msg($l_reset_ok);
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
     html_user_consult($obm_q);
   } else {
-    display_err_msg($l_query_error . " - " . $query . " !");
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
 
 } elseif ($action == "update")  {
@@ -163,13 +163,13 @@ if ($action == "index" || $action == "") {
   if (check_data_form($obm_user["id"], $obm_user)) {
     $retour = run_query_update($obm_user["id"], $obm_user);
     if ($retour) {
-      display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg($l_update_error);
     }
-    html_user_search_form($obm_user);
+    $display["search"] = html_user_search_form($obm_user);
   } else {
-    display_err_msg($err_msg);
+    $display["msg"] .= display_err_msg($err_msg);
   }
 
 } elseif ($action == "check_delete")  {
@@ -181,23 +181,26 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($obm_user["id"]);
   if ($retour) {
-    display_ok_msg($l_delete_ok);
+    $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
-    display_err_msg($l_delete_error);
+    $display["msg"] .= display_err_msg($l_delete_error);
   }
   run_query_delete_profil($obm_user["id"]);
-  html_user_search_form($obm_user);
+  $display["search"] = html_user_search_form($obm_user);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  echo "<center>Nothing here</center><br />";
+  $display["detail"] = "<center>Nothing here</center><br />";
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
-page_close();
-display_end();
+$display["head"] = display_head($l_user);
+$display["end"] = display_end();
+
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////

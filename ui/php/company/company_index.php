@@ -68,7 +68,7 @@ $perm->check();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if (! $popup) {
+if (! $company["popup"]) {
   $display["header"] = generate_menu($menu, $section); // Menu
 }
 
@@ -350,6 +350,7 @@ function get_param_company() {
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
   global $sel_act, $sel_market, $ta_com, $param_company;
   global $tf_kind, $tf_act, $title, $url;
+  global $popup;
   global $cdg_param;
 
   if (isset ($param_company)) $company["id"] = $param_company;
@@ -379,6 +380,7 @@ function get_param_company() {
   // $sel_act -> "act" is already set
   if (isset ($tf_act)) $company["act_label"] = $tf_act;
 
+  if (isset ($popup)) $company["popup"] = $popup;
   if (isset ($title)) $company["title"] = stripslashes(urldecode($title));
   if (isset ($url)) $company["url"] = urldecode($url);
 

@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$path="..";
+$path = "..";
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
@@ -32,7 +32,6 @@ if ($param_theme != "") {
 }
 
 // Validate user preferences
-
 if ($form_user_pref) {
 
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
@@ -115,11 +114,11 @@ if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
 if ($action == "") $action = "index";
 get_settings_actions();
 $perm->check();
+
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_title . $set_lang);     // Head & Body
-generate_menu($menu, $section);                   // Menu
+$display["header"] = generate_menu($menu, $section);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -145,7 +144,7 @@ if ($auth->auth["perm"] == $perms_admin) {
 ///////////////////////////////////////////////////////////////////////////////
 $lang_dir = dir("$path/../$obminclude/lang");
 $dis_lang = "<table class=\"admin\">";
-while($entry=$lang_dir->read()) {
+while ($entry=$lang_dir->read()) {
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
       && is_dir($lang_dir->path."/".$entry)) {
     $dis_lang .= "<tr>
@@ -166,8 +165,8 @@ $lang_dir->close();
 ///////////////////////////////////////////////////////////////////////////////
 $theme_dir = dir("$path/../$obminclude/themes");
 $dis_theme = "<table class=\"admin\">";
-while($entry=$theme_dir->read()) {
-$dotcase = strcmp($entry, "."); 
+while ($entry=$theme_dir->read()) {
+  $dotcase = strcmp($entry, "."); 
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
        && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "<tr>
@@ -186,10 +185,10 @@ $theme_dir->close();
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
 if ($form_user_pref) {
-  display_ok_msg($l_update_ok);
+  $display["msg"] .= display_ok_msg($l_update_ok);
 }
 
-echo "
+$display["detail"] .= "
 <!--User preferences current config -->
 
   <center>
@@ -208,8 +207,8 @@ echo "
     <td class=\"adminLabel\">$l_auto_display</td>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_display\" value=\"yes\" ";
-if ($set_display == "yes") echo "checked = \"checked\"";
-echo " /></td>
+if ($set_display == "yes") $display["detail"] .= "checked = \"checked\"";
+$display["detail"] .= " /></td>
   </tr><tr>
     <td class=\"adminLabel\">$l_set_rows</td>
     <td class=\"adminText\">
@@ -232,8 +231,8 @@ echo " /></td>
     <td class=\"adminLabel\">$l_send_mail</td>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
-if ($set_mail == "yes") echo "checked";
-echo " /></td>
+if ($set_mail == "yes") $display["detail"] .= "checked";
+$display["detail"] .= " /></td>
   </tr><tr>
     <td class=\"adminLabel\">$l_set_cal_interval</td>
     <td class=\"adminText\">
@@ -290,6 +289,15 @@ echo " /></td>
   </center>
   </body>
   </html>";
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display
+///////////////////////////////////////////////////////////////////////////////
+$display["head"] = display_head($l_settings);
+$display["end"] = display_end();
+
+display_page($display);
 
 
 //////////////////////////////////////////////////////////////////////////////
