@@ -702,6 +702,7 @@ function run_query_update($did, &$document) {
   $name = $document["name"];
   $kind = $document["kind"];
   $url = $document["url"];
+  $id = $document["id"];
 
   
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
@@ -751,7 +752,7 @@ function run_query_update($did, &$document) {
     document_category2='$cat2',
     document_mimetype='$mime',
     document_private='$privacy'
-  where document_id='$did'";
+  where document_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

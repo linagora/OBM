@@ -269,8 +269,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     if (islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
-      $proto = substr($doc_q->f("document_name"),0,strrpos($doc_q->f("document_name"),'/')+1);
-      $url = substr($doc_q->f("document_name"),strrpos($doc_q->f("document_name"),'/')+1);
+      $url_parse = parse_url($doc_q->f("document_name"));
+      $proto = $url_parse["scheme"];
+      $url = $url_parse["host"].$url_parse["path"];
       if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
       }
@@ -362,21 +363,21 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
    $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"file\" $checked/> $l_existing_file<br />";
   
 
-  if($kind == "link" && $proto == "http://") {
+  if($kind == "link" && $proto == "http") {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
-     $tp = "$proto";
+     $tp = "http://";
    }else 
      $checked = "";
 
    $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
 
-  if($kind == "link" && $proto == "https://") {
+  if($kind == "link" && $proto == "https") {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
-     $tp = "$proto";
+     $tp = "https://";
    }else 
      $checked = "";
    
