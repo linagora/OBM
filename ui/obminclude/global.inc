@@ -18,6 +18,7 @@ $set_display_default = "no";
 $set_date_default = "Y-m-d";
 $set_menu_default = "both";
 //$set_debug_default=0;
+$set_cal_interval_default = 2;
 $last_deal_default = 0;
 $last_parentdeal_default = 0;
 $last_company_default = 0;

@@ -41,6 +41,7 @@ if ($set_rows == "") $set_rows = $set_rows_default;
 if ($set_date == "") $set_date = $set_date_default;
 if ($set_menu == "") $set_menu = $set_menu_default;
 if ($set_debug == "") $set_debug = $set_debug_default;
+if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 
 if ($last_company == "") $last_company=$last_company_default;
 if ($last_deal == "") $last_deal=$last_deal_default;

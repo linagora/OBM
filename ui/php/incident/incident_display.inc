@@ -370,13 +370,14 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   if ($action == "detailupdate") {
     $param_contract = $inc_q->f("incident_contract_id");
     $lincident = $inc_q->f("incident_label");
-    $owner =  $inc_q->f("incident_owner");
-    $logger =  $inc_q->f("incident_logger");
-    $desc =  $inc_q->f("incident_description");
-    $solu =  $inc_q->f("incident_resolution");
-    $priority =  $inc_q->f("incident_priority");
-    $status =  $inc_q->f("incident_state");
-    $date =  date_format($inc_q->f("date"));
+    $owner = $inc_q->f("incident_owner");
+    $logger = $inc_q->f("incident_logger");
+    $desc = $inc_q->f("incident_description");
+    $duration = $inc_q->f("incident_duration");
+    $solu = $inc_q->f("incident_resolution");
+    $priority = $inc_q->f("incident_priority");
+    $status = $inc_q->f("incident_state");
+    $date = date_format($inc_q->f("date"));
     $hour = get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
@@ -385,14 +386,15 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   } else {
     $param_contract = $incident["contract_id"];
     $lincident = $incident["lincident"];
-    $owner =  $incident["owner"];
-    $logger =  $incident["logger"];
-    $desc =  $incident["description"];
-    $solu =  $incident["solution"];
-    $priority =  $incident["priority"];
-    $status =  $incident["status"];
-    $date =  $incident["date"];
-    $hour =  $incident["hour"];
+    $owner = $incident["owner"];
+    $logger = $incident["logger"];
+    $desc = $incident["description"];
+    $duration = $incident["duration"];
+    $solu = $incident["solution"];
+    $priority = $incident["priority"];
+    $status = $incident["status"];
+    $date = $incident["date"];
+    $hour = $incident["hour"];
     $archive = ($incident["archive"] == "1" ? "checked" : "");
   }
 
@@ -461,13 +463,13 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   $sel_dur = "<select name=\"sel_dur\">";
   for ($cpt = 0.25; $cpt < 2; $cpt += 0.25) {
     $sel_dur .= "\n<option value=\"$cpt\"";
-    if ($cpt == $dur) 
+    if ($cpt == $duration) 
       $sel_dur .= " selected=\"selected\"";
     $sel_dur .= ">$cpt</option>";
   }
   for ($cpt = 2; $cpt < 17; $cpt += 1) {
     $sel_dur .= "\n<option value=\"$cpt\"";
-    if ($cpt == $dur)
+    if ($cpt == $duration)
       $sel_dur .= " selected=\"selected\"";
     $sel_dur .= ">$cpt</option>";
   }
