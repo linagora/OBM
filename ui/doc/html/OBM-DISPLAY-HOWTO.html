@@ -262,7 +262,7 @@ Sinon ils ne seront affichés qu'en haut.
 <br>
 
 <a name="nom_col"><h3>Spécifier le titre des colonnes</h3>
-<p>Pour déterminer le titre des colonnes de la liste correspondant aux champs à afficher, les méthodes <i>dis_preferences(), dis_data_header()</i> utilisent le tableau global $fieldnames[], qui doit être défini dans les fichiers de langues du module et qui à un nom de champ à afficher fait correspondre un titre.
+<p>Pour déterminer le titre des colonnes de la liste correspondant aux champs à afficher, les méthodes <i>dis_preferences(), dis_data_header()</i> utilisent le tableau global $fieldnames[], qui doit être défini dans les fichiers _display.inc du module correspondant et qui à un nom de champ à afficher fait correspondre un titre.
 <br><u>Note</u>: Exit la pénible fontion <i>dis_name_fieldname($fieldname)</i> nécessitant de connaître l'ensemble des champs de tous les modules.
 <p>
 Les clés du haschage $fieldnames[] doivent être le nom des colonnes du dataset (donc correspondre à la requête de récupération des données). Si des alias ou
@@ -271,6 +271,7 @@ champs calculés sont retournés, il faut les positionner dans $fieldnames[].
 <i><pre>
 //------------------------------------//
 // Fields that appear in result lists //
+//  MUST BE IN module_display.inc     //
 //------------------------------------//
 // Direct fields
 $fieldnames["contact_lastname"] = $l_lastname;
