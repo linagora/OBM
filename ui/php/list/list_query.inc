@@ -1074,7 +1074,8 @@ function make_query_from_criteria($list) {
   
   $common_like = "%f $like '%v%'";
   $common_equal = "%f = '%v'";
-  $category_equal = "(%f $like '%v.%' OR %f = '%v')";
+  $category_equal = "(cc%j.%f $like '%v.%' OR cc%j.%f = '%v')";
+  $connection_equal = "%j.%f = '%v'";
   $pub_lang_like = "%f $like '%%v%'";
   $comp_time_sup = "(company_timecreate >= '%v' OR company_timeupdate >= '%v')";
   $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
@@ -1100,8 +1101,8 @@ function make_query_from_criteria($list) {
     "contact_datasource_id" => $common_equal,
     "contact_town"  => $common_like,
     "contact_zipcode"  => $common_like,
-    "contactcategory1link_category_id" => $common_equal,
-    "contactcategory2link_category_id" => $common_equal,
+    "contactcategory1link_category_id" => "cc1l".$connection_equal,
+    "contactcategory2link_category_id" => "cc2l".$connection_equal,
     "contact_function_id" => $common_equal,
     "subscription_publication_id"  => $common_equal,
     "publication_lang"  => $pub_lang_like,
@@ -1114,10 +1115,10 @@ function make_query_from_criteria($list) {
   $add_join = array (
     "publication" => " left join Subscription on subscription_contact_id = contact_id
                        left join Publication on subscription_publication_id = publication_id ",
-    "companycategory_code" => " left join CompanyCategoryLink on company_id = companycategorylink_company_id 
-          	                left join CompanyCategory on companycategory_id = companycategorylink_category_id ",
-    "contactcategory1link_category_id" => " left join ContactCategory1Link on contact_id = contactcategory1link_contact_id ",
-    "contactcategory2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
+    "companycategory_code" => " left join CompanyCategoryLink ccl%j on company_id = ccl%j.companycategorylink_company_id 
+          	                left join CompanyCategory cc%j on cc%j.companycategory_id = ccl%j.companycategorylink_category_id ",
+    "contactcategory1link_category_id" => " left join ContactCategory1Link cc1l%j on contact_id = cc1l%j.contactcategory1link_contact_id ",
+    "contactcategory2link_category_id" => " left join ContactCategory2Link cc2l%j on contact_id = cc2l%j.contactcategory2link_contact_id ",
   );
 
   //If publication info must be displayed we add these fields
@@ -1205,7 +1206,9 @@ function make_query_from_criteria($list) {
                     left join Country as ctry2 on Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
-	     
+
+  $join_name = "a1";
+
   if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
       if (is_array($module_criteria)) {
@@ -1216,21 +1219,23 @@ function make_query_from_criteria($list) {
 		$field_fill = 1;
 		$module_fill = 1;
 		$operation = $operateurs[$field];
+		$operation = str_replace('%j',$join_name,$operation);
 		$operation = str_replace('%f',$field,$operation);
 		$operation = str_replace('%v',$value,$operation);
 		$condition[$line] .= $and[$line]." ". $operation;
 		$and[$line] = " AND";
+		if ($field_fill == 1) {
+		  $join .= str_replace('%j',$join_name,$add_join[$field]);
+		  $select .= $add_select[$field];
+		  $group .= $add_group[$field];
+		  $field_fill = 0;
+		  $join_name ++;
+		}		
 	      }
 	      else {
 		$condition[$line] .= "";
 	      }
             }
-	    if ($field_fill == 1) {
-	      $join .= $add_join[$field];
-    	      $select .= $add_select[$field];
-    	      $group .= $add_group[$field];
-	      $field_fill = 0;
-	    }
           }
         }
        	if ($module_fill == 1) {
@@ -1288,7 +1293,6 @@ function make_query_from_criteria($list) {
   }
 
   $query = trim("SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname");
-
   return $query;
 }
 
