@@ -327,7 +327,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays");
-    if($repeat_end) {
+    if($obm_q_event->f("calendarevent_endrepeat")) {
       $repeat_end = date("Y-m-d",$obm_q_event->f("calendarevent_endrepeat"));
     }
     $id = $obm_q_event->f("calendarevent_id");
@@ -1676,7 +1676,8 @@ function dis_category_links($agenda) {
     <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-      $l_category_link_agenda_no '$label' </td>
+        $l_category_link_agenda_no '$label' 
+      </td>
     </tr>
     </table>
     <div class=\"detailButton\">
@@ -1828,7 +1829,7 @@ END:VEVENT";
     elseif($kind == "monthlybyday") {
       $start_week_day = date("w",$start_date);
       $daypos = ceil(substr($start_date,6,2)/7);
-      $day_num = date("w",strtotime("+ $start_week_day days",$start_date,0,8));
+      $day_num = date("w",strtotime("+ $start_week_day days",$start_date));
       $day = $l_day_repeat[$day_num];
       $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=$repeat_frequence;BYDAY=$daypos$day";
     }
@@ -2189,7 +2190,7 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) {
   global $l_duration, $path, $l_private, $l_private_description, $set_theme,$ico_event;
-  global $auth;
+  global $auth,$l_begin,$l_end;
   $id = $event["event"]->id;
   $usr_id = $properties["id"];
   if($event["event"]->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
@@ -2217,8 +2218,9 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
-    <li class=\"lastList\">$description</li    >
+    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>       
+    <li class=\"lastList\">$description</li>
    </ul>
   </div>  ";	
 
@@ -2234,7 +2236,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
 function dis_week_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
-  global $l_private,$l_private_description;
+  global $l_private,$l_private_description,$l_all_day, $ico_agenda;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -2273,7 +2275,33 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
        <img align=\"middle\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_new_event\" alt=\"[New]\" />
       </a>	
      </td>";
-  } 
+    $day = $events[date("Ymd",$i)];
+    if(is_object($day) && is_array($day->day_events)) {
+       $days_events =  $day->day_events;
+      foreach($calendar_user as $id => $properties) {
+	$user_indice ++;
+	$list_events = $days_events[$id];
+	if($list_events != null)  {
+	  $have_day_events = true;
+	  $days_cal .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
+	  foreach($list_events as $event) {
+	    week_event_display(&$hour_day_list,&$hidden_div,$event,$nb_user,$properties);	
+	  }
+	  $days_cal .=  "</td>";
+	} else {
+	  $days_cal .= "<td colspan=\"$nb_user\" style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
+	}
+      }
+    } else {
+      $days_cal .= "<td colspan=\"$nb_user\" style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
+    }
+  }
+
+  if($have_day_events) {
+    $week_cal .= "<tr><td class=\"agendaHour\" ><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda\" alt=\"$l_all_day\" /></td>";
+    $week_cal .= $days_cal;
+    $week_cal .= "</tr>";
+  }
   /* Events of the week */
   for($j = $set_start_time; $j < $set_stop_time; $j++) {
     $delta = $j - $set_start_time;
@@ -2292,7 +2320,11 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	  $user_indice = 0;
 	  foreach($calendar_user as $id => $properties) {
 	    $user_indice ++;
-	    $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
+	    if($j == $set_start_time && $delta2 == 0) 
+	      $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
+	    else 
+	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
+	   
 	    if($events_data != null)  {
 	      if(is_array($events_data)) {
 		$duration = $events_data["duration"];
@@ -2357,7 +2389,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) {
   global $l_duration, $path, $l_private, $l_private_description, $set_theme,$ico_event;
-  global $auth;
+  global $auth,$l_begin,$l_end;
   $id = $event["event"]->id;
   $usr_id = $properties["id"];
   if($event["event"]->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
@@ -2385,7 +2417,8 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
+    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>        
     <li class=\"lastList\">$description</li    >
    </ul>
   </div>  ";	  
@@ -2402,8 +2435,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
 function dis_day_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $set_start_time, $set_stop_time,$set_cal_interval,$set_weekstart_default;
-  global $l_private,$l_private_description,$auth;
-
+  global $l_private,$l_private_description,$auth,$l_all_day,$ico_agenda;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -2425,24 +2457,49 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
    
   $events = events_model($start_time,$end_time,$calendar_user);
   $nb_user = count($calendar_user);
-
+  
+  $day = $events[date("Ymd",$unix_time)];
+  
   $td_width = floor(460/$nb_user)."px";
   
+  $day = $events[date("Ymd",$unix_time)];
+  $days_events =  $day->day_events;
+  
+  if(is_array($days_events)) {
+    $hour_day_list .= "<tr><td class=\"agendaHour\" ><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda\" alt=\"$l_all_day\" /></td>";
+    foreach($calendar_user as $id => $properties) {
+      $user_indice ++;
+      $list_events = $days_events[$id];
+      if($list_events != null)  {
+	$hour_day_list .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
+	foreach($list_events as $event) {
+	  day_event_display(&$hour_day_list,&$hidden_div,$event,$nb_user,$properties);	
+	}
+	$hour_day_list .=  "</td>";
+      } else {
+	$hour_day_list .= "<td style=\"width:$td_width;\" class=\"agendaHead\">&nbsp;</td>";
+      }
+    }
+    $hour_day_list .= "</tr>";
+  }
+
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     for ($k=0;$k<$set_cal_interval;$k++) {
       if($k==0) {
-	$hour_day_list .= "\n<tr><td class=\"agendaHour\" rowspan=\"$set_cal_interval\" >".($i).":00</td>"; 
+	$hour_day_list .= "\n<tr><td class=\"agendaHour\" rowspan=\"$set_cal_interval\" >$i:00</td>"; 
       } else {
 	$hour_day_list .= "\n<tr>"; 
       }
       $delta2 = $k * $time_unit;
       $current_time = strtotime("+$i hours +$delta2 minutes",strtotime($getdate));   
-      if(isset($events[date("Ymd",$current_time)])) {
-	$day = $events[date("Ymd",$current_time)];
+      if(is_object($day)) {
 	$user_indice = 0;
 	foreach($calendar_user as $id => $properties) {
 	  $user_indice ++;
-	  $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
+	  if($i == $set_start_time && $delta2 == 0) 
+	    $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
+	  else 
+	    $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);	  
 	  if($events_data != null)  {
 	    if(is_array($events_data)) {
 	      $duration = $events_data["duration"];
@@ -2512,7 +2569,7 @@ return $block;
 ///////////////////////////////////////////////////////////////////////////////
 function day_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) {
   global $l_duration, $path, $l_private, $l_private_description, $set_theme,$ico_event;
-  global $auth;
+  global $auth,$l_begin,$l_end;
   $id = $event["event"]->id;
   $usr_id = $properties["id"];
   if($event["event"]->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
@@ -2542,7 +2599,8 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) 
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
-    <li class=\"lastList\">".date("H:i:s",$event["date"])." -> ".date("H:i:s",$event["date"] + $event["event"]->duration)."</li>    
+    <li class=\"lastList\">$l_begin : ".date("Y-m-d H:i:s",$event["date"])." </li>
+    <li class=\"lastList\">$l_end : ".date("Y-m-d H:i:s",$event["date"] + $event["event"]->duration)."</li>    
     <li class=\"lastList\">$description</li    >
    </ul>
   </div>  ";	   

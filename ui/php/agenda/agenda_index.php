@@ -23,16 +23,7 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update agenda access rights
 ///////////////////////////////////////////////////////////////////////////////
-$www = "   <p class=\"messageInfo\">
-    	<a href=\"http://validator.w3.org/check/referer\"><img
-        src=\"http://www.w3.org/Icons/valid-xhtml10\"
-        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
-	<a href=\"http://jigsaw.w3.org/css-validator/\">
- 	 <img style=\"border:0;width:88px;height:31px\"
-       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />²
-	 </a>
-  	</p>";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
@@ -199,18 +190,20 @@ if ($action == "index") {
 } elseif ($action == "insert") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($agenda)){    
-    $conflict = run_query_add_event($agenda,$sel_user_id,$event_id);
-    require("agenda_js.inc");
-    $sel_user_id = array($uid);      
-    $p_user_array = $sel_user_id ;
-    $display["msg"] .= display_ok_msg($l_insert_ok);
-    $user_q = store_users(run_query_get_user_name($p_user_array));
-    $user_obm = run_query_userobm_readable();  
-    $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-  }
-  else {
+  if (check_data_form($agenda)){ 
+    if (!$agenda["force_insert"] && $conflicts = check_for_conflict($agenda,$sel_user_id)) {
+    } else {
+      run_query_add_event($agenda,$sel_user_id,$event_id);
+      require("agenda_js.inc");
+      $sel_user_id = array($uid);      
+      $p_user_array = $sel_user_id ;
+      $display["msg"] .= display_ok_msg($l_insert_ok);
+      $user_q = store_users(run_query_get_user_name($p_user_array));
+      $user_obm = run_query_userobm_readable();  
+      $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);  
+    }
+  }  else {
     require("$obminclude/calendar.js");
     require("agenda_js.inc");
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);

@@ -223,7 +223,7 @@ function display_menus($section, $module) {
           if ($fico) {
 	    $ico = $modules[$mod]["Ico"];
             if ($ico) {
-	      $block .= "<a href='".$value["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	      $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
 	    }
 	  }
 	  $block .= "<a href='".$modules[$mod]["Url"]."'>";

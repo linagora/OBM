@@ -28,7 +28,7 @@ $c_focsys = 3;
 //---------------------------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
+$cgp_host = "http://jaguar.aliacom.local/";
 
 // Generic E-mail for Incident module
 $cmail_incident = "";

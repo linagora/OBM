@@ -34,7 +34,9 @@ $l_user_right = "Gérer les droits de";
 $l_use_endrepeat = "Fin de répétition (blanc si infinie)";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
-
+$l_all_day = "Journée";
+$l_begin = "Début";
+$l_end = "Fin";
 $l_link_events = " événements liés à cette catégorie.";
 $l_waiting_events = "Rendez-vous en attente";
 $l_free = "Libre mais restreint";

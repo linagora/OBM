@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obm-panthere/";
+$cgp_host = "http://obm/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
@@ -115,9 +115,14 @@ $cgp_hide["contact"]["contact_function"] = true;
 $cgp_hide["deal"]["category1"] = true;
 
 // authentification : 'CAS' or 'standalone' : defaults to 'standalone'
-//$auth_kind="CAS";
+$auth_kind="CAS";
 
-// CAS specific parameters. useless in standalone mode
+// authentification 
+// 'CAS' or 'standalone'
+// defaults to 'standalone'
+// $auth_kind="CAS"; 
+// CAS specific parameters.
+// useless in standalone mode
 // Authentication used :
 $cas_server = "sso.aliacom.local";
 $cas_server_port = 8443;

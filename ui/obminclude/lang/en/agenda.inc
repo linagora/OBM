@@ -36,7 +36,9 @@ $l_too_much_user = "No more than six users";
 $l_waiting_events = "Waiting events";
 $l_user_calendar = "Multi-user view";
 $l_repeatdays2 = "Repeatition days";
-
+$l_all_day = "All day";
+$l_begin = "Beginning";
+$l_end = "End";
 $l_link_events = "linked events with this category.";
 $l_accepted = "Accept";
 $l_rejected = "Reject";

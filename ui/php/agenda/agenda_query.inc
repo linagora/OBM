@@ -426,7 +426,14 @@ function run_query_insert_event_data($agenda) {
 
   return $max_id;
 }
+/////////////////////////////////////////////////////////////////////////
+// Check for conflict : Only with the first occurence of each
+// event,
+/////////////////////////////////////////////////////////////////////////
 
+function check_for_conflict($agenda,$sel_user_id) {
+
+}
 /////////////////////////////////////////////////////////////////////////
 // Get all event categories
 /////////////////////////////////////////////////////////////////////////
@@ -537,7 +544,7 @@ function run_query_update_event_data($agenda) {
   $query = "
   UPDATE CalendarEvent SET
     calendarevent_timeupdate = '".date("Y-m-d H:i")."',                         
-    calendarevent_usercreate = ".$auth->auth["uid"].", 
+    calendarevent_userupdate = ".$auth->auth["uid"].", 
     calendarevent_title = '$title', 
     calendarevent_date = '".date("Y-m-d H:i",$stamp_beg)."',     
     calendarevent_description = '$description',
@@ -1011,11 +1018,6 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if ($kind != "none" && $dateend > $datebegin) {
-    $err_msg = $l_err_repeat;
-    return false;
-  }  
-  
   return true; 
 }
 
@@ -1035,7 +1037,7 @@ function localizeDate($format, $timestamp) {
 
  $day = '%A %e %B';
  $week = '%e %B';
- $week_list = '%a %e %b';
+ $week_list = '%a %e';
  $week_jump = '%e %b';
  $month = '%B %Y';
  $month_list = '%A %e %B';
@@ -1148,7 +1150,8 @@ function run_query_no_repeat_events($start,$end,$contacts_array) {
 		   calendaruser_user_id,
 		   calendarcategory_label,
 		   $calendarevent_date_l,
-		   calendarevent_duration
+		   calendarevent_duration,
+		   calendarevent_allday
 	      FROM CalendarEvent, CalendarCategory, CalendarUser 
 	      WHERE calendarevent_category_id = calendarcategory_id
 	      AND calendarevent_id = calendaruser_event_id
@@ -1200,14 +1203,15 @@ function run_query_repeat_events($start,$end,$contacts_array) {
 		   $calendarevent_endrepeat_l,
 		   calendarevent_repeatfrequence,
 		   calendaruser_user_id,
-		   calendarevent_repeatdays
+		   calendarevent_repeatdays,
+		   calendarevent_allday
 	      FROM CalendarEvent, CalendarCategory, CalendarUser 
 	      WHERE calendarevent_category_id = calendarcategory_id
 	      AND calendarevent_id = calendaruser_event_id
 	      AND calendaruser_state = 'A'
 	      AND calendarevent_repeatkind != 'none'
-	      AND $calendarevent_date <= $end  - calendarevent_duration
-	      AND ($calendarevent_endrepeat >= $start
+	      AND $calendarevent_date <= $end 
+	      AND ($calendarevent_endrepeat >= $start - calendarevent_duration
 	           OR $calendarevent_endrepeat = '0')
             ";		  
   if(is_array($contacts_array) && (count($contacts_array)>0) ) {
@@ -1233,10 +1237,10 @@ function run_query_repeat_events($start,$end,$contacts_array) {
 function events_model($start_time, $end_time,$calendar_user) {
   global $set_start_time, $set_stop_time,$set_weekstart_default;
 
+  global $day_duration;
   $day_duration = 86400;
   $obm_no_repeat = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
   while($obm_no_repeat->next_record()) {
-    $multiday = false; 
     $id = $obm_no_repeat->f("calendarevent_id");
     $title = $obm_no_repeat->f("calendarevent_title");
     $privacy = $obm_no_repeat->f("calendarevent_privacy");
@@ -1245,22 +1249,9 @@ function events_model($start_time, $end_time,$calendar_user) {
     $date = $obm_no_repeat->f("calendarevent_date");
     $duration = $obm_no_repeat->f("calendarevent_duration");
     $user_id = $obm_no_repeat->f("calendaruser_user_id");
-    
-    $end_event = $date + $duration;
+    $all_day = $obm_no_repeat->f("calendarevent_allday");    
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
-    do {
-      $day = &$day_events[date("Ymd",$date)];
-      if(!is_object($day) || !$day->is_same_day($date)) {
-	$day = &new Day($date);
-	$day_events[date("Ymd",$date)] = &$day;
-      }
-      $day->add_event(&$event,$date,$user_id);
-      if(!$multiday) {
-        $date = mktime ($set_start_time ,0,0,date("m",$date),date("d",$date),date("Y",$date));
-	$multiday = true;
-      } 
-      $date = strtotime("+1 day",$date);
-    }while($end_event > $date && $date < $end_time);
+    store_event($date, &$event, &$day_events,$user_id,$all_day,$end_time);
   }
   
   $obm_repeat = run_query_repeat_events($start_time,$end_time,$calendar_user);
@@ -1275,166 +1266,231 @@ function events_model($start_time, $end_time,$calendar_user) {
     $duration = $obm_repeat->f("calendarevent_duration");
     $repeatkind = $obm_repeat->f("calendarevent_repeatkind");
     $endrepeat = $obm_repeat->f("calendarevent_endrepeat");
+    $all_day = $obm_no_repeat->f("calendaruser_allday");     
     if(!$endrepeat) {
       $endrepeat = $end_time;
     }
     $repeatfrequence = $obm_repeat->f("calendarevent_repeatfrequence");
     $repeatdays = $obm_repeat->f("calendarevent_repeatdays");
     $user_id = $obm_repeat->f("calendaruser_user_id");    
+    $all_day = $obm_no_repeat->f("calendaruser_allday");       
     $event = &new Event($id,$duration,$title,$category,$privacy,$description);
     $temp_date = $date;
     $end_date = ($endrepeat < $end_time)?$endrepeat:$end_time;
     $end_date += $day_duration;
     switch($repeatkind) {
       case "daily" :
-	if($temp_date < $start_time) {
-	  $temp_date = ceil(($start_time - $date) / $day_duration);
-	  $hour_diff = date("H",$date) - date("H",$start_time);
-	  $min_diff = date("i",$date) - date("i",$start_time);
-	  if($temp_date > 0) {	  
-	    $temp_date = ($temp_date % $repeatfrequence);
-	  }	    
-	  $temp_date = strtotime("+$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
-	}
-	while($temp_date <= $end_date) {
-	  $day = &$day_events[date("Ymd",$temp_date)];
-	  if(!is_object($day)) {
-	    $day = &new Day($temp_date);
-	    $day_events[date("Ymd",$temp_date)] = &$day;
-	  }
-	  $day->add_event(&$event,$temp_date,$user_id);
-	  $temp_date = strtotime("+$repeatfrequence days",$temp_date);
-	}
+        daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day);	
         break; 
       case "weekly" :
-	$temp_date = strtotime(dateOfWeek(date("Ymd",$date), $set_weekstart_default));
-	$temp_date = strtotime("+".date("H",$date)." hours +".date("i",$date)." minutes",$temp_date);
-	if($temp_date < $start_time) {
-	  $temp_date = ceil(($start_time - $temp_date) / $day_duration);
-	  $hour_diff = date("H",$date) - date("H",$start_time);
-	  $min_diff = date("i",$date) - date("i",$start_time);
-	  $temp_date = ($temp_date % ($repeatfrequence * 7));
-	  if($temp_date == "") $temp_date = 0;
-	  $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
-	}
-	$num = (date('w', $temp_date) - date('w', strtotime($set_weekstart_default)) +7)%7;
-	for($i=$num; $i<strlen($repeatdays);$i++) {
-          $repeat_days[$i - $num]=substr($repeatdays, $i, 1);
-	}	
-	while($temp_date <= $end_date) {
-	  foreach($repeat_days as $delta_day => $repeatition) {	  
-	    if($repeatition == 1) {
-	      $current_date = strtotime("+$delta_day days",$temp_date);
-	      if($current_date >= $date) {
-		$day = &$day_events[date("Ymd",$current_date)];
-		if(!is_object($day)) {
-		  $day = &new Day($current_date);
-		  $day_events[date("Ymd",$current_date)] = &$day;
-		}
-		$day->add_event(&$event,$current_date,$user_id);
-	      }
-	    }	  
-	  }	  
-	  $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
-	}		
+	weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day); 
 	break;
       case "monthlybyday" :
-	$start_week = date('w', strtotime($set_weekstart_default));
-	$num = (date('w', $date) - $start_week +7)%7;	
-	$monthlybyday = ceil( date('d',$date) / 7 ) ;
-	if($temp_date < $start_time) {
-	  $month_diff = (date("Y",$start_time) - date("Y",$temp_date)) * 12;	
-	  $month_diff += date("m",$start_time) - date("m",$temp_date);
-	  $hour_diff = date("H",$date) - date("H",$start_time);
-	  $min_diff = date("i",$date) - date("i",$start_time); 
-          $month_diff = $month_diff % ($repeatfrequence);	  
-	  if($month_diff > 0) {	  
-	    $month_diff = $repeatfrequence - $month_diff;
-	  }		      
-	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start_time);
-	}
-	$hour_diff = date("H",$date);
-	$min_diff = date("i",$date);  
-
-	while($temp_date <= $end_date) {
-	  $this_month = strtotime(date("Ym01",$temp_date));
-	  $start_num = (date('w', $this_month) - $start_week +7)%7;
-          $day_diff = ($num -  $start_num +7)%7;
-	  $day_diff += 7*($monthlybyday-1);
-	  $current_date =   strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$this_month);
-	  if(date("m",$temp_date) == date("m",$current_date) 
-	     && date("Ymd",$current_date) >= date("Ymd",$start_time)) {
-	    $day = &$day_events[date("Ymd",$current_date)];
-	    if(!is_object($day)) {
-	      $day = &new Day($current_date);
-	      $day_events[date("Ymd",$current_date)] = &$day;
-	    }
-	    $day->add_event(&$event,$current_date,$user_id);
-	  }
-	  $temp_date = strtotime("+$repeatfrequence months",$temp_date);
-	}		
+	monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day); 
         break;
       case "monthlybydate" :
-	if($temp_date < $start_time) {
-	  $temp_date = strtotime(date("Ym01",$start_time));
-	  $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;	
-	  $month_diff += date("m",$start_time) - date("m",$date);
-	  $hour_diff = date("H",$date) - date("H",$start_time);
-	  $min_diff = date("i",$date) - date("i",$start_time); 
-          $month_diff = $month_diff % ($repeatfrequence);	  
-	  if($month_diff > 0) {	  
-	    $month_diff = $repeatfrequence - $month_diff;
-	  }	  
-    
-	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
-	}	
-	$hour_diff = date("H",$date);
-	$min_diff = date("i",$date);  	
-	$temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
-        $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
-	while($temp_date <= $end_date) {
-	  $day = &$day_events[date("Ymd",$temp_date)];
-	  if(!is_object($day)) {
-	    $day = &new Day($temp_date);
-	    $day_events[date("Ymd",$temp_date)] = &$day;
-	  }
-	  $day->add_event(&$event,$temp_date,$user_id);
-	  $temp_date = strtotime("+$repeatfrequence months",$temp_date);
-	}
+	monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) ;
 	break;
       case "yearly" :
-	if($temp_date < $start_time) {
-	  $temp_date = strtotime(date("Ym01",$start_time));
-	  $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;
-	  $month_diff += date("m",$start_time) - date("m",$date);
-	  $hour_diff = date("H",$date) - date("H",$start_time);
-	  $min_diff = date("i",$date) - date("i",$start_time); 
-          $month_diff = $month_diff % ($repeatfrequence*12);	  
-	  if($month_diff > 0) {	  
-	    $month_diff = $repeatfrequence*12 - $month_diff;
-	  }
-	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
-	}
-	$hour_diff = date("H",$date);
-	$min_diff = date("i",$date);  	
-	$temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
-        $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
-	while($temp_date <= $end_date) {
-	  $day = &$day_events[date("Ymd",$temp_date)];
-	  if(!is_object($day)) {
-	    $day = &new Day($temp_date);
-	    $day_events[date("Ymd",$temp_date)] = &$day;
-	  }
-	  $day->add_event(&$event,$temp_date,$user_id);
-	  $temp_date = strtotime("+$repeatfrequence years",$temp_date);
-	}
+	yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day);
 	break;	
     }
   }
-  
   return $day_events; 
 }
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the daily repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function store_event($date, &$event, &$day_events,$user_id,$all_day,$end_time) {
+  $temp_date = $date;
+  $event_end = $date + $event->duration;
+  do {
+    $day = &$day_events[date("Ymd",$temp_date)];
+    if(!is_object($day) || !$day->is_same_day($temp_date)) {
+      $day = &new Day($temp_date);
+      $day_events[date("Ymd",$temp_date)] = &$day;
+    }
+    $day->store_event(&$event,$date,$user_id,$all_day);
+    $temp_date = strtotime("+1 day",$temp_date);
+  }while($event_end > $temp_date && $temp_date < $end_time);
+}
 
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the daily repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+  global $day_duration;
+  $temp_date = $date;
+  if($temp_date < $start_time) {
+    $temp_date = ceil(($start_time - $date) / $day_duration);
+    $hour_diff = date("H",$date) - date("H",$start_time);
+    $min_diff = date("i",$date) - date("i",$start_time);
+    if($temp_date > 0) {	  
+      $temp_date = ($temp_date % $repeatfrequence);
+    }	    
+    $temp_date = strtotime("+$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+  }
+  while($temp_date <= $end_date) {
+    $day = &$day_events[date("Ymd",$temp_date)];
+    if(!is_object($day)) {
+      $day = &new Day($temp_date);
+      $day_events[date("Ymd",$temp_date)] = &$day;
+    }
+    store_event($temp_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    $temp_date = strtotime("+$repeatfrequence days",$temp_date);
+  }
+}
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the weekly repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+  global $day_duration,$set_weekstart_default;
+  $temp_date = strtotime(dateOfWeek(date("Ymd",$date), $set_weekstart_default));
+  $temp_date = strtotime("+".date("H",$date)." hours +".date("i",$date)." minutes",$temp_date);
+  if($temp_date < $start_time) {
+    $temp_date = ceil(($start_time - $temp_date) / $day_duration);
+    $hour_diff = date("H",$date) - date("H",$start_time);
+    $min_diff = date("i",$date) - date("i",$start_time);
+    $temp_date = ($temp_date % ($repeatfrequence * 7));
+    if($temp_date == "") $temp_date = 0;
+    $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
+  }
+  $num = (date('w', $temp_date) - date('w', strtotime($set_weekstart_default)) +7)%7;
+  for($i=$num; $i<strlen($repeatdays);$i++) {
+    $repeat_days[$i - $num]=substr($repeatdays, $i, 1);
+  }	
+  while($temp_date <= $end_date) {
+    foreach($repeat_days as $delta_day => $repeatition) {	  
+      if($repeatition == 1) {
+	$current_date = strtotime("+$delta_day days",$temp_date);
+	if($current_date >= $date) {
+	  $day = &$day_events[date("Ymd",$current_date)];
+	  if(!is_object($day)) {
+	    $day = &new Day($current_date);
+	    $day_events[date("Ymd",$current_date)] = &$day;
+	  }
+	  store_event($current_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+	}
+      }	  
+    }	  
+    $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
+  }	
+}
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the monthly by date repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
+  
+  global $day_duration,$set_weekstart_default;
+  $temp_date = $date;  
+  $start_week = date('w', strtotime($set_weekstart_default));
+  $num = (date('w', $date) - $start_week +7)%7;	
+  $monthlybyday = ceil( date('d',$date) / 7 ) ;
+  $event_end = $date + $event->duration;
+  if($event_end  < $start_time) {
+    $month_diff = (date("Y",$start_time) - date("Y",$temp_date)) * 12;	
+    $month_diff += date("m",$start_time) - date("m",$temp_date);
+    $hour_diff = date("H",$date) - date("H",$start_time);
+    $min_diff = date("i",$date) - date("i",$start_time); 
+    $month_diff = $month_diff % ($repeatfrequence);	  
+    if($month_diff > 0) {	  
+      $month_diff = $repeatfrequence - $month_diff;
+    }		      
+    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start_time);
+  }
+  $hour_diff = date("H",$date) ;
+  $min_diff = date("i",$date);  
+  $this_month = strtotime(date("Ym01",$temp_date));
+  while($this_month <= $end_date) {
+    $start_num = (date('w', $this_month) - $start_week +7)%7;
+    $day_diff = ($num -  $start_num +7)%7;
+    $day_diff += 7*($monthlybyday-1);
+    $current_date =   strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$this_month);
+    $event_end = $current_date + $event->duration;
+    if(date("m",$this_month) == date("m",$current_date) 
+       && date("Ymd",$event_end) >= date("Ymd",$start_time)) {
+      $day = &$day_events[date("Ymd",$current_date)];
+      if(!is_object($day)) {
+	$day = &new Day($current_date);
+	$day_events[date("Ymd",$current_date)] = &$day;
+      }
+      store_event($current_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    }
+    $this_month = strtotime("+$repeatfrequence months",$this_month);
+  }	
+}
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the monthly by date repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function monthlybydate_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {  
+  global $day_duration;
+  $temp_date = $date;  
+  if($temp_date < $start_time) {
+    $temp_date = strtotime(date("Ym01",$start_time));
+    $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;	
+    $month_diff += date("m",$start_time) - date("m",$date);
+    $hour_diff = date("H",$date) - date("H",$start_time);
+    $min_diff = date("i",$date) - date("i",$start_time); 
+    $month_diff = $month_diff % ($repeatfrequence);	  
+    if($month_diff > 0) {	  
+      $month_diff = $repeatfrequence - $month_diff;
+    }	  
+
+    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
+  }	
+  $hour_diff = date("H",$date);
+  $min_diff = date("i",$date);  	
+  $temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
+  $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
+  while($temp_date <= $end_date) {
+    $day = &$day_events[date("Ymd",$temp_date)];
+    if(!is_object($day)) {
+      $day = &new Day($temp_date);
+      $day_events[date("Ymd",$temp_date)] = &$day;
+    }
+    store_event($temp_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    $temp_date = strtotime("+$repeatfrequence months",$temp_date);
+  }  
+}
+
+/////////////////////////////////////////////////////////////////////////////
+//  Perform the yealy repeatition of an event 
+//
+//////////////////////////////////////////////////////////////////////////////
+function yearly_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {  
+  global $day_duration;
+  $temp_date = $date;    
+  if($temp_date < $start_time) {
+    $temp_date = strtotime(date("Ym01",$start_time));
+    $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;
+    $month_diff += date("m",$start_time) - date("m",$date);
+    $hour_diff = date("H",$date) - date("H",$start_time);
+    $min_diff = date("i",$date) - date("i",$start_time); 
+    $month_diff = $month_diff % ($repeatfrequence*12);	  
+    if($month_diff > 0) {	  
+      $month_diff = $repeatfrequence*12 - $month_diff;
+    }
+    $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
+  }
+  $hour_diff = date("H",$date);
+  $min_diff = date("i",$date);  	
+  $temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
+  $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
+  while($temp_date <= $end_date) {
+    $day = &$day_events[date("Ymd",$temp_date)];
+    if(!is_object($day)) {
+      $day = &new Day($temp_date);
+      $day_events[date("Ymd",$temp_date)] = &$day;
+    }
+    store_event($temp_date, &$event, &$day_events,$user_id,$all_day,$end_date);
+    $temp_date = strtotime("+$repeatfrequence years",$temp_date);
+  }
+}
 /////////////////////////////////////////////////////////////////////////////
 // Class Event :
 // Describe an event.
@@ -1467,6 +1523,7 @@ class Day {
 
   var $day;
   var $events;
+  var $day_events;
 
   function Day($day) {
     $this->day = $day;
@@ -1478,9 +1535,18 @@ class Day {
     }
     return false;
   }
+  
+  function store_event(&$event,$begin_date,$uid,$day_event) {
+    if($day_event == 1) {
+      $this->add_day_event(&$event,$uid);
+    } else {
+      $this->add_event(&$event,$begin_date,$uid);
+    }
+  }
 
+  
   function add_event(&$event,$begin_date,$uid) {
-    $date = date("His",$begin_date);
+    $date = date("YmdHis",$begin_date);
     if(!isset($this->events[$date.".".$event->id])) {
       $this->events[$date.".".$event->id] = array("event"=>&$event,"date"=>$begin_date,"users"=>array($uid));
       ksort($this->events);
@@ -1488,6 +1554,10 @@ class Day {
     else {
       $this->events[$date.".".$event->id]["users"][] = $uid;
     }
+  }
+  
+  function add_day_event(&$event,$uid) {
+    $this->day_events[$uid][] = &$event;
   }
 
   function get_events($uid) {
@@ -1501,7 +1571,7 @@ class Day {
     }
     return $return; 
   }
-  
+ 
   function have_events_between($start,$end) {
     foreach($this->events as $event) {
       $ev_start = $event["date"];
@@ -1512,24 +1582,56 @@ class Day {
     }
     return false;
   }
-
   
-  function get_events_between($start, $end, $uid) {
+  function get_events_before($end, $uid,$start="") {
     foreach($this->events as $event) {
+      
       $ev_start = $event["date"];
       $ev_end = $event["event"]->duration + $ev_start;  
-      if($ev_end < $start) {
-	continue;
-      }
+          
       if($ev_start > $end) {
 	break;
       }
+      
       if(!in_array($uid,$event["users"])) {
 	continue;
       }      
+      if($ev_start < $end) {
+	$return[] = $event;
+	if($ev_end > $end) {
+	  $end = $ev_end;
+	}
+      }
+      
+    }
+    if($return != null) {
+      $return = array("duration"=>$end - $start,"events"=>$return);
+    }
+    return $return; 
+  }
+    
+  function get_events_between($start, $end, $uid) {
+    foreach($this->events as $event) {
+      
+      $ev_start = $event["date"];
+      $ev_end = $event["event"]->duration + $ev_start;  
+      
+      if($ev_end < $start) {
+	continue;
+      }
+      
+      if($ev_start > $end) {
+	break;
+      }
+      
+      if(!in_array($uid,$event["users"])) {
+	continue;
+      }      
+      
       if($ev_end > $start && $ev_start < $start) {
 	return -1;
       }
+      
       if($ev_start < $end && $ev_end > $start) {
 	$return[] = $event;
 	if($ev_end > $end) {
