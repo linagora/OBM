@@ -241,10 +241,12 @@ function run_query_waiting_events() {
   $db_type = $obm_db->type;
   $calendarevent_endrepeat = sql_date_format($db_type,"calendarevent_endrepeat","calendarevent_endrepeat"); 
   $calendarevent_date = sql_date_format($db_type,"calendarevent_date","calendarevent_date");    
-  $query = "SELECT userobm_id,
-		   userobm_lastname,
-		   userobm_firstname,
-                   calendarevent_id,
+  $query = "SELECT attendee.userobm_id,
+		   u.userobm_lastname as usercreate_lastname,
+		   u.userobm_firstname as usercreate_firstname,
+		   attendee.userobm_lastname,
+		   attendee.userobm_firstname,
+                   calendarevent_id,		  
                    calendarevent_title, 
 		   calendarcategory_label,
 		   calendarevent_privacy,
@@ -256,7 +258,8 @@ function run_query_waiting_events() {
 		   $calendarevent_date		   
             FROM CalendarEvent LEFT JOIN CalendarCategory ON calendarevent_category_id = calendarcategory_id
 	    LEFT JOIN CalendarUser ON calendarevent_id  = calendaruser_event_id
-	    LEFT JOIN UserObm ON calendaruser_user_id = userobm_id
+	    LEFT JOIN UserObm attendee ON calendaruser_user_id = attendee.userobm_id
+	    LEFT JOIN UserObm u ON calendarevent_usercreate = u.userobm_id
 	    WHERE calendaruser_state = 'W'";
 
   if(is_array($writable_user)) {

@@ -27,8 +27,9 @@ div.agendaBar {
 }
 
 div.agendaHidden {
-	z-index: 		20;
+	z-index: 		10000;
 	display:		none;
+	position:		absolute;
 	top: 			0px;
 	left: 			0px;
 	width:			auto;

@@ -756,7 +756,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
+  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
 
@@ -777,6 +777,7 @@ function html_waiting_events($obm_wait) {
         <td class=\"detailText\">$l_title</td>
         <td class=\"detailText\">$l_cat</td>
         <td class=\"detailText\">$l_priority</td>
+	<td class=\"detailText\">$l_from</td>
         <td class=\"detailText\">$l_repeatkind</td>
 	<td class=\"detailText\">$l_repeatdays2</td>
 	<td class=\"detailText\">$l_use_endrepeat</td>     
@@ -808,15 +809,17 @@ function html_waiting_events($obm_wait) {
       }
       $start_week_day = strtotime("+1 day", $start_week_day); 
     }
-    
+    $user_create = $obm_wait->f("usercreate_firstname")." ".$obm_wait->f("usercreate_lastname");
     $date_begin = datetime_format($obm_wait->f("calendarevent_date"));
     $date_end = datetime_format($obm_wait->f("calendarevent_date") + $obm_wait->f("calendarevent_duration"));
     $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
+    
     $dis_waiting_events .= "
     <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
      <td class=\"detailForm\">$priority</td>
+     <td class=\"detailForm\">$user_create</td>
      <td class=\"detailForm\">$kind</td>
      <td class=\"detailForm\">$dis_repeat_days</td>
      <td class=\"detailForm\">$date_repeat</td>
@@ -827,8 +830,8 @@ function html_waiting_events($obm_wait) {
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
        <input type=\"hidden\" name=\"param_user\" value=\"$current_user\" />
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept<br />
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait<br />
        <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
       </form>
      </td>
@@ -1829,7 +1832,7 @@ METHOD:PUBLISH";
     $priority = $obm_event->f("calendarevent_priority");
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     $date_ts = $obm_event->f("calendarevent_timeupdate");
-    $date_ts = gmdate("Ymd\THis\Z",mktime(substr($date_ts,8,2),substr($date_ts,10,2),0,substr($date_ts,4,2),substr($date_ts,6,2),substr($date_ts,0,4)));
+    $date_ts = gmdate("Ymd\THis\Z",$date_ts);
     if($obm_event->f("calendarevent_description") != "") {
       $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f("calendarevent_description"));
       $description = "DESCRIPTION:" . $description;
@@ -1863,8 +1866,8 @@ CLASS:$private
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
-DTSTAMP:$date_ts
 DTEND:$date_e
+DTSTAMP:$date_ts
 END:VEVENT";
   }
   
