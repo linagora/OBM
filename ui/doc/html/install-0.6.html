@@ -1,14 +1,17 @@
 <html>
+<head>
+<title>Basic steps to build and install OBM 0.6.5</title>
+</head>
 <!-- $Id$ -->
 <body bgcolor="#FFFFFF">
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2, 0.6.3, 0.6.4
+<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2, 0.6.3, 0.6.4, 0.6.5
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
-<h1>Basic steps to build and install OBM 0.6.4</h1>
+<h1>Basic steps to build and install OBM 0.6.5</h1>
 
 <h2> Assumptions</h2>
 
@@ -31,7 +34,7 @@ And uncompress it in /var/www (or where your document root will be located).
 <tr>
   <td><pre>
 cd /var/www
-tar -xzvf obm-0.6.4.tar.gz
+tar -xzvf obm-0.6.5.tar.gz
 </pre>
   </td>
 </tr>
@@ -301,7 +304,7 @@ and depending on obm file's owner :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-safe_mode = Off
+safe_mode = On
 </pre>
   </td>
 </tr>
@@ -445,6 +448,22 @@ mysql -u web -pweb obm < scripts/0.6/obmdb_default_values_0.6.sql
 <tr>
   <td><pre>
 mysql -u web -pweb obm < scripts/0.6/update-0.6.3-0.6.4.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+<br /><br />
+<a href="javascript:back();">back</a>
+
+
+<p />
+<a name="upgrade-0.6.5"><h1>UPGRADE OBM DATABASE 0.6.4 to 0.6.5</h1></a>
+<p />
+# table CalendaRight was forgotten in 0.6.4 db creation script
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/update-0.6.4-0.6.5.mysql.sql
 </pre>
   </td>
 </tr>
