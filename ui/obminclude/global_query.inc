@@ -793,7 +793,6 @@ function run_query_default_preferences_insert($user_id) {
   // We copy each entry with user id = 0 to the new user
   //---------------------------------------------------------------------------
 
-  $obm_q = new DB_OBM;
   //-- Drop current user preferences
   $query = "delete from UserObmPref where userobmpref_user_id='$user_id'";
   display_debug_msg($query, $cdg_sql);
