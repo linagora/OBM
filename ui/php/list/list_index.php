@@ -24,16 +24,12 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
-$www = "<p class=\"messageInfo\">
-    	<a href=\"http://validator.w3.org/check/referer\"><img
-        src=\"http://www.w3.org/Icons/valid-xhtml10\"
-        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
-	<a href=\"http://jigsaw.w3.org/css-validator/\">
- 	 <img style=\"border:0;width:88px;height:31px\"
-       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />
-	 </a>
-  	</p>";
+
+//---------------------------------------------------------------------------//
+// OBM internal Constants : Do not change 
+//---------------------------------------------------------------------------//
+$clist_mode_normal = "normal";
+$clist_mode_expert = "expert";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -482,16 +478,6 @@ function get_list_action() {
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                       );
-
-// Sel list contacts : Contacts selection
-  $actions["LIST"]["sel_list_contact"] = array (
-    'Name'     => $l_header_add_contact,
-    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
-    'Right'    => $cright_write,
-    'Popup'    => 1,
-    'Target'   => $l_list,
-    'Condition'=> array ('detailconsult','update','contact_add','contact_del') 
-                                    	  );
 
 // Contact ADD
   $actions["LIST"]["contact_add"] = array (

@@ -1,0 +1,160 @@
+% Documentation technique d'OBM : module List
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{List}
+
+Le module \List \obm.
+
+.\\
+Todo\\
+contacts statiques et dynamiques\\
+2 listes affichées\\
+tests des requetes (correction + limites ressources)\\
+génération de la requete\\
+
+\subsection{Organisation de la base de données}
+
+Le module \List utilise 2 tables :
+\begin{itemize}
+ \item List
+ \item ContactList
+\end{itemize}
+\vspace{0.3cm}
+
+La table List stocke les informations générales sur les listes, la table ContactList assure la liaison des contacts statiques avec une liste.
+
+
+\subsubsection{La table List}
+Table principale des informations d'une liste.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_privacy & int 1 & Visibilité de la liste & \\
+\hline
+\_name & varchar 64 & Nom de la liste & \\
+\hline
+\_subject & varchar 128 & Sujet de la liste & \\
+\hline
+\_email & varchar 128 & Adresse E-mail de la liste & \\
+\hline
+\_mailing\_ok & int 1 & Indicateur de prise en compte d'activation pour mailing & \\
+\hline
+\_static\_nb & int 10 & Nombre de contacts statiques (directs) associés à la liste & \\
+\hline
+\_query\_nb & int 10 & Nombre total de contacts de la liste & \\
+\hline
+\_query & text (64k) & Requête sauvegardée des critères (modes normal et expert) & \\
+\hline
+\_structure & text (64k) & Description des critères du mode normal (graphique) &\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le champ query}
+
+Ce champ stocke la requête SQL générée manuellement (mode expert) ou automatiquement en fonction des critères (mode normal).
+
+
+\subsubsection{Le champ structure (critères)}
+
+Ce champ stocke les critères de recherche saisis graphiquement.
+A noter : le tableau des critères est sérialisé pour stockage dans ce champ.
+
+
+\subsubsection{La table ContactList}
+Table de liaison entre une liste et ses contacts statiques.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_list\_id & int 8 & Identifiant de la liste & \\
+\hline
+\_contact\_id & int 8 & Identifiant du contact & \\
+\hline
+\end{tabular}
+
+
+\subsection{Détermination mode normal ou mode expert}
+
+Il n'y a pas de champ indicateur du mode de la liste.
+Celui- ci est déterminé en fonction du contenu des champs list\_query et list\_structure :\\
+
+\begin{tabular}{|p{1.5cm}|p{5.5cm}|p{5.5cm}|}
+\hline
+\textbf{Mode} & \textbf{Détermination} & \textbf{Précisions}\\
+\hline
+Expert & Critères vides et requête non vide & Critères vides ne signifie pas champ structure vide car ce champ est sérialisé. Unserialize(structure) vide \\
+\hline
+Normal & Si non expert & \\
+\hline
+\end{tabular}
+
+
+\subsubsection{API définie}
+
+Une api très simple (1 fonction définie dans list\_query.inc) est disponible :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function check_list_mode(&$query, &$criteria) {
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$query} : requête enregistrée de la liste (list\_query). \\
+ \item \textbf{\$criteria} : critères de recherches. Attention ce n'est pas le champ structure mais la champ struture arès déserialisation.\\
+\end{itemize}
+
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \List, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read & (Défaut) formulaire de recherche de listes. \\ 
+ \hline
+  search & read & Résultat de recherche. \\
+ \hline
+  new & write & Formulaire de création d'une liste. \\
+ \hline
+  new\_criterion & write & Formulaire de saisie d'un nouveau critère graphique. \\
+ \hline
+  detailconsult & read & Fiche détail d'une liste. \\
+ \hline
+  detailupdate & write & Formulaire de modification d'une liste. \\
+ \hline
+  insert & write & Insertion d'une liste. \\
+ \hline
+  update & write & Mise à jour d'une liste. \\
+ \hline
+  check\_delete & write & Vérification avant suppression d'une liste. \\
+ \hline
+  delete & write & Suppression d'une liste. \\
+ \hline
+  contact\_add & write & Ajouts de contacts statiques à la liste\\
+ \hline
+  contact\_del & write & Suppression de contacts statiques de la liste\\
+ \hline
+\end{tabular}

@@ -399,6 +399,8 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   $force = $agenda["force"];
   $mail  = $agenda["mail"];
   $groups = $agenda["group"];
+  $mail_title = stripslashes($agenda["title"]);
+
   if (is_array($groups)) {
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
@@ -429,10 +431,10 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-    $message = $l_add_event_mail_head.$agenda["title"]."\n"
+    $subject = "$l_add_event_mail_subject" . $mail_title;
+    $message = $l_add_event_mail_head . $mail_title . "\n"
       .$l_event_mail_body.$l_from." ".$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
       .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5];      
-    $subject = "$l_add_event_mail_subject" . $agenda["title"];
     send_mail($subject, $message, $contacts_array,"",$mail);
   }
 
@@ -946,7 +948,9 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   $old_event_id = $agenda["id"];
   $groups = $agenda["group"];
   $mail = $agenda["mail"];
-  if($repeat_update == 0 ) {
+  $mail_title = stripslashes($agenda["title"]);
+
+  if ($repeat_update == 0 ) {
     $agenda["kind"] ="none";
     $agenda["repeat_days"] ="0000000";
     $agenda["repeat_end"] = "";
@@ -984,14 +988,14 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-    if(($agenda["old_begin"] != $agenda["date_begin"] || $agenda["old_end"] != $agenda["date_end"])) {
-      $message = $l_update_event_mail_head.$agenda["title"]."\n".$l_event_mail_body.$l_from." "
+    if (($agenda["old_begin"] != $agenda["date_begin"] || $agenda["old_end"] != $agenda["date_end"])) {
+      $subject = "$l_update_event_mail_subject" . $mail_title;
+      $message = $l_update_event_mail_head. $mail_title . "\n".$l_event_mail_body.$l_from." "
                  .$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
 		 .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5]." ".
 		 $l_update_event_mail_body.$l_from." "
                  .$day_array3[1]."-".$day_array3[2]."-".$day_array3[3]." @ ".$day_array3[4].":".$day_array3[5]." "
 		 .$l_to." ".$day_array4[1]."-".$day_array4[2]."-".$day_array4[3]." @ ".$day_array4[4].":".$day_array4[5];         
-      $subject = "$l_update_event_mail_subject" . $agenda["title"];
       send_mail($subject, $message, $contacts_array, "",$mail);
     }
   }
@@ -1061,19 +1065,26 @@ function run_query_delete($agenda) {
   $obm_db = new DB_OBM;
   $event_id = $agenda["id"];
   $mail = $agenda["mail"]; 
-  $query = "SELECT calendarsegment_customerid FROM CalendarSegment WHERE calendarsegment_eventid = '$event_id'";
+
+  $query = "select calendarsegment_customerid
+    from CalendarSegment
+    where calendarsegment_eventid = '$event_id'";
   $obm_db->query($query);
   while($obm_db->next_record()) {
     $contacts[] = $obm_db->f("calendarsegment_customerid");
   }
-  $query = "SELECT calendarevent_title FROM CalendarEvent WHERE calendarevent_id = $event_id";
+  $query = "select calendarevent_title
+    from CalendarEvent
+    where calendarevent_id = '$event_id'";
   $obm_db->query($query); 
   $obm_db->next_record();
   $title = $obm_db->f("calendarevent_title");
+
   $query = "DELETE FROM CalendarSegment WHERE calendarsegment_eventid = '$event_id'";
   $obm_db->query($query);
   $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
   $obm_db->query($query);
+
   $message = $l_delete_event_mail_head.$title;   
   $subject = "$l_delete_event_mail_subject" . $title;
   send_mail($subject, $message, $contacts, "", $mail);

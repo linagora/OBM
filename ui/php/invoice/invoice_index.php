@@ -115,7 +115,7 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_invoice_consult($invoice);
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
-    $display["search"] = dis_invoice_search_form($invoice); 
+    $display["search"] = dis_invoice_form($action, $invoice); 
   }
 
 } elseif ($action == "updatearchive")  {
@@ -290,7 +290,7 @@ function get_invoice_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/invoice/invoice_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult','delete','display') 
+    'Condition'=> array ('','search','index','detailconsult','insert', 'update','delete','display') 
                                    );
 
 //Insert

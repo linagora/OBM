@@ -43,7 +43,7 @@ function check_search_form(f_inv){
     return false;
   }
   if ((j_ht!=\"\")&&(j_ttc!=\"\")) {
-    if (j_ht>j_ttc) {
+    if (parseFloat(j_ht) > parseFloat(j_ttc)) {
       alert(\"$l_check_amounts\");
       return false;
     }
@@ -52,12 +52,12 @@ function check_search_form(f_inv){
   return true;
 }
 
-// input check when creating an invoice
+// Invoice Form check
 function check_invoice(f_inv) {
-  var j_ht=f_inv.tf_amount_ht.value;
-  var j_ttc=f_inv.tf_amount_ttc.value;
-  j_number=f_inv.tf_number.value;
-  j_status=f_inv.sel_status.value;
+  var j_ht = f_inv.tf_amount_ht.value;
+  var j_ttc = f_inv.tf_amount_ttc.value;
+  j_number = f_inv.tf_number.value;
+  j_status = f_inv.sel_status.value;
 
   if (f_inv.tf_label.value==\"\"){
    alert(\"$l_fill_label\");
@@ -76,9 +76,9 @@ function check_invoice(f_inv) {
     alert(\"$l_check_money_ttc\");
     return false;
   }
-  if ( (j_ht != \"\") && (j_ttc != \"\") && (j_ht != 0) && (j_ttc !=0 )
-       && (j_ht > j_ttc) ){
-    alert(\"$l_check_amounts\");
+  if ( (j_ht != \"\") && (j_ttc != \"\") && (j_ht != 0) && (j_ttc != 0 )
+       && (parseFloat(j_ht) > parseFloat(j_ttc)) ) {
+    alert(\"$l_check_amounts aaa\");
     return false;
   }
   // inout de la facture doit être renseigné :
@@ -90,41 +90,6 @@ function check_invoice(f_inv) {
   return true;
 }
 
-
-function check_invoice_link(f_inv) {
-  var j_ht=f_inv.tf_amount_ht.value;
-  var j_ttc=f_inv.tf_amount_ttc.value;
-  j_number=f_inv.tf_number.value;
-  j_status=f_inv.sel_status.value;
-
-  if (f_inv.tf_label.value==\"\"){
-   alert(\"$l_fill_label\");
-   return false;
-  }
-  
-  if (check_date(f_inv.tf_date,\"".$l_date."\")==false) {
-   //alert(\"$l_invalid_date\");
-   return false;
-  }
-
-  if ((j_ht!=\"\")&& check_money(j_ht)==null){
-    alert(\"$l_check_money_ht\");
-    return false;
-  }
-  if ((j_ttc!=\"\")&& check_money(j_ttc)==null){
-    alert(\"$l_check_money_ttc\");
-    return false;
-  }
-  if ((j_ht!=\"\")&&(j_ttc!=\"\")&&(j_ht!=0)&&(j_ttc!=0)&&(j_ht-j_ttc>0)){
-    alert(\"$l_check_amounts\");
-    return false;
-  }
-  // confirmation d'une création sans numéro de facture :
-  if (j_number==\"\") {
-    return (confirm(\"$l_no_number_confirm\"));
-  }
-  return true;
-}
 
 // deletion confirm 
 function valider_suppression() {
@@ -138,24 +103,28 @@ function valider_suppression() {
 // automagic compute of the tas included amount...
 // TODO : if result is NaN, popup an alert and give focus 
 // back to HT or rate...
-function compute_tax (form) {
- var rate = parseFloat(form.tf_tax_rate.value);
- var ht   = parseFloat(form.tf_amount_ht.value);
+function compute_tax (form, auto) {
+  var rate = parseFloat(form.tf_tax_rate.value);
+  var ht   = parseFloat(form.tf_amount_ht.value);
 
- if (isNaN (rate)) {
-  alert (\"$l_rate_nan\");
-  form.tf_rate.focus();
-  form.tf_rate.select();
-  return;
- }
- if (isNaN (ht)) {
-  alert (\"$l_ht_nan\");
-  form.tf_amount_ht.focus();
-  form.tf_amount_ht.select();
-  return;
- }
+  if (auto && (isNaN(ht) || isNaN(rate))) {
+    return true;
+  }
 
- form.tf_amount_ttc.value = (Math.round (ht * rate*100))/100;
+  if (isNaN (rate)) {
+    alert (\"$l_rate_nan\");
+    form.tf_rate.focus();
+    form.tf_rate.select();
+    return;
+  }
+  if (isNaN (ht)) {
+    alert (\"$l_ht_nan\");
+    form.tf_amount_ht.focus();
+    form.tf_amount_ht.select();
+    return;
+  }
+
+  form.tf_amount_ttc.value = (Math.round (ht * rate*100))/100;
 }
 
 // --> 

@@ -702,6 +702,9 @@ function html_deal_consult($deal_q) {
   $com = beautify_comment(nl2br($deal_q->f("deal_comment")));
   $comp_id = $deal_q->f("deal_company_id");
   $comp = $deal_q->f("company_name");
+  if (strlen($comp) > 25) {
+    $comp = substr($comp, 0, 24) . "...";
+  }
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
   $town = $deal_q->f("company_town");

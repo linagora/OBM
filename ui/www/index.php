@@ -24,6 +24,17 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-09-21</b> : version <b>0.8.7</b> released (fixes)
+        <ol>
+          <li> Many fixes in Country handling, sql limit tuning parameter
+          <li> Fixes in Mail handling and new email notification from Incident
+          <li> Many small fixes in modules Company, Deal, List, Calendar, Stats, Incident, Invoice, ExportCSV
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-09-02</b> : version <b>0.8.6</b> released (new functionality and fixes)
         <ol>
           <li> Invoice module total rewrite

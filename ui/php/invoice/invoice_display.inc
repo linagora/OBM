@@ -322,7 +322,7 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
   $display["msg"] .= display_info_msg("$nb_invoice $l_found");
   $block .= $dis_invoice->display("dis_data_invoice");
   if ($perm->check_right($menu, $cright_write_admin)) {
-    $block .= "<input type=\"submit\" value=\"$l_archive_update\">
+    $block .= "<input type=\"submit\" value=\"$l_archive_update\" />
       </form>";
   }
 
@@ -684,9 +684,9 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
 
   // Buttons
   if (($action == "update") || ($action == "detailupdate")) {
-    $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\"/>
+    $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\" />
     <input type=\"hidden\" name=\"param_invoice\" value=\"$id\" />
-    <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">
+    <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\" />
     <input type=\"submit\" value=\"$l_update\"
        onClick=\"if (check_invoice(this.form)) return true; else return false;\" />";
   } elseif (($action == "new") || ($action == "insert")
@@ -750,22 +750,22 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   <tr>
     <td class=\"detailLabel\">$l_label</td>
     <td class=\"detailForm\">
-      <input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\">
+      <input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_number</td>
     <td class=\"detailForm\">
-      <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\">
+      <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_date</td>
     <td class=\"detailForm\">
-      <input name=\"tf_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$date\">
+      <input name=\"tf_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$date\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_payment_date</td>
     <td class=\"detailForm\">
-      <input name=\"tf_payment_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$pdate\">
+      <input name=\"tf_payment_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$pdate\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_status</td>
@@ -775,17 +775,17 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   </tr><tr>
     <td class=\"detailLabel\">$l_amount_ht</td>
     <td class=\"detailForm\">
-      <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\">
+      <input name=\"tf_amount_ht\" type=\"text\" size=\"15\" value=\"$ht\" onChange=\"compute_tax(this.form, true);\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_tax_rate</td>
     <td class=\"detailForm\"><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" />
-      <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" onClick=\"compute_tax(this.form);\">
+      <input type=\"button\" name=\"b_compute\" value=\"$l_compute_tax\" onClick=\"compute_tax(this.form);\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_amount_ttc</td>
     <td class=\"detailForm\">
-      <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\">
+      <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_comment</td>

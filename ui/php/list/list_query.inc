@@ -113,6 +113,38 @@ function run_query_detail($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Stripslashes of all elements of an array (walk_array_recursive() only PHP5)
+// Parameters:
+//   - $item : array or value
+//   - $key  : element key
+///////////////////////////////////////////////////////////////////////////////
+function stripslashes_array(&$item, $key) {
+
+  if (is_array($item)) {
+    array_walk($item, 'stripslashes_array');
+  } else if ($item != "") {
+    $item = stripslashes($item);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Addslashes of all elements of an array (walk_array_recursive() only PHP5)
+// Parameters:
+//   - $item : array or value
+//   - $key  : element key
+///////////////////////////////////////////////////////////////////////////////
+function addslashes_array(&$item, $key) {
+
+  if (is_array($item)) {
+    array_walk($item, 'addslashes_array');
+  } else if ($item != "") {
+    $item = addslashes($item);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : list insertion                                          //
 // Parameters:
 //   - $list[] : list hash info : keys used : all
@@ -124,10 +156,12 @@ function run_query_insert($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
-  $list_query = $list["query"];
+  $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   if (isset($list["criteria"])) {
-    $list_critery = serialize($list["criteria"]);
+    $ss_criteria = $list["criteria"];
+    array_walk($ss_criteria, 'stripslashes_array');
+    $list_critery = addslashes(serialize($ss_criteria));
   }
   $query = "insert into List (list_timeupdate,
     list_timecreate,
@@ -174,7 +208,7 @@ function get_list_id($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
-  $list_query = $list["query"];
+  $list_query = addslashes($list["query"]);
 
   $query = "select list_id
     from List
@@ -207,10 +241,12 @@ function run_query_update($list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
-  $list_query = $list["query"];
+  $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   if (isset($list["criteria"])) {
-    $list_critery = serialize($list["criteria"]);
+    $ss_criteria = $list["criteria"];
+    array_walk($ss_criteria, 'stripslashes_array');
+    $list_critery = addslashes(serialize($ss_criteria));
   }
   $query = "update List set
     list_timeupdate='". date("Y-m-d H:i:s")."',
@@ -650,7 +686,7 @@ function check_data_form($id, $list) {
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
-  $query = stripslashes($list["query"]);
+  $query = $list["query"];
 
   // MANDATORY: List name not empty
   if (trim($name) == "") {
@@ -760,6 +796,27 @@ function get_list_query_num_rows($query="") {
   }  
 
   return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the current mode of a given list according to parameters
+// Parameters:
+//   - $query    : list query
+//   - $criteria : list criteria (unserialized from structureà or parameter
+// Returns:
+//   $clist_mode_expert || $clist_mode_normal
+///////////////////////////////////////////////////////////////////////////////
+function check_list_mode($query, $criteria) {
+  global $clist_mode_expert, $clist_mode_normal;
+
+  if ($criteria == "" && $query != "") {
+    $mode = $clist_mode_expert;
+  } else {
+    $mode = $clist_mode_normal;
+  }
+
+  return $mode;
 }
 
 
@@ -1175,7 +1232,7 @@ function make_query_from_criteria($list) {
     }
   }
 
-  $query = trim(addslashes("SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname"));
+  $query = trim("SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname");
 
   return $query;
 }

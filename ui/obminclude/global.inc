@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.6pl5";
+$obm_version = "0.8.7";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -57,6 +57,9 @@ $c_focsys = 3;
 
 // OBM host (for mail links)
 $cgp_host = "http://obm/";
+
+// Generic E-mail for Incident module
+$cmail_incident = "";
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned

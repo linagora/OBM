@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5, 0.8.6.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5, 0.8.6, 0.8.7.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.6.tar.gz
-tar -C /var/www -xzvf obm-0.8.6.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.7.tar.gz
+tar -C /var/www -xzvf obm-0.8.7.tar.gz
 cd /var/www
-ln -s obm-0.8.6 obm
+ln -s obm-0.8.7 obm
 </pre>
   </td>
 </tr>
@@ -615,6 +615,18 @@ psql -U obm obm < scripts/0.8/update-0.8.5-0.8.6.pgsql.sql
   </td>
 </tr>
 </table>
+
+<p />
+# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+<p />
+# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
+
+
+<p />
+<a name="upgrade-0.8.7"><h1>UPGRADE OBM FROM 0.8.6 to 0.8.7</h1></a>
+<p />
+OBM Database hasn't evolved from 0.8.6 to 0.8.7, so no update scripts are needed.
 
 <p />
 # Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).

@@ -13,15 +13,15 @@ Elle a été repensée et rendue non intrusive depuis \obm 0.8.5.
 
 \subsubsection{Spécifications de la notion de visibilité}
 
-Actuellement une entité est visible par un utilisateur si l'entité est publique (visibility == 0) ou que l'utilisateur en est le créateur.\\
+Actuellement une entité est visible par un utilisateur si l'entité est publique (privacy == 0) ou que l'utilisateur en est le créateur.\\
 
 \paragraph{Implémentation du test de visibilité}
 \begin{verbatim}
-  $field_vis = "${entity}_visibility";
+  $field_pri = "${entity}_privacy";
   $field_uc = "${entity}_usercreate";
   ...
 
-  if ( ($q->f("$field_vis") == 0)
+  if ( ($q->f("$field_pri") == 0)
     || ($q->f("$field_uc") == $uid) ) {
     return true;
   } else {
@@ -54,7 +54,7 @@ Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDea
 
 \subsubsection{Implémentation dans un module}
 
-\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_visibility} défini comme un entier.
+\paragraph{Base de données :} La table de l'entité doit contenir un champ : \textbf{entite\_privacy} défini comme un entier.
 Les valeurs définies sont :\\
 
 \begin{tabular}{|c|c|}

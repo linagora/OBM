@@ -457,7 +457,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
   $static_nb = $list_q->f("list_static_nb");
-  $structure = $list_q->f("list_structure");  
+  $structure = $list_q->f("list_structure");
 
   if ($structure != "") {
     $criteria = unserialize($structure);
@@ -465,11 +465,15 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $criteria = "";
   }
 
+
   if ($criteria != "") {
-    $list_info["criteria"] = $criteria;
+    // Addslashes to all criteria elements
+    $as_criteria = $criteria;
+    array_walk($as_criteria, 'addslashes_array');
+    $list_info["criteria"] = $as_criteria;
     $list_info["id"] = $id;
     $list_info["mailing_ok"] = $list_q->f("list_mailing_ok");
-    $query = stripslashes(make_query_from_criteria($list_info));
+    $query = make_query_from_criteria($list_info);
   } else {
     $query = $list_q->f("list_query");
   }
@@ -646,8 +650,8 @@ function dis_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email,$l_mailing, $l_query, $l_list, $l_private;
-  global $l_expert_mode, $l_normal_mode;
-  global $action, $display, $uid;  
+  global $clist_mode_normal, $clist_mode_expert, $l_expert_mode,$l_normal_mode;
+  global $action, $display, $uid;
 
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -689,7 +693,7 @@ function html_list_form($action, $list_q, $list) {
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   // If criteria are set, we display the criteria form, else the query
-  if ($criteria == "" && $query != "") {
+  if (check_list_mode($query, $criteria) == $clist_mode_expert) {
     $query_checked = " checked=\"checked\" ";
     $style_query = "";
   } else {
@@ -763,7 +767,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;
   global $l_update,$l_delete,$l_recept,$l_renew;
-
+  global $clist_mode_expert, $clist_mode_normal;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -931,7 +935,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     }
   }
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  if ($criteria =="" && $query != "") { 
+  if (check_list_mode($query, $criteria) == $clist_mode_expert) {
     $display = "style=\"display:none\"";
   }
   $block = "

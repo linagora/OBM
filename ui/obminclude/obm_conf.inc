@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -27,6 +27,9 @@ $cgp_host = "http://obmintra/";
 
 // is Mail enabled ? (agenda)
 $cgp_mail_enabled = true;
+
+// Generic E-mail for Incident module
+$cmail_incident = "support@aliacom.fr";
 
 // is mailing enabled by default for a new user
 $cgp_mailing_default = true;

@@ -216,7 +216,11 @@ function run_query_incident_contract($cid) {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($incident) {
-  global $auth, $cdg_sql, $cgp_host, $l_mail_incident_new_subject;
+  global $auth, $cdg_sql, $cgp_host;
+  global $cmail_incident, $l_mail_incident_new_subject;
+
+  $uid = $auth->auth["uid"];
+  $now = date("Y-m-d H:i:s");
 
   $lincident = $incident["lincident"];
   $owner = $incident["owner"];
@@ -249,10 +253,10 @@ function run_query_insert($incident) {
     incident_archive,
     incident_description,
     incident_resolution)
-  values ('". date("Y-m-d H:i:s") ."',
-    '". date("Y-m-d H:i:s") ."',
-    '".$auth->auth["uid"]."',
-    '".$auth->auth["uid"]."',
+  values (null,
+    '$now',
+    null,
+    '$uid',
     '$lincident',
     '$contract_id',
     '$call_date',
@@ -270,10 +274,13 @@ function run_query_insert($incident) {
 
   $i_id = run_query_incident_id($incident);
 
-  $subject = "$l_mail_incident_new_subject : $lincident";
-  $message = "$cgp_host/incident/incident_index.php?action=detailconsult&amp;param_incident=$i_id";
 
-  send_mail($subject, $message, array($logger, $owner), array("pierre.baudracco@aliacom.fr"), 1);
+  if ($cmail_incident != "") {
+    $label_mail = stripslashes($lincident);
+    $subject = "$l_mail_incident_new_subject : $label_mail";
+    $message = "$cgp_host/incident/incident_index.php?action=detailconsult&param_incident=$i_id";
+    send_mail($subject, $message, array($logger, $owner), array("$cmail_incident"), 1);
+  }
 
   return $i_id;
 }
