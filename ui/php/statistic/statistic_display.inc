@@ -135,9 +135,11 @@ function dis_cat_stats($comp_q,$tot) {
       $cat_c = $l_null;
     }
     else {
+      $code = $comp_q->f("companycategory_code");
       $cat_id = $comp_q->f("companycategory_id");
-      $cat_c = $comp_q->f("companycategory_code");
+      $cat_c = $code; 
       $cat_d = $comp_q->f("companycategory_label");
+      $cat_s_c = substr($code,0,strpos($code,'.'));
     }
     if($comp_q->f("country_id") == NULL || $comp_q->f("country_id") == 0) {
       $cty_id = 0;
@@ -151,7 +153,12 @@ function dis_cat_stats($comp_q,$tot) {
     $nb = $comp_q->f("nb");
     $stat[$cty_id][$cat_id] += $nb;
     $cty_count[$cty_id] += $nb;
+    if(!$cat_count[$cat_id] && $cat_id !=0) {
+      $cat_s_n[$cat_s_c] += 1;
+    }
     $cat_count[$cat_id] += $nb;
+    if($cat_id !=0)
+      $cat_s_count[$cat_s_c] += $nb;
     $cty[$cty_id] = $cty_c;
     $cat[$cat_id] = $cat_c;
     $cty_desc[$cty_id] = $cty_d;
@@ -171,7 +178,7 @@ function dis_cat_stats($comp_q,$tot) {
     }else {
       $onOver = "";
     }
-    $block .= "<th $onOver>
+    $cat_label .= "<th $onOver>
     ".$cat_name."
     </th >";
     $percent = round(($cat_count[$cat_id])*100/$tot,1);    
@@ -180,7 +187,7 @@ function dis_cat_stats($comp_q,$tot) {
     $infos .= "<span class=\"hiddenLegend\"  id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
   $pair = 0;
-  $block .= "<th>$l_totals</th><th>%</th></tr>";
+  $block .= "$cat_label<th>$l_totals</th><th>%</th></tr>";
   foreach($stat as $cty_id => $data) {
     if($cty_id != 0) {
       $onOver = "    onMouseOver=\"show(event,'cty_$cty_id'); return true;\"
@@ -208,9 +215,17 @@ function dis_cat_stats($comp_q,$tot) {
     $block .= "<td class=\"totals\">$percent</td>";
     $block .= "</tr>";
   }
+  foreach($cat_s_count as $code => $value) {
+   $super_cat .= "<td colspan=\"".$cat_s_n[$code]."\">$value</td>";
+    $percent = round(($value)*100/$tot,1);
+    $super_cat_p .= "<td class=\"totals\" colspan=\"".$cat_s_n[$code]."\">$percent</td>";
+  }
   $block .= "
   <tr><th>$l_totals</th>$cat_tots<td>$tot</td><td></td></tr>
   <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
+  <tr><th></th>$cat_label<th>$l_totals</th><th>%</th></tr>
+  <tr><th></th><th></th>$super_cat<th></th><th></th></tr>
+  <tr><th>%</th><th></th>$super_cat_p<th></th><th></th></tr>
    </table>
    </div>
    <br />
