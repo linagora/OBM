@@ -95,9 +95,9 @@ if ($action == "index" || $action == "") {
     if ($inc_q->num_rows() == 1) {
       $con_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
     } else {
-      $display["detailInfo"] = display_err_msg($l_query_error . " - " . $inc_q->query . " !");
+      $display["msg"] = display_err_msg($l_query_error . " - " . $inc_q->query . " !");
     }
-    $display["detail"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
     $display["detail"] = html_incident_consult($inc_q, $con_q);
   }
 
