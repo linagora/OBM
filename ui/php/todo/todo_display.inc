@@ -34,6 +34,11 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
 
+  else if ($fieldname == "todo_title") {
+    $t_id = $OD->data_set->f("todo_id");
+    $res["url"] = "todo_index.php?action=detailconsult&amp;param_todo=$t_id";
+  }
+
   else if ($fieldname == "todo_priority") {
     $res["align"] = "center";
   }
@@ -74,8 +79,6 @@ function dis_todo_form($todo, $user_q) {
 
   $max_priority = 5;
   $uid = $todo["uid"];
-
-//     <div class=\"detailHead\">$l_company</div>
 
   // User select
   $sel_user = "<select id=\"sel_user\" name=\"sel_user\">";
@@ -194,4 +197,61 @@ function dis_todo_list($todo, $todo_q) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Company specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_todo_detail($todo, $todo_q) {
+  global $display;
+  global $l_todo, $l_title, $l_user, $l_author, $l_priority, $l_date;
+  global $l_deadline, $l_content, $l_no_deadline;
+
+  $title = $todo_q->f("todo_title");
+  $user = $todo_q->f("user_firstname") ." ". $todo_q->f("user_lastname");
+  $author = $todo_q->f("author_firstname") ." ". $todo_q->f("author_lastname");
+  $priority = $todo_q->f("todo_priority");
+
+  $date = date_format($todo_q->f("date_todo"));
+  $deadline = $todo_q->f("date_deadline");
+  $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
+
+  $content = $todo_q->f("todo_content");
+
+  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
+
+  $block = "
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailText\">$title</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_user</td>
+      <td class=\"detailText\">$user</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_author</td>
+      <td class=\"detailText\">$author</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_priority</td>
+      <td class=\"detailText\">$priority</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_deadline</td>
+      <td class=\"detailText\">$deadline</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_content</td>
+      <td class=\"detailText\">$content</td>
+     </tr>
+    </table>
+    ";
+  
+  return $block;
+
+}
 </script>

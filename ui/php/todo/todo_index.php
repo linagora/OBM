@@ -51,6 +51,12 @@ if ($action == "index" || $action == "") {
   else
     $display["msg"] .= display_info_msg($l_no_found);
 
+} else if ($action == "detailconsult") {
+///////////////////////////////////////////////////////////////////////////////
+  $todo_q = run_query_detail($todo);
+
+  $display["result"] .= dis_todo_detail($todo, $todo_q);
+
 } else if ($action == "add") {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_add($todo);
@@ -98,11 +104,12 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_todo() {
-  global $uid;
+  global $uid, $param_todo;
   global $tf_title, $sel_user, $sel_priority, $tf_deadline, $ta_content;
   global $cdg_param;
 
-  if (isset ($uid)) $todo["uid"] = $uid;  
+  if (isset ($uid)) $todo["uid"] = $uid;
+  if (isset ($param_todo)) $todo["id"] = $param_todo;
 
   if (isset ($tf_title)) $todo["title"] = $tf_title;
   if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
@@ -120,10 +127,19 @@ function get_param_todo() {
 function get_todo_action() {
   global $todo, $actions, $path;
   global $todo_read, $todo_write, $todo_admin_read, $todo_admin_write;
+  global $l_header_todo_list;
 
 // Index
   $actions["TODO"]["index"] = array (
+    'Name'     => $l_header_todo_list,
     'Url'      => "$path/todo/todo_index.php?action=index",
+    'Right'    => $todo_read,
+    'Condition'=> array ('all') 
+                                    	 );
+
+// Search
+  $actions["TODO"]["detailconsult"] = array (
+    'Url'      => "$path/todo/todo_index.php?action=add",
     'Right'    => $todo_read,
     'Condition'=> array ('None') 
                                     	 );

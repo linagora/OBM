@@ -93,6 +93,38 @@ function run_query_add($todo) {
 // Parameters:
 //     -$parms = correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($todo) {
+
+  $t_id = $todo["id"];
+
+  $query = "
+  select
+    Todo.*,
+    UNIX_TIMESTAMP(todo_date) as date_todo,
+    UNIX_TIMESTAMP(todo_deadline) as date_deadline,
+    User.userobm_lastname as user_firstname,
+    User.userobm_firstname as user_lastname,
+    Author.userobm_lastname as author_firstname,
+    Author.userobm_firstname as author_lastname
+  from Todo, UserObm User, UserObm Author
+  where todo_id = $t_id
+    and User.userobm_id = todo_user
+    and Author.userobm_id = todo_usercreate
+  ";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Delete task pass in $params                                              //
+// Parameters:
+//     -$parms = correponding to page parameters
+///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($parms) {
 
   global $cdg_sql;

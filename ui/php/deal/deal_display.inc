@@ -614,7 +614,7 @@ function html_deal_links($deal_q, $inv_nb) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$ico_company, $ico_contact;
+  global $set_theme,$ico_company, $ico_contact, $display;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
@@ -665,6 +665,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 
   $inv_nb = $q_invoices->num_rows ();
   $display["link"] = html_deal_links($deal_q, $inv_nb);
+
+  $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
 
   $block = "
     <table width=\"100%\">

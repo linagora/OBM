@@ -146,6 +146,7 @@ $l_header_add_contact = "Ajouter contact";
 $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_group = "Ajouter groupe";
 $l_header_add_deal = "Ajouter affaire";
+$l_header_todo_list = "Liste";
 
 $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";

@@ -145,6 +145,7 @@ $l_header_add_contact = "Add contact";
 $l_header_add_user = "Add user";
 $l_header_add_group = "Add group";
 $l_header_add_deal = "Add deal";
+$l_header_todo_list = "List";
 
 $l_header_new_child = "New linked Deal";
 $l_header_new_parent = "New ParentDeal";

@@ -35,7 +35,8 @@ function check_addtodoform(form) {
 }
 
 function check_fill_title(form) {
-  if (trim(form.tf_title.value == \"\")) {
+
+  if (trim(form.tf_title.value) == \"\") {
     alert (\"$l_j_fill_title\");
     return false;
   } else

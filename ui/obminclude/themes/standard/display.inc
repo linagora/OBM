@@ -4,7 +4,7 @@
 //     - Desc : Standard global display File                                 //
 // 2003-08-07 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$
+// $Id
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -121,6 +121,7 @@ function generate_menu($menu, $section) {
   $display["menu"] = display_menus($section);
   $display["action"] = display_menu_bar($section, $menu);
   $display["last"] = display_last_visited();
+//   $display["last"] .= display_todo_toplist();
 
 
   $block = "
@@ -213,14 +214,14 @@ function display_menu_bar($section, $menu) {
               onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
            } else {
-            $ret .= "
+	     $ret .= "
                <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
            }
          }
        }
      }
-   }  
-
+   }
+   
    $ret .= "
     </td>
     <td><img class=\"menuBarIconD\" src=\"/images/$set_theme/barre_d.gif\" alt=\"\" /></td>
@@ -507,6 +508,15 @@ function display_last_visited($path="..") {
 }
 
 
+// bcontins todo experiment (cette fontion)
+///////////////////////////////////////////////////////////////////////////////
+// Display : Returns the last visited display block
+// Parameters:
+//   - $path : path to the obm php root (for the first screen after login)
+///////////////////////////////////////////////////////////////////////////////
+function display_todo_toplist($path="..") {
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
@@ -516,7 +526,6 @@ function display_end() {
     </html>
 ";
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Page title

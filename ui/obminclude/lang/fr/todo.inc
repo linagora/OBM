@@ -7,7 +7,9 @@
 // $Id
 ///////////////////////////////////////////////////////////////////////////////
 
+$l_todo = "A faire";
 $l_user = "Utilisateur";
+$l_author = "Auteur";
 $l_date = "Date de saisie";
 $l_deadline = "Date limite";
 $l_priority = "Priorité";
@@ -19,6 +21,7 @@ $l_delete = "Supprimer";
 $l_add = "Ajouter";
 
 $l_no_found = "Rien à faire";
+$l_no_deadline = "Non spécifiée";
 
 $l_delete_confirm = "Confirmer la suppression de ces entrées";
 $l_j_fill_title = "Remplissez le titre";
