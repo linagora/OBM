@@ -345,22 +345,30 @@ if (isset($ext_target)) {
   function fill_ext_form2(int_form) {
    size = int_form.length;
    ext_field = window.opener.document.$ext_target;
-   for(i=0; i <size ; i++) {
+   for(i=0; i <size; i++) {
      if(int_form.elements[i].type == 'checkbox'){
        if(int_form.elements[i].checked == true) {
 	 ext_size = ext_field.length;
-	 for(j=0; j< ext_size; j++) {
+	 bool= false;
+	 for(j=0; j< ext_size  && bool == false; j++) {
 	   if(ext_field.options[j].value == int_form.elements[i].name) {
 	     window.opener.document.$ext_target.options[j].selected =true;
+	     bool=true;
 	   }
+	 }
+	 if(bool==false) {
+	    cat_name = document.getElementById(int_form.elements[i].name);
+	    cat_name = cat_name.innerHTML;
+	    window.opener.document.$ext_target.options[ext_size] = new Option(cat_name);
+            window.opener.document.$ext_target.options[ext_size].value = int_form.elements[i].name;
+	    window.opener.document.$ext_target.options[ext_size].selected =true;
 	 }
        }
      }
    }
  }
-   ";
+";
 }
-
 $extra_js .= "
 
 -->

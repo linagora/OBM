@@ -616,7 +616,7 @@ function run_query_kind_links($p_id) {
 function run_query_companycat() {
   global $cdg_sql;
 
-  $query = "select * from CompanyCategory order by  ASCII(companycategory_code)"; 
+  $query = "select * from CompanyCategory order by  companycategory_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -637,7 +637,7 @@ function run_query_get_companycat($id) {
     from CompanyCategoryLink, CompanyCategory
     where companycategorylink_companyid = '$id' 
       and companycategorylink_categoryid = companycategory_id
-    order by  ASCII(companycategory_code)"; 
+    order by  companycategory_code"; 
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -662,7 +662,7 @@ function run_query_get_companycat_name($id) {
       CompanyCategory
     where companycategorylink_companyid = '$id' 
       and companycategorylink_categoryid = companycategory_id
-    order by  ASCII(companycategory_code)"; 
+    order by  companycategory_code"; 
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -1044,7 +1044,7 @@ function run_query_get_tree() {
   global $cdg_sql,$auth;
 
   $query = "select *  from CompanyCategory $where 
-  order by  ASCII(companycategory_code)
+  order by  companycategory_code
 ";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -67,6 +67,7 @@ $l_select_company = "Sélectionner la société";
 // Messages
 $l_err_act_empty = "Le secteur d'activité doit être renseigné !";
 
+$l_cat_no = "Pas de categories définies";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des sociétés correspondantes.";
 $l_found = "société trouvées.";
 $l_no_found = "Aucune société ne correspond à ces critères !";

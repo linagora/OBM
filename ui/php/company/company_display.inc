@@ -559,11 +559,12 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $c_id = $cat_q->f("companycategory_id");
     $c_code = $cat_q->f("companycategory_code");
     $c_label = $cat_q->f("companycategory_label");
-    $sel_cat .= "\n<option value=\"$c_id\"";
     if ($compcat[$j] == $c_id) { 
+    $sel_cat .= "\n<option value=\"$c_id\"";
+//    if ($compcat[$j] == $c_id) { 
       $sel_cat .= " selected=\"selected\""; 
       $j++;
-    }
+//    }
     $length = 8 - strlen($c_code);
     $label = $c_code;
     for($i=0;$i<$length;$i++) {
@@ -571,6 +572,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     }
     $label .= "$c_label";
     $sel_cat .= ">$label</option>";
+    }
   }
   $sel_kind .= "</select>";
  
@@ -1131,7 +1133,7 @@ function html_company_kind_form($kind_q) {
 //   - $cat_q : Category list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_cat_form($cat_q) {
-  global $l_cat_manage,$l_cat_exist,$l_cat_code,$l_cat_label;
+  global $l_cat_manage,$l_cat_exist,$l_cat_code,$l_cat_label,$l_cat_no;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
 
   $sel_cat = "<select name=\"sel_cat\" onChange=\"
@@ -1143,19 +1145,24 @@ function html_company_cat_form($cat_q) {
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
-  while ($cat_q->next_record()) {
-    $id = $cat_q->f("companycategory_id");
-    $code = $cat_q->f("companycategory_code");
-    $label = $cat_q->f("companycategory_label");
-    $length = 8 - strlen($cat_q->f("companycategory_code"));
-    $label2 = $cat_q->f("companycategory_code");
-    for($i=0;$i<$length;$i++) {
-      $label2 .= "&nbsp;";
+  if($cat_q->nf()>0) {
+    while ($cat_q->next_record()) {
+      $id = $cat_q->f("companycategory_id");
+      $code = $cat_q->f("companycategory_code");
+      $label = $cat_q->f("companycategory_label");
+      $length = 8 - strlen($cat_q->f("companycategory_code"));
+      $label2 = $cat_q->f("companycategory_code");
+      for($i=0;$i<$length;$i++) {
+        $label2 .= "&nbsp;";
+      }
+      $label2 .= " ".$cat_q->f("companycategory_label");    
+      $sel_cat .= "\n<option value=\"$id\">$label2</option>";
     }
-    $label2 .= " ".$cat_q->f("companycategory_label");    
-    $sel_cat .= "\n<option value=\"$id\">$label2</option>";
+    $sel_cat .= "</select>";
   }
-  $sel_cat .= "</select>";
+  else {
+    $sel_cat = $l_cat_no;
+  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -1643,7 +1650,7 @@ function html_select_company($comp_q, $company) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category_tree($category) {
-  global $l_close,$l_add;
+  global $l_close,$l_add,$l_cat_no;
   $popup = $category["popup"];
   $obm_d = run_query_get_tree();
   if($popup) {
@@ -1678,10 +1685,15 @@ function html_category_tree($category) {
 	case 3:
 	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $doc_info;
 	  break;
-	}
-      }
-  foreach($tree as $level => $info) { 
-    $block .= @display_popup_tree($info,0);
+    }
+  }
+  if(is_array($tree)) {
+    foreach($tree as $level => $info) { 
+      $block .= @display_popup_tree($info,0);
+    }
+  }
+  else {
+    $block.= "$l_cat_no";
   }
   $block.= "
   <br />
@@ -1702,45 +1714,57 @@ function html_category_tree($category) {
 function display_popup_tree($tree,$indent) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   global $popup;
-  $indent_file = $indent + 15;
   $code = $tree["code"];
   $label = $tree["label"];
-  $id = $tree["id"];
-
+  $id = $tree["id"]; 
+  if($code != "") {
+    $is_valid = true;
+    $indent_file = $indent + 15;
+  }
+  else {
+    $is_valid = false;
+  }
+    
   foreach($tree as $level => $info) {
     if($level != "code" && $level != "label" && $level != "id") {
        $content.= display_popup_tree($info,$indent_file);
       $bool = true;
     }
   }
-  
-  if($bool == true) {
-    $block= 
-    "<table class=\"category\">
-       <tr>
-	<td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
-	  <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
-	 </a>
-	 <input type=\"checkbox\" name=\"$id\" />$code - $label
-	</td>
-       </tr>
-      </table>
-      <div id='$code' style=\"display:none;\" >
-       $content
-      </div>";
+ 
+  if($is_valid) {
+    if($bool == true) {
+      $block= 
+      "<table class=\"category\">
+	 <tr>
+	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
+	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	   </a>
+	   <input type=\"checkbox\" name=\"$id\" /><span id=\"$id\">$code - $label</span>
+	  </td>
+	 </tr>
+	</table>
+	<div id='$code' style=\"display:none;\" >
+	 $content
+	</div>";
+    }
+    else {
+      $block= 
+      "<table class=\"category\">
+	 <tr>
+	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	     <input type=\"checkbox\" name=\"$id\" /><span id=\"$id\">$code - $label</span>
+	  </td>
+	 </tr>
+	</table>";
+    }
   }
   else {
-    $block= 
-    "<table class=\"category\">
-       <tr>
-	<td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
-	   <input type=\"checkbox\" name=\"$id\" />$code - $label
-	</td>
-       </tr>
-      </table>";
+    $block = $content;
   }
+    
   return $block;
 }
 
