@@ -17,6 +17,9 @@ ALTER table IncidentPriority add column incidentpriority_color char(6) AFTER inc
 -- Update company_archive to '0' where = ''
 Update Company set company_archive='0' where company_archive='';
 
+-- Add new column : company_address3
+ALTER TABLE Company ADD company_address3 varchar(64) AFTER company_address2;
+
 
 -------------------------------------------------------------------------------
 -- Deal
@@ -33,6 +36,7 @@ ALTER TABLE Deal ADD deal_project_status int(1) DEFAULT 0 AFTER deal_soldtime;
 -------------------------------------------------------------------------------
 -- Add query field
 ALTER table List ADD list_query text AFTER list_email;
+ALTER table List ADD list_query_nb int(10) DEFAULT 0 AFTER list_email;
 
 -------------------------------------------------------------------------------
 -- Task -> TimeTask

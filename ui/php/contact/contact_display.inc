@@ -180,7 +180,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
     $ext_target = $contact["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
   // we urlencode to avoid breakage for space char

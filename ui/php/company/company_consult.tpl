@@ -43,6 +43,10 @@
       <td class="detailText">$ad2</td>
     </tr>
     <tr>
+      <td class="detailLabel">$l_address 3</td>
+      <td class="detailText">$ad3</td>
+    </tr>
+    <tr>
       <td class="detailLabel">$l_postcode</td>
       <td class="detailText">$zip</td>
     </tr>

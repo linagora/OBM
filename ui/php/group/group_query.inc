@@ -412,12 +412,14 @@ function run_query_user_group($group, $entity="") {
 // Parameters:
 //   - $group_id  : Group id
 // -- Optionnals
-//   - $new_order : field for the older clause
-//   - $order_dir : direction for the older clause
 //   - $entity    : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_group($group_id, $new_order="", $order_dir="", $entity="") {
+function run_query_group_group($group, $entity="") {
   global $cdg_sql;
+
+  $id = $group["id"];
+  $new_order = $group["new_order"];
+  $order_dir = $group["order_dir"];
 
   if (($entity == "group_group") && (trim($new_order) != "")) {
     $order = "order by $new_order $order_dir";
@@ -436,7 +438,7 @@ function run_query_group_group($group_id, $new_order="", $order_dir="", $entity=
          group_desc,
          group_email
       from GroupGroup LEFT JOIN UGroup ON groupgroup_childid=group_id
-      where groupgroup_parentid='$group_id'
+      where groupgroup_parentid='$id'
          $order";
 
   $obm_q = new DB_OBM; 

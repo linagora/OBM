@@ -29,6 +29,9 @@ $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
 $l_color = "Couleur";
+$l_address = "Adresse";
+$l_postcode = "Code Postal";
+$l_town = "Ville";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";

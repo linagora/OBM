@@ -29,6 +29,9 @@ $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
 $l_color = "Color";
+$l_address = "Address";
+$l_postcode = "Zip Code";
+$l_town = "Town";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

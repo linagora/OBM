@@ -37,6 +37,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_marketingmanager_id,
       company_address1,
       company_address2,
+      company_address3,
       company_zipcode,
       company_town,
       company_expresspostal,
@@ -139,8 +140,8 @@ function run_query_detail($p_id) {
 // Insertion query execution                                                 //
 // Parameters:
 //   - $company[] : Entry's values
-//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, com
+//     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($company) {
   global $auth, $cdg_sql;
@@ -153,6 +154,7 @@ function run_query_insert($company) {
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
+  $ad3 = $company["ad3"];
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
@@ -175,6 +177,7 @@ function run_query_insert($company) {
     company_marketingmanager_id,
     company_address1,
     company_address2,
+    company_address3,
     company_zipcode,
     company_town,
     company_expresspostal,
@@ -196,6 +199,7 @@ function run_query_insert($company) {
     '$market',
     '$ad1',
     '$ad2',
+    '$ad3',
     '$zip',
     '$town',
     '$cdx',
@@ -219,8 +223,8 @@ function run_query_insert($company) {
 // Parameters:
 //   - $cid       : company id
 //   - $company[] : Entry's values
-//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, com
+//     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($cid, $company) {
   global $auth, $cdg_sql;
@@ -233,6 +237,7 @@ function run_query_update($cid, $company) {
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
+  $ad3 = $company["ad3"];
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
@@ -254,6 +259,7 @@ function run_query_update($cid, $company) {
     company_marketingmanager_id='$market',
     company_address1='$ad1',
     company_address2='$ad2',
+    company_address3='$ad3',
     company_zipcode='$zip',
     company_town='$town',
     company_expresspostal='$cdx',

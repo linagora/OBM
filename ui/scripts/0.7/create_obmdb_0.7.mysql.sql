@@ -158,6 +158,7 @@ CREATE TABLE Company (
   company_marketingmanager_id int(8),
   company_address1 varchar(64),
   company_address2 varchar(64),
+  company_address3 varchar(64),
   company_zipcode varchar(14),
   company_town varchar(64),
   company_expresspostal varchar(8),
@@ -439,6 +440,8 @@ CREATE TABLE List (
    list_name varchar(32) NOT NULL,
    list_subject varchar(70),
    list_email varchar(128),
+   list_query_nb int(10) DEFAULT 0,
+   list_query text,
    PRIMARY KEY (list_id),
    UNIQUE list_name (list_name)
 );

@@ -346,9 +346,9 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_company() {
-  global $tf_num, $cb_archive, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
+  global $tf_num, $cb_archive, $tf_name, $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
-  global $sel_act, $sel_market, $ta_com, $param_company;
+  global $sel_act, $sel_kind, $sel_market, $ta_com, $param_company;
   global $tf_kind, $tf_act, $title, $url;
   global $popup;
   global $cdg_param;
@@ -362,6 +362,7 @@ function get_param_company() {
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
+  if (isset ($tf_ad3)) $company["ad3"] = $tf_ad3;
   if (isset ($tf_zip)) $company["zip"] = $tf_zip;
   if (isset ($tf_town)) $company["town"] = $tf_town;
   if (isset ($tf_cdx)) $company["cdx"] = $tf_cdx;

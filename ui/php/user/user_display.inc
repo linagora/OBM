@@ -177,7 +177,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $ext_url = $user["ext_url"];
     $ext_id = $user["ext_id"];
     $ext_target = $user["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");

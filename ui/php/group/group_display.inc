@@ -176,7 +176,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
     $ext_target = $group["ext_target"];
     $ext_id = $group["ext_id"];
     $ext_title = urlencode(stripslashes($group["ext_title"]));
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title";
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_title=$ext_title&amp;ext_target=$ext_target";
   }
 
   $name = urlencode(stripslashes($group["name"]));
@@ -216,7 +216,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group search Form                                                  //
+// Display Group search Form                                                 //
 // Parameters : 
 //   - $group[]   : default form values
 //     keys used  : name, user

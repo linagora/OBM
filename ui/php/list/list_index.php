@@ -116,7 +116,7 @@ else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
   $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list["id"], $new_order, $order_dir);
+  $con_q = run_query_contacts_list($list, $entity);
   $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
 }
 
@@ -173,7 +173,7 @@ else if ($action == "insert") {
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list["id"]);
+    $con_q = run_query_contacts_list($list);
     $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
@@ -210,7 +210,7 @@ else if ($action == "insert") {
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list["id"]);
+    $con_q = run_query_contacts_list($list);
     $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
@@ -227,7 +227,7 @@ else if ($action == "insert") {
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($list["id"]);
+    $con_q = run_query_contacts_list($list);
     $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
@@ -289,8 +289,9 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact;
-  global $param_list, $param_ext,  $hd_usercreate, $hd_timeupdate, $cdg_param;
+  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
+  global $new_order, $order_dir;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // List fields
@@ -304,6 +305,9 @@ function get_param_list() {
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
+
+  if (isset ($new_order)) $list["new_order"] = $new_order;
+  if (isset ($order_dir)) $list["order_dir"] = $order_dir;
 
   // External param
   if (isset ($ext_action)) $list["ext_action"] = $ext_action;

@@ -262,48 +262,57 @@ function run_query_contactlist_delete($list) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the contacts of the given list                      //
 // Parameters:
-//   - $list_id   : List id
+//   - $list   : List hash
 // -- Optionnals
-//   - $new_order : field for the older clause
-//   - $order_dir : direction for the older clause
+//   - $entity : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_contacts_list($list_id, $new_order="", $order_dir="") {
+function run_query_contacts_list($list, $entity="") {
   global $cdg_sql;
 
-  if (trim($new_order) != "") {
+  $id = $list["id"];
+  $new_order = $list["new_order"];
+  $order_dir = $list["order_dir"];
+
+  if ( ($entity == "list_contact") && (trim($new_order) != "") ) {
     $order = "order by $new_order $order_dir";
   } else {
     $order = "order by contact_lastname";
   }
 
-  $query = "select ContactList_contactid as list_contact_id,
+  $query = "select ContactList_contactid as contact_id,
          ContactList_contactid as Id,
-         contact_timeupdate as list_contact_timeupdate,
-         contact_timecreate as list_contact_timecreate,
-         contact_userupdate as list_contact_userupdate,
-         contact_usercreate as list_contact_usercreate,
-         contact_company_id as list_contact_company_id,
-         contact_kind_id as list_contact_kind_id,
-         contact_lastname as list_contact_lastname,
-         contact_firstname as list_contact_firstname,
-         contact_address1 as list_contact_address1,
-         contact_address2 as list_contact_address2,
-         contact_zipcode as list_contact_zipcode,
-         contact_town as list_contact_town,
-         contact_expresspostal as list_contact_expresspostal,
-         contact_country as list_contact_country,
-         contact_function as list_contact_function,
-         contact_phone as list_contact_phone,
-         contact_homephone as list_contact_homephone,
-         contact_mobilephone as list_contact_mobilephone,
-         contact_fax as list_contact_fax,
-         contact_email as list_contact_email,
-         contact_comment as list_contact_comment,
-         contact_visibility as list_contact_visibility,
-         company_name as list_contact_company
+         contact_timeupdate,
+         contact_timecreate,
+         contact_userupdate,
+         contact_usercreate,
+         contact_company_id,
+         contact_kind_id,
+         contact_lastname,
+         contact_firstname,
+         contact_address1,
+         contact_address2,
+         contact_zipcode,
+         contact_town,
+         contact_expresspostal,
+         contact_country,
+         contact_function,
+         contact_phone,
+         contact_homephone,
+         contact_mobilephone,
+         contact_fax,
+         contact_email,
+         contact_comment,
+         contact_visibility,
+         company_name,
+         company_address1,
+         company_address2,
+         company_address3,
+         company_zipcode,
+         company_town,
+         company_expresspostal
       from (ContactList LEFT JOIN Contact ON ContactList_contactid=contact_id)
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-      where ContactList_listid='$list_id'
+      where ContactList_listid='$id'
          $order";
 
   $obm_q = new DB_OBM; 
@@ -390,6 +399,24 @@ function run_query_check_list($id, $name, $subject) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update the dynamic rows number for the list                               //
+// Parameters:
+//   - $id : list_id
+//   - $nb : new rows number
+///////////////////////////////////////////////////////////////////////////////
+function run_query_update_num_rows($id, $nb) {
+  global $cdg_sql;
+
+  $query = "update List set list_query_nb='$nb' where list_id='$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $ret = $obm_q->query($query);
+
+  return $ret;
 }
 
 
@@ -494,6 +521,24 @@ function get_list_name($id) {
   $retour = $obm_q->f("list_name");
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the rows number for the query given                                   //
+// Parameters:
+//   - $query : query to run
+///////////////////////////////////////////////////////////////////////////////
+function get_query_num_rows($query) {
+  global $cdg_sql;
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $ret = $obm_q->num_rows();
+  
+  return $ret;
+}
+
 
 
 

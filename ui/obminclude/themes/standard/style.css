@@ -82,7 +82,8 @@
 	font-size: 10px;
 	font-weight: normal;
 	margin: 0px 2px 0px;
-	border: 1px dashed #9CCBD3;
+	border: 1px solid #009EC6;
+/*	background-color: #FFFFFF;*/
 }
 
 .lastTitle {
@@ -90,8 +91,9 @@
 	color: #7B9EAD;
 	font-weight: bold;
 	border-bottom-width: 1px;
-	border-bottom-style: dashed;
-	border-bottom-color: #9CCBD6;
+	border-bottom-style: solid;
+	border-bottom-color: #009EC6;
+	background-color: #FFFFFF;
 }
 
 .lastList {

@@ -15,7 +15,6 @@
 $fieldnames["company_name"] = $l_name;
 $fieldnames["company_archive"] = $l_archive_first;
 $fieldnames["company_address1"] = $l_address;
-$fieldnames["company_address2"] = $l_address;
 $fieldnames["company_phone"] = $l_phone;
 $fieldnames["company_fax"] = $l_fax;
 $fieldnames["company_email"] = $l_email;
@@ -99,6 +98,9 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     }
     if ($OD->data_set->f("company_address2") != "") {
       $res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+    }
+    if ($OD->data_set->f("company_address3") != "") {
+      $res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
     }
     if ($OD->data_set->f("company_zipcode") != "" ) {
       $res["name"] .= $OD->data_set->f("company_zipcode") . "&nbsp;&nbsp;";
@@ -340,6 +342,7 @@ function html_company_consult($co_q) {
   $mark = $co_q->f("company_marketingmanager_id");
   $ad1 = $co_q->f("company_address1");
   $ad2 = $co_q->f("company_address2");
+  $ad3 = $co_q->f("company_address3");
   $zip = $co_q->f("company_zipcode");
   $town = $co_q->f("company_town");
   $cdx = $co_q->f("company_expresspostal");
@@ -400,7 +403,7 @@ function html_company_consult($co_q) {
 //   - $kind_q    : kind database result 
 //   - $usr_q     : userobm database result 
 //   - $company[] : default values
-//     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
+//     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
@@ -424,6 +427,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     $mark = $co_q->f("company_marketingmanager_id");
     $ad1 = $co_q->f("company_address1");
     $ad2 = $co_q->f("company_address2");
+    $ad3 = $co_q->f("company_address3");
     $zip = $co_q->f("company_zipcode");
     $town = $co_q->f("company_town");
     $cdx = $co_q->f("company_expresspostal");
@@ -447,6 +451,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
   if (isset($company["ad1"])) { $ad1 = stripslashes($company["ad1"]); }
   if (isset($company["ad2"])) { $ad2 = stripslashes($company["ad2"]); }
+  if (isset($company["ad3"])) { $ad3 = stripslashes($company["ad3"]); }
   if (isset($company["zip"])) { $zip = stripslashes($company["zip"]); }
   if (isset($company["town"])) { $town = stripslashes($company["town"]); }
   if (isset($company["cdx"])) { $cdx = stripslashes($company["cdx"]); }
@@ -568,6 +573,9 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
@@ -713,8 +721,8 @@ function dis_check_links($p_id) {
 //   - $cid       : company id
 //   - $co_q      : company database result (at least 1 row)
 //   - $company[] : default values
-//     keys used  : num, archive, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, com
+//     keys used  : num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email, com
 /////////////////////////////////////////////////////////////////////////////
 function dis_company_warn_insert($cid, $co_q, $company) {
   global $display, $l_check_samecompany, $l_confirm, $l_back;
@@ -727,6 +735,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $act = $company["activity"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
+  $ad3 = $company["ad3"];
   $zip = $company["zip"];
   $town = $company["town"];
   $cdx = $company["cdx"];
@@ -767,6 +776,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
@@ -790,6 +800,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />

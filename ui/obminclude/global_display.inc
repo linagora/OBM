@@ -451,12 +451,13 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_index($url) {
-    global $path, $page, $new_order;
+    global $path, $page, $new_order, $entity;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end;
 
     $nb_page_dis = 10;
+    $this_entity = $this->display_entity;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -464,44 +465,46 @@ class OBM_DISPLAY {
     }
 
     // Page display management
-    if (!isset($page)) {
-      $page = 1;
+    // If page not set or page not for this display (this entity)
+    if ((!isset($page)) || ($page == "") || ($entity != $this_entity)) {
+      $lpage = 1;
+    } else {
+      $lpage = $page;
     }
-
 
     if ($set_rows < 1) $set_rows = $set_rows_default;
     $nb_rows = $this->data_set->num_rows();
     // If we delete all contacts of the last page, we must go to $page-1 (list)
-    if ($page > 1) {
-      if ($nb_rows < (($page-1)*$set_rows)+1) {
-         $page-- ;
+    if ($lpage > 1) {
+      if ($nb_rows < (($lpage-1)*$set_rows)+1) {
+         $lpage-- ;
       }
     }
 
     $nb_page = floor(($nb_rows-1) / $set_rows) + 1;
-    $first_row = ($page - 1) * $set_rows;
-    $start_page =  (floor(($page - 1) / $nb_page_dis) * $nb_page_dis) + 1;
+    $first_row = ($lpage - 1) * $set_rows;
+    $start_page =  (floor(($lpage - 1) / $nb_page_dis) * $nb_page_dis) + 1;
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
     $content = "<div class=\"resultIndex\">$l_entries # $nb_rows &nbsp; &nbsp; &nbsp; $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
-    if ($page > 1) {
-      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
+    if ($lpage > 1) {
+      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">-$nb_page_dis</a>&nbsp;&nbsp;&nbsp;";
+      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;&nbsp;";
     }
 
     $i = $start_page;
     // Pages display
     while ($i <= $end_page) {
-      if ($i != $page) {
-	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">$i</a> | \n";
+      if ($i != $lpage) {
+	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">$i</a> | \n";
       } else {
 	$content .= "$i | \n";
       }
@@ -511,13 +514,13 @@ class OBM_DISPLAY {
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
-    if ($page < $nb_page) {
+    if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export

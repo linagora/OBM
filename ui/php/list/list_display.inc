@@ -21,15 +21,17 @@ $fieldnames["userupdate"] = $l_updater;
 $fieldnames["timecreate"] = $l_date_creation;
 $fieldnames["timeupdate"] = $l_date_last_update;
 // Calculated fields
-$fieldnames["list_nb_contact"] = $l_nb_contact;
-$fieldnames["list_contact_lastname"] = $l_lastname;
-$fieldnames["list_contact_firstname"] = $l_firstname;
-$fieldnames["list_contact_function"] = $l_function;
-$fieldnames["list_contact_company"] = $l_company;
-$fieldnames["list_contact_town"] = $l_town;
-$fieldnames["list_contact_phone"] = $l_phone;
-$fieldnames["list_contact_mobilephone"] = $l_hphone;
-$fieldnames["list_contact_email"] = $l_email;
+$fieldnames["list_nb_contact"] = "$l_nb_contact / $l_query";
+$fieldnames["contact_lastname"] = $l_lastname;
+$fieldnames["contact_firstname"] = $l_firstname;
+$fieldnames["contact_function"] = $l_function;
+$fieldnames["company_name"] = $l_company;
+$fieldnames["company_address1"] = $l_address;
+$fieldnames["company_zipcode"] = $l_postcode;
+$fieldnames["company_town"] = $l_town;
+$fieldnames["contact_phone"] = $l_phone;
+$fieldnames["contact_mobilephone"] = $l_hphone;
+$fieldnames["contact_email"] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -54,17 +56,29 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $query = "select count(*) from ContactList where ContactList_listid='$id'";
     $nb_q->query($query);
     $nb_q->next_record();
-    $res["name"] = $nb_q->f(0);
+    $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_query_nb");
     $res["align"] = "center";
   }
   
   // For contacts urls (link):
-  else if ($fieldname == "list_contact_lastname") {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("list_contact_id");
+  else if ($fieldname == "contact_lastname") {
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
   }
 
-  else if ($fieldname == "list_contact_company") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("list_contact_company_id");
+  else if ($fieldname == "company_name") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+  }
+
+  else if ($fieldname == "company_address") {
+    if ($OD->data_set->f("company_address1") != "") {
+      $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+    }
+    if ($OD->data_set->f("company_address2") != "") {
+      $res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+    }
+    if ($OD->data_set->f("company_address3") != "") {
+      $res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
+    }
   }
   
   return $res;
@@ -220,8 +234,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   //-- Label
-  global $l_name, $l_subject, $l_email;
-  global $l_query, $l_no_contact;
+  global $l_name, $l_subject, $l_email, $l_query, $l_nb_contact, $l_no_contact;
   global $display, $perm, $action;
   global $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
 
@@ -233,7 +246,10 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
-  $query = nl2br($list_q->f("list_query"));
+  $query = $list_q->f("list_query");
+  $dis_query = nl2br($query);
+  $query_nb = get_query_num_rows($query);
+  run_query_update_num_rows($id, $query_nb);
 
   $display["detailInfo"] = display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
 
@@ -251,6 +267,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_query</td>
       <td class=\"detailText\">$query</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_query $l_nb_contact</td>
+      <td class=\"detailText\">$query_nb</td>
     </tr>
     </table>";
 
@@ -270,6 +289,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
     $dis_infos->data_set = $con_q;
     $dis_infos->data_url = $url;
+    $dis_infos->display_entity = "list_contact";
     $dis_infos->data_header = "both";
 
     if ($perm->have_perm("editor")) {
@@ -293,6 +313,23 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       </p>
       </form>";
     }
+  }
+
+
+  if ($query_nb != 0) {
+
+    $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
+    
+    $conq_q = new DB_OBM;
+    $conq_q->query($query);
+    
+    $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
+    $dis_infos->data_set = $conq_q;
+    $dis_infos->data_url = $url;
+    $dis_infos->display_entity = "list_contact_2";
+    $dis_infos->data_order = false;
+    $dis_infos->data_header = "both";
+    $block .= $dis_infos->display("dis_data_list");
   }
 
   return $block;
