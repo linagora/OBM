@@ -196,7 +196,7 @@ function get_param_incident() {
   if (isset ($tf_date)) $incident["date"] = $tf_date;
   if (isset ($ta_desc)) $incident["description"] = $ta_desc;
   if (isset ($ta_solu)) $incident["solution"] = $ta_solu;
-  $incident["archive"] = (isset ($cb_archive) ? '1' : '0');
+  $incident["archive"] = ( ($cb_archive == '1') ? '1' : '0');
   if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
   if (isset ($contract_new_id)) $incident["cont_new_id"] = $contract_new_id;
 

@@ -396,10 +396,14 @@ function run_query_get_eventgroups($p_event_id) {
 // ------------
 //   $p_event_id : event's id 
 //////////////////////////////////////////////////////////////////////////
-function run_query_get_eventcontacts($p_event_id) {
+function run_query_get_eventuser($p_event_id) {
   global $cdg_sql;
 
-  $query="select contact_id,contact_lastname,contact_firstname,eventuser_state from EventUser,Contact where contact_id = eventuser_user_id and eventuser_event_id='$p_event_id'";
+  $query = "select userobm_id, userobm_lastname, userobm_firstname,
+      eventuser_state
+    from EventUser, UserObm
+    where userobm_id = eventuser_user_id
+      and eventuser_event_id='$p_event_id'";
   $obm_db = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
