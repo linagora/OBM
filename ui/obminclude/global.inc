@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.3.1";
+$obm_version = "0.6.3.2";
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -39,7 +39,7 @@ $c_day_fraction = 8;
 // How many days we want to fill for each week:
 // 5 : Mon -> Fri; 6 : Mon -> Sat... (not tested for anything else than 5...
 //  and 5 could be hard coded at some places...
-$c_days_in_a_week= 5;
+$c_days_in_a_week = 5;
 // We define a working week to cope with all cases of working week 
 //  for us, we are working from Monday to Friday, so : (week start at Sun)
 // $c_days_in_a_week= 5 will become absolete
@@ -89,7 +89,7 @@ $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
 
 // Mail.
-$activate_mail = 1;
+$gp_mail_enabled = 1;
 
 // Display size
 $popup_width = 620;

@@ -324,6 +324,7 @@ function run_query_get_user_name($contacts_array) {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the addiction of a event
 // Parameters: 
@@ -339,11 +340,11 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   $mail  = $agenda["mail"];
   $return_info = array();
   $event_repeat_dates = get_event_repetition_dates($agenda);
-  foreach($event_repeat_dates as $dates) {
+  foreach ($event_repeat_dates as $dates) {
     $conflicts = run_query_get_conflicts($dates["date_begin"],$dates["date_end"],$contacts_array);
     $return_info = array_merge($return_info, $conflicts);
   }
-  if($force == 1 || count($return_info) == 0){    
+  if ($force == 1 || count($return_info) == 0){    
     $event_id = run_query_insert_event_data($agenda);   
     foreach($event_repeat_dates as $dates) {
       foreach($contacts_array as $user_id) {
@@ -918,7 +919,6 @@ function  run_query_update_deprecated_events($agenda) {
 // -----------
 //    - $agenda
 /////////////////////////////////////////////////////////////////////////////
-
 function run_query_delete($agenda) {
   global $cdg_sql,$l_delete_event_mail_head,$l_delete_event_mail_subject,$l_delete_event_mail_body,$l_to,$l_from;
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_begin"] , $day_array);  

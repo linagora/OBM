@@ -52,6 +52,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Debug Level
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_debug','0');
 
+-- Mail enabled
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_mail','yes');
+
 -- Company bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_company','0');
 

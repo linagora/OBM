@@ -674,61 +674,80 @@ function get_modules_array() {
   return $modules;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Send a Mail to an user                                                    //
 // Parameters:
-//  - $subject : subject of the mail
-//  - $message : content of the mail
-//  - $receivers : Ids of the receivers.
+//  - $subject    : mail subject
+//  - $message    : mail content
+//  - $recipients : Id Recipients array
+//  - $force      : Mail should be forced (all user even with no set_mail)
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject,$message,$receivers,$force) {
-  global $path,$activate_mail;
-  if($activate_mail == 0) {
+function send_mail($subject, $message, $recipients, $force) {
+  global $gp_mail_enabled;
+
+  if (! $gp_mail_enabled) {
     return 0;
   }
-  
-  $obm_q_send = run_query_get_sender();
-  $obm_q_rece = run_query_get_receiver($receivers,$force);
-  while($obm_q_rece->next_record()) {
-    if($rece_list == "") {
-      $rece_list = $obm_q_rece->f("userobm_email");
-    }
-    else{
-      $rece_list .= " , ".$obm_q_rece->f("userobm_email");
+
+  $send_q = run_query_get_sender();
+  $reci_q = run_query_get_recipients($recipients, $force);
+
+  while ($reci_q->next_record()) {
+    $reci = $reci_q->f("userobm_email");
+    if ($reci_list == "") {
+      $reci_list = $reci;
+    } else {
+      $reci_list .= " , $reci";
     }
   }
-  $headers .= "From: ".$obm_q_send->f("userobm_email");
-  if($rece_list != "") {
-    mail($rece_list,$subject,$message,$headers);      
+  $headers .= "From: ".$send_q->f("userobm_email");
+
+  if ($reci_list != "") {
+    mail ($reci_list, $subject, $message, $headers);      
   }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Get receivers mail adress                                                 //
+// Get recipients mail addresses                                             //
 // Parameters:
-//  - $receivers : Ids of the receivers.
+//  - $recipients : Id Recipients array
+//  - $force      : Mail should be forced (all user even with no set_mail)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_receiver($receivers,$force) {
+function run_query_get_recipients($recipients, $force) {
   global $cdg_sql;
-  if($force != 1) {
-    $mail_filter ="AND userobm_id = userobmpref_user_id AND userobmpref_option = 'set_mail' AND userobmpref_value = 'yes'";
-    $join = ",UserObmPref";
+ 
+  if ($force != 1) {
+    $mail_filter = "AND userobm_id = userobmpref_user_id
+      AND userobmpref_option = 'set_mail'
+      AND userobmpref_value = 'yes'";
+    $join = ", UserObmPref";
   }  
-  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (".$receivers[0];
-  for ($i=1;$i<count($receivers);$i++) {
-    $query.= ",".$receivers[$i];
+  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (".$recipients[0];
+  for ($i=1;$i<count($recipients);$i++) {
+    $query.= ",".$recipients[$i];
   }
   $query.=") AND userobm_email != '' $mail_filter";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Get sender mail adress                                                 //
+// Get sender mail address                                                 //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_sender() {
-  global $auth;
-  $query = "SELECT userobm_email  FROM UserObm WHERE userobm_id = ".$auth->auth["uid"];  
+  global $auth, $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+  $query = "SELECT userobm_email
+    FROM UserObm
+    WHERE userobm_id = '$uid'";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
