@@ -538,20 +538,20 @@ CREATE TABLE RepeatKind (
 --
 -- Task table
 --
-CREATE TABLE Task (
-  task_id int(8) NOT NULL auto_increment,
-  task_timeupdate timestamp(14) NOT NULL,
-  task_timecreate timestamp(14) NOT NULL,
-  task_userupdate int(8) default NULL,
-  task_usercreate int(8) default NULL,
-  task_user_id int(8) default NULL,
-  task_date timestamp(14) NOT NULL,
-  task_deal_id int(8) default NULL,
-  task_length int(2) default NULL,
-  task_tasktype_id int(8) default NULL,
-  task_label varchar(255) default NULL,
-  task_status int(1) default NULL,
-  PRIMARY KEY  (task_id)
+CREATE TABLE TimeTask (
+  timetask_id int(8) NOT NULL auto_increment,
+  timetask_timeupdate timestamp(14) NOT NULL,
+  timetask_timecreate timestamp(14) NOT NULL,
+  timetask_userupdate int(8) default NULL,
+  timetask_usercreate int(8) default NULL,
+  timetask_user_id int(8) default NULL,
+  timetask_date timestamp(14) NOT NULL,
+  timetask_projecttask_id int(8) default NULL,
+  timetask_length int(2) default NULL,
+  timetask_tasktype_id int(8) default NULL,
+  timetask_label varchar(255) default NULL,
+  timetask_status int(1) default NULL,
+  PRIMARY KEY  (timetask_id)
 ) TYPE=MyISAM;
 
 
@@ -858,100 +858,7 @@ CREATE TABLE UGroup (
 CREATE TABLE UserObmGroup (
    userobmgroup_groupid int(8) DEFAULT '0' NOT NULL,
    userobmgroup_userobmid int(8) DEFAULT '0' NOT NULL
-);
-
-
---
--- Table structure for table 'GroupGroup'
---
-CREATE TABLE Incident (
-  incident_id int(8) NOT NULL auto_increment,
-  incident_timeupdate timestamp(14) NOT NULL,
-  incident_timecreate timestamp(14) NOT NULL,
-  incident_userupdate int(8) default NULL,
-  incident_usercreate int(8) default NULL,
-  incident_contract_id int(8) NOT NULL,
-  incident_label varchar(100) default NULL,
-  incident_date date default NULL,
-  incident_priority_id int(8) default NULL,
-  incident_status_id int(8) default NULL,
-  incident_logger int(8) default NULL,
-  incident_owner int(8) default NULL,
-  incident_duration char(4) default '0',
-  incident_archive char(1) NOT NULL default '0',
-  incident_description text,
-  incident_resolution text,
-  PRIMARY KEY  (incident_id)
-) TYPE=MyISAM;
-
-
---
--- New table 'IncidentPriority'
---
-CREATE TABLE IncidentPriority (
-  incidentpriority_id int(8) NOT NULL auto_increment,
-  incidentpriority_timeupdate timestamp(14) NOT NULL,
-  incidentpriority_timecreate timestamp(14) NOT NULL,
-  incidentpriority_userupdate int(8) default NULL,
-  incidentpriority_usercreate int(8) default NULL,
-  incidentpriority_order int(2),
-  incidentpriority_color char(6),
-  incidentpriority_label varchar(32) default NULL,
-  PRIMARY KEY (incidentpriority_id)
-) TYPE=MyISAM;
-
-
---
--- New table 'IncidentStatus'
---
-CREATE TABLE IncidentStatus (
-  incidentstatus_id int(8) NOT NULL auto_increment,
-  incidentstatus_timeupdate timestamp(14) NOT NULL,
-  incidentstatus_timecreate timestamp(14) NOT NULL,
-  incidentstatus_userupdate int(8) default NULL,
-  incidentstatus_usercreate int(8) default NULL,
-  incidentstatus_order int(2),
-  incidentstatus_label varchar(32) default NULL,
-  PRIMARY KEY (incidentstatus_id)
-) TYPE=MyISAM;
-    
-
--------------------------------------------------------------------------------
--- Timemanagement tables
--------------------------------------------------------------------------------
---
--- Task table
---
-CREATE TABLE Task (
-  task_id int(8) NOT NULL auto_increment,
-  task_timeupdate timestamp(14) NOT NULL,
-  task_timecreate timestamp(14) NOT NULL,
-  task_userupdate int(8) default NULL,
-  task_usercreate int(8) default NULL,
-  task_user_id int(8) default NULL,
-  task_date timestamp(14) NOT NULL,
-  task_deal_id int(8) default NULL,
-  task_length int(2) default NULL,
-  task_tasktype_id int(8) default NULL,
-  task_label varchar(255) default NULL,
-  task_status int(1) default NULL,
-  PRIMARY KEY  (task_id)
-) TYPE=MyISAM;
-
-
---
--- TaskType table
---
-CREATE TABLE TaskType (
-  tasktype_id int(8) NOT NULL auto_increment,
-  tasktype_timeupdate timestamp(14) NOT NULL,
-  tasktype_timecreate timestamp(14) NOT NULL,
-  tasktype_userupdate int(8) default NULL,
-  tasktype_usercreate int(8) default NULL,
-  tasktype_internal int(1) NOT NULL,
-  tasktype_label varchar(32) default NULL,
-  PRIMARY KEY  (tasktype_id)
-) TYPE=MyISAM;
+);    
 
 
 CREATE TABLE GroupGroup (
