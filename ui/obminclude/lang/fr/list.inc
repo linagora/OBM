@@ -35,7 +35,8 @@ $l_market = "Responsable";
 $l_contact_cat1 = "Categorie 1";
 $l_contact_cat2 = "Categorie 2";
 $l_category = "Categorie";
-$l_show_query = "Utiliser le champ de requête manuel";
+$l_expert_mode = "Mode Expert";
+$l_normal_mode = "Mode Normal";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
@@ -94,6 +95,7 @@ $l_fill_subject = "Le sujet doit être saisi !";
 $l_invalid_query = "La requête saisie est incorrecte !";
 $l_banned_word = "Mot interdit";
 $l_hungry_query = "La requête est trop consommatrice de ressource !";
+$l_warning_lose_query = "Attention, Vous risquez de perdre tout les critères déjà entrés. Continuer?";
 
 //------------------------------------//
 // Export Format informations         //

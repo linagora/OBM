@@ -394,7 +394,7 @@ function dis_list_form($action, $list_q, $list) {
     $crit_q = $list_q->f("list_structure");
   }
   $url = url_prepare("list_index.php");
-  $block = "<form method=\"get\" name=\"f_new\" action=\"$url\"
+  $block = "<form method=\"post\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
 
   $block .= html_list_form($action, $list_q, $list);
@@ -404,12 +404,12 @@ function dis_list_form($action, $list_q, $list) {
 
   if (($action == "detailupdate") || ($action == "update")) {
      $dis_but .= "
-      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\"/>
       <input type=\"submit\" value=\"$l_update\" />";
 
    } else {
     $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\"/>";
+      <input type=\"submit\" value=\"$l_insert\" />";
   }
 
   $block .= "<div class=\"detailButton\">
@@ -430,7 +430,7 @@ function dis_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_list,$display;
-  global $l_show_query;
+  global $l_expert_mode,$l_normal_mode;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -469,13 +469,23 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
-  </tr>";
+  </tr>
+  </table>
+  <div class=\"detailHead\">$l_query</div>  
+  ";
   if($action == "insert" || $action == "new" || ($list["criteria"]["modules"] == "" &&  unserialize($crit_q) =="")) {
-  $block .=  "
+    $block .=  "
+    <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_query<br /> <a id=\"query_show\" href=\"javascript:void(0);\" onclick=\"show_query_field()\">$l_show_query</a></td>
-      <td class=\"detailForm\">
-      <textarea id=\"ta_query\" name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
+      <td class=\"detailLabel\">
+       <input type=\"radio\" name=\"js_query\" value=\"1\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
+       <input type=\"radio\" name=\"js_query\" value=\"-1\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
+      </td>
+     </tr>
+     <tr>
+     <td class=\"detailLabel\">
+      <textarea id=\"ta_query\" style=\"display:none;\" name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+      </td>
     </tr>
     ";
   }
@@ -606,7 +616,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "company_country_id" => array($cty_q,"country_id","country_name"),
       "company_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "company_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
-      "companycategory_code" => array($cat_q,"companycategory_id","companycategory_label"),
+      "companycategory_code" => array($cat_q,"companycategory_code","companycategory_label"),
       "contact_country_id" => array($cty_q,"country_id","country_name"),
       "contact_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
       "contact_datasource_id" => array($dsr_q,"datasource_id","datasource_name"),
@@ -626,13 +636,9 @@ function html_list_graphical_form($action, $list_q, $list) {
 	    $data = $field_data[$field];
 	    $data_q = $data[0];
 	    while($data_q->next_record()) {
-	      if($value == $data_q->f($data[1])) {
-		$selected = "selected=\"selected\"";
+	      if($value == $data_q->f($data[1])) {	
+	        $input .= "<option selected=\"selected\" value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
 	      }
-	      else {
-		$selected = "";
-	      }
-	      $input .= "<option value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
 	    }
 	    $input .= "</select>";
 	    $data_q->seek(0);
@@ -683,16 +689,17 @@ function html_list_graphical_form($action, $list_q, $list) {
     }
   }
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-
+  if($action == "insert" || $action == "new" || $criteria == "") { 
+    $display = "style=\"display:none\"";
+  }
   $block = "
-   <div class=\"detailHead\">$l_criterion</div> 
+  <div id=\"di_query\" $display>
   <table class=\"search\" id=\"list_criterion\">
-      $dis_criteria
+   $dis_criteria
   </table>
-  ";
-
-  $block .= "<input type=\"submit\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>";
+  <input type=\"button\" value=\"$l_add_criterion\" 
+  onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
+  </div>";
 
   return $block;
 }

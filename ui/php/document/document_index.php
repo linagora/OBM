@@ -445,6 +445,12 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      		 );
 
+// Display Level
+  $actions["DOCUMENT"]["ext_get_ids"]  = array (
+    'Url'      => "$path/document/document_index.php?action=ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
 // Index  
   $actions["DOCUMENT"]["index"] = array (
     'Name'     => $l_header_find,

@@ -4,7 +4,11 @@
 -- // $Id$
 -- ////////////////////////////////////////////////////////////////////////////
 
-
+-------------------------------------------------------------------------------
+-- Update Active Usert tables
+-------------------------------------------------------------------------------
+-- Change column : publication_lang varchar(20)
+ALTER TABLE ActiveUserObm CHANGE column activeuserobm_lastpage activeuserobm_lastpage varchar(64);
 -------------------------------------------------------------------------------
 -- Update Contact tables
 -------------------------------------------------------------------------------
@@ -19,6 +23,11 @@ ALTER TABLE Contact CHANGE column contact_address2 contact_address2 VARCHAR(64);
 -------------------------------------------------------------------------------
 -- Change column : publication_lang varchar(20)
 ALTER TABLE Publication CHANGE column publication_lang publication_lang VARCHAR(30);
+-------------------------------------------------------------------------------
+-- Update Subscription tables
+-------------------------------------------------------------------------------
+-- Change column : subscription_renewal int(1)
+ALTER TABLE Subscription CHANGE column subscription_renewal_id subscription_renewal INT(1);
 
 -------------------------------------------------------------------------------
 -- Update UserObmPref table

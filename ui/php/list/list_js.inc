@@ -57,16 +57,6 @@ function add_criterion(form,index) {
   } else {
     criteria = target.all['list_criterion'];
   }
-  if (W3C) {
-    target.getElementById('ta_query').style.visibility = \"hidden\";
-    target.getElementById('query_show').style.visibility = \"visible\";
-  } else if (NS4) {
-    target.layers['ta_query'].visibility = \"hide\";
-    target.layers['query_show'].visibility = \"visible\";
-  } else {
-    target.all['ta_query'].style.visibility = \"hidden\";
-    target.all['query_show'].style.visibility = \"visible\";
-  }  
   if(index == -1) {
     index = criteria.rows.length;
   }
@@ -455,7 +445,12 @@ function publication_criterion(form,labels,values,i) {
 // Show the manual query field                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-function show_query_field() {
+function show_query_field(value1,value2,field) {
+  ta_display = document.getElementById('ta_query').style.display;
+  di_display = document.getElementById('di_query').style.display;
+  if(ta_display != di_display && !confirm('$l_warning_lose_query')) {
+    return false;
+  }
   if (W3C) {
     table = document.getElementById('list_criterion');
   } else if (NS4) {
@@ -464,14 +459,14 @@ function show_query_field() {
     table = document.all['list_criterion'];
   }
   if (W3C) {
-    document.getElementById('query_show').style.visibility = \"hidden\";
-    document.getElementById('ta_query').style.visibility = \"visible\";
+    document.getElementById('ta_query').style.display = value1;
+    document.getElementById('di_query').style.display = value2;
   } else if (NS4) {
-    document.layers['query_show'].visibility = \"hide\";
-    document.layers['ta_query'].visibility = \"show\";
+    document.layers['ta_query'].display = value1;
+    document.getElementById('di_query').style.display = value2;
   } else {
-    document.all['query_show'].style.visibility = \"hidden\";
-    document.all['ta_query'].style.visibility = \"visible\";
+    document.all['ta_query'].style.display = value1;
+    document.getElementById('di_query').style.display = value2;
   }  
   len = table.rows.length
   for(i=0;i<len;i++) 

@@ -494,6 +494,7 @@ function html_company_links($co_q) {
   // Contract
   if ($cgp_show["module"]["contract"]) {
     $nb_ctra = run_query_linked_contract_nb ($id,"company");
+    $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
 
      $block_contract = "
@@ -2177,7 +2178,7 @@ function display_popup_code_tree($tree,$indent) {
       "<table class=\"category\">
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
+	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" > 
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
 	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>

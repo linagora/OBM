@@ -10,8 +10,7 @@
 // Database fields
 $l_publication_title = "Titre Publication";
 $l_type = "Type";
-$l_renew = "Mode de renouvellement";
-$l_auto_renew = "Renouvellement automatique";
+$l_renew = "Renouvellement automatique";
 $l_recept = "Mode de réception";
 $l_publication_type = "Type Publication";
 $l_lang = "Langue";
@@ -32,9 +31,13 @@ $l_renew_new = "Nouveau Mode renouvellement";
 $l_recept_manage = "Gestion des Modes de réception";
 $l_recept_exist = "Modes de réception existants";
 $l_recept_new = "Nouveau Mode de réception";
+$l_auto_sub = "Abonnement automatique";
+$l_contact_category1 = "Categorie contact 1";
 
 // Titres
 $l_publication = "Publication";
+$l_publication_orig = "Publication d'origine";
+$l_publication_dest = "Publication destination";
 $l_subscription = "Abonnement";
 // Actions
 $l_insert = "Enregistrer la Publication";

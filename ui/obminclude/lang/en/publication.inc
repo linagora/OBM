@@ -22,6 +22,9 @@ $l_type_new = "New Type";
 
 // Titres
 $l_publication = "Publication";
+$l_publication_orig = "export from publication";
+$l_publication_dest = "to publication";
+
 $l_subscription = "Subscription";
 
 // Actions
@@ -73,8 +76,9 @@ $l_j_type_create = "You have to enter a new type name to create it !";
 $l_publication_display = "Display options for publications lists"; 
 
 
-$l_renew = "Renewal mode";
-$l_auto_renew = "Automatic renewal";
+$l_renew = "Automatic renewal";
+$l_auto_sub = "Automatic subscription";
+$l_contact_category1 = "Contact Category 1";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 

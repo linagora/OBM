@@ -557,6 +557,14 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	);
+					
+// Update
+  $actions["CONTACT"]["document_add"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=document_add",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     	);
+
 
 // Check Delete
   $actions["CONTACT"]["check_delete"] = array (

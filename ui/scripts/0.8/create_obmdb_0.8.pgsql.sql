@@ -32,7 +32,7 @@ CREATE TABLE ActiveUserObm (
   activeuserobm_timeupdate     timestamp,
   activeuserobm_timecreate     timestamp,
   activeuserobm_nb_connexions  integer NOT NULL DEFAULT '0',
-  activeuserobm_lastpage       varchar(32) NOT NULL DEFAULT '0',
+  activeuserobm_lastpage       varchar(64) NOT NULL DEFAULT '0',
   activeuserobm_ip             varchar(32) NOT NULL DEFAULT '0',
   PRIMARY KEY (activeuserobm_sid)
 );
@@ -1155,24 +1155,11 @@ CREATE TABLE Subscription (
   subscription_userupdate       integer,
   subscription_usercreate       integer,
   subscription_quantity       	integer,
-  subscription_renewal_id       integer NOT NULL,
+  subscription_renewal          integer NOT NULL,
   subscription_reception_id     integer NOT NULL,
   subscription_date_begin       timestamp,
   subscription_date_end         timestamp,
   PRIMARY KEY (subscription_publication_id,subscription_contact_id)
-);
-
---
--- Table structure for table 'SubscriptionRenewal'
---
-CREATE TABLE SubscriptionRenewal (
-  subscriptionrenewal_id          serial,
-  subscriptionrenewal_timeupdate  timestamp,
-  subscriptionrenewal_timecreate  timestamp,
-  subscriptionrenewal_userupdate  integer,
-  subscriptionrenewal_usercreate  integer,
-  subscriptionrenewal_label       char(12),
-  PRIMARY KEY (subscriptionrenewal_id)
 );
 
 --

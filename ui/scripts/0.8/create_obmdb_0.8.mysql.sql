@@ -42,7 +42,7 @@ CREATE TABLE ActiveUserObm (
   activeuserobm_timeupdate     timestamp(14),
   activeuserobm_timecreate     timestamp(14),
   activeuserobm_nb_connexions  int(11) NOT NULL default '0',
-  activeuserobm_lastpage       varchar(32) NOT NULL default '0',
+  activeuserobm_lastpage       varchar(64) NOT NULL default '0',
   activeuserobm_ip             varchar(32) NOT NULL default '0',
   PRIMARY KEY (activeuserobm_sid)
 );
@@ -1159,24 +1159,11 @@ CREATE TABLE Subscription (
   subscription_userupdate       int(8),
   subscription_usercreate       int(8),
   subscription_quantity       	int(8),
-  subscription_renewal_id       int(8) DEFAULT '0' NOT NULL,
+  subscription_renewal          int(1) DEFAULT '0' NOT NULL,
   subscription_reception_id     int(8) DEFAULT '0' NOT NULL,
   subscription_date_begin       timestamp(14),
   subscription_date_end         timestamp(14),
   PRIMARY KEY (subscription_publication_id,subscription_contact_id)
-);
-
---
--- Table structure for table 'SubscriptionRenewal'
---
-CREATE TABLE SubscriptionRenewal (
-  subscriptionrenewal_id          int(8) DEFAULT '0' NOT NULL auto_increment,
-  subscriptionrenewal_timeupdate  timestamp(14),
-  subscriptionrenewal_timecreate  timestamp(14),
-  subscriptionrenewal_userupdate  int(8),
-  subscriptionrenewal_usercreate  int(8),
-  subscriptionrenewal_label       char(12),
-  PRIMARY KEY (subscriptionrenewal_id)
 );
 
 --

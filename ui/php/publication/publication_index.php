@@ -91,25 +91,25 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
+  $recept_q = run_query_subscriptionreception(); 
+  $concat1_q = run_query_publication_contactcategory1();
   $type_q = run_query_publicationtype();
   require("publication_js.inc");
-  $display["detail"] = html_publication_form($action,"", $type_q, $publication);
+  $display["detail"] = html_publication_form($action,"", $type_q,$concat1_q,$recept_q, $publication);
 
 } elseif ($action == "new_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $renew_q = run_query_subscriptionrenewal();
   $recept_q = run_query_subscriptionreception();
   $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
   require("publication_js.inc");
-  $display["detail"] =html_subscription_form($action,$sub_q, $renew_q, $recept_q, $publication);
+  $display["detail"] =html_subscription_form($action,$sub_q, $recept_q, $publication);
 } elseif ($action == "new_auto")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $renew_q = run_query_subscriptionrenewal();
   $recept_q = run_query_subscriptionreception();
   $pub_q = run_query_detail($param_publication);
   if($pub_q->nf() == 1) {
     require("publication_js.inc");
-    $display["detail"] = html_auto_subscription_form($action,$pub_q,$renew_q, $recept_q, $publication);
+    $display["detail"] = html_auto_subscription_form($action,$pub_q, $recept_q, $publication);
   }
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,21 +129,21 @@ if ($action == "ext_get_id") {
     $pub_q = run_query_detail($param_publication);
     if ($pub_q->num_rows() == 1) {
       $type_q = run_query_publicationtype();
+      $recept_q = run_query_subscriptionreception(); 
       require("publication_js.inc");
       $display["detailInfo"] = display_record_info($pub_q);
-      $display["detail"] = html_publication_form($action, $pub_q,$type_q, $publication);
+      $display["detail"] = html_publication_form($action, $pub_q,$type_q,"",$recept_q, $publication);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $pub_q->query . " !");
     }
   }
 } elseif ($action == "detailupdate_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $renew_q = run_query_subscriptionrenewal();
   $recept_q = run_query_subscriptionreception();
   $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
   $sub_q = run_query_subscription_detail($param_contact,$param_publication);
   require("publication_js.inc");
-  $display["detail"] =html_subscription_form($action,$sub_q, $renew_q, $recept_q, $publication);
+  $display["detail"] =html_subscription_form($action,$sub_q,  $recept_q, $publication);
 
 
 } elseif ($action == "insert")  {
@@ -181,7 +181,9 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_publicationtype();
-    $display["search"] = html_publication_form($action, "",  $type_q, $publication);
+    $recept_q = run_query_subscriptionreception(); 
+    $concat1_q = run_query_publication_contactcategory1();
+    $display["search"] = html_publication_form($action, "",  $type_q,$concat1_q,$recept_q, $publication);
   }
 } elseif ($action == "insert_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,17 +202,16 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $renew_q = run_query_subscriptionrenewal();
     $recept_q = run_query_subscriptionreception();
     $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
     require("publication_js.inc");
-    $display["detail"] =html_subscription_form($action,$cont_q, $renew_q, $recept_q, $publication);        
+    $display["detail"] =html_subscription_form($action,$cont_q, $recept_q, $publication);        
   }
 
 } elseif ($action == "insert_auto")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_auto_insert($publication);
-  if ($retour != 0) {
+  if ($retour) {
     $display["msg"] .= display_ok_msg($l_insert_ok);
   } else {
     $display["msg"] .= display_err_msg($l_insert_error);
@@ -234,8 +235,9 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_publicationtype();
+    $recept_q = run_query_subscriptionreception();     
     $pub_q = run_query_detail($param_publication);
-    $display["detail"] = html_publication_form($action, $pub_q, $type_q, $publication);
+    $display["detail"] = html_publication_form($action, $pub_q, $type_q,"",$recept_q, $publication);
   }
 
 } elseif ($action == "update_subscription")  {
@@ -255,11 +257,10 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $renew_q = run_query_subscriptionrenewal();
     $recept_q = run_query_subscriptionreception();
     $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
     require("publication_js.inc");
-    $display["detail"] =html_subscription_form($action,$cont_q, $renew_q, $recept_q, $publication);        
+    $display["detail"] =html_subscription_form($action,$cont_q, $recept_q, $publication);        
   }
 }elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -274,10 +275,9 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
+    require("publication_js.inc");  
   $type_q = run_query_publicationtype();
-  $act_q = run_query_publicationactivity();
-  $usr_q = run_query_userobm_active();
-  $display["search"] = html_publication_search_form($type_q, $act_q, $usr_q, $publication);
+  $display["search"] = html_publication_search_form($type_q, $publication);
   
 } elseif ($action == "delete_subscription")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -333,45 +333,6 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_ok_msg($l_type_delete_ok);
   } else {
     $display["msg"] .= display_err_msg($l_type_delete_error);
-  }
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
-
-} elseif ($action == "renew_insert")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_renew_insert($publication);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_renew_insert_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_renew_insert_error);
-  }
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
-
-} elseif ($action == "renew_update")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_renew_update($publication);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_renew_update_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_renew_update_error);
-  }
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
-
-} elseif ($action == "renew_checklink")  {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_renew_links($publication);
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
-
-} elseif ($action == "renew_delete")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_renew_delete($publication["renew"]);
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_renew_delete_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_renew_delete_error);
   }
   require("publication_js.inc");
   $display["detail"] .= dis_publication_admin_index();
@@ -456,8 +417,8 @@ display_page($display);
 function get_param_publication() {
   global $tf_title, $tf_year, $tf_lang;
   global $sel_type,$ta_desc, $param_publication,$tf_type,$param_contact;
-  global $param_publication_orig;
-  global $sel_renew,$tf_renew,$sel_recept,$tf_recept,$tf_quantity;
+  global $param_publication_orig,$sel_contactcategory1;
+  global $ch_renewal,$sel_recept,$tf_recept,$tf_quantity;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;    
   global $cdg_param;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -470,12 +431,15 @@ function get_param_publication() {
   if (isset ($ext_title)) $publication["ext_title"] = stripslashes(urldecode($ext_title));
   if (isset ($ext_target)) $publication["ext_target"] = $ext_target;
   
+  if (isset ($sel_contactcategory1)) $publication["auto_sub"] = $sel_contactcategory1;
   if (isset ($param_contact)) $publication["contact_id"] = $param_contact;
   if (isset ($param_publication)) $publication["id"] = $param_publication;
   if (isset ($param_publication_orig)) $publication["id_orig"] = $param_publication_orig;
   if (isset ($tf_title)) $publication["title"] = $tf_title;
   if (isset ($sel_type)) $publication["type"] = $sel_type;
-  if (isset ($sel_renew)) $publication["renew"] = $sel_renew;
+  if (isset ($ch_renewal)) $publication["renew"] = $ch_renewal;
+  else $publication["renew"] = 0;
+  
   if (isset ($sel_recept)) $publication["recept"] = $sel_recept;
   if (isset ($tf_year)) $publication["year"] = $tf_year;
   if (isset ($tf_lang)) $publication["lang"] = $tf_lang;
@@ -483,7 +447,6 @@ function get_param_publication() {
   if (isset ($ta_desc)) $publication["desc"] = $ta_desc;
 
   if (isset ($tf_type)) $publication["type_label"] = $tf_type;
-  if (isset ($tf_renew)) $publication["renew_label"] = $tf_renew;
   if (isset ($tf_recept)) $publication["recept_label"] = $tf_recept;
 
   if (debug_level_isset($cdg_param)) {
@@ -533,7 +496,7 @@ function get_publication_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/publication/publication_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
+    'Condition'=> array ('all') 
                                      );
 // New
   $actions["PUBLICATION"]["new_auto"] = array (
@@ -638,33 +601,6 @@ function get_publication_action() {
 // Kind Delete
   $actions["PUBLICATION"]["type_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_delete",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	       );
-// Renewal Insert
-  $actions["PUBLICATION"]["renew_insert"] = array (
-    'Url'      => "$path/publication/publication_index.php?action=renew_insert",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// Renewal Update
-  $actions["PUBLICATION"]["renew_update"] = array (
-    'Url'      => "$path/publication/publication_index.php?action=renew_update",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// Renewal Check Link
-  $actions["PUBLICATION"]["renew_checklink"] = array (
-    'Url'      => "$path/publication/publication_index.php?action=renew_checklink",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                     		);
-
-// Renewal Delete
-  $actions["PUBLICATION"]["renew_delete"] = array (
-    'Url'      => "$path/publication/publication_index.php?action=renew_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );

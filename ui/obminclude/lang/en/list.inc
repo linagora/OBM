@@ -34,8 +34,8 @@ $l_market = "Responsible";
 $l_contact_cat1 = "Category 1";
 $l_contact_cat2 = "Category 2";
 $l_category = "Category";
-$l_show_query = "Use the manual query field";
-
+$l_expert_mode = "Expert Mode";
+$l_normal_mode = "Normal Mode";
 // Contact
 $l_lastname = "Lastname";
 $l_firstname = "Fisrtname";
@@ -97,7 +97,7 @@ $l_fill_subject = "The subject must be filled !";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";
 $l_hungry_query = "The query need too much resource !";
-
+$l_warning_lose_query = "Warning, You might lose all query criteria already entered. Continue?";
 //------------------------------------//
 // Export Format informations         //
 //------------------------------------//
