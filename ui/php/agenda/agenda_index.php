@@ -108,6 +108,7 @@ elseif($action == "decision") {
 
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
   }
@@ -122,6 +123,7 @@ elseif ($action == "view_day") {
 
 elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array =  $sel_user_id;
   }
@@ -136,7 +138,8 @@ elseif ($action == "view_week") {
 
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
- if (count($sel_user_id) != 0) {
+  require("agenda_js.inc");
+  if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
   }
   else {
@@ -192,11 +195,9 @@ elseif ($action == "insert") {
     else{
       display_err_msg($l_insert_error);
       html_dis_conflict($agenda,$conflict,'',0);
-      $p_user_array = array($auth->auth["uid"]);
-      $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
-      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+      $cat_event = run_query_get_eventcategories();
+      dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
     }
   }
   else {

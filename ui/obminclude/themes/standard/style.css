@@ -711,44 +711,49 @@ td.agendaHead2		{
 	}
 	
 td.agendaEventHead	{ 
-        background-color:       #336699;
-		border:         1px #a1a4a8 solid; 
-		text-align:	center;	
-		font-weight: 	800;		
+    background-color:       	#336699;
+    border:			1px #a1a4a8 solid; 
+    text-align:			center;	
+    font-weight: 		800;		
 	}
 td.agendaEventBg5 	{ 
     background-color: 		#b1d29d; 
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg4 	{ 
-	background-color: 	#33a457; 
+    background-color: 		#33a457; 
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg3 	{ 
-	background-color: 	#24682d;  
+    background-color:	 	#24682d;  
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg2 	{ 
-	background-color: 	#1137c6;  
+    background-color: 		#1137c6;  
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg1 	{ 
-	background-color: 	#608bc7;  
+    background-color: 		#608bc7;  
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg0 	{ 
-	background-color: 	#bbcdec;  
+    background-color: 		#bbcdec;  
+    vertical-align:		top;
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}	
 
 td.agendaEventYear {
-	width:				8px;
-	height:				8px;
+	width:			8px;
+	height:			8px;
 	margin:			0;
 	padding:		0;
 	border:			0;	

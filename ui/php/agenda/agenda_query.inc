@@ -113,6 +113,7 @@ function run_query_day_event_list($agenda,$contacts_array) {
       calendarevent_title,
       calendarevent_priority,
       calendarevent_privacy,
+      calendarevent_description, 
       calendarcategory_label,
       calendarsegment_customerid,
       calendarsegment_date,
@@ -167,6 +168,7 @@ function run_query_week_event_list($agenda,$contacts_array) {
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
+		   calendarevent_description, 
 		   calendarcategory_label,
 		   calendarsegment_customerid,
 		   calendarsegment_date,
@@ -217,6 +219,7 @@ function run_query_month_event_list($agenda,$contacts_array) {
                    calendarevent_usercreate,
 		   calendarevent_title,
 		   calendarevent_priority,
+		   calendarevent_description, 
 		   calendarevent_privacy,
 		   calendarcategory_label,
 		   calendarsegment_customerid,
@@ -974,7 +977,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
 	$status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
 	$event_data[$obm_q->f("calendarevent_id")] = 
   	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
-	"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+	"description"=>$obm_q->f("calendarevent_description"),"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
 	substr($obm_q->f("calendarsegment_date"),10,2),"status" => $status);
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
@@ -1019,7 +1022,7 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
       $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
       $event_data[$obm_q->f("calendarevent_id")] = 
         array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
-        "begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+        "description"=>$obm_q->f("calendarevent_description"),"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
         substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
       $obm_q->next_record(); 
     }
@@ -1044,7 +1047,7 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
 	  $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
   	  $event_data[$obm_q->f("calendarevent_id")] = 
   	    array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
-  	    "begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+  	    "description"=>$obm_q->f("calendarevent_description"),"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
   	    substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
 	  $obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
