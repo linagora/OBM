@@ -1,0 +1,67 @@
+\documentclass[french]{article}
+%
+% Packages supplementaires utilises
+%
+\usepackage[T1]{fontenc}
+\usepackage{babel}
+\usepackage{indentfirst}
+\usepackage{graphicx}
+\usepackage{epsf}
+\usepackage{fancybox}
+\usepackage{url}
+\usepackage{fancyheadings}
+\usepackage{xspace}
+%
+% Definition des commandes personnalisées
+%[1]{\textsf{#1}\xspace
+\newcommand{\obm}{\textsc{obm}\xspace}
+\newcommand{\calendar}{\textsc{calendar}\xspace}
+\newcommand{\css}{\textsc{css}\xspace}
+\newcommand{\fonction}[1]{\textit{#1}\xspace}
+\newcommand{\fichier}[1]{\textbf{\textit{#1}}\xspace}
+\newcommand{\variable}[1]{\textbf{#1}\xspace}
+%
+% Modification des marges par defaut
+%
+\addtolength\textwidth{2cm}
+%
+% Profondeur de la table des matieres
+%
+\setcounter{tocdepth}{3}
+%
+%
+%
+\pagestyle{fancy}
+\lhead[ALIACOM]{ALIACOM}
+%
+%
+%
+\title{\Huge
+\textbf{OBM : Open Buisness Managment}\\
+\vspace{1.5cm}
+Manuel d'utilisation\\
+\vspace{.5cm}
+et\\
+\vspace{.5cm}
+Documentation technique\\
+\vspace{1.5cm}
+}
+\author{ALIACOM}
+%\date{}
+%
+% Debut du document
+%
+\begin{document}
+
+\maketitle
+
+\clearpage
+
+\tableofcontents
+
+\clearpage
+
+\input{technique/t_manuel.tex}
+%\input{user/u_manuelr.tex}
+
+\end{document}
