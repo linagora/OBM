@@ -262,7 +262,7 @@ display_end();
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-  global $tf_lcontract, $tf_lincident, $sel_stiatus, $sel_priority;
+  global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
   global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
