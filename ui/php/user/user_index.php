@@ -79,7 +79,6 @@ elseif ($action == "ext_get_users") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-
 }
 
 elseif ($action == "index" || $action == "") {
@@ -251,7 +250,7 @@ function get_param_user() {
   global $cdg_param, $popup;
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
-  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
+  global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
@@ -267,8 +266,8 @@ function get_param_user() {
 
   // External param
   if (isset ($popup)) $obm_user["popup"] = $popup;
-  if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
   if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
+  if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
   if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
   if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;

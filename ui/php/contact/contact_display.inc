@@ -83,7 +83,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact) {
   global $l_contact_name, $l_phone, $l_from_company, $l_email, $l_archive;
-  global $l_find, $popup;
+  global $l_find, $popup, $display;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
@@ -95,11 +95,13 @@ function html_contact_search_form ($contact) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
+    $ext_title = $contact["ext_title"];
     $ext_target = $contact["ext_target"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
 
   // --- HTML Template --------------------------------------------------------
@@ -576,7 +578,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>

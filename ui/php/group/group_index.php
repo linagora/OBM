@@ -339,9 +339,10 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_group() {
+  global $param_group, $cdg_param, $popup, $ext_title;
+  global $new_order, $order_dir, $entity;
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
-  global $param_group, $cdg_param, $popup, $new_order, $order_dir, $entity;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $action, $ext_action, $ext_url, $ext_id, $ext_target;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   // Group fields
@@ -357,11 +358,11 @@ function get_param_group() {
 
   // External param
   if (isset ($popup)) $group["popup"] = $popup;
+  if (isset ($ext_title)) $group["ext_title"] = $ext_title;
   if (isset ($ext_action)) $group["ext_action"] = $ext_action;
   if (isset ($ext_url)) $group["ext_url"] = $ext_url;
   if (isset ($ext_id)) $group["ext_id"] = $ext_id;
   if (isset ($ext_id)) $group["id"] = $ext_id;
-  if (isset ($ext_title)) $group["ext_title"] = $ext_title;
   if (isset ($ext_target)) $group["ext_target"] = $ext_target;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {

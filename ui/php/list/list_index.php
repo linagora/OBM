@@ -361,7 +361,7 @@ function get_list_action() {
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
   global $l_header_consult, $l_header_add_contact;
-  global $l_select_list;
+  global $l_select_list, $l_add_contact;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 
 // Index
@@ -434,7 +434,7 @@ function get_list_action() {
 // Sel list contacts : Contacts selection
   $actions["LIST"]["sel_list_contact"] = array (
     'Name'     => $l_header_add_contact,
-    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
+    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
     'Right'    => $list_write,
     'Popup'    => 1,
     'Target'   => $l_list,

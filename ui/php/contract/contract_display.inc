@@ -918,7 +918,7 @@ function dis_contract_display_pref($pref_q) {
 //   - $url    : url to call with parameter company
 ///////////////////////////////////////////////////////////////////////////////
 function html_select_contract($con_q, $title, $url="") {
-  global $l_select_contract, $l_close;
+  global $l_select_contract, $l_close, $display;
 
   if ($url != "") {
     $jsfunc = "check_get_id_url(this, '$url')";
@@ -926,23 +926,22 @@ function html_select_contract($con_q, $title, $url="") {
     $jsfunc = "check_get_id(this)";
   }
 
-
   $display_cont = "
     <select name=\"param_contract\" size=\"10\" style=\"font-family:fixed,courier\">";
 
-  while($con_q->next_record()) {
+  while ($con_q->next_record()) {
     $id = $con_q->f("contract_id");
     $name = $con_q->f("contract_label");
     $company = $con_q->f("company_name");
     $display_cont .= "\n<option value=\"$id\">$company - $name</option> ";
   }
-   $display_cont.="</select>";
+  $display_cont.="</select>";
+
+  $display["title"] = "<div class=\"title\">$title</div>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <div class=\"detailHead\">$title</div>
-
   <form method=\"get\" name=\"form_contr\"
     onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
 

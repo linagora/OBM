@@ -24,6 +24,8 @@
 // - display         --                 -- display and set display parameters
 // - dispref_display --                 -- update one field display value
 // - dispref_level   --                 -- update one field display position 
+// External API ---------------------------------------------------------------
+// - ext_get_id      -- $title          -- select a contract (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -75,13 +77,7 @@ if (! $popup) {
 if ($action == "ext_get_id") {
   require("contract_js.inc");
   $con_q = run_query_contract();
-  $display["detail"] = html_select_contract($con_q, $contract["title"]);
-
-} elseif ($action == "ext_get_id_url") {
-///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
-  $con_q = run_query_contract();
-  $display["detail"] = html_select_contract($con_q, $contract["title"], $contract["url"]);
+  $display["detail"] = html_select_contract($con_q, $contract["ext_title"]);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -261,13 +257,13 @@ display_page($display);
 // returns : $contract hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contract() {
-  global $tf_label,$tf_company_name,$sel_type;
+  global $tf_label,$tf_company_name,$sel_type, $tf_type;
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
   global $param_contract,$tf_num,$sel_market, $sel_tech;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
   global $hd_usercreate,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
-  global $tf_type;
+  global $ext_title;
   global $cdg_param, $action;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
@@ -310,8 +306,7 @@ function get_param_contract() {
 
   if (isset ($tf_type)) $contract["type_label"] = $tf_type;
 
-  if (isset ($title)) $contract["title"] = stripslashes(urldecode($title));
-  if (isset ($url)) $contract["url"] = urldecode($url);
+  if (isset ($ext_title)) $contract["ext_title"] = stripslashes(urldecode($ext_title));
 
   if (debug_level_isset($cdg_param)) {
     echo "<br>action=$action";
@@ -360,7 +355,7 @@ function get_contract_action() {
 // New
   $actions["CONTRACT"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=".urlencode($l_select_company)."&amp;url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
     'Right'    => $contract_write,
     'Popup'    => 1,
     'Condition'=> array ('','search','index','detailconsult','admin','display')

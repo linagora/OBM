@@ -972,7 +972,7 @@ function run_query_cat_links($c_id, $intern) {
 ///////////////////////////////////////////////////////////////////////////////
 // Deal Form Data checking and formatting
 // Parameters:
-//   - $did : deal id : (empty on insertion)
+//   - $did    : deal id : (empty on insertion)
 //   - $deal[] : values to check
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////

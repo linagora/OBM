@@ -396,18 +396,22 @@ CREATE TABLE DocumentEntity (
 -- Project module tables
 -------------------------------------------------------------------------------
 --
--- Table structure for table 'ProjectStat'
+-- Table structure for table 'Project'
 --
-CREATE TABLE ProjectStat (
-  projectstat_deal_id int(8) NOT NULL,
-  projectstat_date timestamp(14) NOT NULL,
-  projectstat_timeupdate timestamp(14) NOT NULL,
-  projectstat_timecreate timestamp(14) NOT NULL,
-  projectstat_userupdate int(8) default NULL,
-  projectstat_usercreate int(8) default NULL,
-  projectstat_useddays int(8) default NULL,
-  projectstat_remainingdays int(8) default NULL,
-  PRIMARY KEY (projectstat_deal_id, projectstat_date)
+CREATE TABLE Project (
+  project_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  project_timeupdate timestamp(14),
+  project_timecreate timestamp(14),
+  project_userupdate int(8),
+  project_usercreate int(8),
+  project_name varchar(128),
+  project_tasktype_id int(8),
+  project_company_id int(8),
+  project_deal_id int(8),
+  project_soldtime int(8) DEFAULT NULL,
+  project_archive char(1) DEFAULT '0',
+  project_comment text,
+  PRIMARY KEY (project_id)
 );
 
 
@@ -416,12 +420,12 @@ CREATE TABLE ProjectStat (
 --
 CREATE TABLE ProjectTask (
   projecttask_id int(8) DEFAULT '0' NOT NULL auto_increment,
-  projecttask_deal_id int(8) NOT NULL,
+  projecttask_project_id int(8) NOT NULL,
   projecttask_timeupdate timestamp(14) NOT NULL,
   projecttask_timecreate timestamp(14) NOT NULL,
   projecttask_userupdate int(8) default NULL,
   projecttask_usercreate int(8) default NULL,
-  projecttask_label varchar(255) default NULL,
+  projecttask_label varchar(128) default NULL,
   projecttask_parenttask_id int(8) default 0,
   projecttask_rank int(8) default NULL,
   PRIMARY KEY (projecttask_id)
@@ -433,8 +437,8 @@ CREATE TABLE ProjectTask (
 --
 CREATE TABLE ProjectUser (
   projectuser_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  projectuser_project_id int(8) NOT NULL,
   projectuser_user_id int(8) NOT NULL,
-  projectuser_deal_id int(8) NOT NULL,
   projectuser_projecttask_id int(8),
   projectuser_timeupdate timestamp(14) NOT NULL,
   projectuser_timecreate timestamp(14) NOT NULL,
@@ -446,6 +450,18 @@ CREATE TABLE ProjectUser (
   projectuser_soldprice int(8) default NULL,
   projectuser_manager int(1) default NULL,
   PRIMARY KEY (projectuser_id)
+);
+
+
+--
+-- Table structure for table 'ProjectStat'
+--
+CREATE TABLE ProjectStat (
+  projectstat_project_id int(8) NOT NULL,
+  projectstat_date timestamp(14) NOT NULL,
+  projectstat_useddays int(8) default NULL,
+  projectstat_remainingdays int(8) default NULL,
+  PRIMARY KEY (projectstat_project_id)
 );
 
 

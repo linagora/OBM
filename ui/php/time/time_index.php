@@ -43,12 +43,8 @@ require("time_display.inc");
 require("time_query.inc");
 
 $time = get_param_time();
-
 $uid = $auth->auth["uid"]; //current user uid
 
-if (debug_level_isset($cdg_param)) {
-  echo "login : $uid <br>";
-}
 
 // user select ---------------------------------------------
 
@@ -149,7 +145,7 @@ $perm->check("user");
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = run_query_managers();
-$stats_users = run_query_managers();
+$stats_users = $project_managers;
 ///////////////////////////////////////////////////////////////////////////////
 
 if (debug_level_isset($cdg_param)) {
@@ -161,13 +157,13 @@ if (debug_level_isset($cdg_param)) {
 
   echo "<br>HTTP_POST_VARS<br>";
   foreach($HTTP_POST_VARS as $key => $val) {
-	  echo "clé $key val $val <br>";
+    echo "clé $key val $val <br>";
   }
   echo "sel_user_id $sel_user_id";
   if (!is_null($sel_user_id))
-	  echo " sel_user_id is not null <br>";
+    echo " sel_user_id is not null <br>";
   else
-	  echo " sel_user_id is NULL <br>";
+    echo " sel_user_id is NULL <br>";
 }
 
 

@@ -2,84 +2,149 @@
 % ALIACOM Bastien Continsouzas
 % $Id
 
-\section{Project}
-
-Le module \project \obm  .
 
 \clearpage
+\section{Project}
+
+Le module \project \obm.
 
 \subsection{Organisation de la base de données}
 
-Le \calendar utilise trois tables :
+Le \project utilise 4 tables :
 \begin{itemize}
- \item Deal (aussi utilisé par le module \deal)
+ \item Project
  \item ProjectTask
  \item ProjectUser
  \item ProjectStat
 \end{itemize}
 
-\subsubsection{Deal}
-Cette table utilisée pour stocker les informations relatives aux affaires.
-Elle sert aussi à stocker certaines infos relatives spécifiquement aux projets.
-Nous ne détaillerons que les informations utilisées par le module \project.
-\begin{description}
- \item[deal\_id] int(8) : C'est la clé primaire de la table.
- \item[deal\_timeupdate] timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
- \item[deal\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
- \item[deal\_userupdate] int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
- \item[deal\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
- \item[deal\_label] varchar(128) : label du projet.
- \item[deal\_company\_id] int(8) : Clé étrangère pointant vers Company indiquant la société puor laquelle le projet est réalisée (sauf pour le projets internes).
- \item[deal\_tasktype\_id] int(8) : Clé étrangère pointant vers TaskType indiquant le type de tâche concerné par ce projet.
- \item[deal\_soldtime] int(8) : Durée en jours de travail vendue à la société pour laquelle ce projet est réalisé.
- \item[deal\_project\_status] int(1) : Indique si le projet est est encore au stade d'affaire, s'il est en cours ou si il s'agit d'un projet interne (pas de partie affaire).
- \item[deal\_archive] int(2) : Indique si le projet (et l'affaire qui lui est associée) est archivé.
-\end{description}
+\subsection{Project}
+Table principale des informations d'un projet.\\
 
-\subsubsection{ProjectTask}
-Cette table stocke les informations relatives au découpage d'un projet en tâches.
-\begin{description}
- \item[projecttask\_id] int(8) : C'est la clé primaire de la table.
- \item[projecttask\_timeupdate] timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
- \item[projecttask\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
- \item[projecttask\_userupdate] int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
- \item[projecttask\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
- \item[projecttask\_label] varchar(255) : Label de la tâche.
- \item[projecttask\_deal\_id] int(8) : Clé étrangère pointant vers Deal indiquant le projet auquel est rataché cette tâche.
- \item[projecttask\_parenttask\_id] int(8)  : Clé étrangère pointant vers ProjectTask indiquant s'il s'agit d'une sous-tâche ratachée à une autre tâche du projet
- \item[projecttask\_rank] int(8) : Valeur qui permet de gérer l'ordre d'affichage des tâches.
-\end{description}
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 128 & Label du projet & \\
+\hline
+\_tasktype\_id & int 8 & Type de tâche du projet & \\
+\hline
+\_company\_id & int 8 & Société contractante & NULL (projets internes)\\
+\hline
+\_deal\_id & int 8 & Affaire d'origine & NULL (projets internes)\\
+\hline
+\_soldtime & int 8 & Durée (jours) vendue & \\
+\hline
+\_archive & int 2 & Indicateur d'archivage & (1 = 0ui)\\
+\hline
+\_comment & text (64k) & Commentaire &\\
+\hline
+\end{tabular}
 
-\subsubsection{ProjectUser}
-Cette table stocke les informations relatives à l'affectation d'utilisateurs à des projets.
-Ils sont en réalité ratachés à une tâche du projet.
-\begin{description}
- \item[projectuser\_id] int(8) : C'est la clé primaire de la table.
- \item[projectuser\_user\_id] int(8) : Clé étrangère pointant vers UserObm indiquant l'utilisateur concerné.
- \item[projectuser\_deal\_id] varchar(12) :Clé étrangère pointant vers Deal indiquant le projet auquel est rataché l'utilisateur. Cette information peut sembler redondante mais est nécessaire pour pouvoir affecter un utilisateur à un projet avant que les tâches du projet ne soient définies.
- \item[projectuser\_projecttask\_id] varchar(12) :Clé étrangère pointant vers ProjectTask indiquant la tâche à laquelle est affecté cet utilisateur.
- \item[projectuser\_timeupdate] timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
- \item[projectuser\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
- \item[projectuser\_userupdate] int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
- \item[projectuser\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
- \item[projectuser\_projectedtime] varchar(5) : .
- \item[projectuser\_missingtime] varchar(5) : .
- \item[projectuser\_validity] char(1) : Date de la dernière modification de l'avancement. Permet de vérifier la crédibilité des informations disponibles sur l'avancement du projet (non implémenté pour l'instant).
- \item[projectuser\_soldprice] char(1) : Tarif horaire de cet utilisateur. Permet une analyse des coûts plus détaillée pour le projet (non implémenté pour l'instant).
- \item[projectuser\_manager] char(1) : Indique si la personne est chef de projet. Influe sur les droits de modification.
-\end{description} 
 
-\subsubsection{ProjectStat}
-Cette table stocke les informations relatives à l'avancement du projet à chaque fois que celles-ci sont modifiées.
+\subsection{ProjectTask}
+Table des informations des tâches des projets.\\
 
-\begin{description}
- \item[projectstat\_deal\_id] int(8) : C'est la clé primaire de la table. Indique le projet concerné.
- \item[projectstat\_date] timestamp(14) : C'est la clé primaire de la table. Donne au format Unix à laquelle a été effectué le log.
- \item[projectstat\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
- \item[projectstat\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
- \item[projectstat\_useddays] int(8) : Nombre de jours de travail passés sur le projet au moment du log.
- \item[projectstat\_remainingdays] int(8) : Nombre de jours de travail estimé restant pour terminer le projet au moment du log.
-\end{description} 
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_project\_id & int 8 & Projet de la tâche & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_label & varchar 128 & Label de la tâche & \\
+\hline
+\_parenttask\_id & int 8 & Tâche mère (ProjectTask) & 0 si racine \\
+\hline
+\_rank & int 8 & Ordre d'affichage de la tâche & \\
+\hline
+\end{tabular}
+
+
+\subsection{ProjectUser}
+Table d'affectation (avec informations associées) d'utilisateurs aux tâches d'un projet.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_project\_id & int 8 & Projet & \\
+\hline
+\_user\_id & int 8 & Utilisateur & \\
+\hline
+\_projecttask\_id & int 8 & Tâche & \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du createur & \\
+\hline
+\_projectedtime & int 8 & Durée prévue & \\
+\hline
+\_missingtime & int 8 & Durée restante estimée & Par Chef P \\
+\hline
+\_validity & timestamp 14 & Date d'estimation d'avancement & \\
+\hline
+\_soldprice & int 8 & Prix de vente de l'utilisateur & \\
+\hline
+\_manager & int 1 & Statut de l'utilisateur dans le projet & 1 = CP \\
+\hline
+\end{tabular}
+
+\subsubsection{Remarques}
+
+\paragraph{projectuser\_validity} : Date de la dernière modification de l'avancement qui permet de vérifier la crédibilité des informations disponibles sur l'avancement du projet (non implémenté pour l'instant).
+\paragraph{projectuser\_soldprice} : Tarif journalier de cet utilisateur sur cette tâche. Permet une analyse des coûts plus détaillée pour le projet (non implémenté pour l'instant).
+\paragraph{projectuser\_manager} : Indique si la personne est chef de projet. Influe sur les droits de modification.\\
+
+
+ProjectUser est en fait la table de liaison entre Tâches et Membres d'un projet.
+L'ajout d'un membre au projet insère un tuple dans cette table avec une tâche nulle. Ainsi, la \textbf{liste des membres d'un projet} est directement tirée de cette table.
+
+
+\subsection{ProjectStat}
+Table d'historique des informations relatives à l'avancement des projet.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_project\_id & int 8 & Projet & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_date & timestamp 14 & Date d'estimation d'avancement & \\
+\hline
+\_useddays & int 8 & Durée passée (jours) sur le projet & \\
+\hline
+\_remainingdays & int 8 & Durée restante estimée & Par Chef P \\
+\hline
+\end{tabular}
+
 
 \clearpage
 
@@ -90,18 +155,25 @@ Dans cette section seront listées et décrites les actions du module, ainsi que l
 \subsubsection{Actions}
 
 Voici la liste des action du module \project, ainsi qu'une description sommaire de chacune d'entre elles.\\
+
 \begin{tabular}{|c|p{9cm}|}
  \hline
  \textbf{Intitulé} & \textbf{Description} \\
  \hline
  \hline
-  <index> & Action par défaut, elle affiche le formulaire de recherche de projets. \\ 
+  <index> & (Défaut) formulaire de recherche de projets. \\ 
  \hline
-  <search> & Affiche le formulaire de recherche de projets et le résultat de la recherche. \\
+  <search> & Résultat de recherche de projets. \\
  \hline
-  <new> & Affiche le formulaire permettant de créer interne. \\
+  <new> & Formulaire de création d'un projet. \\
  \hline
-  <init> & Affiche le formulaire permettant de créer un projet à partir d'une affaire. \\
+  <detailconsult> & Fiche détail d'un projet. \\
+ \hline
+  <detailupdate> & Formulaire de modification d'un projet. \\
+ \hline
+  <insert> & Insertion d'un projet. \\
+ \hline
+  <update> & Mise à jour du projet. \\
  \hline
   <task\_fill> & Affiche le formulaire permettant l'ajout de tâches au projet et la liste des tâches déjà existantes. \\
  \hline
@@ -109,13 +181,7 @@ Voici la liste des action du module \project, ainsi qu'une description sommaire 
  \hline
   <membertime\_fill> & Affiche le formulaire permettant l'affectation des participants aux différentes tâches. \\
  \hline
-  <vaildate> & Valide les modifications faites à l'écran de modification des affectations et affiche l'écran de consultation. \\
- \hline
-  <detailconsult> & Affiche l'écran de consultation. \\
- \hline
-  <detailupdate> & Affiche le formulaire permettant de modifier les informations relatives au projet. \\
- \hline
-  <d\_update> & Valide les modifications faites à l'écran de modification du projet et affiche l'écran de consultation. \\
+  <validate> & Valide les modifications faites à l'écran de modification des affectations et affiche l'écran de consultation. \\
  \hline
   <advanceupdate> & Affiche le formulaire permettant de modifier les informations relatives au projet. \\
  \hline

@@ -78,13 +78,13 @@ if (! $company["popup"]) {
 if ($action == "ext_get_id") {
   require("company_js.inc");
   $comp_q = run_query_active_company();
-  $display["detail"] = html_select_company($comp_q, $company["title"]);
+  $display["detail"] = html_select_company($comp_q, $company);
 
 } elseif ($action == "ext_get_id_url") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $comp_q = run_query_active_company();
-  $display["detail"] = html_select_company($comp_q, $company["title"], $company["url"]);
+  $display["detail"] = html_select_company($comp_q, $company);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
@@ -365,20 +365,18 @@ function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
   global $sel_act, $sel_kind, $sel_market, $ta_com, $param_company;
-  global $tf_kind, $tf_act, $title, $url;
-  global $popup;
+  global $tf_kind, $tf_act;
   global $cdg_param;
-  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
-
+  if (isset ($popup)) $company["popup"] = $popup;
   if (isset ($ext_action)) $company["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $company["ext_url"] = $ext_url;
+  if (isset ($ext_url)) $company["ext_url"] = urldecode($ext_url);
   if (isset ($ext_id)) $company["ext_id"] = $ext_id;
   if (isset ($ext_id)) $company["id"] = $ext_id;
-  if (isset ($ext_title)) $company["ext_title"] = $ext_title;
+  if (isset ($ext_title)) $company["ext_title"] = stripslashes(urldecode($ext_title));
   if (isset ($ext_target)) $company["ext_target"] = $ext_target;
-
   
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -426,10 +424,6 @@ function get_param_company() {
   // Admin - Activity fields
   // $sel_act -> "act" is already set
   if (isset ($tf_act)) $company["act_label"] = $tf_act;
-
-  if (isset ($popup)) $company["popup"] = $popup;
-  if (isset ($title)) $company["title"] = stripslashes(urldecode($title));
-  if (isset ($url)) $company["url"] = urldecode($url);
 
   if (debug_level_isset($cdg_param)) {
     if ( $company ) {

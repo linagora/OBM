@@ -54,6 +54,11 @@ $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
 
+// TaskType caterogies (used by Project and time management)
+$ctt_sales = '0';    // Sales Activity tasks
+$ctt_research = '1'; // Internal R&D tasks
+$ctt_others = '2';   // Tasks not related to production
+
 // Menu display options constants
 $cme_txt = "text";  // text
 $cme_ico = "icon";  // icon

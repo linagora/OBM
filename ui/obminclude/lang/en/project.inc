@@ -1,6 +1,6 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                   //
+// OBM - Language : English                                                  //
 //     - File     : projet.inc                                               //
 // 2003-07-10 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -9,10 +9,9 @@
 
 // Database fields
 $l_name = "Name";
-$l_label = "Name";
 $l_company_name = "Company Name";
 $l_tasktype = "Category";
-$l_status = "Init.";
+$l_task = "Task";
 $l_soldtime = "Sold time";
 
 $l_sold = "Sold";
@@ -20,7 +19,6 @@ $l_allotted = "Alloted";
 $l_projected = "Projected";
 $l_used = "Used";
 $l_missing = "Missing";
-$l_diff = "Advance/Lateness";
 
 $l_allosold = "Sold time allocation";
 $l_usedsold = "Sold time usage";
@@ -30,29 +28,24 @@ $l_progress = "Project progress";
 $l_progeval = "Advance/Lateness evaluation";
 
 // Labels et textes
-$l_list = "List";
 $l_taskname = "Name";
 $l_parent = "Parent task";
 $l_manager = "project manager";
 $l_member = "Member";
-$l_new = "New";
 $l_soldtime = "Sold time";
 $l_projtime = "Projected time";
 $l_total = "Total";
 $l_resume = "Résumé";
 $l_nbtask = "tasks";
 $l_nbmem = "members";
+$l_company = "Company";
+$l_deal = "Deal";
 
 // Titres
 $l_project = "Project";
-$l_dealinfos = "Deal part";
-$l_projectinfos = "Project part";
-$l_externinfos = "Project";
-$l_interninfos = "Internal project";
-$l_advanceinfos = "Project progress";
 $l_tasksinfos = "Project tasks";
 $l_membersinfos = "Project members";
-$l_progressinfos = "Progress evaluation : the following datas are<br>(used time / missing time / total projected time)";
+$l_progressinfos = "Progress evaluation : time : used / missing / projected)";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";
 $l_advupdateinfos = "Fill in the working length (in days) missing for each person to complete a task";
 
@@ -65,17 +58,15 @@ $l_delete = "del.";
 
 // Messages
 $l_no_display = "Fill the search fields and press < Find > to retrieve the projects.";
-$l_new_projects = "List of new projects";
 $l_found = "project(s) found.";
 $l_no_found = "No project found matching the query !";
 $l_no_tasks = "No tasks are defined yet.";
-$l_no_members = "There are no informations available concerning the project members";
+$l_no_members = "No members assigned";
 $l_no_membertime = "The project members have not been assigned to a task yet";
 $l_tasksdef = "Defined tasks";
 $l_membersdef = "Project members";
 $l_delete_ok = "----";
 $l_delete_error = "----";
-$l_status_error = "This is not a valid project";
 $l_insert_ok = "The project has been inserted succesfully.";
 $l_insert_error = "The insertion of the project has failed !";
 $l_taskdelete_error = "The task has been deleted successfully.";
@@ -99,6 +90,12 @@ $l_member_added = "member(s) added";
 $l_member_removed = "member(s) removed";
 $l_no_member_add = "No member to add";
 $l_no_member_del = "No member to remove";
+$l_add_member = "Add members to the project";
+
+$l_link_timetask = "The project is used in time management";
+$l_link_timetask_no = "The project is not used in time management";
+$l_cant_delete = "The project can't be deleted !";
+$l_can_delete = "The project can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "You have to fill the name before submitting.";

@@ -41,6 +41,8 @@
 // - parent_insert        -- form fields    -- insert the deal
 // - parent_update        -- form fields    -- update the parent
 // - parent_delete        -- $param_parent  -- delete the parent
+// External API ---------------------------------------------------------------
+// - ext_get_id      -- $title         -- select a deal (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,12 +110,6 @@ if ($action == "ext_get_id") {
   require("deal_js.inc");
   $deal_q = run_query_deal($comp_id);
   $display["detail"] = html_select_deal($deal_q, stripslashes($title));
-
-} elseif ($action == "ext_get_id_url") {
-///////////////////////////////////////////////////////////////////////////////
-  require("contract_js.inc");
-  $deal_q = run_query_deal($comp_id);
-  $display["detail"] = html_select_deal($deal_q, stripslashes($title), $url);
 }
 
 
@@ -709,7 +705,7 @@ function get_deal_action() {
   // New
   $actions["DEAL"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=".urlencode($l_deal_select_company)."&amp;url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=".urlencode("$path/deal/deal_index.php?action=new&amp;param_company=")."",
     'Right'    => $deal_write,
     'Popup'    => 1,
     'Condition'=> array ('all') 
@@ -719,7 +715,7 @@ function get_deal_action() {
   $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=". $deal["parent"] . "&amp;sel_market=" . $deal["pmarket"] . "&amp;sel_tech=" . $deal["ptech"] . "&amp;param_company=");
   $actions["DEAL"]["new_child"] = array (
     'Name'     => $l_header_new_child,
-    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=".urlencode($l_deal_select_company)."&amp;url=$ret_url",
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_deal_select_company)."&amp;ext_url=$ret_url",
     'Right'    => $deal_write,
     'Popup'    => 1,
     'Condition'=> array ('parent_detailconsult') 

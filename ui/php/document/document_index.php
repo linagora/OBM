@@ -403,13 +403,6 @@ function get_param_document() {
   if (isset ($sel_cat2)) $document["category2"] = $sel_cat2;
   if (isset ($sel_mime)) $document["mime"] = $sel_mime;
 
-  if (isset ($popup)) $obm_user["popup"] = $popup;
-  if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
-  if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
-  if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
-  if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
-
   if (isset ($cb_privacy)) $document["privacy"] = $cb_privacy;
 
   if (debug_level_isset($cdg_param)) {

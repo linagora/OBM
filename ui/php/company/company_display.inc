@@ -286,9 +286,9 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new;
-  global $l_header_contact, $l_contact_new; 
-  global $l_header_deal, $l_deal_new; 
-  global $l_header_document, $l_document_new, $l_document_add; 
+  global $l_header_contact, $l_contact_new;
+  global $l_header_deal, $l_deal_new;
+  global $l_header_document, $l_document_new, $l_document_add;
   global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
 
   $uname = urlencode($name);
@@ -1237,12 +1237,14 @@ function dis_company_display_pref($display_pref_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company Select Form                                               //
 // Parameters:
-//   - $comp_q : company database result
-//   - $title  : Title to be displayed
-//   - $url    : URL to call with parameter company
+//   - $comp_q  : company database result
+//   - $company : company hash info : keys used : ext_title, ext_url
 ///////////////////////////////////////////////////////////////////////////////
-function html_select_company($comp_q, $title, $url="") {
-  global $l_select_company, $l_close;
+function html_select_company($comp_q, $company) {
+  global $display, $l_select_company, $l_close;
+
+  $url = $company["ext_url"];
+  $title = $company["ext_title"];
 
   if ($url != "") {
     $jsfunc = "check_get_id_url(this, '$url')";
@@ -1261,12 +1263,12 @@ function html_select_company($comp_q, $title, $url="") {
     $sel_company .= "\n<option value=\"$id\">".htmlspecialchars($name)." | ".htmlspecialchars($town)."</option>";
   }
   $sel_company .= "</select>";
+  
+  $display["title"] = "<div class=\"title\">$title</div>";
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-  <div class=\"detailHead\">$title</div>
-
   <form method=\"get\" name=\"form_comp\"
     onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
 

@@ -31,11 +31,35 @@ function run_query_id_user($login, $passwd) {
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// query execution : Count the number of document linked with a entity      //
+// Query execution : number of projects linked to an entity
 // Parameters:
-//   - $id  :  Id of entity
-//   - $entity  :  Type of entity (deal, company..)
+//   - $id     : Id of entity
+//   - $entity : entity (deal, company)
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_linked_project_nb ($id, $entity) {
+  global $cdg_sql;
+
+  $query = "select count(*) as nb from Project
+    where project_${entity}_id = '$id'";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of documents linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (deal, company, contact..)
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,11 +72,13 @@ function run_query_document_nb ($id,$entity) {
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
   $obm_q->next_record();
+
   return $obm_q->f("nb");
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// query execution : Delete document linked with a entity      //
+// query execution : Delete document linked with a entity
 // Parameters:
 //   - $id  :  Id of entity
 //   - $entity  :  Type of entity (deal, company..)
@@ -68,6 +94,7 @@ function run_query_delete_document($id,$entity) {
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // query execution : Insert document linked with a entity      //
@@ -115,8 +142,8 @@ function run_query_insert_documents($ids,$entity) {
   }
 
   return $cpt_ins;
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution : All users                                       //
@@ -461,7 +488,7 @@ function session_load_user_prefs() {
   $sess->register("last_payment_name");
   $last_contract_name = run_query_global_contract_label ($last_contract); 
   $sess->register("last_contract_name");
-  $last_project_name = run_query_global_project_label($last_project);
+  $last_project_name = run_query_global_project_name($last_project);
   $sess->register("last_project_name");
   $last_incident_name = run_query_global_incident_label ($last_incident); 
   $sess->register("last_incident_name");
@@ -741,15 +768,15 @@ function run_query_global_payment_label($p_id) {
 // Parameters:
 //   - $p_id : project id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_project_label($p_id) {
+function run_query_global_project_name($p_id) {
   global $cdg_sql;
 
-  $query = "select deal_label as project_label from Deal where deal_id='$p_id'";
+  $query = "select project_name from Project where project_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
-  return $obm_db->f("project_label");
+  return $obm_db->f("project_name");
 }
 
 

@@ -76,7 +76,7 @@ if ($action == "ext_get_ids") {
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
   } else {
-    $display["msg"] .= display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
@@ -270,16 +270,8 @@ function get_param_contact() {
   global $tf_mphone, $tf_fax, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $popup, $ext_action, $ext_url, $ext_id, $ext_target;
-  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
-
-  if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
-  if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
-  if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
-  if (isset ($ext_id)) $contact["id"] = $ext_id;
-  if (isset ($ext_title)) $contact["ext_title"] = $ext_title;
-  if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -332,7 +324,9 @@ function get_param_contact() {
   if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
   if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
   if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $contact["id"] = $ext_id;
   if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
+  if (isset ($ext_title)) $contact["ext_title"] = $ext_title;
 
   if (debug_level_isset($cdg_param)) {
     echo "<br />action=$action";

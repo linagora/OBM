@@ -11,7 +11,7 @@
 $l_date_task="Date";
 $l_tasktype = "Catégorie";
 $l_tasklabel="Commentaire";
-$l_deallabel="Projet/Affaire";
+$l_project = "Projet";
 $l_task_del="Suppr";
 $l_company = "Société";
 $l_delete = "Supprimer les tâches";
@@ -47,7 +47,6 @@ $l_week_prev = "Semaine précédente";
 $l_month_next = "Mois suivant";
 $l_month_prev = "Mois précédent";
 $l_date = "Date";
-$l_project = "Projet";
 $l_cat = "Catégorie";
 $l_task = "Tache";
 $l_label = "Label";

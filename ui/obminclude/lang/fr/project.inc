@@ -9,10 +9,9 @@
 
 // Database fields
 $l_name = "Nom";
-$l_label = "Nom";
 $l_company_name = "Nom Société";
 $l_tasktype = "Catégorie";
-$l_status = "Init.";
+$l_task = "Tâche";
 $l_soldtime = "Temps vendu";
 
 $l_sold = "Vendu";
@@ -20,39 +19,33 @@ $l_allotted = "Attribué";
 $l_projected = "Prévu";
 $l_used = "Utilisé";
 $l_missing = "Estimé restant";
-$l_diff = "Avance/Retard";
 
 $l_allosold = "Attribution du temps vendu";
 $l_usedsold = "Utilisation du temps vendu";
 $l_alloproj = "Attribution du temps prévu";
 $l_usedproj = "Utilisation du temps prévu";
-$l_progress = "Avancement du projet";
+$l_progress = "Avancement";
 $l_progeval = "Evaluation de l'avance/retard";
 
 // Labels et textes
-$l_list = "Liste";
 $l_taskname = "Nom";
 $l_parent = "Tâche parent";
 $l_manager = "Chef de projet";
 $l_member = "Participant";
-$l_new = "Nouveaux";
 $l_soldtime = "Temps vendu";
 $l_projtime = "Temps prévu";
 $l_total = "Total";
 $l_resume = "Résumé";
 $l_nbtask = "tâches";
 $l_nbmem = "participants";
+$l_company = "Société";
+$l_deal = "Affaire";
 
 // Titres
 $l_project = "Projet";
-$l_dealinfos = "Partie affaire";
-$l_projectinfos = "Partie Projet";
-$l_externinfos = "Projet";
-$l_interninfos = "Projet interne";
-$l_advanceinfos = "Avancement du projet";
 $l_tasksinfos = "Tâches du projet";
 $l_membersinfos = "Participants au projet";
-$l_progressinfos = "Détail de l'avancement : (temps : utilisé / estimé restant / total prévu)";
+$l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
 $l_advupdateinfos = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
 
@@ -60,12 +53,10 @@ $l_advupdateinfos = "Renseignez le temps de travail (en jours) estimé pour termi
 $l_insert = "Créer le projet";
 $l_update = "Modifier le Projet";
 $l_adv_update = "Mettre à jour les avancements";
-$l_checkdelete = "Vérifier ou Supprimer la Société";
-$l_delete = "suppr";
+$l_delete = "Supprimer le projet";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
-$l_new_projects = "Liste des projets non initialisés";
 $l_found = "projet(s) trouvés.";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
 $l_no_tasks = "Pas de tâches";
@@ -75,7 +66,6 @@ $l_tasksdef = "Tâches définies";
 $l_membersdef = "Participants au projet";
 $l_delete_ok = "----";
 $l_delete_error = "----";
-$l_status_error = "Ce n'est pas un projet valide";
 $l_insert_ok = "La création du projet a été correctement effectuée.";
 $l_insert_error = "Impossible de créer cette tâche ; La tâche principale est utilisée par la gestion de temps";
 $l_taskdelete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affecté";
@@ -99,6 +89,12 @@ $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";
 $l_no_member_add = "Aucun participant à ajouter";
 $l_no_member_del = "Aucun participant à effacer";
+$l_add_member = "Ajouter des participants au projet";
+
+$l_link_timetask = "Le projet est renseigné dans la gestion du temps";
+$l_link_timetask_no = "Le projet n'est pas renseigné dans la gestion du temps";
+$l_cant_delete = "Le projet ne peut être supprimé !";
+$l_can_delete = "Le projet peut être supprimé.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
@@ -111,7 +107,7 @@ $l_fill_projected = "Chaque participant avant doit être affecté à au moins une t
 $l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
 $l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du projet";
 $l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
-$l_delete_confirm = "----";
+$l_delete_confirm = "Confirmer la suppression du projet ?";
 
 // For the display preferences modification screen 
 $l_searchproject_display = "Options d'affichage des listes de projets";

@@ -1,5 +1,4 @@
 <SCRIPT language="php">
-
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_display.php                                             //
 //     - Desc : Time Display File                                            //
@@ -13,7 +12,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["deal_label"] = $l_project;
+$fieldnames["project_name"] = $l_project;
 $fieldnames["tasktype_label"] = $l_tasktype;
 $fieldnames["timetask_label"] = $l_tasklabel;
 $fieldnames["company_name"] = $l_company;
@@ -23,7 +22,7 @@ $fieldnames["total_before"] = $l_total_before;
 $fieldnames["total_after"] = $l_total_after;
 
 $fieldnames["date_task"] = $l_date_task;
-$fieldnames["timetask_deal_label"] = $l_deallabel;
+$fieldnames["timetask_project_name"] = $l_project;
 $fieldnames["timetask_company_name"] = $l_company;
 $fieldnames["timetask_length"] = $l_length;
 
@@ -52,8 +51,8 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
       $res["style"] = "class=\"timeValid$parity\"";
   }
 
-  if ($fieldname == "timetask_deal_label") {
-    $label = ($OD->data_set->f("timetask_deal_label"));
+  if ($fieldname == "timetask_project_name") {
+    $label = ($OD->data_set->f("timetask_project_name"));
 
     if (strlen($label) > 30)
       $res["name"] = substr($label,0,30) . "...";
@@ -514,7 +513,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   //-- Themes
   global $set_theme,$set_date,$ico_mail;
   //-- Labels
-  global $l_date_task, $l_company, $l_deallabel, $l_tasklabel, $l_tasktype;
+  global $l_date_task, $l_company, $l_tasklabel, $l_tasktype;
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
   global $l_update, $l_length, $l_task_list;
 
@@ -562,7 +561,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Deal  result                                        //
+// HTML Display the Time Project result                                      //
 // Parameters : 
 //   - $obm_q    : tasks list to display 
 //   - $pref_q   : the fields which have to be displayed
@@ -856,8 +855,6 @@ function display_shortview($time, $array_res) { //, $order) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_one_week($obm_dq, $time) {
   //-- Themes
-  global $set_theme;
-  //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $c_day_fraction, $c_days_in_a_week;
 
@@ -890,8 +887,9 @@ function dis_time_one_week($obm_dq, $time) {
   return $block;
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
-// HTML Display the Month View for one user :                               //
+// HTML Display the Week View for one user :
 //  | 01 | 02 | 03 | 04
 //    OK   OK        5/8
 // Parameters : 
@@ -903,13 +901,11 @@ function dis_time_one_week($obm_dq, $time) {
 //                 wday   = number of the day in the week
 //   - $total : the amount of task filled for the month
 //////////////////////////////////////////////////////////////////////////////
-
 function display_weekview($time, $result, $total, $title) {
   global $working_days;  // array of the days in a week where we are supposed to work
   global $c_day_fraction, $c_days_in_a_week;
   global $col_orange,$col_blue;
-  global $l_total;
-  global $l_fill, $l_daysofweekshort;
+  global $l_total, $l_fill, $l_daysofweekshort;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   $tot_width = 500;
@@ -956,19 +952,19 @@ function display_weekview($time, $result, $total, $title) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Time Entry Form                                               //
 //   - the days already filled are not shown
 //   - check box allows to select more than one day at once
 //   - if all days in the week are validated, does not display anything
 // Parameters:
-//   - $action : one of "modify",
-//   - $project_q : a Database Object listing deals
-//   - $taskt_q : a Database Object listing deal categories
-//   - $day_q : a Database Object listing days for this period of time
+//   - $action    : one of "modify",
+//   - $project_q : Database Object listing projects
+//   - $taskt_q   : Database Object listing deal categories
+//   - $day_q     : Database Object listing days for this period of time
 //   - $time : array of defined variables
 //     - $validate_days : array of validated days (not to be shown)
-//    
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
                           $day_q, $fraction_t, $time, $validate_days) {
@@ -1060,12 +1056,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     $previous_tt = 0;
 
     while ($project_q->next_record()) {
-      $proj_tt  = $project_q->f("deal_tasktype_id");
-      $proj_id = $project_q->f("deal_id");
+      $proj_tt  = $project_q->f("project_tasktype_id");
+      $proj_id = $project_q->f("project_id");
       $company = $project_q->f("company_name");
       if ($company == "") $company = $l_intern;
 
-      $proj_name = htmlspecialchars(addslashes($project_q->f("deal_label")));
+      $proj_name = htmlspecialchars(addslashes($project_q->f("project_name")));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
       $proj_label = "\" $company -- ". $proj_name. "\"";
 
@@ -1087,10 +1083,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // Javascript array construction for the ProjectTask dynamic Select list
   // used by fill_projecttask()
   if ($projecttask_q->num_rows() != 0) {
-    $previous_dl = 0;
+    $previous_pid = 0;
 
     while ($projecttask_q->next_record()) {
-      $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
+      $projtask_pid  = $projecttask_q->f("projecttask_project_id");
       $projtask_id = $projecttask_q->f("projecttask_id");
     
       $projtask_name = htmlspecialchars(addslashes($projecttask_q->f("projecttask_label")));
@@ -1098,12 +1094,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
       $projtask_label = "\"". $projtask_name ."\"";
 
-      if ($previous_dl != $projtask_dl) {
-	if ($previous_dl != 0) {
+      if ($previous_pid != $projtask_pid) {
+	if ($previous_pid != 0) {
 	  $projtask_data .= "\n),";
 	}
-	$projtask_data .= "\nnew Array (\n". $projtask_dl .",\n";
-	$previous_dl = $projtask_dl;
+	$projtask_data .= "\nnew Array (\n". $projtask_pid .",\n";
+	$previous_pid = $projtask_pid;
       }
       else {
 	$projtask_data .= ",\n";

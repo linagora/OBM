@@ -88,7 +88,7 @@ function html_user_search_form($user) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["msg"] .= display_info_msg($ext_title);
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
 
   $block = "
@@ -208,7 +208,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   $user_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $dislay["msg"] .= display_info_msg("$nb_user $l_found");
+  $display["msg"] .= display_info_msg("$nb_user $l_found");
   $block = $display_popup_head;
   $block .= $user_d->display("dis_data_user");
   $block .= $display_popup_end;

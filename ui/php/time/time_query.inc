@@ -31,7 +31,7 @@ function run_query_search($time) {
       UNIX_TIMESTAMP(timetask_timecreate) as date_timecreate,
       concat(timetask_length,concat('/',8)) as timetask_length,
       tasktype_label,
-      deal_label as timetask_deal_label,
+      project_name as timetask_project_name,
       timetask_label,
       projecttask_label,
       company_name as timetask_company_name,
@@ -39,8 +39,8 @@ function run_query_search($time) {
       (if (timetask_status != 2, 1, 0)) as test_status,
       SUBSTRING(timetask_date,8,1) as date_parity
     from ((TimeTask left join ProjectTask on timetask_projecttask_id = projecttask_id)
-      left join Deal on projecttask_deal_id = deal_id)
-      left join Company on deal_company_id = company_id, TaskType 
+      left join Project on projecttask_project_id = project_id)
+      left join Company on project_company_id = company_id, TaskType 
     where timetask_tasktype_id = tasktype_id
       and timetask_date >='". $array_date[0] ."' 
       and timetask_date <'". $array_date[1] ."'
@@ -88,18 +88,18 @@ function run_query_stat_project($time) {
   // task_valid 0 if checkbox not to be shown
   $query = "
     select
-      deal_label,
+      project_name,
       company_name,
       FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
       FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
       FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
-    from TimeTask, ProjectTask, Deal
-    left join Company on deal_company_id = company_id
+    from TimeTask, ProjectTask, Project
+    left join Company on project_company_id = company_id
     where timetask_date <= '$month_end'
       and timetask_projecttask_id = projecttask_id
-      and projecttask_deal_id = deal_id
+      and projecttask_project_id = project_id
       and timetask_user_id in $uid_tab
-    group by deal_id
+    group by project_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
 
@@ -227,7 +227,7 @@ function run_query_get_task($id) {
   $query = "
     select
        TimeTask.*,
-       projecttask_deal_id as timetask_project_id  
+       projecttask_project_id as timetask_project_id  
      from TimeTask
      left join ProjectTask on timetask_projecttask_id = projecttask_id
      where timetask_id = $id";
@@ -628,9 +628,9 @@ function run_query_task_one_month($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and week
-//   - $time[]    :    time search criteria
-//     keys used       date, user_id
+// Timemanager: get tasks for given user and week, and returns total by day
+//   - $time[]    : time search criteria
+//     keys used    date, user_id
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_task_one_week($time) {
@@ -669,11 +669,11 @@ function run_query_tasktype($uid = 0) {
   if ($uid) {
     $query = "
       select distinct TaskType.*
-      from TaskType, Deal, ProjectUser
-      where tasktype_id = deal_tasktype_id
-        and deal_id = projectuser_deal_id
-        and deal_archive = 0
-        and projectuser_user_id = $uid
+      from TaskType, Project, ProjectUser
+      where tasktype_id = project_tasktype_id
+        and project_id = projectuser_project_id
+        and project_archive = '0'
+        and projectuser_user_id = '$uid'
       order by tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, "run_query_tasktype");
@@ -681,9 +681,9 @@ function run_query_tasktype($uid = 0) {
     $obm1_q->query($query);
 
     $query = "
-      select  TaskType.*
+      select TaskType.*
       from TaskType
-      where tasktype_internal=2
+      where tasktype_internal='2'
       order by tasktype_internal, tasktype_label";
 
     display_debug_msg($query, $cdg_sql, "run_query_tasktype");
@@ -712,7 +712,7 @@ function run_query_tasktype($uid = 0) {
 //         left join Deal on (tasktype_id = deal_tasktype_id
 //                            and deal_archive = 0
 //                            and deal_project_status != 0)
-//         left join ProjectUser on (deal_id=projectuser_deal_id
+//         left join ProjectUser on (deal_id=projectuser_project_id
 //                                   and projectuser_projectedtime != 0)
 //       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
 //         or tasktype_internal=2
@@ -729,19 +729,18 @@ function run_query_project($time) {
 
   $query = "
     select distinct
-      deal_id,
-      deal_label,
+      project_id,
+      project_name,
       company_name,
-      deal_tasktype_id
-    from Deal, ProjectTask, ProjectUser
-      left join Company on company_id = deal_company_id
-    where deal_project_status in (1,2)
-      and deal_archive=0
+      project_tasktype_id
+    from Project, ProjectTask, ProjectUser
+      left join Company on company_id = project_company_id
+    where project_archive='0'
       and projectuser_projecttask_id = projecttask_id
-      and projecttask_deal_id = deal_id
-      and projectuser_user_id = $uid
-      and projectuser_projectedtime != 0
-      order by deal_tasktype_id, company_name, deal_label";
+      and projecttask_project_id = project_id
+      and projectuser_user_id = '$uid'
+      and projectuser_projectedtime != '0'
+      order by project_tasktype_id, company_name, project_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_project");
   $obm_q= new DB_OBM;
@@ -762,12 +761,14 @@ function run_query_projecttask($time) {
 
   $query = "
     select
-      projecttask_id, projecttask_label, projecttask_deal_id
+      projecttask_id,
+      projecttask_label,
+      projecttask_project_id
     from ProjectTask, ProjectUser
     where projectuser_projecttask_id = projecttask_id
       and projectuser_user_id = $uid
       and projectuser_projectedtime != 0
-      order by projecttask_deal_id, projecttask_label";
+      order by projecttask_project_id, projecttask_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_projecttask");
   $obm_q= new DB_OBM;

@@ -19,6 +19,7 @@ function display_page(&$display) {
   if ($display["header"] == "") {
     echo $display["head"] . "
       <div class=\"detailpanelalone\">" .
+      $display["title"] .
       $display["msg"] .
       $display["search"] .
       $display["result"] .

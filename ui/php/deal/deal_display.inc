@@ -501,7 +501,7 @@ function html_deal_links($deal_q, $inv_nb) {
   global $ico_contract_new, $ico_invoice, $ico_invoice_new, $ico_project;
   // -- Labels
   global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
-  global $l_create_project, $l_create_short_project, $l_view_project;
+  global $l_project_new, $l_header_project;
   global $l_header_document,$ico_document,$l_deal, $l_header_project;
   global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
   global $l_document_new,$l_document_add,$ico_document_new;
@@ -510,6 +510,8 @@ function html_deal_links($deal_q, $inv_nb) {
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
   $cid = $deal_q->f("deal_company_id");
+  $tt_id = $deal_q->f("deal_tasktype_id");
+  $cname = $deal_q->f("company_name");
   $label = $deal_q->f("deal_label");
   $con1 = $deal_q->f("deal_contact1_id");
   $con2 = $deal_q->f("deal_contact2_id");
@@ -517,6 +519,7 @@ function html_deal_links($deal_q, $inv_nb) {
   $project = $deal_q->f("deal_project_status");
   $market = $deal_q->f("deal_marketingmanager_id");
   $tech = $deal_q->f("deal_technicalmanager_id");
+  $nb_pro = run_query_linked_project_nb ($id, "deal");
 
   // parent deal
   if ($pid > 0) {
@@ -529,30 +532,21 @@ function html_deal_links($deal_q, $inv_nb) {
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid&amp;param_deal=$id");
 
   // Project
-  if ($project or ($hitrate == "100")) {
-    if ($project) {
-      $url_project = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$id");
-      $dis_ico_project = "
-        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_project\">$l_view_project</a></li>";
-    } else {
-      $url_project = url_prepare("$path/project/project_index.php?action=init&amp;param_project=$id");
-      $dis_ico_project = "
-        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_project\">$l_create_project</a></li>";
+  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
+  $dis_ico_project = "
+        <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+            <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>";
 
-      $url_project = url_prepare("$path/project/project_index.php?action=init_short&amp;param_project=$id");
-      $dis_ico_project .= "
-        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_project\">$l_create_short_project</a></li>";
-    }
+  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
+  $dis_ico_project .= "
+        <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+            <a href=\"$url_pro_new\">$l_project_new</a></li>";
     
-    $dis_project_link = "
+  $dis_project_link = "
      <div class=\"linkTitle\">:: $l_header_project</div>
      <ul class=\"linkList\">
        $dis_ico_project
      </ul>";
-  }
 
   // Contract
   $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
@@ -1062,13 +1056,13 @@ function auto_set_hitrate(select, targetField, pos) {
     ";
   }
 
-  if ( ($action=="new") ||
-       ( (($action=="detailupdate") || ($action=="update")) && 
+  if ( ($action == "new") ||
+       ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
     $dis_visibility = "
              <td class=\"detailLabel\">$l_private</td>
              <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
-    if ($vis==1) $dis_visibility .= "checked = \"checked\"";
+    if ($vis == 1) $dis_visibility .= "checked = \"checked\"";
     $dis_visibility .= " /></td></tr><tr>";
   }
 

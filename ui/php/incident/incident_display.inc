@@ -519,6 +519,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
   $display["title"] = "<div class=\"title\">$l_incident : $lincident</div>";
+
   // --- html template --------------------------------------------------------
 
   $block = "
@@ -543,7 +544,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
    <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_name</a>
    <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
    <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-   <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
+   <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
    <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
    <input type=\"text\" name=\"contract_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
   </td>

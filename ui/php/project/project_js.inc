@@ -24,19 +24,19 @@ function confirm_del() {
     return false;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_project(form) {
 
-  // MANDATORY : Check that the Project soldtime is not empty
+  // MANDATORY : Check that the Project name is not empty
   if (trim(form.tf_name.value) == \"\") {
     alert (\"$l_fill_name\");
     return false;
   }
 
-  // MANDATORY : Check that the Project soldtime is not empty
+  // MANDATORY : Check that the Project tasktype is filled
   else if ((form.sel_tt.value) == 0) {
     alert (\"$l_fill_tt\");
     return false;
@@ -64,67 +64,6 @@ function check_project(form) {
     return true;
 } 
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the init project form                                            //
-///////////////////////////////////////////////////////////////////////////////
-
-function check_init_project(form) {
-
-  // MANDATORY : Check that the Project soldtime is not empty
-  if (trim(form.tf_soldtime.value) == \"\") {
-    alert (\"$l_fill_soldtime\");
-    return false;
-  }
-
-  // MANDATORY : Check that the Project soldtime is a number
-  else if (!(check_number(form.tf_soldtime.value))) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
-  }
-
-  // MANDATORY : Check that the Project soldtime is not null
-  else if ((form.tf_soldtime.value) == 0) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
-  }
-
-  else
-    return true;
-} 
-
-///////////////////////////////////////////////////////////////////////////////
-// Check if the short init project form                                      //
-///////////////////////////////////////////////////////////////////////////////
-
-function check_short_init_project(form) {
-
-  // MANDATORY : Check that the Project soldtime is not empty
-  if (trim(form.tf_soldtime.value) == \"\") {
-    alert (\"$l_fill_soldtime\");
-    return false;
-  }
-
-  // MANDATORY : Check that the Project soldtime is a number
-  else if (!(check_number(form.tf_soldtime.value))) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
-  }
-
-  // MANDATORY : Check that the Project soldtime is not null
-  else if ((form.tf_soldtime.value) == 0) {
-    alert (\"$l_fill_soldnumber\");
-    return false;
-  }
-
-  // MANDATORY : Check that the Project soldtime is not null
-  else if ((form.sel_member.value) == 0) {
-    alert (\"$l_fill_member\");
-    return false;
-  }
-  else
-    return true;
-} 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Select the task add form                                                  //
@@ -217,10 +156,10 @@ function check_membertimevalid(form, nb_mem)
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Select the advance update form                                            //
 ///////////////////////////////////////////////////////////////////////////////
-
 function check_advancevalid(form)
 {
   error = 0;
@@ -251,10 +190,10 @@ function check_advancevalid(form)
   }
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Open the userobm list form window                                         //
 ///////////////////////////////////////////////////////////////////////////////
-
 function submit_memberadd(form, p_id)
 {
     window.name='Liste';

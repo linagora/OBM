@@ -90,7 +90,7 @@ function html_group_search_form ($group) {
       <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
       <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
       <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["msg"] .= display_info_msg($ext_title);
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
   // --- Var preparation ------------------------------------------------------
@@ -168,7 +168,7 @@ function dis_group_search_group($group, $popup=false) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
-  global $l_found, $l_add, $l_close;
+  global $display, $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $group["ext_action"];
@@ -207,7 +207,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   $dis_group->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $display["msg"] .= display_ok_msg("$nb_group $l_found");
+  $display["msg"] .= display_info_msg("$nb_group $l_found");
   $block .= $display_popup_head;
   $block .= $dis_group->display("dis_data_group");
   $block .= $display_popup_end;
