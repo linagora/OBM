@@ -32,6 +32,7 @@ $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";
 $l_todo = "A faire";
 $l_visibility ="Accès";
+$l_project ="Projet";
 
 // Labels et textes
 $l_private = "Privé";
@@ -57,8 +58,10 @@ $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
 $l_deal_select_parentdeal = "Sélectionner la surAffaire à laquelle l'affaire doit être affectée";
 $l_affect_deal = "Affecter à une surAffaire";
-$l_no_invoice = "Aucune Facture en cours associée";
+$l_create_project = "Créer le projet associé";
+$l_view_project = "Voir le projet associé";
 $l_invoice_new = "Nouvelle facture";
+$l_no_invoice = "Pas de factures";
 $l_archived_invoices = "Factures archivées";
 $l_see_archived_invoices = "Voir aussi les factures archivées";
 $l_kind_manage = "Gestion des Types d'Affaires";
