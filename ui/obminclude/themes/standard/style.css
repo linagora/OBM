@@ -472,8 +472,8 @@ a.details:active { color: #000000; background-color: transparent;}
 a.details:visited { color: #000000; background-color: transparent;}
 
 
-/* //////////////////DETAILS///////////////// */
-/* ///// Details table style definition ///// */
+/* //////////////////DIVERS////////////////// */
+/* ///// Diverstable style definition ////// */
 /* ////////////////////////////////////////// */
 
 table.recordInfo	{
@@ -487,6 +487,13 @@ td.recordInfo		{
 	font-size:		10px;
 	color:			#000000;
 	text-align:		right;
+	background-color:	transparent;
+}
+
+td.textLabelForm		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#000000;
 	background-color:	transparent;
 }
 

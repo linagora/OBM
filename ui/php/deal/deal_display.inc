@@ -116,79 +116,80 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 
     <table class=\"details\">
     <tr>
-      <td class=\"detailHead\" colspan=\"9\">$l_deal</td>
-    </tr>
-    <tr>
+      <td class=\"detailHead\">$l_deal</td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+
+      <td>
+       <table class=\"details\">
+        <tr>
 <!-- Label -->
-      <td class=\"textLabelForm\">$l_label_start</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_company</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_zipcode</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_after</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_before</td>
-      <td>&nbsp;&nbsp;</td>
-    </tr>
-    <tr>
-      <td><input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" /></td>
-      <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_label_start</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_company</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_zipcode</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_after</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_before</td>
+         <td>&nbsp;&nbsp;</td>
+        </tr>
+        <tr>
+         <td><input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" /></td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Name -->
-      <td><input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" /></td>
-      <td>&nbsp;&nbsp;</td>
+         <td><input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" /></td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Zipcode -->
-      <td><input name=\"tf_zip\" size=\"14\" value=\"$zip\" /></td>
-      <td>&nbsp;&nbsp;</td>
+         <td><input name=\"tf_zip\" size=\"14\" value=\"$zip\" /></td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Alarm date after -->
-      <td><input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\" value=\"$dateafter\" /></td>
-      <td>&nbsp;&nbsp;</td>
+         <td><input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\" value=\"$dateafter\" /></td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Alarm date before -->
-      <td><input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\" value=\"$datebefore\" /></td>
-      <td>&nbsp;&nbsp;</td>
+         <td><input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\" value=\"$datebefore\" /></td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Search -->
-      <td rowspan=\"4\"> 
-      <input name=\"action\" type=\"hidden\" value=\"search\" />
-      <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
-      <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    <tr>
+        </tr>
+       </table>
+       <table class=\"details\">     
+        <tr>
 <!-- Kind -->
-      <td class=\"textLabelForm\">$l_kind</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_category</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_state</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_manager</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_show_archive</td>
-    </tr>
-    <tr>
-      <td>
-      $sel_kind
-      </td>
-      <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_kind</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_category</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_state</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_manager</td>
+         <td>&nbsp;&nbsp;</td>
+         <td class=\"textLabelForm\">$l_show_archive</td>
+        </tr>
+        <tr>
+         <td>$sel_kind</td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Categories -->
-      <td>
-      $sel_cat
-      </td>
-      <td>&nbsp;&nbsp;</td>
+         <td>$sel_cat</td>
+         <td>&nbsp;&nbsp;</td>
 <!-- State -->
-      <td>
-      $sel_state
-      </td>
-      <td>&nbsp;&nbsp;</td>
+         <td>$sel_state</td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Manager -->
-      <td>
-      $sel_manager
-      </td>
-      <td>&nbsp;&nbsp;</td>
+         <td>$sel_manager</td>
+         <td>&nbsp;&nbsp;</td>
 <!-- Archive -->
-      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
-    </tr>
+         <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+        </tr>
+       </table>
+      </td>
+      <td> 
+       <input name=\"action\" type=\"hidden\" value=\"search\" />
+       <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
+       <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
+       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      </td>
+
+     </tr>
     </table>
   </form>
   <hr />";
@@ -234,9 +235,8 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
     action=\"" . $sess->url("deal_index.php") . "\">
     <table class=\"details\">
     <tr>
-      <td colspan=\"6\" class=\"detailHead\">$l_parentdeal</td>
-    </tr>
-    <tr>
+      <td rowspan=\"2\" class=\"detailHead\">$l_parentdeal</td>
+      <td rowspan=\"2\">&nbsp;&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_label_start</td>
       <td>&nbsp;&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_manager</td>
