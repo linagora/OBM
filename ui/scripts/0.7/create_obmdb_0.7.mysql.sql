@@ -610,7 +610,7 @@ CREATE TABLE TimeTask (
   timetask_label varchar(255) default NULL,
   timetask_status int(1) default NULL,
   PRIMARY KEY  (timetask_id),
-  INDEX tt_idx_pt (timetask_projecttask_id),
+  INDEX tt_idx_pt (timetask_projecttask_id)
 ) TYPE=MyISAM;
 
 
@@ -964,5 +964,25 @@ CREATE TABLE DataSource (
   datasource_name varchar(64),
   PRIMARY KEY (datasource_id)
 );
+
+
+--
+-- Table structure for the table  'Country'
+--
+CREATE TABLE Country (
+  country_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  country_timeupdate timestamp(14),
+  country_timecreate timestamp(14),
+  country_userupdate int(8),
+  country_usercreate int(8),
+  country_iso3166 char(2),
+  country_name varchar(64) UNIQUE,
+  country_lang char(2),
+  country_tel varchar(4),
+  PRIMARY KEY (country_id)
+);
+
+
+
 
 

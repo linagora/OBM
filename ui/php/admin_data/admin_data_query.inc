@@ -15,6 +15,9 @@ function get_company_list() {
   global $cdg_sql;
 
   $query = "select company_id,
+      company_name,
+      company_aka,
+      company_sound,
       company_contact_number,
       company_deal_number,
       company_deal_total
@@ -96,7 +99,7 @@ function update_one_deal($id, $hitrate) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - document list                                            //
+// Query execution - document list                                           //
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_list() {
   global $cdg_sql;
@@ -116,8 +119,10 @@ function get_document_list() {
   $c_q->query($query);
   return $c_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution - document list                                            //
+// Query execution - document list                                           //
 ///////////////////////////////////////////////////////////////////////////////
 function get_file_list($repository) {
   global $document_path;
@@ -144,4 +149,27 @@ function get_file_list($repository) {
     return $tree;
   }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - Company Sound Update
+// Parametres:
+//   - $id    : company id
+//   - $aka   : aka to insert
+//   - $sound : sound key to insert
+///////////////////////////////////////////////////////////////////////////////
+function update_sound_aka_one_company($id, $aka, $sound) {
+  global $cdg_sql;
+
+  $query = "update Company set
+      company_aka='$aka',
+      company_sound='$sound'
+    where company_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $u_q = new DB_OBM;
+  $retour = $u_q->query($query);
+  return $retour;
+}
+
 

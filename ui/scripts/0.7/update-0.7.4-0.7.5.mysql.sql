@@ -22,6 +22,23 @@ CREATE TABLE DataSource (
 );
 
 
+--
+-- Table structure for the table  'Country'
+--
+CREATE TABLE Country (
+  country_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  country_timeupdate timestamp(14),
+  country_timecreate timestamp(14),
+  country_userupdate int(8),
+  country_usercreate int(8),
+  country_iso3166 char(2),
+  country_name varchar(64) UNIQUE,
+  country_lang char(2),
+  country_tel varchar(4),
+  PRIMARY KEY (country_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Update structure for table 'Company'
 -------------------------------------------------------------------------------

@@ -99,10 +99,25 @@ function html_data_index($actions, $modules) {
       <td class=\"adminText\">$sel_module</td>
     </tr>
     </table>
-    </form>
-";
 
+    <hr />
+
+    <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
+    <table class=\"admin\">
+    <tr>
+      <td class=\"adminHead\">action : sound_aka_update</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"sound_aka_update\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">Update aka and sound keys used for searches (Company)</td>
+    </tr>
+    </table>
+    </form>";
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display data inconsistency for the modules selected
 // Parameters:
@@ -273,7 +288,7 @@ function dis_data_deal($action, $mode) {
   if ($mode == "txt") {
     echo "
 ------------------------------------------------------------------------------
-*** Company : $nb_comp to parse
+*** Deal : $nb_deal to parse
 ------------------------------------------------------------------------------
 ";
   } else {
@@ -659,6 +674,80 @@ at least as much in the file system.
     echo "<tr>
         <td class=\"adminLabel\" colspan=\"8\">
           Document : $nb_document to parse, $cpt_du inconsistencies</td>
+      </tr>
+      </table>";
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update company sound key representation and aka
+// In case of database update or sound function change
+// Parametres:
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_sound_aka_update($mode) {
+  global $debug, $c_all;
+
+  // Get the company list
+  $c_q = get_company_list();
+  $cpt_c = 0;
+  $cpt_cu = 0;
+  $nb_comp = $c_q->num_rows();
+  
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Sound Update : Company : $nb_comp to process
+------------------------------------------------------------------------------
+";
+  } else {
+
+    echo "
+      <table class=\"admin\">
+      <tr>
+        <td class=\"adminHead\">Company ($nb_comp)</td>
+        <td class=\"adminHead\">Aka and Sound Update</td>
+      </tr>";
+  }
+
+  while ($c_q->next_record()) {
+    $cpt_c++;
+
+    $id = $c_q->f("company_id");
+    $name = $c_q->f("company_name");
+    $aka = $c_q->f("company_aka");
+    // If reduced version of name not in aka (and not same as name), we add it
+    $auto_aka = reduce_name($name);
+    if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
+      $aka .= " $auto_aka";
+    }
+    $sound = phonetic_key($name);
+
+    $retour = update_sound_aka_one_company($id, $aka, $sound);
+
+    if ($cpt_c % 100 == 0) {
+      if ($mode =="txt") {
+	echo ".";
+      } else {
+	echo "<tr>
+          <td class=\"adminLabel\" colspan=\"2\">$cpt_c</td>
+        </tr>";
+	flush();
+      }
+    }
+  }
+
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Sound update : Company $nb_comp processed
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<tr>
+        <td class=\"adminLabel\" colspan=\"2\">
+          Sound Update : Company : $nb_comp processed</td>
       </tr>
       </table>";
   }

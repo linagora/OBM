@@ -10,6 +10,7 @@
 // - index
 // - data_show
 // - data_update
+// - sound_aka_update
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
@@ -36,7 +37,7 @@ $db->next_record();
 $document_path = $db->f("globalpref_value");	
 $modules = array ('company', 'deal','document');
 //$modules = get_modules_array();
-$acts = array ('help', 'index', 'data_show', 'data_update');
+$acts = array ('help', 'index', 'data_show', 'data_update', 'sound_aka_update');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -54,7 +55,7 @@ switch ($mode) {
    $debug = $set_debug;
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
-   if($action == "") $action = "index";
+   if ($action == "") $action = "index";
    get_admin_data_action();
    $perm->check();
    $display["head"] = display_head("Admin_Data");
@@ -76,6 +77,9 @@ switch ($action) {
     break;
   case "data_update":
     dis_data($action, $mode, $module);
+    break;
+  case "sound_aka_update":
+    dis_sound_aka_update($action, $mode);
     break;
   default:
     echo "No action specified !";
@@ -199,6 +203,12 @@ function get_admin_data_action() {
 
  $actions["ADMIN_DATA"]["data_update"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=data_update&amp;mode=html",
+     'Right' 	=> $admin_data_write,
+     'Condition'=> array ('None')
+                                    	);
+
+ $actions["ADMIN_DATA"]["sound_aka_update"] = array (
+     'Url'      => "$path/admin_data/admin_data_index.php?action=sound_search_update&amp;mode=html",
      'Right' 	=> $admin_data_write,
      'Condition'=> array ('None')
                                     	);

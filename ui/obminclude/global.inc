@@ -10,7 +10,7 @@
 
 require_once("$obminclude/obm_conf.inc");
 
-$obm_version = "0.7.4";
+$obm_version = "0.7.5pre1";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -519,10 +519,8 @@ function get_hour($timestamp="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Dispaly an entity dates and users creation / update infos
 // Parameters:
-//   - $uc_id : usercreate id
-//   - $uu_id : userupdate id
-//   - $tc    : timecreate
-//   - $tu    : timeupdate
+//   - $obm_q : DBO object : used fields
+//              usercreate userupdate timecreate timeupdate datasource_name
 ///////////////////////////////////////////////////////////////////////////////
 function display_record_info($obm_q) {
   global $set_theme, $ico_created, $ico_updated;
@@ -550,33 +548,40 @@ function display_record_info($obm_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Dispaly an entity dates and users creation / update infos
+// Transform a name in a simplified version (suppress .,-,',accent)
+// Used for aka (Also Know As) names
 // Parameters:
-//   - $uc_id : usercreate id
-//   - $uu_id : userupdate id
-//   - $tc    : timecreate
-//   - $tu    : timeupdate
+//   - $name : name to transform
+// Returns:
+//   - $result : name converted
 ///////////////////////////////////////////////////////////////////////////////
-function display_record_info2($uc_id, $uu_id, $tc, $tu) {
-  global $set_theme, $ico_created, $ico_updated;
+function reduce_name($name) {
 
-  $obm_q = new DB_OBM;
-  $query_created = "select userobm_login from UserObm where userobm_id='$uc_id'";
-  $query_updated = "select userobm_login from UserObm where userobm_id='$uu_id'";
+  $res = preg_replace("/[טכיך]/i", "e", $name);
+  $res = preg_replace("/[אה]/i", "a", $res);
+  $res = preg_replace("/[מן]/i", "i", $res);
+  $res = preg_replace("/[פצ]/i", "o", $res);
+  $res = preg_replace("/[ûüש]/i", "u", $res);
+  $res = preg_replace("/[ח]/i", "c", $res);
+  $res = preg_replace("/[\.\-\']/", "", $res);
 
-  $obm_q->query($query_created);
-  $obm_q->next_record();
-  $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" /> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
-  $obm_q->query($query_updated);
-  $obm_q->next_record();
-  $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" /> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
-
-  $block = "<div class=\"detailInfo\">$created<br />$updated
-  </div>";
-
-  return $block;
+  return $res;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Wrapper around phonetic encoding (to ease phonetic algo change)           //
+// Parameters:
+//   - $name : name to encode
+// Returns:
+//   $res : phonetic encoded value of name
+///////////////////////////////////////////////////////////////////////////////
+function phonetic_key($name) {
+
+  $res = metaphone($name);
+
+  return $res;
+}
 
 
 //functions used by many modules

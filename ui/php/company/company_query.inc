@@ -30,7 +30,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   // If a name has been given we serch its sound too
   if ($name != "") {
     $auto_aka = reduce_name($name);
-    $sound = metaphone($name);
+    $sound = phonetic_key($name);
   }
 
   $req = "select
@@ -152,23 +152,6 @@ function run_query_detail($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Transform a name in a simplified version (suppress .,-,',accent)
-// Parameters:
-//   - $name : name to transform
-// Returns:
-//   - $result : name converted
-///////////////////////////////////////////////////////////////////////////////
-function reduce_name($name) {
-
-  $res = preg_replace("/[טכיך]/i", "e", $name);
-  $res = preg_replace("/[אה]/i", "a", $res);
-  $res = preg_replace("/[\.\-\']/", "", $res);
-
-  return $res;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Insertion query execution                                                 //
 // Parameters:
 //   - $company[] : Entry's values
@@ -187,7 +170,7 @@ function run_query_insert($company) {
   if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
     $aka .= " $auto_aka";
   }
-  $sound = metaphone($name);
+  $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -284,7 +267,7 @@ function run_query_update($cid, $company) {
   if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
     $aka .= " $auto_aka";
   }
-  $sound = metaphone($name);
+  $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
   $kind = $company["kind"];
   $act = $company["activity"];
