@@ -143,6 +143,7 @@ function run_query_detail($id) {
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         incidentpriority_label,
         incidentstatus_label,
+        incidentcategory1_label,
         $date,
         $timeupdate,
         $timecreate,
@@ -153,15 +154,36 @@ function run_query_detail($id) {
         left join UserObm u2 on incident_owner=u2.userobm_id
         left join IncidentPriority on incident_priority_id=incidentpriority_id
         left join IncidentStatus on incident_status_id=incidentstatus_id
+        left join IncidentCategory1 on incident_cat1_id=incidentcategory1_id
         left join UserObm as c on incident_usercreate=c.userobm_id
         left join UserObm as u on incident_userupdate=u.userobm_id
       where incident_id='$id'";
+ 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail1($id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  
+  $query = "select incident_contract_id,incident_duration
+            from Incident
+            where incident_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   $obm_q->next_record();
+  
   return $obm_q;
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -181,21 +203,26 @@ function run_query_incident_contract($cid) {
       contract_datebegin,
       contract_dateexp,
       contract_type_id,
+      contract_privacy,
+      contract_usercreate,
       u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
       u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
       c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
       c1.contact_phone as phone_c1, c2.contact_phone as phone_c2,
       c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
+      contractstatus_label,
       company_name,
       company_address1,
       company_zipcode,
       company_town
-    from ((((Contract
+    from ((((((Contract
               left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
               left join UserObm u2 on contract_techmanager_id=u2.userobm_id)
               left join Contact c1 on contract_contact1_id=c1.contact_id)
               left join Contact c2 on contract_contact2_id=c2.contact_id)
-              left join Company on contract_company_id=company_id
+              left join ContractStatus on contract_status_id=contractstatus_id)
+              left join Company on contract_company_id=company_id)
+             
     where contract_id='$cid'
     order by contract_label";
 
@@ -225,18 +252,25 @@ function run_query_insert($incident) {
   $lincident = $incident["lincident"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
-  $desc = $incident["description"];
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
+  $cat1 = $incident["cat1"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
   $contract_id = $incident["contract_id"];
   $call_date = "$date $hour:0:0";
+  $add_comment = $incident["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $incident["datecomment"];
+    $usercomment = $incident["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
 
   $obm_q = new DB_OBM;
+
 
   $query = "insert into Incident (incident_timeupdate,
     incident_timecreate,
@@ -247,11 +281,12 @@ function run_query_insert($incident) {
     incident_date,
     incident_priority_id,
     incident_status_id,
+    incident_cat1_id,
+    incident_comment,
     incident_logger,
     incident_owner,
     incident_duration,
     incident_archive,
-    incident_description,
     incident_resolution)
   values (null,
     '$now',
@@ -262,18 +297,25 @@ function run_query_insert($incident) {
     '$call_date',
     '$priority',
     '$status',
+    '$cat1',
+    '$comment',
     '$logger',
     '$owner',
     '$duration',
     '$archive',
-    '$desc',
     '$solu')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
+
+
+
   $i_id = run_query_incident_id($incident);
 
+
+
+ // send_mail($subject, $message, array($logger, $owner), array("pierre.baudracco@aliacom.fr"), 1);
 
   if ($cmail_incident != "") {
     $label_mail = stripslashes($lincident);
@@ -335,14 +377,16 @@ function run_query_incident_id($incident) {
 }
 
 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Incident update query execution                                           //
 // Parameters:
 //   - $incident[] : Entry's values
-//     keys used   : lincident, logger, owner, description, solution, priority
+//     keys used   : lincident, logger, owner,  solution, priority
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($incident) {
+function run_query_update($incident,$duration_temp) {
   global $auth, $cdg_sql;
 
   $param_incident = $incident["id"];
@@ -350,16 +394,22 @@ function run_query_update($incident) {
   $lincident = $incident["lincident"];
   $owner = $incident["owner"];
   $logger = $incident["logger"];
-  $desc = $incident["description"];
   $solu = $incident["solution"];
   $priority = $incident["priority"];
   $status = $incident["status"];
+  $cat1 = $incident["cat1"];
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
   $archive = $incident["archive"];
   $call_date = "$date $hour:0:0";
-
+  $comment = $incident["com"];
+  $add_comment = $incident["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $incident["datecomment"];
+    $usercomment = $incident["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $query = "update Incident set
     incident_timeupdate='". date("Y-m-d H:i:s")."',
     incident_userupdate='".$auth->auth["uid"]."',
@@ -369,9 +419,10 @@ function run_query_update($incident) {
     incident_date='$call_date', 
     incident_priority_id='$priority',
     incident_status_id='$status',
+    incident_cat1_id='$cat1',
     incident_resolution = '$solu',
-    incident_description = '$desc',
     incident_duration = '$duration',
+    incident_comment='$comment',
     incident_archive='$archive',
     incident_contract_id = '$param_contract'
    where incident_id='$param_incident'";
@@ -379,6 +430,10 @@ function run_query_update($incident) {
   $con_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $con_q->query($query);  
+  $diff = -0.6;
+  $diff = ($duration - $duration_temp);
+
+
 }
 
 
@@ -387,15 +442,19 @@ function run_query_update($incident) {
 // Parameters:
 //   - $i_id : incident id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($i_id) {
-  global $cdg_sql;
-
+function run_query_delete($i_id,$c_id,$duration) {
+  global $auth, $cdg_sql;
+ 
   $query = "delete from Incident where incident_id='$i_id'";
 
   $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $i_q->query($query);
+
+
+
 }
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -409,6 +468,7 @@ function run_query_priority() {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+ 
   return $obm_q;
 }
 
@@ -424,9 +484,25 @@ function run_query_status() {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Incident Status list                                    //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat1() {
+  global $cdg_sql;
+
+  $query = "select * from IncidentCategory1 order by incidentcategory1_order";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Priority insert                                         //
@@ -629,6 +705,107 @@ function run_query_status_links($s_id) {
 }
 
 
+
+//////////////////////////////////////////////////////////////////////////////
+// Query execution : Category1 insert
+// Parameters:
+//   - $incident[] : incident hash info : keys used : cat1_label, cat1_order
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat1_insert($incident) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $label = $incident["cat1_label"];
+  $order = $incident["cat1_order"];
+
+  $query = "insert into IncidentCategory1 (
+    incidentcategory1_timecreate,
+    incidentcategory1_usercreate,
+    incidentcategory1_label,
+    incidentcategory1_order)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$label',
+    '$order')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Category1 update
+// Parameters:
+//   - $incident[] : incident hash info :
+//     keys used : cat1, cat1_label, cat1_order
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat1_update($incident) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $cat1 = $incident["cat1"];
+  $label = $incident["cat1_label"];
+  $order = $incident["cat1_order"];
+
+  $query = "update IncidentCategory1 set 
+    incidentcategory1_label='$label',
+    incidentcategory1_timeupdate='$timeupdate',
+    incidentcategory1_userupdate='$userupdate',
+    incidentcategory1_order='$order'
+  where incidentcategory1_id='$cat1'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Category1 deletion
+// Parameters:
+//   - $id : Category1 id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat1_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from IncidentCategory1 where incidentcategory1_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $sta_q = new DB_OBM;
+  $retour = $sta_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Links to the Category1 given
+// Parameters:
+//   - $c_id : cat1 id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat1_links($c_id) {
+  global $cdg_sql;
+
+  $query = "SELECT incident_id, incident_label
+    FROM Incident
+    WHERE incident_cat1_id='$c_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get a priority label                                                      //
 // Parameters:
@@ -647,6 +824,7 @@ function get_priority_label($id) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("incidentpriority_label");
+
   return $retour;
 }
 
@@ -669,6 +847,30 @@ function get_status_label($id) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("incidentstatus_label");
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a Category1 label
+// Parameters:
+//   - $id : cat1 id
+///////////////////////////////////////////////////////////////////////////////
+function get_cat1_label($id) {
+  global $cdg_sql;
+
+  $query = "SELECT incidentcategory1_label
+    FROM IncidentCategory1
+    WHERE incidentcategory1_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("incidentcategory1_label");
+
   return $retour;
 }
 
@@ -714,8 +916,4 @@ function check_incident_form($incident) {
 
   return true;
 }
-
-
-
-
 

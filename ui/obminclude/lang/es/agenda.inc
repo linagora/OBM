@@ -19,8 +19,6 @@ $l_high = "Alta";
 $l_low = "Baja";
 $l_medium = "Media";
 
-$l_datebegin = "Fecha Inicio";
-$l_dateend = "Fecha Final";
 $l_timebegin = "Hora Inicio";
 $l_timebegin2 = "Hora Inicio";
 $l_timeend = "Hora Final";

@@ -20,8 +20,6 @@ $l_high = "Alta";
 $l_low = "Bassa";
 $l_medium = "Normale";
 
-$l_datebegin = "Data di inizio";
-$l_dateend = "Date fine";
 $l_timebegin = "Ora inizio";
 $l_timeend = "Ora fine ";
 $l_occupied_day = "Giorno occupato";

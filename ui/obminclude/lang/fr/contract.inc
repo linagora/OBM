@@ -10,33 +10,76 @@
 // Labels et textes
 $l_archive = "Archive";
 $l_contract_contracttype = "Type";
-$l_contract_exp = "Expiration";
-$l_date_alarm_after = "Date Expiration Après";
-$l_date_alarm_before = "Date Expiration Avant";
-$l_after = "Date Expiration Après";
-$l_before = "Date Expiration Avant";
-$l_incident_list = "Liste des incidents";
-$l_incident_new = "Ajouter un incident";
-
+$l_after = "Expiration Après";
+$l_before = "Expiration Avant";
+$l_incident_list = "Incidents";
+$l_incident_new = "Nouveau";
+$l_ccf_period = "Période";
+$l_ccf_ticket = "Coupons";
+$l_ccf_duration = "Durée";
+$l_responsable = "Responsable";
+$l_date = "Dates";
+$l_dateexp = "Expiration";
+$l_autorenewal ="Tacite Reconduction";
+$l_priority = "Priorite";
+$l_status = "Etat";
+$l_type = "Type";
+$l_pri_manage = "Gestion des priorités du contrat";
+$l_pri_exist = "Priorités existantes";
+$l_pri_new = "Nouvelle";
+$l_sta_manage = "Gestion des états du contrat";
+$l_sta_exist = "Etats existants";
+$l_sta_new = "Nouveau";
+$l_format = "Format";
+$l_no_ticket = "Nombre coupons";
+$l_total_ticket ="Coupons consommés";
+$l_disp_ticket = "Coupons disponibles";
+$l_ticket_final = "Dernier"; 
+$l_total_duration = "Durée utilisée (h)";
+$l_disp_supportduration ="Durée du support disponible (h)";
+$l_duration_final = "Dernier"; 
+$l_supportduration = "Durée du support (h)";
+$l_cck_customer = "Client";
+$l_cck_supplier = "Fournisseur";
+$l_contract_kind = "Relation";
 $l_contract_select_deal = "Sélection de l'Affaire liée au contrat.";
-$l_label_libelle = "Mot-clef du libellé";
-$l_kind = "Type";
+$l_label_libelle = "Libellé";
+$l_renewalkind = "Type de renouvellement";
 $l_marketing_manager = "Resp Commercial";
 $l_technical_manager = "Resp Technique";
 $l_client_manager = "Resp Client";
 $l_clause = "Clauses ";
-$l_date_init = "Date Debut";
-$l_dateexp = "Date Expiration";
+$l_begin = "Début";
+$l_dateexp = "Expiration";
+$l_date_renew = "Renouvellement";
+$l_date_cancel = "Résiliation";
+$l_date_signature = "Signature";
 $l_last_update = "Dernière modification le";
 $l_at = "à";
 $l_number = "Numéro";
+$l_ticket_final_coupon ="coupons";
+$l_final_duration ="heures";
+$l_company_town = "Ville du Company";
+$l_company_zipcode = "Zipcode";
+$l_company_expresspostalcode = "express postal code";
+$l_company_phonenumber = "numéro de telephone";
+$l_company_fax = "numéro de fax";
+$l_company_web = "adresse internet";
+$l_company_email = "email";
 
 // Actions
+$l_pri_update = "Modifier la priorité";
+$l_pri_checkdelete = "Vérifier ou supprimer la priorité";
+$l_pri_delete = "Supprimer la priorité";
+$l_pri_insert = "Insérer la priorité";
+$l_sta_update = "Modifier l'état";
+$l_sta_checkdelete = "Vérifier ou supprimer l'état";
+$l_sta_delete = "Supprimer l'état";
+$l_sta_insert = "Insérer l'état";
 $l_insert = "Enregistrer le Contrat";
 $l_update = "Modifier le Contrat";
 $l_delete = "Supprimer le Contrat";
 $l_select_company = "Sélectionner la société avec laquelle le contrat doit être renseigné.";
-
 $l_select_contract = "Selectionner le contrat";
 
 // Messages
@@ -49,12 +92,30 @@ $l_insert_ok = "L'insertion du Contrat a été correctement effectuée.";
 $l_insert_error = "L'insertion du Contrat a échoué !";
 $l_update_ok = "La modification du Contrat a été correctement effectuée";
 $l_update_error = "La modification du Contrat a échoué !";
-
+$l_pri_insert_ok = "La priorité a été insérée avec succès.";
+$l_pri_insert_error = "L'insertion de la priorité a échoué !";
+$l_pri_update_ok = "La modification de la priorité a été correctement effectuée.";
+$l_pri_update_error = "La modification de la priorité a échoué !";
+$l_pri_delete_ok = "La suppression de la priorité a été correctement effectuée !.";
+$l_pri_delete_error = "La suppression de la priorité a échoué !";
+$l_pri_can_delete = "La priorité peut être supprimée !";
+$l_pri_cant_delete = "La priorité ne peut être supprimée !";
+$l_pri_link_contract = "La priorité est référencée par ces incidents";
+$l_pri_link_contract_no = "La priorité n'est pas référencée";
+$l_sta_insert_ok = "L'état a été inséré avec succès.";
+$l_sta_insert_error = "L'insertion de l'état a échoué !";
+$l_sta_update_ok = "La modification de l'état a été correctement effectuée.";
+$l_sta_update_error = "La modification de l'état a échoué !";
+$l_sta_delete_ok = "La suppression de l'état a été correctement effectuée !.";
+$l_sta_delete_error = "La suppression de l'état a échoué !";
+$l_sta_can_delete = "L'état peut être supprimé !";
+$l_sta_cant_delete = "L'état ne peut être supprimé !";
+$l_sta_link_incident = "L'état est référencé par ces incidents";
+$l_sta_link_incident_no = "L'état n'est pas référencé";
 $l_link_incident = "Le contrat référence ces incidents";
 $l_link_incident_no = "Le contrat n'a pas d'incidents";
 $l_cant_delete = "Le contrat ne peut être supprimé !";
 $l_can_delete = "Le contrat peut être supprimé.";
-
 $l_type_manage = "Gestion des Types";
 $l_type_exist = "Types existants";
 $l_type_new = "Nouveau Type";
@@ -71,8 +132,14 @@ $l_type_delete_ok = "La suppression du type a été correctement effectuée.";
 $l_type_can_delete = "Le type peut être supprimé";
 $l_type_cant_delete = "Le type ne peut être supprimé !";
 $l_type_link_contract = "Le type est référencé par ces contrats";
-
 $l_err_label_empty = "Le label doit être renseigné !";
+$l_err_duration_empty = "Le Durée du support doit être renseigné !";
+$l_err_ticket_empty = "Le nombre de coupons doit être renseigné !";
+$l_check_samecontract = "Ces contracts sont similaires avec cette nouvelle introduction !";
+$l_err_daterenew = "Invalide date de rénouvellement!";
+$l_err_datecancel = "Invalide date de cancellation! ";
+$l_err_date = "Date de début ne peut pas etre supérieure à date d'expiration!";
+
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_contract = "Vous devez sélectionner un contrat !";
@@ -83,3 +150,10 @@ $l_delete_confirm = "Confirmer la suppression du contrat ?";
 
 // For the display preferences modification screen 
 $l_contract_display = "Options d'affichage des Contrats de Support";
+$l_j_pri_create = "Vous devez saisir une priorité pour la créer !";
+$l_j_pri_update = "Vous devez sélectionner une priorité et entrer une modification avant de valider !";
+$l_j_pri_delete = "Vous devez sélectionner une priorité pour l'effacer !";
+$l_j_sta_create = "Vous devez saisir un état pour le créer !";
+$l_j_sta_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
+$l_j_sta_delete = "Vous devez sélectionner un état pour l'effacer !";
+

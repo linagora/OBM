@@ -12,8 +12,6 @@ $l_tasktype = "Categoría";
 $l_task = "Tarea";
 $l_soldtime = "Tiempo vendido";
 $l_estimatedtime = "Tiempo Estimado";
-$l_datebegin = "Fecha de Inicio";
-$l_dateend = "Fecha final";
 
 $l_sold = "Vendido";
 $l_estimated = "Estimado";

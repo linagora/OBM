@@ -149,6 +149,58 @@ function check_status_new(form)
 }
 
 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the Deal Solution type deletion is possible                      //
+///////////////////////////////////////////////////////////////////////////////
+function check_solutiontype_checkdel(form)
+{  
+   if (form.sel_solutiontype.selectedIndex >= 0)
+   { 
+     return true;
+   }
+   else
+   {
+     alert(\"$l_j_soltype_delete\");
+     return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the solutiontype update is possible                              //
+///////////////////////////////////////////////////////////////////////////////
+function check_solutiontype_upd(form,formd)
+{
+  solutiontype_pos = formd.sel_solutiontype.selectedIndex;
+  if ((solutiontype_pos >= 0) && (form.tf_solutiontype.value != \"\")) {
+    form.sel_solutiontype.value=formd.sel_solutiontype.options[solutiontype_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_soltype_update\");
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the solutiontype creation is possible                            //
+///////////////////////////////////////////////////////////////////////////////
+function check_solutiontype_new(form)
+{
+   if (form.tf_solutiontype.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_soltype_create\");
+      return false;
+   }
+}
+
+
+
+
 -->
 </script>
 ";

@@ -9,9 +9,6 @@
 
 // Labels et textes
 $l_contract_contracttype = "Tipo de contrato";
-$l_contract_exp = "Expiración";
-$l_date_alarm_after = "Antes de Fecha de vencimiento";
-$l_date_alarm_before = "Posterior a  Fecha de vencimiento";
 $l_after = "Antes de Fecha de vencimiento";
 $l_before = "Posterior a  Fecha de vencimiento";
 $l_incident_list = "Lista de  incidentes";
@@ -24,8 +21,8 @@ $l_marketing_manager = "Gerente de Mercadeo";
 $l_technical_manager = "Gerente Técnico";
 $l_client_manager = "Gerente Comercial";
 $l_clause = "Clausulas";
-$l_date_init = "Fecha de Inicio";
-$l_dateexp = "Fecha Final";
+$l_date = "Fechas";
+$l_dateexp = "Expiración";
 $l_last_update = "Última actualización";
 $l_at = "a las";
 

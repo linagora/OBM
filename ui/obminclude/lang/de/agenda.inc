@@ -18,8 +18,6 @@ $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
 
-$l_datebegin = "Date begin";
-$l_dateend = "Date End";
 $l_timebegin = "Hour begin (HH:MM)";
 $l_timebegin2 = "Hour begin";
 $l_timeend = "Hour end (HH:MM)";

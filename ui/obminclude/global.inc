@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.9";
+$obm_version = "0.9.0pre1";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -167,19 +167,17 @@ if ($cgp_hide["contact"]["contact_function"]) {
 // OBM internal Constants : Do not change 
 //---------------------------------------------------------------------------//
 
-// TaskType caterogies (used by Project and time management) (field : internal)
-$ctt_sales = '0';    // Sales Activity tasks
-$ctt_research = '1'; // Internal R&D tasks
-$ctt_others = '2';   // Tasks not related to production
+// Global Constants
+$c_all = "_ALL_";		// Used in Form select
+$c_auto = "_AUTO_";
+$c_yes = "Yes";			// Maybe stored in database
+$c_no = "No";
 
-// Menu display options constants
-$cme_txt = "text";  // text
-$cme_ico = "icon";  // icon
-$cme_both = "both"; // both
-
-// Todo sort order options constants
-$cts_pri = "todo_priority";  // Priority
-$cts_dead = "todo_deadline"; // Deadline
+// Debug Constants
+$cdg_id = 1;     // id display
+$cdg_param = 2;  // parameter display
+$cdg_sess = 4;   // session display
+$cdg_sql = 8;    // sql query display
 
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
@@ -188,9 +186,22 @@ $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
 $cda_txt = "d M Y"; // txt format
 
+// Menu display options constants
+$cme_txt = "text";  // text
+$cme_ico = "icon";  // icon
+$cme_both = "both"; // both
+
 // Comment dislay order
 $cco_chro = 0; // Chronological
 $cco_rev = 1;  // Reverse
+
+// Export delimiter constants
+$ccsvd_sc = ";";    // Semi-colon
+$ccsvd_tab = "tab"; // Tab
+
+// Todo sort order options constants
+$cts_pri = "todo_priority";  // Priority
+$cts_dead = "todo_deadline"; // Deadline
 
 // Calendar Interval display constant
 $ccal_4 = 4;  // 1/4 h
@@ -200,26 +211,24 @@ $l_cal_4 = "1/4";  // 1/4 h
 $l_cal_2 = "1/2";  // 1/2 h
 $l_cal_1 = "1";    // 1 h
 
-// Export delimiter constants
-$ccsvd_sc = ";";    // Semi-colon
-$ccsvd_tab = "tab"; // Tab
+// TaskType caterogies (used by Project and time management) (field : internal)
+$ctt_sales = '0';    // Sales Activity tasks
+$ctt_research = '1'; // Internal R&D tasks
+$ctt_others = '2';   // Tasks not related to production
+
+// Contract Kind
+$cck_customer = 0;
+$cck_supplier = 1;
+
+// Contract Format
+$ccf_period = 0;
+$ccf_duration = 1;
+$ccf_ticket = 2;
 
 // Perms XXXXX Deprecated : to be removed
 $perms_user = "user";
 $perms_editor = "editor";
 $perms_admin = "admin";
-
-// Debug Constants
-$cdg_id = 1;     // id display
-$cdg_param = 2;  // parameter display
-$cdg_sess = 4;   // session display
-$cdg_sql = 8;    // sql query display
-
-// Global Constants
-$c_all = "_ALL_";		// Used in Form select
-$c_auto = "_AUTO_";
-$c_yes = "Yes";			// Maybe stored in database
-$c_no = "No";
 
 //---------------------------------------------------------------------------//
 // Default access rights bits meanings

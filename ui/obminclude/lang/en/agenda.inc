@@ -21,8 +21,6 @@ $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";
 
-$l_datebegin = "Begin date";
-$l_dateend = "End date";
 $l_timebegin = "Begin time";
 $l_timeend = "End time";
 $l_occupied_day = "Whole day";

@@ -1,7 +1,7 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File : create_obmdb_0.8.pgsql.sql                                 //
---//     - Desc : PostGreSQL Database 0.8 creation script                    //
---// 2003-12-30 Pierre Baudracco                                             //
+--// OBM - File : create_obmdb_0.9.pgsql.sql                                 //
+--//     - Desc : PostGreSQL Database 0.9 creation script                    //
+--// 2004-12-30 Pierre Baudracco                                             //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
@@ -505,7 +505,6 @@ CREATE TABLE DealCategory (
   PRIMARY KEY (dealcategory_id)
 );
 
-
 -- Table structure for table 'DealCategoryLink'
 --
 CREATE TABLE DealCategoryLink (
@@ -650,6 +649,75 @@ CREATE TABLE Todo (
   todo_title       varchar(80) DEFAULT NULL,
   todo_content     text DEFAULT NULL,
   PRIMARY KEY (todo_id)
+);
+
+
+-------------------------------------------------------------------------------
+-- Publication module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Publication'
+--
+
+CREATE TABLE Publication (
+  publication_id             serial,
+  publication_timeupdate     timestamp,
+  publication_timecreate     timestamp,
+  publication_userupdate     integer,
+  publication_usercreate     integer,
+  publication_title          varchar(64) NOT NULL,
+  publication_type_id        integer,
+  publication_year           integer,
+  publication_lang           varchar(30),
+  publication_desc           text,
+  PRIMARY KEY (publication_id)
+);
+
+--
+-- Table structure for table 'PublicationType'
+--
+CREATE TABLE PublicationType (
+  publicationtype_id          serial,
+  publicationtype_timeupdate  timestamp,
+  publicationtype_timecreate  timestamp,
+  publicationtype_userupdate  integer,
+  publicationtype_usercreate  integer,
+  publicationtype_label       varchar(64),
+  PRIMARY KEY (publicationtype_id)
+);
+
+
+--
+-- Table structure for table 'Subscription'
+--
+CREATE TABLE Subscription (
+  subscription_id		serial,
+  subscription_publication_id 	integer NOT NULL,
+  subscription_contact_id       integer NOT NULL,
+  subscription_timeupdate       timestamp,
+  subscription_timecreate       timestamp,
+  subscription_userupdate       integer,
+  subscription_usercreate       integer,
+  subscription_quantity       	integer,
+  subscription_renewal          integer NOT NULL,
+  subscription_reception_id     integer NOT NULL,
+  subscription_date_begin       timestamp,
+  subscription_date_end         timestamp,
+  PRIMARY KEY (subscription_id)
+);
+
+
+--
+-- Table structure for table 'SubscriptionReception'
+--
+CREATE TABLE SubscriptionReception ( 
+  subscriptionreception_id          serial,
+  subscriptionreception_timeupdate  timestamp,
+  subscriptionreception_timecreate  timestamp,
+  subscriptionreception_userupdate  integer,
+  subscriptionreception_usercreate  integer,
+  subscriptionreception_label       char(12),
+  PRIMARY KEY (subscriptionreception_id)
 );
 
 
@@ -846,8 +914,8 @@ create INDEX tt_idx_pt ON TimeTask (timetask_projecttask_id);
 --
 CREATE TABLE TaskType (
   tasktype_id          serial,
-  tasktype_timeupdate  TIMESTAMP,
-  tasktype_timecreate  TIMESTAMP,
+  tasktype_timeupdate  timestamp,
+  tasktype_timecreate  timestamp,
   tasktype_userupdate  integer DEFAULT NULL,
   tasktype_usercreate  integer DEFAULT NULL,
   tasktype_internal    integer NOT NULL,
@@ -864,24 +932,35 @@ CREATE TABLE TaskType (
 --
 CREATE TABLE Contract (
   contract_id                serial,
-  contract_timeupdate        TIMESTAMP,
-  contract_timecreate        TIMESTAMP,
+  contract_timeupdate        timestamp,
+  contract_timecreate        timestamp,
   contract_userupdate        integer DEFAULT NULL,
   contract_usercreate        integer DEFAULT NULL,
-  contract_label             varchar(40) DEFAULT NULL,
   contract_deal_id           integer DEFAULT NULL,
   contract_company_id        integer DEFAULT NULL,
+  contract_label             varchar(128) DEFAULT NULL,
   contract_number            varchar(20) DEFAULT NULL,
+  contract_datesignature     date DEFAULT NULL,
   contract_datebegin         date DEFAULT NULL,
   contract_dateexp           date DEFAULT NULL,
+  contract_daterenew         date DEFAULT NULL,
+  contract_datecancel        date DEFAULT NULL,
   contract_type_id           integer DEFAULT NULL,
+  contract_priority_id       integer DEFAULT 0 NOT NULL,
+  contract_status_id         integer DEFAULT 0 NOT NULL,
+  contract_kind              integer DEFAULT 0 NULL,
+  contract_format            integer DEFAULT 0 NULL,
+  contract_ticketnumber      integer DEFAULT 0 NULL,
+  contract_duration          integer DEFAULT 0 NULL,
+  contract_autorenewal       integer DEFAULT 0 NULL,
   contract_contact1_id       integer DEFAULT NULL,
   contract_contact2_id       integer DEFAULT NULL,
   contract_techmanager_id    integer DEFAULT NULL,
   contract_marketmanager_id  integer DEFAULT NULL,
+  contract_privacy           integer DEFAULT 0 NULL,
+  contract_archive           integer DEFAULT 0,
   contract_clause            text,
   contract_comment           text,
-  contract_archive           integer DEFAULT 0,
   PRIMARY KEY (contract_id)
 );
 
@@ -891,12 +970,43 @@ CREATE TABLE Contract (
 --
 CREATE TABLE ContractType (
   contracttype_id          serial,
-  contracttype_timeupdate  TIMESTAMP,
-  contracttype_timecreate  TIMESTAMP,
+  contracttype_timeupdate  timestamp,
+  contracttype_timecreate  timestamp,
   contracttype_userupdate  integer DEFAULT NULL,
   contracttype_usercreate  integer DEFAULT NULL,
-  contracttype_label       varchar(40) DEFAULT NULL,
+  contracttype_label       varchar(64) DEFAULT NULL,
   PRIMARY KEY (contracttype_id)
+);
+
+
+--
+-- New table 'ContractPriority'
+--
+CREATE TABLE ContractPriority (
+  contractpriority_id          serial,
+  contractpriority_timeupdate  timestamp,
+  contractpriority_timecreate  timestamp,
+  contractpriority_userupdate  integer DEFAULT NULL,
+  contractpriority_usercreate  integer DEFAULT NULL,
+  contractpriority_color       varchar(6) DEFAULT NULL,
+  contractpriority_order       integer DEFAULT NULL,
+  contractpriority_label       varchar(64) DEFAULT NULL,
+  PRIMARY KEY (contractpriority_id)
+);
+
+
+--
+-- New table 'ContractStatus'
+--
+CREATE TABLE ContractStatus (
+  contractstatus_id     	serial,
+  contractstatus_timeupdate  	timestamp,
+  contractstatus_timecreate  	timestamp,
+  contractstatus_userupdate  	integer DEFAULT	NULL,
+  contractstatus_usercreate  	integer DEFAULT	NULL,
+  contractstatus_order  	integer DEFAULT	NULL,
+  contractstatus_label  	varchar(64) DEFAULT NULL,
+PRIMARY KEY (contractstatus_id)
 );
 
 
@@ -904,22 +1014,23 @@ CREATE TABLE ContractType (
 -- New table 'Incident'
 --
 CREATE TABLE Incident (
-  incident_id           serial,
-  incident_timeupdate   timestamp,
-  incident_timecreate   timestamp,
-  incident_userupdate   integer DEFAULT NULL,
-  incident_usercreate   integer DEFAULT NULL,
-  incident_contract_id  integer NOT NULL,
-  incident_label        varchar(100) DEFAULT NULL,
-  incident_date         timestamp,
-  incident_priority_id  integer DEFAULT NULL,
-  incident_status_id    integer DEFAULT NULL,
-  incident_logger       integer DEFAULT NULL,
-  incident_owner        integer DEFAULT NULL,
-  incident_duration     char(4) DEFAULT '0',
-  incident_archive      char(1) NOT NULL DEFAULT '0',
-  incident_description  text,
-  incident_resolution   text,
+  incident_id               serial,
+  incident_timeupdate       timestamp,
+  incident_timecreate       timestamp,
+  incident_userupdate       integer DEFAULT NULL,
+  incident_usercreate       integer DEFAULT NULL,
+  incident_contract_id      integer NOT NULL,
+  incident_label            varchar(100) DEFAULT NULL,
+  incident_date             timestamp,
+  incident_priority_id      integer DEFAULT NULL,
+  incident_status_id        integer DEFAULT NULL,
+  incident_cat1_id          integer DEFAULT NULL,
+  incident_logger           integer DEFAULT NULL,
+  incident_owner            integer DEFAULT NULL,
+  incident_duration         char(4) DEFAULT '0',
+  incident_archive          char(1) NOT NULL DEFAULT '0',
+  incident_comment          text,
+  incident_resolution       text,
   PRIMARY KEY (incident_id)
 );
 
@@ -953,7 +1064,22 @@ CREATE TABLE IncidentStatus (
   incidentstatus_label       varchar(32) DEFAULT NULL,
   PRIMARY KEY (incidentstatus_id)
 );
-    
+
+
+--
+-- New table 'IncidentCategory1'
+--
+CREATE TABLE IncidentCategory1 (
+  incidentcategory1_id          serial,
+  incidentcategory1_timeupdate  timestamp,
+  incidentcategory1_timecreate  timestamp,
+  incidentcategory1_userupdate  integer DEFAULT NULL,
+  incidentcategory1_usercreate  integer DEFAULT NULL,
+  incidentcategory1_order       integer,
+  incidentcategory1_label       varchar(32) DEFAULT NULL,
+  PRIMARY KEY (incidentcategory1_id)
+);
+
 
 -------------------------------------------------------------------------------
 -- Accounting Section tables
@@ -1175,77 +1301,6 @@ CREATE TABLE Import (
   UNIQUE (import_name)
 );
 
-
--------------------------------------------------------------------------------
--- Publication module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Publication'
---
-CREATE TABLE Publication (
-  publication_id             serial,
-  publication_timeupdate     timestamp,
-  publication_timecreate     timestamp,
-  publication_userupdate     integer,
-  publication_usercreate     integer,
-  publication_title          varchar(64) NOT NULL,
-  publication_type_id        integer,
-  publication_year           integer,
-  publication_lang           varchar(30),
-  publication_desc           text,
-  PRIMARY KEY (publication_id)
-);
-
-
---
--- Table structure for table 'PublicationType'
---
-CREATE TABLE PublicationType (
-  publicationtype_id          serial,
-  publicationtype_timeupdate  timestamp,
-  publicationtype_timecreate  timestamp,
-  publicationtype_userupdate  integer,
-  publicationtype_usercreate  integer,
-  publicationtype_label       varchar(64),
-  PRIMARY KEY (publicationtype_id)
-);
-
-
---
--- Subscription Tables
---
-
---
--- Table structure for table 'Subscription'
---
-CREATE TABLE Subscription(
-  subscription_id		serial,
-  subscription_publication_id 	integer NOT NULL,
-  subscription_contact_id       integer NOT NULL,
-  subscription_timeupdate       timestamp,
-  subscription_timecreate       timestamp,
-  subscription_userupdate       integer,
-  subscription_usercreate       integer,
-  subscription_quantity       	integer,
-  subscription_renewal          integer NOT NULL,
-  subscription_reception_id     integer NOT NULL,
-  subscription_date_begin       timestamp,
-  subscription_date_end         timestamp,
-  PRIMARY KEY (subscription_id)
-);
-
---
--- Table structure for table 'SubscriptionReception'
---
-CREATE TABLE SubscriptionReception ( 
-  subscriptionreception_id          serial,
-  subscriptionreception_timeupdate  timestamp,
-  subscriptionreception_timecreate  timestamp,
-  subscriptionreception_userupdate  integer,
-  subscriptionreception_usercreate  integer,
-  subscriptionreception_label       char(12),
-  PRIMARY KEY (subscriptionreception_id)
-);
 
 COMMIT;
 
