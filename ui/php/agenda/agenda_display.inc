@@ -2813,18 +2813,26 @@ function dis_export_handle($agenda) {
   echo "
 BEGIN:VCALENDAR
 VERSION:2.0
-PRODID :-//OBM/OBM V$obm_version Calendar//EN";
+PRODID:-//OBM/OBM V$obm_version Calendar//EN
+METHOD:PUBLISH";
   while($obm_event->next_record()) {
     $id = $obm_event->f("calendarevent_id");
-    $title = $obm_event->f("calendarevent_title");
+    $title = "SUMMARY:" . $obm_event->f("calendarevent_title");
+    $title = wordwrap($title,74,"\n ",1);
     $priority = $obm_event->f("calendarevent_priority");
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
+    $date_ts = $obm_event->f("calendarevent_timeupdate");
+    $date_ts = gmdate("Ymd\THis\Z",mktime(substr($date_ts,8,2),substr($date_ts,10,2),0,substr($date_ts,4,2),substr($date_ts,6,2),substr($date_ts,0,4)));
     if($obm_event->f("calendarevent_description") != "") {
-      $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
+      $description = preg_replace("/\\r?\\n/","\\n",$obm_event->f("calendarevent_description"));
+      $description = "DESCRIPTION:" . $description;
+      $description = "\n" . wordwrap($description,74,"\n ",1);
     }
-    $date_b = substr($obm_event->f("calendarsegment_date"),0,8)."T".substr($obm_event->f("calendarsegment_date"),8,4)."00";
+    $date_b = $obm_event->f("calendarsegment_date");
+    $date_b = gmdate("Ymd\THis\Z",mktime(substr($date_b,8,2),substr($date_b,10,2),0,substr($date_b,4,2),substr($date_b,6,2),substr($date_b,0,4)));
     $obm_event->next_record();
-    $date_e = substr($obm_event->f("calendarsegment_date"),0,8)."T".substr($obm_event->f("calendarsegment_date"),8,4)."00";
+    $date_e = $obm_event->f("calendarsegment_date");
+    $date_e = gmdate("Ymd\THis\Z",mktime(substr($date_e,8,2),substr($date_e,10,2),0,substr($date_e,4,2),substr($date_e,6,2),substr($date_e,0,4)));
     switch($priority) {
       case 1 : $priority = 3;
 	break;
@@ -2841,11 +2849,12 @@ PRODID :-//OBM/OBM V$obm_version Calendar//EN";
     echo "
 BEGIN:VEVENT
 UID:$id    
-SUMMARY:$title
+$title
 CLASS:$private
 CATEGORIES:$category
 STATUS:CONFIRMED$description
 DTSTART:$date_b
+DTSTAMP:$date_ts
 DTEND:$date_e
 END:VEVENT";
   }

@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2, 0.7.3
+<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2, 0.7.3, 0.7.4
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,8 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
+wget http://obm.aliacom.fr/obm-archives/obm-0.7.4.tar.gz
+tar -C /var/www -xzvf obm-0.7.4.tar.gz
 cd /var/www
-tar -xzvf obm-0.7.3.tar.gz
+ln -s obm-0.7.4 obm
 </pre>
   </td>
 </tr>
@@ -244,75 +246,9 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 
 <h2>4: Create the OBM database</h2>
 
-<h3>4.1: MySQL</h3>
-The scripts are in the scripts/0.7 directory.
-<br />The script <i>install_obmdb_0.7.sh</i> handle all the database creation steps.
-<p />
-<b>Requisite :</b> you must know (or create) a valid mysql login/password
+<h3>4.1: OBM configuration</h3>
 
-<h4>4.1.1: MySQL preparation</h3>
-
-mysql user creation example (user web / web) (number of "Y" may vary with mysql versions) 
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u root mysql    # or with an authorized user
-insert into user values("localhost","web",password("web"),"Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y");
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-Because of the way the mysql access rights works you may have to remove the
-standard access from localhost
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-delete from user where Host="localhost" and Select_priv="N";
-</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-You have to restart the mysql daemon for the new acces rights to take effect
-or use mysqladmin
-
-<h4>4.1.2 - Create the database</h4>
-
-Open the install_obmdb_0.7.sh and fill the mysql user and password with valid values.
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-# Mysql User and Password var definition
-U=web
-P=web</pre>
-  </td>
-</tr>
-</table>
-
-<p />
-Run the creation script
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-cd obm/scripts/0.7
-./install_obmdb_0.7.sh
-</pre>
-  </td>
-</tr>
-</table>
-
-
-<h3>4.2: Create the obm database - PostgreSQL</h3>
-
-Scripts for postgres are not yet available.
-
-
-<h2>5: Select the database (MySQL or PostgreSQL) for OBM</h2>
-
-<h3>5.1: For OBM 0.7.0, 0.7.1 and 0.7.2 only</h3>
+<h4>4.1.1: For OBM 0.7.0, 0.7.1 and 0.7.2 only</h3>
 
 # in obminclude/phplib edit the file <i>obmlib.inc</i> and comment one of these two lines in the DB_OBM class definition (near line 30) :
 <table bgcolor="#CCCCCC" border="1">
@@ -339,7 +275,8 @@ var $Password = "web";
 </tr>
 </table>
 
-<h3>5.2: For OBM 0.7.3 and ></h3>
+
+<h4>4.1.2: For OBM 0.7.3 and +</h4>
 # in obminclude edit the file <i>obm_conf.inc</i> and select the database to use, declare the database, the database user and password.
 You can update some global preferences in this file too (eg: gp_mail_enabled)
 
@@ -350,8 +287,8 @@ You can update some global preferences in this file too (eg: gp_mail_enabled)
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
-$obmdb_user = "root";
-$obmdb_password = "";
+$obmdb_user = "web";
+$obmdb_password = "web";
 
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;
@@ -362,7 +299,46 @@ $gp_mail_enabled = false;
 
 
 
-<h2>6: Run OBM (access the obm.php from your browser)</h2>
+<h3>4.2: Database Configuration</h3>
+The scripts are in the scripts/0.7 directory.
+
+<h4>4.2.1: MySQL</h4>
+The script <i>install_obmdb_0.7.sh</i> handle all the database creation steps.
+<p />
+<b>Requisite :</b> you must know (or create) a valid mysql login/password
+
+<p />
+mysql user creation example (user web / web)
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE ON obm.* TO web@localhost IDENTIFIED BY 'web';
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h4>4.2.2: PostgreSQL</h4>
+
+Scripts for postgres are not yet available but will come soon (we hope to have them for 0.7.5).
+
+
+<h3>4.3: - Database Creation</h4>
+
+Run the creation script
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd obm/scripts/0.7
+./install_obmdb_0.7.sh
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h2>5: Run OBM (access the obm.php from your browser)</h2>
 # First restart your apache web server
 
 <table bgcolor="#CCCCCC" border="1">
@@ -518,6 +494,35 @@ mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
 <p>
 <h3>Update stored values that are not calculated</h3>
 # In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the company module (which update these values)
+
+
+<p/>
+<a name="upgrade-0.7.4"><h1>UPGRADE OBM DATABASE 0.7.3 to 0.7.4</h1></a>
+<p />
+# Database has evolved from 0.7.3 to 0.7.4
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/update-0.7.3-0.7.4.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
 
 
 <br /><br />

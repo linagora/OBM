@@ -1062,7 +1062,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $company = $project_q->f("company_name");
       if ($company == "") $company = $l_intern;
 
-      $proj_name = htmlspecialchars(addslashes($project_q->f("project_name")));
+      $proj_name = addslashes($project_q->f("project_name"));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
       $proj_label = "\" $company -- ". $proj_name. "\"";
 
@@ -1090,7 +1090,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $projtask_pid  = $projecttask_q->f("projecttask_project_id");
       $projtask_id = $projecttask_q->f("projecttask_id");
     
-      $projtask_name = htmlspecialchars(addslashes($projecttask_q->f("projecttask_label")));
+      $projtask_name = addslashes($projecttask_q->f("projecttask_label"));
       $projtask_name = (strlen($projtask_name) > 35) ? substr($projtask_name,0,35)."..." : $projtask_name;
 
       $projtask_label = "\"". $projtask_name ."\"";

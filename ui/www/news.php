@@ -19,6 +19,17 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2003-12-05</b> : version <b>0.7.4</b> released (minor fixes)
+        <ol>
+          <li> Project module fixes and improvement
+          <li> Fixes on install script (typo ';' !)
+     <li> Fixes in Incident, Agenda (better export for Outlook), Lang, User,...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-11-24</b> : version <b>0.7.3</b> released (many fixes)
         <ol>
           <li> Project module rewrite

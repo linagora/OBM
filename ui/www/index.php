@@ -24,6 +24,17 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2003-12-05</b> : version <b>0.7.4</b> released (minor fixes)
+        <ol>
+          <li> Project module fixes and improvement
+          <li> Fixes on install script (typo ';' !)
+     <li> Fixes in Incident, Agenda (better export for Outlook), Lang, User,...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-11-24</b> : version <b>0.7.3</b> released (many fixes)
         <ol>
           <li> Project module rewrite
@@ -41,36 +52,6 @@
         <ol>
           <li> Major fixes on install script (Todo table)
           <li> Minor fixes in Contract, Incident, Project and Todo
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2003-09-29</b> : version <b>0.7.1</b> released (fixes and enhancement)
-        <ol>
-          <li> New module : todo
-          <li> New theme : grey (finally we have more than 1 real theme)
-          <li> CVS Export enhancement (delimiter in user preference, default to save with module.csv filename, export all pages...)
-	  <li> Document tree now viewed directly from database
-	  <li> Time optimizations and enhancement (project list refresh)
-	  <li> fixes in Company (deletion), Deal (User comments), Contract, User (deletion)
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li> 
-        <div align="left"><b>2003-09-09</b> : version <b>0.7.0</b> released (major enhancement, functionnality update)</b> !
-        <ol>
-          <li> New module : <b>Project management</b>. Tasks, members and progress tracking.
-          <li> <b>Time management</b> total rewrite to interact with new Project management. 
-	  <li> New module : <b>Document</b>, with dual view (DB and filesystem). Documents can be linked to entities (deal,...)
-	  <li> New module : <b>User groups</b>. A group consist of users and/or groups.
-          <li> CSV export (OBM_DISPLAY) : each dataset or search results can be exported to csv files,
-	  <li> Dynamic lists. Contacts lists can now be based on a query (and keeping hard linked members too).
-	  <li> Global display reworked. Only one function handle the display, with all display attributes in CSS.
-	  <li> Many fixes and enhancements !
         </ol>
         </div>
         <br />

@@ -990,7 +990,7 @@ function html_project_task_form($ptask_q, $project) {
   
   $pid = $project["id"];
   $pname = $project["name"];
-  $label = $project["tasklabel"];
+  $label = stripslashes($project["tasklabel"]);
   $ptask = $project["ptask"];
 
   if (($ptask_q != 0) && ($ptask_q->num_rows() != 0)) {

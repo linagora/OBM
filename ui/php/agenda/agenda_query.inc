@@ -2036,9 +2036,11 @@ function dateOfWeek($Ymd, $day) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_vevent_norepeat($agenda) { 
   global $auth;
+
   $uid = $auth->auth["uid"];
   $obm_db = new DB_OBM;
   $query = "SELECT calendarevent_id,
+                   calendarevent_timeupdate,
                    calendarevent_title,
                    calendarevent_priority,
                    calendarevent_privacy,
@@ -2049,11 +2051,11 @@ function run_query_get_vevent_norepeat($agenda) {
 		   calendarsegment_date,
 		   calendarsegment_flag
 	    FROM CalendarEvent,CalendarCategory, CalendarSegment
-	    WHERE calendarsegment_customerid = $uid
+	    WHERE calendarsegment_customerid = '$uid'
 	    AND calendarevent_category_id = calendarcategory_id
 	    AND calendarevent_id = calendarsegment_eventid
 	    AND calendarevent_repeatkind = 'none'
-	    AND  calendarsegment_state = 'A'
+	    AND calendarsegment_state = 'A'
 ";
 
   $query.=" ORDER BY calendarevent_id,calendarsegment_date";
@@ -2075,6 +2077,7 @@ function run_query_get_vevent_repeat($agenda) {
   $uid = $auth->auth["uid"];
   $obm_db = new DB_OBM;
   $query = "SELECT calendarevent_id,
+                   calendarevent_timeupdate,
                    calendarevent_title,
                    calendarevent_priority,
                    calendarevent_privacy,
@@ -2088,11 +2091,11 @@ function run_query_get_vevent_repeat($agenda) {
 		   MIN(calendarsegment_date) as calendarsegment_date,
 		   calendarsegment_flag
 	    FROM CalendarEvent,CalendarCategory, CalendarSegment
-	    WHERE calendarsegment_customerid = ".$uid."
+	    WHERE calendarsegment_customerid = '$uid'
 	    AND calendarevent_category_id = calendarcategory_id
 	    AND calendarevent_id = calendarsegment_eventid
 	    AND calendarevent_repeatkind != 'none'
-	    AND  calendarsegment_state = 'A'";
+	    AND calendarsegment_state = 'A'";
 
   $query.="GROUP BY calendarevent_id,calendarsegment_flag  ORDER BY calendarevent_id,calendarsegment_date";
   display_debug_msg($query, $cdg_sql);
