@@ -122,8 +122,8 @@ function generate_menu($menu, $section) {
 //   - $menu   : selected menu 
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $menu) {
-  global $set_theme, $menus, $action ;
-  global $col_barre, $font_fonction,$actions;
+  global $set_theme, $menus, $action, $popup_height ;
+  global $col_barre, $font_fonction,$actions, $popup_width;
 
   echo "
 <table width=90% cellspacing=0 cellpadding=0 align=center>
@@ -135,9 +135,16 @@ function display_menu_bar($section, $menu) {
    if(is_array($actions[$menu])){
      foreach($actions[$menu] as $key => $value){
        if(in_array("all",$value["Condition"]) || in_array($action,$value["Condition"])) {
+         if($value["Popup"] == 1) {
          echo "
-          <a href=\"".$value["Url"]."\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+          <a href=\"\" href=\"\" onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
          ";
+         }
+         else {
+          echo "
+             <a href=\"".$value["Url"]."\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+          ";
+         }
        }
      }
    }  

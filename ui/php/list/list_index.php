@@ -44,7 +44,7 @@ require("list_js.inc");
 
 $uid = $auth->auth["uid"];
 $list = get_param_list();
-
+get_list_action();
 // ses_list is the session array of lists id to export
 if (sizeof($ses_list) >= 1) {
   $sess->register("ses_list");
@@ -54,7 +54,7 @@ if ($action != "export_add") {
   $sess->unregister("ses_list");
 }
 page_close();
-
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -341,5 +341,145 @@ function get_param_list() {
   return $list;
 }
 
+//////////////////////////////////////////////////////////////////////////////
+// LIST actions
+//////////////////////////////////////////////////////////////////////////////
+function get_list_action() {
+  global $list,$actions;
+  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_export,$l_header_admin, $l_header_add_contact;
+
+//Index
+
+  $actions["LIST"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/list/list_index.php?action=index",
+    'Right'    => $list_read,
+    'Condition'=> array ('all') 
+                                    );
+
+//Search
+
+  $actions["LIST"]["search"] = array (
+    'Url'      => "$path/list/list_index.php?action=search",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//New
+
+  $actions["LIST"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/list/list_index.php?action=new",
+    'Right'    => $list_write,
+    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+                                  );
+//Detail Consult
+
+  $actions["LIST"]["detailconsult"] = array (
+    'Url'      => "$path/list/list_index.php?action=detailconsult",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//Detail Update
+
+  $actions["LIST"]["detailupdate"] = array (
+     'Name'     => $l_header_modify,
+     'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
+     'Right'    => $list_write,
+     'Condition'=> array ('detailconsult','contact_add','contact_del') 
+                                           );
+
+//Insert
+
+  $actions["LIST"]["insert"] = array (
+    'Url'      => "$path/list/list_index.php?action=insert",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//Update
+
+  $actions["LIST"]["update"] = array (
+    'Url'      => "$path/list/list_index.php?action=update",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//Check Delete
+
+  $actions["LIST"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/list/list_index.php?action=check_delete&amp;hd_list_id=".$list["id"]."",
+    'Right'    => $list_write,
+    'Condition'=> array ('detailconsult','contact_add','contact_del') 
+                                           );
+
+//Delete
+
+  $actions["LIST"]["delete"] = array (
+    'Url'      => "$path/list/list_index.php?action=delete",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//Ext get Ids
+  $actions["LIST"]["ext_get_ids"] = array (
+    'Name'     => $l_header_add_contact,
+    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."",
+    'Right'    => $list_write,
+    'Popup'    => 1,
+    'Condition'=> array ('detailconsult','contact_add','contact_del') 
+                                    	  );
+
+//Contact ADD
+
+  $actions["LIST"]["contact_add"] = array (
+    'Url'      => "$path/list/list_index.php?action=contact_add",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                          );
+//Contact Del
+
+  $actions["LIST"]["contact_del"] = array (
+    'Url'      => "$path/list/list_index.php?action=contact_del",
+    'Right'    => $list_read,
+    'Condition'=> array ('None') 
+                                          );
+
+//Export ADD
+
+  $actions["LIST"]["export_add"] = array (
+    'Name'     => $l_header_export,
+    'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
+    'Right'    => $list_write,
+    'Condition'=> array ('detailconsult','contact_add','contact_del') 
+                                     	 );
+
+//Display
+  $actions["LIST"]["display"] = array (
+   'Name'     => $l_header_display,
+   'Url'      => "$path/list/list_index.php?action=display",
+   'Right'    => $list_admin_write,
+   'Condition'=> array ('all') 
+                                      );
+
+//Display Préférence
+  $actions["LIST"]["dispref_display"] = array (
+   'Url'      => "$path/list/list_index.php?action=dispref_display",
+   'Right'    => $list_admin_write,
+   'Condition'=> array ('None') 
+                                               );
+
+//Display level
+  $actions["LIST"]["dispref_level"] = array (
+   'Url'      => "$path/list/list_index.php?action=dispref_level",
+   'Right'    => $list_admin_write,
+   'Condition'=> array ('None') 
+                                            );
+
+
+}
 
 </SCRIPT>
