@@ -106,8 +106,6 @@ $l_header_agenda = "Calendar";
 
 //TIME
 $l_header_time = "Time management" ;
-$l_header_stats = "Statistics";
-$l_header_month = "Monthly view";
 
 
 $l_header_title_computer = "COMPUTER" ;

@@ -8,6 +8,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+// Headers
+$l_header_stats = "Statistics";
+$l_header_view = "Monthly view";
+$l_header_globalview = "Global monthly view";
+
 //for list
 $l_task_fac = "Factured Tasks";
 $l_task_int = "Internal Tasks";

@@ -7,6 +7,11 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+// Headers
+$l_header_stats = "Statistiques";
+$l_header_view = "Vue mensuelle";
+$l_header_globalview = "Vue générale";
+
 
 //for list
 $l_task_fac = "Taches Facturées";
