@@ -47,7 +47,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_zipcode,
       company_town,
       company_expresspostal,
-      company_country,
+      company_country_id,
       company_phone,
       company_fax,
       company_web,
@@ -123,18 +123,22 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 //   - $p_id  : company id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
         UNIX_TIMESTAMP(company_timeupdate) as timeupdate,
         UNIX_TIMESTAMP(company_timecreate) as timecreate,
+        m.userobm_lastname as market_lname,
+        m.userobm_firstname as market_fname,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
       from Company
            LEFT JOIN CompanyType on company_type_id=companytype_id
            LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+           LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
+           LEFT JOIN Country on company_country_id=country_id
            LEFT JOIN DataSource on company_datasource_id=datasource_id
            LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
            LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
@@ -207,7 +211,7 @@ function run_query_insert($company) {
     company_zipcode,
     company_town,
     company_expresspostal,
-    company_country,
+    company_country_id,
     company_phone,
     company_fax,
     company_web,
@@ -304,7 +308,7 @@ function run_query_update($cid, $company) {
     company_zipcode='$zip',
     company_town='$town',
     company_expresspostal='$cdx',
-    company_country='$ctry',
+    company_country_id='$ctry',
     company_phone='$phone',
     company_fax='$fax',
     company_web='$web',
@@ -837,28 +841,6 @@ function get_activity_label($id) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("companyactivity_label");
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the name (lastname firstname) of the userobm from his Id              //
-// Parameters:
-//   - $id : userobm Id
-///////////////////////////////////////////////////////////////////////////////
-function get_userobm_name($id) {
-  global $cdg_sql;
-
-  $query = "select userobm_lastname, userobm_firstname
-            from UserObm
-            where userobm_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("userobm_lastname") ." ". $obm_q->f("userobm_firstname");
   return $retour;
 }
 

@@ -140,6 +140,7 @@ function run_query_detail($p_id) {
         UNIX_TIMESTAMP(contact_timecreate) as timecreate,
         company_id, company_name, company_phone,
         kind_minilabel,
+        country_name,
         datasource_name,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
@@ -147,6 +148,7 @@ function run_query_detail($p_id) {
         Contact
         left join Company on contact_company_id=company_id
         left join Kind on kind_id=contact_kind_id
+        left join Country on contact_country_id=country_id
         left join DataSource on contact_datasource_id=datasource_id
         left join UserObm as c on contact_usercreate=c.userobm_id
         left join UserObm as u on contact_userupdate=u.userobm_id
@@ -227,7 +229,7 @@ function run_query_insert($contact) {
     contact_zipcode,
     contact_town,
     contact_expresspostal,
-    contact_country,
+    contact_country_id,
     contact_function,
     contact_phone,
     contact_homephone,
@@ -331,7 +333,7 @@ function run_query_update($contact) {
     contact_zipcode='$zip',
     contact_town='$town',
     contact_expresspostal='$cdx',
-    contact_country='$ctry',
+    contact_country_id='$ctry',
     contact_function='$func',
     contact_phone='$phone',
     contact_homephone='$hphone',

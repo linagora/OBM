@@ -57,7 +57,7 @@
     </tr>
     <tr>
       <td class="detailLabel">$l_country</td>
-      <td class="detailText">$crty</td>
+      <td class="detailText">$ctry_name</td>
     </tr>
     <tr>
       <td class="detailLabel">$l_phone</td>

@@ -258,7 +258,7 @@ function html_contact_consult($co_q) {
   $zip = $co_q->f("contact_zipcode");
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
-  $ctry = $co_q->f("contact_country");
+  $ctry_name = $co_q->f("country_name");
   $func = $co_q->f("contact_function");
   $phone = $co_q->f("contact_phone");
   if ( (trim($phone) != "") && ($phone == $c_phone)) {
@@ -356,7 +356,7 @@ function html_contact_consult($co_q) {
       <td class=\"detailText\">$cdx</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailText\">$ctry</td>
+      <td class=\"detailText\">$ctry_name</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$link_email $email</td>
@@ -428,11 +428,12 @@ function html_deal_links($id) {
 //   - $co_q      : contact database result 
 //   - $dsrc_q    : datasource database result 
 //   - $kind_q    : contact kind database result 
+//   - $ctry_q    : country database result 
 //   - $contact[] : default values
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
@@ -457,7 +458,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
     $zip = $co_q->f("contact_zipcode");
     $town = $co_q->f("contact_town");
     $cdx = $co_q->f("contact_expresspostal");
-    $ctry = $co_q->f("contact_country");
+    $ctry = $co_q->f("contact_country_id");
     $func = $co_q->f("contact_function");
     $phone = $co_q->f("contact_phone");
     $hphone = $co_q->f("contact_homephone");
@@ -500,7 +501,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
   if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
   if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
   if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
-  if (isset($contact["ctry"])) { $ctry = stripslashes($contact["ctry"]); }
+  if (isset($contact["ctry"])) { $ctry = $contact["ctry"]; }
   if (isset($contact["func"])) { $func = stripslashes($contact["func"]); }
   if (isset($contact["phone"])) { $phone = stripslashes($contact["phone"]); }
   if (isset($contact["hphone"])) { $hphone = stripslashes($contact["hphone"]); }
@@ -532,6 +533,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
     $sel_kind .= ">". $kind_q->f("kind_minilabel") . "</option>\n";
   }
   $sel_kind .= "</select>";
+
+  // Country select
+  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
+  while ($ctry_q->next_record()) {
+    $c_id = $ctry_q->f("country_id");
+    $sel_ctry .= "\n<option value=\"$c_id\"";
+    if ($c_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+  }
+  $sel_ctry .= "</select>";
 
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -639,7 +650,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ctry\" size=\"20\" value=\"$ctry\" /></td>
+    <td class=\"detailForm\">$sel_ctry</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" value=\"$email\" /></td>
@@ -691,7 +702,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $cdx = stripslashes($contact["cdx"]);
-  $ctry = stripslashes($contact["ctry"]);
+  $ctry = $contact["ctry"];
   $func = stripslashes($contact["func"]);
   $phone = stripslashes($contact["phone"]);
   $hphone = stripslashes($contact["hphone"]);
@@ -744,7 +755,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
     <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
@@ -771,7 +782,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
     <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />

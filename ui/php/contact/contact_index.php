@@ -105,8 +105,9 @@ if ($action == "index" || $action == "") {
   }
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
+  $ctry_q = run_query_country();
   require("contact_js.inc");
-  $display["detail"] = html_contact_form($action, $comp_q, $dsrc_q, $kind_q, $contact);
+  $display["detail"] = html_contact_form($action, $comp_q, $dsrc_q, $kind_q, $ctry, $contact);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,9 +132,10 @@ if ($action == "index" || $action == "") {
     if ($con_q->num_rows() == 1) {
       $dsrc_q = run_query_datasource();
       $kind_q = run_query_kind();
+      $ctry_q = run_query_country();
       require("contact_js.inc");
       $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = html_contact_form($action, $con_q, $dsrc_q, $kind_q, $contact);
+      $display["detail"] = html_contact_form($action, $con_q, $dsrc_q, $kind_q, $ctry_q, $contact);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
@@ -175,7 +177,8 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $dsrc_q = run_query_datasource();
     $kind_q = run_query_kind();
-    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $contact);
+    $ctry_q = run_query_country();
+    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $ctry_q, $contact);
   }
   
 } elseif ($action == "update")  {
@@ -194,7 +197,8 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
     $dsrc_q = run_query_datasource();
     $kind_q = run_query_kind();
-    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $contact);
+    $ctry_q = run_query_country();
+    $display["detail"] = html_contact_form($action, "", $dsrc_q, $kind_q, $ctry_q, $contact);
   }
   
 } elseif ($action == "check_delete")  {
@@ -270,7 +274,7 @@ display_page($display);
 function get_param_contact() {
   global $action;
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company;
-  global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $tf_ctry;
+  global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $tf_func, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
   global $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
@@ -313,7 +317,7 @@ function get_param_contact() {
   if (isset ($tf_zip)) $contact["zip"] = $tf_zip;
   if (isset ($tf_town)) $contact["town"] = $tf_town;
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
-  if (isset ($tf_ctry)) $contact["ctry"] = $tf_ctry;
+  if (isset ($sel_ctry)) $contact["ctry"] = $sel_ctry;
   if (isset ($tf_func)) $contact["func"] = $tf_func;
   if (isset ($tf_phone)) $contact["phone"] = trim($tf_phone);
   if (isset ($tf_hphone)) $contact["hphone"] = trim($tf_hphone);

@@ -51,9 +51,21 @@ ALTER table Company add column company_aka varchar(255) after company_name;
 -- Add new column : company_sound (Metaphone version of name)
 ALTER table Company add column company_sound varchar(24) after company_aka;
 
+-- Drop column : company_country
+ALTER table Company drop column company_country;
+
+-- Add new column : company_country_id
+ALTER table Company add column company_country_id int(8) after company_expresspostal;
+
 
 -------------------------------------------------------------------------------
 -- Update structure for table 'Contact'
 -------------------------------------------------------------------------------
 -- Add new column : contact_datasource_id
 ALTER table Contact add column contact_datasource_id int(8) DEFAULT NULL after contact_usercreate;
+
+-- Drop column : contact_country
+ALTER table Contact drop column contact_country;
+
+-- Add new column : contact_country_id
+ALTER table Contact add column contact_country_id int(8) after contact_expresspostal;

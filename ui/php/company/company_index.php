@@ -115,8 +115,9 @@ if ($action == "ext_get_id") {
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
+  $ctry_q = run_query_country();
   require("company_js.inc");
-  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $company);
+  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -140,9 +141,10 @@ if ($action == "ext_get_id") {
       $act_q = run_query_companyactivity();
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_userobm_active($users);
+      $ctry_q = run_query_country();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $company);
+      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -191,7 +193,8 @@ if ($action == "ext_get_id") {
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $company);
+    $ctry_q = run_query_country();
+    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -213,7 +216,8 @@ if ($action == "ext_get_id") {
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $company);
+    $ctry_q = run_query_country();
+    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $ctry_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -407,7 +411,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
-  global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web;
+  global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
   global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com, $param_company;
   global $sel_dsrc, $tf_kind, $tf_act,$tf_cat_code,$tf_cat;
   global $cdg_param;
@@ -457,7 +461,7 @@ function get_param_company() {
   if (isset ($tf_zip)) $company["zip"] = $tf_zip;
   if (isset ($tf_town)) $company["town"] = $tf_town;
   if (isset ($tf_cdx)) $company["cdx"] = $tf_cdx;
-  if (isset ($tf_ctry)) $company["ctry"] = $tf_ctry;
+  if (isset ($sel_ctry)) $company["ctry"] = $sel_ctry;
   if (isset ($tf_phone)) $company["phone"] = $tf_phone;
   if (isset ($tf_fax)) $company["fax"] = $tf_fax;
   if (isset ($tf_web)) $company["web"] = $tf_web;

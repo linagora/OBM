@@ -377,7 +377,7 @@ function html_company_consult($co_q) {
   $zip = $co_q->f("company_zipcode");
   $town = $co_q->f("company_town");
   $cdx = $co_q->f("company_expresspostal");
-  $ctry = $co_q->f("company_country");
+  $ctry_name = $co_q->f("country_name");
   $phone = $co_q->f("company_phone");
   $fax = $co_q->f("company_fax");
   $web = $co_q->f("company_web");
@@ -385,6 +385,11 @@ function html_company_consult($co_q) {
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
   $com = $co_q->f("company_comment");
+
+  if ($mark > 0)
+    $lmarket = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
+  else
+    $lmarket = "&nbsp;";
 
 
   // Display Aka only if non empty
@@ -397,11 +402,6 @@ function html_company_consult($co_q) {
   } else {
     $dis_aka = "";
   }
-
-  if ($mark > 0)
-    $lmarket = get_userobm_name($mark);
-  else
-    $lmarket = "&nbsp;";
 
   // Email link
   if ($email != "") {
@@ -446,11 +446,12 @@ function html_company_consult($co_q) {
 //   - $dsrc_q    : datasource database result 
 //   - $kind_q    : kind database result 
 //   - $usr_q     : userobm database result 
+//   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ctry_q, $company) {
   global $display, $auth, $set_dsrc, $l_none;
   global $set_theme,$ico_web,$ico_mail;
   global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
@@ -475,7 +476,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $co
     $zip = $co_q->f("company_zipcode");
     $town = $co_q->f("company_town");
     $cdx = $co_q->f("company_expresspostal");
-    $ctry = $co_q->f("company_country");
+    $ctry = $co_q->f("company_country_id");
     $phone = $co_q->f("company_phone");
     $fax = $co_q->f("company_fax");
     $web = $co_q->f("company_web");
@@ -504,7 +505,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $co
   if (isset($company["zip"])) { $zip = stripslashes($company["zip"]); }
   if (isset($company["town"])) { $town = stripslashes($company["town"]); }
   if (isset($company["cdx"])) { $cdx = stripslashes($company["cdx"]); }
-  if (isset($company["ctry"])) { $ctry = stripslashes($company["ctry"]); }
+  if (isset($company["ctry"])) { $ctry = $company["ctry"]; }
   if (isset($company["phone"])) { $phone = stripslashes($company["phone"]); }
   if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
@@ -552,6 +553,16 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $co
     $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
   }
   $sel_market .= "</select>";
+
+  // Country select
+  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
+  while ($ctry_q->next_record()) {
+    $c_id = $ctry_q->f("country_id");
+    $sel_ctry .= "\n<option value=\"$c_id\"";
+    if ($c_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+  }
+  $sel_ctry .= "</select>";
 
   // Email link
   if (($action=="detailupdate") || ($action=="update")) { 
@@ -653,7 +664,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $co
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>
+      <td class=\"detailForm\">$sel_ctry</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_phone</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
@@ -869,7 +880,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
@@ -893,7 +904,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
     <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
