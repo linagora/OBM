@@ -47,7 +47,7 @@ switch ($mode) {
    display_head("Admin_Pref");
    if($action == "") $action = "index";
    get_admin_pref_action();
-   $pref->check();
+   //   $pref->check();
    generate_menu($menu, $section);
    break;
  default:
@@ -202,10 +202,11 @@ function get_param_pref() {
 
   return $pref;
 }
+
+
 //////////////////////////////////////////////////////////////////////////////
 // ADMIN PREF actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_admin_pref_action() {
   global $actions;
   global $l_header_index,$l_header_pref_update,$l_header_help;
@@ -235,7 +236,6 @@ function get_admin_pref_action() {
      'Right' 	=> $admin_pref_write,
      'Condition'=> array ('None') 
                                     	);
-
 
 }
 
