@@ -11,7 +11,7 @@
 
 <h1>OBM-PREFERENCES-HOWTO</h1>
 <I>Comment utiliser les préférences utilisateur </I><BR>
-Version 0.6 - 2002-12-25<BR>
+Version 0.6.6 - 2003-07-14<BR>
 </CENTER>
 
 
@@ -81,6 +81,10 @@ Ceci s'effectue dans l'écran de l'utilisateur (pour portée sur l'utilisateur) ou
   <td>format de date pour affichage</td>
   <td>($cda_iso || $cda_fr || $cda_en || $cda_txt)</td>
 </tr><tr>
+  <td>set_commentorder</td>
+  <td>Ordre d'affichage des commentaires</td>
+  <td>($cco_chro || $cco_rev)</td>
+</tr><tr>
   <td>set_debug</td>
   <td>niveau de debug</td>
   <td>combinaison des flags de debug (dbg_sql, dbg_exe,...)</td>
@@ -108,7 +112,7 @@ Ceci s'effectue dans l'écran de l'utilisateur (pour portée sur l'utilisateur) ou
 <br>
 Pas besoin de prevoir sa suppression puisque a la disparition d'un utilisateur, on efface tous les tuples le concernant dans UserObmPref.
 <br><br>
-  <li>Si cette option est parametrable par l'utilisateur (comme la langue, le theme ...) il faut prevoir son formulaire de modification dans le module "Settings". La mise a jour en base de donnees se fait par le biais de la fonction <i>run_query_set_user_pref($user_id, $option, $value)</i> de <b>obminclude/query_global.inc</b>.
+  <li>Si cette option est parametrable par l'utilisateur (comme la langue, le theme ...) il faut prevoir son formulaire de modification dans le module "Settings". La mise a jour en base de donnees se fait par le biais de la fonction <i>run_query_set_user_pref($user_id, $option, $value)</i> de <b>obminclude/query_global.inc</b>, et sa valeur par defaut dans <b>global_pref.inc</b>.
 </ul>
 
 

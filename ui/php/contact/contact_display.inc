@@ -31,12 +31,13 @@ $fieldnames["contact_company_name"] = $l_company;
 //     keys used  : name, company
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact) {
-  global $l_contact_name, $l_phone, $l_from_company, $l_archive, $l_find;
-  global $popup;
+  global $l_contact_name, $l_phone, $l_from_company, $l_email, $l_archive;
+  global $l_find, $popup;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
   $company = stripslashes($contact["company"]);
+  $email = stripslashes($contact["email"]);
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
   if ($popup) {
@@ -61,6 +62,10 @@ function html_contact_search_form ($contact) {
       <td>&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_phone<br />
         <input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" />
+      </td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_email<br />
+        <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
       </td>
       <td>&nbsp;&nbsp;</td>
       <td class=\"textLabelForm\">$l_from_company<br />
@@ -221,6 +226,13 @@ function html_contact_consult($co_q) {
       <td class=\"detailLabel\">$l_visibility</td>
       <td class=\"detailText\">$l_priv</td>";
   }
+
+  if  ($email != "") {
+    $link_email = "
+      <a href=\"mailto:$email\">
+      <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
+      </a>";
+  }
   
   // --- HTML Template --------------------------------------------------------
 
@@ -283,10 +295,7 @@ function html_contact_consult($co_q) {
       <td class=\"detailText\">$ctry</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">
-      <a href=\"mailto:$email\">
-      <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
-      </a> $email</td>
+      <td class=\"detailText\">$link_email $email</td>
     </tr><tr>
       <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
     </tr><tr>
@@ -355,33 +364,34 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       $c_new_id = $c_id;
       $c_new_name = $c_name;
     }
-
-  } else {
-    $c_id = $contact["company_id"];
-    $c_name = $contact["company_name"];
-    $c_new_id = $contact["comp_new_id"];
-    $c_new_name = $contact["comp_new_name"];
-    $id = $contact["id"];
-    $usercreate = $contact["usercreate"];
-    $kind = $contact["kind"];
-    $lname = stripslashes($contact["lname"]);
-    $fname = stripslashes($contact["fname"]);
-    $ad1 = stripslashes($contact["ad1"]);
-    $ad2 = stripslashes($contact["ad2"]);
-    $zip = stripslashes($contact["zip"]);
-    $town = stripslashes($contact["town"]);
-    $cdx = stripslashes($contact["cdx"]);
-    $ctry = stripslashes($contact["ctry"]);
-    $func = stripslashes($contact["func"]);
-    $phone = stripslashes($contact["phone"]);
-    $hphone = stripslashes($contact["hphone"]);
-    $mphone = stripslashes($contact["mphone"]);
-    $fax = stripslashes($contact["fax"]);
-    $email = stripslashes($contact["email"]);
-    $com = stripslashes($contact["com"]);
-    $archive = ($contact["archive"] == 1 ? "checked" : "");
-    $vis = $contact["vis"];
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($contact["company_id"])) { $c_id = $contact["company_id"]; }
+  if (isset($contact["company_name"])) { $c_name = $contact["company_name"]; }
+  if (isset($contact["comp_new_id"])) { $c_new_id = $contact["comp_new_id"]; }
+  if (isset($contact["comp_new_name"])) { $c_new_name = $contact["comp_new_name"]; }
+  if (isset($contact["id"])) { $id = $contact["id"]; }
+  if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
+  if (isset($contact["kind"])) { $kind = $contact["kind"]; }
+  if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
+  if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
+  if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
+  if (isset($contact["ad2"])) { $ad2 = stripslashes($contact["ad2"]); }
+  if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
+  if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
+  if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
+  if (isset($contact["ctry"])) { $ctry = stripslashes($contact["ctry"]); }
+  if (isset($contact["func"])) { $func = stripslashes($contact["func"]); }
+  if (isset($contact["phone"])) { $phone = stripslashes($contact["phone"]); }
+  if (isset($contact["hphone"])) { $hphone = stripslashes($contact["hphone"]); }
+  if (isset($contact["mphone"])) { $mphone = stripslashes($contact["mphone"]); }
+  if (isset($contact["fax"])) { $fax = stripslashes($contact["fax"]); }
+  if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
+  if (isset($contact["com"])) { $com = stripslashes($contact["com"]); }
+  if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
+  if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
+
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\">";

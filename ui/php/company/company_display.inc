@@ -416,27 +416,27 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     $con_num = $co_q->f("company_contact_number");
     $deal_num = $co_q->f("company_deal_number");
     $com = $co_q->f("company_comment");
-  } else {
-    // Values are taken from parameters ($company hash)
-    if (isset($company["id"])) { $id = $company["id"]; }
-    $num = stripslashes($company["num"]);
-    $state = $company["state"];
-    $name = stripslashes($company["name"]);
-    $kind = $company["kind"];
-    $act = $company["activity"];
-    $mark = $company["marketing_manager"];
-    $ad1 = stripslashes($company["ad1"]);
-    $ad2 = stripslashes($company["ad2"]);
-    $zip = stripslashes($company["zip"]);
-    $town = stripslashes($company["town"]);
-    $cdx = stripslashes($company["cdx"]);
-    $ctry = stripslashes($company["ctry"]);
-    $phone = stripslashes($company["phone"]);
-    $fax = stripslashes($company["fax"]);
-    $web = stripslashes($company["web"]);
-    $email = stripslashes($company["email"]);
-    $com = stripslashes($company["com"]);
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($company["id"])) { $id = $company["id"]; }
+  if (isset($company["num"])) { $num = stripslashes($company["num"]); }
+  if (isset($company["state"])) { $state = stripslashes($company["state"]); }
+  if (isset($company["name"])) { $name = stripslashes($company["name"]); }
+  if (isset($company["kind"])) { $kind = $company["kind"]; }
+  if (isset($company["activity"])) { $act = $company["activity"]; }
+  if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
+  if (isset($company["ad1"])) { $ad1 = stripslashes($company["ad1"]); }
+  if (isset($company["ad2"])) { $ad2 = stripslashes($company["ad2"]); }
+  if (isset($company["zip"])) { $zip = stripslashes($company["zip"]); }
+  if (isset($company["town"])) { $town = stripslashes($company["town"]); }
+  if (isset($company["cdx"])) { $cdx = stripslashes($company["cdx"]); }
+  if (isset($company["ctry"])) { $ctry = stripslashes($company["ctry"]); }
+  if (isset($company["phone"])) { $phone = stripslashes($company["phone"]); }
+  if (isset($company["fax"])) { $fax = stripslashes($company["fax"]); }
+  if (isset($company["web"])) { $web = stripslashes($company["web"]); }
+  if (isset($company["email"])) { $email = stripslashes($company["email"]); }
+  if (isset($company["com"])) { $com = stripslashes($company["com"]); }
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">";
@@ -695,6 +695,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $state = $company["state"];
   $name = $company["name"];
   $kind = $company["kind"];
+  $act = $company["activity"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $zip = $company["zip"];
@@ -731,6 +732,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
@@ -752,6 +754,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />

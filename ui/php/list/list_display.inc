@@ -268,13 +268,14 @@ function html_list_form($action, $list_q, $list) {
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
-  } else {
-    // Values are taken from parameters
-    $id = $list["id"];
-    $name = stripslashes($list["name"]);
-    $subject = stripslashes($list["subject"]);
-    $email = stripslashes($list["email"]);
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["name"])) { $name = stripslashes($list["name"]); }
+  if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
+  if (isset($list["email"])) { $email = stripslashes($list["email"]); }
+
   $url = url_prepare("list_index.php");
 
   echo "

@@ -34,12 +34,24 @@ if (($set_debug & $cdg_sess) == $cdg_sess) {
   echo $dis_session;
 }
 
+// Default settings
+$set_lang_default = "en";
+$set_theme_default = "standard";
+$set_menu_default = $cme_both;
+$set_display_default = "no";
+$set_rows_default = 10;
+$set_date_default = $cda_iso;
+$set_commentorder_default = $cco_chro;
+$set_debug_default = 0;
+$set_cal_interval_default = 2;
+
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
+if ($set_menu == "") $set_menu = $set_menu_default;
 if ($set_display == "") $set_display = $set_display_default;
 if ($set_rows == "") $set_rows = $set_rows_default;
 if ($set_date == "") $set_date = $set_date_default;
-if ($set_menu == "") $set_menu = $set_menu_default;
+if ($set_commentorder == "") $set_commentorder = $set_commentorder_default;
 if ($set_debug == "") $set_debug = $set_debug_default;
 if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 

@@ -49,7 +49,7 @@ function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_day);
     $day = $l_daysofweekshort[$day_num];
-    $dis_day .= "<td class=\"agendaHead2\">$day</td>\n";
+    $dis_day .= "<td class=\"agendaHead2\">$day</td>";
     $start_day = strtotime("+1 day", $start_day); 
   }
   do {
@@ -64,21 +64,19 @@ function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $whole_month = TRUE;
     $num_of_events = 0;
  
-    $dis_calendar .= "<td width=\"210\">\n";
-    $dis_calendar .= "<table border=\"0\" width=\"210\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">\n";
-    $dis_calendar .= "<tr>\n";
-    $dis_calendar .= "<td colspan=\"7\" class=\"agendaHead2\">\n";
-    $dis_calendar .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=".$monthlink)."\">\n";
-    $dis_calendar .= localizeDate ("month", $startYear);
-    $dis_calendar .= "</a>\n";
-    $dis_calendar .= "</td>\n";
-    $dis_calendar .= "</tr>\n";
-    $dis_calendar .= "<tr>\n";
-    $dis_calendar .= $dis_day;
-    $dis_calendar .= "</tr>\n";
-    $dis_calendar .= "<tr>\n";
-    $dis_calendar .= "<td colspan=\"7\">\n";
-    $dis_calendar .= "<table border=\"0\" width=\"210\" cellspacing=\"1\" cellpadding=\"0\" class=\"agendaYear\">\n";
+    $dis_calendar .= "<td width=\"210\">
+    <table border=\"0\" width=\"210\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
+    <tr>
+      <td colspan=\"7\" class=\"agendaHead2\">
+      <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthlink")."\">" . localizeDate ("month", $startYear) . "</a>
+      </td>
+    </tr>
+    <tr>
+      $dis_day
+    </tr>
+    <tr>
+      <td colspan=\"7\">
+      <table border=\"0\" width=\"210\" cellspacing=\"1\" cellpadding=\"0\" class=\"agendaYear\">\n";
     do {
       $day = date ("j", $start_day);
       $daylink = date ("Ymd", $start_day);
@@ -108,31 +106,30 @@ function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       if ($check_month != $minical_month) $day= "$day";
       if ($i == 0) $dis_calendar .= "<tr>";
       if ( $daylink == date ("Ymd", time()) ) {
-	$dis_calendar .= "<td width=\"30\" height=\"30\" class=\"agendaMonthOn\"\n"; 
-	$dis_calendar .= "onmouseover=\"this.style.backgroundColor='#dddddd'\" "; 
-	$dis_calendar .= "onmouseout=\"this.style.backgroundColor='#f4e5a9'\" "; 
-	$dis_calendar .= "onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=".$daylink."'\">\n";
-	$dis_calendar .= "<a class=\"agendaLink\" ";
-	$dis_calendar .= "href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">\n";
-	$dis_calendar .= "$day</a>$dis_event_cal</td>\n";
+	$dis_calendar .= "
+          <td width=\"30\" height=\"30\" class=\"agendaMonthOn\"
+              onmouseover=\"this.style.backgroundColor='#dddddd'\" 
+	      onmouseout=\"this.style.backgroundColor='#f4e5a9'\"
+	      onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=$daylink'\">
+	  <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$daylink")."\">$day</a>$dis_event_cal
+          </td>";
       }	
       elseif ($check_month == $minical_month) {	   
-	$dis_calendar .= "<td width=\"30\" height=\"30\" class=\"agendaMonthReg\"\n"; 
-	$dis_calendar .= "onmouseover=\"this.style.backgroundColor='#dddddd'\" "; 
-	$dis_calendar .= "onmouseout=\"this.style.backgroundColor='#ffffff'\" "; 
-	$dis_calendar .= "onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=".$daylink."'\">\n";
-	$dis_calendar .= "<a class=\"agendaLink\" ";
-	$dis_calendar .= "href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">\n";
-	$dis_calendar .= "$day</a>$dis_event_cal</td> \n";
-      }else {
-	$dis_calendar .= "<td width=\"30\" height=\"30\" class=\"agendaMonthOff\" \n";
-	$dis_calendar .= "onmouseover=\"this.style.backgroundColor='#dddddd'\" ";
-	$dis_calendar .= "onmouseout=\"this.style.backgroundColor='#f2f2f2'\"  ";
-	$dis_calendar .= "onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=".$daylink."'\"> \n";
-	$dis_calendar .= "<a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">";
-	$dis_calendar .= "$day ";
-	$dis_calendar .= "</a> ";
-	$dis_calendar .= "$dis_event_cal</td>\n";
+	$dis_calendar .= "
+          <td width=\"30\" height=\"30\" class=\"agendaMonthReg\" 
+	      onmouseover=\"this.style.backgroundColor='#dddddd'\"
+	      onmouseout=\"this.style.backgroundColor='#ffffff'\" 
+	      onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=$daylink'\">
+          <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$daylink")."\">$day</a>$dis_event_cal
+          </td>";
+      } else {
+	$dis_calendar .= "
+          <td width=\"30\" height=\"30\" class=\"agendaMonthOff\"
+	      onmouseover=\"this.style.backgroundColor='#dddddd'\"
+	      onmouseout=\"this.style.backgroundColor='#f2f2f2'\"
+	      onclick=\"window.location.href='agenda_index.php?action=view_day&amp;param_date=$daylink'\">
+	  <a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$daylink")."\">$day</a>$dis_event_cal
+          </td>";
       }
       $start_day = strtotime("+1 day", $start_day); 
       $i++;
@@ -242,8 +239,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $day_num = date("w", $start_day);
     $day = $l_daysofweek[$day_num];
     
-    $dis_day_head .= "<td width=\"105\" class=\"agendaHead2\">";
-    $dis_day_head .= "$day</td>";
+    $dis_day_head .= "<td width=\"105\" class=\"agendaHead2\">$day</td>";
     $start_day = strtotime("+1 day", $start_day);
   }
 
@@ -266,25 +262,26 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $num = date('w', strtotime($set_weekstart_default));
       $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$sunday));
       $week_num = date("W",strtotime("$delta_thursday days",$sunday));
-      $dis_month_cal .= "<td class=\"agendaHead\" style=\"vertical-align:middle;\"><a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$daylink)."\" >$week_num</a></td>";
+      $dis_month_cal .= "<td class=\"agendaHead\" style=\"vertical-align:middle;\"><a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$daylink")."\" >$week_num</a></td>";
     }
-    $dis_month_cal .= "<td $bgclass width=\"105\" height=\"105\">\n";
-    $dis_month_cal .= "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
-    $dis_month_cal .= "<tr>\n";
-    $dis_month_cal .= "<td colspan=\"$td_colspan\" class=\"agendaCell2\">\n";
     $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($daylink)));
     $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($daylink)));
-    $dis_month_cal .= "<a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" />
-     <img align=\"left\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
-    </a>";
+
+    $dis_month_cal .= "
+      <td $bgclass width=\"105\" height=\"105\">
+        <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">
+        <tr>
+          <td colspan=\"$td_colspan\" class=\"agendaCell2\">
+          <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" />
+          <img align=\"left\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+          </a>";
   
     if (($check_month == $this_month)) {
-      $dis_month_cal .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">";
+      $dis_month_cal .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$daylink")."\">";
     } else {
-      $dis_month_cal .= "<a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">";
+      $dis_month_cal .= "<a class=\"agendaLink2\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$daylink")."\">";
     }
-    $dis_month_cal .= "$day</a>\n";
-    $dis_month_cal .= "</td>\n";
+    $dis_month_cal .= "$day</a></td>";
     $current_time = $daylink;  
     if(is_array($current_events[$current_time])) {
       $dis_month_cal .= "<tr>";
@@ -292,8 +289,8 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	 $dis_month_cal .= "<td  valign=\"top\" width=\"$td_width\"><table heigth=\"100%\" width=\"$td_width\">";
 	 if(is_array($current_events[$current_time][$id]))
 	   foreach($current_events[$current_time][$id] as $event => $event_id) {
-	     $dis_month_cal .= "<tr>"; 
-	     $dis_month_cal .= "<td class=\"".$data["class"]."\">";
+	     $dis_month_cal .= "<tr>
+	       <td class=\"".$data["class"]."\">";
 	     if($event_data[$event_id]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 	       $titleEvent = $event_data[$event_id]["title"];
 	       $descEvent = $event_data[$event_id]["description"];
@@ -313,34 +310,37 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	     $hidden_div .= "
 	      <div id=\"$daylink-$event_id\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\">
 	       <table border=\"0\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
-		<tr><td bgcolor=\"transparent\">
+		<tr>
+                  <td bgcolor=\"transparent\">
 		  <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
-		   <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
-		   <tr><td class=\"agendaEventHead\">
+		  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
+		  <tr><td class=\"agendaEventHead\">
 		     $typeEvent ".$event_data[$event_id]["begin"]."-".$event_data[$event_id]["end"]."
-	           </td></tr>
-		   <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
+	            </td>
+                  </tr>
+		  <tr><td class=\"agendaEventHead\">$descEvent</td></tr>
 		  </table>
-		</td></tr>
-	       </table>
+		</td>
+                </tr>
+	        </table>
 	      </div>";	
-	     if($nb_user == 1) {
+	     if ($nb_user == 1) {
       	       $dis_month_cal .= $event_data[$event_id]["begin"]."-";
 	       $dis_month_cal .= $event_data[$event_id]["end"];
-	     }else {
-	       $dis_month_cal .= "<img src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
-	       $dis_month_cal .= "</a></td>";	
+	     } else {
+	       $dis_month_cal .= "<img src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" /></a></td>";	
 	     } 
 	     $dis_month_cal .= "</tr>";   
 	  }
-	  else
-	    $dis_month_cal .= "<tr><td>&nbsp;</td>"; 
-	  $dis_month_cal .= "</table></td>"; 
+	 else {
+	   $dis_month_cal .= "<tr><td>&nbsp;</td>";
+	 }
+	 $dis_month_cal .= "</table></td>"; 
         }
 	$dis_month_cal .= "</tr>";
       }
-    $dis_month_cal .= "</table>\n";
-    $dis_month_cal .= "</td>\n";
+    $dis_month_cal .= "</table>
+      </td>";
     $sunday = strtotime("+1 day", $sunday); 
     $i++;
     if ($i == 7) { 
@@ -421,15 +421,13 @@ $hidden_div
 
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    - $agenda: agenda parameters
-//    - $obm_q_events : list of event's records 
+// Parameters:
+//    - $agenda         : agenda parameters
+//    - $obm_q_events   : list of event's records 
 //    - $contacts_array : array of selected contacts 
-//    - $groups_array : array of selected groups 
+//    - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
@@ -466,10 +464,10 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {
     $this_date = date("Ymd", $i);
     $this_date_l = localizeDate("week_list", $i);
-    $week_day_list .= "<td colspan=\"$td_colspan\" width=\"70\"  class=\"agendaCell\">\n";
-    $week_day_list .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$this_date)."\"> ";
-    $week_day_list .= "$this_date_l</a>\n";
-    $week_day_list .= "</td>\n";
+    $week_day_list .= "
+      <td colspan=\"$td_colspan\" width=\"70\"  class=\"agendaCell\">
+        <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$this_date")."\">$this_date_l</a>
+      </td>";
     $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($this_date)));
     $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($this_date)));
 
@@ -588,10 +586,10 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 			 </table>
 		       </td></tr>
 		      </table>
-		     </div>";		     
-		    if($nb_user == 1) {	      
+		     </div>";
+                    if ($nb_user == 1) {	      
      		      $event_head_display .= "&#8226; $titleEvent";
-		    }else {
+		    } else {
 		      $td_begin .= "style=\"text-align: center;\" ";	
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		    }
@@ -605,7 +603,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		$temp_array = $current_events[$indice_time][$id];
 		$temp_array2 = next($current_events);
 		$indice_time = key($current_events);
-	      }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
+	      } while (is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
 	             && substr($indice_time,8,2)<$set_stop_time);
 	      $rowspan = "rowspan=\"$rowspan_event\"";
 	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
@@ -613,7 +611,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	    }
 	  }
 	  else {
-       	    if($user_indice != $nb_user) {
+       	    if ($user_indice != $nb_user) {
 	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
 	    }
 	    else {
@@ -626,14 +624,14 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	$hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
       }
     }
-    $hour_day_list .=   "</tr>\n";
-    for($k=1;$k<$set_cal_interval;$k++) {
+    $hour_day_list .= "</tr>\n";
+    for ($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
-      for($j=0; $j<7;$j++) {
+      for ($j=0; $j<7;$j++) {
       	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
-	if(is_array($current_events[$current_time])) {
+	if (is_array($current_events[$current_time])) {
 	  $user_indice=1;
-	  foreach($calendar_user as $id => $user_data ) {
+	  foreach ($calendar_user as $id => $user_data ) {
 	    if(is_array($current_events[$current_time][$id])){    
 	      $temp_data =$event_data[current($current_events[$current_time][$id])];
 	      $temp_ib = substr($current_time,8,2).":".substr($current_time,10,2);
@@ -650,13 +648,13 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		$rowspan_event = 0;
 		$event_head_display ="";
 		$temp_array = array();
-		do{
+		do {
 		  foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {
-	  	    if($is_title == FALSE) {
+	  	    if ($is_title == FALSE) {
 	  	      $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		      $is_title = TRUE;
 		      $tempDate = substr($indice_time,0,8);
-		      if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
+		      if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 			$titleEvent = $event_data[$idOfEvent]["title"];
 			$descEvent = $event_data[$idOfEvent]["description"];
 			$linkEvent = "agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".$tempDate;
@@ -688,9 +686,9 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 			 </td></tr>
 			</table>
 		       </div>";		     
-		      if($nb_user == 1) {	      
+		      if ($nb_user == 1) {	      
 			$event_head_display .= "&#8226; $titleEvent";
-		      }else {
+		      } else {
 			$td_begin .= "style=\"text-align: center;\" ";	
 			$event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		      }
@@ -781,7 +779,7 @@ echo "
       <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
        <tr>
         <td class=\"agendaHead\">
-         <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$prev_week)."\">
+         <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$prev_week")."\">
           <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
          </a>
         </td>
@@ -789,7 +787,7 @@ echo "
          $display_date
         </td>
         <td class=\"agendaHead\">
-         <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$next_week)."\">
+         <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$next_week")."\">
           <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
          </a>
         </td>
@@ -799,7 +797,7 @@ echo "
     </tr>
     <tr>
      <td>
-      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">      			
+      <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
        <tr>
         <td>
          <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
@@ -838,15 +836,13 @@ $hidden_div
 ";
 }
 
-////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the day
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    - $agenda: agenda parameters
-//    - $obm_q_events : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array : array of selected groups 
+// Parameters:
+//   - $agenda         : agenda parameters
+//   - $obm_q_events   : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
@@ -875,29 +871,30 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   $td_colspan = $nb_user;
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_time),date("YmdHi",$end_time));
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
-    $hour_day_list .= 	"<tr>";
-    $hour_day_list .= 	"<td height=\"15\" width=\"60\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
-    $hour_day_list .= 	"<td height=\"15\" width=\"1\"></td>";
+    $hour_day_list .= "
+      <tr>
+        <td height=\"15\" width=\"60\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>
+        <td height=\"15\" width=\"1\"></td>";
     $current_time = date("YmdHi", strtotime("+$i hours",strtotime($getdate)));  
-    if(is_array($current_events[$current_time])) {
+    if (is_array($current_events[$current_time])) {
       $user_indice = 0;
-      foreach($calendar_user as $id => $user_data ) {
-	if(is_array($current_events[$current_time][$id])){
-	  if($event_data[current($current_events[$current_time][$id])]["status"]>0) {
+      foreach ($calendar_user as $id => $user_data) {
+	if (is_array($current_events[$current_time][$id])) {
+	  if ($event_data[current($current_events[$current_time][$id])]["status"]>0) {
 	    $is_title = FALSE;	  
 	    $indice_time = $current_time;
 	    reset($current_events);
-	    if(key($current_events) != $indice_time) {
-		do{
+	    if (key($current_events) != $indice_time) {
+		do {
 		  next($current_events);
-		}while(key($current_events) != $indice_time);
+		} while (key($current_events) != $indice_time);
 	    }
 	    $rowspan_event = 0;
 	    $event_head_display ="";
 	    $temp_array = array();
-	    do{
-	      foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {
-		if($is_title == FALSE) {
+	    do {
+	      foreach ($current_events[$indice_time][$id] as $h => $idOfEvent) {
+		if ($is_title == FALSE) {
 		  $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		  $is_title = true;
 		  $tempDate = substr($indice_time,0,8);
@@ -934,7 +931,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    </table>
 		   </div>";	
 		  $event_head_display .= "&#8226;";
-		  if($nb_user == 1) {
+		  if ($nb_user == 1) {
 		    $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
 		    $event_head_display .= $event_data[$idOfEvent]["end"]." : ";
 		  }		      
@@ -942,10 +939,10 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  $event_head_display .= "</a>";	  
 	  	  $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;
 		}
-		elseif(!in_array($idOfEvent,$temp_array)){
+		elseif (!in_array($idOfEvent,$temp_array)){
 		  $event_head_display .= "<br />";
 		  $tempDate = substr($indice_time,0,8);
-		  if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
+		  if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		    $titleEvent = $event_data[$idOfEvent]["title"];
 		    $descEvent = $event_data[$idOfEvent]["description"];
 		    $linkEvent = "agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".$tempDate;
@@ -998,7 +995,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  }
         }       
 	else {
-	  if($user_indice != $nb_user) {
+	  if ($user_indice != $nb_user) {
 	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
 	  }
 	  else {
@@ -1007,35 +1004,35 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	}
 	$user_indice++;
       }	  
-    }else {
+    } else {
       $hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
     }    
     $hour_day_list .=   "</tr>\n";
-    for($k=1;$k<$set_cal_interval;$k++) {
+    for ($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
       $current_time = date("YmdHi", strtotime("+$i hours ".($k*$time_unit)." minutes",strtotime($getdate)));  
-      if(is_array($current_events[$current_time])) {
+      if (is_array($current_events[$current_time])) {
 	$user_indice = 1;
-	foreach($calendar_user as $id => $user_data ) {
-	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){
-	    if($event_data[current($current_events[$current_time][$id])]["status"]>0) {
+	foreach ($calendar_user as $id => $user_data ) {
+	  if (isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){
+	    if ($event_data[current($current_events[$current_time][$id])]["status"]>0) {
 	      $is_title = FALSE;	  
 	      $indice_time = $current_time;
 	      reset($current_events);
-	      if(key($current_events) != $indice_time) {
-		do{
+	      if (key($current_events) != $indice_time) {
+		do {
 		  next($current_events);
-		}while(key($current_events) != $indice_time);
+		} while (key($current_events) != $indice_time);
 	      }
 	      $rowspan_event = 0;
 	      $event_head_display ="";
 	      $temp_array = array();
-	      do{
+	      do {
 	      	foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {	
-		  if($is_title == FALSE) {
+		  if ($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $tempDate = substr($indice_time,0,8);
-		    if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
+		    if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
 		      $linkEvent = "agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".$tempDate;
@@ -1072,15 +1069,14 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
 		      $event_head_display .= $event_data[$idOfEvent]["end"]." : ";
 		    }		      
-		    $event_head_display .= $titleEvent;
-		    $event_head_display .= "</a>";	  
+		    $event_head_display .= "$titleEvent</a>";	  
 		    $is_title = TRUE; 
 		    $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;
 		  }
-		  elseif(!in_array($idOfEvent,$temp_array)){
+		  elseif (!in_array($idOfEvent,$temp_array)){
 		    $event_head_display .=" <br />";
 		    $tempDate = substr($indice_time,0,8);
-		    if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
+		    if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
 		      $linkEvent = "agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".$tempDate;
@@ -1113,7 +1109,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      </table>
 		     </div>";		     
 		    $event_head_display .= "&#8226;";
-		    if($nb_user == 1) {
+		    if ($nb_user == 1) {
 		      $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
 		      $event_head_display .= $event_data[$idOfEvent]["end"]." : ";
 		    }		      
@@ -1127,14 +1123,14 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	      	$temp_array = $current_events[$indice_time][$id];
 		$temp_array2 = next($current_events);
 		$indice_time = key($current_events);
-	      }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
+	      } while (is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
 	      $rowspan = "rowspan=\"$rowspan_event\"";
 	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 	      $hour_day_list .= "</td>";	
 	    }
 	  }
 	  else {
-    	    if($user_indice != $nb_user) {
+    	    if ($user_indice != $nb_user) {
   	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
   	    }
   	    else {
@@ -1143,7 +1139,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  }
 	  $user_indice++;
 	}	  
-      }else {
+      } else {
 	$hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
       }  
     }
@@ -1151,7 +1147,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   }
   $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($getdate)));
   $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($getdate)));  
-echo "
+  echo "
 
 <table class=\"agendaMain\">
  <tr>
@@ -1162,7 +1158,7 @@ echo "
       <table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\">
        <tr>
         <td class=\"agendaHead\">
-         <a href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$yesterdays_date)."\">
+         <a href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$yesterdays_date")."\">
 	  <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Yesterday]\" />
 	 </a>
         </td>
@@ -1170,7 +1166,7 @@ echo "
          $display_date
         </td>
         <td class=\"agendaHead\">
-         <a href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$tomorrows_date)."\">
+         <a href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$tomorrows_date")."\">
           <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" />
          </a>
         </td>
@@ -1259,7 +1255,6 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   $first_of_month = $minical_year.$minical_month."01";
   $start_day = strtotime(dateOfWeek($first_of_month, $set_weekstart_default));
 
-
   $whole_month = TRUE;
   $num_of_events = 0;
 
@@ -1270,11 +1265,11 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     $select_week1 = localizeDate("week_jump", $start_week_time);
     $select_week2 = localizeDate("week_jump", $end_week_time);
     if (($check_week >= $start_week_time) && ($check_week <= $end_week_time)) {
-      $sel_week .= "<option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$weekdate)."\" selected=\"selected\">";
-      $sel_week .= "$select_week1 - $select_week2</option>";
+      $sel_week .= "
+        <option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\" selected=\"selected\">$select_week1 - $select_week2</option>";
     } else {
-      $sel_week .= "<option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$weekdate)."\">";
-      $sel_week .= "$select_week1 - $select_week2</option>";
+      $sel_week .= "
+        <option value=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$weekdate")."\">$select_week1 - $select_week2</option>";
     }
     $start_week_time =  strtotime ("+1 week", $start_week_time);
     $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
@@ -1313,7 +1308,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 
 // User Selection
 
-  if($action == "perform_meeting") {
+  if ($action == "perform_meeting") {
     $duration = $agenda["duration"];     
     $dis_duration = "<input type=\"hidden\" name=\"param_duration\" value=\"$duration\" />";
     $new_action = "$action";
@@ -1328,7 +1323,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     $new_action = $action;
     $check_sel_user = "onsubmit=\"if (check_count_user(this)) return true; else return false;\"";
   }
-  if(count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
+  if (count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
     $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
   }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"12\" multiple=\"multiple\" style=\"font-size:10px\">";
@@ -1412,9 +1407,9 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     </td></tr>    
     ";
   }
-  else{
+  else {
     $l_legend = $l_user_calendar;
-    foreach($calendar_user as $user_id => $user_data) {
+    foreach ($calendar_user as $user_id => $user_data) {
       $dis_leg_user .="
       <tr>
        <td class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
@@ -1422,8 +1417,8 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       </tr>";
     }
   }
-echo "
 
+  echo "
    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"170\">
     <tr>
      <td>
@@ -1586,10 +1581,10 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:
-//    -$agenda: agenda parameters
-//    -$obm_q_events : list of event's records 
-//    -$contacts_array : array of selected contacts 
-//    -$groups_array : array of selected groups 
+//   - $agenda         : agenda parameters
+//   - $obm_q_events   : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
@@ -1606,7 +1601,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $title = htmlspecialchars($obm_q_event->f("calendarevent_title"));
     $category_id = $obm_q_event->f("calendarevent_category_id");
     $priority = $obm_q_event->f("calendarevent_priority");
-    $description = $obm_q_event->f("calendarevent_description");
+    $desc = $obm_q_event->f("calendarevent_description");
     ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("datebegin") , $day_array);
     $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
     $hourbegin = $day_array[4];
@@ -1624,49 +1619,55 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $id = $obm_q_event->f("calendarevent_id");
     $old_begin = $day_array[0];
     $old_end = $day_array2[0];
-    
-  } else {
-    if (isset($agenda["id"])) { $id = $agenda["id"]; }
-    $title = $agenda["title"];
-    $category_id = $agenda["category"];
-    $priority = $agenda["priority"];
-    $description = $agenda["description"];
-    
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($agenda["id"])) { $id = $agenda["id"]; }
+  if (isset($agenda["title"])) { $title = $agenda["title"]; }
+  if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
+  if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
+  if (isset($agenda["description"])) { $desc = $agenda["description"]; }
+  if (isset($agenda["date_begin"])) {
     $datebegin = substr($agenda["date_begin"],0,8);    
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $datebegin, $day_array);
     $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
     $hourbegin = substr($agenda["date_begin"],8,2);
     $minbegin = substr($agenda["date_begin"],10,2);
-
+    $day_array[0] = $agenda["date_begin"];
+  }
+  if (isset($agenda["date_end"])) {
     $dateend = substr($agenda["date_end"],0,10);
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$dateend , $day_array2);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $dateend, $day_array2);
     $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
     $hourend = substr($agenda["date_end"],8,2);
     $minend = substr($agenda["date_end"],10,2);
-    $privacy = $agenda["privacy"]; 
-    $occupied_day = $agenda["occupied"];
-    $repeat_kind = $agenda["kind"];
-    $repeat_days =$agenda["repeat_days"]; 
-    if(isset($agenda["repeat_end"]) && $agenda["repeat_end"]!= "") {
-      ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$agenda["repeat_end"] , $day_array3);
-      $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
-    }
-    $day_array[0] = $agenda["date_begin"];
     $day_array2[0] = $agenda["date_end"];
-    $force = $agenda["force"];
-    $old_begin = $agenda["old_begin"];
-    $old_end = $agenda["old_end"];
   }
+  if (isset($agenda["privacy"])) { $privacy = $agenda["privacy"]; }
+  if (isset($agenda["occupied"])) { $occupied_day = $agenda["occupied"]; }
+  if (isset($agenda["kind"])) { $repeat_kind = $agenda["kind"]; }
+  if (isset($agenda["repeat_days"])) { $repeat_days = $agenda["repeat_days"];}
+  if (isset($agenda["repeat_end"]) && $agenda["repeat_end"] != "") {
+    ereg("([0-9]{4})([0-9]{2})([0-9]{2})", $agenda["repeat_end"], $day_array3);
+    $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+  }
+  if (isset($agenda["force"])) { $force = $agenda["force"]; }
+  if (isset($agenda["old_begin"])) { $old_begin = $agenda["old_begin"]; }
+  if (isset($agenda["old_end"])) { $old_end = $agenda["old_end"]; }
+
   
   if (($action == "detailupdate") || ($action == "update")) {
-    if($repeat_kind == "none") {
+    if ($repeat_kind == "none") {
       $check_activate = "disabled=\"disabled\"";
       $check_case_style = "style=\"color:#cccccc; bacgound-color: #999999\"";
     } else {
       $check_case_style = "style=\"color:red;\"";      
     }	
-    $dis_repeat_update = "<tr><td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>";
-    $dis_repeat_update .= "<td><input type=\"checkbox\" name=\"cb_repeat_update\" $check_activate value=\"1\"</td> </tr> "; 
+    $dis_repeat_update = "
+      <tr>
+        <td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>
+        <td><input type=\"checkbox\" name=\"cb_repeat_update\" $check_activate value=\"1\"</td>
+      </tr>"; 
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
@@ -1682,30 +1683,34 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
       ";
   }
 
+  // $$repeat_kind: $daily | $weekly | $monthlybydate | $monthlybyday | $yearly
   $$repeat_kind .= "selected=\"selected\" ";
-  $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"none\">$l_none</option>";
-  $dis_sel_kind .= "\n<option value=\"daily\" $daily>$l_daily</option>";
-  $dis_sel_kind .= "\n<option value=\"weekly\" $weekly>$l_weekly</option>";
-  $dis_sel_kind .= "\n<option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option> ";
-  $dis_sel_kind .= "\n<option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option> ";
-  $dis_sel_kind .= "\n<option value=\"yearly\" $yearly>$l_yearly</option> ";
-  $dis_sel_kind .= "\n</select>";
+  $dis_sel_kind .= "
+    <select name=\"sel_repeat_kind\">
+      <option value=\"none\">$l_none</option>
+      <option value=\"daily\" $daily>$l_daily</option>
+      <option value=\"weekly\" $weekly>$l_weekly</option>
+      <option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option>
+      <option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option>
+      <option value=\"yearly\" $yearly>$l_yearly</option>
+    </select>";
   switch($priority) {
-    case 1 : $tag_low="selected=\"selected\""; break;
-    case 2 : $tag_medium="selected=\"selected\""; break;
-    case 3: $tag_high="selected=\"selected\""; break; 
+    case 1 : $tag_low = "selected=\"selected\""; break;
+    case 2 : $tag_medium = "selected=\"selected\""; break;
+    case 3 : $tag_high = "selected=\"selected\""; break; 
     default :
-      $tag_low="";
-      $tag_medium="selected=\"selected\"";
-      $tag_high=""; 
+      $tag_low = "";
+      $tag_medium = "selected=\"selected\"";
+      $tag_high = ""; 
     break;
   }
   
-  $dis_sel_prio .= "<select name=\"sel_priority\">";
-  $dis_sel_prio .= "<option value=1 ".$tag_low.">".$l_low."</option>";
-  $dis_sel_prio .= "<option value=2 ".$tag_medium.">".$l_medium."</option>";
-  $dis_sel_prio .= "<option value=3 ".$tag_high.">".$l_high."</option>";
-  $dis_sel_prio .= "</select>";
+  $dis_sel_prio .= "
+    <select name=\"sel_priority\">
+      <option value=\"1\" $tag_low>$l_low</option>
+      <option value=\"2\" $tag_medium>$l_medium</option>
+      <option value=\"3\" $tag_high>$l_high</option>
+    </select>";
 
   // eventcategory select
   $sel_cat = "<select name=\"sel_category_id\">"; 
@@ -1907,7 +1912,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
      <td colspan=\"2\" class=\"detailHead\">$l_description</td>
     </tr>       
     <tr>    
-     <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_event_description\" rows=\"6\" cols=\"72\">$description</textarea></td> 
+     <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_event_description\" rows=\"6\" cols=\"72\">$desc</textarea></td> 
     </tr>     
    </table>
    <table class=\"details\">
@@ -1920,8 +1925,10 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   </form>
    ";
  }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Waiting events                                                  //
+// Display Waiting events
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
@@ -1929,8 +1936,8 @@ function html_waiting_events($obm_wait) {
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
-  
-  while($obm_wait->next_record()) {
+
+  while ($obm_wait->next_record()) {
     $kind = ${"l_".$obm_wait->f("calendarevent_repeatkind")};
     switch ($obm_wait->f("calendarevent_priority") ) {
       case 1 : 
@@ -1942,8 +1949,8 @@ function html_waiting_events($obm_wait) {
       case 3 :
 	$priority = $l_high;
 	break;
-      
     }
+
     $start_week_day = strtotime($set_weekstart_default);
     $dis_repeat_days = "";
     for ($i=0; $i<7; $i++) {
@@ -1964,9 +1971,9 @@ function html_waiting_events($obm_wait) {
     $dis_waiting_events .= "<tr>
      <td class=\"detailText\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailText\">".$obm_wait->f("calendarcategory_label")."</td>
-     <td class=\"detailText\">".$priority."</td>
-     <td class=\"detailText\">".$kind."</td>
-     <td class=\"detailText\">".$dis_repeat_days."</td>
+     <td class=\"detailText\">$priority</td>
+     <td class=\"detailText\">$kind</td>
+     <td class=\"detailText\">$dis_repeat_days</td>
      <td class=\"detailText\">".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]."</td>
      <td class=\"detailText\">".$day_array[1]."-".$day_array[2]."-".$day_array[3]."</td>
      <td class=\"detailText\">".$day_array[4].":".$day_array[5]."</td>
@@ -2044,8 +2051,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
     case 3 :
       $priority = $l_high;
       break;
-      
-    }
+  }
     
   $start_week_day = strtotime($set_weekstart_default);
   for ($i=0; $i<7; $i++) {
@@ -2057,8 +2063,8 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
     
-  while($obm_q_cust->next_record()) {
-    if($auth->auth["uid"] == $obm_q_cust->f("userobm_id")) {
+  while ($obm_q_cust->next_record()) {
+    if ($auth->auth["uid"] == $obm_q_cust->f("userobm_id")) {
       ${$obm_q_cust->f("calendarsegment_state")} = "checked=\"checked\"";
       $dis_decision_radio = "<tr><td colspan=\"2\" class=\"detailHead\">$l_change_state</td></tr>";
       $dis_decision_radio .= "<tr><td colspan=\"2\" class=\"detailText\">
@@ -2072,6 +2078,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
     }
     $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."(".$obm_q_cust->f("calendarsegment_state").")<br />";
   }
+
   // --- HTML Template --------------------------------------------------------
   echo "
   <form method=\"get\" name=\"f_mod_decision\">
@@ -2144,8 +2151,10 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   </form>
   ";
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Conflict                                                          //
+// Display Conflicts
 // Parameters:
 //   - $agenda:
 //   - $conflict:
@@ -2158,7 +2167,7 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user,$l_force_all,$l_replace_all,$l_cancel_all,$l_validate;
   global $l_force_event,$l_cancel_event, $l_replace_event;
 
-  if($force == 1) { 
+  if ($force == 1) { 
     $dis_form_begin = "<form name=\"f_conflict\" method=\"post\"><input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
                        <input type=\"hidden\" name=\"action\" value=\"insert_conflict\" />";
     $dis_form_button = "<tr><td class=\"detailHead\" colspan=\"7\">
@@ -2170,25 +2179,34 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
     $dis_head = "<td class=\"detailLabel\">$l_force_event</td>
                  <td class=\"detailLabel\">$l_replace_event</td><td class=\"detailLabel\">$l_cancel_event</td>";
   }
-  foreach($conflict as $data) {
+  foreach ($conflict as $data) {
+    $id = $data["event_id"];
+    $title = $data["event_title"];
+    $user_id = $data["user_id"];
+    $user_name = $data["user_name"];
+    $date_begin = $data["date_begin"];
+    $date_end = $data["date_end"];
     $day_array = "";
     $day_array2 = "";
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$data["date_begin"] , $day_array); 
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$data["date_end"] , $day_array2); 
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})", $date_begin, $day_array); 
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})", $date_end, $day_array2); 
     $date_b = $day_array[1]."-".$day_array[2]."-".$day_array[3]." ".$day_array[4].":".$day_array[5];
     $date_e = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." ".$day_array2[4].":".$day_array2[5];
-    $dis_conflict .= "<tr><td class=\"detailText\">".$data["event_title"]."</td>";
-    $dis_conflict .= "<td class=\"detailText\">$date_b</td>";
-    $dis_conflict .= "<td class=\"detailText\">$date_e</td>";     
-    $dis_conflict .= "<td class=\"detailText\">".$data["user_name"]."</td>";
-    if($force == 1 && $data["user_id"] == $auth->auth["uid"]) {
-      $dis_conflict .= "<td class=\"detailText\">";
-      $dis_conflict .= "<input type=\"radio\" checked=\"checked\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"force\" /></td>";
-      $dis_conflict .= "<td class=\"detailText\">";
-      $dis_conflict .= "<input type=\"radio\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"replace\" /></td>";
-      $dis_conflict .= "<td class=\"detailText\">";
-      $dis_conflict .= "<input type=\"radio\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"cancel\" />";
-      $dis_conflict .= "<input type=\"hidden\" name=\"hd_conflict_end[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"".$data["date_end"]."\" /></td>";
+    $dis_conflict .= "
+      <tr>
+        <td class=\"detailText\">$title</td>
+        <td class=\"detailText\">$date_b</td>
+        <td class=\"detailText\">$date_e</td>
+        <td class=\"detailText\">$user_name</td>";
+    if ($force == 1 && $user_id == $auth->auth["uid"]) {
+      $dis_conflict .= "
+        <td class=\"detailText\">
+          <input type=\"radio\" checked=\"checked\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"force\" /></td>
+        <td class=\"detailText\">
+          <input type=\"radio\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"replace\" /></td>
+        <td class=\"detailText\">
+          <input type=\"radio\" name=\"rd_conflict_event[$date_begin][$id]\" value=\"cancel\" />
+          <input type=\"hidden\" name=\"hd_conflict_end[$date_begin][$id]\" value=\"$date_end\" /></td>";
     }
      $dis_conflict .= "</tr>";
   }
@@ -2212,8 +2230,10 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   $dis_form_end
   ";
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display Delete Options                                                          //
+// Display Delete Options
 // Parameters:
 //   - $agenda:
 ///////////////////////////////////////////////////////////////////////////////
@@ -2395,8 +2415,9 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
-  $time_unit = 60 / $set_cal_interval;  
-  $datebegin = substr($agenda["date"],0,8);    
+
+  $time_unit = 60 / $set_cal_interval;
+  $datebegin = substr($agenda["date"],0,8);
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array);
   $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
   $dis_button = "
@@ -2427,25 +2448,24 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   $dis_sel_user .= "</select>";
   
   $dis_hour_d = "<select name=\"sel_time_duration\">";
-  for($i=0;$i<24;$i++) {
+  for ($i=0;$i<24;$i++) {
     $current_hour = substr("0$i",-2,2); 
     if($current_hour == $hourbegin){
       $dis_hour_d .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
     }
-    else{
+    else {
       $dis_hour_d .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
   $dis_hour_d .= "</select>";  
  
-
- $dis_min_d = "<select name=\"sel_min_duration\">";
-  for($i=4;$i>=1;$i--) {
+  $dis_min_d = "<select name=\"sel_min_duration\">";
+  for ($i=4;$i>=1;$i--) {
     $current_min = substr("0".(60 - (15*$i)),-2);
     if($current_min  == $mindur){
       $dis_min_d .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     }
-    else{
+    else {
       $dis_min_d .= "<option value=\"$current_min\">$current_min</option>";
     }
   }
@@ -2487,15 +2507,15 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   </form>
    ";
  }
-////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Free meeting performing and display
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    - $agenda: agenda parameters
-//    - $obm_q_events : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array : array of selected groups 
+// Parameters:
+//   - $agenda         : agenda parameters
+//   - $obm_q_events   : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
   global $set_cal_interval,$set_weekstart_default, $set_start_time, $set_stop_time;
@@ -2510,15 +2530,15 @@ function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
   $meeting = store_meeting_cell($current_events,$duration,$calendar_user,$getdate);
   html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$calendar_user);
 }
-////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the free cells for the week
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    - $agenda: agenda parameters
-//    - $obm_q_events : list of event's records 
-//    - $contacts_array : array of selected contacts 
-//    - $groups_array : array of selected groups 
+// Parameters:
+//   - $agenda         : agenda parameters
+//   - $obm_q_events   : list of event's records 
+//   - $contacts_array : array of selected contacts 
+//   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$calendar_user){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$sel_user_id;
@@ -2598,7 +2618,7 @@ function html_meeting_planning($agenda,$user_q,$usr_q, $p_user_array,$meeting,$c
     $hour_day_list .=   "</tr>";
   }
   
-echo "
+  echo "
 <table class=\"agendaMain\">
  <tr>
   <td style=\"vertical-align: top;\">
@@ -2654,10 +2674,11 @@ echo "
  </tr>
 </table>
 ";
-  }
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the agenda administration index                                  //
+// Display the agenda administration index
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
@@ -2667,7 +2688,7 @@ function dis_admin_index() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Category section                                                      //
+// Company Category section
 // Parameters:
 //   - $category_q : Category list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -2759,7 +2780,7 @@ function html_agenda_category_form($category_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the category delete display form (button)                              //
+// Return the category delete display form (button)
 // Parameters:
 //   - $label : category label
 // Retuns:
@@ -2780,7 +2801,7 @@ function dis_category_delete_form($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the category links                                                   //
+// Displays the category links
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////

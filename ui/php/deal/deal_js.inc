@@ -74,7 +74,26 @@ function check_form(f_aff) {
     return false;
   }
   else
+  {
+    // Check if date alarm is in the past
+    today = new Date();
+    dalarm = f_aff.tf_datealarm.value;
+    year = dalarm.substring(0,4);
+    month = dalarm.substring(5,7) - 1;
+    day = dalarm.substring(8,10);
+    date_alarm = new Date(year, month, day);
+    today.setHours(0);
+    date_alarm.setHours(12);
+    // We set the hours not to alert if alarm date is today
+    if (date_alarm < today) {
+      if (confirm(\"$l_confirm_datealarm\")) {
+        return true;
+      } else {
+        return false;
+      }
+    }
     return true;
+  }
 }
 
 
@@ -139,9 +158,7 @@ function check_kind_checkdel(form)
    if (form.sel_kind.selectedIndex >= 0)
    {
      return true;
-   }
-   else
-   {
+   } else {
      alert(\"$l_j_kind_delete\");
      return false;
    }

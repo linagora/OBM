@@ -289,7 +289,7 @@ function get_user_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
     'Right'    => $user_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                      	   );
 
 // Delete

@@ -142,6 +142,7 @@ function run_query_detail($id) {
         tasktype_label,
         dealstatus_label,
         company_name, company_address1, company_zipcode, company_town,
+        company_phone,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
@@ -1002,15 +1003,10 @@ function check_deal_form($did, $deal) {
     return false;
   }
 
-  // Check if the hitrate is numerical
-  if (! is_numeric($deal["hitrate"])) {
-    $err_msg = $l_err_hitrate;
-    return false;
-  }
-
   // If the amount is filled, Check if the hitrate is between 0 and 100
-  if ( ($deal["amount"]) && !($deal["amount"] == 0)) {
-    if ( ($deal["hitrate"] == "")
+  if ( ( ($deal["amount"]) && !($deal["amount"] == 0) )
+       || ($deal["hitrate"] != "") ) {
+    if ( ($deal["hitrate"] == "") || (! is_numeric($deal["hitrate"]))
 	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
       $err_msg = $l_err_hitrate;
       return false;

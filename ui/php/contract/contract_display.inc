@@ -356,7 +356,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $type_id = $contract_q->f("contract_type_id");
     $con1_id = $contract_q->f("contract_contact1_id");
     $con2_id = $contract_q->f("contract_contact2_id");
-    $market_i = $contract_q->f("contract_marketmanager_id");
+    $market_id = $contract_q->f("contract_marketmanager_id");
     $tech = $contract_q->f("contract_techmanager_id");
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
@@ -370,39 +370,37 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $deal_id = $contract_q->f("deal_id");
     $deal_label = $contract_q->f("deal_label");
 
-  } else {
-    // Values are taken from parameters
-    $deal_id = $contract["deal_id"];
-    $deal_label = $contract["deal_label"];
-    $id = $contract["id"];
-    $label = $contract["label"];
-    $comp_id = $contract["company_id"];
-    $number = $contract["number"];
-    $datebegin = $contract["datebegin"];
-    $dateexp = $contract["dateexp"];
-    $type_id = $contract["type_id"];
-    $con1_id = $contract["contact1"];
-    $con2_id = $contract["contact2"];
-    $market_i = $contract["market"];
-    $tech = $contract["tech"];
-    $clause = $contract["clause"];
-    $comment = $contract["comment"];
-    if ($action == "new") {
-      $comp_name = $comp_q->f("company_name");
-      $ad1 = $comp_q->f("company_address1");
-      $zip = $comp_q->f("company_zipcode");
-      $town = $comp_q->f("company_town");
-      $market = $comp_q->f("company_marketingmanager_id");
-      // We pre-fill date with current date
-      $datebegin = date($c_php_isodate_format);
-      $dateexp = date($c_php_isodate_format, time() + 31536000);
-    } else {
-      $comp_name = $contract["company_name"];
-      $ad1 = $contract["company_ad1"];
-      $zip = $contract["company_zip"];
-      $town = $contract["company_town"];
-    }
+  } elseif ($action == "new") {
+    $comp_name = $comp_q->f("company_name");
+    $ad1 = $comp_q->f("company_address1");
+    $zip = $comp_q->f("company_zipcode");
+    $town = $comp_q->f("company_town");
+    $market = $comp_q->f("company_marketingmanager_id");
+    // We pre-fill date with current date
+    $datebegin = date($c_php_isodate_format);
+    $dateexp = date($c_php_isodate_format, time() + 31536000);
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($contract["deal_id"])) { $deal_id = $contract["deal_id"]; }
+  if (isset($contract["deal_label"])) { $deal_label = stripslashes($contract["deal_label"]); }
+  if (isset($contract["id"])) { $id = $contract["id"]; }
+  if (isset($contract["label"])) { $label = stripslashes($contract["label"]); }
+  if (isset($contract["company_id"])) { $comp_id = $contract["company_id"]; }
+  if (isset($contract["number"])) { $number = $contract["number"]; }
+  if (isset($contract["datebegin"])) { $datebegin = $contract["datebegin"]; }
+  if (isset($contract["dateexp"])) { $dateexp = $contract["dateexp"]; }
+  if (isset($contract["type_id"])) { $type_id = $contract["type_id"]; }
+  if (isset($contract["contact1"])) { $con1_id = $contract["contact1"]; }
+  if (isset($contract["contact2"])) { $con2_id = $contract["contact2"]; }
+  if (isset($contract["market"])) { $market_id = $contract["market"]; }
+  if (isset($contract["tech"])) { $tech = $contract["tech"]; }
+  if (isset($contract["clause"])) { $clause = stripslashes($contract["clause"]); }
+  if (isset($contract["comment"])) { $comment = stripslashes($contract["comment"]); }
+  if (isset($contract["company_name"])) { $comp_name = stripslashes($contract["company_name"]); }
+  if (isset($contract["company_ad1"])) { $ad1 = stripslashes($contract["company_ad1"]); }
+  if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }
+  if (isset($contract["company_town"])) { $town = stripslashes($contract["company_town"]); }
   
   $dis_sel_t="<select name=\"sel_type\">";
   while($type_q->next_record()) {
@@ -416,7 +414,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   $dis_sel_respc="<select name=\"sel_market\">";
   while($usr_q->next_record()) {
     $dis_sel_respc.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
-    if ($usr_q->f("userobm_id") == $market_i) 
+    if ($usr_q->f("userobm_id") == $market_id) 
       $dis_sel_respc.=" selected=\"selected\"";
     $dis_sel_respc.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }

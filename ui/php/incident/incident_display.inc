@@ -379,25 +379,26 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
     $c_name = $contr_q->f("contract_label");
-  } else {
-    $param_contract = $incident["contract_id"];
-    $lincident = $incident["lincident"];
-    $owner = $incident["owner"];
-    $logger = $incident["logger"];
-    $desc = $incident["description"];
-    $duration = $incident["duration"];
-    $solu = $incident["solution"];
-    $priority = $incident["priority"];
-    $status = $incident["status"];
-    $date = $incident["date"];
-    $hour = $incident["hour"];
-    $archive = ($incident["archive"] == "1" ? "checked" : "");
-    $c_name = $incident["lcontract"];
-    if ($action == "new") {
+  } elseif ($action == "new") {
       // We pre-fill date with current date
-      $date = date($c_php_isodate_format);
-    }
+    $date = date($c_php_isodate_format);
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($incident["contract_id"])) { $param_contract = $incident["contract_id"]; }
+  if (isset($incident["lincident"])) { $lincident = stripslashes($incident["lincident"]); }
+  if (isset($incident["owner"])) { $owner = $incident["owner"]; }
+  if (isset($incident["logger"])) { $logger = $incident["logger"]; }
+  if (isset($incident["description"])) { $desc = stripslashes($incident["description"]); }
+  if (isset($incident["duration"])) { $duration = $incident["duration"]; }
+  if (isset($incident["solution"])) { $solu = stripslashes($incident["solution"]); }
+  if (isset($incident["priority"])) { $priority = $incident["priority"]; }
+  if (isset($incident["status"])) { $status = $incident["status"]; }
+  if (isset($incident["date"])) { $date = $incident["date"]; }
+  if (isset($incident["hour"])) { $hour = $incident["hour"]; }
+  if (isset($incident["archive"])) { $archive = ($incident["archive"] == 1 ? "checked" : ""); }
+  if (isset($incident["lcontract"])) { $c_name = stripslashes($incident["lcontract"]); }
+
 
   $dis_sel_owner="<select name=\"sel_owner\">";
   while($usr_q->next_record()) {

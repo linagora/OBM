@@ -103,16 +103,16 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
     echo "
   <form name=\"form_create_payment\" method=\"post\" action=\"$url_creating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
     } elseif ($p_action == "detailupdate") {
-    echo "
+      echo "
   <form name=\"form_create_payment\" method=\"post\" action=\"$url_updating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
     } elseif ($p_action == "add_invoices") {
-    // banking
-    echo "
+      // banking
+      echo "
   <FORM name=\"form_add_invoices\" method=\"post\" action=\"$url_banking\" onsubmit=\"if (check_payment_banking (this)) return true; else return false ;\">";
   } else {
     display_err_msg ("unhandled action value '".$p_action."' in html_payment_form ()");
   }
-
+  
   echo "
   <table border=\"$border\" cellspacing=\"$cellspacing\">";
   // label :
@@ -140,24 +140,19 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   echo "
    <TR><TD>
     <TABLE WIDTH=\"100%\" BORDER=$border CELLSPACING=$cellspacing>
-     <TR><TD>";
-  echo"
+     <TR><TD>
       <FONT COLOR=\"#$col_label\">$l_expected_date</FONT><BR>
-      <INPUT TYPE=\"text\" NAME=\"tf_expected_date\" size=10 value=\"".$expected_date."\">";
-  echo "</TD><TD>";
-  echo "
+      <INPUT TYPE=\"text\" NAME=\"tf_expected_date\" size=10 value=\"".$expected_date."\">
+     </TD><TD>
       <FONT COLOR=\"#$col_label\">$l_date</FONT><BR>
-      <INPUT TYPE=\"text\" NAME=\"tf_date\" size=10 value=\"".$date."\" $readonly>";
-  echo " 
+      <INPUT TYPE=\"text\" NAME=\"tf_date\" size=10 value=\"$date\" $readonly>
      </TD></TR>
     </TABLE>
-   </TD></TR>";
-  echo "
+   </TD></TR>
    <TR>";
   // payment kind  : 
   echo "<td>
-    <table width=\"100%\" cellspacing=$cellspacing border=$border>";
-  echo "
+    <table width=\"100%\" cellspacing=$cellspacing border=$border>
      <tr><td>
      <font color=\"#$col_label\">$l_type</font><br>
      <select name=\"sel_kind\" $readonly>
@@ -199,8 +194,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   echo "
      </select>
     </td>
-   </tr>";
-  echo "
+   </tr>
    </table>";
   // radio buttons inout
   // not needed when banking...
@@ -241,19 +235,16 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   echo "
    <tr><td align=\"center\">
     <br>";
-    if ( ($p_action =="new") || ($p_action =="duplicate") ) {
+  if ( ($p_action =="new") || ($p_action =="duplicate") ) {
     echo "
       <table border=$border cellspacing=$cellspacing>
       <tr><td>
-       <input type=\"submit\" value=\"$l_insert\">";
-    
-    echo "
+       <input type=\"submit\" value=\"$l_insert\">
       </td><td>";
     $new_action = url_prepare("payment_index.php?action=new_with_invoices");
     echo "
       <input type=\"button\" value=\"$l_add_invoices\" ".
-      "onClick=\"if (check_payment(this.form)) {this.form.action='$new_action'; this.form.submit();} else { return false; }\">";
-echo "
+      "onClick=\"if (check_payment(this.form)) {this.form.action='$new_action'; this.form.submit();} else { return false; }\">
     </td></tr>
     </table>
   </table>  
@@ -271,17 +262,14 @@ echo "
       </td></tr>
      </table>
   </table>  
-  </form>
-";
+  </form>";
   } elseif ($p_action == "add_invoices") {
     // no buttons, we got invoices to check
     // below this form (cf. html_payment_affect_invoices ())
   }
-    echo "</table>";
-
-  echo "
+  echo "</table>
   </center>";   
-}// html_payment_form
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -29,12 +29,11 @@ $fieldnames["payment_amount"] = $l_amount;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Account Form              
-// params :
+// Parameters:
 //  $obm_q_account : if updating, contains the account current info
-//  $action : action 
+//  $action        : action 
 ///////////////////////////////////////////////////////////////////////////////
-// account creation form 
-function html_account_form($obm_q_account, $action){
+function html_account_form($obm_q_account, $action) {
   // - Themes :
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
@@ -43,74 +42,82 @@ function html_account_form($obm_q_account, $action){
   global $l_insert,$l_update, $l_delete;
   global $obm_q_company;
   global $border,$cellspacing;
-  
-  echo "
-  <center>
-    <form method=\"post\" onSubmit=\"if (check_cpte(this)) return true; else return false;\" action=\"\">
-      <table border=$border cellspacing=$cellspacing>
-       <tr>
-        <td>";  
-  echo "
-        <table border=$border cellspacing=$cellspacing>
-         <tr>";
-  // label :
-  echo "
-          <td><font color=\"#$col_label\">$l_label</font><br>
-          <input name=tf_label type=text size=40 value=\"";
-  echo (($action=="update")||($action=="detailupdate"))? $obm_q_account->f("account_label") : "";
-  echo "\">
-        </td>"; 
-  // account number :
-  echo "
-          <td><font color=\"#$col_label\">$l_number</font><br>
-<input name=tf_number type=text size=12 value=\"";
-  echo (($action=="update")||($action=="detailupdate"))? $obm_q_account->f("account_number") : "";
-  echo "\">
-        </td>";
-  // account balance :
-  echo "
-          <td><font color=\"#$col_label\">$l_initial_balance</font><br>
-<input name=\"tf_balance\" type=text size=20 value=\"";
-  echo (($action=="update")||($action=="detailupdate"))? $obm_q_account->f("account_balance") : "";
-  echo "\"";
-  // when we update, this field is only available if the account
-  // is not connected to any payments
+
+  // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
-    $q_payments = run_query_search_payments ($obm_q_account->f("account_id"));
+    $id = $obm_q_account->f("account_id");
+    $label = $obm_q_account->f("account_label");
+    $number = $obm_q_account->f("account_number");
+    $today = $obm_q_account->f("account_today");
+    $bank = $obm_q_account->f("account_bank");
+    $comment = nl2br($obm_q_account->f("account_comment"));
+    // when we update, this field is only available if the account
+    // is not connected to any payments
+    $q_payments = run_query_search_payments ($id);
     if ($q_payments->nf() != 0) {
-      echo " disabled ";
+      $bal_state = " disabled ";
     }
   }
-  echo ">
-        </td>";  
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($account["id"])) { $id = $account["id"]; }
+  if (isset($account["label"])) { $label = stripslashes($account["label"]); }
+  if (isset($account["number"])) { $number = $account["number"]; }
+  if (isset($account["balance"])) { $balance = $account["balance"]; }
+  if (isset($account["bank"])) { $bank = stripslashes($account["bank"]); }
+  if (isset($account["comment"])) { $comment = stripslashes($account["comment"]); }
+
 
   echo "
+  <center>
+  <form method=\"post\" onSubmit=\"if (check_cpte(this)) return true; else return false;\" action=\"\">
+    <table border=$border cellspacing=$cellspacing>
+    <tr>
+      <td>
+        <table border=$border cellspacing=$cellspacing>
+        <tr>
+          <td>
+            <font color=\"#$col_label\">$l_label</font>
+            <br />
+            <input name=\"tf_label\" size=\"40\" value=\"$label\">
+          </td>
+          <td>
+            <font color=\"#$col_label\">$l_number</font>
+            <br />
+            <input name=\"tf_number\" size=\"12\" value=\"$number\">
+          </td>
+          <td>
+            <font color=\"#$col_label\">$l_initial_balance</font>
+            <br />
+            <input name=\"tf_balance\" size=\"20\" value=\"$balance\" $bal_state>
+          </td>
         </tr>
-       </table>
+        </table>
       </td>
-     </tr>";
-  // bank : 
-  echo "
-        <tr>
-          <td><font color=\"#$col_label\">$l_bank</font><br>
-           <input name=tf_bank type=text size=60 value=\"";
-  echo (($action=="update")||($action=="detailupdate"))? $obm_q_account->f("account_bank") : "";
-  echo "\"></td></tr>"; 
-  // account comment :
-  echo "
-        <tr>
-          <td><font color=\"#$col_label\">$l_comment</font><br>
-          <textarea name=\"ta_comment\" rows=6 cols=72>";
-  if (($action=="update")||($action=="detailupdate")) echo $obm_q_account->f("account_comment");
-  echo "</textarea></td>";    
-  // boutons inserer ou modifier/supprimer
-  echo "
-        </tr>
-        <tr>
-          <td><br><center>";
+    </tr>
+    <tr>
+      <td>
+        <font color=\"#$col_label\">$l_bank</font>
+        <br />
+        <input name=\"tf_bank\" size=\"60\" value=\"$bank\">
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <font color=\"#$col_label\">$l_comment</font>
+        <br />
+        <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">
+        $comment
+        </textarea>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <br />
+        <center>";
   if ($action=="detailupdate"){//modifier/supprimer
-    $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=". $obm_q_account->f("account_id"));
-    $url_update = url_prepare("account_index.php?action=update&amp;param_account=". $obm_q_account->f("account_id"));
+    $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=$id");
+    $url_update = url_prepare("account_index.php?action=update&amp;param_account=$id");
     echo "
             <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
              <input type=\"button\" value=\"$l_update\" ".
@@ -147,12 +154,11 @@ function html_account_form($obm_q_account, $action){
   echo "
          </center>
          </td>
-        </tr>";
-  echo "
+        </tr>
           </td>
        </tr>
 </table></form></center>";
-} // html_account_form
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,9 +233,8 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   $bank = urlencode($account["bank"]);
   $number = urlencode($account["number"]);
 
-  echo "<CENTER><FONT color=\"#$col_textem\">";
-  echo "$nb_accounts $l_found";
-  echo "</FONT><BR></CENTER>";
+  echo "<center><font color=\"#$col_textem\">$nb_accounts $l_found</font>
+    <br /></center>";
 
   $url = url_prepare("account_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -298,48 +303,52 @@ function html_account_consult($obm_q_account, $p_action){
   global $auth, $perms_user,$l_perms_user;
   global $border, $cellspacing;
 
+
+  $label = $obm_q_account->f("account_label");
+  $number = $obm_q_account->f("account_number");
+  $today = $obm_q_account->f("account_today");
+  $bank = $obm_q_account->f("account_bank");
+  $comment = nl2br($obm_q_account->f("account_comment"));
+
   $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
 
   
   // number and label
   echo "
   <center>
-   <table border=$border cellspacing=$cellspacing>
-    <tr><td>";
-  echo "
-     <table border=$border cellspacing=$cellspacing width=\"100%\">
-      <tr>";
-  echo"
-      <td width=\"60%\">
-       <font color=\"#$col_label\">$l_label</font><br>".
-    $obm_q_account->f("account_label")."
-      </td>";
-  echo"
-      <td width=\"20%\">
-       <font color=\"#$col_label\">$l_number</font><br>".
-    $obm_q_account->f("account_number")."
-      </td>";  
-  echo "
-      <td width=\"20%\">
-       <font color=\"#$col_label\">$l_balance</font><br>
-       <font color=\"#$col_balance\">".$obm_q_account->f("account_today")."</font>
-      </td></tr>";
-  echo "
-     </table>
-    </td></tr>";
-
-  // bank
-  echo "
-    <tr><td>
-     <font color=\"#$col_label\">$l_bank</font><br>".
-     $obm_q_account->f("account_bank")."
-    </td></tr>";
- // comment
-  echo "
-    <tr><td>
-     <font color=\"#$col_label\">$l_comment</font><br>".
-     nl2br($obm_q_account->f("account_comment"))."
-    </td></tr>";
+  <table border=$border cellspacing=$cellspacing>
+  <tr>
+    <td>
+      <table border=$border cellspacing=$cellspacing width=\"100%\">
+      <tr>
+        <td width=\"60%\">
+          <font color=\"#$col_label\">$l_label</font>
+          <br />$label
+        </td>
+        <td width=\"20%\">
+          <font color=\"#$col_label\">$l_number</font>
+          <br />$number
+        </td>
+        <td width=\"20%\">
+         <font color=\"#$col_label\">$l_balance</font><br>
+         <font color=\"#$col_balance\">$today</font>
+        </td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <font color=\"#$col_label\">$l_bank</font>
+      <br />$bank
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <font color=\"#$col_label\">$l_comment</font>
+      <br />$comment
+    </td>
+  </tr>";
 
   // we display buttons only if we need them :
   if ($p_action == "detailconsult") {
@@ -449,19 +458,16 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
  <table border=\"$border\" cellspacing=\"$cellspacing\">
   <form method=\"post\" action=\"$url\"
   onSubmit=\"return check_balance_form (this);\">
-   <tr><td>";
-  echo "
+   <tr><td>
     <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
-    <input type=text name=\"tf_balance_date\" value=\"".$p_date."\">";
-  echo "
+    <input type=text name=\"tf_balance_date\" value=\"".$p_date."\">
    </td><td>
     <input type=submit value=\"".$l_compute_balance."\">
-   </td></tr>";
-  echo "
+   </td></tr>
   </form>
  </table>
-</center>";
-  echo "\n<br><br><hr>";
+</center>
+ <br><br><hr>";
      
   // we display the result :
   echo "
@@ -508,8 +514,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   <tr><td>
    <font color=\"#$col_label\">$l_total</font>
   </td><td colspan=\"2\" align=\"center\">
-   <font color=\"#$col_balance\">".$data["balance"]."</font>";
-  echo "
+   <font color=\"#$col_balance\">".$data["balance"]."</font>
   </td></tr>
  </table>
 </center><br><br>";
@@ -549,8 +554,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
    <font color=\"#$col_label\">$l_total</font>
   </td><td>
    <font color=\"#$col_balance\">".$data["balance"]."</font>
-  </td></tr>";
-  echo "
+  </td></tr>
  </table>
 </center>
 <br><br>";

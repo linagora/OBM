@@ -133,7 +133,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($first_try, $usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_email, $l_archive, $l_insert,$l_update,$l_checkdelete,$l_reset,$l_none;
+  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action;
 
@@ -147,40 +147,55 @@ function html_user_form($first_try, $usr_q, $user) {
     $fname = $usr_q->f("userobm_firstname");
     $email = $usr_q->f("userobm_email");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
-  } else {
-    $id = $user["id"];
-    $login = $user["login"];
-    $passwd = $user["passwd"];
-    $perms = $user["perms"];
-    $lname = $user["lastname"];
-    $fname = $user["firstname"];
-    $email = $user["email"];
-    $archive = ($user["archive"] == "1" ? "checked" : "");
   }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($user["id"])) { $id = $user["id"]; }
+  if (isset($user["login"])) { $login = $user["login"]; }
+  if (isset($user["passwd"])) { $passwd = $user["passwd"]; }
+  if (isset($user["perms"])) { $perms = $user["perms"]; }
+  if (isset($user["lname"])) { $lname = stripslashes($user["lname"]); }
+  if (isset($user["fname"])) { $fname = stripslashes($user["fname"]); }
+  if (isset($user["email"])) { $email = $user["email"]; }
+  if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
+
 
   // perms selectconstruction
   if ($perms == $perms_user) $perms_user_s = " selected";
   if ($perms == $perms_editor) $perms_editor_s = " selected";
   if ($perms == $perms_admin) $perms_admin_s = " selected";
 
-  echo "<table>
-    <form method=post name=form_user
+  // Buttons
+  if (($action == "new") || ($action == "insert")) {
+    $dis_button = "<input type=hidden name=action value=\"insert\">
+          <input type=submit value=\"$l_insert\">";
+
+  } elseif (($action=="detailupdate") || ($action=="update")) {
+    $dis_button = "<input type=hidden name=action value=\"update\">
+          <input type=hidden name=param_user value=\"$id\">
+          <input type=submit value=\"$l_update\">
+      </form>";
+  }
+
+  // --- HTML Template --------------------------------------------------------
+  echo "
+    <form method=\"post\" name=\"form_user\"
       onSubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
-    <tr><td>
-
-    <table>
+    <table class=\"details\">
     <tr>
-      <td>$l_archive </td>
-      <td><input name=cb_archive type=checkbox value=1 $archive></td>
+      <td colspan=\"2\" class=\"detailHead\">$l_user</td>
     </tr><tr>
-      <td>$l_login </td>
-      <td><input name=tf_login size=24 maxlength=32 value=\"$login\"></td>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td><input name=\"cb_archive\" type=\"checkbox\" value=\"1\" $archive /></td>
     </tr><tr>
-      <td>$l_password </td>
-      <td><input name=tf_passwd size=24 maxlength=32 value=\"$passwd\"></td>
+      <td class=\"detailLabel\">$l_login</td>
+      <td><input name=\"tf_login\" size=\"24\" maxlength=\"32\" value=\"$login\" /></td>
     </tr><tr>
-      <td>$l_user_perms </td>
+      <td class=\"detailLabel\">$l_password</td>
+      <td><input name=\"tf_passwd\" size=\"24\" maxlength=\"32\" value=\"$passwd\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_user_perms</td>
       <td><select name=sel_perms>
         <option value=\"$perms_user\" $perms_user_s>$l_perms_user
         <option value=\"$perms_editor\" $perms_editor_s>$l_perms_editor
@@ -188,46 +203,21 @@ function html_user_form($first_try, $usr_q, $user) {
         </select>
       </td>
     </tr><tr>
-      <td>$l_lastname </td>
-      <td><input name=tf_lastname size=32 maxlength=32 value=\"$lname\"></td>
+      <td class=\"detailLabel\">$l_lastname</td>
+      <td><input name=\"tf_lastname\" size=\"32\" maxlength=\"32\" value=\"$lname\" /></td>
     </tr><tr>
-      <td>$l_firstname </td>
-      <td><input name=tf_firstname size=32 maxlength=32 value=\"$fname\"></td>
+      <td class=\"detailLabel\">$l_firstname</td>
+      <td><input name=\"tf_firstname\" size=\"32\" maxlength=\"32\" value=\"$fname\" /></td>
     </tr><tr>
-      <td>$l_email </td>
-      <td><input name=tf_email size=32 maxlength=64 value=\"$email\"></td>
+      <td class=\"detailLabel\">$l_email</td>
+      <td><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr>
     </table>
-
-    </td><td align=middle>";
-
-  if (($action=="new") || ($action=="insert")) {
-    echo "<input type=hidden name=action value=\"insert\">
-          <input type=submit value=\"$l_insert\">";
-
-  } elseif (($action=="detailupdate") || ($action=="update")) {
-    echo "<input type=hidden name=action value=\"update\">
-          <input type=hidden name=param_user value=\"$id\">
-          <input type=submit value=\"$l_update\">
-      </form>
-      <p>
-      <form method=post name=f_del
-        action=\"" . url_prepare("user_index.php") . "\">
-      <input type=hidden name=\"action\" value=\"check_delete\">
-      <input type=hidden name=\"param_user\" value=\"$id\">
-      <input type=submit value=\"$l_checkdelete\">";
-  }
-
-  echo "</form>
-      <form method=post name=f_reset
-        action=\"" . url_prepare("user_index.php") . "\">
-      <input type=hidden name=\"action\" value=\"reset\">
-      <input type=hidden name=\"param_user\" value=\"$id\">
-      <input type=submit value=\"$l_reset\">
-      </form>
-    </td></tr>
-  </table>";
-
+    <p />
+    <center>
+    $dis_button
+    </center>
+    </form>";
 }
 
 
@@ -238,7 +228,7 @@ function html_user_form($first_try, $usr_q, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_email, $l_lastaccess, $l_archive;
+  global $l_user, $l_email, $l_lastaccess, $l_archive;
   global $l_insert,$l_update,$l_delete;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action, $c_yes, $c_no;
@@ -260,46 +250,34 @@ function html_user_consult($obm_q) {
   echo "
     <table class=\"details\">
     <tr>
-      <td>
-
-      <table class=\"details\">
-      <tr>
-        <td class=\"detailLabel\">$l_archive</td>
-        <td class=\"detailText\">$archive</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_login</td>
-        <td class=\"detailText\">$login</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_password</td>
-        <td class=\"detailText\">$passwd</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_user_perms</td>
-        <td class=\"detailText\">$l_perms</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_lastname</td>
-        <td class=\"detailText\">$lname</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_firstname</td>
-        <td class=\"detailText\">$fname</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_email</td>
-        <td class=\"detailText\">$email</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_lastaccess</td>
-        <td class=\"detailText\">$lastaccess</td>
-      </tr>
-      </table>
-
-      </td><td align=middle>
-      <form method=get name=form_user
-            action=\"" . url_prepare("user_index.php") . "\">
-      <input type=hidden name=\"action\" value=\"detailupdate\">
-      <input type=hidden name=param_user value=\"$id\">
-      <input type=submit value=\"$l_update\">
-      </td>
+      <td colspan=\"2\" class=\"detailHead\">$l_user</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_login</td>
+      <td class=\"detailText\">$login</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_password</td>
+      <td class=\"detailText\">$passwd</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_user_perms</td>
+      <td class=\"detailText\">$l_perms</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_lastname</td>
+      <td class=\"detailText\">$lname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_firstname</td>
+      <td class=\"detailText\">$fname</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email</td>
+      <td class=\"detailText\">$email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_lastaccess</td>
+      <td class=\"detailText\">$lastaccess</td>
     </tr>
-    </form>
-    </table>";
+    </table>
+  ";
 }
 
 

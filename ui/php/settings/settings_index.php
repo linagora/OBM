@@ -23,12 +23,12 @@ $uid = $auth->auth["uid"];
 if ($param_lang != "") {
   $set_lang=$param_lang;
   $sess->register("set_lang");
-  run_query_set_user_pref($uid, "set_lang", $set_lang, 1);
+  run_query_set_user_pref($uid, "set_lang", $set_lang);
 }
 if ($param_theme != "") {
   $set_theme=$param_theme;
   $sess->register("set_theme");
-  run_query_set_user_pref($uid, "set_theme", $set_theme, 1);
+  run_query_set_user_pref($uid, "set_theme", $set_theme);
 }
 
 // Validate user preferences
@@ -38,7 +38,7 @@ if ($form_user_pref) {
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
   $set_debug=$param_debug;
   $sess->register("set_debug");
-  run_query_set_user_pref($uid, "set_debug", $set_debug, 1);
+  run_query_set_user_pref($uid, "set_debug", $set_debug);
 
   if ($param_display == "yes") {
     $set_display = "yes";
@@ -46,12 +46,12 @@ if ($form_user_pref) {
     $set_display = "no";
   }
   $sess->register("set_display");
-  run_query_set_user_pref($uid, "set_display", $set_display, 1);
+  run_query_set_user_pref($uid, "set_display", $set_display);
 
   if ($param_rows != "") {
     $set_rows=$param_rows;
     $sess->register("set_rows");
-    run_query_set_user_pref($uid, "set_rows", $set_rows, 1);
+    run_query_set_user_pref($uid, "set_rows", $set_rows);
   }
 
   if ($param_mail == "yes") {
@@ -60,18 +60,24 @@ if ($form_user_pref) {
     $set_mail = "no";
   }
   $sess->register("set_mail");
-  run_query_set_user_pref($uid, "set_mail", $set_mail, 1);
-
-  if ($param_date != "") {
-    $set_date = $param_date;
-    $sess->register("set_date");
-    run_query_set_user_pref($uid, "set_date", $set_date, 1);
-  }
+  run_query_set_user_pref($uid, "set_mail", $set_mail);
 
   if ($param_menu != "") {
     $set_menu = $param_menu;
     $sess->register("set_menu");
-    run_query_set_user_pref($uid, "set_menu", $set_menu, 1);
+    run_query_set_user_pref($uid, "set_menu", $set_menu);
+  }
+
+  if ($param_date != "") {
+    $set_date = $param_date;
+    $sess->register("set_date");
+    run_query_set_user_pref($uid, "set_date", $set_date);
+  }
+
+  if ($param_commentorder != "") {
+    $set_commentorder = $param_commentorder;
+    $sess->register("set_commentorder");
+    run_query_set_user_pref($uid, "set_commentorder", $set_commentorder);
   }
 
   if ($param_cal_interval != "") {
@@ -90,18 +96,21 @@ if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sess) == $cdg_sess) $dg_sess = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
 
+if ($set_menu == $cme_txt) $me_txt = "checked";
+if ($set_menu == $cme_ico) $me_ico = "checked";
+if ($set_menu == $cme_both) $me_both = "checked";
+
 if ($set_date == $cda_iso) $da_iso = "checked";
 if ($set_date == $cda_en) $da_en = "checked";
 if ($set_date == $cda_fr) $da_fr = "checked";
 if ($set_date == $cda_txt) $da_txt = "checked";
 
+if ($set_commentorder == $cco_chro) $co_chro = "checked";
+if ($set_commentorder == $cco_rev) $co_rev = "checked";
+
 if ($set_cal_interval == $ccal_4) $cal_4 = "checked";
 if ($set_cal_interval == $ccal_2) $cal_2 = "checked";
 if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
-
-if ($set_menu == $cme_txt) $me_txt = "checked";
-if ($set_menu == $cme_ico) $me_ico = "checked";
-if ($set_menu == $cme_both) $me_both = "checked";
 
 if ($action == "") $action = "index";
 get_settings_actions();
@@ -189,6 +198,13 @@ echo "
   <tr>
     <td class=\"adminHead\" colspan=\"2\">$l_cur_settings</td>
   </tr><tr>
+    <td class=\"adminLabel\">$l_set_menu</td>
+    <td class=\"adminText\">
+      <input type=\"radio\" name=\"param_menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
+      <input type=\"radio\" name=\"param_menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
+      <input type=\"radio\" name=\"param_menu\" value=\"$cme_both\" $me_both />$l_me_both
+    </td>
+  </tr><tr>
     <td class=\"adminLabel\">$l_auto_display</td>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_display\" value=\"yes\" ";
@@ -199,12 +215,6 @@ echo " /></td>
     <td class=\"adminText\">
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
   </tr><tr>
-    <td class=\"adminLabel\">$l_send_mail</td>
-    <td class=\"adminText\">
-      <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
-if ($set_mail == "yes") echo "checked";
-echo " /></td>
-  </tr><tr>
     <td class=\"adminLabel\">$l_set_date</td>
     <td class=\"adminText\">
       <input type=\"radio\" name=\"param_date\" value=\"$cda_iso\" $da_iso />$l_da_iso
@@ -213,18 +223,23 @@ echo " /></td>
       <input type=\"radio\" name=\"param_date\" value=\"$cda_txt\" $da_txt />$l_da_txt
     </td>
   </tr><tr>
+    <td class=\"adminLabel\">$l_set_commentorder</td>
+    <td class=\"adminText\">
+      <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_chro\" $co_chro />$l_co_chro
+      <input type=\"radio\" name=\"param_commentorder\" value=\"$cco_rev\" $co_rev />$l_co_rev
+    </td>
+  </tr><tr>
+    <td class=\"adminLabel\">$l_send_mail</td>
+    <td class=\"adminText\">
+      <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
+if ($set_mail == "yes") echo "checked";
+echo " /></td>
+  </tr><tr>
     <td class=\"adminLabel\">$l_set_cal_interval</td>
     <td class=\"adminText\">
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
-    </td>
-  </tr><tr>
-    <td class=\"adminLabel\">$l_set_menu</td>
-    <td class=\"adminText\">
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_txt\" $me_txt />$l_me_txt
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_ico\" $me_ico />$l_me_ico
-      <input type=\"radio\" name=\"param_menu\" value=\"$cme_both\" $me_both />$l_me_both
     </td>
   </tr>
   $dis_debug

@@ -21,6 +21,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $company_id = $contact["company_id"];
   $lname = $contact["lname"];
   $phone = stripslashes($contact["phone"]);
+  $email = $contact["email"];
   $company = $contact["company"];
   $archive = $contact["archive"];
 
@@ -52,6 +53,10 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
     $query .= " (contact_phone like '$phone%' or
                  contact_homephone like '$phone%' or
                  contact_mobilephone like '$phone%') and";
+  }
+  // If an email indication has been specified, get it 
+  if ($email != "") {
+    $query .= " contact_email like '$email%' and";
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {

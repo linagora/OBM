@@ -348,33 +348,75 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 // Separe comment in section displayed with different colors
 // The secion separator is a line beginning with "nnnn-nn-nn:aa:"
 // Parameters :
-//   - $com : comment text to handle
+//   - $com     : comment text to handle
+//   - $p_order : Comment order (1 = reverse, else chronological)
+//              : if not set, take $set_commentorder pref
 ///////////////////////////////////////////////////////////////////////////////
-function beautify_deal_comment($com) {
+function beautify_deal_comment($com, $p_order="") {
+  global $cco_chro, $cco_rev, $set_commentorder;
 
   $col0 = "FFFFFF";
   $col1 = "BBBBBB";
 
-  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
-  $replace = "</td>
+  if ($p_order != "") {
+    $order = $p_order;
+  } else {
+    $order = $set_commentorder;
+  }
+
+  // Chronological Order
+  if ($order == $cco_chro) {
+
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
+    $replace = "</td>
     </tr>
     <tr>
       <td bgcolor=\"#$col1\">\\2</td>
     </tr><tr>
       <td bgcolor=\"#$col0\">";
 
-  $res = preg_replace($pattern, $replace, $com, 1);
-  while (preg_match($pattern, $res)) {
-    $nb++;
-    $res = preg_replace($pattern, $replace, $res, 1);
-  }
-
-  $result .= "
+    $res = preg_replace($pattern, $replace, $com, 1);
+    while (preg_match($pattern, $res)) {
+      $nb++;
+      $res = preg_replace($pattern, $replace, $res, 1);
+    }
+    
+    $result = "
     <table border=\"1\" width=\"100%\">
     <tr>
       <td>$res</td>
     </tr>
     </table>";
+
+  } else {
+  // reverse Chronological Order
+    // pattern modifiers :
+    // U : Ungreedy
+    // s : "." matches all chars even newlines
+    // D : $ matches only end of text, not end of line
+    $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)(.*)($|((^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)))/UsD";
+    $replace = "\\4";
+    $tmp = $com;
+    
+    while (preg_match($pattern, $tmp, $matches)) {
+      $nb++;
+      $who = $matches[2];
+      $text = $matches[3];
+      $row = "
+    <tr>
+      <td bgcolor=\"#$col1\">$who</td>
+    </tr><tr>
+      <td bgcolor=\"#$col0\">$text</td>
+    </tr>";
+      $rows = $row . $rows;
+      $tmp = preg_replace($pattern, $replace, $tmp, 1);
+    }
+
+    $result = "
+    <table border=\"1\" width=\"100%\">
+    $rows
+    </table>";
+  }
 
   return $result;
 }
@@ -415,12 +457,6 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $datepro = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
   $amount = $deal_q->f("deal_amount");
   $hitrate = $deal_q->f("deal_hitrate");
-  $con1 = $deal_q->f("deal_contact1_id");
-  $dis_con1 = $deal_q->f("lnamec1") . " " . $deal_q->f("fnamec1");
-  $phone_con1 = $deal_q->f("phonec1");
-  $con2 = $deal_q->f("deal_contact2_id");
-  $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
-  $phone_con2 = $deal_q->f("phonec2");
   $datealarm = date_format($deal_q->f("datealarm"));
   $status = $deal_q->f("dealstatus_label");
   $dateu = date_format($deal_q->f("datemodif"));
@@ -432,6 +468,14 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
   $town = $deal_q->f("company_town");
+  $comp_phone = $deal_q->f("company_phone");
+  $comp_phone = (($comp_phone != "") ? "($comp_phone)" : "");
+  $con1 = $deal_q->f("deal_contact1_id");
+  $dis_con1 = $deal_q->f("lnamec1") . " " . $deal_q->f("fnamec1");
+  $phone_con1 = ($deal_q->f("phonec1") ? $deal_q->f("phonec1") : $comp_phone);
+  $con2 = $deal_q->f("deal_contact2_id");
+  $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
+  $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
   if ($usercreate == $auth->auth["uid"]) {   
    $visibility = "<tr><td class=\"detailLabel\">$l_visibility</td>
@@ -660,51 +704,49 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $town = $deal_q->f("company_town");
     $usercomment = $uid;
     $datecomment = isodate_format();
-  } else {
-    // Values are taken from parameters
-    $id = $deal["id"];
-    $pid = $deal["parent"];
-    $usercreate = $deal["usercreate"];
-    $num = stripslashes($deal["num"]);
-    $label = stripslashes($deal["label"]);
-    $vis = $deal["vis"];
-    $datebegin = stripslashes($deal["datebegin"]);
-    $kind = $deal["kind"]; 
-    $cat = $deal["cat"];
-    $market = $deal["market"];
-    $tech = $deal["tech"];
-    $dateprop = stripslashes($deal["dateprop"]);
-    $amount = stripslashes($deal["amount"]);
-    $hitrate = stripslashes($deal["hitrate"]);
-    $con1 = $deal["contact1"];
-    $con2 = $deal["contact2"];
-    $datealarm = stripslashes($deal["datealarm"]);
-    $status = $deal["state"];
-    $timeupdate = $deal["timeupdate"];
-    $archive = ($deal["archive"] == 1 ? "checked" : "");
-    $todo = stripslashes($deal["todo"]);
-    $comment = stripslashes($deal["com"]);
-    $add_comment = stripslashes($deal["add_comment"]);
-    $usercomment = ($deal["usercomment"] ? $deal["usercomment"] : $uid);
-    $datecomment = ($deal["datecomment"] ? $deal["datecomment"] : isodate_format());
-    if ($action == "new") {
-      $comp = $comp_q->f("company_name");
-      $ad1 = $comp_q->f("company_address1");
-      $zip = $comp_q->f("company_zipcode");
-      $town = $comp_q->f("company_town");
-      $market = $comp_q->f("company_marketingmanager_id");
-      // We pre-fill datebegin and datealarm with current date
-      $datebegin = date($c_php_isodate_format); 
-      $datealarm = $datebegin;
-      // We pre-fill Hit rate
-      // $hitrate = "0";
-    } else {
-      $comp = stripslashes($deal["company_name"]);
-      $ad1 = $deal["company_ad1"];
-      $zip = $deal["company_zip"];
-      $town = $deal["company_town"];
-    }
-  }  
+  } elseif ($action == "new") {
+    $comp = $comp_q->f("company_name");
+    $ad1 = $comp_q->f("company_address1");
+    $zip = $comp_q->f("company_zipcode");
+    $town = $comp_q->f("company_town");
+    $market = $comp_q->f("company_marketingmanager_id");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
+    // We pre-fill datebegin and datealarm with current date
+    $datebegin = date($c_php_isodate_format); 
+    $datealarm = $datebegin;
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($deal["id"])) { $id = $deal["id"]; }
+  if (isset($deal["parent"])) { $pid = $deal["parent"]; }
+  if (isset($deal["usercreate"])) { $usercreate = $deal["usercreate"]; }
+  if (isset($deal["num"])) { $num = stripslashes($deal["num"]); }
+  if (isset($deal["label"])) { $label = stripslashes($deal["label"]); }
+  if (isset($deal["vis"])) { $vis = $deal["vis"]; }
+  if (isset($deal["datebegin"])) { $datebegin = stripslashes($deal["datebegin"]); }
+  if (isset($deal["kind"])) { $kind = $deal["kind"]; }
+  if (isset($deal["cat"])) { $cat = $deal["cat"]; }
+  if (isset($deal["market"])) { $market = $deal["market"]; }
+  if (isset($deal["tech"])) { $tech = $deal["tech"]; }
+  if (isset($deal["dateprop"])) { $dateprop = stripslashes($deal["dateprop"]); }
+  if (isset($deal["amount"])) { $amount = stripslashes($deal["amount"]); }
+  if (isset($deal["hitrate"])) { $hitrate = stripslashes($deal["hitrate"]); }
+  if (isset($deal["contact1"])) { $con1 = $deal["contact1"]; }
+  if (isset($deal["contact2"])) { $con2 = $deal["contact2"]; }
+  if (isset($deal["datealarm"])) { $datealarm = stripslashes($deal["datealarm"]); }
+  if (isset($deal["state"])) { $status = $deal["state"]; }
+  if (isset($deal["timeupdate"])) { $timeupdate = $deal["timeupdate"]; }
+  if (isset($deal["archive"])) { $archive = ($deal["archive"] == 1 ? "checked" : ""); }
+  if (isset($deal["todo"])) { $todo = stripslashes($deal["todo"]); }
+  if (isset($deal["com"])) { $comment = stripslashes($deal["com"]); }
+  if (isset($deal["add_comment"])) { $add_comment = stripslashes($deal["add_comment"]); }
+  if (isset($deal["usercomment"])) { $usercomment = $deal["usercomment"]; }
+  if (isset($deal["datecomment"])) { $datecomment = $deal["datecomment"]; }
+  if (isset($deal["company_name"])) { $comp = stripslashes($deal["company_name"]); }
+  if (isset($deal["company_ad1"])) { $ad1 = stripslashes($deal["company_ad1"]); }
+  if (isset($deal["company_zip"])) { $zip = stripslashes($deal["company_zip"]); }
+  if (isset($deal["company_town"])) { $town = stripslashes($deal["company_town"]); }
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind\">

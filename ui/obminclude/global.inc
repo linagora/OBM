@@ -7,18 +7,10 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.5.1";
+$obm_version = "0.6.5.2";
 $l_title = "O.B.M.";
 
-// VARS that go in session
-$set_lang_default = "en";
-$set_theme_default = "standard";
-$set_rows_default = 10;
-$set_display_default = "no";
-$set_date_default = "Y-m-d";
-$set_menu_default = "both";
-//$set_debug_default=0;
-$set_cal_interval_default = 2;
+// Bookmarks default
 $last_deal_default = 0;
 $last_parentdeal_default = 0;
 $last_company_default = 0;
@@ -29,10 +21,12 @@ $last_account_default = 0;
 $last_payment_default = 0;
 $last_contract_default = 0;
 $last_incident_default = 0;
-//Agenda constants
+
+// Agenda constants
 $set_weekstart_default = "monday"; //First day of the week, in english
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
+
 //Timemanager module CONSTANTS
 // In how many parts we can chop a day
 $c_day_fraction = 8;
@@ -52,12 +46,21 @@ $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
 
+// Menu display options constants
+$cme_txt = "text";  // text
+$cme_ico = "icon";  // icon
+$cme_both = "both"; // both
+
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
 $cda_iso = "Y-m-d"; // Iso format
 $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
 $cda_txt = "d M Y"; // txt format
+
+// Comment dislay order
+$cco_chro = 0; // Chronological
+$cco_rev = 1;  // Reverse
 
 // Calendar Interval display constant
 $ccal_4 = 4;  // 1/4 h
@@ -66,11 +69,6 @@ $ccal_1 = 1;  // 1 h
 $l_cal_4 = "1/4";  // 1/4 h
 $l_cal_2 = "1/2";  // 1/2 h
 $l_cal_1 = "1";    // 1 h
-
-// Menu display options constants
-$cme_txt = "text";  // text
-$cme_ico = "icon";  // icon
-$cme_both = "both"; // both
 
 // Perms
 $perms_user = "user" ;
