@@ -15,17 +15,18 @@ $l_task_int = "Tâches Internes";
 // Database fields
 $l_date_task="Date tâche";
 $l_tasktype = "Type tâche";
-$l_tasklabel="Label tâche";
+$l_tasklabel="Commentaire";
 $l_deallabel="Projet/Affaire";
 $l_task_del="Suppr";
 $l_company = "Société";
 $l_delete = "Supprimer les tâches";
 $l_length="Durée";
+$l_total = "Total";
 
 $l_total_period="Durée sur la période";
 $l_total_spent="Temps utilisé";
-$l_total_before="Durée cumulée précédente";
-$l_total_after="Durée cumulée suivante";
+$l_total_before="Cumul précédente";
+$l_total_after="Cumul suivante";
 $l_day="Jour";
 $l_period="Période";
 
@@ -83,7 +84,7 @@ $l_projects_manager = "Confirmation de la validation des taches par l'administra
 $l_found_task = "Voici les tâches réalisées et saisies pour la semaine en cours:";
 $l_found = "Taches trouvées.";
 $l_no_found = "Aucune tache pour cet utilisateur!";
-$l_fill_addtask = "Saisissez les tâches réalisées pour la semaine en cours. La durée s'entend en fraction de journée";
+$l_fill_addtask = "Saisissez les tâches réalisées pour la semaine en cours.";
 $l_task_list = "Récapitulatif des tâches de la semaine";
 $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
 

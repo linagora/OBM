@@ -139,10 +139,10 @@ $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
 
-$l_header_ = "";
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";
 $l_header_man_advance = "Avancement";
+$l_header_man_affect = "Affectation";
 $l_header_add_member = "Ajouter participant";
 
 $l_header_reset = "Préférence par défaut";

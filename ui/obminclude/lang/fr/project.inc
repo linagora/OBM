@@ -44,16 +44,22 @@ $l_manager = "Chef de projet";
 $l_member = "Participant";
 $l_new = "Nouveaux";
 $l_soldtime = "Temps vendu";
+$l_projtime = "Temps prévu";
 $l_total = "Total";
+$l_resume = "Résumé";
+$l_nbtask = "tâches";
+$l_nbmem = "participants";
 
 // Titres
+$l_project = "Projet";
 $l_dealinfos = "Partie affaire";
 $l_projectinfos = "Partie Projet";
-$l_externinfos = "Projet commercial";
+$l_externinfos = "Projet";
 $l_interninfos = "Projet interne";
 $l_advanceinfos = "Avancement du projet";
-$l_tasksinfos = "Sous-tâches du projet";
-$l_membersinfos = "Participants au projet";
+$l_tasksinfos = "Tâches du projet";
+$l_membersinfos = "Detail de l'avancement";
+$l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
 
 // Actions
 $l_insert = "Créer le projet";
@@ -77,13 +83,14 @@ $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > p
 $l_new_projects = "Liste des projets non initialisés";
 $l_found = "projets trouvés.";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
-$l_no_tasks = "Il n'y a pas encore de sous-tâches définies";
+$l_no_tasks = "Il n'y a pas encore de tâches définies";
 $l_no_members = "Il n'y a pas de renseignements sur les participants au projet";
 $l_delete_ok = "La suppression de la société a été correctement effectuée.";
 $l_status_error = "Ce n'est pas un projet valide";
-$l_delete_error = "La suppression de la société a échoué !";
 $l_insert_ok = "La création du projet a été correctement effectuée.";
-$l_insert_error = "La création du projet a échoué !";
+$l_insert_error = "Impossible de créer cette tâche ; La tâche principale est utilisée par la gestion de temps";
+$l_taskdelete_error = "Impossible de supprimer une tâche ; Elle est utilisée par la gestion de temps";
+$l_memberdelete_error = "Impossible d'enlever ce participant ; Il est affecté à une tâche du projet";
 $l_update_ok = "La modification du projet a été correctement effectuée";
 $l_update_error = "La modification du projet a échoué !";
 $l_adv_update_ok = "La mise à jour des avancements a été correctement effectuée";
@@ -110,7 +117,7 @@ $l_valid_member = "Confirmer";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
-$l_fill_tt = "Vous devez indiquer le type de tâche avant de valider.";
+$l_fill_tt = "Vous devez indiquer la catégorie avant de valider.";
 $l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
 $l_fill_tasklabel = "Vous devez donner un nom à cette tâche.";
 $l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";

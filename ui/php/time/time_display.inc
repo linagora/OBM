@@ -15,6 +15,7 @@
 // Direct fields
 $fieldnames["deal_label"] = $l_project;
 $fieldnames["tasktype_label"] = $l_tasktype;
+$fieldnames["timetask_label"] = $l_tasklabel;
 $fieldnames["company_name"] = $l_company;
 $fieldnames["total_length"] = $l_total_period;
 $fieldnames["total_spent"] = $l_total_spent;
@@ -51,8 +52,6 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
       $res["style"] = "class=\"timeValid$parity\"";
   }
 
-  //mettre un name a 0
-
   if ($fieldname == "timetask_deal_label") {
     $label = ($OD->data_set->f("timetask_deal_label"));
 
@@ -72,9 +71,6 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
       $res["name"] = "&nbsp;";
     }
   }
-//else if ($fieldname == "task_id") {
-//  $res["name"] = "&nbsp;";
-//}
 
   return $res;
 }
@@ -124,14 +120,30 @@ function debug_array($a) {
 //     default : all
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_links ($time, $type="all") {
-  global $cdg_param; 
+  global $cdg_param, $auth, $set_theme; 
   global $l_week, $l_week_prev,$l_week_next, $l_month_prev,$l_month_next;
   global $hum_date, $l_month2, $l_from, $l_to;
   // WEEK
 
-  $user_id = $time["user_id"];
+  $action = $time["action"];
+
+  if (($action=="globalview") or ($action=="validate") or ($action=="unvalidate")) {
+    $user_id = $auth->auth["uid"];
+    $time["user_id"] = $user_id;
+  } else {
+    $user_id = $time["user_id"];
+  }
+
+  $obm_user_q = run_query_userobm($user_id);
+  $obm_user_q->next_record();
+
+  $f_name = $obm_user_q->f("userobm_firstname");
+  $l_name = $obm_user_q->f("userobm_lastname");
+  $user = $f_name . " " . $l_name;
 
   if ($type == "week") {
+
+    $tot_width = 550;
 
     //get the current start and end of week
     $d_start_week = first_day_week($time);
@@ -141,33 +153,69 @@ function dis_time_links ($time, $type="all") {
     $d_start_prev = $d_start_week-7*86400;
     $d_start_next = $d_start_week+7*86400; 
      
-    // bcontins ???
     $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
     $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
 
     $block = "
-      <center> <font size=-2>
-         <table border=1>
-            <tr><td class=\"timeLinks\" align=\"left\">
-               <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
-               &lt;&nbsp;".$l_week_prev."
-               </a>
-            </td>
-            <td class=\"timePeriod\">&nbsp;
-	      $l_week $l_from $hum_date_start $l_to $hum_date_end
-              &nbsp;</td>
-            <td class=\"timeLinks\" align=\"right\">
-               <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=".date("Ymd",$d_start_next))."\">
-               ".$l_week_next."&gt;&nbsp;
-               </a>
-            </td></tr>
-         </table>    
-      </font> </center>    
-        ";
+      <center>
+       <table width=\"$tot_width\" border=0>
+        <tr>
+         <td class=\"timeLinks\" align=\"left\">
+          <a href=\"" .
+             url_prepare("time_index.php?action=".$time["action"].
+       	     "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
+           <img border=0 src=\"/images/$set_theme/previous.png\">
+          </a>
+         </td>
+         <td class=\"timePeriod\">
+           $user : $l_week $l_from $hum_date_start $l_to $hum_date_end
+         </td>
+         <td class=\"timeLinks\" align=\"right\">
+          <a href=\"" .
+             url_prepare("time_index.php?action=".$time["action"].
+             "&amp;wbegin=".date("Ymd",$d_start_next))."\">
+           <img border=0 src=\"/images/$set_theme/next.png\">
+          </a>
+         </td>
+        </tr>
+       </table>    
+      </center>    
+      ";
+
+//     //get the current start and end of week
+//     $d_start_week = first_day_week($time);
+//     $d_end_week = $d_start_week+6*86400;
+
+//     // get the previous and next beginning of week
+//     $d_start_prev = $d_start_week-7*86400;
+//     $d_start_next = $d_start_week+7*86400; 
+     
+//     $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
+//     $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
+
+//     $block = "
+//       <center> <font size=-2>
+//          <table border=1>
+//             <tr><td class=\"timeLinks\" align=\"left\">
+//                <a href=\"" .
+//       url_prepare("time_index.php?action=".$time["action"].
+// 		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
+//                &lt;&nbsp;".$l_week_prev."
+//                </a>
+//             </td>
+//             <td class=\"timePeriod\">&nbsp;
+// 	      $l_week $l_from $hum_date_start $l_to $hum_date_end
+//               &nbsp;</td>
+//             <td class=\"timeLinks\" align=\"right\">
+//                <a href=\"" .
+//       url_prepare("time_index.php?action=".$time["action"].
+// 		  "&amp;wbegin=".date("Ymd",$d_start_next))."\">
+//                ".$l_week_next."&gt;&nbsp;
+//                </a>
+//             </td></tr>
+//          </table>    
+//       </font> </center>    
+//         ";
 
   } else if ($type == "month") {
     if (debug_level_isset($cdg_param)) {
@@ -179,6 +227,8 @@ function dis_time_links ($time, $type="all") {
       echo "DIS_TIME_LINKS <br>";
       echo "date ". $time["date"] . " <br>";
     }
+
+    $tot_width = 400;
 
     // This should work for january also (month 0 = december) 
     $month=substr($time["date"],4,2);
@@ -195,28 +245,28 @@ function dis_time_links ($time, $type="all") {
     // nothing to do for this
 
     $block = "
-      <center> <font size=-2>
-       <table border=1>
+      <center>
+       <table width=\"$tot_width\" border=0>
         <tr><td class=\"timeLinks\" align=\"left\">
          <a href=\"" .
             url_prepare("time_index.php?action=".$time["action"].
 	    "&amp;wbegin=$d_start_prev")."\">
-            &lt;&nbsp;".$l_month_prev."
+           <img border=0 src=\"/images/$set_theme/previous.png\">
          </a>
         </td>
         <td class=\"timePeriod\">
-         &nbsp;&nbsp;&nbsp;$l_month2 ". month_name($month) ."&nbsp;&nbsp;&nbsp;
+         $user : $l_month2 ". month_name($month) ."
         </td>
         <td class=\"timeLinks\" align=\"right\">
          <a href=\"" .
             url_prepare("time_index.php?action=".$time["action"].
 	    "&amp;wbegin=$d_start_next")."\">
-            ".$l_month_next."&nbsp;&gt;
+           <img border=0 src=\"/images/$set_theme/next.png\">
          </a>
         </td></tr>
        </table>    
-     </font> </center>    
-        ";    
+     </center>    
+     ";    
   }
 
   return $block;
@@ -281,20 +331,20 @@ function dis_time_search_form ($time, $usr_q, $uid) {
     $block = "<br>
       <center>
       <form method=post name=f_time action=\"" .
-      url_prepare("time_index.php") . "\">
-      <table border=1>
-      <tr>
-        <td><font size=-2> $l_user </font></td>
-        <td align=left>
-        $sel_user
-        </td>
-        <td valign=bottom>&nbsp;&nbsp;
+           url_prepare("time_index.php") . "\">
+       <table cellpadding=\"0\" cellspacing=\"0\" class=\"timeUser\">
+        <tr>
+         <td class=\"timeUserhead\">$l_user</td>
+        </tr><tr>
+         <td class=\"timeUserback\">$sel_user</td>
+        </tr><tr>
+         <td class=\"timeUserback\">
           <input type=hidden name=\"wbegin\" value=\"".$time["date"]."\">
           <input type=hidden name=\"action\" value=\"$act\">
           <input type=submit name=\"submit\" value=\"$l_see\">&nbsp;
-        </td>
-      </tr>
-      </table>
+         </td>
+        </tr>
+       </table>
       </form><hr>
       </center>";
   }
@@ -303,106 +353,6 @@ function dis_time_search_form ($time, $usr_q, $uid) {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Select Form for Users                                       //
-// Parameters:
-//   - $time[] : default form values
-//     keys used  : interval
-//   - $usr_q  : DBO : UserObm list
-//   - $uid    : current user id
-///////////////////////////////////////////////////////////////////////////////
-// bcontins not used
- function dis_selectusers_form ($time, $usr_q, $uid) {
-//   global $l_see, $l_week, $l_month, $project_managers, $stats_users;
-//   global $l_user, $l_all_users;
-//   global $l_tasktype, $l_task_all, $l_task_uservalid, $l_task_adminvalid;
-//   global $uid;
-
-//   $hum_date_start = dis_human_date($time["date"]);
-//   $hum_date_end = dis_human_date($time["date_end"]);
-
-//   if ($time["interval"] == "week")
-//     $l_period = $l_week;
-//   else if ($time["interval"] == "month")
-//     $l_period = $l_month;
-
-//   if (in_array($uid, $project_managers) or in_array($uid, $stats_users)) {
-//     $sel_user_id = $time["user_id"];
-  
-//     if (debug_level_isset($cdg_param)) {
-//       echo "tableau users";
-//       print_r($time["user_id"]);
-//       echo "<br>";
-//     }
-
-//     if ($time["allusers"])
-//       $allusers = " checked";
-
-//     // UserObm Select
-//     $sel_user = "<select name=\"sel_user_id[]\" size=6 multiple>";
-//     while ($usr_q->next_record()) {
-//       $u_id = $usr_q->f("userobm_id");
-//       $lname = $usr_q->f("userobm_lastname");
-//       $fname = $usr_q->f("userobm_firstname");
-//       $sel_user .= "\n<option value=\"$u_id\"";
- 
-//       // decide which user to select:
-//       // if one has been selected (sel_user_id) select it,
-//       // else we do not select any
-//       if (in_array($u_id, $sel_user_id)) {
-//         $sel_user .= "selected";
-//       }
-
-//       $sel_user .= ">$lname $fname</option>";
-//     }
-//     $sel_user .= "</select>";
-
-
-//     $block = "<br>
-//       <center>
-//       <form method=post name=f_time action=\"" .
-//       url_prepare("time_index.php") . "\">
-//       <table border=1>
-//       <tr>
-//         <td><font size=-2>$l_period</font></td>
-//         <td><font size=-1>Du $hum_date_start au $hum_date_end</font></td>
-//       </tr><tr>
-//         <td><font size=-2> $l_user <br>$l_all_users<input type=checkbox name=cb_allusers $allusers></font></td>
-//         <td align=left>
-//         $sel_user
-//         </td>
-//         <td valign=bottom>&nbsp;&nbsp;
-//           <input type=hidden name=param_begin value=\"".$time["date"]."\">
-//           <input type=hidden name=param_end value=\"".$time["date_end"]."\">
-//           <input name=\"action\" type=hidden value=\"stats\">
-//           &nbsp;
-//         </td>
-//       </tr>
-//       <tr>
-//         <td><font size=-2>$l_tasktype</font></td>
-//         <td>
-//            <input name=\"rb_tasktype\" type=radio value=$c_task_notvalid>
-//            <font size=-2>$l_task_all</font><br>
-//            <input name=\"rb_tasktype\" type=radio value=$c_task_uservalid>
-//            <font size=-2>$l_task_uservalid</font><br>
-//            <input name=\"rb_tasktype\" type=radio value=$c_task_adminvalid>
-//            <font size=-2>$l_task_adminvalid</font><br>
-//         </td>
-//         <td>          
-//            <input name=\"submit\" type=submit value=\"$l_see\">&nbsp;
-//         </td>
-//       </tr>
-//       </table>
-//       </form><hr>
-//       </center>";
-//   }
-//   else
-//     $block = "<br>$l_week du $hum_date_start au $hum_date_end<br><br>";
-
-   return $block;
- }
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -459,14 +409,17 @@ function dis_time_list($time) {
                    $time, 
                    $val_days); 
  
-  if ($nb_task == 0) {
-    $display["msg"] .= display_ok_msg($l_no_found) ;
-  }
-  else {
-    // bcontins display task list
+//   if ($nb_task == 0) {
+//     $display["msg"] .= display_ok_msg($l_no_found) ;
+//   }
+//   else {
+//     $block .= dis_time_list_result($task_q, $pref_q, $time);
+//   }
+
+  if ($nb_task != 0) {
     $block .= dis_time_list_result($task_q, $pref_q, $time);
   }
-  
+
   return $block;
 }
 
@@ -645,7 +598,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
   global $l_update, $l_length, $l_task_list;
 
-  dis_table_title($l_found_task) ;
+  //  dis_table_title($l_found_task) ;
 
   //oldstart
   //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
@@ -704,7 +657,7 @@ function dis_time_one_month($obm_dq, $time) {
   global $c_day_fraction, $c_days_in_a_week;
 
   $uid = $time["user_id"];
-  $obm_user_q = run_query_userobm($uid);
+//   $obm_user_q = run_query_userobm($uid);
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
@@ -715,12 +668,12 @@ function dis_time_one_month($obm_dq, $time) {
   $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
   $first_wday =date("w", $day_in_sec);
 
-  while($obm_user_q->next_record()) {
-    $userid = $obm_user_q->f("userobm_id");
-    $f_name = $obm_user_q->f("userobm_firstname");
-    $l_name = $obm_user_q->f("userobm_lastname");
-    $array_users["name"] = $f_name . " " . $l_name;
-  }
+//   while($obm_user_q->next_record()) {
+//     $userid = $obm_user_q->f("userobm_id");
+//     $f_name = $obm_user_q->f("userobm_firstname");
+//     $l_name = $obm_user_q->f("userobm_lastname");
+//     $array_users["name"] = $f_name . " " . $l_name;
+//   }
 
   $day_in_sec = $first_day_sec;
   $wday =date("w", $day_in_sec);
@@ -738,11 +691,13 @@ function dis_time_one_month($obm_dq, $time) {
   
   while ($obm_dq->next_record())  {
     $day = $obm_dq->f("day_in_month");
-    $array_users["status"] = $obm_dq->f("timetask_status");
+    $status = $obm_dq->f("timetask_status");
     $array_res["$day"]["length"] = $obm_dq->f("total_length");
+
+    $length_tot += $obm_dq->f("total_length");
   }
 
-  $block .= display_monthview($time, $array_res, $length_tot, $array_users);
+  $block .= display_monthview($time, $array_res, $length_tot, $status);
         
   return $block;
 }
@@ -762,99 +717,122 @@ function dis_time_one_month($obm_dq, $time) {
 //   - $total : the amount of task filled for the month
 //////////////////////////////////////////////////////////////////////////////
 
-function display_monthview($time, $array_res, $total, $title) {
+function display_monthview($time, $array_res, $total, $status) {
   global $working_days;  // array of the days in a week where we are supposed to work
   global $c_day_fraction, $c_days_in_a_week;
   global $col_orange, $col_blue;
-  global $l_total, $l_fill;
+  global $l_total, $l_fill, $l_see;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   $col_width=20;
+  $time_length = 0;
+  $time_worked = 0;
+  $span = 0;
+  $month_length = count($array_res);
+
   $month=substr($time["date"],4,2);
   $year=substr($time["date"],0,4);
   $day=substr($time["date"],6,2);
 
-  $name = $title["name"];
-  $status = $title["status"];
+//   $name = $title["name"];
+//   $status = $title["status"];
+
+//   $first_wday = $array_res["01"]["wday"];
+//   $span = $c_days_in_a_week - $first_wday + 1;
   
   // Display the array
-  while (list($key,$val) = each($array_res)) {
+  while (list($day,$val) = each($array_res)) {
     if ($working_days[$val["wday"]] == 0) {
-      $line1 .= "<td width=$col_width class=\"timeOffdayHead\">$key</td>\n";
+      $line1 .= "<td width=$col_width class=\"timeOffday\">$day</td>\n";
       $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
+      $line3 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
 
-      if ($status != 2)
-	$line3 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
-    }
-    else {
-      $cell_1 = "<td width=$col_width class=\"timeWorkdayHead\" >$key</td>\n";
-      //       $cell_1 = "<td size=$col_width class=\"OBMDisplayPref\">$key</td>";
-
-      //       $cell_1_short = $cell_1;
+    } else {
+      $cell_1 = "<td width=$col_width class=\"timeWorkday\" >$day</td>\n";
 
       if ($val["length"] == $c_day_fraction)
-        $line2 .= "<td class=\"timeWorkday\">OK</td>\n";
+        $line2 .= "<td class=\"timeValid\">".$val["length"]."/$c_day_fraction</td>\n";
       else
-	$line2 .= "<td class=\"timeWorkday\" bgcolor=\"#$col_orange\">".$val["length"]."/$c_day_fraction</td>\n";
-      
-      // first day of the week 
+	$line2 .= "<td class=\"timeUnvalid\">".$val["length"]."/$c_day_fraction</td>\n";
+
       if ($val["wday"] == 1) {
+	$time_length = 0;
+	$time_worked = 0;
+	$span = 1;
+      } else {
+	$time_length += $c_day_fraction;
+	$time_worked += $val["length"];
+	$span += 1;
+      }
+      
+//       //or first day of the month
+//       if ($day == "01") {
+	 
+
+// 	// return first and last day of the week
+// 	$week = get_week_point($year.$month."01");
+// 	$url= url_prepare("time_index.php?action=index".
+// 			  "&amp;wbegin=".$week[0]);
+
+// 	// This week is not $c_days_in_a_week long
+// 	$week_length = $c_days_in_a_week - $val["wday"] +1;
+
+// 	if ($status == 2)
+// 	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$week_length\"><a href=\"$url\">$l_see</a></td>";
+// 	else if ($time_length != $time_worked)
+// 	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
+// 	else
+// 	  $line3 .="<td class=\"timeValid\" colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
+//       }
+
+      // last day of the week 
+      if (($val["wday"] == $c_days_in_a_week) or ($day == $month_length)) {
 	// return first and last day of the week
-	$day = $key < 10 ? "0".$key : $key; 
 	$week = get_week_point($year.$month.$day);
 	$url= url_prepare("time_index.php?action=index".
 			  "&amp;wbegin=".$week[0]);
 
-	if ($status != 2)
-	  $line3.="<td colspan=\"$c_days_in_a_week\"><a href=\"$url\">$l_fill</a></td>";
-      }
-      //or first day of the month
-      else if ($key == 1) {
-	// return first and last day of the week
-	$week = get_week_point($year.$month."01");
-	$url= url_prepare("time_index.php?action=index".
-			  "&amp;wbegin=".$week[0]);
-
-	// This week is not $c_days_in_a_week long
-	$week_length = $c_days_in_a_week - $val["wday"] +1;
-
-	if ($status != 2)
-	  $line3.="<td colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
-
-	$cell_1_short="<td width=$col_width align=center><a href=\"$url\">$key</a></td>";
+	if ($status == 2)
+	  $line3 .="<td class=\"timeValid\" colspan=\"$span\"><a href=\"$url\">$l_see</a></td>";
+	else if ($time_length != $time_worked)
+	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
+	else
+	  $line3 .="<td class=\"timeValid\" colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
+	
+// 	$span = $c_days_in_a_week;
       }
       
       $line1.=$cell_1;
     }
 
-    $span += 1;
+//     $span += 1;
   }
   
   // we display a recap for this user
-  $fract = $total/$c_day_fraction;
-  $tot_workingdays = get_nb_working_days($time["date"]);
-    
-  $last_cell_1 = "<td>&nbsp;&nbsp;</td><td width=60 align=center>$l_total</td>";
-  $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
-  $dis_tot= $fract != $tot_workingdays ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
-  $last_cell_2 = "<td>&nbsp;&nbsp;</td><td $bg_color>$dis_tot</td>";
-  $line1.=$last_cell_1;
-  $line2.=$last_cell_2;
+//   $fract = $total/$c_day_fraction;
+//   $tot_workingdays = get_nb_working_days($time["date"]);
+
+//   $last_cell_1 = "<td>&nbsp;&nbsp;</td><td width=60 align=center>$l_total</td>";
+//   $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
+//   $dis_tot= $fract != $tot_workingdays ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
+//   $last_cell_2 = "<td>&nbsp;&nbsp;</td><td $bg_color>$dis_tot</td>";
+//   $line1.=$last_cell_1;
+//   $line2.=$last_cell_2;
 
   $block = "
-   <table border=1>
-    <tr>
-     <td colspan=\"$span\"><b>&nbsp;$name</b></td>
-    <tr>
-     $line1
-    </tr>
-    <tr>
-     $line2
-    </tr>
-    <tr>
-     $line3
-    </tr>
-   </table>
+   <center>
+    <table border=\"0\" cellpadding=\"2\" cellspacing=\"1\">
+     <tr>
+      $line1
+     </tr>
+     <tr>
+      $line2
+     </tr>
+     <tr>
+      $line3
+     </tr>
+    </table>
+   <center>
    ";
 
   return $block;
@@ -880,7 +858,7 @@ function dis_short_month($month_q, $time) {
   //-- Labels
   global $l_admin_empty;
 
-  dis_table_title($l_total_month);  
+  //  dis_table_title($l_total_month);  
 
   $cpt=0;
   
@@ -1047,12 +1025,9 @@ function display_weekview($time, $result, $total, $title) {
   global $l_fill, $l_daysofweekshort;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
-  //  $col = "b2ebe8";
-  //  $col_red="a00000";
-  /*  echo "<br> res ";
-  print_r($array_res); */
-  $col_width=25;
-  
+  $tot_width = 550;
+  $col_width = $tot_width / $c_days_in_a_week;
+
   $curr_day = first_day_week($time);
   $last_day = $curr_day + 7*86400;
 
@@ -1065,61 +1040,91 @@ function display_weekview($time, $result, $total, $title) {
     if (!(isset($result[$wday])))
       $result[$wday]=0;
 
-    if ($working_days[$wday] == 0) {
-      $line1 .= "<td width=$col_width class=\"timeOffdayHead\">";
+    if ($working_days[$wday] != 0) {
+      $line1 .= "<td width=$col_width class=\"timeWeekhead\" >";
       $line1 .= "$hum_wday</td>\n";
-      $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
-    }
-    else {
-      $line1 .= "<td width=$col_width class=\"timeWorkdayHead\" >";
-      $line1 .= "$hum_wday</td>\n";
-
+      
       if ($result[$wday] == $c_day_fraction)
-        $line2 .= "<td class=\"timeWorkday\">OK</td>\n";
+        $line2 .= "<td class=\"timeWeekvalid\">$c_day_fraction/$c_day_fraction</td>\n";
       else
-	$line2 .= "<td class=\"timeWorkday\" bgcolor=\"#$col_orange\">".$result[$wday]."/$c_day_fraction</td>\n";
+	$line2 .= "<td class=\"timeWeekunvalid\">".$result[$wday]."/$c_day_fraction</td>\n";
     }
     
     $curr_day += 86400;        
   }
   
-  $line1 .= "<td width=$col_width>&nbsp;&nbsp;</td>";
-  $line1 .= "<td width=60 align=center>$l_total</td>";
-  //     $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
-  
-  $fract = $total/$c_day_fraction;
-  $dis_tot= "$fract/$c_days_in_a_week";
-
-  $line2 .= "<td>&nbsp;&nbsp;</td>";
-  $line2 .= "<td bgcolor=\"#$col_blue\" align=center>$dis_tot</td>";
-
   $block = "
-  <center><table border=1>
-  <tr><td width=200 align=left rowspan=3><b>&nbsp;$title</b></td>
-  $line1
-  </tr><tr>
-  $line2
-  </tr>
-  </table></center>
-  <p></p>
-  $tab_total";
+  <center>
+  <table width=\"$tot_width\" border=\"0\" cellspacing=\"1\">
+   <tr>
+    $line1
+   </tr>
+   <tr>
+    $line2
+   </tr>
+  </table>
+  </center>
+  ";
+
+//   //  $col = "b2ebe8";
+//   //  $col_red="a00000";
+//   /*  echo "<br> res ";
+//   print_r($array_res); */
+//   $col_width=25;
+  
+//   $curr_day = first_day_week($time);
+//   $last_day = $curr_day + 7*86400;
+
+//   // Display the array
+//   while ($curr_day < $last_day) {
+    
+//     $wday =date("w", $curr_day);
+//     $hum_wday = $l_daysofweekshort[$wday];
+
+//     if (!(isset($result[$wday])))
+//       $result[$wday]=0;
+
+//     if ($working_days[$wday] == 0) {
+//       $line1 .= "<td width=$col_width class=\"timeOffdayHead\">";
+//       $line1 .= "$hum_wday</td>\n";
+//       $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
+//     }
+//     else {
+//       $line1 .= "<td width=$col_width class=\"timeWorkdayHead\" >";
+//       $line1 .= "$hum_wday</td>\n";
+
+//       if ($result[$wday] == $c_day_fraction)
+//         $line2 .= "<td class=\"timeWorkday\">OK</td>\n";
+//       else
+// 	$line2 .= "<td class=\"timeWorkday\" bgcolor=\"#$col_orange\">".$result[$wday]."/$c_day_fraction</td>\n";
+//     }
+    
+//     $curr_day += 86400;        
+//   }
+  
+//   $line1 .= "<td width=$col_width>&nbsp;&nbsp;</td>";
+//   $line1 .= "<td width=60 align=center>$l_total</td>";
+//   //     $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
+  
+//   $fract = $total/$c_day_fraction;
+//   $dis_tot= "$fract/$c_days_in_a_week";
+
+//   $line2 .= "<td>&nbsp;&nbsp;</td>";
+//   $line2 .= "<td bgcolor=\"#$col_blue\" align=center>$dis_tot</td>";
+
+//   $block = "
+//   <center><table border=1>
+//   <tr><td width=200 align=left rowspan=3><b>&nbsp;$title</b></td>
+//   $line1
+//   </tr><tr>
+//   $line2
+//   </tr>
+//   </table></center>
+//   <p></p>
+//   $tab_total";
 
   return $block;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Table description or message                             //
-// Parameters:
-//   - $message : message to display
-///////////////////////////////////////////////////////////////////////////////
-function dis_table_title($message) {
-  //bcontins à harmoniser 
-
-//   echo "<center><font size=+1>";
-//   echo $message;
-//   echo "<br></font></center>";
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Time Entry Form                                               //
@@ -1326,7 +1331,8 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $block .= "<p></p>";
 
   if ($action == "insert") {
-    dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
+    //bcontins faudra les virer
+//    dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
     $block .= "
       <form method=post name=form_add_task
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
@@ -1335,7 +1341,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       <input type=\"hidden\" name=\"popup\" value=0>\n";
   }
   else {
-    dis_table_title($l_update_task);
+    //dis_table_title($l_update_task);
     $block .= "
       <form method=post  name=form_add_task 
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\"
@@ -1349,51 +1355,32 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   else
     $dis_date .= "$l_date :</td><td>$rd_day";
 
-
-  // bcontins garder un seul ?
-  //   if ($action != "update")
-  //     $block .= "<td>$l_date<br>$ch_day</td>";
-  //   else
-  //     $block .= "<td>$l_date<br>$rd_day</td>";
-  
-  //   $block .= "<td>$l_duration<br>$sel_time</td>
-  //      <td>$l_cat<br>$sel_tt</td>
-  //     </tr>
-  //     <tr class=\"timeHeader\">
-  //      <td colspan=2>$l_project<br>$sel_proj</td>
-  //      <td>$l_task<br>$sel_projtask</td>
-  //     </tr>
-  //     <tr class=\"timeHeader\">
-  //      <td colspan=\"4\">$l_label<br>$tf_label</td>
-  //     </tr>
-  //   </table>";
-
   $block .= "
-  <div class=\"detailHead\">$l_fill_addtask</div>
+   <div class=\"detailHead\">$l_fill_addtask</div>
 
-  <table border=0 cellspacing=0 width=95%>
-   <tr class=\"timeHeader\">
-    <td>$dis_date</td>
-    <td>$l_duration :</td>
-    <td>$sel_time</td>
-   </tr>
-   <tr class=\"timeHeader\">
-    <td>$l_cat :</td>
-    <td colspan=\"3\">$sel_tt</td>
-   </tr>
-   <tr class=\"timeHeader\">
-    <td>$l_project</td>
-    <td colspan=\"3\">$sel_proj</td>
-   </tr>
-   <tr class=\"timeHeader\">
-    <td>$l_task</td>
-    <td colspan=\"3\">$sel_projtask</td>
-   </tr>
-   <tr class=\"timeHeader\">
-    <td>$l_label</td>
-    <td colspan=\"3\">$tf_label</td>
-   </tr>
-  </table>";
+   <table border=0 cellspacing=0 width=95%>
+    <tr class=\"timeHeader\">
+     <td>$dis_date</td>
+     <td>$l_duration :</td>
+     <td>$sel_time</td>
+    </tr>
+    <tr class=\"timeHeader\">
+     <td>$l_cat :</td>
+     <td colspan=\"3\">$sel_tt</td>
+    </tr>
+    <tr class=\"timeHeader\">
+     <td>$l_project</td>
+     <td colspan=\"3\">$sel_proj</td>
+    </tr>
+    <tr class=\"timeHeader\">
+     <td>$l_task</td>
+     <td colspan=\"3\">$sel_projtask</td>
+    </tr>
+    <tr class=\"timeHeader\">
+     <td>$l_label</td>
+     <td colspan=\"3\">$tf_label</td>
+    </tr>
+   </table>";
 
   if ($action == "insert") {
     $block .= "<br><input type=submit value=\"$l_add\">";

@@ -1135,13 +1135,11 @@ a.agendaLink4:hover	{ font-family: sans-serif; font-size: 13px;color: #000099; b
 /* ////////////////////////////////////////// */
 
 td.timePeriod			{
-	color:			#49627a;
  	text-align: 		center; 
-	vertical-align: 	middle;
  	font-family: 		sans-serif;
-	font-size: 		15px;
-	font-weight: 		800;
-        width			300px;
+	font-size: 		12px;
+	font-weight: 		600;
+	color:			#4f7091;
 	}
 
 td.timeLinks			{
@@ -1150,6 +1148,96 @@ td.timeLinks			{
 	font-size: 		10px;
 	font-weight: 		80;
 	}
+
+td.timeWeekhead			{
+ 	font-family: 		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#a5bace;
+	}
+
+td.timeWeekunvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#fbf7db;
+	}
+
+td.timeWeekvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#c1cfdd;
+	}
+
+td.timeHead			{
+ 	font-family: 		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#a5bace;
+	}
+
+td.timeUnvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#fbf7db;
+	}
+
+td.timeValid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#4f7091;
+	background-color:	#c1cfdd;
+	}
+
+td.timeWorkday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#4f7091;
+	text-align:		center;
+	background-color:	#a5bace;
+	font-weight: 		bold;
+}
+
+td.timeOffday 	 	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#c6cfde;
+	text-align:		center;
+	background-color:	#97aec6;
+	font-weight: 		bold;
+}
+
+table.timeUser		{
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color: 	#ffffff;
+	border: 		1px #a1a5a9 solid; 
+	width:			100%;
+}
+
+td.timeUserhead		{
+ 	background-image: 	url(side_bg.gif); 
+ 	text-align: 		center; 
+	vertical-align: 	middle;
+ 	font-family: 		sans-serif;
+	font-size: 		12px;
+	font-weight: 		800;
+	}
+
+td.timeUserback		{
+ 	text-align: 		center; 
+	background-color:	#ffffff;
+	}
+
+///////////////////////////////
 
 th.timeTask			{
 	background-color:	#a6b8ca;
@@ -1167,8 +1255,10 @@ td.timeTask			{
 	font-weight: 		80;
 	}
 
+///////////////////////////////////
+
 tr.timeHeader			{
-	background-color:	#a6b8ca;
+	background-color:	#a5bace;
 	vertical-align: 	middle;
  	font-family: 		sans-serif;
 	}
@@ -1178,7 +1268,7 @@ tr.timeUnvalid			{
 	font-size:		10px;
 	text-align:		left;
 	color:			#000000;
-	background-color:	#ffcc00;
+	background-color:	#fbf7db;
 	}
 
 tr.timeValid0			{
@@ -1186,7 +1276,7 @@ tr.timeValid0			{
 	font-size:		10px;
 	text-align:		left;
 	color:			#000000;
-	background-color:	#eeeeee;
+	background-color:	#e4eaef;
 	}
 
 tr.timeValid1			{
@@ -1194,89 +1284,76 @@ tr.timeValid1			{
 	font-size:		10px;
 	text-align:		left;
 	color:			#000000;
-	background-color:	#ffffff;
+	background-color:	#f4faff;
 	}
 
-td.timeWorkdayHead 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-	color:			#000000;
-	text-align:		center;
-}
-
-td.timeOffdayHead 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-	color:			#ffff00;
-	text-align:		center;
-	background-color:	#93919c;
-}
-
-td.timeWorkday 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
-	text-align:		center;
-}
-
-td.timeOffday 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#ffff00;
-	text-align:		center;
-	background-color:	#93919c;
-}
 
 /* /////////////////PROJECT////////////////// */
 /* ////  Project table style definition  //// */
 /* ////////////////////////////////////////// */
 
-td.projectHead 	 	 {
+td.projectHead 	 	 	{
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
-	color:			#000000;
+	color:			#486789;
 	text-align:		center;
 	background-color:	#a5bace;
-	padding : 5;
+	padding : 4;
 }
 
 td.projectPtask 	 	 {
 	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
+	font-size:		11px;
+	color:			#486786;
 	text-align:		left;
 	background-color:	#e9f7fe;
-	padding : 5;
+	padding : 3;
 }
 
 td.projectCtask 	 	 {
 	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
+	font-size:		11px;
+	color:			#666666;
 	text-align:		left;
 	background-color:	#ffffff;
-	padding : 5;
+	padding : 3;
 }
 
 td.projectPtime 	 	 {
 	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
+	font-size:		11px;
+	color:			#486786;
 	text-align:		center;
 	background-color:	#e9f7fe;
-	padding : 5;
+	padding : 3;
+}
+
+td.projectPlate 	 	 {
+	font-family:		sans-serif;
+	font-size:		11px;
+	color:			#cc0000;
+	text-align:		center;
+	background-color:	#e9f7fe;
+	padding : 3;
+}
+
+td.projectPearly 	 	 {
+	font-family:		sans-serif;
+	font-size:		11px;
+	color:			#006600;
+	text-align:		center;
+	background-color:	#e9f7fe;
+	padding : 3;
 }
 
 td.projectCtime 	 	 {
 	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
+	font-size:		11px;
+	color:			#666666;
 	text-align:		center;
 	background-color:	#ffffff;
-	padding : 5;
+	padding : 3;
 }
 
 

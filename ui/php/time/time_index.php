@@ -156,17 +156,19 @@ if ($action == "index" || $action == "") {
   $time["interval"] = "week";
   $time["action"] = "index";
 
+  // bcontins pour l'instant on n'a jamais plusieurs utilisateurs à la fois
+  // (ça servait pour les stats multi-utilisateur)
   // USERS : only one for index (and others, except stats)
-//   if (! in_array($u_id, $project_managers))
-//     $time["user_id"] == array($u_id);
-//   else if (sizeof($time["user_id"]) > 1) {
-//     $tt = $time["user_id"];
-//     $time["user_id"] == $tt[0];
-//   }
-//   else if (sizeof($time["user_id"]) == 0) {
-//     echo "error \$time[user_id] empty !!! <br>";
-//     $time["user_id"] == array($u_id);
-//   }
+  //   if (! in_array($u_id, $project_managers))
+  //     $time["user_id"] == array($u_id);
+  //   else if (sizeof($time["user_id"]) > 1) {
+  //     $tt = $time["user_id"];
+  //     $time["user_id"] == $tt[0];
+  //   }
+  //   else if (sizeof($time["user_id"]) == 0) {
+  //     echo "error \$time[user_id] empty !!! <br>";
+  //     $time["user_id"] == array($u_id);
+  //   }
 
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"week");
@@ -178,7 +180,7 @@ if ($action == "index" || $action == "") {
   $display["detail"] .= dis_time_list($time);
 
   // display user Search Form
-  $display["detail"] .= dis_time_search_form($time,
+  $display["features"] .= dis_time_search_form($time,
                        run_query_get_obmusers(),
                        $uid);
 
@@ -208,7 +210,7 @@ elseif ($action == "viewmonth") {
   $display["detail"] .= dis_time_index($time);
 
   // display user Search Form
-  $display["detail"] .= dis_time_search_form($time, 
+  $display["features"] .= dis_time_search_form($time, 
                        run_query_get_obmusers(),
                        $uid);
 
@@ -235,14 +237,11 @@ elseif ($action == "insert") {
   run_query_insert($time);
   run_query_validate($time["user_id"]);
 
-  // bcontins planning hebdomadaire
   $display["detail"] .= dis_time_index($time);
-
   $display["detail"] .= dis_time_list($time);
-
-  $display["detail"] .= dis_time_search_form($time, 
-      run_query_get_obmusers(),
-      $uid);
+  $display["features"] .= dis_time_search_form($time, 
+					     run_query_get_obmusers(),
+					     $uid);
 }
 
 elseif ($action == "validate") {
@@ -279,7 +278,7 @@ elseif ($action == "statsuser") {
   $statproj_q = run_query_stat_project_by_user($time);
   $stattt_q = run_query_stat_tasktype_by_user($time);
 
-  $display["detail"] .= dis_time_search_form($time, 
+  $display["features"] .= dis_time_search_form($time, 
       run_query_get_obmusers(),
       $uid);
 
@@ -320,14 +319,11 @@ elseif ($action == "delete") {
   run_query_delete($HTTP_POST_VARS);
   run_query_validate($time["user_id"]);
 
-  // bcontins planning hebdomadaire
   $display["detail"] .= dis_time_index($time);
-
   $display["detail"] .= dis_time_list($time);
-
-  $display["detail"] .= dis_time_search_form($time, 
-      run_query_get_obmusers(),
-      $uid);
+  $display["features"] .= dis_time_search_form($time, 
+					       run_query_get_obmusers(),
+					       $uid);
 }
 
 elseif ($action == "update") {
@@ -347,17 +343,14 @@ elseif ($action == "update") {
     // Creating the dates for the selected (or current) date
     $day_q = get_this_week($d_start_week, $c_days_in_a_week);
     
-    // array of validated days
-//     $val_days = run_query_valid_search($time);
-
     $display["detail"] .= dis_form_addtask("update",
-		     $obm_project_q, 
-		     $obm_projecttask_q, 
-		     $obm_tasktype_q, 
-		     $day_q, 
-		     $c_day_fraction, 
-		     $time, 
-		     null);
+					   $obm_project_q, 
+					   $obm_projecttask_q, 
+					   $obm_tasktype_q, 
+					   $day_q, 
+					   $c_day_fraction, 
+					   $time, 
+					   null);
   }
 
   else {
@@ -508,13 +501,6 @@ function get_time_actions() {
     'Right'    => $time_admin_read,
     'Condition'=> array ('all') 
                                     );
-
-// Stats by Projects
-//   $actions["TIME"]["stats_project"] = array (
-//     'Url'      => "$path/time/time_index.php?action=stats_project",
-//     'Right'    => $time_admin_read,
-//     'Condition'=> array ('None') 
-//                                   );
 
 // Insert 
   $actions["TIME"]["insert"] = array (

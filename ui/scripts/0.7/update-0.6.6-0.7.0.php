@@ -127,7 +127,7 @@ function fill_projecttask() {
       values (
         $deal,
         \"$text\",
-        1
+        0
       )";
 
     //     echo "$query \n ---------------------------------------------\n";
@@ -293,10 +293,11 @@ function fill_preferences() {
         ($id,'project','project_archive',5,1),
         ($id,'time','date_task',1,2),
         ($id,'time','timetask_deal_label',2,2),
-        ($id,'time','timetask_company_name',3,2),
-        ($id,'time','tasktype_label',4,2),
-        ($id,'time','timetask_length',5,2),
-        ($id,'time','timetask_id',6,2),
+        ($id,'time','timetask_company_name',3,1),
+        ($id,'time','timetask_label',4,1),
+        ($id,'time','tasktype_label',5,1),
+        ($id,'time','timetask_length',6,2),
+        ($id,'time','timetask_id',7,2),
         ($id,'time_projmonth','deal_label',1,2),
         ($id,'time_projmonth','company_name',2,2),
         ($id,'time_projmonth','total_length',3,1),
