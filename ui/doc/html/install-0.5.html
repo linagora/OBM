@@ -91,7 +91,7 @@ $ cd ../apache_1.3.x
 <BR>$ make install
 
 <H2>4: Configure apache, and test it (with test.php) !</H2>
-<H3>4.1: Configure the Apache document root</H3>
+<H3>4.1: [0.5.0 - 0.5.1] Configure the Apache document root</H3>
 # Edit your httpd.conf and modify the DocumentRoot and its Directory entries:
 <BR>DocumentRoot "/home/web"
 <BR>...
@@ -107,7 +107,7 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 <br>  Deny from all
 <br>< /Files>
 </pre>
-<h2>0.5.2+ specific config</h2>
+<h3>4.1: [0.5.2]+ specific config</h3>
 Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
 <br>We encourage to set up a virtual host to handle one occurence of OBM (there can be several now on one server).
 In this virtual host section set :
@@ -120,9 +120,27 @@ In this virtual host section set :
 <br>Alias /images path_to_obminclude/themes
 <br><u>eg:</u> Alias /images /home/web/obm/obminclude/themes
 
-<p># the name obminclude is now a variable to allow multiple OBM instances on the same code source base (only obminclude will differ which give different database, themes, langs... for each instances)
-<br>fill the OBM_INCLUDE_VAR with the name of the obminclude dir
+<p># the name obminclude is now a variable to allow multiple OBM instances on the same code source base (only obminclude will differ which give different database, themes, langs... for each instances). This variable is set through the apache httpd.conf file.
+<br># load the env module
+<br>LoadModule env_module /usr/lib/apache/1.3/mod_env.so
+
+<br>#fill the OBM_INCLUDE_VAR with the name of the obminclude dir
 <br>Setenv OBM_INCLUDE_VAR obminclude
+
+<p>
+<u>Eg:</u>
+<pre>
+< VirtualHost 192.168.1.5>
+    ServerAdmin root@localhost
+    DocumentRoot /home/pierre/cvs/obm/php
+    ServerName obm-panthere
+    ErrorLog /var/log/apache/obm-error.log
+    CustomLog /var/log/apache/obm-access.log common
+    Alias /images /home/pierre/cvs/obm/obminclude/themes
+    SetEnv OBM_INCLUDE_VAR obminclude
+    DirectoryIndex obm.php
+< /VirtualHost>
+</pre>
 
 <H3>4.2: Configure apache to process PHP files</H3>
 
@@ -140,7 +158,7 @@ In this virtual host section set :
 # Edit the php.ini file (/usr/local/lib/php.ini)
 <BR># Add the phplib and the working directories in the include path
 <BR>include_path = "what_was_here_before:/home/web/obm:."
-<BR># unfill the auto_prepend_file and auto_append_file vars.
+<P># unfill the auto_prepend_file and auto_append_file vars.
 <BR>auto_prepend_file = ;
 <BR>auto_append_file = ;
 
@@ -317,6 +335,48 @@ mysql -u web -pweb obm < update-after-export-0.4.x-0.5.0.mysql.sql   &nbsp;<i>  
 # Update stored values that are not calculated
 <br>
 # In OBM, from the admin module (must be connected with an admin user), select the Data menu and execute the action data_update for the company module (which update these values)
+
+
+
+<h3>[0.5.2] apache specific config</h3>
+Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
+<p>So now the OBM archive can be put directly on your web tree (no more copying the php directory content). After unpacking :
+<br>mv obm/ /home/web
+<br> or : mv obm /var/www (on Debian)
+
+<p>We encourage to set up a virtual host to handle one occurence of OBM (there can be several now on one server).
+In this virtual host section set :
+
+<p>
+# Set your document root to : /home/web/obm/php
+<br>as obminclude is in /home/web/obm/obminclude so outside the web tree.
+
+<p># Set an alias to images in the themes directory:
+<br>Alias /images path_to_obminclude/themes
+<br><u>eg:</u> Alias /images /home/web/obm/obminclude/themes
+
+<p># the name obminclude is now a variable to allow multiple OBM instances on the same code source base (only obminclude will differ which give different database, themes, langs... for each instances). This variable is set through the apache httpd.conf file.
+<br># load the env module
+<br>LoadModule env_module /usr/lib/apache/1.3/mod_env.so
+
+<br>#fill the OBM_INCLUDE_VAR with the name of the obminclude dir
+<br>Setenv OBM_INCLUDE_VAR obminclude
+
+<p>
+<u>Eg:</u>
+<pre>
+< VirtualHost 192.168.1.5>
+    ServerAdmin root@localhost
+    DocumentRoot /home/pierre/cvs/obm/php
+    ServerName obm-panthere
+    ErrorLog /var/log/apache/obm-error.log
+    CustomLog /var/log/apache/obm-access.log common
+    Alias /images /home/pierre/cvs/obm/obminclude/themes
+    SetEnv OBM_INCLUDE_VAR obminclude
+    DirectoryIndex obm.php
+< /VirtualHost>
+</pre>
+
 <br><br>
 <A HREF="index.html">back</A>
 
