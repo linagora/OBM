@@ -18,6 +18,7 @@ $l_set_lang = "Scegli la lingua";
 $l_set_theme = "Scegli la grafica";
 $l_set_rows = "Quante righe per pagina?";
 $l_set_date = "Date format";
+$l_set_cal_interval = "Calendar interval";
 $l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";
 

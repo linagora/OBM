@@ -60,6 +60,14 @@ $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
 $cda_txt = "d M Y"; // txt format
 
+// Calendar Interval display constant
+$ccal_4 = 4;  // 1/4 h
+$ccal_2 = 2;  // 1/2 h
+$ccal_1 = 1;  // 1 h
+$l_cal_4 = "1/4";  // 1/4 h
+$l_cal_2 = "1/2";  // 1/2 h
+$l_cal_1 = "1";    // 1 h
+
 // Menu display options constants
 $cme_txt = "text";  // text
 $cme_ico = "icon";  // icon
@@ -70,8 +78,43 @@ $perms_user = "user" ;
 $perms_editor = "editor" ;
 $perms_admin = "admin" ;
 
+// Debug Constants
+$cdg_id = 1;     // id display
+$cdg_param = 2;  // parameter display
+$cdg_sess = 4;   // session display
+$cdg_sql = 8;    // sql query display
+
+// Global Constants
+$c_all = "_ALL_";		// Used in Form select
+$c_yes = "Yes";			// Maybe stored in database
+$c_no = "No";
+
 // Mail.
 $activate_mail = 0;
+
+// Display size
+$popup_width = 620;
+$popup_height = 400;
+$popup_contact_height = 600;
+
+// JavaScript and PHP Fields masks (regexp)
+$js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
+$php_regexp_phone="^[0-9+ \(\)-\.]+$";  // digits + SPACE ( ) - in phone number
+$js_regexp_fax="/^[0-9+ \(\)-\.]+$/";   // digits + SPACE ( ) - in fax number
+$php_regexp_fax="^[0-9+ \(\)-\.]+$";    // digits + SPACE ( ) - in fax number
+$js_regexp_zip="/^[0-9A-Z]{4,8}$/";     // 4-8 digits or letters
+$php_regexp_zip="^[0-9A-Z]{4,8}$";      // 4-8 digits or letters
+$js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
+$php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
+$js_regexp_web="/^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}$/";  // Web
+$php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
+$php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
+$js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
+$js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
+$js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
+$php_regexp_lifetime = "^[0-9]{1,6}$";
+
+
 // Perms and Profil
 ///////////////////////////////////////////////////////////////////////////////
 //                         COMMERCIAL RIGTHS                                 //
@@ -244,38 +287,6 @@ $perm_admin = $com_read + $com_write + $com_admin_read + $com_admin_write +
       $users_read + $users_write + $users_admin_read + $users_admin_write +
       $admins_read + $admins_write + $admins_admin_read + $admins_admin_write;
 
-// Debug Constants
-$cdg_id = 1;     // id display
-$cdg_param = 2;  // parameter display
-$cdg_sess = 4;   // session display
-$cdg_sql = 8;    // sql query display
-
-// Global Constants
-$c_all = "_ALL_";		// Used in Form select
-$c_yes = "Yes";			// Maybe stored in database
-$c_no = "No";
-
-// Display size
-$popup_width = 620;
-$popup_height = 400;
-$popup_contact_height = 600;
-
-// JavaScript and PHP Fields masks (regexp)
-$js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
-$php_regexp_phone="^[0-9+ \(\)-\.]+$";  // digits + SPACE ( ) - in phone number
-$js_regexp_fax="/^[0-9+ \(\)-\.]+$/";   // digits + SPACE ( ) - in fax number
-$php_regexp_fax="^[0-9+ \(\)-\.]+$";    // digits + SPACE ( ) - in fax number
-$js_regexp_zip="/^[0-9A-Z]{4,8}$/";     // 4-8 digits or letters
-$php_regexp_zip="^[0-9A-Z]{4,8}$";      // 4-8 digits or letters
-$js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
-$php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
-$js_regexp_web="/^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}$/";  // Web
-$php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
-$php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
-$js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
-$js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
-$js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
-$php_regexp_lifetime = "^[0-9]{1,6}$";
 
 // Path to the OBM php root (if not set)
 if ($path == "") {

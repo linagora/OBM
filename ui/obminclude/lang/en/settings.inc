@@ -17,6 +17,7 @@ $l_new_settings = "To change your setup, select here the new parameters";
 $l_set_lang = "Select your language";
 $l_set_theme = "Choose your theme";
 $l_set_date = "Date format";
+$l_set_cal_interval = "Calendar interval";
 $l_set_rows = "# Rows displayed per page";
 $l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";

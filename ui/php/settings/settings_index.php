@@ -65,6 +65,12 @@ if ($form_user_pref) {
     $sess->register("set_menu");
     run_query_set_user_pref($uid, "set_menu", $set_menu, 1);
   }
+
+  if ($param_cal_interval != "") {
+    $set_cal_interval = $param_cal_interval;
+    $sess->register("set_cal_interval");
+    run_query_set_user_pref($uid, "set_cal_interval", $set_cal_interval, 1);
+  }
 }
 page_close();
 
@@ -80,6 +86,10 @@ if ($set_date == $cda_iso) $da_iso = "checked";
 if ($set_date == $cda_en) $da_en = "checked";
 if ($set_date == $cda_fr) $da_fr = "checked";
 if ($set_date == $cda_txt) $da_txt = "checked";
+
+if ($set_cal_interval == $ccal_4) $cal_4 = "checked";
+if ($set_cal_interval == $ccal_2) $cal_2 = "checked";
+if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
 
 if ($set_menu == $cme_txt) $me_txt = "checked";
 if ($set_menu == $cme_ico) $me_ico = "checked";
@@ -183,6 +193,13 @@ echo " /></td>
       <input type=\"radio\" name=\"param_date\" value=\"$cda_en\" $da_en />$l_da_en
       <input type=\"radio\" name=\"param_date\" value=\"$cda_fr\" $da_fr />$l_da_fr
       <input type=\"radio\" name=\"param_date\" value=\"$cda_txt\" $da_txt />$l_da_txt
+    </td>
+  </tr><tr>
+    <td class=\"adminLabel\">$l_set_cal_interval</td>
+    <td class=\"adminText\">
+      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
+      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
+      <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
     </td>
   </tr><tr>
     <td class=\"adminLabel\">$l_set_menu</td>

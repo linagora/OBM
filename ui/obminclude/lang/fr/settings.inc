@@ -17,6 +17,7 @@ $l_set_lang = "Choisissez votre langue";
 $l_set_theme = "Choisissez votre theme";
 $l_set_rows = "# lignes affichées par page";
 $l_set_date = "Format de date";
+$l_set_cal_interval = "Intervalle du calendrier";
 $l_set_menu = "Affichage des menus";
 $l_set_debug = "Niveau de debug";
 
