@@ -52,6 +52,8 @@ function html_company_search_form ($kind_q, $usr_q, $company) {
 
   if ($state == '1') $cstate = " checked";
 
+  // --- HTML Template --------------------------------------------------------
+
   echo "<center>
     <form method=get name=f_societe
       action=\"" . $sess->url("company_index.php") . "\">
@@ -141,12 +143,14 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company links menu                                                //
+// Return the Display Company links menu                                     //
 // Parameters:
 //   - $p_id     : company id
 //   - $name     : company name
 //   - $con_num  : contact number
 //   - $deal_num : deal number
+// Returns:
+//   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -- Themes
@@ -159,32 +163,33 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   $uname = urlencode($name);
 
   // -------| Menu Liste Contacts
-  echo "<A HREF=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\"><IMG BORDER=0
-          SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-        <FONT SIZE=-1><A HREF=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\">$l_contact_list</A> ($con_num)</FONT>";
+  $r = "<a href=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\"><img border=0
+          src=\"/images/$set_theme/$ico_contact_list\"></a>
+        <font size=-1><a href=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\">$l_contact_list</a> ($con_num)</font>";
 
   // -------| Menu Nouveau Contact
   if ($auth->auth["perm"] != $perms_user) {
-    echo "<BR>
-      <A HREF=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\"><IMG BORDER=0
-        SRC=\"/images/$set_theme/$ico_contact_new\"></A>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">$l_contact_new</A></FONT>";
+    $r .= "<br>
+      <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
+        src=\"/images/$set_theme/$ico_contact_new\"></a>
+      <font size=-1><a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">$l_contact_new</a></font>";
   }
 
   // -------| Menu Liste Affaires
-  echo "<BR>
-    <A HREF=\"" . $sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\"><IMG BORDER=0
-      SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-    <FONT SIZE=-1><A HREF=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">$l_deal_list</A> ($deal_num)</FONT>";
+  $r .= "<br>
+    <a href=\"" . $sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\"><img border=0
+      src=\"/images/$set_theme/$ico_contact_list\"></a>
+    <font size=-1><a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">$l_deal_list</a> ($deal_num)</font>";
 
   // -------| Menu Nouvelle Affaire
   if ($auth->auth["perm"] != $perms_user) {
-    echo "<BR>
-      <A HREF=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><IMG BORDER=0
-        SRC=\"/images/$set_theme/$ico_contact_new\"></A>
-      <FONT SIZE=-1><A HREF=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</A></FONT>\n";
+    $r .= "<br>
+      <a href=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
+        src=\"/images/$set_theme/$ico_contact_new\"></a>
+      <font size=-1><a href=\"".$sess->url("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
   }
 
+  return $r;
 }
 
 
@@ -256,127 +261,148 @@ function html_company_consult($co_q, $kind_q) {
     $link_web = "&nbsp;";
   }
 
-
-  echo "<CENTER>
-    <TABLE BORDER=0>
-    <TR><TD VALIGN=top>\n";
-
-  html_company_links($id, $name, $con_num, $deal_num);
-
-  echo "</TD><TD>
-      <TABLE BORDER=0>
-      <TR>
-        <TD VALIGN=top>
-        <TABLE BORDER=0>
-        <TR>
-  <!-- NUMBER -->
-          <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_number
-          &nbsp;&nbsp;</FONT></TD>
-          <TD>$num</TD>
-  <!-- NAME -->
-        </TR><TR>
-          <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_name
-          &nbsp;&nbsp;</FONT></TD>
-          <TD>$name</TD>
-  <!-- KIND -->
-        </TR><TR>
-          <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_kind
-          &nbsp;&nbsp;</FONT></TD>
-          <TD>$lkind</TD>
-  <!-- Marketing manage -->
-        </tr><tr>
-          <td align=right><font color=\"#$col_label\" size=-2>$l_market
-          &nbsp;&nbsp;</font></td>
-          <td>$lmarket</td>
-  <!-- EMPTY -->
-      </TR><TR>
-        <TD>&nbsp;</TD>
-        <TD>&nbsp;</TD>
-  <!-- PHONE -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_phone
-        &nbsp;</FONT></TD>
-        <TD>$phone</TD>
-  <!-- FAX -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_fax
-        &nbsp;</FONT></TD>
-        <TD>$fax</TD>
-      </TR>
-      </TABLE>
-
-      </TD>
-      <TD>&nbsp;&nbsp;</TD>
-      <TD VALIGN=top>
-
-      <TABLE BORDER=0>
-      <TR>
-  <!-- ADDRESS 1 -->
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_address
-        &nbsp;1&nbsp;&nbsp;</FONT></TD>
-        <TD>$ad1</TD>
-  <!-- ADDRESS 2 -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_address
-        &nbsp;2&nbsp;&nbsp;</FONT></TD>
-        <TD>$ad2</TD>
-  <!-- ZIP CODE + Express POSTAL -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_postcode
-        &nbsp;&nbsp;</FONT></TD>
-        <TD>$zip &nbsp;&nbsp;&nbsp;
-        <FONT COLOR=\"#$col_label\" SIZE=-2>$l_expresspostal</FONT> &nbsp;
-        $cdx</TD>
-  <!-- TOWN -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_town
-        &nbsp;&nbsp;</FONT></TD>
-        <TD>$town</TD>
-  <!-- COUNTRY -->
-      </TR><TR>
-        <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_country
-        &nbsp;&nbsp;</FONT></TD>
-        <TD>$ctry</TD>
-      </TR>
-      </TABLE>
-
-      </TD>
-    </TR>
-    </TABLE>
-
-    <TABLE BORDER=0>
-
-  <!-- EMAIL + LINK -->
-    <TR>
-      <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_email
-      &nbsp;&nbsp;</FONT></TD>
-      <TD>$email</TD>
-      <TD ALIGN=center>$link_email</TD>
-  <!-- WEB + LINK -->
-    </TR><TR>
-      <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_web
-      &nbsp;&nbsp;</FONT></TD>
-      <TD>$web</TD>
-      <TD ALIGN=center>$link_web</TD>
-    </TR>
-    </TABLE>
-
-  <!-- COMMENTS -->
-    <P><FONT COLOR=\"#$col_label\" SIZE=-2>$l_comment</FONT><BR>" .
-    nl2br($com);
-
+  $links = html_company_links($id, $name, $con_num, $deal_num);
+  $lcom = nl2br($com);
 
   if ($auth->auth["perm"] != $perms_user) {
     // -------| BITBTN - Update Mode 
-    echo "<FORM METHOD=GET NAME=f_mod_societe ACTION=\"".$sess->url("company_index.php")."\">
-      <INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
-      <INPUT TYPE=\"hidden\" name=\"action\" value=\"detailupdate\">
-      <INPUT TYPE=\"submit\" value=\"$l_update\">
-      </FORM>";
+    $dis_update = "<form method=get name=f_mod_societe
+                         action=\"".$sess->url("company_index.php")."\">
+      <input type=hidden name=param_company value=\"$id\">
+      <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
+      <input type=\"submit\" value=\"$l_update\">
+      </form>";
   }
 
-  echo "</TD></TR></TABLE>
-   </CENTER>";
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<center>
+    <table border=0>
+    <tr>
+      <td valign=top>
+      $links
+      </td>
+      <td>
+      <table border=0>
+      <tr>
+        <td valign=top>
+        <table border=0>
+        <tr>
+  <!-- NUMBER -->
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_number &nbsp;&nbsp;</font>
+          </td>
+          <td>$num</td>
+  <!-- NAME -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_name &nbsp;&nbsp;</font>
+          </td>
+          <td>$name</td>
+  <!-- KIND -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_kind &nbsp;&nbsp;</font>
+          </td>
+          <td>$lkind</td>
+  <!-- Marketing manage -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_market &nbsp;&nbsp;</font>
+          </td>
+          <td>$lmarket</td>
+  <!-- EMPTY -->
+        </tr><TR>
+          <td>&nbsp;</td>
+          <td>&nbsp;</td>
+  <!-- PHONE -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_phone &nbsp;</font>
+          </td>
+          <td>$phone</td>
+  <!-- FAX -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_fax &nbsp;</font>
+          </td>
+          <td>$fax</td>
+        </tr>
+        </table>
+        </td>
+
+        <td>&nbsp;&nbsp;</td>
+        <td valign=top>
+
+        <table border=0>
+        <tr>
+  <!-- ADDRESS 1 -->
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_address &nbsp;1&nbsp;</font>
+          </td>
+          <td>$ad1</td>
+  <!-- ADDRESS 2 -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_address &nbsp;2&nbsp;</font>
+          </td>
+          <td>$ad2</td>
+  <!-- ZIP CODE + Express POSTAL -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_postcode &nbsp;</font>
+          </td>
+          <td>$zip &nbsp;&nbsp;&nbsp;
+            <font color=\"#$col_label\" size=-2>$l_expresspostal &nbsp;$cdx</font>
+          </td>
+  <!-- TOWN -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_town &nbsp;</font>
+          </td>
+          <td>$town</td>
+  <!-- COUNTRY -->
+        </tr><tr>
+          <td align=right>
+            <font color=\"#$col_label\" size=-2>$l_country &nbsp;</font>
+          </td>
+          <td>$ctry</td>
+        </tr>
+        </table>
+
+        </td>
+      </tr>
+      </table>
+
+      <table border=0>
+      <tr>
+  <!-- EMAIL + LINK -->
+        <td align=right>
+          <font color=\"#$col_label\" size=-2>$l_email &nbsp;</font>
+        </td>
+        <td>$email</td>
+        <td align=center>$link_email</td>
+      </tr><tr>
+  <!-- WEB + LINK -->
+        <td align=right>
+          <font color=\"#$col_label\" size=-2>$l_web &nbsp;</font>
+        </td>
+        <td>$web</td>
+        <td align=center>$link_web</td>
+      </tr>
+      </table>
+
+  <!-- COMMENTS -->
+      <p>
+      <font color=\"#$col_label\" size=-2>$l_comment</font>
+      <br>
+      $lcom
+
+      $dis_update
+      </td>
+    </tr>
+    </table>
+    </center>";
 
 }
 
@@ -485,144 +511,160 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
 
-  echo "<CENTER>
-    <FORM METHOD=POST NAME=f_mod_societe
-      onSubmit=\"if (check_company(this)) return true; else return false;\"
-      ACTION=\"".$sess->url("company_index.php")."\">
-
-    <TABLE BORDER=0>
-      <TR><TD VALIGN=top>\n";
   if (($action == "detailupdate") || ($action == "update")) {
-    html_company_links($id, $name, $con_num, $deal_num);
+    $links = html_company_links($id, $name, $con_num, $deal_num);
   }
 
-  echo "</TD><TD>
-      <TABLE BORDER=0>
-      <TR>
-        <TD VALIGN=top>
-        <TABLE BORDER=0>
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_button = "
+      <!-- Update button -->
+      <input type=hidden name=param_company value=\"$id\">
+      <input type=\"hidden\" name=\"action\" value=\"update\">
+      <input type=\"submit\" value=\"$l_update\"> 
+      </form>
+      </td>
+
+      <!-- Delete button -->
+      <td><form method=post name=f_sup_societe
+      onSubmit=\"if (valider_suppression()) return true; else return false;\"
+      action=\"" . $sess->url("company_index.php") . "\"> 
+      <input type=hidden name=action value=check_delete>
+      <input type=hidden name=param_company value=\"$id\">
+      <input type=submit value=\"$l_checkdelete\">
+      </form>";
+  } elseif (($action == "new") || ($action == "insert")) {
+    $dis_button = "<input type=hidden name=\"action\" value=\"insert\">
+      <input type=submit value=\"$l_insert\">
+      </form>";
+  }
+
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<center>
+    <form method=post name=f_mod_societe
+      onSubmit=\"if (check_company(this)) return true; else return false;\"
+      action=\"".$sess->url("company_index.php")."\">
+
+    <table border=0>
+    <tr>
+      <td valign=top>
+       $links
+      </td>
+      <td>
+      <table border=0>
+      <tr>
+        <td valign=top>
+        <table border=0>
   <!-- NAME -->
-        <TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_name &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_name size=30 value=\"$name\"></TD>
+        <tr>
+          <td align=right>
+            <font size=-2>$l_name &nbsp;&nbsp;</font>
+          </td>
+          <td><input name=tf_name size=30 maxlength=50 value=\"$name\"></td>
   <!-- NUMBER -->
-        </TR><TR>
-          <TD><FONT size=-2>$l_number</FONT></TD>
-          <TD><INPUT NAME=tf_num value=\"$num\" size=30 maxlength=32></TD>
+        </tr><tr>
+          <td><font size=-2>$l_number</font></td>
+          <td><input name=tf_num value=\"$num\" size=30 maxlength=32></td>
   <!-- COMPANY KIND -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_kind &nbsp;&nbsp;</FONT></TD>
-          <TD>$sel_kind</TD>
+        </tr><tr>
+          <td align=right><font size=-2>$l_kind &nbsp;&nbsp;</font></td>
+          <td>$sel_kind</td>
   <!-- Marketing Manager -->
         </tr><tr>
           <td align=right><font size=-2>$l_market &nbsp;&nbsp;</font></td>
           <td>$sel_market</td>
   <!-- STATE -->
-        </TR><TR>
-          <TD><FONT SIZE=-2>$l_internal</FONT></TD>
-          <TD><INPUT TYPE=\"checkbox\" NAME=\"cb_state\" value=1 $lstate></TD>
+        </tr><tr>
+          <td><font size=-2>$l_internal</font></td>
+          <td><input type=\"checkbox\" name=\"cb_state\" value=1 $lstate></td>
   <!-- PHONE -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_phone &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_phone size=16 value=\"$phone\"></TD>
+        </tr><tr>
+          <td align=right><font size=-2>$l_phone &nbsp;&nbsp;</font></td>
+          <td><input name=tf_phone size=16 maxlength=16 value=\"$phone\"></td>
   <!-- FAX -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_fax &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_fax size=16 value=\"$fax\"></TD>
-        </TR>
-        </TABLE>
+        </tr><tr>
+          <td align=right><font size=-2>$l_fax &nbsp;&nbsp;</font></td>
+          <td><input name=tf_fax size=16 maxlength=16 value=\"$fax\"></td>
+        </tr>
+        </table>
 
-        </TD>
-        <TD>&nbsp;&nbsp;</TD>
-        <TD VALIGN=top>
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td valign=top>
 
-        <TABLE BORDER=0>
+        <table border=0>
   <!-- ADDRESS 1 -->
-        <TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_address
-          &nbsp;&nbsp;<BR>1&nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_ad1 size=30 value=\"$ad1\"></TD>
+        <tr>
+          <td align=right>
+            <font size=-2>$l_address &nbsp;<br>1 &nbsp;</font>
+          </td>
+          <td><input name=tf_ad1 size=30 maxlength=50 value=\"$ad1\"></td>
   <!-- ADDRESSE 2 -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_address
-          &nbsp;&nbsp;<BR>1&nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_ad2 size=30 value=\"$ad2\"></TD>
+        </tr><tr>
+          <td align=right>
+            <font SIZE=-2>$l_address &nbsp;<br>2 &nbsp;</font>
+          </td>
+          <td><input name=tf_ad2 size=30 maxlength=50 value=\"$ad2\"></td>
   <!-- ZIP CODE + CEDEX -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_postcode &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_zip size=6 value=\"$zip\">
-          &nbsp;&nbsp;&nbsp; <FONT SIZE=-2>$l_expresspostal</FONT> &nbsp;
-          <INPUT NAME=tf_cdx size=8 value=\"$cdx\"></TD>
+        </tr><tr>
+          <td align=right><font size=-2>$l_postcode &nbsp;&nbsp;</font></td>
+          <td>
+            <input name=tf_zip size=6 maxlength=14 value=\"$zip\"> &nbsp;&nbsp;
+            <font size=-2>$l_expresspostal</font> &nbsp;
+            <input name=tf_cdx size=8 maxlength=8 value=\"$cdx\">
+          </td>
   <!-- TOWN -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_town &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_town size=24 value=\"$town\"></TD>
+        </tr><tr>
+          <td align=right><font size=-2>$l_town &nbsp;&nbsp;</font></td>
+          <td><input name=tf_town size=24 maxlength=24 value=\"$town\"></td>
   <!-- COUNTRY -->
-        </TR><TR>
-          <TD ALIGN=right><FONT SIZE=-2>$l_country &nbsp;&nbsp;</FONT></TD>
-          <TD><INPUT NAME=tf_ctry size=20 value=\"$ctry\"></TD>
-        </TR>
-        </TABLE>
-        </TD>
-      </TR>
-      </TABLE>
+        </tr><tr>
+          <td align=right><font size=-2>$l_country &nbsp;&nbsp;</font></td>
+          <td><input name=tf_ctry size=20 maxlength=24 value=\"$ctry\"></td>
+        </tr>
+        </table>
+        </td>
+      </tr>
+      </table>
 
-      <TABLE BORDER=0>
-      <TR>
+      <table border=0>
+      <tr>
   <!-- EMAIL + LINK -->
-        <TD ALIGN=right><FONT SIZE=-2>$l_email &nbsp;&nbsp;</FONT></TD>
-        <TD><INPUT NAME=tf_email size=45 value=\"$email\"></TD>
-        <TD ALIGN=center>$link_email </TD>
-      </TR><TR>
+        <td align=right><font size=-2>$l_email &nbsp;&nbsp;</font></td>
+        <td><input name=tf_email size=45 maxlength=128 value=\"$email\"></td>
+        <td align=center>$link_email</td>
+      </tr><tr>
   <! -- WEB + LINK -->
-        <TD ALIGN=right><FONT SIZE=-2>$l_web &nbsp;&nbsp;</FONT></TD>
-        <TD><INPUT NAME=tf_web size=45 value=\"$web\"></TD>
-        <TD ALIGN=center>$link_web</TD>
-      </TR>
-      </TABLE>
+        <td align=right><font size=-2>$l_web &nbsp;&nbsp;</font></td>
+        <td><input name=tf_web size=45 maxlength=52 value=\"$web\"></td>
+        <td align=center>$link_web</td>
+      </tr>
+      </table>
 
-      <TABLE BORDER=0>
-      <TR>
+      <table border=0>
+      <tr>
 
   <!-- COMMENT -->
-        <TD><FONT SIZE=-2>$l_comment &nbsp;&nbsp;</FONT><BR>
-          <TEXTAREA NAME=ta_com ROWS=6 COLS=72>$com</TEXTAREA></TD>
-      </TR><TR>
-        <TD ALIGN=center>
-        <TABLE border=0>
-        <TR>
-          <TD>\n";
-  
-  if (($action == "detailupdate") || ($action == "update")) {
-    // -------| BITBTN 1 - VALIDER LES CHANGEMENTS
-    echo "<INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
-      <INPUT TYPE=\"hidden\" name=\"action\" value=\"update\">
-      <INPUT TYPE=\"submit\" value=\"$l_update\"> 
-      </FORM></TD>\n";
-
-    // -------| BITBTN 2 - SUPPRMIER LA SOCIETE
-    echo "<TD><FORM METHOD=POST NAME=f_sup_societe
-      onSubmit=\"if (valider_suppression()) return true; else return false;\"
-      ACTION=\"" . $sess->url("company_index.php") . "\">"; 
-    echo "<INPUT TYPE=hidden name=action value=check_delete>
-      <INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
-      <INPUT TYPE=submit value=\"$l_checkdelete\">";
-  } elseif (($action == "new") || ($action == "insert")) {
-    echo "<INPUT TYPE=hidden name=\"action\" value=\"insert\">
-      <INPUT TYPE=submit value=\"$l_insert\">";
-  }
-
-  echo "</FORM>
-          </TD>
-        </TR>
-        </TABLE>
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-  </CENTER>";
+        <td><font size=-2>$l_comment &nbsp;&nbsp;</font><br>
+          <textarea name=ta_com rows=6 cols=72>$com</textarea>
+        </td>
+      </tr><tr>
+        <td align=center>
+        <table border=0>
+        <tr>
+          <td>
+          $dis_button
+          </td>
+        </tr>
+        </table>
+        </td>
+      </tr>
+      </table>
+      </td>
+    </tr>
+    </table>
+  </center>";
 }
 
 
@@ -809,99 +851,106 @@ function html_company_kind_form($kind_q) {
   global $l_kind_checkdelete,$l_kind_update,$l_kind_new,$l_kind_insert;
   global $sess;
 
-  echo "<CENTER>
-    <FORM name=\"form_admin_kind_delete\"
-      METHOD=post action=\"" . $sess->url("company_index.php") . "\">
-    <TABLE WIDTH=90% border=1 bgcolor=\"#$col_a_table\">
-    <TR>
-      <TD colspan=5 BGCOLOR=\"#$col_a_tableh\">
-        <I><FONT COLOR=\"#$col_textem\">$l_kind_manage
-        </FONT></I>
-      </TD>
-    </TR><TR>
-      <TD>
+  $sel_kind = "<select name=\"sel_kind\" size=4 >";
+  while ($kind_q->next_record()) {
+    $label = $kind_q->f("companytype_label");
+    $sel_kind .= "\n<option value=\"$label\">$label</option>";
+  }
+  $sel_kind .= "</select></td>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<center>
+    <form name=\"form_admin_kind_delete\"
+      method=post action=\"" . $sess->url("company_index.php") . "\">
+    <table width=90% border=1 bgcolor=\"#$col_a_table\">
+    <tr>
+      <td colspan=5 bgcolor=\"#$col_a_tableh\">
+        <i><font color=\"#$col_textem\">$l_kind_manage</font></i>
+      </td>
+    </tr><tr>
+      <td>
 
 <!-- Kind Check Delete Section -->
 
-        <TABLE border=0>
-        <TR>
-          <TD>$l_kind_exist</TD>
-          <TD><SELECT NAME=\"sel_kind\" SIZE=4 >";
-
-  while ($kind_q->next_record()) {
-    $label = $kind_q->f("companytype_label");
-     echo "\n<OPTION value=\"$label\">$label</OPTION>";
-  }
-  echo "</SELECT></TD>
-          <TD>
-            <INPUT TYPE=hidden name=\"action\" value=\"kind_checklink\">
-            <INPUT TYPE=submit name=sub_kind value=\"$l_kind_checkdelete\"
+        <table border=0>
+        <tr>
+          <td>$l_kind_exist</td>
+          <td>
+            $sel_kind
+          </td>
+          <td>
+            <input type=hidden name=\"action\" value=\"kind_checklink\">
+            <input type=submit name=sub_kind value=\"$l_kind_checkdelete\"
               onClick=\"if (check_kind_checkdel(this.form)) return true;
               else return false;\">
-           </TD>
-        </TR>
-    </FORM>
+          </td>
+        </tr>
+    </form>
 
 <!-- Kind Update Section -->
 
-    <FORM name=\"form_admin_kind_update\"
-      METHOD=post action=\"" . $sess->url("company_index.php") . "\">
-        <TR>
-          <TD colspan=2 align=center>
-            <INPUT TYPE=hidden name=sel_kind value=\"\">
-            <INPUT TYPE=hidden name=action value=\"kind_update\">
-            <INPUT TYPE=text name=tf_kind_upd>
-          </TD><TD>
-            <INPUT TYPE=submit name=sub_kind value=\"$l_kind_update\"
-              onClick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\">";
+    <form name=\"form_admin_kind_update\"
+      method=get action=\"" . $sess->url("company_index.php") . "\">
+        <tr>
+          <td colspan=2 align=center>
+            <input type=hidden name=sel_kind value=\"\">
+            <input type=hidden name=action value=\"kind_update\">
+            <input type=text name=tf_kind_upd>
+          </td><td>
+            <input type=submit name=sub_kind value=\"$l_kind_update\"
+              onClick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\">
 
-  // End of the company kind management left cell
-  echo "</TD>
-        </TR>
-        </TABLE>
-      </TD>
-      <TD>
-    </FORM>
+          </td>
+        </tr>
+        </table>
+      </td>
+      <td>
+    </form>
 
 <!-- New Kind Section -->
 
-    <FORM name=\"form_admin_kind_new\"
-      METHOD=post action=\"" . $sess->url("company_index.php") . "\">
-      <TABLE>
-      <TR>
-        <TD align=right>$l_kind_new : <INPUT name=\"tf_kind_new\"></TD>
-      </TR><TR>
-        <TD align=center>
-          <INPUT TYPE=hidden name=action value=\"kind_insert\">
-          <INPUT type=submit name=sub_kind value=\"$l_kind_insert\"
+    <form name=\"form_admin_kind_new\"
+      method=get action=\"" . $sess->url("company_index.php") . "\">
+      <table>
+      <tr>
+        <td align=right>$l_kind_new : <input name=\"tf_kind_new\"></td>
+      </tr><tr>
+        <td align=center>
+          <input type=hidden name=action value=\"kind_insert\">
+          <input type=submit name=sub_kind value=\"$l_kind_insert\"
             onClick=\"if (check_kind_new(this.form)) return true; else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM>
-  </CENTER>";
+        </td>
+      </tr>
+      </table>
+      </td>
+    </tr>
+    </table>
+    </form>
+  </center>";
 
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the kind delete form (button)                                    //
+// Return the kind delete display form (button)                              //
 // Parameters:
 //   - $label : kind label
+// Retuns:
+//   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function dis_kind_delete_form($label) {
   global $l_kind_delete;
   global $sess;
 
-  echo "\n<FORM name=\"form_kind_delete\" " .
-      "METHOD=post action=\"" . $sess->url("company_index.php") . "\">
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"kind_delete\">
-    <INPUT TYPE=\"hidden\" name=\"hd_kind_label\" value=\"$label\">
-    <INPUT TYPE=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
-    </FORM>\n";
+  $r = "<form name=\"form_kind_delete\"
+          method=post action=\"" . $sess->url("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind_delete\">
+        <input type=\"hidden\" name=\"hd_kind_label\" value=\"$label\">
+        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
+        </form>";
+
+  return $r;
 }
 
 
@@ -917,6 +966,7 @@ function dis_kind_links($label) {
 
   $id = get_kind_id($label);
   $obm_q = run_query_kind_links($id);
+  $del_form = dis_kind_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
     echo "$l_kind_link_company $label";
@@ -927,16 +977,21 @@ function dis_kind_links($label) {
     }
     echo "<P>$label : $l_kind_cant_delete";
   } else {
-    echo "$l_kind_link_company_no '$label' : $l_kind_can_delete";
-    echo "<TABLE><TR><TD>";
-    dis_kind_delete_form($label);
-    echo "</TD><TD>";
-    echo "<FORM NAME=form_back METHOD=POST
-     ACTION=\"" .$sess->url("company_index.php") . "\">
-     <INPUT TYPE=hidden NAME=action VALUE=admin>
-     <INPUT TYPE=submit VALUE=\"$l_back\">
-     </FORM>";
-    echo "</TR></TABLE>";
+    echo "$l_kind_link_company_no '$label' : $l_kind_can_delete
+      <table>
+      <tr>
+        <td>
+        $del_form
+        </td>
+        <td>
+        <form name=form_back method=get
+        action=\"" .$sess->url("company_index.php") . "\">
+        <input type=hidden name=action value=admin>
+        <input type=submit value=\"$l_back\">
+        </form>
+        </td>
+      </tr>
+      </table>";
   }
 }
 
@@ -977,28 +1032,32 @@ function html_select_company($comp_q, $title, $url="") {
     $jsfunc = "check_get_id(this)";
   }
 
-  echo "<CENTER>
-    <FORM METHOD=GET NAME=form_comp
-          onSubmit=\"if ($jsfunc) return true; else return false;\"
-          ACTION=\"\">";
-
-  echo " $title
-    <P><font size=2 face=courier>
-    <SELECT name=\"param_company\" size=10 style=\"font-family:fixed,courier\">";
+  // Company Select
+  $sel_company = "<font size=2 face=courier>
+    <select name=param_company size=10 style=\"font-family:fixed,courier\">";
   while($comp_q->next_record()) {
     $id = $comp_q->f("company_id");
     $name = $comp_q->f("company_name");
     $name = str_pad($name, 40, ".");
     $town = $comp_q->f("company_town");
-    echo "\n<OPTION value=\"$id\">$name | $town</OPTION>";
+    $sel_company .= "\n<option value=\"$id\">$name | $town</option>";
   }
+  $sel_company .= "</select></font>";
 
-  echo "</SELECT></font>
-    <P>
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
-    <INPUT TYPE=submit value=\"$l_select_company\">
-    </FORM>
-    </CENTER>";
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<center>
+    <form method=get name=form_comp
+          onSubmit=\"if ($jsfunc) return true; else return false;\"
+          action=\"\">
+    $title
+    <p>
+    $sel_company
+    <p>
+    <input type=\"hidden\" name=\"action\" value=\"new\">
+    <input type=submit value=\"$l_select_company\">
+    </form>
+    </center>";
 }
 
 

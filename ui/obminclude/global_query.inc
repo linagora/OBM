@@ -212,7 +212,7 @@ function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
 //   - $option   : preference name
 //   - $value    : new preference value
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_set_options_user($user_id, $option, $value) {
+function run_query_set_user_pref($user_id, $option, $value) {
   global $cdg_sql;
 
   $query = "update UserObmPref
@@ -229,7 +229,7 @@ function run_query_set_options_user($user_id, $option, $value) {
 /////////////////////////////////////////////////////////////////////////////
 // Return all the preferences of the specified user
 /////////////////////////////////////////////////////////////////////////////
-function run_query_get_all_options_user($p_user_id) {
+function run_query_get_user_prefs($p_user_id) {
   global $cdg_sql;
 
   $query = "select * from UserObmPref where userobmpref_user_id='$p_user_id'";
@@ -245,7 +245,7 @@ function run_query_get_all_options_user($p_user_id) {
 /////////////////////////////////////////////////////////////////////////////
 // Return all the global preferences
 /////////////////////////////////////////////////////////////////////////////
-function run_query_get_all__global_options() {
+function run_query_get_global_prefs() {
   global $cdg_sql;
 
   $query = "select * from GlobalPref";
@@ -262,7 +262,7 @@ function run_query_get_all__global_options() {
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_global_prefs() {
   global $sess;
-  $obm_q_name_var = run_query_get_all__global_options();
+  $obm_q_name_var = run_query_get_global_prefs();
   while ($obm_q_name_var->next_record()) {
     $tab[0]=$obm_q_name_var->f("globalpref_option");
     $tab[1]=$obm_q_name_var->f("globalpref_value");
@@ -283,7 +283,7 @@ function session_load_global_prefs() {
 function session_load_user_prefs() {
   global $sess, $auth;
 
-  $obm_q_name_var = run_query_get_all_options_user($auth->auth["uid"]);
+  $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
   while ($obm_q_name_var->next_record()) {
     $tab[0]=$obm_q_name_var->f("userobmpref_option");
     $tab[1]=$obm_q_name_var->f("userobmpref_value");

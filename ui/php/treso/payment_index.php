@@ -27,7 +27,7 @@ if ( ($param_payment == $last_payment) && (strcmp($action,"delete")==0) ) {
   $last_payment=$last_payment_default;
 } elseif  ( ($param_payment > 0) && ($last_payment != $param_payment) ) {
   $last_payment=$param_payment;
-  run_query_set_options_user($auth->auth["uid"],"last_payment",$param_payment);
+  run_query_set_user_pref($auth->auth["uid"],"last_payment",$param_payment);
   $last_payment_name = run_query_global_payment_label($last_payment);
 }
 

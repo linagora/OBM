@@ -28,7 +28,7 @@ if ( ($param_account == $last_account) && (strcmp($action,"delete")==0) ) {
   $last_account=$last_account_default;
 } elseif  ( ($param_account > 0) && ($last_account != $param_account) ) {
     $last_account=$param_account;
-    run_query_set_options_user($auth->auth["uid"],"last_account",$param_account);
+    run_query_set_user_pref($auth->auth["uid"],"last_account",$param_account);
     $last_account_name = run_query_global_account_label($last_account);
 
 }

@@ -64,7 +64,7 @@ if ( ($param_deal == $last_deal) && (strcmp($action,"delete")==0) ) {
   $last_deal=$last_deal_default;
 } elseif  ( ($param_deal > 0) && ($last_deal != $param_deal) ) {
   $last_deal=$param_deal;
-  run_query_set_options_user($uid,"last_deal",$param_deal);
+  run_query_set_user_pref($uid,"last_deal",$param_deal);
   $last_deal_name = run_query_global_deal_label($last_deal);
   //$sess->register("last_deal");
 }

@@ -9,7 +9,7 @@
 
 <H1>OBM-PREFERENCES-HOWTO</H1>
 <I>Comment utiliser les preferences utilisateur </I><BR>
-Version 0.4 - 2001-06-13<BR>
+Version 0.5 - 2002-08-27<BR>
 </CENTER>
 
 
@@ -27,7 +27,7 @@ Version 0.4 - 2001-06-13<BR>
 <td>userobmpref_option</td><td>varchar(50)</td><tD>nom de l'option</td> 
 </tr>
 <tr>
-<td>userobmpref_choice</td><td>varchar(50)</td><td>valeur de l'option</td>
+<td>userobmpref_value</td><td>varchar(50)</td><td>valeur de l'option</td>
 </tr>
 </table>
 <br><br>
@@ -63,19 +63,11 @@ Version 0.4 - 2001-06-13<BR>
 <tr>
 <td>last_deal</td><td>identifiant de la derniere affaire consultee</td><td>&nbsp;</td>
 </tr>
-<tr>
-<td>order_servicecomputer</td><td>nom du champ selon lequel la liste des services est triee (utilise seulement par le module "Computer")</td><td>&nbsp;</td>
-</tr>
-<tr>
-<td>order_contactslist</td><td>nom du champ selon lequel les contacts de la mailing list sont ordonnes (utilise seulement par le module "List")</td><td>&nbsp;</td>
-</tr>
 </table>
 
 <br>
 <p><b>Remarque 1 :</b> les variables de session correspondant aux preferences de l'utilisateur sont crées automatiquement lors de la connection a obm, et elles ont le meme nom que les options.<i>Ex: $set_theme correspond a l'option "set_theme"</i>.
 <p>
-
-<p><b>Remarque 2 :</b> les options "order_contactslist" et "order_servicecomputer" sont utilisees par les modules "List" et "Computer" pour memoriser le nom du champ selon lequel on trie les listes. La methode n'est desormais plus la meme pour changer l'ordre des listes : ces options ne sont donc conservees que dans un souci de compatibilite.<p>
 
 <br>
 
@@ -88,7 +80,7 @@ Version 0.4 - 2001-06-13<BR>
 <LI>L'integrer au profil par default insere dans UserObmPref a la creation d'un nouvel utilisateur (fonction <i>run_query_default_preferences_insert($user_id)</i> dans <b>/user/user_query.inc</b>).<br>
 Pas besoin de prevoir sa suppression puisque a la disparition d'un utilisateur, on efface tous les tuples le concernant dans UserObmPref.
 <br><br>
-<LI>Si cette option est parametrable par l'utilisateur (comme la langue, le theme ...) il faut prevoir son formulaire de modification dans le module "Settings". La mise a jour en base de donnees se fait par le biais de la fonction <i>run_query_set_options_user($auth, $userobmpref_option,$new_value)</i> de <b>obminclude/query_global.inc</b>.(remarque : si on est dans "Settings" la mise a jour se fait dans setting_index.php).
+<LI>Si cette option est parametrable par l'utilisateur (comme la langue, le theme ...) il faut prevoir son formulaire de modification dans le module "Settings". La mise a jour en base de donnees se fait par le biais de la fonction <i>run_query_set_user_pref($auth, $userobmpref_option,$new_value)</i> de <b>obminclude/query_global.inc</b>.(remarque : si on est dans "Settings" la mise a jour se fait dans setting_index.php).
 
 </UL>
 

@@ -37,17 +37,17 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
                  contact_homephone like '$phone%' or
                  contact_mobilephone like '$phone%') and";
   }
-  // If a company indication has been specified, get it 
-  if ($company != "") {
-    $query .= " company_name like ' $company%' and";
+  // If a company name indication has been specified (without id) get it 
+  if (($company != "") && ($company_id == "")) {
+    $query .= " company_name like '$company%' and";
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
-    $query .= " company_id =" . $company_id . " and";
+    $query .= " company_id='$company_id' and";
   }
 
   // only the one which are allowed (ie. publics )
-  $query .= " (contact_visibility=0 or contact_usercreate=".$auth->auth["uid"].") and ";
+  $query .= " (contact_visibility='0' or contact_usercreate='".$auth->auth["uid"]."') and ";
   
   // join
   $query .= " contact_company_id=company_id";

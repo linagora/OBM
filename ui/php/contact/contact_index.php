@@ -52,7 +52,7 @@ if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
   $last_contact = $last_contact_default;
 } else if ( ($param_contact > 0) && ($last_contact != $param_contact) ) {
     $last_contact = $param_contact;
-    run_query_set_options_user($auth->auth["uid"],"last_contact",$param_contact);
+    run_query_set_user_pref($auth->auth["uid"],"last_contact",$param_contact);
     $last_contact_name = run_query_global_contact_name($last_contact);
    //$sess->register("last_contact");  
 }

@@ -22,12 +22,12 @@ $uid = $auth->auth["uid"];
 if ($param_lang != "") {
   $set_lang=$param_lang;
   $sess->register("set_lang");
-  run_query_set_options_user($uid, "set_lang", $set_lang, 1);
+  run_query_set_user_pref($uid, "set_lang", $set_lang, 1);
 }
 if ($param_theme != "") {
   $set_theme=$param_theme;
   $sess->register("set_theme");
-  run_query_set_options_user($uid, "set_theme", $set_theme, 1);
+  run_query_set_user_pref($uid, "set_theme", $set_theme, 1);
 }
 
 // Validate user preferences
@@ -37,7 +37,7 @@ if ($form_user_pref) {
   $param_debug = $param_debug_id | $param_debug_param | $param_debug_sql;
   $set_debug=$param_debug;
   $sess->register("set_debug");
-  run_query_set_options_user($uid, "set_debug", $set_debug, 1);
+  run_query_set_user_pref($uid, "set_debug", $set_debug, 1);
 
   if ($param_display == "yes") {
     $set_display = "yes";
@@ -45,12 +45,12 @@ if ($form_user_pref) {
     $set_display = "no";
   }
   $sess->register("set_display");
-  run_query_set_options_user($uid, "set_display", $set_display, 1);
+  run_query_set_user_pref($uid, "set_display", $set_display, 1);
 
   if ($param_rows != "") {
     $set_rows=$param_rows;
     $sess->register("set_rows");
-    run_query_set_options_user($uid, "set_rows", $set_rows, 1);
+    run_query_set_user_pref($uid, "set_rows", $set_rows, 1);
   }
 }
 page_close();

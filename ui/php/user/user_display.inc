@@ -331,7 +331,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <FORM NAME=form_back METHOD=POST
     ACTION=\"" .$sess->url("user_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=new>
-    <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
+    <INPUT TYPE=hidden NAME=tf_login VALUE=\"$login\">
     <INPUT TYPE=hidden NAME=tf_passwd VALUE=\"$passwd\">
     <INPUT TYPE=hidden NAME=sel_perms VALUE=\"$perms\">
     <INPUT TYPE=hidden NAME=tf_lastname VALUE=\"$lname\">
