@@ -19,7 +19,7 @@ $l_sold = "Vendu";
 $l_allotted = "Attribué";
 $l_projected = "Prévu";
 $l_used = "Utilisé";
-$l_missing = "Manquant";
+$l_missing = "Estimé restant";
 $l_diff = "Avance/Retard";
 
 $l_allosold = "Attribution du temps vendu";
@@ -52,9 +52,9 @@ $l_interninfos = "Projet interne";
 $l_advanceinfos = "Avancement du projet";
 $l_tasksinfos = "Tâches du projet";
 $l_membersinfos = "Participants au projet";
-$l_progressinfos = "Détail de l'avancement : les valeurs données sont<br>(temps utilisé / temps manquant / temps total prévu)";
+$l_progressinfos = "Détail de l'avancement : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
-$l_advupdateinfos = "Renseignez le temps de travail (en jours) manquant aux participants pour terminer une tâche";
+$l_advupdateinfos = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
 
 // Actions
 $l_insert = "Créer le projet";
@@ -68,11 +68,11 @@ $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > p
 $l_new_projects = "Liste des projets non initialisés";
 $l_found = "projet(s) trouvés.";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
-$l_no_tasks = "Il n'y a pas encore de tâches définies";
-$l_no_members = "Il n'y a pas de renseignements sur les participants au projet";
-$l_no_membertime = "Les personnes qui participent à ce projet n'ont pas encore été affecté à une tâche";
-$l_tasksdef = "les tâches suivantes on été définies";
-$l_membersdef = "Les personnes suivantes participent à ce projet mais n'ont pas encore été affecté à une tâche";
+$l_no_tasks = "Pas de tâches";
+$l_no_members = "Pas de participants";
+$l_no_membertime = "Participants au projet";
+$l_tasksdef = "Tâches définies";
+$l_membersdef = "Participants au projet";
 $l_delete_ok = "----";
 $l_delete_error = "----";
 $l_status_error = "Ce n'est pas un projet valide";

@@ -643,9 +643,13 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     }
   }
 
+  $has_tasks = ($tasks_q != 0) && ($tasks_q->num_rows() != 0);
+  $has_members = ($members_q != 0) && ($members_q->num_rows() != 0);
+
   // we don't have informations about time allocation
-  if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
-    
+  //  if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
+    if (!($has_tasks) or !($has_members)) {
+
     $action = "consultnoadv";
     $tab_style = "class=\"detail\"";
 
@@ -658,67 +662,67 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
        <td class=\"detailText\" align=\"right\">0 %</td>
       </tr>";    
 
-    // we display the task list
-    if (($tasks_q != 0) && ($tasks_q->num_rows() != 0)) { 
-      
-      $dis_member .= "
+      // we display the task list
+      if ($has_tasks) { 
+
+	$dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_tasksdef :</td>
        </tr>";
 
-      while ($tasks_q->next_record()) {
-	$tsk_name = $tasks_q->f("projecttask_label");
+	while ($tasks_q->next_record()) {
+	  $tsk_name = $tasks_q->f("projecttask_label");
 
-	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
+	  $img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
 
-	$dis_member .= "
+	  $dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
         <td class=\"detailText\">$img $tsk_name</td>
        </tr>";
-      }
+	}
+      
+      } else {
+	$action = "consultnoproj";
 
-    } else {
-      $action = "consultnoproj";
-
-      $dis_member .= "
+	$dis_member .= "
         <tr>
          <td class=\"detailLabel\" colspan=\"2\">$l_no_tasks</td>
         </tr>";
-    }
+      }
     
-   $dis_member .= "
+      $dis_member .= "
      <tr>
       <td>&nbsp;</td>
      <tr>";
 
-   if (($members_q != 0) && ($members_q->num_rows() != 0)){
+      if ($has_members){
      
-     $dis_member .= "
+	$dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_membersdef :</td>
        </tr>";
 
-      while (list($key,$val) = each($array_mem)) {
-	$mem_name = $val["firstname"] ." ". $val["name"];
+	while (list($key,$val) = each($array_mem)) {
+	  $mem_name = $val["firstname"] ." ". $val["name"];
 
-	$dis_member .= "
+	  $dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
         <td class=\"detailText\">- $mem_name</td>
        </tr>";
-      }
+	}
 
-    } else {
-      $action = "consultnoproj";
+      } else {
+	$action = "consultnoproj";
       
-      $dis_member .= "
+	$dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_no_members</td>
        </tr>";
-    }
+      }
 
-  // Display the detailled advance array
+    // Display the detailled advance array
   } else {
     
     $allotted = 0;
@@ -879,10 +883,16 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     $tm_proj = $timetot["proj"];
     $tm_miss = $timetot["miss"];
     $tm_used = $timetot["used"];
+
+    if (!(isset($tm_miss))) $tm_miss = 0;
+    if (!(isset($tm_proj))) $tm_proj = 0;
+
     $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
     $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     $dis_member .= "</tr>\n";
 
+
+    // ratios
     $ratio_allosold = intval(($allotted/$soldtime)*100);
     $ratio_usedsold = intval(($usedtime/$soldtime)*100);
 
@@ -1076,6 +1086,8 @@ function html_project_member_form($members_q, $project) {
 
   if (($members_q != 0) && ($members_q->num_rows() != 0)) {
 
+    $class = "projectMemberlist";
+
     while ($members_q->next_record()) {
 
       $m_id = $members_q->f("member_id");
@@ -1097,9 +1109,9 @@ function html_project_member_form($members_q, $project) {
       
       $dis_member .= "
         <tr>
-         <td align=\"right\" width=\"5%\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>
-         <td class=\"detailText\" colspan=\"2\">$m_name</td>
-         <td align=\"right\">$rd_manager</td>
+         <td class=\"projectMember\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>
+         <td class=\"projectMember\">$m_name</td>
+         <td class=\"projectMemberrd\">$rd_manager</td>
         </tr>";
     }
 
@@ -1114,6 +1126,8 @@ function html_project_member_form($members_q, $project) {
     $span = 3;
 
   } else {
+
+    $class = "detail";
 
     $dis_member  = "
       <tr>
@@ -1133,7 +1147,7 @@ function html_project_member_form($members_q, $project) {
 
     <div class=\"detailHead\">$l_membersinfos</div>
 
-    <table class=\"detail\">
+    <table class=\"$class\">
        $dis_member
     </table>
 

@@ -63,8 +63,8 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
 
     if ($OD->data_set->f("test_status") != 0) {
       $res["popup"] = true;
-      $res["popup_width"] = 970;
-      $res["popup_height"] = 270;
+      $res["popup_width"] = 700;
+      $res["popup_height"] = 210;
       $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;wbegin=".$time["date"];
       $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\" alt=\"\" />";
     } else {
@@ -1051,7 +1051,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     while($project_q->next_record()) {
       $proj_tt  = $project_q->f("deal_tasktype_id");
       $proj_id = $project_q->f("deal_id");
-    
+
       $company = $project_q->f("company_name");
 
       if ($company == "") $company = $l_intern;
@@ -1119,7 +1119,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $type_prec = -1;
   $sel_tt = "<select name=sel_tasktype ";
   $sel_tt .= "  onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,";
-  $sel_tt .= "  this.form.sel_projecttask)\">";
+  $sel_tt .= "             this.form.sel_projecttask, -1) \">";
   $sel_tt .= "<option value=\"0\">$l_none</option>";
   while($taskt_q->next_record()) {
     //put menu titles
@@ -1136,14 +1136,54 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_tt .= "</select>";
 
   // Project select construction
-  $sel_proj = "<select name=sel_project onchange=\"fill_projecttask(this.form.sel_projecttask, this.form.sel_project.value)\">";
-  $sel_proj .= "<option value=\"0\">$l_none</option>";
-  $sel_proj .= "</select>";
+
+  $dis_deal_list = "<option value=\"0\">$l_none</option>\n";
+  $arr = Array();
+
+  // we put the elements in an array to sort them (they are sorted by tasktype)
+  $project_q->seek(0);
+  if ($projecttask_q->num_rows() != 0) {
+    while($project_q->next_record()) {
+
+      $proj_id = $project_q->f("deal_id");
+      $company = $project_q->f("company_name");
+      $proj_name = addslashes($project_q->f("deal_label"));
+
+      if ($company == "") $company = $l_intern;
+
+      $company = (strlen($company) > 20) ? substr($company,0,20)."..." : $company;
+      $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
+      $proj_label = "$company -- ". $proj_name;
+
+      array_push($arr, Array($proj_label, $proj_id));
+    }
+  }
+
+  // we sort the array
+  rsort($arr);
+
+  // we build the list from the array
+  while (count($arr) != 0) {
+    $tab_proj = array_pop($arr);
+    $proj_id = $tab_proj[1];
+    $proj_label = $tab_proj[0];
+
+    $dis_deal_list .= "<option value=\"$proj_id\">$proj_label</option>\n";
+  }
+
+  $sel_proj = "
+    <select name=sel_project
+            onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
+                       fill_project(this.form.sel_project, this.form.sel_tasktype.value,
+                                    this.form.sel_projecttask, this.form.sel_project.value);\">    
+      $dis_deal_list
+    </select>";
 
   // ProjectTask select construction
-  $sel_projtask = "<select name=sel_projecttask>";
-  $sel_projtask .= "<option value=\"0\">$l_none</option>";
-  $sel_projtask .= "</select>";
+  $sel_projtask = "
+    <select name=sel_projecttask>
+    <option value=\"0\">$l_none</option>
+    </select>";
 
   // Project Label
   if ($action == "detailupdate")

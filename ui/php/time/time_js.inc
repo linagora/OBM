@@ -110,11 +110,34 @@ function check_sel_tasktype(form) {
 // }
 
 /////////////////////////////////////
+// tasklist auto-selection         //
+/////////////////////////////////////
+
+function fill_tasktype(sel_tt, deal_id) {
+  var i, j, k;
+  var tt;
+
+  for (i = 0; i < project.length; i++) {
+    for (j = 1; j < project[i].length; j++) {
+      if (project[i][j][1] == deal_id) {
+        tt = project[i][0];
+      }
+    }
+  }
+
+  for (k=0; k<(sel_tt.options.length); k++) {
+    if (sel_tt.options[k].value == tt)
+      sel_tt.options[k].selected=true;
+  }
+
+}
+
+/////////////////////////////////////
 // project dynamic list generation //
 /////////////////////////////////////
 
-function fill_project(sel_list, tasktype_id, next_sel) {
-  var i, j;
+function fill_project(sel_list, tasktype_id, next_sel, deal_id) {
+  var i, j, k;
   // location of selected tasktype in project array
   var tt_location = -1;
 
@@ -146,8 +169,15 @@ function fill_project(sel_list, tasktype_id, next_sel) {
   // select first item (prompt) for sub list
   //select_list.options[0].selected = true;
 
-  fill_projecttask(next_sel, sel_list.options[0].value);
-  
+  for (k=0; k<(sel_list.options.length); k++) {
+    if (sel_list.options[k].value == deal_id)
+      sel_list.options[k].selected = true;
+  }
+
+  if (deal_id > 0)
+    fill_projecttask(next_sel, deal_id);
+  else 
+    fill_projecttask(next_sel, sel_list.options[0].value);
 }
 
 /////////////////////////////////////////
@@ -187,6 +217,10 @@ function fill_projecttask(sel_list, deal_id) {
 	// select first item (prompt) for sub list
 	//select_list.options[0].selected = true;
 	}
+
+//////////////////////////////////////
+// projecttask selection for update //
+//////////////////////////////////////
 
 function select_default(sel_list, def_value) {
   for (i=0; i<(sel_list.options.length); i++) {

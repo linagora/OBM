@@ -69,19 +69,13 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 
   if ($manager != $c_all) {
     $query .= " and deal_id = Manager.projectuser_deal_id
-                and Manager.projectuser_user_id = $manager";
-    //     $query .= " and deal_id = projecttask_deal_id
-    //                 and projecttask_id = Manager.projectuser_projecttask_id
-    //                 and Manager.projectuser_manager = 1
-    //                 and Manager.projectuser_user_id = $manager";
+                and Manager.projectuser_user_id = $manager
+                and Manager.projectuser_manager = 1";
   }
 
   if ($member != $c_all) {
     $query .= " and deal_id = Member.projectuser_deal_id
                 and Member.projectuser_user_id = $member";
-    //     $query .= " and deal_id = projecttask_deal_id
-    //                 and projecttask_id = Member.projectuser_projecttask_id
-    //                 and Member.projectuser_user_id = $member";
   }
 
   // Order by clause
