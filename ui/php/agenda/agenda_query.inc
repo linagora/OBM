@@ -375,15 +375,19 @@ function run_query_insert_event_data($agenda) {
   preg_match ("/^(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})/",$agenda["date_begin"] , $repeat_array);        
   $stamp_repeat = mktime($repeat_array[4],$repeat_array[5],00,$repeat_array[2],$repeat_array[3],$repeat_array[1] );
   
-  if($repeat_end && $repeat_kind != "none") {
-    $repeat_end = $repeat_end;
+  preg_match ("/^(\d{4})(\d{2})(\d{2})/",$agenda["repeat_end"] , $repeat_array);        
+  $stamp_repeat = mktime(00,00,00,$repeat_array[2],$repeat_array[3],$repeat_array[1] );
+  
+  if($stamp_repeat && $repeat_kind != "none") {
+    $stamp_repeat = $stamp_repeat;
   }
   elseif($repeat_kind != "none") {
-    $repeat_end = strtotime("+1 year");
+    $stamp_repeat = strtotime("+1 year",date("Ymd"));
+    
   } 
   else{
-    $repeat_end = "";
-  }
+    $stamp_repeat = "";
+  } 
   
   $obm_db = new DB_OBM;
   $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
@@ -421,7 +425,7 @@ function run_query_insert_event_data($agenda) {
     '$repeat_kind',
     '1',
     '$repeat_days',
-    '".date("Y-m-d H:i",$repeat_end)."')";
+    '".date("Y-m-d H:i",$stamp_repeat)."')";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
 
