@@ -17,6 +17,19 @@
     <h2 align="left">News</h2>
 
     <ul class="detailList">
+
+      <li>
+        <div align="left"><b>2003-09-26</b> : version <b>0.7.1</b> released (fixes and enhancement)
+        <ol>
+          <li> CVS Export enhancement (delimiter in user preference, default to save with module.csv filename, export all pages...)
+	  <li> Document tree now viewed directly from database
+	  <li> Time optimizations and enhancement (project list refresh)
+	  <li> fixes in Company (deletion), Deal (User comments), Contract, User (deletion)
+        </ol>
+        </div>
+        <br />
+      </li>
+
       <li> 
         <div align="left"><b>2003-09-09</b> : version <b>0.7.0</b> released (major enhancement, functionnality update)</b> !
         <ol>

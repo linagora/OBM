@@ -528,7 +528,7 @@ class OBM_DISPLAY {
     $query = urlencode($this->data_set->obm_query);
     $query_pref = urlencode($this->display_pref->obm_query);
     $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref";
-    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
+    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=0&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
       <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"resultIndexIcon\" alt=\"$l_export\"/></a>

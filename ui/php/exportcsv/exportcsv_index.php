@@ -50,6 +50,8 @@ if (($action == "index") || ($action == "")) {
   if ($module != "") {
     require_once("$obminclude/lang/$set_lang/${module}.inc");
     require_once("$path/$module/${module}_display.inc");
+  } else {
+    $module = "obm";
   }
   
   display_debug_msg($query, $cdg_sql);
@@ -59,11 +61,21 @@ if (($action == "index") || ($action == "")) {
   display_debug_msg($query_pref, $cdg_sql);
   $pref_q = new DB_OBM;
   $pref_q->query($query_pref);
-  
+
+  // Set separator (if not set in setting => ;)
+  if (($set_csv_sep != $ccsvd_sc) && ($set_csv_sep != $ccsvd_tab)) {
+    $sep = ";";
+  } else if ($set_csv_sep == $ccsvd_tab) {
+    $sep = "\t";
+  } else {
+    $sep = $set_csv_sep;
+  }
+
   $export_d = new OBM_DISPLAY("DATA", $pref_q);
   $export_d->data_set = $obm_q;
   header("Content-Type: text/plain");
-  $export_d->dis_data_file($first_row, $nb_rows, ';');
+  header("Content-Disposition: attachment; filename=\"$module.csv\"");
+  $export_d->dis_data_file($first_row, $nb_rows, $sep);
 
 }
 

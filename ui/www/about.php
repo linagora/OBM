@@ -65,7 +65,7 @@
         <td>OBM <b>0.3, 0.4</b> : 3.0.5 - 3.0.16; 4.0.1 pl2 - 4.1.x
           <br />OBM <b>0.5.x</b> : 4.0.x - 4.3.x (PHP3 no more supported)
           <br />OBM <b>0.6.x</b> : 4.0.x - 4.3.x
-          <br />OBM <b>0.7.0</b> : 4.1.x - 4.3.x
+          <br />OBM <b>0.7.x</b> : 4.1.x - 4.3.x
         </td>
         <td>One or two &quot;;&quot; to delete with 4.0.x (for OBM 0.3)
           but that's all </td>

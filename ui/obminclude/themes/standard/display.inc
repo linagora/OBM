@@ -465,18 +465,18 @@ function display_last_visited($path="..") {
         <a href=\"$payment_url\">$payment_name</a></li>";
   }
 
-  if ($last_contract_name != "") {
-    $contract_url = url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract);
-    $contract_name = substr($last_contract_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$contract_url\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
-        <a href=\"$contract_url\">$contract_name</a></li>";
-  }
-
   if ($last_project_name != "") {
     $project_url = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=".$last_project);
     $project_name = substr($last_project_name,0,30);
     $block .= "<li class=\"lastList\"><a href=\"$project_url\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
         <a href=\"$project_url\">$project_name</a></li>";
+  }
+
+  if ($last_contract_name != "") {
+    $contract_url = url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract);
+    $contract_name = substr($last_contract_name,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$contract_url\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
+        <a href=\"$contract_url\">$contract_name</a></li>";
   }
 
   if ($last_incident_name != "") {

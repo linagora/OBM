@@ -51,6 +51,7 @@ if ( ($param_user == $last_user) && (strcmp($action,"delete")==0) ) {
   run_query_set_user_pref($uid, "last_user", $param_user);
   $last_user_name = run_query_global_user_name($last_user);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////

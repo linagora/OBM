@@ -234,9 +234,9 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   //-- Label
-  global $l_name, $l_subject, $l_email, $l_query, $l_nb_contact, $l_no_contact;
+  global $l_list, $l_name, $l_subject, $l_email, $l_query;
   global $display, $perm, $action;
-  global $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
+  global $l_nb_contact, $l_no_contact, $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -252,8 +252,10 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   run_query_update_num_rows($id, $query_nb);
 
   $display["detailInfo"] = display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
+  $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   $block = "
+    <div class=\"detailHead\">$l_list</div>
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>

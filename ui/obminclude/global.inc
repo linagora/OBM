@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.7.0";
+$obm_version = "0.7.1pre1";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -32,7 +32,7 @@ $set_weekstart_default = "monday"; //First day of the week, in english
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
-//Timemanager module CONSTANTS
+// Timemanager module CONSTANTS
 // In how many parts we can chop a day
 $c_day_fraction = 8;
 // How many days we want to fill for each week:
@@ -74,6 +74,10 @@ $ccal_1 = 1;  // 1 h
 $l_cal_4 = "1/4";  // 1/4 h
 $l_cal_2 = "1/2";  // 1/2 h
 $l_cal_1 = "1";    // 1 h
+
+// Export delimiter constants
+$ccsvd_sc = ";";   // Semi-colon
+$ccsvd_tab = "tab"; // Tab
 
 // Perms
 $perms_user = "user" ;

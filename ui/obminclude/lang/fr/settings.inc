@@ -20,6 +20,7 @@ $l_set_rows = "# lignes affichées par page";
 $l_set_date = "Format de date";
 $l_set_commentorder = "Affichage des commentaires";
 $l_set_cal_interval = "Intervalle du calendrier";
+$l_set_csv_sep = "Séparateur pour export CSV";
 $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les e-mail";
 
@@ -41,3 +42,6 @@ $l_me_both = "texte+icône";
 
 $l_co_chro = "Chronologique";
 $l_co_rev = "Inverse";
+
+$l_csvd_sc = ";";
+$l_csvd_tab = "tab";

@@ -39,6 +39,12 @@ if ($form_user_pref) {
   $sess->register("set_debug");
   run_query_set_user_pref($uid, "set_debug", $set_debug);
 
+  if ($param_menu != "") {
+    $set_menu = $param_menu;
+    $sess->register("set_menu");
+    run_query_set_user_pref($uid, "set_menu", $set_menu);
+  }
+
   if ($param_display == "yes") {
     $set_display = "yes";
   } else {
@@ -48,23 +54,9 @@ if ($form_user_pref) {
   run_query_set_user_pref($uid, "set_display", $set_display);
 
   if ($param_rows != "") {
-    $set_rows=$param_rows;
+    $set_rows = $param_rows;
     $sess->register("set_rows");
     run_query_set_user_pref($uid, "set_rows", $set_rows);
-  }
-
-  if ($param_mail == "yes") {
-    $set_mail = "yes";
-  } else {
-    $set_mail = "no";
-  }
-  $sess->register("set_mail");
-  run_query_set_user_pref($uid, "set_mail", $set_mail);
-
-  if ($param_menu != "") {
-    $set_menu = $param_menu;
-    $sess->register("set_menu");
-    run_query_set_user_pref($uid, "set_menu", $set_menu);
   }
 
   if ($param_date != "") {
@@ -79,11 +71,26 @@ if ($form_user_pref) {
     run_query_set_user_pref($uid, "set_commentorder", $set_commentorder);
   }
 
+  if ($param_mail == "yes") {
+    $set_mail = "yes";
+  } else {
+    $set_mail = "no";
+  }
+  $sess->register("set_mail");
+  run_query_set_user_pref($uid, "set_mail", $set_mail);
+
   if ($param_cal_interval != "") {
     $set_cal_interval = $param_cal_interval;
     $sess->register("set_cal_interval");
     run_query_set_user_pref($uid, "set_cal_interval", $set_cal_interval, 1);
   }
+
+  if ($param_csv_sep != "") {
+    $set_csv_sep = $param_csv_sep;
+    $sess->register("set_csv_sep");
+    run_query_set_user_pref($uid, "set_csv_sep", $set_csv_sep);
+  }
+
 }
 page_close();
 
@@ -110,6 +117,10 @@ if ($set_commentorder == $cco_rev) $co_rev = "checked";
 if ($set_cal_interval == $ccal_4) $cal_4 = "checked";
 if ($set_cal_interval == $ccal_2) $cal_2 = "checked";
 if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
+
+if ($set_csv_sep == $ccsvd_sc) $csvd_sc = "checked";
+if ($set_csv_sep == $ccsvd_tab) $csvd_tab = "checked";
+
 
 if ($action == "") $action = "index";
 get_settings_actions();
@@ -165,7 +176,7 @@ $lang_dir->close();
 ///////////////////////////////////////////////////////////////////////////////
 $theme_dir = dir("$path/../$obminclude/themes");
 $dis_theme = "<table class=\"admin\">";
-while ($entry=$theme_dir->read()) {
+while ($entry = $theme_dir->read()) {
   $dotcase = strcmp($entry, "."); 
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
        && strcmp($entry,"images") && is_dir($theme_dir->path."/".$entry)) {
@@ -239,6 +250,12 @@ $display["detail"] .= " /></td>
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_4\" $cal_4 />$l_cal_4
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_2\" $cal_2 />$l_cal_2
       <input type=\"radio\" name=\"param_cal_interval\" value=\"$ccal_1\" $cal_1 />$l_cal_1
+    </td>
+  </tr><tr>
+    <td class=\"adminLabel\">$l_set_csv_sep</td>
+    <td class=\"adminText\">
+      <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_sc\" $csvd_sc />$l_csvd_sc
+      <input type=\"radio\" name=\"param_csv_sep\" value=\"$ccsvd_tab\" $csvd_tab />$l_csvd_tab
     </td>
   </tr>
   $dis_debug

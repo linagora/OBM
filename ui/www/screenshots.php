@@ -39,7 +39,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
   <table class="picture">
     <tr> 
       <td><a href="#4"><img src="images/vignettes/Societe01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_societe01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        Search an company</td>
+        Search a company</td>
       <td><a href="#4"><img src="images/vignettes/Societe02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_societe02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
        Company view</td>
       <td></td>
@@ -71,7 +71,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
       <tr> 
         
       <td><a href="#2"><img src="images/vignettes/agenda01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-          Annual view</td>
+          Year view</td>
         
       <td><a href="#2"><img src="images/vignettes/agenda02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
           Month view</td>

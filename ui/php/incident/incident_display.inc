@@ -287,97 +287,90 @@ function html_incident_consult($inc_q,$con_q) {
 
   $block = "
   <div class=\"detailHead\">$l_company</div>
-   <table class=\"detail\">
-    <tr>
-     <td class=\"detailLabel\">
-      $comp_name
-       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-   <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-  </td>
-  <td class=\"detailText\">
-   $comp_ad1<br />
-   $comp_zip $comp_town
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_client_manager 1
-  </td>
-  <td class=\"detailText\">
-   $dis_con1
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_client_manager 2
-  </td>
-  <td class=\"detailText\">
-   $dis_con2
-  </td>
- </tr>
- </table>
- <div class=\"detailHead\">$l_contract</div>
- <table class=\"detail\"> 
+  <table class=\"detail\">
   <tr>
-  <td class=\"detailLabel\">
-   <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
-   </a> 
-   $con_label
-   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
-   <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
-  </td>
-  <td class=\"detailText\">
-   $l_num : $con_num <br />
-   $l_from $con_debut $l_to $con_exp
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_manager 1
-  </td>
-  <td class=\"detailText\">$dis_market</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_manager 2</td>
-  <td class=\"detailText\">$dis_tech</td>
- </tr>
- </table>
+    <td class=\"detailLabel\">$l_company
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+      <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+    </td>
+    <td class=\"detailText\">$comp_name
+      <br />$comp_ad1
+      <br />$comp_zip $comp_town
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_client_manager 1</td>
+    <td class=\"detailText\">$dis_con1</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_client_manager 2</td>
+    <td class=\"detailText\">$dis_con2</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_contract</div>
+  <table class=\"detail\"> 
+  <tr>
+    <td class=\"detailLabel\">
+      <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"></a> 
+      $con_label
+      <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
+      <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
+    </td>
+    <td class=\"detailText\">
+      $l_num : $con_num <br />
+      $l_from $con_debut $l_to $con_exp
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_manager 1</td>
+    <td class=\"detailText\">$dis_market</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_manager 2</td>
+    <td class=\"detailText\">$dis_tech</td>
+  </tr>
+  </table>
+
   <div class=\"detailHead\">$l_incident</div>
- <table class=\"detail\"> 
- <tr>
-  <td class=\"detailLabel\">$l_label</td>
-  <td class=\"detailText\">$label</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_logger</td>
-  <td class=\"detailText\">$logger</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_owner</td>
-  <td class=\"detailText\">$owner</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_priority</td>
-  <td class=\"detailText\">$priority</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_status</td>
-  <td class=\"detailText\">$status</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_date</td>
-  <td class=\"detailText\">$date</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_duration</td>
-  <td class=\"detailText\">$inc_dur</td>
- </tr>
- $dis_lab_archive
- </table>
+  <table class=\"detail\"> 
+  <tr>
+    <td class=\"detailLabel\">$l_label</td>
+    <td class=\"detailText\">$label</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_logger</td>
+    <td class=\"detailText\">$logger</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_owner</td>
+    <td class=\"detailText\">$owner</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_priority</td>
+    <td class=\"detailText\">$priority</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_status</td>
+    <td class=\"detailText\">$status</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_date</td>
+    <td class=\"detailText\">$date</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_duration</td>
+    <td class=\"detailText\">$inc_dur</td>
+  </tr>
+  $dis_lab_archive
+  </table>
+ 
   <div class=\"detailHead\">$l_description</div>
- <table class=\"detail\"> 
- <tr>
-  <td colspan=\"2\" class=\"detailText\">$inc_desc</td>
- </tr>
- </table>
+  <table class=\"detail\"> 
+  <tr>
+    <td colspan=\"2\" class=\"detailText\">$inc_desc</td>
+  </tr>
+  </table>
+
   <div class=\"detailHead\">$l_solution</div>
- <table class=\"detail\"> 
- <tr>
-  <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
- </tr>
-</table>
+  <table class=\"detail\"> 
+  <tr>
+    <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
+  </tr>
+  </table>
 ";
-return $block;
+
+  return $block;
 }
 
 

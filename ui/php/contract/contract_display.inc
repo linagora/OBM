@@ -300,17 +300,19 @@ function html_contract_consult($contract_q) {
   // --- HTML Template --------------------------------------------------------
 
   $display["link"] = html_contract_links($id, $deal_id, $deal_label);
+  $display["title"] = "<div class=\"title\">$l_contract : $label</div>";
 
   $block = "
   <div class=\"detailHead\">$l_company</div>
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$comp_name
+      <td class=\"detailLabel\">$l_company
         <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
       </td>
-      <td class=\"detailText\">$comp_address1
+      <td class=\"detailText\">$comp_name
+        <br />$comp_address1
         <br />$comp_zip $comp_town
       </td>
     </tr><tr>
@@ -325,11 +327,6 @@ function html_contract_consult($contract_q) {
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
       </td>
       <td class=\"detailText\">$con2</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_deal</td>
-      <td class=\"detailText\">
-        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
-      </td>
     </tr>
     </table>
 
@@ -972,7 +969,3 @@ function html_select_contract($con_q, $title, $url="") {
 }
  
 </script>
-
-
-
-

@@ -53,6 +53,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Calendar Interval
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_cal_interval','2');
 
+-- CSV Export separator
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_csv_sep',';');
+
 -- Debug Level
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_debug','0');
 

@@ -173,9 +173,9 @@ function run_query_detail($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Contact Insertion query execution                                         //
 // Parameters:
-//   - $contact[] : Entry's values
-//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
-//                : ctry, func, phone, hphone, mphone, fax, email, com, vis
+//   - $contact[]: Entry's values
+//     keys used : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
+//               : ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($contact) {
   global $auth, $cdg_sql;
@@ -273,8 +273,8 @@ function run_query_insert($contact) {
 // Contact update query execution                                            //
 // Parameters:
 //   - $contact[] : Entry's values
-//     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town,
-//                :  cdx, ctry, func, phone, hphone, mphone, fax, email, com, vis
+//     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town
+//                : cdx, ctry, func, phone, hphone, mphone, fax, email, com,vis
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($contact) {
   global $auth, $cdg_sql;
@@ -360,6 +360,27 @@ function run_query_contact_deal_links($p_id) {
             from Deal, Contact
             where deal_contact1_id='$p_id'
               or deal_contact2_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the contracts attached to the contact
+// Parameters:
+//   - $p_id : contact Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_contract_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select distinct contract_id, contract_label 
+            from Contract, Contact
+            where contract_contact1_id='$p_id'
+              or contract_contact2_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
 //     - File     : document.inc                                             //
-// 2003-08-21 Rande Mehdi                                               //
-//////////////////////////////////////////////////////////////////////////////
+// 2003-08-21 Rande Mehdi                                                    //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_author = "Auteur";
@@ -78,7 +80,7 @@ $l_cat2_update_error = "La modification de la categorie 2 a &eacute;chou&eacute;
 $l_delete_ok = "La suppression du document a été correctement effectuée.";
 $l_delete_error = "La suppression de la société a échoué !";
 $l_found = "document(s) trouvé(s)";
-$l_insert_ok = "L'insertion ddu document a été correctement effectuée.";
+$l_insert_ok = "L'insertion du document a été correctement effectuée.";
 $l_insert_error = "L'insertion du document a échoué !";
 $l_mime_checkdelete = "Vérifier ou supprimer le type mime"; 
 $l_mime_update = "Mettre à jour le type mime"; 

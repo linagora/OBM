@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.7.0 - 2003-09-06
+version 0.7.1 - 2003-09-26
 <p>
 </center>
 
@@ -21,18 +21,27 @@ To do<br>
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> Look at the display_record() implementation.
 <LI> how to detect doublons ?
-<LI> Pour les listes : listes dynamiques ? supprimer les listes dans export ? trier requete exports ?
+<LI> Pour les listes : supprimer les listes dans export ? trier requete exports ?
 </UL>
 
 
-2003-09-30 : version 0.7.1<br>
+2003-09-26 : version 0.7.1<br>
 
 <ul>
-<li> BUG#225 : Contact : Add a third address line to a contact (same as company)
-<li> BUG#224 : User : Error when deleting a user (Unknown column 'ProjectStat_userupdate)
-<li> BUG#221 : Incident : Deatin Info now displayed in detail view
-<li> BUG#219 : Time : Query optimization. Main pae now display quickly
+<li> BUG#233 : Company deletion: optimization and contracts links checked
+<li> BUG#231 : Company : Company panel now doesn't mix data and label styles
+<li> BUG#230 : CVS export on all pages now starts at first page (not current)
+<li> BUG#229 : CVS export now default to save file with a module.csv name
+<li> BUG#226 : Document links from Company and Contact
+<li> BUG#225 : Contact : Add a third address line to a contact
+<li> BUG#224 : User : User deletion doesn't produce an error (ProjectStats)
+<li> BUG#223 : Contract : cvs export corrected
+<li> BUG#222 : Deal : User names back in comment description (instead of id !)
+<li> BUG#221 : Incident : Detail Info now displayed in detail view
+<li> BUG#219 : Time : Query optimization. Main page now displays quickly
 <li> BUG#218 : Time : Project list now refreshed after task reset to ---
+<li> BUG#210 : Contact : links to contracts checked on contact deletion
+<li> BUG#198 : CSV export delimiter now in user preference (; or tab)
 <li> BUG#111 : New module Document (was in 0.7.0)
 </ul>
 

@@ -4,7 +4,7 @@
 //     - File     : todo.inc                                                 //
 // 2003-07-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_todo = "Todo";
@@ -24,6 +24,6 @@ $l_no_found = "Nothing to do";
 $l_no_deadline = "Not specified";
 
 $l_delete_confirm = "Confirm entry deletion";
-$l_j_fill_title "Fill the title";
+$l_j_fill_title = "Fill the title";
 
 </script>

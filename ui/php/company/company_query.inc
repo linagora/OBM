@@ -320,33 +320,6 @@ function run_query_active_company() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the deals attached to the company
-// Parameters:
-//   - $p_id : company Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_deal_links($p_id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select distinct deal_id,deal_label 
-            from Deal,Contact
-            where
-              deal_company_id='$p_id'
-              or
-              (contact_company_id='$p_id'
-                and (deal_contact1_id=contact_id 
-                  or deal_contact2_id=contact_id
-                  or deal_marketingmanager_id=contact_id
-                  or deal_technicalmanager_id=contact_id))";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return all the contacts attached to the company
 // Parameters:
 //   - $p_id : company Id
@@ -359,6 +332,46 @@ function run_query_company_contact_links($p_id) {
             from Contact
             where contact_company_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the deals attached to the company
+// Parameters:
+//   - $p_id : company Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_deal_links($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select distinct deal_id, deal_label
+    from Deal
+    where deal_company_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the contracts attached to the company
+// Parameters:
+//   - $p_id : company Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_contract_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select distinct contract_id, contract_label 
+            from Contract, Contact
+            where contract_company_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;

@@ -35,3 +35,11 @@ CREATE TABLE Todo (
 -- add missing lines
 --ALTER TABLE ProjectStat ADD projectstat_timeupdate timestamp(14) AFTER projectstat_date;
 --ALTER TABLE ProjectStat ADD projectstat_userupdate int(8) AFTER projectstat_usercreate;
+
+
+-------------------------------------------------------------------------------
+-- Preferences
+-------------------------------------------------------------------------------
+-- CSV Export separator
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_csv_sep',';');
+

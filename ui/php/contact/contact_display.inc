@@ -778,7 +778,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
-  global $l_link_deal, $l_link_deal_no, $l_link_list, $l_link_list_no;
+  global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
+  global $l_link_list, $l_link_list_no;
   global $path, $display;
 
   $delete_ok = true;
@@ -795,13 +796,34 @@ function dis_check_links($p_id) {
       $display_link_d .= "
       <tr>
         <td class=\"detailLabel\">
-          <a class=\"detail\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
+          <a class=\"detailLabel\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
           $dlabel</a>
         </td>
       </tr>";
     }
   } else {
     $display_link_d = "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>";
+  }
+
+  // Links from Contracts
+  $obm_q = run_query_contact_contract_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_link_c = "<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contract_id");
+      $clabel = $obm_q->f("contract_label");
+      $display_link_c .= "
+      <tr>
+        <td class=\"detailLabel\">
+          <a class=\"detailLabel\" href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid")."\">
+          $clabel</a>
+        </td>
+      </tr>";
+    }
+  } else {
+    $display_link_c = "<tr><td class=\"detailHead\">$l_link_contract_no</td></tr>";
   }
 
   // Links from lists
@@ -815,7 +837,7 @@ function dis_check_links($p_id) {
       $display_link_l .= "
         <tr>
           <td class=\"detailLabel\">
-            <a class=\"detail\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
+            <a class=\"detailLabel\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
             $lname</a>
           </td>
         </tr>";
@@ -834,6 +856,7 @@ function dis_check_links($p_id) {
 
   $block .= "<table class=\"detail\">
     $display_link_d
+    $display_link_c
     $display_link_l
     </table>";
 

@@ -645,6 +645,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
+  global $l_link_contract, $l_link_contract_no;
   global $path, $display;
 
   $delete_ok = true;
@@ -664,7 +665,7 @@ function dis_check_links($p_id) {
       $display_linkc .= "
       <tr>
         <td class=\"detailLabel\">
-        <a class=\"detail\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
         </td>
       </tr>";
     }
@@ -688,8 +689,8 @@ function dis_check_links($p_id) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $display_linkd .="<tr>
-        <td class=\"detailText\">
-        <a class=\"detail\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+        <td class=\"detailLabel\">
+        <a class=\"detailLabel\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
         </td>
       </tr>";
     }
@@ -698,6 +699,27 @@ function dis_check_links($p_id) {
       <tr>
         <td class=\"detailHead\">$l_link_deal_no</td>
       </tr>";
+  }
+
+  // Links from Contracts
+  $obm_q = run_query_company_contract_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_link_cr = "<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contract_id");
+      $clabel = $obm_q->f("contract_label");
+      $display_link_cr .= "
+      <tr>
+        <td class=\"detailLabel\">
+          <a class=\"detailLabel\" href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid")."\">
+          $clabel</a>
+        </td>
+      </tr>";
+    }
+  } else {
+    $display_link_cr = "<tr><td class=\"detailHead\">$l_link_contract_no</td></tr>";
   }
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
@@ -710,6 +732,7 @@ function dis_check_links($p_id) {
   $block .= "<table class=\"detail\">
    $display_linkc
    $display_linkd
+   $display_link_cr
    </table>";
 
   if ($delete_ok == true) {

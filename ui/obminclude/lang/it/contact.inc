@@ -45,8 +45,10 @@ $l_add = "Aggiungi i contatti";
 
 // Messages
 $l_check_samecontact = "Quasti contatti sembrano simili al nuovo  !";
-$l_link_deal = "Qusto contatto ha deals in corso";
-$l_link_deal_no = "Il contatto non ha ";
+$l_link_deal = "Questo contatto ha deals in corso";
+$l_link_deal_no = "Il contatto non ha impegni";
+$l_link_contract = "Questo contatto ha contratti in corso";
+$l_link_contract_no = "Il contatto non ha contratti";
 $l_link_list = "Il contatto è registrato in queste liste";
 $l_link_list_no = "Il Contatto non è registrato in nessuna lista";
 $l_cant_delete = "Il contatto non può essere eliminato!";

@@ -617,10 +617,10 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $set_theme,$ico_company, $ico_contact, $display;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
-  global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
+  global $l_company, $l_contact, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal;
-  global $l_invoices, $l_no_invoice, $l_see_archived_invoices, $incl_arch;
+  global $l_invoice, $l_no_invoice, $l_see_archived_invoices, $incl_arch;
   global $display, $path, $auth, $c_yes, $c_no;
   global $perms_user, $perms_editor, $perms_admin;
 
@@ -659,12 +659,15 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
   if ($usercreate == $auth->auth["uid"]) {   
-   $visibility = "<tr><td class=\"detailLabel\">$l_visibility</td>
-                 <td class=\"detailText\">$lvis</td>";
+   $visibility = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_visibility</td>
+      <td class=\"detailText\">$lvis</td>";
   }
 
   $inv_nb = $q_invoices->num_rows ();
   $display["link"] = html_deal_links($deal_q, $inv_nb);
+  $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
 
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
 
@@ -716,24 +719,24 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 
       <table class=\"detail\">
       <tr>
-        <td class=\"detailLabel\">$comp
+        <td class=\"detailLabel\">$l_company
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         </td>
-        <td class=\"detailText\">$ad1<br/>$zip $town</td>
+        <td class=\"detailText\">$comp<br />$ad1<br/>$zip $town</td>
       </tr><tr>
-        <td class=\"detailLabel\">$dis_con1
+        <td class=\"detailLabel\">$l_contact 1
         <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
-        <td class=\"detailText\">$phone_con1
+        <td class=\"detailText\">$dis_con1 - $phone_con1
         </td>
       </tr><tr>
-        <td class=\"detailLabel\">$dis_con2
+        <td class=\"detailLabel\">$l_contact 2
         <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
-        <td class=\"detailText\">$phone_con2
+        <td class=\"detailText\">$dis_con2 - $phone_con2
         </td>
       </tr>
       </table>
@@ -776,11 +779,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     </table>";
 
   // we display invoices list
-  if ($inv_nb == 0) {
-    $display["msg"] .= display_info_msg ($l_no_invoice);
-  } else {
-    $display["msg"] .= display_info_msg ($inv_nb." ".$l_invoice);
-
+  if ($inv_nb != 0) {
     $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
     
     $dis_invoice_list = new OBM_DISPLAY("DATA", $invoices_options, "deal");
@@ -1035,8 +1034,11 @@ function auto_set_hitrate(select, targetField, pos) {
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
-    $sel_usercomment .= "<option value=\"$cid\"";
-    if ($usercomment == $cid) $sel_usercomment .= " selected = \"selected\""; 
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
     $sel_usercomment .= ">$cname</option>\n";
   }
   $sel_usercomment .= "</select>";
@@ -1217,7 +1219,7 @@ function dis_check_links($p_id) {
       $display_linkc .= "
     <tr>
       <td class=\"detailLabel\">
-        <a class=\"detail\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
+        <a class=\"detailLabel\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
       </td>
     </tr>";
     }
