@@ -124,6 +124,13 @@ $l_header_admin_lang = "Langue";
 $l_header_admin_data = "Données";
 $l_header_admin_pref = "Préférences";
 $l_header_admin_code = "Code";
+$l_header_account = "Comptes";
+$l_header_invoice = "Factures";
+$l_header_payment = "Paiements";
+$l_header_time = "Gestion des temps";
+$l_header_project = "Projets";
+$l_header_agenda = "Agenda";
+$l_header_document = "Documents";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";

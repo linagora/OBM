@@ -80,6 +80,7 @@ $l_pri_delete_error = "La suppression de la priorité a échoué !";
 $l_pri_can_delete = "La priorité peut être supprimée !";
 $l_pri_cant_delete = "La priorité ne peut être supprimée !";
 $l_pri_link_incident = "La priorité est référencée par ces incidents";
+$l_pri_link_incident_no = "La priorité n'est pas référencée";
 
 $l_sta_insert_ok = "L'état a été inséré avec succès.";
 $l_sta_insert_error = "L'insertion de l'état a échoué !";
@@ -90,6 +91,7 @@ $l_sta_delete_error = "La suppression de l'état a échoué !";
 $l_sta_can_delete = "L'état peut être supprimé !";
 $l_sta_cant_delete = "L'état ne peut être supprimé !";
 $l_sta_link_incident = "L'état est référencé par ces incidents";
+$l_sta_link_incident_no = "L'état n'est pas référencé";
 
 // For the display preferences modification screen 
 $l_incident_display = "Options d'affichage des Incidents";

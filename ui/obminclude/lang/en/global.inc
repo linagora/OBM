@@ -116,6 +116,7 @@ $l_header_account = "Accounts";
 $l_header_invoice = "Invoices";
 $l_header_payment = "Payments";
 $l_header_agenda = "Calendar";
+$l_header_document = "Documents";
 
 //TIME
 $l_header_time = "Time management";

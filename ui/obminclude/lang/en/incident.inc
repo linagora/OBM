@@ -81,6 +81,7 @@ $l_pri_delete_ok = "The priority has been deleted successfully.";
 $l_pri_can_delete = "The Priority can be deleted";
 $l_pri_cant_delete = "The Priority can't be deleted";
 $l_pri_link_incident = "The Priority is referenced by these incidents";
+$l_pri_link_incident_no = "The Priority isn't referenced";
 $l_sta_insert_ok = "The status has been inserted successfully.";
 $l_sta_insert_error = "The insertion of the status has failed !";
 $l_sta_update_ok = "The status has been updated successfully.";
@@ -90,7 +91,7 @@ $l_sta_delete_ok = "The status has been deleted successfully.";
 $l_sta_can_delete = "The Status can be deleted";
 $l_sta_cant_delete = "The Status can't be deleted";
 $l_sta_link_incident = "The Status is referenced by these incidents";
-
+$l_sta_link_incident_no = "The Status isn't referenced";
 // For the display preferences modification screen 
 $l_incident_display = "Display options for Incidents";
 
