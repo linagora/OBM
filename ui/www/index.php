@@ -24,6 +24,24 @@
     <ul class="detailList">
 
       <li>
+    <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
+        <ol>
+          <li> PostreSQL support (except time and document)
+          <li> Spanish translation added
+          <li> Many Company, Contact enhancements
+          <li> Better configuration (allowing specific site configuration keeping compatibility with generic branch)
+          <li> New module : Publication with subscription management
+          <li> New Access right and profile models (with module granularity)
+          <li> A directory can now be removed in Document
+          <li> Graphical query construction in List
+          <li> Many Fixes and enhancements in Project, Todo, Calendar,...
+          <li> ...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-12-24</b> : version <b>0.7.5</b> released (enhancement)
         <ol>
           <li> PostreSQL support is back (db scripts, modules Company, Contact,Deal and User for now)
@@ -33,30 +51,6 @@
     <li> New tables : Country and DataSource (
           <li> Fixes and enhancements in Project, Deal,...
           <li> Updates on install script and doc
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2003-12-05</b> : version <b>0.7.4</b> released (minor fixes)
-        <ol>
-          <li> Project module fixes and improvement
-          <li> Fixes on install script (typo ';' !)
-     <li> Fixes in Incident, Agenda (better export for Outlook), Lang, User,...
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2003-11-24</b> : version <b>0.7.3</b> released (many fixes)
-        <ol>
-          <li> Project module rewrite
-          <li> CSS + Javascript enhancement improve Mozilla 1.0 and IE display
-          <li> Specific site configuration now in a separated file
-          <li> Fixes on install script (Contact address 3,...)
-     <li> Fixes in Project, Time management, Contact, User,...
         </ol>
         </div>
         <br />

@@ -7,7 +7,7 @@
 --/////////////////////////////////////////////////////////////////////////////
 
 -- Uncoment next line if you use Postgres with Unicode or no latin1 charset
-\encoding latin1
+--\encoding latin1
 
 --
 -- Dumping data for table 'CompanyType'

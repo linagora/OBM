@@ -174,7 +174,6 @@ class DB_Sql {
 
     $this->connect();
     $id = pg_query($this->Link_ID, "select * from $table");
-  echo "<br>db_pgsq : DDDDDDDD";
     if ($id < 0) {
       $this->Error = pg_ErrorMessage($id);
       $this->Errno = 1;

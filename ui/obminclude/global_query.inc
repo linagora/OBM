@@ -61,6 +61,74 @@ function sql_casei_like($db_type) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the sql corresponding to concat function
+// Parameters:
+//   - $db_type : DB type
+//   - $ctt[]   : array of values ctt[0][type] = field | string, ctt[0][value]
+// Returns:
+//   - sql concatenation string
+///////////////////////////////////////////////////////////////////////////////
+function sql_string_concat($db_type, $ctt) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $start = "concat(";
+    $end = ")";
+    $sep = ",";
+  } elseif ($db_type == $db_type_pgsql) {
+    $start = "(";
+    $end = ")";
+    $sep = "||";
+  } else {
+    $start = "(";
+    $end = ")";
+    $sep = "||";
+  }
+
+  $ret = $start;
+  if ($ctt[0]["type"] == "field") {
+    $ret .= $ctt[0]["value"];
+  } else {
+    $ret .= "'" . $ctt[0]["value"] . "'";
+  }
+  $i = 1;
+  while ($ctt[$i]) {
+    $ret .= " $sep ";
+    if ($ctt[$i]["type"] == "field") {
+      $ret .= $ctt[$i]["value"];
+    } else {
+      $ret .= "'" . $ctt[$i]["value"] . "'";
+    }
+    $i++;
+  }
+  $ret .= $end;
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the sql string corresponding to if then else
+// Parameters:
+//   - $db_type : DB type
+// Returns:
+//   - sql word "ilike"
+///////////////////////////////////////////////////////////////////////////////
+function sql_if($db_type, $expr, $iftrue, $iffalse) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $ret = "if ($expr, $iftrue, $iffalse)";
+  } elseif ($db_type == $db_type_pgsql) {
+    $ret = "case $expr when true then $iftrue else $iffalse end";
+  } else {
+    $ret = "if ($expr, $iftrue, $iffalse)";
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login
 // Parameters:
 //   - $login  : login

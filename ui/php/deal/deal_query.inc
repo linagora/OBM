@@ -1108,13 +1108,16 @@ function run_query_detail_parentdeal($pid) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
-  
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select ParentDeal.*,
+  $db_type = $obm_q->type;
+
+  $timeupdate = sql_date_format($db_type, "parentdeal_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "parentdeal_timecreate", "timecreate");
+
+  $query = "select ParentDeal.*,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        UNIX_TIMESTAMP(parentdeal_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(parentdeal_timecreate) as timecreate,
+        $timeupdate,
+        $timecreate,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
       from 
@@ -1124,17 +1127,6 @@ function run_query_detail_parentdeal($pid) {
         left join UserObm c on parentdeal_usercreate=c.userobm_id
         left join UserObm u on parentdeal_userupdate=u.userobm_id
       where parentdeal_id='$pid'";
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select ParentDeal.*,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        parentdeal_timeupdate as timeupdate,
-        parentdeal_timecreate as timecreate
-      from (ParentDeal
-          left join UserObm u1 on parentdeal_marketingmanager_id=u1.userobm_id)
-          left join UserObm u2 on parentdeal_technicalmanager_id=u2.userobm_id
-      where parentdeal_id='$pid'";
-  }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

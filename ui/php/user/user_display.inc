@@ -625,60 +625,61 @@ function dis_check_links($p_id) {
 
   $obm_q = new DB_OBM;
   $tables = $obm_q->table_names();
-  echo "AAAAAAAAAAA";
 
   $i = 0;
   while ($tables[$i]["table_name"]) {
     $table = $tables[$i]["table_name"];
-    $usercreate = $table . "_usercreate";
-    $userupdate = $table . "_userupdate";
 
-    $obm_qm = new DB_OBM;
-  echo "BBBBBBBBBB";
-    $fields = $obm_qm->metadata($table, false);
-  echo "CCCCCCCCCC";
-    $fieldexist_uc = false;
-    $fieldexist_uu = false;
-    $j = 0;
-    while ($fields[$j]["name"]) {
-      if (strtoupper($fields[$j]["name"]) == strtoupper($usercreate)) {
-        $fieldexist_uc = true;
+    // We exclude POSTGRES meta table (sql_xxxx)
+    if (! (substr($table, 0, 4) == "sql_")) {
+      $usercreate = $table . "_usercreate";
+      $userupdate = $table . "_userupdate";
+
+      $obm_qm = new DB_OBM;
+      $fields = $obm_qm->metadata($table, false);
+      $fieldexist_uc = false;
+      $fieldexist_uu = false;
+      $j = 0;
+      while ($fields[$j]["name"]) {
+	if (strtoupper($fields[$j]["name"]) == strtoupper($usercreate)) {
+	  $fieldexist_uc = true;
+	}
+	if (strtoupper($fields[$j]["name"]) == strtoupper($userupdate)) {
+	  $fieldexist_uu = true;
+	}
+	$j++;
       }
-      if (strtoupper($fields[$j]["name"]) == strtoupper($userupdate)) {
-        $fieldexist_uu = true;
+      if ($fieldexist_uc) {
+	$query = "select count(*) from $table where $usercreate='$p_id'";
+	$c_q = new DB_OBM($query);
+	$c_q->next_record();
+	$nbc = $c_q->f("0");
       }
-      $j++;
-    }
-    if ($fieldexist_uc) {
-      $query = "select count(*) from $table where $usercreate='$p_id'";
-      $c_q = new DB_OBM($query);
-      $c_q->next_record();
-      $nbc = $c_q->f("0");
-    }
-    if ($fieldexist_uu) {
-      $query = "select count(*) from $table where $userupdate='$p_id'";
-      $c_q = new DB_OBM($query);
-      $c_q->next_record();
-      $nbu = $c_q->f("0");
-    }
-    if ($fieldexist_uc || $fieldexist_uu) {
-      $dis_user .= "
+      if ($fieldexist_uu) {
+	$query = "select count(*) from $table where $userupdate='$p_id'";
+	$c_q = new DB_OBM($query);
+	$c_q->next_record();
+	$nbu = $c_q->f("0");
+      }
+      if ($fieldexist_uc || $fieldexist_uu) {
+	$dis_user .= "
       <tr>
         <td class=\"detailHead\" rowspan=\"2\">$table</td>
         <td class=\"detailText\"><b>$nbc</b> $l_check_usercreate</td>
       </tr><tr>
         <td class=\"detailText\"><b>$nbu</b> $l_check_userupdate</td>
       </tr>";
-    } else {
-      $dis_user .= "
+      } else {
+	$dis_user .= "
       <tr>
         <td class=\"detailHead\">$table</td>
         <td class=\"detailText\">$l_no_user</td>
       </tr>";
-    }
-    $dis_user .= "<tr>
+      }
+      $dis_user .= "<tr>
       <td colspan=\"2\"><hr /></td>
     </tr>";
+    }
     $i++;
   }
  

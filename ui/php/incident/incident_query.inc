@@ -33,6 +33,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
+  $date = sql_date_format($db_type, "incident_date", "date");
+  $timeupdate = sql_date_format($db_type, "incident_timeupdate", "timeupdate");
 
   $req = "select
       Incident.incident_id as Id,
@@ -49,8 +51,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incident_logger,
       incident_owner,
       incident_archive,
-      UNIX_TIMESTAMP(incident_date) as date,
-      UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
+      $date,
+      $timeupdate,
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
@@ -111,19 +113,22 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 //   - $id : incident id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $db_type_mysql,$db_type_pgsql;  
   global $cdg_sql;
 
-  $connect_db = new DB_OBM;
-  if ($connect_db->type == $db_type_mysql) {
-    $query = "select *,
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $date = sql_date_format($db_type, "incident_date", "date");
+  $timeupdate = sql_date_format($db_type, "incident_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "incident_timecreate", "timecreate");
+
+  $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         p.incidentpriority_label,
         s.incidentstatus_label,
-        UNIX_TIMESTAMP(incident_date) as date,
-        UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(incident_timecreate) as timecreate,
+        $date,
+        $timeupdate,
+        $timecreate,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
       from Incident
@@ -134,19 +139,11 @@ function run_query_detail($id) {
            left join UserObm as c on incident_usercreate=c.userobm_id
            left join UserObm as u on incident_userupdate=u.userobm_id
       where incident_id='$id'";
-  }
-  else if ($connect_db->type == $db_type_pgsql) {
-    $query = "select *,
-        incident_timeupdate as timeupdate,
-        incident_timecreate as timecreate
-      from Incident
-      where incident_id='$id'";
-  }
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  $connect_db->next_record();
-  return $connect_db;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q;
 }
 
 

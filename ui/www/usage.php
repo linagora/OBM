@@ -28,6 +28,10 @@ If you are using OBM and want to be referenced here drop us a note.
     <li>GMX
     <li>SOPRA
     <li>Castel & Fromager (groupe FAYAT, 1er groupe indépendant de BTP)
+    <li><!-- <a href="http://www.stm-trading.com.br/"> -->STM Trading
+    <li><a href="http://obm.lighthouse.com.br/">Lighthouse</a>
+    <li>IB Group
+    <li>Cellon - Philips
     <li>...
   </ul>
   </p>

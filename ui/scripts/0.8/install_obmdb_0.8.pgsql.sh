@@ -7,10 +7,11 @@
 # $Id$
 ###############################################################################
 
-# Postgres User and Password var definition
+# Postgres User, Password and Data lang var definition
 U=obm
 P="obm"
 DB="obm"
+DATA_LANG="en"
 
 # We search for the PHP interpreter (different name on Debian, RedHat)
 PHP=`which php4 2> /dev/null`
@@ -30,7 +31,7 @@ psql -U $U $DB < create_obmdb_0.8.pgsql.sql
 
 # Dictionnary data insertion
 echo "Dictionnary data insertion"
-psql -U $U $DB < obmdb_ref_0.8_fr.sql
+psql -U $U $DB < obmdb_ref_0.8_$DATA_LANG.sql
 
 # Test data insertion
 echo "Test data insertion"

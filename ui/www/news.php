@@ -19,6 +19,24 @@
     <ul class="detailList">
 
       <li>
+    <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
+        <ol>
+          <li> PostreSQL support (except time and document)
+          <li> Spanish translation added
+          <li> Many Company, Contact enhancements
+          <li> Better configuration (allowing specific site configuration keeping compatibility with generic branch)
+          <li> New module : Publication with subscription management
+          <li> New Access right and profile models (with module granularity)
+          <li> A directory can now be removed in Document
+          <li> Graphical query construction in List
+          <li> Many Fixes and enhancements in Project, Todo, Calendar,...
+          <li> ...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-12-24</b> : version <b>0.7.5</b> released (enhancement)
         <ol>
           <li> PostreSQL support is back (db scripts, modules Company, Contact,Deal and User for now)

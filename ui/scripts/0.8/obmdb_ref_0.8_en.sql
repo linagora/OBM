@@ -60,19 +60,6 @@ INSERT INTO DealType (dealtype_timeupdate, dealtype_timecreate, dealtype_userupd
 
 
 --
--- dump for table 'CalendarEvent'
---
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'RDV');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Training');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Trade');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Meeting');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Call');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Support');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Development');
-INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Private');
-
-
---
 -- dump for table 'CalendarCategory'
 --
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'RDV');

@@ -286,7 +286,26 @@ $gp_mail_enabled = false;
 <h3>4.2: Database Configuration and Creation</h3>
 The scripts are in the scripts/0.8 directory.
 
-<h4>4.2.1: MySQL</h4>
+<h4>4.2.1: Default Data language</h4>
+
+Some references values are inserted by default. These values can be in french (by default) or in english.
+To toggle these to english for installation edit the file scripts/0.8/install_obmdb_0.8.mysql.sh (pr pgsql) and change the DATA_LANG value to en :
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+# Mysql User, Password and Data lang var definition
+U=obm
+P="obm"
+DB="obm"
+DATA_LANG="en"
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h4>4.2.2: MySQL</h4>
 
 Requisite :</b> you must know (or create) a valid mysql login/password
 
@@ -318,7 +337,7 @@ emacs /install_obmdb_0.8.mysql.sh
 </table>
 
 
-<h4>4.2.2: PostgreSQL</h4>
+<h4>4.2.3: PostgreSQL</h4>
 
 Postgres support is back since 0.7.5.
 
@@ -334,7 +353,7 @@ create database obm with owner = obm;
 </table>
 <p />
 
-If your Postgres server is not configured with latin1 character set, edit the file script/0.8/obmdb_test_values_0.8.sql and uncomment the line
+If your Postgres server is not configured with latin1 character set, edit the file scripts/0.8/obmdb_test_values_0.8.sql and scripts/0.8/obmdb_ref_0.8_fr.sql (oe scripts/0.8/obmdb_ref_0.8_en.sql for english) and uncomment the lines
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
