@@ -243,6 +243,8 @@ $c_all = "_ALL_";		// Used in Form select
 $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
+$c_public = "__PUBLIC__";
+$c_private = "__PRIVATE__";
 
 // Debug Constants
 $cdg_id = 1;     // id display

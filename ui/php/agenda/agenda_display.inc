@@ -13,11 +13,12 @@
 // Parameters:
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
-function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
+function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q) {
   global $set_theme, $set_weekstart_default, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
+  global $c_all, $l_all, $l_groups;
   global $action,$auth;
  
   $getdate = $agenda["date"];
@@ -31,6 +32,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   $this_day = $day_array2[3]; 
   $this_month = $day_array2[2];
   $this_year = $day_array2[1];
+  $this_group = $agenda["agenda_group"];
 
   $check_week = strtotime($getdate);
   $start_week_time = strtotime(dateOfWeek(date("Ymd", strtotime("$this_year-01-01")), $set_weekstart_default));
@@ -148,6 +150,26 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     $dis_duration
     <input type=\"submit\" value=\"$l_validate\" />";
 
+  // Group selection
+  $sel_group = "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_all")."\" ";
+ if ($c_all == $this_group) {
+    $sel_group .= "selected=\"selected\">";
+  } else {
+    $sel_group .= ">";
+  }
+  $sel_group .= "$l_all</option>\n";
+  while ($group_q->next_record()) {
+    $c_id = $group_q->f("group_id");
+    $c_title = $group_q->f("group_name");
+
+    if ($c_id == $this_group) {
+      $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_id")."\" selected=\"selected\">";
+      $sel_group .= "$c_title</option>\n";
+    } else {
+      $sel_group .=  "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$c_id")."\">";
+      $sel_group .=  "$c_title</option>\n";
+    }
+  }
 
 // Minicalendar Head
 
@@ -225,8 +247,17 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
      <div class=\"lastTitle\">:: $l_calendar_visible</div>
        <tr>
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
-       <tr>
-        <td class=\"agendaVide\" align=\"left\">
+       <tr align=\"center\">
+        <td>
+        $l_groups
+         <form action=\"\" onsubmit=\"return false;\">
+          <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
+            $sel_group
+          </select>
+          <!--
+            <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);\" />
+          -->
+         </form>
 	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
 	  $dis_sel_user
 	  <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />
@@ -387,9 +418,8 @@ function html_conflict_form($agenda) {
 //   - $agenda         : agenda parameters
 //   - $obm_q_events   : list of event's records 
 //   - $contacts_array : array of selected contacts 
-//   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_list, $p_user_array) {
+function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category_list, $p_user_array) {
   global $display;
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   global $ico_add_user, $ico_add_group,$ico_delete;
@@ -573,6 +603,20 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      </td>
      ";
 
+    // group select
+    if (isset($grp_q)) {
+      while ($grp_q->next_record()) {
+        $g_id = $grp_q->f("group_id");
+        $g_lname = $grp_q->f("group_name");
+        $dis_sel_group .= "<div class=\"elementRow\" id=\"sel_group_id$g_id\">
+        <a href=\"javascript: remove_element('sel_group_id$g_id','sel_group_id');\">
+        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
+        </a>
+        $g_lname
+        <input value=\"$g_id\" name=\"sel_group_id[]\" type=\"hidden\" />
+        </div>";
+      }
+    }
     $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
     $block_group = "
@@ -585,6 +629,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       </a>
      </td>    
      <td class=\"detailForm\" id=\"sel_group_id\">
+       $dis_sel_group
      </td>
      ";
   if ($force == 1){
@@ -1229,6 +1274,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   global $ico_add_user,$popup_height,$popup_width;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
+  global $l_groups;
 
   $time_unit = 60 / $set_cal_interval;
   $datebegin = substr($agenda["date"],0,8);
@@ -1240,7 +1286,6 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
      <input type=\"submit\" value=\"$l_meeting_perform\" /> 
      ";
 
- 
 
   // userobm select
     while ($usr_q->next_record()) {
@@ -1272,6 +1317,24 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
        $dis_sel_user
      </td>
      ";
+
+    // group select
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_meeting_id";
+
+    $block_group = "
+    <td class=\"detailLabel\">
+    $l_groups
+    <a href=\"javascript: return false;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+      </a>
+     </td>
+     <td class=\"detailForm\" id=\"sel_group_meeting_id\">
+     </td>
+     ";
+
+
 
   $dis_hour_d = "<select name=\"sel_time_duration\">";
   for ($i=0;$i<24;$i++) {
@@ -1309,6 +1372,9 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
      $block_user
     </tr>
     <tr>
+     $block_group
+    </tr>
+    <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format</td>
      <td class=\"detailForm\">
       <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
@@ -1339,13 +1405,14 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 //   - $contacts_array : array of selected contacts 
 //   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_free_interval($agenda,$calendar_user,$usr_q ){
+function dis_free_interval($agenda,$calendar_user,$usr_q){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description,$display;              
 
 
   $user_meeting = $agenda["user_meeting"]; 
+  $group_meeting = $agenda["group_meeting"]; 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
   $time_unit = 60 / $set_cal_interval; 
@@ -1358,6 +1425,9 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
   foreach($user_meeting as $user) {
     $param_user .= "&amp;sel_user_meeting_id[]=$user";
+  }
+  foreach($group_meeting as $group) {
+    $param_group .= "&amp;sel_group_meeting_id[]=$group";
   }
   
   $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
@@ -1398,12 +1468,12 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
         $end_time = $current_time + $duration;	
 	$begin_date = date("YmdHis",$current_time);
 	$end_date = date("YmdHis",$end_time);	
-	$goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user";
+	$goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user$param_group";
 	if(isset($events[$dayLink])) {
 	  $day = $events[$dayLink];
 	  $have_event = $day->have_events_between($current_time, $current_time + $time_unit_sec);
 	  $will_have_event = $day->have_events_between($current_time,$end_time);
-	  $goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user";
+	  $goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user$param_group";
 	  if($have_event)  {
 	    $week_cal .=  "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
           } elseif($will_have_event) {
@@ -1430,7 +1500,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user$param_group&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>     
      </td>
@@ -1438,7 +1508,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
       $display_date
      </td>  
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user$param_group&amp;param_duration=$param_duration")."\">
        <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>

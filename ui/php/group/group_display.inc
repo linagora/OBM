@@ -106,7 +106,8 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_form ($group) {
   global $display, $l_name, $l_group_user, $l_email, $l_find, $l_add_groups;
-
+  global $c_all, $l_all, $l_visibility, $l_private, $l_public, $c_private, $c_public;
+ 
   $popup = $group["popup"];
 
   if ($group["children_restriction"]) {
@@ -140,6 +141,17 @@ function html_group_search_form ($group) {
   $name = stripslashes($group["name"]);
   $email = stripslashes($group["email"]);
   $user = stripslashes($group["user"]);
+  $privacy = $group["privacy"];
+
+  // Privacy select
+  $sel_privacy = "<select id=\"sel_privacy\" name=\"sel_privacy\"><option value=\"$c_all\">$l_all</option>";
+  $sel_privacy .= "\n<option value=\"$c_public\"";
+  if ($privacy == $c_public) { $sel_privacy .= " selected=\"selected\""; }
+  $sel_privacy .= ">". $l_public . "</option>\n";
+  $sel_privacy .= "\n<option value=\"$c_private\"";
+  if ($privacy  == $c_private) { $sel_privacy .= " selected=\"selected\""; }
+  $sel_privacy .= ">". $l_private . "</option>\n";
+  $sel_privacy .= "</select>";
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -155,6 +167,9 @@ function html_group_search_form ($group) {
     </div>
     <div class=\"searchLabel\">$l_email<br />
       <input name=\"tf_email\" size=\"20\" maxlength=\"20\" value=\"$email\" />
+    </div>
+    <div class=\"searchLabel\">$l_visibility<br />
+      $sel_privacy
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />

@@ -16,9 +16,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($group) {
   global $cdg_sql, $ctu_sql_limit;
+  global $c_public, $c_private;
   
   $name = sql_search_text_parse($group["name"]);
   $email = sql_search_text_parse($group["email"]);
+  $privacy = $group["privacy"];
   $user = sql_search_text_parse($group["user"]);
   $new_order = $group["new_order"];
   $order_dir = $group["order_dir"];
@@ -39,6 +41,11 @@ function run_query_search($group) {
   }
   if ($email != '') {
     $where .= " and group_email $like '%$email%'";
+  }
+  if ($privacy == $c_public) {
+    $where .= " and group_privacy = 0";
+  } elseif ($privacy == $c_private) { 
+    $where .= " and group_privacy = 1";
   }
   // only the one which are allowed (ie. publics )
   $where .=  " and " .sql_obm_entity_privacy("group");

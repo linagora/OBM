@@ -39,12 +39,22 @@ $uid = $auth->auth["uid"];
 
 require("agenda_query.inc");
 require("agenda_display.inc");
+
+//Session parameters
+if (isset($param_group)) {
+  $agenda_group_view = $param_group;
+  $sel_user_id = get_default_group_user_ids($param_group);
+}
+$sess->register("agenda_group_view");
 if (count($sel_user_id) != 0 ) {
   $agenda_user_view = $sel_user_id;
 }
 $sess->register("agenda_user_view");
 page_close();
+
 $sel_user_id = $agenda_user_view;
+$param_group = $agenda_group_view;
+
 
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
@@ -88,9 +98,10 @@ if ($action == "index") {
     }
     $user_q = store_users(run_query_get_user_name($p_user_array));
     $user_obm = run_query_userobm_readable();  
+    $group_q = run_query_userobm_group();
     require("agenda_js.inc");
     $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
   }
 } elseif($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,8 +127,9 @@ if ($action == "index") {
       $p_user_array = $sel_user_id ;
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
+      $group_q = run_query_userobm_group();
       $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
     }
   }
 } elseif ($action == "view_day") {
@@ -132,8 +144,9 @@ if ($action == "index") {
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
+  $group_q = run_query_userobm_group();
   $display["result"] = dis_day_planning($agenda,$user_q,$user_obm);
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
 
 } elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,8 +160,9 @@ if ($action == "index") {
     }
     $user_q = store_users(run_query_get_user_name($p_user_array));
     $user_obm = run_query_userobm_readable();  
+    $group_q = run_query_userobm_group();
     $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+    $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
 } elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
@@ -161,8 +175,9 @@ if ($action == "index") {
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
+  $group_q = run_query_userobm_group();
   $display["result"] = dis_month_planning($agenda,$user_q,$user_obm);
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
 } elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
@@ -174,16 +189,17 @@ if ($action == "index") {
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
+  $group_q = run_query_userobm_group();
   $display["result"] = dis_year_planning($agenda,$user_q,$user_obm);
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
-  $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
   if($p_user_meeting==1) {
     $p_user_array =  $agenda["user_meeting"] ;
+    $grp_obm = run_query_group_in($agenda["group_meeting"]);
   }else {
     $p_user_array = array($uid);
   }
@@ -210,8 +226,9 @@ if ($action == "index") {
       $p_user_array = $sel_user_id ;
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
+      $group_q = run_query_userobm_group();
       $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);  
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);  
     }
   }  else {
     require("$obminclude/calendar.js");
@@ -265,8 +282,9 @@ if ($param_event > 0) {
       $p_user_array = $sel_user_id ;
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
+      $group_q = run_query_userobm_group();
       $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
     }
   }
   else {
@@ -287,6 +305,7 @@ if ($param_event > 0) {
   $p_user_array = $sel_user_id ;
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
+  $group_q = run_query_userobm_group();
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 } elseif ($action == "check_delete") {
@@ -308,8 +327,9 @@ if ($param_event > 0) {
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_readable();  
+  $group_q = run_query_userobm_group();
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
 } elseif ($action == "rights_admin") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -332,14 +352,15 @@ if ($param_event > 0) {
 } elseif ($action == "perform_meeting")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  if (count($agenda["user_meeting"]) != 0) {
-    $p_user_array =  $agenda["user_meeting"] ;
-  } else {
+  $p_user_array = run_query_get_allusers($agenda["user_meeting"], $agenda["group_meeting"]);
+  if (count($p_user_array) == 0) {
     $p_user_array =  array($uid);
   }
+  print_r($p_user_array);
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_in($p_user_array);      
-  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);  
+  $group_q = run_query_userobm_group();
+  $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q,$group_q);
   $display["detail"] = dis_free_interval($agenda,$user_q,$user_obm);
 
 } elseif ($action == "admin")  {
@@ -397,14 +418,14 @@ display_page($display);
 // returns : $agenda hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
-  global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
+  global $param_date,$param_event,$param_group,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
   global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id;
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_group_id,$sel_user_meeting_id, $sel_group_meeting_id;
   global $ch_all_day;
   
   // Agenda fields
@@ -435,6 +456,7 @@ function get_param_agenda() {
   if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
   if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
   if (is_array($sel_user_meeting_id)) $agenda["user_meeting"] = $sel_user_meeting_id;
+  if (is_array($sel_group_meeting_id)) $agenda["group_meeting"] = $sel_group_meeting_id;
 
   if (isset($sel_time_duration)) {
     $agenda["duration"] = $sel_time_duration;
@@ -495,6 +517,7 @@ function get_param_agenda() {
   if (isset($hd_date_end)) $agenda["date_end"] = $hd_date_end;
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
   if (is_array($sel_group_id)) $agenda["group"] = $sel_group_id;
+  if (isset($param_group)) $agenda["agenda_group"] = $param_group;
 
 
   if (debug_level_isset($cdg_param)) {
@@ -517,7 +540,7 @@ function get_agenda_action() {
   global $actions, $path;
   global $l_header_consult, $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
-  global $l_header_month,$l_header_new_event,$param_event,$param_date,$l_header_admin, $l_header_export;
+  global $l_header_month,$l_header_new_event,$param_event,$param_date,$param_group,$l_header_admin, $l_header_export;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   // Index

@@ -157,6 +157,26 @@ function run_query_get_user_name($contacts_array) {
   return $obm_db;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Perform the concatenation of users and groups array in a users array 
+// Parameters:
+//   - $users_array : List of the users
+//   - $groups_array : List of the groups 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_allusers($users_array,$groups_array) {
+
+  $r_array = array();
+  if (is_array($groups_array)) {
+    foreach($groups_array as $group_id) {
+      $r_array = array_merge($r_array, get_all_users_from_group($group_id));
+    }
+  }
+  $r_array = array_merge($users_array,$r_array);
+  $r_array = array_unique($r_array);
+
+  return $r_array;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the addiction of a event
@@ -645,23 +665,110 @@ function run_query_userobm_right($uid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Get the list of default agenda users for the current group
+///////////////////////////////////////////////////////////////////////////////
+function get_default_group_user_ids($p_group) {
+  global $cdg_sql, $auth, $agenda, $c_all;
+
+  $uid = $auth->auth["uid"];
+  $group = $p_group;
+  if ($p_group != $c_all) {
+  $query = "SELECT u.*,
+      c.calendarright_read
+    FROM UGroup g, UserObmGroup ug, UserObm as u
+      LEFT OUTER JOIN CalendarRight as c
+        ON c.calendarright_customerid = '$uid'
+          AND u.userobm_id = c.calendarright_ownerid
+    WHERE
+      g.group_id = '$group' AND
+      ug.userobmgroup_group_id = g.group_id AND
+      ug.userobmgroup_userobm_id = u.userobm_id AND
+      (c.calendarright_read = 1 OR u.userobm_id='$uid')
+    ORDER BY u.userobm_lastname";
+  } else {
+    $query = "SELECT u.*,
+        c.calendarright_read
+      FROM UserObm as u
+        LEFT OUTER JOIN CalendarRight as c
+          ON c.calendarright_customerid = '$uid'
+            AND u.userobm_id = c.calendarright_ownerid
+      WHERE (c.calendarright_read = 1 OR u.userobm_id='$uid')
+      ORDER BY u.userobm_lastname";
+  }
+
+  $obm_db = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+
+  $ret_array = array();
+  while($obm_db->next_record()) {
+     $ret_array[] = $obm_db->f("userobm_id");
+  }
+  if (count($ret_array) == 0) {
+     $ret_array = array($uid);
+  }
+
+  return $ret_array;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the list of readable agenda users for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_readable() {
+  global $cdg_sql, $auth, $agenda, $c_all;
+
+  $uid = $auth->auth["uid"];
+
+  if (isset($agenda["agenda_group"]) && ($agenda["agenda_group"] != $c_all)) {
+    $group = $agenda["agenda_group"];
+    $query = "SELECT u.*,
+        c.calendarright_read
+      FROM UGroup g, UserObmGroup ug, UserObm as u
+        LEFT OUTER JOIN CalendarRight as c
+          ON c.calendarright_customerid = '$uid'
+            AND u.userobm_id = c.calendarright_ownerid
+      WHERE
+        g.group_id = '$group' AND
+        ug.userobmgroup_group_id = g.group_id AND
+        ug.userobmgroup_userobm_id = u.userobm_id AND
+        (c.calendarright_read = 1 OR u.userobm_id='$uid')
+      ORDER BY u.userobm_lastname";
+  } else {
+    $query = "SELECT u.*,
+        c.calendarright_read
+      FROM UserObm as u
+        LEFT OUTER JOIN CalendarRight as c
+          ON c.calendarright_customerid = '$uid'
+            AND u.userobm_id = c.calendarright_ownerid
+      WHERE (c.calendarright_read = 1 OR u.userobm_id='$uid')
+      ORDER BY u.userobm_lastname";
+  }
+  $obm_db = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of calendar group for the current user
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_group() {
   global $cdg_sql, $auth;
 
   $uid = $auth->auth["uid"];
-  $query = "SELECT u.*,
-      c.calendarright_read
-    FROM UserObm as u
-      LEFT OUTER JOIN CalendarRight as c 
-        ON c.calendarright_customerid = '$uid'
-          AND u.userobm_id = c.calendarright_ownerid 
-    WHERE (c.calendarright_read = 1 OR u.userobm_id='$uid')
-    ORDER BY u.userobm_lastname";
+  $where = sql_obm_entity_privacy("group");
+  $query = "
+    SELECT *
+    FROM UGroup
+    WHERE ";
+  $query .= $where;
+  $query .= " ORDER BY group_name";
+
 
   $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);	    
+  display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
 }
@@ -719,6 +826,34 @@ function run_query_userobm_label_writable() {
   }
   return $ret_array;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get groups infos from the gid array given
+// Parameters:
+//   - groups : array of groups id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_in($groups) {
+  global $cdg_sql;
+
+  $where = "(0";
+  foreach($groups as $group) {
+    $where .= ", $group";
+  }
+  $where .= ")";
+  $query = "SELECT *
+    FROM UGroup
+    WHERE 
+      group_id IN $where
+    ORDER by group_name";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql, "run_query_group_in()");
+
+  return $obm_q;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of writable agenda groups for the current user
 ///////////////////////////////////////////////////////////////////////////////

@@ -244,7 +244,7 @@ display_page($display);
 function get_param_group() {
   global $param_group, $popup, $child_res;
   global $new_order, $order_dir, $entity;
-  global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis, $cb_priv;
+  global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis, $cb_priv, $sel_privacy;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
   global $ext_element;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
@@ -256,6 +256,7 @@ function get_param_group() {
   if (isset ($tf_email)) $group["email"] = $tf_email;
   if (isset ($tf_user)) $group["user"] = trim($tf_user);
   if (isset ($cb_priv)) $group["priv"] = ($cb_priv == 1 ? 1 : 0);
+  if (isset ($sel_privacy)) $group["privacy"] = $sel_privacy;
 
   if (isset ($child_res)) $group["children_restriction"] = $child_res;
 
