@@ -336,7 +336,7 @@ CREATE TABLE Kind (
   kind_minilabel   varchar(64),
   kind_header      varchar(64),
   kind_lang        char(2),
-  kind_default     int(1) NOT NULL DEFAULT '0,
+  kind_default     int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (kind_id)
 );
 
