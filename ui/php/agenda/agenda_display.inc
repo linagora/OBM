@@ -2326,7 +2326,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\"> 
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
@@ -2523,7 +2523,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a><br />";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\"> 
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
@@ -2746,7 +2746,7 @@ function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
   onMouseOut=\"hide('$id-$usr_id'); return true;\"		
   href=\"$link\">$event_head_display</a>";
   $hidden_div .= "
-  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;position:absolute;z-index:1000;\"> 
    <div class=\"lastTitle\">:: $title</div>
    <ul class=\"lastList\">  
     <li class=\"lastList\">$category</li>
