@@ -17,7 +17,7 @@ $nreq = 0;
 init_projects();
 fill_projecttask();
 fill_projectuser();
-fill_preferences();
+// fill_preferences();
 
 echo "update successfully completed : $nreq requests performed\n";
 
@@ -39,7 +39,7 @@ function init_projects() {
     where timetask_projecttask_id != 0
     group by timetask_projecttask_id";
 
-  echo "$query \n ---------------------------------------------\n";
+  //echo "$query \n ---------------------------------------------\n";
 
   $toinit_q = new DB_OBM;
   $toinit_q->query($query);
@@ -62,7 +62,7 @@ function init_projects() {
       deal_soldtime = 1
     where deal_id in $toinit_tab";
 
-  echo "$query \n ---------------------------------------------\n";
+  //echo "$query \n ---------------------------------------------\n";
 
   $init_q = new DB_OBM;
   $init_q->query($query);
@@ -91,7 +91,7 @@ function fill_projecttask() {
     from Deal, TimeTask
     where timetask_projecttask_id = deal_id";
   
-  echo "$query \n ---------------------------------------------\n";
+  //echo "$query \n ---------------------------------------------\n";
   
   $tasks_q = new DB_OBM;
   $tasks_q->query($query);
@@ -129,7 +129,7 @@ function fill_projecttask() {
         0
       )";
 
-    echo "$query \n ---------------------------------------------\n";
+    //echo "$query \n ---------------------------------------------\n";
     
     $project_q->query($query);
     $nreq ++;
@@ -143,7 +143,7 @@ function fill_projecttask() {
         and projecttask_label = '$text'
     ";
 
-   echo "$query \n ---------------------------------------------\n";
+   //echo "$query \n ---------------------------------------------\n";
     
     $newtask_q->query($query);
     $nreq ++;
@@ -164,7 +164,7 @@ function fill_projecttask() {
     else
       $query .= "and trim(timetask_label) like '$text'";
 
-      echo "$query \n ---------------------------------------------\n";
+      //echo "$query \n ---------------------------------------------\n";
 
     $time_q->query($query);
     $nreq ++;
@@ -194,7 +194,7 @@ function fill_projectuser() {
       and projecttask_deal_id = deal_id
       and deal_project_status = 1";
   
-  echo "$query \n ---------------------------------------------\n";
+  //echo "$query \n ---------------------------------------------\n";
 
   $members_q = new DB_OBM;
   $members_q->query($query);
@@ -234,7 +234,7 @@ function fill_projectuser() {
         0
         )";
 
-    echo "$query \n ---------------------------------------------\n";
+    //echo "$query \n ---------------------------------------------\n";
     
     $projuser_q->query($query);
     $nreq ++;
@@ -260,7 +260,7 @@ function fill_preferences() {
       userobm_id as id
     from UserObm";
   
-  echo "$query \n ---------------------------------------------\n";
+  //echo "$query \n ---------------------------------------------\n";
 
   $users_q = new DB_OBM;
   $users_q->query($query);
@@ -309,7 +309,7 @@ function fill_preferences() {
         ($id,'time_tt','total_after',4,1)
     ";
 
-    echo "$query \n ---------------------------------------------\n";
+    //echo "$query \n ---------------------------------------------\n";
     
     $prefs_q->query($query);
     $nreq ++;

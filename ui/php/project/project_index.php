@@ -800,14 +800,6 @@ function get_project_action() {
     'Condition'=> array ('None') 
                                        );
 
-// Admin
-//   $actions["PROJECT"]["admin"] = array (
-//     'Name'     => $l_header_admin,
-//     'Url'      => "$path/project/project_index.php?action=admin",
-//     'Right'    => $project_admin_read,
-//     'Condition'=> array ('all') 
-//                                        );
-
 // Display
    $actions["PROJECT"]["display"] = array (
      'Name'     => $l_header_display,

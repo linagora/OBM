@@ -1041,7 +1041,6 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     }
   }
 
-
   // data array for the project dynamic list construction
   // the generated array is used by fill_project()
   if ($project_q->num_rows() != 0) {
@@ -1141,8 +1140,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $arr = Array();
 
   // we put the elements in an array to sort them (they are sorted by tasktype)
-  $project_q->seek(0);
-  if ($projecttask_q->num_rows() != 0) {
+  if ($project_q->num_rows() != 0) {
+    $project_q->seek(0);
+
     while($project_q->next_record()) {
 
       $proj_id = $project_q->f("deal_id");
@@ -1159,11 +1159,11 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     }
   }
 
-  // we sort the array
-  rsort($arr);
-
   // we build the list from the array
   while (count($arr) != 0) {
+    // we sort the array
+    rsort($arr);
+
     $tab_proj = array_pop($arr);
     $proj_id = $tab_proj[1];
     $proj_label = $tab_proj[0];

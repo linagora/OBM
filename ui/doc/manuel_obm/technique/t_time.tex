@@ -1,0 +1,177 @@
+\section{Time}
+
+Le \timemanager \obm  est un module permettant.
+
+\clearpage
+
+\subsection{Organisation de la base de données}
+
+Le \timemanager utilise une table :
+\begin{itemize}
+ \item TimeTask
+\end{itemize}
+
+\subsubsection{TimeTask}
+Cette table stocke toutes les informations concernant une tâche qui a été saisie par l'utilisateur..
+\begin{description}
+ \item[timetask\_id] int(8) : C'est la clé primaire de la table.
+ \item[timetask\_timeupdate] timestamp(14) : Donne au format Unix la date de dernière mise à jour du tuple.
+ \item[timetask\_timecreate] timestamp(14) : Donne au format Unix la date de création du tuple.
+ \item[timetask\_userupdate] int(8) : Id de l'utilisateur qui à opéré la dernière mise à jour.
+ \item[timetask\_usercreate] int(8) : Id de l'utilisateur qui à créé le tuple.
+ \item[timetask\_user_id] int(8) : Clé étrangère pointant vers UserObm indiquant l'utilisateur qui a effectué cette tâche.
+ \item[timetask\_date] timestamp(14) : Date à laquelle a eu lieu cette tâche.
+ \item[timetask\_projecttask\_id] int(8) : Clé étrangère pointant vers ProjectTask indiquant la tâche (et par ce biais le projet) ----
+ \item[timetask\_length] int(2) : Durée de la tâche en fractions de journées.
+ \item[timetask\_tasktype\_id] int(8) : Clé étrangère pointant vers TaskType indiquant le type de le tâche effectuée.
+ \item[timetask\_label] varchar(255) : Commentaires saisis par l'utilisateur pour cette tâche.
+ \item[timetask\_status] varchar(1) : Etat de validation de cette tâche.
+\end{description}
+
+\clearpage
+
+
+\subsection{Actions, droits, et fonctions}
+Dans cette section seront listées et décrites les actions du module, ainsi que les droits qui leurs sont appliqués et l'intitulé des fonctions executées. 
+
+\subsubsection{Actions}
+
+Voici la liste des action du module \timemanager, ainsi qu'une description sommaire de chacune d'entre elles.\\
+\begin{tabular}{|c|p{9cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Description} \\
+ \hline
+ \hline
+ <index> & Action par défaut, elle affiche une vue de la semaine, le formulaire permettant la saisie d'une tâche et la liste déjà saisies pour la semaine. \\ 
+ \hline
+ <viewmonth> & Cette action affiche une vue de l'état de la saisie pour un mois. Elle permet de visualiser les partise du mois pour lesquelles la gestion des temps a été remplie.\\ 
+ \hline
+  <globalview> & Cette action affiche un écran qui permet de visualiser l'état de remplissage de la gestion des temps pour tous les utilisateurs. Il est possible de valider le mois pour les personnes qui ont entièrement rempli le mois. \\ 
+ \hline
+  <insert> & Ajoute une tâche saisie dans la base de données. \\
+ \hline
+  <validate> & Valide les tâches saisies sur un mois par un utilisateur. Cette action que seul un administrateur peut effectuer empêche ensuite toute modification sur les tâches du mois concerné. \\
+ \hline
+  <unvalidate> & Annule la validation d'un mois. \\ 
+ \hline
+ <stats> & Cette action affiche l'écran de statistiques. Il permet de visualiser les informations concernant la répartition du temps de travail entre les différents projets et les différents types de tâches. . \\
+ \hline
+ <delete> & Supprime une tâche.  \\ 
+ \hline
+ <detailupdate> & Affiche un popup permettant de modifier les informations concernant une tâche précédemment saisies. \\ 
+ \hline
+\end{tabular}
+
+\clearpage
+
+\subsubsection{Droits}
+
+Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque action ainsi que l'intitulé de ce droit. \\
+\begin{tabular}{|c|c|l|}
+ \hline
+ \textbf{Action} & \textbf{Code du droit} & \textbf{Intitulé du droit}\\
+ \hline
+ \hline
+  <index> & time\_read & Droits d'Utilisateur en lecture. \\ 
+ \hline
+  <viewmonth> & time\_read & Droits d'Utilisateur en lecture. \\ 
+ \hline
+  <globalview> & time\_admin\_read & Droits d'Administrateur en lecture. \\ 
+ \hline
+  <insert> & time\_write & Droits d'Utilisateur en écriture. \\
+ \hline
+  <validate> & time\_admin\_write & Droits d'Administrateur en écriture. \\
+ \hline
+  <unvalidate> & time\_admin\_write & Droits d'Administrateur en écriture. \\
+ \hline
+  <stats> & time\_read & Droits d'Utilisateur en lecture. \\ 
+ \hline
+  <delete> & time\_write & Droits d'Utilisateur en écriture. \\ 
+ \hline
+  <detailupdate> & time\_write & Droits d'Utilisateur en écriture. \\ 
+ \hline
+\end{tabular}
+
+\subsubsection{Fonctions}
+ Ci-dessous le tableau présentant la ou les fonctions appelées pour chacune des actions. \\
+\begin{tabular}{|c|c|}
+ \hline
+ \textbf{Action} & \textbf{Fonction(s)}\\
+ \hline
+ \hline
+  <index> & dis\_time\_links() \\
+          & dis\_time\_index() \\  
+          & dis\_time\_list() \\ 
+ 	  & dis\_time\_search\_form() \\
+ \hline
+  <viewmonth> & dis\_time\_links() \\ 
+              & dis\_time\_index() \\
+   	      & dis\_time\_search\_form() \\
+ \hline
+  <globalview> & dis\_time\_links() \\ 
+               & dis\_time\_index() \\
+ \hline
+  <insert> & dis\_time\_links() \\
+ 	   & run\_query\_insert() \\
+	   & run\_query\_validate() \\
+	   & dis\_time\_index() \\
+	   & dis\_time\_list() \\
+	   & dis\_time\_search\_form() \\
+ \hline
+ \end{tabular}
+
+\begin{tabular}{|c|c|p{3cm}|}
+ \hline
+ \textbf{Action} & \textbf{Fonction(s)} \\
+ \hline
+ \hline
+  <validate> & run\_query\_adminvalidate() \\
+	     & dis\_time\_links() \\
+	     & dis\_time\_index() \\
+ \hline
+  <unvalidate> & run\_query\_adminunvalidate() \\
+	     & dis\_time\_links() \\
+	     & dis\_time\_index() \\
+ \hline
+  <stats> & run\_query\_stat\_project() \\ 
+	  & run\_query\_stat\_taskttype() \\
+          & dis\_time\_links() \\ 
+          & dis\_time\_statsuser() \\
+   	  & dis\_time\_search\_form() \\
+ \hline
+  <delete> & dis\_time\_links() \\
+ 	   & run\_query\_delete() \\
+	   & run\_query\_validate() \\
+	   & dis\_time\_index() \\
+	   & dis\_time\_list() \\
+	   & dis\_time\_search\_form() \\
+ \hline
+\end{tabular}
+
+\begin{tabular}{|c|c|p{3cm}|}
+ \hline
+ \textbf{Action} & \textbf{Fonction(s)} \\
+ \hline
+ \hline
+  <detailupdate> & run\_query\_tasktype()\\ 
+                 & run\_query\_project() \\
+                 & run\_query\_projecttask() \\
+                 & first\_day\_week() \\
+                 & get\_this\_week() \\
+                 & ou \\
+	         & run\_query\_update() \\
+	         & run\_query\_validate() \\
+ \hline 
+\end{tabular}
+
+\subsection{Fonctionalité}
+ Dans cette partie seront abordées les fonctionnalités du module \timemanager. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus être sujet du fonctionnement que de l'utilité et de l'utilisation du module.
+
+\subsubsection{Affichage}
+ Nous passerons assez rapidement sur l'affichage des details d'un évenement qui est une fonctionnalité assez basique(recherche des éléments en base, puis affichage de ces derniers de manière structuré).
+ Nous nous interresseront plus au differentes vues du planning.
+
+ Nous alons dans un premier temps traiter les vues quotidiennes et hebdomadaire.
+
+\subsubsection{Insertion}
+

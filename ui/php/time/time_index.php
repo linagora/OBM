@@ -10,13 +10,14 @@
 // - index (default) -- search fields  -- show the task week list and the task 
 //					  insert form.
 // - viewmonth       --                -- display month
-// - globalview      --                --
+// - globalview      --                -- display validation pannel
 // - insert          -- form fields    -- insert the task
-// - validate        --                --
-// - update          -- $task_id       -- show the update task form in a popup
-// -                 -- form fields    -- update the task
+// - validate        --                -- validate a month for a user
+// - unvalidate      --                -- cancel admin validation
+// - stats           --                -- show stats screen
 // - delete          -- $params        -- delete the tasks
-// - export_stats    --                -- export stats
+// - detailupdate    -- $task_id       -- show the update task form in a popup
+// -                 -- form fields    -- update the task
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -129,7 +130,6 @@ if ($popup != 2) {
 ///////////////////////////////////////////////////////////////////////////////
 //Initialisation                                                             //
 ///////////////////////////////////////////////////////////////////////////////
-// bcontins : normalement pas utile, deja fait plus tot
 //set user_id if not set
 if (!(isset($time["user_id"])))
   $time["user_id"] = $uid;
@@ -365,11 +365,6 @@ elseif ($action == "detailupdate") {
   }
 }  
 
-elseif ($action == "admin") {
-//////////////////////////////////////////////////////////////////////////////
-  $display["msg"] .= display_info_msg($l_no_display);
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
@@ -450,27 +445,13 @@ function get_time_actions() {
     'Condition'=> array('all') 
                                     );
 
-// Search
+// User Monthly View
   $actions["TIME"]["viewmonth"] = array (
     'Name'     => "$l_header_monthlyview",
     'Url'      => "$path/time/time_index.php?action=viewmonth".
                   "&amp;wbegin=" . $time["date"],
     'Right'    => $time_read,
-    'Condition'=> array ('all') //, 'display') 
-                                    );
-
-// Validate
-  $actions["TIME"]["validate"] = array (
-    'Url'      => "$path/time/time_index.php?action=validate",
-    'Right'    => $time_write,
-    'Condition'=> array ('None')
-                                    );
-
-// Cancel Validation
-  $actions["TIME"]["unvalidate"] = array (
-    'Url'      => "$path/time/time_index.php?action=unvalidate",
-    'Right'    => $time_write,
-    'Condition'=> array ('None')
+    'Condition'=> array ('all')
                                     );
 
 // General Monthly View
@@ -479,24 +460,30 @@ function get_time_actions() {
     'Url'      => "$path/time/time_index.php?action=globalview".
                   "&amp;wbegin=" . $time["date"],
     'Right'    => $time_admin_write,
-    'Condition'=> array ('all') //, 'display') 
+    'Condition'=> array ('all')
+                                    );
+
+// Validate
+  $actions["TIME"]["validate"] = array (
+    'Url'      => "$path/time/time_index.php?action=validate",
+    'Right'    => $time_admin_write,
+    'Condition'=> array ('None')
+                                    );
+
+// Cancel Validation
+  $actions["TIME"]["unvalidate"] = array (
+    'Url'      => "$path/time/time_index.php?action=unvalidate",
+    'Right'    => $time_admin_write,
+    'Condition'=> array ('None')
                                     );
 
 // Stats by Users
   $actions["TIME"]["stats"] = array (
     'Name'     => "$l_header_stats",
     'Url'      => "$path/time/time_index.php?action=stats",
-    'Right'    => $time_admin_read,
-    'Condition'=> array ('all') //, 'display') 
+    'Right'    => $time_read,
+    'Condition'=> array ('all')
                                      );
-
-// Stats by Month
-//   $actions["TIME"]["statsmonth"] = array (
-//     'Name'     => "$l_header_statsmonth",
-//     'Url'      => "$path/time/time_index.php?action=statsmonth",
-//     'Right'    => $time_admin_read,
-//     'Condition'=> array ('all') 
-//                                     );
 
 // Insert 
   $actions["TIME"]["insert"] = array (
@@ -518,29 +505,6 @@ function get_time_actions() {
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
-
-// Update
-  $actions["TIME"]["update"] = array (
-    'Url'      => "$path/time/time_index.php?action=update",
-    'Right'    => $time_write,
-    'Condition'=> array ('None') 
-                                    );
-
-// Admin
-  $actions["TIME"]["admin"] = array (
-    'Name'     => "$l_header_admin",
-    'Url'      => "$path/time/time_index.php?action=admin",
-    'Right'    => $time_admin_read,
-    'Condition'=> array ('all')
-                                       );
-
-// Display
-//   $actions["TIME"]["display"] = array (
-//     'Name'     => "$l_header_display",
-//     'Url'      => "$path/time/time_index.php?action=display",
-//     'Right'    => $time_read,
-//     'Condition'=> array ('all')
-//                                        );
 
 }
 

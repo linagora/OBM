@@ -194,31 +194,6 @@ DELETE
 FROM DisplayPref
 WHERE display_entity like "time%";
 
--- add new preferences for the project displays
-INSERT INTO DisplayPref
-(display_user_id, display_entity, display_fieldname, display_fieldorder, display_display)
-VALUES (0,'project','project_label',1,2),
-       (0,'project','project_company_name',2,1),
-       (0,'project','project_tasktype',3,1),
-       (0,'project','project_status',4,1),
-       (0,'project','project_archive',5,1),
-       (0,'time','date_task',1,2),
-       (0,'time','timetask_deal_label',2,2),
-       (0,'time','timetask_company_name',3,1),
-       (0,'time','timetask_label',4,1),
-       (0,'time','tasktype_label',5,1),
-       (0,'time','timetask_length',6,2),
-       (0,'time','timetask_id',7,2),
-       (0,'time_proj','deal_label',1,2),
-       (0,'time_proj','company_name',2,2),
-       (0,'time_proj','total_length',3,1),
-       (0,'time_proj','total_before',4,1),
-       (0,'time_proj','total_after',5,1),
-       (0,'time_tt','tasktype_label',1,2),
-       (0,'time_tt','total_length',2,1),
-       (0,'time_tt','total_before',3,1),
-       (0,'time_tt','total_after',4,1);
-
 -------------------------------------------------------------------------------
 -- Group module tables
 -------------------------------------------------------------------------------
