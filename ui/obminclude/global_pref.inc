@@ -13,7 +13,7 @@ if ( (! headers_sent()) && ($mode != "txt"))
   $sess->setcookie();
 
 // if prefs have not been loaded (we check the var set_lang) - Login Phase
-if ($set_lang == "") {
+if (($set_lang == "")  && ($mode != "txt")) {
   // We Load and make session variables from Global and User preferences
   session_load_global_prefs();
   session_load_user_prefs();
