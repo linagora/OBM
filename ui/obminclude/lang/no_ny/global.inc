@@ -23,6 +23,7 @@ $l_archive = "Arkiv";
 $l_archive_first = "A";
 $l_date = "Date";
 $l_invalid_data = "Ugyldig data";
+$l_datasource = "Data source";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

@@ -68,7 +68,7 @@ function dis_project_consult($pid) {
 
   if (($project_q->f("project_visibility") == 0) ||
       ($project_q->f("usercreate") == $uid) ) {
-    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($project_q);
     $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $times);
   } else {
     // this project's page has "private" access

@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.7.3 - 2003-10-22<br>
+Version 0.7.5 - 2003-12-07<br>
 Pierre Baudracco
 </center>
 <p>
@@ -367,13 +367,14 @@ Depending on the action, default parameters can be set, but can be superceded if
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : company database result 
+//   - $dsrc_q    : datasource database result 
 //   - $kind_q    : kind database result 
 //   - $usr_q     : userobm database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $company) {
   ....
 
   // if update mode and first display values are taken from database
@@ -426,7 +427,7 @@ A future enhancement will be to export the HTML Template in externals files.
 
   // --- HTML Template --------------------------------------------------------
   echo "
-    &lt;form method=\"post\" name=\"f_mod_societe\"
+    &lt;form method=\"post\" name=\"form_company\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
     &lt;table class=\"detail\">

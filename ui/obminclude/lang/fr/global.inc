@@ -33,6 +33,7 @@ $l_color = "Couleur";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
+$l_datasource = "Source de données";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
 

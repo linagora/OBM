@@ -13,11 +13,14 @@ $extra_js .= "
 require("$obminclude//javascript/check_js.inc");
 
 $extra_js .= "
+function check_list(list) {
+  // allow only valid list name
+  return list.match($js_regexp_list_name) ;
+}
 
 function check_name_list(form) {
   name_list = form.tf_name.value ;
   subject_list = form.tf_subject.value ;
-
 
   if (trim(name_list) == \"\") {
      alert(\"$l_fill_name\") ;

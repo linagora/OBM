@@ -44,6 +44,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- # Rows displayed in a result page
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_rows','12');
 
+-- Default Data Source
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_dsrc','0');
+
 -- Date
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_date','Y-m-d');
 

@@ -1078,7 +1078,6 @@ function html_payment_affect_invoices ($payment, $tab_invoices_selected){
   // first form : the user can update the payment
   // (type in number, amount kind, account...)
   $q_payment = run_query_detail ($payment["payment"]);
-  $q_payment->next_record ();
   html_payment_form ("add_invoices", $q_payment,
 		     run_query_paymentkind(), run_query_account());
   // ATTENTION : peut-être un problème de formulaire dans html_payment_form()

@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Actions
 // - index
+// - datasource           --                -- Data Source index
 // - datasource_insert    -- form fields    -- insert the Data Source
 // - datasource_update    -- form fields    -- update the Data Source
 // - datasource_checklink --                -- check if Data Source is used
@@ -80,6 +81,11 @@ if ($action == "index")  {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
+} elseif ($action == "datasource")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("admin_ref_js.inc");
+  $display["detail"] = dis_datasource_index();
+
 } elseif ($action == "datasource_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_datasource_insert($ref);
@@ -106,11 +112,10 @@ if ($action == "index")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("admin_ref_js.inc");
   $display["detail"] .= dis_datasource_links($ref);
-  $display["detail"] .= dis_datasource_index();
 
 } elseif ($action == "datasource_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_datasource_delete($company["datasource"]);
+  $retour = run_query_datasource_delete($ref);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_dsrc_delete_ok);
   } else {

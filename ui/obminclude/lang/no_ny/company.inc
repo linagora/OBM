@@ -10,10 +10,11 @@
 // Labels and texts
 $l_company_name = "Firmanamn";
 $l_company_kind = "Firmakategori";
-$l_orgnr = "Organisasjonssnummer";
+$l_number = "Organisasjonssnummer";
 $l_postcode = "Postnummer";
 $l_mailing_first = "M";
 $l_name = "Namn";
+$l_aka = "Other names";
 $l_contact_first = "K";
 $l_newcontact_first = "NK";
 $l_listdoc_first = "A";

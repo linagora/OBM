@@ -86,9 +86,14 @@ function run_query_detail($id) {
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
-      UNIX_TIMESTAMP(List.list_timecreate) as timecreate,
-      UNIX_TIMESTAMP(List.list_timeupdate) as timeupdate
-    from List where list_id = '$id'";
+        UNIX_TIMESTAMP(List.list_timecreate) as timecreate,
+        UNIX_TIMESTAMP(List.list_timeupdate) as timeupdate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+    from List
+         LEFT JOIN UserObm as c on list_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on list_userupdate=u.userobm_id
+    where list_id = '$id'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select List.* from List where list_id = '$id'";
   }

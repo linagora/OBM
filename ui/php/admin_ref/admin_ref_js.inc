@@ -40,7 +40,7 @@ function check_dsrc_checkdel(sel)
 function check_dsrc_upd(form, sel_del_dsrc)
 {
   dsrc_pos = sel_del_dsrc.selectedIndex;
-  if ((dsrc_pos >= 0) && (form.tf_dsrc.value != \"\")) {
+  if ((dsrc_pos >= 0) && (form.tf_name.value != \"\")) {
     form.sel_dsrc.value=sel_del_dsrc.options[dsrc_pos].value;
     return true;
    } else {
@@ -55,7 +55,7 @@ function check_dsrc_upd(form, sel_del_dsrc)
 ///////////////////////////////////////////////////////////////////////////////
 function check_dsrc_new(form)
 {
-   if (form.tf_dsrc.value != \"\")
+   if (form.tf_name.value != \"\")
       return true;
    else
    {

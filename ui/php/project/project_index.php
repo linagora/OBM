@@ -96,7 +96,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_project > 0) {
     $project_q = run_query_detail($param_project);
-    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($project_q);
     $display["detail"] = html_project_form($action, $project_q, $project);
   } else {
     $display["msg"] .= display_err_msg($l_query_error);

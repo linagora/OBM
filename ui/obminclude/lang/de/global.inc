@@ -34,6 +34,7 @@ $l_color = "Farbe";
 $l_address = "Adresse";
 $l_postcode = "Postleitzahl";
 $l_town = "Ort";
+$l_datasource = "Data source";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

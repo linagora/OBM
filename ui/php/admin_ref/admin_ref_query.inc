@@ -9,23 +9,6 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Data Source query execution                                               //
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_datasource() {
-  global $cdg_sql;
-
-  $query = "select * from DataSource order by datasource_name"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Data Source insertion query construction and execution                    //
 // Parameters:
 //   - $dsrc : data source hash info : keys used : name
@@ -64,7 +47,7 @@ function run_query_datasource_update($dsrc) {
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $dsrc["id"];
+  $id = $dsrc["datasource"];
   $name = $dsrc["name"];
 
   $query = "update DataSource set
@@ -90,7 +73,7 @@ function run_query_datasource_update($dsrc) {
 function run_query_datasource_delete($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["id"];
+  $id = $dsrc["datasource"];
 
   $query = "delete from DataSource where datasource_id='$id'";
 
@@ -110,7 +93,7 @@ function run_query_datasource_delete($dsrc) {
 function run_query_datasource_company_links($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["id"];
+  $id = $dsrc["datasource"];
 
   $query = "select company_id,
       company_name,
@@ -134,17 +117,39 @@ function run_query_datasource_company_links($dsrc) {
 function run_query_datasource_contact_links($dsrc) {
   global $cdg_sql;
 
-  $id = $dsrc["id"];
+  $id = $dsrc["datasource"];
 
   $query = "select contact_id,
       contact_lastname,
       contact_firstname,
       contact_datasource_id
-    from Company where contact_datasource_id='$id'";
+    from Contact where contact_datasource_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the name of a Data Source from its id                                 //
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_datasource_name($id) {
+  global $cdg_sql;
+
+  $query = "select datasource_name
+    from DataSource
+    where datasource_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("datasource_name");
+  return $retour;
 }

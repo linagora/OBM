@@ -91,7 +91,7 @@ if ($action == "index" || $action == "") {
     } else {
       $display["msg"] = display_err_msg($l_query_error . " - " . $inc_q->query . " !");
     }
-    $display["detailInfo"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($inc_q);
     $display["detail"] = html_incident_consult($inc_q, $con_q);
   }
 
@@ -102,7 +102,7 @@ if ($action == "index" || $action == "") {
     if ($inc_q->num_rows() == 1) {
       $contr_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
       require("incident_js.inc");
-      $display["detailInfo"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
+      $display["detailInfo"] = display_record_info($inc_q);
       $users = array($inc_q->f("incident_owner"),$inc_q->f("incident_logger"));
       $usr_q = run_query_userobm_active($users);
       $display["detail"] = html_incident_form($action, $inc_q, $contr_q, $usr_q, run_query_priority(), run_query_status(), $incident);

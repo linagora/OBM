@@ -49,42 +49,41 @@ $display["header"] = generate_menu($menu, $section);
 ///////////////////////////////////////////////////////////////////////////////
 // ACTIONS :
 ///////////////////////////////////////////////////////////////////////////////
-///////////////////////////////////////////////////////////////////////////////
+
 if ($action =="new") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
-    $display["msg"] = display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
+    $display["msg"] = display_debug_msg("FIXME PERMISSIONS", $cdg_param);
     $display["detail"] = html_payment_form($action,"",run_query_paymentkind(), run_query_account());
   } else {
    $display["msg"] =  display_err_msg($l_error_permission);
   }
 
-} elseif ($action =="new_with_invoices") {
+} elseif ($action == "new_with_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
     run_query_insert ($payment);
     $display["msg"] = display_ok_msg($l_insert_ok);
 
     // we re-load all values :
-    $q_payment = run_query_search ($payment);
-    $q_payment->next_record();
-    $payment["payment"] = $q_payment->f("payment_id");
+    $pay_q = run_query_search ($payment);
+    $pay_q->next_record();
+    $payment["payment"] = $pay_q->f("payment_id");
 
-    $q_payment = run_query_detail ($payment["payment"]);
-    $q_payment->next_record();
-    $q_invoices = run_query_search_connectable_invoices ($payment);
-    $q_options_invoices = run_query_display_pref ($auth->auth["uid"], "invoice");
+    $pay_q = run_query_detail ($payment["payment"]);
+    $inv_q = run_query_search_connectable_invoices ($payment);
+    $pref_inv_q = run_query_display_pref($auth->auth["uid"], "invoice");
 
     // we display all data concerning our freshly created payment
-    $display["detail"] = html_payment_consult ($action, $q_payment, run_query_paymentkind (), run_query_account (), $q_invoices, $q_options_invoices);
+    $display["detail"] = html_payment_consult ($action, $pay_q, run_query_paymentkind (), run_query_account (), $inv_q, $pref_inv_q);
 
     // and we give the user a form to find invoices :
-    $display["detail"] = html_chose_invoices_form ($action, $payment, $q_options_invoices,$q_invoices);
+    $display["detail"] = html_chose_invoices_form ($action, $payment, $pref_inv_q, $inv_q);
   }
   else {
     $display["msg"] = display_err_msg($l_error_permission);
   }
-///////////////////////////////////////////////////////////////////////////////
+
 } elseif ($action == "insert_with_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
   // we don't seem to need checks here...
@@ -93,72 +92,64 @@ if ($action =="new") {
   // first, we need to kown which invoices have been selected :
   reset($HTTP_POST_VARS);
 
-  while (list($key) = each ($HTTP_POST_VARS)){
-    if (strcmp(substr($key,0,4),"use_")==0){
-      run_query_link_payment_to_invoice ($payment, substr($key, 4));
+  while (list($key) = each ($HTTP_POST_VARS)) {
+    if (strcmp(substr($key,0,4),"use_") == 0) {
+      run_query_link_payment_to_invoice($payment, substr($key, 4));
     }
   }
-  $display["msg"] = display_ok_msg ($l_insert_paymentinvoice_ok);
-
+  $display["msg"] = display_ok_msg($l_insert_paymentinvoice_ok);
   // then back to the search screen :
+  $display["detail"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account(), $payment);
 
-  $display["detail"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment); 
-
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
   if ($set_display == "yes") {
-    $q_payment = run_query_search ($payment);
-    $nb_payments = $q_payment->num_rows();
+    $pay_q = run_query_search($payment);
+    $nb_payments = $pay_q->num_rows();
     if ($nb_payments == 0){
-      $display["msg"] = display_warn_msg ($l_no_found);
+      $display["msg"] = display_warn_msg($l_no_found);
     } else {
-      $payment_options = run_query_display_pref ($auth->auth["uid"],"payment");
-      
-      $display["result"] = html_payment_search_list ($q_payment, $payment_options, $nb_payments, $payment);
+      $pref_pay_q = run_query_display_pref($auth->auth["uid"],"payment");
+      $display["result"] = html_payment_search_list($pay_q, $pref_pay_q, $nb_payments, $payment);
     }
   } else {
     $display["msg"] = display_ok_msg($l_no_display);
   }
+
 } elseif ($action == "search")  { 
 //////////////////////////////////////////////////////////////////////////////
   require("payment_js.inc");
   $display["search"] = html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
-  $q_payment = run_query_search ($payment);
-  $nb_payments = $q_payment->num_rows();
+  $pay_q = run_query_search($payment);
+  $nb_payments = $pay_q->num_rows();
   if ($nb_payments == 0){
-    $display["msg"] = display_warn_msg ($l_no_found);
+    $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $payment_options = run_query_display_pref ($auth->auth["uid"],"payment");
-    
-   $display["result"] =  html_payment_search_list ($q_payment, $payment_options, $nb_payments, $payment);
+    $pref_pay_q = run_query_display_pref ($auth->auth["uid"],"payment");
+    $display["result"] =  html_payment_search_list ($pay_q, $pref_pay_q, $nb_payments, $payment);
   }
-///////////////////////////////////////////////////////////////////////////////
+
 } elseif ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($payment["payment"] > 0) {
-    $q_payment = run_query_detail ($payment["payment"]);
-    $q_invoices = run_query_search_connected_invoices ($payment["payment"]);
-    $invoices_options = run_query_display_pref ($auth->auth["uid"], "invoice");
-
-    $q_payment->next_record ();
-    display_record_info ($q_payment->f("payment_usercreate"), $q_payment->f("payment_userupdate"), $q_payment->f("payment_timecreate"), $q_payment->f("payment_timeupdate"));
-
-    $display["detail"] = html_payment_consult ($action, $q_payment, run_query_paymentkind(), run_query_account(),$q_invoices, $invoices_options);
+    $pay_q = run_query_detail($payment["payment"]);
+    $inv_q = run_query_search_connected_invoices($payment["payment"]);
+    $pref_inv_q = run_query_display_pref($auth->auth["uid"], "invoice");
+    $display["detailInfo"] = display_record_info($pay_q);
+    $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $inv_q, $pref_inv_q);
   }
-///////////////////////////////////////////////////////////////////////////////
+
 } elseif ($action == "detailupdate") {
   // detailupdate means changing the label or that kind of things...
   // nothing to do with invoice or account stuff
 ///////////////////////////////////////////////////////////////////////////////
   if ($payment["payment"] > 0) {
-    $q_payment = run_query_detail ($payment["payment"]);
-    $q_payment->next_record();
-    display_record_info ($q_payment->f("payment_usercreate"), $q_payment->f("payment_userupdate"), $q_payment->f("payment_timecreate"), $q_payment->f("payment_timeupdate"));
+    $pay_q = run_query_detail($payment["payment"]);
+    $display["detailInfo"] = display_record_info($pay_q);
+    $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
+  }
 
-    $display["detail"] = html_payment_form ($action, $q_payment, run_query_paymentkind(), run_query_account());
-  }  
 ///////////////////////////////////////////////////////////////////////////////
 } /*
     never used ?
@@ -169,20 +160,16 @@ if ($action =="new") {
   // and checking its amount, date, bank account concerned, etc.
 ///////////////////////////////////////////////////////////////////////////////
    if ($payment["payment"] > 0) {
-
      display_ok_msg (" action == bank");
- 
-     $q_payment = run_query_detail ($payment["payment"]);
-     $q_payment->next_record();
-     display_record_info ($q_payment->f("payment_usercreate"), $q_payment->f("payment_userupdate"), $q_payment->f("payment_timecreate"), $q_payment->f("payment_timeupdate"));
-     
-     html_payment_form ($action, $q_payment, run_query_paymentkind(), run_query_account());
+     $pay_q = run_query_detail ($payment["payment"]);
+     $display["detailInfo"] = display_record_info ($pay_q);
+     html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
   } 
 ///////////////////////////////////////////////////////////////////////////////
 }
 
   */
-elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
+elseif (($action == "search_invoice") || ($action == "search_invoice_new")) {
   // when banking a payment, we first look for invoices,
   // then we add the chosen ones (action == $add_invoices),
   // then we ask the amount of the payment, and we affect this amount
@@ -190,25 +177,22 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
   // last, we check that repartition and update the db if everything is ok,
   // or go back to the beginning if anything is ko...
 ///////////////////////////////////////////////////////////////////////////////
- $display["msg"] =  display_debug_msg ("FIXME : permissions", $cdg_param);
+  $display["msg"] = display_debug_msg("FIXME : permissions", $cdg_param);
   // options d'affichage pour les invoices
-  $dis_options_invoice = run_query_display_pref ($auth->auth["uid"],"invoice");
-
+  $pref_inv_q = run_query_display_pref($auth->auth["uid"],"invoice");
   // recherche des invoices selon label si la recherche a déjà été lancée,
-  $q_invoice = run_query_search_connectable_invoices($payment);
-
+  $inv_q = run_query_search_connectable_invoices($payment);
   // get invoices already connected to that payment :
-  $q_invoices_connected = run_query_search_connected_invoices ($payment["payment"]);
+  $q_invoices_connected = run_query_search_connected_invoices($payment["payment"]);
   //  $q_invoices_connected->next_record ();
   // first, we display payment info :
-  $q_payment = run_query_detail ($payment["payment"]);
-  $q_payment->next_record();
-  $display["detail"] = html_payment_consult ($action, $q_payment, run_query_paymentkind(), run_query_account(),$q_invoices_connected,$dis_options_invoice);
+  $pay_q = run_query_detail($payment["payment"]);
+  $display["detail"] = html_payment_consult($action, $pay_q, run_query_paymentkind(), run_query_account(), $q_invoices_connected, $pref_inv_q);
   
   // then the invoices search form
-  $dis_options_invoice = run_query_display_pref ($auth->auth["uid"], "invoice");
- $display["detail"] .= html_chose_invoices_form ($action,$payment, $dis_options_invoice, $q_invoice);
-///////////////////////////////////////////////////////////////////////////////
+  $pref_inv_q = run_query_display_pref($auth->auth["uid"], "invoice");
+  $display["detail"] .= html_chose_invoices_form($action, $payment, $pref_inv_q, $inv_q);
+
 } elseif ($action == "add_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
   // first, we need to kown which invoices have been selected :
@@ -254,20 +238,17 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
     run_query_do_banking ($payment, $all_invoices);
     $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment);
   }
-///////////////////////////////////////////////////////////////////////////////
+
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $q_payment = run_query_detail ($payment["payment"]);
-  $q_payment->next_record();
+  $pay_q = run_query_detail($payment["payment"]);
   // we give the user the traditionnal form to modify his payment :
- $display["detail"] = html_payment_form ($action, $q_payment, run_query_paymentkind(), run_query_account());
+  $display["detail"] = html_payment_form ($action, $pay_q, run_query_paymentkind(), run_query_account());
 
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_insert ($payment);
   $display["msg"] = display_ok_msg ($l_insert_ok);
-
   $display["search"] = html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment); 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,18 +277,16 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
     $display["msg"] = display_err_msg($l_error_permission);
   } else {
     // first, we get payment details :
-    $q_payment = run_query_detail ($payment["payment"]);
-    $q_payment->next_record ();
+    $pay_q = run_query_detail($payment["payment"]);
     // then invoices connected to that payment
-    $q_connected_invoices = run_query_search_connected_invoices ($payment["payment"]);
+    $inv_q = run_query_search_connected_invoices ($payment["payment"]);
     //$q_connected_invoices->next_record ();
     // display stuff :
-    $invoices_display = run_query_display_pref ($auth->auth["uid"], "invoice");
-    
+    $pref_inv_q = run_query_display_pref ($auth->auth["uid"], "invoice");
     // at last, we can work for real :
-   $display["detail"] = html_breaking_associations ($action,$q_payment, $q_connected_invoices, $invoices_display);
+   $display["detail"] = html_breaking_associations ($action, $pay_q, $inv_q, $pref_inv_q);
   }
-///////////////////////////////////////////////////////////////////////////////
+
 } elseif ($action == "do_break_asso") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_admin) {

@@ -33,6 +33,7 @@ $l_color = "Color";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";
+$l_datasource = "Data source";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

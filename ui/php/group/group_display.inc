@@ -454,7 +454,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   //$mail = get_mail_info();
   //$main_domain = $mail["main_domain"];
 
-  $display["detailInfo"] = display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
+  $display["detailInfo"] = display_record_info($group_q);
   $display["title"] = "<div class=\"title\">$l_group : $name</div>";
 
   $block = "

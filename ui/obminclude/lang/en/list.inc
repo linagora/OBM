@@ -61,8 +61,10 @@ $l_warn_delete = "registered contacts in this list";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the lists";
 $l_found = "lists found.";
 $l_no_found = "No lists found matching the query";
-$l_con_found = "registered contacts";
-$l_no_contact = "No contact registered";
+$l_static_con_found = "static registered contacts";
+$l_no_static_contact = "No static contact registered";
+$l_dyn_con_found = "dynamic registered contacts";
+$l_no_dyn_contact = "No dynamic contact registered";
 
 $l_add_contact = "Add contacts" ;
 $l_del_contact_sel = "Remove these contacts";

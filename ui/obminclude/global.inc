@@ -126,7 +126,7 @@ $php_regexp_email_name="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*$/"; // Email name
 $js_regexp_web="/^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}$/";  // Web
 $php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
 $php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
-$js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
+$js_regexp_list_name = "/^[0-9A-Za-z_- ]+$/";  //Name of a list
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
@@ -524,23 +524,52 @@ function get_hour($timestamp="") {
 //   - $tc    : timecreate
 //   - $tu    : timeupdate
 ///////////////////////////////////////////////////////////////////////////////
-function display_record_info($uc_id, $uu_id, $tc, $tu) {
+function display_record_info($obm_q) {
+  global $set_theme, $ico_created, $ico_updated;
+
+  $usercreate = $obm_q->f("usercreate");
+  $userupdate = $obm_q->f("userupdate");
+  $timecreate = datetime_format($obm_q->f("timecreate"));
+  $timeupdate = datetime_format($obm_q->f("timeupdate"));
+  $datasource = $obm_q->f("datasource_name");
+
+  $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
+  $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
+
+  if ($datasource != "") {
+    $dis_dsrc = "<br />$datasource";
+  } else {
+    $dis_dsrc = "";
+  }
+
+  $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Dispaly an entity dates and users creation / update infos
+// Parameters:
+//   - $uc_id : usercreate id
+//   - $uu_id : userupdate id
+//   - $tc    : timecreate
+//   - $tu    : timeupdate
+///////////////////////////////////////////////////////////////////////////////
+function display_record_info2($uc_id, $uu_id, $tc, $tu) {
   global $set_theme, $ico_created, $ico_updated;
 
   $obm_q = new DB_OBM;
   $query_created = "select userobm_login from UserObm where userobm_id='$uc_id'";
   $query_updated = "select userobm_login from UserObm where userobm_id='$uu_id'";
 
-  //  if ($uc_id != "") {
-    $obm_q->query($query_created);
-    $obm_q->next_record();
-    $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" /> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
-    //  }
-    //  if ($uu_id != "") {
-    $obm_q->query($query_updated);
-    $obm_q->next_record();
-    $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" /> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
-    //  }
+  $obm_q->query($query_created);
+  $obm_q->next_record();
+  $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" /> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
+  $obm_q->query($query_updated);
+  $obm_q->next_record();
+  $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" /> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
 
   $block = "<div class=\"detailInfo\">$created<br />$updated
   </div>";

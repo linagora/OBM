@@ -101,7 +101,7 @@ elseif ($action == "index" || $action == "") {
   if ($param_document > 0 || $name_document != "") {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
+      $display["detailInfo"] = display_record_info($doc_q);
       $display["detail"] = html_document_consult($doc_q);
     } else {
       $display["msg"] .= display_err_msg("$l_no_document !");
@@ -117,7 +117,7 @@ if ($param_document > 0) {
       $cat2_q = run_query_documentcategory2();
       $mime_q = run_query_documentmime();
       require("document_js.inc");
-      $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($doc_q);
       $display["detail"] = html_document_form($action,$doc_q,$cat1_q, $cat2_q,$mime_q,  $document);
   } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
@@ -175,7 +175,7 @@ elseif ($action == "insert")  {
       $display["msg"] .= display_err_msg($l_update_error."  ".$err_msg);
     }
     $doc_q = run_query_detail($document);
-    $display["detailInfo"] .= display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
+    $display["detailInfo"] .= display_record_info($doc_q);
     $display["detail"] = html_document_consult($doc_q);
   } else {
     require("document_js.inc");

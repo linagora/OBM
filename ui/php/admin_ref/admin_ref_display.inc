@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_display.inc                                        //
 //     - Desc : Referential data display file                                //
@@ -42,7 +42,7 @@ function html_datasource_form($dsrc_q) {
 
   if ($dsrc_q->num_rows() > 0) {
     $sel_dsrc = "<select name=\"sel_dsrc\" onChange=\"
-      forms.form_dsrc_update.tf_dsrc.value=this.options[this.selectedIndex].text;\" size=\"8\">";
+      forms.form_dsrc_update.tf_name.value=this.options[this.selectedIndex].text;\" size=\"8\">";
     while ($dsrc_q->next_record()) {
       $id = $dsrc_q->f("datasource_id");
       $name = $dsrc_q->f("datasource_name");
@@ -135,3 +135,106 @@ function html_datasource_form($dsrc_q) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Data Source links                                                //
+// Parameters:
+//   - $ref : datasource hash info : keys used : id, name
+///////////////////////////////////////////////////////////////////////////////
+function dis_datasource_links($ref) {
+  global $display, $l_back, $l_dsrc_link_company, $l_dsrc_link_company_no;
+  global $l_dsrc_link_contact, $l_dsrc_link_contact_no;
+  global $l_dsrc_delete, $l_dsrc_can_delete, $l_dsrc_cant_delete;
+
+  $delete_ok = true;
+  $id = $ref["datasource"];
+  $name = get_datasource_name($id);
+
+  // Company Links
+  $obm_q = run_query_datasource_company_links($id);
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link_comp = "
+    <tr>
+      <td class=\"detailHead\">$name : $l_dsrc_link_company</td>
+    </tr>";
+
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("company_id");
+      $cname = $obm_q->f("company_name");
+      $dis_link_comp .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_comp = "
+    <tr>
+      <td class=\"detailHead\">$l_dsrc_link_company_no</td>
+    </tr>";
+  }
+
+  // Contacts Links
+  $obm_q = run_query_datasource_contact_links($id);
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link_cont = "
+    <tr>
+      <td class=\"detailHead\">$name : $l_dsrc_link_contact</td>
+    </tr>";
+
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
+      $dis_link_cont .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_cont = "
+    <tr>
+      <td class=\"detailHead\">$l_dsrc_link_contact_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link_comp
+    $dis_link_cont
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"datasource\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_dsrc_can_delete);
+    $dis_del = "<form name=\"form_act_delete\".
+          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"datasource_delete\" />
+        <input type=\"hidden\" name=\"sel_dsrc\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_dsrc\" value=\"$l_dsrc_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_dsrc_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+
+  return $block;
+}

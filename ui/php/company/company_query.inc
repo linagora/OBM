@@ -27,6 +27,12 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $market = $company["marketing_manager"];
   $zip = $company["zip"];
 
+  // If a name has been given we serch its sound too
+  if ($name != "") {
+    $auto_aka = reduce_name($name);
+    $sound = metaphone($name);
+  }
+
   $req = "select
       company_id as Id,
       company_id,
@@ -51,13 +57,15 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_deal_total,
       companytype_label,
       companyactivity_label
-    from (Company
-         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id)
+    from Company
+         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
          LEFT JOIN CompanyType on company_type_id=companytype_id";
 
   $and = "";
   if ($name != "") {
-    $where .= " company_name like '$name%'";
+    $where .= " (company_name like '$name%'
+                 or company_aka like '%auto_aka%'
+                 or company_sound = '$sound')";
     $and = "and";
   }
   if (($kind != $c_all) && ($kind != "")) { 
@@ -121,9 +129,15 @@ function run_query_detail($p_id) {
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
         UNIX_TIMESTAMP(company_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(company_timecreate) as timecreate
-      from (Company LEFT JOIN CompanyType on company_type_id=companytype_id)
+        UNIX_TIMESTAMP(company_timecreate) as timecreate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      from Company
+           LEFT JOIN CompanyType on company_type_id=companytype_id
            LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+           LEFT JOIN DataSource on company_datasource_id=datasource_id
+           LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
+           LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
       where company_id='$p_id'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select *,company_timeupdate as timeupdate, company_timecreate as timecreate from Company where company_id=".$p_id;
@@ -134,6 +148,23 @@ function run_query_detail($p_id) {
   $obm_q->next_record();
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Transform a name in a simplified version (suppress .,-,',accent)
+// Parameters:
+//   - $name : name to transform
+// Returns:
+//   - $result : name converted
+///////////////////////////////////////////////////////////////////////////////
+function reduce_name($name) {
+
+  $res = preg_replace("/[טכיך]/i", "e", $name);
+  $res = preg_replace("/[אה]/i", "a", $res);
+  $res = preg_replace("/[\.\-\']/", "", $res);
+
+  return $res;
 }
 
 
@@ -150,6 +181,14 @@ function run_query_insert($company) {
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
+  $aka = $company["aka"];
+  // If reduced version of name not in aka (and not same as name), we add it
+  $auto_aka = reduce_name($name);
+  if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
+    $aka .= " $auto_aka";
+  }
+  $sound = metaphone($name);
+  $dsrc = $company["datasource"];
   $kind = $company["kind"];
   $act = $company["activity"];
   $market = $company["marketing_manager"];
@@ -170,9 +209,12 @@ function run_query_insert($company) {
     company_timecreate,
     company_userupdate,
     company_usercreate,
+    company_datasource_id,
     company_number,
     company_archive,
     company_name,
+    company_aka,
+    company_sound,
     company_type_id,
     company_activity_id,
     company_marketingmanager_id,
@@ -192,9 +234,12 @@ function run_query_insert($company) {
     '" . date("Y-m-d H:i:s") . "',
     null,
     " . $auth->auth["uid"] . ",
+    '$dsrc',
     '$num',
     '$archive',
     '$name',
+    '$aka',
+    '$sound',
     '$kind',
     '$act',
     '$market',
@@ -233,6 +278,14 @@ function run_query_update($cid, $company) {
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
+  $aka = $company["aka"];
+  // If reduced version of name not in aka (and not same as name), we add it
+  $auto_aka = reduce_name($name);
+  if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
+    $aka .= " $auto_aka";
+  }
+  $sound = metaphone($name);
+  $dsrc = $company["datasource"];
   $kind = $company["kind"];
   $act = $company["activity"];
   $market = $company["marketing_manager"];
@@ -249,12 +302,16 @@ function run_query_update($cid, $company) {
   $email = $company["email"];
   $com = $company["com"];
 
+
   $query = "update Company set
     company_timeupdate='". date("Y-m-d H:i:s") ."',
     company_userupdate='". $auth->auth["uid"] ."',
+    company_datasource_id='$dsrc',
     company_number='$num',
     company_archive='$archive',
     company_name='$name',
+    company_aka='$aka',
+    company_sound='$sound',
     company_type_id='$kind',
     company_activity_id='$act',
     company_marketingmanager_id='$market',

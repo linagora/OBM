@@ -97,20 +97,24 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 function run_query_detail($p_invoice_id) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
-  $connect_db = new DB_OBM;
-  if ($connect_db->type == $db_type_mysql) {
+  $obm_q = new DB_OBM;
+  if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
-       UNIX_TIMESTAMP(Invoice.invoice_date) as date,
-       UNIX_TIMESTAMP(invoice_timeupdate) as datemodif,
-       UNIX_TIMESTAMP(invoice_timeupdate) as timeupdate,
-       UNIX_TIMESTAMP(invoice_timecreate) as timecreate,
-       sum(paymentinvoice_amount) as invoice_paid
-     from Invoice left outer join PaymentInvoice
-          on (invoice_id = paymentinvoice_invoice_id)
-     where invoice_id='$p_invoice_id'
-     group by paymentinvoice_invoice_id";
+        UNIX_TIMESTAMP(Invoice.invoice_date) as date,
+        UNIX_TIMESTAMP(invoice_timeupdate) as datemodif,
+        UNIX_TIMESTAMP(invoice_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(invoice_timecreate) as timecreate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate,
+        sum(paymentinvoice_amount) as invoice_paid
+      from Invoice
+        left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
+        left join UserObm as c on invoice_usercreate=c.userobm_id
+        left join UserObm as u on invoice_userupdate=u.userobm_id
+      where invoice_id='$p_invoice_id'
+      group by paymentinvoice_invoice_id";
 
-  } else if ($connect_db->type == $db_type_pgsql) {
+  } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select * ".
        ", invoice_timeupdate as datemodif ".
        ", invoice_timeupdate as timeupdate ".
@@ -123,8 +127,10 @@ function run_query_detail($p_invoice_id) {
   }
 
   display_debug_msg ("<b>run_query_detail() :</b>$query", $cdg_sql); 
-  $connect_db->query($query);
-  return $connect_db;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
 }
 
 

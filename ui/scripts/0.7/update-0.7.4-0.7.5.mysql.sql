@@ -20,3 +20,23 @@ CREATE TABLE DataSource (
   datasource_name varchar(64),
   PRIMARY KEY (datasource_id)
 );
+
+
+-------------------------------------------------------------------------------
+-- Update structure for table 'Company'
+-------------------------------------------------------------------------------
+-- Add new column : company_datasource_id
+ALTER table Company add column company_datasource_id int(8) DEFAULT NULL after company_usercreate;
+
+-- Add new column : company_aka (Also Known As)
+ALTER table Company add column company_aka varchar(255) after company_name;
+
+-- Add new column : company_sound (Metaphone version of name)
+ALTER table Company add column company_sound varchar(24) after company_aka;
+
+
+-------------------------------------------------------------------------------
+-- Update structure for table 'Contact'
+-------------------------------------------------------------------------------
+-- Add new column : contact_datasource_id
+ALTER table Contact add column contact_datasource_id int(8) DEFAULT NULL after contact_usercreate;

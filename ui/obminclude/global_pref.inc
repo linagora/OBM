@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : global_pref.inc                                              //
 //     - Desc : Global preference OBM include file                           //

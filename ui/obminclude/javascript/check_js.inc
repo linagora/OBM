@@ -46,10 +46,6 @@ function check_web(web) {
   return web.match($js_regexp_web);
 }
 
-function check_list(list) {
-  // allow only valid list name
-  return list.match($js_regexp_list_name) ;
-}
 function check_number(number){
   // field containing only digits :
   return number.match($js_regexp_number);

@@ -10,6 +10,7 @@
 // Database fields
 $l_number = "Numero";
 $l_name = "Nome";
+$l_aka = "Altri nome";
 $l_company_name = "Nome Azienda";
 $l_kind = "Tipo";
 $l_activity = "Activita";

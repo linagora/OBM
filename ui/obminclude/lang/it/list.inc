@@ -72,8 +72,10 @@ $l_fill_subject = "Oggeto non valido";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";
 
-$l_con_found = "Contatti registrati";
-$l_no_contact = "Non sono presenti contatti registrati";
+$l_static_con_found = "Static Contatti registrati";
+$l_no_static_contact = "Non sono presenti static contatti registrati";
+$l_dyn_con_found = "Dynamic Contatti registrati";
+$l_no_dyn_contact = "Non sono presenti dynamic contatti registrati";
 
 //------------------------------------//
 // Export Format informations         //

@@ -64,6 +64,8 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   return $obm_db;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // User query search query execution                                         //
 // Parameters:
@@ -125,6 +127,7 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution                                               //
 // Parameters:
@@ -135,11 +138,15 @@ function run_query_detail($p_id) {
 
   $obm_q = new DB_OBM;
   $query = "select UserObm.*,
-      UNIX_TIMESTAMP(userobm_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(userobm_timecreate) as timecreate,
-      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+      UNIX_TIMESTAMP(UserObm.userobm_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(UserObm.userobm_timecreate) as timecreate,
+      UNIX_TIMESTAMP(UserObm.userobm_timelastaccess) as userobm_timelastaccess,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
     from UserObm
-    where userobm_id='$p_id'";
+         left join UserObm as c on UserObm.userobm_usercreate=c.userobm_id
+         left join UserObm as u on UserObm.userobm_userupdate=u.userobm_id
+    where UserObm.userobm_id='$p_id'";
 
   $obm_q->query($query);
   $obm_q->next_record();

@@ -336,7 +336,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
-	<li><a href=\"\" 
+    <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -357,7 +357,7 @@ function html_company_consult($co_q) {
   // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
-  global $l_name,$l_number,$l_kind,$l_activity,$l_archive;
+  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_archive;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
   global $l_insert,$l_update,$l_delete, $l_company, $l_coord;
@@ -367,6 +367,7 @@ function html_company_consult($co_q) {
   $num = $co_q->f("company_number");
   $archive = ($co_q->f("company_archive") == 1 ? $c_yes : $c_no);
   $name = $co_q->f("company_name");
+  $aka = $co_q->f("company_aka");
   $kind = $co_q->f("companytype_label");
   $act = $co_q->f("companyactivity_label");
   $mark = $co_q->f("company_marketingmanager_id");
@@ -384,6 +385,18 @@ function html_company_consult($co_q) {
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
   $com = $co_q->f("company_comment");
+
+
+  // Display Aka only if non empty
+  if ($aka != "") {
+    $dis_aka = "
+    <tr> 
+      <td class=\"detailLabel\">$l_aka</td>
+      <td class=\"detailText\">$aka</td>
+    </tr>";
+  } else {
+    $dis_aka = "";
+  }
 
   if ($mark > 0)
     $lmarket = get_userobm_name($mark);
@@ -416,7 +429,7 @@ function html_company_consult($co_q) {
 
 
   // --- HTML Template --------------------------------------------------------
-  
+
   $template = get_template("company_consult.tpl");
   eval ("\$template = \"$template\";");
   $block = $template;
@@ -430,21 +443,20 @@ function html_company_consult($co_q) {
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : company database result 
+//   - $dsrc_q    : datasource database result 
 //   - $kind_q    : kind database result 
 //   - $usr_q     : userobm database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
-  global $display, $auth, $l_none;
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $company) {
+  global $display, $auth, $set_dsrc, $l_none;
   global $set_theme,$ico_web,$ico_mail;
-  global $l_name,$l_kind,$l_activity,$l_archive,$l_phone,$l_fax,$l_address;
-  global $l_postcode,$l_expresspostal,$l_town;
+  global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
+  global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
   global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
-
-  $mark = $auth->auth["uid"];
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -452,6 +464,8 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     $num = $co_q->f("company_number");
     $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
     $name = $co_q->f("company_name");
+    $aka = $co_q->f("company_aka");
+    $dsrc = $co_q->f("company_datasource_id");
     $kind = $co_q->f("company_type_id");
     $act = $co_q->f("company_activity_id");
     $mark = $co_q->f("company_marketingmanager_id");
@@ -469,6 +483,9 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
     $con_num = $co_q->f("company_contact_number");
     $deal_num = $co_q->f("company_deal_number");
     $com = $co_q->f("company_comment");
+  } else  if ($action == "new") {
+    $mark = $auth->auth["uid"];
+    $dsrc = $set_dsrc;
   }
 
   // If parameters have been given, they supercede the default action value
@@ -476,6 +493,8 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   if (isset($company["num"])) { $num = stripslashes($company["num"]); }
   if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
   if (isset($company["name"])) { $name = stripslashes($company["name"]); }
+  if (isset($company["aka"])) { $aka = stripslashes($company["aka"]); }
+  if (isset($company["datasource"])) { $dsrc = $company["datasource"]; }
   if (isset($company["kind"])) { $kind = $company["kind"]; }
   if (isset($company["activity"])) { $act = $company["activity"]; }
   if (isset($company["marketing_manager"])) { $mark = $company["marketing_manager"]; }
@@ -491,6 +510,17 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   if (isset($company["web"])) { $web = stripslashes($company["web"]); }
   if (isset($company["email"])) { $email = stripslashes($company["email"]); }
   if (isset($company["com"])) { $com = stripslashes($company["com"]); }
+
+  // data source select
+  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+    <option value=\"0\">$l_none</option>";
+  while ($dsrc_q->next_record()) {
+    $d_id = $dsrc_q->f("datasource_id");
+    $sel_dsrc .= "\n<option value=\"$d_id\"";
+    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+  }
+  $sel_dsrc .= "</select>";
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">";
@@ -566,7 +596,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"post\" name=\"f_mod_societe\"
+    <form method=\"post\" name=\"form_company\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
 
@@ -577,8 +607,14 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_aka</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_datasource</td> 
+      <td class=\"detailForm\">$sel_dsrc</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
@@ -1008,31 +1044,26 @@ function html_company_kind_form($kind_q) {
 //   - $company : company hash info : keys used : kind
 ///////////////////////////////////////////////////////////////////////////////
 function dis_kind_links($company) {
-  global $l_kind_link_company, $l_kind_link_company_no;
+  global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
   global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
-  global $l_back;
 
-  // $id = get_kind_id($label);
+  $delete_ok = true;
   $id = $company["kind"];
   $label = get_kind_label($id);
   $obm_q = run_query_kind_links($id);
 
   if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
     $dis_link = "
-    <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_kind_cant_delete</td>
-    </tr><tr>
-      <td>&nbsp;</td>
-    </tr><tr>
-      <td class=\"detailHead\">$l_kind_link_company $label</td>
+      <td class=\"detailHead\">$label : $l_kind_link_company</td>
     </tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .="
     <tr>
-      <td class=\"detailText\">
+      <td class=\"detailLabel\">
         <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
     </tr>";
@@ -1040,31 +1071,44 @@ function dis_kind_links($company) {
 
   } else {
     $dis_link = "
-    <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"messageOk\">
-      $l_kind_link_company_no '$label' : $l_kind_can_delete</td>
-    </tr><tr>
-      <td>
-        <form name=\"form_kind_delete\"
-          method=post action=\"" . url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind_delete\">
-        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\">
-        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\">
-        </form>
-      </td>
-      <td>
-        <form name=\"form_back\" method=\"get\"
+      <td class=\"detailHead\">$label : $l_kind_link_company_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </td>
-    </tr>
-    </table>";
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_kind_can_delete);
+    $dis_del = "<form name=\"form_kind_delete\".
+          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
+        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   }
 
-  return $dis_link;
+
+  return $block;
 }
 
 
@@ -1169,30 +1213,27 @@ function html_company_activity_form($act_q) {
 //   - $company : company hash info : keys used : activity
 ///////////////////////////////////////////////////////////////////////////////
 function dis_activity_links($company) {
-  global $l_act_link_company, $l_act_link_company_no;
+  global $display, $l_back, $l_act_link_company, $l_act_link_company_no;
   global $l_act_delete, $l_act_can_delete, $l_act_cant_delete;
-  global $l_back;
 
+  $delete_ok = true;
   $id = $company["activity"];
   $label = get_activity_label($id);
   $obm_q = run_query_activity_links($id);
 
   if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
     $dis_link = "
-    <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_act_cant_delete</td>
-    </tr><tr>
-      <td>&nbsp;</td>
-    </tr><tr>
       <td class=\"detailHead\">$label : $l_act_link_company</td>
     </tr>";
+
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .= "
     <tr>
-      <td class=\"detailText\">
+      <td class=\"detailLabel\">
         <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
     </tr>";
@@ -1200,31 +1241,44 @@ function dis_activity_links($company) {
 
   } else {
     $dis_link = "
-    <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"messageOk\">
-        $l_act_link_company_no '$label' : $l_act_can_delete</td>
-    </tr><tr>
-      <td>
-        <form name=\"form_act_delete\"
-          method=post action=\"" . url_prepare("company_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"activity_delete\">
-        <input type=\"hidden\" name=\"sel_act\" value=\"$id\">
-        <input type=\"submit\" name=\"sub_act\" value=\"$l_act_delete\">
-        </form>
-      </td>
-      <td>
-        <form name=\"form_back\" method=\"get\"
+      <td class=\"detailHead\">$label : $l_act_link_company_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </td>
-    </tr>
-    </table>";
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_act_can_delete);
+    $dis_del = "<form name=\"form_act_delete\".
+          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"activity_delete\" />
+        <input type=\"hidden\" name=\"sel_act\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_act\" value=\"$l_act_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_act_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   }
 
-  return $dis_link;
+
+  return $block;
 }
 
 

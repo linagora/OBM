@@ -82,22 +82,20 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  if ($account["account"] > 0) {    
-    $obm_q_account=run_query_detail($account["account"]);
-    $obm_q_account->next_record();
-
-    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
-    $display["detail"] = html_account_consult($obm_q_account, $action);
+  if ($account["account"] > 0) {
+    $ac_q = run_query_detail($account["account"]);
+    $ac_q->next_record();
+    $display["detailInfo"] = display_record_info($ac_q);
+    $display["detail"] = html_account_consult($ac_q, $action);
   }
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($account["account"] > 0) {
-     
-    $obm_q_account=run_query_detail($account["account"]);
-    $obm_q_account->next_record();    
+    $ac_q = run_query_detail($account["account"]);
+    $ac_q->next_record();    
     require("account_js.inc");
-    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
-    $display["detail"] = html_account_form($obm_q_account,$action);
+    $display["detailInfo"] = display_record_info($ac_q);
+    $display["detail"] = html_account_form($ac_q, $action);
   }
 
 } elseif ($action == "update")  {
@@ -105,12 +103,11 @@ if ($action == "index" || $action == "") {
   require("account_js.inc");
   run_query_update($account);
 
-  if ($account["account"] > 0) {    
-    $obm_q_account=run_query_detail($account["account"]);
-    $obm_q_account->next_record();
-
-    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
-    $display["detail"] = html_account_consult($obm_q_account, $action);
+  if ($account["account"] > 0) {
+    $ac_q = run_query_detail($account["account"]);
+    $ac_q->next_record();
+    $display["detailInfo"] = display_record_info($ac_q);
+    $display["detail"] = html_account_consult($ac_q, $action);
   }
 //   $display["msg"] = display_ok_msg($l_update_ok);
 //   require("account_js.inc");

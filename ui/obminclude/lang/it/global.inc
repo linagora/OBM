@@ -33,6 +33,7 @@ $l_color = "Colore";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
 $l_town = "Citta";
+$l_datasource = "Data source";
 
 // OBM_DISPLAY
 $l_entries = "Resultati";

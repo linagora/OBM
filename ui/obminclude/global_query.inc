@@ -33,6 +33,23 @@ function run_query_id_user($login, $passwd) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Data Source query execution                                               //
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_datasource() {
+  global $cdg_sql;
+
+  $query = "select * from DataSource order by datasource_name"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of projects linked to an entity
 // Parameters:
 //   - $id     : Id of entity

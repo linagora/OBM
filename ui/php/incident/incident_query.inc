@@ -120,12 +120,16 @@ function run_query_detail($id) {
         s.incidentstatus_label,
         UNIX_TIMESTAMP(incident_date) as date,
         UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(incident_timecreate) as timecreate
-      from (((Incident
-              left join UserObm u1 on incident_logger=u1.userobm_id)
-              left join UserObm u2 on incident_owner=u2.userobm_id)
-              left join IncidentPriority p on incident_priority_id=p.incidentpriority_id)
-              left join IncidentStatus s on incident_status_id=s.incidentstatus_id
+        UNIX_TIMESTAMP(incident_timecreate) as timecreate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      from Incident
+           left join UserObm u1 on incident_logger=u1.userobm_id
+           left join UserObm u2 on incident_owner=u2.userobm_id
+           left join IncidentPriority p on incident_priority_id=p.incidentpriority_id
+           left join IncidentStatus s on incident_status_id=s.incidentstatus_id
+           left join UserObm as c on incident_usercreate=c.userobm_id
+           left join UserObm as u on incident_userupdate=u.userobm_id
       where incident_id='$id'";
   }
   else if ($connect_db->type == $db_type_pgsql) {

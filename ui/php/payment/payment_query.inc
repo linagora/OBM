@@ -114,6 +114,51 @@ function run_query_search($p_payment, $p_new_order="") {
 }
 
 
+// à refaire avec quelques join pour récuperer l'account et le type
+///////////////////////////////////////////////////////////////////////////////
+// récupération de tous les champs du payment
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($p_payment_id) {
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  if ($obm_q->type == $db_type_mysql){
+    $query = "select *,
+      UNIX_TIMESTAMP(Payment.payment_date) as date,
+      UNIX_TIMESTAMP(Payment.payment_expected_date) as expect_date,
+      UNIX_TIMESTAMP(payment_timeupdate) as datemodif,
+      UNIX_TIMESTAMP(payment_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(payment_timecreate) as timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate,
+      sum(paymentinvoice_amount) as pay_inv_paid
+    from Payment
+      left outer join PaymentInvoice on payment_id=paymentinvoice_payment_id
+      left join UserObm as c on payment_usercreate=c.userobm_id
+      left join UserObm as u on payment_userupdate=u.userobm_id
+    where payment_id = '$p_payment_id'";
+  } elseif ($obm_q->type == $db_type_pgsql) { 
+    $query = "select * ".
+       ", payment_timeupdate as datemodif ".
+       ", payment_timeupdate as timeupdate ".
+       ", payment_timecreate as timecreate ".
+       ", sum(paymentinvoice_amount) as pay_inv_paid ".
+       " from Payment  left outer join PaymentInvoice ".
+       " on (payment_id=paymentinvoice_payment_id)".
+       " where payment_id =".$p_payment_id;
+  }
+
+  $query .= " group by paymentinvoice_invoice_id ";
+
+  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // creation of a new payment : database insertion
 // the new payment has payment_amount_used = 0 et is not connected to
@@ -188,46 +233,6 @@ function run_query_account () {
 
   return $db;
 }
-
-// à refaire avec quelques join pour récuperer l'account et le type
-///////////////////////////////////////////////////////////////////////////////
-// récupération de tous les champs du payment
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_payment_id) {
-  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
-
-  $go = new DB_OBM;
-
-  if ($go->type == $db_type_mysql){
-    $query = "select *,
-      UNIX_TIMESTAMP(Payment.payment_date) as date,
-      UNIX_TIMESTAMP(Payment.payment_expected_date) as expect_date,
-      UNIX_TIMESTAMP(payment_timeupdate) as datemodif,
-      UNIX_TIMESTAMP(payment_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(payment_timecreate) as timecreate,
-      sum(paymentinvoice_amount) as pay_inv_paid
-    from Payment left outer join PaymentInvoice
-         on (payment_id=paymentinvoice_payment_id)
-    where payment_id = '$p_payment_id'";
-  } elseif ($go->type == $db_type_pgsql) { 
-    $query = "select * ".
-       ", payment_timeupdate as datemodif ".
-       ", payment_timeupdate as timeupdate ".
-       ", payment_timecreate as timecreate ".
-       ", sum(paymentinvoice_amount) as pay_inv_paid ".
-       " from Payment  left outer join PaymentInvoice ".
-       " on (payment_id=paymentinvoice_payment_id)".
-       " where payment_id =".$p_payment_id;
-  }
-
-  $query .= " group by paymentinvoice_invoice_id ";
-
-  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
-
-  $go->query($query);
-  return $go;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // mise à jour de payments 

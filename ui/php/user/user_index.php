@@ -120,7 +120,7 @@ elseif ($action == "index" || $action == "") {
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     include("user_js.inc");
-    $display["detailInfo"] = display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
+    $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_user_form(1, $obm_q, $obm_user);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");

@@ -126,16 +126,18 @@ function run_query_detail($p_id) {
       project_soldtime,
       project_estimatedtime,
       project_archive,
-      project_userupdate as userupdate,
-      project_usercreate as usercreate,
       UNIX_TIMESTAMP(project_timeupdate) as timeupdate,
       UNIX_TIMESTAMP(project_timecreate) as timecreate,
       UNIX_TIMESTAMP(project_datebegin) as datebegin,
-      UNIX_TIMESTAMP(project_dateend) as dateend
+      UNIX_TIMESTAMP(project_dateend) as dateend,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
     from Project
          left join Company on project_company_id=company_id
          left join Deal on project_deal_id=deal_id
          left join TaskType on project_tasktype_id=tasktype_id
+         LEFT JOIN UserObm as c on project_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on project_userupdate=u.userobm_id
     where project_id='$p_id'
     ";
 

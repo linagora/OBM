@@ -23,6 +23,7 @@ function run_query_documentcategory1() {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Category 2 query execution
 // Return:
@@ -138,6 +139,80 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   $obm_db->query($req);
   
   return $obm_db;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Detail query execution                                                    //
+// Parameters :
+//   - $p_id  : document id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($document) {
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+
+  $p_id = $document["id"];
+  $name = $document["name"];
+  $path = $document["path"];
+  if (islink($name)) {
+    $name = getlink($name,$path);
+  }
+  $obm_q = new DB_OBM;
+  if ($obm_q->type == $db_type_mysql) {
+    $query = "select *,
+        UNIX_TIMESTAMP(document_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(document_timecreate) as timecreate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      from Document
+        left join DocumentCategory1 on document_category1 = documentcategory1_id
+        left join DocumentCategory2 on document_category2 = documentcategory2_id
+	left join DocumentMimeType on document_mimetype = documentmimetype_id
+        left join UserObm as c on document_usercreate=c.userobm_id
+        left join UserObm as u on document_userupdate=u.userobm_id
+      where document_id='$p_id'";
+  } else if ($obm_q->type == $db_type_pgsql) {
+    $query = "select *,document_timeupdate as timeupdate, document_timecreate as timecreate from Document where document_id='$p_id'";
+  }
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Detail query execution                                                    //
+// Parameters :
+//   - $p_id  : document id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail_by_path($path,$name) {
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select *,
+      UNIX_TIMESTAMP(document_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(document_timecreate) as timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from Document
+      LEFT JOIN DocumentCategory1 on document_category1 = documentcategory1_id
+      LEFT JOIN DocumentCategory2 on document_category2 = documentcategory2_id
+      LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id
+      LEFT JOIN UserObm as c on document_usercreate=c.userobm_id
+      LEFT JOIN UserObm as u on document_userupdate=u.userobm_id
+    where document_name='$name'
+      and (document_path='$path' OR document_path='$path/'
+           OR document_path='/$path' OR document_path='/$path/')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  if($obm_q->nf()>0) {
+    $obm_q->next_record();
+    return $obm_q;
+  }
+
+  return false;
 }
 
 
@@ -582,70 +657,6 @@ function check_data_form($cid, $document) {
   }
 
   return true; 
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
-// Parameters :
-//   - $p_id  : document id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($document) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
-
-  $p_id = $document["id"];
-  $name = $document["name"];
-  $path = $document["path"];
-  if(islink($name)) {
-    $name = getlink($name,$path);
-  }
-  $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(document_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(document_timecreate) as timecreate
-      from ((Document
-         LEFT JOIN DocumentCategory1 on document_category1 = documentcategory1_id)
-         LEFT JOIN DocumentCategory2 on document_category2 = documentcategory2_id)
-	 LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id
-	 where document_id='$p_id'";
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select *,document_timeupdate as timeupdate, document_timecreate as timecreate from Document where document_id='$p_id'";
-  }
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
-// Parameters :
-//   - $p_id  : document id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail_by_path($path,$name) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $query = "select *,
-      UNIX_TIMESTAMP(document_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(document_timecreate) as timecreate
-    from ((Document
-       LEFT JOIN DocumentCategory1 on document_category1 = documentcategory1_id)
-       LEFT JOIN DocumentCategory2 on document_category2 = documentcategory2_id)
-       LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id
-       where document_name='$name' and (document_path='$path' OR  document_path='$path/'
-       OR  document_path='/$path 'OR  document_path='/$path/')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  if($obm_q->nf()>0) {
-    $obm_q->next_record();
-    return $obm_q;
-  }
-  return false;
 }
 
 

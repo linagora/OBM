@@ -125,11 +125,17 @@ function run_query_detail($id) {
   $obm_q = new DB_OBM;
   $query = "select *,
       UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
-      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate
-    from UGroup where group_id = '$id'";
+      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from UGroup
+         left join UserObm as c on group_usercreate=c.userobm_id
+         left join UserObm as u on group_userupdate=u.userobm_id
+ where group_id = '$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;
   $obm_q->next_record();
+
   return $obm_q;
 }
 

@@ -111,16 +111,16 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
-    $display["detailInfo"] = display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($contract_q);
     $display["detail"] = html_contract_consult($contract_q);
   }
   
 } elseif ($action == "detailupdate")  {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
     require("contract_js.inc");
-    $display["detailInfo"] = display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($contract_q);
     $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
     $usr_q = run_query_userobm_active($users);
     $company = $contract_q->f("contract_company_id");

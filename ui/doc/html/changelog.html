@@ -12,25 +12,30 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.7.4 - 2003-12-05
+version 0.7.5 - 2003-12-19
 <p>
 </center>
 
 To do<br>
 <UL>
 <LI> When deleting a user, move all his calendarevents from private to public ?
-<LI> Look at the display_record() implementation.
 <LI> how to detect doublons ?
 <LI> Pour les listes : supprimer les listes dans export ? trier requete exports ?
 <LI> Requete Document dans admin_data_index ?
 <LI> Application des autorisations d'action sur l'action courante (ou positionner get_module_action: avant switch action, pb avec insert qui recupere l'id pour les menus; apres switch action, pb car pas de test de l'autorisation).
+<li> Constantes
 </UL>
 
 
 2003-12-19 : version 0.7.5<br>
 
 <ul>
+<li> Company : New AKA (Also Known As) field with auto-filling improve searches
+<li> Company : enhanced search via sounding search (via metaphone)
+<li> New Module : Admin Referential, to handle global references tables
+<li> DataSource handling to ease Company and Contact imports. Admin Referential
 <li> BUG#282 : Deal creation from Comapny detail corredted
+<li> BUG#204 : Display record info optimization (2 queries removed)
 </ul>
 
 2003-12-05 : version 0.7.4<br>

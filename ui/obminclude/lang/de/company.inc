@@ -13,6 +13,7 @@
 // Labels and texts
 $l_number = "Nummer";
 $l_name = "Name";
+$l_aka = "Also known as";
 $l_company_name = "Firma";
 $l_kind = "Firmenart";
 $l_activity = "Activity";

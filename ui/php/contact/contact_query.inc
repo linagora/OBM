@@ -88,7 +88,6 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Contact Company query execution                                           //
 // Parameters:
@@ -134,19 +133,25 @@ function run_query_kind() {
 function run_query_detail($p_id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
-  $obm_q= new DB_OBM;
+  $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select Contact.*,
         UNIX_TIMESTAMP(contact_timeupdate) as timeupdate,
         UNIX_TIMESTAMP(contact_timecreate) as timecreate,
         company_id, company_name, company_phone,
-        kind_minilabel
+        kind_minilabel,
+        datasource_name,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
       from
-        Contact left join Kind on kind_id=contact_kind_id,
-        Company
+        Contact
+        left join Company on contact_company_id=company_id
+        left join Kind on kind_id=contact_kind_id
+        left join DataSource on contact_datasource_id=datasource_id
+        left join UserObm as c on contact_usercreate=c.userobm_id
+        left join UserObm as u on contact_userupdate=u.userobm_id
       where
-        contact_id='$p_id'
-        and company_id=contact_company_id";
+        contact_id='$p_id'";
 
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select Contact.*,
@@ -185,6 +190,7 @@ function run_query_insert($contact) {
     $comp_id = $contact["company_id"];
   }
 
+  $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
@@ -210,6 +216,7 @@ function run_query_insert($contact) {
     contact_timecreate,
     contact_userupdate,
     contact_usercreate,
+    contact_datasource_id,
     contact_company_id,
     contact_kind_id,
     contact_lastname,
@@ -235,6 +242,7 @@ function run_query_insert($contact) {
     '" . date("Y-m-d H:i:s") . "',
     null,
     '" . $auth->auth["uid"] . "',
+    '$dsrc',
     '$comp_id',
     '$kind',
     '$lname',
@@ -287,6 +295,7 @@ function run_query_update($contact) {
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
+  $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
@@ -311,6 +320,7 @@ function run_query_update($contact) {
   $query = "update Contact set
     contact_timeupdate='".date("Y-m-d H:i:s")."',
     contact_userupdate='".$auth->auth["uid"]."',
+    contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_kind_id='$kind',
     contact_lastname='$lname',

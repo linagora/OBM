@@ -25,21 +25,21 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
   $bank = $account["bank"];
   $number = $account["number"];
 
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
   
   $query = "select *, account_id as Id from Account ";
   $query .= " where 1 > 0 ";
   if ($label != "") {
-    $query.=" and account_label like '$label%' ";
+    $query .= " and account_label like '$label%' ";
   }
 
   if ($bank != "") {
-    $query.=$flag." and account_bank like '%$bank%' ";
+    $query .= $flag." and account_bank like '%$bank%' ";
   }
   if ($number != "") 
-    $query.=" and account_number like '%$number%' ";
+    $query .= " and account_number like '%$number%' ";
 
-  $query.=" order by $order $p_order_dir";
+  $query .= " order by $order $p_order_dir";
   
   display_debug_msg("<b>run_query_search() : </b>$query", $cdg_sql);
   $obm_q = new DB_OBM;
@@ -47,6 +47,36 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
   
   return ($obm_q);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Account: Select query construction
+// the balance returned by this query is the true balance at date == today... 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($p_account_id) {
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
+
+  $connect_db = new DB_OBM;
+  if ($connect_db->type == $db_type_mysql) {
+    $query = "select *,
+        UNIX_TIMESTAMP(account_timeupdate) as datemodif,
+        UNIX_TIMESTAMP(account_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(account_timecreate) as timecreate,
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      from Account
+           LEFT JOIN UserObm as c on account_usercreate=c.userobm_id
+           LEFT JOIN UserObm as u on account_userupdate=u.userobm_id
+      where account_id ='$p_account_id'";
+  } else if ($connect_db->type == $db_type_pgsql) {
+    $query = "select *,account_timeupdate as datemodif,account_timeupdate as timeupdate,account_timecreate as timecreate from Account where account_id=".$p_account_id;
+  }
+
+  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
+  $connect_db->query($query);
+  return $connect_db;
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 // insertion query :
@@ -65,30 +95,6 @@ function run_query_insert ($account) {
   display_debug_msg( "<b>run_query_insert () :</b>$query", $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Account: Select query construction
-// the balance returned by this query is the true balance at date == today... 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_account_id) {
-  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
-
-  $connect_db = new DB_OBM;
-  if ($connect_db->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(account_timeupdate) as datemodif,
-        UNIX_TIMESTAMP(account_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(account_timecreate) as timecreate
-      from Account where account_id ='$p_account_id'";
-  } else if ($connect_db->type == $db_type_pgsql) {
-    $query = "select *,account_timeupdate as datemodif,account_timeupdate as timeupdate,account_timecreate as timecreate from Account where account_id=".$p_account_id;
-  }
-
-  display_debug_msg ("<b>run_query_detail() : </b>$query", $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
 }
 
 
@@ -152,7 +158,7 @@ function run_query_search_payments ($p_account_id, $p_date_before = "") {
 // if $p_date_before is set, matching payments must have 
 //          payment_expected_date < $p_date_before
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_expected_payments ($p_account_id, $p_date_before="") {
+function run_query_search_expected_payments($p_account_id, $p_date_before="") {
   global $cdg_sql;
 
   $query = "select *, payment_id as Id,

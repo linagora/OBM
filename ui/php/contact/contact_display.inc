@@ -426,17 +426,18 @@ function html_deal_links($id) {
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : contact database result 
+//   - $dsrc_q    : datasource database result 
 //   - $kind_q    : contact kind database result 
 //   - $contact[] : default values
-//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx, ctry, func
+//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $kind_q, $contact) {
-  global $set_theme, $ico_company;
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $contact) {
+  global $set_dsrc, $set_theme, $ico_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
-  global $l_archive, $l_private,$l_coord, $l_contact;
+  global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $display, $path, $auth;
@@ -470,6 +471,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // New form and first time
   } elseif ($action == "new") {
+    $dsrc = $set_dsrc;
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one
@@ -488,6 +490,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if (isset($contact["comp_new_name"])) { $c_new_name = $contact["comp_new_name"]; }
   if (isset($contact["id"])) { $id = $contact["id"]; }
   if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
+  if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
@@ -509,6 +512,16 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
+  // data source select
+  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+    <option value=\"0\">$l_none</option>";
+  while ($dsrc_q->next_record()) {
+    $d_id = $dsrc_q->f("datasource_id");
+    $sel_dsrc .= "\n<option value=\"$d_id\"";
+    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+  }
+  $sel_dsrc .= "</select>";
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\">";
@@ -556,23 +569,26 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
     <table class=\"detail\">
     <tr>
-    <td class=\"detailLabel\">$l_lastname</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
+      <td class=\"detailLabel\">$l_lastname</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_firstname</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
+      <td class=\"detailLabel\">$l_firstname</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_kind</td>
-    <td class=\"detailForm\">$sel_kind</td>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailForm\">$display_private</td>
+      <td class=\"detailLabel\">$l_datasource</td> 
+      <td class=\"detailForm\">$sel_dsrc</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_archive</td>
-    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      <td class=\"detailLabel\">$l_private</td>
+      <td class=\"detailForm\">$display_private</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_company</td>
-    <td class=\"detailForm\">
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_company</td>
+      <td class=\"detailForm\">
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
@@ -583,8 +599,8 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_function</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
+      <td class=\"detailLabel\">$l_function</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
     </tr>
     </table>
 

@@ -111,15 +111,19 @@ function run_query_detail($p_contract_id) {
       UNIX_TIMESTAMP(contract_datebegin) as datebegin,
       UNIX_TIMESTAMP(contract_dateexp) as dateexp,
       UNIX_TIMESTAMP(contract_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(contract_timecreate) as timecreate
-    from ((((((Contract
-          left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
-          left join UserObm u2 on contract_techmanager_id=u2.userobm_id)
-          left join Contact c1 on contract_contact1_id=c1.contact_id)
-          left join Contact c2 on contract_contact2_id=c2.contact_id)
-          left join Company on contract_company_id=company_id)
-          left join ContractType on contract_type_id=contracttype_id)
-          left join Deal on contract_deal_id=deal_id
+      UNIX_TIMESTAMP(contract_timecreate) as timecreate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from Contract
+         left join UserObm u1 on contract_marketmanager_id=u1.userobm_id
+         left join UserObm u2 on contract_techmanager_id=u2.userobm_id
+         left join Contact c1 on contract_contact1_id=c1.contact_id
+         left join Contact c2 on contract_contact2_id=c2.contact_id
+         left join Company on contract_company_id=company_id
+         left join ContractType on contract_type_id=contracttype_id
+         left join Deal on contract_deal_id=deal_id
+         left join UserObm as c on contract_usercreate=c.userobm_id
+         left join UserObm as u on contract_userupdate=u.userobm_id
     where contract_id='$p_contract_id'";
 
   display_debug_msg($query, $cdg_sql);

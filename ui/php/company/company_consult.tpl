@@ -5,6 +5,7 @@
       <td class="detailLabel">$l_name</td>
       <td class="detailText">$name</td>
     </tr>
+    $dis_aka
     <tr> 
       <td class="detailLabel">$l_number</td>
       <td class="detailText">$num</td>

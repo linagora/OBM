@@ -498,7 +498,7 @@ function html_user_consult($obm_q) {
   if ($perms == $perms_editor) $l_perms = $l_perms_editor;
   if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
-  $display["detailInfo"] = display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
+  $display["detailInfo"] = display_record_info($obm_q);
   $display["title"] = "<div class=\"title\">$l_user : $fname $lname</div>";
 
   $block = "

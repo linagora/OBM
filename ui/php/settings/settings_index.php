@@ -59,6 +59,12 @@ if ($form_user_pref) {
     run_query_set_user_pref($uid, "set_rows", $set_rows);
   }
 
+  if ($param_dsrc != "") {
+    $set_dsrc = $param_dsrc;
+    $sess->register("set_dsrc");
+    run_query_set_user_pref($uid, "set_dsrc", $set_dsrc);
+  }
+
   if ($param_date != "") {
     $set_date = $param_date;
     $sess->register("set_date");
@@ -121,7 +127,6 @@ if ($set_cal_interval == $ccal_1) $cal_1 = "checked";
 if ($set_csv_sep == $ccsvd_sc) $csvd_sc = "checked";
 if ($set_csv_sep == $ccsvd_tab) $csvd_tab = "checked";
 
-
 if ($action == "") $action = "index";
 get_settings_actions();
 $perm->check();
@@ -130,6 +135,19 @@ $perm->check();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 $display["header"] = generate_menu($menu, $section);
+
+
+// Data source select
+$dsrc_q = run_query_datasource();
+$sel_dsrc = "<select name=\"param_dsrc\" id=\"param_dsrc\">
+  <option value=\"0\">$l_none</option>";
+while ($dsrc_q->next_record()) {
+  $d_id = $dsrc_q->f("datasource_id");
+  $sel_dsrc .= "\n<option value=\"$d_id\"";
+  if ($d_id == $set_dsrc) { $sel_dsrc .= " selected=\"selected\" "; }
+  $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>";
+}
+$sel_dsrc .= "</select>";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,7 +242,16 @@ $display["detail"] .= " /></td>
     <td class=\"adminLabel\">$l_set_rows</td>
     <td class=\"adminText\">
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
-  </tr><tr>
+  </tr>
+
+<!-- Data Source config ------------------------------------------------------>
+  <tr>
+    <td class=\"adminLabel\">$l_datasource</td>
+    <td class=\"adminText\">$sel_dsrc</td>
+  </tr>
+
+<!-- Date Format config ------------------------------------------------------>
+  <tr>
     <td class=\"adminLabel\">$l_set_date</td>
     <td class=\"adminText\">
       <input type=\"radio\" name=\"param_date\" value=\"$cda_iso\" $da_iso />$l_da_iso

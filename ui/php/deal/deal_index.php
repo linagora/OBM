@@ -142,7 +142,7 @@ elseif (($action == "index") || ($action == "")) {
     $deal_q = run_query_detail($deal["id"]);
     if ( ($deal_q->f("deal_visibility")==0) ||
          ($deal_q->f("deal_usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($deal_q);
       $cid = $deal_q->f("deal_company_id");
       // we retrieve invoices data :
       $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
@@ -159,7 +159,7 @@ elseif (($action == "index") || ($action == "")) {
   if ($deal["id"] > 0) {
     require("deal_js.inc");
     $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($deal_q);
     $param_company = $deal_q->f("deal_company_id");
     $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
     $usr_q = run_query_userobm_active($users);
@@ -173,7 +173,7 @@ elseif (($action == "index") || ($action == "")) {
     if ($deal["id"]) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $deal_q = run_query_detail($deal["id"]);
-      $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($deal_q);
       $cid = $deal_q->f("deal_company_id");
       $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
       $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, "");
@@ -200,7 +200,7 @@ elseif (($action == "index") || ($action == "")) {
       $display["msg"] .= display_err_msg($l_update_error);
     }
     $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($deal_q);
     $cid = $deal_q->f("deal_company_id");
     $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
     $q_invoices->next_record();
@@ -246,7 +246,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
     $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($deal_q);
     $cid = $deal_q->f("deal_company_id");
     $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
     $q_invoices->next_record();
@@ -430,7 +430,7 @@ elseif (($action == "index") || ($action == "")) {
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usr_q = run_query_userobm_active($users);
-    $display["detailInfo"] = display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_parentdeal_form($action,$obm_q, $usr_q, $deal);
   } 
   
@@ -457,7 +457,7 @@ elseif (($action == "index") || ($action == "")) {
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usr_q = run_query_userobm_active($users);
-    $display["detailInfo"] = display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($obm_q);
     $display["search"] = html_parentdeal_form($action,$obm_q, $usr_q, $deal);
   } else {
     run_query_delete_parentdeal($deal["parent"]); 
@@ -486,7 +486,7 @@ elseif (($action == "index") || ($action == "")) {
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
     $usr_q = run_query_userobm_active($users);
-    $display["detailInfo"] = display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($obm_q);
     $display["detail"] = html_parentdeal_form($action, $obm_q, $usr_q, $deal);
   }
 
@@ -506,7 +506,7 @@ elseif (($action == "index") || ($action == "")) {
     $deal_q = run_query_detail($deal["id"]);
     if ( ($deal_q->f("deal_visibility")==0) ||
          ($deal_q->f("deal_usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($deal_q);
       $cid = $deal_q->f("deal_company_id");
       $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
       $q_invoices->next_record();

@@ -236,7 +236,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   //-- Label
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
   global $display, $perm, $action;
-  global $l_nb_contact, $l_no_contact, $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
+  global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
+  global $l_no_dyn_contact, $l_dyn_con_found;
+  global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -251,7 +253,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $query_nb = get_query_num_rows($query);
   run_query_update_num_rows($id, $query_nb);
 
-  $display["detailInfo"] = display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
+  $display["detailInfo"] = display_record_info($list_q);
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   $block = "
@@ -275,11 +277,12 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     </tr>
     </table>";
 
+  // Static Contacts
   $nb_con = $con_q->num_rows();
   if ($nb_con == 0) {
-    $message = $l_no_contact;
+    $message = $l_no_static_contact;
   } else {
-    $message = "$nb_con $l_con_found";
+    $message = "$nb_con $l_static_con_found";
   }
 
   $block .= display_info_msg($message);
@@ -318,13 +321,15 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   }
 
 
+  // Dynamic Contacts
   if ($query_nb != 0) {
+    $message = "$nb_conq $l_dyn_con_found";
+    $block .= display_info_msg($message);
 
     $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
     $conq_q = new DB_OBM;
     $conq_q->query($query);
-    
     $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
     $dis_infos->data_set = $conq_q;
     $dis_infos->data_url = $url;
@@ -332,6 +337,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $dis_infos->data_order = false;
     $dis_infos->data_header = "both";
     $block .= $dis_infos->display("dis_data_list");
+  } else {
+    $message = $l_no_dyn_contact;
+    $block .= display_info_msg($message);
   }
 
   return $block;

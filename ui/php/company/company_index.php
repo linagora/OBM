@@ -111,18 +111,19 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
+  $dsrc_q = run_query_datasource();
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
   require("company_js.inc");
-  $display["detail"] = html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
+  $display["detail"] = html_company_form($action,"", $dsrc_q, $type_q, $act_q, $usr_q, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_company > 0) {
     $comp_q = run_query_detail($param_company);
     if ($comp_q->num_rows() == 1) {
-      $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+      $display["detailInfo"] = display_record_info($comp_q);
       $display["detail"] = html_company_consult($comp_q);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
@@ -134,13 +135,14 @@ if ($action == "ext_get_id") {
   if ($param_company > 0) {
     $comp_q = run_query_detail($param_company);
     if ($comp_q->num_rows() == 1) {
+      $dsrc_q = run_query_datasource();
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_userobm_active($users);
       require("company_js.inc");
-      $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
-      $display["detail"] = html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
+      $display["detailInfo"] = display_record_info($comp_q);
+      $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $company);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -184,11 +186,12 @@ if ($action == "ext_get_id") {
   // Form data are not valid
   } else {
     $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    $display["search"] = html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
+    $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -201,15 +204,16 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_err_msg($l_update_error);
     }
     $comp_q = run_query_detail($param_company);
-    $display["detailInfo"] .= display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+    $display["detailInfo"] .= display_record_info($comp_q);
     $display["detail"] = html_company_consult($comp_q);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
+    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -340,13 +344,13 @@ if ($action == "ext_get_id") {
   }
   $comp_q = run_query_detail($company["id"]);
   if ($comp_q->num_rows() == 1) {
-    $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+    $display["detailInfo"] = display_record_info($comp_q);
     $display["detail"] = html_company_consult($comp_q);
   } else {
     var_dump($company);    
     $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->num_rows() . " !");
   }
-}    
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -362,10 +366,10 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_company() {
-  global $tf_num, $cb_archive, $tf_name, $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip;
-  global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
-  global $sel_act, $sel_kind, $sel_market, $ta_com, $param_company;
-  global $tf_kind, $tf_act;
+  global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
+  global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web;
+  global $tf_email, $sel_act, $sel_kind, $sel_market, $ta_com, $param_company;
+  global $sel_dsrc, $tf_kind, $tf_act;
   global $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -401,6 +405,8 @@ function get_param_company() {
   if (isset ($tf_num)) $company["num"] = $tf_num;
   if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
   if (isset ($tf_name)) $company["name"] = $tf_name;
+  if (isset ($tf_aka)) $company["aka"] = $tf_aka;
+  if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
   if (isset ($sel_act)) $company["activity"] = $sel_act;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
