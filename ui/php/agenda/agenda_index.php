@@ -61,23 +61,26 @@ if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
 $perm->check();
-
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_agenda);     // Head & Body
+     // Head & Body
 
 if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
   if ($action == "calendar") {
+    display_head($l_agenda);
     require("$obminclude/calendar.inc");
+    display_end();
   }
-  display_end();
+  elseif ($action == "export") {
+    dis_export_handle($agenda);
+  }
   exit();
 }
-
+display_head($l_agenda);
 generate_menu($menu,$section);      // Menu
 //////////////////////////////////////////////////////////////////////////////
 
@@ -564,7 +567,7 @@ function get_agenda_action() {
   global $l_header_update,$l_header_right,$l_header_meeting;
   global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_month,$l_header_new_event,$param_event,$param_date,$l_header_admin;
-  global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
+  global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write,$l_header_export;
 
 //Index
 
@@ -733,7 +736,7 @@ function get_agenda_action() {
     'Right'    => $agenda_admin_read,
     'Condition'=> array ('all') 
                                        );
-
+				       
 // Kind Insert
   $actions["AGENDA"]["category_insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_insert",
@@ -761,6 +764,14 @@ function get_agenda_action() {
     'Right'    => $agenda_admin_write,
     'Condition'=> array ('None') 
                                      	       );
+					       
+// Export
+  $actions["AGENDA"]["export"] = array (
+    'Name'     => $l_header_export,
+    'Url'      => "$path/agenda/agenda_index.php?action=export&amp;popup=1",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('all') 
+                                       );
 
 }
   

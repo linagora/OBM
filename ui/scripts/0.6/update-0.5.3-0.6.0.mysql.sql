@@ -56,6 +56,7 @@ DROP TABLE IF EXISTS ServiceComputer;
 DROP TABLE IF EXISTS CalendarEvent;
 DROP TABLE IF EXISTS CalendarLayer;
 DROP TABLE IF EXISTS EventUser;
+DROP TABLE IF EXISTS EventCategory;
 DROP TABLE IF EXISTS CalendarCategory;
 --
 -- Table structure for the table  'CalendarSegment'

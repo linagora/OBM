@@ -175,6 +175,7 @@ $l_category_exist = "Categories existantes";
 $l_header_meeting = "Nouvelle réunion";
 $l_category_new = "Nouvelle Categorie";
 $l_header_right = "Gestion des droits";
+$l_header_export = "Exporter";
 $l_header_admin = "Administration";
 $l_authorize_list = "Personnes authorisées";
 $l_denie_list = "Personnes non-authorisées";

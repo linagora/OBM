@@ -1810,3 +1810,110 @@ function dateOfWeek($Ymd, $day) {
   
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Vcalendar Exportation : SQL Query for non repeated event
+//------------------------------------------------------------------------
+// Argument:
+// ---------
+//     - $agenda
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_vevent_norepeat($agenda) { 
+  global $auth,$set_start_time,$set_stop_time;
+  $agenda["date_begin"] = "200303010600";
+  $agenda["date_end"] = "200306012000";
+  $date_begin = $agenda["date_begin"];
+  $date_end = $agenda["date_end"];
+  $uid = $auth->auth["uid"];
+  $start_day_time = mktime(substr($date_begin,8,2), substr($date_begin,10,2), "00",
+                    substr($date_begin,4,2), substr($date_begin,6,2), substr($date_begin,0,4));
+  $start_day = $date_begin;
+  $end_day_time =   mktime(substr($date_end,8,2), substr($date_end,10,2),"00",
+                    substr($date_end,4,2), substr($date_end,6,2),substr($date_end,0,4));
+  $end_day = $date_end;
+  
+  $obm_db = new DB_OBM;
+  $query = "SELECT calendarevent_id,
+                   calendarevent_title,
+                   calendarevent_priority,
+                   calendarevent_privacy,
+		   calendarevent_description, 
+		   calendarevent_length,
+		   calendarcategory_label,
+		   calendarsegment_customerid,
+		   calendarsegment_date,
+		   calendarsegment_flag
+	    FROM CalendarEvent,CalendarCategory, CalendarSegment
+	    WHERE calendarsegment_customerid = $uid
+	    AND calendarevent_category_id = calendarcategory_id
+	    AND calendarevent_id = calendarsegment_eventid
+	    AND calendarevent_repeatkind = 'none'
+	    AND  calendarsegment_state = 'A'
+	    AND ((calendarsegment_flag = 'begin'
+	          AND calendarsegment_date < $end_day
+		  AND UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) + calendarevent_length > $start_day_time)
+	     OR  (calendarsegment_flag = 'end'
+	         AND calendarsegment_date > $start_day
+		 AND UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) - calendarevent_length < $end_day_time)
+	        )";
+
+  $query.=" ORDER BY calendarevent_id,calendarsegment_date";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Vcalendar Exportation : SQL Query for repeated event
+//------------------------------------------------------------------------
+// Argument:
+// ---------
+//     - $agenda
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_vevent_repeat($agenda) { 
+  global $auth,$set_start_time,$set_stop_time;
+  $agenda["date_begin"] = "200303010600";
+  $agenda["date_end"] = "200306012000";
+  $date_begin = $agenda["date_begin"];
+  $date_end = $agenda["date_end"];
+  $uid = $auth->auth["uid"];
+  $uid = "23";
+  $start_day_time = mktime(substr($date_begin,8,2), substr($date_begin,10,2), "00",
+                    substr($date_begin,4,2), substr($date_begin,6,2), substr($date_begin,0,4));
+  $start_day = $date_begin;
+  $end_day_time =   mktime(substr($date_end,8,2), substr($date_end,10,2),"00",
+                    substr($date_end,4,2), substr($date_end,6,2),substr($date_end,0,4));
+  $end_day = $date_end;
+  
+  $obm_db = new DB_OBM;
+  $query = "SELECT calendarevent_id,
+                   calendarevent_title,
+                   calendarevent_priority,
+                   calendarevent_privacy,
+		   calendarevent_description,
+		   calendarevent_repeatkind,
+		   calendarevent_endrepeat,
+		   calendarevent_repeatdays,
+		   calendarevent_length,
+		   calendarcategory_label,
+		   calendarsegment_customerid,
+		   MIN(calendarsegment_date) as calendarsegment_date,
+		   calendarsegment_flag
+	    FROM CalendarEvent,CalendarCategory, CalendarSegment
+	    WHERE calendarsegment_customerid = ".$uid."
+	    AND calendarevent_category_id = calendarcategory_id
+	    AND calendarevent_id = calendarsegment_eventid
+	    AND calendarevent_repeatkind != 'none'
+	    AND  calendarsegment_state = 'A'
+	    AND ((calendarsegment_flag = 'begin'
+	          AND calendarsegment_date < $end_day
+		  AND UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) + calendarevent_length > $start_day_time)
+	     OR  (calendarsegment_flag = 'end'
+	         AND calendarsegment_date > $start_day
+		 AND UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) - calendarevent_length < $end_day_time)
+	        )";
+
+  $query.="GROUP BY calendarevent_id,calendarsegment_flag  ORDER BY calendarevent_id,calendarsegment_date";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}

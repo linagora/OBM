@@ -159,6 +159,7 @@ $l_category_new = "New Category";
 $l_header_right = "Right management";
 $l_header_meeting = "New meeting";
 $l_header_admin = "Administration";
+$l_header_export = "Export";
 $l_authorize_list = "Authorized people";
 $l_denie_list = "Unauthorized people";
 $l_read_permission = "Read access management";
