@@ -126,9 +126,13 @@ $l_header_add_contact = "Word to define";
 
 $l_header_reset = "Word to define";
 
-$l_header_amp	= "Word to define";
-$l_header_clear_sess = "Word to define";
-$l_header_index     =  "Word to define";
+// Admin headers
+$l_header_index = "Main";
+$l_header_help = "Help";
+$l_header_amp = "Show amp";
+$l_header_func_unused = "Functions";
+$l_header_clear_sess = "Clear sessions";
+$l_header_pref_update = "Reset users preferences";
 
 $l_header_agenda = "Agenda";
 $l_header_title_agenda = "AGENDA";

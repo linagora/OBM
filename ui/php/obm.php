@@ -28,19 +28,7 @@ if ($action == "logout") {
   $sess->delete();
   $action = "";
   include("$obminclude/auth/logout.ihtml");
- // page_close();
   exit;
-
-} else if ($action == "login") { 
-  // Load and make session variables from Global and User preferences
-  session_load_global_prefs();
-  session_load_user_prefs();
-  include("$obminclude/global_pref.inc");
-
-  $obm_q = new DB_OBM;
-  $query = "update UserObm set userobm_timelastaccess='".date("Y-m-d H:i:s")."' where userobm_id='".$auth->auth["uid"]."'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
 
 } else {
   include("$obminclude/global_pref.inc");
@@ -61,9 +49,7 @@ echo "   <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
     </head>
     <body >";
 
-
 generate_menu("","");
-display_bookmarks(".");
 
 echo "<center>
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "

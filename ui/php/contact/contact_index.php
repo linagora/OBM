@@ -49,10 +49,10 @@ $uid = $auth->auth["uid"];
 if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
   $last_contact = $last_contact_default;
 } else if ( ($param_contact > 0) && ($last_contact != $param_contact) ) {
-    $last_contact = $param_contact;
-    run_query_set_user_pref($auth->auth["uid"],"last_contact",$param_contact);
-    $last_contact_name = run_query_global_contact_name($last_contact);
-   //$sess->register("last_contact");  
+  $last_contact = $param_contact;
+  run_query_set_user_pref($auth->auth["uid"],"last_contact",$param_contact);
+  $last_contact_name = run_query_global_contact_name($last_contact);
+  //$sess->register("last_contact");  
 }
 
 page_close();
@@ -68,7 +68,6 @@ display_head($l_contact);     // Head & Body
 
 if (! $popup) {
   generate_menu($menu,$section);         // Menu
-  display_bookmarks();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,13 +95,11 @@ if ($action == "index" || $action == "") {
     display_info_msg($l_no_display);
   }
   
-
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
   dis_contact_search_list($contact, $popup);
   
-
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (isset($param_company)) {
@@ -111,7 +108,6 @@ if ($action == "index" || $action == "") {
   $kind_q = run_query_kind();
   require("contact_js.inc");
   html_contact_form($action, $comp_q, $kind_q, $contact);
-  
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -129,7 +125,6 @@ if ($action == "index" || $action == "") {
     }      
   }
   
-
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contact > 0) {
@@ -143,7 +138,6 @@ if ($action == "index" || $action == "") {
     display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("contact_timecreate"),$con_q->f("contact_timeupdate")); 
     html_contact_form($action, $con_q, $kind_q, $contact);
   }
-  
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////

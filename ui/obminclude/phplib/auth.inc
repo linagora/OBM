@@ -123,7 +123,6 @@ class Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
@@ -133,13 +132,11 @@ class Auth {
             $this->auth["uid"] = "form";
             $this->auth["exp"] = 0x7fffffff;
             $this->auth["refresh"] = 0x7fffffff;
-            $sess->freeze();
             exit;
             break;
           default:
             # This should never happen. Complain.
             echo "Error in auth handling: no valid mode specified.\n";
-            $sess->freeze();
             exit;
         }
         break;
@@ -148,7 +145,6 @@ class Auth {
         # Refresh expire info
         ## DEFAUTH handling: do not update exp for nobody.
         if ($uid != "nobody")
-//          $this->auth["exp"] = time() + (60 * $this->lifetime);
           // OBM : we get the global lifetime which is in seconds
           $this->auth["exp"] = time() + $this->lifetime;
         break;
@@ -161,7 +157,6 @@ class Auth {
             // OBM : if login successfull (valid auth)
             if ( $uid = $this->auth_validatelogin() ) {
               $this->auth["uid"] = $uid;
-//              $this->auth["exp"] = time() + (60 * $this->lifetime);
               // OBM : in OBM each time is in seconds. this->lifetime too.
               $this->auth["exp"] = time() + $this->lifetime;
               $this->auth["refresh"] = time() + (60 * $this->refresh);
@@ -171,7 +166,6 @@ class Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
@@ -186,14 +180,12 @@ class Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
           default:
             # This should never happen. Complain.
             echo "Error in auth handling: no valid mode specified.\n";
-            $sess->freeze();
             exit;
             break;
         }
@@ -201,20 +193,11 @@ class Auth {
       default:
         # This should never happen. Complain.
         echo "Error in auth handling: invalid state reached.\n";
-        $sess->freeze();
         exit;
         break;
     }
   }
 
-  function login_if( $t ) {
-    if ( $t ) {
-      $this->unauth();  # We have to relogin, so clear current auth info
-      $this->nobody = false; # We are forcing login, so default auth is 
-                             # disabled
-      $this->start(); # Call authentication code
-    }
-  }
 
   function unauth($nobody = false) {
     $this->auth["uid"]   = "";
@@ -273,13 +256,6 @@ class Auth {
   ##
   ## Helper functions
   ##
-  function url() {
-    return $GLOBALS["sess"]->self_url();
-  }
-
-  function purl() {
-    print $GLOBALS["sess"]->self_url();
-  }
 
   ## This method can authenticate a user before the loginform
   ## is being displayed. If it does, it must set a valid uid 

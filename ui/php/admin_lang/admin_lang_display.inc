@@ -62,14 +62,14 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   // modules SELECT
   $sel_module = "<select name=\"module\">";
   while (list ($key, $val) = each ($modules)) {
-    $sel_module .= "<option value=\"$val\">$val";
+    $sel_module .= "<option value=\"$val\">$val</option>";
   }
   $sel_module .= "</select>";
 
   // lang1 SELECT
   $sel_lang1 = "<select name=\"lang\">";
   while (list ($key, $val) = each ($langs)) {
-    $sel_lang1 .= "<option value=\"$val\">$val";
+    $sel_lang1 .= "<option value=\"$val\">$val</option>";
   }
   $sel_lang1 .= "</SELECT>";
 
@@ -77,7 +77,7 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   reset ($langs);
   $sel_lang2 = "<select name=\"lang2\">";
   while (list ($key, $val) = each ($langs)) {
-    $sel_lang2 .= "<option value=\"$val\">$val";
+    $sel_lang2 .= "<option value=\"$val\">$val</option>";
   }
   $sel_lang2 .= "</select>";
 
@@ -85,7 +85,7 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   reset ($themes);
   $sel_theme = "<select name=\"theme\">";
   while (list ($key, $val) = each ($themes)) {
-    $sel_theme .= "<option value=\"$val\">$val";
+    $sel_theme .= "<option value=\"$val\">$val</option>";
   }
   $sel_theme .= "</select>";
 

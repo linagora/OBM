@@ -1337,25 +1337,6 @@ function get_cat_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the name of a Contact
-// Parameters:
-//   - $id : contact id
-///////////////////////////////////////////////////////////////////////////////
-function get_contact_name($id) {
-  global $cdg_sql;
-
-  $query = "select contact_lastname from Contact where contact_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM ;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  return $obm_q->f("contact_lastname");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return the label of the specified ParentDeal
 // Parameters:
 //   - $p_id : parent deal id

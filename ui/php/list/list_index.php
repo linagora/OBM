@@ -76,7 +76,6 @@ require("list_js.inc");
 display_head($l_list);  // Head & Body
 if (! $popup) {
   generate_menu($menu,$section);   // Menu
-  display_bookmarks();    // links to the last visited companie, contact, deal
 }
 
 ///////////////////////////////////////////////////////////////////////////////

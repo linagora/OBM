@@ -130,10 +130,12 @@ $l_header_add_contact = "Ajouter contact";
 
 $l_header_reset = "Préférence par défaut";
 
-$l_header_amp = "Afficher les esperluettes";
-$l_header_clear_sess = "Nettoyer les sessions";
+// Admin headers
 $l_header_index = "Accueil";
 $l_header_help = "Aide";
+$l_header_amp = "Afficher les esperluettes";
+$l_header_func_unused = "Fonctions";
+$l_header_clear_sess = "Nettoyer les sessions";
 $l_header_pref_update = "Réinitialiser les préférences utilisateur";
 
 $l_header_day = "Jour";

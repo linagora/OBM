@@ -92,7 +92,6 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_title . $set_lang);     // Head & Body
 generate_menu($menu, $section);                   // Menu
-display_bookmarks();
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -122,7 +121,7 @@ while($entry=$lang_dir->read()) {
       && is_dir($lang_dir->path."/".$entry)) {
     $dis_lang .= "<tr>
       <td class=\"adminLabel\">
-        <a href=\"" . $sess->url("settings_index.php?param_lang=$entry") . "\">
+        <a href=\"" . url_prepare("settings_index.php?param_lang=$entry") ."\">
         <img src=\"/images/images/flag-$entry.gif\" /></a>
       </td>
       </tr>";
@@ -144,7 +143,7 @@ $dotcase = strcmp($entry, ".");
        && is_dir($theme_dir->path."/".$entry)) {
     $dis_theme .= "<tr>
       <td class=\"adminLabel\">
-        <a href=\"".$sess->url("settings_index.php?param_theme=$entry") .
+        <a href=\"".url_prepare("settings_index.php?param_theme=$entry") .
         "\"><img src=\"/images/$entry/$entry.jpg\" /></a>
       </td>
       </tr>";
@@ -161,7 +160,7 @@ echo "
 <!--User preferences current config -->
 
   <center>
-  <form action=\"".$sess->url("settings_index.php")."\" method=\"get\">
+  <form action=\"".url_prepare("settings_index.php")."\" method=\"get\">
   <table class=\"admin\">
   <tr>
     <td class=\"adminHead\" colspan=\"2\">$l_cur_settings</td>
@@ -240,10 +239,10 @@ echo " /></td>
   </body>
   </html>";
 
+
 //////////////////////////////////////////////////////////////////////////////
 // Settings actions
 //////////////////////////////////////////////////////////////////////////////
-
 function get_settings_actions() {
   global $actions, $settings_read;
 

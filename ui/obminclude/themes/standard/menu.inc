@@ -85,6 +85,7 @@ function generate_menu($menu, $section) {
 echo "
 <p>
 </p>";
+  display_bookmarks();
 }
 
 
@@ -291,3 +292,75 @@ function display_inactive_tab($tab) {
 ";
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the links to the last visited company, contact and deal
+// we need $path to be able to display bookmarks
+// from the first screen after login...
+///////////////////////////////////////////////////////////////////////////////
+function display_bookmarks($path="..") {
+  global $set_theme;
+  global $last_company,$last_contact,$last_deal, $last_contract;
+  global $last_account,$last_invoice, $last_payment, $last_incident;
+  global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
+  global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
+
+  $book = "
+  <table class=\"bookmarks\">
+  <tr>";
+
+  if ($last_company_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">".substr($last_company_name,0,30)."</a></td>";
+
+  if ($last_contact_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">".substr($last_contact_name,0,30)."</a></td>";
+
+  if ($last_deal_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">".substr($last_deal_name,0,30)."</a></td>";
+
+  if ($last_account_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/account/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">".substr($last_account_name,0,30)."</a></td>";
+
+  if ($last_invoice_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">".substr($last_invoice_name,0,30)."</a></td>";
+
+  if ($last_payment_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">".substr($last_payment_name,0,30)."</a></td>";
+
+  if ($last_contract_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">".substr($last_contract_name,0,30)."</a></td>";
+
+  if ($last_incident_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">".substr($last_incident_name,0,30)."</a></td>";
+
+  $book .= "
+   </tr>
+   </table>
+   <hr />";
+
+  echo $book;
+}

@@ -10,20 +10,14 @@
 $path = "..";
 $section = "ADMINS";
 $menu = "ADMIN_CODE";
+$obm_root = "../..";
 
 // $obminclude not used in txt mode
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-$debug = 0;
-$obm_root = "../..";
-$cpt_line = 0;
-
+include("$obminclude/global.inc");
 require("admin_code_query.inc");
 require("admin_code_display.inc");
-
-$acts = array ('help', 'index', 'show_amp', 'func_unused');
-$words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
-$exclude = array('.', '..', 'CVS', 'doc', 'scripts');
 
 list($key, $val) = each ($words);
 $regexp = "&(?!($val";
@@ -45,7 +39,6 @@ switch ($mode) {
    break;
  case "html":
    require("$obminclude/phplib/obmlib.inc");
-   include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    //   $debug = $set_debug;
@@ -69,7 +62,10 @@ switch ($action) {
     dis_amp($mode, $words);
     break;
   case "func_unused":
-    dis_unused_functions($mode);
+    dis_unused_functions($mode, $module);
+    break;
+  case "function_uses":
+    dis_function_uses($mode, $function);
     break;
   default:
     echo "No action specified !";
@@ -152,11 +148,23 @@ function parse_arg($argv) {
 	return false;
       }
       break;
+    case '-f':
+      list($nb2, $val2) = each ($argv);
+      if (in_array($val2, $acts)) {
+        $action = $val2;
+        if ($debug > 0) { echo "-f -> \$function=$val2\n"; }
+      }
+      else {
+	dis_command_use("Invalid action ($val2)");
+	return false;
+      }
+      break;
     }
   }
 
   if (! $module) $module = "contact";
   if (! $action) $action = "show_amp";
+  if (! $function) $function = "run_query_detail";
 }
 
 
@@ -165,7 +173,7 @@ function parse_arg($argv) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_admin_code_action() {
   global $actions, $path;
-  global $l_header_index,$l_header_help, $l_header_amp;
+  global $l_header_index,$l_header_help, $l_header_amp, $l_header_func_unused;
   global $admin_code_read,$admin_code_write;
 
   // index : launch form
@@ -191,8 +199,16 @@ function get_admin_code_action() {
                                         );
   // func_unused : show unused functions
   $actions["ADMIN_CODE"]["func_unused"]	= array (
-     'Name'     => $l_header_amp,
+     'Name'     => $l_header_func_unused,
      'Url'      => "$path/admin_code/admin_code_index.php?action=func_unused&amp;mode=html",
+     'Right'    => $admin_code_write,
+     'Condition'=> array ('index') 
+                                        );
+
+  // function_uses : show function uses
+  $actions["ADMIN_CODE"]["func_unused"]	= array (
+     'Name'     => $l_header,
+     'Url'      => "$path/admin_code/admin_code_index.php?action=function_uses&amp;mode=html",
      'Right'    => $admin_code_write,
      'Condition'=> array ('index') 
                                         );

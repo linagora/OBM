@@ -130,17 +130,18 @@ $l_header_dupplicate = "Dupplicate";
 
 $l_header_reset = "Défault Préferences";
 
-$l_header_amp	= "Show amp";
+// Admin headers
+$l_header_index = "Main";
+$l_header_help = "Help";
+$l_header_amp = "Show amp";
+$l_header_func_unused = "Functions";
 $l_header_clear_sess = "Clear sessions";
-$l_header_pref_update  = "Reset users preferences";
-
-$l_header_help = "Aide";
+$l_header_pref_update = "Reset users preferences";
 
 $l_header_year = "Year";
 $l_header_day = "Day";
 $l_header_week = "Week";
 $l_header_month = "Month";
 $l_header_new_event = "New appointment";
-$l_header_index     = "Main";
 
 

@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.0";
+$obm_version = "0.6.0p2";
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -373,67 +373,6 @@ function display_info_msg($msg) {
   echo "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the links to the last visited company, contact and deal
-// we need $path to be able to display bookmarks
-// from the first screen after login...
-///////////////////////////////////////////////////////////////////////////////
-function display_bookmarks($path="..") {
-  global $last_company,$last_contact,$last_deal, $last_contract;
-  global $last_account,$last_invoice, $last_payment, $last_incident;
-  global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
-  global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
-
-  echo "
-     <table class=\"bookmarks\">
-       <tr>
-         <td class=\"bookmarks\">
-     <a class=\"bookmarks\" 
-     href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
-     ".substr($last_company_name,0,30)."
-     </a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
-     ".substr($last_contact_name,0,30)."</a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
-     ".substr($last_deal_name,0,30)."
-     </a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/account/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
-     ".substr($last_account_name,0,30)."</a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
-     ".substr($last_invoice_name,0,30)."</a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
-     ".substr($last_payment_name,0,30)."</a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
-     ".substr($last_contract_name,0,30)."</a>
-         </td>
-	 <td class=\"bookmarks\">
-     <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
-     ".substr($last_incident_name,0,30)."</a>
-         </td>
-       </tr>
-     </table>
-     <hr />"; 
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Prepare an URL to be displayed in a link
@@ -576,18 +515,11 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
     $obm_q->next_record();
     echo "modified:" . $obm_q->f("userobm_login") . " (". datetime_format($p_timeupdate) .")";
   }
-  echo "  </td></tr>";
-  echo "</table>";
+  echo "  </td></tr>
+    </table>";
 
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-//         Function return yes or no if 1 or 0 is given as argument         ///
-///////////////////////////////////////////////////////////////////////////////
-function return_yes_no($number) {
-  return ($number == 1) ? "yes" : "no" ;
-}
 
 
 //functions used by many modules

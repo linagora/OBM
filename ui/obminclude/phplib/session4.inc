@@ -15,17 +15,11 @@ class Session {
   ## Define the parameters of your session by either overwriting
   ## these values or by subclassing session (recommended).
 
-//  var $magic = "";              ## Some string you should change.
   var $mode = "";                 ## We propagate session IDs with cookies
   var $cookiename = "";           ## Name of session cookie default : classname
-//  var $fallback_mode;           ## If this doesn't work, fall back...
 
 //  var $cookie_domain = "";      ## If set, the domain for which the
                                   ## session cookie is set.
-
-//  var $gc_time  = 2;            ## Purge all session data older than 1440 minutes.
-//  var $gc_probability = 1;      ## Garbage collect probability in percent
-
   var $auto_init = "";            ## Name of the autoinit-File, if any.
   var $secure_auto_init = 1;      ## Set to 0 only, if all pages call
                                   ## page_close() guaranteed.
@@ -43,9 +37,7 @@ class Session {
 
   var $name;                      ## Session name
   var $id;                        ## Unique Session ID
-//  var $that;
 
-//  var $pt = array();            ## This Array contains the registered things
 
   ## register($things):
   ##
@@ -57,14 +49,12 @@ class Session {
     while ( list(,$thing) = each($things) ) {
       $thing=trim($thing);
       if ( $thing ) {
-//        $this->pt[$thing] = true;
         session_register($thing);
       }
     }
   }
 
   function is_registered($name) {
-//    if ($this->pt[$name] == true)
     if (session_is_registered($name))
       return true;
     return false;
@@ -76,7 +66,6 @@ class Session {
     while (list(,$thing) = each($things)) {
       $thing = trim($thing);
       if ($thing) {
-//        unset($this->pt[$thing]);
         session_unregister($thing);
       }
     }
@@ -136,168 +125,10 @@ class Session {
     return $url;
   }
 
-  function purl($url) {
-    print $this->url($url);
-  }
-
-  function self_url() {
-    global $PHP_SELF, $QUERY_STRING;
-
-    return $this->url($PHP_SELF.
-           ((isset($QUERY_STRING) && ("" != $QUERY_STRING)) ? "?".$QUERY_STRING : ""));
-  }
-
-  function pself_url() {
-    print $this->self_url();
-  }
-  
-  function hidden_session()
-  {
-    printf("<input type=\"hidden\" name=\"%s\" value=\"%s\">\n", session_name(), session_id());
-  }
-
-  function add_query($qarray) {
-    global $PHP_SELF;
-    global $QUERY_STRING;
-
-    if ((isset($QUERY_STRING) && ("" != $QUERY_STRING))
-     || ($this->mode == "get")) {
-      $sep_char = "&";
-    } else {
-      $sep_char = "?";
-    }
-
-    $qstring = "";
-    while (list($k, $v) = each($qarray)) {
-      $qstring .= $sep_char . urlencode($k) . "=" . urlencode($v);
-      $sep_char = "&";
-    }
-
-    return $qstring;
-  }
-
-  function padd_query($qarray) {
-    print $this->add_query($qarray);
-  }
-
-  ## serialize($prefix,&$str):
-  ##
-  ## appends a serialized representation of $$prefix
-  ## at the end of $str.
-  ##
-  ## To be able to serialize an object, the object must implement
-  ## a variable $classname (containing the name of the class as string)
-  ## and a variable $persistent_slots (containing the names of the slots
-  ## to be saved as an array of strings).
-  ##
-  ## You don't need to know...
-  function serialize($prefix, $str) {
-    static $t,$l,$k;
-
-    ## Determine the type of $$prefix
-    eval("\$t = gettype(\$$prefix);");
-    switch ( $t ) {
-
-      case "array":
-        ## $$prefix is an array. Enumerate the elements and serialize them.
-        eval("reset(\$$prefix); \$l = gettype(list(\$k)=each(\$$prefix));");
-        $str .= "\$$prefix = array(); ";
-        while ( "array" == $l ) {
-          ## Structural recursion
-          $this->serialize($prefix."['".ereg_replace("([\\'])", "\\\\1", $k)."']", &$str);
-          eval("\$l = gettype(list(\$k)=each(\$$prefix));");
-        }
-
-      break;
-      case "object":
-        ## $$prefix is an object. Enumerate the slots and serialize them.
-        eval("\$k = \$${prefix}->classname; \$l = reset(\$${prefix}->persistent_slots);");
-        $str.="\$$prefix = new $k; ";
-        while ( $l ) {
-          ## Structural recursion.
-          $this->serialize($prefix."->".$l,&$str);
-          eval("\$l = next(\$${prefix}->persistent_slots);");
-        }
-
-      break;
-      default:
-        ## $$prefix is an atom. Extract it to $l, then generate code.
-        eval("\$l = \$$prefix;");
-        $str.="\$$prefix = '".ereg_replace("([\\'])", "\\\\1", $l)."'; ";
-
-
-      break;
-    }
-  }
-
-  function get_lock() {
-  }
-
-  function release_lock() {
-  }
-
-  ## freeze():
-  ##
-  ## freezes all registered things ( scalar variables, arrays, objects ) into
-  ## a database table
-
-  function freeze() {
-  }
-
-  ## thaw:
-  ##
-  ## Reload frozen variables from the database and microwave them.
-
-  function thaw() {
-  }
-
-  ##
-  ## Garbage collection
-  ##
-  ## Destroy all session data older than this
-  ##
-  function gc() {
-  }
-
-  ##
-  ## Variable precedence functions
-  ##
-  function reimport_get_vars() {
-    $this->reimport_any_vars("HTTP_GET_VARS");
-  }
-
-  function reimport_post_vars() {
-    $this->reimport_any_vars("HTTP_POST_VARS");
-  }
-
-  function reimport_cookie_vars() {
-    $this->reimport_any_vars("HTTP_COOKIE_VARS");
-  }
-
-  function reimport_any_vars($arrayname) {
-    global $$arrayname;
-
-    if (!is_array($$arrayname))
-      return;
-
-    reset($$arrayname);
-    while(list($key, $val) = each($$arrayname)) {
-      $GLOBALS[$key] = $val;
-    }
-  }
 
   ##
   ## All this is support infrastructure for the start() method
   ##
-
-  function set_container() {
-  }
-
-  function set_tokenname(){
-  }
-
-  function release_token(){ 
-  }   
 
   function put_headers() {
     # Allowing a limited amount of caching, as suggested by
@@ -348,13 +179,6 @@ class Session {
     }
   }
 
-  ##
-  ## Garbage collection
-  ##
-  ## Destroy all session data older than this
-  ##
-  function gc() {
-  }
 
   ##
   ## Initialization

@@ -14,7 +14,6 @@
 require("$obminclude/phplib/db_mysql.inc");     //Mysql
 require("$obminclude/phplib/ct_sql.inc");
 require("$obminclude/phplib/session4.inc");
-require("$obminclude/phplib/user4.inc");
 require("$obminclude/phplib/auth.inc");
 require("$obminclude/phplib/perm.inc");
 require("$obminclude/phplib/page4.inc");
@@ -41,14 +40,12 @@ class DB_OBM extends DB_Sql {
 
 
 class OBM_CT_Sql extends CT_Sql {
-//  var $classname = "OBM_CT_Sql";
   var $database_class = "DB_OBM";           ## Which database to connect...
   var $database_table = "ActiveSessions";  ## and find our session data in this table.
 }
 
 
 class OBM_User_Sql extends CT_Sql {
-//  var $classname = "OBM_CT_Sql";
   var $database_class = "DB_OBM";         ## Which database to connect...
   var $database_table = "ActiveUserObm";  ## our session data in this table.
 
@@ -128,101 +125,17 @@ class OBM_User_Sql extends CT_Sql {
     }
     return $ret;
   }
-
-
 }
 
-#class Example_CT_Split_Sql extends CT_Split_Sql {
-#  var $database_class = "DB_Example";         ## Which database to connect...
-#  var $database_table = "active_sessions_split"; ## and find our session data in this table.
-#  var $split_length = 4096                    ## Split rows every 4096 bytes
-#}
-
-#class Example_CT_Shm extends CT_Shm {
-#  var $max_sessions   = 500;               ## number of maximum sessions
-#  var $shm_key        = 0x123754;          ## unique shm identifier
-#  var $shm_size       = 64000;             ## size of segment
-#}
-
-#class Example_CT_Ldap extends CT_Ldap {
-#   var $ldap_host = "localhost";
-#   var $ldap_port = 389;
-#   var $basedn    = "dc=your-domain, dc=com";
-#   var $rootdn    = "cn=root, dc=your-domain, dc=com";
-#   var $rootpw    = "secret";
-#   var $objclass  = "phplibdata";
-#}
-
-#class Example_CT_Dbm extends CT_DBM {
-#   var $dbm_file  = "must_exist.dbm";
-#}
 
 class OBM_Session extends Session {
   var $classname 	= "OBM_Session";
-
   var $cookiename     	= "";           ## defaults to classname
-  var $magic          	= "Falcon030";  ## ID seed
-  var $mode           	= "cookie";     ## We propagate session IDs with cookies
-  var $fallback_mode  	= "get";
+  var $mode           	= "cookie";     ## We propagate session ID with cookies
   var $lifetime_default = 0x7fffffff;   ## session cookie if global lifetime=0
   var $that_class     	= "OBM_CT_Sql"; ## Which database to connect...
-  var $gc_probability 	= 5;
   var $allowcache	= "" ;
 }
-
-class OBM_User extends User {
-  var $classname = "OBM_User";
-
-  var $magic          = "Abracadabra";  ## ID seed
-  var $that_class     = "OBM_CT_Sql";   ## data storage container
-}
-
-#class Example_Auth extends Auth {
-#  var $classname      = "Example_Auth";
-#
-#  var $lifetime       =  15;
-#
-#  var $database_class = "DB_Example";
-#  var $database_table = "auth_user";
-#  
-#  function auth_loginform() {
-#    global $sess;
-#    global $_PHPLIB;
-#
-#    include($_PHPLIB["libdir"] . "loginform.ihtml");
-#  }
-#  
-#  function auth_validatelogin() {
-#    global $username, $password;
-#
-#    if(isset($username)) {
-#      $this->auth["uname"]=$username;        ## This provides access for "loginform.ihtml"
-#    }
-#    
-#    
-#    $uid = false;
-#    
-#    $this->db->query(sprintf("select user_id, perms ".
-#                             "        from %s ".
-#                             "       where username = '%s' ".
-#                             "         and password = '%s'",
-#                          $this->database_table,
-#                          addslashes($username),
-#                          addslashes($password)));
-#
-#    while($this->db->next_record()) {
-#      $uid = $this->db->f("user_id");
-#      $this->auth["perm"] = $this->db->f("perms");
-#    }
-#    return $uid;
-#  }
-#}
-#
-#class Example_Default_Auth extends Example_Auth {
-#  var $classname = "Example_Default_Auth";
-#  
-#  var $nobody    = true;
-#}
 
 
 class OBM_Challenge_Auth extends Auth {
@@ -234,14 +147,12 @@ class OBM_Challenge_Auth extends Auth {
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $sess, $obminclude, $obm_version, $menu, $path;
-    global $challenge;
-    global $_PHPLIB;
+    global $sess, $obminclude, $obm_version, $menu, $path, $challenge;
+
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
     $sess->register("challenge");
     
-#    include($_PHPLIB["libdir"] . "crloginform.ihtml");
     include($login_form);
   }
   
@@ -303,7 +214,6 @@ class OBM_Perm extends Perm {
      global $perm_invalid,$menu,$section;
      display_head($l_error);     // Head & Body 
      generate_menu($menu,$section);         // Menu
-     display_bookmarks();
      display_err_msg($l_invalid_perm);
      display_end();
   }

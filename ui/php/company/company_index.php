@@ -51,12 +51,11 @@ require("company_display.inc");
 
 // updating the company bookmark : 
 if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
-  $last_company=$last_company_default;
-} else if ( ($param_company >0 ) && ($last_company != $param_company) ) {
-  $last_company=$param_company;
+  $last_company = $last_company_default;
+} else if ( ($param_company > 0 ) && ($last_company != $param_company) ) {
+  $last_company = $param_company;
   run_query_set_user_pref($auth->auth["uid"],"last_company",$param_company);
   $last_company_name = run_query_global_company_name($last_company);
-  //$sess->register("last_company");
 }
 
 page_close();
@@ -92,7 +91,6 @@ if ($popup) {
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 generate_menu($menu,$section);         // Menu
-display_bookmarks();
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////

@@ -4,6 +4,8 @@
 //     - Desc  : Contact javascript functions File                           //
 // 2000-01-13 Pierre Baudracco : Last Update 2000-01-13                      //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 echo "
 <script type=\"text/javascript\">
@@ -20,22 +22,6 @@ function confirm_del() {
     return true;
   else
     return false;
-}
-
-
-function verifie(form) {
-  Index = form.param_contract.selectedIndex;
-  if ((Index == -1)) {
-    alert (\"$l_j_select_contract\");
-    return false;
-  }
-  valeur = form.param_contract.options[form.param_contract.selectedIndex].value;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_contract\");
-    return false;
-  } else {
-    return true;
-  };
 }
 
 

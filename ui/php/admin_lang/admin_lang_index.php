@@ -11,6 +11,7 @@ $section = "ADMINS";
 $menu = "ADMIN_LANG";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
+include("$obminclude/global.inc");
 
 $debug = 1;
 //require("admin_query.inc");
@@ -31,7 +32,6 @@ switch ($mode) {
  case "html":
    $debug = $set_debug;
    require("$obminclude/phplib/obmlib.inc");
-   include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    if($action == "") $action = "index";

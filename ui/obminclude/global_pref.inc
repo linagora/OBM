@@ -12,6 +12,16 @@
 if ( (! headers_sent()) && ($mode != "txt"))
   $sess->setcookie();
 
+// if prefs have not been loaded (we check the var set_lang) - Login Phase
+if ($set_lang == "") {
+  // We Load and make session variables from Global and User preferences
+  session_load_global_prefs();
+  session_load_user_prefs();
+
+  // We update the last login date for the user
+  run_query_userobm_update_lastaccess($auth->auth["uid"]);
+}
+
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;

@@ -51,9 +51,6 @@ function page_open($feature) {
     if (($sess->auto_init != "") && ($sess->in == "")) {
       $sess->in = 1;
       include($_PHPLIB["libdir"] . $sess->auto_init);
-//      if ($sess->secure_auto_init != "") {
-//        $sess->freeze();
-//      }
     } 
   }
 }
@@ -63,30 +60,7 @@ function page_close() {
   $base_session = NEW OBM_User_Sql;
   $base_session->ac_start();
   $base_session->ac_store($sess->id,"OBM_User_Active",$auth->auth["uid"]);
-  if (isset($sess)) {
-    $sess->freeze();
-    if (isset($user)) {
-      $user->freeze();
-    }
-  }
 }
 
-function sess_load($session) {
-/*
-  reset($session);
-  while (list($k,$v) = each($session)) {
-    $GLOBALS[$k] = new $v;
-    $GLOBALS[$k]->start();
-  }
-*/
-}
 
-function sess_save($session) {
-/*
-  reset($session);
-  while (list(,$v) = each($session)) {
-    $GLOBALS[$v]->freeze();
-  }
-*/
-}
 ?>

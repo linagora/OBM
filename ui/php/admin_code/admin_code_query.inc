@@ -7,9 +7,16 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$regexp_def_func = '/^function ([a-z_]*)\s{0,3}\(.*/Us';
-$regexp_used_func = '/^.*([a-z_]{1,50})\s{0,3}\(.*$/Us';
+$regexp_def_func = '/^\s*function ([a-z_]*)\s{0,3}\(.*/Us';
+$regexp_used_func = '/^.*([a-z_]{1,64})\s{0,3}\(.*$/Us';
 $regexp_used_func_not = '/^\s*(function|\/\/).*$/Us';
+
+$modules = get_modules_array();
+array_unshift($modules, $c_all);
+$acts = array ('help', 'index', 'show_amp', 'func_unused', 'function_uses');
+$words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
+$exclude = array('.', '..', 'CVS', 'doc', 'scripts', 'contrib', 'www');
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Parse and process one directory (recursive) for defined function search
@@ -36,43 +43,6 @@ function get_def_func_directory($dir) {
 	$ext = $temp[1];
 	if (($ext == "php") || ($ext == "inc")) {
 	  $table2 = get_def_functions($long_entry);
-	}
-      }
-    }
-
-    $table = array_merge($table, $table2);
-  }
-  $obm_dir->close();
-
-  return $table;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Parse and process one directory (recursive) for used function search
-// Parameters:
-//   - $dir : directory to process
-///////////////////////////////////////////////////////////////////////////////
-function get_used_func_directory($dir) {
-  global $exclude;
-
-  $table = array();
-  $table2 = array();
-
-  $obm_dir = dir($dir);
-  while ($entry=$obm_dir->read()) {
-
-    $long_entry = $obm_dir->path."/".$entry;
-
-    if (! in_array ($entry, $exclude)) {
-      if (is_dir($long_entry)) {
-	$table2 = get_used_func_directory($long_entry);
-      } else {
-	// We look only in .php and .inc files
-	$temp = explode (".", $entry);
-	$ext = $temp[1];
-	if (($ext == "php") || ($ext == "inc")) {
-	  $table2 = get_used_functions($long_entry);
 	}
       }
     }
@@ -124,20 +94,81 @@ function get_def_functions($file) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Parse and process recursively the directory for used function search
+// Parameters:
+//   - $dir : root directory to process
+///////////////////////////////////////////////////////////////////////////////
+function get_used_functions($dir) {
+  global $exclude, $used_table;
+
+  $used_table = array();
+
+  $obm_dir = dir($dir);
+  while ($entry=$obm_dir->read()) {
+
+    $long_entry = $obm_dir->path."/".$entry;
+
+    if (! in_array ($entry, $exclude)) {
+      if (is_dir($long_entry)) {
+	get_used_func_directory($long_entry);
+      } else {
+	// We look only in .php and .inc files
+	$temp = explode (".", $entry);
+	$ext = $temp[1];
+	if (($ext == "php") || ($ext == "inc")) {
+	  get_used_func_file($long_entry);
+	}
+      }
+    }
+  }
+  $obm_dir->close();
+
+  return $used_table;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Parse and process one directory (recursive) for used function search
+// Parameters:
+//   - $dir : directory to process
+///////////////////////////////////////////////////////////////////////////////
+function get_used_func_directory($dir) {
+  global $exclude;
+
+  $obm_dir = dir($dir);
+  while ($entry=$obm_dir->read()) {
+
+    $long_entry = $obm_dir->path."/".$entry;
+
+    if (! in_array ($entry, $exclude)) {
+      if (is_dir($long_entry)) {
+	get_used_func_directory($long_entry);
+      } else {
+	// We look only in .php and .inc files
+	$temp = explode (".", $entry);
+	$ext = $temp[1];
+	if (($ext == "php") || ($ext == "inc")) {
+	  get_used_func_file($long_entry);
+	}
+      }
+    }
+  }
+  $obm_dir->close();
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the list of used functions in the file given
 // Parameters:
 //   - $file   : file to process
 // Returns:
 //   - $resultat : array of functions (defined or used)
 ///////////////////////////////////////////////////////////////////////////////
-function get_used_functions($file) {
-  global $debug, $path, $regexp_used_func, $regexp_used_func_not;
+function get_used_func_file($file) {
+  global $debug, $path, $regexp_used_func, $regexp_used_func_not, $used_table;
 
-  if ($debug > 0) {
-    echo "<br />Files read : $pfile";
-  }
-
-  $tableau = array();
   $contents = array();
   if (file_exists($file)) {
     $contents = file($file);
@@ -153,15 +184,13 @@ function get_used_functions($file) {
       // If a function is used, we note it
       while (preg_match($regexp_used_func, $line, $matches)) {
 	$func_name =  $matches[1];
-	$tableau[$func_name]["file"] = $file;
-	$tableau[$func_name]["line_num"] = $line_num;
-	$tableau[$func_name]["cpt"] += 1;
+	$used_table[$func_name]["file"] = $file;
+	$used_table[$func_name]["line_num"] = $line_num;
+	$used_table[$func_name]["cpt"] += 1;
 
 	$pattern = preg_quote($matches[1]);
 	$line = preg_replace("/$pattern/","",$line,1);
       }
     }
   }
-
-  return $tableau;
 }

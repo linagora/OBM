@@ -143,10 +143,12 @@ $l_header_add_contact = "Word to define";
 
 $l_header_reset = "Word to define";
 
-$l_header_amp	= "Word to define";
+// Admin headers
+$l_header_index = "Index";
+$l_header_help 	= "Ayuto";
+$l_header_amp = "Word to define";
+$l_header_func_unused = "Functions";
 $l_header_clear_sess = "Word to define";
-$l_header_index     =  "Word to define";
-$l_header_help 	= "Word to define";
 $l_header_pref_update = "Ripristini le preferenze degli utenti";
 
 $l_header_day = "Giorno";

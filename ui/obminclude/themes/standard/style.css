@@ -79,7 +79,6 @@ p			{
 /* /// Global menu items style definition /// */
 /* ////////////////////////////////////////// */
 
-
 table.global		{
 	width:			100%;
 	border-spacing:		0;
@@ -204,7 +203,6 @@ td.menuBarLabel		{
 	font-weight:		bold;
 	color:			#ffffff;
 	background-color:	#93919c;
-
 }
 
 td.menuBarText		{
@@ -214,7 +212,6 @@ td.menuBarText		{
 	color:			#ffffff;
 	background-color:	#93919c;
 	text-align:		right;
-
 }
 
 img.menuBarIconG	{
@@ -231,7 +228,6 @@ img.menuBarIconD	{
 	text-align:		left;
 	margin:			0;
 	padding:		0;
-
 }
 
 a.menuBar:link { color: #ffffff; background-color: transparent;}
@@ -439,7 +435,6 @@ table.details		{
         margin-left:		auto;
 	margin-right:		auto;
 	width:			auto;
-	
 }
 
 td.detailHead		{
@@ -457,7 +452,6 @@ td.detailLabel		{
 	font-weight:		bold;
 	color:			#59519e;
 	background-color:	#ffffff;
-	
 }
 
 td.detailText		{
@@ -465,7 +459,6 @@ td.detailText		{
 	font-size:		12px;
 	color:			#000000;
 	background-color:	#ffffff;
-	
 }
 
 a.details:link 		{ color: #000000; background-color: transparent;}
@@ -532,6 +525,33 @@ td.adminText		{
 	font-size:		12px;
 	vertical-align:		top;
 	text-align:		center;
+	color:			#000000;
+	background-color:	transparent;
+}
+
+td.adminText		{
+	font-family:		sans-serif;
+	font-size:		12px;
+	vertical-align:		top;
+	text-align:		center;
+	color:			#000000;
+	background-color:	transparent;
+}
+
+td.adminTextLeft	{
+	font-family:		sans-serif;
+	font-size:		12px;
+	vertical-align:		top;
+	text-align:		left;
+	color:			#000000;
+	background-color:	transparent;
+}
+
+td.adminTextRight	{
+	font-family:		sans-serif;
+	font-size:		12px;
+	vertical-align:		top;
+	text-align:		right;
 	color:			#000000;
 	background-color:	transparent;
 }

@@ -7,7 +7,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 The Code administration module is a compilation of tools to help checking that
-the code respects OBM coding standards.
+the code respects OBM coding standards and to help keeping the code clean.
 
 Each tool actually check only one aspect of the standard.
 
@@ -30,6 +30,13 @@ show_amp         |        | show (line, file) where & could be misuse in URL
                  |        | word list (eg: '& nbsp;')
                  |        | It parse each file (.php, .inc) under the php
                  |        | directory
+===============================================================================
+func_unused      |        | display each defined functions with infos (file,
+                 |        | line number, # used occurence)
+                 |        | Usefull to show unused defined functions
+===============================================================================
+function_uses    |        | display each use of the function, with infos (file,
+                 |        | line number)
 -------------------------------------------------------------------------------
 txt: php admin_code_index.php -a show_amp
 ===============================================================================

@@ -143,7 +143,6 @@ if ($popup != 2) {
 }
 if (! $popup) {
   generate_menu($menu,$section);         // Menu
-  display_bookmarks();
 }
 
 ///////////////////////////////////////////////////////////////////////////////

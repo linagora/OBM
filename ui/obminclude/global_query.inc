@@ -52,6 +52,24 @@ function run_query_userobm($id="") {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Update the login date of the user                                         //
+// Parameters:
+//   - $id : UserObm Id 
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_update_lastaccess($id) {
+  global $cdg_sql;
+
+  $query = "update UserObm
+    set userobm_timelastaccess='".date("Y-m-d H:i:s")."'
+    where userobm_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +107,6 @@ function run_query_default_preferences_insert($user_id) {
     display_debug_msg($query, $cdg_sql);
     $line_q->query($query);
   }
-
 
   //---------------------------------------------------------------------------
   // Default Display Parameters
@@ -256,12 +273,14 @@ function run_query_get_global_prefs() {
   return $obm_q_pref;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get and register the global preferences into session at login 
 // This must be called in before page_open 
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_global_prefs() {
   global $sess;
+
   $obm_q_name_var = run_query_get_global_prefs();
   while ($obm_q_name_var->next_record()) {
     $tab[0]=$obm_q_name_var->f("globalpref_option");
@@ -312,7 +331,6 @@ function session_load_user_prefs() {
   $sess->register("last_contract_name");
   $last_incident_name = run_query_global_incident_label ($last_incident); 
   $sess->register("last_incident_name");
-
 }
 
 
@@ -614,20 +632,26 @@ function get_company_total_deal_number($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the configuration variable in the database this variable could be set
-// in the administration module.
-// Parameters:
-//   - none   
+// Get the module list                                                       //
+// Return : $modules : array of modules
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_config_var() {
-  global $cdg_sql;
+function get_modules_array() {
+  global $path;
 
-  $query = "select * from ConfigObmVars";
+  // Module dirs to exclude
+  $exclude = array('.', '..', 'CVS');
+  $modules = array();
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
+  $mod_dir = dir("$path");
+  while($entry=$mod_dir->read()) {
+    if (! in_array ($entry, $exclude) && is_dir($mod_dir->path."/".$entry)) {
+      array_push($modules, $entry);
+    }
+  }
+  $mod_dir->close();
+  sort($modules);
+
+  return $modules;
 }
 
 ?>

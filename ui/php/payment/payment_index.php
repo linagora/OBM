@@ -46,7 +46,6 @@ $perm->check();
 display_head ($l_treso);
 require("payment_js.inc");
 generate_menu ($menu,$section);
-display_bookmarks();
 
 ///////////////////////////////////////////////////////////////////////////////
 // ACTIONS :
@@ -400,7 +399,7 @@ elseif ($action =="reconcile_import") {
       $mon_fichier = tempnam ("/tmp/","csv_");
       exec ("chmod 604 $mon_fichier");
       // we have to register the name of the file to be able to delete it :
-      $sess->register ("mon_fichier");$sess->freeze();
+      $sess->register ("mon_fichier");
       //      copy ($fichier_csv, $mon_fichier);
       // we have to modify a little bit the file received, 
       // some lines to remove
@@ -502,7 +501,7 @@ elseif ($action == "do_reconcile") {
     // and we look for invoices that become checked to check them =)
     run_query_update_invoice_status ();
     // we can, at last, dele te the csv file :
-    $sess->thaw ();
+    //    $sess->thaw ();
     if ($sess->is_registered("mon_fichier")) {
       unlink ($mon_fichier);
       $sess->unregister ("mon_fichier");

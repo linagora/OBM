@@ -123,27 +123,6 @@ function run_query_activeuserobm_delete($sid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the module list                                                       //
-// Return : $modules : array of modules
-///////////////////////////////////////////////////////////////////////////////
-function get_modules_array() {
-  global $cdg_sql;
-
-  // Module dirs to exclude
-  $exclude = array('.', '..', 'CVS', 'obminclude', 'images');
-  $modules = array();
-
-  $mod_dir = dir("..");
-  while($entry=$mod_dir->read()) {
-    if (! in_array ($entry, $exclude) && is_dir($mod_dir->path."/".$entry)) {
-      array_push($modules, $entry);
-    }
-  }
-  $mod_dir->close();
-
-  return $modules;
-}
-///////////////////////////////////////////////////////////////////////////////
 // Get the lifetime global pref value                                        //
 // Returns:
 //   - $lifetime value
