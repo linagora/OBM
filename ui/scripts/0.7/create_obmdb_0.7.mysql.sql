@@ -308,6 +308,21 @@ CREATE TABLE Function (
 );
 
 
+--
+-- Table structure for table 'ContactCategory'
+--
+CREATE TABLE ContactCategory (
+  contactcategory_id          int(8) NOT NULL auto_increment,
+  contactcategory_timeupdate  timestamp(14) NOT NULL,
+  contactcategory_timecreate  timestamp(14) NOT NULL,
+  contactcategory_userupdate  int(8) NOT NULL default '0',
+  contactcategory_usercreate  int(8) NOT NULL default '0',
+  contactcategory_code        varchar(10) NOT NULL default '',
+  contactcategory_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Deal module tables
 -------------------------------------------------------------------------------
