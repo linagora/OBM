@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.1";
+$obm_version = "0.6.1.9b";
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -247,7 +247,8 @@ $perm_admin = $com_read + $com_write + $com_admin_read + $com_admin_write +
 // Debug Constants
 $cdg_id = 1;     // id display
 $cdg_param = 2;  // parameter display
-$cdg_sql = 4;    // sql query display
+$cdg_sess = 4;   // session display
+$cdg_sql = 8;    // sql query display
 
 // Global Constants
 $c_all = "_ALL_";		// Used in Form select

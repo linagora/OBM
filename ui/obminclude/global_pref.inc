@@ -22,6 +22,18 @@ if ($set_lang == "") {
   run_query_userobm_update_lastaccess($auth->auth["uid"]);
 }
 
+// Display session content if debug level is set
+if (($set_debug & $cdg_sess) == $cdg_sess) {
+  $dis_session = "<table border=\"1\">
+    <tr><th>Session content</th></tr>
+    <tr><td>";
+  while (list($key, $val) = each ($_SESSION)) {
+    $dis_session .= "$key = $val<br />\n";
+  }
+  $dis_session .= "</td></tr></table>";
+  echo $dis_session;
+}
+
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;

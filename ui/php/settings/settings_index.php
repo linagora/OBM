@@ -35,7 +35,7 @@ if ($param_theme != "") {
 
 if ($form_user_pref) {
 
-  $param_debug = $param_debug_id | $param_debug_param | $param_debug_sql;
+  $param_debug = $param_debug_id | $param_debug_param | $param_debug_sess | $param_debug_sql;
   $set_debug=$param_debug;
   $sess->register("set_debug");
   run_query_set_user_pref($uid, "set_debug", $set_debug, 1);
@@ -73,6 +73,7 @@ require("settings_display.inc");
 
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
+if (($set_debug & $cdg_sess) == $cdg_sess) $dg_sess = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
 
 if ($set_date == $cda_iso) $da_iso = "checked";
@@ -105,6 +106,7 @@ if ($auth->auth["perm"] == $perms_admin) {
       <input type=\"hidden\" name=\"param_debug\" value=\"1\" />
       <input type=\"checkbox\" name=\"param_debug_id\" value=\"$cdg_id\" $dg_id />$l_dg_id
       <input type=\"checkbox\" name=\"param_debug_param\" value=\"$cdg_param\" $dg_param />$l_dg_param
+      <input type=\"checkbox\" name=\"param_debug_sess\" value=\"$cdg_sess\" $dg_sess />$l_dg_sess
       <input type=\"checkbox\" name=\"param_debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
     </td>
   </tr>";

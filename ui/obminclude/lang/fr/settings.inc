@@ -22,6 +22,7 @@ $l_set_debug = "Niveau de debug";
 
 $l_dg_id = "Id";
 $l_dg_param = "Paramètres";
+$l_dg_sess = "Session";
 $l_dg_sql = "SQL";
 
 $l_da_iso = "yyyy-mm-dd";
