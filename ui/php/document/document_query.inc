@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : document_query.inc                                           //
 //     - Desc : document query File                                          //
-//  2003-08-21 Mehdi Rande                                                   //
+// 2003-08-21 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -259,18 +259,18 @@ function run_query_insert(&$document) {
     return false;
   }
 
-  if($size == "") $size = 0;
+  if ($size == "") $size = 0;
   
-  if($mime == $c_auto) {
+  if ($mime == $c_auto) {
     $mime = run_query_get_mime($document);
     $document["mime"] = $mime;
   }
 
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
 
-  if($kind == "new_file") {
+  if ($kind == "new_file") {
     $file_kind = 1;
-    if(!run_query_create_file($document)){
+    if (!run_query_create_file($document)){
       $err_msg = $l_creation_error;
       return false;
     }
@@ -559,11 +559,12 @@ function run_query_delete_file($path,$name) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_create_file($document) {
   global $document_path;
+
   $path = $document["path"];
   $name = $document["name"];
   $file = $document["file"];
   
-  if(strpos($path,'/') === 0) {
+  if (strpos($path,'/') === 0) {
     $final_path = $document_path.$path;
   }
   else {
@@ -571,11 +572,11 @@ function run_query_create_file($document) {
   }
   
   
-  if(!is_dir($final_path)) {
+  if (!is_dir($final_path)) {
     return false;
   }
 
-  if(strrpos($finalpath,'/') == (strlen($finalpath) -1)) {
+  if (strrpos($finalpath,'/') == (strlen($finalpath) -1)) {
     $directory = $final_path.$name;
   }
   else {
@@ -627,20 +628,19 @@ function check_data_form($cid, $document) {
   }
   
   $realpath = realpath($final_path);
-  if(substr($realpath,0,strlen($document_path)) != $document_path) {
+  if (substr($realpath,0,strlen($document_path)) != $document_path) {
     $err_msg = $l_invalid_repository_path;
     return false;
   }
 
-  if($kind == "new_file"  && $file_update != "no" && ($name == "" || $size == "")) {
+  if ($kind == "new_file"  && $file_update != "no" && ($name == "" || $size == "")) {
     $err_msg = $l_invalid_file;
     return false;
-
   }
   
-  if($kind == "link" && $url == "" && $file_update != "no") {
-      $err_msg = $l_invalid_url;
-      return false;
+  if ($kind == "link" && $url == "" && $file_update != "no") {
+    $err_msg = $l_invalid_url;
+    return false;
   } 
 
 
@@ -671,6 +671,7 @@ function check_data_form($cid, $document) {
 function run_query_update($did, &$document) {
   global $auth, $cdg_sql,$document_path,$c_auto;
   global $l_already_exist_error,$l_creation_error,$err_msg;
+
   $title = $document["title"];
   $cat1 = $document["category1"];
   $cat2 = $document["category2"];

@@ -20,7 +20,6 @@ $menu = "DOCUMENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 $extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
@@ -631,4 +630,3 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      		 );
 }
-

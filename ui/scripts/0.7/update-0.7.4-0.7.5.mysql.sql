@@ -126,9 +126,6 @@ CREATE TABLE ContactCategory2Link (
   PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
 );
 
-ALTER table CalendarSegment change column calendarsegment_date calendarsegment_date varchar(14);
-UPDATE CalendarSegment SET calendarsegment_date = UNIX_TIMESTAMP(calendarsegment_date);
-ALTER table CalendarSegment change column calendarsegment_date calendarsegment_date timestamp(14);
 
 -------------------------------------------------------------------------------
 -- Update structure for table 'Company'

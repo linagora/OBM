@@ -552,6 +552,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   if (isset($company["email"])) { $email = stripslashes($company["email"]); }
   if (isset($company["com"])) { $com = stripslashes($company["com"]); }
   if (isset($company["cat"])) { $compcat = $company["cat"]; }
+
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
     <option value=\"0\">$l_none</option>";

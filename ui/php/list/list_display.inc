@@ -229,8 +229,9 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display List Consultation                                            //
 // Parameters:
-//   - $list_q : company database result 
-//   - $con_q  : contact database result 
+//   - $list_q     : list database result 
+//   - $pref_con_q : contact display preferences database result 
+//   - $con_q      : contact database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
@@ -386,22 +387,22 @@ function html_list_form($action, $list_q, $list) {
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_subject</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_query</td>
-    <td class=\"detailText\">
+    <td class=\"detailForm\">
       <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
   </tr>
   </table>";

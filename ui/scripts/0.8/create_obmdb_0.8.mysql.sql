@@ -560,6 +560,26 @@ CREATE TABLE RepeatKind (
 
 
 -------------------------------------------------------------------------------
+-- Todo
+-------------------------------------------------------------------------------
+-- Create new table
+CREATE TABLE Todo (
+  todo_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  todo_timeupdate  timestamp(14),
+  todo_timecreate  timestamp(14),
+  todo_userupdate  int(8),
+  todo_usercreate  int(8),
+  todo_user        int(8),
+  todo_date        timestamp(14) default NULL,
+  todo_deadline    timestamp(14) default NULL,
+  todo_priority    int(8) default NULL,
+  todo_title       varchar(80) default NULL,
+  todo_content     text default NULL,
+  PRIMARY KEY (todo_id)
+);
+
+
+-------------------------------------------------------------------------------
 -- Document module tables
 -------------------------------------------------------------------------------
 --
@@ -1062,24 +1082,24 @@ CREATE TABLE GroupGroup (
 
 
 -------------------------------------------------------------------------------
--- Todo
+-- Import module tables
 -------------------------------------------------------------------------------
--- Create new table
-CREATE TABLE Todo (
-  todo_id          int(8) DEFAULT '0' NOT NULL auto_increment,
-  todo_timeupdate  timestamp(14),
-  todo_timecreate  timestamp(14),
-  todo_userupdate  int(8),
-  todo_usercreate  int(8),
-  todo_user        int(8),
-  todo_date        timestamp(14) default NULL,
-  todo_deadline    timestamp(14) default NULL,
-  todo_priority    int(8) default NULL,
-  todo_title       varchar(80) default NULL,
-  todo_content     text default NULL,
-  PRIMARY KEY (todo_id)
+--
+-- Table structure for table 'Import'
+--
+CREATE TABLE Import (
+  import_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  import_timeupdate     timestamp(14),
+  import_timecreate     timestamp(14),
+  import_userupdate     int(8),
+  import_usercreate     int(8),
+  import_name           varchar(64) NOT NULL,
+  import_datasource_id  int(8),
+  import_format         varchar(128),
+  import_desc           text,
+  PRIMARY KEY (import_id),
+  UNIQUE (import_name)
 );
-
 
 
 

@@ -63,9 +63,9 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deal detail query execution                                               //
+// List detail query execution                                               //
 // Parameters:
-//   - $id : deal id
+//   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
@@ -96,7 +96,7 @@ function run_query_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : list insertion                                          //
 // Parameters:
-//   - $list[] : deal hash info : keys used : all
+//   - $list[] : list hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($list) {
   global $auth, $cdg_sql;
@@ -188,7 +188,7 @@ function run_query_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : ContactList conditionnal insertion                      //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
+//   - $list[] : list hash info : keys used : id, con_nb, conX
 // Return: number of contact inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contactlist_insert($list) {
@@ -237,7 +237,7 @@ function run_query_contactlist_insert($list) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : ContactList deletion                                    //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
+//   - $list[] : list hash info : keys used : id, con_nb, conX
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contactlist_delete($list) {
   global $auth, $cdg_sql;
@@ -394,7 +394,7 @@ function run_query_check_list($id, $name, $subject) {
   global $cdg_sql;
 
   if ($id != "") {
-    $where_id = "and list_id != '$id'";
+    $where_id = "list_id != '$id' and";
   }
 
   // We search for a similar name (as same name is already excluded)
