@@ -229,8 +229,11 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
  	$having_task = " having task_totalperiod <> 0";
 
   // order
-  $query .= $where_users. $where_task ." group by task_deal_id, tasktype_id $having_task 
-      order by tasktype_internal, tasktype_id, task_totalperiod desc";
+    $query .= $where_users. $where_task ." group by task_deal_id, tasktype_id $having_task 
+        order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
+	//$query .= $where_users. $where_task .
+	//  " group by tasktype_internal, task_company_name, task_deal_id $having_task 
+    //  order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
   
   display_debug_msg($query, $cdg_sql, "run_query_by_deal 2");
 
@@ -1038,6 +1041,42 @@ function get_nb_working_days2($date) {
   return $workingdays;
 
 }
+
+
+function weekday_name ($num_day) {
+ 
+  global $l_monday,$l_tuesday,$l_wednesday,$l_thursday,$l_friday,$l_saturday,$l_sunday,$l_unknown; 
+  
+  switch($num_day) {
+    case 1 : $day_name=$l_monday;    break; 
+    case 2 : $day_name=$l_tuesday;   break;
+    case 3 : $day_name=$l_wednesday; break;   
+    case 4 : $day_name=$l_thursday;  break;
+    case 5 : $day_name=$l_friday;    break;
+    case 6 : $day_name=$l_saturday;  break;
+    case 0 : $day_name=$l_sunday;    break;
+    default : $day_name=$l_unknown;  break;   
+  }
+  return $day_name;
+}
+
+function weekday_short_name ($num_day) {
+
+  global $l_short_monday,$l_short_tuesday,$l_short_wednesday,$l_short_thursday,$l_short_friday,$l_short_saturday,$l_short_sunday,$l_unknown; 
+ 
+  switch($num_day) {
+    case 1 : $day_name=$l_short_monday;    break;
+    case 2 : $day_name=$l_short_tuesday;   break;
+    case 3 : $day_name=$l_short_wednesday; break;   
+    case 4 : $day_name=$l_short_thursday;  break;
+    case 5 : $day_name=$l_short_friday;    break;
+    case 6 : $day_name=$l_short_saturday;  break;
+    case 0 : $day_name=$l_short_sunday;    break;
+    default : $day_name=$l_unknown;        break;
+  }
+  return $day_name;
+}
+
 
 
 
