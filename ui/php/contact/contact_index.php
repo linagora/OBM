@@ -681,7 +681,7 @@ function get_contact_action() {
                                      	       );
 
 // Category Insert
-  $actions["DOCUMENT"]["cat1_insert"] = array (
+  $actions["CONTACT"]["cat1_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
