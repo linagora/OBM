@@ -157,12 +157,15 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       company_town,
       company_expresspostal,
       function_label as contact_function,
-      country_name
+      ctry2.country_name as company_country
     from Contact
         left join Company on contact_company_id=company_id 
         left join Function on contact_function_id=function_id
         left join Country on contact_country_iso3166=country_iso3166
                   and country_lang='$lang'
+        LEFT JOIN Country as ctry2 ON
+                  Company.company_country_iso3166 = ctry2.country_iso3166
+                  and ctry2.country_lang='$lang'
         $join_cat1
         $join_cat2
     $whereq

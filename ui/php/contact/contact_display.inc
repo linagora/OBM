@@ -37,7 +37,7 @@ $fieldnames["contact_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contact specific dataset fields                                   //
+// Display Contact specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -172,6 +172,10 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       if ($OD->data_set->f("company_expresspostal") != "") {
 	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
+      }
+      if ($OD->data_set->f("company_country") != "") {
+	$res["name"] .= $OD->data_set->f("company_country")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_country");
       }
     }
   }
