@@ -245,7 +245,7 @@ if ($action == "index" || $action == "") {
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "incident", 1);
   dis_incident_display_pref($pref_q);
 

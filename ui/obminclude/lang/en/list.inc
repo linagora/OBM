@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 // Database fields
 $l_name = "Name";
 $l_subject = "Subject";
@@ -20,8 +19,6 @@ $l_date_last_update = "Last update";
 
 // Labels and texts
 $l_list = "List";
-$l_yes = "yes";
-$l_no = "no";
 $l_nb_contact = "Number of contact";
 $l_list_contact = "Having as contact";
 $l_list_display = "Display options for Lists list";
@@ -30,6 +27,7 @@ $l_list_set = "List Set";
 $l_export_format = "Available export formats";
 $l_desc = "Description";
 $l_export_intro = "Select the export format needed";
+$l_select_list = "Select the lists to be exported";
 
 // Contact
 $l_lastname = "Lastname";
@@ -44,10 +42,8 @@ $l_town = "Town";
 $l_insert = "Insert the list";
 $l_update = "Update the list";
 $l_delete = "Delete the list";
-$l_change_auth = "Change auth";
 $l_confirm = "Confirm the action";
 $l_add = "Add these lists";
-$l_mail = "Send mail to members" ;
 
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";
@@ -64,9 +60,10 @@ $l_j_check_email = "The email adress is not valid.";
 $l_warn_delete = "registered contacts in this list";
 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the lists";
-$l_no_list = "No list can be found with these criterias." ;
 $l_found = "lists found.";
 $l_no_found = "No lists found matching the query";
+$l_con_found = "registered contacts";
+$l_no_contact = "No contact registered";
 
 $l_add_contact = "Add contacts" ;
 $l_del_contact_sel = "Remove these contacts";
@@ -74,19 +71,9 @@ $l_contact_added = "added Contact(s)";
 $l_contact_removed = "removed Contact(s)";
 
 $l_fill_name = "The list Name must be filled !";
+$l_fill_subject = "The subject must be filled !";
 $l_invalid_query = "The query is invalid !";
-
-
-
-$l_con_found = "registered contacts";
-$l_no_contact = "No contact registered";
-$l_nb_contact_deleted = "Number of contact deleted" ;
-$l_list_add_contact = "Add" ;
-$l_list_add_contact_chosen = "Add selected contacts" ;
-$l_nb_contact_added = "Number of contact added" ;
-$l_delete_confirm = "Do you comfirm removal of list" ;
-$l_complete_mail_form = "Please fill mail fields to sent mail" ;
-
+$l_banned_word = "Banned word";
 
 //------------------------------------//
 // Export Format informations         //

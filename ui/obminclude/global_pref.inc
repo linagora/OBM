@@ -95,10 +95,10 @@ if ($menu != "") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Inclusion of the correct Menu (function generate_menu($menu) in menu.inc) //
+// Inclusion of the correct Display file (global display functrions)         //
 ///////////////////////////////////////////////////////////////////////////////
-$menu_include_file = "$obminclude/themes/$set_theme/menu.inc";
-include("$menu_include_file");
+$display_include_file = "$obminclude/themes/$set_theme/display.inc";
+include("$display_include_file");
 
 
 // List Export Formats (use theme info so after theme inclusion)

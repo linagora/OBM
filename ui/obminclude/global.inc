@@ -329,9 +329,9 @@ require_once("$obminclude/global_display.inc");
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display HTML Head
+// Display: HTML Head
 ///////////////////////////////////////////////////////////////////////////////
-function display_head($l_module) { 
+function display_head($p_module) { 
   global $l_title, $set_theme, $obminclude;
 
   $headers_e = "
@@ -340,26 +340,25 @@ function display_head($l_module) {
    <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
   $headers_et = "<html>";
 
-  echo "
+  return "
     $headers_e
     <head>
-     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />
-     <title>$l_title - $l_module</title>
+     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
+     <title>$l_title - $p_module</title>
      <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
     </head>
-    <body >";
+    <body>";
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the end of an HTML page
+// Display: end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
-  echo "
+  return "
     </body>
     </html>
 ";
-
 }
 
 
@@ -367,7 +366,7 @@ function display_end() {
 // Display an error message
 /////////////////////////////////////////////////////////////////////////////
 function display_err_msg($msg) {
-  echo "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
+  return "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
 }
 
 
@@ -375,7 +374,7 @@ function display_err_msg($msg) {
 // Display a warning message
 /////////////////////////////////////////////////////////////////////////////
 function display_warn_msg($msg) {
-  echo "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
+  return "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
 }
 
 
@@ -384,14 +383,31 @@ function display_warn_msg($msg) {
 ////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg) {
   //  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
-  echo "<p class=\"messageOk\">$msg</p>";
+  return "<p class=\"messageOk\">$msg</p>";
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Display an Info message
 ////////////////////////////////////////////////////////////////////////////
 function display_info_msg($msg) {
-  echo "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
+  return "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Get a template file, add slashes to ", and return it in a string
+// Parameters:
+//   - $tpl : template name
+/////////////////////////////////////////////////////////////////////////////
+function get_template($tpl) {
+
+  // could be replace by file_get_contents (but PHP >= 4.3.0)
+  $fd = fopen($tpl, "rb");
+  $template = fread($fd, filesize($tpl));
+  fclose($fd);
+  $template = str_replace('"', '\"', $template);
+
+  return $template;
 }
 
 
@@ -509,36 +525,36 @@ function get_hour($timestamp="") {
 }
 
 
-//////////////////////////////////
-//
-///////////////////////////////////
-function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_timeupdate) {
+///////////////////////////////////////////////////////////////////////////////
+// Dispaly an entity dates and users creation / update infos
+// Parameters:
+//   - $uc_id : usercreate id
+//   - $uu_id : userupdate id
+//   - $tc    : timecreate
+//   - $tu    : timeupdate
+///////////////////////////////////////////////////////////////////////////////
+function display_record_info($uc_id, $uu_id, $tc, $tu) {
+  global $set_theme, $ico_created, $ico_updated;
 
-  $obm_q= new DB_OBM;
-  $query_created = "select userobm_login from UserObm where userobm_id=".$p_usercreate_id;
-  $query_modified = "select userobm_login from UserObm where userobm_id=".$p_userupdate_id;
+  $obm_q = new DB_OBM;
+  $query_created = "select userobm_login from UserObm where userobm_id='$uc_id'";
+  $query_updated = "select userobm_login from UserObm where userobm_id='$uu_id'";
 
-  echo "
-    <table class=\"recordInfo\">
-    <tr>
-      <td class=\"recordInfo\">";
-  if ($p_usercreate_id != "") {
+  if ($uc_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
-    echo "created:".$obm_q->f("userobm_login")." (".datetime_format($p_timecreate).")";
+    $created = "<img src=\"/images/$set_theme/$ico_created\"> ".$obm_q->f("userobm_login")." : ".datetime_format($p_timecreate);
   }
-  echo "</td>
-	</tr><tr>
-	<td class=\"recordInfo\">";
-
-  if ($p_userupdate_id != "") {
-    $obm_q->query($query_modified);
+  if ($uu_id != "") {
+    $obm_q->query($query_updated);
     $obm_q->next_record();
-    echo "modified:" . $obm_q->f("userobm_login") . " (". datetime_format($p_timeupdate) .")";
+    $updated = "<img src=\"/images/$set_theme/$ico_updated\"> " . $obm_q->f("userobm_login") . " : ". datetime_format($p_timeupdate);
   }
-  echo "  </td></tr>
-    </table>";
 
+  $block = "<div class=\"detailInfo\">$created<br />$updated
+  </div>";
+
+  return $block;
 }
 
 

@@ -316,12 +316,12 @@ function run_query_contacts_list($list_id, $new_order="", $order_dir="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Return the number of registered contact in the list specified
 // Parameters:
-//   - $l_id    : list id
+//   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
-function get_list_nb_contact($l_id) {
+function get_list_nb_contact($id) {
   global $cdg_sql;
 
-  $query = "select count(*) from ContactList where ContactList_listid='$l_id'";
+  $query = "select count(*) from ContactList where ContactList_listid='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -333,34 +333,56 @@ function get_list_nb_contact($l_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if a list (except with id given) with the name given already exists
+// Parameters:
+//   - $name : name to search for
+//   - $id   : list id to exclude
+// Returns:
+//   - true (if a list exists) or false
+///////////////////////////////////////////////////////////////////////////////
+function get_list_name_exists($name, $id="") {
+  global $cdg_sql;
+
+  $query = "select list_id, list_name
+    from List
+    where list_id!='$id' and list_name='$name'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the lists which matches the name or the subject
 // except the one given (update mode)
 // Parameters:
-//   - $l_id    : list id
+//   - $id      : list id
 //   - $name    : list name
 //   - $subject : list subject
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_list($l_id, $name, $subject) {
+function run_query_check_list($id, $name, $subject) {
   global $cdg_sql;
 
-  // If name is short, we test equality, else similarity
-  if (strlen($name)  > 2) {
-    $wname = "list_name like '%$name%'";
-  } else {
-    $wname = "list_name = '$name'";
-  }
+  // We search for a similar name (as same name is already excluded)
+  $wname = "list_name like '%$name%'";
 
   // If subject is short, we test equality, else similarity
   if (strlen($subject)  > 2) {
     $wsubject = "list_subject like '%$subject%'";
-    //  } elseif ($subject != "") {
   } else {
     $wsubject = "list_subject = '$subject'";
   }
 
   $query = "select distinct list_id, list_name, list_subject
      from List
-     where list_id!='$l_id'
+     where list_id!='$id'
        and ($wname or $wsubject)";
 
   display_debug_msg($query, $cdg_sql);
@@ -374,35 +396,35 @@ function run_query_check_list($l_id, $name, $subject) {
 ///////////////////////////////////////////////////////////////////////////////
 // List context checking (same lists exists ?)
 // Parameters:
-//   - $l_id     : list id
+//   - $id       : list id
 //   - $list[]   : list values
 //     keys used : name, subject, email
 // Returns:
 //   - List Database object with list of similar lists
 ///////////////////////////////////////////////////////////////////////////////
-function check_list_context($l_id, $list) {
+function check_list_context($id, $list) {
   global $cdg_sql;
 
   $name = $list["name"];
   $subject = $list["subject"];
 
   // return the lists with same name or subject
-  $l_q = run_query_check_list($l_id, $name, $subject);
+  $list_q = run_query_check_list($id, $name, $subject);
 
-  return $l_q;
+  return $list_q;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // List Form Data checking and formatting
 // Parameters:
-//   - $l_id     : list id  (empty on insertion)
+//   - $id       : list id  (empty on insertion)
 //   - $list[]   : values checked
 //     keys used : name, subject, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($l_id, $list) {
-  global $php_regexp_email, $l_fill_name, $l_invalid_query;
-  global $err_msg, $l_j_check_email;
+function check_data_form($id, $list) {
+  global $php_regexp_email, $l_fill_name, $l_invalid_query, $l_banned_word;
+  global $err_msg, $l_j_check_email, $l_list_exists;
 
   $name = $list["name"];
   $subject = $list["subject"];
@@ -415,6 +437,12 @@ function check_data_form($l_id, $list) {
     return false;
   }
 
+  // MANDATORY: List name unique
+  if (get_list_name_exists($name, $id)) {
+    $err_msg = "$l_list_exists ($name)";
+    return false;
+  }
+
   // List email
   if (($email != "") && (eregi($php_regexp_email, $email) == false)) {
     $err_msg = " $email : $l_j_check_email";
@@ -423,6 +451,15 @@ function check_data_form($l_id, $list) {
 
   // If a query has been given, check if it is correct
   if (trim($query) != "") {
+    // Check if banned words are included
+    $excluded_words = array ('insert', 'update', 'delete', 'create', 'alter', 'drop');
+    while ( list($key, $value) = each($excluded_words)) {
+      if (preg_match("/\b$value\b/i", $query)) {
+	$err_msg = "$l_invalid_query $l_banned_word : $value";
+	return false;
+      }
+    }
+    // Check if query is syntaxically correct
     $query = "explain $query";
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;

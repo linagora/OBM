@@ -63,10 +63,6 @@ if($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
 $perm->check();
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-display_head($l_company);     // Head & Body
 
 if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,18 +86,18 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-generate_menu($menu, $section); // Menu
+$display["header"] = generate_menu($menu, $section); // Menu
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
   if ($set_display == "yes") {
-    dis_company_search_list($company);
+    $display["result"] = dis_company_search_list($company);
   } else {
-    display_info_msg($l_no_display);
+    $display["msg"] = display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search")  {
@@ -109,8 +105,8 @@ if ($action == "index" || $action == "") {
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $act_q, $usr_q, $company);
-  dis_company_search_list($company);
+  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["result"] = dis_company_search_list($company);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,17 +114,17 @@ if ($action == "index" || $action == "") {
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
   require("company_js.inc");
-  html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
+  $display["detail"] = html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_company > 0) {
-    $obm_q_soc = run_query_detail($param_company);
-    if ($obm_q_soc->num_rows() == 1) {
-      display_record_info($obm_q_soc->f("company_usercreate"),$obm_q_soc->f("company_userupdate"),$obm_q_soc->f("timecreate"),$obm_q_soc->f("timeupdate")); 
-      html_company_consult($obm_q_soc);
+    $comp_q = run_query_detail($param_company);
+    if ($comp_q->num_rows() == 1) {
+      $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+      $display["detail"] = html_company_consult($comp_q);
     } else {
-      display_err_msg($l_query_error . " - " . $obm_q_soc->query . " !");
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
 
@@ -142,10 +138,10 @@ if ($action == "index" || $action == "") {
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_userobm_active($users);
       require("company_js.inc");
-      display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
-      html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
+      $display["detailInfo"] = display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
+      $display["detail"] = html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
     } else {
-      display_err_msg($l_query_error . " - " . $comp_q->query . " !");
+      $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
 
@@ -157,41 +153,41 @@ if ($action == "index" || $action == "") {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_insert($company);
       if ($retour) {
-        display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
-        display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg($l_insert_error);
       }
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
       $usr_q = run_query_userobm();
-      html_company_search_form($type_q, $act_q, $usr_q, $company);
+      $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
       if ($obm_q->num_rows() > 0) {
-        dis_company_warn_insert("", $obm_q, $company);
+        $display["detail"] = dis_company_warn_insert("", $obm_q, $company);
       } else {
         $retour = run_query_insert($company);
         if ($retour) {
-          display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
-          display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg($l_insert_error);
         }
         $type_q = run_query_companytype();
 	$act_q = run_query_companyactivity();
         $usr_q = run_query_userobm();
-        html_company_search_form($type_q, $act_q, $usr_q, $company);
+        $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
       }
     }
 
   // Form data are not valid
   } else {
-    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
+    $display["search"] = html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -199,138 +195,149 @@ if ($action == "index" || $action == "") {
   if (check_data_form($param_company, $company)) {
     $retour = run_query_update($param_company, $company);
     if ($retour) {
-      display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg($l_update_error);
     }
     $comp_q = run_query_detail($param_company);
-    display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
-    html_company_consult($comp_q);
+    $display["detailInfo"] .= display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+    $display["detail"] = html_company_consult($comp_q);
   } else {
-    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
     $usr_q = run_query_userobm_active($users);
-    html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
+    $display["detail"] = html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  dis_check_links($param_company);
+  $display["detail"] = dis_check_links($param_company);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($hd_company_id);
   if ($retour) {
-    display_ok_msg($l_delete_ok);
+    $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
-    display_err_msg($l_delete_error);
+    $display["msg"] .= display_err_msg($l_delete_error);
   }
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm();
-  html_company_search_form($type_q, $act_q, $usr_q, $company);
+  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_insert($company);
   if ($retour) {
-    display_ok_msg($l_kind_insert_ok);
+    $display["msg"] .= display_ok_msg($l_kind_insert_ok);
   } else {
-    display_err_msg($l_kind_insert_error);
+    $display["msg"] .= display_err_msg($l_kind_insert_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_update($company);
   if ($retour) {
-    display_ok_msg($l_kind_update_ok);
+    $display["msg"] .= display_ok_msg($l_kind_update_ok);
   } else {
-    display_err_msg($l_kind_update_error);
+    $display["msg"] .= display_err_msg($l_kind_update_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_kind_links($company);
+  $display["detail"] .= dis_kind_links($company);
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_delete($company["kind"]);
   if ($retour) {
-    display_ok_msg($l_kind_delete_ok);
+    $display["msg"] .= display_ok_msg($l_kind_delete_ok);
   } else {
-    display_err_msg($l_kind_delete_error);
+    $display["msg"] .= display_err_msg($l_kind_delete_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_insert($company);
   if ($retour) {
-    display_ok_msg($l_act_insert_ok);
+    $display["msg"] .= display_ok_msg($l_act_insert_ok);
   } else {
-    display_err_msg($l_act_insert_error);
+    $display["msg"] .= display_err_msg($l_act_insert_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_update($company);
   if ($retour) {
-    display_ok_msg($l_act_update_ok);
+    $display["msg"] .= display_ok_msg($l_act_update_ok);
   } else {
-    display_err_msg($l_act_update_error);
+    $display["msg"] .= display_err_msg($l_act_update_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_activity_links($company);
+  $display["detail"] .= dis_activity_links($company);
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_delete($company["activity"]);
   if ($retour) {
-    display_ok_msg($l_act_delete_ok);
+    $display["msg"] .= display_ok_msg($l_act_delete_ok);
   } else {
-    display_err_msg($l_act_delete_error);
+    $display["msg"] .= display_err_msg($l_act_delete_error);
   }
   require("company_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 }  elseif ($action == "display") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
-  dis_company_display_pref($pref_q);
+  $display["detail"] = dis_company_display_pref($pref_q);
+
 } else if ($action == "dispref_display") {
-/////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+///////////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
-  dis_company_display_pref($pref_q);
+  $display["detail"] = dis_company_display_pref($pref_q);
+
 } else if ($action == "dispref_level") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
-  dis_company_display_pref($pref_q);
+  $display["detail"] = dis_company_display_pref($pref_q);
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display
+///////////////////////////////////////////////////////////////////////////////
+$display["head"] = display_head($l_company);
+$display["end"] = display_end();
+
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -415,7 +422,7 @@ function get_company_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
     'Right'    => $company_write,
-    'Condition'=> array ('search','index','detailconsult','update','admin','display') 
+    'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
                                      );
 
 // Detail Consult
@@ -549,10 +556,5 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                      		 );
 }
-///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
-///////////////////////////////////////////////////////////////////////////////
-display_end();
-
 
 </SCRIPT>

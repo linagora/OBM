@@ -185,7 +185,7 @@ $q_account = run_query_detail ($account["account"]);
 
 } else if($action =="dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_account_q = run_query_display_pref($uid,"account",1);
   $pref_payment_q = run_query_display_pref($uid,"payment",1);
   dis_account_display_pref($pref_account_q, $pref_payment_q);

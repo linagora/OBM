@@ -6,8 +6,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-$section="";
-$menu="";
+$section = "";
+$menu = "";
 $path = ".";
 
 
@@ -39,21 +39,14 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-echo "   <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
-    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
-   <html xmlns=\"http://www.w3.org/1999/xhtml\"> 
-    <head>
-     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />
-     <title>$l_title - OBM Version $obm_version</title>
-     <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
-    </head>
-    <body >";
+$display["head"] = display_head("OBM Version $obm_version");
+$display["header"] = generate_menu("","");
 
-generate_menu("","");
-
-echo "<center>
+$display["detail"] = "<center>
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
-</center>
-</body></html>";
+</center>";
+$display["end"] = display_end();
+
+display_page($display);
 
 </script>

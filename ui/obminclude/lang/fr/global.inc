@@ -16,6 +16,8 @@ $l_validate = "Valider";
 $l_execute = "Exécute action";
 
 // Common messages
+$l_yes = "Oui";
+$l_no = "Non";
 $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "---";

@@ -16,6 +16,8 @@ $l_validate = "Validate";
 $l_execute = "Execute action";
 
 // Common messages
+$l_yes = "Yes";
+$l_no = "No";
 $l_all = "All";
 $l_all_f = "All";
 $l_none = "---";
@@ -115,12 +117,12 @@ $l_header_payment = "Payments";
 $l_header_agenda = "Calendar";
 
 //TIME
-$l_header_time = "Time management" ;
-
+$l_header_time = "Time management";
 $l_header_new_f = "New";
 $l_header_new = "New";
 $l_header_find = "Find";
 $l_header_display = "Display";
+$l_header_global_export = "Export";
 $l_header_export = "Export";
 $l_header_consult = "Consult";
 $l_header_update = "Update";

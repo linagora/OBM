@@ -527,7 +527,7 @@ elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
 }elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update ($entity,$fieldname, $display) ;
+  run_query_display_pref_update ($entity, $fieldname, $disstatus) ;
   $payment_options = run_query_display_pref($auth->auth["uid"],"payment",1);
   $invoices_options = run_query_display_pref ($auth->auth["uid"], "invoice",1);
   $et_options = run_query_display_pref ($auth->auth["uid"], "entrytemp",1);

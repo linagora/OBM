@@ -148,7 +148,7 @@ else if ($action == "insert") {
     } else {
       $obm_q = check_list_context("", $list);
       if ($obm_q->num_rows() > 0) {
-        dis_list_warn_insert("", $obm_q, $list);
+        dis_list_warn_insert($obm_q, $list);
       } else {
         $retour = run_query_insert($list);
         if ($retour) {
@@ -246,7 +246,7 @@ else if ($action == "insert") {
 
 else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
   dis_list_display_pref($pref_q, $pref_con_q);
@@ -358,7 +358,7 @@ function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
-  global $l_header_consult,$l_header_admin, $l_header_add_contact;
+  global $l_header_consult, $l_header_add_contact;
   global $l_select_list;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 

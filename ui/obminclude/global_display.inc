@@ -1,4 +1,4 @@
-<?
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : global_display.inc                                           //
 //     - Desc : Global Display File (OBM_DISPLAY)                            //
@@ -64,10 +64,10 @@ class OBM_DISPLAY {
   function display($dis_data_entity="") {
     if ($this->display_type == "PREFERENCES") {
       $this->check_preferences_vars();
-      $this->dis_preferences();
+      return $this->dis_preferences();
     } else if ($this->display_type == "DATA") {
       $this->check_data_vars();
-      $this->dis_data($dis_data_entity);
+      return $this->dis_data($dis_data_entity);
     }
   }
 
@@ -84,13 +84,13 @@ class OBM_DISPLAY {
   // Function that check if PREFERENCES variables are set, if not die        //
   /////////////////////////////////////////////////////////////////////////////
   function check_preferences_vars() {
-    if(!is_object($this->display_pref)) {
+    if (!is_object($this->display_pref)) {
       die("THE display_pref VARIABLE MUST BE SET");
     }
-    if(!isset($this->display_entity)) {
+    if (!isset($this->display_entity)) {
       die("THE display_entity VARIABLE MUST BE SET");
     }
-    if(!isset($this->pref_title)) {
+    if (!isset($this->pref_title)) {
       die("THE pref_title VARIABLE MUST BE SET");
     }
   }
@@ -118,91 +118,93 @@ class OBM_DISPLAY {
       $url = $this->display_entity . "_index.php";
     }
 
-    echo "
-    <table class=\"OBMDisplayPref\" >
-       <tr>
-         <td class=\"OBMDisplayHead\" colspan=\"4\">
-          ".$this->pref_title."</td>
-       </tr>
-       <tr>
-         <td class=\"OBMDisplayLabel\">
-            $l_displayed</td>
-         <td class=\"OBMDisplayLabel\">
-            $l_order</td>
-        <td class=\"OBMDisplayLabel\">
-            $l_field</td>
-         <td class=\"OBMDisplayLabel\">
-            $l_move</td>
-       </tr>";
+    $block = "
+    <table class=\"resultPref\" >
+    <tr>
+      <td class=\"resultHead\" colspan=\"4\">".$this->pref_title."</td>
+    </tr>
+    <tr>
+      <td class=\"resultLabel\">$l_displayed</td>
+      <td class=\"resultLabel\">$l_order</td>
+      <td class=\"resultLabel\">$l_field</td>
+      <td class=\"resultLabel\">$l_move</td>
+    </tr>";
 
     $i = 0;
     $nb_field_hidden = 0;
     while ($this->display_pref->next_record()) {
       $entity = $this->display_entity;
       $fieldname = $this->display_pref->f("display_fieldname");
-      $display = $this->display_pref->f("display_display");
-      echo "
-          <tr>
-            <td class=\"OBMDisplayTextCentered\">";
-      if ($display == 1) {
-	echo "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
-        <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
-      } else if ($display == 0) {
+      $disstatus = $this->display_pref->f("display_display");
+      $block .= "
+    <tr>
+      <td class=\"resultTextC\">";
+      if ($disstatus == 1) {
+	$block .= "
+      <a class=\"resultText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
+      <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
+      } else if ($disstatus == 0) {
 	$nb_field_hidden++;
-	echo "<a class=\"OBMDisplayTextCentered\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
-          <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
-      } else if ($display == 2) {
-	echo "<img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
+	$block .= "
+      <a class=\"resultTextC\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
+      <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
+      } else if ($disstatus == 2) {
+	$block .= "
+      <img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
       }
-      echo "
-            </td>
-            <td class=\"OBMDisplayTextCentered\">
-              ";
-      if($display == 0) {
-	echo "&nbsp;";
+
+      $block .= "
+      </td>
+      <td class=\"resultTextC\">";
+
+      if ($disstatus == 0) {
+	$block .= "&nbsp;";
       } else {
 	$pos = $this->display_pref->f("display_fieldorder") - $nb_field_hidden;
-	echo "$pos";
+	$block .= "$pos";
       }
-      echo "
-             </td>
-            <td class=\"OBMDisplayTextCentered\">
-                   ".$fieldnames[$fieldname]."
-            </td>
-            <td class=\"OBMDisplayText\">
-              <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
-                <tr>";
+      $block .= "</td>
+      <td class=\"resultTextC\">".$fieldnames[$fieldname]."</td>
+      <td class=\"resultText\">
+        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
+        <tr>";
 
       // If last field we doesn't display the down arrow
       if ($i == $nb_field) {
-	echo "<td>&nbsp;</td>";
+	$block .= "
+          <td>&nbsp;</td>";
       } else {
-	echo "<td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
-           <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
+	$block .= "
+          <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
+            <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
       }
 
       // If first field we doesn't display the up arrow
       if ($i == 0) {
-	echo "<td >&nbsp;</td>";
+	$block .= "
+          <td >&nbsp;</td>";
       } else {
-	echo "<td>
-              <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
+	$block .= "
+          <td>
+            <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
             <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
       }
-      echo "
-                </tr>
-              </table>   
-            </td>
-          </tr>";
+      $block .= "
+        </tr>
+        </table>   
+      </td>
+    </tr>";
       $i++;
     }
-    echo "
-        </table>";
+    $block .= "
+    </table>";
 
     // If help is set, we display the help panel
-    if($this->pref_dis_help == 1) {
-      $this->dis_pref_help();
+    if ($this->pref_dis_help == 1) {
+      $block .= $this->dis_pref_help();
     }
+
+    return $block;
   }
 
 
@@ -214,58 +216,60 @@ class OBM_DISPLAY {
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
 
-    echo "<hr />
-      <table class=\"OBMDisplayPref\">
+    $block = "<hr />
+      <table class=\"resultPref\">
       <tr>
-        <td class=\"OBMDisplayHead\" colspan=\"2\">
+        <td class=\"resultHead\" colspan=\"2\">
         $l_help</td>
       </tr>
       <tr>
-        <td class=\"OBMDisplayLabel\">
+        <td class=\"resultLabel\">
           <img src=\"/images/$set_theme/$ico_ball\" alt=\"\" />
         </td>
-        <td class=\"OBMDisplayText\">
+        <td class=\"resultText\">
           $l_help_display_yes
         </td>
       </tr>
       <tr>
-        <td class=\"OBMDisplayLabel\">
+        <td class=\"resultLabel\">
           <img src=\"/images/$set_theme/$ico_crow\" alt=\"\" />
         </td>
-        <td class=\"OBMDisplayText\">
+        <td class=\"resultText\">
           $l_help_display_no
         </td>
       </tr>
       <tr>
-        <td class=\"OBMDisplayLabel\">
+        <td class=\"resultLabel\">
          <img src=\"/images/$set_theme/$ico_forbidden\" alt=\"\" />
         </td>
-        <td class=\"OBMDisplayText\">
+        <td class=\"resultText\">
           $l_help_mandatory
         </td>
       </tr>
       <tr>
-        <td class=\"OBMDisplayLabel\">
+        <td class=\"resultLabel\">
          <img src=\"/images/$set_theme/$ico_arrow_down\" alt=\"\" />
         </td>
-        <td class=\"OBMDisplayText\">
+        <td class=\"resultText\">
           $l_help_down
         </td>
       </tr>
       <tr>
-        <td class=\"OBMDisplayLabel\">
+        <td class=\"resultLabel\">
           <img src=\"/images/$set_theme/$ico_arrow_up\" alt=\"\" />
         </td>
-        <td class=\"OBMDisplayText\">
+        <td class=\"resultText\">
           $l_help_up
         </td>
       </tr>
     </table>";
+
+    return $block;
   }
 
 
   /////////////////////////////////////////////////////////////////////////////
-  // Function that display the dataset
+  // Display: Returns the dataset display
   // Parameters:
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
@@ -274,13 +278,15 @@ class OBM_DISPLAY {
 
     $link_ok = $this->display_link;
 
+    $block .= "<div class=\"result\">";
+
     // We display page management only if enabled and a search url is given
     if (($this->data_page) && ($this->data_url != "")) {
-      $this->dis_data_index($this->data_url);
+      $block .= $this->dis_data_index($this->data_url);
     }
 
-    echo "<table class=\"OBMDisplayData\">";
-    $this->dis_data_header($this->data_url);
+    $block .= "<table class=\"resultTable\">";
+    $block .= $this->dis_data_header($this->data_url);
 
     $this->display_pref->seek(0);
     $cpt = 0;
@@ -289,12 +295,12 @@ class OBM_DISPLAY {
     while ( ($this->data_set->next_record() )
             && ( ($cpt < $set_rows) || ( ! $this->data_page) ) ) {
       $cpt++;
-      echo "<tr>";
+      $block .= "<tr>";
 
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
 	$dg_id = $this->data_set->f("Id");
-	echo "<td class=\"OBMDisplayText\">$dg_id</td>";
+	$block .= "<td class=\"resultText\">$dg_id</td>";
       }
 
       // If a left checkbox has to be displayed
@@ -309,11 +315,11 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-	  echo "<td class=\"OBMDisplayText\">
+	  $block .= "<td class=\"resultText\">
                 <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
-	  echo "<td class=\"OBMDisplayText\">&nbsp;</td>";
+	  $block .= "<td class=\"resultText\">&nbsp;</td>";
       }
 
 
@@ -366,16 +372,16 @@ class OBM_DISPLAY {
 	if ($style != "") {
 	  $td = "<td $style>";
 	} elseif ($align == "center") {
-	  $td = "<td class=\"OBMDisplayTextCentered\">";
+	  $td = "<td class=\"resultTextC\">";
 	} else {
-	  $td = "<td class=\"OBMDisplayText\">";
+	  $td = "<td class=\"resultText\">";
 	}
 	
 	// Pre cell display (open popup, link)
 	if ($popup) {
-	  $content = "<a class=\"OBMDisplayText\" href=\"\" OnClick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	  $content = "<a class=\"resultText\" href=\"\" OnClick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
 	} else if ($url != "") {
-	  $content = "<a class=\"OBMDisplayText\" href=\"".url_prepare("$url")."\">";
+	  $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
 	}
 	
 	// Cell display
@@ -387,7 +393,7 @@ class OBM_DISPLAY {
 	}
 	
 	// Cell writing
-	echo "$td $content </td>\n";
+	$block .= "$td $content </td>\n";
       }
       
 
@@ -403,29 +409,32 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-	  echo "<td class=\"OBMDisplayText\">
+	  $block .= "<td class=\"resultText\">
                 <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
-	  echo "<td class=\"OBMDisplayText\">&nbsp;</td>";
+	  $block .= "<td class=\"resultText\">&nbsp;</td>";
       }
 
       $this->display_pref->seek(0);
-      echo "</tr>";
+      $block .= "</tr>";
     }
 
     //--------------------------------------------------------
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
     if ($this->data_header == "both") {
-      $this->dis_data_header($this->data_url);
+      $block .= $this->dis_data_header($this->data_url);
     }
-    echo "</table>";
+    $block .= "</table>
+      </div>";
+
+    return $block;
   }
 
 
   /////////////////////////////////////////////////////////////////////////////
-  // Function that display the dataset index (page management)
+  // Display : Returns the dataset index display (page management)
   // Parameters:
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
@@ -463,11 +472,11 @@ class OBM_DISPLAY {
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
-    $content = "<div class=\"indexPage\">$l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
+    $content = "<div class=\"resultIndex\">$l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
     if ($page > 1) {
-      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_begin\" class=\"indexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
+      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
@@ -496,7 +505,7 @@ class OBM_DISPLAY {
     // Go to last page
     if ($page < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_end\" class=\"indexIcon\" alt=\">| $nb_page\"></a>";
+      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export
@@ -507,18 +516,20 @@ class OBM_DISPLAY {
     $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;call_module=$module&amp;first_row=$first_row&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
 
     $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
-      <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"indexIcon\" alt=\"$l_export\"/></a>
-      <a href=\"$export_all_url\"><img src=\"/images/$set_theme/$ico_export_all\" class=\"indexIcon\" alt=\"$l_export_all\"/></a>
+      <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"resultIndexIcon\" alt=\"$l_export\"/></a>
+      <a href=\"$export_all_url\"><img src=\"/images/$set_theme/$ico_export_all\" class=\"resultIndexIcon\" alt=\"$l_export_all\"/></a>
     </div>
 ";
 
-    echo $content;
+    return $content;
     $this->data_set->seek($first_row);
   }
 
 
   /////////////////////////////////////////////////////////////////////////////
-  // Function that display the dataset headers (col names)
+  // Display : Returns the dataset header display (Columns names)
+  // Parameters:
+  //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
     global $page, $new_order, $order_dir;
@@ -530,18 +541,18 @@ class OBM_DISPLAY {
     }
 
     $this->display_pref->seek(0);
-    echo "
+    $block = "
     <tr>";
     
     // If debug level Id is set, display the entity id
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
-      echo "<td class=\"OBMDisplayHead\">Id</td>";
+      $block .= "<td class=\"resultHead\">Id</td>";
     }
 
     // Display the checkbox title if needed (exists and left side)
     if (($this->data_cb_side == "left")
           && ($this->data_cb_text != "")) {
-      echo "<td class=\"OBMDisplayHead\">".$this->data_cb_text."</td>";
+      $block .= "<td class=\"resultHead\">".$this->data_cb_text."</td>";
     }
 
     while ($this->display_pref->next_record()) {
@@ -549,27 +560,29 @@ class OBM_DISPLAY {
       $label = $fieldnames[$fieldname];
       $order = ($order_dir == "ASC" ? "DESC" : "ASC");
 
-      echo "
-        <td class=\"OBMDisplayHead\">";
+      $block .= "
+        <td class=\"resultHead\">";
       if ($this->data_order) {
-        echo "<a class=\"OBMDisplayHead\" href=\"".$url.
+        $block .= "<a class=\"resultHead\" href=\"".$url.
           (($url != "") ? "&amp;page=$page" : "" ) .
           "&amp;new_order=$fieldname&amp;order_dir=$order\">";
       }
-      echo $label;
+      $block .= $label;
       if ($this->data_order) {
-        echo "</a>";
+        $block .= "</a>";
       }
 
-      echo "</td>";
+      $block .= "</td>";
     }
 
     // Display the checkbox title if needed (exists and right side)
     if (($this->data_cb_side == "right")
          && ($this->data_cb_text != "")) {
-      echo "<td class=\"OBMDisplayHead\">".$this->data_cb_text."</td>";
+      $block .= "<td class=\"resultHead\">".$this->data_cb_text."</td>";
     }
-    echo "</tr>";
+    $block .= "</tr>";
+
+    return $block;
   }
 
 

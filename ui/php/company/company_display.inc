@@ -169,44 +169,45 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
   }
   $sel_market .= "</select>";
 
+  $url = url_prepare("company_index.php");
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "    
-    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"" . url_prepare("company_index.php") . "\">
-    <table class=\"details\">
-    <tr>
-      <td class=\"textLabelForm\">$l_company_name<br />
-        <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\"
-        value=\"$name\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_phone<br />
-        <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
-        value=\"$phone\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_company_kind<br />
-        $sel_kind</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_activity<br />
-        $sel_act</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_postcode<br />
-        <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
-        value=\"$zip\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_market<br />
-        $sel_market</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_archive<br />
-        <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
-      <td>&nbsp;&nbsp;&nbsp;&nbsp;
-        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
-        <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    </table>
-    </form>
-    <hr />";
+  $block = "
+  <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"$url\">
+  <div class=\"search\">
+    <div class=\"searchLabel\">$l_company_name<br />
+      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\"
+      value=\"$name\" />
+    </div>
+    <div class=\"searchLabel\">$l_phone<br />
+      <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
+      value=\"$phone\" />
+    </div>
+    <p class=\"searchLabel\">$l_company_kind<br />
+      $sel_kind
+    </p>
+    <p class=\"searchLabel\">$l_activity<br />
+      $sel_act
+    </p>
+    <p class=\"searchLabel\">$l_postcode<br />
+      <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
+      value=\"$zip\" />
+    </p>
+    <p class=\"searchLabel\">$l_market<br />
+      $sel_market
+    </p>
+    <p class=\"searchLabel\">$l_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+    </p>
+    <p class=\"searchLabel\">&nbsp;<br />
+      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </p>
+  </div>
+  </form>";
+
+  return $block;
 }
 
 
@@ -217,31 +218,33 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
 //     keys used  : name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
-  global $l_no_found;
+  global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "company");
   $obm_q = run_query_search($company, $new_order, $order_dir);
   $nb_company = $obm_q->num_rows();
   if ($nb_company == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    html_company_search_list($obm_q,$pref_q,$nb_company,$company);
+    $block = html_company_search_list($obm_q,$pref_q,$nb_company,$company);
   }
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Search result                                                //
+// Display: Returns the XHTML result display
 // Parameters : 
-//   - $obm_q_comp : list of companies
+//   - $comp_q     : list of companies
 //   - $pref_q     : the fields which have to be displayed
 //   - $nb_company : nb companies returned by the search query
 //   - $company[]  : company search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
-  global $l_found;
+  global $display, $l_found;
 
   // we urlencode to avoid breakage for space char
   $archive = $company["archive"];
@@ -260,8 +263,10 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
   $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
   $comp_d->data_header = "both";
-  display_info_msg("$nb_company $l_found");
-  $comp_d->display("dis_data_company");
+  $display["msg"] = display_info_msg("$nb_company $l_found");
+  $block = $comp_d->display("dis_data_company");
+
+  return $block;
 }
 
 
@@ -277,48 +282,35 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -- Themes
-  global $set_theme,$ico_contact,$ico_contact_new;
+  global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   // -- Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
-  global $perms_user,$ico_deal_new;  
-  global $path, $auth;
+  global $perms_user, $path, $auth;
 
   $uname = urlencode($name);
+  $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id&amp;tf_company=$uname");
+  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id");
+  $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id&amp;tf_company_name=$uname");
+  $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id");
 
-  // -------| Menu Liste Contacts
-  $r = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
-        <img border=0 src=\"/images/$set_theme/$ico_contact\"></a>
-        <font size=-1>
-         <a href=\"".url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
-         $l_contact_list</a> ($con_num)</font>";
+  $block = "<div class=\"link\"> 
+  <div class=\"linkTitle\">:: Contacts associes</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_con_list\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
+        <a href=\"$url_con_list\">$l_contact_list ($con_num)</a></li>
+    <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
+        <a href=\"$url_con_new\">$l_contact_new</a></li>
+  </ul>
+  <div class=\"linkTitle\">:: Affaires associees</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal.gif\" /></a>
+        <a href=\"$url_deal_list\">$l_deal_list ($deal_num)</a></li>
+    <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
+        <a href=\"$url_deal_new\">$l_deal_new</a></li>
+  </ul>
+</div>";
 
-  // -------| Menu Nouveau Contact
-  if ($auth->auth["perm"] != $perms_user) {
-    $r .= "<br>
-           <a href=\"" . url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
-           <img border=0 src=\"/images/$set_theme/$ico_contact_new\"></a>
-           <font size=-1>
-           <a href=\"" . url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
-           $l_contact_new</a></font>";
-  }
-
-  // -------| Menu Liste Affaires
-  $r .= "<br>
-         <a href=\"".url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
-         <img border=0 src=\"/images/$set_theme/$ico_deal\"></a>
-         <font size=-1>
-         <a href=\"".url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
-         $l_deal_list</a> ($deal_num)</font>";
-
-  // -------| Menu Nouvelle Affaire
-  if ($auth->auth["perm"] != $perms_user) {
-    $r .= "<br>
-      <a href=\"".url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
-        src=\"/images/$set_theme/$ico_deal_new\"></a>
-      <font size=-1><a href=\"".url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
-  }
-
-  return $r;
+  return $block;
 }
 
 
@@ -336,7 +328,7 @@ function html_company_consult($co_q) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
   global $l_insert,$l_update,$l_delete, $l_company, $l_coord;
-  global $c_yes, $c_no;
+  global $display, $c_yes, $c_no;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
@@ -384,81 +376,18 @@ function html_company_consult($co_q) {
     $link_web = "&nbsp;";
   }
 
-  $links = html_company_links($id, $name, $con_num, $deal_num);
   $lcom = nl2br($com);
+  $display["link"] = html_company_links($id, $name, $con_num, $deal_num);
+  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
 
   // --- HTML Template --------------------------------------------------------
-  echo "
-    <table class=\"details\">
-    <tr>
-      <td rowspan=\"25\">$links</td>
-    </tr>
-    <tr>
-      <td rowspan=\"25\">&nbsp;&nbsp;&nbsp;</td>
-    </tr>
-    <tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_company</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailText\">$name</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_archive</td>
-      <td class=\"detailText\">$archive</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_activity</td>
-      <td class=\"detailText\">$act</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_contact_list</td>
-      <td class=\"detailText\">$con_num</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_market</td>
-      <td class=\"detailText\">$lmarket</td>
-    </tr><tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_coord</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 1</td>
-      <td class=\"detailText\">$ad1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailText\">$ad2</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailText\">$zip</td>
-    </tr><tr> 
-      <td class=\"detailLabel\">$l_town</td>
-      <td class=\"detailText\">$town</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$cdx</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailText\">$ctry</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td class=\"detailText\">$phone</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td class=\"detailText\">$fax</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\"> $email $link_email</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_web</td>
-      <td class=\"detailText\">$web $link_web</td>
-    </tr><tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
-    </tr><tr>
-      <td class=\"detailText\" colspan=\"2\">".nl2br($com)."</td>
-    </tr>
-    </table>
-";
+  
+  $template = get_template("company_consult.tpl");
+  eval ("\$template = \"$template\";");
+  $block = $template;
+
+  return $block;
 }
 
 
@@ -474,9 +403,8 @@ function html_company_consult($co_q) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
-  // -- Themes
+  global $display;
   global $set_theme,$ico_web,$ico_mail;
-  // -- Labels
   global $l_name,$l_kind,$l_activity,$l_archive,$l_phone,$l_fax,$l_address;
   global $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
@@ -587,11 +515,6 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
-    $dis_delete = "
-      <form method=\"post\" name=\"f_sup_societe\"
-      onsubmit=\"if (valider_suppression()) return true; else return false;\"
-      action=\"" . url_prepare("company_index.php") . "\"> 
-      ";
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
@@ -599,93 +522,101 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
       ";
   }
 
+  $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
-  echo "
+  $block = "
     <form method=\"post\" name=\"f_mod_societe\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
-    <table class=\"details\">
+
+    <div class=\"detailHead\">$l_company</div>
+
+    <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"detailHead\">$l_company</td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
-      <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
-      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
-      <td>$sel_kind</td>
+      <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_activity</td>
-      <td>$sel_act</td>
+      <td class=\"detailForm\">$sel_act</td>
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
-      <td>$sel_market</td>
-    </tr><tr>
-      <td colspan=\"2\" class=\"detailHead\">$l_coord</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 1</td>
-      <td><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"30\" size=\"30\" value=\"$ad1\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 2</td>
-      <td><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_postcode</td>
-      <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_town</td>
-      <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_country</td>
-      <td><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_phone</td>
-      <td><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_fax</td>
-      <td><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"16\" size=\"16\" value=\"$fax\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_email</td>
-      <td><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_web</td>
-      <td><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
-    </tr><tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
-    </tr><tr>
-      <td colspan=\"2\"><textarea id=\"ta_com\" name=\"ta_com\" rows=\"8\" cols=\"80\">$com</textarea></td>
+      <td class=\"detailForm\">$sel_market</td>
     </tr>
     </table>
-   <table class=\"details\">
+
+    <div class=\"detailHead\">$l_coord</div>
+
+    <table class=\"detail\">
     <tr>
-     <td>
-      $dis_button
-     </td>
+      <td class=\"detailLabel\">$l_address 1</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"30\" size=\"30\" value=\"$ad1\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 2</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_postcode</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_town</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_country</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"16\" size=\"16\" value=\"$fax\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_web</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
     </tr>
-   </table>
-   </form>
-    $dis_delete
+    </table>
+
+    <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea id=\"ta_com\" name=\"ta_com\" rows=\"8\" cols=\"80\">$com</textarea></td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>
    ";
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays and check the company links (and delete form if ok)              //
+// Display: Display and check the company links (and delete form if ok)
 // Parameters:
 //   - $p_id : company id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
-  global $path;
+  global $path, $display;
 
   $delete_ok = true;
 
@@ -694,17 +625,25 @@ function dis_check_links($p_id) {
 
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    $display_linkc ="<tr><td class=\"detailHead\">$l_link_contact</td></tr>";
+    $display_linkc ="
+      <tr>
+        <td class=\"detailHead\">$l_link_contact</td>
+      </tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      $display_linkc .= "<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
-      $cname</a>
-      </td></tr>";
+      $display_linkc .= "
+      <tr>
+        <td class=\"detailText\">
+        <a class=\"detail\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        </td>
+      </tr>";
     }
   } else {
-    $display_linkc = "<tr><td class=\"detailHead\">$l_link_contact_no</td></tr>";
+    $display_linkc = "
+      <tr>
+        <td class=\"detailHead\">$l_link_contact_no</td>
+      </tr>";
   }
 
   // Links from deals
@@ -712,17 +651,24 @@ function dis_check_links($p_id) {
 
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    $display_linkd = "<tr><td class=\"detailHead\">$l_link_deal</td></tr>";
+    $display_linkd = "
+      <tr>
+        <td class=\"detailHead\">$l_link_deal</td>
+      </tr>";
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $display_linkd .="<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
-      $dlabel</a>
-      </td></tr>";
+      $display_linkd .="<tr>
+        <td class=\"detailText\">
+        <a class=\"detail\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+        </td>
+      </tr>";
     }
   } else {
-    $display_linkd =  "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>" ;
+    $display_linkd = "
+      <tr>
+        <td class=\"detailHead\">$l_link_deal_no</td>
+      </tr>";
   }
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
@@ -732,26 +678,33 @@ function dis_check_links($p_id) {
     <input type=\"submit\" value=\"$l_back\" />
     </form>";
 
-  if ($delete_ok == true) {
-    display_ok_msg($l_can_delete);
-    echo "<table class=\"details\">
-          <tr><td>
-            <table>
-            <tr>
-              <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
-              <td class=\"detailHead\">$dis_back</td>
-            </tr>
-            </table>
-          </td></tr>";
-  } else {
-    display_warn_msg($l_cant_delete);
-    echo "<table class=\"details\">
-          <tr><td class=\"detailHead\">$dis_back</td></tr>";
-  }
-  echo "
+  $block .= "<table class=\"detail\">
    $display_linkc
-   $display_linkd 
-   </table>";
+   $display_linkd";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <tr>
+        <td>
+          <table>
+          <tr>
+            <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
+            <td class=\"detailHead\">$dis_back</td>
+          </tr>
+          </table>
+        </td>
+      </tr>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <tr>
+        <td class=\"detailHead\">$dis_back</td>
+      </tr>";
+  }
+  $block .= "</table>";
+
+  return $block;
 }
 
 
@@ -766,7 +719,7 @@ function dis_check_links($p_id) {
 //                : phone, fax, web, email, com
 /////////////////////////////////////////////////////////////////////////////
 function dis_company_warn_insert($cid, $co_q, $company) {
-  global $l_check_samecompany, $l_confirm, $l_back;
+  global $display, $l_check_samecompany, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
   $num = $company["num"];
@@ -786,20 +739,21 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $email = $company["email"];
   $com = $company["com"];
 
-  $disp_same_comp = "<tr><td colspan =\"2\" class=\"detailHead\">$l_check_samecompany</td></tr>";
+  $display["msg"] .= display_warn_msg($l_check_samecompany);
+
   while ($co_q->next_record()) {
     $id = $co_q->f("company_id");
     $samename = $co_q->f("company_name");
     $samezip = $co_q->f("company_zip");
     $disp_same_comp .= "
           <tr><td colspan =\"2\" class=\"detailText\">
-             <a class=\"details\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
+             <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
               $samename ($samezip)</a>
           </td></tr>";
   }
 
-  echo "
-    <table class=\"details\">
+  $block = "
+    <table class=\"detail\">
     $disp_same_comp
     <tr><td>
     <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
@@ -848,6 +802,8 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     </form>
     </td></tr>
     </table>";
+
+  return $block;
 }
 
 
@@ -878,13 +834,15 @@ function dis_admin_index() {
 
   $kind_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  html_company_kind_form($kind_q);
-  html_company_activity_form($act_q);
+  $block = html_company_kind_form($kind_q);
+  $block .= html_company_activity_form($act_q);
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Kind section                                                      //
+// Display: Company Kind section                                             //
 // Parameters:
 //   - $kind_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -904,7 +862,7 @@ function html_company_kind_form($kind_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">
@@ -974,6 +932,8 @@ function html_company_kind_form($kind_q) {
     </tr>
     </table>
 ";
+
+  return $block;
 }
 
 
@@ -994,7 +954,7 @@ function dis_kind_links($company) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_kind_cant_delete</td>
     </tr><tr>
@@ -1015,7 +975,7 @@ function dis_kind_links($company) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">
       $l_kind_link_company_no '$label' : $l_kind_can_delete</td>
@@ -1038,12 +998,13 @@ function dis_kind_links($company) {
     </tr>
     </table>";
   }
-  echo "$dis_link";
+
+  return $dis_link;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Activity section                                                  //
+// Display: Company Activity section                                         //
 // Parameters:
 //   - $act_q : Activity list database object
 ///////////////////////////////////////////////////////////////////////////////
@@ -1063,7 +1024,7 @@ function html_company_activity_form($act_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">
@@ -1131,13 +1092,14 @@ function html_company_activity_form($act_q) {
         </form>
       </td>
     </tr>
-    </table>
-";
+    </table>";
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the activity links                                               //
+// Display: the activity links                                               //
 // Parameters:
 //   - $company : company hash info : keys used : activity
 ///////////////////////////////////////////////////////////////////////////////
@@ -1152,7 +1114,7 @@ function dis_activity_links($company) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_act_cant_delete</td>
     </tr><tr>
@@ -1173,7 +1135,7 @@ function dis_activity_links($company) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">
         $l_act_link_company_no '$label' : $l_act_can_delete</td>
@@ -1196,12 +1158,13 @@ function dis_activity_links($company) {
     </tr>
     </table>";
   }
-  echo $dis_link;
+
+  return $dis_link;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Company Display preference screen                             //
+// Display: the Company Display preference screen                            //
 // Parameters:
 //   - $display_pref_q : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////
@@ -1213,7 +1176,9 @@ function dis_company_display_pref($display_pref_q) {
   $dis_pref->pref_title = $l_company_display;
   $dis_pref->pref_dis_help = 1;
 
-  $dis_pref->display();
+  $block = $dis_pref->display();
+
+  return $block;
 }
 
 
@@ -1248,7 +1213,7 @@ function html_select_company($comp_q, $title, $url="") {
   // --- HTML Template --------------------------------------------------------
 
   echo "
-  <table class=\"details\">
+  <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">
         <form method=\"get\" name=\"form_comp\"

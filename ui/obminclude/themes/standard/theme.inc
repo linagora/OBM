@@ -36,6 +36,7 @@ $ico_cancel	    = "non2.gif";
 $ico_contact        = "ico_contact.gif";         // Contact Icon
 $ico_contact_new    = "ico_contact_new.gif";     // New Contact Icon
 $ico_deal           = "ico_deal.gif";            // Deal Icon
+$ico_parentdeal     = "ico_deal.gif";            // Deal Icon
 $ico_deal_new       = "ico_deal_new.gif";        // New Deal Icon
 $ico_company        = "ico_company.gif";         // Company Icon
 $ico_change_company = "ico_change_company.gif";  // Contract Icon
@@ -63,6 +64,9 @@ $ico_export         = "ico_export.gif";
 $ico_export_all     = "ico_export_all.gif";
 $ico_begin          = "ico_begin.gif";
 $ico_end            = "ico_end.gif";
+
+$ico_created        = "ico_created.gif";
+$ico_updated        = "ico_updated.gif";
 
 $ico_web            = "ico_web.gif";        // WWW Icon
 $ico_mail           = "ico_mail.gif";       // Mail Icon

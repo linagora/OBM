@@ -144,7 +144,7 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
         onSubmit=\"if (check_form(this) == false) return false ;
         else return true;\" action=\"$url_form\">
 
-  <table class=\"details\">
+  <table class=\"detail\">
   <tr>
     <td>
 

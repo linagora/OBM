@@ -76,10 +76,9 @@ function dis_data_account(&$OD, $fieldname, $link_ok) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Account Search Form
-// Parameters :
-//  $p_action : current action in the application
-//  $account hash table containing values for
-//  name account and number.
+// Parameters:
+//   - $p_action : current action in the application
+//   - $account  : hash table containing values for name account and number.
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_search_form ($p_action, $account) {
   global $l_label_start, $l_bank, $l_number, $l_find;
@@ -94,7 +93,7 @@ function html_account_search_form ($p_action, $account) {
   <form method=\"get\" name=\"form_account\"
     onSubmit=\"if (check_form(this) == false) return false; else return true;\"
     action=\"$url\">
-  <table class=\"details\">
+  <table class=\"detail\">
   <tr>
     <td class=\"textLabelForm\">$l_label_start<br />
       <input name=\"tf_label\" size=\"20\" value=\"$label\" />
@@ -181,7 +180,6 @@ function html_account_consult($obm_q_account, $p_action){
   global $l_label,$l_comment,$l_bank, $l_number, $l_balance,$l_compute_balance;
   global $auth, $perms_user,$l_perms_user;
   global $border, $cellspacing;
-
 
   $label = $obm_q_account->f("account_label");
   $number = $obm_q_account->f("account_number");

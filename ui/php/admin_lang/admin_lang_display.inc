@@ -16,7 +16,7 @@
 function dis_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"details\">
+    echo "<table class=\"detail\">
       <tr>
         <td><pre>";
 
@@ -71,7 +71,7 @@ function html_lang_index($actions, $modules, $langs, $themes) {
   while (list ($key, $val) = each ($langs)) {
     $sel_lang1 .= "<option value=\"$val\">$val</option>";
   }
-  $sel_lang1 .= "</SELECT>";
+  $sel_lang1 .= "</select>";
 
   // lang2 SELECT
   reset ($langs);
@@ -337,7 +337,7 @@ function txt_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unus
 *** $module / $lang
 ------------------------------------------------------------------------------
 From Source    : $nb_ref var referenced : $nb_used used - $nb_unused unused 
-From lang file : $nb_lang ($module.inc), $nb_glang ($lang/global.inc) vars defined
+From lang file : $nb_lang ($module.inc), $nb_used_def_glo ($lang/global.inc) vars defined
 ------------------------------------------------------------------------------
 *** $module / $lang : vars used and defined : $nb_used_def vars
 ------------------------------------------------------------------------------
@@ -559,8 +559,8 @@ function html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unu
     if ((! in_array($lvar, $used_v)) && (! in_array($lvar, $unused_v))) {
       $text_def_unref .= "
     <tr>
+      <td class=\"adminText\">$lvar</td>
       <td class=\"adminText\">$lval</td>
-      <td class=\"adminText\">$value</td>
     </tr>";
       $nb_def_unref++;
     }
@@ -573,7 +573,7 @@ function html_lang_vars($module, $lang, $lang_v, $glang_v, $ref_v, $used_v, $unu
       From Source : <b>$nb_ref</b> var referenced :
         <b>$nb_used</b> used - <b>$nb_unused</b> unused 
       <br />From lang file : <b>$nb_lang</b> ($module.inc),
-          <b>$nb_glang</b> ($lang/global.inc) vars defined
+          <b>$nb_used_def_glo</b> ($lang/global.inc) vars defined
       </td>
     </tr><tr>
       <td class=\"adminText\" colspan=\"2\">&nbsp;</td>
@@ -764,8 +764,8 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
     if ( ((! $value) && (! $gvalue)) || ((! $value2) && (! $gvalue2)) ) {
       $text_used_undef .= "<tr>
         <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td class=\"adminText\">$value $gvalue</td>
+        <td class=\"adminText\">$value2 $gvalue2</td>
         </tr>";
       if (! $value) $nb_used_undef++;
       if (! $value2) $nb_used_undef_2++;
@@ -782,8 +782,8 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
     if ($value || $value2 || $gvalue || $gvalue2) {
       $text_unused_def .= "<tr>
         <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td class=\"adminText\">$value $gvalue</td>
+        <td class=\"adminText\">$value2 $gvalue2</td>
         </tr>";
       if ($value) $nb_unused_def++;
       if ($value2) $nb_unused_def_2++;
@@ -810,9 +810,9 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
     if ((! in_array($lvar, $used_v)) && (! in_array($lvar, $unused_v))) {
       $lval2 = $lang2_v[$lvar];
       $text_def_unref .= "<tr>
+        <td class=\"adminText\">$lvar</td>
         <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td class=\"adminText\">$lval2</td>
         </tr>";
       $nb_def_unref++;
       if (array_key_exists($lvar, $lang2_v)) $nb_def_unref_2++;
@@ -825,9 +825,9 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
          (! in_array($lvar2, $used_v)) && (! in_array($lvar2, $unused_v))) {
       $lval = $lang_v[$lvar2];
       $text_def_unref .= "<tr>
+        <td class=\"adminText\">$lvar2</td>
         <td class=\"adminText\">$lval</td>
-        <td class=\"adminText\">$value</td>
-        <td class=\"adminText\">$value2</td>
+        <td class=\"adminText\">$lval2</td>
         </tr>";
       $nb_def_unref_2++;
       if (array_key_exists($lvar2, $lang_v)) $nb_def_unref++;
@@ -847,8 +847,8 @@ function html_comp_lang_vars($module, $lang, $lang2, $lang_v, $lang2_v, $glang_v
       <td class=\"adminHead\">$module / $lang2</td>
     </tr><tr>
       <td class=\"adminHead\">From lang file :</td>
-      <td class=\"adminHead\"><b>$nb_lang</b> vars defined</td>
-      <td class=\"adminHead\"><b>$nb_lang2</b> vars defined</td>
+      <td class=\"adminHead\">(<b>$nb_lang + $nb_used_def_glo</b>) vars defined</td>
+      <td class=\"adminHead\">(<b>$nb_lang2 + $nb_used_def_glo_2</b>) vars defined</td>
     </tr><tr>
       <td class=\"adminText\" colspan=\"3\">&nbsp;</td>
     </tr><tr>

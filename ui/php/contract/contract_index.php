@@ -210,7 +210,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
   dis_contract_display_pref($pref_q);
   

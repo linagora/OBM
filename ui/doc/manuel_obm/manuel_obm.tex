@@ -1,16 +1,25 @@
+% Manuel d'utilisation et documentation technique d'OBM
+% ALIACOM Pierre Baudracco
+% $Id$
 \documentclass[french]{article}
 %
 % Packages supplementaires utilises
 %
+\usepackage[right]{eurosym}
 \usepackage[T1]{fontenc}
 \usepackage{babel}
 \usepackage{indentfirst}
-\usepackage{graphicx}
+\usepackage[pdftex]{graphicx}
 \usepackage{epsf}
+\usepackage{soul}
+\usepackage{calc}
 \usepackage{fancybox}
 \usepackage{url}
 \usepackage{fancyheadings}
 \usepackage{xspace}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{longtable}
 %
 % Definition des commandes personnalisées
 %[1]{\textsf{#1}\xspace
@@ -23,11 +32,11 @@
 %
 % Modification des marges par defaut
 %
-\addtolength\textwidth{2cm}
-%
-% Profondeur de la table des matieres
-%
-\setcounter{tocdepth}{3}
+\addtolength{\marginparwidth}{-1cm}
+\addtolength{\oddsidemargin}{-1cm}
+\addtolength{\evensidemargin}{-1cm}
+\addtolength{\textwidth}{2cm}
+\addtolength{\textheight}{2.0cm}
 %
 %
 %
@@ -36,31 +45,34 @@
 %
 %
 %
-\title{\Huge
-\textbf{OBM : Open Buisness Managment}\\
-\vspace{1.5cm}
-Manuel d'utilisation\\
-\vspace{.5cm}
-et\\
-\vspace{.5cm}
-Documentation technique\\
-\vspace{1.5cm}
-}
 \author{ALIACOM}
 %\date{}
 %
 % Debut du document
 %
 \begin{document}
-
-\maketitle
-
+\frenchspacing 
+\selectlanguage{francais}
+\sloppy
+%
+%===   Page de garde ===
+%
+\pagestyle{empty}
+\begin{titlepage}
+\input{page_titre.tex}
+\end{titlepage}
+\pagestyle{fancy}
+%
+% === Table des matières ===
+%
 \clearpage
-
+\setcounter{tocdepth}{1}
 \tableofcontents
+%
+% === Corps du document ===
+%
 
 \clearpage
-
 \input{technique/t_manuel.tex}
 %\input{user/u_manuelr.tex}
 

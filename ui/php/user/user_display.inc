@@ -90,7 +90,7 @@ function html_user_search_form($user) {
   echo "
   <form method=\"get\" name=\"f_user\"
     action=\"". url_prepare("user_index.php")."\">
-  <table class=\"details\">
+  <table class=\"detail\">
   <tr>
     <td class=\"textLabelForm\">$l_login<br />
     <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
@@ -185,7 +185,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td>
       <input type=\"submit\" value=\"$l_add\" />
@@ -271,7 +271,7 @@ function html_user_form($first_try, $usr_q, $user) {
     <form method=\"post\" name=\"form_user\"
       onSubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">$l_user</td>
     </tr><tr>
@@ -337,7 +337,7 @@ function html_user_consult($obm_q) {
   if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
   echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">$l_user</td>
     </tr><tr>
@@ -444,7 +444,7 @@ function dis_check_links($p_id) {
   $obm_q = new DB_OBM;
   $tables = $obm_q->table_names();
 
-  echo "<table class=\"details\">";
+  echo "<table class=\"detail\">";
   $i = 0;
   while ($tables[$i]["table_name"]) {
 

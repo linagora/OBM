@@ -20,7 +20,7 @@ function check_name_list(form) {
 
 
   if (trim(name_list) == \"\") {
-     alert(\"$l_name_list\") ;
+     alert(\"$l_fill_name\") ;
      return false ;
   }
 
@@ -30,7 +30,7 @@ function check_name_list(form) {
   }
 
   if (trim(subject_list) == \"\") {
-     alert(\"$l_subject_list_empty\") ;
+     alert(\"$l_fill_subject\") ;
      return false ;
   }
   return true ;

@@ -16,7 +16,7 @@
 function dis_help($mode) {
 
   if ($mode == "html")
-    echo "<table class=\"details\">
+    echo "<table class=\"detail\">
       <tr>
         <td><pre>";
 

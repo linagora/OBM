@@ -1,10 +1,363 @@
-/*Style Cheet of the obm standard theme.*/
+/*/////////////////////////////////////////////////////////////////////////////
+// OBM - File : style.css (standard)                                         //
+//     - Desc : CSS style file (standard theme)                              //
+// 2003-07-30 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+/* ------------------------------------------------------------------------- */
+/* Global display layout */
+/* ------------------------------------------------------------------------- */
+
+.leftpanel {
+	position: absolute;
+	left: 2px;
+	width: 190px;
+#	border: 1px solid #000000;
+	margin-top: 10px;
+	padding: 2px;
+}
+
+.rightpanel {
+	float: right;
+	width: 190px;
+#	border: 1px solid #000000;
+	padding: 2px;
+}
+
+.middlepanel {
+	width: auto;
+#	border: 1px solid #000000;
+	margin-right: 206px;
+#	background-color: #0000FF;
+}
+
+.detailpanel {
+	position: absolute;
+	left: 206px;
+	right: 0px;
+	width: auto;
+#	border: 1px solid #000000;
+	padding: 0px;
+	margin-top: 10px;
+	margin-right: 2px;
+#	background-color: #00FF00;
+}
+
+/* ------------------------------------------------------------------------- */
+/* header */
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+/* section */
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+/* menu */
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+/* action */
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+/* last */
+/* ------------------------------------------------------------------------- */
+
+.last {
+	width: 180px;
+	padding: 0px 1px 1px;
+	font-size: 10px;
+	font-weight: normal;
+	margin: 0px 2px 0px;
+	border: 1px dashed #9CCBD3;
+}
+
+.lastTitle {
+	font-size: 13px;
+	color: #7B9EAD;
+	font-weight: bold;
+	border-bottom-width: 1px;
+	border-bottom-style: dashed;
+	border-bottom-color: #9CCBD6;
+}
+
+.lastList {
+#	display: block;
+	list-style-type: none;
+	margin-top: 0px;
+	text-indent: -3em;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* title */
+/* ------------------------------------------------------------------------- */
+
+.title {
+	font-size: 18px;
+	font-weight: bold;
+	color: #789CAF;
+	border-bottom-width: 2px;
+	border-bottom-style: dashed;
+	border-bottom-color: #C6D2D7;
+	margin-bottom: 16px;
+	text-align: left;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* msg */
+/* ------------------------------------------------------------------------- */
+
+/* ------------------------------------------------------------------------- */
+/* search */
+/* ------------------------------------------------------------------------- */
+
+input {
+	font-size: 10px;
+	border: 1px solid #7B9EAD;
+}
+
+select {
+	font-size: 10px;
+	border: 1px solid #7B9EAD;
+}
+
+.search {
+	font-size: 10px;
+#	border: 1px solid #009EC6;
+	height: 100%;
+	width: auto;
+	margin-top: 5px;
+	margin-bottom: 10px;
+	font-style: italic;
+	color: #7B9EAD;
+	background-color: #FF0000;
+}
+
+.searchLabel {
+	float: left;
+	margin: 0px;
+	padding: 3px;
+	background-color: #FF0000;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* detail */
+/* ------------------------------------------------------------------------- */
+
+a.detail:link 		{ color: #000000; background-color: transparent;}
+a.detail:active 	{ color: #000000; background-color: transparent;}
+a.detail:visited 	{ color: #000000; background-color: transparent;}
+
+
+table.detail {
+	font-size: 12px;
+	background-color: #FFFFFF;
+	border: 1px solid #009EC6;
+	width: 100%;
+}
+
+.detailHead {
+	font-size: 17px;
+	font-weight: bold;
+	color: #7B9EAD;
+	text-align: center;
+	margin-top: 10px;
+}
+
+.detailLabel {
+	text-align: center;
+	font-style: italic;
+	color: #7B9EAD;
+	width: 30%;
+}
+
+.detailText {
+	text-align: left;
+	font-weight: bold;
+	color: #666666;
+}
+
+.detailForm {
+	text-align: left;
+	font-weight: bold;
+	color: #666666;
+	background-color: #EEEEEE;
+}
+
+.detailInfo {
+	float: right;
+	font-size: 10px;
+	text-align: right;
+	color: #7B9EAD;
+	margin-top: 0px;
+	margin-bottom: 10px;
+}
+
+.detailButton {
+	position: relative;
+	top: 16px;
+	border: 3px solid #FF9EC6;
+	text-align: center;
+	background-color: #FF;
+}
+
+.detailButtons {
+	display: inline;
+	text-align: center;
+}
+
+
+/* ------------------------------------------------------------------------- */
+/* link */
+/* ------------------------------------------------------------------------- */
+
+.link {
+	font-size: 13px;
+	width: 180px;
+	border: 1px solid #009EC6;
+	float: right;
+	clear: right;
+	margin-bottom: 0px;
+	padding: 5px;
+	margin-top: 5px;
+	background-color: #FFFFFF;
+}
+
+.linkTitle {
+	font-size: 15px;
+	color: #7B9EAD;
+	font-weight: bold;
+	background-color: #E7F3F7;
+}
+
+.linkList {
+	display: block;
+	list-style-type: none;
+	margin-top: 0px;
+	text-indent: -3em;
+}
+
+/* ------------------------------------------------------------------------- */
+/* result */
+/* ------------------------------------------------------------------------- */
+
+.result {
+	font-size: 10px;
+	background-color: #FF0000;
+	height: 100%;
+	width: auto;
+	margin-top: 10px;
+	font-style: italic;
+	color: #7B9EAD;
+	clear: both;
+}
+
+table.resultTable	 {
+	background-color:	#93919c;
+	color:			#000000;
+	width:			100%;
+	border:			0;
+}
+
+.resultIndex {
+	color: #56545C;
+	background-color: #94929C;
+	width: 100%;
+	text-align: center;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	vertical-align: middle;
+	border-top: 1px solid black;
+	border-bottom: 1px solid black;
+}
+
+.resultIndexIcon {
+	vertical-align: middle;
+	border: 0px;
+}
+
+td.resultHead	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	font-weight:		bold;
+	color:			#ffff00;
+	text-align:		center;
+	background-color:	#93919c;
+}
+
+td.resultLabel	 {
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#ffff00;
+	text-align:		center;
+	background-color:	#93919c;
+}
+
+td.resultText  	{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#ffffff;
+}
+
+td.resultTextC  {
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#000000;
+	background-color:	#ffffff;
+}
+
+table.resultPref	 {
+        margin-left:		auto;
+	margin-right:		auto;
+	background-color:	#93919c;
+	color:			#000000;
+	width:			auto;
+	border:			3px outset green;
+}
+
+a.resultHead:link	 { color: #ffff00; background-color: transparent;}
+a.resultHead:active	 { color: #ffff00; background-color: transparent;}
+a.resultHead:visited { color: #ffff00; background-color: transparent;}
+
+a.resultText:link 	 { color: #0ba589; background-color: transparent;}
+a.resultText:active  { color: #0ba589; background-color: transparent;}
+a.resultText:visited { color: #0ba589; background-color: transparent;}
+
+
+
+/* ------------------------------------------------------------------------- */
+/* admin */
+/* ------------------------------------------------------------------------- */
+
+
+
+
+
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+
+
+
 
 /* //////////////////GLOBALS///////////////// */
 /* ///// Globals items style definition ///// */
 /* ////////////////////////////////////////// */
 body 			{
-	background-color: 	#d7dfe7;
+	background-color: #EFF3F7;
+#	background-color: 	#d7dfe7;
 	color:			#000000;
         border:                 0px;
         margin:                 0px;
@@ -341,170 +694,10 @@ a.sections:link 	{ color: #d7d6e0; background-color: transparent;}
 a.sections:active	{ color: #d7d6e0; background-color: transparent;}
 a.sections:visited 	{ color: #d7d6e0; background-color: transparent;}
 
-/* //////////////////BOOKMARKS/////////////// */
-/* ///// Bokmarks item style definition ///// */
-/* ////////////////////////////////////////// */
-
-table.bookmarks		{
-	width:			auto;
-        margin-left:		auto;
-	margin-right:		auto;
-}
-		
-td.bookmarks		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		center;
-	margin:			0;
-	border:			0;
-	padding:		0;
-}
-
-a.bookmarks:link 	{ color: #000000; background-color: transparent;}
-a.bookmarks:active	{ color: #000000; background-color: transparent;}
-a.bookmarks:visited	{ color: #000000; background-color: transparent;}
-
-/* ////////////////OBM DISPLAY/////////////// */
-/* ////// Obm display style definition ////// */
-/* ////////////////////////////////////////// */
-
-table.OBMDisplayData	 {
-        margin-left:		auto;
-	margin-right:		auto;
-	background-color:	#93919c;
-	color:			#000000;
-	width:			100%;
-	border:			0;
-}
-
-table.OBMDisplayPref	 {
-        margin-left:		auto;
-	margin-right:		auto;
-	background-color:	#93919c;
-	color:			#000000;
-	width:			auto;
-	border:			3px outset green;
-
-}
-
-td.OBMDisplayHead	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-	color:			#ffff00;
-	text-align:		center;
-	background-color:	#93919c;
-}
-
-td.OBMDisplayLabel	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#ffff00;
-	text-align:		center;
-	background-color:	#93919c;
-}
-
-td.OBMDisplayText  	 {
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		left;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-
-td.OBMDisplayTextCentered{
-	font-family:		sans-serif;
-	font-size:		10px;
-	text-align:		center;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-
-a.OBMDisplayHead:link	 { color: #ffff00; background-color: transparent;}
-a.OBMDisplayHead:active	 { color: #ffff00; background-color: transparent;}
-a.OBMDisplayHead:visited { color: #ffff00; background-color: transparent;}
-
-a.OBMDisplayText:link 	 { color: #0ba589; background-color: transparent;}
-a.OBMDisplayText:active  { color: #0ba589; background-color: transparent;}
-a.OBMDisplayText:visited { color: #0ba589; background-color: transparent;}
-
-
-.indexPage {
-#	background-color: #BBBBBB;
-	background-color: #94929C;
-	width: 100%;
-	text-align: center;
-	font-size: 12px;
-	color: #56545C;
-	font-weight: bold;
-	padding: 8px;
-	font-family: Arial, Helvetica, sans-serif;
-	vertical-align: middle;
-	border: 1px solid black;
-}
-
-.indexIcon {
-	vertical-align: middle;
-	border: 0px;
-}
-
-
-/* //////////////////DETAILS///////////////// */
-/* ///// Details table style definition ///// */
-/* ////////////////////////////////////////// */
-
-table.details		{
-        margin-left:		auto;
-	margin-right:		auto;
-	width:			auto;
-}
-
-td.detailHead		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-	color:			#59519e;
-	text-align:		center;
-	background-color:	#d7dfe7;
-}
-
-td.detailLabel		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	font-weight:		bold;
-	color:			#59519e;
-	background-color:	#ffffff;
-}
-
-td.detailText		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#000000;
-	background-color:	#ffffff;
-}
-
-a.details:link 		{ color: #000000; background-color: transparent;}
-a.details:active 	{ color: #000000; background-color: transparent;}
-a.details:visited 	{ color: #000000; background-color: transparent;}
-
 
 /* //////////////////DIVERS////////////////// */
 /* ///// Divers table style definition ////// */
 /* ////////////////////////////////////////// */
-
-table.recordInfo	{
-        margin-left:		auto;
-	margin-right:		0;
-	width:			auto;
-}
-
-td.recordInfo		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	color:			#000000;
-	text-align:		right;
-	background-color:	transparent;
-}
 
 td.textLabelForm	{
 	font-family:		sans-serif;
@@ -513,8 +706,8 @@ td.textLabelForm	{
 	background-color:	transparent;
 }
 
-/* //////////////////DETAILS///////////////// */
-/* ///// Details table style definition ///// */
+/* //////////////////ADMIN/////////////////// */
+/* /////  Admin table style definition  ///// */
 /* ////////////////////////////////////////// */
 
 table.admin		{
@@ -941,3 +1134,8 @@ td.timeOffday 	 	 {
 	text-align:		center;
 	background-color:	#93919c;
 }
+
+
+/* /////////////////////////////////////////////////////////////////////////
+// Classes de test
+*/

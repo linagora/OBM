@@ -1,0 +1,114 @@
+\subsection{Les feuilles de style - CSS}
+
+Le code produit par OBM est et doit être conforme XHTML 1.0 Transitionnal.
+Les feuilles de style (CSS) sont utilisées selon le standard CSS2. (1 ?).\\
+
+OBM défini des zones graphiques (bandeau de gauche, bandeau de droite,...) ainsi que des objects graphiques (block des sections, fiche de détail, block des dernières entités visitées,...). Une fonction générale d'affichage \textbf{display\_page()}, spécifique à chaque thème indique la répartition des objets dans les zones.
+
+
+\subsubsection{Les zones graphiques définies dans le thème standard}
+
+L'affichage d'OBM est effectué dans des zones définies.
+Le thème standard défini les zones :\\
+
+\begin{tabular}{|c|l|}
+\hline
+\textbf{Zone} & \textbf{Description pour thème standard}\\
+\hline
+leftpanel & Bandeau de gauche \\
+\hline
+detailpanel & Zone principale d'affichage, soit unique soit découpée en middlepanel et rightpanel\\
+\hline
+middlepanel & Zone centrale d'affichage quand un bandeau est présent à droite (rightpanel)\\
+\hline
+rightpanel & Bandeau de droite. Si non vide, alors affiché ainsi que middle panel\\
+\hline
+\end{tabular}
+
+
+
+\subsubsection{Les objets graphiques définis}
+
+L'affichage d'OBM est découpé selon les objets graphiques suivants, pour lesquels des styles sont définis :\\
+
+\begin{tabular}{|c|c|p{8cm}|}
+\hline
+\textbf{Objet} & \textbf{Style} & \textbf{Description}\\
+\hline
+en-tête HTML & head & En-tête de définition du type de document, titre (<head>)\\
+\hline
+en-tête & header & Block d'en-tête contenant le logo, les infos de connexions\\
+\hline
+section & section & Block affichant les sections (onglets par exemple)\\
+\hline
+menu & menu & Block contenant les menus ou modules d'une section\\
+\hline
+action & action & Block contenant les actions disponibles du module\\
+\hline
+\multirow{4}{3cm}{dernière visite} & last & Block contenant les entités dernièrement visitées\\
+\cline{2-3}
+ & lastTitle & Titre du block \\
+\cline{2-3}
+ & lastList & éléments de la liste des entités visitées \\
+\hline
+titre & title & Block contenant le titre de la page (ex: Société : Chercher)\\
+\hline
+message & msg & Block contenant la zone de message\\
+\hline
+\multirow{3}{3cm}{recherche} & search & Block contenant le formulaire de recherche\\
+\cline{2-3}
+ & searchForm & Donnée d'un champ de recherche \\
+\cline{2-3}
+ & searchLabel & Label d'un champ de recherche \\
+\hline
+\multirow{5}{3cm}{détail} & detail & Block contenant le détail d'une fiche d'un module\\
+\cline{2-3}
+ & detailHead & En-tête d'une fiche détail \\
+\cline{2-3}
+ & detailLabel & Label d'une fiche détail \\
+\cline{2-3}
+ & detailText & Donnée d'une fiche détail \\
+\cline{2-3}
+ & detailForm & Donnée d'un formulaire d'une fiche détail en modification \\
+\hline
+infos création & detailInfo & Utilisateurs et dates de création / modification\\
+\hline
+\multirow{2}{3cm}{boutons détail} & detailButton & Block contenant les boutons associés à une fiche détail\\
+\cline{2-3}
+ & detailButtons & Bouton d'une fiche détail \\
+\hline
+\multirow{3}{3cm}{link} & link & Block contenant les liens vers les entités associées\\
+\cline{2-3}
+ & linkTitle & Titre du block \\
+\cline{2-3}
+ & linkList & éléments de la liste des entités associées \\
+\hline
+\multirow{7}{3cm}{résultat de recherche} & result & Block contenant un résultat de recherche\\
+\cline{2-3}
+ & resultIndex & Block contenant l'index d'un résultat de recherche \\
+\cline{2-3}
+ & resultIndexIcon & icônes de l'index d'un résultat de recherche \\
+\cline{2-3}
+ & resultHead & Titre des colonnes de résultat \\
+\cline{2-3}
+ & resultText & Cellules du tableau de résultats \\
+\cline{2-3}
+ & resultTextC & Cellules centrées du tableau de résultats \\
+\cline{2-3}
+ & resultPref & table des préférences d'affichage d'un résultat de recherche \\
+\hline
+\multirow{4}{3cm}{formulaire d'admin} & admin & Block contenant un formulaire d'administration\\
+\cline{2-3}
+ & adminHead & titre du formulaire d'administration \\
+\cline{2-3}
+ & adminLabel & label d'un formulaire d'administration \\
+\cline{2-3}
+ & adminText & Donnée d'un formulaire d'administration \\
+\hline
+fin HTML & end & Cloture de la page\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Insertion}
+

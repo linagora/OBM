@@ -16,6 +16,8 @@ $l_validate = "Valida";
 $l_execute = "Esegui azione";
 
 // Common messages
+$l_yes = "Si";
+$l_no = "No";
 $l_all = "Tutti";
 $l_all_f = "Tutti";
 $l_none = "---";
@@ -144,6 +146,7 @@ $l_header_dupplicate =  "Word to define";
 $l_header_compute_balance =  "Word to define";
 
 $l_header_export = "Esporta";
+$l_header_global_export = "Esporta";
 
 $l_header_add_contact = "Word to define";
 

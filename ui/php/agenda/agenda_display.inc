@@ -1826,7 +1826,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   <form method=\"get\" name=\"f_mod_calendar\"
    onsubmit=\"if (check_calendar(this)) return true; else return false;\"
    action=\"".url_prepare("agenda_index.php")."\">
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
     </tr>
@@ -1915,7 +1915,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
      <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_event_description\" rows=\"6\" cols=\"72\">$desc</textarea></td> 
     </tr>     
    </table>
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td>
       $dis_button
@@ -1992,7 +1992,7 @@ function html_waiting_events($obm_wait) {
 
   // --- HTML Template --------------------------------------------------------
   echo "
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td class=\"detailLabel\">$l_title</td>
      <td class=\"detailLabel\">$l_category</td>
@@ -2082,7 +2082,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   // --- HTML Template --------------------------------------------------------
   echo "
   <form method=\"get\" name=\"f_mod_decision\">
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
     </tr>
@@ -2212,7 +2212,7 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   }
   echo "
   $dis_form_begin
-  <table class=\"details\">
+  <table class=\"detail\">
    <tr>
     <td colspan=\"7\" class=\"detailHead\">$l_conflicts 
     </td>
@@ -2247,7 +2247,7 @@ function html_dis_delete($agenda) {
   $event_id = $agenda["id"];
   $getdate = $agenda["date"];
   echo "
-  <table class=\"details\">
+  <table class=\"detail\">
    <tr>
     <td colspan=\"10\" class=\"detailHead\">$l_confirm_delete</td>
     <tr>
@@ -2306,7 +2306,7 @@ function html_dis_right_admin($user_q) {
     }
   }
   echo "
-  <table class=\"details\">
+  <table class=\"detail\">
    <tr>
     <td colspan=\"3\" class=\"detailLabel\">
      &nbsp;
@@ -2477,7 +2477,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   <form method=\"get\" name=\"f_mod_calendar\"
    onsubmit=\"if (check_meeting(this)) return true; else return false;\"
    action=\"".url_prepare("agenda_index.php")."\">
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td colspan=\"2\" class=\"detailHead\">$l_header_meeting</td>
     </tr>
@@ -2816,7 +2816,7 @@ function dis_category_links($agenda) {
   $obm_q->next_record();
   if ($obm_q->f("numlink") > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_category_cant_delete ".$obm_q->f("numlink")." $l_link_events</td>
     </tr><tr>
@@ -2825,7 +2825,7 @@ function dis_category_links($agenda) {
 ";
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">
       $l_category_link_agenda_no '$label' : $l_category_can_delete</td>

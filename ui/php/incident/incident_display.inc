@@ -129,7 +129,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
     <form method=\"get\" name=\"f_incident\" action=\"" .
     url_prepare("incident_index.php") . " \" onsubmit=\"if (check_search_inc(this)) return true; else return false;\">
 
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td>
       <table>
@@ -155,7 +155,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
             value=\"$datebefore\" /></td>
       </tr>
       </table>
-      <table class=\"details\">     	
+      <table class=\"detail\">     	
       <tr>
         <td class=\"textLabelForm\">$l_priority<br />
           $sel_pri</td>
@@ -296,7 +296,7 @@ function html_incident_consult($inc_q,$con_q) {
   // --- HTML Template --------------------------------------------------------
 
   echo "
-<table class=\"details\">
+<table class=\"detail\">
  <tr>
   <td colspan=\"2\" class=\"detailHead\">$l_company</td>
  </tr><tr>
@@ -528,7 +528,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
 
   echo "
 <form method=\"get\" name=\"form_mod_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
-<table class=\"details\">
+<table class=\"detail\">
  <tr>
   <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
  </tr><tr>
@@ -578,7 +578,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
   <td colspan=\"2\"><textarea name=\"ta_solu\" rows=\"6\" cols=\"60\">$solu</textarea></td>
  </tr>
 </table>
-<table class=\"details\">
+<table class=\"detail\">
  <tr>
   <td>
    $dis_button
@@ -873,7 +873,7 @@ function dis_priority_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_pri_cant_delete</td>
     </tr><tr>
@@ -894,7 +894,7 @@ function dis_priority_links($id) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">
       $l_pri_link_incident_no '$label' : $l_pri_can_delete</td>
@@ -935,7 +935,7 @@ function dis_status_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_sta_cant_delete</td>
     </tr><tr>
@@ -957,7 +957,7 @@ function dis_status_links($id) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">$label : $l_sta_can_delete</td>
     </tr><tr>

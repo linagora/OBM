@@ -14,7 +14,7 @@ $themes = get_themes_array();
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the lang list                                                       //
+// Get the lang list                                                         //
 // Return : $langs : array of langs
 ///////////////////////////////////////////////////////////////////////////////
 function get_langs_array() {
@@ -100,7 +100,7 @@ function get_src_vars($module) {
   while (list($line_num, $line) = each($contents)) {
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)[^a-z_].*$/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z0-9_]*)[^a-z_].*$/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $pattern = preg_quote($matches[1]);
       $line = preg_replace("/$pattern/", "\$R_", $line, 1);
@@ -164,7 +164,7 @@ function get_src_used_vars($module) {
     }
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)[^a-z_].*$/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z0-9_]*)[^a-z_].*$/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $pattern = preg_quote($matches[1]);
       if ($debug > 1) {
@@ -225,7 +225,7 @@ function get_src_used_vars_file($myfile) {
     }
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)[^a-z_].*$/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z0-9_]*)[^a-z_].*$/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $pattern = preg_quote($matches[1]);
       if ($debug > 1) {
@@ -313,7 +313,7 @@ function get_lang_vars($module, $lang) {
   while (list($line_num, $line) = each($contents)) {
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*$/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z0-9_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*$/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $lvalue = $matches[3];
       $pattern = preg_quote($matches[1]);
@@ -356,7 +356,7 @@ function get_global_lang_vars($lang) {
   while (list($line_num, $line) = each($contents)) {
 
     // for each lang var, we note it as recorded "R_" and put it in the array
-    while (preg_match('/^.*(\$l_)([a-z_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*/Us',$line, $matches)) {
+    while (preg_match('/^.*(\$l_)([a-z0-9_]*)\s*=\s*"(.*)"\s*;\s*(\/\/.*$)*/Us',$line, $matches)) {
       $lvar = "\$l_" . $matches[2];
       $lvalue = $matches[3];
       $pattern = preg_quote($matches[1]);

@@ -114,13 +114,13 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     onsubmit=\"if (check_search_form(this) == false) return false;
     else return true;\" action=\"".url_prepare("contract_index.php")."\">
 
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">$l_deal</td>
       <td>&nbsp;&nbsp;&nbsp;</td>
 
       <td>
-      <table class=\"details\">   
+      <table class=\"detail\">   
       <tr>
         <td class=\"textLabelForm\">$l_number<br />
           <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
@@ -139,7 +139,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
             value=\"$p_datebefore\" /></td>
       </tr>
       </table>
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td class=\"textLabelForm\">$l_label_libelle<br />
           <input type=\"text\" name=\"tf_label\" size=\"20\"
@@ -276,7 +276,7 @@ function html_contract_consult($contract_q) {
 //Liens Externes//
 //////////////////
   echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
     <td rowspan=\"25\"> 
       <a href=\"".url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id")."\">
@@ -540,7 +540,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   <form method=\"post\" name=\"form_contract\"
     onsubmit=\"if (check_contract(this)) return true; else return false;\" 
     action=\"".url_prepare("contract_index.php")."\">
-  <table class=\"details\">
+  <table class=\"detail\">
    <tr>
     <td colspan=\"2\" class=\"detailHead\">$l_contract_company</td>
    </tr><tr>
@@ -605,7 +605,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     <td colspan=\"2\" class=\"detailHead\">$dis_sub</td>
    </tr>
   </table>
-  <table class=\"details\">
+  <table class=\"detail\">
    <tr>
     <td>
      $dis_button
@@ -637,7 +637,7 @@ function dis_check_links($p_id) {
     while ($obm_q->next_record()) {
       $iid = $obm_q->f("incident_id");
       $ilabel = $obm_q->f("incident_label");
-      $display_linki .= "<tr><td class=\"detailText\"><a class=\"details\" href=\"" . url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a></td>
+      $display_linki .= "<tr><td class=\"detailText\"><a class=\"detail\" href=\"" . url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a></td>
       </tr>";
     }
   } else {
@@ -654,7 +654,7 @@ function dis_check_links($p_id) {
 
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
-    echo "<table class=\"details\">
+    echo "<table class=\"detail\">
           <tr><td>
             <table>
             <tr>
@@ -665,7 +665,7 @@ function dis_check_links($p_id) {
           </td></tr>";
   } else {
     display_warn_msg($l_cant_delete);
-    echo "<table class=\"details\">
+    echo "<table class=\"detail\">
           <tr><td class=\"detailHead\">$dis_back</td></tr>";
   }
   echo "
@@ -805,7 +805,7 @@ function dis_type_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_type_cant_delete</td>
     </tr><tr>
@@ -827,7 +827,7 @@ function dis_type_links($id) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">$label : $l_type_can_delete</td>
     </tr><tr>
@@ -901,7 +901,7 @@ function html_select_contract($con_q, $title, $url="") {
 
   // --- html template --------------------------------------------------------
   echo "
-  <table class=\"details\">
+  <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">
     <form method=\"get\" name=\"form_contr\"

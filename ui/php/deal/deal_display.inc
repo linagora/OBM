@@ -229,13 +229,13 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
     onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
     action=\"" . url_prepare("deal_index.php") . "\">
 
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">$l_deal</td>
       <td>&nbsp;&nbsp;&nbsp;</td>
 
       <td>
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
 <!-- Label -->
         <td class=\"textLabelForm\">$l_label_start<br />
@@ -259,7 +259,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
         <td>&nbsp;&nbsp;</td>
       </tr>
       </table>
-      <table class=\"details\">     
+      <table class=\"detail\">     
       <tr>
 <!-- Kind -->
         <td class=\"textLabelForm\">$l_kind<br />
@@ -330,7 +330,7 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 
   echo "<form method=\"get\" name=\"form_search_parentdeal\"
     action=\"" . url_prepare("deal_index.php") . "\">
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">$l_parentdeal</td>
       <td>&nbsp;&nbsp;&nbsp;</td>
@@ -566,7 +566,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 
 
   echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td rowspan=\"4\">";
 
@@ -606,7 +606,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     </tr>
     <tr>
       <td valign=\"top\">
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
       </tr><tr>
@@ -645,7 +645,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
       </td>
 
       <td>
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td colspan=\"2\" class=\"detailHead\">$l_company</td>
       </tr><tr>
@@ -716,7 +716,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 		       "&amp;incl_arch=1");
     echo "
        <form method=\"post\" action=\"$url\">
-        <table class=\"details\">
+        <table class=\"detail\">
 	 <tr><td class=\"detailHead\">
 	  <input type=\"submit\" value=\"$l_see_archived_invoices\" />
          </td></tr>
@@ -1004,7 +1004,7 @@ function auto_set_hitrate(select, targetField, pos) {
     $dis_button2 =" <form method=\"post\" name=\"form_deal_delete\"
       onsubmit=\"if (confirm_del()) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
-      <table class =\"details\">
+      <table class =\"detail\">
        <tr><td class=\"detailHead\">
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
         <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
@@ -1029,7 +1029,7 @@ function auto_set_hitrate(select, targetField, pos) {
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
-     <table class=\"details\">
+     <table class=\"detail\">
        <tr>
          <td colspan=\"2\" class=\"detailHead\">$l_company</td>
        </tr><tr>
@@ -1107,7 +1107,7 @@ function auto_set_hitrate(select, targetField, pos) {
         $dis_comment
       </tr>
      </table>
-    <table class =\"details\">
+    <table class =\"detail\">
       <tr><td class=\"detailHead\">$dis_button1</td></tr>
     </table>
     </form>
@@ -1139,7 +1139,7 @@ function dis_check_links($p_id) {
       $display_linkc .= "
     <tr>
       <td class=\"detailText\">
-        <a class=\"details\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
+        <a class=\"detail\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
       </td>
     </tr>";
     }
@@ -1160,7 +1160,7 @@ function dis_check_links($p_id) {
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
     echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td>
         <table>
@@ -1175,7 +1175,7 @@ function dis_check_links($p_id) {
   } else {
     display_warn_msg($l_cant_delete);
     echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">$dis_back</td>
     </tr>";
@@ -1225,7 +1225,7 @@ function html_deal_affect($parent_q, $p_deal_id) {
     echo "
       <form name=\"form_affect_deal\" method=\"get\"
         action=\"" . url_prepare("deal_index.php") . "\">
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td class=\"messageInfo\">$l_deal_select_parentdeal</td>
       </tr>
@@ -1608,7 +1608,7 @@ function dis_kind_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_kind_cant_delete</td>
     </tr><tr>
@@ -1630,7 +1630,7 @@ function dis_kind_links($id) {
 
   } else {
      $dis_link ="
-     <table class=\"details\">
+     <table class=\"detail\">
      <tr>
        <td colspan=\"2\" class=\"messageOk\">$label : $l_kind_can_delete</td>
      </tr><tr>
@@ -1666,7 +1666,7 @@ function dis_status_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_status_cant_delete</td>
     </tr><tr>
@@ -1688,7 +1688,7 @@ function dis_status_links($id) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">$label : $l_status_can_delete</td>
     </tr><tr>
@@ -1727,7 +1727,7 @@ function dis_cat_links($id) {
 
   if ($obm_q->num_rows() > 0) {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"messageWarning\">$label : $l_cat_cant_delete</td>
     </tr><tr>
@@ -1749,7 +1749,7 @@ function dis_cat_links($id) {
 
   } else {
     $dis_link = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"messageOk\">$label : $l_cat_can_delete</td>
     </tr><tr>
@@ -1789,7 +1789,7 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
   $dis_pref->pref_title = $l_deal_display;
 
   echo "
-    <table class=\"details\"><tr><td>";
+    <table class=\"detail\"><tr><td>";
   $dis_pref->display();
   echo "
     </td>";
@@ -1932,7 +1932,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
      $dis_button2 ="<form method=\"post\" name=\"form_parentdeal_delete\"
       onsubmit=\"if (confirm_del()) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
-      <table class=\"details\"><tr><td class=\"detailHead\">
+      <table class=\"detail\"><tr><td class=\"detailHead\">
        <input type=\"hidden\" name=\"action\" value=\"parent_delete\" />
        <input type=\"hidden\" name=\"param_parent\" value=\"$parent\" />
        <input type=\"submit\" value=\"$l_delete_parent\" />
@@ -1947,7 +1947,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
       onsubmit=\"if (check_parentdeal(this)) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
 
-    <table class=\"details\">
+    <table class=\"detail\">
      <tr>
       <td colspan=\"2\" class=\"detailHead\">$l_parentdeal</td>
      </tr><tr>
@@ -2021,10 +2021,10 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
       </form>";
 
   echo "
-   <table class=\"details\">
+   <table class=\"detail\">
     <tr>
      <td>
-      <table class=\"details\">
+      <table class=\"detail\">
        <tr>
         <td class=\"detailHead\" colspan=\"2\">$l_parentdeal</td>
        </tr>
@@ -2047,7 +2047,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
       </table>
      </td>
      <td>
-      <table class=\"details\">
+      <table class=\"detail\">
        <tr>
         <td class=\"detailHead\" colspan=\"2\">$l_infos</td>
        </tr><tr>
@@ -2148,7 +2148,7 @@ function html_select_deal($deal_q, $title, $url="") {
   $dis_select .= " </select>";
 
   echo "
-  <table class=\"details\">
+  <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">
     <form method=\"get\" name=\"form_contr\"

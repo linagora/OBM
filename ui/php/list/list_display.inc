@@ -104,7 +104,7 @@ function html_list_search_form ($list) {
   echo "
     <form method=\"get\" name=\"f_list\"
       action=\"".url_prepare("list_index.php")."\">
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td class=\"textLabelForm\">$l_name
           <br />
@@ -233,7 +233,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
 
   echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailText\">$name</td>
@@ -279,7 +279,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     if ($perm->have_perm("editor")) {
       echo "
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td>
         <input type=\"submit\" value=\"$l_del_contact_sel\" />
@@ -327,7 +327,7 @@ function html_list_form($action, $list_q, $list) {
   echo "
   <form method=\"get\" name=\"f_new action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
-  <table class=\"details\"=0>
+  <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_name</td>
     <td class=\"detailText\">
@@ -417,28 +417,28 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
 // Display warning before a list deletion                                    //
 // We ask confirmation or cancel
 // Parameters:
-//   - $l_id : list id
+//   - $id : list id
 /////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($l_id) {
+function dis_warn_delete($id) {
   global $l_warn_delete, $l_delete, $l_back;
 
-  $nb_con = get_list_nb_contact($l_id);
+  $nb_con = get_list_nb_contact($id);
   echo "<p align=\"center\" />$nb_con $l_warn_delete</p>
 
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">
         <form method=\"get\" name=\"form_delete\"
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"hd_list_id\" value=\"$l_id\" />
+        <input type=\"hidden\" name=\"hd_list_id\" value=\"$id\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
         </form>
       </td><td class=\"detailHead\">
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-        <input type=\"hidden\" name=\"param_list\" value=\"$l_id\" />
+        <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
         <input type=\"submit\" VALUE=\"$l_back\" />
         </form>
       </td>
@@ -451,12 +451,11 @@ function dis_warn_delete($l_id) {
 // Display the context about a list insertion or update                      //
 // When similar lists exist we show these and ask confirmation
 // Parameters:
-//   - $l_id     : list id
-//   - $l_q      : list database result (at least 1 row)
+//   - $list_q   : list database result (at least 1 row)
 //   - $list[]   : values for insertion/update (if confirmation)
 //     keys used : name, subject
 /////////////////////////////////////////////////////////////////////////////
-function dis_list_warn_insert($l_id, $l_q, $list) {
+function dis_list_warn_insert($list_q, $list) {
   global $l_check_samelist, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
@@ -464,18 +463,18 @@ function dis_list_warn_insert($l_id, $l_q, $list) {
   $subject = $list["subject"];
 
   display_warn_msg($l_check_samelist);
-  while ($l_q->next_record()) {
-    $id = $l_q->f("list_id");
-    $samename = $l_q->f("list_name");
-    $samesubject = $l_q->f("list_subject");
+  while ($list_q->next_record()) {
+    $id = $list_q->f("list_id");
+    $samename = $list_q->f("list_name");
+    $samesubject = $list_q->f("list_subject");
     $dis_same_list .= "
       <tr><td colspan =\"2\" class=\"detailText\">
-        <a class=\"details\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>
+        <a class=\"detail\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>
       </td></tr>";
   }
 
   echo "<p />
-    <table class=\"details\">
+    <table class=\"detail\">
     $dis_same_list
     <tr>
       <td>&nbsp;</td>
@@ -520,7 +519,7 @@ function dis_export_form($list) {
   $nb_list = $list["list_nb"];
   $cpt = 1;
   $d_list = "
-    <table class=\"details\">
+    <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">$l_list_set</td>
     </tr>";
@@ -569,7 +568,7 @@ function dis_export_form($list) {
   }
   $d_format .= "</table>";
 
-  echo "<table class=\"details\">
+  echo "<table class=\"detail\">
     <tr>
       <td>$d_list
       </td>

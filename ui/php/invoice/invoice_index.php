@@ -433,7 +433,7 @@ elseif ($action == "delete")  { // delete means delete an invoice
   
 } else if($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update ($entity, $fieldname, $display) ;
+  run_query_display_pref_update ($entity, $fieldname, $disstatus) ;
   $invoice_options=run_query_display_pref ($auth->auth["uid"], "invoice", 1);
   $deal_options = run_query_display_pref ($auth->auth["uid"],"deal", 1);
   dis_invoice_display_pref ($invoice_options, $deal_options); 

@@ -76,7 +76,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display: Contact search Form                                              //
 // Parameters:
 //   - $contact[] : default form values
 //     keys used  : name, company
@@ -103,51 +103,46 @@ function html_contact_search_form ($contact) {
   }
 
   // --- HTML Template --------------------------------------------------------
-  echo "
-    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"".url_prepare("contact_index.php")."\">
-    <table class=\"details\">
-    <tr>
-      <td class=\"textLabelForm\">$l_contact_name<br />
-        <input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" />
-      </td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_phone<br />
-        <input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" />
-      </td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_email<br />
-        <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
-      </td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_from_company<br />
-        <input type=\"text\" name=\"tf_company\" size=\"16\"
-        value=\"$company\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_archive<br />
-        <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
-      </td>
-      <td>&nbsp;&nbsp;&nbsp;&nbsp;
-        <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
-        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
-        <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-        <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-        $ext&nbsp;
-        </td>
-      </tr>
-    </table>
-    </form>
-    <hr />";
+  $block = "
+  <form method=\"get\" name=\"f_contact\" action=\"".url_prepare("contact_index.php")."\">
+  <div class=\"search\">
+
+    <div class=\"searchLabel\">$l_contact_name<br />
+      <input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" />
+    </div>
+    <div class=\"searchLabel\">$l_phone<br />
+      <input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" />
+    </div>
+    <div class=\"searchLabel\">$l_email<br />
+      <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
+    </div>
+    <div class=\"searchLabel\">$l_from_company<br />
+      <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </div>
+    <div class=\"searchLabel\">$l_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+    </div>
+    <div class=\"searchLabel\">&nbsp;<br />
+      <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
+      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+      $ext&nbsp;
+    </div>
+    </form>";
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contact search result                                         //
+// Display: Contact search result                                            //
 // Parameters:
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_list($contact) {
-  global $l_no_found;
+  global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
   $popup = $contact["popup"];
@@ -156,15 +151,17 @@ function dis_contact_search_list($contact) {
   $obm_q = run_query_search($contact, $new_order, $order_dir);
   $nb_contact = $obm_q->num_rows();
   if ($nb_contact == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    html_contact_search_list($obm_q, $pref_q, $nb_contact, $contact, $popup);
+    $block = html_contact_search_list($obm_q, $pref_q, $nb_contact, $contact, $popup);
   }
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Contact search result                                    //
+// Display: Contact search result
 // Parameters : 
 //   - $obm_q     : list of the contacts to display 
 //   - $pref_q    : the fields which have to be displayed
@@ -174,7 +171,7 @@ function dis_contact_search_list($contact) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
-  global $l_found, $l_add, $l_close;
+  global $display, $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -202,7 +199,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
-      <table class=\"details\">
+      <table class=\"detail\">
       <tr>
         <td>
       <input type=\"submit\" value=\"$l_add\" />
@@ -221,10 +218,12 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   $dis_contact_list->data_header = "both";
 
   // --- HTML Template --------------------------------------------------------
-  display_info_msg("$nb_con $l_found");
-  echo $display_popup_head;
-  $dis_contact_list->display("dis_data_contact");
-  echo $display_popup_end;
+  $display["msg"] .= display_info_msg("$nb_con $l_found");
+  $block = $display_popup_head;
+  $block .= $dis_contact_list->display("dis_data_contact");
+  $block .= $display_popup_end;
+
+  return $block;
 }
 
 
@@ -240,7 +239,7 @@ function html_contact_consult($co_q) {
   global $l_public,$l_private,$l_archive,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme,  $ico_mail;
-  global $path, $action, $auth;
+  global $display, $path, $action, $auth;
   global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
@@ -288,13 +287,14 @@ function html_contact_consult($co_q) {
       </a>";
   }
   
+  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-    <table class=\"details\">
+  $block = "
+    <div class=\"detailHead\">$l_contact</div>
+    <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_contact</td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_lastname</td>
       <td class=\"detailText\">$lname</td>
     </tr><tr>
@@ -315,8 +315,12 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
       <td class=\"detailText\">$func</td>
-    </tr><tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_coord</td>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_coord</div>
+
+    <table class=\"detail\">
     </tr><tr>
       <td class=\"detailLabel\">$l_phone</td>
       <td class=\"detailText\">$phone</td>
@@ -353,15 +357,20 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_mailing_ok</td>
       <td class=\"detailText\">$mailok</td>
-    </tr><tr>
-      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
-    </tr><tr>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
       <td class=\"detailText\" colspan=\"2\">
       $com
       </td>
     </tr>
     </table>
 ";
+  return $block;
 }
 
 
@@ -383,7 +392,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $path, $auth;
+  global $display, $path, $auth;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -473,7 +482,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // UPDATE 
   if (($action=="detailupdate") || ($action=="update")) {
-    $display_update = "
+    $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
       <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
@@ -482,38 +491,39 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
-    $display_update = "
+    $dis_button = "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
+  $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
     <form method=\"post\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
 
-    <table class=\"details\">
+    <div class=\"detailHead\">$l_contact</div>
+
+    <table class=\"detail\">
     <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_contact</td>
-    </tr><tr>
     <td class=\"detailLabel\">$l_lastname</td>
-    <td><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_firstname</td>
-    <td><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_kind</td>
-    <td>$sel_kind</td>
+    <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_private</td>
-    <td>$display_private</td>
+    <td class=\"detailForm\">$display_private</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_archive</td>
-    <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_company</td>
-    <td>
+    <td class=\"detailForm\">
       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
@@ -525,55 +535,67 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </td>
     </tr><tr>
     <td class=\"detailLabel\">$l_function</td>
-    <td><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
-    </tr><tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_coord</td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_phone</td>
-    <td><input type=\"text\" name=\"tf_phone\" size=\"16\" value=\"$phone\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_hphone</td>
-    <td><input type=\"text\" name=\"tf_hphone\" size=\"16\" value=\"$hphone\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_fax</td>
-    <td><input type=\"text\" name=\"tf_fax\" size=\"16\" value=\"$fax\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_mphone</td>
-    <td><input type=\"text\" name=\"tf_mphone\" size=\"16\" value=\"$mphone\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_address 1</td>
-    <td><input type=\"text\" name=\"tf_ad1\" size=\"30\" value=\"$ad1\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_address 2</td>
-    <td><input type=\"text\" name=\"tf_ad2\" size=\"30\" value=\"$ad2\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_town</td>
-    <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_expresspostal</td>
-    <td><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_country</td>
-    <td><input type=\"text\" name=\"tf_ctry\" size=\"20\" value=\"$ctry\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_email</td>
-    <td><input type=\"text\" name=\"tf_email\" size=\"52\" value=\"$email\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_mailing_ok</td>
-    <td><input type=\"checkbox\" name=\"cb_mailok\" value=\"1\" $mailok /></td>
-    </tr><tr>
-    <td colspan =\"2\" class=\"detailHead\">$l_comment</td>
-    </tr><tr>
-    <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_com\" rows=\"6\" cols=\"60\">$com</textarea></td>
-    </tr><tr>
-    <td colspan =\"2\" class=\"detailHead\">$display_update</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
     </tr>
     </table>
+
+    <div class=\"detailHead\">$l_coord</div>
+
+    <table class=\"detail\">
+    <tr>
+    <td class=\"detailLabel\">$l_phone</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_phone\" size=\"16\" value=\"$phone\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_hphone</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_hphone\" size=\"16\" value=\"$hphone\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_fax</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_fax\" size=\"16\" value=\"$fax\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_mphone</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"16\" value=\"$mphone\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_address 1</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"30\" value=\"$ad1\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_address 2</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"30\" value=\"$ad2\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_postcode</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_town</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_expresspostal</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_country</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ctry\" size=\"20\" value=\"$ctry\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_email</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" value=\"$email\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_mailing_ok</td>
+    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_mailok\" value=\"1\" $mailok /></td>
+    </tr>
+    </table>
+
+    <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+    <td colspan=\"2\" class=\"detailForm\"><textarea name=\"ta_com\" rows=\"6\" cols=\"60\">$com</textarea></td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
     </form>
  ";
+
+  return $block;
 }
 
 
@@ -622,7 +644,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $disp_same_cont .= "
       <tr>
         <td colspan =\"2\" class=\"detailText\">
-          <a class=\"details\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
+          <a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
           $samename ($company)</a>
         </td>
       </tr>";
@@ -632,7 +654,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   // --- HTML Template --------------------------------------------------------
 
   echo "
-    <table class=\"details\">
+    <table class=\"detail\">
     $disp_same_cont
     <tr><td>
     <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
@@ -714,7 +736,7 @@ function dis_check_links($p_id) {
       $display_link_d .= "
       <tr>
         <td class=\"detailText\">
-          <a class=\"details\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
+          <a class=\"detail\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
           $dlabel</a>
         </td>
       </tr>";
@@ -734,7 +756,7 @@ function dis_check_links($p_id) {
       $display_link_l .= "
         <tr>
           <td class=\"detailText\">
-            <a class=\"details\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
+            <a class=\"detail\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
             $lname</a>
           </td>
         </tr>";
@@ -745,13 +767,13 @@ function dis_check_links($p_id) {
 
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
-    echo "<table class=\"details\"><tr>
+    echo "<table class=\"detail\"><tr>
           <td class=\"detailHead\">";
     dis_delete_form($p_id);
     echo "</td></tr>";
   } else {
     display_warn_msg($l_cant_delete);
-    echo "<table class=\"details\">";
+    echo "<table class=\"detail\">";
   }
 
   // --- HTML Template --------------------------------------------------------
