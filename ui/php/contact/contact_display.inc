@@ -149,11 +149,9 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
 
   // --- HTML Template --------------------------------------------------------
   display_info_msg($nb_con." ".$l_found);
-  echo "
-  $display_popup_head".
+  echo $display_popup_head;
   $dis_contact_list->display();
-  echo "$display_popup_end
-  ";
+  echo $display_popup_end;
 }
 
 

@@ -130,6 +130,7 @@ $l_header_delete = "Supprimer";
 $l_header_new_parent = "Nouvelle SurAffaire";
 $l_header_find_parent = "Chercher SurAffaire";
 
+$l_header_global_export = "Export";
 $l_header_export = "Exporter";
 $l_header_reconcile = "Rapprocher";
 $l_header_dupplicate = "Dupliquer";

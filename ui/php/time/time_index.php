@@ -39,7 +39,7 @@ require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
-require("../agenda/agenda_functions.inc");
+//require("../agenda/agenda_functions.inc");
 require("time_display.inc");
 require("time_query.inc");
 

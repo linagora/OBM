@@ -109,9 +109,9 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
       </td>
     </tr>
     <tr>
-      <td><input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"20\" value=\"$name\" /></td>
+      <td><input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\" value=\"$name\" /></td>
       <td>&nbsp;&nbsp;</td>
-      <td><input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"14\" value=\"$phone\" /></td>
+      <td><input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\" value=\"$phone\" /></td>
       <td>&nbsp;&nbsp;</td>
       <td>$sel_kind</td>
       <td>&nbsp;&nbsp;</td>
@@ -1165,7 +1165,7 @@ function html_select_company($comp_q, $title, $url="") {
         <form method=\"get\" name=\"form_comp\"
           onsubmit=\"if ($jsfunc) return true; else return false;\"
           action=\"\">
-         $title<br />
+         $title<p />
          $sel_company<br />
          <input type=\"hidden\" name=\"action\" value=\"new\" /><br />
          <input type=\"submit\" value=\"$l_select_company\" />

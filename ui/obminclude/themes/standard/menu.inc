@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// SECURINET - File : menu.inc (standard)                                    //
-//           - Desc : Standard menu display File                             //
+// OBM - File : menu.inc (standard)                                          //
+//     - Desc : Standard menu display File                                   //
 // 2002-07-16 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -117,7 +117,7 @@ echo "
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction whicjh perform the item of the selected module                      //
+// Fonction which perform the item of the selected module                    //
 // Parameters:
 //   - $menu   : selected menu 
 ///////////////////////////////////////////////////////////////////////////////

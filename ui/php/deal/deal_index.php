@@ -658,6 +658,7 @@ function get_deal_action() {
   global $deal, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_new_parent;
+  global $l_deal_select_company;
   global $deal_read, $deal_write, $deal_admin_read, $deal_admin_write;
 
   // Index

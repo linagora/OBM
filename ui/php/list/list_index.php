@@ -16,9 +16,11 @@
 // - update          -- form fields    -- update the list
 // - delete          -- $param_list    -- delete the list
 // - contact_add     -- 
+// - contact_del     -- 
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
+// - export_add      --                --
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,13 +51,13 @@ require("$obminclude/global_pref.inc");
 
 include("list_display.inc");
 include("list_query.inc");
-require("list_js.inc");
 
 if($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $list = get_param_list();
 get_list_action();
 $perm->check();
+
 // ses_list is the session array of lists id to export
 if (sizeof($ses_list) >= 1) {
   $sess->register("ses_list");
@@ -65,6 +67,9 @@ if ($action != "export_add") {
   $sess->unregister("ses_list");
 }
 page_close();
+
+require("list_js.inc");
+
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -278,7 +283,7 @@ display_end();
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_contact, $tf_datebegin, $tf_email, $cb_vis;
   global $param_list, $hd_usercreate, $hd_timeupdate, $cdg_param;
-  global $action, $ext_action, $ext_url, $ext_id;
+  global $action, $ext_action, $ext_url, $ext_id, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // List fields
@@ -312,6 +317,7 @@ function get_param_list() {
   if (isset ($ext_action)) $list["ext_action"] = $ext_action;
   if (isset ($ext_url)) $list["ext_url"] = $ext_url;
   if (isset ($ext_id)) $list["ext_id"] = $ext_id;
+  if (isset ($title)) $list["title"] = stripslashes($title);
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
@@ -357,7 +363,8 @@ function get_param_list() {
 function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
-  global $l_header_display,$l_header_export,$l_header_admin, $l_header_add_contact;
+  global $l_header_display,$l_header_export, $l_header_global_export;
+  global $l_header_admin, $l_header_add_contact, $l_select_list;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 
 // Index
@@ -426,7 +433,7 @@ function get_list_action() {
     'Condition'=> array ('None') 
                                       );
 
-// Ext get Ids
+// Ext get Ids : Lists selection
   $actions["LIST"]["ext_get_ids"] = array (
     'Name'     => $l_header_add_contact,
     'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."",
@@ -454,6 +461,15 @@ function get_list_action() {
     'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
     'Right'    => $list_write,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
+                                     	 );
+
+// Export
+  $actions["LIST"]["export"] = array (
+    'Name'     => $l_header_global_export,
+    'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_url=".urlencode("$path/list/list_index.php"),
+    'Right'    => $list_write,
+    'Popup'    => 1,
+    'Condition'=> array ('all') 
                                      	 );
 
 // Display

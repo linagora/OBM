@@ -31,7 +31,8 @@ class DB_OBM extends DB_Sql {
 	//var $Host     = "localhost" ;
 	//  var $Host     = "couguar" ;
   var $Database = "obm";             
-  var $type = "MYSQL" ;//  var $type     = "PGSQL";
+  var $type = "MYSQL" ;
+//  var $type     = "PGSQL";
   //var $User     = "postgres";
   //var $Password = "postgres";
     var $User     = "root";

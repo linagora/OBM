@@ -43,6 +43,7 @@ function html_list_search_form ($list) {
   global $sess, $popup;
 
   if ($popup) {
+    $title = $list["title"];
     $ext_action = $list["ext_action"];
     $ext_url = $list["ext_url"];
     $ext_id = $list["ext_id"];
@@ -63,6 +64,10 @@ function html_list_search_form ($list) {
     <center>
     <form method=get name=f_list action=\"".url_prepare("list_index.php")."\">
       <table border=0>
+        <tr>
+          <td colspan=6 class=\"detailHead\">$title<br />&nbsp;
+          </td>
+        </tr>
         <tr>
           <td>
             $l_name
@@ -248,41 +253,6 @@ function html_list_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display List links menu                                                   //
-// Parameters:
-//   - $id   : list id
-//   - $name : company name
-///////////////////////////////////////////////////////////////////////////////
-function html_list_links($id, $list_name, $l_action="") {
-  global $sess, $perm;
-  global $l_add_contact, $l_delete, $l_mail, $l_update, $l_export;
-  global $popup_width, $popup_contact_height;
-
-  $url_update = url_prepare("list_index.php?action=detailupdate&amp;param_list=$id");
-  $url_delete = url_prepare("list_index.php?action=check_delete&amp;hd_list_id=$id");
-
-  echo "<table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><a href=\"$url_update\">$l_update</a></td>
-    </tr>";
-  if($perm->have_perm("editor")) {
-    echo "<tr><td><a href=\"$url_delete\">$l_delete</a></td></tr>";
-  }
-  if ($perm->have_perm("editor")) {
-    $ext_url = url_prepare("../list/list_index.php");
-    echo "<tr><td><a href=\"\" onclick=\"window.name='root';window.open('" .url_prepare("../contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=" . urlencode($l_add_contact) . "&amp;ext_action=contact_add&amp;ext_url=$ext_url&amp;ext_id=$id") . "','Company','height=$popup_height,width=$popup_width'); return false;\">$l_add_contact</a></td></tr>";
-  }
-  if ($perm->have_perm("editor")) {
-    echo "<tr><td><a href=\"".url_prepare("list_index.php?action=export_add&amp;cb_list$id=$id")."\">$l_export</a></td></tr>";
-  }
-  echo "
-            </td>
-          </tr>
-        </table>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // HTML Display List Consultation                                            //
 // Parameters:
 //   - $list_q : company database result 
@@ -307,30 +277,21 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
   display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
 
-  echo "<CENTER>
-    <TABLE BORDER=1 WIDTH=95%>
-    <TR><TD VALIGN=top>\n";
-
-  html_list_links($id, $name);
-
-  echo "</TD><TD>
-      <table border=0>      
-      <tr>
-        <td align=right><font color=\"#$col_label\" size=-2>$l_name
-          </font></td>
-        <td>$name</td>
-      </tr><tr>
-        <td align=right><font color=\"#$col_label\" size=-2>$l_subject
-          </font></td>
-        <td>$subject</td>
-      </tr><tr>
-        <td align=right><font color=\"#$col_label\" size=-2>$l_email
-          </font></td>
-        <td>$email</td>
-      </tr>
-      </table>
-      </TD>
-    </TR>
+  echo "<center>
+    <table border=\"1\" WIDTH=\"95%\">
+    <tr>
+      <td><font color=\"#$col_label\" size=-2>$l_name
+        </font></td>
+      <td>$name</td>
+    </tr><tr>
+      <td><font color=\"#$col_label\" size=-2>$l_subject
+        </font></td>
+      <td>$subject</td>
+    </tr><tr>
+      <td><font color=\"#$col_label\" size=-2>$l_email
+        </font></td>
+      <td>$email</td>
+    </tr>
     </table>";
 
   $nb_con = $con_q->num_rows();
