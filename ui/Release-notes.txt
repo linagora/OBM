@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Vers : 0.6.0                                                        //
+// OBM - Vers : 0.6.2                                                        //
 //     - File : Release-notes.txt                                            //
-//     - Desc : First file to read. Basic infos on OBM release 0.6.0         //
+//     - Desc : First file to read. Basic infos on OBM release 0.6.2         //
 // 2002-02-04 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -15,6 +15,15 @@ install and the data and the database model are subject to change.
 Licence
 -------
 OBM is protected by the GNU General Public License (See file COPYING).
+
+
+Version 0.6.2
+-------------
+Minor release
+
+- Major Calendar work
+- Deal, contact and minor fixes
+- Debug flag to display session content
 
 
 Version 0.6.0
