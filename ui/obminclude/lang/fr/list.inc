@@ -38,7 +38,7 @@ $l_expert_mode = "Mode Expert";
 $l_normal_mode = "Mode Normal";
 $l_renew = "Renouvellement auto";
 $l_recept = "Mode de réception";
-$l_mailing = "Mailing activé";
+$l_mailing = "Mailing activé uniquement";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";

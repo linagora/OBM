@@ -287,6 +287,8 @@ function get_param_list() {
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $cb_vis, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $new_order, $order_dir, $popup, $row_index;
+  global $ch_mailing_ok;
+
   global $tf_company_name,$tf_company_zipcode,$tf_company_town;
   global $tf_company_timeafter,$tf_company_timebefore;
   global $sel_company_country_id,$sel_company_marketingmanager_id;
@@ -298,7 +300,6 @@ function get_param_list() {
   global $sel_contact_country_id,$sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id,$sel_contact_function_id;
-  global $tf_contact_mailing_ok;
   
   global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
   global $sel_subscription_reception_id,$tf_subscription_renewal;
@@ -316,8 +317,12 @@ function get_param_list() {
   if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
-  $list["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($row_index)) $list["row_index"] = $row_index;
+  if (isset( $cb_vis))
+  $list["vis"] = $cb_vis == 1?  1:0; 
+  if (isset($ch_mailing_ok))
+  $list["mailing_ok"] = $ch_mailing_ok == 1?  1:0; 
+
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
@@ -336,7 +341,7 @@ function get_param_list() {
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
     $http_obm_vars = $HTTP_GET_VARS;
   }
-
+  
   //Criteria params :
   //Company
   if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
@@ -363,7 +368,6 @@ function get_param_list() {
   if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
   if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
   if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
-  if (isset ($tf_contact_mailing_ok)) $list["criteria"]["modules"]["contact"]["contact_mailing_ok"] = $tf_contact_mailing_ok; 
   
   //Publication
   if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;

@@ -106,11 +106,12 @@ function run_query_detail($id) {
 function run_query_insert($list) {
   global $auth, $cdg_sql;
 
-  $vis = $list["vis"];
+  $vis = ($list["vis"]==1)?1:0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
+  $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   if (isset($list["criteria"])) {
     $list_critery = serialize($list["criteria"]);
   }
@@ -122,6 +123,7 @@ function run_query_insert($list) {
     list_name,
     list_subject,
     list_email,
+    list_mailing_ok,
     list_query,
     list_structure)
   values (null,
@@ -132,6 +134,7 @@ function run_query_insert($list) {
     '$name',
     '$subject',
     '$email',
+    '$mailing_ok',
     '$list_query',
     '$list_critery')";
   display_debug_msg($query, $cdg_sql);
@@ -151,11 +154,12 @@ function run_query_update($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
-  $vis = $list["vis"];
+  $vis = ($list["vis"]==1)?1:0;
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
+  $mailing_ok = ($list["mailing_ok"]==1)?1:0;
   if (isset($list["criteria"])) {
     $list_critery = serialize($list["criteria"]);
   }
@@ -166,7 +170,8 @@ function run_query_update($list) {
     list_subject='$subject',
     list_email='$email',
     list_query='$list_query',
-    list_structure='$list_critery'
+    list_structure='$list_critery',
+    list_mailing_ok='$mailing_ok'
   where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -846,7 +851,8 @@ function make_query($list) {
   $query_kind = $list["query_kind"];
   $bollean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
-
+  
+  $mailing_ok = $list["mailing_ok"];
   
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -883,7 +889,6 @@ function make_query($list) {
     "contactcategory1link_category_id" => $common_equal,
     "contactcategory2link_category_id" => $common_equal,
     "contact_function_id" => $common_equal,
-    "contact_mailing_ok"  => $common_equal,
     "subscription_publication_id"  => $common_equal,
     "publication_lang"  => $pub_lang_like,
     "publication_year"  => $common_like,
@@ -997,11 +1002,14 @@ function make_query($list) {
 
 
   
-  
+  if($mailing_ok == 1) {
+    $where = " ($where) AND contact_mailing_ok = 1 ";
+  }	
   if ($where != "") {
     $where = " WHERE $where";
   }
   $query = "SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname";
+  echo $query;
   return trim(addslashes($query));
 }
 

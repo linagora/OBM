@@ -381,11 +381,11 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
-  global $l_visibility, $l_public, $l_private;
+  global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
   global $display, $perm, $menu, $action, $cright_write;
   global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_invalid_query;
-  global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
+  global $l_del_contact_sel, $nb_contact_added,$l_mailing, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -393,6 +393,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $timecreate = $list_q->f("timecreate");
   $timeupdate = $list_q->f("timeupdate");
   $lvis = ($list_q->f("list_visibility") == 0 ? $l_public : $l_private);
+  $dis_mailing = ($list_q->f("list_mailing_ok") == 0 ? $l_no : $l_yes);
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
@@ -425,6 +426,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       <td class=\"detailLabel\">$l_visibility</td>
       <td class=\"detailText\">$lvis</td>
     </tr><tr>
+    <td class=\"detailLabel\">$l_mailing</td>
+    <td class=\"detailText\">$dis_mailing</td>
+    </tr> <tr>
       <td class=\"detailLabel\">$l_subject</td>
       <td class=\"detailText\">$subject</td>
     </tr><tr>
@@ -560,7 +564,7 @@ function dis_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email, $l_query, $l_list, $l_private;
+  global $l_name, $l_subject, $l_email,$l_mailing, $l_query, $l_list, $l_private;
   global $l_expert_mode, $l_normal_mode;
   global $action, $display, $uid;  
 
@@ -574,7 +578,8 @@ function html_list_form($action, $list_q, $list) {
     $crit_q = $list_q->f("list_structure");
     $query = $list_q->f("list_query");
     $vis = ($list_q->f("list_visibility") == 0 ? "0" : "1");
-  }
+    $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
+      }
   
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
@@ -583,7 +588,8 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
-
+  if (isset($list["mailing_ok"])) { $mailing_ok = stripslashes($list["mailing_ok"]); }
+	
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
@@ -594,7 +600,7 @@ function html_list_form($action, $list_q, $list) {
     $dis_vis .= " /></td>
   </tr><tr>";
   }
-
+  if ($mailing_ok == 1) $dis_mailing .= "checked = \"checked\""; 
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
   if ($crit_q =="" && $query != "") {
@@ -624,6 +630,11 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailForm\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
   </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_mailing</td>
+    <td class=\"detailForm\">
+      <input type=\"checkbox\" $dis_mailing name=\"ch_mailing_ok\" size=\"30\" value=\"1\" /></td>
+  </tr>  
   </table>
   <div class=\"detailHead\">$l_query</div>  
     <table class=\"detail\">
@@ -659,7 +670,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
-  global $l_contact_cat2,$l_function,$l_cat,$l_mailing;
+  global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;
   global $l_update,$l_delete,$l_recept,$l_renew;
 
@@ -710,7 +721,6 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
       "kind_lang" => "sel",
-      "contact_mailing_ok"  => "tf",       
       "subscription_publication_id"  => "sel",
       "publication_lang"  => "tf",
       "publication_year"  => "tf",
@@ -738,7 +748,6 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
   $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
   $fields_label["kind_lang"] = "$l_contact: $l_lang"; 
-  $fields_label["contact_mailing_ok"] = "$l_contact: $l_mailing";  
   $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
   $fields_label["subscription_publication_id"] = "$l_publication: $l_title"; 
   $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
@@ -785,7 +794,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 	    $data = $field_data[$field];
 	    $data_q = $data[0];
 	    while($data_q->next_record()) {
-	      if ($value == $data_q->f($data[1])) {	
+	      if ("$value " == $data_q->f($data[1])." ") {
 	        $input .= "<option selected=\"selected\" value=\"$value\" $selected>".$data_q->f($data[2])."</option>";
 	      }
 	    }
@@ -995,7 +1004,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q){
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
-  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang,$l_mailing;
+  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
   global $l_none,$l_yes,$l_no;
   global $set_theme,$ico_mini_cal;  
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -1095,18 +1104,12 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   </tr>
   <tr> 
     <td class=\"detailLabel\">$l_lang</td>
-    <td class=\"detailLabel\">$l_mailing</td>
+    <td></td>
     <td></td>
   </tr> 
   <tr>  
     <td class=\"detailForm\"><select name=\"sel_kind_lang\">$sel_lag</select></td>    
-    <td class=\"detailForm\">
-    <select name=\"tf_contact_mailing_ok\">
-     <option value=\"\">$l_none</option>
-     <option value=\"1\">$l_yes</option>
-     <option value=\"0\">$l_no</option>
-    </select>
-    </td>
+    <td></td>
     <td></td>
   </tr>
 
