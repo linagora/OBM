@@ -45,7 +45,7 @@ require("time_js.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
-$project_managers = array( '6' , '7' , '8' ) ;
+$project_managers = array( '6' , '7' , '8','23' ) ;
 ///////////////////////////////////////////////////////////////////////////////
 
 $time = get_param_time();

@@ -542,11 +542,12 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
    echo "<br><input type=submit value=\"$l_add\">";
  } else {
    echo "<br><input type=hidden name=task_id value=\"$task_id\">
-         <input TYPE=submit value=\"$l_update\">";
+         <input TYPE=submit value=\"$l_update\">
+	<br>
+     <input type=submit value=\"$l_close\" onclick=\"window.close();\">";
  }     
  
- echo "<br>
-     <input type=submit value=\"$l_close\" onclick=\"window.close();\">
+ echo "
   </center>
     <input type=hidden name=user_id value=\"".$time["user_id"]."\">
     <input type=hidden name=param_begin value=\"".$time["date"]."\">
