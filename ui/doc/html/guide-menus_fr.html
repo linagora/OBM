@@ -1,0 +1,147 @@
+<HTML>
+<HEAD>
+<TITLE>Le menu OBM </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+<CENTER>
+<H1>Gestion du menu OBM</H1>
+Version 0.6.0
+</CENTER>
+
+<br>
+
+
+<H2>Présentation de la génration du menu : </H2>
+
+<p>
+ Le menu OBM à pour rôle proposer les diférentes fonctionnalités accessibles de l'application.
+ Jusqu'a la version 0.5.3 d'OBM, la génération du module était gérée au niveau du théme, dans <b>theme.inc</b>.
+Cette methode présentait cependant de nombreux problèmes de maintenabilité du code.
+<p>
+ Ainsi à partir de la version 0.6.0, une nouvelle methode de génération du menu à été mise en place, 
+facilitant l'ajout de nouveaus modules, et la modification de la structure du menu.
+<p>
+<table border=1>
+<tr>
+  <th colspan=2 align=center>Le Menu OBM</th>
+</tr><tr>
+  <td>Objectifs</td>
+  <td><ul>
+        <li>Faciliter la modification de la structure du menu.
+        <li>Faciliter l'ajout de modules et de sections.
+	<li>Rendre le code générique.
+      </ul>
+  </td>
+</tr><tr>
+  <td>variables utilisés</td>
+  <td><ul>
+        <li><b>$menus</b> (Variable contenant les paramètres des éléments du tableaux)
+        <li><b>$section</b> (Définit la section en cours)
+      </ul>
+  </td>
+</tr><tr>
+  <td>Fichiers concernés</td>
+  <td><ul>
+        <li><b>theme.inc</b> (fonction de génération du menu)
+        <li><b>global_?.inc</b> (Définition de la variable <b>$menus</b>)
+      </ul>
+  </td>
+</tr>
+</table>
+
+<H2>Principe de génération du menu : </H2>
+
+ Les éléments du menu sont stockés dans la variable <b>$menus</b> qui sera la seule partie du code
+à mettre à jour lors de l'ajout d'un module.
+<p>
+<br>  Voici la structure de cette variable :
+<p>
+<table width="10">
+<tr>
+  <td>$menus</td>
+  <td>["Section"]</td>
+  <td>["Name"]</td>
+  <td>&nbsp;</td>
+</tr><tr>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>["Url"]</td>
+  <td>&nbsp;</td>
+</tr><tr>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>["Module"]</td>
+  <td>["Name"]</td>
+</tr><tr>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>&nbsp;</td>
+  <td>["Url"]</td>
+</tr></table>
+<p>
+<table border=1>
+<tr>
+  <th colspan=2 align=center>Description de la variable <b>$menus</b></th>
+</tr><tr>
+  <td>$menus</td>
+  <td>Tableau contenant des sous tableaux indéxés par les noms des sections.</td>
+</tr><tr>
+  <td>$actions["Section"]</td>
+  <td>Tableau contenant des sous tableaux indéxés par les noms des paramètres de la gestion de la section <i>Section</i>.</td>
+</tr><tr>
+  <td>$actions["Section"]["Name"]</td>
+  <td>Cette variable contient le label de la section <i>Section</i>.</td>
+</tr><tr>
+  <td>$actions["Section"]["Url"]</td>
+  <td>Cette variable contient le chemin relatif pour accéder à la page d'accueil de la section <i>Section</i>.</td>
+</tr><tr>
+  <td>$actions["Section"]["Module"]</td>
+  <td>Tableau contenant des sous tableaux indéxés par les noms des paramètres de la gestion du module <i>Module</i> (à noter que le module   <i>Module</i> appartient à la section <i>Section</i>).
+  </td>
+</tr><tr>
+  <td nowrap>$action["Section"]["Module"]["Name"]</td>
+  <td>Cette variable contient le label du module <i>Module</i>.</td>
+</tr><tr>
+  <td nowrap>$action["Section"]["Module"]["Url"]</td>
+  <td>Cette variable contient le chemin relatif pour accéder à la page d'accueil du module <i>Module</i>.</td>
+</tr>
+</table>
+<p>
+
+La variable <b>$section</b> définit au niveau de chaque module (cf <a href="dev-guidelines.html#global_var">dev-guidelines.html</a>)
+La variable est definit au niveau du fichier <b>global.inc</b> de la manière qui suit :
+<br>
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+//////////////////////////////////////////////////////////////////////////////
+// Menu item defintion : Sections
+//////////////////////////////////////////////////////////////////////////////
+$menus["COM"]	=	{'Name'=> $l_com_label,
+			 'Url' => '$path/comany/company_index'};
+$menus["PROD"]	=	{'Name'=> $l_prod_label,
+			 'Url' => '$path/contact/contract_index'};
+//////////////////////////////////////////////////////////////////////////////
+// Menu item defintion : Modules
+//////////////////////////////////////////////////////////////////////////////
+if($section = "PROD") {
+$menus["PROD"]["CONTRACT"] = {'Name'=> $l_contract_label,
+			      'Url' => '$path/contract/contract_index'};
+$menus["PROD"]["INCIDENT"] = {'Name'=> $l_incident_label,
+			      'Url' => '$path/contract/incident_index'};
+}
+elseif($section = "COM") {
+$menus["COM"]["COMPANY"] = {'Name'=> $l_company_label,
+			    'Url' => '$path/comany/company_index'};
+$menus["COM"]["CONTACT"] = {'Name'=> $l_incident_label,
+			    'Url' => '$path/contact/contact_index'};
+}
+</pre>
+</td></tr>
+</table>
+
+<A HREF="index.html">back</A>
+
+</BODY>
+</HTML>
