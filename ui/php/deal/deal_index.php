@@ -78,46 +78,38 @@ if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0)
   $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
 }
 
-
 page_close();
 if($action == "") $action = "index";
 $deal = get_param_deal();
 get_deal_action();
 $perm->check();
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-display_head($l_deal);     // Head & Body
-
-if ($popup) {
-///////////////////////////////////////////////////////////////////////////////
-// External calls (main menu not displayed)                                  //
-///////////////////////////////////////////////////////////////////////////////
-  if ($action == "ext_get_id") {
-    require("deal_js.inc");
-    $deal_q = run_query_deal($comp_id);
-    html_select_deal($deal_q, stripslashes($title));
-  } elseif ($action == "ext_get_id_url") {
-    require("contract_js.inc");
-    $deak_q = run_query_deal($comp_id);
-    html_select_deal($deal_q, stripslashes($title), $url);
-  } else {
-    display_err_msg($l_error_permission);
-  }
-
-  display_end();
-  exit();
-}
-
-
-generate_menu($menu,$section);      // Menu
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
+if (! $popup) {
+  $display["header"] = generate_menu($menu,$section);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+if ($action == "ext_get_id") {
+///////////////////////////////////////////////////////////////////////////////
+  require("deal_js.inc");
+  $deal_q = run_query_deal($comp_id);
+  html_select_deal($deal_q, stripslashes($title));
+} elseif ($action == "ext_get_id_url") {
+///////////////////////////////////////////////////////////////////////////////
+  require("contract_js.inc");
+  $deak_q = run_query_deal($comp_id);
+  html_select_deal($deal_q, stripslashes($title), $url);
+}
+
 // when searching deals belonging to a parent, we display the parent
-if (($action == "search") && ($param_parent)) {
+elseif (($action == "search") && ($param_parent)) {
+///////////////////////////////////////////////////////////////////////////////
   $action = "parent_detailconsult";
 }
 
@@ -125,11 +117,11 @@ if (($action == "search") && ($param_parent)) {
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  dis_deal_index();
+  $display["search"] = dis_deal_index();
   if ($set_display == "yes") {
-    dis_deal_search_list($deal);
+    $display["detail"] = dis_deal_search_list($deal);
   } else {
-    display_info_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
  
 } elseif ($action == "search")  { // tester si hd_parent mis ??? pour form :oui
@@ -529,9 +521,12 @@ if (($action == "index") || ($action == "")) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["head"] = display_head($l_contact);
+$display["end"] = display_end();
+
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////

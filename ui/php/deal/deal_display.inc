@@ -131,9 +131,13 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_index($deal="") {
+  global $display;
+
   $usr_q = run_query_userobm();
-  html_parentdeal_search_form($deal, $usr_q);
-  html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
+  $block .= html_parentdeal_search_form($deal, $usr_q);
+  $block .= html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
+
+  return $block;
 }
 
 
@@ -184,7 +188,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   //TaskType select construction
   $sel_cat = "<select name=\"sel_cat\">
               <option value=\"$c_all\">$l_all</option>";
-  while($obm_q_cat->next_record()) {
+  while ($obm_q_cat->next_record()) {
     //put menu titles
     $id = $obm_q_cat->f("tasktype_id");
     $tt_label = $obm_q_cat->f("tasktype_label");
@@ -223,74 +227,54 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
+  <form method=\"get\" name=\"form_deal\"
+  onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
+  action=\"" . url_prepare("deal_index.php") . "\">
+  <div class=\"search\">
+    <div class=\"detailHead\">$l_deal</div>
+    <div class=\"searchLabel\">$l_label_start<br />
+      <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
+    </div>
+    <div class=\"searchLabel\">$l_company<br />
+      <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" />
+    </div>
+    <div class=\"searchLabel\">$l_zipcode<br />
+      <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
+    </div>
+    <div class=\"searchLabel\">$l_after<br />
+      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
+        value=\"$dateafter\" />
+    </div>
+    <div class=\"searchLabel\">$l_before<br />
+      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
+        value=\"$datebefore\" />
+    </div>
+    <div class=\"searchLabel\">$l_kind<br />
+      $sel_kind
+    </div>
+    <div class=\"searchLabel\">$l_category<br />
+      $sel_cat
+    </div>
+    <div class=\"searchLabel\">$l_state<br />
+      $sel_state
+    </div>
+    <div class=\"searchLabel\">$l_manager<br />
+      $sel_manager
+    </div>
+    <div class=\"searchLabel\">$l_show_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+    </div>
+    <div class=\"searchButton\">&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
+      <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </div>
+  </div>
+  </form>";
 
-    <form method=\"get\" name=\"form_deal\"
-    onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
-    action=\"" . url_prepare("deal_index.php") . "\">
-
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$l_deal</td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
-
-      <td>
-      <table class=\"detail\">
-      <tr>
-<!-- Label -->
-        <td class=\"textLabelForm\">$l_label_start<br />
-          <input name=\"tf_label\" size=\"16\" maxlength=\"128\"
-            value=\"$label\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_company<br />
-          <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\"
-            value=\"$name\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_zipcode<br />
-          <input name=\"tf_zip\" size=\"14\" value=\"$zip\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_after<br />
-          <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
-             value=\"$dateafter\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_before<br />
-          <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
-            value=\"$datebefore\" /></td>
-        <td>&nbsp;&nbsp;</td>
-      </tr>
-      </table>
-      <table class=\"detail\">     
-      <tr>
-<!-- Kind -->
-        <td class=\"textLabelForm\">$l_kind<br />
-          $sel_kind</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_category<br />
-          $sel_cat</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_state<br />
-          $sel_state</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_manager<br />
-          $sel_manager</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_show_archive<br />
-          <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
-        </td>
-      </tr>
-      </table>
-      </td>
-      <td> 
-       <input name=\"action\" type=\"hidden\" value=\"search\" />
-       <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
-       <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
-       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-
-     </tr>
-    </table>
-  </form>
-  <hr />";
+  return $block;
 }
 
 
@@ -328,31 +312,28 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<form method=\"get\" name=\"form_search_parentdeal\"
+  $block = "
+  <form method=\"get\" name=\"form_search_parentdeal\"
     action=\"" . url_prepare("deal_index.php") . "\">
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$l_parentdeal</td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_label_start<br />
-        <input type=\"text\" name=\"tf_plabel\" size=\"20\"
-          value=\"$plabel\" /></td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_manager<br />
-        $sel_pmanager</td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_show_archive<br />
-        <input type=\"checkbox\" name=\"cb_parchive\" value=\"1\" $parchive />
-      </td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
-      <td> 
+  <div class=\"search\">
+    <div class=\"detailHead\">$l_parentdeal</div>
+    <div class=\"searchLabel\">$l_label_start<br />
+      <input type=\"text\" name=\"tf_plabel\" size=\"20\" value=\"$plabel\" />
+    </div>
+    <div class=\"searchLabel\">$l_manager<br />
+      $sel_pmanager
+    </div>
+    <div class=\"searchLabel\">$l_show_archive<br />
+      <input type=\"checkbox\" name=\"cb_parchive\" value=\"1\" $parchive />
+    </div>
+    <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"parent_search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    </table>
-  </form>
-  <hr />  ";
+    </div>
+  </div>
+  </form>";
+
+  return $block;
 }
 
 

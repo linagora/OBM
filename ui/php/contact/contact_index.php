@@ -145,33 +145,34 @@ if ($action == "index" || $action == "") {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_insert($contact);
       if ($retour) {
-        $dislay["msg"] .= display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
-        $dislay["msg"] .= display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $dislay["search"] = html_contact_search_form($contact);
+      $display["search"] = html_contact_search_form($contact);
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
       $obm_q = check_contact_context("", $contact);
       if ($obm_q->num_rows() > 0) {
-        dis_contact_warn_insert("", $obm_q, $contact);
+	$display["title"] = display_title("$l_contact : $l_insert");
+        $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {
         $retour = run_query_insert($contact);
         if ($retour) {
-          $dislay["msg"] .= display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
-          $dislay["msg"] .= display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg($l_insert_error);
         }
-        html_contact_search_form($contact);
+        $display["search"] = html_contact_search_form($contact);
       }
     }
 
   // Form data are not valid
   } else {
-    $dislay["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $kind_q = run_query_kind();
-    html_contact_form($action, "", $kind_q, $contact);
+    $display["detail"] = html_contact_form($action, "", $kind_q, $contact);
   }
   
 } elseif ($action == "update")  {
@@ -179,54 +180,54 @@ if ($action == "index" || $action == "") {
   if (check_data_form("", $contact)) {
     $retour = run_query_update($contact);
     if ($retour) {
-      $dislay["msg"] .= display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      $dislay["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg($l_update_error);
     }
     $con_q = run_query_detail($param_contact);
-    display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("timecreate"),$con_q->f("timeupdate")); 	    
-    html_contact_consult($con_q);
+    $display["detailInfo"] = display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("timecreate"),$con_q->f("timeupdate")); 	    
+    $display["detail"] = html_contact_consult($con_q);
   } else {
-    $dislay["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
     $kind_q = run_query_kind();
-    html_contact_form($action, "", $kind_q, $contact);
+    $display["detail"] = html_contact_form($action, "", $kind_q, $contact);
   }
   
 } elseif ($action == "check_delete")  {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   require("contact_js.inc");
-  dis_check_links($param_contact);
+  $display["detail"] = dis_check_links($param_contact);
   
 } elseif ($action == "delete")  {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($param_contact);
   if ($retour) {
-    $dislay["msg"] .= display_ok_msg($l_delete_ok);
+    $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
-    $dislay["msg"] .= display_err_msg($l_delete_error);
+    $display["msg"] .= display_err_msg($l_delete_error);
   }
-  html_contact_search_form($contact);
+  $display["search"] = html_contact_search_form($contact);
     
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-   $dislay["msg"] .= display_err_msg("Nothing admin here for now.");
+   $display["msg"] .= display_err_msg("Nothing admin here for now.");
    
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "contact", 1);
-  dis_contact_display_pref($pref_q); 
+  $display["detail"] = dis_contact_display_pref($pref_q); 
   
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "contact", 1);
-  dis_contact_display_pref($pref_q);
+  $display["detail"] = dis_contact_display_pref($pref_q);
   
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);
-  dis_contact_display_pref($pref_q);
+  $display["detail"] = dis_contact_display_pref($pref_q);
 }
 
 

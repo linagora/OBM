@@ -15,6 +15,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 function display_page(&$display) {
 
+  // If header is null, display only the detail (Popup windows)
+  if ($display["header"] == "") {
+    echo $display["head"] . "
+      <div class=\"detailpanelalone\">" .
+      $display["detail"] . "
+      </div>" .
+      $display["end"];
+    return;
+  }
+
   if (($display["link"] != "") || ($display["detailInfo"] != "")) {
     $right_panel = true;
   } else {
@@ -24,7 +34,6 @@ function display_page(&$display) {
   echo $display["head"] . $display["header"] . "
 
     <!-- left panel -->  <div class=\"leftpanel\">" .
-      $display["last"] . "<p>" .
       $display["last"] . "
     <!-- left panel end --> </div>
 

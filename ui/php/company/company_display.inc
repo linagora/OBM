@@ -525,6 +525,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
+
   $block = "
     <form method=\"post\" name=\"f_mod_societe\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
@@ -634,7 +635,7 @@ function dis_check_links($p_id) {
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
       $display_linkc .= "
       <tr>
-        <td class=\"detailText\">
+        <td class=\"detailLabel\">
         <a class=\"detail\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
         </td>
       </tr>";
@@ -680,29 +681,23 @@ function dis_check_links($p_id) {
 
   $block .= "<table class=\"detail\">
    $display_linkc
-   $display_linkd";
+   $display_linkd
+   </table>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_can_delete);
     $block .= "
-      <tr>
-        <td>
-          <table>
-          <tr>
-            <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
-            <td class=\"detailHead\">$dis_back</td>
-          </tr>
-          </table>
-        </td>
-      </tr>";
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_cant_delete);
     $block .= "
-      <tr>
-        <td class=\"detailHead\">$dis_back</td>
-      </tr>";
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   }
-  $block .= "</table>";
 
   return $block;
 }
@@ -1212,7 +1207,7 @@ function html_select_company($comp_q, $title, $url="") {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
   <table class=\"detail\">
     <tr>
       <td class=\"detailHead\">
@@ -1230,6 +1225,8 @@ function html_select_company($comp_q, $title, $url="") {
 
   <a href=\"\" onclick='window.close();'>$l_close</a>
     ";
+
+  return $block;
 }
 
 

@@ -600,7 +600,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a contact insertion or update                   //
+// Display: context about a contact insertion or update                      //
 // When similar contacts exist we show these and ask confirmation
 // Parameters:
 //   - $cid       : contact id
@@ -608,7 +608,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 //   - $contact[] : values for insertion/update (if confirmation)
 //     keys used  : company_id, kind, lname, fname ad1, ad2, zip, town, cdx
 //                : ctry, func, phone, hphone, mphone, fax, email, com, vis
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
   global $c_yes, $c_no;
@@ -643,7 +643,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $company = $co_q->f("company_name");
     $disp_same_cont .= "
       <tr>
-        <td colspan =\"2\" class=\"detailText\">
+        <td colspan =\"2\" class=\"detailLabel\">
           <a class=\"detail\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
           $samename ($company)</a>
         </td>
@@ -653,10 +653,13 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $block = "
     <table class=\"detail\">
     $disp_same_cont
-    <tr><td>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">
     <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
     action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -682,7 +685,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
-    </td><td>
+    </p>
+    <p class=\"detailButtons\">
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
@@ -707,8 +711,10 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
-    </td></tr>
-    </table>";
+    </p>
+    </div>";
+
+  return $block;
 }
 
 
@@ -720,7 +726,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_list, $l_link_list_no;
-  global $path;
+  global $path, $display;
 
   $delete_ok = true;
 
@@ -735,7 +741,7 @@ function dis_check_links($p_id) {
       $dlabel = $obm_q->f("deal_label");
       $display_link_d .= "
       <tr>
-        <td class=\"detailText\">
+        <td class=\"detailLabel\">
           <a class=\"detail\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
           $dlabel</a>
         </td>
@@ -755,7 +761,7 @@ function dis_check_links($p_id) {
       $lname = $obm_q->f("list_name");
       $display_link_l .= "
         <tr>
-          <td class=\"detailText\">
+          <td class=\"detailLabel\">
             <a class=\"detail\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
             $lname</a>
           </td>
@@ -765,28 +771,35 @@ function dis_check_links($p_id) {
     $display_link_l = "<tr><td class=\"detailHead\">$l_link_list_no</td></tr>";
   }
 
+
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+     action=\"".url_prepare("contact_index.php") ."\">
+     <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
+     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
+     <input type=\"submit\" value=\"$l_back\" />
+     </form>";
+
+  $block .= "<table class=\"detail\">
+    $display_link_d
+    $display_link_l
+    </table>";
+
   if ($delete_ok == true) {
-    display_ok_msg($l_can_delete);
-    echo "<table class=\"detail\"><tr>
-          <td class=\"detailHead\">";
-    dis_delete_form($p_id);
-    echo "</td></tr>";
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   } else {
-    display_warn_msg($l_cant_delete);
-    echo "<table class=\"detail\">";
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   }
 
-  // --- HTML Template --------------------------------------------------------
-  echo "
-   $display_link_d
-   $display_link_l
-   <tr><td class=\"detailHead\">
-   <form name=\"form_back\" method=\"post\"
-   action=\"".url_prepare("contact_index.php") ."\">
-   <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
-   <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
-   <input type=\"submit\" value=\"$l_back\" />
-   </form></td></tr></table>";
+  return $block;
 }
 
 
@@ -799,14 +812,13 @@ function dis_delete_form($p_id) {
   global $l_delete;
 
   // --- HTML Template --------------------------------------------------------
-  echo "\n<form name=\"form_delete\" " .
-      "method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
+  return "
+    <form name=\"form_delete\" method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
-  </form>\n";
-
+  </form>";
 }
 
 
@@ -825,8 +837,9 @@ function dis_contact_display_pref($display_pref_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  $dis_pref->display();
+  $block = $dis_pref->display();
 
+  return $block;
 }
 
 

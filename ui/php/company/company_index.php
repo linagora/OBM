@@ -54,41 +54,37 @@ if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
   $last_company = $last_company_default;
 } else if ( ($param_company > 0 ) && ($last_company != $param_company) ) {
   $last_company = $param_company;
-  run_query_set_user_pref($auth->auth["uid"],"last_company",$param_company);
+  run_query_set_user_pref($auth->auth["uid"],"last_company", $param_company);
   $last_company_name = run_query_global_company_name($last_company);
 }
 
 page_close();
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
 $perm->check();
 
-if ($popup) {
-///////////////////////////////////////////////////////////////////////////////
-// External calls (main menu not displayed)                                  //
-///////////////////////////////////////////////////////////////////////////////
-  if ($action == "ext_get_id") {
-    require("company_js.inc");
-    $comp_q = run_query_active_company();
-    html_select_company($comp_q, $company["title"]);
-  } elseif ($action == "ext_get_id_url") {
-    require("company_js.inc");
-    $comp_q = run_query_active_company();
-    html_select_company($comp_q, $company["title"], $company["url"]);
-  } else {
-    display_err_msg($l_error_permission);
-  }
-  display_end();
-  exit();
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-$display["header"] = generate_menu($menu, $section); // Menu
 
-if ($action == "index" || $action == "") {
+if (! $popup) {
+  $display["header"] = generate_menu($menu, $section); // Menu
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+if ($action == "ext_get_id") {
+  require("company_js.inc");
+  $comp_q = run_query_active_company();
+  $display["detail"] = html_select_company($comp_q, $company["title"]);
+} elseif ($action == "ext_get_id_url") {
+  require("company_js.inc");
+  $comp_q = run_query_active_company();
+  $display["detail"] = html_select_company($comp_q, $company["title"], $company["url"]);
+
+} elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
