@@ -134,3 +134,4 @@ $ico_update = "modify.png";
 //Portal Icons 
 
 $ico_agenda_portal = "ico_portal_agenda.gif";
+$ico_time_portal = "ico_portal_time.gif";

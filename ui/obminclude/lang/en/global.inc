@@ -85,6 +85,7 @@ $l_monthsofyear = array ('January','February', 'March','April','May','June',
 $l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
 			      'aug','sep','oct','nov','dec');
 
+$l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
 $l_invalid_perm = "Invalid permissions.";
 
 ////////////////////////////////////////////////////////
@@ -190,3 +191,9 @@ $l_header_globalview = "Validation";
 //document headers
 $l_document_new = "New document";
 $l_document_add = "Affect a document";
+
+//Portal labels
+$l_waiting_events = "Wainting events";
+$l_unfilled = "Days unfilled";
+$l_youre_agenda = "Your calendar";
+$l_youre_time = "Your time management";

@@ -29,7 +29,7 @@ $cgp_mailing_default = true;
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
-$cgp_show["section"]["prod"] = false;
+//$cgp_show["section"]["prod"] = false;
 $cgp_show["section"]["compta"] = false;
 $cgp_show["section"]["aliamin"] = false;
 

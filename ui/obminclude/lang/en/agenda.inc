@@ -120,7 +120,6 @@ $l_daysofweekshort = array (	'Sun',
 				'Fri',
 				'Sat');
 
-$l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
 
 // Messages
 $l_sendamail = "Force the notification by mail.";

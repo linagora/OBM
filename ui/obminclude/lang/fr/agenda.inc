@@ -149,7 +149,6 @@ $l_daysofweekshort = array (	'Dim',
 				'Ven',
 				'Sam');
 
-$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 
 
 $l_short_monday = "Lun";

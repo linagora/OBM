@@ -88,6 +88,7 @@ $l_monthsofyear = array (	'Janvier','Février',
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
 			      'juil','aoû','sep','oct','nov','déc');
 			      
+$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 $l_invalid_perm = "Vous n'avez pas les permissions pour éxecuter cette action";
 
 ////////////////////////////////////////////////////////
@@ -192,3 +193,13 @@ $l_header_globalview = "Validation";
 //document headers
 $l_document_new = "Nouveau document";
 $l_document_add = "Affecter un document";
+
+////////////////////////////////////////////////////////
+////// Theme 'Yours' lang files ////////////////////////
+////////////////////////////////////////////////////////
+
+$l_waiting_events = "Evémenements en attente";
+$l_unfilled = "Jours non remplis";
+$l_youre_agenda = "Votre agenda";
+$l_youre_time = "Votre gestion du temps";
+
