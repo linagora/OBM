@@ -198,7 +198,7 @@ $l_document_add = "Affecter un document";
 ////// Theme 'Yours' lang files ////////////////////////
 ////////////////////////////////////////////////////////
 
-$l_waiting_events = "Evémenements en attente";
+$l_waiting_events = "Evémenement(s) en attente";
 $l_unfilled = "Jours non remplis";
 $l_youre_agenda = "Votre agenda";
 $l_youre_time = "Votre gestion du temps";
