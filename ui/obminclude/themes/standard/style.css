@@ -109,6 +109,7 @@ p			{
 	font-weight: bold;
 	float: right;
 	margin: 5px;
+	margin-bottom:	-4px;
 }
 
 .header ul	{
@@ -133,7 +134,11 @@ p			{
 	vertical-align: bottom;
 }
 
-
+.header .entries {
+  	float: 			left;
+	position: 		relative;
+	clear:			right;
+}
 /* ------------------------------------------------------------------------- */
 /* section */
 /* ------------------------------------------------------------------------- */
@@ -171,18 +176,11 @@ p			{
 /* ------------------------------------------------------------------------- */
 /* menu */
 /* ------------------------------------------------------------------------- */
-
 .header .menu	{
   	clear:			left;
 	padding:		0px;
 	font-family: 		arial,sans-serif;
-	/* IE Put a margin between section and menu... don't know why..
-	if anyone have an issue mail me at mehdi.rande@aliacom.fr
-	So here we use the special css dirty hack pattern no to let IE
-	read the rest of this css tag...*/
-	voice-family: 		"\"}\"";
-  	voice-family:		inherit;
-	margin-top:		0px;
+	margin-right:		10px;
 		
 }
 

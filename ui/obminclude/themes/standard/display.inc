@@ -146,7 +146,7 @@ function generate_menu($menu, $section) {
 <li><img src='/images/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>Logout</a></li>
 </ul>
 <!-- Fin Login -->
-<div style=\"float:left\">
+<div class=\"entries\">
 <!-- Onglets -->
 " . $display["section"] ."" . $display["menu"] ."
 <!-- Fin Menu -->
