@@ -1132,14 +1132,20 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	  $current_event[$current_time][$db_customer_id] = -1;
 	}	
 	$event_data[$db_id]["end"] = substr($db_date,8,2).":".substr($db_date,10,2);      }
-      else{
-	$current_event[$past_time][$db_customer_id][] = $db_id;
-	$current_event[$current_time][$db_customer_id][] = $db_id;
-       	$status = $event_data[$db_id]["status"] + 1;
-      	$event_data[$db_id] = 
-	array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status);
-
-      }	
+	else{
+	  if(!is_array($current_event[$current_time][$db_customer_id])) {
+	    $current_event[$current_time][$db_customer_id] = array();
+	  }
+  	  if(!is_array($past_time[$current_time][$db_customer_id])) {
+	    $current_event[$current_time][$db_customer_id] = array();
+  	  }	  
+  	  $current_event[$past_time][$db_customer_id][] = $db_id;
+  	  $current_event[$current_time][$db_customer_id][] = $db_id;
+	  $status = $event_data[$db_id]["status"] + 1;
+	  $event_data[$db_id] = 
+  	  array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status);
+	  
+      	}	
       $obm_q->next_record(); 
       $db_date = $obm_q->f("calendarsegment_date");
       $db_customer_id = $obm_q->f("calendarsegment_customerid");
@@ -1152,6 +1158,9 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
  
     while($db_date == $current_time) {
       if($db_flag == "begin") {
+	if(!is_array($current_event[$current_time][$db_customer_id])) {
+  	  $current_event[$current_time][$db_customer_id] = array();
+	}
 	$current_event[$current_time][$db_customer_id][] = $db_id;
 	$status = $event_data[$db_id]["status"] + 1;
 	$event_data[$db_id] = 
