@@ -341,7 +341,6 @@ function dis_contact_consult($contact) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
   if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
-    $display["link"] = html_contact_links($id);
     $display["detailInfo"] = display_record_info($con_q);
     if($view != "") {
       $block .= html_contact_header($con_q);
