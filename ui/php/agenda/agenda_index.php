@@ -297,7 +297,7 @@ elseif ($action == "detailconsult") {
     $eve_q = run_query_detail($param_event,$agenda["date"]);
     $cust_q = run_query_event_customers($param_event,$agenda["date"]);
     $obm_q_grp = run_query_event_groups($param_event,$agenda["date"]);
-    $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("timecreate"),$eve_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($eve_q);
     $display["detail"] = html_calendar_consult($eve_q, $cust_q,$obm_q_grp);
   }
 }
@@ -312,7 +312,7 @@ if ($param_event > 0) {
   $cat_event = run_query_get_eventcategories();
   $eve_q = run_query_detail($param_event,$agenda["date"]);  
   $p_user_array = run_query_event_customers_array($param_event,$agenda["date"]);
-  $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
+  $display["detailInfo"] = display_record_info($eve_q);
   $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm,$grp_obm, $cat_event, $p_user_array);
   }
 }

@@ -50,7 +50,7 @@ if ($action == "ext_get_path") {
   $mime_q = run_query_documentmime();    
   $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,$document);
   if ($set_display == "yes") {
-    $display["result"] = dis_user_search_list($document);
+    $display["result"] = dis_document_search_list($document);
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }

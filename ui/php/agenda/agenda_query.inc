@@ -891,9 +891,9 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   }
   if(is_array($groups)) {
     foreach($groups as $group_id) {
-      $user_group_array = run_query_get_groupsusers($group_id);
+      $user_group_array = array_merge($user_group_array,run_query_get_groupsusers($group_id));
     }
-    $contacts_array .= $user_group_array;
+    $contacts_array = array_merge($contacts_array,$user_group_array);
     $contacts_array = array_unique($contacts_array);
   }
   
