@@ -152,6 +152,7 @@ $l_header_find = "Chercher";
 $l_header_global_export = "Export";
 $l_header_export = "Exporter";
 $l_header_display = "Affichage";
+$l_header_vcard = "Vcard";
 $l_header_consult = "Consulter";
 $l_header_quickupdate = "Maj rapide";
 $l_header_update = "Modifier";
