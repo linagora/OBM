@@ -1371,8 +1371,8 @@ function run_query_conflict_events($start,$end,$contacts_array,$event_id) {
 	      WHERE calendarevent_category_id = calendarcategory_id
 	      AND calendarevent_id = calendaruser_event_id
 	      AND calendaruser_state = 'A'
-	      AND $calendarevent_date >= $start - calendarevent_duration
-	      AND $calendarevent_date <= $end 
+	      AND $calendarevent_date > $start - calendarevent_duration
+	      AND $calendarevent_date < $end 
             ";	
   if(is_array($contacts_array) && (count($contacts_array)>0) ) {
     $query .= " AND calendaruser_user_id IN (";
