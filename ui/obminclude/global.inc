@@ -472,6 +472,10 @@ function debug_level_isset($debug) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Format a date according to user preference                                //
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   date formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
 function date_format($timestamp="") {
   global $set_date_default, $set_date;
@@ -489,6 +493,10 @@ function date_format($timestamp="") {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Iso Format a date                                                         //
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   datetime formated iso
 ///////////////////////////////////////////////////////////////////////////////
 function isodate_format($timestamp="") {
   global $c_php_isodate_format;
@@ -504,6 +512,10 @@ function isodate_format($timestamp="") {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Format a date-time according to user preference                           //
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
 function datetime_format($timestamp="") {
   global $set_date_default, $set_date;
@@ -519,6 +531,24 @@ function datetime_format($timestamp="") {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Return hour portion of a datetime                                         //
+// Parameters:
+//   - $timestamp : Unix timestamp
+// Returns:
+//   hour (0-23)
+///////////////////////////////////////////////////////////////////////////////
+function get_hour($timestamp="") {
+
+  if ($timestamp != "")
+    $date = date("H", $timestamp);
+  else
+    $date = date("H");
+
+  return $date;
+}
+
+
 //////////////////////////////////
 //
 ///////////////////////////////////
@@ -528,8 +558,10 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
   $query_created = "select userobm_login from UserObm where userobm_id=".$p_usercreate_id;
   $query_modified = "select userobm_login from UserObm where userobm_id=".$p_userupdate_id;
 
-  echo "<table class=\"recordInfo\">";
-  echo "<tr><td class=\"recordInfo\">";
+  echo "
+    <table class=\"recordInfo\">
+    <tr>
+      <td class=\"recordInfo\">";
   if ($p_usercreate_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();

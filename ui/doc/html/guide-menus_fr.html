@@ -1,27 +1,30 @@
-<HTML>
-<HEAD>
-<TITLE>Le menu OBM </TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
-<CENTER>
-<H1>Gestion du menu OBM</H1>
+<html>
+<head>
+<title>Le menu OBM </title>
+</head>
+<body bgcolor="#FFFFFF">
+<a href="javascript:back();">back</a>
+
+
+<center>
+<h1>Gestion du menu OBM</h1>
 Version 0.6.0
-</CENTER>
+</center>
 
-<br>
+<br />
 
 
-<H2>Présentation de la génration du menu : </H2>
+<h2>Présentation de la génration du menu</h2>
 
 <p>
- Le menu OBM à pour rôle proposer les diférentes fonctionnalités accessibles de l'application.
- Jusqu'a la version 0.5.3 d'OBM, la génération du module était gérée au niveau du théme, dans <b>theme.inc</b>.
-Cette methode présentait cependant de nombreux problèmes de maintenabilité du code.
+ Le menu OBM à pour rôle proposer les différentes fonctionnalités accessibles de l'application.
+ Jusqu'à la version 0.5.3 d'OBM, la génération du menu était gérée au niveau du thème, dans <b>theme.inc</b>.
+Cette methode présentait cependant de nombreux problèmes de maintenabilité du code et nécessitait l'intervention dans chaque thème lors de l'ajout d'un item à un menu.
 <p>
  Ainsi à partir de la version 0.6.0, une nouvelle methode de génération du menu à été mise en place, 
 facilitant l'ajout de nouveaus modules, et la modification de la structure du menu.
 <p>
-<table border=1>
+<table border="1">
 <tr>
   <th colspan=2 align=center>Le Menu OBM</th>
 </tr><tr>
@@ -141,7 +144,7 @@ $menus["COM"]["CONTACT"] = {'Name'=> $l_incident_label,
 </td></tr>
 </table>
 
-<A HREF="index.html">back</A>
+<a href="javascript:back();">back</a>
 
-</BODY>
-</HTML>
+</body>
+</html>

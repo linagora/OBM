@@ -20,6 +20,7 @@ function generate_menu($menu) {
   global $popup_width, $popup_height;
   global $auth, $sess, $obm_version; 
   global $l_deal_select_company, $l_select_company;
+
   if ($menu == "")
     $path = "";
   else 
@@ -42,11 +43,11 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
 </style>
 " ;
   */
-  $lang_file = "$obminclude/lang/$set_lang/header.inc";
+  $lang_file = "$obminclude/lang/$set_lang/global.inc";
   if (file_exists($path."../".$lang_file)) {
     include ($lang_file);
   } else {
-    include ("$obminclude/lang/$set_lang_default/header.inc");
+    include ("$obminclude/lang/$set_lang_default/global.inc");
   }
 
   $theme_file = "$obminclude/themes/$set_theme/theme.inc";

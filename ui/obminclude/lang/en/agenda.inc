@@ -2,85 +2,127 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : agenda.inc                                               //
-// 2001-06-28 by Francois Bloque                                             //
+// 2002-01-06 by Pierre Baudracco                                            //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-$l_users = "Contacts";
-$l_groups = "Groupes";
-$l_title = "Titre";
-$l_priority = "Priorit&eacute;";
-$l_private = "Priv&eacute;";
+$l_agenda = "Calendar";
+$l_users = "Users";
+$l_groups = "Groups";
+$l_title = "Title";
+$l_priority = "Priority";
+$l_private = "Private";
 $l_public  = "Public";
-$l_category = "Cat&eacute;gorie";
+$l_category = "Catégory";
 $l_description = "Description";
-$l_state = "Etat";
-$l_none = "aucune";
+$l_state = "Status";
 
-$l_high = "Haute";
-$l_low = "Basse";
-$l_medium = "Normale";
+$l_high = "High";
+$l_low = "Low";
+$l_medium = "Medium";
 
-$l_datebegin = "Date de d&eacute;but";
-$l_dateend = "Date de fin";
-$l_timebegin = "Heure de d&eacute;but";
-$l_timeend = "Heure de fin";
-$l_occupied_day = "Journ&eacute;e entiere";
+$l_datebegin = "Begin date";
+$l_dateend = "End date";
+$l_timebegin = "Begin time";
+$l_timeend = "End time";
+$l_occupied_day = "Whole day";
 
+$l_format = "(AAAA-MM-JJ)";
 $l_repeat = "REPETITION";
-$l_periodicity = "Fr&eacute;quence";
-$l_repeatkind = "Type de r&eacute;p&eacute;tition";
-$l_repeatdays = "Jours de r&eacute;p&eacute;tition (type hebdomadaire)";
-$l_use_endrepeat = "Date de fin de r&eacute;p&eacute;tition";
-$l_interval = "Intervalle ";
+$l_periodicity = "Frequency";
+$l_repeatkind = "Frequency type";
+$l_repeatdays = "Repetition days (weekly type)";
+$l_use_endrepeat = "End repetition date";
 
-$l_waiting_events = "Rendez-vous en attente";
+$l_waiting_events = "Waiting events";
+$l_user_calendar = "Multi-user view";
 
-$l_accepted = "Accept&eacute;";
-$l_rejected = "Rejet&eacute;";
-$l_waiting  = "En attente de confirmation";
+$l_accepted = "Accept";
+$l_rejected = "Reject";
+$l_waiting  = "Waiting for confirmation";
 $l_short_accepted = "A";
 $l_short_rejected = "R";
-$l_short_waiting  = "Att";
+$l_short_waiting  = "Wait";
+$l_wait = "Waiting";
 
-$l_daily = "quotidienne";
-$l_weekly = "hebdomadaire";
-$l_monthlybydate = "mensuelle (date)";
-$l_monthlybyday = "mensuelle(jour)";
-$l_yearly = "annuelle";
+$l_daily = "daily";
+$l_weekly = "weekly";
+$l_monthlybydate = "monthly (date)";
+$l_monthlybyday = "monthly (day)";
+$l_yearly = "yearly";
 
-$l_from = "du";
-$l_to = "au";
+$l_from = "from";
+$l_to = "to";
 
+$l_conflicts = "Conflit(s) found";
+$l_date = "Date";
+$l_user = "User";
 
 // actions 
-$l_insert = "Enregistrer le rdv";
-$l_update = "Modifier le rdv";
-$l_delete = "Supprimer le rdv";
-$l_delete_all = "Supprimer tous";
-$l_validate = "Valider";
-$l_accept = "Accepter";
-$l_reject = "Refuser";
-$l_select = "S&eacute;lectionner";
+$l_insert = "Insert the event";
+$l_update = "Update the event";
+$l_accept = "Accept";
+$l_reject = "Refuse";
+$l_select = "Select";
+$l_repeat_update = "Update repetitions";
+$l_go_to = "Go to";
+$l_refuse = "Refuse";
+$l_change_state = "Your event participation";
+$l_force_all = "Force all";
+$l_replace_all = "Replace all";
+$l_cancel_all = "Cancel all";
+$l_force_event = "Force";
+$l_cancel_event = "Cancel";
+$l_replace_event = "Replace";
 
-// Messages 
+$l_force = "Force the event insertion";
+$l_carac = "Caracteristics";
+
+$l_insert_ok = "Insertion successful";
+$l_update_ok = "Update successful";
+$l_update_warning = "Warning : some conflicts have been detected";
+$l_insert_warning = "Warning : some conflicts have been detected";
+$l_update_error = "Conflicts have been detected, update cancelled";
+$l_insert_error = "Conflicts have been detected, insertion cancelled";
+
+
+$l_daysofweek = array (	'Sunday',
+			'Monday',
+			'Tuesday',
+			'Wednesday',
+			'Thursday',
+			'Friday',
+			'Saturday');
+
+$l_daysofweekshort = array (	'Sun',
+				'Mon',
+				'Tue',
+				'Wed',
+				'Thu',
+				'Fri',
+				'Sat');
+
+$l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
+
+$l_monthsofyear = array ('January','February', 'March','April','May','June',
+                         'July','August','September','October','November',
+			 'December');
+$l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
+			      'aug','sep','oct','nov','dec');
+
+// Messages
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
-$l_event_insert_ok = "L'enregistrement du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;";
-$l_event_insert_error = "L'enregistrement du rendez-vous a &eacute;chou&eacute;";
-$l_event_update_ok = "La modification du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;e";
-$l_event_update_error = "La modification du rendez-vous a &eacute;chou&eacute;";
-$l_event_delete_ok = "La suppression du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;e";
-$l_event_delete_error = "La suppression du rendez-vous a &eacute;chou&eacute;";
-$l_event_delete_all_ok = "La suppression du rendez-vous et de toutes ses r&eacute;p&eacute;titions a &eacute;t&eacute; correctement effectu&eacute;e"; 
-$l_event_delete_all_error = "La suppression du rendez-vous et de toutes ses r&eacute;p&eacute;titions a &eacute;chou&eacute;";
-$l_event_approve_ok = "Vos choix ont &eacute;t&eacute; enregistr&eacute;s";
-$l_event_approve_error = "L'enregistrement de vos choix a &eacute;chou&eacute;";
-$l_event_update_cancel_ok = "La modification du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
-$l_event_insert_cancel_ok = "L'insertion du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
 $l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
+$l_fill_title = "You have to fill the [ $l_title ] field";
+$l_fill_dateend = "You have to fill the [ $l_dateend ] field";
+$l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
+$l_err_datebegin = "[ $l_datebegin ] format incorrect !";
+$l_err_dateend = "[ $l_dateend ] format incorrect !";
+$l_err_repeat = "[ $l_use_endrepeat ] format incorrect !";
+$l_err_begin_end = "End date must be after begin date !";
+$l_err_end_repeat = "Repetion end must be after end date";
 
 $l_short_december="Dec";
 

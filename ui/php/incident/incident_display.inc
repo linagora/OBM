@@ -12,26 +12,26 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["incident_state"] = $l_incident_status;
-$fieldnames["incident_label"] = $l_incident_label;
-$fieldnames["incident_priority"] = $l_incident_priority;
-$fieldnames["incident_date"] = $l_incident_date;
+$fieldnames["incident_state"] = $l_status;
+$fieldnames["incident_label"] = $l_label;
+$fieldnames["incident_priority"] = $l_priority;
+$fieldnames["incident_date"] = $l_date;
 // Calculate fields
-$fieldnames["timeupdate"] = $l_incident_lastupdate;
-$fieldnames["incident_owner_lastname"] = $l_incident_owner;
-$fieldnames["incident_logger_lastname"] = $l_incident_logger;
-$fieldnames["incident_company_name"] = $l_incident_company;
+$fieldnames["timeupdate"] = $l_lastupdate;
+$fieldnames["incident_owner_lastname"] = $l_owner;
+$fieldnames["incident_logger_lastname"] = $l_logger;
+$fieldnames["incident_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Incident search Form                                              //
 // Parameters:
 //   - $usr_q      : DB result object (userobm list)
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_form ($usr_q, $incident) {
-  global $l_incident_label,$l_contract_label,$l_incident_priority,$l_incident_status, $l_find,$l_incident_owner;
+  global $l_label,$l_contract,$l_priority,$l_status, $l_find,$l_owner;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$c_all,$l_all;
   global $l_date_after,$l_date_before,$l_archive;
 
@@ -101,9 +101,9 @@ function html_incident_search_form ($usr_q, $incident) {
       <tr><td>
        <table>
         <tr>
-         <td class=\"textLabelForm\">$l_incident_label</td>
+         <td class=\"textLabelForm\">$l_label</td>
          <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_contract_label</td>
+         <td class=\"textLabelForm\">$l_contract</td>
          <td>&nbsp;&nbsp;</td>
          <td class=\"textLabelForm\">$l_archive</td>
          <td>&nbsp;&nbsp;</td>
@@ -127,11 +127,11 @@ function html_incident_search_form ($usr_q, $incident) {
       <td>
        <table class=\"details\">     	
         <tr>
-         <td class=\"textLabelForm\">$l_incident_priority</td>
+         <td class=\"textLabelForm\">$l_priority</td>
          <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_incident_status</td>
+         <td class=\"textLabelForm\">$l_status</td>
          <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_incident_owner</td>
+         <td class=\"textLabelForm\">$l_owner</td>
         </tr><tr>
          <td class=\"textLabelForm\">$dis_sel_prio</td>
          <td>&nbsp;&nbsp;</td>
@@ -185,7 +185,7 @@ function dis_incident_search_list($incident) {
 //     keys used    : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
-  global $set_theme, $l_found, $l_no_found;
+  global $l_found, $l_no_found;
 
   $lincident = $incident["lincident"];
   $lcontract = $incident["lcontract"];
@@ -214,6 +214,145 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Incident Consult                                                  //
+// Parameters:
+//   - $inc_q : DBO : incident result
+//   - $con_q : DBO : contract result
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_consult($inc_q,$con_q) {
+  // -- Themes
+  global $set_theme,$ico_contract,$ico_company;
+  // - Labels
+  global $l_incident, $l_label, $l_status, $l_company, $l_num;
+  global $l_logger, $l_owner, $l_priority;
+  global $l_duration, $l_description,$l_solution,$l_date, $l_to, $l_from;
+  global $l_from,$l_manager,$l_client_manager,$l_archive_consult,$l_contract;
+  global $path;
+
+  $label = $inc_q->f("incident_label");
+  $pri = $inc_q->f("incident_priority");
+  $state = $inc_q->f("incident_state");
+  $date = datetime_format($inc_q->f("date"));
+  $inc_id = $inc_q->f("incident_id");
+  $inc_desc = nl2br($inc_q->f("incident_description"));
+  $inc_dur = nl2br($inc_q->f("incident_duration"));
+  $inc_reso = nl2br($inc_q->f("incident_resolution"));
+  $con_id = $con_q->f("contract_id");
+  $comp_id = $con_q->f("contract_company_id");
+  $con_label = $con_q->f("contract_label");
+  $con_num = $con_q->f("contract_numero");
+  $con_debut = $con_q->f("contract_datebegin");
+  $con_exp = $con_q->f("contract_dateexp");
+  $tech = $con_q->f("contract_techmanager_id");
+  $market = $con_q->f("contract_marketmanager_id");
+  $comp_name = $con_q->f("company_name");
+  $comp_ad1 = $con_q->f("company_address1");
+  $comp_zip = $con_q->f("company_zipcode");
+  $comp_town = $con_q->f("company_town");
+
+  $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
+  $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
+  $dis_market = $con_q->f("lname1") . " " . $con_q->f("fname1");
+  $dis_tech = $con_q->f("lname2") . " " . $con_q->f("fname2");
+  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1");
+  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2");
+
+  if ($inc_q->f("incident_archive") == 1) {
+    $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "
+<table class=\"details\">
+ <tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_company</td>
+ </tr><tr>
+  <td class=\"detailLabel\">
+   $comp_name
+   <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+   <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+  </td>
+  <td class=\"detailText\">
+   $comp_ad1<br />
+   $comp_zip $comp_town
+  </td>
+ </tr><tr>
+  <td class=\"detailLabel\">
+   $l_client_manager 1
+  </td>
+  <td class=\"detailText\">
+   $dis_con1
+  </td>
+ </tr><tr>
+  <td class=\"detailLabel\">
+   $l_client_manager 2
+  </td>
+  <td class=\"detailText\">
+   $dis_con2
+  </td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_contract</td>
+ </tr><tr>
+  <td class=\"detailLabel\">
+   <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
+   </a> 
+   $con_label
+   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
+   <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
+  </td>
+  <td class=\"detailText\">
+   $l_num : $con_num <br />
+   $l_from $con_debut $l_to $con_exp
+  </td>
+ </tr><tr>
+  <td class=\"detailLabel\">
+   $l_manager 1
+  </td>
+  <td class=\"detailText\">$dis_market</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_manager 2</td>
+  <td class=\"detailText\">$dis_tech</td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_label</td>
+  <td class=\"detailText\">$label</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_logger</td>
+  <td class=\"detailText\">$logger</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_owner</td>
+  <td class=\"detailText\">$owner</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_priority</td>
+  <td class=\"detailText\">$pri</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_status</td>
+  <td class=\"detailText\">$state</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_date</td>
+  <td class=\"detailText\">$date</td>
+ </tr><tr>
+  <td class=\"detailLabel\">$l_duration</td>
+  <td class=\"detailText\">$inc_dur</td>
+ </tr>
+ $dis_lab_archive
+ <tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_description</td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailText\">$inc_desc</td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_solution</td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
+ </tr>
+</table>
+";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Incident Form                                                     //
 // Parameters:
 //   - $action    : action called
@@ -224,12 +363,13 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
-  global $l_incident_label,$l_contract_label,$l_incident_prority,$l_incident_status, $l_find;
+  global $path, $set_theme, $ico_contract;
+  global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
-  global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status,$l_incident;
-  global $l_contract_label, $l_contract_num, $l_update, $l_checkdelete, $l_insert, $l_contract_date_init;
-  global $l_contract_date_expir,$l_incident_description,$l_incident_solution,$l_incident_date, $l_archive_new;
-  global $path, $auth,$popup_height,$popup_width, $set_theme, $ico_contract, $l_incident_select_contract,$l_contract_label ;
+  global $l_logger,$l_owner,$l_priority,$l_incident;
+  global $l_num, $l_update, $l_checkdelete, $l_insert;
+  global $l_duration, $l_description,$l_solution,$l_date, $l_archive_new;
+  global $popup_height, $popup_width, $l_select_contract;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -242,6 +382,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $priority =  $inc_q->f("incident_priority");
     $status =  $inc_q->f("incident_state");
     $date =  date_format($inc_q->f("date"));
+    $hour = get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
     $c_name = $contr_q->f("contract_label");
@@ -256,6 +397,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $priority =  $incident["priority"];
     $status =  $incident["status"];
     $date =  $incident["date"];
+    $hour =  $incident["hour"];
     $archive = ($incident["archive"] == "1" ? "checked" : "");
   }
 
@@ -310,11 +452,39 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
    $dis_sel_stat.=" selected=\"selected\"";
   $dis_sel_stat.=">$l_closed</option>\n</select>";
 
+  // Hour select
+  $sel_hour = "<select name=\"sel_hour\">";
+  for ($cpt = 0; $cpt < 24; $cpt++) {
+    $sel_hour .= "\n<option value=\"$cpt\"";
+    if ($cpt == $hour) 
+      $sel_hour .= " selected=\"selected\"";
+    $sel_hour .= ">$cpt</option>";
+  }
+  $sel_hour .= "</select>";
+
+  // Duration select
+  $sel_dur = "<select name=\"sel_dur\">";
+  for ($cpt = 0.25; $cpt < 2; $cpt += 0.25) {
+    $sel_dur .= "\n<option value=\"$cpt\"";
+    if ($cpt == $dur) 
+      $sel_dur .= " selected=\"selected\"";
+    $sel_dur .= ">$cpt</option>";
+  }
+  for ($cpt = 2; $cpt < 17; $cpt += 1) {
+    $sel_dur .= "\n<option value=\"$cpt\"";
+    if ($cpt == $dur)
+      $sel_dur .= " selected=\"selected\"";
+    $sel_dur .= ">$cpt</option>";
+  }
+  $sel_dur .= "</select>";
+
+
   // update 
   if (($action=="detailupdate") || ($action=="update")) {
-    $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\" />\n";
-    $dis_button .="<input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />\n";
-    $dis_button .="<input type=\"submit\" value=\"$l_update\" />\n";
+    $dis_button = "
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
+      <input type=\"submit\" value=\"$l_update\" />";
 
   // check delete
     $dis_delete .= "<form method=\"get\" name=\"f_del_con\"
@@ -331,8 +501,8 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
 
   // insert
   } elseif (($action=="new") || ($action=="insert")) {
-    $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />\n";
-    $dis_button .="<input type=submit value=\"$l_insert\" />\n";
+    $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
+    $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
 
   // --- html template --------------------------------------------------------
@@ -343,42 +513,48 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
  <tr>
   <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_label</td>
+  <td class=\"detailLabel\">$l_label</td>
   <td><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_logger</td>
+  <td class=\"detailLabel\">$l_logger</td>
   <td>$dis_sel_logger</td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_owner</td>
+  <td class=\"detailLabel\">$l_owner</td>
   <td>$dis_sel_owner</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_archive_new</td>
   <td><input name=\"cb_archive\" type=\"checkbox\"size=\"30\" value=\"1\" $archive /></td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_contract_label</td>
+  <td class=\"detailLabel\">$l_contract</td>
   <td>
    <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$c_id")."\">$c_name</a>
    <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
    <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-   <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_incident_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
+   <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
    <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
    <input type=\"text\" name=\"contract_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
   </td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_priority</td>
+  <td class=\"detailLabel\">$l_priority</td>
   <td>$dis_sel_prio</td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_status</td>
+  <td class=\"detailLabel\">$l_status</td>
   <td>$dis_sel_stat</td>
  </tr><tr>
-  <td class=\"detailLabel\">$l_incident_date</td>
-  <td><input name=\"tf_date\" size=\"12\" value=\"$date\" /></td>
+  <td class=\"detailLabel\">$l_date</td>
+  <td>
+    <input name=\"tf_date\" size=\"10\" maxlength=\"10\" value=\"$date\" />
+    H $sel_hour
+  </td>
  </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident_description</td>
+  <td class=\"detailLabel\">$l_duration</td>
+  <td>$sel_dur H</td>
+ </tr><tr>
+  <td colspan=\"2\" class=\"detailHead\">$l_description</td>
  </tr><tr>
   <td colspan=\"2\"><textarea name=\"ta_desc\" rows=\"6\" cols=\"60\">$desc</textarea></td>
  </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident_solution</td>
+  <td colspan=\"2\" class=\"detailHead\">$l_solution</td>
  </tr><tr>
   <td colspan=\"2\"><textarea name=\"ta_solu\" rows=\"6\" cols=\"60\">$solu</textarea></td>
  </tr>
@@ -392,141 +568,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
 </table>
 </form>
 $dis_delete
-";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Incident Consult                                                  //
-// Parameters:
-//   - $inc_q : DBO : incident result
-//   - $con_q : DBO : contract result
-///////////////////////////////////////////////////////////////////////////////
-function html_incident_consult($inc_q,$con_q) {
-  // -- Themes
-  global $set_theme,$ico_contract,$ico_company;
-  // - Labels
-  global $l_incident_label,$l_incident_prority,$l_incident_status, $l_incident_company;
-  global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status,$l_incident;
-  global $l_update,$l_incident_description,$l_incident_solution,$l_incident_date,$l_contract_num;
-  global $l_to, $l_from,$l_manager,$l_client_manager,$l_update,$l_archive_consult,$l_contract_label;
-  global $path;
-
-  $label = $inc_q->f("incident_label");
-  $pri = $inc_q->f("incident_priority");
-  $state = $inc_q->f("incident_state");
-  $date = date_format($inc_q->f("date"));
-  $inc_id = $inc_q->f("incident_id");
-  $inc_desc = nl2br($inc_q->f("incident_description"));
-  $inc_reso = nl2br($inc_q->f("incident_resolution"));
-  $con_id = $con_q->f("contract_id");
-  $comp_id = $con_q->f("contract_company_id");
-  $con_label = $con_q->f("contract_label");
-  $con_num = $con_q->f("contract_numero");
-  $con_debut = $con_q->f("contract_datebegin");
-  $con_exp = $con_q->f("contract_dateexp");
-  $tech = $con_q->f("contract_techmanager_id");
-  $market = $con_q->f("contract_marketmanager_id");
-  $comp_name = $con_q->f("company_name");
-  $comp_ad1 = $con_q->f("company_address1");
-  $comp_zip = $con_q->f("company_zipcode");
-  $comp_town = $con_q->f("company_town");
-
-  $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
-  $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
-  $dis_market = $con_q->f("lname1") . " " . $con_q->f("fname1");
-  $dis_tech = $con_q->f("lname2") . " " . $con_q->f("fname2");
-  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1");
-  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2");
-
-  if ($inc_q->f("incident_archive") == 1) {
-    $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
-  }
-
-  // --- HTML Template --------------------------------------------------------
-
-  echo "
-<table class=\"details\">
- <tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident_company</td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $comp_name
-   <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-   <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-  </td>
-  <td class=\"detailText\">
-   $comp_ad1<br />
-   $comp_zip $comp_town
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_client_manager 1
-  </td>
-  <td class=\"detailText\">
-   $dis_con1
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_client_manager 2
-  </td>
-  <td class=\"detailText\">
-   $dis_con2
-  </td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_contract_label</td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
-   </a> 
-   $con_label
-   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
-   <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
-  </td>
-  <td class=\"detailText\">
-   $l_contract_num : $con_num <br />
-   $l_from $con_debut $l_to $con_exp
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $l_manager 1
-  </td>
-  <td class=\"detailText\">$dis_market</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_manager 2</td>
-  <td class=\"detailText\">$dis_tech</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_label</td>
-  <td class=\"detailText\">$label</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_priority</td>
-  <td class=\"detailText\">$pri</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_status</td>
-  <td class=\"detailText\">$state</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_date</td>
-  <td class=\"detailText\">$date</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_logger</td>
-  <td class=\"detailText\">$logger</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_incident_owner</td>
-  <td class=\"detailText\">$owner</td>
- </tr>
- $dis_lab_archive
- <tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident_description</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailText\">$inc_desc</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident_solution</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
- </tr>
-</table>
 ";
 }
 

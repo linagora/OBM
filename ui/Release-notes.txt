@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Vers : 0.5.3                                                        //
+// OBM - Vers : 0.6.0                                                        //
 //     - File : Release-notes.txt                                            //
-//     - Desc : First file to read. Basic infos on OBM release 0.5.3         //
+//     - Desc : First file to read. Basic infos on OBM release 0.6.0         //
 // 2002-02-04 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -17,22 +17,18 @@ Licence
 OBM is protected by the GNU General Public License (See file COPYING).
 
 
-Version 0.5.3
+Version 0.6.0
 -------------
-Many fixes and enhancements to 0.5.2
+Major release
 
-*** Highligths of this version
-- Session polishment with graphical administartion
-- Italian translation added (Augusto fagioli)
-- User enhancement (archive, names) and migration from Internal Contact
-- many fixes and cleanups
-- documentaion updates
-
-*** State
-- Company, Contact, Deal, List, User, Setting and Admin modules in production.
-- Support (Contract and Incident) in production
-
-- The Calendar and time manager are in beta mode.
-- Account/Invoice/Payment in alpha stage.
-
-- Computer : need rewrite and design
+- New design and theme (with real design now !)
+- XHTML / CSS compliance
+- modules are grouped in sections (tabs in the default theme)
+- New (cleaner, better, nicer) shared calendar (complete rewrite by Mehdi)
+- Better genericity (themes, menus, actions,...)
+- New access right model not code intrusive,
+- New actions model (theme don't need now some hardcoded info)
+- Code quality improvment : Rules defined and applied everywhere for date, url,...
+- Lots, lots of clean up, fixes, polishment
+- Lots of minor functionalities added
+- New web site, documentation, install scripts,...

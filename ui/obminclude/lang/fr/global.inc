@@ -13,6 +13,7 @@ $l_back = "Retour";
 $l_cancel = "Annuler";
 $l_close = "Fermer la fenêtre";
 $l_validate = "Valider";
+$l_execute = "Exécute action";
 
 // Common messages
 $l_all = "Tout";

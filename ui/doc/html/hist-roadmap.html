@@ -1,21 +1,24 @@
-<HTML>
-<HEAD>
-<TITLE> OBM History, Status and Roadmap </TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
+<html>
+<head>
+<!-- $Id$ -->
+<title> OBM History, Status and Roadmap </title>
+</head>
+<body bgcolor="#FFFFFF">
 
-<A HREF="index.html">back</A>
+<a href="javascript:back();">back</a>
 
-<CENTER>
-<H1>OBM History and Roadmap</H1>
-<I>Why OBM and where does it go </I><BR>
-Version 0.5.3 - 2002-08-23<BR>
+<center>
+<h1>OBM History and Roadmap</h1>
+<i>Why OBM and where does it go </i>
+<br />
+Version 0.6.0 - 2003-01-06<br />
 Pierre Baudracco
-</CENTER>
-<P>
+</center>
+<p />
 
-<H2>Events</H2>
+<h2>Events</h2>
 
+2003-01-06 : version <b>0.6.0</b> released (Major release)<br />
 2002-08-23 : version <B>0.5.3</B> released (architecture improvements, fixes)<BR>
 2002-07-30 : version <B>0.5.2</B> released (architecture improvements, fixes)<BR>
 2002-06-01 : version <B>0.5.1</B> released (feature enhancement and fixes)<BR>
@@ -33,10 +36,11 @@ Pierre Baudracco
 1999-11-01 : version <B>0.2.3a</B> released. (Bug fixes release)<BR>
 1999-10-30 : version <B>0.2.3</B> released. (Bug fixes release)<BR>
 1999-09-07 : version <B>0.2.2</B> released.<BR>
-1999-05-22 : version <B>0.2.1</B> released.<BR>
-1999-04-04 : version <B>0.2.0</B> released. Initial public release.<BR>
+1999-05-22 : version <B>0.2.1</B> released.<br />
+1999-04-04 : version <b>0.2.0</b> released. Initial public release.
 
-<H2>History</H2>
+
+<h2>History</h2>
 
 OBM started as an internal project at Aliacom (the company I work for) which
 goal was to manage our contact and customer database.
@@ -103,86 +107,151 @@ For example, today what is the logical behind the computer module in OBM ?
 <P>
 It took a long time but was vital to the project and led to 0.5.0.
 
-<H2>Status - Current situation - 0.5.x</H2>
-0.5.0 has been released on 2002-02-01 and was a major rewrite with many enhancements.
-Current release is 0.5.3.
-<P>
-A mailing list and the bugzilla bugs and features tracking have been set up.
-The base modules (Company, Contact, Deal, List, User,) have been completly rewritten.
+
+<h3>Versions 0.5.x</h3>
+0.5.0 had been released on 2002-02-01 and was a major rewrite with many enhancements.
+<p />
+A mailing list and the bugzilla bugs and features tracking tools had been set up.
+The base modules (Company, Contact, Deal, List, User,) had been completly rewritten.
 A new module (time manager) to help track time spent on each tasks, and some enhancements.
-New tools have been set up in the admin module (Prefs, Data, Lang) which help
-code and maintain the code and data (translations, Preferences,...).
-<br> 
-OBM_DISPLAY class has been greatly improved and simplified.
-Code is now cleaner and more constant in the global project.
+New tools had been set up in the admin module (Prefs, Data, Lang) which help
+code and data maintenance (translations, Preferences,...).
+<br /> 
+OBM_DISPLAY class had been greatly improved and simplified.
+Code was now cleaner and more constant in the global project.
 <br>
-The calendar module is now integrated for testing purpose, its code hasn't been reviewed.
-<br>The accounting module has been integrated for testing only.
+The calendar module was integrated for testing purpose but its code hadn't been reviewed.
+<br>The accounting module had been integrated for testing only.
 <P>
-0.5.1 brings many bug fixes, a new module (time manager) to help track time spent on each tasks, and some enhancements.
+0.5.1 brought many bug fixes, a new module (time manager) to help track time spent on each tasks, and some enhancements.
 <p>
-0.5.2 brings many architectures improvements (great sessions with user info, independant debug levels, better bookmarks, security fixes, multiple install, OBM_DISPLAY improvements, new admin tools,...)
+0.5.2 brought many architectures improvements (great sessions with user info, independant debug levels, better bookmarks, security fixes, multiple install, OBM_DISPLAY improvements, new admin tools,...)
 <p>
 0.5.3 continued on the global architecture clean up and enhancement for 0.6 preparation (session administration, input files rules, internal contact moved to userobm, date handling,..).
-<p>
-OBM can now be viewed has a great framework for complex web applications. The strategy is now clearer for OBM.
+<p />
+OBM coul now be viewed has a great framework for complex web applications. The strategy was now clearer for OBM.
 
 
-<H2>Towards 0.6</H2>
+<h3>Status - Current situation - 0.6.0</h3>
 
-The main goal for the 0.6 version is to have the new section grouping with new UI and the 5 modules for the "sale force" (force de vente) section completly finished and usable.
-For now :
+0.6.0 represent a major release with a great amount of work done.
+Quality, maintenance and usability had been the main goals.
+All the backoffice work (architecture changes) can now be visible through the new theme !
+<ul>
+  <li>New design and theme (with real design now !)
+  <li>XHTML / CSS compliance
+  <li>modules are grouped in sections (tabs in the default theme)
+  <li>New (cleaner, better, nicer) shared calendar (complete rewrite by Mehdi)
+  <li>Better genericity (themes, menus, actions,...)
+  <li>New access right model not code intrusive,
+  <li>New actions model (theme don't need now some hardcoded info)
+  <li>Code quality improvment : Rules defined and applied everywhere for date, url,...
+  <li>Lots, lots of clean up, fixes, polishment
+  <li>Lots of minor functionalities added
+  <li>New web site, documentation, install scripts
+</ul>
+
+<p />
+<h3>Actual module status :</h3>
+
 <table border=1>
 <tr>
-<th>Module</th><th>state</th>
+  <th>Section</th>
+  <th>Module</th>
+  <th>state</th>
 </tr><tr>
-<td colspan=2 bgcolor=\"#CCCCCC\">Core modules</td>
+<td colspan="3" bgcolor=\"#CCCCCC\">Core modules</td>
 </tr><tr>
-  <td>User</td><td>Production</td>
+  <td>COM</td>
+  <td>Company</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Admin (Lang, prefs, data...)</td><td>Production</td>
+  <td>COM</td>
+  <td>Contact</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Company</td><td>Production</td>
+  <td>COM</td>
+  <td>Deal</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Contact</td><td>Production</td>
+  <td>COM</td>
+  <td>List</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Deal</td><td>Production</td>
+  <td>COM</td>
+  <td>Calendar</td>
+  <td>beta</td>
 </tr><tr>
-  <td>List</td><td>Production</td>
+  <td>PROD</td>
+  <td>Contracts</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Calendar</td><td>beta : with bugs...</td>
+  <td>PROD</td>
+  <td>Incidents</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Settings</td><td>Production</td>
+  <td>USERS</td>
+  <td>User</td>
+  <td>Production</td>
 </tr><tr>
-  <td colspan=2 bgcolor=\"#CCCCCC\">modules in testing mode</td>
+  <td>USERS</td>
+  <td>Settings</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Computer</td><td>Deprecated : to be removed or redesigned</td>
+  <td>ADMINS</td>
+  <td>Admin</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Support : Contracts</td><td>beta</td>
+  <td>ADMINS</td>
+  <td>Admin_code</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Support : Incidents</td><td>beta</td>
+  <td>ADMINS</td>
+  <td>Admin_pref</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Accounting : Account</td><td>alpha : to be reviewed</td>
+  <td>ADMINS</td>
+  <td>Admin_data</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Accounting : Invoice</td><td>alpha : to be reviewed</td>
+  <td>ADMINS/td>
+  <td>Admin_lang</td>
+  <td>Production</td>
 </tr><tr>
-  <td>Accounting : Payments</td><td>alpha : to be reviewed</td>
+  <td colspan="3" bgcolor=\"#CCCCCC\">modules in testing mode</td>
 </tr><tr>
-  <td>Time manager</td><td>beta</td>
+  <td>Deprecated</td>
+  <td>Computer</td>
+  <td>Removed</td>
+</tr><tr>
+  <td>COMPTA</td>
+  <td>Accounting : Account</td>
+  <td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>COMPTA</td>
+  <td>Accounting : Invoice</td>
+  <td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>COMPTA</td>
+  <td>Accounting : Payments</td>
+  <td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>USERS</td>
+  <td>Time manager</td>
+  <td>beta</td>
 </tr>
 </table>
-<P>
+<p />
 
-<H2>Future developments</H2>
 
-We will add the section stage.
-A section will be for exemple : <b>sales forces</b> wich will included the modules Company, Contact, Deal, List and Calendar. 
+<h2>Towards 0.7 and Future developments</h2>
 
-<P>
-Work has just started on two new modules. An accounting module and an support
-module.
-<P>
+<h3>Functionality</h3>
 
+See what to do with the accountings (compta) modules (account, invoice and payment).
+<p />
+Improve marketing data analisys for the COM section (allow forecast, reporting,...).
+<p />
 Then we are planning a new module : The Document Module, designed to
 store all the documents a company can produce (letter, bill, ...).
 One intersting feature of this module would be the capability to automaticaly
@@ -192,10 +261,22 @@ the document type.
 The Document would be generated by specific modules (LaTex, Word, any capable
 Linux office tool) which could be added later. We are currently working on the
 LaTex module.
-<P>
-Then maybe a very strong concept of modules where you can choose modules you
-want to use, and where OBM knows what to offer depending on the presence of
-modules. You could add a module,...
+
+
+<h3>Architecture</h3>
+
+Finish the OBM_DISPLAY clean up : export all specific fields process away from the class to the field module.
+<p />
+<b>not urgent</b> : evaluate and select a template engine (and really put each presentation output in separated files)
+<p />
+<b>not urgent</b> : select a new database abstraction layer.
+<p />
+<b>not urgent</b> : then remove phplib use (after session and auth rewrite finished and new database abstraction layer chosen)
+
+
+<h3>Others</h3>
+
+Put all the documentation in one central guide (in latex) to be exported in pdf and html.
 
 
 <H2>RoadMap</H2>
@@ -221,13 +302,13 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
 </TR>
 <TR>
 <TD><b>0.5.x</b></TD>
-<TD>2002-07-xx - ?</TD>
+<TD>2002-07-xx - 2003-01-05?</TD>
 <TD>
 <UL>
 <LI> (done - 0.5.2) complete the List rewrite
-<LI> complete the shared Calendar module
-<LI> start section grouping
-<LI> improve access rights
+<LI> (done - 0.6.0) complete the shared Calendar module
+<LI> (done - 0.6.0) start section grouping
+<LI> (done - 0.6.0) improve access rights
 <LI> (done - 0.5.2) complete OBM_DISPLAY
 <LI> (done - 0.5.2) extend debug infos and level
 <LI> (done - 0.5.2) move to native PHP4 session (through PHPLIB)
@@ -235,14 +316,14 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
 </TD>
 </TR><TR>
   <TD>0.6</TD>
-  <TD>2002-09-xx</TD>
+  <TD>2003-02-xx</TD>
   <TD>
     <UL>
-    <li> <b>GUI work</b>
+    <li> (done, to complete - 0.6.0) <b>GUI work</b>
     <li> Templates separation
-    <li> New default theme with cleaner displays
-    <li> Themes to use CSS
-    <LI> Section grouping of modules
+    <li> (done - 0.6.0) New default theme with cleaner displays
+    <li> (done - 0.6.0) Themes to use CSS
+    <LI> (done - 0.6.0) Section grouping of modules
     </UL>
   </TD>
 </TR><TR>
@@ -257,9 +338,9 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
 </TR>
 
 </TABLE>
-<P>
+<p />
 
-<A HREF="index.html">back</A>
+<a href="javascript:back();">back</a>
 
-</BODY>
-</HTML>
+</body>
+</html>

@@ -35,8 +35,7 @@ tr.logintable {
 
 <body>
 <div align="center"><font color="#0892B5" size="2" face="sans-serif, Verdana, Arial"><strong>OBM 
-<?php print $obm_version; ?>- DEMO</strong></font> </div>
-<p align="center">&nbsp;</p>
+<?php print $obm_version; ?> - DEMO</strong></font> </div>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
@@ -73,6 +72,20 @@ tr.logintable {
 </tr>
 </table>
 
+ <?php global $login; if ( isset($login) ): ?>
+ <!-- failed login code -->
+
+<p />
+ <table align="center">
+  <tr>
+   <td colspan=2><font color=red><b>Either your login or your password
+       are invalid or your session may have expired.<br>
+       Please try again!</b></font></td>
+  </tr>
+ </table>
+
+ <?php endif ?>
+
 <p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </font><font size="2" face="sans-serif, Verdana, Arial"><br>
   <em>Available login and pass for Demo :</em></font></p>
@@ -107,20 +120,6 @@ tr.logintable {
   <font size="2" face="sans-serif, Verdana, Arial"><a href="http://www.alaicom.fr" target="_blank">Aliacom</a></font> 
   <font size="2" face="sans-serif, Verdana, Arial">- 2003</font></div>
 
-
- <?php global $login; if ( isset($login) ): ?>
- <!-- failed login code -->
-
- <p>
- <table>
-  <tr>
-   <td colspan=2><font color=red><b>Either your login or your password
-       are invalid or your session may have expired.<br>
-       Please try again!</b></font></td>
-  </tr>
- </table>
-
- <?php endif ?>
 
 <input type="hidden" name="action" value="login">
 <!-- Set up the form with the challenge value and an empty reply value -->

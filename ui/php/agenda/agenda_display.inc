@@ -754,17 +754,14 @@ echo "
 ";
 }
 
-////////////////////////////////////////////////////////////////////////////////////
-// Display the navigation bar
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
-//    $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
-
+// Display the navigation bar
+// Parameters:
+//   - $agenda: agenda parameters
+///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer,$l_go_to,$l_tomorrow_event,$l_user_calendar;
-  global $set_weekstart_default, $l_daysofweekreallyshort,$l_valid;
+  global $set_theme,$ico_spacer,$l_go_to,$l_user_calendar;
+  global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -872,8 +869,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
   } 
   $dis_sel_user .= "</select><br />";
-  $dis_sel_user .= "<input type=\"submit\" value=\"$l_valid\" />";
-
+  $dis_sel_user .= "<input type=\"submit\" value=\"$l_validate\" />";
 
 
 // Minicalendar Head
@@ -1077,25 +1073,24 @@ echo "
   </td>
 ";
 }
-////////////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
-////////////////////////////////////////////////////////////////////////////////////
-// Arguments :
-// -----------
+// Parameters:
 //    $agenda: agenda parameters
 //    $obm_q_events : list of event's records 
 //    $contacts_array : array of selected contacts 
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-
 function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
-  global $l_checkdelete,$l_insert,$l_force,$l_repeat_update;
+  global $l_none,$l_insert,$l_force,$l_repeat_update;
   
   if($action == "detailupdate") {
     $title = $obm_q_event->f("calendarevent_title");
@@ -1169,7 +1164,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
   }
 
   $$repeat_kind .= "selected=\"selected\" ";
-  $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"none\">aucune</option>";
+  $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"none\">$l_none</option>";
   $dis_sel_kind .= "\n<option value=\"daily\" $daily>$l_daily</option>";
   $dis_sel_kind .= "\n<option value=\"weekly\" $weekly>$l_weekly</option>";
   $dis_sel_kind .= "\n<option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option> ";
@@ -1399,7 +1394,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
 function html_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_priority, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
-  global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   while($obm_wait->next_record()) {
@@ -1484,8 +1479,8 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   global $set_theme,$set_weekstart_default;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat,$auth,$l_change_state;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $obm_q_event->f("calendarevent_title");

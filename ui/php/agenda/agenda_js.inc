@@ -12,13 +12,13 @@ function check_calendar(form) {
     alert (\"$l_fill_title\");
     return false;
   }
-  else if (check_date(form.tf_date_begin, \"$l_incorect_datebegin\") == false) {
+  else if (check_date(form.tf_date_begin, \"$l_err_datebegin\") == false) {
     return false;
   }
-  else if (check_date(form.tf_date_end, \"$l_incorect_dateend\") == false) {
+  else if (check_date(form.tf_date_end, \"$l_err_dateend\") == false) {
     return false;
   }
-  else if ((trim(form.tf_repeat_end.value) != \"\") && (check_date(form.tf_repeat_end, \"$l_incorect_repeat\") == false)) {
+  else if ((trim(form.tf_repeat_end.value) != \"\") && (check_date(form.tf_repeat_end, \"$l_err_repeat\") == false)) {
     return false;
   }
 

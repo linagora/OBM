@@ -2,17 +2,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : agenda_query.inc                                             //
 //     - Desc : Agenda query File                                            //
-// Created    : 2001-06-27 by Mehdi Rande                                //
+// 2001-06-27 : Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Return events details
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
-//    $param_event
-/////////////////////////////////////////////////////////////////////////////
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Return events details
+// Parameters: 
+//   - $param_event
+///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($param_event,$getdate) {
   $obm_db = new DB_OBM;
   $date_time_d = strtotime($getdate);
@@ -1075,8 +1075,8 @@ function store_users($user_q) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
-  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_incorect_datebegin, $l_incorect_dateend,$err_msg ;
-  global $l_incorect_begin_end ,$l_incorect_end_repeat, $l_incorect_repeat ;
+  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_err_datebegin, $l_err_dateend,$err_msg ;
+  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat ;
   
   $title = $agenda["title"];
   $datebegin = substr($agenda["date_begin"],0,8);
@@ -1108,7 +1108,7 @@ function check_data_form($agenda) {
     return false;
   }
   elseif(!checkdate($this_month_b,$this_day_b,$this_year_b)) {    
-    $err_msg = $l_incorect_datebegin;
+    $err_msg = $l_err_datebegin;
     return false;
   }  
   
@@ -1117,24 +1117,24 @@ function check_data_form($agenda) {
     return false;
   }
   elseif(!checkdate($this_month_e,$this_day_e,$this_year_e)) {    
-    $err_msg = $l_incorect_dateend;
+    $err_msg = $l_err_dateend;
     return false;
   }  
   
   if (trim($repeat_end) != "") {
     if(!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
-      $err_msg = $l_incorect_repeat;
+      $err_msg = $l_err_repeat;
       return false;
     }  
   }
 
   if($dateend<$datebegin) {
-    $err_msg =  $l_incorect_begin_end;
+    $err_msg =  $l_err_begin_end;
     return false;
   } 
   
   if(trim($repeat_end) != "" && $dateend>$repeat_end) {
-    $err_msg =  $l_incorect_end_repeat;
+    $err_msg =  $l_err_end_repeat;
     return false;
   }  
     

@@ -30,6 +30,5 @@ $l_admin = "Admin";
 $l_admin_lang = "Admin Lang";
 
 // Actions
-$l_execute = "Execute action";
 $l_help = "Help";
 

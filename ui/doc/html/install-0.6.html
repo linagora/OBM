@@ -1,0 +1,324 @@
+<html>
+<!-- $Id$ -->
+<body bgcolor="#FFFFFF">
+
+<a href="javascript:back();">back</a>
+
+<p />These docs are valid for OBM 0.6.0.
+
+Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
+
+<h1>Basic steps to build and install OBM 0.6.0</h1>
+
+<h2> Assumptions</h2>
+
+We suppose apache, php and a database server (mysql) are correctly installed and functionnal.
+<br>
+For pre-packaged distributions, check in your distribution docs.
+<br>
+In Debian, install php4, php4-cgi, php4-mysql, apache, apache-common
+
+<p />
+We suppose that as an example the obm root is /var/www/obm
+<p />
+
+
+<h2>1: Get the source</H2>
+Would be more difficult without it.
+<br />
+And uncompress it in /var/www (or where your document root will be located).
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd /var/www
+tar -xzvf obm-0.6.0.tar.gz
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h2>2: Apache and PHP configuration</h3>
+
+OBM sources are in the php directory.
+Included files are in the obminclude directory.
+Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
+<p />
+All the apache and php configuration is done through the apache <b>httpd.conf</b> file.
+
+<h3>Configure apache to process PHP files</h3>
+Edit your httpd.conf or srm.conf file and add:
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    AddType application/x-httpd-php .php
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<p />
+We set up a virtual host to handle one occurence of OBM (there can be several on one server).
+In the virtual host section set :
+
+<h3>Document root</h3>
+Set your document root to : /var/www/obm/php
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    DocumentRoot /var/www/obm/php
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>OBM include directory</h3>
+
+The name obminclude is now a variable to allow multiple OBM instances on the same code source base (only obminclude will differ which give different database, themes, langs... for each instances). This variable is set through an environment variable in the apache httpd.conf file.
+<p />
+load the env module
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    LoadModule env_module /usr/lib/apache/1.3/mod_env.so
+</pre>
+  </td>
+</tr>
+</table>
+
+<br>fill the OBM_INCLUDE_VAR with the name of the obminclude dir
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    Setenv OBM_INCLUDE_VAR obminclude
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+The path to php include files must be given.
+As a side note, the obminclude directory can be moved to another location.
+<p />
+fill the php include_path with the location of the obminclude
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    php_value include_path ".:/var/www/obm"
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>Images alias</h3>
+# Set an alias to images in the themes directory:
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    Alias /images /var/www/obm/obminclude/themes
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>Directory Index</h3>
+Set the directory index to obm.php
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+    DirectoryIndex obm.php
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<p />
+We <b>strongly</b> recommend to prevent direct access to .inc files
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+< Files "\.inc$">
+  Order allow,deny
+  Deny from all
+< /Files>
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>Complete virtual host block example</h3>
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+< VirtualHost 192.168.1.5>
+    ServerAdmin root@localhost
+    DocumentRoot /var/www/obm/php
+    ServerName obm-panthere
+    ErrorLog /var/log/apache/obm-error.log
+    CustomLog /var/log/apache/obm-access.log common
+    SetEnv OBM_INCLUDE_VAR obminclude
+    Alias /images /var/www/obm/obminclude/themes
+    DirectoryIndex obm.php
+< /VirtualHost>
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h2>3: Create the OBM database</h2>
+
+<h3>3.1: MySQL</h3>
+The scripts are in the scripts/0.6 directory.
+<br />From 0.6 a shell script <i>install_obmdb_0.6.sh</i> handle all the database creation steps.
+<p />
+<b>Requisite :</b> you must know (or create) a valid mysql login/password
+
+<h4>3.1.1: MySQL preparation</h3>
+
+mysql user creation example (user web / web) (number of "Y" may vary with mysql versions) 
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u root mysql    # or with an authorized user
+insert into user values("localhost","web",password("web"),"Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y","Y");
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+Because of the way the mysql access rights works you may have to remove the
+standard access from localhost
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+delete from user where Host="localhost" and Select_priv="N";
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+You have to restart the mysql daemon for the new acces rights to take effect
+or use mysqladmin
+
+<h4>3.1.2 - Create the database</h4>
+
+Open the install_obmdb_0.6.sh and fill the mysql user and password with valid values.
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+# Mysql User and Password var definition
+U=web
+P=web</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+Run the creation script
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd obm/scripts/0.6
+./install_obmdb_0.6.sh
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h3>3.2: Create the obm database - PostgreSQL</h3>
+
+Scripts for postgres are not yet available.
+
+
+<h2>4: Select the database (MySQL or PostgreSQL) for OBM</h2>
+# in obminclude/phplib edit the file <i>obmlib.inc</i> and comment one of these two lines in the DB_OBM class definition (near line 30) :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+// require("obminclude/phplib/db_pgsql.inc");       ## Postgres
+require("obminclude/phplib/db_mysql.inc");       ## Mysql
+</pre>
+  </td>
+</tr>
+</table>
+<P>
+# then declare the right db type, user and password in the DB_OBM class (same file)
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+// var $type     = "PGSQL";   # for PostgreSQL
+var $type     = "MYSQL";   # for MySQL
+# user and password (web, web as example)
+var $User     = "web";
+var $Password = "web";
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h2>10: Run OBM (access the obm.php from your browser)</h2>
+# First restart your apache web server
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+/etc/init.d/apache restart
+</pre>
+  </td>
+</tr>
+</table>
+
+<p /># If all goes well run netscape and launch the url
+<br />yourvirtualhost/
+
+<P># Log in with the uadmin/padmin account
+
+
+<p/>
+<a name="upgrade-0.6.0"><h1>UPGRADE OBM DATABASE 0.5.3 to 0.6.0</h1></a>
+<p />
+# Database has evolved from 0.5.3 to 0.6.0
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/update-0.5.3-0.6.0.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/obmdb_default_values_0.6.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+
+<p>
+<h3>Update stored values that are not calculated</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the company module (which update these values)
+
+<br /><br />
+<a href="javascript:back();">back</a>
+
+</body>
+</html>

@@ -72,7 +72,7 @@ if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_wait = run_query_waiting_events();
   if($obm_wait->nf() != 0) {
-    display_warn_msg($l_waitings_events." : ".$obm_wait->nf());
+    display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
     html_waiting_events($obm_wait);
   }
   else {
@@ -387,7 +387,7 @@ function get_param_agenda() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_agenda_action() {
   global $actions, $path;
-  global $l_header_update,$l_header_delete;
+  global $l_header_update;
   global $l_header_day,$l_header_week,$l_header_year;
   global $l_header_month,$l_header_new_event,$param_event,$param_date;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;

@@ -13,6 +13,7 @@ $l_back = "Back";
 $l_cancel = "Cancel";
 $l_close = "Close the window";
 $l_validate = "Validate";
+$l_execute = "Execute action";
 
 // Common messages
 $l_all = "All";
@@ -135,6 +136,7 @@ $l_header_pref_update  = "Reset users preferences";
 
 $l_header_help = "Aide";
 
+$l_header_year = "Year";
 $l_header_day = "Day";
 $l_header_week = "Week";
 $l_header_month = "Month";

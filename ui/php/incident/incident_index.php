@@ -44,10 +44,10 @@ $uid = $auth->auth["uid"];
 if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
   $last_incident=$last_incident_default;
 } elseif  ( ($param_incident > 0) && ($last_incident != $param_incident) ) {
-    $last_incident=$param_incident;
-    run_query_set_user_pref($auth->auth["uid"],"last_incident",$param_incident);
-    $last_incident_name = run_query_global_incident_label($last_incident);
-    //$sess->register("last_incident");
+  $last_incident=$param_incident;
+  run_query_set_user_pref($auth->auth["uid"],"last_incident",$param_incident);
+  $last_incident_name = run_query_global_incident_label($last_incident);
+  //$sess->register("last_incident");
 }
 
 page_close();
@@ -132,20 +132,19 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
- if (check_incident_form($incident)) {
+  if (check_incident_form($incident)) {
     run_query_update($incident);         
     display_ok_msg($l_update_ok);
     require("incident_js.inc");
     html_incident_search_form(run_query_userobm(),$incident);
- } else {
+  } else {
     require("incident_js.inc");
     display_warn_msg($err_msg);
     html_incident_search_form(run_query_userobm(),$incident);
  }
  
 } elseif ($action == "delete")  {
-///OK//////////////////////////////////////////////////////////////////////////
- 
+///////////////////////////////////////////////////////////////////////////////
   run_query_delete($param_incident);
   display_ok_msg($l_delete_ok);
   require("incident_js.inc");
@@ -181,9 +180,10 @@ display_end();
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-   global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority, $sel_logger, $sel_owner, $cb_archive;
-   global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident,$tf_dateafter,$tf_datebefore, $contract_new_id;
-   global $set_debug, $cdg_param;
+  global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority;
+  global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
+  global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident,$tf_dateafter,$tf_datebefore, $contract_new_id;
+  global $set_debug, $cdg_param;
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $incident["date_before"] = $tf_datebefore;
@@ -195,6 +195,8 @@ function get_param_incident() {
   if (isset ($sel_owner)) $incident["owner"] = $sel_owner;
   if (isset ($sel_logger)) $incident["logger"] = $sel_logger;
   if (isset ($tf_date)) $incident["date"] = $tf_date;
+  if (isset ($sel_hour)) $incident["hour"] = $sel_hour;
+  if (isset ($sel_dur)) $incident["duration"] = $sel_dur;
   if (isset ($ta_desc)) $incident["description"] = $ta_desc;
   if (isset ($ta_solu)) $incident["solution"] = $ta_solu;
   $incident["archive"] = ( ($cb_archive == '1') ? '1' : '0');

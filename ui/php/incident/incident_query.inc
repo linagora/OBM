@@ -178,7 +178,7 @@ function run_query_incident_contract($cid) {
 // Parameters:
 //   - $incident[] : Entry's values
 //     keys used   : lincident, logger, owner, description, solution, priority
-//                 : status, date, archive, contract_id
+//                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($incident) {
   global $auth, $cdg_sql;
@@ -191,8 +191,11 @@ function run_query_insert($incident) {
   $priority =  $incident["priority"];
   $status =  $incident["status"];
   $date =  $incident["date"];
+  $hour =  $incident["hour"];
+  $duration =  $incident["duration"];
   $archive = ($incident["archive"] ? "1" : "0");
   $contract_id = $incident["contract_id"];
+  $call_date = "$date $hour:0:0";
 
   $connect_db=new DB_OBM;
 
@@ -207,6 +210,7 @@ function run_query_insert($incident) {
     incident_state,
     incident_logger,
     incident_owner,
+    incident_duration,
     incident_archive,
     incident_description,
     incident_resolution)
@@ -216,11 +220,12 @@ function run_query_insert($incident) {
     '".$auth->auth["uid"]."',
     '$lincident',
     '$contract_id',
-    '$date',
+    '$call_date',
     '$priority',
     '$status',
     '$logger',
     '$owner',
+    '$duration',
     '$archive',
     '$desc',
     '$solu')";
@@ -235,7 +240,7 @@ function run_query_insert($incident) {
 // Parameters:
 //   - $incident[] : Entry's values
 //     keys used   : lincident, logger, owner, description, solution, priority
-//                 : status, date, archive, contract_id
+//                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($incident) {
   global $auth, $cdg_sql;
@@ -250,9 +255,10 @@ function run_query_update($incident) {
   $priority =  $incident["priority"];
   $status =  $incident["status"];
   $date =  $incident["date"];
+  $hour =  $incident["hour"];
+  $duration =  $incident["duration"];
   $archive = ($incident["archive"] ? "1" : "0");
- 
-  $connect_db=new DB_OBM;
+  $call_date = "$date $hour:0:0";
 
   $query = "update Incident set
     incident_timeupdate='". date("Y-m-d H:i:s")."',
@@ -260,17 +266,19 @@ function run_query_update($incident) {
     incident_logger='$logger',
     incident_owner='$owner',
     incident_label='$lincident',
-    incident_date='$date', 
+    incident_date='$call_date', 
     incident_priority='$priority',
     incident_state='$status',
     incident_resolution = '$solu',
     incident_description = '$desc',
+    incident_duration = '$duration',
     incident_archive='$archive',
     incident_contract_id = '$param_contract'
    where incident_id='$param_incident'";
 
+  $con_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);  
+  $con_q->query($query);  
 }
 
 
@@ -282,8 +290,9 @@ function run_query_update($incident) {
 function run_query_delete($i_id) {
   global $cdg_sql;
 
-  $i_q = new DB_OBM;
   $query = "delete from Incident where incident_id='$i_id'";
+
+  $i_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
   $i_q->query($query);
 }
@@ -294,13 +303,15 @@ function run_query_delete($i_id) {
 // Query   :  kind of The Contract          : Table ContractType             //
 //////////////////////////////////////////////////////////////////////////////
 function run_query_contracttype($type_id) {
-
   global $cdg_sql;
-  $connect_db=new DB_OBM;
+
   $query = "select contracttype_label,contracttype_id from ContractType where contracttype_id=".$type_id."";
+
+  $con_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
+  $con_q->query($query);
+
+  return $con_q;
 }
 
 

@@ -116,3 +116,13 @@ INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_time
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Support');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Developpement');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Personnel');
+
+
+-------------------------------------------------------------------------------
+-- Incident Update
+-------------------------------------------------------------------------------
+-- change incident_date to incident_datetime
+ALTER table Incident change column incident_date incident_date timestamp(14);
+
+-- Add new column : incident_duration
+ALTER table Incident add column incident_duration char(4) default 0 AFTER incident_owner;
