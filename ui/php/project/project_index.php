@@ -404,7 +404,6 @@ function get_param_project() {
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
-  global $cdg_param;
 
   if (isset ($param_project)) $project["id"] = $param_project;
   if (isset ($param_user)) $project["user_id"] = $param_user;
@@ -457,8 +456,6 @@ function get_param_project() {
   if (isset ($http_obm_vars)) {
     $nb_mem = 0;
     $nb_tsk = 0;
-    // Document
-    $nb_d = 0;
 
     while ( list( $key ) = each( $http_obm_vars ) ) {
       // cb_u is likely to be called cb_user
@@ -473,27 +470,15 @@ function get_param_project() {
         $mem_num = substr($key, 4);
         $project["mem$nb_mem"] = $mem_num;
       } 
-
-      else if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$project["doc$nb_d"] = $d_num;
-      }
-
     }
 
     $project["mem_nb"] = $nb_mem;
     $project["tsk_nb"] = $nb_tsk;
-    $project["doc_nb"] = $nb_d;
   }
 
-  if (debug_level_isset($cdg_param)) {
-    if ( $project ) {
-      while ( list( $key, $val ) = each( $project ) ) {
-        echo "<br />project[$key]=$val";
-      }
-    }
-  }
+  get_global_param_document($project);
+
+  display_debug_param($project);
 
   return $project;
 }

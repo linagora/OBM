@@ -113,24 +113,21 @@ $l_fill_label = "You have to fill the label";
 $l_fill_date = "The date must be filled";
 $l_invalid_date = "Invalid date format (MM/JJ/AAAA ou AAAA-MM-JJ)";
 
-//used by many modules
-//tasktype groups
+// Tasktype groups
 $l_task_fac = "Factured Tasks";
 $l_task_int = "Internal Projects";
 $l_task_div = "Not Factured Tasks";
 
-$l_monthsofyear = array ('January','February', 'March','April','May','June',
-                         'July','August','September','October','November',
-			 'December');
-$l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
-			      'aug','sep','oct','nov','dec');
-
+// Days and months
+$l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
+$l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
+$l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+$l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 $l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
-$l_invalid_perm = "Invalid permissions.";
 
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
 
 $l_header_com    = "COMMERCIAL";
 $l_header_prod   = "PRODUCTION";

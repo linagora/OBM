@@ -184,7 +184,7 @@ function dateOfWeek($Ymd, $day) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_days_unfilled() {
   global $cdg_sql, $cdg_param, $auth;
-  global $c_day_fraction,$working_days;
+  global $c_day_fraction, $c_working_days;
 
   $uid = $auth->auth["uid"];
 
@@ -219,7 +219,7 @@ function run_query_days_unfilled() {
   $today = time();
   while($current_day <= $today) {
     $day = date("w",$current_day);
-    if( $working_days[$day] == 1) {
+    if ($c_working_days[$day] == 1) {
       $workingdays ++;
     }
     $current_day = strtotime("+1 day",$current_day);

@@ -13,8 +13,8 @@ $l_back = "Retour";
 $l_cancel = "Annuler";
 $l_close = "Fermer la fenêtre";
 $l_validate = "Valider";
-$l_execute = "Exécute action";
-$l_confirm = "Confirmer l'action";
+$l_execute = "Exécuter";
+$l_confirm = "Confirmer";
 
 // Common messages
 $l_yes = "Oui";
@@ -113,27 +113,21 @@ $l_fill_label = "Vous devez renseigner le Label.";
 $l_fill_date = "La date doit être renseignée.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 
-//used by many modules
-//tasktype groups
+// tasktype groups
 $l_task_fac = "Taches Facturées";
 $l_task_int = "Projets Internes";
 $l_task_div = "Tâches Non Facturées";
 
-// days and months
-$l_monthsofyear = array (	'Janvier','Février',
-				'Mars','Avril','Mai',
-				'Juin','Juillet','Août',
-				'Septembre','Octobre','Novembre',
-				'Décembre');
-$l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
-			      'juil','aoû','sep','oct','nov','déc');
-			      
+// Days and months
+$l_monthsofyear = array ('Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août', 'Septembre','Octobre','Novembre', 'Décembre');
+$l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin','juil','aoû','sep','oct','nov','déc');
+$l_daysofweek = array ('Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi');
+$l_daysofweekshort = array ('Dim','Lun','Mar','Mer','Jeu','Ven','Sam');
 $l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
-$l_invalid_perm = "Vous n'avez pas les permissions pour éxecuter cette action";
 
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
 
 $l_header_com    = "COMMERCIAL";
 $l_header_prod   = "PRODUCTION";
@@ -148,7 +142,7 @@ $l_header_deal    = "Affaires";
 $l_header_list    = "Listes";
 $l_header_agenda  = "Agenda";
 $l_header_todo    = "A faire";
-$l_header_publication    = "Publication";
+$l_header_publication  = "Publication";
 $l_header_statistic    = "Statistiques";
 
 $l_header_time = "Gestion des temps";

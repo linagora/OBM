@@ -745,7 +745,7 @@ function html_list_form($action, $list_q, $list) {
   <tr>
     <td class=\"detailLabel\">$l_mailing</td>
     <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_mailing name=\"ch_mailing_ok\" size=\"30\" value=\"1\" /></td>
+      <input type=\"checkbox\" $dis_mailing name=\"cb_mailing_ok\" size=\"30\" value=\"1\" /></td>
   </tr>  
   </table>
   <div class=\"detailHead\">$l_query</div>  

@@ -269,10 +269,6 @@ function run_query_insert($task) {
   global $auth;
   global $cdg_sql;
 
-  
-  //  if (debug_level_isset($cdg_param))
-  //	debug_array($task);
-
   $valid_date = run_query_valid_search($task);
   $date = $task["sel_date"];
   $ttype = $task["tasktype"];
@@ -607,8 +603,8 @@ function run_query_short_month($time) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: qet tasks for given user and month                 
-//   - $time[]    :    time search criteria
-//     keys used       date, user_id
+// Parameters:
+//   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_task_one_month($time) {
@@ -624,18 +620,23 @@ function run_query_task_one_month($time) {
 
   $user_id = $time["user_id"];
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $date = sql_date_format($db_type, "timetask_date", "date");
+
   $query = "
-    select
+    SELECT
       sum(timetask_length) as total_length,
-      substring(timetask_date,7,2) as day_in_month, 
+      $date,
       timetask_status
-    from TimeTask, UserObm
-    where timetask_date >= '$month_begin' 
+    FROM TimeTask, UserObm
+    WHERE timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end'
       and timetask_user_id = userobm_id
       and timetask_user_id = $user_id
-    group by timetask_user_id, day_in_month
-    order by day_in_month 
+    GROUP by timetask_user_id, date, timetask_status
+    ORDER by date
     ";
   
   display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
@@ -648,8 +649,8 @@ function run_query_task_one_month($time) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: get tasks for given user and week, and returns total by day
-//   - $time[]    : time search criteria
-//     keys used    date, user_id
+// Parameters:
+//   - $time[] : time search criteria
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_task_one_week($time) {
@@ -659,23 +660,29 @@ global $cdg_sql, $cdg_param;
 
   $user_id = $time["user_id"];
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $date = sql_date_format($db_type, "timetask_date", "date");
+
   $query = "
-    select 
+    SELECT 
       sum(timetask_length) as total_length,
-      substring(timetask_date,1,8) as day_in_week
-    from TimeTask
-    where timetask_date >= '$week[0]' 
+      $date
+    FROM TimeTask
+    WHERE timetask_date >= '$week[0]' 
       and timetask_date <= '$week[1]'
       and timetask_user_id = $user_id
-    group by day_in_week
-    order by day_in_week ";
+    GROUP by date
+    ORDER by date";
 
   display_debug_msg($query, $cdg_sql, "run_query_task_one_week");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
   
-  return $obm_db; 
+  return $obm_q; 
 }
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -866,195 +873,74 @@ function run_query_get_obmusers() {
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-// Get n day values for a given week, for displaying in the creating task
-//  form
-// Paramaters: $date : a date starting on the 1st day of the week
-//        $num_days : the number of days choosen (5)
+///////////////////////////////////////////////////////////////////////////////
+// Get an array of working days date for the week begining at the date given
+// Paramaters:
+//   - $date : a date starting on the 1st day of the week
 // Returns:
-//  array with days of the week in "Mon 23 Apr" format
-//////////////////////////////////////////////////////////////////////////
-function get_this_week($date, $num_days) {
-    global $cdg_sql,$l_monthsofyearshort;
+//  array with for each days of the week : 0->"Mon 23 Apr" 1->20040413
+///////////////////////////////////////////////////////////////////////////////
+function get_week_working_days_dates($date) {
+  global $c_week_first_day, $l_daysofweekshort, $l_monthsofyearshort;
   
-    for ($i=0 ; $i <$num_days; $i++) {
-       // Calc the 5 dates
-       //don't change it the first time
-       if ($i != 0)
-         $date += 86400;
-       $date_hum = date("Ymd",$date);
-       // spliting it
-       $p_year=substr($date_hum,0,4);
-       $p_month=substr($date_hum,4,2);
-       $p_day=substr($date_hum,6,2);
-       // Then we display it
-       // display the name for the day, 1 is monday
-       if ($i ==6)
-         $dis_date = weekday_short_name(0);
-       else  
-         $dis_date = weekday_short_name($i+1);
-       
-	   // We add day of month and month
-       $dis_date .= " $p_day " . $l_monthsofyearshort[$p_month -1];
-       // We create an array 
-       $array_date[$i][0]=$dis_date;
-       $array_date[$i][1]="$p_year$p_month$p_day";
-
+  $cpt_end = $c_week_first_day + 7;
+  for ($i=$c_week_first_day ; $i < $cpt_end; $i++) {
+    if (is_working_day($date)) {
+      $date_link = date("Ymd", $date);
+      $month = date("m", $date);
+      $day = date("d", $date);
+      $dis_date = $l_daysofweekshort[$i%7] ." $day " . $l_monthsofyearshort[$month - 1];
+      
+      $array_date[$i][0] = $dis_date;
+      $array_date[$i][1] = $date_link;
     }
 
-    return $array_date;
+    $date += 86400;
+  }
+  
+  return $array_date;
 }
 
 
-//////////////////////////////////////////////////////////////////////////
-// Get the starting and ending date of a week
-//  params :
-//////////////////////////////////////////////////////////////////////////
-function get_week_point($sel_date) {
-  global $cdg_sql;
+///////////////////////////////////////////////////////////////////////////////
+// Get the starting and ending date of a week in YYYYMMDD format
+// Parameters:
+//   - $date : date with YYYYMMDD format
+///////////////////////////////////////////////////////////////////////////////
+function get_week_point($date) {
 
+  if (is_null($date)) {
+    $p_date = date("Ymd");
+  } else {
+    $p_date = $date;
+  }
 
-  // week planning
-  if (is_null($sel_date))
-    $p_date=date("Ymd");
-  else
-    $p_date=$sel_date;
-
-  $p_year=substr($p_date,0,4);
-  $p_month=substr($p_date,4,2);
-  $p_day=substr($p_date,6,2);
-
-
-  $weekstart = start_of_week($p_month,$p_day,$p_year);
-  
+  $week_first_day = first_day_week($p_date);
   // beginning and end of week (Ymd format)
-  $weekend=date("Ymd",$weekstart + 6 * 86400);
-  $weekstart=date("Ymd",$weekstart);
+  $weekstart = date("Ymd", $week_first_day);
+  $weekend = date("Ymd", $week_first_day + 6 * 86400);
+
   return array($weekstart, $weekend);
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Return the first day of the week (in timestamp format) in where the date is
+// Parameters :
+// - $date : with YYYYMMDD format
+///////////////////////////////////////////////////////////////////////////////
+function first_day_week($date) {
+  global $c_week_first_day;
 
-//////////////////////////////////////////////////////////////////////////
-// return the start of the week
-//  params : $stamp : current time in seconds
-//////////////////////////////////////////////////////////////////////////
-function start_of_week($month,$day,$year) {
-  global $cdg_sql;
+  $date_int = strtotime($date);
+  $year = date("Y", $date_int);
+  $month = date("m", $date_int);
+  $day = date("d", $date_int);
+  $dow = date("w", $date_int);
+  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+  $weekstart = mktime(0, 0, 0, $month, $day - $obm_dow, $year);
 
-  $dow=date("w",mktime(0,0,0,$month,$day,$year));       
-
-  if ($dow == 0) {
-    $weekstart=mktime(0,0,0,$month,$day - 6,$year);
-  } elseif ( $dow == 1 ) {
-    $weekstart=mktime(0,0,0,$month,$day,$year); 
-  } else {
-    $weekstart=mktime(0,0,0,$month,$day - ($dow-1),$year);
-  }
-
-  return($weekstart); 
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Return the first day of the week in seconds                            //
-//Parameters :
-// - $time : array with $time["date"] == current date 
-///////////////////////////////////////////////////////////////////////////
-function first_day_week(&$time) {
-  global $cdg_sql;
-
-  if ( isset($time["date"]) ) {
-    $year=substr($time["date"],0,4);
-    $month=substr($time["date"],4,2);
-    $day=substr($time["date"],6,2);
-    $d_start_week = start_of_week($month,$day,$year);
-  }
-  else {
-    $today = date("Ymd");
-    $year=substr($today,0,4);
-    $month=substr($today,4,2);
-    $day=substr($today,6,2);
-
-    $d_start_week = start_of_week($month,$day,$year);
-    $time["date"] = date("Ymd",$d_start_week);  
-    }
-  
-  // Unix timestamp
-  return ($d_start_week); 
-
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Return the first day of the month in 20020825 format                    //
-//Parameters :
-// - $time : array with $time["date"] == current date 
-///////////////////////////////////////////////////////////////////////////
-function first_day_month(&$time, $change=true) {
-  global $cdg_sql;
-
-  if ( isset($time["date"]) ) { 
-    $year=substr($time["date"],0,4);
-    $month=substr($time["date"],4,2);
-    $d_start_month=mktime(0,0,0,$month,1,$year);
-    // According to doc, 0th day of a month is the last of the previous one
-    //$d_end_month=mktime(0,0,0,$month+1,0, $year);
-    $date_start_month=date("Ymd",$d_start_month);
-  }
-  else {
-    $today = date("Ymd");
-	//    echo "first_day_month : today $today <br>";
-    $year=substr($today,0,4);
-    $month=substr($today,4,2);
-    $d_start_month=mktime(0,0,0,$month,1,$year);
-    // According to doc, 0th day of a month is the last of the previous one
-    $d_end_month=mktime(0,0,0,$month+1,0, $year);
-    //set $time["date"]
-    $date_start_month=date("Ymd",$d_start_month);
-    $time["date"] = $date_start_month;  
-  }
-
-  if ($change) {
-    // Set last day of the month
-    $time["date_end"] = date("Ymd", $d_end_month);
-  }
-  return ($date_start_month); 
-
-}
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-// Return the number of days in the month                                 //
-//Parameters :
-// - $time = current time in seconds 
-// - $direction = "prev" or "next" month,if others => current month 
-///////////////////////////////////////////////////////////////////////////
-function nb_days_in_month($sec,$direction) {
-    global $cdg_sql;
-
-  if($direction == "prev")
-    $move = -1;
-  else if($direction == "next")
-    $move = 1;
-  else
-    $move = 0;
-
-  $month = date('m',$sec)+$move; 
-  if ($month == 0) $month = 12;
-  
-  if ($month == "2") //if february
-  {
-    $year = date('Y',$sec);
-    if($year%4 == 0 and $year%100 ==0 and $year%400 !=0) //if bissextile
-      return(29);
-    else
-      return(28);
-  }
-  else
-    return(number_days_month($month));
+  return ($weekstart); 
 }
 
 
@@ -1084,163 +970,48 @@ function array_to_list($array) {
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Test if the given day is an "Open days" (jours ouvrables)               //
-//   we mean by "open day" $c_days_in_a_week, starting on Monday
-//    $c_days_in_a_week = 5 : Mon to Fri
-//    $c_days_in_a_week = 6 : Mon to Sat
-//    $c_days_in_a_week = 7 : Mon to Sun !
-//Parameters :
-// - $date = a date in 20020917 format 
-//Return :
+///////////////////////////////////////////////////////////////////////////////
+// Test if the given day is an "Open days" (jours ouvrables)
+// Parameters :
+// - $date = a date in timestamp format 
+// Return :
 //  true or false
-///////////////////////////////////////////////////////////////////////////
-function in_workingdays($date) {
-   global $working_days, $cdg_param;
+///////////////////////////////////////////////////////////////////////////////
+function is_working_day($date) {
+  global $c_working_days;
 
-  $year=substr($date,0,4);
-  $month=substr($date,4,2);
-  $day=substr($date,6,2);
+  $wday = date("w", $date);
 
-  // day of the month in second
-  $day_sec = mktime(0,0,0,$month, $day, $year);
-  // Weekday
-  $wday =date("w", $day_sec);
-
-  if ($working_days[$wday] == 1) 
-	return true;
+  if ($c_working_days[$wday] == 1) 
+    return true;
   else
-	return false;
+    return false;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-// Return number of "Open days" (jours ouvrables) in a month     //
-//   for a given date in this month
-// THIS COPE WITH 5 or 6 (or 7) working days
-//  IN A MONTH (if we work on saturday or sunday) 
-//  (based on a global array, $working_days)
-//Parameters :
-// - $date = a date in 20020917 format 
-///////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Return number of "Open days" (jours ouvrables) in a month
+// Parameters :
+//   - $date = a date in the month in the AAAAMMDD format 
+///////////////////////////////////////////////////////////////////////////////
 function get_nb_working_days($date) {
-  global $cdg_param;
 
-  $year=substr($date,0,4);
-  $month=substr($date,4,2);
-  $this_day=substr($date,6,2);
-  $day =1;
-  $workingdays = 0;
-
-  /*
-  if (debug_level_isset($cdg_param))
-	echo "jour $day mois $month an $year <br>";
-  */
-  // set this to 12h
-  $day_sec = mktime(12,0,0,$month, $day, $year);
-  // set this to 00h
+  $date_int = strtotime(substr($date,0,6)."01");
+  $date_int += 43200;  // We add 12h
+  $month = date("m", $date_int);
+  $year = date("Y", $date_int);
   $first_next_month = mktime(0,0,0,$month+1, 1, $year);
-  while ($day_sec < $first_next_month) {
-    if (in_workingdays($year.$month.$day))
+
+  $workingdays = 0;
+  while ($date_int < $first_next_month) {
+    if (is_working_day($date_int)) {
       $workingdays++;
-  $day++;	  
-  $day_sec = mktime(12,0,0,$month, $day, $year);
-  }
-
-  /*  if (debug_level_isset($cdg_param))
-  	echo "<br> date $date, working days $workingdays <br>";
-  */
-
-  return $workingdays;
-}
-
-
-
-function get_nb_working_days2($date) {
-  global $c_days_in_a_week, $cdg_param;
-
-
-  $year=substr($date,0,4);
-  $month=substr($date,4,2);
-  $day=substr($date,6,2);
-
-  // first day of the month in second
-  $first_day_sec = mktime(0,0,0,$month, $day, $year);
-  // Fist Weekday
-  $first_wday =date("w", $first_day_sec);
-
-  // Last day
-  $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
-  $last_wday =date("w", $last_day_sec);
-
-  // Testing on where is Sunday in the month to calculate
-  // First sunday of the month is :
-  if ($first_wday ==0) {
-	$first_sunday = $first_day_sec; 
-    // Count of working day to first sunday
-    $workingdays = 0;
-  }
-  else {
-	// nb of days to sunday
-	$nb_to_sun = 7-$first_wday;
-	$first_sunday = mktime(0,0,0,$month, $day+$nb_to_sun, $year); 
-    // Count of working day to first sunday
-    $workingdays = $nb_to_sun -1;
-  }
-
-  // We calculate the number of completes weeks
-  // (sunday to sunday)
-  $week =0;
-  do {
-    $week++;
-    
-  } while ($last_day_sec > mktime(0,0,0,$month, $day+$nb_to_sun+7*$week, $year));
-
-  $workingdays += $c_days_in_a_week *($week-1);
-
-  // we now add the number of days to end of month
-  // What is the last in the month ?
-  // If last day is sunday (wday = 0), nothing to add
-  if ($last_wday !=0) {
-	// If wday > 5 (mean Saturday, one day to sub)
-    // Count of working day to last sunday
-    $workingdays += ($last_wday > 5 ? 5 : $last_wday);
+    }
+    $date_int += 86400;
   }
 
   return $workingdays;
 }
 
-
-function weekday_name ($num_day) {
-  global $l_monday,$l_tuesday,$l_wednesday,$l_thursday,$l_friday,$l_saturday,$l_sunday,$l_unknown; 
-  
-  switch($num_day) {
-    case 1 : $day_name=$l_monday;    break; 
-    case 2 : $day_name=$l_tuesday;   break;
-    case 3 : $day_name=$l_wednesday; break;   
-    case 4 : $day_name=$l_thursday;  break;
-    case 5 : $day_name=$l_friday;    break;
-    case 6 : $day_name=$l_saturday;  break;
-    case 0 : $day_name=$l_sunday;    break;
-    default : $day_name=$l_unknown;  break;   
-  }
-  return $day_name;
-}
-
-
-function weekday_short_name ($num_day) {
-  global $l_short_monday,$l_short_tuesday,$l_short_wednesday,$l_short_thursday,$l_short_friday,$l_short_saturday,$l_short_sunday,$l_unknown; 
- 
-  switch($num_day) {
-    case 1 : $day_name=$l_short_monday;    break;
-    case 2 : $day_name=$l_short_tuesday;   break;
-    case 3 : $day_name=$l_short_wednesday; break;   
-    case 4 : $day_name=$l_short_thursday;  break;
-    case 5 : $day_name=$l_short_friday;    break;
-    case 6 : $day_name=$l_short_saturday;  break;
-    case 0 : $day_name=$l_short_sunday;    break;
-    default : $day_name=$l_unknown;        break;
-  }
-  return $day_name;
-}
 
 </script>

@@ -260,60 +260,6 @@ function get_query_count($query) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the Id of one User from its login
-// Parameters:
-//   - $login  : login
-// Returns:
-//   - user's Id
-///////////////////////////////////////////////////////////////////////////////
-function get_user_id($login) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM ;
-  if (isset($login)) {
-    $query = "select userobm_id from UserObm where userobm_login='$login'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query) ;
-    $obm_q->next_record() ;
-    return $obm_q->f("userobm_id") ;
-  } else {
-    return "" ;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the entry date of one User from its id
-// Parameters:
-//   - $id : id
-// Returns:
-//   - begin date
-///////////////////////////////////////////////////////////////////////////////
-function get_user_entrydate($id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
-
-  if (isset($id)) {
-    $query = "select userobm_datebegin,
-        $datebegin
-      from UserObm
-      where userobm_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-    $obm_q->next_record();
-    $date["iso"] = $obm_q->f("userobm_datebegin");
-    $date["unix_timestamp"] = $obm_q->f("datebegin");
-    return $date;
-  } else {
-    return "" ;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // CompanyCategory query execution
 // Return:
 //   Database Object
@@ -525,7 +471,7 @@ function run_query_linked_invoice_nb ($id, $entity, $arch="") {
 //   - $id     : Id of entity
 //   - $entity : entity (deal, company, contact..)
 // Return:
-//   - Database Object : userobm list
+//   - $nb : document number
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_nb ($id,$entity) {
   global $cdg_sql;
@@ -549,8 +495,6 @@ function run_query_document_nb ($id,$entity) {
 //   - $id     : entity Id
 //   - $entity : Type of entity (deal, company..)
 //   - $doc_id : [optionnal] document Id
-// Return:
-//   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
   global $cdg_sql;
@@ -581,10 +525,10 @@ function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
 //   - $id  :  Id of entity
 //   - $entity  :  Type of entity (deal, company..)
 // Return:
-//   - Database Object : userobm list
+//   - $cpt_ins : # documents inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert_documents($ids, $entity) {
-  global $cdg_sql,$auth;
+  global $cdg_sql;
 
   $id = $ids["id"];
   $cpt = 0;
@@ -621,6 +565,92 @@ function run_query_insert_documents($ids, $entity) {
   }
 
   return $cpt_ins;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the Id of one User from its login
+// Parameters:
+//   - $login  : login
+// Returns:
+//   - user's Id
+///////////////////////////////////////////////////////////////////////////////
+function get_user_id($login) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM ;
+  if (isset($login)) {
+    $query = "select userobm_id from UserObm where userobm_login='$login'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query) ;
+    $obm_q->next_record() ;
+    return $obm_q->f("userobm_id") ;
+  } else {
+    return "" ;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get User infos
+// Parameters:
+//   - $id  : user id
+// Returns:
+//   - user hash values
+///////////////////////////////////////////////////////////////////////////////
+function get_user_info($id="") {
+  global $cdg_sql, $auth;
+
+  $obm_q = new DB_OBM ;
+  if ($id == "") $id = $auth->auth["uid"];
+
+  $query = "SELECT userobm_login,
+      userobm_perms,
+      userobm_lastname,
+      userobm_firstname
+    FROM UserObm
+    WHERE userobm_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query) ;
+  $obm_q->next_record() ;
+  $u["login"] = $obm_q->f("userobm_login");
+  $u["perms"] = $obm_q->f("userobm_perms");
+  $u["lastname"] = $obm_q->f("userobm_lastname");
+  $u["firstname"] = $obm_q->f("userobm_firstname");
+
+  return $u;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the entry date of one User from its id
+// Parameters:
+//   - $id : id
+// Returns:
+//   - begin date
+///////////////////////////////////////////////////////////////////////////////
+function get_user_entrydate($id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
+
+  if (isset($id)) {
+    $query = "select userobm_datebegin,
+        $datebegin
+      from UserObm
+      where userobm_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $date["iso"] = $obm_q->f("userobm_datebegin");
+    $date["unix_timestamp"] = $obm_q->f("datebegin");
+    return $date;
+  } else {
+    return "" ;
+  }
 }
 
 
@@ -1051,6 +1081,9 @@ function session_load_global_prefs() {
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
   global $sess, $auth, $last_v;
+
+  // We reset $last_v in case of session persistence (changing user)
+  $last_v = "";
 
   $obm_q = run_query_get_user_prefs($auth->auth["uid"]);
   while ($obm_q->next_record()) {

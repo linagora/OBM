@@ -24,7 +24,6 @@ $l_from = "du";
 $l_to = "au";
 $l_week="Semaine";
 $l_month="Mois";
-$l_month2="Mois de";
 $l_user="Utilisateur";
 $l_see = "Voir";
 $l_valid = "Valider";

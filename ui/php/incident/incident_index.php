@@ -260,7 +260,6 @@ function get_param_incident() {
   global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
   global $tf_pri, $tf_order, $tf_status, $tf_color;
-  global $set_debug, $cdg_param;
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $incident["date_before"] = $tf_datebefore;
@@ -292,13 +291,7 @@ function get_param_incident() {
   if (isset ($tf_status)) $incident["sta_label"] = $tf_status;
   $incident["sta_order"] = (isset($tf_order) ? $tf_order : "0");
 
-  if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
-    if ( $incident ) {
-      while ( list( $key, $val ) = each( $incident ) ) {
-        echo "<br />incident[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($incident);
 
   return $incident;
 }

@@ -222,12 +222,11 @@ display_page($display);
 // returns : $obm_user hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
-  global $action, $cdg_param, $popup;
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_datebegin, $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $ext_widget;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+  global $popup, $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
@@ -269,14 +268,7 @@ function get_param_user() {
     $obm_user["group_nb"] = $nb_group;
   }
 
-  if (debug_level_isset($cdg_param)) {
-    echo "<br />action = $action";
-    if ( $obm_user ) {
-      while ( list( $key, $val ) = each( $obm_user ) ) {
-        echo "<br />user[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($obm_user);
 
   return $obm_user;
 }

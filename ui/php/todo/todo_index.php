@@ -176,7 +176,6 @@ display_page($display);
 function get_param_todo() {
   global $uid, $param_todo, $action, $popup;
   global $tf_title, $sel_user, $sel_priority, $tf_deadline, $ta_content;
-  global $cdg_param;
 
   if (isset ($uid)) $todo["uid"] = $uid;
   if (isset ($action)) $todo["action"] = $action;
@@ -189,6 +188,8 @@ function get_param_todo() {
   if (isset ($sel_user)) $todo["sel_user"] = $sel_user;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
+
+  display_debug_param($todo);
 
   return $todo;
 }

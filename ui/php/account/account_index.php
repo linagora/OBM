@@ -201,9 +201,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_account() {
   global $tf_label, $tf_number, $tf_balance, $tf_bank;
-  global $ta_comment, $tf_balance_date, $param_account;
-  global $hd_balance;
-  global $set_debug, $cdg_param, $action;
+  global $ta_comment, $tf_balance_date, $hd_balance, $param_account;
 
   if (isset ($tf_label)) $account["label"] = $tf_label;
   if (isset ($tf_number)) $account["number"] = $tf_number;
@@ -213,14 +211,7 @@ function get_param_account() {
   if (isset ($tf_bank)) $account["bank"] = $tf_bank;
   if (isset ($ta_comment)) $account["comment"] = $ta_comment;
   
-  if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
-    echo "<br />action = $action";
-    if ( $account ) {
-      while ( list( $key, $val ) = each( $account ) ) {
-        echo "<br />account[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($account);
 
   return $account;
 }

@@ -24,7 +24,6 @@ $l_from = "from";
 $l_to = "to";
 $l_week="Week";
 $l_month="Month";
-$l_month2=" ";
 $l_see = "See";
 $l_valid = "Validation";
 $l_unvalid = "Cancel";

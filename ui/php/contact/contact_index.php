@@ -406,30 +406,11 @@ function get_param_contact() {
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
   global $sel_market, $tf_email, $tf_email2, $cb_mailok, $cb_priv, $ta_com;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $cb_archive;
-  global $param_company, $param_contact, $hd_usercreate, $cdg_param;
+  global $param_company, $param_contact, $hd_usercreate;
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header, $cb_default;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2,$tf_code2,$tf_code1;
-  global $HTTP_POST_VARS,$HTTP_GET_VARS;
-
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
-    $nb_d = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$contact["doc$nb_d"] = $d_num;
-      }
-    }
-    $contact["doc_nb"] = $nb_d;
-  }
 
   if (isset ($view)) $contact["view"] = $view;
   if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
@@ -493,14 +474,9 @@ function get_param_contact() {
   if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
   if (isset ($ext_title)) $contact["ext_title"] = $ext_title;
 
-  if (debug_level_isset($cdg_param)) {
-    echo "<br />action=$action";
-    if ( $contact ) {
-      while ( list( $key, $val ) = each( $contact ) ) {
-        echo "<br />contact[$key]=$val";
-      }
-    }
-  }
+  get_global_param_document($contact);
+
+  display_debug_param($contact);
 
   return $contact;
 }

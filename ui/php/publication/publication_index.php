@@ -439,7 +439,6 @@ function get_param_publication() {
   global $param_publication_orig,$sel_contactcategory1;
   global $cb_renewal,$sel_recept,$tf_recept,$tf_quantity;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;    
-  global $cdg_param;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
   
   if (isset ($popup)) $publication["popup"] = $popup;
@@ -469,13 +468,7 @@ function get_param_publication() {
   if (isset ($tf_type)) $publication["type_label"] = $tf_type;
   if (isset ($tf_recept)) $publication["recept_label"] = $tf_recept;
 
-  if (debug_level_isset($cdg_param)) {
-    if ( $publication ) {
-      while ( list( $key, $val ) = each( $publication ) ) {
-        echo "<br />publication[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($publication);
 
   return $publication;
 }

@@ -381,11 +381,8 @@ function get_param_document() {
   if (isset ($name_document)) $document["name"] = $name_document;
   if (isset ($param_entity)) $document["entity_id"] = $param_entity;
   if (isset ($entity)) $document["entity"] = $entity;
-
   if (isset($rd_file_update)) $document["file_update"] = $rd_file_update;
-  
   if (isset ($tf_url)) $document["url"] = $tf_url;
- 
   if (isset ($tf_repository_name)) $document["repository_name"] = $tf_repository_name;
   if (isset ($tf_repository_path)) $document["repository_path"] = $tf_repository_path;
   
@@ -421,13 +418,8 @@ function get_param_document() {
 
   if (isset ($cb_privacy)) $document["privacy"] = $cb_privacy;
 
-  if (debug_level_isset($cdg_param)) {
-    if ( $document ) {
-      while ( list( $key, $val ) = each( $document ) ) {
-        echo "<br />document[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($document);
+
   return $document;
 }
 

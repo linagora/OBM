@@ -535,7 +535,6 @@ function get_param_payment() {
   global $hd_amount, $hd_used_amount, $hd_account, $hd_number, $hd_kind;
   global $hd_nb_invoices, $tf_instant_value, $tf_invoice_company;
   global $rd_paid, $cb_checked;
-  global $set_debug , $action;
 
   if (isset ($tf_amount)) $p_payment["amount"] = $tf_amount;
   if (isset ($hd_amount)) $p_payment["amount"] = $hd_amount;
@@ -565,14 +564,7 @@ function get_param_payment() {
   if (isset ($tf_company)) $p_payment["company"] = $tf_company;
   if (isset ($cb_checked)) $p_payment["checked"] = $cb_checked;
 
-  if ($set_debug > 0) {
-    echo "<br />action = $action";
-    if ( $p_payment ) {
-      while ( list( $key, $val ) = each( $p_payment ) ) {
-        echo "<br />payment[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($p_payment);
 
   return $p_payment;
 }

@@ -483,7 +483,6 @@ function get_param_deal() {
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text, $new_order, $order_dir;
-  global $HTTP_POST_VARS,$HTTP_GET_VARS;
  
   if (isset ($popup)) $deal["popup"] = $popup;
   if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
@@ -565,47 +564,11 @@ function get_param_deal() {
   if (isset ($tf_status)) $deal["status_label"] = $tf_status;
   $deal["status_order"] = (isset($tf_order) ? $tf_order : "0");
 
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
-
-  if (isset ($http_obm_vars)) {
-    $nb_d = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$deal["doc$nb_d"] = $d_num;
-      }
-    }
-    $deal["doc_nb"] = $nb_d;
-  }
+  get_global_param_document($deal);
   
-  dis_debug_param($deal);
+  display_debug_param($deal);
 
   return $deal;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Comodity function: display the parameters store in the hash given
-// Parameters:
-//   - $deal[] : hash which values to display
-///////////////////////////////////////////////////////////////////////////////
-function dis_debug_param($deal) {
-  global $cdg_param, $action;
-
-  if (debug_level_isset($cdg_param)) {
-    echo "<br />action=$action";
-    if ( $deal ) {
-      while ( list( $key, $val ) = each( $deal ) ) {
-        echo "<br />deal[$key]=$val";
-      }
-    }
-  }
-
 }
 
 

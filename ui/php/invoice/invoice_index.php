@@ -203,7 +203,6 @@ function get_param_invoice() {
   global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
   global $param_project, $project_name, $project_new_name, $project_new_id;
   global $ext_id;
-  global $set_debug, $cdg_param, $action;
 
   get_global_param_document($invoice);
 
@@ -247,14 +246,7 @@ function get_param_invoice() {
   // External parameters
   if (isset ($ext_id)) $invoice["id"] = $ext_id;
 
-  if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
-    echo "<br />action = $action";
-    if ( $invoice ) {
-      while ( list( $key, $val ) = each( $invoice ) ) {
-        echo "<br />invoice[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($invoice);
 
   return $invoice;
 }

@@ -269,10 +269,10 @@ exit(0);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
-  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
+  global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate;
   global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
   global $new_order, $order_dir, $popup, $row_index;
-  global $ch_mailing_ok;
+  global $cb_mailing_ok;
 
   global $tf_company_name,$tf_company_zipcode,$tf_company_town;
   global $tf_company_timeafter,$tf_company_timebefore;
@@ -304,7 +304,7 @@ function get_param_list() {
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
   if (isset( $cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
-  if (isset($ch_mailing_ok)) $list["mailing_ok"] = $ch_mailing_ok == 1 ? 1 : 0; 
+  if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0; 
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;
@@ -385,17 +385,11 @@ function get_param_list() {
     $list["list_nb"] = $nb_list;
   }
 
-  if (debug_level_isset($cdg_param)) {
-    echo "action=$action";
-    if ( $list ) {
-      while ( list( $key, $val ) = each( $list ) ) {
-        echo "<br />list[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($list);
 
   return $list;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // LIST actions

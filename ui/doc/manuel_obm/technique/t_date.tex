@@ -1,0 +1,95 @@
+% Documentation technique d'OBM : Gestion des dates
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\subsection{Gestion des dates}
+
+Les problèmes de format des dates sont génériques et pariculièrement sensibles dans une application comme \obm fonctionnant avec différentes bases de données et permettant à chaque utilisateur de sélectionner sa propre langue.\\
+
+Afin de simplifier la gestion des dates \obm définit un cadre avec des règles d'utilisation des dates et une api.
+
+\subsubsection{Cadre général et règles d'utilisation}
+
+\begin{tabular}{|p{7cm}|p{7cm}|}
+\hline
+\textbf{Règles} & \textbf{Implications} \\
+\hline
+\obm récupére les dates de la base de données au format \textbf{Timestamp Unix}. & La BD doit savoir retourner une date au format \textbf{Timestamp Unix}.
+Voir :
+\begin{itemize}
+\item \fonction{sql\_date\_format()}
+\end{itemize}\\
+\hline
+\obm propose des fonctions de formattage des dates récupérées tenant compte des paramètres utilisateur.
+&
+Toute date récupérée de la BD doit utiliser une des fonctions de formattage avant affichage.
+Voir :
+\begin{itemize}
+\item \fonction{date\_format()}
+\item \fonction{isodate\_format()}
+\item \fonction{datetime\_format()}
+\end{itemize}\\
+\hline
+\obm reçoit les dates à insérer en BD au format ISO ``\textbf{AAAA-MM-JJ HH:MM:SS}''
+&
+La BD doit accepter en entrée des dates au format ISO.
+A noter que la fonction javascript globale \fonction{check\_date()} permet aussi de saisir les dates au format du pays (JJ/MM/AAAA ou MM/JJ/AAAA). Cette fonction est définie dans le fichier de langue \fichier{check\_date.js}\\
+\hline
+OBM acceptant en simultané des langues différentes pour les utilisateurs, propose des labels pour le nom des mois, et jours de semaine.
+&
+Voir :
+\begin{itemize}
+\item \variable{\$l\_monthsofyear}
+\item \variable{\$l\_monthsofyearshort}
+\item \variable{\$l\_daysofweek}
+\item \variable{\$l\_daysofweekshort}
+\item \variable{\$l\_daysofweekreallyshort}
+\end{itemize}\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Récupération de date au format Timestamp Unix}
+
+\paragraph{Implémentation multi-base de données}
+
+\fonction{sql\_date\_format()} définie dans le fichier \fichier{global\_query.inc} :
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+function sql_date_format($db_type, $field, $as="") {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $ret = "UNIX_TIMESTAMP($field)";
+    if ($as != "") {
+      $ret .= " as $as";
+    }
+  } elseif ($db_type == $db_type_pgsql) {
+    $ret = "EXTRACT (EPOCH from $field)";
+    if ($as != "") {
+      $ret .= " as $as";
+    }
+  } else {
+    $ret = $field;
+  }
+
+  return $ret;
+}
+\end{verbatim}
+\end{minipage}
+}
+\paragraph{Utilisation} dans une requète :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datealarm = sql_date_format($db_type, "deal_datealarm", "datealarm");
+\end{verbatim}
+\end{minipage}
+}

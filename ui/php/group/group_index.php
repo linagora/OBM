@@ -239,7 +239,7 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_group() {
-  global $action, $param_group, $cdg_param, $popup, $child_res;
+  global $param_group, $popup, $child_res;
   global $new_order, $order_dir, $entity;
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
   global $ext_action, $ext_url, $ext_id, $ext_target, $ext_title, $ext_widget;
@@ -292,14 +292,7 @@ function get_param_group() {
     $group["group_nb"] = $nb_group;
   }
 
-  if (debug_level_isset($cdg_param)) {
-    echo "action=$action";
-    if ( $group ) {
-      while ( list( $key, $val ) = each( $group ) ) {
-        echo "<br>group[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($group);
 
   return $group;
 }

@@ -1403,6 +1403,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
       </table>
      </div>
 
+<!-- User select -->
      <div class=\"agendaBar\">
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">
        <tr>

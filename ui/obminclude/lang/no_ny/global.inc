@@ -62,39 +62,22 @@ $l_help_mandatory = "This field is mandatory";
 $l_help_down  = "Move the field down";
 $l_help_up = "Move the field up";
 
+// Tasktype groups
+$l_task_fac = "Factured Tasks";
+$l_task_int = "Internal Projects";
+$l_task_div = "Not Factured Tasks";
 
-//used by many modules
-// days and months
-$l_january="January";
-$l_february="February";
-$l_march="March";
-$l_april="April";
-$l_may="May";
-$l_june="June";
-$l_july="July";
-$l_august="August";
-$l_september="September";
-$l_october="October";
-$l_november="November";
-$l_december="December";
+// Days and months
+$l_monthsofyear = array('January','February', 'March','April','May','June','July','August','September','October','November','December');
+$l_monthsofyearshort = array('jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec');
+$l_daysofweek = array('Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday');
+$l_daysofweekshort = array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
+$l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
 
-$l_short_january="Jan";
-$l_short_february="Feb";
-$l_short_march="Mar";
-$l_short_april="Apr";
-$l_short_may="May";
-$l_short_june="Jun";
-$l_short_july="Jul";
-$l_short_august="Aou";
-$l_short_september="Sep";
-$l_short_october="Oct";
-$l_short_november="Nov";
-$l_short_december="Dec";
-$l_invalid_perm = "Word to define";
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
 
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
 $l_header_com    = "Word to define";
 $l_header_prod   = "Word to define";
 $l_header_compta = "Word to define";

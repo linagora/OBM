@@ -7,125 +7,160 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_users = "Contacts";
-$l_groups = "Groupes";
-$l_title = "Titre";
+$l_agenda = "Calendar";
+$l_users = "Users";
+$l_groups = "Groups";
+$l_title = "Title";
+$l_private_description = "This is a private event, you cannot see the details";
 $l_description = "Description";
-$l_state = "Etat";
-$l_none = "aucune";
+$l_state = "Status";
+$l_back_mono = "Back to your own view";
 
-$l_high = "Haute";
-$l_low = "Basse";
-$l_medium = "Normale";
+$l_go = "Go";
+$l_high = "High";
+$l_low = "Low";
+$l_medium = "Medium";
 
-$l_datebegin = "Date de d&eacute;but";
-$l_dateend = "Date de fin";
-$l_timebegin = "Heure de d&eacute;but";
-$l_timeend = "Heure de fin";
-$l_occupied_day = "Journ&eacute;e entiere";
+$l_datebegin = "Begin date";
+$l_dateend = "End date";
+$l_timebegin = "Begin time";
+$l_timeend = "End time";
+$l_occupied_day = "Whole day";
+$l_user_right = "Manage rights for";
 
-$l_repeat = "REPETITION";
-$l_periodicity = "Fr&eacute;quence";
-$l_repeatkind = "Type de r&eacute;p&eacute;tition";
-$l_repeatdays = "Jours de r&eacute;p&eacute;tition (type hebdomadaire)";
-$l_use_endrepeat = "Date de fin de r&eacute;p&eacute;tition";
-$l_interval = "Intervalle ";
+$l_format = "(AAAA-MM-JJ)";
+$l_repeat = "Repeatition";
+$l_periodicity = "Frequency";
+$l_repeatkind = "Frequency type";
+$l_repeatdays = "Repetition days (weekly type)";
+$l_use_endrepeat = "End repetition date";
+$l_too_much_user = "No more than six users";
+$l_waiting_events = "Waiting events";
+$l_user_calendar = "Multi-user view";
+$l_repeatdays2 = "Repeatition days";
 
-$l_waiting_events = "Rendez-vous en attente";
-
-$l_accepted = "Accept&eacute;";
-$l_rejected = "Rejet&eacute;";
-$l_waiting  = "En attente de confirmation";
+$l_link_events = "linked events with this category.";
+$l_accepted = "Accept";
+$l_rejected = "Reject";
+$l_waiting  = "Waiting for confirmation";
 $l_short_accepted = "A";
 $l_short_rejected = "R";
-$l_short_waiting  = "Att";
-
-$l_daily = "quotidienne";
-$l_weekly = "hebdomadaire";
-$l_monthlybydate = "mensuelle (date)";
-$l_monthlybyday = "mensuelle(jour)";
-$l_yearly = "annuelle";
-
-$l_from = "du";
-$l_to = "au";
-
-
+$l_short_waiting  = "Wait";
+$l_wait = "Waiting";
+$l_free = "Free but restricted";
+$l_possible = "Free";
+$l_occupied = "Unavailable";
+$l_daily = "daily";
+$l_weekly = "weekly";
+$l_monthlybydate = "monthly (date)";
+$l_monthlybyday = "monthly (day)";
+$l_yearly = "yearly";
+$l_repeatkind = "Repeatition kind";
+$l_from = "from";
+$l_to = "to";
+$l_event_duration = "Meeting duration";
+$l_use_endrepeat = "End repeatition";
+$l_timebegin2 = "Begin time";
+$l_timeend2 = "End time";
+$l_conflicts = "Conflict(s) found";
+$l_date = "Date";
+$l_user = "User";
+$l_meeting_legend = "Legend";
 // actions 
-$l_insert = "Enregistrer le rdv";
-$l_update = "Modifier le rdv";
-$l_delete = "Supprimer le rdv";
-$l_delete_all = "Supprimer tous";
-$l_validate = "Valider";
-$l_accept = "Accepter";
-$l_reject = "Refuser";
-$l_select = "S&eacute;lectionner";
+$l_insert = "Insert the event";
+$l_update = "Update the event";
+$l_accept = "Accept";
+$l_reject = "Refuse";
+$l_select = "Select";
+$l_repeat_update = "Update all occurrences of this appointment";
+$l_go_to = "Go to";
+$l_refuse = "Refuse";
+$l_change_state = "Your event participation";
+$l_force_insert = "Force insert";
+$l_refuse_insert = "Refuse event";
+$l_cancel_insert = "Wait...";
+$l_category_update = "Update Category";
+$l_category_checkdelete = "Check or Delete Category";
+$l_category_delete = "Delete Category";
+$l_category_insert = "Insert Category";
+$l_agenda_select_group = "Select the groups.";
 
-// Messages 
-$l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
-$l_error_visibility = "Les informations contenues dans cette page sont priv&eacute;es. Vous ne pouvez pas les consulter";
-$l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
-$l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
-$l_event_insert_ok = "L'enregistrement du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;";
-$l_event_insert_error = "L'enregistrement du rendez-vous a &eacute;chou&eacute;";
-$l_event_update_ok = "La modification du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;e";
-$l_event_update_error = "La modification du rendez-vous a &eacute;chou&eacute;";
-$l_event_delete_ok = "La suppression du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;e";
-$l_event_delete_error = "La suppression du rendez-vous a &eacute;chou&eacute;";
-$l_event_delete_all_ok = "La suppression du rendez-vous et de toutes ses r&eacute;p&eacute;titions a &eacute;t&eacute; correctement effectu&eacute;e"; 
-$l_event_delete_all_error = "La suppression du rendez-vous et de toutes ses r&eacute;p&eacute;titions a &eacute;chou&eacute;";
-$l_event_approve_ok = "Vos choix ont &eacute;t&eacute; enregistr&eacute;s";
-$l_event_approve_error = "L'enregistrement de vos choix a &eacute;chou&eacute;";
-$l_event_update_cancel_ok = "La modification du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
-$l_event_insert_cancel_ok = "L'insertion du rendez-vous a bien &eacute;t&eacute; annul&eacute;e";
-$l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
+$l_force = "Force the event insertion";
+$l_carac = "Caracteristics";
+$l_meeting_perform = "Seek for free crenels";
 
-// days and months
-$l_january="Janvier";
-$l_february="F&eacute;vrier";
-$l_march="Mars";
-$l_april="Avril";
-$l_may="Mai";
-$l_june="Juin";
-$l_july="Juillet";
-$l_august="Aout";
-$l_september="Septembre";
-$l_october="Octobre";
-$l_november="Novembre";
-$l_december="Decembre";
+$l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
+$l_confirm = "Confirm";
+$l_cancel = "Cancel";
+$l_insert_ok = "Insertion successful";
+$l_update_ok = "Update successful";
+$l_update_warning = "Warning : some conflicts have been detected";
+$l_insert_warning = "Warning : some conflicts have been detected";
+$l_update_error = "Conflicts have been detected, update cancelled";
+$l_insert_error = "Conflicts have been detected, insertion cancelled";
 
-$l_short_january="Jan";
-$l_short_february="Fev";
-$l_short_march="Mar";
-$l_short_april="Avr";
-$l_short_may="Mai";
-$l_short_june="Jun";
-$l_short_july="Jul";
-$l_short_august="Aou";
-$l_short_september="Sep";
-$l_short_october="Oct";
-$l_short_november="Nov";
-$l_short_december="Dec";
-
-$l_monday="Lundi";
-$l_tuesday="Mardi";
-$l_wednesday="Mercredi";
-$l_thursday="Jeudi";
-$l_friday="Vendredi";
-$l_saturday="Samedi";
-$l_sunday="Dimanche";
-
-$l_short_monday="Lun";
-$l_short_tuesday="Mar";
-$l_short_wednesday="Mer";
-$l_short_thursday="Jeu";
-$l_short_friday="Ven";
-$l_short_saturday="Sam";
-$l_short_sunday="Dim";
+// Messages
+$l_sendamail = "Force the notification by mail.";
+$l_select_contacts = "You have to select an user or group.";
+$l_select_repeat_day = "You have to select the repetition days.";
+$l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour "; 
+$l_fill_title = "You have to fill the [ $l_title ] field";
+$l_fill_dateend = "You have to fill the [ $l_dateend ] field";
+$l_fill_datebegin = "You have to fill the field [ $l_datebegin ]";
+$l_err_datebegin = "[ $l_datebegin ] invalid format !";
+$l_err_dateend = "[ $l_dateend ] invalid format !";
+$l_err_repeat = "[ $l_use_endrepeat ] invalid format !";
+$l_err_begin_end = "End date must be after begin date !";
+$l_err_end_repeat = "Repetion end must be after end date";
+$l_err_end_repeat2 = "The max duration of a repetition is one year";
+$l_err_end_repeat3 = "The max duration of a repetition is ten years when the repeatition kind is yearly";
+$l_err_days_repeat = "You must check one or more repeatition day.";
+$l_err_days_repeat_not_weekly = "You can give repeatition days only on weekly repeatition.";
+$l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
+$l_category_insert_ok = "The category has been inserted successfully.";
+$l_category_insert_error = "The insertion of the category has failed !";
+$l_category_delete_ok = "The category has been deleted successfully.";
+$l_category_delete_error = "The deletion of the category has failed !";
+$l_category_update_ok = "The category has been updated successfully.";
+$l_category_update_error = "The update of the category has failed !";
+$l_category_link_company = "These companies are referenced as";
+$l_category_link_company_no = "No company referenced as";
+$l_category_cant_delete = "The category can't be deleted !";
+$l_category_can_delete = "The category can be deleted.";
 
 $l_unknown="Inconnu";
 
+$l_category_manage = "Calendar Category Management";
+$l_category_exist = "Existing Categorys";
+$l_category_new = "New Category";
+$l_header_right = "Right management";
+$l_header_meeting = "New meeting";
+$l_header_admin = "Administration";
+$l_header_export = "Export";
+$l_authorize_list = "Authorized people";
+$l_denie_list = "Unauthorized people";
+$l_read_permission = "Read access management";
+$l_write_permission = "Write access management";
+$l_everyone = "Authorized everybody";
+$l_noone = "Authorized nobody";
+$l_list = "Authorized list people";
+$l_authorize = "&lt;&lt;&lt;&lt;";
+$l_deny = "&gt;&gt;&gt;&gt;";
 
+//Mail
+$l_add_event_mail_head = "New event on OBM :";
+$l_update_event_mail_head = "Event updated on OBM :";
+$l_delete_event_mail_head = "Event deleted on OBM :";
+
+$l_event_mail_body = "Date : ";
+$l_update_event_mail_body = "Instead of : ";
+$l_delete_event_mail_body = "Date : ";
+$l_confirm_mail = "Confirm+Force notification";
+$l_add_event_mail_subject = "New event on obm";
+$l_update_event_mail_subject = "Updated event on obm";
+$l_delete_event_mail_subject = "Deleted event on obm";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_interval_null = "Duration cannot be null";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";
 $mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";
@@ -137,7 +172,6 @@ $mj_date_incompatibility = "La date de fin ne peut etre anterieure a la date de 
 $mj_repeat_date_incompatibility = "La date de fin de repetition ne peut etre anterieure a la date de debut."; 
 $mj_event_delete_confirm = "Confirmer la suppression du rdv ?"; 
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
-
-
-
-?>
+$l_j_category_create = "Please specify a label for the new category";
+$l_j_category_update = "Please specify a new label, and select a category for the update";
+$l_j_category_delete = "Please select a category to delete it";

@@ -455,10 +455,9 @@ function get_param_company() {
   global $tf_dateafter, $tf_datebefore, $cb_cat_tree, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
   global $tf_naf_code, $tf_naf_label, $cb_naf_title, $tf_vat;
-  global $action, $param_company, $cdg_param;
+  global $param_company;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text;
-  global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   if (isset ($popup)) $company["popup"] = $popup;
   if (isset ($ext_action)) $company["ext_action"] = $ext_action;
@@ -469,25 +468,7 @@ function get_param_company() {
   if (isset ($ext_target)) $company["ext_target"] = $ext_target;
   if (isset ($ext_widget)) $company["ext_widget"] = $ext_widget;
   if (isset ($ext_widget_text)) $company["ext_widget_text"] = $ext_widget_text;
-  
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
-  }
 
-  if (isset ($http_obm_vars)) {
-    $nb_d = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
-	$nb_d++;
-	$d_num = substr($key, 4);
-	$company["doc$nb_d"] = $d_num;
-      }
-    }
-    $company["doc_nb"] = $nb_d;
-  }
-  
   if (isset ($param_company)) $company["id"] = $param_company;
   if (isset ($tf_num)) $company["num"] = $tf_num;
   if (isset ($tf_vat)) $company["vat"] = $tf_vat;
@@ -540,14 +521,9 @@ function get_param_company() {
   if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;
   if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
 
-  if (debug_level_isset($cdg_param)) {
-    echo "<br />action = $action";
-    if ( $company ) {
-      while ( list( $key, $val ) = each( $company ) ) {
-        echo "<br />company[$key]=$val";
-      }
-    }
-  }
+  get_global_param_document($company);
+
+  display_debug_param($company);
 
   return $company;
 }

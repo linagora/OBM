@@ -73,6 +73,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     $d_lifetime = "unlimited";
   }
 
+  $obm_db_version
   $nbua = $obm_u->nf();
   $list_user = "";
   while ($obm_u->next_record()) {
@@ -91,7 +92,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       <td class=\"adminText\">$lastpage</td>
       <td class=\"adminText\">$ip</td>
       </tr>";
-}
+  }
 
   echo "
     <br />

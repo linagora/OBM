@@ -1,6 +1,6 @@
 % Manuel d'utilisation d'OBM : module Time manager
-% ALIACOM Bastien Continsouzas
-% $Id
+% ALIACOM Bastien Continsouzas - Pierre Baudracco
+% $Id$
 
 \clearpage
 \section{Le module Gestion des temps}
@@ -9,39 +9,48 @@ Ce module permet de suivre l'activité des différents utilisateurs et leur partic
 
 Les principales entités du module \timemanager sont décrites ci-dessous :
 
-\subsection{Description d'une tâche}
+\subsection{Description d'une saisie de temps}
 
-Composantes d'une tâche :
+Composantes d'une saisie de temps :\\
 
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Date & Date à laquelle a été effectuée la tâche\\
+\hline
+Durée & Durée du travail sur la tâche exprimée en fraction de journée\\
+\hline
+Catégorie & Catégorie du projet. Celles-ci sont divisées en trois groupes :
 \begin{itemize}
-\item{\textbf{Id}} Non modifiable, numéro technique géré par l'application.
-
-\item{\textbf{Date}} Date à laquelle a été effectuée la tâche.
-
-\item{\textbf{Durée}} Durée de la tâche exprimée en fraction de journée.
-
-\item{\textbf{Catégorie}} La catégorie d'activité de cette tâche. Celles-ci sont divisées en trois groupes :
-
-\begin{itemize}
-\item Tâches facturées
-\item Projets internes,
+\item Projets facturés
+\item Projets internes R\&D,
 \item Tâches non facturées
 \end{itemize}
+Les catégories de tâches sont gérées dans le module référentiel de la section administration.\\
+\hline
+Projet & Projet imputé. Cette information n'est présente que pour les catégories de tâches ``projets facturés'' et ``projets internes''\\
+\hline
+Tâche & Tâche du projet imputé. Cette information n'est présente que pour les catégories de tâches ``projets facturés'' et ``projets internes''\\
+\hline
+Commentaire & Descriptif optionnel\\
+\hline
+Statut & Les imputations de temps ont un statut différent en fonction de leur niveau de validation\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
 
-\item{\textbf{Projet/Affaire}} Indique le projet pour lequel cette tâche a été réalisée. Cette information n'est présente que pour les tâches facturées et les projets internes.
 
-\item{\textbf{Société}} Indique la société pour le compte de qui cette tâche a été effectuée. Cette information n'a de sens que pour les tâches facturées.
+\subsubsection{Description des statuts d'une imputation}
 
-\item{\textbf{Commentaire}} Court descriptif de la tâche permettant de mieux  le travail effectué.
-
-\item{\textbf{Statut}} Les tâches ont un statut différent en fonction de leur niveau de validation :
+Les imputations ont un statut différent en fonction de leur niveau de validation :\\
 
 \begin{itemize}
 \item Non validée : c'est le cas lorsque la tâche vient d'être saisie.
 \item Validation utilisateur : elle est réalisée automatiquement lorsqu'une journée est complètement remplie.
 \item Validation administrateur elle est réalisée manuellement par l'administrateur qui veut valider le mois d'un utilisateur lorsque celui-çi est entièrement rempli. Il n'est alors plus possible de modifier ces tâches.
 \end{itemize}
-\end{itemize}
+
 
 \subsection{Les sous-menus du module Gestion des temps}
 

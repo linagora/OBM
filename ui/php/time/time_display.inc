@@ -41,8 +41,7 @@ $fieldnames["timetask_id"] = "";
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_time(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
-  global $time;
+  global $path, $set_theme, $time;
 
   $res["style"] = "";
   
@@ -80,53 +79,15 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Array content
+// Display Time navigation by date
 // Parameters:
-//   - $array : any array
+//   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
-function debug_array($a) {
-  global $_POST;
-
-  echo "<br />BEGIN----- debug_array ------<br />";
-  foreach($a as $key => $val) {
-    if (is_null($val))
-      echo "clé $key val -- NULL -- <br />";
-    else if (is_array($val)) {
-      echo "clé $key val ";
-      print_r($val);
-      echo " <br />";
-    }
-    else
-      echo "clé $key val --$val-- <br />";
-  }
-  echo "_POST<br />";
-  foreach($_POST as $key => $val) {
-    if (is_array($val)) {
-      echo "clé $key val ";
-      print_r($val);
-      echo " <br />";
-    }
-    else
-      echo "clé $key val --$val-- <br />";
-  }
-
-  echo "----- debug_array ------END<br />";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Changing Time Links                                              //
-// Parameters:
-//   - $time : array, with all pairs of value set by forms
-//         with $time["date"] = current date 
-//   - $type : "week", "month", "all"
-//     default : all
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_links ($time, $type="all") {
-  global $cdg_param, $auth, $set_theme; 
-  global $hum_date, $l_week, $l_month2, $l_from, $l_to;
+function dis_time_nav_date($time) {
+  global $cdg_param, $auth, $set_theme, $l_monthsofyear;
 
   $action = $time["action"];
+  $interval = $time["interval"];
 
   if (($action=="globalview") or ($action=="validate") or ($action=="unvalidate")) {
     $user_id = $auth->auth["uid"];
@@ -135,132 +96,290 @@ function dis_time_links ($time, $type="all") {
     $user_id = $time["user_id"];
   }
 
-  $obm_user_q = run_query_userobm($user_id);
-  $obm_user_q->next_record();
-
-  $f_name = $obm_user_q->f("userobm_firstname");
-  $l_name = $obm_user_q->f("userobm_lastname");
-
+  $u = get_user_info($user_id);
   $no_name = array("stats","globalview","validate","unvalidate");
-  if (!(in_array($action, $no_name)))
-    $user = $f_name . " " . $l_name . " :";
+  if (!(in_array($action, $no_name))) {
+    $user = $u["firstname"]. " " . $u["lastname"];
+  }
 
-  if ($type == "week") {
+  if ($interval == "week") {
 
     $tot_width = 500;
 
-    //get the current start and end of week
-    $d_start_week = first_day_week($time);
+    // get the current start and end of week
+    $d_start_week = first_day_week($time["date"]);
     $d_end_week = $d_start_week+6*86400;
-
-    // get the previous and next beginning of week
-    $d_start_prev = $d_start_week-7*86400;
-    $d_start_next = $d_start_week+7*86400; 
-     
     $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
     $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
+    $title = "$user : $hum_date_start - $hum_date_end";
 
-    $block = "
-      <div class=\"timeCenter\">
-       <table class=\"timeLinks\" width=\"$tot_width\">
-        <tr>
-         <td align=\"left\">
-          <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
-          <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
-          </a>
-         </td>
-         <td class=\"timePeriod\">
-           $user $l_from $hum_date_start $l_to $hum_date_end
-         </td>
-         <td align=\"right\">
-          <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=".date("Ymd",$d_start_next))."\">
-           <img border=\"0\" src=\"/images/$set_theme/next.png\" alt=\"\" />
-          </a>
-         </td>
-        </tr>
-       </table>    
-      </div>
-      ";
+    // get the previous and next beginning of week
+    $d_prev = date("Ymd",$d_start_week-7*86400);
+    $d_next = date("Ymd",$d_start_week+7*86400+3*3600); // +3h prevent DST bug
+    $url_prev = url_prepare("time_index.php?action=$action&amp;wbegin=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$action&amp;wbegin=$d_next");
 
-  } else if ($type == "month") {
-    if (debug_level_isset($cdg_param)) {
-      echo "dis_time_links \$time <br />";
-      debug_array($time);
-    }
-
-    if (debug_level_isset($cdg_param)) {
-      echo "DIS_TIME_LINKS <br />";
-      echo "date ". $time["date"] . " <br />";
-    }
+  } else if ($interval == "month") {
 
     $tot_width = (in_array($action, $no_name)) ? 200 : 400;
 
     // This should work for january also (month 0 = december) 
-    $month=substr($time["date"],4,2);
-    $year=substr($time["date"],0,4);
+    $month = substr($time["date"],4,2);
+    $year = substr($time["date"],0,4);
+    $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
+    $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
+    $url_prev = url_prepare("time_index.php?action=$action&amp;wbegin=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$action&amp;wbegin=$d_next");
+    $title = "$user : ". $l_monthsofyear[$month-1] . " $year";;
+  }
 
-    $d_start_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
-    $d_start_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
-
-    if (debug_level_isset($cdg_param)) {
-      echo "previous $d_start_prev, next $d_start_next, <br />";
-    }
-
-    //Daylight Savings Time
-    // nothing to do for this width=\"$tot_width\"
-
-    $block = "
-     <div class=\"timeCenter\">
-       <table class=\"timeLinks\" width=\"$tot_width\">
-        <tr><td class=\"timeLinks\" align=\"left\">
-         <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=$d_start_prev")."\">
-           <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
-         </a>
+  $block = "
+    <div class=\"timeCenter\">
+      <table class=\"timeLinks\" width=\"$tot_width\">
+      <tr>
+        <td>
+          <a href=\"$url_prev\">
+          <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
+          </a>
         </td>
         <td class=\"timePeriod\">
-         $user $l_month2 ". month_name($month) ."
+          $title
         </td>
-        <td class=\"timeLinks\" align=\"right\">
-         <a href=\"" .
-      url_prepare("time_index.php?action=".$time["action"].
-		  "&amp;wbegin=$d_start_next")."\">
+        <td>
+          <a href=\"$url_next\">
            <img border=\"0\" src=\"/images/$set_theme/next.png\" alt=\"\" />
-         </a>
-        </td></tr>
-       </table>    
-     </div>
-     ";    
-  }
+          </a>
+        </td>
+      </tr>
+      </table>    
+    </div>
+";
 
   return $block;
 }
 
- 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display TimeManager User search Form                                      //
+// Display the planning according to the interval given
+// Parameters:
+//   - $time[] : time hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_planning($time) {
+  global $auth, $cdg_param;
+
+  if ($time["interval"] == "week") {
+    $task_q = run_query_task_one_week($time, '');
+    $block = dis_time_planning_week($task_q, $time);
+
+  } else if ($time["interval"] == "month") {
+
+    // If $action=globalview, show all users
+    if (($time["action"] == "globalview") or
+        ($time["action"] == "validate") or
+        ($time["action"] == "unvalidate")) {
+      $obm_short_q = run_query_short_month($time);
+      $block = dis_short_month($obm_short_q, $time);
+
+    } else {
+      $task_q = run_query_task_one_month($time);
+      $block = dis_time_planning_month($task_q, $time);
+    }
+  }
+
+  return "AAAA" . $block. "BBB";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the planning for a week
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $time[] : time hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_planning_week($obm_q, $time) {
+  global $c_working_days, $c_day_fraction,$l_daysofweekshort;
+
+  while ($obm_q->next_record())  {
+    $date = $obm_q->f("date");
+    $wday = date("w", $date);
+    $result[$wday] = $obm_q->f("total_length");
+  }
+  
+  $nb_worked_days = array_sum($c_working_days);
+  $tot_width = 500;
+  $col_width = $tot_width / $nb_worked_days;
+
+  $first_day = first_day_week($time["date"]);
+  $curr_day = $first_day;
+  $last_day = $first_day + 7*86400;
+
+  // we loop through days
+  while ($curr_day < $last_day) {
+    $wday = date("w", $curr_day);
+    $hum_wday = $l_daysofweekshort[$wday];
+
+    if (!(isset($result[$wday]))) {
+      $result[$wday] = 0;
+    }
+
+    if ($c_working_days[$wday] != 0) {
+      $line1 .= "
+        <td width=\"$col_width\" class=\"timeWeekhead\">$hum_wday</td>";
+      if ($result[$wday] == $c_day_fraction) {
+        $line2 .= "
+        <td class=\"timeWeekvalid\">$c_day_fraction/$c_day_fraction</td>";
+      } else {
+	$line2 .= "
+        <td class=\"timeWeekunvalid\">".$result[$wday]."/$c_day_fraction</td>";
+      }
+    }
+    
+    $curr_day += 86400;        
+  }
+  
+  $block = "
+  <div class=\"timeCenter\">
+    <table class=\"timeLinks\" width=\"$tot_width\">
+    <tr>
+      $line1
+    </tr>
+    <tr>
+      $line2
+    </tr>
+    </table>
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the planning for a month
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $time[] : time hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_planning_month($obm_q, $time) {
+  global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
+
+  $uid = $time["user_id"];
+  $col_width = 20;
+  $time_length = 0;
+  $time_worked = 0;
+  $span = 0;
+  $nb_worked_days = array_sum($c_working_days);
+
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+
+  // first day of the month in second
+  $first_day_sec = mktime(0,0,0,$month, 1, $year);
+  $last_day_sec = mktime(23,0,0,$month+1, 0, $year);
+  $day_in_sec = $first_day_sec;
+  $dow = date("w", $day_in_sec);
+  $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+
+  // Fill the day array -------------------------------------------------------
+  $day = 1;
+  while ($day_in_sec < $last_day_sec) {
+    $fday = ($day>9) ? "$day" : "0$day";
+    $array_res["$fday"]["length"] = 0;
+    $array_res["$fday"]["dow"] = $dow;
+    $array_res["$fday"]["obm_dow"] = $obm_dow;
+    $day++;
+
+    $day_in_sec += 86400;
+    $dow = date("w", $day_in_sec);
+    $obm_dow = ($dow - $c_week_first_day + 7) % 7;
+  }
+  
+  while ($obm_q->next_record())  {
+    $day = date("d", $obm_q->f("date"));
+    $status = $obm_q->f("timetask_status");
+    $array_res["$day"]["length"] = $obm_q->f("total_length");
+  }
+
+  // Display ------------------------------------------------------------------
+  $month_length = count($array_res);
+
+  // Display the array
+  while (list($day,$val) = each($array_res)) {
+    // Not working days
+    if ($c_working_days[$val["dow"]] == 0) {
+      $line1 .= "<td width=\"$col_width\" class=\"timeOffday\">$day</td>\n";
+      $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
+
+    } else {
+      // Working days
+      $line1 .= "<td width=\"$col_width\" class=\"timeWorkday\">$day</td>\n";
+
+      if ($val["length"] == $c_day_fraction) {
+	$class = "class=\"timeValid\"";
+      } else {
+	$class = "class=\"timeUnvalid\"";
+      }
+      $line2 .= "
+        <td $class>".$val["length"]."/$c_day_fraction</td>";
+    }
+
+    // handle the 3rd line (fill) XXXX not generic with working day here
+    if ($val["obm_dow"] == 0) {
+      $time_length = 0;
+      $time_worked = 0;
+      $span = 1;
+    } else {
+      if ($c_working_days[$val["dow"]] == 1) {
+	$time_length += $c_day_fraction;
+      }
+      $time_worked += $val["length"];
+      $span += 1;
+    }
+
+    // last day of the week 
+    if (($val["obm_dow"] == 6) or ($day == $month_length)) {
+      $week = get_week_point($year.$month.$day);
+      $url = url_prepare("time_index.php?action=index&amp;wbegin=".$week[0]);
+      
+      if ($time_length != $time_worked) {
+	$class = "class=\"timeUnvalid\"";
+      } else {
+	$class = "class=\"timeValid\"";
+      }
+      
+      $line3 .= "
+          <td $class colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
+    }
+  }
+  
+  $block = "
+  <div class=\"timeCenter\">
+    <table class=\"timeMonth\">
+    <tr>
+      $line1
+    </tr>
+    <tr>
+      $line2
+    </tr>
+    <tr>
+      $line3
+    </tr>
+    </table>
+  <div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display TimeManager User search Form
 // Parameters:
 //   - $time[] : default form values
-//     keys used  : week
 //   - $usr_q  : DBO : UserObm list
-//   - $uid    : current user id
+//   - $multi  : if false, mono select else select multi
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
-  global $l_see, $l_week, $l_month, $project_managers, $l_user, $l_all;
+function dis_user_select($time, $usr_q, $multi=false) {
+  global $l_see, $project_managers, $l_user, $l_all;
   global $uid;
-
-  $hum_date_start = dis_human_date($time["date"]);
-  $hum_date_end = dis_human_date($time["date_end"]);
-
-  if ($time["interval"] == "week")
-    $period = $l_week;
-  else if ($time["interval"] == "month")
-    $period = $l_month;
 
   if (in_array($uid, $project_managers)) {
     $sel_user_id = $time["user_id"];
@@ -269,6 +388,9 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
       $size = 12;
       $type = "multiple";
       $alt = "[]";
+      $dis_button_all = "
+        <input type=\"submit\" name=\"submit\" value=\"$l_all\"
+               onclick=\"select_all(f_time)\" />";
     } else {
       $size = 6;
     }
@@ -288,7 +410,7 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
       } else {
 	if ($sel_user_id == $u_id)
 	  $sel_user .= "selected=\"selected\"";
-      };
+      }
 
       $sel_user .= " >$lname $fname</option>";
     }
@@ -302,31 +424,28 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
     else 
       $act = "index";
 
-    if ($multi)
-      $dis_button_all = "<input type=\"submit\" name=\"submit\" value=\"$l_all\"
-                                onclick=\"select_all(f_time)\" />";
+    $url = url_prepare("time_index.php");
 
     $block = "<br />
-      <div class=\"timeBar\">
-     <form method=\"post\" name=\"f_time\" action=\"" .
-      url_prepare("time_index.php") . "\">
+    <div class=\"timeBar\">
+    <form method=\"post\" name=\"f_time\" action=\"$url\">
 
-       <table class=\"timeUser\">
-        <tr>
-         <td class=\"timeUserhead\">$l_user</td>
-        </tr><tr>
-         <td class=\"timeUserback\">$sel_user</td>
-        </tr><tr>
-         <td class=\"timeUserback\">
-          <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
-          <input type=\"hidden\" name=\"action\" value=\"$act\" />
-          <input type=\"submit\" name=\"submit\" value=\"$l_see\"/>
-          $dis_button_all
-         </td>
-        </tr>
-       </table>
-     </form>
-      </div>
+    <table class=\"timeUser\">
+    <tr>
+      <td class=\"timeUserhead\">$l_user</td>
+    </tr><tr>
+      <td class=\"timeUserback\">$sel_user</td>
+    </tr><tr>
+      <td class=\"timeUserback\">
+        <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+        <input type=\"hidden\" name=\"action\" value=\"$act\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_see\" />
+        $dis_button_all
+      </td>
+    </tr>
+    </table>
+    </form>
+    </div>
 ";
   }
 
@@ -335,99 +454,27 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the full TimeManager result page                                 //
+// Display the full TimeManager result page
 // Parameters:
 //   - $time[] : time search criteria
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list($time) {
-  global $l_no_found, $cdg_param;
-  global $auth, $new_order, $order_dir, $display;
-  global $status_id; // "Signed" status for deals
-  global $c_day_fraction; // nbre de fraction possible d'une journée
-  global $c_days_in_a_week; // how many days in a week have to be filled (5)
+  global $uid, $display;
 
   $task_q = run_query_search($time);
   $nb_task = $task_q->num_rows();
 
-  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
+  $pref_q = run_query_display_pref($uid, "time");
 
   // array of validated days
   $val_days = run_query_valid_search($time);
-  if (debug_level_isset($cdg_param)) {
-    echo "validated days : ".sizeof($val_days)." <br />";
-    print_r($val_days);
-  }
 
-  // Creating the dates for the selected (or current) date
-  // format "Mon 25 May"
-  $d_start_week = first_day_week($time);  
-  $day_q = get_this_week($d_start_week, $c_days_in_a_week);
-  
-  if (debug_level_isset($cdg_param)) {
-    echo "list of days <br />";
-    print_r($day_q);
-  }
-
-  // Get elements for insertion of new task
-  // TaskType
-  $obm_tasktype_q = run_query_used_tasktype($time["user_id"]);
-  // Project
-  $obm_project_q = run_query_project($time);
-  // ProjectTask
-  $obm_projecttask_q = run_query_projecttask($time);
-
-  // dis_form_addtask does not display anything if days are full
-  //   and validated
-  $block .= dis_form_addtask("insert", 
-			     $obm_project_q, 
-			     $obm_projecttask_q, 
-			     $obm_tasktype_q, 
-			     $day_q,
-			     $c_day_fraction,
-			     $time, 
-			     $val_days); 
+  // dis_form_addtask does not display anything if days are full and validated
+  $block .= dis_form_addtask($time, $val_days); 
  
   if ($nb_task != 0) {
     $block .= dis_time_list_result($task_q, $pref_q, $time);
-  }
-
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the full TimeManager result page for Index Page                       //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_index($time) {
-  global $l_no_found, $cdg_param;
-  global $auth, $new_order, $order_dir;
-  global $status_id; // "Signed" status for deals
-  global $c_day_fraction; // nbre de fraction possible d'une journée
-  global $c_days_in_a_week; // how many days in a week have to be filled (5)
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  
-  if ($time["interval"] == "month") {
-
-    $pref_month_task_q = run_query_display_pref($auth->auth["uid"], "time_task_month");
-
-    // If $action=globalview, show all users
-    if (($time["action"] == "globalview") or
-        ($time["action"] == "validate") or
-        ($time["action"] == "unvalidate")) {
-      $obm_short_q = run_query_short_month($time);
-      $block = dis_short_month($obm_short_q, $time);
-    } else {
-      $obm_month_task_q = run_query_task_one_month($time);
-      $block = dis_time_one_month($obm_month_task_q, $time);
-    }
-
-  } else {
-    $obm_week_task_q = run_query_task_one_week($time, '');
-    $block = dis_time_one_week($obm_week_task_q, $time);
   }
 
   return $block;
@@ -441,8 +488,7 @@ function dis_time_index($time) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_statsuser($statproj_q, $stattt_q, $time) {
-  global $l_no_found, $cdg_param;
-  global $auth, $new_order, $order_dir;
+  global $cdg_param, $auth, $new_order, $order_dir;
   global $l_proj_stats, $l_no_proj_stats;
   global $l_tt_stats, $l_no_tt_stats;
 
@@ -479,26 +525,6 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Export the Stats TimeManager result in a file                                 //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-// function dis_time_export_stats($time) {
-
-//   global $auth;
-//   global $status_id; // "Signed" status for deals
-//   global $fraction_jour; // nbre de fraction possible d'une journée
-//   global $days_in_a_week; // how many days in a week have to be filled (5)
-//   $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  
-//   $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
-//   $obm_stats_q = run_query_stats_by_deal($time, $new_order, $order_dir);
-
-//   dis_time_deal_export($obm_stats_q,$pref_deal_q,$nb_task,$time);
-// }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Time Task  result                                        //
@@ -511,7 +537,7 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list_result($task_q,$pref_q,$time) {
   //-- Themes
-  global $set_theme,$set_date,$ico_mail;
+  global $set_date,$ico_mail;
   //-- Labels
   global $l_date_task, $l_company;
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
@@ -560,168 +586,6 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Project result                                      //
-// Parameters : 
-//   - $obm_q    : tasks list to display 
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_task  : nb tasks returned by the search query 
-//     keys used : week
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_one_month($obm_dq, $time) {
-  //-- Themes
-  global $set_theme;
-  //-- Labels
-  global $l_found, $_task_del, $l_delete;
-  global $c_day_fraction, $c_days_in_a_week;
-
-  $uid = $time["user_id"];
-  //   $obm_user_q = run_query_userobm($uid);
-
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
-
-  // first day of the month in second
-  $day = 1;
-  $first_day_sec = mktime(0,0,0,$month, 1, $year);
-  $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
-  $first_wday =date("w", $day_in_sec);
-
-  //   while($obm_user_q->next_record()) {
-  //     $userid = $obm_user_q->f("userobm_id");
-  //     $f_name = $obm_user_q->f("userobm_firstname");
-  //     $l_name = $obm_user_q->f("userobm_lastname");
-  //     $array_users["name"] = $f_name . " " . $l_name;
-  //   }
-
-  $day_in_sec = $first_day_sec;
-  $wday =date("w", $day_in_sec);
-  
-  while ($day_in_sec < $last_day_sec) {
-    $fday = ($day>9) ? "$day" : "0$day";
-    $array_res["$fday"]["length"] = 0;
-    $array_res["$fday"]["wday"] = $wday;
-    $day++;
-    $day_in_sec = mktime(0,0,0,$month, $day, $year);
-    $wday =date("w", $day_in_sec);
-  }
-  
-  $day_in_sec = $first_day_sec;
-  
-  while ($obm_dq->next_record())  {
-    $day = $obm_dq->f("day_in_month");
-    $status = $obm_dq->f("timetask_status");
-    $array_res["$day"]["length"] = $obm_dq->f("total_length");
-
-    $length_tot += $obm_dq->f("total_length");
-  }
-
-  $block .= display_monthview($time, $array_res, $length_tot, $status);
-        
-  return $block;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// HTML Display the Month View for one user :                               //
-//  | 01 | 02 | 03 | 04
-//    OK   OK        5/8
-// Parameters : 
-//   - $array_res : an associative array build by XXXXX 
-//      $array_res[$day_in_month][string]
-//     where
-//        $day_in_month : [1-31]
-//        string : length = total filled for this day [1-$c_day_fraction]
-//                 wday   = number of the day in the week
-//   - $total : the amount of task filled for the month
-//////////////////////////////////////////////////////////////////////////////
-
-function display_monthview($time, $array_res, $total, $status) {
-  global $working_days;  // array of the days in a week where we are supposed to work
-  global $c_day_fraction, $c_days_in_a_week;
-  global $col_orange, $col_blue;
-  global $l_total, $l_fill, $l_see;
-
-  $col_width=20;
-  $time_length = 0;
-  $time_worked = 0;
-  $span = 0;
-  $month_length = count($array_res);
-
-  $month=substr($time["date"],4,2);
-  $year=substr($time["date"],0,4);
-  $day=substr($time["date"],6,2);
-
-  //   $name = $title["name"];
-  //   $status = $title["status"];
-
-  //   $first_wday = $array_res["01"]["wday"];
-  //   $span = $c_days_in_a_week - $first_wday + 1;
-  
-  // Display the array
-  while (list($day,$val) = each($array_res)) {
-    if ($working_days[$val["wday"]] == 0) {
-      $line1 .= "<td width=$col_width class=\"timeOffday\">$day</td>\n";
-      $line2 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
-      $line3 .= "<td class=\"timeOffday\">&nbsp;</td>\n";
-
-    } else {
-      $cell_1 = "<td width=$col_width class=\"timeWorkday\" >$day</td>\n";
-
-      if ($val["length"] == $c_day_fraction)
-        $line2 .= "<td class=\"timeValid\">".$val["length"]."/$c_day_fraction</td>\n";
-      else
-	$line2 .= "<td class=\"timeUnvalid\">".$val["length"]."/$c_day_fraction</td>\n";
-
-      if ($val["wday"] == 1) {
-	$time_length = 0;
-	$time_worked = 0;
-	$span = 1;
-      } else {
-	$time_length += $c_day_fraction;
-	$time_worked += $val["length"];
-	$span += 1;
-      }
-      
-      // last day of the week 
-      if (($val["wday"] == $c_days_in_a_week) or ($day == $month_length)) {
-	// return first and last day of the week
-	$week = get_week_point($year.$month.$day);
-	$url= url_prepare("time_index.php?action=index".
-			  "&amp;wbegin=".$week[0]);
-
-	if ($status == 2)
-	  $line3 .="<td class=\"timeValid\" colspan=\"$span\"><a href=\"$url\">$l_see</a></td>";
-	else if ($time_length != $time_worked)
-	  $line3 .="<td class=\"timeUnvalid\" colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
-	else
-	  $line3 .="<td class=\"timeValid\" colspan=\"$span\"><a href=\"$url\">$l_fill</a></td>";
-	
-      }
-      
-      $line1.=$cell_1;
-    }
-  }
-  
-  $block = "
-    <div class=\"timeCenter\">
-    <table class=\"timeMonth\">
-     <tr>
-      $line1
-     </tr>
-     <tr>
-      $line2
-     </tr>
-     <tr>
-      $line3
-     </tr>
-    </table>
-    <div>
-   ";
-
-  return $block;
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // HTML Display the Short View for one user :                               //
 //  | 01 | 02 | 03 | 04
@@ -737,7 +601,7 @@ function display_monthview($time, $array_res, $total, $status) {
 //////////////////////////////////////////////////////////////////////////////
 function dis_short_month($month_q, $time) {
   //-- Themes
-  global $set_theme, $display;
+  global $display;
   //-- Labels
   global $l_admin_empty;
 
@@ -778,9 +642,8 @@ function dis_short_month($month_q, $time) {
 //   - $total : the amount of task filled for the month
 //////////////////////////////////////////////////////////////////////////////
 function display_shortview($time, $array_res) { //, $order) {
-  global $set_theme, $working_days;  // array of the days in a week where we are supposed to work
-  global $c_day_fraction, $c_days_in_a_week;
-  global $col_orange, $col_blue;
+  global $set_theme, $c_working_days;
+  global $c_day_fraction;
   global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
 
   $date = $time["date"];
@@ -844,140 +707,34 @@ function display_shortview($time, $array_res) { //, $order) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Deal  result                                        //
-// Parameters : 
-//   - $obm_q    : tasks list to display 
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_task  : nb tasks returned by the search query 
-//     keys used : week
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_one_week($obm_dq, $time) {
-  //-- Themes
-  global $l_found, $_task_del, $l_delete;
-  global $c_day_fraction, $c_days_in_a_week;
-
-  $obm_user_q = run_query_userobm($time["user_id"]);
-  $obm_user_q->next_record();
-
-  $userid = $obm_user_q->f("userobm_id");
-  $f_name = $obm_user_q->f("userobm_firstname");
-  $l_name = $obm_user_q->f("userobm_lastname");
-  $user = $f_name . " " . $l_name;
-
-  $length_tot = 0;
-
-  while ($obm_dq->next_record())  {
-
-    $date = $obm_dq->f("day_in_week");
-    $year=substr($date,0,4);
-    $month=substr($date,4,2);
-    $day=substr($date,6,2);
-    
-    $day_in_sec = mktime(0,0,0,$month, $day, $year);
-    $wday =date("w", $day_in_sec);
-
-    $result[$wday] = $obm_dq->f("total_length");
-    $length_tot += $obm_dq->f("total_length");
-  }
-  
-  $block = display_weekview($time, $result, $length_tot, $user);
-
-  return $block;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// HTML Display the Week View for one user :
-//  | 01 | 02 | 03 | 04
-//    OK   OK        5/8
-// Parameters : 
-//   - $array_res : an associative array build by XXXXX 
-//      $array_res[$day_in_month][string]
-//     where
-//        $day_in_month : [1-31]
-//        string : length = total filled for this day [1-$c_day_fraction]
-//                 wday   = number of the day in the week
-//   - $total : the amount of task filled for the month
-//////////////////////////////////////////////////////////////////////////////
-function display_weekview($time, $result, $total, $title) {
-  global $working_days;  // array of the days in a week where we are supposed to work
-  global $c_day_fraction, $c_days_in_a_week;
-  global $col_orange,$col_blue;
-  global $l_total, $l_fill, $l_daysofweekshort;
-
-  $tot_width = 500;
-  $col_width = $tot_width / $c_days_in_a_week;
-
-  $curr_day = first_day_week($time);
-  $last_day = $curr_day + 7*86400;
-
-  // Display the array
-  while ($curr_day < $last_day) {
-    
-    $wday =date("w", $curr_day);
-    $hum_wday = $l_daysofweekshort[$wday];
-
-    if (!(isset($result[$wday])))
-      $result[$wday]=0;
-
-    if ($working_days[$wday] != 0) {
-      $line1 .= "<td width=\"$col_width\" class=\"timeWeekhead\" >";
-      $line1 .= "$hum_wday</td>\n";
-      
-      if ($result[$wday] == $c_day_fraction)
-        $line2 .= "<td class=\"timeWeekvalid\">$c_day_fraction/$c_day_fraction</td>\n";
-      else
-	$line2 .= "<td class=\"timeWeekunvalid\">".$result[$wday]."/$c_day_fraction</td>\n";
-    }
-    
-    $curr_day += 86400;        
-  }
-  
-  $block = "
-   <div class=\"timeCenter\">
-    <table class=\"timeLinks\" width=\"$tot_width\">
-     <tr>
-      $line1
-     </tr>
-     <tr>
-      $line2
-     </tr>
-    </table>
-   </div>
-   ";
-
-  return $block;
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Time Entry Form                                               //
+// Display the Time Entry Form
 //   - the days already filled are not shown
 //   - check box allows to select more than one day at once
 //   - if all days in the week are validated, does not display anything
 // Parameters:
-//   - $action    : one of "modify",
-//   - $project_q : Database Object listing projects
-//   - $taskt_q   : Database Object listing deal categories
-//   - $day_q     : Database Object listing days for this period of time
-//   - $time : array of defined variables
-//     - $validate_days : array of validated days (not to be shown)
+//   - $time[] : time hash values
+//   - $validate_days : array of validated days (not to be shown)
 ///////////////////////////////////////////////////////////////////////////////
-function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
-                          $day_q, $fraction_t, $time, $validate_days) {
-  global $auth, $time, $fraction_jour ,$task_id_modify;
-  global $l_add, $l_none;
-  global $l_comment,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
-  global $l_fill_addtask, $l_daysofweekshort;
-  //for list classement of task
-  global $l_task_fac,$l_task_div,$l_task_int, $l_intern, $l_cat, $l_comment;
-  global $c_days_in_a_week; // number of days to be displayed in a week
+function dis_form_addtask($time, $validate_days) {
+  global $auth, $l_add, $l_update, $l_none, $l_close;
+  global $l_fill_addtask, $l_comment, $l_date, $l_cat, $l_project, $l_duration;
+  global $l_task_fac, $l_task_div, $l_task_int, $l_intern;
+  global $c_day_fraction, $c_working_days, $c_week_first_day;
+
+  $action = $time["action"];
+  $project_q = run_query_project($time);
+  $projecttask_q = run_query_projecttask($time);
+  $tasktype_q = run_query_used_tasktype($time["user_id"]);
+  $nb_worked_days = array_sum($c_working_days);
+
+  $d_start_week = first_day_week($time["date"]);  
+  $day_q = get_week_working_days_dates($d_start_week);
 
   // If length of $validate_days = length of week ($days_in_a_week) :
   //   => form not to be shown
   if (debug_level_isset($cdg_param)) {
-    debug_array($time);
     echo "<br />day_q <br />";
     print_r($day_q);
     echo "<br />validate_days  <br />";
@@ -986,7 +743,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       echo "<br />sum validate_days " .array_sum($validate_days)."<br />";
   }
 
-  if (sizeof($validate_days) == $c_days_in_a_week) {
+  if (sizeof($validate_days) == $nb_worked_days) {
     $block .= "<p></p>";
     return;
   }
@@ -1004,12 +761,13 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     $is_time = $task_q->f("timetask_length");
   }
 
+  $cpt_end = $c_week_first_day + sizeof($day_q);
+
   // Day radio select (for update)
   if ($action == "detailupdate") {
-    for ($day=0;$day< sizeof($day_q);  $day++) {
+    for ($day = $c_week_first_day; $day < $cpt_end; $day++) {
       $dlabel = $day_q[$day][0];
       $rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"".$day_q[$day][1]."\"";
-      
       if ($day_q[$day][1] == $is_day)
 	$rd_day .= " checked=\"checked\"";
       
@@ -1020,13 +778,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // Day check construction
   else {
     $day_checked = -1;
-    for ($day=0;$day< sizeof($day_q);  $day++) {
+    for ($day=$c_week_first_day; $day < $cpt_end; $day++) {
       if ($day_q[$day][1] == date("Ymd"))
 	$day_checked = $day;
     }
 
-    for ($day=0; $day< sizeof($day_q); $day++) {
-
+    for ($day=$c_week_first_day; $day < $cpt_end; $day++) {
       if (sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]]))
 	$disabled = 1;
       else
@@ -1126,7 +883,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       <option value=\"0\">$l_none</option>";
 
   for ($i=0; $i<2; $i++) {
-    $tt_q = $taskt_q[$i];
+    $tt_q = $tasktype_q[$i];
 
     while($tt_q->next_record()) {
       //put menu titles
@@ -1166,8 +923,8 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
   // Project time length
   $sel_time="<select name=\"sel_time\">";
-  for ($t=1;$t<=$fraction_t;  $t++) {
-    $dlabel = $t.'/'.$fraction_t;
+  for ($t=1; $t<=$c_day_fraction; $t++) {
+    $dlabel = "$t/$c_day_fraction";
     $sel_time .= "<option value=\"$t\"";
     if ($is_time == $t) $sel_time .= " selected=\"selected\""; 
     $sel_time .= ">$dlabel</option>\n";
@@ -1180,50 +937,19 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $block .= "$script2";
   $block .= "<p></p>";
 
-  if ($action == "insert") {
-    $block .= "
-      <form method=\"post\" name=\"f_add_task\"
-        onsubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
-        action=\"".url_prepare("time_index.php")."\">\n
-      <input type=\"hidden\" name=\"action\" value=\"$action\" />\n
-      <input type=\"hidden\" name=\"popup\" value=\"0\" />\n";
-  }
-  else {
-    $block .= "
-      <form method=\"post\"  name=\"f_add_task\" 
-        onsubmit=\"if (check_addtaskform(this)) return true; else return false;\"
-        action=\"".url_prepare("time_index.php")."\">
-      <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
-      <input type=\"hidden\" name=\"popup\" value=\"0\" />";
-  }
-
-  if ($action != "detailupdate")
-    $dis_date .= "$l_date :</td><td class=\"timeForm\" colspan=\"2\">$ch_day";
-  else
+  // Update timetask ----------------------------------------------------------
+  if ($action == "detailupdate") {
     $dis_date .= "$l_date :</td><td class=\"timeForm\" colspan=\"2\">$rd_day";
 
-  // bastien : différents possibilités de mise en page pour le form
-  //---------------------------------------------------------------
-  // mise en page bouton integre au formulaire
-  // (sinon, ca vire et on decommente en bas)
-
-  if ($action == "insert") {
-    $dis_button .= "
-      <td class=\"timeForm\">
-       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
-       <input type=\"submit\" value=\"$l_add\" />
-      </td>";
-  } 
-  else {
+    // Action button
     $dis_button .= "
       <td class=\"timeForm\">
        <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
        <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
        <input type=\"submit\" value=\"$l_update\" />
       </td>";
-  }
-  
-  if ($action == "detailupdate"){
+
+    // Script that prefill values
     $dis_script .= "
       <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
       <script type=\"text/javascript\">
@@ -1234,117 +960,65 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
         select_default(document.f_add_task.sel_project, $is_proj);
         select_default(document.f_add_task.sel_projecttask, \"$is_projtask\");
       </script>";
-    } else {
+
+    // New timetask -----------------------------------------------------------
+  } else {
+    $dis_date .= "$l_date :</td><td class=\"timeForm\" colspan=\"2\">$ch_day";
+
+    // Action button
+    $dis_button .= "
+      <td class=\"timeForm\">
+       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+       <input type=\"submit\" value=\"$l_add\" />
+      </td>";
+
+    // Script that prefill values
     $dis_script .= "
     <script type=\"text/javascript\">
      fill_projectall(document.f_add_task.sel_project);
     </script>";
-
   }
   
-  //-------------------------------------------------------------
-  // enlever dis_button si on sort le bouton du formulaire
+  $url = url_prepare("time_index.php");
 
   $block .= "
-   <div class=\"detailHead\">$l_fill_addtask</div>
+  <form method=\"post\"  name=\"f_add_task\" action=\"$url\"
+    onsubmit=\"if (check_addtaskform(this)) return true; else return false;\">
+    <input type=\"hidden\" name=\"action\" value=\"$action\" />
+    <input type=\"hidden\" name=\"popup\" value=\"0\" />
 
-   <div class=\"timeCenter\">
-   <table class=\"timeDetail\" width=\"100%\">
+  <div class=\"detailHead\">$l_fill_addtask</div>
+
+  <div class=\"timeCenter\">
+    <table class=\"timeDetail\" width=\"100%\">
     <tr>
-     <td class=\"timeForm\">$dis_date</td>
-     <td class=\"timeForm\">$l_duration :</td>
-     <td class=\"timeForm\">$sel_time</td>
+      <td class=\"timeForm\">$dis_date</td>
+      <td class=\"timeForm\">$l_duration :</td>
+      <td class=\"timeForm\">$sel_time</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_cat :</td>
-     <td class=\"timeForm\" colspan=\"4\">$sel_tt</td>
+      <td class=\"timeForm\">$l_cat :</td>
+      <td class=\"timeForm\" colspan=\"4\">$sel_tt</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_project :</td>
-     <td class=\"timeForm\">$sel_proj</td>
-     <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
+      <td class=\"timeForm\">$l_project :</td>
+      <td class=\"timeForm\">$sel_proj</td>
+      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_comment :</td>
-     <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
-     $dis_button
+      <td class=\"timeForm\">$l_comment :</td>
+      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
+      $dis_button
     </tr>
-   </table>
-   </div>
+    </table>
+  </div>
 
-   $dis_script
-   </form>
-   ";
-
-  //------------------------------------------------------------
-  // mise en page sur 5 lignes
-
-  //   $block .= "
-  //    <div class=\"detailHead\">$l_fill_addtask</div>
-
-  //    <center>
-  //    <table class=\"timeDetail\" width=\"95%\">
-  //     <tr>
-  //      <td class=\"timeForm\">$dis_date</td>
-  //      <td class=\"timeForm\">$l_duration :</td>
-  //      <td class=\"timeForm\">$sel_time</td>
-  //     </tr>
-  //     <tr>
-  //      <td class=\"timeForm\">$l_cat :</td>
-  //      <td class=\"timeForm\" colspan=\"3\">$sel_tt</td>
-  //     </tr>
-  //     <tr>
-  //      <td class=\"timeForm\">$l_project :</td>
-  //      <td class=\"timeForm\" colspan=\"3\">$sel_proj</td>
-  //     </tr>
-  //     <tr>
-  //      <td class=\"timeForm\">$l_task :</td>
-  //      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
-  //     </tr>
-  //     <tr>
-  //      <td class=\"timeForm\">$l_comment :</td>
-  //      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
-  //     </tr>
-  //    </table>
-  //    </center>";
-
-  //------------------------------------------------------------
-  // a décommenter si on sort le bouton du formulaire
-
-  //   if ($action == "insert") {
-  //     $block .= "<br /><input type=\"submit\" value=\"$l_add\" />";
-  //   } 
-  //   else {
-  //     $block .= "<br />
-  //      <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
-  //      <input type=\"submit\" value=\"$l_update\" />
-  //      <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
-  //   }     
-  
-  //   $block .= "
-  //     <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />\n";
-  
-  //   if ($action == "detailupdate"){
-  //     $block .= "
-  //       <script language=\"JavaScript\">
-  //         fill_project(document.form_add_task.sel_project,
-  //           document.form_add_task.sel_tasktype.value,
-  //           document.form_add_task.sel_projecttask);
-  //         fill_projecttask(document.form_add_task.sel_projecttask, $is_proj);
-  //         select_default(document.form_add_task.sel_project, $is_proj);
-  //         select_default(document.form_add_task.sel_projecttask, $is_projtask);
-  //       </script>";
-  //   }
-  
-  //   $block .= "</form>";
+  $dis_script
+  </form>";
 
   return $block;
 }
 
-
-// function col_table($col, $data) {
-//   return "<font color=\"#$col\">$data</font>";
-// } 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Time Display preference screen                             //
@@ -1367,59 +1041,23 @@ function dis_time_display_pref($display_searchpref_q) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the Time search form with params                                  //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_search($time) {
-  global $l_no_found;
-  global $auth, $new_order, $order_dir;
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  $obm_q = run_query_search($time);
-  $nb_contact = $obm_q->num_rows();
-  if ($nb_contact == 0) {
-    display_warn_msg($l_no_found);
-  } else {
-    // From the Contact Display Module
-    html_contact_search_list($obm_q,$pref_q,$nb_contact,$contact);
-  }
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 // Show a date in human format
 //  params : $p_date : date in yyyymmdd format
 //////////////////////////////////////////////////////////////////////////
 function dis_human_date($p_date) {
-  global $cdg_sql;
+  global $cdg_sql, $l_monthsofyear;
     
   $p_year=substr($p_date,0,4);
   $p_month=substr($p_date,4,2);
   $p_day=substr($p_date,6,2);
-
    
-  $mois = month_name($p_month);
+  $mois = $l_monthsofyear[$p_month-1];
 
   return "$p_day $mois $p_year";
 
 }
 
-//////////////////////////////////////////////////////////////////////////
-// Show a date in mysql format (for query)
-//  params : $p_date : date in yyyymmdd format
-//////////////////////////////////////////////////////////////////////////
-function dis_mysql_date($p_date) {
-  global $cdg_sql;
-    
-  $p_year = substr($p_date,0,4);
-  $p_month = substr($p_date,4,2);
-  $p_day = substr($p_date,6,2);
-
-  return "'$p_year-$mois-$p_day'";
-
-}
 
 </script>

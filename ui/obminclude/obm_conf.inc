@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -89,7 +89,7 @@ $cgp_hide["company"]["company_vat"] = true;
 // Contact module
 $cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
-//$cgp_hide["contact"]["category1"] = true;
+$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 

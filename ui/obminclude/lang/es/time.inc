@@ -24,7 +24,6 @@ $l_from = "de";
 $l_to = "para";
 $l_week="Semana";
 $l_month="Mes";
-$l_month2=" ";
 $l_user="Usuario";
 $l_see = "Ver";
 $l_valid = "Validación";

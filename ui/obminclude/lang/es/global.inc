@@ -112,37 +112,16 @@ $l_task_fac = "Tareas Facturadas";
 $l_task_int = "Internal Proyecto";
 $l_task_div = "Tareas NO Facturadas";
 
-// days and months
-$l_january="Enero";
-$l_february="Febrero";
-$l_march="Marzo";
-$l_april="Abril";
-$l_may="Mayo";
-$l_june="Junio";
-$l_july="Julio";
-$l_august="Agosto";
-$l_september="Septiembre";
-$l_october="Octubre";
-$l_november="Noviembre";
-$l_december="Diciembre";
+// Days and months
+$l_monthsofyear = array ('Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre');
+$l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic');
+$l_daysofweek = array ('Domingo','Lunes','Martes','Miercoles','Jueves','Viernes','Sábado');
+$l_daysofweekshort = array ('Dom','Lun','Mar','Mie','Jue','Vie','Sab');
+$l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 
-$l_short_january="Ene";
-$l_short_february="Feb";
-$l_short_march="Mar";
-$l_short_april="Abr";
-$l_short_may="May";
-$l_short_june="Jun";
-$l_short_july="Jul";
-$l_short_august="Ago";
-$l_short_september="Sep";
-$l_short_october="Oct";
-$l_short_november="Nov";
-$l_short_december="Dic";
-$l_invalid_perm = "Permisos Inválidos.";
-
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
 
 $l_header_com    = "COMMERCIAL";
 $l_header_prod   = "PRODUCCIÓN";

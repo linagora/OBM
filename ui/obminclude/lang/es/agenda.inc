@@ -110,8 +110,6 @@ $l_category_can_delete = "La categoría puede ser borrada";
 $l_select_contacts = "Debe seleccionar un usuario o grupo.";
 $l_select_repeat_day = "Debe seleccionar los días de repetición.";
 $l_confirm_delete ="Esta operación borrará todas las ocurrencias de estos eventos para todos los usuarios, esta seguro que desea continuar?";
-$l_confirm = "Confirmar";
-$l_cancel = "Cancelar";
 $l_conflict_events = "Las horas escogidas están ocupadas por"; 
 $l_fill_title = "Tiene que llenar el campo [ $l_title ] ";
 $l_fill_dateend = "Tiene que llenar el campo [ $l_dateend ]";
@@ -125,45 +123,6 @@ $l_err_end_repeat2 = "The duración máxima de una repetición es un año";
 $l_err_end_repeat3 = "La máxima duración de una repetición anual es de 10 años.";
 $l_err_days_repeat = "Debe elegir uno o mas días de repetición.";
 $l_err_weekly_repeat = "Para repetición semanal, el dia final debe estar al menos siete dias despues del evento.";
-$l_monday = "Lunes";
-$l_tuesday = "Martes";
-$l_wednesday = "Miercoles";
-$l_thursday = "Jueves";
-$l_friday = "Viernes";
-$l_saturday = "Sabado";
-$l_sunday = "Domingo";
-$l_daysofweek = array (	'Domingo',
-			'Lunes',
-			'Martes',
-			'Miercoles',
-			'Jueves',
-			'Viernes',
-			'Sábado');
-$l_daysofweekshort = array (	'Dom',
-				'Lun',
-				'Mar',
-				'Mie',
-				'Jue',
-				'Vie',
-				'Sab');
-
-$l_daysofweekreallyshort = array ('M','L','M','M','J','V','S');
-
-$l_monthsofyear = array ('Enero','Febrero',
-			 'Marzo','Abril','Mayo',
-			 'Junio','Julio','Agosto',
-			 'Septiembre','Octubre','Noviembre',
-			 'Diciembre');
-$l_monthsofyearshort = array ('ene','feb','mar','abr','may','jun','jul',
-			      'ago','sep','oct','nov','dic');
-
-$l_short_monday = "Lun";
-$l_short_tuesday = "Mar";
-$l_short_wednesday = "Mie";
-$l_short_thursday = "Jue";
-$l_short_friday = "Vie";
-$l_short_saturday = "Sab";
-$l_short_sunday = "Dom";
 
 $l_category_manage = "Manejo de Categorías de Agenda";
 $l_category_exist = "Categorías Existentes";
@@ -181,8 +140,8 @@ $l_noone = "Nadie autorizado";
 $l_list = "Lista de personas autorizadas";
 $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
-//MAIL
 
+//MAIL
 $l_add_event_mail_head = "Nuevo evento en OBM :";
 $l_update_event_mail_head = "Evento actualizado en OBM :";
 $l_delete_event_mail_head = "Evento borrado en OBM :";
@@ -195,7 +154,6 @@ $l_event_mail_body = "Fecha : ";
 $l_update_event_mail_body = "A cambio de : ";
 $l_delete_event_mail_body = "Fecha : ";
 $l_confirm_mail = "Confirmar+Forzar notificación";
-
 
 $l_unknown="Desconocido";
 $l_user_calendar = "Vista Multi-usuario";
@@ -215,5 +173,3 @@ $mj_event_delete_all_confirm = "Confirme la eliminación del evento  y todas sus 
 $l_j_category_create = "Por Favor especifique un nombre para la nueva categoría";
 $l_j_category_update = "Por Favor especifique un nuevo nombre, y seleccione una categoría para la actualización";
 $l_j_category_delete = "Por Favor seleccione una categoria para borrar";
-
-?>

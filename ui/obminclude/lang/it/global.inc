@@ -104,41 +104,20 @@ $l_fill_label = "Scrivi prima nome.";
 $l_fill_date = "Scrivi prima Data.";
 $l_invalid_date = "Formato data non valido (GG/MM/AAAA ou AAAA-MM-GG).";
 
-//used by many modules
-// days and months
-$l_january="Gennaio";
-$l_february="Febbraio";
-$l_march="Marzo";
-$l_april="Aprile";
-$l_may="Maggio";
-$l_june="Giugno";
-$l_july="Lug";
-$l_august="Agosto";
-$l_september="Settembre";
-$l_october="Ottobre";
-$l_november="Novembre";
-$l_december="Dicembre";
+// Days and months
+$l_monthsofyear = array ('Gennaio','Febbraio','Marzo','Aprile','Maggio','Giugno','Lug','Agosto', 'Settembre','Ottobre','Novembre', 'Dicembre');
+$l_monthsofyearshort = array ('Gen','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic');
+$l_daysofweek = array ('Domenica','Lunedi','Martedi','Mercoledi','Giovedi','Venerdi','Sabato');
+$l_daysofweekshort = array ('Dom','Lun','Mar','Mer','Gio','Ven','Sab');
+$l_daysofweekreallyshort = array ('D','L','M','M','G','V','S');
 
-$l_short_january="Gen";
-$l_short_february="Feb";
-$l_short_march="Mar";
-$l_short_april="Apr";
-$l_short_may="Mag";
-$l_short_june="Giu";
-$l_short_july="Lug";
-$l_short_august="Ago";
-$l_short_september="Set";
-$l_short_october="Ott";
-$l_short_november="Nov";
-$l_short_december="Dic";
-$l_invalid_perm = "Permesso non valido";
+//---------------------------------------------------------------------------//
+// Theme headers lang files
+//---------------------------------------------------------------------------//
 
-////////////////////////////////////////////////////////
-////// Theme headers lang files ////////////////////////
-////////////////////////////////////////////////////////
-$l_header_com    = "Word to define";
-$l_header_prod   = "Word to define";
-$l_header_compta = "Word to define";
+$l_header_com    = "COMMERCIALE";
+$l_header_prod   = "PRODUZIONE";
+$l_header_compta = "CONTABILITA";
 $l_header_users  = "UTENTI";
 $l_header_admins = "AMMINISTRAZIONE";
 

@@ -77,26 +77,7 @@ $l_event_update_cancel_ok = "Modifica dell'appuntamento eseguita";
 $l_event_insert_cancel_ok = "Inserimento appuntamento eseguito";
 $l_conflict_events = "Conflitto di appuntamenti";
 
-$l_short_december="Dic";
-
-$l_monday="Lunedi";
-$l_tuesday="Martedi";
-$l_wednesday="Mercoledi";
-$l_thursday="Giovedi";
-$l_friday="Venerdi";
-$l_saturday="Sabato";
-$l_sunday="Domenica";
-
-$l_short_monday="Lun";
-$l_short_tuesday="Mar";
-$l_short_wednesday="Mer";
-$l_short_thursday="Gio";
-$l_short_friday="Ven";
-$l_short_saturday="Sab";
-$l_short_sunday="Dom";
-
 $l_unknown="Sconosciuto";
-
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Scegli un titolo per l'appuntamento.";
@@ -110,6 +91,3 @@ $mj_date_incompatibility = "Data di fine anteriore a quella di inizio.";
 $mj_repeat_date_incompatibility = "Data di fine ripetizione anteriore a quella di inizio.";
 $mj_event_delete_confirm = "Confermi eliminazione dell'appuntamento ?";
 $mj_event_delete_all_confirm = "Confermi eliminazione dell'appuntamento e delle ripetizioni ?";
-
-?>
-                                                       s

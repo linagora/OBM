@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.9pre1";
+$obm_version = "0.8.9pre2";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -28,24 +28,6 @@ $set_weekstart_default = "monday + 2 hours"; // First day of the week,
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
-// Timemanager module CONSTANTS
-// In how many parts we can chop a day
-$c_day_fraction = 8;
-// How many days we want to fill for each week:
-// 5 : Mon -> Fri; 6 : Mon -> Sat... (not tested for anything else than 5...
-//  and 5 could be hard coded at some places...
-$c_days_in_a_week = 5;
-// We define a working week to cope with all cases of working week 
-//  for us, we are working from Monday to Friday, so : (week start at Sun)
-// $c_days_in_a_week= 5 will become absolete
-$working_days = array(0,1,1,1,1,1,0);
-// task_status flag
-// task not valided by the user : $c_task_notvalid
-// task valided by user : $c_task_uservalid (automatically done when a day is full)
-// task valided by admin : $c_task_adminvalid
-$c_task_notvalid = 0;
-$c_task_uservalid = 1;
-$c_task_adminvalid = 2;
 //Id of the Publication reception type which is dedicated to the auto
 //subscription.
 $c_focsys = 3;
@@ -98,6 +80,20 @@ $cgp_sql_star = true;
 
 // Tuning constants
 $ctu_sql_limit = false;
+
+// In how many parts we split up a day (Time management)
+$c_day_fraction = 8;
+
+// Worked days in a week (start at sunday)
+$c_working_days = array(1,1,1,1,1,1,0);
+
+// Day beginning a week (0=Sunday, 1=Monday,...)
+$c_week_first_day = 1;
+
+// task_status flag
+$c_task_notvalid = 0;    // task not valiated
+$c_task_uservalid = 1;   // validated by user (auto when day is full)
+$c_task_adminvalid = 2;  // validated by admin
 
 //-------------------------//
 // Default Displayed Infos //
@@ -242,8 +238,8 @@ $js_regexp_fax="/^[0-9+x \(\)-\.]+$/";   // digits + SPACE ( ) - fax number
 $php_regexp_fax="/^[0-9+x \(\)-\.]+$/";
 $js_regexp_zip="/^[0-9A-Z ]{2,8}$/";     // 2-8 digits or letters
 $php_regexp_zip="/^[0-9A-Z ]{2,8}$/";
-$js_regexp_email="/^\w([\.\w-_&]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
-$php_regexp_email="/^[a-z0-9_&-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$/i"; // Email
+$js_regexp_email="/^\w([\.\w-_&]+)?@([\w\-]+\.)+[A-Za-z]{2,4}$/";  // Email
+$php_regexp_email="/^[a-z0-9_&-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,4}$/i"; // Email
 $php_regexp_email_name="/^[a-z0-9_&-]+(\.[a-z0-9_-]+)*$/"; // Email name
 $js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-_\.\/A-Za-z0-9])*$/";  // Web
 $php_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9-]+(\.[A-Za-z0-9-]+)*\.[a-z]{2,3}([\-_\.\/A-Za-z0-9]*)$/i"; // Web
@@ -287,6 +283,32 @@ function display_debug_msg($msg, $debug=0, $function_name="") {
 ///////////////////////////////////////////////////////////////////////////////
 require_once("$obminclude/global_query.inc");
 require_once("$obminclude/global_display.inc");
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display parameters debug block
+// Parameters:
+//   - $param : parameters hash
+///////////////////////////////////////////////////////////////////////////////
+function display_debug_param($param) {
+  global $cdg_param, $action;
+
+  if (debug_level_isset($cdg_param)) {
+    $block = "<br />action=$action";
+    if ( $param ) {
+      while ( list( $key, $val ) = each( $param ) ) {
+	if (is_array($val)) {
+          $block .= "<br />param[$key]=";
+	  $block .= print_r($val, true);
+	} else {
+          $block .= "<br />param[$key]=$val";
+	}
+      }
+    }
+  }
+
+  echo $block;
+}  
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -411,6 +433,7 @@ function isodate_format($timestamp="", $null_empty="") {
 ///////////////////////////////////////////////////////////////////////////////
 function datetime_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
+
   $format = $set_date;
   if (trim($format) == "") $format = $set_date_default;
   if ($timestamp != "") {
@@ -742,22 +765,6 @@ function phonetic_key($name) {
   $res = metaphone($name);
 
   return $res;
-}
-
-
-//functions used by many modules
-function month_name ($num_month) {
-  global $l_monthsofyear;
-
-  return $l_monthsofyear[$num_month-1];
-  
-}
-
-
-function month_short_name ($num_month) {
-  global $l_monthsofyearshort;
-
-  return $l_monthsofyearshor[$num_month-1];
 }
 
 

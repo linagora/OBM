@@ -107,8 +107,6 @@ $l_category_can_delete = "La catégorie peut être supprimée.";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
 $l_confirm_delete = "Cette opération va supprimer toutes les occurences de cet événement pour tous les utilisateurs, êtes-vous sûr de vouloir poursuivre ?";
-$l_confirm = "Confirmer";
-$l_cancel = "Annuler";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";
@@ -123,37 +121,6 @@ $l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque la
 $l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
 $l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition qu'en mode de répétition hebdomadaire.";
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
-$l_monday = "Lundi";
-$l_tuesday = "Mardi";
-$l_wednesday = "Mercredi";
-$l_thursday = "Jeudi";
-$l_friday = "Vendredi";
-$l_saturday = "Samedi";
-$l_sunday = "Dimanche";
-$l_daysofweek = array (	'Dimanche',
-			'Lundi',
-			'Mardi',
-			'Mercredi',
-			'Jeudi',
-			'Vendredi',
-			'Samedi');
-$l_daysofweekshort = array (	'Dim',
-				'Lun',
-				'Mar',
-				'Mer',
-				'Jeu',
-				'Ven',
-				'Sam');
-
-
-
-$l_short_monday = "Lun";
-$l_short_tuesday = "Mar";
-$l_short_wednesday = "Mer";
-$l_short_thursday = "Jeu";
-$l_short_friday = "Ven";
-$l_short_saturday = "Sam";
-$l_short_sunday = "Dim";
 
 $l_category_manage = "Gestion des Catégories d'événements";
 $l_category_exist = "Catégories existantes";
@@ -185,7 +152,6 @@ $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
 $l_confirm_mail = "Confirmer+forcer l'envoi de mail";
 
-
 $l_unknown = "Inconnu";
 $l_user_calendar = "Vue Multi-utilisateurs";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
@@ -204,5 +170,3 @@ $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses
 $l_j_category_create = "Vous devez donner un nom à la catégorie";
 $l_j_category_update = "Vous devez sélectionner une catégorie et lui donner un nom pour la mettre à jour";
 $l_j_category_delete = "Vous devez sélectionner une catégorie pour la supprimer";
-
-?>

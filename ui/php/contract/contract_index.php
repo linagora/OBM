@@ -259,7 +259,6 @@ function get_param_contract() {
   global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $ext_title;
-  global $cdg_param, $action;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
   if (isset ($param_company)) $contract["company_id"] = $param_company;
@@ -304,14 +303,7 @@ function get_param_contract() {
 
   if (isset ($ext_title)) $contract["ext_title"] = stripslashes(urldecode($ext_title));
 
-  if (debug_level_isset($cdg_param)) {
-    echo "<br>action=$action";
-    if ( $contract ) {
-      while ( list( $key, $val ) = each( $contract ) ) {
-        echo "<br>contract[$key]=$val";
-      }
-    }
-  }
+  display_debug_param($contract);
 
   return $contract;
 }

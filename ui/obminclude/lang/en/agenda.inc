@@ -85,11 +85,9 @@ $l_category_delete = "Delete Category";
 $l_category_insert = "Insert Category";
 $l_agenda_select_group = "Select the groups.";
 
-
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free crenels";
-
 
 $l_confirm_delete ="This operation will remove all the occurences of this event for all the users, are you sure to want to continue?";
 $l_confirm = "Confirm";
@@ -100,24 +98,6 @@ $l_update_warning = "Warning : some conflicts have been detected";
 $l_insert_warning = "Warning : some conflicts have been detected";
 $l_update_error = "Conflicts have been detected, update cancelled";
 $l_insert_error = "Conflicts have been detected, insertion cancelled";
-
-
-$l_daysofweek = array (	'Sunday',
-			'Monday',
-			'Tuesday',
-			'Wednesday',
-			'Thursday',
-			'Friday',
-			'Saturday');
-
-$l_daysofweekshort = array (	'Sun',
-				'Mon',
-				'Tue',
-				'Wed',
-				'Thu',
-				'Fri',
-				'Sat');
-
 
 // Messages
 $l_sendamail = "Force the notification by mail.";
@@ -195,6 +175,3 @@ $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses
 $l_j_category_create = "Please specify a label for the new category";
 $l_j_category_update = "Please specify a new label, and select a category for the update";
 $l_j_category_delete = "Please select a category to delete it";
-
-
-?>
