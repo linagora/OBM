@@ -552,7 +552,8 @@ global $cdg_sql, $cdg_param;
         and task_date <= '". $time["date_end"] ."' ";
 
   // user_id : array -> size 1 or more 
-  if (empty($option) && (sizeof($time["user_id"]) == 1))
+  if (empty($option))
+	  // && (sizeof($time["user_id"]) == 1))
 	  $query .= " and task_user_id = ". $time["user_id"]["0"];
   elseif ($option == 'all')
 	  display_debug_msg("\$option='all', select for all users", $cdg_param,
@@ -729,8 +730,8 @@ function get_week_point($sel_date) {
   $weekstart=date("YmdHis",$weekstart);  
     
   // Date Couple in an array
-  //  if ($debug > 0)
-  //    echo "dates debut $weekstart fin $weekend<br>";
+  // if ($debug > 0)
+  //      echo "dates debut $weekstart fin $weekend<br>";
   
   return array($weekstart, $weekend);
 	

@@ -1247,12 +1247,16 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
   global $c_day_fraction, $c_days_in_a_week;
   global $col_orange, $col_grey, $col_blue;
   global $l_total;
-  
+  global $l_fill;
+
   //  $col = "b2ebe8";
   //  $col_red="a00000";
   /*  echo "<br> res ";
   print_r($array_res); */
   $col_width=25;
+  $month=substr($time["date"],4,2);
+  $year=substr($time["date"],0,4);
+  $day=substr($time["date"],6,2);
 
   // Display the array
   while (list($key,$val) = each($array_res)) {
@@ -1279,7 +1283,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
            "&amp;param_end=".$week[1].
 						  //        "&amp;user_id=".$time["user_id"].
 		   "&amp;st_detail=".$time["show_task_detail"]);
-        $line3.="<td colspan=\"$c_days_in_a_week\"><a href=\"$url\">compléter</a></td>";
+        $line3.="<td colspan=\"$c_days_in_a_week\"><a href=\"$url\">$l_fill</a></td>";
         $cell_1_short="<td width=$col_width align=center><a href=\"$url\">$key</a></td>";
 	  }
 	  //or first day of the month
@@ -1293,7 +1297,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
 		   "&amp;st_detail=".$time["show_task_detail"]);
         // This week is not $c_days_in_a_week long
         $week_length = $c_days_in_a_week - $val["wday"] +1;
-        $line3.="<td colspan=\"$week_length\"><a href=\"$url\">compléter</a></td>";
+        $line3.="<td colspan=\"$week_length\"><a href=\"$url\">$l_fill</a></td>";
         $cell_1_short="<td width=$col_width align=center><a href=\"$url\">$key</a></td>";
 	  }
     if ($shortview)
