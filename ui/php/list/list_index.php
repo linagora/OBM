@@ -420,7 +420,7 @@ function get_list_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/list/list_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult','insert','update','admin','display') 
+    'Condition'=> array ('all') 
                                   );
 
 // New

@@ -2194,7 +2194,7 @@ function display_popup_code_tree($tree,$indent) {
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
-	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form($code);return false;\"><span id=\"data$id\">$code - $label</span></a>
+	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form('$code');return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
 	 </tr>
 	</table>";

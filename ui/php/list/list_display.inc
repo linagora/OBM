@@ -585,7 +585,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contact_town"] = "$l_contact: $l_town"; 
   $fields_label["contact_timeupdate"] = "$l_contact: $l_timeupdate"; 
   $fields_label["contact_timecreate"] = "$l_contact: $l_timecreate"; 
-  $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_marketingmanager_id"; 
+  $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_market"; 
   $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
   $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
   $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
@@ -752,22 +752,26 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   while($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
   }
-  $cty_q->seek(0);
+  if($cty_q->nf()!=0) 
+    $cty_q->seek(0);
   $sel_usr .= "\n<option value=\"\">$l_all</option>";
   while($usr_q->next_record()) {
     $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
   }
-  $usr_q->seek(0);
+  if($usr_q->nf()!=0) 
+    $usr_q->seek(0);
   $sel_dsr .= "\n<option value=\"\">$l_all</option>";
   while($dsr_q->next_record()) {
     $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
   }  
-  $dsr_q->seek(0);
+  if($dsr_q->nf()!=0) 
+    $dsr_q->seek(0);
   $sel_cat .= "\n<option value=\"\">$l_all</option>";
   while($cat_q->next_record()) {
     $sel_cat .= "\n<option value=\"".$cat_q->f("companycategory_code")."\">".substr($cat_q->f("companycategory_label"),0,30)."</option>";
   }
-  $cat_q->seek(0);
+  if($cat_q->nf()!=0) 
+    $cat_q->seek(0);
   
   $block .= "
   <div class=\"detailHead\">$l_company</div>    
@@ -833,33 +837,39 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
     $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
-  }   
-  $cty_q->seek(0);
+  }  
+  if($cty_q->nf()!=0)   
+    $cty_q->seek(0);
   $sel_usr .= "\n<option value=\"\">$l_all</option>";
   while($usr_q->next_record()) {
     $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
   }
-  $usr_q->seek(0);
+  if($usr_q->nf()!=0) 
+    $usr_q->seek(0);
   $sel_dsr .= "\n<option value=\"\">$l_all</option>";
   while($dsr_q->next_record()) {
     $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
   }  
-  $dsr_q->seek(0);
+  if($dsr_q->nf()!=0) 
+    $dsr_q->seek(0);
   $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
   while($cat1_q->next_record()) {
     $sel_cat1 .= "\n<option value=\"".$cat1_q->f("contactcategory1_id")."\">".$cat1_q->f("contactcategory1_label")."</option>";
   }  
-  $cat1_q->seek(0);
+  if($cat1_q->nf()!=0) 
+    $cat1_q->seek(0);
   $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
   while($cat2_q->next_record()) {
     $sel_cat2 .= "\n<option value=\"".$cat2_q->f("contactcategory2_id")."\">".$cat2_q->f("contactcategory2_label")."</option>";
   }   
-  $cat2_q->seek(0);
+  if($cat2_q->nf()!=0) 
+    $cat2_q->seek(0);
   $sel_fct .= "\n<option value=\"\">$l_all</option>";
   while($fct_q->next_record()) {
     $sel_fct .= "\n<option value=\"".$fct_q->f("function_id")."\">".$fct_q->f("function_label")."</option>";
   }   
-  $fct_q->seek(0);
+  if($fct_q->nf()!=0) 
+    $fct_q->seek(0);
   
   $block = "
   <div class=\"detailHead\">$l_contact</div>    
