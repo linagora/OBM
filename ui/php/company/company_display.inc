@@ -195,41 +195,41 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -- Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
   global $perms_user,$ico_deal_new;  
-  global $auth;
+  global $path, $auth;
 
   $uname = urlencode($name);
 
   // -------| Menu Liste Contacts
-  $r = "<a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+  $r = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
         <img border=0 src=\"/images/$set_theme/$ico_contact\"></a>
         <font size=-1>
-         <a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+         <a href=\"".url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
          $l_contact_list</a> ($con_num)</font>";
 
   // -------| Menu Nouveau Contact
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
-           <a href=\"" . url_prepare("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           <a href=\"" . url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
            <img border=0 src=\"/images/$set_theme/$ico_contact_new\"></a>
            <font size=-1>
-           <a href=\"" . url_prepare("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           <a href=\"" . url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
            $l_contact_new</a></font>";
   }
 
   // -------| Menu Liste Affaires
   $r .= "<br>
-         <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         <a href=\"".url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          <img border=0 src=\"/images/$set_theme/$ico_deal\"></a>
          <font size=-1>
-         <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         <a href=\"".url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          $l_deal_list</a> ($deal_num)</font>";
 
   // -------| Menu Nouvelle Affaire
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
-      <a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
+      <a href=\"".url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
         src=\"/images/$set_theme/$ico_deal_new\"></a>
-      <font size=-1><a href=\"".url_prepare("../deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
+      <font size=-1><a href=\"".url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id") . "\">$l_deal_new</a></font>\n";
   }
 
   return $r;
@@ -607,6 +607,7 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contact, $l_link_contact_no;
+  global $path;
 
   $delete_ok = true;
 
@@ -620,7 +621,7 @@ function dis_check_links($p_id) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
       $display_linkc .= "<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" . url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
+      <a class=\"details\" href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
       $cname</a>
       </td></tr>";
     }
@@ -638,7 +639,7 @@ function dis_check_links($p_id) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $display_linkd .="<tr><td class=\"detailText\">
-      <a class=\"details\" href=\"" .url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
+      <a class=\"details\" href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
       $dlabel</a>
       </td></tr>";
     }

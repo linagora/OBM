@@ -399,7 +399,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $l_contract_list;
-  global $path,$auth, $c_yes, $c_no;
+  global $path, $auth, $c_yes, $c_no;
   global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
@@ -459,9 +459,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<a href=\"". url_prepare("deal_index.php?action=affect&amp;param_deal=$id") . "\">$l_affect_deal</a><br><br>";
   }
   echo "
-  <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   <img border=0  src=\"/images/$set_theme/$ico_contact\"></a>
-  <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
   if ($auth->auth["perm"] != $perms_user) {
@@ -527,20 +527,20 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         <td colspan=\"2\" class=\"detailHead\">$l_company</td>
       </tr><tr>
         <td class=\"detailLabel\">$comp
-        <a href=\"". url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+        <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$ad1<br/>$zip $town</td>
       </tr><tr>
         <td class=\"detailLabel\">$dis_con1
-        <a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
+        <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$phone_con1
         </td>
       </tr><tr>
         <td class=\"detailLabel\">$dis_con2
-        <a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
+        <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a>
         </td>
         <td class=\"detailText\">$phone_con2
@@ -633,7 +633,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state;
   global $l_last_update,$l_archive,$l_comment,$l_add_comment,$l_upd_comment;
   global $l_at,$l_todo;
-  global $action, $auth,$c_all,$l_all,$l_add_contrat;
+  global $path, $action, $auth,$c_all,$l_all,$l_add_contrat;
 
   $uid = $auth->auth["uid"];
 
@@ -844,10 +844,10 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }
 
   if ($action == "detailupdate") {
-    $dis_contact_2 = "<a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
+    $dis_contact_2 = "<a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
              <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
-    $dis_contact_1 = "<a href=\"" . url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\">
+    $dis_contact_1 = "<a href=\"" . url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\">
              <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
   }
@@ -885,7 +885,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }
 
 
-
   echo "
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
@@ -895,7 +894,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
          <td colspan=\"2\" class=\"detailHead\">$l_company</td>
        </tr><tr>
          <td class=\"detailLabel\">$comp&nbsp;
-        <a href=\"" . url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
+        <a href=\"" . url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
          <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
          <td class=\"detailText\">
           $ad1

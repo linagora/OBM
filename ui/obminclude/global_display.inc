@@ -271,7 +271,7 @@ class OBM_DISPLAY {
     global $col_inc_redhot,$col_inc_hot,$col_inc_closed;
     global $ico_mail,$ico_contact_new,$ico_web,$ico_ball, $ico_crow;
     global $cdg_id, $set_debug, $set_theme, $set_rows;
-    global $time;
+    global $path, $time;
 
     $link_ok = $this->display_link;
 
@@ -345,7 +345,7 @@ class OBM_DISPLAY {
 
 	//------------------------------
 	// For any field to be used as a date field
-    //  -> start with "date_" 
+	//  -> start with "date_" 
 	//   * used in timemanagement
 	//------------------------------
 	// For date:
@@ -357,18 +357,18 @@ class OBM_DISPLAY {
 	//------------------------------
 	// For contacts urls (link):
 	if ($fieldname == "list_contact_lastname") {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("list_contact_id");
+	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("list_contact_id");
 	}
 	// For Company urls (link):
 	else if ($fieldname == "list_contact_company") {
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("list_contact_company_id");
+	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("list_contact_company_id");
         }
 	
 	//------------------------------
 	// For the companies 
 	//------------------------------
 	else if ($fieldname == "company_name") {
-	   $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
+	   $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
 	}
 	else if ($fieldname == "company_email") {
 	  if (strcmp($this->data_set->f("company_email"),"") != 0) {
@@ -388,13 +388,13 @@ class OBM_DISPLAY {
         else if ($fieldname == "company_contact_number") {
 	  $name = $this->data_set->f("company_contact_number");
 	  if ($name > 0) {
-	    $url = "../contact/contact_index.php?action=search&amp;param_company=".$this->data_set->f("company_id")."&amp;tf_company=".urlencode("".$this->data_set->f("company_name"));
+	    $url = "$path/contact/contact_index.php?action=search&amp;param_company=".$this->data_set->f("company_id")."&amp;tf_company=".urlencode("".$this->data_set->f("company_name"));
 	  }
           $align = "center";
         }
         else if ($fieldname == "company_new_contact") {
           $align = "center";
-	  $url = "../contact/contact_index.php?action=new&amp;param_company=".$this->data_set->f("company_id");
+	  $url = "$path/contact/contact_index.php?action=new&amp;param_company=".$this->data_set->f("company_id");
           $name = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
         }
         else if ($fieldname == "company_deal_number") {
@@ -402,7 +402,7 @@ class OBM_DISPLAY {
 	  $name .= $this->data_set->f("company_deal_total");
 	  $c_id = $this->data_set->f("company_id");
 	  if ($name != "0 / 0") {
-	    $url = "../deal/deal_index.php?action=search&amp;param_company=$c_id";
+	    $url = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
 	  }
           $align = "center";
         }
@@ -428,10 +428,10 @@ class OBM_DISPLAY {
 	// For the contacts 
 	//------------------------------
         else if (($fieldname == "contact_lastname") && $link_ok) {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("contact_id");
+	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("contact_id");
 	}
        	else if (($fieldname == "contact_company_name") && $link_ok){
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contact_company_id");
+	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contact_company_id");
 	}
 	else if ($fieldname == "contact_archive") {
           $align = "center";
@@ -460,17 +460,17 @@ class OBM_DISPLAY {
 	// For the parentdeals and deals
 	//------------------------------
  	else if ($fieldname == "parentdeal_label") {
-	  $url = "../deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$this->data_set->f("parentdeal_id");
+	  $url = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$this->data_set->f("parentdeal_id");
 	}
         else if ($fieldname == "parentdeal_marketing_lastname") {
-	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_marketingmanager_id");
+	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_marketingmanager_id");
 	}
         else if ($fieldname == "parentdeal_technical_lastname") {
-	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_technicalmanager_id");
+	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_technicalmanager_id");
 	} 
 	else if ($fieldname == "deal_label") {
 	  $name="";
-	  $url = "../deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
+	  $url = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
 	}
 	else if ($fieldname == "deal_archive") {
           $align = "center";
@@ -483,7 +483,7 @@ class OBM_DISPLAY {
 	}
 	else if ($fieldname == "deal_company_name") {
 	  $name="";
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");
+	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");
         } 
 	else if ($fieldname == "deal_datealarm") {
 	  $date = $this->data_set->f($fieldname);
@@ -524,7 +524,7 @@ class OBM_DISPLAY {
 	// invoice from the deal display screen
         //-------------------------------------
 	elseif ($fieldname == "deal_invoice_label") {
-	  $url = "../invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
+	  $url = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
 	} elseif (($fieldname == "deal_invoice_HT") 
 		   || ($fieldname == "deal_invoice_TTC") ) {
 	  $amount = $this->data_set->f($fieldname);
@@ -541,7 +541,7 @@ class OBM_DISPLAY {
 	// For the users 
 	//------------------------------
 	else if ($fieldname == "userobm_login") {
-	   $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("userobm_id");
+	   $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("userobm_id");
 	}
 	else if ($fieldname == "userobm_email") {
           $email = $this->data_set->f("userobm_email");
@@ -591,13 +591,13 @@ class OBM_DISPLAY {
 	// For the invoices :
 	//------------------------
 	elseif ($fieldname == "invoice_deal") {
-	  $url="../deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
+	  $url="$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
 	} elseif ($fieldname == "invoice_label") {
-	  $url="../invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
+	  $url="$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
 	} elseif ($fieldname == "invoice_company") {
-	  $url="../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
+	  $url="$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
 	} elseif ($fieldname == "invoice_pay_label") {
-	  $url = "../payment/payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("invoice_payment_id");
+	  $url = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("invoice_payment_id");
 	} // amount column color 
 	elseif (($fieldname == "invoice_amount_HT") 
 		|| ($fieldname == "invoice_amount_TTC")
@@ -625,7 +625,7 @@ class OBM_DISPLAY {
 	} elseif ($fieldname == "pay_inv_label") {
 	  $url = "./invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
 	} elseif ($fieldname == "pay_inv_company") {
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
+	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
 	}// amount column color 
 	elseif (($fieldname == "payment_amount")
 		 || ($fieldname == "pay_inv_paid")) {
@@ -656,17 +656,17 @@ class OBM_DISPLAY {
 	// For the contracts 
 	//------------------------------
         else if ($fieldname == "contract_label") {
-	  $url = "../contract/contract_index.php?action=detailconsult&amp;param_contract=".$this->data_set->f("contract_id");
+	  $url = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$this->data_set->f("contract_id");
 	}
        	else if ($fieldname == "contract_company_name") {
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");
+	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");
        	}
         else if ($fieldname == "contract_marketmanager") {
-	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_techmanager_id");
+	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_techmanager_id");
 	  $name = $this->data_set->f("lmarket") . " " . $this->data_set->f("fmarket");
 	}
         else if ($fieldname == "contract_techmanager") {
-	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_marketmanager_id");
+	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_marketmanager_id");
 	  $name = $this->data_set->f("ltech") . " " . $this->data_set->f("ftech");
 	}
         else if ($fieldname == "contract_dateexp") {
@@ -677,13 +677,13 @@ class OBM_DISPLAY {
 	// For the incidents 
 	//------------------------------
         else if ($fieldname == "incident_label") {
-	  $url = "../incident/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
+	  $url = "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
 	}
        	else if ($fieldname == "incident_owner_lastname") {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_owner");
+	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_owner");
 	}
        	else if ($fieldname == "incident_logger_lastname") {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
+	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
 	}
         else if ($fieldname == "incident_date") {
 	  $name = date_format($this->data_set->f("date"));

@@ -18,7 +18,7 @@ function generate_menu($menu) {
   global $obminclude, $set_lang, $set_theme, $set_lang_default, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
-  global $auth, $sess, $obm_version; 
+  global $path, $auth, $obm_version; 
   global $l_deal_select_company, $l_select_company;
 
   if ($menu == "")
@@ -246,7 +246,7 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     if ($auth->auth["perm"] != $perms_user) {
       $ret_url = urlencode($path."deal/deal_index.php?action=new&amp;param_company=");
       $title = urlencode($l_deal_select_company);
-      $url = url_prepare("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
+      $url = url_prepare("$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
       echo "<a class=header_green href=\"\" onclick=\"window.open('$url','Company','height=$popup_height,width=$popup_width'); return false;\">$l_header_new_f</a> | 
             <a class=header_green href=\"".url_prepare("deal_index.php?action=parent_new")."\">$l_header_new_parent</a> | 
             <a class=header_green href=\"".url_prepare("deal_index.php?action=admin")."\">$l_header_admin</a> | ";
@@ -265,7 +265,7 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     if ($auth->auth["perm"] != $perms_user) {
       $ext_url = urlencode($path."list/list_index.php");
       $title = urlencode($l_deal_select_company);
-      $url = url_prepare("../list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=$title&amp;ext_action=export_add&amp;ext_url=$ext_url");
+      $url = url_prepare("$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=$title&amp;ext_action=export_add&amp;ext_url=$ext_url");
       echo "<a class=header_green href=\"\" onclick=\"window.name='root';window.open('$url','List','height=$popup_height,width=$popup_width'); return false;\">$l_header_export</a> | ";
     }
     echo "<a class=header_green href=\"".url_prepare("list_index.php?action=display")."\">$l_header_display</a>";
@@ -296,7 +296,7 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     echo "<a class=header_green href=\"".url_prepare("contract_index.php?action=index")."\"> $l_header_find</a> | ";
       $ret_url = urlencode($path."contract/contract_index.php?action=new&amp;param_company=");
       $title = urlencode($l_select_company);
-      $url = url_prepare("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
+      $url = url_prepare("$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
       echo "<a class=header_green href=\"\" onclick=\"window.open('$url','Company','height=$popup_height,width=$popup_width'); return false;\">$l_header_new</a> | ";
     if ($auth->auth["perm"] != $perms_user) {
       echo "<a class=header_green href=\"".

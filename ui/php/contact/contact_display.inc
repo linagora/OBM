@@ -176,7 +176,7 @@ function html_contact_consult($co_q) {
   global $l_public,$l_private,$l_archive,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme,  $ico_mail;
-  global $action, $auth;
+  global $path, $action, $auth;
   global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
@@ -238,7 +238,7 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
-      <a class=\"detailText\" href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
+      <a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
       </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
@@ -314,7 +314,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $auth;
+  global $path, $auth;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -442,12 +442,12 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </tr><tr>
     <td class=\"detailLabel\">$l_company</td>
     <td>
-      <a href=\"". url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
       $c_name
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('../company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -620,6 +620,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_list, $l_link_list_no;
+  global $path;
 
   $delete_ok = true;
 
@@ -635,7 +636,7 @@ function dis_check_links($p_id) {
       $display_link_d .= "
       <tr>
         <td class=\"detailText\">
-          <a class=\"details\" href=\"".url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
+          <a class=\"details\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
           $dlabel</a>
         </td>
       </tr>";
@@ -655,7 +656,7 @@ function dis_check_links($p_id) {
       $display_link_l .= "
         <tr>
           <td class=\"detailText\">
-            <a class=\"details\" href=\"".url_prepare("../list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
+            <a class=\"details\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
             $lname</a>
           </td>
         </tr>";
