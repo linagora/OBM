@@ -59,8 +59,8 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_incident);     // Head & Body
-generate_menu($menu,$section); // Menu
+$display["head"] = display_head($l_incident);     // Head & Body
+$display["header"] = generate_menu($menu,$section); // Menu
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -70,9 +70,9 @@ generate_menu($menu,$section); // Menu
 if ($action == "index" || $action == "") {
 //////////////////////h////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
+  $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
   if ($set_display == "yes") {
-    dis_incident_search_list($incident);
+    $display["result"] = dis_incident_search_list($incident);
   } else {
     display_info_msg($l_no_display);
   }
@@ -80,13 +80,13 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
-  dis_incident_search_list($incident);
+  $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(), $incident);
+  $display["result"] = dis_incident_search_list($incident);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_form($action, "", "", run_query_userobm_active(), run_query_priority(), run_query_status(), $incident);
+   $display["detail"] = html_incident_form($action, "", "", run_query_userobm_active(), run_query_priority(), run_query_status(), $incident);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,10 +95,10 @@ if ($action == "index" || $action == "") {
     if ($inc_q->num_rows() == 1) {
       $con_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
     } else {
-      display_err_msg($l_query_error . " - " . $inc_q->query . " !");
+      $display["detailInfo"] = display_err_msg($l_query_error . " - " . $inc_q->query . " !");
     }
-    display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
-    html_incident_consult($inc_q, $con_q);
+    $display["detail"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
+    $display["detail"] = html_incident_consult($inc_q, $con_q);
   }
 
 } elseif ($action == "detailupdate")  {
@@ -108,13 +108,13 @@ if ($action == "index" || $action == "") {
     if ($inc_q->num_rows() == 1) {
       $contr_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
       require("incident_js.inc");
-      display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
+      $display["detailInfo"] = display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
       $users = array($inc_q->f("incident_owner"),$inc_q->f("incident_logger"));
       $usr_q = run_query_userobm_active($users);
-      html_incident_form($action, $inc_q, $contr_q, $usr_q, run_query_priority(), run_query_status(), $incident);
+      $display["detail"] = html_incident_form($action, $inc_q, $contr_q, $usr_q, run_query_priority(), run_query_status(), $incident);
     } else {
-      display_err_msg($l_query_error . " - " . $con_q->query . " !");
-      html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
+      $display["msg"] = display_err_msg($l_query_error . " - " . $con_q->query . " !");
+      $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
     }
   }
 
@@ -122,82 +122,82 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($incident)) {
     run_query_insert($incident);
-    display_ok_msg($l_insert_ok);
+    $display["msg"] = display_ok_msg($l_insert_ok);
     require("incident_js.inc");
-    html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
+    $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   } else {
     require("incident_js.inc");
-    display_warn_msg($err_msg);
+    $display["msg"] = display_warn_msg($err_msg);
     $users = array($incident["owner"], $incident["logger"]);
     $usr_q = run_query_userobm_active($users);
-    html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
+    $display["detail"] = html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($incident)) {
     run_query_update($incident);         
-    display_ok_msg($l_update_ok);
+    $display["msg"] = display_ok_msg($l_update_ok);
     require("incident_js.inc");
-    html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
+    $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   } else {
     require("incident_js.inc");
-    display_warn_msg($err_msg);
+    $display["msg"] = display_warn_msg($err_msg);
     $users = array($incident["owner"], $incident["logger"]);
     $usr_q = run_query_userobm_active($users);
-    html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
+    $display["detail"] = html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
  }
  
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_delete($param_incident);
-  display_ok_msg($l_delete_ok);
+  $display["msg"] = display_ok_msg($l_delete_ok);
   require("incident_js.inc");
-  html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
+  $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
   
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "priority_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_insert($incident);
   if ($retour) {
-    display_ok_msg($l_pri_insert_ok);
+    $display["msg"] = display_ok_msg($l_pri_insert_ok);
   } else {
-    display_err_msg($l_pri_insert_error);
+    $display["msg"] = display_err_msg($l_pri_insert_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "priority_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_update($incident);
   if ($retour) {
-    display_ok_msg($l_pri_update_ok);
+    $display["msg"] = display_ok_msg($l_pri_update_ok);
   } else {
-    display_err_msg($l_pri_update_error);
+    $display["msg"] = display_err_msg($l_pri_update_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_priority_links($incident["priority"]);
+  $display["detail"] = dis_priority_links($incident["priority"]);
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_priority_delete($incident["priority"]);
   if ($retour) {
-    display_ok_msg($l_pri_delete_ok);
+    $display["msg"] = display_ok_msg($l_pri_delete_ok);
   } else {
-    display_err_msg($l_pri_delete_error);
+    $display["msg"] = display_err_msg($l_pri_delete_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -208,59 +208,60 @@ if ($action == "index" || $action == "") {
     display_err_msg($l_sta_insert_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_update($incident);
   if ($retour) {
-    display_ok_msg($l_sta_update_ok);
+    $display["msg"] = display_ok_msg($l_sta_update_ok);
   } else {
-    display_err_msg($l_sta_update_error);
+    $display["msg"] = display_err_msg($l_sta_update_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_status_links($incident["status"]);
+  $display["detail"] = dis_status_links($incident["status"]);
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_delete($incident["status"]);
   if ($retour) {
-    display_ok_msg($l_sta_delete_ok);
+    $display["msg"] = display_ok_msg($l_sta_delete_ok);
   } else {
-    display_err_msg($l_sta_delete_error);
+    $display["msg"] = display_err_msg($l_sta_delete_error);
   }
   require("incident_js.inc");
-  dis_admin_index();
+  $display["detail"] = dis_admin_index();
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "incident", 1);
-  dis_incident_display_pref($pref_q); 
+  $display["detail"] = dis_incident_display_pref($pref_q); 
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "incident", 1);
-  dis_incident_display_pref($pref_q);
+  $display["detail"] = dis_incident_display_pref($pref_q);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "incident", 1);
-  dis_incident_display_pref($pref_q);
+  $display["detail"] = dis_incident_display_pref($pref_q);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["end"] = display_end();
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////

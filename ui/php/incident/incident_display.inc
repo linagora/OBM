@@ -125,62 +125,47 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
 
   // --- html template --------------------------------------------------------
 
-  echo "
+  $block = "
     <form method=\"get\" name=\"f_incident\" action=\"" .
     url_prepare("incident_index.php") . " \" onsubmit=\"if (check_search_inc(this)) return true; else return false;\">
 
-    <table class=\"detail\">
-    <tr>
-      <td>
-      <table>
-      <tr>
-        <td class=\"textLabelForm\">$l_label<br />
-          <input type=\"text\" name=\"tf_lincident\" size=\"16\"
-            value=\"$lincident\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_company<br />
-          <input type=\"text\" name=\"tf_company\" size=\"16\"
-            value=\"$company\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_contract<br />
-          <input type=\"text\" name=\"tf_lcontract\" size=\"16\"
-            value=\"$lcontract\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_date_after<br />
-   	  <input name=\"tf_dateafter\" type=\"text\" size=\"10\"
-            value=\"$dateafter\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_date_before<br />
-   	  <input name=\"tf_datebefore\" type=\"text\" size=\"10\"
-            value=\"$datebefore\" /></td>
-      </tr>
-      </table>
-      <table class=\"detail\">     	
-      <tr>
-        <td class=\"textLabelForm\">$l_priority<br />
-          $sel_pri</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_status<br />
-          $sel_sta</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_owner<br />
-          $dis_sel_owner</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_archive<br />
-          <input name=\"cb_archive\" type=\"checkbox\" size=\"10\"
-            value=\"1\" $archive /></td>
-      </tr>
-      </table>
-      </td>
-      <td>
-        <input name=\"action\" type=\"hidden\" value=\"search\" />
-        <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    </table>
-    </form>
-    <hr />
+    <div class=\"search\">
+     <div class=\"searchLabel\">$l_label<br />
+       <input type=\"text\" name=\"tf_lincident\" size=\"16\" value=\"$lincident\" />
+     </div>
+     <div class=\"searchLabel\">$l_companyr<br />
+      <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+     </div>	    
+     <div class=\"searchLabel\">$l_contract<br />
+      <input type=\"text\" name=\"tf_lcontract\" size=\"16\" value=\"$lcontract\" />
+     </div>
+     <div class=\"searchLabel\">$l_date_after<br />
+      <input name=\"tf_dateafter\" type=\"text\" size=\"10\" value=\"$dateafter\" />
+     </div>
+     <div class=\"searchLabel\">$l_date_before<br />
+      <input name=\"tf_datebefore\" type=\"text\" size=\"10\" value=\"$datebefore\" />
+     </div>
+     <div class=\"searchLabel\">$l_priority<br />
+      $sel_pri
+     </div>
+     <div class=\"searchLabel\">$l_status<br />
+      $sel_sta
+     </div>
+     <div class=\"searchLabel\">$l_owner<br />
+      $dis_sel_owner
+     </div>
+     <div class=\"searchLabel\">$l_archive<br />
+      <input name=\"cb_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive />
+     </div>
+     <div class=\"searchLabel\">&nbsp;<br />
+      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />     
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+     </div>
+     <div class=\"searchEnd\"></div>
+    </div>
+   </form>
 ";
+  return $block;
 }
 
 
@@ -191,6 +176,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_list($incident) {
+  global $display;
   global $l_no_found;
   global $auth, $new_order, $order_dir;
 
@@ -198,10 +184,11 @@ function dis_incident_search_list($incident) {
   $obm_q = run_query_search($incident, $new_order, $order_dir);
   $nb_incident = $obm_q->num_rows();
   if ($nb_incident == 0) {
-    display_info_msg($l_no_found);
+    $display["msg"] = display_info_msg($l_no_found);
   } else {
-    html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
+    $block = html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
   }
+  return $block;
 }
 
 
@@ -215,6 +202,7 @@ function dis_incident_search_list($incident) {
 //     keys used    : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
+  global $display;
   global $l_found, $l_no_found;
 
   $lincident = urlencode($incident["lincident"]);
@@ -239,8 +227,9 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 
   // --- HTML Template --------------------------------------------------------
 
-  display_info_msg("$nb_incident $l_found");
-  $dis_incidents_list->display("dis_data_incident");
+  $display["msg"] = display_info_msg("$nb_incident $l_found");
+  $block = $dis_incidents_list->display("dis_data_incident");
+  return $block;
 }
 
 
@@ -251,6 +240,7 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 //   - $con_q : DBO : contract result
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_consult($inc_q,$con_q) {
+  global $display;
   // -- Themes
   global $set_theme,$ico_contract,$ico_company;
   // - Labels
@@ -292,17 +282,16 @@ function html_incident_consult($inc_q,$con_q) {
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
   }
-
+  $display["title"] = "<div class=\"title\">$l_incident : $label</div>";
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-<table class=\"detail\">
- <tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_company</td>
- </tr><tr>
-  <td class=\"detailLabel\">
-   $comp_name
-   <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+  $block = "
+  <div class=\"detailHead\">$l_company</div>
+   <table class=\"detail\">
+    <tr>
+     <td class=\"detailLabel\">
+      $comp_name
+       <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
    <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
   </td>
   <td class=\"detailText\">
@@ -323,9 +312,11 @@ function html_incident_consult($inc_q,$con_q) {
   <td class=\"detailText\">
    $dis_con2
   </td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_contract</td>
- </tr><tr>
+ </tr>
+ </table>
+ <div class=\"detailHead\">$l_contract</div>
+ <table class=\"detail\"> 
+  <tr>
   <td class=\"detailLabel\">
    <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
    </a> 
@@ -345,9 +336,11 @@ function html_incident_consult($inc_q,$con_q) {
  </tr><tr>
   <td class=\"detailLabel\">$l_manager 2</td>
   <td class=\"detailText\">$dis_tech</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
- </tr><tr>
+ </tr>
+ </table>
+  <div class=\"detailHead\">$l_incident</div>
+ <table class=\"detail\"> 
+ <tr>
   <td class=\"detailLabel\">$l_label</td>
   <td class=\"detailText\">$label</td>
  </tr><tr>
@@ -370,17 +363,21 @@ function html_incident_consult($inc_q,$con_q) {
   <td class=\"detailText\">$inc_dur</td>
  </tr>
  $dis_lab_archive
+ </table>
+  <div class=\"detailHead\">$l_description</div>
+ <table class=\"detail\"> 
  <tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_description</td>
- </tr><tr>
   <td colspan=\"2\" class=\"detailText\">$inc_desc</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_solution</td>
- </tr><tr>
+ </tr>
+ </table>
+  <div class=\"detailHead\">$l_solution</div>
+ <table class=\"detail\"> 
+ <tr>
   <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
  </tr>
 </table>
 ";
+return $block;
 }
 
 
@@ -395,6 +392,7 @@ function html_incident_consult($inc_q,$con_q) {
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $incident) {
+  global $display;
   global $path, $set_theme, $ico_contract, $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -523,15 +521,14 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"insert\" />";
     $dis_button .="<input type=\"submit\" value=\"$l_insert\" />";
   }
-
+  $display["title"] = "<div class=\"title\">$l_incident : $lincident</div>";
   // --- html template --------------------------------------------------------
 
-  echo "
+  $block = "
 <form method=\"get\" name=\"form_mod_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
+<div class=\"detailHead\">$l_incident</div>
 <table class=\"detail\">
  <tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
- </tr><tr>
   <td class=\"detailLabel\">$l_label</td>
   <td><input name=\"tf_lincident\" size=\"30\" value=\"$lincident\" /></td>
  </tr><tr>
@@ -568,25 +565,26 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
  </tr><tr>
   <td class=\"detailLabel\">$l_duration</td>
   <td>$sel_dur H</td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_description</td>
- </tr><tr>
+ </tr>
+ </table>
+ <div class=\"detailHead\">$l_description</div>
+<table class=\"detail\">
+<tr>
   <td colspan=\"2\"><textarea name=\"ta_desc\" rows=\"6\" cols=\"60\">$desc</textarea></td>
- </tr><tr>
-  <td colspan=\"2\" class=\"detailHead\">$l_solution</td>
- </tr><tr>
+ </tr>
+ </table>
+  <div class=\"detailHead\">$l_solution</div>
+ <table class=\"detail\">
+<tr>
   <td colspan=\"2\"><textarea name=\"ta_solu\" rows=\"6\" cols=\"60\">$solu</textarea></td>
  </tr>
 </table>
-<table class=\"detail\">
- <tr>
-  <td>
-   $dis_button
-  </td>
- </tr>
-</table>
+ <div class=\"detailButton\">
+ <p class=\"detailButtons\">$dis_button</p>
+ </div>
 </form>
 ";
+return $block;
 }
 
 
@@ -597,7 +595,7 @@ function dis_admin_index() {
 
   $pri_q = run_query_priority();
   $sta_q = run_query_status();
-  echo html_priority_form($pri_q) . "<hr />" . html_status_form($sta_q);
+  return html_priority_form($pri_q) . "<hr />" . html_status_form($sta_q);
 }
 
 
@@ -917,7 +915,7 @@ function dis_priority_links($id) {
     </tr>
     </table>";
   }
-  echo "$dis_link";
+  return $dis_link;
 }
 
 
@@ -978,7 +976,7 @@ function dis_status_links($id) {
     </tr>
     </table>";
   }
-  echo $dis_link;
+  return $dis_link;
 }
 
 
@@ -997,7 +995,7 @@ function dis_incident_display_pref($display_pref_q) {
  
  // --- HTML Template --------------------------------------------------------
 
-  $dis_pref->display();
+  return $dis_pref->display();
 }
 
 
