@@ -216,6 +216,10 @@ if ($section == "COM") {
                    'Ico' => "$ico_lang",
                    'Url' => "$path/admin_lang/admin_lang_index.php?mode=html",
                    'Right'=> $admini_lang_read);
+  $menus["ADMINS"]["ADMIN_REF"] = array('Name'=> $l_header_admin_ref,
+                   'Ico' => "$ico_lang",
+                   'Url' => "$path/admin_ref/admin_ref_index.php",
+                   'Right'=> $admini_ref_read);
 
 } elseif ($section == "COMPTA") {
 

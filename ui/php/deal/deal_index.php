@@ -178,6 +178,7 @@ elseif (($action == "index") || ($action == "")) {
       $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
       $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, "");
     } else {
+      echo "<p>deal[id]=".$deal["id"]."; erreur ici</p>";
       $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
       $display["search"] = dis_deal_index($deal);
     }

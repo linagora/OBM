@@ -134,6 +134,7 @@ $l_header_admin_lang = "Langue";
 $l_header_admin_data = "Données";
 $l_header_admin_pref = "Préférences";
 $l_header_admin_code = "Code";
+$l_header_admin_ref = "Référentiel";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";

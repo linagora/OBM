@@ -320,6 +320,13 @@ $admin_pref_read	= $admins_read;
 $admin_pref_write 	= $admins_read + $admins_write;
 $admin_pref_admin_read 	= $admins_admin_read;
 $admin_pref_admin_write	= $admins_admin_read + $admins_admin_write;	
+			//////////////
+			//ADMIN REF //
+			//////////////
+$admin_ref_read         = $admins_read;
+$admin_ref_write 	= $admins_read + $admins_write;
+$admin_ref_admin_read 	= $admins_admin_read;
+$admin_ref_admin_write	= $admins_admin_read + $admins_admin_write;	
 
 ///////////////////////////////////////////////////////////////////////////////
 //                       PROFILES DEFINITIONS                                //

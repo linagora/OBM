@@ -108,11 +108,14 @@ $l_header_incident = "Incidents";
 $l_header_deal = "Deals";
 $l_header_list = "Liste";
 $l_header_user = "Utenti";
+
 $l_header_admin = "Amministrazione";
 $l_header_admin_lang = "Lingua";
 $l_header_admin_data = "Data";
 $l_header_admin_pref = "Prefs";
 $l_header_admin_code = "Codice";
+$l_header_admin_ref = "Referential";
+
 $l_header_computer = "Computers";
 $l_header_account = "Accounts";
 $l_header_invoice = "Fatture";

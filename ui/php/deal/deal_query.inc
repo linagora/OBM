@@ -406,9 +406,9 @@ function run_query_deal_id($deal) {
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
-  $archive = $deal["archive"];
   $todo = $deal["todo"];
-  // comment not serached because processed before stored in db
+  $archive = ($deal["archive"] == 1 ? "1" : "0");
+  // comment not searched because processed before stored in db
 
   $query = "select deal_id from Deal Where 
     deal_number='$num' and

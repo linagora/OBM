@@ -624,6 +624,7 @@ CREATE TABLE TaskType (
   PRIMARY KEY  (tasktype_id)
 ) TYPE=MyISAM;
 
+
 -------------------------------------------------------------------------------
 -- Support tables
 -------------------------------------------------------------------------------
@@ -941,6 +942,23 @@ CREATE TABLE Todo (
   todo_title Varchar(80) default NULL,
   todo_content text default NULL,
   PRIMARY KEY (todo_id)
+);
+
+
+-------------------------------------------------------------------------------
+-- References Tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for the table  'DataSource'
+--
+CREATE TABLE DataSource (
+  datasource_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  datasource_timeupdate timestamp(14),
+  datasource_timecreate timestamp(14),
+  datasource_userupdate int(8),
+  datasource_usercreate int(8),
+  datasource_name varchar(64),
+  PRIMARY KEY (datasource_id)
 );
 
 
