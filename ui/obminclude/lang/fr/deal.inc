@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : deal.inc                                                 //
@@ -50,8 +50,6 @@ $l_show_archive = "Voir les archives";
 $l_date_alarm_after = "Date Alarme Après";
 $l_date_alarm_before = "Date Alarme Avant";
 $l_zipcode = "Code Postal";
-$l_after = "Date Alarme Après";
-$l_before = "Date Alarme Avant";
 $l_last_update = "Dernière modification le";
 $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";

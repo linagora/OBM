@@ -28,6 +28,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $act = $company["activity"];
   $market = $company["marketing_manager"];
   $zip = $company["zip"];
+  $dateafter = $company["dateafter"];
+  $datebefore = $company["datebefore"];
 
   // If a name has been given we search its sound too
   if ($name != "") {
@@ -100,6 +102,16 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
   if ($zip != "") {
     $where .= " $and company_zipcode $like '$zip%'";
+    $and = "and";
+  }
+  if ($dateafter != "") {
+    $where .= " $and (company_timeupdate > '$dateafter'
+                     or company_timecreate > '$dateafter')";
+    $and = "and";
+  }
+  if ($datebefore != "") {
+    $where .= " $and (company_timeupdate < '$datebefore'
+                     and company_timecreate < '$datebefore')";
     $and = "and";
   }
 

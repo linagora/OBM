@@ -39,6 +39,8 @@ $l_postcode = "Zip Code";
 $l_town = "Town";
 $l_priority = "Priority";
 $l_datasource = "Data source";
+$l_after = "After";
+$l_before = "Before";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

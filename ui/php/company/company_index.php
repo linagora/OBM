@@ -422,9 +422,10 @@ display_page($display);
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
-  global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com, $param_company;
-  global $sel_dsrc, $tf_kind, $tf_act,$tf_cat_code,$tf_cat,$sel_cat;
-  global $cdg_param;
+  global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com;
+  global $tf_dateafter, $tf_datebefore;
+  global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
+  global $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
@@ -477,6 +478,10 @@ function get_param_company() {
   if (isset ($tf_web)) $company["web"] = $tf_web;
   if (isset ($tf_email)) $company["email"] = $tf_email;
   if (isset ($ta_com)) $company["com"] = $ta_com;
+
+  // Search fields
+  if (isset ($tf_dateafter)) $company["dateafter"] = $tf_dateafter;
+  if (isset ($tf_datebefore)) $company["datebefore"] = $tf_datebefore;
 
   // Admin - Kind fields
   // $sel_kind -> "kind" is already set

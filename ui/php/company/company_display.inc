@@ -161,7 +161,8 @@ function dis_company_search_form($company="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   global $l_company_name, $l_company_kind, $l_postcode, $l_archive, $l_phone;
-  global $l_all, $l_find, $l_market, $l_activity, $l_country, $l_town; 
+  global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
+  global $l_all, $l_find; 
   global $c_all;
 
   $popup = $company["popup"];
@@ -174,8 +175,10 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   $ctry = $company["country"];
   $mark = $company["marketing_manager"];
   $zip = stripslashes($company["zip"]);
+  $dateafter = stripslashes($company["dateafter"]);
+  $datebefore = stripslashes($company["datebefore"]);
 
-  // kind select
+  // Kind select
   $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
     <option value=\"$c_all\">$l_all</option>";
   while ($kind_q->next_record()) {
@@ -186,7 +189,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   }
   $sel_kind .= "</select>";
 
-  // activity select
+  // Activity select
   $sel_act = "<select id=\"sel_act\" name=\"sel_act\">
     <option value=\"$c_all\">$l_all</option>";
   while ($act_q->next_record()) {
@@ -267,6 +270,14 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
     </div>
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
+    </div>
+    <div class=\"searchLabel\">$l_after<br />
+      <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
+        value=\"$dateafter\" />
+    </div>
+    <div class=\"searchLabel\">$l_before<br />
+      <input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\"
+        value=\"$datebefore\" />
     </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
