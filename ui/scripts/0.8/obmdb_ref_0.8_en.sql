@@ -85,7 +85,7 @@ INSERT INTO InvoiceStatus VALUES(4, 'trouble');
 -- dump for table  PaymentKind :
 --
 INSERT INTO PaymentKind VALUES (1,'Ch','Cheque');
-INSERT INTO PaymentKind VALUES (2,'C.T.','credit transfert');
+INSERT INTO PaymentKind VALUES (2,'C.T','credit transfert');
 INSERT INTO PaymentKind VALUES (3,'TIP','Titre Interbancaire de Paiement');
 INSERT INTO PaymentKind VALUES (4,'PA','Prélèvement Automatique');
 INSERT INTO PaymentKind VALUES (5,'FrB','Frais bancaires');

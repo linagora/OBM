@@ -699,7 +699,7 @@ function html_list_graphical_form($action, $list_q, $list) {
    $dis_criteria
   </table>
   <input type=\"button\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
+  onclick=\"window.open('$url2','','height=600,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
   </div>";
 
   return $block;
