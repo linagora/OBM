@@ -19,6 +19,20 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-11-03</b> : version <b>0.8.8</b> released (fixes)
+        <ol>
+          <li> ACCESSKEY support, better focus handling
+          <li> More site config parameters (allow * in searches, allow auto-format some fields, visiblue fields...)
+          <li> Reworked Contact category assignments (better ergonomics)
+          <li> Enhancement in Company category search, contact email search, contact address handling
+          <li> Company Statistics can be based on a given List
+          <li> Fixes in modules Company, Contact, Calendar List, Time, Admin data
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-09-21</b> : version <b>0.8.7</b> released (fixes)
         <ol>
           <li> Many fixes in Country handling, sql limit tuning parameter

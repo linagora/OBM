@@ -24,6 +24,20 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-11-03</b> : version <b>0.8.8</b> released (fixes)
+        <ol>
+          <li> ACCESSKEY support, better focus handling
+          <li> More site config parameters (allow * in searches, allow auto-format some fields, visiblue fields...)
+          <li> Reworked Contact category assignments (better ergonomics)
+          <li> Enhancement in Company category search, contact email search, contact address handling
+          <li> Company Statistics can be based on a given List
+          <li> Fixes in modules Company, Contact, Calendar List, Time, Admin data
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-09-21</b> : version <b>0.8.7</b> released (fixes)
         <ol>
           <li> Many fixes in Country handling, sql limit tuning parameter
@@ -59,22 +73,6 @@
           <li> Performance enhancements : SQL Limit clause can be toggled on / of for all searches, List and Todo
           <li> Fixes in Export CSV, Contact, Deal, Contract, Incident, Invoice, Project, Time, Admin,...
           <li> Many fixes and Clean up preparing 0.9
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-08-02</b> : version <b>0.8.4</b> released (<b>Guêpe Release</b>) (fixes and minors enhancements)
-        <ol>
-          <li> Many enhancements to the List (Mail merge) module
-          <li> Comments now automatically stamped in Company, Contact
-          <li> Group membership management from User screen
-          <li> Fixes and enhancements in column availability (addresses, order)
-          <li> Search enhancements for Company, Contact, Deal
-          <li> Enhancements in Company, List, Contact, Contract, User
-          <li> Fixes in Install, Company, Deal, Group, Contract
-          <li> Clean up in external modules calls
         </ol>
         </div>
         <br />
