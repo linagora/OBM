@@ -36,7 +36,6 @@ $time_active_session = $sess->lifetime;
 // In how many parts we can chop a day
 $fraction_jour = 8;
 
-
 // Perms
 $perms_user = "user" ;
 $perms_editor = "editor" ;
@@ -397,43 +396,44 @@ function display_bookmarks($path="..") {
   global $l_last_company,$l_last_contact,$l_last_deal;
   global $last_company,$last_contact,$last_deal, $last_contract;
   global $last_account,$last_invoice, $last_payment, $last_incident;
+  global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
+  global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
   global $sess;
-
-  $company_name=run_query_global_company_name($last_company);
-  $contact_name=run_query_global_contact_name($last_contact);
-  $deal_label=run_query_global_deal_label($last_deal);
-  $account_label = run_query_global_account_label($last_account);
-  $invoice_label = run_query_global_invoice_label ($last_invoice);
-  $payment_label = run_query_global_payment_label ($last_payment);
-  $contract_label = run_query_global_contract_label ($last_contract);  
-  $incident_label = run_query_global_incident_label ($last_incident);    
 
   echo "<center>
      <table border=0>
      <tr><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">".substr($company_name,0,30)."</a></font>
+     <a href=\"".$sess->url("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
+     ".substr($last_company_name,0,30)."</a></font>
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">".substr($contact_name,0,30)."</a></font>
+     <a href=\"".$sess->url("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
+     ".substr($last_contact_name,0,30)."</a></font>
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">".substr($deal_label,0,30)."</a></font>
+     <a href=\"".$sess->url("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
+     ".substr($last_deal_name,0,30)."</a></font>
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">".substr($account_label,0,30)."</a></font>
+     <a href=\"".$sess->url("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
+     ".substr($last_account_name,0,30)."</a></font>
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">".substr($invoice_label,0,30)."</a></font>
+     <a href=\"".$sess->url("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
+     ".substr($last_invoice_name,0,30)."</a></font>
      </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">".substr($payment_label,0,30)."</a></font> 
+     <a href=\"".$sess->url("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
+     ".substr($last_payment_name,0,30)."</a></font> 
+     </td><td>
+     <font size=-2>
+     <a href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult_contract&amp;param_contract=".$last_contract)."\">
+     ".substr($last_contract_name,0,30)."</a></font>
     </td><td>
      <font size=-2>
-     <a href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult_contract&amp;param_contract=".$last_contract)."\">".substr($contract_label,0,30)."</a></font>
-    </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">".substr($incident_label,0,30)."</a></font>"; 
+     <a href=\"".$sess->url("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
+     ".substr($last_incident_name,0,30)."</a></font>"; 
   echo "          </td></tr></table></center>
      <hr>"; 
 }

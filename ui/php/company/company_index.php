@@ -51,6 +51,7 @@ if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
 } else if ( ($param_company >0 ) && ($last_company != $param_company) ) {
   $last_company=$param_company;
   run_query_set_options_user($auth->auth["uid"],"last_company",$param_company);
+  $last_company_name = run_query_global_company_name($last_company);
   //$sess->register("last_company");
 }
 

@@ -100,7 +100,6 @@ class DB_Sql {
        * like these: '$db = new DB_Sql_Subclass;'
        */
       return 0;
-
     if (!$this->connect()) {
       return 0; /* we already complained in connect() about that. */
     };

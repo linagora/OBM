@@ -148,7 +148,7 @@ class OBM_Session extends Session {
   var $magic          = "Falcon030";       ## ID seed
   var $mode           = "cookie";          ## We propagate session IDs with cookies
   var $fallback_mode  = "get";
-  var $lifetime       = 7200;                 ## 0 = do session cookies, else minutes
+  var $lifetime       = 10;                 ## 0 = do session cookies, else minutes
   var $that_class     = "OBM_CT_Sql";      ## Which database to connect...
   var $gc_probability = 5;
   var $allowcache = "" ;

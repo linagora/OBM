@@ -48,6 +48,7 @@ if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
 } elseif  ( ($param_contract > 0) && ($last_contract != $param_contract) ) {
     $last_contract=$param_contract;
     run_query_set_options_user($auth->auth["uid"],"last_contract",$param_contract);
+    $last_contract_name = run_query_global_contract_label($last_contract);
     //$sess->register("last_contract");
 }
 

@@ -46,6 +46,7 @@ if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
 } elseif  ( ($param_incident > 0) && ($last_incident != $param_incident) ) {
     $last_incident=$param_incident;
     run_query_set_options_user($auth->auth["uid"],"last_incident",$param_incident);
+    $last_incident_name = run_query_global_incident_label($last_incident);
     //$sess->register("last_incident");
 }
 
