@@ -920,7 +920,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
    $dis_task_list->data_page = false;
    $dis_task_list->data_url = $url;
 
-   $dis_task_list->display();
+   $dis_task_list->display("dis_data_time");
 
    echo "
      <br>
@@ -977,7 +977,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   $dis_task_list->data_header = "top";
   $dis_task_list->data_url = $url;
   
-  $dis_task_list->display();
+  $dis_task_list->display("dis_data_time");
 
 
   echo "<table>";
