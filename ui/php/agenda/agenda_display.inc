@@ -432,6 +432,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     for($j=0; $j<7;$j++) {
       $current_time = date("YmdHi", strtotime("+$j days $i hours",$start_week_day));  
       if(is_array($current_events[$current_time])) {
+	$user_indice=1;
 	foreach($calendar_user as $id => $user_data ) {
 	  if(is_array($current_events[$current_time][$id])){    
 	    $is_title = FALSE;	  
@@ -463,8 +464,14 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	    $hour_day_list .= "</td>";	
 	  }
 	  else {
-     	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
-     	  }
+	    if($user_indice != $nb_user) {
+	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
+	    }
+	    else {
+	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+	    }
+	  }
+	  $user_indice++;
      	}	  
       }else {
      	$hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
@@ -475,7 +482,8 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
       for($j=0; $j<7;$j++) {
       	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
-      	if(is_array($current_events[$current_time])) {
+	if(is_array($current_events[$current_time])) {
+	  $user_indice=1;
 	  foreach($calendar_user as $id => $user_data ) {
       	    if(is_array($current_events[$current_time][$id])){    
 	      $is_title = FALSE;	  
@@ -507,8 +515,14 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       	      $hour_day_list .= "</td>";	
 	    }
 	    else {
-	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+	      if($user_indice != $nb_user) {
+	       	$hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
+	      }
+	      else {
+		$hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+	      }
 	    }
+	    $user_indice++;
 	  }	  
       	}else {
       	  $hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
@@ -613,6 +627,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $hour_day_list .= 	"<td width=\"1\"></td>";
     $current_time = date("YmdHi", strtotime("+$i hours",strtotime($getdate)));  
     if(is_array($current_events[$current_time])) {
+      $user_indice = 1;
       foreach($calendar_user as $id => $user_data ) {
 	if(is_array($current_events[$current_time][$id])){    
 	  $is_title = FALSE;	  
@@ -642,8 +657,14 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  $hour_day_list .= "</td>";	
 	}
 	else {
-	  $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+	  if($user_indice != $nb_user) {
+	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
+	  }
+	  else {
+	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+	  }	    
 	}
+	$user_indice++;
       }	  
     }else {
       $hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
@@ -653,6 +674,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
       $current_time = date("YmdHi", strtotime("+$i hours ".($k*$time_unit)." minutes",strtotime($getdate)));  
       if(is_array($current_events[$current_time])) {
+	$user_indice = 1;
 	foreach($calendar_user as $id => $user_data ) {
 	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){      
   	    $is_title = FALSE;	  
@@ -682,8 +704,14 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	    }
 	  }
 	  else {
-	    $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+    	    if($user_indice != $nb_user) {
+  	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
+  	    }
+  	    else {
+  	      $hour_day_list .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+  	    }	    
 	  }
+	  $user_indice++;
 	}	  
       }else {
 	$hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
@@ -756,9 +784,9 @@ echo "
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar;
+  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono;
   global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate;
-  global $action;
+  global $action,$auth;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -845,11 +873,15 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 
 // User Selection
   if ( ($action != "view_day") && ($action != "view_week") &&
-       ($action != "view_month") && ($action != "view_year") )
+       ($action != "view_month") && ($action != "view_year") ) {
     $new_action = "view_week";
-  else
+  }
+  else {
     $new_action = $action;
-
+  }
+  if(count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
+    $dis_back_monoview = "<tr><td colspan=\"3\" class=\"agendaCell\"><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a></td></tr>";
+  }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\">";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -993,10 +1025,11 @@ echo "
        <tr>
         <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
        </tr>
+       	$dis_back_monoview
        <tr>
-        <td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
+	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
         <td colspan=\"2\" class=\"agendaVide\" align=\"left\">
-	 <form action=\"\" method=\"post\">
+	 <form action=\"\" method=\"get\">
 	  $dis_sel_user
 	 </form>
         </td>
