@@ -62,16 +62,16 @@ INSERT INTO DealType (dealtype_timeupdate, dealtype_timecreate, dealtype_userupd
 INSERT INTO DealType (dealtype_timeupdate, dealtype_timecreate, dealtype_userupdate, dealtype_usercreate, dealtype_label,dealtype_inout) VALUES (null,null,2,null,'JURIDICAL','-');
 
 --
--- dump for table 'EventCategory'
+-- dump for table 'CalendarEvent'
 --
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'RDV');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Training');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Trade');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Meeting');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Call');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Support');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Development');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Private');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'RDV');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Training');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Trade');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Meeting');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Call');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Support');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Development');
+INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, calendarevent_usercreate, calendarevent_label) VALUES (null,null,null,1,'Private');
 
 
 --

@@ -65,16 +65,16 @@ INSERT INTO DealType (dealtype_timeupdate, dealtype_timecreate, dealtype_userupd
 
 
 --
--- dump for table 'EventCategory'
+-- dump for table 'CalendarCategory'
 --
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'RDV');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Formation');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Commercial');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Reunion');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Appel tel.');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Support');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Developpement');
-INSERT INTO EventCategory (eventcategory_timeupdate, eventcategory_timecreate, eventcategory_userupdate, eventcategory_usercreate, eventcategory_label) VALUES (null,null,null,1,'Personnel');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'RDV');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Formation');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Commercial');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Reunion');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Appel tel.');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Support');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Developpement');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Personnel');
 
 --
 -- dump for table  InvoiceStatus :
