@@ -166,6 +166,10 @@ if ($section == "COM") {
 			           'Ico' => "$ico_agenda",
 			           'Url' => "$path/agenda/agenda_index.php",
 			           'Right'=> $agenda_read);
+  $menus["COM"]["TODO"]    = array('Name'=> $l_header_todo,
+			           'Ico' => "$ico_todo",
+			           'Url' => "$path/todo/todo_index.php",
+			           'Right'=> $todo_read);
 
 } elseif ($section == "PROD") {
 

@@ -162,6 +162,13 @@ $agenda_read 		= $com_read;
 $agenda_write 		= $com_read + $com_write ;
 $agenda_admin_read 	= $com_admin_read;
 $agenda_admin_write	= $com_admin_read + $com_admin_write;
+			///////////
+			// TODO  //
+			///////////
+$todo_read 		= $com_read;
+$todo_write 		= $com_read + $com_write ;
+$todo_admin_read 	= $com_admin_read;
+$todo_admin_write	= $com_admin_read + $com_admin_write;
 
 ///////////////////////////////////////////////////////////////////////////////
 //                         PRODUCTION RIGTHS                                 //

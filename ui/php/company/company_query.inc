@@ -80,6 +80,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $where .= " $and company_zipcode like '$zip%'";
     $and = "and";
   }
+
   // Get only not archived by default
   if ($archive != "1") {
     $where .= " $and company_archive=0";

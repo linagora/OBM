@@ -42,6 +42,7 @@ $ico_company        = "ico_company.gif";         // Company Icon
 $ico_change_company = "ico_change_company.gif";  // Contract Icon
 $ico_list           = "ico_list.gif";            // List Icon
 $ico_agenda         = "ico_agenda.gif";          // Agenda Icon
+$ico_todo           = "ico_todo.png";            // Agenda Icon
 
 $ico_time           = "ico_time.gif";
 $ico_project        = "ico_project.png";
