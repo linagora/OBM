@@ -196,7 +196,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_invoice() {
   global $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
-  global $ta_comment, $sel_status, $param_invoice, $tf_date;
+  global $ta_comment, $sel_status, $param_invoice, $tf_date, $tf_payment_date;
   global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
   global $tf_deal, $tf_company, $cb_archive;
   global $param_company, $company_name, $company_new_name, $company_new_id;
@@ -214,6 +214,7 @@ function get_param_invoice() {
   if (isset ($tf_amount_ttc)) $invoice["ttc"] = $tf_amount_ttc;
   if (isset ($sel_status)) $invoice["status"] = $sel_status;
   if (isset ($tf_date)) $invoice["date"] = $tf_date;
+  if (isset ($tf_payment_date)) $invoice["pdate"] = $tf_payment_date;
   if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
   if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
   if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;

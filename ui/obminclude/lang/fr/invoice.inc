@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : invoice.inc                                              //
-// 2001-08-02 Nicolas Roman                                                  //
+// 2001-08-02 Aliacom - Nicolas Roman                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,12 +15,13 @@ $l_amount = "Montant";
 $l_amount_ht = "Montant HT";
 $l_amount_ttc = "Montant TTC";
 $l_status = "Etat";
+$l_payment_date = "Date de paiment";
 $l_date_apres = "Ayant la date après";
 $l_date_avant = "Ayant la date avant";
 $l_paid = "Montant TTC payé";
 $l_pick_deal = "Choisissez une affaire";
 $l_inout = "Type";
-$l_both = "Tous"; 
+$l_both = "Tous";
 $l_tax_rate = "Taux TVA";
 $l_compute_tax = "Calculer le montant TTC";
 $l_include_archive = "Inclure les archives";

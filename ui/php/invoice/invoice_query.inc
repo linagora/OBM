@@ -124,6 +124,7 @@ function run_query_detail($p_invoice_id) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $date = sql_date_format($db_type, "Invoice.invoice_date", "date");
+  $pdate = sql_date_format($db_type, "Invoice.invoice_payment_date", "invoice_payment_date");
   $datemodif = sql_date_format($db_type, "invoice_timeupdate", "datemodif");
   $timeupdate = sql_date_format($db_type, "invoice_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "invoice_timecreate", "timecreate");
@@ -131,6 +132,7 @@ function run_query_detail($p_invoice_id) {
   // XXXXX ???? exporter le calcul des paiements a par (pour eviter group by)
   $query = "select Invoice.*,
       $date,
+      $pdate,
       $datemodif,
       $timeupdate,
       $timecreate,
@@ -181,6 +183,7 @@ function run_query_insert($invoice) {
   $status = $invoice["status"];
   $comment = $invoice["comment"];
   $date = $invoice["date"];
+  $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
   $comp_id = $invoice["comp_new_id"];
   if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
@@ -212,6 +215,7 @@ function run_query_insert($invoice) {
       invoice_status_id,
       invoice_comment,
       invoice_date,
+      invoice_payment_date,
       invoice_inout,
       invoice_archive
     ) values (
@@ -229,6 +233,7 @@ function run_query_insert($invoice) {
      '$status',
      '$comment',
      '$date',
+     '$pdate',
      '$inout',
      '$arch')"; 
 
@@ -257,6 +262,7 @@ function run_query_update ($invoice) {
   $status = $invoice["status"];
   $comment = $invoice["comment"];
   $date = $invoice["date"];
+  $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
   if ($status == ""){
     $status = "0";
@@ -285,6 +291,7 @@ function run_query_update ($invoice) {
       invoice_status_id='$status',
       invoice_comment='$comment',
       invoice_date='$date',
+      invoice_payment_date='$pdate',
       invoice_inout='$inout',
       invoice_archive='$arch'
     where invoice_id='$id'"; 
@@ -523,6 +530,7 @@ function check_invoice_data_form($id, $invoice) {
   $label = $invoice["label"];
   $number = $invoice["number"];
   $date = $invoice["date"];
+  $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
@@ -546,11 +554,20 @@ function check_invoice_data_form($id, $invoice) {
     $err_msg = $l_fill_date;
     return false;
   } else if (preg_match($php_regexp_isodate, $date) == 0) {
-    $err_msg = "$l_date : $l_invalid_date"; 
+    $err_msg = "$l_date : $date : $l_invalid_date"; 
     return false;
   }
 
-  // MANDATORY: Invoice date must be set
+  // Payment Date check
+  if ($pdate == "") {
+    $err_msg = $l_fill_date;
+    return false;
+  } else if (preg_match($php_regexp_isodate, $pdate) == 0) {
+    $err_msg = "$l_date : $pdate : $l_invalid_date"; 
+    return false;
+  }
+
+  // MANDATORY: Invoice inout type must be set
   if (($inout != "+") && ($inout != "-")) {
     $err_msg = $l_fill_inout;
     return false;

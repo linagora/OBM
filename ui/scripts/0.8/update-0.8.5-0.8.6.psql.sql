@@ -52,6 +52,7 @@ ALTER TABLE Invoice ALTER COLUMN invoice_company_id SET DEFAULT 0;
 ALTER TABLE Invoice ALTER COLUMN invoice_company_id SET NOT NULL;
 ALTER TABLE Invoice ADD COLUMN invoice_deal_id integer DEFAULT NULL;
 ALTER TABLE Invoice ADD COLUMN invoice_project_id integer DEFAULT NULL;
+ALTER TABLE Invoice ADD COLUMN invoice_payment_date date;
 
 UPDATE Invoice set invoice_deal_id=(select dealinvoice_deal_id from DealInvoice where dealinvoice_invoice_id=invoice_id);
 UPDATE Invoice set invoice_company_id=(select deal_company_id from Deal where deal_id=invoice_deal_id);

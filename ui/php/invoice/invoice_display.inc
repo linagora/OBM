@@ -20,6 +20,7 @@ $fieldnames["invoice_amount_ht"] = $l_amount_ht;
 $fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
 $fieldnames["invoice_status"] = $l_status;
 $fieldnames["invoice_date"] = $l_date;
+$fieldnames["invoice_payment_date"] = $l_payment_date;
 $fieldnames["invoice_paid"] = $l_paid;
 $fieldnames["payment_label"] = $l_label;
 $fieldnames["payment_number"] = $l_number;
@@ -294,6 +295,8 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
 		    "&amp;tf_amount_ht=$ht". 
 		    "&amp;tf_amount_ttc=$ttc".
 		    "&amp;sel_status=$status".
+		    "&amp;tf_date_after=$date_after".
+		    "&amp;tf_date_before=$date_before".
 		    "&amp;tf_deal=$deal".
 		    "&amp;rd_inout=$inout".
 		    "&amp;param_company=$comp_id".
@@ -363,7 +366,7 @@ function dis_invoice_consult($invoice) {
 function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
   global $display, $set_theme;
   global $l_delete, $l_invoice_infos;
-  global $l_list_payment, $l_no_payment, $l_payments_todel, $l_invoice_del_payment, $l_del_payment_chosen;
+  global $l_list_payment, $l_no_payment, $l_payments_todel;
   global $perm, $menu, $cright_write_admin;
 
   $i_id = $inv_q->f('invoice_id');
@@ -455,11 +458,12 @@ function dis_invoice_detail($inv_q) {
   global $display, $set_theme, $path, $ico_company, $ico_deal, $ico_project;
   global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
-  global $l_status, $l_comment, $l_invoice;
+  global $l_status, $l_comment, $l_invoice, $l_payment_date;
 
   $label = $inv_q->f("invoice_label");
   $num = $inv_q->f("invoice_number");
   $date = date_format($inv_q->f("date"));
+  $payment_date = date_format($inv_q->f("payment_date"));
   $status = $inv_q->f("invoicestatus_label");
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
   $title = $inout;
@@ -518,6 +522,10 @@ function dis_invoice_detail($inv_q) {
     <tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailText\">$date</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_payment_date</td>
+      <td class=\"detailText\">$payment_date</td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_status</td>
@@ -582,8 +590,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   global $l_label, $l_number, $l_comment, $l_deal, $l_amount_ht, $l_amount_ttc;
   global $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_supplier;
   global $l_insert, $l_update;
-  global $l_invoice, $l_company, $l_deal, $l_project;
-  global $default_invoice_numbering;
+  global $l_invoice, $l_company, $l_deal, $l_project, $l_payment_date;
+  global $default_invoice_numbering, $c_php_isodate_format;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
 
   // if update mode and first time values are taken from database
@@ -594,6 +602,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
     $date = $inv_q->f("invoice_date");
+    $pdate = $inv_q->f("invoice_payment_date");
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -606,6 +615,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
 
   // New form and first time
   } elseif ($action == "new") {
+    $date = date($c_php_isodate_format); 
+    $pdate = $date;
     $number = date ($default_invoice_numbering);
     // when creating from a deal, default to use same "inout" as the dealtype
     if ($d_id >= 1) {
@@ -625,6 +636,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   if (isset($invoice["label"])) { $label = stripslashes($invoice["label"]); }
   if (isset($invoice["number"])) { $number = $invoice["number"]; }
   if (isset($invoice["date"])) { $date = $invoice["date"]; }
+  if (isset($invoice["pdate"])) { $pdate = $invoice["pdate"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
   if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
@@ -749,6 +761,11 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
     <td class=\"detailLabel\">$l_date</td>
     <td class=\"detailForm\">
       <input name=\"tf_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$date\">
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_payment_date</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_payment_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$pdate\">
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_status</td>

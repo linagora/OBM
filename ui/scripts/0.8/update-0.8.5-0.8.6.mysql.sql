@@ -55,6 +55,7 @@ ALTER TABLE Invoice CHANGE COLUMN invoice_usercreate invoice_usercreate int(8) a
 ALTER TABLE Invoice ADD COLUMN invoice_company_id int(8) NOT NULL after invoice_usercreate;
 ALTER TABLE Invoice ADD COLUMN invoice_deal_id int(8) DEFAULT NULL after invoice_company_id;
 ALTER TABLE Invoice ADD COLUMN invoice_project_id int(8) DEFAULT NULL after invoice_deal_id;
+ALTER TABLE Invoice ADD COLUMN invoice_payment_date date after invoice_date;
 
 UPDATE Invoice left join DealInvoice on invoice_id=dealinvoice_invoice_id
                left join Deal on dealinvoice_deal_id=deal_id
