@@ -47,12 +47,12 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
       UNIX_TIMESTAMP(contract_dateexp) as contract_dateexp
-    from ((Contract
+    from (((Contract
       left join UserObm u1 on contract_techmanager_id=u1.userobm_id)
-      left join UserObm u2 on contract_marketmanager_id=u2.userobm_id),
-      Company, ContractType
-    where contract_company_id=company_id
-      and contracttype_id=contract_type_id";
+      left join UserObm u2 on contract_marketmanager_id=u2.userobm_id)
+      left join ContractType on contract_type_id=contracttype_id),
+      Company
+    where contract_company_id=company_id";
 
   if (($p_type != $c_all) && ($p_type != ""))
     $query .= " and contract_type_id = '$p_type'";

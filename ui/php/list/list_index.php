@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_index.php                                               //
 //     - Desc : List Index File                                              //
@@ -283,7 +283,7 @@ display_end();
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_contact, $tf_datebegin, $tf_email, $cb_vis;
   global $param_list, $hd_usercreate, $hd_timeupdate, $cdg_param;
-  global $action, $ext_action, $ext_url, $ext_id, $title;
+  global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // List fields
@@ -317,6 +317,7 @@ function get_param_list() {
   if (isset ($ext_action)) $list["ext_action"] = $ext_action;
   if (isset ($ext_url)) $list["ext_url"] = $ext_url;
   if (isset ($ext_id)) $list["ext_id"] = $ext_id;
+  if (isset ($ext_target)) $list["ext_target"] = $ext_target;
   if (isset ($title)) $list["title"] = stripslashes($title);
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
@@ -349,7 +350,7 @@ function get_param_list() {
     echo "action=$action";
     if ( $list ) {
       while ( list( $key, $val ) = each( $list ) ) {
-        echo "<BR>list[$key]=$val";
+        echo "<br />list[$key]=$val";
       }
     }
   }
@@ -363,7 +364,7 @@ function get_param_list() {
 function get_list_action() {
   global $list, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_export, $l_header_global_export;
+  global $l_list,$l_header_display,$l_header_export, $l_header_global_export;
   global $l_header_admin, $l_header_add_contact, $l_select_list;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
 
@@ -436,9 +437,10 @@ function get_list_action() {
 // Ext get Ids : Lists selection
   $actions["LIST"]["ext_get_ids"] = array (
     'Name'     => $l_header_add_contact,
-    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."",
+    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
     'Right'    => $list_write,
     'Popup'    => 1,
+    'Target'    => $l_list,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                     	  );
 
@@ -466,9 +468,10 @@ function get_list_action() {
 // Export
   $actions["LIST"]["export"] = array (
     'Name'     => $l_header_global_export,
-    'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_url=".urlencode("$path/list/list_index.php"),
+    'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
     'Right'    => $list_write,
     'Popup'    => 1,
+    'Target'    => $l_list,
     'Condition'=> array ('all') 
                                      	 );
 
@@ -497,4 +500,4 @@ function get_list_action() {
 
 }
 
-</SCRIPT>
+</script>

@@ -130,10 +130,13 @@ function display_menu_bar($section, $menu) {
        if (in_array("all",$value["Condition"])
            || in_array($action,$value["Condition"])) {
          if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
-           if($value["Popup"] == 1) {
+           if ($value["Popup"] == 1) {
+	     if ($value["Target"]) {
+	       $wtarget = "window.name='" . $value['Target'] . "';";
+	     }
              echo "
               <a href=\"\" class=\"menuBar\" 
-              onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">
+              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
            } else {
             echo "

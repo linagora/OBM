@@ -17,7 +17,7 @@ $l_updater = "Mise à jour par" ;
 $l_date_last_update = "Mise à jour" ;
 
 // Labels et textes
-$l_list_list = "Liste";
+$l_list = "Liste";
 $l_yes = "oui";
 $l_no = "non";
 $l_nb_contact = "# Contacts";

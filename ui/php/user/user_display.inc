@@ -37,7 +37,7 @@ function html_user_search_form($user) {
   $perms = $user["perms"];
   $archive = ($user["archive"] == "1" ? "checked" : "");
 
-  echo "<center>
+  echo "
   <form method=\"get\" name=\"f_user\"
     action=\"". url_prepare("user_index.php")."\">
   <table class=\"details\">
@@ -68,8 +68,7 @@ function html_user_search_form($user) {
   </tr>
   </table>
 
-  </form><hr />
-  </center>";
+  </form><hr />";
 }
 
 

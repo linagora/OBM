@@ -818,7 +818,8 @@ class OBM_DISPLAY {
     }
 
     $this->display_pref->seek(0);
-    echo "<tr>";
+    echo "
+    <tr>";
     
     // If debug level Id is set, display the entity id
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
@@ -836,7 +837,8 @@ class OBM_DISPLAY {
       $label = $fieldnames[$fieldname];
       $order = ($order_dir == "ASC" ? "DESC" : "ASC");
 
-      echo "<td class=\"OBMDisplayHead\">";
+      echo "
+        <td class=\"OBMDisplayHead\">";
       if ($this->data_order) {
         echo "<a class=\"OBMDisplayHead\" href=\"".$url.
           (($url != "") ? "&amp;page=$page" : "" ) .

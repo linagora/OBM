@@ -69,4 +69,5 @@ echo "<center>
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
 </center>
 </body></html>";
-</SCRIPT>
+
+</script>

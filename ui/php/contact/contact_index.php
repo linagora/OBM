@@ -224,14 +224,12 @@ if ($action == "index" || $action == "") {
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q); 
   
-
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q);
   
-
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
@@ -257,7 +255,7 @@ function get_param_contact() {
   global $tf_mphone, $tf_fax, $tf_email, $ta_com, $cb_vis, $param_company;
   global $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $ext_action, $ext_url, $ext_id;
+  global $ext_action, $ext_url, $ext_id, $ext_target;
 
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
@@ -288,6 +286,7 @@ function get_param_contact() {
   if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
   if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
   if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
+  if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
 
   if (debug_level_isset($cdg_param)) {
     if ( $contact ) {
@@ -300,10 +299,10 @@ function get_param_contact() {
   return $contact;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 //  Contact Action 
 ///////////////////////////////////////////////////////////////////////////////
-
 function get_contact_action() {
   global $contact, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;

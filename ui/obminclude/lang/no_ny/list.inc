@@ -14,7 +14,7 @@ $l_name_list_empty = "The list name must be filled" ;
 $l_name_list_nomatch = "List name is not valid" ;
 $l_subject_list_empty = "List subject is not valid" ;
 $l_list_exists = "Sorry but this list already exists";
-$l_list_list = "List" ;
+$l_list = "List" ;
 
 $l_yes = "yes" ;
 $l_no = "no" ;

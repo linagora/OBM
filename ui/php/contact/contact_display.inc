@@ -40,8 +40,10 @@ function html_contact_search_form ($contact) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
+    $ext_target = $contact["ext_target"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
   }
 
@@ -116,6 +118,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
+    $ext_target = $contact["ext_target"];
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
   }
 
@@ -125,7 +128,6 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   $company = stripslashes($contact["company"]);
   $company_id = $contact["company_id"];
 
-
   $url = url_prepare("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA",$pref_q);
@@ -134,8 +136,10 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
     $dis_contact_list->data_cb_text = "X";
     $dis_contact_list->data_idfield = "contact_id";
     $dis_contact_list->data_cb_name = "cb_con";
-    $display_popup_head = "\n<form target=\"root\" method=\"post\" action=\"$ext_url\">";
-    $display_popup_end = "<input type=\"submit\" value=\"$l_add\" />
+    $display_popup_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    $display_popup_end = "
+      <input type=\"submit\" value=\"$l_add\" />
       <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
       </form>
@@ -166,7 +170,7 @@ function html_contact_consult($co_q) {
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $set_theme,  $ico_mail;
   global $action, $auth;
-  global $perms_user,$l_perms_user;
+  global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
   $c_id = $co_q->f("contact_company_id");
@@ -208,10 +212,8 @@ function html_contact_consult($co_q) {
   // --- HTML Template --------------------------------------------------------
 
   echo "
-
-
     <table class=\"details\">
-<tr>
+    <tr>
       <td class=\"detailHead\" colspan=\"2\">$l_contact</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_lastname</td>
@@ -279,8 +281,6 @@ function html_contact_consult($co_q) {
       </td>
     </tr>
     </table>
-
-
 ";
 }
 
@@ -385,7 +385,8 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // UPDATE 
   if (($action=="detailupdate") || ($action=="update")) {
-    $display_update = "<input type=\"hidden\" name=\"action\" value=\"update\" />
+    $display_update = "
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
       <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
       <input type=\"hidden\" name=\"hd_usercreate\" value=\"$usercreate\" />
       <input type=\"submit\" value=\"$l_update\" />
@@ -393,8 +394,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
-    $display_update = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-    <input type=\"submit\" value=\"$l_insert\" />";
+    $display_update = "
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
   }
 
 
@@ -478,8 +480,6 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </table>
     </form>
  ";
-
-
 }
 
 
@@ -516,17 +516,21 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $com = $contact["com"];
   $vis = ($contact["vis"] == 1 ? 1 : 0);
 
-
-  $disp_same_cont = "<tr><td colspan =\"2\" class=\"detailHead\">$l_check_samecontact</td></tr>";
+  $disp_same_cont = "
+    <tr>
+      <td colspan =\"2\" class=\"detailHead\">$l_check_samecontact</td>
+    </tr>";
   while ($co_q->next_record()) {
     $id = $co_q->f("contact_id");
     $samename = $co_q->f("contact_lastname")." ". $co_q->f("contact_firstname");
     $company = $co_q->f("company_name");
-    $disp_same_cont .= 
-        "    <tr><td colspan =\"2\" class=\"detailText\">
-                <a class=\"details\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
-                $samename ($company)</a>
-             </td></tr>";
+    $disp_same_cont .= "
+      <tr>
+        <td colspan =\"2\" class=\"detailText\">
+          <a class=\"details\" href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">
+          $samename ($company)</a>
+        </td>
+      </tr>";
 
   }
 
@@ -586,8 +590,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     </form>
     </td></tr>
     </table>";
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Displays and check the contact links (and delete form if ok)              //
@@ -610,13 +614,15 @@ function dis_check_links($p_id) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $display_link_d .= "
-      <tr><td class=\"detailText\">
-      <a class=\"details\" href=\"".url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
-      $dlabel</a>
-      </td></tr>";
+      <tr>
+        <td class=\"detailText\">
+          <a class=\"details\" href=\"".url_prepare("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did")."\">
+          $dlabel</a>
+        </td>
+      </tr>";
     }
   } else {
-    $display_link_d =  "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>"; 
+    $display_link_d = "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>";
   }
 
   // Links from lists
@@ -628,13 +634,15 @@ function dis_check_links($p_id) {
       $lid = $obm_q->f("list_id");
       $lname = $obm_q->f("list_name");
       $display_link_l .= "
-    	  <tr><td class=\"detailText\">
-          <a class=\"details\" href=\"".url_prepare("../list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
-          $lname</a>
-         </td></tr>";
+        <tr>
+          <td class=\"detailText\">
+            <a class=\"details\" href=\"".url_prepare("../list/list_index.php?action=detailconsult&amp;param_list=$lid")."\">
+            $lname</a>
+          </td>
+        </tr>";
     }
   } else {
-    $display_link_l =  "<tr><td class=\"detailHead\">$l_link_list_no</td></tr>";
+    $display_link_l = "<tr><td class=\"detailHead\">$l_link_list_no</td></tr>";
   }
 
   if ($delete_ok == true) {

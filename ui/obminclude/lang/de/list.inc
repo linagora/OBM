@@ -15,7 +15,7 @@ $l_name_list_empty = "Der Listenname muß eingegeben werden" ;
 $l_name_list_nomatch = "ungültiger Listenname" ;
 $l_subject_list_empty = "Betreff muß eingegeben werden" ;
 $l_list_exists = "Mailliste existiert bereits";
-$l_list_list = "Mailliste" ;
+$l_list = "Mailliste" ;
 
 $l_yes = "ja" ;
 $l_no = "nein" ;

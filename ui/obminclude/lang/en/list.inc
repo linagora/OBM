@@ -18,7 +18,7 @@ $l_updater = "Last updater";
 $l_date_last_update = "Last update";
 
 // Labels and texts
-$l_list_list = "List";
+$l_list = "List";
 $l_yes = "yes";
 $l_no = "no";
 $l_nb_contact = "Number of contact";

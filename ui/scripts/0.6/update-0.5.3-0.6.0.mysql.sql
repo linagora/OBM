@@ -41,6 +41,14 @@ CREATE TABLE CompanyActivity (
 -- Add new column : deal_hitrate
 ALTER table Deal add column deal_hitrate char(3) default 0 AFTER deal_amount;
 
+
+-------------------------------------------------------------------------------
+-- Computer removed : deprecated
+-------------------------------------------------------------------------------
+DROP TABLE IF EXISTS Computer;
+DROP TABLE IF EXISTS ServiceComputer;
+
+
 -------------------------------------------------------------------------------
 -- Calendar module tables
 -------------------------------------------------------------------------------
@@ -108,4 +116,3 @@ INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_time
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Support');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Developpement');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Personnel');
-
