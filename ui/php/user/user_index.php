@@ -163,7 +163,7 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  run_query_delete_profil($obm_user["id"]);
+  run_query_delete_profile($obm_user["id"]);
   $display["search"] = html_user_search_form($obm_user);
 
 } elseif ($action == "group_consult")  {

@@ -47,6 +47,14 @@ Implémentation du test de visibilité :
 \end{verbatim}
 
 
+\subsubsection{Gestion de la notion de visibilité et conséquences}
+
+Une entité créée en tant que privée n'est visible que par son créateur.
+Il faut donc veiller à traiter les entités privés d'un utilisateur lorsque celui-ci doit être supprimé.
+
+Ces entités peuvent être supprimées ou rendues publiques (la fonction run\_query\_delete\_profile() effectue se travail).
+
+
 \subsubsection{Modules gérant la notion de visibilité}
 
 \begin{tabular}{|p{5cm}|c|}

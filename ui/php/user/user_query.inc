@@ -494,7 +494,7 @@ function check_data_form($p_id, $user) {
 // Parameters:
 //   - $param_user : user id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_profil($param_user)  {
+function run_query_delete_profile($param_user)  {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -530,6 +530,15 @@ function run_query_delete_profil($param_user)  {
       and list_visibility != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
+
+  // Move all the user events from private to public
+  // Not activated ! case of private event with multiple users..... to handle
+  $query = "Update CalendarEvent set
+      calendarevent_privacy='0'
+    where calendarevent_usercreate='$param_user'
+      and calendarevent_privacy != '0'"; 
+  //display_debug_msg($query, $cdg_sql);
+  //$obm_q->query($query);
 }
 
 
