@@ -1101,3 +1101,37 @@ CREATE TABLE Import (
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
 );
+
+-------------------------------------------------------------------------------
+-- Publication module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Publication'
+--
+CREATE TABLE Publication (
+  publication_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  publication_timeupdate     timestamp(14),
+  publication_timecreate     timestamp(14),
+  publication_userupdate     int(8),
+  publication_usercreate     int(8),
+  publication_title          varchar(64) NOT NULL,
+  publication_type_id        int(8),
+  publication_year           int(4),
+  publication_lang           char(2),
+  publication_desc           text,
+  PRIMARY KEY (publication_id)
+);
+
+--
+-- Table structure for table 'PublicationType'
+--
+CREATE TABLE PublicationType (
+  publicationtype_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  publicationtype_timeupdate  timestamp(14),
+  publicationtype_timecreate  timestamp(14),
+  publicationtype_userupdate  int(8),
+  publicationtype_usercreate  int(8),
+  publicationtype_label       char(12),
+  PRIMARY KEY (publicationtype_id)
+);
+         

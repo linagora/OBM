@@ -197,7 +197,13 @@ $todo_read 		= $com_read;
 $todo_write 		= $com_read + $com_write ;
 $todo_admin_read 	= $com_admin_read;
 $todo_admin_write	= $com_admin_read + $com_admin_write;
-
+			/////////////////
+			// PUBLICATION //
+			/////////////////
+$publication_read 	= $com_read;
+$publication_write 	= $com_read + $com_write ;
+$publication_admin_read = $com_admin_read;
+$publication_admin_write= $com_admin_read + $com_admin_write;
 ///////////////////////////////////////////////////////////////////////////////
 //                         PRODUCTION RIGTHS                                 //
 ///////////////////////////////////////////////////////////////////////////////

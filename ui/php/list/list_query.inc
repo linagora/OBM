@@ -742,7 +742,7 @@ function make_query($list) {
              left join Company on contact_company_id=company_id
              left join Country as c1 on contact_country_id=c1.country_id
              left join Country as c2 on company_country_id=c2.country_id ";   
-
+/*
   if(is_array($criteria)) {
     $and = "";
     foreach($criteria as $module => $module_criteria) {
@@ -769,6 +769,32 @@ function make_query($list) {
       }
     }
   }
+*/
+  if(is_array($criteria)) {
+    foreach($criteria as $module => $module_criteria) {
+      if(is_array($module_criteria)) {
+        foreach($module_criteria as $field => $criterion) {
+          if(is_array($criterion)) {
+            foreach($criterion as $line => $value) {
+              if($value != "") {
+                $condition[$line] .= $and[$line]." $field LIKE '$value%'";
+		$and[$line] = " AND";
+	      }		
+            }
+          }        
+        } 
+      }
+    }
+  }
+
+  foreach($condition as $value) {
+    $where .= "$or ($value)";
+    $or = " OR";
+  }
+
+
+
+  
   if($where != "") {
     $where = " WHERE $where";
   }

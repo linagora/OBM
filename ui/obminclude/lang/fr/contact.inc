@@ -56,7 +56,7 @@ $l_code = "Code";
 $l_lalbel = "Label";
 // Titres
 $l_contact = "Contact";
-
+$l_letter = "En-tête de Lettre";
 // Actions
 $l_cat1_checkdelete = "Vérifier ou supprimer la catégorie 1"; 
 $l_cat1_update = "Mettre à jour la catégorie 1"; 

@@ -196,7 +196,10 @@ if ($section == "COM") {
 			           'Ico' => "$ico_todo",
 			           'Url' => "$path/todo/todo_index.php",
 			           'Right'=> $todo_read);
-
+  $menus["COM"]["PUBLICATION"]    = array('Name'=> $l_header_publication,
+			           'Ico' => "$ico_publication",
+			           'Url' => "$path/publication/publication_index.php",
+			           'Right'=> $publication_read);
 } elseif ($section == "PROD") {
 
   $menus["PROD"]["TIME"]     = array('Name'=> $l_header_time,

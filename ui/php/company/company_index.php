@@ -70,10 +70,23 @@ $perm->check();
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_id") {
-  require("company_js.inc");
+  require("company_js.inc");  
+  $type_q = run_query_companytype();
+  $act_q = run_query_companyactivity();
+  $usr_q = run_query_userobm_active();
+  $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
+  if ($set_display == "yes") {
+    $display["result"] = dis_company_search_list($company);
+  } else {
+    $display["msg"] = display_info_msg($l_no_display);
+  }
+
+
+  
+/*  require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company);
-
+*/
 } elseif ($action == "ext_get_id_url") {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
@@ -102,6 +115,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
+  require("company_js.inc");  
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();

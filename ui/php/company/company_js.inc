@@ -16,14 +16,7 @@ require("$obminclude/javascript/check_js.inc");
 
 $extra_js .= "
 
-function check_get_id(form) {
-  comp_pos = form.param_company.selectedIndex;
-  if (! (comp_pos >= 0)) {
-    alert (\"$l_j_select_company\");
-    return false;
-  }
-  valeur = form.param_company.options[comp_pos].value;
-  text = form.param_company.options[comp_pos].text;
+function check_get_id(valeur,text) {
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
@@ -334,7 +327,7 @@ function show ( name ) {
 
 ";
 
-if (isset($ext_target)) {
+if (isset($ext_target) && $ext_target!="") {
   $extra_js .= "
    function fill_ext_form(repo_path) {
      ext_field = window.opener.document.$ext_target;

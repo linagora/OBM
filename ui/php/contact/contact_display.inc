@@ -551,7 +551,7 @@ function dis_contact_form($action, $co_q, $contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
@@ -822,7 +822,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\"> $sel_kind_lang $sel_kind_label $sel_kind_header </td>
+      <td class=\"detailForm\"> $sel_kind_lang $sel_kind_label $l_letter : $sel_kind_header </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td> 
       <td class=\"detailForm\">$sel_dsrc</td>

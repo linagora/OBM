@@ -39,6 +39,7 @@ $l_category1 = "Category 1";
 $l_category2 = "Category 2";
 $l_code = "Code";
 $l_lalbel = "Label";
+$l_letter = "Letter Head";
 // Labels and texts
 $l_contact_name = "Contact Name";
 $l_from_company = "From Company";

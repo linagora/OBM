@@ -34,6 +34,8 @@ class OBM_DISPLAY {
   var $data_cb_show = 1;      // To set visible
                               //   1 -> visible
                               //   "string" if ->f["string"] == 0 -> visible
+  var $data_specialfield = "";// Special field to signal special treatments which
+                              // haven't been perform here 
   var $separator = ";";       // for file generation : .csv by default
 
   /////////////////////////////////////////////////////////////////////////////

@@ -40,7 +40,12 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
 
   if ($fieldname == "company_name") {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+    if($OD->data_specialfield == "ext_get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("company_id").",'".$OD->data_set->f("company_name")."');";
+    }
+    else {    
+      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+    }
   }
 
   else if ($fieldname == "company_archive") {
@@ -135,7 +140,7 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
   global $l_company_name, $l_company_kind, $l_postcode, $l_archive, $l_phone;
   global $l_all, $l_find, $l_market, $l_activity; 
   global $c_all;
-
+  $popup=$company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
   $name = stripslashes($company["name"]);
   $phone = stripslashes($company["phone"]);
@@ -179,13 +184,27 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
 
   $url = url_prepare("company_index.php");
 
+
+  if ($popup) {
+    $ext_action = $contact["ext_action"];
+    $ext_url = $contact["ext_url"];
+    $ext_id = $contact["ext_id"];
+    $ext_title = $contact["ext_title"];
+    $ext_target = $contact["ext_target"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
   // --- HTML Template --------------------------------------------------------
 
   $block = "
   <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"$url\">
   <div class=\"search\">
     <div class=\"searchLabel\">$l_company_name<br />
-      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\"
+      <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"24\"
       value=\"$name\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
@@ -211,6 +230,8 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />      
+      $ext
     </div>
     <div class=\"searchEnd\"></div>
   </div>
@@ -230,13 +251,14 @@ function dis_company_search_list($company) {
   global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
+  $popup = $company["popup"];
   $pref_q = run_query_display_pref($auth->auth["uid"], "company");
   $obm_q = run_query_search($company, $new_order, $order_dir);
   $nb_company = $obm_q->num_rows();
   if ($nb_company == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_company_search_list($obm_q,$pref_q,$nb_company,$company);
+    $block = html_company_search_list($obm_q,$pref_q,$nb_company,$company,$popup);
   }
 
   return $block;
@@ -252,9 +274,17 @@ function dis_company_search_list($company) {
 //   - $company[]  : company search criteria
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
-  global $display, $l_found;
+function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup) {
+  global $display, $l_found,$l_close;
 
+
+  if ($popup) {
+    $ext_action = $contact["ext_action"];
+    $ext_url = $contact["ext_url"];
+    $ext_id = $contact["ext_id"];
+    $ext_target = $contact["ext_target"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;popup=1";
+  }
   // we urlencode to avoid breakage for space char
   $archive = $company["archive"];
   $name = urlencode(stripslashes($company["name"]));
@@ -264,16 +294,25 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
 
   $comp_q->seek($first_row);
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
+  if ($popup) {
+    $comp_d->data_specialfield = "ext_get_id";
+    $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+  
   $comp_d->data_set = $comp_q;
   $comp_d->data_url = $url;
   $comp_d->data_header = "both";
   $display["msg"] = display_info_msg("$nb_company $l_found");
   $block = $comp_d->display("dis_data_company");
+  $block .= $display_popup_end;  
 
   return $block;
 }
@@ -699,7 +738,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"50\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_aka</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
@@ -1799,7 +1838,7 @@ function display_popup_tree($tree,$indent) {
   }
     
   foreach($tree as $level => $info) {
-    if($level != "code" && $level != "label" && $level != "id") {
+    if("$level" != "code" && "$level" != "label" && "$level" != "id") {    
        $content.= display_popup_tree($info,$indent_file);
       $bool = true;
     }

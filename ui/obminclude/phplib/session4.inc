@@ -191,13 +191,13 @@ class Session {
     global $lifetime, $session_cookie;
 
     if ($session_cookie) {
-      setcookie(session_name(), session_id(), 0, "/");
+      setcookie(session_name(), session_id(), 0, "/",".jaguar.aliacom-local");
     } else {
       if ($lifetime == 0) {
         $lifetime = $this->lifetime_default;
       }
       // Use setcookie() as session_set_cookie_params() doesn't seem to work!
-      setcookie(session_name(), session_id(), time()+$lifetime, "/");
+      setcookie(session_name(), session_id(), time()+$lifetime, "/",".jaguar.aliacom-local");
       //   session_set_cookie_params($lifetime);
     }
   }

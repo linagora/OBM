@@ -1105,6 +1105,38 @@ CREATE TABLE Import (
   UNIQUE (import_name)
 );
 
+-------------------------------------------------------------------------------
+-- Publication module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Publication'
+--
 
+CREATE TABLE Publication (
+  publication_id             serial,
+  publication_timeupdate     timestamp,
+  publication_timecreate     timestamp,
+  publication_userupdate     integer,
+  publication_usercreate     integer,
+  publication_title          varchar(64) NOT NULL,
+  publication_type_id        integer,
+  publication_year           integer,
+  publication_lang           char(2),
+  publication_desc           text,
+  PRIMARY KEY (publication_id)
+);
+
+--
+-- Table structure for table 'PublicationType'
+--
+CREATE TABLE PublicationType (
+  publicationtype_id          serial,
+  publicationtype_timeupdate  timestamp,
+  publicationtype_timecreate  timestamp,
+  publicationtype_userupdate  integer,
+  publicationtype_usercreate  integer,
+  publicationtype_label       char(12),
+  PRIMARY KEY (publicationtype_id)
+);
 COMMIT;
 

@@ -407,9 +407,10 @@ function html_list_form($action, $list_q, $list) {
     $name = $list_q->f("list_name");
     $subject = $list_q->f("list_subject");
     $email = $list_q->f("list_email");
+    $crit_q = $list_q->f("list_structure");
     $query = $list_q->f("list_query");
   }
-
+  
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
@@ -438,14 +439,16 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
-  </tr>
-  <tr>
-    <td class=\"detailLabel\">$l_query</td>
-    <td class=\"detailForm\">
+  </tr>";
+  if($action == "insert" || $action == "new" || ($list["criteria"] == "" &&  $crit_q =="")) {
+  $block .=  "
+    <tr>
+      <td class=\"detailLabel\">$l_query</td>
+      <td class=\"detailForm\">
       <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
-  </tr>
-  </table>";
-
+    </tr>
+    </table>";
+  }
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
   }
