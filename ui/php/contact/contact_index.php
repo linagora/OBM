@@ -441,7 +441,7 @@ function get_param_contact() {
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
-  global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2;
+  global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2,$tf_code2,$tf_code1;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
@@ -466,6 +466,8 @@ function get_param_contact() {
   if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;
   if (isset ($tf_cat1)) $contact["cat1_label"] = $tf_cat1;
   if (isset ($tf_cat2)) $contact["cat2_label"] = $tf_cat2;
+  if (isset ($tf_cat1)) $contact["cat1_code"] = $tf_code1;
+  if (isset ($tf_cat2)) $contact["cat2_code"] = $tf_code2;  
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;

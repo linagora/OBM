@@ -52,7 +52,8 @@ $l_kind_exist = "Genre existants";
 $l_kind_new = "Nouveau Genre";
 $l_lang = "Langue";
 $l_header = "En-tête";
-
+$l_code = "Code";
+$l_lalbel = "Label";
 // Titres
 $l_contact = "Contact";
 

@@ -37,7 +37,8 @@ $l_cat2_new = "New category 2";
 $l_cat2_delete =  "Delete";
 $l_category1 = "Category 1";
 $l_category2 = "Category 2";
-
+$l_code = "Code";
+$l_lalbel = "Label";
 // Labels and texts
 $l_contact_name = "Contact Name";
 $l_from_company = "From Company";

@@ -41,6 +41,7 @@ $l_insert = "Insert the list";
 $l_update = "Update the list";
 $l_delete = "Delete the list";
 $l_add = "Add these lists";
+$l_add_criterion = "Add a criterion";
 
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";

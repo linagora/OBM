@@ -1745,7 +1745,7 @@ function html_category_tree($category) {
    <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
    ";
    $cat_a = run_query_ordered_category($obm_d);
-   if(is_array($tree)) {
+   if(is_array($cat_a)) {
      foreach($cat_a as $cat_info) {
        $hash_code = explode(".",$cat_info["code"]);
        $deep = count($hash_code);

@@ -104,11 +104,12 @@ else if ($action == "search") {
 
 else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    $display["detail"] = html_list_form($action, "", $list);
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
+  $display["detail"] = html_list_form($action, "", $list);
+}
+
+else if ($action == "new_graphical") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = html_list_graphical_form($action, "", $list);
 }
 
 else if ($action == "detailconsult") {
@@ -385,6 +386,15 @@ function get_list_action() {
     'Right'    => $list_write,
     'Condition'=> array ('','search','index','detailconsult','admin','display') 
                                   );
+
+// New
+/*  $actions["LIST"]["new_graphical"] = array (
+    'Name'     => "pouic",
+    'Url'      => "$path/list/list_index.php?action=new_graphical",
+    'Right'    => $list_write,
+    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+                                  );
+*/				  
 // Detail Consult
   $actions["LIST"]["detailconsult"] = array (
      'Name'     => $l_header_consult,

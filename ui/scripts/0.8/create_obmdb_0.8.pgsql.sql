@@ -280,32 +280,6 @@ CREATE TABLE Contact (
   PRIMARY KEY (contact_id)
 );
 
---
--- Table structure for table 'ContactCategory1'
---
-CREATE TABLE ContactCategory1 (
-  contactcategory1_id          serial,
-  contactcategory1_timeupdate  TIMESTAMP,
-  contactcategory1_timecreate  TIMESTAMP,
-  contactcategory1_userupdate  integer DEFAULT NULL,
-  contactcategory1_usercreate  integer DEFAULT NULL,
-  contactcategory1_label       varchar(255) DEFAULT NULL,
-  PRIMARY KEY (contactcategory1_id)
-);
-
-
---
--- Table structure for table 'ContactCategory2'
---
-CREATE TABLE ContactCategory2 (
-  contactcategory2_id          serial,
-  contactcategory2_timeupdate  TIMESTAMP,
-  contactcategory2_timecreate  TIMESTAMP,
-  contactcategory2_userupdate  integer DEFAULT NULL,
-  contactcategory2_usercreate  integer DEFAULT NULL,
-  contactcategory2_label       varchar(255) DEFAULT NULL,
-  PRIMARY KEY (contactcategory2_id)
-);
 
 --
 -- Table structure for table 'Kind'
@@ -346,7 +320,7 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp,
   contactcategory1_userupdate  integer default 0,
   contactcategory1_usercreate  integer default 0,
-  contactcategory1_order       integer default 0,
+  contactcategory1_code        integer default 0,
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
@@ -371,7 +345,7 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_timecreate  timestamp,
   contactcategory2_userupdate  integer default 0,
   contactcategory2_usercreate  integer default 0,
-  contactcategory2_order       integer default 0,
+  contactcategory2_code        integer  default 0,
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );

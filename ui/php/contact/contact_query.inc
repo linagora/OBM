@@ -15,7 +15,7 @@
 function run_query_contactcategory1() {
   global $cdg_sql;
 
-  $query = "select * from ContactCategory1 order by contactcategory1_label"; 
+  $query = "select * from ContactCategory1 order by contactcategory1_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -32,7 +32,7 @@ function run_query_contactcategory1() {
 function run_query_contactcategory2() {
   global $cdg_sql;
 
-  $query = "select * from ContactCategory2 order by contactcategory2_label"; 
+  $query = "select * from ContactCategory2 order by contactcategory2_code"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -561,7 +561,7 @@ function run_query_get_contactcategory1($c_id) {
 function run_query_get_contactcategory1_label($c_id) {
     global $cdg_sql;
 
-  $query = "select contactcategory1_label
+  $query = "select contactcategory1_label,contactcategory1_code
   from ContactCategory1Link,ContactCategory1 where 
   contactcategory1link_category_id = contactcategory1_id and  contactcategory1link_contact_id = '$c_id'
   order by contactcategory1_id";     
@@ -581,7 +581,7 @@ function run_query_get_contactcategory1_label($c_id) {
 function run_query_get_contactcategory2_label($c_id) {
     global $cdg_sql;
 
-  $query = "select contactcategory2_label
+  $query = "select contactcategory2_label,contactcategory2_code
   from ContactCategory2Link,ContactCategory2 where 
   contactcategory2link_category_id = contactcategory2_id and  contactcategory2link_contact_id = '$c_id'
   order by contactcategory2_id";     
@@ -1153,15 +1153,18 @@ function run_query_cat1_insert($contact) {
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
   $cat1 = $contact["cat1_label"];
+  $cat1_code = $contact["cat1_code"];
 
   $query = "insert into ContactCategory1 (
     contactcategory1_timecreate,
     contactcategory1_usercreate,
-    contactcategory1_label)
+    contactcategory1_label,
+    contactcategory1_code)
   values (
     '$timecreate',
     '$usercreate',
-    '$cat1')";
+    '$cat1',
+    '$cat1_code')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1183,15 +1186,19 @@ function run_query_cat2_insert($contact) {
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
   $cat2 = $contact["cat2_label"];
+  $cat2_code = $contact["cat2_code"];
+  
 
   $query = "insert into ContactCategory2 (
     contactcategory2_timecreate,
     contactcategory2_usercreate,
-    contactcategory2_label)
+    contactcategory2_label,
+    contactcategory2_code)
   values (
     '$timecreate',
     '$usercreate',
-    '$cat2')";
+    '$cat2',
+    '$cat2_code')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1213,9 +1220,11 @@ function run_query_cat2_update($contact) {
   $userupdate = $auth->auth["uid"];
   $id = $contact["category2"];
   $cat2 = $contact["cat2_label"];
+  $cat2_code = $contact["cat2_code"];
 
   $query = "update ContactCategory2 set
       contactcategory2_label='$cat2',
+      contactcategory2_code='$cat2_code',
       contactcategory2_timeupdate='$timeupdate',
       contactcategory2_userupdate='$userupdate'
     where
@@ -1241,9 +1250,11 @@ function run_query_cat1_update($contact) {
   $userupdate = $auth->auth["uid"];
   $id = $contact["category1"];
   $cat1 = $contact["cat1_label"];
-
+  $cat1_code = $contact["cat1_code"];
+  
   $query = "update ContactCategory1 set
       contactcategory1_label='$cat1',
+      contactcategory1_code='$cat1_code',
       contactcategory1_timeupdate='$timeupdate',
       contactcategory1_userupdate='$userupdate'
     where

@@ -41,6 +41,7 @@ $l_insert = "Enregistrer la liste";
 $l_update = "Modifier la liste";
 $l_delete = "Supprimer la liste";
 $l_add = "Ajouter ces listes";
+$l_add_criterion = "Ajouter un critère de recherche";
 
 // Messages
 $l_insert_ok = "L'insertion de la liste a été correctement effectuée.";

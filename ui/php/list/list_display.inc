@@ -436,6 +436,89 @@ function html_list_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Graphical List Form                                               //
+// Parameters :
+//   - $action    : action called
+//   - $list_q    : DBO : information about the list (null for new list)
+//   - $list[]    : default or transmitted values
+//     keys used  : name, subject, usercreate
+///////////////////////////////////////////////////////////////////////////////
+function html_list_graphical_form($action, $list_q, $list) {
+  global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
+  global $popup_height,$popup_width;
+  // if update mode and first time, values are taken from db
+  if ($action == "detailupdate") {
+    $id = $list_q->f("list_id");
+    $usercreate = $list_q->f("list_usercreate");
+    $name = $list_q->f("list_name");
+    $subject = $list_q->f("list_subject");
+    $email = $list_q->f("list_email");
+    $query = $list_q->f("list_query");
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["name"])) { $name = stripslashes($list["name"]); }
+  if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
+  if (isset($list["email"])) { $email = stripslashes($list["email"]); }
+  if (isset($list["query"])) { $query = stripslashes($list["query"]); }
+
+  $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
+  $url = url_prepare("list_index.php");
+
+  $block = "
+  <form method=\"get\" name=\"f_new action=\"$url\"
+    onSubmit=\"if (check_name_list(this)) return true; else return false;\">
+
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_name</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_subject</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
+  </tr>
+  <tr>
+    <td>
+    </td>
+  </tr>
+  </table>";
+
+  $dis_but .= "<input type=\"submit\" value=\"$l_add_criterion\" 
+  onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"/>";
+
+  if (($action == "detailupdate") || ($action == "update")) {
+     $dis_but .= "
+      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+
+       $dis_back = "<form method=\"get\" name=\"f_back\"
+        action=\"".url_prepare("list_index.php")."\">
+      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>";
+   } else {
+    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
+  }
+
+  $block .= "<div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_but
+    </p>
+    </div>
+    </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the List Display preference screen                                //
 // Parameters:
 //   - $pref_list_q    : DBO : List Field list to display

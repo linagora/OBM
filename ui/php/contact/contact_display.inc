@@ -1211,16 +1211,23 @@ function dis_admin_index() {
 //   - $cat1_q : Category1 list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_cat1_form($cat1_q) {
-  global $l_cat1_manage,$l_cat1_exist;
+  global $l_cat1_manage,$l_cat1_exist,$l_code,$l_lalbel ;
   global $l_cat1_checkdelete,$l_cat1_update,$l_cat1_new,$l_cat1_insert;
 
   $sel_cat1 = "<select name=\"sel_cat1\" onChange=\"
-    forms.form_cat1_update.tf_cat1.value=this.options[this.selectedIndex].text;\"
+    mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf(' ');
+    ext = mytext.substr(0, pos);
+    mytext = mytext.substr(pos+1); 
+    forms.form_cat1_update.tf_cat1.value=mytext;
+    forms.form_cat1_update.tf_code1.value=ext;
+    \"
     size=\"4\" >";
   while ($cat1_q->next_record()) {
     $id = $cat1_q->f("contactcategory1_id");
     $label = $cat1_q->f("contactcategory1_label");
-    $sel_cat1 .= "\n<option value=\"$id\">$label</option>";
+    $code = $cat1_q->f("contactcategory1_code");
+    $sel_cat1 .= "\n<option value=\"$id\">$code $label</option>";
   }
   $sel_cat1 .= "</select>";
 
@@ -1264,7 +1271,8 @@ function html_contact_cat1_form($cat1_q) {
               action=\"" . url_prepare("contact_index.php") . "\">
             <input type=\"hidden\" name=\"sel_cat1\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"cat1_update\" />
-            <input type=\"text\" name=\"tf_cat1\" />
+	    <input type=\"text\" size=\"2\" name=\"tf_code1\" />
+   	    <input type=\"text\" name=\"tf_cat1\" />
             <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_update\"
               onclick=\"if (check_cat1_upd(this.form,document.form_cat1_delete)) return true; else return false;\" />
             </form>
@@ -1280,11 +1288,19 @@ function html_contact_cat1_form($cat1_q) {
         <form name=\"form_cat1_new\" method=\"get\"
           action=\"" . url_prepare("contact_index.php") . "\">
         <table>
+	<tr>
+	<td class=\"adminLabel\" colspan=\"2\">$l_cat1_new</td>
+	</tr>
         <tr>
-          <td class=\"adminLabel\">$l_cat1_new :
-            <input name=\"tf_cat1\" /></td>
+	    <td class=\"adminLabel\">$l_code :</td>
+            <td >
+            <input type=\"text\" size=\"2\" name=\"tf_code1\" /></td>
         </tr><tr>
-          <td class=\"adminLabel\">
+          <td class=\"adminLabel\">$l_lalbel :</td>
+            <td >
+            <input type=\"text\" name=\"tf_cat1\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
             <input type=\"hidden\" name=\"action\" value=\"cat1_insert\" />
             <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_insert\"
               onclick=\"if (check_cat1_new(this.form)) return true; else return false;\" />
@@ -1302,21 +1318,28 @@ function html_contact_cat1_form($cat1_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Category1 section                                             //
+// Display: Contact Category2 section                                             //
 // Parameters:
 //   - $cat2_q : Category2 list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_cat2_form($cat2_q) {
-  global $l_cat2_manage,$l_cat2_exist;
+  global $l_cat2_manage,$l_cat2_exist,$l_code,$l_label;
   global $l_cat2_checkdelete,$l_cat2_update,$l_cat2_new,$l_cat2_insert;
 
   $sel_cat2 = "<select name=\"sel_cat2\" onChange=\"
-    forms.form_cat2_update.tf_cat2.value=this.options[this.selectedIndex].text;\"
+  mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf(' ');
+    ext = mytext.substr(0, pos);
+    mytext = mytext.substr(pos+1); 
+    forms.form_cat2_update.tf_cat2.value=mytext;
+    forms.form_cat2_update.tf_code2.value=ext;
+    \"
     size=\"4\" >";
   while ($cat2_q->next_record()) {
     $id = $cat2_q->f("contactcategory2_id");
     $label = $cat2_q->f("contactcategory2_label");
-    $sel_cat2 .= "\n<option value=\"$id\">$label</option>";
+    $code = $cat2_q->f("contactcategory2_code");
+    $sel_cat2 .= "\n<option value=\"$id\">$code $label</option>";
   }
   $sel_cat2 .= "</select>";
 
@@ -1359,6 +1382,7 @@ function html_contact_cat2_form($cat2_q) {
             <form name=\"form_cat2_update\" method=\"get\"
               action=\"" . url_prepare("contact_index.php") . "\">
             <input type=\"hidden\" name=\"sel_cat2\" value=\"\" />
+	    <input type=\"text\" size=\"2\" name=\"tf_code2\" />	    
             <input type=\"hidden\" name=\"action\" value=\"cat2_update\" />
             <input type=\"text\" name=\"tf_cat2\" />
             <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_update\"
@@ -1376,11 +1400,17 @@ function html_contact_cat2_form($cat2_q) {
         <form name=\"form_cat2_new\" method=\"get\"
           action=\"" . url_prepare("contact_index.php") . "\">
         <table>
+	<tr>
+	<td class=\"adminLabel\" colspan=\"2\">$l_cat2_new</td>
+	</tr>
         <tr>
-          <td class=\"adminLabel\">$l_cat2_new :
-            <input name=\"tf_cat2\" /></td>
+	    <td class=\"adminLabel\">$l_code :</td>
+            <td ><input type=\"text\" size=\"2\" name=\"tf_code2\" /></td>
         </tr><tr>
-          <td class=\"adminLabel\">
+          <td class=\"adminLabel\">$l_label :</td>
+            <td ><input type=\"text\" name=\"tf_cat2\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\" colspan=\"2\">
             <input type=\"hidden\" name=\"action\" value=\"cat2_insert\" />
             <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_insert\"
               onclick=\"if (check_cat2_new(this.form)) return true; else return false;\" />
