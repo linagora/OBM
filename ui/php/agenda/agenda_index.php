@@ -200,7 +200,7 @@ if ($action == "index") {
   if($p_user_meeting==1) {
     $p_user_array =  $agenda["user_meeting"] ;
     $grp_obm = run_query_group_in($agenda["group_meeting"]);
-  }else {
+  } else {
     $p_user_array = array($uid);
   }
   $user_obm = run_query_userobm_in($p_user_array);
@@ -356,7 +356,6 @@ if ($param_event > 0) {
   if (count($p_user_array) == 0) {
     $p_user_array =  array($uid);
   }
-  print_r($p_user_array);
   $user_q = store_users(run_query_get_user_name($p_user_array));
   $user_obm = run_query_userobm_in($p_user_array);      
   $group_q = run_query_userobm_group();

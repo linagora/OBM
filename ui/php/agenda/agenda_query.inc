@@ -193,7 +193,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   $mail  = $agenda["mail"];
   $groups = $agenda["group"];
   $mail_title = stripslashes($agenda["title"]);
-
+  
   if (is_array($groups)) {
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));

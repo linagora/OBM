@@ -604,7 +604,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
      ";
 
     // group select
-    if (isset($grp_q)) {
+    if (isset($grp_q) && $action == "new") {
       while ($grp_q->next_record()) {
         $g_id = $grp_q->f("group_id");
         $g_lname = $grp_q->f("group_name");
