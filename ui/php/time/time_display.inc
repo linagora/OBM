@@ -278,7 +278,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
 //   - $uid    : current user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_selectusers_form ($time, $usr_q, $uid) {
-  global $l_see, $l_week, $l_month, $project_managers;
+  global $l_see, $l_week, $l_month, $project_managers, $stats_users;
   global $l_user, $l_all_users;
   global $l_tasktype, $l_task_all, $l_task_uservalid, $l_task_adminvalid;
   global $sess, $uid;
