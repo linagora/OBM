@@ -76,7 +76,6 @@ if (($action == "index") || ($action == "")) {
   header("Content-Type: text/plain");
   header("Content-Disposition: attachment; filename=\"$module.csv\"");
   $export_d->dis_data_file($first_row, $nb_rows, $sep);
-
 }
 
 
