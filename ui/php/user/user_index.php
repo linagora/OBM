@@ -30,7 +30,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("admin");
 include("$obminclude/global_pref.inc");
 
 // the user MUST be "admin" to access this section
@@ -39,9 +38,10 @@ require("user_display.inc");
 require("user_query.inc");
 
 //There is no page_close()
+if($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
-if($action == "") $action = "index";
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ function get_user_action() {
   global $obm_user,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_reset;
-
+  global $user_read, $user_write, $user_admin_read, $user_admin_write;
 
 
 //Index
@@ -252,7 +252,7 @@ function get_user_action() {
 
   $actions["USER"]["search"] = array (
     'Url'      => "$path/user/user_index.php?action=new",
-    'Right'    => $user_write,
+    'Right'    => $user_read,
     'Condition'=> array ('None') 
                                   );
 
@@ -260,7 +260,7 @@ function get_user_action() {
 
   $actions["USER"]["detailconsult"] = array (
      'Url'      => "$path/user/user_index.php?action=detailconsult",
-    'Right'    => $user_write,
+    'Right'    => $user_read,
     'Condition'=> array ('None') 
                                   );
 
@@ -319,7 +319,7 @@ function get_user_action() {
   $actions["USER"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/user/user_index.php?action=admin",
-    'Right'    => $contract_admin_write,
+    'Right'    => $contract_admin_read,
     'Condition'=> array ('all') 
                                     );
 

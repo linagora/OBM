@@ -51,6 +51,178 @@ $perms_user = "user" ;
 $perms_editor = "editor" ;
 $perms_admin = "admin" ;
 
+
+//Perms and Profil
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////COMERCIAL RIGTHS////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+$com_read 		= 1;
+$com_write 		= 2;
+$com_admin_read 	= 4;
+$com_admin_write	= 8;
+			///////////
+			//COMPANY//
+			///////////
+$company_read 		= $com_read;
+$company_write 		= $com_read + $com_write ;
+$company_admin_read 	= $com_admin_read;
+$company_admin_write	= $com_admin_read + $com_admin_write;
+			///////////
+			//CONTACT//
+			///////////
+$contact_read 		= $com_read;
+$contact_write 		= $com_read + $com_write ;
+$contact_admin_read 	= $com_admin_read;
+$contact_admin_write	= $com_admin_read + $com_admin_write;
+			///////////
+			// DEAL  //
+			///////////
+$deal_read 		= $com_read;
+$deal_write 		= $com_read + $com_write ;
+$deal_admin_read 	= $com_admin_read;
+$deal_admin_write	= $com_admin_read + $com_admin_write;
+			///////////
+			// LIST  //
+			///////////
+$list_read 		= $com_read;
+$list_write 		= $com_read + $com_write ;
+$list_admin_read 	= $com_admin_read;
+$list_admin_write	= $com_admin_read + $com_admin_write;
+			///////////
+			//AGENDA //
+			///////////
+$agenda_read 		= $com_read;
+$agenda_write 		= $com_read + $com_write ;
+$agenda_admin_read 	= $com_admin_read;
+$agenda_admin_write	= $com_admin_read + $com_admin_write;
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////PRODUCTION RIGTHS///////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+$prod_read 		= 16;
+$prod_write 		= 32;
+$prod_admin_read	= 64;
+$prod_admin_write	= 128;
+			////////////
+			//CONTRACT//
+			////////////
+$contract_read		= $prod_read;
+$contract_write 	= $prod_read + $prod_write;
+$contract_admin_read 	= $prod_admin_read;
+$contract_admin_write	= $prod_admin_read + $prod_admin_write;
+			////////////
+			//INCIDENT//
+			////////////
+$incident_read		= $prod_read;
+$incident_write 	= $prod_read + $prod_write;
+$incident_admin_read 	= $prod_admin_read;
+$incident_admin_write	= $prod_admin_read + $prod_admin_write;
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////COMPTA RIGTHS///////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+$compta_read 		= 256;
+$compta_write 		= 512;
+$compta_admin_read 	= 1024;
+$compta_admin_write 	= 2048;
+			////////////
+			//ACCOUNT //
+			////////////
+$account_read		= $compta_read;
+$account_write 	= $compta_read + $compta_write;
+$account_admin_read 	= $compta_admin_read;
+$account_admin_write	= $compta_admin_read + $compta_admin_write;
+			////////////
+			//INVOICE //
+			////////////
+$invoice_read		= $compta_read;
+$invoice_write	 	= $compta_read + $compta_write;
+$invoice_admin_read 	= $compta_admin_read;
+$invoice_admin_write	= $compta_admin_read + $compta_admin_write;
+			////////////
+			//PAYMENT //
+			////////////
+$payment_read		= $compta_read;
+$payment_write	 	= $compta_read + $compta_write;
+$payment_admin_read 	= $compta_admin_read;
+$payment_admin_write	= $compta_admin_read + $compta_admin_write;
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////USERS RIGTHS//////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+$users_read 		= 4096;
+$users_write 		= 8192;
+$users_admin_read	= 16384;
+$users_admin_write	= 32768;
+			////////////
+			//USER    //
+			////////////
+$user_read		= $users_read;
+$user_write	 	= $users_read + $users_write;
+$user_admin_read 	= $users_admin_read;
+$user_admin_write	= $users_admin_read + $users_admin_write;
+			////////////
+			//TIME    //
+			////////////
+$time_read		= $users_read;
+$time_write	 	= $users_read + $users_write;
+$time_admin_read 	= $users_admin_read;
+$time_admin_write	= $users_admin_read + $users_admin_write;
+			////////////
+			//SETTINGS//
+			////////////
+$settings_read		= $users_read;
+$settings_write	 	= $users_read + $users_write;
+$settings_admin_read 	= $users_admin_read;
+$settings_admin_write	= $users_admin_read + $users_admin_write;
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////ADMINS RIGTHS////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+$admins_read		= 65536;
+$admins_write		= 131072;
+$admins_admin_read	= 262144;
+$admins_admin_write	= 524288;
+			////////////
+			//ADMIN   //
+			////////////
+$admin_read		= $admins_read;
+$admin_write	 	= $admins_read + $admins_write;
+$admin_admin_read 	= $admins_admin_read;
+$admin_admin_write	= $admins_admin_read + $admins_admin_write;		
+			//////////////
+			//ADMIN CODE//
+			//////////////
+$admin_code_read	= $admins_read;
+$admin_code_write 	= $admins_read + $admins_write;
+$admin_code_admin_read 	= $admins_admin_read;
+$admin_code_admin_write	= $admins_admin_read + $admins_admin_write;	
+			//////////////
+			//ADMIN DATA//
+			//////////////
+$admin_data_read	= $admins_read;
+$admin_data_write 	= $admins_read + $admins_write;
+$admin_data_admin_read 	= $admins_admin_read;
+$admin_data_admin_write	= $admins_admin_read + $admins_admin_write;	
+			//////////////
+			//ADMIN PREF//
+			//////////////
+$admin_pref_read	= $admins_read;
+$admin_pref_write 	= $admins_read + $admins_write;
+$admin_pref_admin_read 	= $admins_admin_read;
+$admin_pref_admin_write	= $admins_admin_read + $admins_admin_write;	
+
+//////////////////////////////////////////////////////////////////////////////
+//////////////////////////PROFILS/////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+
+$perm_user   =  $com_read + $prod_read + $user_read ;
+$perm_editor =  $com_read + $prod_read + $user_read + $com_write +
+	        $prod_write + $user_write;
+$perm_admin  =  $com_read + $prod_read + $compta_read + $users_read +
+  	        $com_write + $prod_write + $compta_write + $users_write +
+  	        $com_admin_read + $prod_admin_read + $compta_admin_read +
+  	        $users_admin_read + $com_admin_write + $prod_admin_write +
+  	        $compta_admin_write + $users_admin_write + $admins_read	+
+  	        $admins_write + $admins_admin_read + $admins_admin_write;
+
+
 // Debug Constants
 $cdg_id = 1;     // id display
 $cdg_param = 2;  // parameter display

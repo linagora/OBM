@@ -286,24 +286,36 @@ class OBM_Challenge_Auth extends Auth {
 
 class OBM_Perm extends Perm {
   var $classname = "OBM_Perm";
-  
-  var $permissions = array(
-                            "user"       => 1,
+
+  function OBM_Perm (){
+    global $perm_user, $perm_editor ,$perm_admin;
+    $this-> permissions = array(
+                            "user"       => $perm_user,
                             "author"     => 3,
-                            "editor"     => 7,
+                            "editor"     => $perm_editor,
                             "supervisor" => 15,
-                            "admin"      => 31
+                            "admin"      => $perm_admin
                           );
+  }
 
   function perm_invalid($does_have, $must_have) {
-    global $perm, $auth, $sess, $obminclude;
-#    global $_PHPLIB;
-    global $perm_invalid;
-    $perm_invalid = "$obminclude/auth/perminvalid.ihtml";
-    include($perm_invalid);
-    
-#    include($_PHPLIB["libdir"] . "perminvalid.ihtml");
+     global $perm, $auth, $sess, $obminclude,$l_error, $l_invalid_perm;
+     global $perm_invalid,$menu,$section;
+     display_head($l_error);     // Head & Body 
+     generate_menu($menu,$section);         // Menu
+     display_bookmarks();
+     display_err_msg($l_invalid_perm);
+     display_end();
   }
+  function check() {
+    global $auth;
+    global $actions, $action, $menu;
+    if(($this->permissions[$auth->auth["perm"]] & $actions[$menu][$action]["Right"]) != $actions[$menu][$action]["Right"]) {
+      $this->perm_invalid($auth->auth["perm"], $p);
+      exit();
+    }
+  }
+
 }
 
 ##

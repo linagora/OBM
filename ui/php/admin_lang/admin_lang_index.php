@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMIN";
+$section = "ADMINS";
 $menu = "ADMIN_LANG";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -35,6 +35,8 @@ switch ($mode) {
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    if($action == "") $action = "index";
+   get_admin_lang_action();
+   $perm->check();
    display_head("Admin_Lang");
    generate_menu($menu, $section);
    break;
@@ -182,3 +184,46 @@ function parse_arg($argv) {
   if (! $action) $action = "show_src";
   if (! $theme) $theme = "standard";
 }
+
+//////////////////////////////////////////////////////////////////////////////
+// ADMIN LANG actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_admin_lang_action() {
+  global $actions;
+  global $l_header_clear_sess,$l_header_index,$l_header_help;
+  global $admin_lang_read, $admin_lang_write;
+
+  $actions["ADMIN_LANG"]["index"] = array (
+     'Name'     => $l_header_index,
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=htm",
+     'Right'    => $admin_lang_read,
+     'Condition'=> array ('all') 
+                                    	 ); 
+
+ $actions["ADMIN_LANG"]["help"] = array (
+     'Name'     => $l_header_help,
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=help&amp;mode=html",
+     'Right'    => $admin_lang_read,
+     'Condition'=> array ('all') 
+                                    	);
+ $actions["ADMIN_LANG"]["show_src"] = array (
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_src&amp;mode=html",
+     'Right'    => $admin_lang_write,
+     'Condition'=> array ('None') 
+                                    	);
+ $actions["ADMIN_LANG"]["show_lang"] = array (
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_lang&amp;mode=html",
+     'Right'    => $admin_lang_write,
+     'Condition'=> array ('None') 
+                                    	);
+ $actions["ADMIN_LANG"]["comp_header_lang"] = array (
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_header_lang&amp;mode=html",
+     'Right'    => $admin_lang_write,
+     'Condition'=> array ('None') 
+                                    	);
+
+
+}
+
+

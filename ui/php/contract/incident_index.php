@@ -53,10 +53,10 @@ if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-
+if($action == "") $action = "index";
 $incident=get_param_incident();
 get_incident_action();
-if($action == "") $action = "index";
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,7 +215,7 @@ function get_incident_action() {
   global $incident,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display;
-
+  global $incident_read, $incident_write, $incident_admin_write, $incident_admin_read;
 //Index
 
   $actions["INCIDENT"]["index"] = array (
@@ -288,7 +288,7 @@ function get_incident_action() {
   $actions["INCIDENT"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/contract/incident_index.php?action=display",
-     'Right'    => $incident_admin_write,
+     'Right'    => $incident_read,
      'Condition'=> array ('all') 
                                       	   );
 
@@ -296,7 +296,7 @@ function get_incident_action() {
 
   $actions["INCIDENT"]["dispref_display"] = array (
      'Url'      => "$path/contract/incident_index.php?action=dispref_display",
-     'Right'    => $incident_admin_write,
+     'Right'    => $incident_write,
      'Condition'=> array ('None') 
                                       	   );
 
@@ -304,7 +304,7 @@ function get_incident_action() {
 
   $actions["INCIDENT"]["dispref_level"] = array (
      'Url'      => "$path/contract/incident_index.php?action=dispref_level",
-     'Right'    => $incident_admin_write,
+     'Right'    => $incident_write,
      'Condition'=> array ('None') 
                                       	   );
 

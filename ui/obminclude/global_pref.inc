@@ -85,252 +85,90 @@ $c_export_format[3]["icon"] = $ico_excel;
 //////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Sections
 //////////////////////////////////////////////////////////////////////////////
-$menus["COM"]	 =	array('Name'=> $l_header_com,
-		 	      'Url' => "$path/company/company_index.php");
-$menus["PROD"]	 =	array('Name'=> $l_header_prod,
-		 	      'Url' => "$path/contract/contract_index.php");
-$menus["ADMIN"]  =	array('Name'=> $l_header_admins,
-		              'Url' => "$path/admin/admin_index.php?mode=html");
-$menus["COMPTA"] =	array('Name'=> $l_header_compta,
-			      'Url' => "$path/treso/account_index.php");
-$menus["USERS"]   =	array('Name'=> $l_header_users,
-			      'Url' => "$path/user/user_index.php");
+$menus["COM"]	 =	array('Name' => $l_header_com,
+		 	      'Url'  => "$path/company/company_index.php",
+			      'Right'=> $com_read);
+$menus["PROD"]	 =	array('Name' => $l_header_prod,
+		 	      'Url'  => "$path/contract/contract_index.php",
+			      'Right'=> $prod_read);
+$menus["COMPTA"] =	array('Name' => $l_header_compta,
+			      'Url'  => "$path/treso/account_index.php",
+			      'Right'=> $compta_read);
+$menus["USERS"]   =	array('Name' => $l_header_users,
+			      'Url'  => "$path/user/user_index.php",
+			      'Right'=> $users_read);
+$menus["ADMINS"]  =	array('Name' => $l_header_admins,
+		              'Url'  => "$path/admin/admin_index.php?mode=html",
+			      'Right'=> $admins_read);
 //////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Modules
 //////////////////////////////////////////////////////////////////////////////
 if($section == "PROD") {
 
-  $menus["PROD"]["CONTRACT"] = array('Name'=> $l_header_contract,
-  			             'Url' => "$path/contract/contract_index.php");
+  $menus["PROD"]["CONTRACT"] = array('Name' => $l_header_contract,
+  			             'Url'  => "$path/contract/contract_index.php",
+			             'Right'=> $contract_read);
   $menus["PROD"]["INCIDENT"] = array('Name'=> $l_header_incident,
-  			      	     'Url' => "$path/contract/incident_index.php");
+  			      	     'Url' => "$path/contract/incident_index.php",
+			             'Right'=> $incident_read);
 }elseif($section == "COM") {
 
   $menus["COM"]["COMPANY"] = array('Name'=> $l_header_company,
-			           'Url' => "$path/company/company_index.php");
+			           'Url' => "$path/company/company_index.php",
+			           'Right'=> $company_read);
   $menus["COM"]["CONTACT"] = array('Name'=> $l_header_contact,
-			           'Url' => "$path/contact/contact_index.php");
+			           'Url' => "$path/contact/contact_index.php",
+			           'Right'=> $contact_read);
   $menus["COM"]["DEAL"]	   = array('Name'=> $l_header_deal,
-  			         'Url' => "$path/deal/deal_index.php");
+  			           'Url' => "$path/deal/deal_index.php",
+			           'Right'=> $deal_read);
   $menus["COM"]["LIST"]	   = array('Name'=> $l_header_list,
-			           'Url' => "$path/list/list_index.php");
+			           'Url' => "$path/list/list_index.php",
+			           'Right'=> $list_read);
   $menus["COM"]["AGENDA"]  = array('Name'=> $l_header_agenda,
-			           'Url' => "$path/agenda/agenda_index.php");
+			           'Url' => "$path/agenda/agenda_index.php",
+			           'Right'=> $agenda_read);
 
-}elseif($section == "ADMIN") {
+}elseif($section == "ADMINS") {
 
-  $menus["ADMIN"]["ADMIN"]       = array('Name'=> $l_header_admin,
-			                 'Url' => "$path/admin/admin_index.php?mode=html");
-  $menus["ADMIN"]["ADMIN_CODE"]  = array('Name'=> $l_header_admin_code,
-			                 'Url' => "$path/admin_code/admin_code_index.php?mode=html");
-  $menus["ADMIN"]["ADMIN_PREF"]  = array('Name'=> $l_header_admin_pref,
-			                 'Url' => "$path/admin_pref/admin_pref_index.php?mode=html");
-  $menus["ADMIN"]["ADMIN_DATA"]  = array('Name'=> $l_header_admin_data,
-			                 'Url' => "$path/admin_data/admin_data_index.php?mode=html");
-  $menus["ADMIN"]["ADMIN_LANG"]  = array('Name'=> $l_header_admin_lang,
-			                 'Url' => "$path/admin_lang/admin_lang_index.php?mode=html");
+  $menus["ADMINS"]["ADMIN"]       = array('Name'=> $l_header_admin,
+			                 'Url' => "$path/admin/admin_index.php?mode=html",
+			                 'Right'=> $admin_read);
+  $menus["ADMINS"]["ADMIN_CODE"]  = array('Name'=> $l_header_admin_code,
+			                 'Url' => "$path/admin_code/admin_code_index.php?mode=html",
+			                 'Right'=> $admin_code_read);
+  $menus["ADMINS"]["ADMIN_PREF"]  = array('Name'=> $l_header_admin_pref,
+			                 'Url' => "$path/admin_pref/admin_pref_index.php?mode=html",
+			                 'Right'=> $admin_pref_read);
+  $menus["ADMINS"]["ADMIN_DATA"]  = array('Name'=> $l_header_admin_data,
+			                 'Url' => "$path/admin_data/admin_data_index.php?mode=html",
+			                 'Right'=> $admin_data_read);
+  $menus["ADMINS"]["ADMIN_LANG"]  = array('Name'=> $l_header_admin_lang,
+			                 'Url' => "$path/admin_lang/admin_lang_index.php?mode=html",
+			                 'Right'=> $admini_lang_read);
 
 }elseif($section == "COMPTA") {
 
   $menus["COMPTA"]["ACCOUNT"] = array('Name'=> $l_header_account,
-			              'Url' => "$path/treso/account_index.php");
+			              'Url' => "$path/treso/account_index.php",
+			              'Right'=> $account_read);
   $menus["COMPTA"]["INVOICE"] = array('Name'=> $l_header_invoice,
-			              'Url' => "$path/treso/invoice_index.php");
+			              'Url' => "$path/treso/invoice_index.php",
+			              'Right'=> $invoice_read);
   $menus["COMPTA"]["PAYMENT"] = array('Name'=> $l_header_payment,
-			              'Url' => "$path/treso/payment_index.php");
+			              'Url' => "$path/treso/payment_index.php",
+			              'Right'=> $payment_read);
 
 }elseif($section == "USERS") {
 
   $menus["USERS"]["USER"]     = array('Name'=> $l_header_user,
-			              'Url' => "$path/user/user_index.php");
+			              'Url' => "$path/user/user_index.php",
+			              'Right'=> $user_read);
   $menus["USERS"]["TIME"]     = array('Name'=> $l_header_time,
-			              'Url' => "$path/time/time_index.php");
+			              'Url' => "$path/time/time_index.php",
+			              'Right'=> $time_read);
   $menus["USERS"]["SETTINGS"] = array('Name'=> $l_header_settings,
-			              'Url' => "$path/settings/settings_index.php");
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// Company actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Contact actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// LIST actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// AGENDA actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Contract actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Incident actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Account actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Payment actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Invoice actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// User actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Settings actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-
-if($menu == "ADMIN") {
-
-//Index 
-
-  $actions["ADMIN"]["index"] = array (
-    'Name'    => $l_header_find,   'Url'     => "$path/admin/admin_index.php?action=index&amp;mode=html",
-    'Right'   => $admin_read,
-   'Condition'=> array ('all') 
-                                     );
-
-//data_show 
-
-  $actions["ADMIN"]["data_show"] = array (
-    'Url'     => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
-    'Right'   => $admin_read,
-    'Condition'=> array ('None') 
-                                     );
-
-//Data Update 
-
-  $actions["ADMIN"]["data_update"] = array (
-    'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
-    'Right'    => $admin_read,
-    'Condition'=> array ('None') 
-                                     );
-
-//Help
-
-  $actions["ADMIN"]["help"] = array (
-     'Name'     => $l_header_help,
-     'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
-     'Right'    => $admin_read,
-     'Condition'=> array ('all') 
-                                    );
-
-}
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "ADMIN_LANG") {
-
-  $actions["ADMIN_LANG"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=htm",
-                                                  'Right' 	  
-						  => $admin_lang_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  ); 
-
- $actions["ADMIN_LANG"]["help"]		 = array ('Name'
-						  => $l_header_help,
-            		          	          'Url'
-					 	  => "$path/admin_lang/admin_lang_index.php?action=help&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-}
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "ADMIN_CODE") {
-
-  $actions["ADMIN_CODE"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/admin_code/admin_code_index.php?action=index&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_code_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
- $actions["ADMIN_CODE"]["help"]		 = array ('Name'
-						  => $l_header_help,
-            		          	          'Url'
-					 	  => "$path/admin_code/admin_code_index.php?action=help&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-}
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "ADMIN_PREF") {
-
-  $actions["ADMIN_PREF"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/admin_pref/admin_pref_index.php?action=index&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_pref_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
- $actions["ADMIN_PREF"]["help"]		 = array ('Name'
-						  => $l_header_help,
-            		          	          'Url'
-					 	  => "$path/admin_pref/admin_pref_index.php?action=help&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-}
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "ADMIN_DATA") {
-
-  $actions["ADMIN_DATA"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/admin_data/admin_data_index.php?action=index&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_data_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
- $actions["ADMIN_DATA"]["help"]		 = array ('Name'
-						  => $l_header_help,
-            		          	          'Url'
-					 	  => "$path/admin_data/admin_data_index.php?action=help&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
+			              'Url' => "$path/settings/settings_index.php",
+			              'Right'=> $settings_read);
 }
 

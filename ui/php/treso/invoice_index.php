@@ -14,7 +14,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("admin");
 include("$obminclude/global_pref.inc");
 
 require("invoice_display.inc");
@@ -33,9 +32,10 @@ page_close();
 
 // $invoice is a hash table containing, for each form field set 
 // in the calling page, a couple var_name => var_value...
+if($action == "") $action = "index";
 $invoice = get_param_invoice();
 get_invoice_action();
-if($action == "") $action = "index";
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -508,7 +508,7 @@ function get_invoice_action() {
   global $invoice,$actions;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_dupplicate,$l_header_admin;
-
+  global $invoice_read, $invoice_write, $invoice_admin_read, $invoice_admin_write;
 //Index 
 
   $actions["INVOICE"]["index"] = array (
@@ -522,7 +522,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["search"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=search",
-    'Right'    => $invoice_write,
+    'Right'    => $invoice_read,
     'Condition'=> array ('None') 
   
                                    );
@@ -550,7 +550,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["detailconsult"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=detailconsult",
-    'Right'    => $invoice_write,
+    'Right'    => $invoice_read,
     'Condition'=> array ('None') 
   
                                    );
@@ -602,7 +602,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["search_deal"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=search_deal",
-    'Right'    => $invoice_write,
+    'Right'    => $invoice_read,
     'Condition'=> array ('None') 
                                         );
 
@@ -635,7 +635,7 @@ function get_invoice_action() {
   $actions["INVOICE"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/treso/invoice_index.php?action=admin",
-    'Right'    => $contract_admin_write,
+    'Right'    => $contract_admin_read,
     'Condition'=> array ('all') 
                                        );
 
@@ -644,7 +644,7 @@ function get_invoice_action() {
   $actions["INVOICE"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/invoice_index.php?action=display",
-    'Right'    => $incident_admin_write,
+    'Right'    => $incident_read,
     'Condition'=> array ('all') 
                                         );
 
@@ -652,7 +652,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["dispref_display"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_display",
-    'Right'    => $incident_admin_write,
+    'Right'    => $incident_write,
     'Condition'=> array ('None') 
                                         );
 
@@ -660,7 +660,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["dispref_level"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_level",
-    'Right'    => $incident_admin_write,
+    'Right'    => $incident_write,
     'Condition'=> array ('None') 
                                         );
 

@@ -18,7 +18,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 include("$obminclude/global_pref.inc");
 
 require("agenda_query.inc");
@@ -28,8 +27,9 @@ require("agenda_display.inc");
 page_close();
 
 include("agenda_functions.inc");
-
+if ($action == "") $action = "index"; 
 get_agenda_action();
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -1064,7 +1064,7 @@ function get_agenda_action() {
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_day,$l_header_week,$l_header_admin;
   global $l_header_month,$l_header_new_event,$param_event;
-
+  global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
 //Index
 
@@ -1097,7 +1097,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=insert",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -1105,7 +1105,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["cancel_insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=cancel_insert",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -1113,7 +1113,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["confirm_insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=confirm_insert",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -1122,7 +1122,7 @@ function get_agenda_action() {
   $actions["AGENDA"]["view_month"] = array (
     'Name'     => $l_header_month,
     'Url'      => "$path/agenda/agenda_index.php?action=view_month",
-    'Right'    => $agenda_write,
+    'Right'    => $agenda_read,  
     'Condition'=> array ('all') 
                                     	    );
 
@@ -1131,7 +1131,7 @@ function get_agenda_action() {
   $actions["AGENDA"]["view_week"] = array (
     'Name'     => $l_header_week,
     'Url'      => "$path/agenda/agenda_index.php?action=view_week",
-    'Right'    => $agenda_write,
+    'Right'    => $agenda_read, 
     'Condition'=> array ('all') 
                                     	  );
 
@@ -1140,7 +1140,7 @@ function get_agenda_action() {
   $actions["AGENDA"]["view_day"] = array (
     'Name'     => $l_header_day,
     'Url'      => "$path/agenda/agenda_index.php?action=view_day",
-    'Right'    => $agenda_write,
+    'Right'    => $agenda_read, 
     'Condition'=> array ('all') 
                                     	 );
 
@@ -1165,7 +1165,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -1173,7 +1173,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["cancel_update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=cancel_update",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -1181,7 +1181,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["confirm_update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=confirm_update",
-    'Right'    => $agenda_read,
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 

@@ -57,9 +57,10 @@ if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-
+if($action == "") $action = "index";
 $contract=get_param_contract();
 get_contract_action();
+$perm->check();
 display_head($l_contract);     // Head & Body
 
 if ($popup) {
@@ -81,7 +82,7 @@ if ($popup) {
   display_end();
   exit();
 }
-if($action == "") $action = "index";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -316,7 +317,7 @@ function get_contract_action() {
   global $contract,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
-
+  global $contract_read, $contract_write, $contract_admin_read, $contract_admin_write;
 
 //Search
 
@@ -358,7 +359,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["insert"] = array (
     'Url'      => "$path/contract/contract_index.php?action=insert",
-    'Right'    => $contract_read,
+    'Right'    => $contract_write,
     'Condition'=> array ('None') 
                                     	);
 
@@ -374,7 +375,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["detailconsult"] = array (
     'Url'      => "$path/contract/contract_index.php?action=detailconsult",
-    'Right'    => $contract_read,
+    'Right'    => $contract_read, 
     'Condition'=> array ('None') 
                                     	);
 
@@ -383,7 +384,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["update"] = array (
     'Url'      => "$path/contract/contract_index.php?action=update",
-    'Right'    => $contract_read,
+    'Right'    => $contract_write,
     'Condition'=> array ('None') 
                                     	);
 
@@ -400,7 +401,7 @@ function get_contract_action() {
   $actions["CONTRACT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contract/contract_index.php?action=admin",
-    'Right'    => $contract_admin_write,
+    'Right'    => $contract_admin_read, 
     'Condition'=> array ('all') 
                                       	);
 
@@ -408,7 +409,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["admintypeinsert"] = array (
     'Url'      => "$path/contract/contract_index.php?action=admintypeinsert",
-    'Right'    => $contract_read,
+    'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);
 
@@ -416,7 +417,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["admintypedelete"] = array (
     'Url'      => "$path/contract/contract_index.php?action=admintypedelete",
-    'Right'    => $contract_read,
+    'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);
 
@@ -424,7 +425,7 @@ function get_contract_action() {
 
   $actions["CONTRACT"]["admintypeupdate"] = array (
     'Url'      => "$path/contract/contract_index.php?action=admintypeupdate",
-    'Right'    => $contract_read,
+    'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);
 
@@ -432,7 +433,7 @@ function get_contract_action() {
   $actions["CONTRACT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contract/contract_index.php?action=display",
-    'Right'    => $contract_admin_write,
+    'Right'    => $contract_read,
     'Condition'=> array ('all') 
                                       	  );
 

@@ -41,7 +41,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 include("$obminclude/global_pref.inc");
 
 require("company_query.inc");
@@ -58,9 +57,10 @@ if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
 }
 
 page_close();
-
+if($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +86,6 @@ if ($popup) {
   exit();
 }
 
-if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -358,7 +357,7 @@ function get_company_action() {
   global $company,$actions;
   global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
-
+  global $company_read, $company_write, $company_admin_read, $company_admin_write;
 //Index
 
   $actions["COMPANY"]["index"] = array (
@@ -440,7 +439,7 @@ function get_company_action() {
   $actions["COMPANY"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/company/company_index.php?action=admin",
-    'Right'    => $company_admin_write,
+    'Right'    => $company_admin_read,
     'Condition'=> array ('all') 
                                        );
 
@@ -448,7 +447,7 @@ function get_company_action() {
 
   $actions["COMPANY"]["kind_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
-    'Right'    => $company_write,
+    'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	     );
 
@@ -456,7 +455,7 @@ function get_company_action() {
 
   $actions["COMPANY"]["kind_update"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
-    'Right'    => $company_write,
+    'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	      );
 
@@ -464,7 +463,7 @@ function get_company_action() {
 
   $actions["COMPANY"]["kind_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_checklink",
-    'Right'    => $company_write,
+    'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      		);
 
@@ -472,7 +471,7 @@ function get_company_action() {
 
   $actions["COMPANY"]["kind_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_delete",
-    'Right'    => $company_write,
+    'Right'    => $company_admin_write,
     'Condition'=> array ('None') 
                                      	       );
 
@@ -481,7 +480,7 @@ function get_company_action() {
   $actions["COMPANY"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/company/company_index.php?action=display",
-    'Right'    => $company_admin_write,
+    'Right'    => $company_read,
     'Condition'=> array ('all') 
                                       	 );
 
@@ -489,14 +488,14 @@ function get_company_action() {
 
   $actions["COMPANY"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
-    'Right'    => $company_write,
+    'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
 
 //Display Level
   $actions["COMPANY"]["dispref_level"]  = array (
     'Url'      => "$path/company/company_index.php?action=dispref_level",
-    'Right'    => $company_write,
+    'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
 }

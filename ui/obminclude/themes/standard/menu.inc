@@ -122,8 +122,8 @@ function generate_menu($menu, $section) {
 //   - $menu   : selected menu 
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $menu) {
-  global $set_theme, $menus, $action, $popup_height ;
-  global $col_barre, $font_fonction,$actions, $popup_width;
+  global $set_theme, $menus, $action, $popup_height, $perm ;
+  global $col_barre, $font_fonction,$actions, $popup_width, $auth;
 
   echo "
 <table width=90% cellspacing=0 cellpadding=0 align=center>
@@ -134,16 +134,18 @@ function display_menu_bar($section, $menu) {
 ";
    if(is_array($actions[$menu])){
      foreach($actions[$menu] as $key => $value){
-       if(in_array("all",$value["Condition"]) || in_array($action,$value["Condition"])) {
-         if($value["Popup"] == 1) {
-         echo "
-          <a href=\"\" href=\"\" onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
-         ";
-         }
-         else {
-          echo "
-             <a href=\"".$value["Url"]."\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
-          ";
+      if(in_array("all",$value["Condition"]) || in_array($action,$value["Condition"])) {
+         if(($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
+           if($value["Popup"] == 1) {
+             echo "
+              <a href=\"\" href=\"\" onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+           ";
+           }
+           else {
+            echo "
+               <a href=\"".$value["Url"]."\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+            ";
+           }
          }
        }
      }
@@ -166,7 +168,7 @@ function display_menu_bar($section, $menu) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menus($section) {
   global $set_theme, $cong_app, $cong_usr, $cong_adm;
-  global $path, $col_menu, $font_menu, $menus;
+  global $path, $col_menu, $font_menu, $menus, $perm, $auth;
 
     echo "
         <table cellspacing=0 cellpadding=0 border=0>
@@ -174,7 +176,9 @@ function display_menus($section) {
     ";
   if(is_array($menus[$section])) {
     foreach($menus[$section] as $key => $value) {
-      if($key != "Name" && $key != "Url") {
+      if(($key != "Name" && $key != "Url" && $key != "Right") 
+          && 
+         (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"])) {
         echo "
             <td>&nbsp;&nbsp;</td>
             <td nowrap><img src=\"/images/$set_theme/puce.gif\">&nbsp;
@@ -199,20 +203,24 @@ function display_menus($section) {
 //   - $section : acrtive section 
 ///////////////////////////////////////////////////////////////////////////////
 function display_tabs($section) {
-  global $col_green, $menus,$col_blue;
+  global $col_green, $menus,$col_blue, $auth, $perm;
 
   echo "
         <table cellspacing=0 cellpadding=0 border=0>
         <tr>
           <td>";
   foreach($menus as $key => $value) {
-    echo "<td>";
-    if ($key == $section) {
-      display_active_tab($value);
-    } else {
-      display_inactive_tab($value);
+    if(($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
+      if ($key == $section) {
+        echo "<td>";
+        display_active_tab($value);
+        echo "</td>";
+      } else {
+        echo "<td>";
+        display_inactive_tab($value);
+        echo "</td>";
+      }
     }
-    echo "</td>";
   }
      echo "
           <!------- Remplissage apres tabs -------------------------------->

@@ -12,12 +12,12 @@
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMIN";
+$section = "ADMINS";
 $menu = "ADMIN";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
-$actions = array ('help', 'index', 'data_show', 'data_update', 'clear_sess');
+$acts = array ('help', 'index', 'data_show', 'data_update', 'clear_sess');
 
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
@@ -38,9 +38,11 @@ switch ($mode) {
  case "html":
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
+   if($action == "") $action = "index";
+   get_admin_action();
+   $perm->check();
    display_head("Admin_Code");
    generate_menu($menu, $section);
-   if($action == "") $action = "index";
    break;
 }
 
@@ -84,9 +86,9 @@ switch ($mode) {
 // Display command use                                                       //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $actions, $modules, $langs, $themes;
+  global $acts, $modules, $langs, $themes;
 
-  while (list($nb, $val) = each ($actions)) {
+  while (list($nb, $val) = each ($acts)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
   }
@@ -105,7 +107,7 @@ Ex: php4 admin_clear_sess.php -a clear_sess
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions, $modules;
+  global $debug, $acts, $modules;
   global $action, $module;
 
   // We skip the program name [0]
@@ -119,7 +121,7 @@ function parse_arg($argv) {
       break;
     case '-a':
       list($nb2, $val2) = each ($argv);
-      if (in_array($val2, $actions)) {
+      if (in_array($val2, $acts)) {
         $action = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
@@ -133,6 +135,55 @@ function parse_arg($argv) {
 
   if (! $action) $action = "clear_sess";
 }
+//////////////////////////////////////////////////////////////////////////////
+// ADMIN actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_admin_action() {
+  global $actions;
+  global $l_header_clear_sess,$l_header_index,$l_header_help;
+  global $admin_read, $admin_write;
 
 
+//Index 
+
+  $actions["ADMIN"]["index"] = array (
+    'Name'     => $l_header_index,   
+    'Url'      => "$path/admin/admin_index.php?action=index&amp;mode=html",
+    'Right'    => $admin_read,
+    'Condition'=> array ('all') 
+                                     );
+
+//data_show 
+
+  $actions["ADMIN"]["data_show"] = array (
+    'Url'      => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
+    'Right'    => $admin_read,
+    'Condition'=> array ('None') 
+                                     );
+
+//Data Update 
+
+  $actions["ADMIN"]["data_update"] = array (
+    'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
+    'Right'    => $admin_write,
+    'Condition'=> array ('None') 
+                                     );
+
+//Help
+
+  $actions["ADMIN"]["help"] = array (
+     'Name'     => $l_header_help,
+     'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
+     'Right'    => $admin_read,
+     'Condition'=> array ('all') 
+                                    );
+//Clear Session
+  $actions["ADMIN"]["clear_sess"] = array (
+     'Name'     => $l_header_clear_sess,
+     'Url'      => "$path/admin/admin_index.php?action=clear_sess&amp;mode=html",
+     'Right'    => $admin_write,
+     'Condition'=> array ('index') 
+                                    );
+}
 </SCRIPT>

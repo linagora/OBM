@@ -33,7 +33,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 include("$obminclude/global_pref.inc");
 
 require("../agenda/agenda_functions.inc");
@@ -89,7 +88,9 @@ else {
 page_close();
 
 require("time_js.inc");
+if ($action == "" ) $action = "index";
 get_time_actions();
+$perm->check("user");
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = array( '6' , '7' , '8','23' ) ;
@@ -369,27 +370,21 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 
 function get_time_actions() {
-global $actions;
+global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 //Index
 
   $actions["TIME"]["index"] = array (
     'Url'      => "$path/time/time_index.php?action=index",
-    'Right'    => $settings_read,
+    'Right'    => $time_read,
     'Condition'=> array ('None') 
                                     );
 
-//Search
 
-  $actions["TIME"]["search"] = array (
-    'Url'      => "$path/time/time_index.php?action=search",
-    'Right'    => $settings_read,
-    'Condition'=> array ('None') 
-                                    );
 
 //Validate
   $actions["TIME"]["validate"] = array (
     'Url'      => "$path/time/time_index.php?action=validate",
-    'Right'    => $settings_read,
+    'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
@@ -397,7 +392,7 @@ global $actions;
 
   $actions["TIME"]["validate_admin"] = array (
     'Url'      => "$path/time/time_index.php?action=validate_admin",
-    'Right'    => $settings_read,
+    'Right'    => $time_admin_write,
     'Condition'=> array ('None') 
                                     );
 
@@ -405,7 +400,7 @@ global $actions;
 
   $actions["TIME"]["stats"] = array (
     'Url'      => "$path/time/time_index.php?action=stats",
-    'Right'    => $settings_read,
+    'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
@@ -413,7 +408,7 @@ global $actions;
 
   $actions["TIME"]["detailupdate"] = array (
     'Url'      => "$path/time/time_index.php?action=detailupdate",
-    'Right'    => $settings_read,
+    'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 
@@ -421,7 +416,7 @@ global $actions;
 
   $actions["TIME"]["update"] = array (
     'Url'      => "$path/time/time_index.php?action=update",
-    'Right'    => $settings_read,
+    'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );
 

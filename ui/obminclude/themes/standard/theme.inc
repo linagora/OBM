@@ -29,7 +29,7 @@ $col_barre = $col_grey;
 
 $col_label = $col_purpleblue;    // Labels (grey fonce)
 $col_data = "222222";            // Data (grey fonce)
-$col_ok = $col_purpleblue;       // Messages color (bleu violet)
+$col_ok = $col_orange;       // Messages color (bleu violet)
 $col_warn = $col_orange;         // Warnings (oranges)
 $col_textem = $col_ok;           // Highligthed Text (orange)
 $col_table = $col_white;         // Table background color

@@ -18,7 +18,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("admin");
 include("$obminclude/global_pref.inc");
 
 require("account_display.inc");
@@ -38,9 +37,10 @@ page_close();
 
 // $account is a hash table containing, for each form field set 
 // in the calling page, a couple var_name, var_value...
+if($action == "") $action = "index";
 $account = get_param_account();
 get_account_action();
-if($action == "") $action = "index";
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -255,7 +255,7 @@ function get_account_action() {
   global $account,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
-
+  global $account_read, $account_write, $account_admin_read, $account_admin_write;
 //Index
 
   $actions["ACCOUNT"]["index"] = array (
@@ -286,7 +286,7 @@ function get_account_action() {
 
   $actions["ACCOUNT"]["insert"] = array (
     'Url'      => "$path/treso/account_index.php?action=insert",
-    'Right'    => $account_read,
+    'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
 
@@ -320,7 +320,7 @@ function get_account_action() {
 
   $actions["ACCOUNT"]["update"] = array (
     'Url'      => "$path/treso/account_index.php?action=update",
-    'Right'    => $account_read,
+    'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
 
@@ -329,7 +329,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/treso/account_index.php?action=delete&amp;param_account=".$account["account"]."",
-    'Right'    => $incident_write,
+    'Right'    => $account_write,
     'Condition'=> array ('detailconsult') 
                                      	);
 
@@ -338,7 +338,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/treso/account_index.php?action=admin",
-    'Right'    => $contract_admin_write,
+    'Right'    => $account_admin_read,
     'Condition'=> array ('all') 
                                       );
 
@@ -347,7 +347,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=display",
-    'Right'    => $incident_admin_write,
+    'Right'    => $account_read,
     'Condition'=> array ('all') 
                                       	 );
 
@@ -356,7 +356,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["dispref_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=dispref_display",
-    'Right'    => $incident_admin_write,
+    'Right'    => $account_write,
     'Condition'=> array ('None') 
                                       	 );
 
@@ -365,7 +365,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["level_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=level_display",
-    'Right'    => $incident_admin_write,
+    'Right'    => $account_write,
     'Condition'=> array ('None') 
                                       	 );
 

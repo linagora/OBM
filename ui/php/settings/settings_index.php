@@ -17,7 +17,6 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 $uid = $auth->auth["uid"];
 
 if ($param_lang != "") {
@@ -64,6 +63,7 @@ if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
 if ($action == "") $action = "index";
 get_settings_actions();
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -219,8 +219,9 @@ echo "></td>
 //////////////////////////////////////////////////////////////////////////////
 
 function get_settings_actions() {
+  global $actions, $settings_read;
+
   $actions["SETTINGS"]["index"] = array (
-    'Name'     => $l_header_find,
     'Url'      => "$path/settings/settings_index.php?action=index",
     'Right'    => $settings_read,
     'Condition'=> array ('None') 

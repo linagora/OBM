@@ -74,6 +74,7 @@ $l_short_september="Sep";
 $l_short_october="Oct";
 $l_short_november="Nov";
 $l_short_december="Dec";
+$l_invalid_perm = "Invalid permissions.";
 
 ////////////////////////////////////////////////////////
 ////// Theme headers lang files ////////////////////////
@@ -144,5 +145,8 @@ $l_header_day = "Day";
 $l_header_week = "Week";
 $l_header_month = "Month";
 $l_header_new_event = "New appointment";
-
+$l_header_clear_sess = "Clear sessions";
+$l_header_index     = "Main";
+$l_header_amp	= "Show amp";
+$l_header_pref_update  = "Reset users preferences";
 

@@ -14,7 +14,7 @@
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMIN";
+$section = "ADMINS";
 $menu = "ADMIN_PREF";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -46,6 +46,8 @@ switch ($mode) {
    include("$obminclude/global_pref.inc"); 
    display_head("Admin_Pref");
    if($action == "") $action = "index";
+   get_admin_pref_action();
+   $pref->check();
    generate_menu($menu, $section);
    break;
  default:
@@ -200,6 +202,43 @@ function get_param_pref() {
 
   return $pref;
 }
+//////////////////////////////////////////////////////////////////////////////
+// ADMIN PREF actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_admin_pref_action() {
+  global $actions;
+  global $l_header_index,$l_header_pref_update,$l_header_help;
+  global $admin_pref_read, $admin_pref_write;
+
+  $actions["ADMIN_PREF"]["index"] = array (
+     'Name'     => $l_header_index,
+     'Url'      => "$path/admin_pref/admin_pref_index.php?action=index&amp;mode=html",
+     'Right'    => $admin_pref_read,
+     'Condition'=> array ('all') 
+                                    	 );
+
+ $actions["ADMIN_PREF"]["help"] = array (
+     'Name'     => $l_header_help,
+     'Url'      => "$path/admin_pref/admin_pref_index.php?action=help&amp;mode=html",
+     'Right' 	=> $admin_pref_read,
+     'Condition'=> array ('all') 
+                                    	);
+ $actions["ADMIN_PREF"]["user_pref_update"] = array (
+     'Name'     => $l_header_pref_update,
+     'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update&amp;mode=html",
+     'Right' 	=> $admin_pref_write,
+     'Condition'=> array ('index') 
+                                    	);
+ $actions["ADMIN_PREF"]["global_pref_update"] = array (
+     'Url'     => "$path/admin_pref/admin_pref_index.php?action=global_pref_update&amp;mode=html",
+     'Right' 	=> $admin_pref_write,
+     'Condition'=> array ('None') 
+                                    	);
+
+
+}
+
 
 </SCRIPT>
 

@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "ADMIN";
+$section = "ADMINS";
 $menu = "ADMIN_DATA";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -29,7 +29,7 @@ $debug=1;
 
 $modules = array ('company');
 //$modules = get_modules_array();
-$actions = array ('help', 'index', 'data_show', 'data_update','clear_sess');
+$acts = array ('help', 'index', 'data_show', 'data_update');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -48,10 +48,10 @@ switch ($mode) {
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    if($action == "") $action = "index";
-   if($action!="clear_sess") {
-    display_head("Admin_Data");
-    generate_menu($menu, $section);
-   }
+   get_admin_data_action();
+   $perm->check();
+   display_head("Admin_Data");
+   generate_menu($menu, $section);
    break;
 }
 
@@ -61,16 +61,13 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_data_index($mode, $actions, $modules, $langs, $themes);
+    dis_data_index($mode, $acts, $modules, $langs, $themes);
     break;
   case "data_show":
     dis_data($action, $mode, $module);
     break;
   case "data_update":
     dis_data($action, $mode, $module);
-    break;
-  case "clear_sess":
-    dis_clear_sess($mode);
     break;
   default:
     echo "No action specified !";
@@ -132,9 +129,9 @@ function update_one_company($id, $con_num, $deal_num) {
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $actions, $modules;
+  global $acts, $modules;
 
-  while (list($nb, $val) = each ($actions)) {
+  while (list($nb, $val) = each ($acts)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
   }
@@ -159,7 +156,7 @@ Ex: php4 admin_data_index.php -a data_show -m company
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions, $modules;
+  global $debug, $acts, $modules;
   global $action, $module;
 
   // We skip the program name [0]
@@ -184,7 +181,7 @@ function parse_arg($argv) {
       break;
     case '-a':
       list($nb2, $val2) = each ($argv);
-      if (in_array($val2, $actions)) {
+      if (in_array($val2, $acts)) {
         $action = $val2;
         if ($debug > 0) { echo "-a -> \$action=$val2\n"; }
       }
@@ -198,6 +195,43 @@ function parse_arg($argv) {
 
   if (! $module) $module = "company";
   if (! $action) $action = "data_show";
+}
+//////////////////////////////////////////////////////////////////////////////
+// ADMIN DATA actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_admin_data_action() {
+  global $actions;
+  global $l_header_index,$l_header_help;
+  global $admin_data_read, $admin_data_write;
+
+
+  $actions["ADMIN_DATA"]["index"] = array (
+     'Name'     => $l_header_index,
+     'Url'      => "$path/admin_data/admin_data_index.php?action=index&amp;mode=html",
+     'Right'    => $admin_data_read,
+     'Condition'=> array ('all') 
+                                    	  );
+
+ $actions["ADMIN_DATA"]["help"] = array (
+     'Name'     => $l_header_help,
+     'Url'      => "$path/admin_data/admin_data_index.php?action=help&amp;mode=html",
+     'Right' 	=> $admin_data_read,
+     'Condition'=> array ('all') 
+                                    	);
+
+ $actions["ADMIN_DATA"]["data_show"] = array (
+     'Url'      => "$path/admin_data/admin_data_index.php?action=data_show&amp;mode=html",
+     'Right' 	=> $admin_data_read,
+     'Condition'=> array ('None') 
+                                    	);
+
+ $actions["ADMIN_DATA"]["data_update"] = array (
+     'Url'      => "$path/admin_data/admin_data_index.php?action=data_update&amp;mode=html",
+     'Right' 	=> $admin_data_write,
+     'Condition'=> array ('None') 
+                                    	);
+
 }
 
 </SCRIPT>

@@ -35,16 +35,17 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 require("$obminclude/global_pref.inc");
 
 include("list_display.inc");
 include("list_query.inc");
 require("list_js.inc");
 
+if($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $list = get_param_list();
 get_list_action();
+$perm->check();
 // ses_list is the session array of lists id to export
 if (sizeof($ses_list) >= 1) {
   $sess->register("ses_list");
@@ -54,7 +55,6 @@ if ($action != "export_add") {
   $sess->unregister("ses_list");
 }
 page_close();
-if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -348,7 +348,7 @@ function get_list_action() {
   global $list,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_export,$l_header_admin, $l_header_add_contact;
-
+  global $list_read, $list_write, $list_admin_read, $list_admin_write;
 //Index
 
   $actions["LIST"]["index"] = array (
@@ -395,7 +395,7 @@ function get_list_action() {
 
   $actions["LIST"]["insert"] = array (
     'Url'      => "$path/list/list_index.php?action=insert",
-    'Right'    => $list_read,
+    'Right'    => $list_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -403,7 +403,7 @@ function get_list_action() {
 
   $actions["LIST"]["update"] = array (
     'Url'      => "$path/list/list_index.php?action=update",
-    'Right'    => $list_read,
+    'Right'    => $list_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -420,7 +420,7 @@ function get_list_action() {
 
   $actions["LIST"]["delete"] = array (
     'Url'      => "$path/list/list_index.php?action=delete",
-    'Right'    => $list_read,
+    'Right'    => $list_write,
     'Condition'=> array ('None') 
                                       );
 
@@ -437,14 +437,14 @@ function get_list_action() {
 
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
-    'Right'    => $list_read,
+    'Right'    => $list_write,
     'Condition'=> array ('None') 
                                           );
 //Contact Del
 
   $actions["LIST"]["contact_del"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_del",
-    'Right'    => $list_read,
+    'Right'    => $list_write,
     'Condition'=> array ('None') 
                                           );
 
@@ -461,21 +461,21 @@ function get_list_action() {
   $actions["LIST"]["display"] = array (
    'Name'     => $l_header_display,
    'Url'      => "$path/list/list_index.php?action=display",
-   'Right'    => $list_admin_write,
+   'Right'    => $list_read,
    'Condition'=> array ('all') 
                                       );
 
 //Display Préférence
   $actions["LIST"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
-   'Right'    => $list_admin_write,
+   'Right'    => $list_write,
    'Condition'=> array ('None') 
                                                );
 
 //Display level
   $actions["LIST"]["dispref_level"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_level",
-   'Right'    => $list_admin_write,
+   'Right'    => $list_write,
    'Condition'=> array ('None') 
                                             );
 

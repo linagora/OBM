@@ -39,9 +39,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check("user");
 include("$obminclude/global_pref.inc");
-
 require("contact_display.inc");
 require("contact_query.inc");
 
@@ -63,6 +61,7 @@ page_close();
 if($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
+$perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -309,6 +308,7 @@ function get_contact_action() {
   global $contact,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
+  global $contact_read, $contact_write, $contact_admin_read, $contact_admin_write;
 
 //Index
 
@@ -323,7 +323,7 @@ function get_contact_action() {
 
   $actions["CONTACT"]["search"] = array (
     'Url'      => "$path/contact/contact_index.php?action=search",
-    'Right'    => $contact_write,
+    'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                     	);
 
@@ -340,7 +340,7 @@ function get_contact_action() {
  
  $actions["CONTACT"]["detailconsult"]   = array (
     'Url'      => "$path/contact/contact_index.php?action=detailconsult",
-    'Right'    => $contact_write,
+    'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                     		 );
 
@@ -374,7 +374,7 @@ function get_contact_action() {
   $actions["CONTACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
-    'Right'    => $company_write,
+    'Right'    => $contact_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
 
@@ -391,7 +391,7 @@ function get_contact_action() {
   $actions["CONTACT"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contact/contact_index.php?action=admin",
-    'Right'    => $company_admin_write,
+    'Right'    => $contact_admin_read,
     'Condition'=> array ('all') 
                                       		 );
 
@@ -400,7 +400,7 @@ function get_contact_action() {
   $actions["CONTACT"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contact/contact_index.php?action=display",
-    'Right'    => $company_admin_write,
+    'Right'    => $contact_read,
     'Condition'=> array ('all') 
                                       	 );
 
@@ -408,7 +408,7 @@ function get_contact_action() {
 
   $actions["CONTACT"]["displref_level"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
-    'Right'    => $company_admin_write,
+    'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                       	        );
 
@@ -416,7 +416,7 @@ function get_contact_action() {
 
   $actions["CONTACT"]["displref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
-    'Right'    => $company_admin_write,
+    'Right'    => $contact_read,
     'Condition'=> array ('None') 
                                       		 );
 

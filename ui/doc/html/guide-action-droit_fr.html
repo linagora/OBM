@@ -66,7 +66,7 @@ en lui associant des droits, des conditions d'appelle suivant l'action actuelle,
   <td>&nbsp;</td>
   <td>&nbsp;</td>
   <td>&nbsp;</td>
-  <td>["Position"]</td>
+  <td>["Pop-Up"]</td>
   <td>&nbsp;</td>
 </tr><tr>
   <td>&nbsp;</td>
@@ -121,21 +121,18 @@ La variable est definit au niveau du fichier <b>global.inc</b> et sera utilisée 
 
 $actions["COMPANY"]["index"] = array ('Name'	 => $l_header_index_f,
             		              'Url' 	 => '$path/company/conmpany_index?action=index',
-                                      'Position' => '1',
                                       'Right' 	 => $company_read,
 				      'Condition => 'all'; 
                                       );
 
 $actions["COMPANY"]["new"]   = array ('Name'	 => $l_header_new_f,
             		              'Url' 	 => '$path/company/conmpany_index?action=new',
-                                      'Position' => '2',
                                       'Right' 	 => $company_write,
 				      'Condition => array ( 'index', 'detail_consult','admin','display'); 
                                       );
 
 $actions["COMPANY"]["admin"] = array ('Name'	 => $l_header_admin_f,
             		              'Url' 	 => '$path/company/conmpany_index?action=admin',
-                                      'Position' => '3',
                                       'Right' 	 => $company_admin_write,
 				      'Condition => array ( 'index', 'detail_consult','display'); 
                                       );
