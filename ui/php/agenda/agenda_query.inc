@@ -1258,6 +1258,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
   $db_cat_label = $obm_q->f("calendarcategory_label");
   $db_desc = $obm_q->f("calendarevent_description");
   $db_flag = $obm_q->f("calendarsegment_flag");
+  $db_privacy = $obm_q->f("calendarevent_privacy");
   $time_unit = 60 / $set_cal_interval;
   $s =0;
   $unix_time = mktime(substr($p_date_begin,8,2), substr($p_date_begin,10,2), "00", substr($p_date_begin,4,2), substr($p_date_begin,6,2), substr($p_date_begin,0,4));
@@ -1265,7 +1266,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
     $current_event[$current_time][$db_customer_id][] = $db_id;
     $status = $event_data[$db_id]["status"] + 1;
     $event_data[$db_id] = 
-    array("title"=>$db_title,"type"=>$db_cat_label,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status);
+    array("title"=>$db_title,"type"=>$db_cat_label,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status,"privacy" => $db_privacy);
     $obm_q->next_record(); 
     $db_date = $obm_q->f("calendarsegment_date");
     $db_customer_id = $obm_q->f("calendarsegment_customerid");
@@ -1274,6 +1275,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
     $db_cat_label = $obm_q->f("calendarcategory_label");
     $db_desc = $obm_q->f("calendarevent_description");
     $db_flag = $obm_q->f("calendarsegment_flag");
+    $db_privacy = $obm_q->f("calendarevent_privacy");
   }  
   for($current_time=$p_date_begin;$current_time<=$p_date_end;$current_time=date("YmdHi",$unix_time)) {
     if(date("G",$unix_time) < $set_stop_time){
@@ -1312,7 +1314,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
   	  $current_event[$current_time][$db_customer_id][] = $db_id;
 	  $status = $event_data[$db_id]["status"] + 1;
 	  $event_data[$db_id] = 
-  	  array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status);
+  	  array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status,"privacy" => $db_privacy);
 	  
       	}	
       $obm_q->next_record(); 
@@ -1323,6 +1325,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
       $db_cat_label = $obm_q->f("calendarcategory_label");
       $db_desc = $obm_q->f("calendarevent_description");
       $db_flag = $obm_q->f("calendarsegment_flag");
+      $db_privacy = $obm_q->f("calendarevent_privacy");
     }
  
     while($db_date == $current_time) {
@@ -1333,7 +1336,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	$current_event[$current_time][$db_customer_id][] = $db_id;
 	$status = $event_data[$db_id]["status"] + 1;
 	$event_data[$db_id] = 
-  	array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status);
+	array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status,"privacy" => $db_privacy);
 	$obm_q->next_record(); 
       	$db_date = $obm_q->f("calendarsegment_date");
 	$db_customer_id = $obm_q->f("calendarsegment_customerid");
@@ -1342,6 +1345,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	$db_cat_label = $obm_q->f("calendarcategory_label");
 	$db_desc = $obm_q->f("calendarevent_description");
 	$db_flag = $obm_q->f("calendarsegment_flag");
+	$db_privacy = $obm_q->f("calendarevent_privacy");
       }elseif($db_flag == "end"){
 	if(is_array($current_event[$current_time][$db_customer_id])) {
 	  $current_event[$current_time][$db_customer_id] = array_diff($current_event[$current_time][$db_customer_id],array($db_id));
@@ -1361,6 +1365,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	$db_cat_label = $obm_q->f("calendarcategory_label");
 	$db_desc = $obm_q->f("calendarevent_description");
 	$db_flag = $obm_q->f("calendarsegment_flag");							   
+	$db_privacy = $obm_q->f("calendarevent_privacy");
       }       
     }
     $past_time = $current_time;
@@ -1375,6 +1380,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
     $db_cat_label = $obm_q->f("calendarcategory_label");
     $db_desc = $obm_q->f("calendarevent_description");
     $db_flag = $obm_q->f("calendarsegment_flag");	    
+    $db_privacy = $obm_q->f("calendarevent_privacy");
     $current_event[$current_time][$db_customer_id] = -1;
     $event_data[$db_id]["end"] = substr($db_date,8,2).":".substr($db_date,10,2);
   }while($obm_q->next_record());
@@ -1403,7 +1409,7 @@ function store_daily_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p
       $event_data[$obm_q->f("calendarevent_id")] = 
         array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
         "description"=>$obm_q->f("calendarevent_description"),"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
-        substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
+        substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status,"privacy"=>$obm_q->f("calendarevent_privacy"));
       $obm_q->next_record(); 
     }
     if(is_array($current_event[$past_time])){
@@ -1428,7 +1434,7 @@ function store_daily_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p
   	  $event_data[$obm_q->f("calendarevent_id")] = 
   	    array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
   	    "description"=>$obm_q->f("calendarevent_description"),"begin"=>substr($obm_q->f("calendarsegment_date"),8,2).":".
-  	    substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status);
+	    substr($obm_q->f("calendarsegment_date"),10,2),"status"=>$status,"privacy"=>$obm_q->f("calendarevent_privacy"));
 	  $obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
 	$end_event[] = $obm_q->f("calendarevent_id");

@@ -13,6 +13,7 @@ $l_groups = "Groups";
 $l_title = "Title";
 $l_priority = "Priority";
 $l_private = "Private";
+$l_private_description = "This is a private event, you cannot see the details.";
 $l_public  = "Public";
 $l_category = "Category";
 $l_description = "Description";

@@ -14,6 +14,7 @@ $l_groups = "Groupes";
 $l_title = "Titre";
 $l_priority = "Priorité";
 $l_private = "Privé";
+$l_private_description = "Cet événement est personnel il vous est impossible d'en voire le détail.";
 $l_public  = "Public";
 $l_category = "Catégorie";
 $l_description = "Description";
