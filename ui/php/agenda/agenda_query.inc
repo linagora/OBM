@@ -864,7 +864,6 @@ function run_query_insert_event_data($agenda) {
     $repeat_end = "";
   }
   $obm_db = new DB_OBM;
-  $obm_db->lock("CalendarEvent");
   $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -879,7 +878,6 @@ function run_query_insert_event_data($agenda) {
 			 '$repeat_kind','$repeat_days','".date("Y-m-d H:i",$repeat_end)."')";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_db->unlock();  
   $obm_db->query($query);
 
   return $max_id;
