@@ -56,16 +56,23 @@ if($action == "") $action = "index";
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  if(count($sel_user_id) != 0){
-    $p_user_array =  $sel_user_id;
+  $obm_wait = run_query_waiting_events();
+  if($obm_wait->nf() != 0) {
+    display_warn_msg($l_waitings_events." : ".$obm_wait->nf());
+    html_waiting_events($obm_wait);
   }
   else {
-    $p_user_array =  array($auth->auth["uid"]);
+    if(count($sel_user_id) != 0){
+      $p_user_array =  $sel_user_id;
+    }
+    else {
+      $p_user_array =  array($auth->auth["uid"]);
+    }
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    $user_obm = run_query_userobm();  
+    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
   }
-  $obm_q = run_query_week_event_list($agenda,$p_user_array);
-  $user_q = run_query_get_user_name($p_user_array);
-  $user_obm = run_query_userobm();  
-  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -147,11 +154,11 @@ elseif ($action == "insert") {
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
-      display_warning_msg($l_insert_warning);
+      display_warn_msg($l_insert_warning);
       html_dis_conflict($agenda,$conflict,$event_id);
     }
     else{
-      display_error_msg($l_insert_error);
+      display_err_msg($l_insert_error);
       html_dis_conflict($agenda,$conflict);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -217,7 +224,7 @@ elseif ($action == "update") {
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
-      display_warning_msg($l_update_warning);      
+      display_warn_msg($l_update_warning);      
       html_dis_conflict($agenda,$conflict,$event_id);
     }
     else{
@@ -238,7 +245,27 @@ elseif ($action == "update") {
     dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
   }
 }
-
+elseif ($action == "update_decision") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_change_decision($agenda);
+  if(count($conflict) == 0) {
+    display_ok_msg($l_update_ok);  
+    $p_user_array =  array($auth->auth["uid"]);
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    $user_obm = run_query_userobm();
+    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  }
+  else{
+    display_error_msg($l_update_error); 
+    html_dis_conflict($agenda,$conflict);
+    $p_user_array =  array($auth->auth["uid"]);
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    $user_obm = run_query_userobm();
+    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  }
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
@@ -247,11 +274,12 @@ elseif ($action == "update") {
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
   global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
-  global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begiûXn;
+  global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
+  global $hd_date_begin, $hd_date_end,$rd_decision_event;
 
-
+	
   // Deal fields
   if (isset ($param_date))
     $agenda["date"] = $param_date; 
@@ -311,6 +339,10 @@ function get_param_agenda() {
     }
       
   }  
+  if (isset($hd_date_begin)) $agenda["date_begin"] = $hd_date_begin;
+  if (isset($hd_date_end)) $agenda["date_end"] = $hd_date_end;
+  if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
+
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {
       while ( list( $key, $val ) = each( $agenda ) ) {

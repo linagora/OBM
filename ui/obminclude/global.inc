@@ -12,7 +12,7 @@ $l_title = "O.B.M.";
 
 // VARS that go in session
 $set_lang_default = "en";
-$set_theme_default = "aliacom";
+$set_theme_default = "standard";
 $set_rows_default = 10;
 $set_display_default = "no";
 $set_date_default = "Y-m-d";

@@ -60,7 +60,7 @@ function run_query_detail($param_event,$getdate) {
 /////////////////////////////////////////////////////////////////////////////
 function run_query_event_customers($param_event,$getdate) {
   $obm_db = new DB_OBM;
-  $query = "SELECT DISTINCT userobm_lastname,userobm_firstname,userobm_id
+  $query = "SELECT DISTINCT userobm_lastname,userobm_firstname,userobm_id,calendarsegment_state,userobm_id
             FROM UserObm, CalendarSegment
             WHERE  calendarsegment_eventid = $param_event
 	    AND calendarsegment_date LIKE '$getdate%'
@@ -352,7 +352,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	if($user_id == $auth->auth["uid"]) {
 	  if(count($return_info) != 0) {
 	    $conflicts = run_query_get_conflicts_user($dates["date_begin"],$dates["date_end"],$user_id);
-	    if(count($conflicts) != 0) {
+	    if($conflicts->nf() != 0) {
 	      run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
 	    }
 	    else{
@@ -372,15 +372,28 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   return $return_info;
 }
 /////////////////////////////////////////////////////////////////////////////
-// Perform the addiction of a event
+// Update a user decision for an user
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
 //    $agenda : Agenda params
-//    $contacts_array : List of the users 
+
 /////////////////////////////////////////////////////////////////////////////
 
-
+function run_query_change_decision($agenda) {
+  global $auth;
+  echo $agenda["decision_event"];
+  if($agenda["decision_event"] == 'A') {
+    $conflicts = run_query_get_conflicts($agenda["date_begin"],$agenda["date_end"],array($auth->auth["uid"]));   
+  }
+  else{
+    $conflicts = array();
+  }
+  if(count($conflicts) == 0) {
+    run_query_update_occurence_state($agenda["id"],$agenda["date_begin"],$agenda["date_end"],$auth->auth["uid"],$agenda["decision_event"]);	
+  }
+  return $return_info;
+}
 /////////////////////////////////////////////////////////////////////////////
 // Perform the conflict management
 //////////////////////////////////////////////////////////////////////////////
@@ -407,6 +420,41 @@ function run_query_manage_conflict($agenda) {
     }
   }
 }
+/////////////////////////////////////////////////////////////////////////////
+// Select All waiting Events
+//////////////////////////////////////////////////////////////////////////////
+
+function run_query_waiting_events() {
+  global $auth, $cdg_sql;
+  $obm_db = new DB_OBM;
+  $query = "SELECT DISTINCT
+                   calendarevent_id,
+                   calendarevent_usercreate,
+                   calendarevent_title, 
+		   calendarcategory_label,
+		   calendarevent_privacy,
+		   calendarevent_priority,
+		   calendarevent_repeatkind,
+		   calendarevent_repeatdays,
+		   calendarevent_endrepeat,
+		   MIN(cs1.calendarsegment_date) as datebegin,
+		   MIN(cs2.calendarsegment_date) as dateend
+            FROM CalendarEvent, CalendarCategory, CalendarSegment cs1, CalendarSegment cs2
+	    WHERE calendarevent_category_id = calendarcategory_id
+	      	  AND cs1.calendarsegment_customerid = ".$auth->auth["uid"]."
+		  AND cs1.calendarsegment_state = 'W'
+  		  AND cs2.calendarsegment_customerid = ".$auth->auth["uid"]."
+		  AND cs2.calendarsegment_state = 'W'
+	          AND calendarevent_id = cs1.calendarsegment_eventid
+		  AND calendarevent_id = cs2.calendarsegment_eventid	
+		  AND cs1.calendarsegment_flag = 'begin'
+		  AND cs2.calendarsegment_flag = 'end'
+		 GROUP BY calendarevent_id"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Update the state of a couple of occurence

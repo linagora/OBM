@@ -26,7 +26,9 @@ $l_medium = "Normale";
 $l_datebegin = "Date de d&eacute;but";
 $l_dateend = "Date de fin";
 $l_timebegin = "Heure de d&eacute;but (HH:MM)";
+$l_timebegin2 = "Heure de d&eacute;but";
 $l_timeend = "Heure de fin (HH:MM)";
+$l_timeend2 = "Heure de fin";
 $l_occupied_day = "Journ&eacute;e entiere";
 
 $l_format = "(AAAA-MM-JJ)";
@@ -34,6 +36,8 @@ $l_repeat = "Répétition";
 $l_periodicity = "Fr&eacute;quence";
 $l_repeatkind = "Type de r&eacute;p&eacute;tition";
 $l_repeatdays = "Jours de r&eacute;p&eacute;tition (type hebdomadaire)";
+$l_repeatdays2 = "Jours de r&eacute;p&eacute;tition";
+
 $l_use_endrepeat = "Date de fin de r&eacute;p&eacute;tition";
 $l_interval = "Intervalle (en jours)";
 $l_carac = "Propriétés";
@@ -119,6 +123,7 @@ $l_friday="Vendredi";
 $l_saturday="Samedi";
 $l_sunday="Dimanche";
 $l_go_to = "Aller à";
+$l_waitings_events = " Evenements en attente";
 $l_tomorrow_event ="Evenements de demain";
 $l_daysofweek = array (	'Dimanche',
 			'Lundi',
@@ -145,7 +150,11 @@ $l_monthsofyear = array (	'Janvier','Février',
 $l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
 			      'juil','aoû','sep','oct','nov','déc');
 
-
+$l_accept = "Accepter";
+$l_wait = "En attente";
+$l_refuse = "Refuser";
+$l_change_state = "Votre participation à l'évenement";
+			      
 $l_short_monday="Lun";
 $l_short_tuesday="Mar";
 $l_short_wednesday="Mer";
@@ -157,7 +166,7 @@ $l_short_sunday="Dim";
 $l_unknown="Inconnu";
 $l_checkdelete ="Supprimer";
 $l_repeat_update ="Mettre à jour les répétitions";
-$l_user_calendar = "Utilisateurs du Calendrier";
+$l_user_calendar = "Vue Multi-utilisateurs";
 $l_valid = "Valider";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";

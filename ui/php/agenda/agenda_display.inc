@@ -1092,7 +1092,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
-    $dis_delete = "
+/*    $dis_delete = "
       <form method=\"post\" name=\"f_sup_societe\"
       onsubmit=\"if (valider_suppression()) return true; else return false;\"
       action=\"" . url_prepare("company_index.php") . "\"> 
@@ -1106,7 +1106,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
        </tr>
       </table>
       </form>
-      ";
+      ";*/
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
@@ -1336,24 +1336,94 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
     </tr>
    </table>
   </form>
-    $dis_delete
    ";
  }
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Consult                                                  //
+// Display Waiting events                                                  //
 // Parameters:
-//   - $inc_q : DBO : incident result
-//   - $con_q : DBO : contract result
-//      $obm_q_company : list of companies
-//      $contact_q : list of contact from the company 
+///////////////////////////////////////////////////////////////////////////////
+function html_waiting_events($obm_wait) {
+  global $l_users, $l_title, $l_priority, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state;
+  global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  
+  while($obm_wait->next_record()) {
+    $kind = ${"l_".$obm_wait->f("calendarevent_repeatkind")};
+    switch ($obm_wait->f("calendarevent_priority") ) {
+      case 1 : 
+      	$priority = $l_low;
+	break;
+      case 2 :
+	$priority = $l_medium;
+	break;
+      case 3 :
+	$priority = $l_high;
+	break;
+      
+    }
+    $start_week_day = strtotime($set_weekstart_default);
+    $dis_repeat_days = "";
+    for ($i=0; $i<7; $i++) {
+      $day_num = date("w", $start_week_day);
+      $day = $l_daysofweekshort[$day_num];
+      if (strcmp(substr($obm_wait->f("calendarevent_repeatdays"),$i,1),"1")==0) {
+	$dis_repeat_days .= "$day ";
+      }
+      $start_week_day = strtotime("+1 day", $start_week_day); 
+    }
+    
+    $day_array = "";
+    $day_array1 = "";
+    $day_array2 = "";
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_wait->f("datebegin") , $day_array);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_wait->f("dateend") , $day_array1);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$obm_wait->f("calendarevent_endrepeat") , $day_array2);
+    $dis_waiting_events .= "<tr>
+     <td class=\"detailText\">".$obm_wait->f("calendarevent_title")."</td>
+     <td class=\"detailText\">".$obm_wait->f("calendarcategory_label")."</td>
+     <td class=\"detailText\">".$priority."</td>
+     <td class=\"detailText\">".$kind."</td>
+     <td class=\"detailText\">".$dis_repeat_days."</td>
+     <td class=\"detailText\">".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]."</td>
+     <td class=\"detailText\">".$day_array[1]."-".$day_array[2]."-".$day_array[3]."</td>
+     <td class=\"detailText\">".$day_array[4].":".$day_array[5]."</td>
+     <td class=\"detailText\">".$day_array1[4].":".$day_array1[5]."</td></tr>";
+  }
+
+
+  echo "  
+   <table class=\"details\">
+    <tr>
+     <td class=\"detailLabel\">$l_title</td>
+     <td class=\"detailLabel\">$l_category</td>
+     <td class=\"detailLabel\">$l_priority</td>
+     <td class=\"detailLabel\">$l_repeatkind</td>
+     <td class=\"detailLabel\">$l_repeatdays2</td>
+     <td class=\"detailLabel\">$l_use_endrepeat</td>     
+     <td class=\"detailLabel\">$l_datebegin</td>
+     <td class=\"detailLabel\">$l_timebegin2</td>
+     <td class=\"detailLabel\">$l_timeend2</td>
+    </tr>
+    $dis_waiting_events
+   </table>
+  </form>
+";
+
+  }
+ 
+ 
+///////////////////////////////////////////////////////////////////////////////
+// Display Calendar Consult                                                  //
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_consult($obm_q_event,$obm_q_cust) {
   global $set_theme,$set_weekstart_default;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat,$auth,$l_change_state;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $obm_q_event->f("calendarevent_title");
   $category = $obm_q_event->f("calendarcategory_label");
@@ -1371,6 +1441,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
   $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+  $id = $obm_q_event->f("calendarevent_id");
 
   switch ($priority ) {
     case 1 : 
@@ -1396,76 +1467,90 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   }
     
   while($obm_q_cust->next_record()) {
-    $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."<br />";
+    if($auth->auth["uid"] == $obm_q_cust->f("userobm_id")) {
+      ${$obm_q_cust->f("calendarsegment_state")} = "checked=\"checked\"";
+      $dis_decision_radio = "<tr><td colspan=\"2\" class=\"detailHead\">$l_change_state</td></tr>";
+      $dis_decision_radio .= "<tr><td colspan=\"2\" class=\"detailText\">
+	<input type=\"hidden\" name=\"action\" value=\"update_decision\">
+	<input type=\"hidden\" name=\"param_event\" value=\"$id\">
+	<input type=\"hidden\" name=\"hd_date_begin\" value=\"".$day_array[0]."\">
+	<input type=\"hidden\" name=\"hd_date_end\" value=\"".$day_array2[0]."\">
+	<input type=\"radio\" $A name=\"rd_decision_event\" value=\"A\" onchange=\"this.form.submit()\" />$l_accept
+	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onchange=\"this.form.submit()\" />$l_wait
+	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse</td></tr>";
+    }
+    $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."(".$obm_q_cust->f("calendarsegment_state").")<br />";
   }
   // --- HTML Template --------------------------------------------------------
   echo "
-  <table class=\"details\">
-   <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
-   </tr>
-   <tr>
-    <td class=\"detailLabel\">$l_title</td>
-    <td class=\"detailText\">$title</td>
-   </tr>  
-   <tr>
-    <td class=\"detailLabel\">$l_private</td>
-    <td class=\"detailText\">$privacy</td>
-   </tr> 
-   <tr>
-    <td class=\"detailLabel\">$l_category</td>
-    <td class=\"detailText\">$category</td>
-   </tr>    
-   <tr>
-    <td class=\"detailLabel\">$l_users</td>
-    <td class=\"detailText\">$dis_user_list</td>
-   </tr>
-   <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_carac</td>
-   </tr>   
-   <tr>
-    <td class=\"detailLabel\">$l_datebegin</td>
-    <td class=\"detailText\">$datebegin</td>
-   </tr>
-   <tr>
-    <td class=\"detailLabel\">$l_timebegin</td>
-    <td class=\"detailText\">$timebegin</td>
-   </tr>
-   <tr>
-    <td class=\"detailLabel\">$l_dateend</td>
-    <td class=\"detailText\">$dateend</td>       
-   </tr>
-   <tr>    
-    <td class=\"detailLabel\">$l_timeend</td>
-    <td class=\"detailText\">$timeend</td>
-   </tr>
-   <tr>
-    <td class=\"detailLabel\">$l_priority</td>
-    <td class=\"detailText\">$priority</td>
-   </tr>      
-   <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_repeat</td>
-   </tr>   
-   <tr>    
-    <td class=\"detailLabel\">$l_repeatkind</td> 
-    <td class=\"detailText\">$kind</td>
-   </tr>
-   <tr>    
-    <td class=\"detailLabel\">$l_use_endrepeat</td> 
-    <td class=\"detailText\">$repeat_end</td>
-   </tr>
-   <tr>  
-    <td class=\"detailLabel\">$l_repeatdays</td>
-    <td class=\"detailText\">$dis_repeat_days</td>
-   </tr>
-   <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_description</td>
-   </tr>       
-   <tr>    
-    <td colspan=\"2\" class=\"detailText\">$description</td>
-   </tr>     
-  </table>
-  
+  <form method=\"get\" name=\"f_mod_calendar\">
+   <table class=\"details\">
+    <tr>
+     <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_title</td>
+     <td class=\"detailText\">$title</td>
+    </tr>  
+    <tr>
+     <td class=\"detailLabel\">$l_private</td>
+     <td class=\"detailText\">$privacy</td>
+    </tr> 
+    <tr>
+     <td class=\"detailLabel\">$l_category</td>
+     <td class=\"detailText\">$category</td>
+    </tr>    
+    <tr>
+     <td class=\"detailLabel\">$l_users</td>
+     <td class=\"detailText\">$dis_user_list</td>
+    </tr>
+    <tr>
+     <td colspan=\"2\" class=\"detailHead\">$l_carac</td>
+    </tr>   
+    <tr>
+     <td class=\"detailLabel\">$l_datebegin</td>
+     <td class=\"detailText\">$datebegin</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_timebegin</td>
+     <td class=\"detailText\">$timebegin</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_dateend</td>
+     <td class=\"detailText\">$dateend</td>       
+    </tr>
+    <tr>    
+     <td class=\"detailLabel\">$l_timeend</td>
+     <td class=\"detailText\">$timeend</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_priority</td>
+     <td class=\"detailText\">$priority</td>
+    </tr>      
+    <tr>
+     <td colspan=\"2\" class=\"detailHead\">$l_repeat</td>
+    </tr>   
+    <tr>    
+     <td class=\"detailLabel\">$l_repeatkind</td> 
+     <td class=\"detailText\">$kind</td>
+    </tr>
+    <tr>    
+     <td class=\"detailLabel\">$l_use_endrepeat</td> 
+     <td class=\"detailText\">$repeat_end</td>
+    </tr>
+    <tr>  
+     <td class=\"detailLabel\">$l_repeatdays</td>
+     <td class=\"detailText\">$dis_repeat_days</td>
+    </tr>
+    <tr>
+     <td colspan=\"2\" class=\"detailHead\">$l_description</td>
+    </tr>       
+    <tr>    
+     <td colspan=\"2\" class=\"detailText\">$description</td>
+    </tr>   
+    $dis_decision_radio
+   </table>
+  </form>
   ";
 }
 ///////////////////////////////////////////////////////////////////////////////
