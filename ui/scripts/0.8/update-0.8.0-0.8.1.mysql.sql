@@ -17,7 +17,7 @@ ALTER TABLE ActiveUserObm CHANGE column activeuserobm_lastpage activeuserobm_las
  
 ALTER TABLE Contact CHANGE column contact_address1 contact_address1 VARCHAR(64);
 ALTER TABLE Contact CHANGE column contact_address2 contact_address2 VARCHAR(64);
-ALTER TABLE Contact CHANGE column contact_address2 contact_address2 VARCHAR(64);
+ALTER TABLE Contact CHANGE column contact_address3 contact_address3 VARCHAR(64);
 
 -------------------------------------------------------------------------------
 -- Update Publication tables

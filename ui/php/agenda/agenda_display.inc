@@ -483,7 +483,6 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	      $end_of_day = date("Ymd".$set_stop_time."00",$indice_time);
 	      do{
 		foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {
-		  
 	  	  if($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $is_title = TRUE;
@@ -522,9 +521,10 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		    }
 		    $event_head_display .= "</a>";	
-// Why? if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && 
+		       $event_data[$idOfEvent]["begin"] < $temp_ie) {
 		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
-//  }
+		    }
 		  }
 		  elseif(!in_array($idOfEvent,$temp_array)) {	
 		    $event_head_display .= "<br />";
@@ -562,9 +562,10 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt=\"[D]\" />";
 		    }
 		    $event_head_display .= "</a>";	 
-// Why? if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib &&
+		       $event_data[$idOfEvent]["begin"] < $temp_ie) {
 		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
-//}
+		    }
 		  }
 		}
 		$rowspan_event++;
@@ -603,7 +604,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	  foreach ($calendar_user as $id => $user_data ) {
 	    if(is_array($current_events[$current_time][$id])){    
 	      $temp_data =$event_data[current($current_events[$current_time][$id])];
-	      $temp_ib = substr($current_time,8,2).":".substr($current_time,10,2);
+	      $temp_ib = substr("0$i:".(($k)*$time_unit),-5);
 	      $temp_ie = date("H:i", strtotime("+$j days $i hours ".(($k+1)*$time_unit)." minutes",$start_week_day));
 	      if($temp_data["status"] > 0 && $temp_data["begin"] >= $temp_ib && $temp_data["begin"] < $temp_ie) {	     
 		$is_title = FALSE;	  

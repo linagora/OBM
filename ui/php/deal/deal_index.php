@@ -660,6 +660,13 @@ function get_deal_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      );
+  // Popup
+  $actions["DEAL"]["ext_get_id"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     );
+				     
 
   // New
   $actions["DEAL"]["new"] = array (

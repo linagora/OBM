@@ -37,7 +37,7 @@ $cgp_show["section"]["aliamin"] = false;
 
 //$cgp_show["module"]["deal"] = false;
 //$cgp_show["module"]["agenda"] = false;
-$cgp_show["module"]["time"] = false;
+//$cgp_show["module"]["time"] = false;
 //$cgp_show["module"]["todo"] = false;
 //$cgp_show["module"]["user"] = false;
 //$cgp_show["module"]["group"] = false;
@@ -50,7 +50,7 @@ $cgp_show["module"]["time"] = false;
 
 // Company module
 //$cgp_hide["company"]["number"] = true;
-//$cgp_hide["company"]["companytype_label"] = true;
+///$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["category"] = true;
 //$cgp_hide["company"]["address3"] = true;

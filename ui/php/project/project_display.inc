@@ -597,7 +597,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $ratio_usedestimated = intval(($usedtime/$estimated)*100);
 
     $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
-  
     $ratio_progeval = intval((($usedtime + $missingtime)/$estimated)*100);
 
     if ($ratio_progeval < 70)
