@@ -279,14 +279,13 @@ function run_query_list_update_sql($id) {
   // Check that list has really a query (if not we do nothing)
   $query = "select list_structure from List where list_id='$id'";
   display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  $obm_q->next_record();
-  $structure = $obm_q->f("list_structure");
-  $criteria = unserialize($structure);
+  $list_q = new DB_OBM;
+  $retour = $list_q->query($query);
+  $list_q->next_record();
 
-  if ($criteria != "") {
-    $list_query = make_query_from_db($id);
+  $list_query = addslashes(make_query_from_db($list_q));
+
+  if ($list_query != "") {
 
     $query = "update List set
       list_timeupdate='". date("Y-m-d H:i:s")."',
@@ -998,16 +997,32 @@ function run_query_subscriptionreception() {
 ///////////////////////////////////////////////////////////////////////////////
 // Generate the SQL Query from a List given by its id
 // Parameters:
-//   - $id : list id
+//   - $list_q : DBO with list info
 ///////////////////////////////////////////////////////////////////////////////
-function make_query_from_db($id) {
+function make_query_from_db(&$list_q) {
   global $auth, $cdg_sql;
 
-  $list_info = get_list_info($id);
-  $structure = $list_info["structure"];
-  $list_info["criteria"] = unserialize($structure);
-
-  $query = make_query_from_criteria($list_info);
+  if (is_object($list_q)) {
+    $id = $list_q->f("list_id");
+    $structure = $list_q->f("list_structure");
+    $mail_ok = $list_q->f("list_mailing_ok");
+    
+    if ($structure != "") {
+      $criteria = unserialize($structure);
+    } else {
+      $criteria = "";
+    }
+    
+    if ($criteria != "") {
+      // Addslashes to all criteria elements
+      $as_criteria = $criteria;
+      array_walk($as_criteria, 'addslashes_array');
+      $list_info["criteria"] = $as_criteria;
+      $list_info["id"] = $id;
+      $list_info["mailing_ok"] = $mail_ok;
+      $query = make_query_from_criteria($list_info);
+    }
+  }
 
   return $query;
 }
@@ -1216,7 +1231,7 @@ function make_query_from_criteria($list) {
 	if ($first) {
 	  $where_static .= "contact_id='$c_id'";
 	} else {
-	  $where_static .= "or contact_id='$c_id'";
+	  $where_static .= " or contact_id='$c_id'";
 	}
 	$first = false;
       }

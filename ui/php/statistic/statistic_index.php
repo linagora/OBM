@@ -46,8 +46,8 @@ if (! $statistic["popup"]) {
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["features"] = dis_menu_stats(); 
-}
-elseif ($action == "responsible") {
+
+} elseif ($action == "responsible") {
 ///////////////////////////////////////////////////////////////////////////////
   $cont_q = run_query_contact_per_resp();
   $comp_q = run_query_company_per_resp();
@@ -55,8 +55,7 @@ elseif ($action == "responsible") {
   $display["detail"] = dis_resp_stats($cont_q,$comp_q);
   $display["features"] = dis_menu_stats(); 
 
-}
-elseif ($action == "company") {
+} elseif ($action == "company") {
 ///////////////////////////////////////////////////////////////////////////////
   require("statistic_js.inc");
   $cat_q = run_query_company_per_country_per_cat();
@@ -64,7 +63,6 @@ elseif ($action == "company") {
   $display["title"] = display_title($l_header_comp_stats);
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
-
 }
 
 ///////////////////////////////////////////////////////////////////////////////

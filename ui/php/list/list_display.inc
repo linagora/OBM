@@ -465,15 +465,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $criteria = "";
   }
 
-
   if ($criteria != "") {
-    // Addslashes to all criteria elements
-    $as_criteria = $criteria;
-    array_walk($as_criteria, 'addslashes_array');
-    $list_info["criteria"] = $as_criteria;
-    $list_info["id"] = $id;
-    $list_info["mailing_ok"] = $list_q->f("list_mailing_ok");
-    $query = make_query_from_criteria($list_info);
+    $query = make_query_from_db($list_q);
   } else {
     $query = $list_q->f("list_query");
   }
@@ -604,7 +597,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display List Form (graphical or not)                                     //
+// Display List Form (graphical or not)
 // Parameters :
 //   - $action    : action called
 //   - $list_q    : DBO : information about the list (null for new list)
@@ -641,7 +634,7 @@ function dis_list_form($action, $list_q, $list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display List Form                                                         //
+// Display List Form
 // Parameters :
 //   - $action    : action called
 //   - $list_q    : DBO : information about the list (null for new list)

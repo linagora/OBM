@@ -462,12 +462,9 @@ function dis_data_list($action, $mode) {
     $query = $l_q->f("list_query");
 
     $criteria = unserialize($l_q->f("list_structure"));
-    $list_info["criteria"] = $criteria;
-    $list_info["id"] = $id;
-    $list_info["mailing_ok"] = $l_q->f("list_mailing_ok");
 
     if ($criteria != "") {
-      $new_query = stripslashes(make_query_from_criteria($list_info));
+      $new_query = make_query_from_db($l_q);
     } else {
       $new_query = $l_q->f("list_query");
     }

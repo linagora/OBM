@@ -479,6 +479,16 @@ function get_list_action() {
     'Condition'=> array ('None') 
                                       );
 
+// Sel list contacts : Contacts selection
+  $actions["LIST"]["sel_list_contact"] = array (
+    'Name'     => $l_header_add_contact,
+    'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
+    'Right'    => $cright_write,
+    'Popup'    => 1,
+    'Target'   => $l_list,
+    'Condition'=> array ('detailconsult','update','contact_add','contact_del')
+                                          );
+
 // Contact ADD
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",

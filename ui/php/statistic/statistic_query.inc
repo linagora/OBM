@@ -15,10 +15,14 @@
 function run_query_contact_per_resp() {
   global $cdg_sql;
 
-  $query = "SELECT  userobm_id, userobm_lastname,userobm_firstname,COUNT(contact_id) as cont_stat 
-  FROM Contact, UserObm
-  WHERE contact_marketingmanager_id = userobm_id GROUP BY contact_marketingmanager_id,
-  userobm_id, userobm_lastname,userobm_firstname
+  $query = "select userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      COUNT(contact_id) as cont_stat 
+    from Contact, UserObm
+    where contact_marketingmanager_id = userobm_id
+    group by contact_marketingmanager_id,
+      userobm_id, userobm_lastname,userobm_firstname
    ";
 
   display_debug_msg($query, $cdg_sql);
@@ -36,10 +40,14 @@ function run_query_contact_per_resp() {
 function run_query_company_per_resp() {
   global $cdg_sql;
 
-  $query = "SELECT  userobm_id, userobm_lastname,userobm_firstname,COUNT(company_id) as comp_stat 
-  FROM Company, UserObm
-  WHERE company_marketingmanager_id = userobm_id GROUP BY company_marketingmanager_id,userobm_id,userobm_firstname,
-   userobm_lastname";
+  $query = "select userobm_id,
+      userobm_lastname,
+      userobm_firstname,
+      COUNT(company_id) as comp_stat 
+    from Company, UserObm
+    where company_marketingmanager_id = userobm_id
+    group by company_marketingmanager_id,userobm_id,userobm_firstname,
+      userobm_lastname";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
@@ -65,14 +73,14 @@ function run_query_company_per_country_per_cat() {
       companycategory_code,
       companycategory_label,
       count(company_id) as nb 
-    FROM Company
-      LEFT JOIN Country ON company_country_iso3166 = country_iso3166
+    from Company
+      left join Country ON company_country_iso3166 = country_iso3166
                            and country_lang='$lang'
-      LEFT JOIN CompanyCategoryLink ON companycategorylink_company_id = company_id
-      LEFT JOIN CompanyCategory ON companycategory_id = companycategorylink_category_id
-    GROUP BY country_iso3166, country_name,
+      left join CompanyCategoryLink ON companycategorylink_company_id = company_id
+      left join CompanyCategory ON companycategory_id = companycategorylink_category_id
+    group by country_iso3166, country_name,
       companycategory_id, companycategory_code,companycategory_label
-    ORDER BY country_iso3166, companycategory_id";
+    order by country_iso3166, companycategory_id";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
