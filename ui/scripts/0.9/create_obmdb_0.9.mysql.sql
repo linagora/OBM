@@ -55,7 +55,7 @@ CREATE TABLE ActiveUserObm (
   activeuserobm_userobm_id     int(11) default NULL,
   activeuserobm_timeupdate     timestamp(14),
   activeuserobm_timecreate     timestamp(14),
-  activeuserobm_nb_connexions  int(11) NOT NULL default '0',
+  activeuserobm_nb_connexions  int(11) NOT NULL default 0,
   activeuserobm_lastpage       varchar(64) NOT NULL default '0',
   activeuserobm_ip             varchar(32) NOT NULL default '0',
   PRIMARY KEY (activeuserobm_sid)
@@ -71,7 +71,7 @@ CREATE TABLE UserObm_SessionLog (
   userobm_sessionlog_userobm_id     int(11) default NULL,
   userobm_sessionlog_timeupdate     timestamp(14),
   userobm_sessionlog_timecreate     timestamp(14),
-  userobm_sessionlog_nb_connexions  int(11) NOT NULL default '0',
+  userobm_sessionlog_nb_connexions  int(11) NOT NULL default 0,
   userobm_sessionlog_lastpage       varchar(32) NOT NULL default '0',
   userobm_sessionlog_ip             varchar(32) NOT NULL default '0',
   PRIMARY KEY (userobm_sessionlog_sid)
@@ -82,11 +82,13 @@ CREATE TABLE UserObm_SessionLog (
 -- Table structure for table 'UserObm'
 --
 CREATE TABLE UserObm (
-  userobm_id              int(8) DEFAULT '0' NOT NULL auto_increment,
+  userobm_id              int(8) DEFAULT 0 NOT NULL auto_increment,
   userobm_timeupdate      timestamp(14),
   userobm_timecreate      timestamp(14),
   userobm_userupdate      int(8),
   userobm_usercreate      int(8),
+  userobm_local           int(1) default 1;
+  userobm_ext_id          varchar(16),
   userobm_login           varchar(32) DEFAULT '' NOT NULL,
   userobm_password        varchar(32) DEFAULT '' NOT NULL,
   userobm_perms           varchar(254),
@@ -95,7 +97,11 @@ CREATE TABLE UserObm (
   userobm_lastname        varchar(32),
   userobm_firstname       varchar(32),
   userobm_phone           varchar(32),
+  userobm_phone2          varchar(32),
+  userobm_fax             varchar(32),
+  userobm_fax2            varchar(32),
   userobm_email           varchar(60),
+  userobm_description     varchar(255),
   userobm_timelastaccess  timestamp(14),
   PRIMARY KEY (userobm_id),
   UNIQUE k_login_user (userobm_login)
@@ -106,7 +112,7 @@ CREATE TABLE UserObm (
 -- Table structure for table 'UserObmPref'
 --
 CREATE TABLE UserObmPref (
-   userobmpref_user_id  int(8) DEFAULT '0' NOT NULL,
+   userobmpref_user_id  int(8) DEFAULT 0 NOT NULL,
    userobmpref_option   varchar(50) NOT NULL,
    userobmpref_value    varchar(50) NOT NULL
 );
@@ -116,11 +122,11 @@ CREATE TABLE UserObmPref (
 -- New table 'DisplayPref'
 --
 CREATE TABLE DisplayPref (
-  display_user_id     int(8) NOT NULL default '0',
+  display_user_id     int(8) NOT NULL default 0,
   display_entity      varchar(32) NOT NULL default '',
   display_fieldname   varchar(64) NOT NULL default '',
   display_fieldorder  int(3) unsigned default NULL,
-  display_display     int(1) unsigned NOT NULL default '1',
+  display_display     int(1) unsigned NOT NULL default 1,
   PRIMARY KEY (display_user_id, display_entity, display_fieldname),
   INDEX idx_user (display_user_id),
   INDEX idx_entity (display_entity)
@@ -134,7 +140,7 @@ CREATE TABLE DisplayPref (
 -- Table structure for the table  'DataSource'
 --
 CREATE TABLE DataSource (
-  datasource_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  datasource_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   datasource_timeupdate  timestamp(14),
   datasource_timecreate  timestamp(14),
   datasource_userupdate  int(8),
@@ -167,7 +173,7 @@ CREATE TABLE Country (
 -- Table structure for table 'CompanyType'
 --
 CREATE TABLE CompanyType (
-  companytype_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  companytype_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   companytype_timeupdate  timestamp(14),
   companytype_timecreate  timestamp(14),
   companytype_userupdate  int(8),
@@ -181,7 +187,7 @@ CREATE TABLE CompanyType (
 -- Table structure for table 'CompanyActivity'
 --
 CREATE TABLE CompanyActivity (
-  companyactivity_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  companyactivity_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   companyactivity_timeupdate  timestamp(14),
   companyactivity_timecreate  timestamp(14),
   companyactivity_userupdate  int(8),
@@ -195,12 +201,12 @@ CREATE TABLE CompanyActivity (
 -- Table structure for table 'CompanyNafCode'
 --
 CREATE TABLE CompanyNafCode (
-  companynafcode_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  companynafcode_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   companynafcode_timeupdate  timestamp(14),
   companynafcode_timecreate  timestamp(14),
   companynafcode_userupdate  int(8),
   companynafcode_usercreate  int(8),
-  companynafcode_title       int(1) NOT NULL DEFAULT '0',
+  companynafcode_title       int(1) NOT NULL DEFAULT 0,
   companynafcode_code        varchar(4),
   companynafcode_label       varchar(128),
   PRIMARY KEY (companynafcode_id)
@@ -211,7 +217,7 @@ CREATE TABLE CompanyNafCode (
 -- Table structure for table 'Company'
 --
 CREATE TABLE Company (
-  company_id                   int(8) DEFAULT '0' NOT NULL auto_increment,
+  company_id                   int(8) DEFAULT 0 NOT NULL auto_increment,
   company_timeupdate           timestamp(14),
   company_timecreate           timestamp(14),
   company_userupdate           int(8),
@@ -238,9 +244,9 @@ CREATE TABLE Company (
   company_fax                  varchar(32),
   company_web                  varchar(64),
   company_email                varchar(64),
-  company_contact_number       int(5) DEFAULT '0' NOT NULL,
-  company_deal_number          int(5) DEFAULT '0' NOT NULL,
-  company_deal_total           int(5) DEFAULT '0' NOT NULL,
+  company_contact_number       int(5) DEFAULT 0 NOT NULL,
+  company_deal_number          int(5) DEFAULT 0 NOT NULL,
+  company_deal_total           int(5) DEFAULT 0 NOT NULL,
   company_comment              text,
   PRIMARY KEY (company_id)
 );
@@ -253,8 +259,8 @@ CREATE TABLE CompanyCategory (
   companycategory_id          int(8) NOT NULL auto_increment,
   companycategory_timeupdate  timestamp(14),
   companycategory_timecreate  timestamp(14),
-  companycategory_userupdate  int(8) NOT NULL default '0',
-  companycategory_usercreate  int(8) NOT NULL default '0',
+  companycategory_userupdate  int(8) NOT NULL default 0,
+  companycategory_usercreate  int(8) NOT NULL default 0,
   companycategory_code        varchar(10) NOT NULL default '',
   companycategory_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (companycategory_id)
@@ -265,8 +271,8 @@ CREATE TABLE CompanyCategory (
 -- Table structure for table 'CompanyCategoryLink'
 --
 CREATE TABLE CompanyCategoryLink (
-  companycategorylink_category_id  int(8) NOT NULL default '0',
-  companycategorylink_company_id   int(8) NOT NULL default '0',
+  companycategorylink_category_id  int(8) NOT NULL default 0,
+  companycategorylink_company_id   int(8) NOT NULL default 0,
   PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
 );
 
@@ -278,7 +284,7 @@ CREATE TABLE CompanyCategoryLink (
 -- Table structure for table 'Contact'
 --
 CREATE TABLE Contact (
-  contact_id                   int(8) DEFAULT '0' NOT NULL auto_increment,
+  contact_id                   int(8) DEFAULT 0 NOT NULL auto_increment,
   contact_timeupdate           timestamp(14),
   contact_timecreate           timestamp(14),
   contact_userupdate           int(8),
@@ -307,7 +313,7 @@ CREATE TABLE Contact (
   contact_email2               varchar(128),
   contact_mailing_ok           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
-  contact_privacy              int(2) NOT NULL DEFAULT '0',
+  contact_privacy              int(2) NOT NULL DEFAULT 0,
   contact_comment              text,
   PRIMARY KEY (contact_id)
 );
@@ -317,7 +323,7 @@ CREATE TABLE Contact (
 -- Table structure for table 'Kind'
 --
 CREATE TABLE Kind (
-  kind_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  kind_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   kind_timeupdate  timestamp(14),
   kind_timecreate  timestamp(14),
   kind_userupdate  int(8),
@@ -325,7 +331,7 @@ CREATE TABLE Kind (
   kind_minilabel   varchar(64),
   kind_header      varchar(64),
   kind_lang        char(2),
-  kind_default     int(1) NOT NULL DEFAULT '0',
+  kind_default     int(1) NOT NULL DEFAULT 0,
   PRIMARY KEY (kind_id)
 );
 
@@ -334,7 +340,7 @@ CREATE TABLE Kind (
 -- Table structure for the table 'Function'
 --
 CREATE TABLE Function (
-  function_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  function_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   function_timeupdate  timestamp(14),
   function_timecreate  timestamp(14),
   function_userupdate  int(8),
@@ -351,9 +357,9 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_id          int(8) NOT NULL auto_increment,
   contactcategory1_timeupdate  timestamp(14),
   contactcategory1_timecreate  timestamp(14),
-  contactcategory1_userupdate  int(8) default '0',
-  contactcategory1_usercreate  int(8) default '0',
-  contactcategory1_code        int(8) default '0',
+  contactcategory1_userupdate  int(8) default 0,
+  contactcategory1_usercreate  int(8) default 0,
+  contactcategory1_code        int(8) default 0,
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
@@ -363,8 +369,8 @@ CREATE TABLE ContactCategory1 (
 -- Table structure for table 'ContactCategory1Link'
 --
 CREATE TABLE ContactCategory1Link (
-  contactcategory1link_category_id  int(8) NOT NULL default '0',
-  contactcategory1link_contact_id   int(8) NOT NULL default '0',
+  contactcategory1link_category_id  int(8) NOT NULL default 0,
+  contactcategory1link_contact_id   int(8) NOT NULL default 0,
   PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
 );
 
@@ -376,9 +382,9 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_id          int(8) NOT NULL auto_increment,
   contactcategory2_timeupdate  timestamp(14),
   contactcategory2_timecreate  timestamp(14),
-  contactcategory2_userupdate  int(8) default '0',
-  contactcategory2_usercreate  int(8) default '0',
-  contactcategory2_code        int(8) default '0',
+  contactcategory2_userupdate  int(8) default 0,
+  contactcategory2_usercreate  int(8) default 0,
+  contactcategory2_code        int(8) default 0,
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );
@@ -388,8 +394,8 @@ CREATE TABLE ContactCategory2 (
 -- Table structure for table 'ContactCategory2Link'
 --
 CREATE TABLE ContactCategory2Link (
-  contactcategory2link_category_id  int(8) NOT NULL default '0',
-  contactcategory2link_contact_id   int(8) NOT NULL default '0',
+  contactcategory2link_category_id  int(8) NOT NULL default 0,
+  contactcategory2link_contact_id   int(8) NOT NULL default 0,
   PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
 );
 
@@ -419,7 +425,7 @@ CREATE TABLE ParentDeal (
 -- Table structure for table 'Deal'
 --
 CREATE TABLE Deal (
-  deal_id                   int(8) DEFAULT '0' NOT NULL auto_increment,
+  deal_id                   int(8) DEFAULT 0 NOT NULL auto_increment,
   deal_timeupdate           timestamp(14),
   deal_timecreate           timestamp(14),
   deal_userupdate           int(8),
@@ -430,7 +436,7 @@ CREATE TABLE Deal (
   deal_parentdeal_id        int(8),
   deal_type_id              int(8),
   deal_tasktype_id          int(8),
-  deal_company_id           int(8) DEFAULT '0' NOT NULL,
+  deal_company_id           int(8) DEFAULT 0 NOT NULL,
   deal_contact1_id          int(8),
   deal_contact2_id          int(8),
   deal_marketingmanager_id  int(8),
@@ -442,7 +448,7 @@ CREATE TABLE Deal (
   deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
-  deal_privacy              int(2) NOT NULL DEFAULT '0',
+  deal_privacy              int(2) NOT NULL DEFAULT 0,
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );
@@ -452,7 +458,7 @@ CREATE TABLE Deal (
 -- Table structure for table 'DealStatus'
 --
 CREATE TABLE DealStatus (
-  dealstatus_id          int(2) DEFAULT '0' NOT NULL auto_increment,
+  dealstatus_id          int(2) DEFAULT 0 NOT NULL auto_increment,
   dealstatus_timeupdate  timestamp(14),
   dealstatus_timecreate  timestamp(14),
   dealstatus_userupdate  int(8),
@@ -468,7 +474,7 @@ CREATE TABLE DealStatus (
 -- Table structure for table 'DealType'
 --
 CREATE TABLE DealType (
-  dealtype_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  dealtype_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   dealtype_timeupdate  timestamp(14),
   dealtype_timecreate  timestamp(14),
   dealtype_userupdate  int(8),
@@ -486,9 +492,9 @@ CREATE TABLE DealCategory (
   dealcategory_id          int(8) NOT NULL auto_increment,
   dealcategory_timeupdate  timestamp(14),
   dealcategory_timecreate  timestamp(14),
-  dealcategory_userupdate  int(8) default '0',
-  dealcategory_usercreate  int(8) default '0',
-  dealcategory_code        int(8) default '0',
+  dealcategory_userupdate  int(8) default 0,
+  dealcategory_usercreate  int(8) default 0,
+  dealcategory_code        int(8) default 0,
   dealcategory_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (dealcategory_id)
 );
@@ -497,8 +503,8 @@ CREATE TABLE DealCategory (
 -- Table structure for table 'DealCategoryLink'
 --
 CREATE TABLE DealCategoryLink (
-  dealcategorylink_category_id  int(8) NOT NULL default '0',
-  dealcategorylink_deal_id      int(8) NOT NULL default '0',
+  dealcategorylink_category_id  int(8) NOT NULL default 0,
+  dealcategorylink_deal_id      int(8) NOT NULL default 0,
   PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
 );
 
@@ -515,7 +521,7 @@ CREATE TABLE List (
   list_timecreate  	 timestamp(14),
   list_userupdate  	 int(8),
   list_usercreate  	 int(8),
-  list_privacy     	 int(2) NOT NULL DEFAULT '0',
+  list_privacy     	 int(2) NOT NULL DEFAULT 0,
   list_name        	 varchar(64) NOT NULL,
   list_subject     	 varchar(128),
   list_email       	 varchar(128),
@@ -535,45 +541,30 @@ CREATE TABLE List (
 -- Table structure for table 'ContactList'
 --
 CREATE TABLE ContactList (
-  contactlist_list_id     int(8) DEFAULT '0' NOT NULL,
-  contactlist_contact_id  int(8) DEFAULT '0' NOT NULL
+  contactlist_list_id     int(8) DEFAULT 0 NOT NULL,
+  contactlist_contact_id  int(8) DEFAULT 0 NOT NULL
 );
 
 
 -------------------------------------------------------------------------------
 -- Calendar module tables
 -------------------------------------------------------------------------------
-
 --
--- Table structure for the table  'CalendarUser'
+-- Table structure for the table  'CalendarSegment'
 --
-CREATE TABLE CalendarUser (
-  calendaruser_timeupdate   timestamp(14),
-  calendaruser_timecreate   timestamp(14),
-  calendaruser_userupdate   int(8) default NULL,
-  calendaruser_usercreate   int(8) default NULL,
-  calendaruser_user_id  int(8) NOT NULL default '0',
-  calendaruser_event_id     int(8) NOT NULL default '0',
-  calendaruser_state       char(1) NOT NULL default '',
-  calendaruser_required    int(1) NOT NULL default '0',
-  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
-);
-  
---
--- Table structure for the table  'CalendarException'
---
-CREATE TABLE CalendarException (
-  calendarexception_timeupdate   timestamp(14),
-  calendarexception_timecreate   timestamp(14),
-  calendarexception_userupdate   int(8) default NULL,
-  calendarexception_usercreate   int(8) default NULL,
-  calendarexception_event_id int(8)    NOT NULL auto_increment,
-  calendarexception_date         timestamp(14) NOT NULL,
-  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
+CREATE TABLE CalendarSegment (
+  calendarsegment_eventid     int(8) NOT NULL default '0',
+  calendarsegment_customerid  int(8) NOT NULL default '0',
+  calendarsegment_date        timestamp(14) NOT NULL,
+  calendarsegment_flag        varchar(5) NOT NULL default '',
+  calendarsegment_type        varchar(5) NOT NULL default '',
+  calendarsegment_state       char(1) NOT NULL default '',
+  PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
 );
 
+
 --
--- Table structure for table 'CalendarEvent'
+-- Table structure for the table  'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
   calendarevent_id int(8)    NOT NULL auto_increment,
@@ -581,22 +572,19 @@ CREATE TABLE CalendarEvent (
   calendarevent_timecreate   timestamp(14),
   calendarevent_userupdate   int(8) default NULL,
   calendarevent_usercreate   int(8) default NULL,
-  calendarevent_owner        int(8) default NULL,
   calendarevent_title        varchar(255) default NULL,
   calendarevent_description  text,
   calendarevent_category_id  int(8) default NULL,
   calendarevent_priority     int(2) default NULL,
   calendarevent_privacy      int(2) NOT NULL default '0',
-  calendarevent_date       timestamp(14) NOT NULL,
-  calendarevent_duration     int(8) NOT NULL default '',
-  calendarevent_allday	     int(1) NOT NULL default '0',
+  calendarevent_length       int(4) NOT NULL default '',
   calendarevent_repeatkind   varchar(20) default NULL,
-  calendarevent_repeatfrequence  int(3) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp(14) NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 
+    
 --
 -- Table structure for table 'CalendarCategory'
 --
@@ -610,6 +598,7 @@ CREATE TABLE CalendarCategory (
   PRIMARY KEY (calendarcategory_id)
 );
 
+
 --
 -- Table structure for table 'CalendarRight'
 --
@@ -622,13 +611,26 @@ CREATE TABLE CalendarRight (
 );
 
 
+--
+-- structure fot table 'RepeatKind'
+--
+CREATE TABLE RepeatKind (
+  repeatkind_id          int(8) NOT NULL auto_increment,
+  repeatkind_timeupdate  timestamp(14),
+  repeatkind_timecreate  timestamp(14),
+  repeatkind_userupdate  int(8),
+  repeatkind_usercreate  int(8),
+  repeatkind_label       varchar(128),
+  PRIMARY KEY(repeatkind_id)	
+);
+
 
 -------------------------------------------------------------------------------
 -- Todo
 -------------------------------------------------------------------------------
 -- Create new table
 CREATE TABLE Todo (
-  todo_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  todo_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   todo_timeupdate  timestamp(14),
   todo_timecreate  timestamp(14),
   todo_userupdate  int(8),
@@ -650,7 +652,7 @@ CREATE TABLE Todo (
 -- Table structure for table 'Publication'
 --
 CREATE TABLE Publication (
-  publication_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  publication_id             int(8) DEFAULT 0 NOT NULL auto_increment,
   publication_timeupdate     timestamp(14),
   publication_timecreate     timestamp(14),
   publication_userupdate     int(8),
@@ -667,7 +669,7 @@ CREATE TABLE Publication (
 -- Table structure for table 'PublicationType'
 --
 CREATE TABLE PublicationType (
-  publicationtype_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  publicationtype_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   publicationtype_timeupdate  timestamp(14),
   publicationtype_timecreate  timestamp(14),
   publicationtype_userupdate  int(8),
@@ -688,8 +690,8 @@ CREATE TABLE Subscription (
   subscription_userupdate       int(8),
   subscription_usercreate       int(8),
   subscription_quantity       	int(8),
-  subscription_renewal          int(1) DEFAULT '0' NOT NULL,
-  subscription_reception_id     int(8) DEFAULT '0' NOT NULL,
+  subscription_renewal          int(1) DEFAULT 0 NOT NULL,
+  subscription_reception_id     int(8) DEFAULT 0 NOT NULL,
   subscription_date_begin       timestamp(14),
   subscription_date_end         timestamp(14),
   PRIMARY KEY (subscription_publication_id,subscription_contact_id)
@@ -700,7 +702,7 @@ CREATE TABLE Subscription (
 -- Table structure for table 'SubscriptionReception'
 --
 CREATE TABLE SubscriptionReception ( 
-  subscriptionreception_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  subscriptionreception_id          int(8) DEFAULT 0 NOT NULL auto_increment,
   subscriptionreception_timeupdate  timestamp(14),
   subscriptionreception_timecreate  timestamp(14),
   subscriptionreception_userupdate  int(8),
@@ -726,10 +728,10 @@ CREATE TABLE Document (
   document_name        	 varchar(255) default NULL,
   document_kind        	 int(2) default NULL,
   document_mimetype    	 varchar(255) default NULL,
-  document_category1_id  int(8) not null default '0',
-  document_category2_id  int(8) not null default '0',
+  document_category1_id  int(8) not null default 0,
+  document_category2_id  int(8) not null default 0,
   document_author      	 varchar(255) default NULL,
-  document_privacy     	 int(2) not null default '0',
+  document_privacy     	 int(2) not null default 0,
   document_path        	 text default NULL,
   document_size        	 int(15) default NULL,
   PRIMARY KEY (document_id)
@@ -798,7 +800,7 @@ CREATE TABLE DocumentEntity (
 -- Table structure for table 'Project'
 --
 CREATE TABLE Project (
-  project_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  project_id             int(8) DEFAULT 0 NOT NULL auto_increment,
   project_timeupdate     timestamp(14),
   project_timecreate     timestamp(14),
   project_userupdate     int(8),
@@ -823,7 +825,7 @@ CREATE TABLE Project (
 -- Table structure for table 'ProjectTask'
 --
 CREATE TABLE ProjectTask (
-  projecttask_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  projecttask_id             int(8) DEFAULT 0 NOT NULL auto_increment,
   projecttask_project_id     int(8) NOT NULL,
   projecttask_timeupdate     timestamp(14),
   projecttask_timecreate     timestamp(14),
@@ -841,7 +843,7 @@ CREATE TABLE ProjectTask (
 -- Table structure for table 'ProjectUser'
 --
 CREATE TABLE ProjectUser (
-  projectuser_id              int(8) DEFAULT '0' NOT NULL auto_increment,
+  projectuser_id              int(8) DEFAULT 0 NOT NULL auto_increment,
   projectuser_project_id      int(8) NOT NULL,
   projectuser_user_id         int(8) NOT NULL,
   projectuser_projecttask_id  int(8),
@@ -1089,7 +1091,7 @@ CREATE TABLE Invoice (
   invoice_label             varchar(40) NOT NULL DEFAULT '',
   invoice_amount_ht         double(10,2),
   invoice_amount_ttc        double(10,2),
-  invoice_status_id         int(4) DEFAULT '0' NOT NULL,
+  invoice_status_id         int(4) DEFAULT 0 NOT NULL,
   invoice_date              date not NULL DEFAULT '0000-00-00',
   invoice_expiration_date   date,
   invoice_payment_date      date,
@@ -1105,8 +1107,8 @@ CREATE TABLE Invoice (
 --
 CREATE TABLE InvoiceStatus (
   invoicestatus_id       int(8) NOT NULL auto_increment,
-  invoicestatus_payment  int(1) DEFAULT '0' NOT NULL,
-  invoicestatus_archive  int(1) DEFAULT '0' NOT NULL,
+  invoicestatus_payment  int(1) DEFAULT 0 NOT NULL,
+  invoicestatus_archive  int(1) DEFAULT 0 NOT NULL,
   invoicestatus_label    varchar(24) default '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
@@ -1167,7 +1169,7 @@ CREATE TABLE PaymentInvoice (
 -- New table 'Account'
 --
 CREATE TABLE Account (
-  account_id	      int(8) DEFAULT '0' NOT NULL auto_increment,
+  account_id	      int(8) DEFAULT 0 NOT NULL auto_increment,
   account_timeupdate  timestamp(14),
   account_timecreate  timestamp(14),
   account_userupdate  int(8),
@@ -1190,7 +1192,7 @@ CREATE TABLE Account (
 -- New table 'EntryTemp'
 --
 CREATE TABLE EntryTemp (
-  entrytemp_id        int(8) not null default '0' auto_increment,
+  entrytemp_id        int(8) not null default 0 auto_increment,
   entrytemp_label     varchar(40),
   entrytemp_amount    double(10,2) not null default '0.00',
   entrytemp_type      varchar(100),
@@ -1238,7 +1240,9 @@ CREATE TABLE UGroup (
   group_timecreate  timestamp(14),
   group_userupdate  int(8),
   group_usercreate  int(8),
-  group_system      int(1) DEFAULT '0',
+  group_system      int(1) DEFAULT 0,
+  group_local       int(1) DEFAULT 1,
+  group_ext_id      int(8),
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
@@ -1251,8 +1255,8 @@ CREATE TABLE UGroup (
 -- Table structure for table 'UserObmGroup'
 --
 CREATE TABLE UserObmGroup (
-  userobmgroup_group_id    int(8) DEFAULT '0' NOT NULL,
-  userobmgroup_userobm_id  int(8) DEFAULT '0' NOT NULL
+  userobmgroup_group_id    int(8) DEFAULT 0 NOT NULL,
+  userobmgroup_userobm_id  int(8) DEFAULT 0 NOT NULL
 );
 
 
@@ -1260,8 +1264,8 @@ CREATE TABLE UserObmGroup (
 -- Table structure for table 'GroupGroup'
 --
 CREATE TABLE GroupGroup (
-  groupgroup_parent_id  int(8) DEFAULT '0' NOT NULL,
-  groupgroup_child_id   int(8) DEFAULT '0' NOT NULL
+  groupgroup_parent_id  int(8) DEFAULT 0 NOT NULL,
+  groupgroup_child_id   int(8) DEFAULT 0 NOT NULL
 );
 
 
@@ -1272,7 +1276,7 @@ CREATE TABLE GroupGroup (
 -- Table structure for table 'Import'
 --
 CREATE TABLE Import (
-  import_id                   int(8) DEFAULT '0' NOT NULL auto_increment,
+  import_id                   int(8) DEFAULT 0 NOT NULL auto_increment,
   import_timeupdate           timestamp(14),
   import_timecreate           timestamp(14),
   import_userupdate           int(8),

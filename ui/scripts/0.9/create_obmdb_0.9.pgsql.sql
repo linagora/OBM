@@ -55,7 +55,7 @@ CREATE TABLE ActiveUserObm (
   activeuserobm_userobm_id     integer DEFAULT NULL,
   activeuserobm_timeupdate     timestamp,
   activeuserobm_timecreate     timestamp,
-  activeuserobm_nb_connexions  integer NOT NULL DEFAULT '0',
+  activeuserobm_nb_connexions  integer NOT NULL DEFAULT 0,
   activeuserobm_lastpage       varchar(64) NOT NULL DEFAULT '0',
   activeuserobm_ip             varchar(32) NOT NULL DEFAULT '0',
   PRIMARY KEY (activeuserobm_sid)
@@ -71,7 +71,7 @@ CREATE TABLE UserObm_SessionLog (
   userobm_sessionlog_userobm_id     integer DEFAULT NULL,
   userobm_sessionlog_timeupdate     timestamp,
   userobm_sessionlog_timecreate     timestamp,
-  userobm_sessionlog_nb_connexions  integer NOT NULL DEFAULT '0',
+  userobm_sessionlog_nb_connexions  integer NOT NULL DEFAULT 0,
   userobm_sessionlog_lastpage       varchar(32) NOT NULL DEFAULT '0',
   userobm_sessionlog_ip             varchar(32) NOT NULL DEFAULT '0',
   PRIMARY KEY (userobm_sessionlog_sid)
@@ -87,6 +87,8 @@ CREATE TABLE UserObm (
   userobm_timecreate      TIMESTAMP,
   userobm_userupdate      integer,
   userobm_usercreate      integer,
+  userobm_local           integer DEFAULT 1,
+  userobm_ext_id          varchar(16),
   userobm_login           varchar(32) DEFAULT '' NOT NULL,
   userobm_password        varchar(32) DEFAULT '' NOT NULL,
   userobm_perms           varchar(254),
@@ -95,7 +97,11 @@ CREATE TABLE UserObm (
   userobm_lastname        varchar(32),
   userobm_firstname       varchar(32),
   userobm_phone           varchar(32),
+  userobm_phone2          varchar(32),
+  userobm_fax             varchar(32),
+  userobm_fax2            varchar(32),
   userobm_email           varchar(60),
+  userobm_description     varchar(255),
   userobm_timelastaccess  TIMESTAMP,
   PRIMARY KEY (userobm_id),
   UNIQUE (userobm_login)
@@ -107,7 +113,7 @@ CREATE UNIQUE INDEX k_login_user_UserObm_index ON UserObm (userobm_login);
 -- Table structure for table 'UserObmPref'
 --
 CREATE TABLE UserObmPref (
-  userobmpref_user_id  integer DEFAULT '0' NOT NULL,
+  userobmpref_user_id  integer DEFAULT 0 NOT NULL,
   userobmpref_option   varchar(50) NOT NULL,
   userobmpref_value    varchar(50) NOT NULL
 );
@@ -117,11 +123,11 @@ CREATE TABLE UserObmPref (
 -- New table 'DisplayPref'
 --
 CREATE TABLE DisplayPref (
-  display_user_id     integer NOT NULL DEFAULT '0',
+  display_user_id     integer NOT NULL DEFAULT 0,
   display_entity      varchar(32) NOT NULL DEFAULT '',
   display_fieldname   varchar(64) NOT NULL DEFAULT '',
   display_fieldorder  integer DEFAULT NULL,
-  display_display     integer NOT NULL DEFAULT '1',
+  display_display     integer NOT NULL DEFAULT 1,
   PRIMARY KEY(display_user_id, display_entity, display_fieldname)
 );
 create INDEX DisplayPref_user_id_index ON DisplayPref (display_user_id);
@@ -201,7 +207,7 @@ CREATE TABLE CompanyNafCode (
   companynafcode_timecreate  timestamp,
   companynafcode_userupdate  integer,
   companynafcode_usercreate  integer,
-  companynafcode_title       integer NOT NULL DEFAULT '0',
+  companynafcode_title       integer NOT NULL DEFAULT 0,
   companynafcode_code        varchar(4),
   companynafcode_label       varchar(128),
   PRIMARY KEY (companynafcode_id)
@@ -255,7 +261,7 @@ CREATE TABLE CompanyCategory (
   companycategory_timeupdate  TIMESTAMP,
   companycategory_timecreate  TIMESTAMP,
   companycategory_userupdate  integer,
-  companycategory_usercreate  integer NOT NULL default '0',
+  companycategory_usercreate  integer NOT NULL default 0,
   companycategory_code        varchar(10) NOT NULL default '',
   companycategory_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (companycategory_id)
@@ -266,8 +272,8 @@ CREATE TABLE CompanyCategory (
 -- Table structure for table 'CompanyCategoryLink'
 --
 CREATE TABLE CompanyCategoryLink (
-  companycategorylink_category_id  integer NOT NULL default '0',
-  companycategorylink_company_id   integer NOT NULL default '0',
+  companycategorylink_category_id  integer NOT NULL default 0,
+  companycategorylink_company_id   integer NOT NULL default 0,
   PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
 );
 
@@ -308,7 +314,7 @@ CREATE TABLE Contact (
   contact_email2               varchar(128),
   contact_mailing_ok           char(1) DEFAULT '0',
   contact_archive              char(1) DEFAULT '0',
-  contact_privacy              integer DEFAULT '0',
+  contact_privacy              integer DEFAULT 0,
   contact_comment              text,
   PRIMARY KEY (contact_id)
 );
@@ -431,7 +437,7 @@ CREATE TABLE Deal (
   deal_parentdeal_id        integer,
   deal_type_id              integer,
   deal_tasktype_id          integer,
-  deal_company_id           integer DEFAULT '0' NOT NULL,
+  deal_company_id           integer DEFAULT 0 NOT NULL,
   deal_contact1_id          integer,
   deal_contact2_id          integer,
   deal_marketingmanager_id  integer,
@@ -443,7 +449,7 @@ CREATE TABLE Deal (
   deal_datealarm            date,
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
-  deal_privacy              integer DEFAULT '0',
+  deal_privacy              integer DEFAULT 0,
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );
@@ -498,7 +504,7 @@ CREATE TABLE DealCategory (
 --
 CREATE TABLE DealCategoryLink (
   dealcategorylink_category_id  integer NOT NULL default 0,
-  dealcategorylink_deal_id   integer NOT NULL default 0,
+  dealcategorylink_deal_id      integer NOT NULL default 0,
   PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
 );
 
@@ -515,7 +521,7 @@ CREATE TABLE List (
   list_timecreate  	 TIMESTAMP,
   list_userupdate  	 integer,
   list_usercreate  	 integer,
-  list_privacy     	 integer DEFAULT '0',
+  list_privacy     	 integer DEFAULT 0,
   list_name        	 varchar(64) NOT NULL,
   list_subject     	 varchar(128),
   list_email       	 varchar(128),
@@ -535,8 +541,8 @@ CREATE TABLE List (
 -- Table structure for table 'ContactList'
 --
 CREATE TABLE ContactList (
-  contactlist_list_id     integer DEFAULT '0' NOT NULL,
-  contactlist_contact_id  integer DEFAULT '0' NOT NULL
+  contactlist_list_id     integer DEFAULT 0 NOT NULL,
+  contactlist_contact_id  integer DEFAULT 0 NOT NULL
 );
 
 
@@ -544,58 +550,41 @@ CREATE TABLE ContactList (
 -- Calendar module tables
 -------------------------------------------------------------------------------
 --
--- Table structure for the table  'CalendarUser'
+-- Table structure for the table  'CalendarSegment'
 --
-CREATE TABLE CalendarUser (
-  calendaruser_timeupdate   timestamp,
-  calendaruser_timecreate   timestamp,
-  calendaruser_userupdate   integer default NULL,
-  calendaruser_usercreate   integer default NULL,
-  calendaruser_user_id      integer NOT NULL default '0',
-  calendaruser_event_id     integer NOT NULL default '0',
-  calendaruser_state        char(1) NOT NULL default '',
-  calendaruser_required     integer NOT NULL default '0',
-  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
+CREATE TABLE CalendarSegment (
+  calendarsegment_eventid     integer NOT NULL DEFAULT '0',
+  calendarsegment_customerid  integer NOT NULL DEFAULT '0',
+  calendarsegment_date        TIMESTAMP NOT NULL,
+  calendarsegment_flag        varchar(5) NOT NULL DEFAULT '',
+  calendarsegment_type        varchar(5) NOT NULL DEFAULT '',
+  calendarsegment_state       char(1) NOT NULL DEFAULT '''',
+  PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
 );
 
---
--- Table structure for the table  'CalendarException'
---
-CREATE TABLE CalendarException (
-  calendarexception_timeupdate   timestamp,
-  calendarexception_timecreate   timestamp,
-  calendarexception_userupdate   integer default NULL,
-  calendarexception_usercreate   integer default NULL,
-  calendarexception_event_id integer    NOT NULL,
-  calendarexception_date         timestamp NOT NULL,
-  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
-);
 
 --
--- Table structure for table 'CalendarEvent'
+-- Table structure for the table  'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
   calendarevent_id           serial,
-  calendarevent_timeupdate   timestamp,
-  calendarevent_timecreate   timestamp,
-  calendarevent_userupdate   integer default NULL,
-  calendarevent_usercreate   integer default NULL,
-  calendarevent_owner        integer NOT NULL, 
-  calendarevent_title        varchar(255) default NULL,
+  calendarevent_timeupdate   TIMESTAMP,
+  calendarevent_timecreate   TIMESTAMP,
+  calendarevent_userupdate   integer DEFAULT NULL,
+  calendarevent_usercreate   integer DEFAULT NULL,
+  calendarevent_title        varchar(255) DEFAULT NULL,
   calendarevent_description  text,
-  calendarevent_category_id  integer default NULL,
-  calendarevent_priority     integer default NULL,
-  calendarevent_privacy      integer NOT NULL default '0',
-  calendarevent_date         timestamp NOT NULL,
-  calendarevent_duration     integer NOT NULL default '0',
-  calendarevent_allday	     integer NOT NULL default '0',
-  calendarevent_repeatkind   varchar(20) default NULL,
-  calendarevent_repeatfrequence  integer default NULL,
-  calendarevent_repeatdays   varchar(7) default NULL,
-  calendarevent_endrepeat    timestamp NOT NULL,
+  calendarevent_category_id  integer DEFAULT NULL,
+  calendarevent_priority     integer DEFAULT NULL,
+  calendarevent_privacy      integer DEFAULT NULL,
+  calendarevent_length       integer NOT NULL DEFAULT 0,
+  calendarevent_repeatkind   varchar(20) DEFAULT NULL,
+  calendarevent_repeatdays   varchar(7) DEFAULT NULL,
+  calendarevent_endrepeat    TIMESTAMP NOT NULL,
   PRIMARY KEY (calendarevent_id)
-)
+);
 
+    
 --
 -- Table structure for table 'CalendarCategory'
 --
@@ -614,12 +603,27 @@ CREATE TABLE CalendarCategory (
 -- Table structure for table 'CalendarRight'
 --
 CREATE TABLE CalendarRight (
-  calendarright_ownerid     integer NOT NULL DEFAULT '0',
-  calendarright_customerid  integer NOT NULL DEFAULT '0',
-  calendarright_write       integer NOT NULL DEFAULT '0',
-  calendarright_read        integer NOT NULL DEFAULT '0',
+  calendarright_ownerid     integer NOT NULL DEFAULT 0,
+  calendarright_customerid  integer NOT NULL DEFAULT 0,
+  calendarright_write       integer NOT NULL DEFAULT 0,
+  calendarright_read        integer NOT NULL DEFAULT 0,
   PRIMARY KEY (calendarright_ownerid,calendarright_customerid)
 );
+
+
+--
+-- structure fot table 'RepeatKind'
+--
+CREATE TABLE RepeatKind (
+  repeatkind_id          serial,
+  repeatkind_timeupdate  TIMESTAMP,
+  repeatkind_timecreate  TIMESTAMP,
+  repeatkind_userupdate  integer,
+  repeatkind_usercreate  integer,
+  repeatkind_label       varchar(128),
+  PRIMARY KEY(repeatkind_id)	
+);
+
 
 -------------------------------------------------------------------------------
 -- Todo
@@ -728,10 +732,10 @@ CREATE TABLE Document (
   document_name        	 varchar(255) DEFAULT NULL,
   document_kind        	 integer DEFAULT NULL,
   document_mimetype    	 varchar(255) DEFAULT NULL,
-  document_category1_id  integer NOT NULL DEFAULT '0',
-  document_category2_id  integer NOT NULL DEFAULT '0',
+  document_category1_id  integer NOT NULL DEFAULT 0,
+  document_category2_id  integer NOT NULL DEFAULT 0,
   document_author      	 varchar(255) DEFAULT NULL,
-  document_privacy     	 integer NOT NULL DEFAULT '0',
+  document_privacy     	 integer NOT NULL DEFAULT 0,
   document_path        	 text DEFAULT NULL,
   document_size        	 integer DEFAULT NULL,
   PRIMARY KEY (document_id)
@@ -1091,7 +1095,7 @@ CREATE TABLE Invoice (
   invoice_label            varchar(40) NOT NULL DEFAULT '',
   invoice_amount_ht        DECIMAL(10,2),
   invoice_amount_ttc       DECIMAL(10,2),
-  invoice_status_id        integer DEFAULT '0' NOT NULL,
+  invoice_status_id        integer DEFAULT 0 NOT NULL,
   invoice_date             date,
   invoice_expiration_date  date,
   invoice_payment_date     date,
@@ -1107,8 +1111,8 @@ CREATE TABLE Invoice (
 --
 CREATE TABLE InvoiceStatus (
   invoicestatus_id       serial,
-  invoicestatus_payment  integer DEFAULT '0' NOT NULL,
-  invoicestatus_archive  integer DEFAULT '0' NOT NULL,
+  invoicestatus_payment  integer DEFAULT 0 NOT NULL,
+  invoicestatus_archive  integer DEFAULT 0 NOT NULL,
   invoicestatus_label    varchar(24) DEFAULT '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
@@ -1243,7 +1247,9 @@ CREATE TABLE UGroup (
   group_timecreate  timestamp,
   group_userupdate  integer,
   group_usercreate  integer,
-  group_system      integer DEFAULT '0',
+  group_local       integer DEFAULT 1,
+  group_ext_id      integer,
+  group_system      integer DEFAULT 0,
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
@@ -1256,8 +1262,8 @@ CREATE TABLE UGroup (
 -- Table structure for table 'UserObmGroup'
 --
 CREATE TABLE UserObmGroup (
-  userobmgroup_group_id    integer DEFAULT '0' NOT NULL,
-  userobmgroup_userobm_id  integer DEFAULT '0' NOT NULL
+  userobmgroup_group_id    integer DEFAULT 0 NOT NULL,
+  userobmgroup_userobm_id  integer DEFAULT 0 NOT NULL
 );
 
 
@@ -1265,8 +1271,8 @@ CREATE TABLE UserObmGroup (
 -- Table structure for table 'GroupGroup'
 --
 CREATE TABLE GroupGroup (
-  groupgroup_parent_id  integer DEFAULT '0' NOT NULL,
-  groupgroup_child_id   integer DEFAULT '0' NOT NULL
+  groupgroup_parent_id  integer DEFAULT 0 NOT NULL,
+  groupgroup_child_id   integer DEFAULT 0 NOT NULL
 );
 
 

@@ -16,10 +16,30 @@ UPDATE ObmInfo set obminfo_value='0.9.0' where obminfo_name='db_version';
 -------------------------------------------------------------------------------
 DROP TABLE GlobalPref;
 
+
 -------------------------------------------------------------------------------
 -- RepeatKind table drop 
 -------------------------------------------------------------------------------
 DROP TABLE RepeatKind;
+
+
+-------------------------------------------------------------------------------------------------------------------------
+-- Update User and Group tables
+-------------------------------------------------------------------------------
+-- Add column _local
+ALTER TABLE UserObm ADD COLUMN userobm_local integer DEFAULT 1;
+ALTER TABLE UGroup ADD COLUMN group_local integer DEFAULT 1;
+
+-- Add column _ext_id
+ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16);
+ALTER TABLE UGroup ADD COLUMN group_ext_id varchar(16);
+
+-- User phone2, fax, fax2 and description
+ALTER TABLE UserObm ADD COLUMN userobm_phone2 varchar(32);
+ALTER TABLE UserObm ADD COLUMN userobm_fax varchar(32);
+ALTER TABLE UserObm ADD COLUMN userobm_fax2 varchar(32);
+ALTER TABLE UserObm ADD COLUMN userobm_description varchar(255);
+
 
 -------------------------------------------------------------------------------
 -- Update Contract tables
