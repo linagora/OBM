@@ -102,7 +102,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   // debug :
   global $border, $cellspacing;
   // themes :
-  global $set_theme, $col_label, $coltextem, $col_ok;
+  global $set_theme, $col_label, $coltextem, $col_ok, $c_all;
   // labels :
   global $display;
   global $l_insert, $l_update, $l_delete, $l_bank, $l_add_invoices;
@@ -138,12 +138,50 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   
   // if the payment has been banked, or during banking,
   // some fields are no more updatable...
-  if (($p_action == "detailupdate") && ($q_payment->f("payment_paid"))) {
+  if (($p_action == "detailupdate") && ($q_payment->f("payment_paid")))
     $readonly = " disabled " ;
-  } else {
+  else
     $readonly = ""; // useless, because php would have understood "" by itself,
-    // be code is so much clearer with...
+
+  // Kind select
+  $sel_kind = "
+    <select name=\"sel_kind\" $readonly>
+     <option value=\"$c_all\">$l_pick_paymentkind</option>\n";
+
+  while ($q_paymentkind->next_record()) {
+    $p_id = $q_paymentkind->f("paymentkind_id");
+    $p_label = $q_paymentkind->f("paymentkind_longlabel");
+
+    $pselect = ($type == $p_id) ? "selected" : "";
+    $sel_kind .= "<option value=\"$p_id\" $pselect>$p_label</option>\n";
+  };
+
+  $sel_kind .= "</select>";
+
+  // Account select
+  $sel_account ="
+    <select name=\"sel_account\" $readonly>
+     <option value=\"$c_all\">$l_pick_account</option>\n";
+
+  while ($q_account->next_record()) {
+    $a_id = $q_account->f("account_id");
+    $a_label = $q_account->f("account_label");
+
+    $aselect = ($a_id == $account) ? "selected" : "";
+    $sel_account .= "<option value=\"$a_id\" $aselect>$a_label</option>";
   }
+  $sel_account .= "</select>";
+
+  // Type radio
+  if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices") {
+    $pcheck = ($q_payment->f("payment_inout")=='+') ? "checked" : "";
+    $mcheck = ($q_payment->f("payment_inout")=='-') ? "checked" : "";
+  }
+
+  $rd_type = "
+    <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck $readonly/>$l_client &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck $readonly/>$l_fournisseur &nbsp;
+    ";
 
   // various form actions :
   $url_banking = url_prepare("payment_index.php?action=check_banking");
@@ -151,162 +189,218 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   $url_deleting = url_prepare("payment_index.php?action=delete");
   $url_updating = url_prepare("payment_index.php?action=update");
 
-  $block .=  "<center>";
   // we do different check if we are creating/updating or banking the payment :
   if (($p_action == "new") || ($p_action == "duplicate") ) {
     // creating/duplicating
     $block .=  "
   <form name=\"form_create_payment\" method=\"post\" action=\"$url_creating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
-    } elseif ($p_action == "detailupdate") {
+  } elseif ($p_action == "detailupdate") {
       $block .=  "
   <form name=\"form_create_payment\" method=\"post\" action=\"$url_updating\" onsubmit=\"if (check_payment (this)) return true; else return false ;\">";
-    } elseif ($p_action == "add_invoices") {
+  } elseif ($p_action == "add_invoices") {
       // banking
       $block .=  "
   <FORM name=\"form_add_invoices\" method=\"post\" action=\"$url_banking\" onsubmit=\"if (check_payment_banking (this)) return true; else return false ;\">";
   } else {
     $display["msg"] .= display_err_msg ("unhandled action value '".$p_action."' in html_payment_form ()");
   }
-  
-  $block .= "
-  <table border=\"$border\" cellspacing=\"$cellspacing\">
-   <tr><td>
-    <font color=\"#$col_label\">$l_label</font><br>
-    <input type=\"text\" name=\"tf_label\" size=40 value=\"".$label."\">
-   </td></tr>
-   <tr><td>
-    <FONT COLOR=\"#$col_label\">$l_number</FONT><BR>
-    <INPUT TYPE=\"text\" NAME=\"tf_number\" size=10 value=\"".$number."\" $readonly>
-   </TD></TR>
-   <TR><TD>
-    <FONT COLOR=\"#$col_label\">$l_amount</FONT><BR>
-    <INPUT TYPE=\"text\" NAME=\"tf_amount\" size=10 value=\"".$amount."\" $readonly>
-   </TD></TR>
-   <TR><TD>
-    <TABLE WIDTH=\"100%\" BORDER=$border CELLSPACING=$cellspacing>
-     <TR><TD>
-      <FONT COLOR=\"#$col_label\">$l_expected_date</FONT><BR>
-      <INPUT TYPE=\"text\" NAME=\"tf_expected_date\" size=10 value=\"".$expected_date."\">
-     </TD><TD>
-      <FONT COLOR=\"#$col_label\">$l_date</FONT><BR>
-      <INPUT TYPE=\"text\" NAME=\"tf_date\" size=10 value=\"$date\" $readonly>
-     </TD></TR>
-    </TABLE>
-   </TD></TR>
-   <TR>
-  <td>
-    <table width=\"100%\" cellspacing=$cellspacing border=$border>
-     <tr><td>
-     <font color=\"#$col_label\">$l_type</font><br>
-     <select name=\"sel_kind\" $readonly>
-      <option value=\"-1\"";
-  if ($p_action == "new") {
-    $block .=  " selected";
-  }
-  $block .= ">$l_pick_paymentkind";
-  while ($q_paymentkind->next_record()) {
-    $block .=  "\n<OPTION value=\"".$q_paymentkind->f("paymentkind_id")."\"";
-    if ($type == $q_paymentkind->f("paymentkind_id")){
-      $block .=  " selected";
-    }
-    $block .=  ">".$q_paymentkind->f("paymentkind_longlabel");
-  }
-  
-  $block .=  "
-     </select>
-    </td>    <td>
-     <font color=\"#$col_label\">$l_account</font><br>
-     <select name=\"sel_account\" $readonly>
-      <option value=\"-1\"";
-  if ($p_action == "new") {
-    $block .= " selected";
-  }
-  $block .= ">$l_pick_account";
-  while ($q_account->next_record()) {
-    $block .= "\n<option value=\"".$q_account->f("account_id")."\"";
-    if ($account == $q_account->f("account_id")) {
-      $block .= "selected";
-    }
-    $block .= ">".$q_account->f("account_label");
-  }
- $block .= "
-     </select>
-    </td>
-   </tr>
-   </table>";
-  // radio buttons inout
-  // not needed when banking...
-  if ($p_action != "add_invoices") {
-    $block .= "<tr>
-      <td><font color=\"#$col_label\">$l_inout</font>
-        <br>
-        <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
-    if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices") {
-      if ($q_payment->f("payment_inout")=='+') {
-	$block .= " checked";
-      }
-    }
-    $block .= " $readonly>$l_client &nbsp;
-      <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
-    if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices"){
-      if ($q_payment->f("payment_inout")=='-'){
-	$block .= " checked";
-      }
-    }
-    $block .= " $readonly>$l_fournisseur &nbsp;
-      </td></tr>";
-  }
-  if (($p_action != "new" && ($p_action != "new_with_invoices"))) {
-    // we need that, but not shown 
-    $block .= "
-  <input type=hidden name=\"hd_param_payment\" ".
-      " value=\"".$q_payment->f("payment_id")."\">";
-  }
-  // comment :
- $block .= "
-   <tr><td>
-    <font color=\"#$col_label\">$l_comment</font><br>
-    <textarea name=ta_comment rows=6 cols=72>".$comment."</textarea>
-   </td></tr>"; 
 
-  // buttons, number and function depending on the current action
   $block .= "
-   <tr><td align=\"center\">
-    <br>";
-  if ( ($p_action =="new") || ($p_action =="duplicate") ) {
-    $block .= "
-      <table border=$border cellspacing=$cellspacing>
-      <tr><td>
-       <input type=\"submit\" value=\"$l_insert\">
-      </td><td>";
-    $new_action = url_prepare("payment_index.php?action=new_with_invoices");
-    $block .= "
-      <input type=\"button\" value=\"$l_add_invoices\" ".
-      "onClick=\"if (check_payment(this.form)) {this.form.action='$new_action'; this.form.submit();} else { return false; }\">
-    </td></tr>
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailForm\">
+       <input type=\"text\" name=\"tf_label\" size=40 value=\"$label\">
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailForm\">
+       <input type=\"text\" name=\"tf_number\" size=10 value=\"$number\" $readonly>
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_amount</td>
+      <td class=\"detailForm\">
+       <input type=\"text\" name=\"tf_amount\" size=10 value=\"$amount\" $readonly>
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_expected_date</td>
+      <td class=\"detailForm\">
+       <input type=\"text\" name=\"tf_expected_date\" size=10 value=\"$expected_date\">
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailForm\">
+       <input type=\"text\" name=\"tf_date\" size=10 value=\"$date\" $readonly>
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_type</td>
+      <td class=\"detailForm\">
+       $sel_kind
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_account</td>
+      <td class=\"detailForm\">
+       $sel_account
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_inout</td>
+      <td class=\"detailForm\">
+       $rd_type
+      </td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailForm\">
+       <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea>
+      </td>
+     <tr>
     </table>
-  </table>  
-";
-  } elseif ($p_action =="detailupdate") { // two buttons : update/delete
-    $block .= "
-     <table cellspacing=\"$cellspacing\" border=\"$border\">
-      <tr><td>
-       <input type=\"submit\" value=\"$l_update\">
-           </form> 
-      </td><td valign=\"top\"> 
-       <form method=\"post\" name=\"form_payment_delete\" onSubmit=\"return (valider_suppression());\" action=\"$url_deleting\">
-        <input type=\"submit\" value=\"$l_delete\" $readonly>
-        <input type=\"hidden\" name=\"hd_param_payment\" value=\"".$q_payment->f("payment_id")."\">
-      </td></tr>
-     </table>
-  </table>  
-  </form>";
-  } elseif ($p_action == "add_invoices") {
-    // no buttons, we got invoices to check
-    // below this form (cf. html_payment_affect_invoices ())
-  }
-  $block .= "</table>
-</center>";   
+
+    <div class=\"detailButton\">
+     <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    ";
+
+  // bcontins obsolete partie a nico
+  ///////////////////////////////////////////////////////////  
+  //   $block .= "
+  //   <table border=\"$border\" cellspacing=\"$cellspacing\">
+  //    <tr><td>
+  //     <font color=\"#$col_label\">$l_label</font><br>
+  //     <input type=\"text\" name=\"tf_label\" size=40 value=\"".$label."\">
+  //    </td></tr>
+  //    <tr><td>
+  //     <FONT COLOR=\"#$col_label\">$l_number</FONT><BR>
+  //     <INPUT TYPE=\"text\" NAME=\"tf_number\" size=10 value=\"".$number."\" $readonly>
+  //    </TD></TR>
+  //    <TR><TD>
+  //     <FONT COLOR=\"#$col_label\">$l_amount</FONT><BR>
+  //     <INPUT TYPE=\"text\" NAME=\"tf_amount\" size=10 value=\"".$amount."\" $readonly>
+  //    </TD></TR>
+  //    <TR><TD>
+  //     <TABLE WIDTH=\"100%\" BORDER=$border CELLSPACING=$cellspacing>
+  //      <TR><TD>
+  //       <FONT COLOR=\"#$col_label\">$l_expected_date</FONT><BR>
+  //       <INPUT TYPE=\"text\" NAME=\"tf_expected_date\" size=10 value=\"".$expected_date."\">
+  //      </TD><TD>
+  //       <FONT COLOR=\"#$col_label\">$l_date</FONT><BR>
+  //       <INPUT TYPE=\"text\" NAME=\"tf_date\" size=10 value=\"$date\" $readonly>
+  //      </TD></TR>
+  //     </TABLE>
+  //    </TD></TR>
+  //    <TR>
+  //   <td>
+  //     <table width=\"100%\" cellspacing=$cellspacing border=$border>
+  //      <tr><td>
+  //      <font color=\"#$col_label\">$l_type</font><br>
+  //      <select name=\"sel_kind\" $readonly>
+  //       <option value=\"-1\"";
+  //   if ($p_action == "new") {
+  //     $block .=  " selected";
+  //   }
+  //   $block .= ">$l_pick_paymentkind";
+  //   while ($q_paymentkind->next_record()) {
+  //     $block .=  "\n<OPTION value=\"".$q_paymentkind->f("paymentkind_id")."\"";
+  //     if ($type == $q_paymentkind->f("paymentkind_id")){
+  //       $block .=  " selected";
+  //     }
+  //     $block .=  ">".$q_paymentkind->f("paymentkind_longlabel");
+  //   }
+  
+  //   $block .=  "
+  //      </select>
+  //     </td>    <td>
+  //      <font color=\"#$col_label\">$l_account</font><br>
+  //      <select name=\"sel_account\" $readonly>
+  //       <option value=\"-1\"";
+  //   if ($p_action == "new") {
+  //     $block .= " selected";
+  //   }
+  //   $block .= ">$l_pick_account";
+  //   while ($q_account->next_record()) {
+  //     $block .= "\n<option value=\"".$q_account->f("account_id")."\"";
+  //     if ($account == $q_account->f("account_id")) {
+  //       $block .= "selected";
+  //     }
+  //     $block .= ">".$q_account->f("account_label");
+  //   }
+  //  $block .= "
+  //      </select>
+  //     </td>
+  //    </tr>
+  //    </table>";
+  //   // radio buttons inout
+  //   // not needed when banking...
+  //   if ($p_action != "add_invoices") {
+  //     $block .= "<tr>
+  //       <td><font color=\"#$col_label\">$l_inout</font>
+  //         <br>
+  //         <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
+  //     if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices") {
+  //       if ($q_payment->f("payment_inout")=='+') {
+  // 	$block .= " checked";
+  //       }
+  //     }
+  //     $block .= " $readonly>$l_client &nbsp;
+  //       <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
+  //     if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices"){
+  //       if ($q_payment->f("payment_inout")=='-'){
+  // 	$block .= " checked";
+  //       }
+  //     }
+  //     $block .= " $readonly>$l_fournisseur &nbsp;
+  //       </td></tr>";
+  //   }
+  //   if (($p_action != "new" && ($p_action != "new_with_invoices"))) {
+  //     // we need that, but not shown 
+  //     $block .= "
+  //   <input type=hidden name=\"hd_param_payment\" ".
+  //       " value=\"".$q_payment->f("payment_id")."\">";
+  //   }
+  //   // comment :
+  //  $block .= "
+  //    <tr><td>
+  //     <font color=\"#$col_label\">$l_comment</font><br>
+  //     <textarea name=ta_comment rows=6 cols=72>".$comment."</textarea>
+  //    </td></tr>"; 
+
+  //   // buttons, number and function depending on the current action
+  //   $block .= "
+  //    <tr><td align=\"center\">
+  //     <br>";
+  //   if ( ($p_action =="new") || ($p_action =="duplicate") ) {
+  //     $block .= "
+  //       <table border=$border cellspacing=$cellspacing>
+  //       <tr><td>
+  //        <input type=\"submit\" value=\"$l_insert\">
+  //       </td><td>";
+  //     $new_action = url_prepare("payment_index.php?action=new_with_invoices");
+  //     $block .= "
+  //       <input type=\"button\" value=\"$l_add_invoices\" ".
+  //       "onClick=\"if (check_payment(this.form)) {this.form.action='$new_action'; this.form.submit();} else { return false; }\">
+  //     </td></tr>
+  //     </table>
+  //   </table>  
+  // ";
+  //   } elseif ($p_action =="detailupdate") { // two buttons : update/delete
+  //     $block .= "
+  //      <table cellspacing=\"$cellspacing\" border=\"$border\">
+  //       <tr><td>
+  //        <input type=\"submit\" value=\"$l_update\">
+  //            </form> 
+  //       </td><td valign=\"top\"> 
+  //        <form method=\"post\" name=\"form_payment_delete\" onSubmit=\"return (valider_suppression());\" action=\"$url_deleting\">
+  //         <input type=\"submit\" value=\"$l_delete\" $readonly>
+  //         <input type=\"hidden\" name=\"hd_param_payment\" value=\"".$q_payment->f("payment_id")."\">
+  //       </td></tr>
+  //      </table>
+  //   </table>  
+  //   </form>";
+  //   } elseif ($p_action == "add_invoices") {
+  //     // no buttons, we got invoices to check
+  //     // below this form (cf. html_payment_affect_invoices ())
+  //   }
+  //   $block .= "</table>
+  // </center>";   
   return $block;
 }
 
@@ -315,6 +409,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
 // payment search form
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payment) {
+  global $l_all, $c_all;
   global $l_label_start, $l_number, $l_amount, $l_date_apres;
   global $l_date_avant, $l_inout, $l_kind, $l_account;
   global $l_deal, $l_company, $l_include_checked;
@@ -333,139 +428,250 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   $paid = $payment["paid"];
   $deal = $payment["deal"];
   $company = $payment["company"];
-  $checked = ($payment["checked"]) ? "checked" : "" ;
+  $ichecked = ($payment["checked"]) ? "checked" : "" ;
+
+  // Inout
+  $bcheck = (($inout == "_TOUT_")||($inout=="")) ? "checked" : "";
+  $pcheck = ($inout == "+") ? "checked" : "";
+  $mcheck = ($inout == "-") ? "checked" : "";
+
+  $rd_inout = "
+    <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\" $bcheck />$l_both &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck />$l_client &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />$l_fournisseur &nbsp;
+    ";
+
+  // Paid
+  $bcheck = (($paid == "_TOUT_")||($paid=="")) ? "checked" : "";
+  $ycheck = ($paid == "y") ? "checked" : "";
+  $ncheck = ($paid == "n") ? "checked" : "";
+
+  $rd_status = "
+    <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\" $bcheck />$l_both &nbsp;
+    <input type=\"radio\" name=\"rd_paid\" value=\"y\" $ycheck />$l_paid &nbsp;
+    <input type=\"radio\" name=\"rd_paid\" value=\"n\" $ncheck />$l_unpaid &nbsp;
+    ";
+
+  // Account select
+  $sel_account ="
+    <select name=\"sel_account\">
+     <option value=\"$c_all\">$l_all</option>\n";
+
+  while ($q_account->next_record()) {
+    $a_id = $q_account->f("account_id");
+    $a_label = $q_account->f("account_label");
+
+    $aselect = ($a_id == $account) ? "selected" : "";
+    $sel_account .= "<option value=\"$a_id\" $aselect>$a_label</option>";
+  }
+  $sel_account .= "</select>";
+  
+  // Kind select
+  $sel_kind ="
+    <select name=\"sel_kind\">
+     <option value=$c_all>$l_all</option>";
+
+  while ($q_paymentkind->next_record()) {
+    $p_id = $q_paymentkind->f("paymentkind_id");
+    $p_label = $q_paymentkind->f("paymentkind_longlabel");
+
+    $pselect = ($p_id == $kind) ? "selected" : "";
+    $sel_kind .= "<option value=\"$p_id\" $aselect>$p_label</option>";
+  }
+  $sel_kind .= "</select>";
 
   $block = "
-   <center>
-    <form method=\"get\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">
-     <table border=$border cellspacing=$cellspacing>
-      <tr><td>
-      <table border=$border cellspacing=$cellspacing width=\"100%\">
-       <tr><td>
-	<table border=$border cellspacing=$cellspacing width=\"100%\">
-         <tr>
-          <td>
-           <font size=-2>$l_label_start</font><br>
-           <input type=text name=tf_label size=20 value=\"$label\">
-          </td>
-          <td>
-           <font size=-2>$l_number</font><br>
-           <input type=text name=tf_number size=12 value=\"$number\">
-          </td>
-          <td>
-           <font size=-2>$l_amount</font><br>
-           <input type=text name=tf_amount size=12 value=\"$amount\">
-          </td>
-         </tr>
-        </table>
-       </td></tr>
-       <tr><td>
-        <table cellspacing=$cellspacing border=$border width=\"100%\">
-         <tr>
-         <td>
-          <font size=-2>$l_date_apres</font><br>
-          <input type=text name=tf_date_after size=12 value=\"$date_after\">
-         </td>
-         <td>
-          <font size=-2>$l_date_avant</font><br>
-          <input type=text name=tf_date_before size=12 value=\"$date_before\">
-         </td>
-        <td>
-          <font size=-2>$l_inout</font><br>
-          <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
-  if (($inout == "_TOUT_")||($inout=="")){
-    $block .= "checked";
-  }
-  $block .= ">$l_both &nbsp;
-    <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
-  if ($inout == "+"){
-    $block .= "checked";
-  }
-  $block .= ">$l_client &nbsp;
-          <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
-  if ($inout == "-"){
-    $block .= "checked";
-  }
-  $block .= ">$l_fournisseur &nbsp;
-        </td></tr>";
-  // Paid or unpaid payments ?
-  $block .= "
-        <tr><td>
-          <font size=-2>$l_status</font>
-          <br>
-          <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\"";
-  if (($paid == "_TOUT_")||($paid=="")){
-    $block .= "checked"; 
-  }
-  $block .= ">$l_both &nbsp;
-          <input type=\"radio\" name=\"rd_paid\" value=\"y\"";
-  if ($paid == "y"){
-    $block .= "checked";
-  }
-  $block .= ">$l_paid &nbsp;
-          <input type=\"radio\" name=\"rd_paid\" value=\"n\"";
-  if ($paid == "n"){
-   $block .= "checked";
-  }
-  $block .=">$l_unpaid &nbsp;";
-  // deal :
-  $block .="
-        </td><td>
-         <font size=\"-2\">$l_deal</font><br>
-         <input type=\"text\" name=\"tf_deal\" value=\"$deal\">
-	 </td>
-	 <td>
-         <font size=\"-2\">$l_company</font><br>
-         <input type=\"text\" name=\"tf_company\" value=\"$company\">
-        </td></tr>
-       </table>
-        </td></tr>
-        <tr><td>
-         <table width=\"100%\" border=$border cellspacing=$cellspacing>
-          <tr><td>
-           <font size=-2>$l_account</font><br>
-           <select name=\"sel_account\">
-           <option value=\"-1\">$l_all";
-  while ($q_account->next_record()) {
-   $block .= "\n\t<option value=\"".$q_account->f("account_id")."\"";
-    if ($q_account->f("account_id") == $account) {
-      $block .= " selected ";
-    }
-    $block .=">".$q_account->f("account_label");
-  }
- $block .= "
-           </select>";
-  // kind of the payment (paymentkind db table)
-    $block .="
-          </td><td>
-           <font size=-2>$l_kind</font><br>
-           <select name=\"sel_kind\">
-            <option value=-1>$l_all";
-  while ($q_paymentkind->next_record()) {
-    $block .="
-            <option value=\"".$q_paymentkind->f("paymentkind_id")."\"";
-    if ($q_paymentkind->f("paymentkind_id") == $kind) {
-      $block .=" selected ";
-    }
-    $block .=">".$q_paymentkind->f("paymentkind_longlabel");
-  }
-  $block .=" 
-           </select> 
-	   </td>
-	   <td>
-           <font size=\"-2\">".$l_include_checked."</font><br>
-           <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $checked>
-          </td></tr>
-         </table>  
-        </td></tr>
-       </table>
-      </td><td valign=center>
-        <input type=hidden name=action value=\"search\">
-        <input type=submit value=".$l_find.">
-      </td></tr>
-     </table>
-    </form><hr>
-   </center>";
+    <form method=\"get\" name=\"form_search_payment\" action=\"payment_index.php?action=search\">
+     <div class=\"search\">
+
+      <div class=\"searchLabel\">$l_label_start<br />
+       <input type=text name=tf_label size=20 value=\"$label\">
+      </div>
+
+      <div class=\"searchLabel\">$l_number<br />
+       <input type=text name=tf_number size=12 value=\"$number\">
+      </div>
+
+      <div class=\"searchLabel\">$l_amount<br />
+       <input type=text name=tf_amount size=12 value=\"$amount\">
+      </div>
+
+      <div class=\"searchLabel\">$l_date_apres<br />
+       <input type=text name=tf_date_after size=12 value=\"$date_after\">
+      </div>
+
+      <div class=\"searchLabel\">$l_date_avant<br />
+       <input type=text name=tf_date_before size=12 value=\"$date_before\">
+      </div>
+
+      <div class=\"searchLabel\">$l_inout<br />
+       $rd_inout
+      </div>
+
+      <div class=\"searchLabel\">$l_status<br />
+       $rd_status
+      </div>
+
+      <div class=\"searchLabel\">$l_deal<br />
+       <input type=\"text\" name=\"tf_deal\" value=\"$deal\" />
+      </div>
+
+      <div class=\"searchLabel\">$l_company<br />
+       <input type=\"text\" name=\"tf_company\" value=\"$company\" />
+      </div>
+
+      <div class=\"searchLabel\"$l_account><br />
+       $sel_account
+      </div>
+
+      <div class=\"searchLabel\">$l_kind<br />
+       $sel_kind
+      </div>
+
+      <div class=\"searchLabel\">$l_include_checked<br />
+       <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $ichecked>
+      </div>
+
+      <div class=\"searchLabel\"><br />
+       <input type=hidden name=action value=\"search\">
+       <input type=submit value=$l_find>  
+      </div>
+
+      <div class=\"searchEnd\"></div>
+     </div>
+    </form>
+    ";
+
+  // bcontins : ancienne version à Nico
+  /////////////////////////////////////////////////////////////////
+  //   $block = "
+  //     <form method=\"get\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">
+  //      <table border=$border cellspacing=$cellspacing>
+  //       <tr><td>
+  //       <table border=$border cellspacing=$cellspacing width=\"100%\">
+  //        <tr><td>
+  // 	<table border=$border cellspacing=$cellspacing width=\"100%\">
+  //          <tr>
+  //           <td>
+  //            <font size=-2>$l_label_start</font><br>
+  //            <input type=text name=tf_label size=20 value=\"$label\">
+  //           </td>
+  //           <td>
+  //            <font size=-2>$l_number</font><br>
+  //            <input type=text name=tf_number size=12 value=\"$number\">
+  //           </td>
+  //           <td>
+  //            <font size=-2>$l_amount</font><br>
+  //            <input type=text name=tf_amount size=12 value=\"$amount\">
+  //           </td>
+  //          </tr>
+  //         </table>
+  //        </td></tr>
+  //        <tr><td>
+  //         <table cellspacing=$cellspacing border=$border width=\"100%\">
+  //          <tr>
+  //          <td>
+  //           <font size=-2>$l_date_apres</font><br>
+  //          </td>
+  //          <td>
+  //           <font size=-2>$l_date_avant</font><br>
+  //          </td>
+  //         <td>
+  //           <font size=-2>$l_inout</font><br>
+  //           <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
+  //   if (($inout == "_TOUT_")||($inout=="")){
+  //     $block .= "checked";
+  //   }
+  //   $block .= ">$l_both &nbsp;
+  //     <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
+  //   if ($inout == "+"){
+  //     $block .= "checked";
+  //   }
+  //   $block .= ">$l_client &nbsp;
+  //           <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
+  //   if ($inout == "-"){
+  //     $block .= "checked";
+  //   }
+  //   $block .= ">$l_fournisseur &nbsp;
+  //         </td></tr>";
+  //   // Paid or unpaid payments ?
+  //   $block .= "
+  //         <tr><td>
+  //           <font size=-2>$l_status</font>
+  //           <br>
+  //           <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\"";
+  //   if (($paid == "_TOUT_")||($paid=="")){
+  //     $block .= "checked"; 
+  //   }
+  //   $block .= ">$l_both &nbsp;
+  //           <input type=\"radio\" name=\"rd_paid\" value=\"y\"";
+  //   if ($paid == "y"){
+  //     $block .= "checked";
+  //   }
+  //   $block .= ">$l_paid &nbsp;
+  //           <input type=\"radio\" name=\"rd_paid\" value=\"n\"";
+  //   if ($paid == "n"){
+  //    $block .= "checked";
+  //   }
+  //   $block .=">$l_unpaid &nbsp;";
+  //   // deal :
+  //   $block .="
+  //         </td><td>
+  //          <font size=\"-2\">$l_deal</font><br>
+  //          <input type=\"text\" name=\"tf_deal\" value=\"$deal\">
+  // 	 </td>
+  // 	 <td>
+  //          <font size=\"-2\">$l_company</font><br>
+  //          <input type=\"text\" name=\"tf_company\" value=\"$company\">
+  //         </td></tr>
+  //        </table>
+  //         </td></tr>
+  //         <tr><td>
+  //          <table width=\"100%\" border=$border cellspacing=$cellspacing>
+  //           <tr><td>
+  //            <font size=-2>$l_account</font><br>
+  //            <select name=\"sel_account\">
+  //            <option value=\"-1\">$l_all";
+  //   while ($q_account->next_record()) {
+  //    $block .= "\n\t<option value=\"".$q_account->f("account_id")."\"";
+  //     if ($q_account->f("account_id") == $account) {
+  //       $block .= " selected ";
+  //     }
+  //     $block .=">".$q_account->f("account_label");
+  //   }
+  //  $block .= "
+  //            </select>";
+  //   // kind of the payment (paymentkind db table)
+  //     $block .="
+  //           </td><td>
+  //            <font size=-2>$l_kind</font><br>
+  //            <select name=\"sel_kind\">
+  //             <option value=-1>$l_all";
+  //   while ($q_paymentkind->next_record()) {
+  //     $block .="
+  //             <option value=\"".$q_paymentkind->f("paymentkind_id")."\"";
+  //     if ($q_paymentkind->f("paymentkind_id") == $kind) {
+  //       $block .=" selected ";
+  //     }
+  //     $block .=">".$q_paymentkind->f("paymentkind_longlabel");
+  //   }
+  //   $block .=" 
+  //            </select> 
+  // 	   </td>
+  // 	   <td>
+  //            <font size=\"-2\">".$l_include_checked."</font><br>
+  //            <input type=\"checkbox\" name=\"cb_checked\" value=\"y\" $checked>
+  //           </td></tr>
+  //          </table>  
+  //         </td></tr>
+  //        </table>
+  //       </td><td valign=center>
+  //         <input type=hidden name=action value=\"search\">
+  //         <input type=submit value=".$l_find.">
+  //       </td></tr>
+  //      </table>
+  //     </form><hr>
+  //    </center>";
 
    return $block;
 }// html_payment_search_form
@@ -506,6 +712,14 @@ function html_payment_search_list ($payment_q, $pref_q, $nb_payment, $payment){
   return $block;
 }
 
+// bcontins !! faudra refaire la requete qui renvoit les details pour récuperer
+// bcontins !! les label des types de paiement et autre parce que c'est crade
+// bcontins !!
+// bcontins !! while ($q_paymentkind->next_record()) {
+// bcontins !!   if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
+// bcontins !!	   $block .= $q_paymentkind->f("paymentkind_longlabel");
+// bcontins !!	   break; // dès qu'on a le bon, on sort
+// bcontins !! } }
 
 ///////////////////////////////////////////////////////////////////////////////
 // display of payment details 
@@ -516,7 +730,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_bank,$l_payment_infos,$l_duplicate;
   global $l_label,$l_comment,$l_number, $l_date, $l_amount, $l_expected_date;
-  global $l_account, $l_kind, $l_type;
+  global $l_account, $l_kind, $l_type, $l_payment;
   global $l_no_invoices_connected, $l_invoices_connected, $l_break_asso;
   global $param_payment;
   global $border, $cellspacing;
@@ -533,137 +747,214 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   $url_duplicate = url_prepare("payment_index.php?action=duplicate&amp;param_payment=".$q_payment->f("payment_id"));
   $url_bank = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$q_payment->f("payment_id"));
   
-  $block =  "
-   <center>
-    <table border=$border cellspacing=$cellspacing>
-     <tr>
-     <td>
-      <font color=\"#$col_label\">$l_label</font><br>".$q_payment->f("payment_label")."
-     </td></tr>
-     <tr><td>
-      <font color=\"#$col_label\">$l_number</font><br>".$q_payment->f("payment_number")."
-     </td></tr>
-     <tr><td>
-       <font color=\"#$col_label\">$l_amount</font><br>
-       <font color=\"#$col_montant\">".$q_payment->f("payment_amount")."</font>
-     </td></tr>
-     <tr><td>
-      <table width=\"100%\" border=$border cellspacing=$cellspacing>
-       <tr><td>
-        <font color=\"#$col_label\">$l_expected_date</font><br>".date_format($q_payment->f("expect_date"))."
-       </td><td>
-        <font color=\"#$col_label\">$l_date</font><br>".
-    ( ($q_payment->f("date") == "") ? "&nbsp;" : date_format($q_payment->f("date")) )  ."
-       </td></tr>
-      </table>
-     </td></tr>
-     <tr><td>
-      <font color=\"#$col_label\">$l_type</font><br>\n";
+  $label = $q_payment->f("payment_label");
+  $number = $q_payment->f("payment_number");
+  $amount = $q_payment->f("payment_amount");
+  $expect_date = date_format($q_payment->f("expect_date"));
+  $date = ($q_payment->f("date") == "") ? "&nbsp;" : date_format($q_payment->f("date"));
+  $comment = $q_payment->f("payment_comment");
+
+  // Kind (bcontins a changer avec la requete)
   if ($q_payment->f("payment_paymentkind_id") == "") {
-    $block .= "&nbsp;";
+    $kind = "&nbsp;";
   } else {
     while ($q_paymentkind->next_record()) {
       if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
-	$block .= $q_paymentkind->f("paymentkind_longlabel");
+	$kind = $q_paymentkind->f("paymentkind_longlabel");
 	break; // dès qu'on a le bon, on sort
       }
     }
   }
-  $block .= "
-     </td></tr>
-     <tr><td>
-      <font color=\"#$col_label\">$l_account</font><br>\n";
-  // no account yet 
+
+  // Account
   if ($q_payment->f("payment_account_id") == "") {
-    $block .=  "&nbsp;";
+    $account =  "&nbsp;";
   } else {
     while ($q_account->next_record()) {
       if ($q_account->f("account_id") == $q_payment->f("payment_account_id")) {
-	$block .=  $q_account->f("account_label");
+	$account =  $q_account->f("account_label");
 	break; // dès qu'on a le bon, on sort
       }
     }
   }  
-  $block .=  "
-     </td></tr>
-     <tr><td>
-      <font color=\"#$col_label\">$l_comment</font><br>\n".
-    $q_payment->f("payment_comment")."
-     </td></tr>"; 
-  // boutons update/bank...
-  if ($action == "detailconsult") {
-    // if $action == "search_invoice", we don't need those buttons...
-    $block .=  "
-      <tr><td>
-       <table border=$border cellspacing=$cellspacing width=\"100%\">
-        <tr>
-       <form method=post name=form_payment_update action=\"\">
-         <td align=\"center\">";
-    // we do not need that button if the payment is checked :
-    if ( ! $q_payment->f("payment_checked")) {
-      $block .=  "
-          <input type=button value=\"$l_update\" onClick=\"form_payment_update.action='$url_update'; form_payment_update.submit();\">";
-    }
-    // this button is used to handle periodic payments.
-    // when clicked, it allows the user to duplicate the current
-    // payment, so he can keep some fields and only update those who need
-    // to change :
-    $block .=  "
-          <input type=\"button\" value=\"$l_duplicate\" onClick=\"form_payment_update.action='$url_duplicate'; form_payment_update.submit();\">";
-    // we display the "bank" button only if payment has not been banked yet
-    if ($q_payment->f("payment_paid") == "n"){
-      // if the user clicks on bank, we jump to the invoice search page
-      $block .=  "
-          <input type=button value=\"$l_bank\" onClick=\"form_payment_update.action='$url_bank';form_payment_update.submit();\">"; 
-    } 
-    // we hide payment_inout because we need to have it,
-  // but not to show it :
-    $block .=  "
-  <input type=hidden name=\"hd_inout\" ".
-      " value=\"".$q_payment->f("payment_inout")."\">
-        </td>
-       </form>
-     </tr></table>
-     </td></tr>
-";
-  }
-  $block .=  "
-     </td></tr>
-    </table><br><br>";
-  // we display the invoice connected to that payment (if not banking)
-  if ($action == "detailconsult" || $action == "search_invoice") {
-    if ($q_invoices->num_rows() == 0){
-      $display["msg"] .= display_ok_msg("$l_no_invoices_connected<br>");
-    } else {
 
-      $display["msg"] .= display_ok_msg ($l_invoices_connected);
+  $display["title"] = "<div class=\"title\">$l_payment : $label</div>";
+
+  $block = "
+    <div class=\"detailHead\">$title</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailText\">$label</td>
+     </tr>
+     <tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$number</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_amount</td>
+      <td class=\"detailText\">$amount</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_expected_date</td>
+      <td class=\"detailText\">$expect_date</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_type</td>
+      <td class=\"detailText\">$kind</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_account</td>
+      <td class=\"detailText\">$account</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailText\">$comment</td>
+     </tr>
+    </table>
+ 	
+    </div>
+    ";
+
+  // bcontins version obsolete de nico
+  ////////////////////////////////////////////////////////////////
+  //   $block =  "
+  //     <table border=$border cellspacing=$cellspacing>
+  //      <tr>
+  //      <td>
+  //       <font color=\"#$col_label\">$l_label</font><br>".$q_payment->f("payment_label")."
+  //      </td></tr>
+  //      <tr><td>
+  //       <font color=\"#$col_label\">$l_number</font><br>".$q_payment->f("payment_number")."
+  //      </td></tr>
+  //      <tr><td>
+  //        <font color=\"#$col_label\">$l_amount</font><br>
+  //        <font color=\"#$col_montant\">".$q_payment->f("payment_amount")."</font>
+  //      </td></tr>
+  //      <tr><td>
+  //       <table width=\"100%\" border=$border cellspacing=$cellspacing>
+  //        <tr><td>
+  //         <font color=\"#$col_label\">$l_expected_date</font><br>".date_format($q_payment->f("expect_date"))."
+  //        </td><td>
+  //         <font color=\"#$col_label\">$l_date</font><br>".
+  //     ($q_payment->f("date") == "") ? "&nbsp;" : date_format($q_payment->f("date"))   ."
+  //        </td></tr>
+  //       </table>
+  //      </td></tr>
+  //      <tr><td>
+  //       <font color=\"#$col_label\">$l_type</font><br>\n";
+  //   if ($q_payment->f("payment_paymentkind_id") == "") {
+  //     $block .= "&nbsp;";
+  //   } else {
+  //     while ($q_paymentkind->next_record()) {
+  //       if ($q_paymentkind->f("paymentkind_id") == $q_payment->f("payment_paymentkind_id")) {
+  // 	$block .= $q_paymentkind->f("paymentkind_longlabel");
+  // 	break; // dès qu'on a le bon, on sort
+  //       }
+  //     }
+  //   }
+  //   $block .= "
+  //      </td></tr>
+  //      <tr><td>
+  //       <font color=\"#$col_label\">$l_account</font><br>\n";
+  //   // no account yet 
+  //   if ($q_payment->f("payment_account_id") == "") {
+  //     $block .=  "&nbsp;";
+  //   } else {
+  //     while ($q_account->next_record()) {
+  //       if ($q_account->f("account_id") == $q_payment->f("payment_account_id")) {
+  // 	$block .=  $q_account->f("account_label");
+  // 	break; // dès qu'on a le bon, on sort
+  //       }
+  //     }
+  //   }  
+  //   $block .=  "
+  //      </td></tr>
+  //      <tr><td>
+  //       <font color=\"#$col_label\">$l_comment</font><br>\n".
+  //     $q_payment->f("payment_comment")."
+  //      </td></tr>"; 
+  //   // boutons update/bank...
+  //   if ($action == "detailconsult") {
+  //     // if $action == "search_invoice", we don't need those buttons...
+  //     $block .=  "
+  //       <tr><td>
+  //        <table border=$border cellspacing=$cellspacing width=\"100%\">
+  //         <tr>
+  //        <form method=post name=form_payment_update action=\"\">
+  //          <td align=\"center\">";
+  //     // we do not need that button if the payment is checked :
+  //     if ( ! $q_payment->f("payment_checked")) {
+  //       $block .=  "
+  //           <input type=button value=\"$l_update\" onClick=\"form_payment_update.action='$url_update'; form_payment_update.submit();\">";
+  //     }
+  //     // this button is used to handle periodic payments.
+  //     // when clicked, it allows the user to duplicate the current
+  //     // payment, so he can keep some fields and only update those who need
+  //     // to change :
+  //     $block .=  "
+  //           <input type=\"button\" value=\"$l_duplicate\" onClick=\"form_payment_update.action='$url_duplicate'; form_payment_update.submit();\">";
+  //     // we display the "bank" button only if payment has not been banked yet
+  //     if ($q_payment->f("payment_paid") == "n"){
+  //       // if the user clicks on bank, we jump to the invoice search page
+  //       $block .=  "
+  //           <input type=button value=\"$l_bank\" onClick=\"form_payment_update.action='$url_bank';form_payment_update.submit();\">"; 
+  //     } 
+  //     // we hide payment_inout because we need to have it,
+  //   // but not to show it :
+  //     $block .=  "
+  //   <input type=hidden name=\"hd_inout\" ".
+  //       " value=\"".$q_payment->f("payment_inout")."\">
+  //         </td>
+  //        </form>
+  //      </tr></table>
+  //      </td></tr>
+  // ";
+  //   }
+  //   $block .=  "
+  //      </td></tr>
+  //     </table><br><br>";
+  //   // we display the invoice connected to that payment (if not banking)
+  //   if ($action == "detailconsult" || $action == "search_invoice") {
+  //     if ($q_invoices->num_rows() == 0){
+  //       $display["msg"] .= display_ok_msg("$l_no_invoices_connected<br>");
+  //     } else {
+
+  //       $display["msg"] .= display_ok_msg ($l_invoices_connected);
       
-      $url = url_prepare("payment_index.php?action=detailconsult".
-			"&amp;param_payment=".$q_payment->f("payment_id"));
+  //       $url = url_prepare("payment_index.php?action=detailconsult".
+  // 			"&amp;param_payment=".$q_payment->f("payment_id"));
       
-      $dis_invoice = new OBM_DISPLAY("DATA", $invoices_options, "payment");
-      $dis_invoice->data_set = $q_invoices;
-      $dis_invoice->data_header = "top";
-      $dis_invoice->data_url = $url;
-      $dis_invoice->data_order = false;
+  //       $dis_invoice = new OBM_DISPLAY("DATA", $invoices_options, "payment");
+  //       $dis_invoice->data_set = $q_invoices;
+  //       $dis_invoice->data_header = "top";
+  //       $dis_invoice->data_url = $url;
+  //       $dis_invoice->data_order = false;
 
-      $dis_invoice->display ();
-      //and the button to break invoices-payments associations :
+  //       $dis_invoice->display ();
+  //       //and the button to break invoices-payments associations :
 
-      if ($action=="detailconsult" && $q_payment->f("payment_checked")=="n") {
-	$action_break = url_prepare("payment_index.php?action=break_asso&amp;param_payment=".$q_payment->f("payment_id"));
-	$block .=  "
-<center>
- <form name=\"break_asso\" method=\"post\" action=\"$action_break\">
-  <input type=\"submit\" value=\"$l_break_asso\">
- </form>
-</center>";    
-      }
-    }
-  }
-  $block .=  "<br><br> 
- </center>";
-return $block;
+  //       if ($action=="detailconsult" && $q_payment->f("payment_checked")=="n") {
+  // 	$action_break = url_prepare("payment_index.php?action=break_asso&amp;param_payment=".$q_payment->f("payment_id"));
+  // 	$block .=  "
+  // <center>
+  //  <form name=\"break_asso\" method=\"post\" action=\"$action_break\">
+  //   <input type=\"submit\" value=\"$l_break_asso\">
+  //  </form>
+  // </center>";    
+  //       }
+  //     }
+  //   }
+  //   $block .=  "<br><br> 
+  //  </center>";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////

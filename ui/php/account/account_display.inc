@@ -93,27 +93,25 @@ function html_account_search_form ($p_action, $account) {
   <form method=\"get\" name=\"form_account\"
     onSubmit=\"if (check_form(this) == false) return false; else return true;\"
     action=\"$url\">
-  <table class=\"detail\">
-  <tr>
-    <td class=\"textLabelForm\">$l_label_start<br />
-      <input name=\"tf_label\" size=\"20\" value=\"$label\" />
-    </td>
-    <td>&nbsp;&nbsp;</td>
-    <td class=\"textLabelForm\">$l_bank<br />
-      <input name=\"tf_bank\" size=\"20\" value=\"$bank\" />
-    </td>
-    <td>&nbsp;&nbsp;</td>
-    <td class=\"textLabelForm\">$l_number<br />
-      <input name=\"tf_number\" size=\"12\" value=\"$number\" />
-    </td>
-    <td>&nbsp;&nbsp;&nbsp;&nbsp;
-      <input name=\"action\" type=\"hidden\" value=\"search\" />
-      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-    </td>
-  </tr>
-  </table>
-  </form>
-  <hr />";
+  <div class=\"search\">
+   <div class=\"searchLabel\">$l_label_start<br />
+    <input name=\"tf_label\" size=\"20\" value=\"$label\" />
+   </div>
+
+   <div class=\"searchLabel\">$l_bank<br />
+    <input name=\"tf_bank\" size=\"20\" value=\"$bank\" />
+   </div>
+
+   <div class=\"searchLabel\">$l_number<br />
+    <input name=\"tf_number\" size=\"12\" value=\"$number\" />
+   </div>
+
+   <div class=\"searchLabel\">&nbsp;<br />
+    <input name=\"action\" type=\"hidden\" value=\"search\" />
+    <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+   </div>
+  </div>
+  </form>";
   return $block;
 }  
 
@@ -174,9 +172,9 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_consult($obm_q_account, $p_action){
   // -- Themes
-  global $set_theme,$col_label,$col_ok;
+  global $display, $set_theme,$col_label,$col_ok;
   // - Labels
-  global $l_update,$l_delete,$l_insert;
+  global $l_account, $l_update,$l_delete,$l_insert;
   global $col_balance_neg, $col_balance_pos;
   global $l_label,$l_comment,$l_bank, $l_number, $l_balance,$l_compute_balance;
   global $auth, $perms_user,$l_perms_user;
@@ -188,86 +186,75 @@ function html_account_consult($obm_q_account, $p_action){
   $bank = $obm_q_account->f("account_bank");
   $comment = nl2br($obm_q_account->f("account_comment"));
 
-  $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
+  // $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
 
+  $display["title"] = "<div class=\"title\">$l_account : $label</div>";
   
   // number and label
   $block .= "
-  <center>
-  <table border=$border cellspacing=$cellspacing>
-  <tr>
-    <td>
-      <table border=$border cellspacing=$cellspacing width=\"100%\">
-      <tr>
-        <td width=\"60%\">
-          <font color=\"#$col_label\">$l_label</font>
-          <br />$label
-        </td>
-        <td width=\"20%\">
-          <font color=\"#$col_label\">$l_number</font>
-          <br />$number
-        </td>
-        <td width=\"20%\">
-         <font color=\"#$col_label\">$l_balance</font><br>
-         <font color=\"#$col_balance\">$today</font>
-        </td>
-      </tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <font color=\"#$col_label\">$l_bank</font>
-      <br />$bank
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <font color=\"#$col_label\">$l_comment</font>
-      <br />$comment
-    </td>
-  </tr>";
+    <div class=\"detailHead\">$l_account</div>
 
-  // we display buttons only if we need them :
-  if ($p_action == "detailconsult") {
-    $block .= "<br /><br /><br />
-    <tr><td>";  
-    // update/ compute balance of the account
-    $block .= "
-     <table border=$border cellspacing=$cellspacing width=\"100%\">
-      <tr><td align=\"center\" valign=\"top\">";
-    // if ($auth->auth["perm"] != $perms_user) {
-    $block .= "
-       <form method=\"post\" action=\"\">";
-    $url_upd = url_prepare("account_index.php?action=detailupdate".
-			   "&amp;param_account=".
-			   $obm_q_account->f("account_id"));
-    $url_comp = url_prepare("account_index.php?action=compute_balance".
-			   "&amp;param_account=".
-			   $obm_q_account->f("account_id"));
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailText\">$label</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$number</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_bank</td>
+      <td class=\"detailText\">$bank</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_balance</td>
+      <td class=\"detailText\">$today</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailText\">$comment</td>
+     </tr>
+    </table>";
+
+//   // we display buttons only if we need them :
+//   if ($p_action == "detailconsult") {
+//     // update/ compute balance of the account
+//     $block .= "
+//      <table border=$border cellspacing=$cellspacing width=\"100%\">
+//       <tr><td align=\"center\" valign=\"top\">";
+//     // if ($auth->auth["perm"] != $perms_user) {
+//     $block .= "
+//        <form method=\"post\" action=\"\">";
+//     $url_upd = url_prepare("account_index.php?action=detailupdate".
+// 			   "&amp;param_account=".
+// 			   $obm_q_account->f("account_id"));
+//     $url_comp = url_prepare("account_index.php?action=compute_balance".
+// 			   "&amp;param_account=".
+// 			   $obm_q_account->f("account_id"));
     
-    $block .= " 
-        <input type=\"button\" value=\"$l_update\" ".
-      "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
+//     $block .= " 
+//         <input type=\"button\" value=\"$l_update\" ".
+//       "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
 
-    // compute the balance 
-    // useless ?
-//        <input type=hidden name=hd_balance value=\"".
-//      $obm_q_account->f("account_balance")."\">
-    $block .= "
-      </td><td align=\"center\" valign=\"top\">
-        <input type=\"button\" value=\"$l_compute_balance\" ".
-      "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
-       </form>
-      </td></tr>
-     </table>";
-    //}
-    $block .= "
-    </td></tr>";
-  }
-  $block .= "
-   </table>
-  </center>";
+//     // compute the balance 
+//     // useless ?
+// //        <input type=hidden name=hd_balance value=\"".
+// //      $obm_q_account->f("account_balance")."\">
+//     $block .= "
+//       </td><td align=\"center\" valign=\"top\">
+//         <input type=\"button\" value=\"$l_compute_balance\" ".
+//       "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
+//        </form>
+//       </td></tr>
+//      </table>";
+//     //}
+//     $block .= "
+//     </td></tr>";
+//   }
+//   $block .= "
+//    </table>
+//   </center>";
   return $block;
 
 }
@@ -313,99 +300,94 @@ function html_account_form($obm_q_account, $action) {
   if (isset($account["bank"])) { $bank = stripslashes($account["bank"]); }
   if (isset($account["comment"])) { $comment = stripslashes($account["comment"]); }
 
+  if ($action=="detailupdate"){
+    $action = ($q_payments->nf() != 0) ? "detailupdate_nodel" : $action;
+
+    $dis_button = "
+      <input type=\"hidden\" name=\"param_account\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"submit\" name=\"\" value=\"$l_update\" />
+    ";
+  } else {
+    $dis_button = "
+      <input type=\"hidden\" name=\"param_account\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" name=\"\" value=\"$l_insert\" />
+    ";
+  }
+
+  //////////////////////////////////////
+
+//   if ($action=="detailupdate"){//modifier/supprimer
+//     $action = ($q_payments->nf() != 0)) ? "detailupdate_nodel" : $action;
+
+//     $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=$id");
+//     $url_update = url_prepare("account_index.php?action=update&amp;param_account=$id");
+//     $block .= "
+//             <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
+//              ">
+//             </td><td>";
+//     //    $block .= "
+//     //            <form method=post name=form_account_delete onSubmit=\"if(valider_suppression()) return true; else return false;\" action=\"$url_delete\">";
+//     // deletion is impossible if there are payments connected to
+//     // this account :
+//     if (($action == "detailupdate") &&  {
+//       $block .= "
+//              <input type=\"button\" value=\"$l_delete\" disabled>
+//              </td></tr>
+//             </table>"; 
+//     } else {
+//       $block .= "
+//              <input type=\"button\" value=\"$l_delete\" ".
+// 	"onClick=\" if (valider_suppression ()) { ".
+// 	" this.form.action='$url_delete'; this.form.submit () ; ".
+// 	"}\">
+//              </td></tr>
+//             </table>"; 
+//     }
+//   } else{ // inserer : 
+//     $url_insert = url_prepare("account_index.php?action=insert");
+//     $block .= "
+//           <input type=\"button\" value=\"$l_insert\" ".
+//       " onClick=\"if (check_cpte (this.form)) {".
+//       "this.form.action='$url_insert';this.form.submit();".
+//       "}\">";
+//   }  
+////////////////////////////////////////
 
   $block .= "
-  <center>
-  <form method=\"post\" onSubmit=\"if (check_cpte(this)) return true; else return false;\" action=\"\">
-    <table border=$border cellspacing=$cellspacing>
-    <tr>
-      <td>
-        <table border=$border cellspacing=$cellspacing>
-        <tr>
-          <td>
-            <font color=\"#$col_label\">$l_label</font>
-            <br />
-            <input name=\"tf_label\" size=\"40\" value=\"$label\">
-          </td>
-          <td>
-            <font color=\"#$col_label\">$l_number</font>
-            <br />
-            <input name=\"tf_number\" size=\"12\" value=\"$number\">
-          </td>
-          <td>
-            <font color=\"#$col_label\">$l_initial_balance</font>
-            <br />
-            <input name=\"tf_balance\" size=\"20\" value=\"$balance\" $bal_state>
-          </td>
-        </tr>
-        </table>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <font color=\"#$col_label\">$l_bank</font>
-        <br />
-        <input name=\"tf_bank\" size=\"60\" value=\"$bank\">
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <font color=\"#$col_label\">$l_comment</font>
-        <br />
-        <textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">
-        $comment
-        </textarea>
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <br />
-        <center>";
-  if ($action=="detailupdate"){//modifier/supprimer
-    $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=$id");
-    $url_update = url_prepare("account_index.php?action=update&amp;param_account=$id");
-    $block .= "
-            <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
-             <input type=\"button\" value=\"$l_update\" ".
-      "onClick=\"if (check_cpte (this.form)) {".
-      "this.form.action='$url_update'; this.form.submit ();".
-      "}\">
-            </td><td>";
-    //    $block .= "
-    //            <form method=post name=form_account_delete onSubmit=\"if(valider_suppression()) return true; else return false;\" action=\"$url_delete\">";
-    // deletion is impossible if there are payments connected to
-    // this account :
-    if (($action == "detailupdate") && ($q_payments->nf() != 0)) {
-      $block .= "
-             <input type=\"button\" value=\"$l_delete\" disabled>
-             </td></tr>
-            </table>"; 
-    } else {
-      $block .= "
-             <input type=\"button\" value=\"$l_delete\" ".
-	"onClick=\" if (valider_suppression ()) { ".
-	" this.form.action='$url_delete'; this.form.submit () ; ".
-	"}\">
-             </td></tr>
-            </table>"; 
-    }
-  } else{ // inserer : 
-    $url_insert = url_prepare("account_index.php?action=insert");
-    $block .= "
-          <input type=\"button\" value=\"$l_insert\" ".
-      " onClick=\"if (check_cpte (this.form)) {".
-      "this.form.action='$url_insert';this.form.submit();".
-      "}\">";
-  }  
-  $block .= "
-         </center>
-         </td>
-        </tr>
-          </td>
-       </tr>
-    </table></form></center>";
-    return $block;
+   <form method=\"post\" action=\"account_index.php\"
+         onSubmit=\"if (check_cpte(this)) return true; else return false;\" >
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailForm\"><input name=\"tf_label\" size=\"40\" value=\"$label\"></td>
+     <tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailForm\"><input name=\"tf_number\" size=\"12\" value=\"$number\"></td>
+     </tr>
+      <td class=\"detailLabel\">$l_initial_balance</td>
+      <td class=\"detailForm\"><input name=\"tf_balance\" size=\"20\" value=\"$balance\" $bal_state></td>
+     </tr>
+     </tr>
+      <td class=\"detailLabel\">$l_bank</td>
+      <td class=\"detailForm\"><input name=\"tf_bank\" size=\"60\" value=\"$bank\"></td>
+     </tr>
+     </tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailForm\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"72\">$comment</textarea></td>
+     </tr>
+    </table>
 
+    <div class=\"detailButton\">
+     <p class=\"detailButtons\">
+      $dis_button
+     </p>
+    </div>
+   </form>
+  ";
+
+  return $block;
 }
 
 

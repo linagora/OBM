@@ -96,11 +96,11 @@ function check_payment_banking (f_pay) {
     //alert(\"$l_invalid_date\"); // check_date() does the alert ;)
     return false;
   }
-  if (f_pay.sel_kind.value == -1) {
+  if (f_pay.sel_kind.value == $c_all) {
     alert ('$l_check_paymentkind');
     return false;
   }
-  if (f_pay.sel_account.value == -1) {
+  if (f_pay.sel_account.value == $c_all) {
     alert ('$l_check_account');
     return false;
   }

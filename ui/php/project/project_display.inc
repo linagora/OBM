@@ -148,25 +148,25 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       <div class=\"searchLabel\">$l_name<br>
         <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"40\" value=\"$name\" />
       </div>
-      <div class=\"searchLabel\">$l_company_name<br>
+      <div class=\"searchLabel\">$l_company_name<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
       </div>
-      <div class=\"searchLabel\">$l_tasktype<br>
+      <div class=\"searchLabel\">$l_tasktype<br />
         $sel_tt
       </div>
-      <div class=\"searchLabel\">$l_manager<br>
+      <div class=\"searchLabel\">$l_manager<br />
         $sel_manager
       </div>
-      <div class=\"searchLabel\">$l_member<br>
+      <div class=\"searchLabel\">$l_member<br />
         $sel_member
       </div>
-      <div class=\"searchLabel\">$l_new<br>
+      <div class=\"searchLabel\">$l_new<br />
         $cb_new
       </div>
-      <div class=\"searchLabel\">$l_archive<br>
+      <div class=\"searchLabel\">$l_archive<br />
         $cb_archive
       </div>
-      <div class=\"searchLabel\">&nbsp;<br>
+      <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       </div>
@@ -445,80 +445,6 @@ function html_project_taskadd_form($ptask_q, $project) {
 
   return $block;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Member Add Window                                                 //
-// Parameters:
-//   - $project[] : default form values
-//     keys used  : id
-///////////////////////////////////////////////////////////////////////////////
-// function html_project_memberadd_form($project) {
-  
-//   $pid = $project["id"];
-
-//   $ext_open  = "
-//     window.name='Liste'\n
-//     window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_member_add&ext_action=member_add&ext_url=../project/project_index.php&ext_id=$pid&ext_target=Liste','','height=400,width=620,scrollbars=yes')";
-
-//   $block = "
-//     <script type=\"text/javascript\">
-//       $ext_open
-//     </script>
-//   ";
-
-//   return $block;
-// }
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the new Projects search result                                    //
-// Parameters:
-//   - $company[] : company search criteria
-//     keys used  : status, name, kind, zip
-///////////////////////////////////////////////////////////////////////////////
-// function dis_project_new_list($project) {
-//   global $auth, $display;
-//   global $l_new_projects, $l_no_display;
-  
-//   $pref_q = run_query_display_pref($auth->auth["uid"], "project_new");
-
-//   $obm_q = run_query_newprojects($project);
-
-//   $nb_newprojects = $obm_q->num_rows();
-
-//   if ($nb_newprojects != 0) {
-//     $display["msg"] .= display_info_msg($l_new_projects) ;
-//     $block = html_project_new_list($obm_q, $pref_q, $nb_newprojects, $project);
-//   }
-//   else
-//     $display["msg"] .= display_info_msg($l_no_projects) ;
-
-//   return $block;
-// }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display new Projects search result                                   //
-// Parameters : 
-//   - $obm_q_comp : list of companies
-//   - $pref_q     : the fields which have to be displayed
-//   - $nb_company : nb companies returned by the search query
-//   - $company[]  : company search criteria
-//     keys used   : status, name, kind, zip
-///////////////////////////////////////////////////////////////////////////////
-// function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) {
-//   global $l_found;
-
-//   $url = url_prepare("project_index.php?action=index");
-
-//   $dis_newprojects_list = new OBM_DISPLAY("DATA", $pref_q, "project");
-//   $dis_newprojects_list->data_set = $obm_q_comp;
-//   $dis_newprojects_list->data_url = $url;
-//   $dis_newprojects_list->data_header = "both";
-//   $dis_newprojects_list->data_order = false;
-
-//   $block = $dis_newprojects_list->display("dis_data_project");
-//   return $block;
-// }
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -948,9 +874,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     </tr>";
 
   } 
-
-    
-  $display["title"] = "<div class=\"title\">$l_project : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
 

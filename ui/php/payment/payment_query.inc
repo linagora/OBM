@@ -11,7 +11,7 @@
 // search for the specified payment in the database
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($p_payment, $p_new_order="") {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $c_all;
 
   $label = $p_payment["label"];
   $number = $p_payment["number"];
@@ -82,10 +82,10 @@ function run_query_search($p_payment, $p_new_order="") {
   if (($paid != "")&&($paid != "_TOUT_")) {
     $query .= " and Payment.payment_paid = '$paid'";
   }
-  if (($kind != "")&&($kind!="-1")) {
+  if (($kind != "")&&($kind!="$c_all")) {
     $query .= " and Payment.payment_paymentkind_id ='$kind'";
   }
-  if (($account != "")&&($account != "-1")) {
+  if (($account != "")&&($account != "$c_all")) {
     $query .= " and Payment.payment_account_id ='$account'";
   }
   if ($deal != "" || $company != "" ) {
@@ -189,7 +189,7 @@ function run_query_account () {
   return $db;
 }
 
-
+// à refaire avec quelques join pour récuperer l'account et le type
 ///////////////////////////////////////////////////////////////////////////////
 // récupération de tous les champs du payment
 ///////////////////////////////////////////////////////////////////////////////

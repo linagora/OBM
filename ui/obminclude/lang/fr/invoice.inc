@@ -13,6 +13,7 @@ $l_label = "Label";
 $l_label_start = "Début de Label";
 $l_number = "Numéro";
 $l_amount = "Montant";
+$l_geninvoice = "Caractéristiques";
 $l_amount_HT = "Montant HT";
 $l_amount_TTC = "Montant TTC";
 $l_comment = "Commentaire";

@@ -41,11 +41,6 @@ $account = get_param_account();
 get_account_action();
 $perm->check();
 
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head("$l_account");
-$display["header"] = generate_menu($menu, $section);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +85,8 @@ if ($action == "index" || $action == "") {
   if ($account["account"] > 0) {    
     $obm_q_account=run_query_detail($account["account"]);
     $obm_q_account->next_record();
-    display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
+
+    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
     $display["detail"] = html_account_consult($obm_q_account, $action);
   }
 } elseif ($action == "detailupdate")  {
@@ -100,16 +96,25 @@ if ($action == "index" || $action == "") {
     $obm_q_account=run_query_detail($account["account"]);
     $obm_q_account->next_record();    
     require("account_js.inc");
-    display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
     $display["detail"] = html_account_form($obm_q_account,$action);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_update($account);
-  $display["msg"] = display_ok_msg($l_update_ok);
   require("account_js.inc");
-  $display["search"] = html_account_search_form($action, $account);
+  run_query_update($account);
+
+  if ($account["account"] > 0) {    
+    $obm_q_account=run_query_detail($account["account"]);
+    $obm_q_account->next_record();
+
+    $display["detailInfo"] = display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
+    $display["detail"] = html_account_consult($obm_q_account, $action);
+  }
+//   $display["msg"] = display_ok_msg($l_update_ok);
+//   require("account_js.inc");
+//   $display["search"] = html_account_search_form($action, $account);
   
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -200,8 +205,11 @@ $q_account = run_query_detail ($account["account"]);
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page
+// Display HTML page
 ///////////////////////////////////////////////////////////////////////////////
+$display["header"] = generate_menu($menu, $section);
+
+$display["head"] = display_head("$l_account");
 $display["end"] = display_end();
 display_page($display);
 
@@ -244,6 +252,7 @@ function get_account_action() {
   global $account, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
+  global $l_header_consult;
   global $account_read, $account_write, $account_admin_read, $account_admin_write;
 
 // Index
@@ -278,9 +287,10 @@ function get_account_action() {
 
 // Detail Consult
   $actions["ACCOUNT"]["detailconsult"] = array (
-    'Url'      => "$path/account/account_index.php?action=detailconsult",
+    'Name'     => $l_header_consult,
+    'Url'      => "$path/account/account_index.php?action=detailconsult&amp;param_account=".$account["account"]."",
     'Right'    => $account_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('compute_balance') 
                                        );
 
 // Compute Balance
@@ -311,7 +321,7 @@ function get_account_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["account"]."",
     'Right'    => $account_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                      	);
 
 // Admin

@@ -12,7 +12,7 @@ echo "
 <!--
 ";
 
-//require("$obminclude/javascript/check_js.inc");
+require("$obminclude/javascript/check_js.inc");
 
 
 echo "
@@ -27,7 +27,7 @@ function confirm_del() {
 echo "
 function check_addtodoform(form) {
 
-  if (check_fill_title(form)) {
+  if (!(check_fill_title(form))) {
     return false;
   }
   else

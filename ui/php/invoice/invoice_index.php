@@ -496,7 +496,8 @@ function get_invoice_action() {
   global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_dupplicate,$l_header_admin;
-  global $invoice_read, $invoice_write, $invoice_admin_read, $invoice_admin_write;
+  global $invoice_read, $invoice_write, $invoice_admin_read;
+  global $l_header_add_deal, $invoice_admin_write;
 
 // Index 
   $actions["INVOICE"]["index"] = array (
@@ -567,9 +568,10 @@ function get_invoice_action() {
 
 // Add Deal
   $actions["INVOICE"]["add_deal"] = array (
+    'Name'     => $l_header_add_deal,
     'Url'      => "$path/invoice/invoice_index.php?action=add_deal",
     'Right'    => $invoice_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('detailconsult') 
                                         );
 
 // Search Deal
@@ -598,7 +600,7 @@ function get_invoice_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $incident_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'detailupdate') 
                                      	);
 // Administration
   $actions["INVOICE"]["admin"] = array (
