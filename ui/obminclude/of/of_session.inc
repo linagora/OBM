@@ -58,7 +58,7 @@ function page_close() {
 ///////////////////////////////////////////////////////////////////////////////
 class Session {
   var $cookie_name = "";     // Cookie name
-  var $cookie_domain = "";   // Cookie domain, if domain cookie used
+  var $cookie_domain = "aliacom.local";   // Cookie domain, if domain cookie used
   var $lifetime = 0;         // Cookie lifetime (seconds, 0=session cookie)
   var $id;                   // Unique Session ID
 

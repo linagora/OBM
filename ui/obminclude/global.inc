@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre14";
+$obm_version = "0.9.0pre16";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -16,8 +16,8 @@ $set_weekstart_default = "monday + 2 hours"; // First day of the week,
 //english The +2 hours is a quick fix
 //for a bug php (see dst bug in bugzilla.aliacom.fr)
 
-$set_start_time = '6'; // first hour of the day
-$set_stop_time = '22'; // last hour of the day
+$set_start_time = '8'; // first hour of the day
+$set_stop_time = '20'; // last hour of the day
 
 // Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
@@ -178,7 +178,7 @@ $cgp_show["section"]["prod"]["url"] = "$path/time/time_index.php";
 $cgp_show["section"]["compta"]["url"] = "$path/account/account_index.php";
 $cgp_show["section"]["user"]["url"] = "$path/settings/settings_index.php";
 $cgp_show["section"]["admin"]["url"] = "$path/admin/admin_index.php?mode=html";
-$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
+//$cgp_show["section"]["admin"]["right"] = "$cright_read_admin";
 $cgp_show["section"]["aliamin"]["url"] = "http://aliamin/";
 
 // modules
@@ -202,6 +202,11 @@ $cgp_show["module"]["settings"] = "user";
 $cgp_show["module"]["user"] = "user";
 $cgp_show["module"]["group"] = "user";
 $cgp_show["module"]["admin"] = "admin";
+$cgp_show["module"]["admin_pref"] = "admin";
+$cgp_show["module"]["admin_data"] = "admin";
+$cgp_show["module"]["admin_lang"] = "admin";
+$cgp_show["module"]["admin_code"] = "admin";
+$cgp_show["module"]["import"] = "admin";
 
 
 require_once("$obminclude/obm_conf.inc");
