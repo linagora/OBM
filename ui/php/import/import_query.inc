@@ -507,11 +507,12 @@ function get_similar_company($fields, $map) {
   }
   $name = addslashes($name);
   $zip = $fields["comp_zip"];
-
+  $town = $fields["comp_town"];
   $query = "select distinct company_id, company_name, company_zipcode 
             from Company
-            where company_name $like '$name%'
-              and company_zipcode $like '$zip'";
+	     where (company_name $like '$name%' or company_aka $like
+                    '%$name%') and (company_zipcode $like '$zip' or
+                     company_town $like '$town')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
