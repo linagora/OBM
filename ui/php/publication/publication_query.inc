@@ -247,10 +247,13 @@ function run_query_auto_insert($publication){
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_auto_subscription($publication,$p_id){
   global $auth, $cdg_sql, $c_focsys;
-
+  
   $auto_sub =   $publication["auto_sub"];
   $recept =   $c_focsys;
   $lang = $publication["lang"];
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;  
+  $like = sql_casei_like($type);     
   $lang_array = split("-",$lang);
   $query = "insert into Subscription (
     subscription_timeupdate,
@@ -283,19 +286,16 @@ function run_query_auto_subscription($publication,$p_id){
     $coma =',';
   }
   $query .= ") 
-  AND 
-  kind_lang IN (";
+  AND (";
   $coma = "";
   foreach($lang_array as $lang_id) {
-    $query .= "$coma '$lang_id'";
-    $coma =',';
+    $query .= "$coma kind_lang $like '$lang_id' ";
+    $coma ='OR';
   }
   $query .= ") 
   group by contact_id";
-  
   display_debug_msg($query, $cdg_sql);
 
-  $obm_q = new DB_OBM;
   $retour = $obm_q->query($query); 
 }
 
@@ -490,7 +490,7 @@ function run_query_check_publication($p_id, $title, $lang) {
   }
   $query = "select distinct publication_id, publication_title, publication_lang
     from Publication
-    where publication_title $like '$title%'and publication_lang like '$lang%'
+    where publication_title $like '$title%'and publication_lang $like '$lang%'
           $where_id";
 
   display_debug_msg($query, $cdg_sql);
