@@ -196,8 +196,8 @@ function run_query_insert($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $com = $contact["com"];
-  $arch = ($contact["archive"] == 1 ? 1 : 0);
-  $vis = ($contact["vis"] == 1 ? 1 : 0);
+  $arch = $contact["archive"];
+  $vis = $contact["vis"];
 
   $query = "insert into Contact (contact_timeupdate,
     contact_timecreate,
@@ -292,8 +292,8 @@ function run_query_update($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $com = $contact["com"];
-  $arch = ($contact["archive"] == 1 ? 1 : 0);
-  $vis = ($contact["vis"] == 1 ? 1 : 0);
+  $arch = $contact["archive"];
+  $vis = $contact["vis"];
 
   $query = "update Contact set
     contact_timeupdate='".date("Y-m-d H:i:s")."',

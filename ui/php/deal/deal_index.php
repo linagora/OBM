@@ -576,7 +576,7 @@ function get_param_deal() {
     $deal["archive"] = "0";
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
-  if (isset ($cb_vis)) $deal["vis"] = $cb_vis;
+  $deal["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
   if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
   if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);

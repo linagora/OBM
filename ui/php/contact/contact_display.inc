@@ -533,7 +533,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $fax = stripslashes($contact["fax"]);
   $email = stripslashes($contact["email"]);
   $com = $contact["com"];
-  $vis = ($contact["vis"] == 1 ? 1 : 0);
+  $vis = $contact["vis"];
 
   $disp_same_cont = "
     <tr>

@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.6.2 - 2003-02-26<br>
+Version 0.6.3 - 2003-04-15<br>
 Pierre Baudracco
 </center>
 <p>
@@ -100,7 +100,7 @@ Each OBM file should have an header as described below :
 
 
 <h2>Module Structure</h2>
-OBM is divided into application sections and modules. A section beeing a set of modules).
+OBM is divided into application sections and modules. A section beeing a set of modules.
 <p>
 Each module must be divided into 4 files :
 <ul type=disc>
@@ -286,11 +286,56 @@ require("company_display.inc");
 </pre>
 </td></tr>
 </table>
-<P>
+<p>
 
 
 <h3>Main action branch switch</h3>
 <i>To do</i>
+
+<h3>Parameters handling</h3>
+
+No parameter should be uses "as is" or as passed.
+For each module the function <b>get_param_module()</b> is in charge of collecting the parameters and assigning these to the <b>$module</b> associative array which is then be used all over the module to get the values.
+<p>
+This allows to change easily forms widget names in the templates without numerous modifications on the code.
+
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// Stores Company parameters transmited in $company hash
+// returns : $company hash with parameters set
+///////////////////////////////////////////////////////////////////////////////
+function get_param_company() {
+  global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
+  ...
+  global $cdg_param;
+
+  if (isset ($param_company)) $company["id"] = $param_company;
+  if (isset ($tf_num)) $company["num"] = $tf_num;
+  if (isset ($cb_state)) $company["state"] = $cb_state;
+  if (isset ($tf_name)) $company["name"] = $tf_name;
+  ...
+
+  if (debug_level_isset($cdg_param)) {
+    if ( $company ) {
+      while ( list( $key, $val ) = each( $company ) ) {
+        echo "<br />company[$key]=$val";
+      }
+    }
+  }
+
+  return $company;
+}
+</pre>
+</td></tr>
+</table>
+<p>
+
+With php set to <b>magic_quotes_gpc = On</b>, parameters strings are automatically backslashed (quotes).
+<p>
+<b>All the variable formatting must be done here</b>, but there is an exception : some code parts used backslashed var form (ex: in queries) and other not (eg: when value must be displayed in a text field). So some "stripslashes()" calls will remains in module_display.inc functions.
 
 <h2>Functions</h2>
 

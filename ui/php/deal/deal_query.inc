@@ -208,7 +208,7 @@ function run_query_insert($deal) {
   $pid = ($deal["parent"] ? $deal["parent"] : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = (($deal["vis"] == 1) ? 1 : 0);
+  $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];
@@ -222,7 +222,7 @@ function run_query_insert($deal) {
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
-  $archive = ($deal["archive"] ? "1" : "0");
+  $archive = $deal["archive"];
   $todo = $deal["todo"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
@@ -310,7 +310,7 @@ function run_query_update($deal) {
   $pid = ($deal["parent"] ? $deal["parent"] : "null");
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = (($deal["vis"] == 1) ? 1 : 0);
+  $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];
@@ -386,7 +386,7 @@ function run_query_deal_id($deal) {
 
   $num = $deal["num"];
   $label = $deal["label"];
-  $vis = (($deal["vis"] == 1) ? 1 : 0);
+  $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? $deal["datebegin"] : "null");
   $kind = $deal["kind"]; 
   $cat = $deal["cat"];

@@ -274,8 +274,8 @@ function get_param_contact() {
   if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
   if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
-  if (isset ($cb_archive)) $contact["archive"] = $cb_archive;
-  if (isset ($cb_vis)) $contact["vis"] = $cb_vis;
+  $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
+  $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
 
   // External param

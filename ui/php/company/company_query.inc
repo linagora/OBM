@@ -145,7 +145,7 @@ function run_query_insert($company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $state = ($company["state"] == 1 ? 1 : 0);
+  $state = $company["state"];
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -225,7 +225,7 @@ function run_query_update($cid, $company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $state = ($company["state"] == 1 ? 1 : 0);
+  $state = $company["state"];
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];

@@ -439,7 +439,7 @@ function get_list_action() {
     'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
     'Right'    => $list_write,
     'Popup'    => 1,
-    'Target'    => $l_list,
+    'Target'   => $l_list,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
                                     	  );
 

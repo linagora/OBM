@@ -341,7 +341,7 @@ function get_param_company() {
 
   if (isset ($param_company)) $company["id"] = $param_company;
   if (isset ($tf_num)) $company["num"] = $tf_num;
-  if (isset ($cb_state)) $company["state"] = $cb_state;
+  $company["state"] = ($cb_state == 1 ? 1 : 0);
   if (isset ($tf_name)) $company["name"] = $tf_name;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
   if (isset ($sel_act)) $company["activity"] = $sel_act;

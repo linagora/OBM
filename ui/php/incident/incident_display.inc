@@ -386,6 +386,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $date = $incident["date"];
     $hour = $incident["hour"];
     $archive = ($incident["archive"] == "1" ? "checked" : "");
+    $c_name = $incident["lcontract"];
   }
 
   $dis_sel_owner="<select name=\"sel_owner\">";

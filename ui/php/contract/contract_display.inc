@@ -241,17 +241,17 @@ function html_contract_consult($contract_q) {
     <tr>
     <td rowspan=\"25\"> 
       <a href=\"".url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id")."\">
-      <img BORDER=0  SRC=\"/images/$set_theme/$ico_incident\"></A>
-      <font SIZE=-1>
-      <A HREF=\"" . url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id") . "\">
-      $l_incident_list</A></font>
-      <BR>
-      <A HREF=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id") . "\">
-      <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_incident\"></A>
-      <FONT SIZE=-1><A HREF=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id") . "\">
-      $l_incident_new</A></FONT>
-      <BR>
-      <FONT SIZE=-1><A HREF=\"" . url_prepare("$path/deal_index.php?action=detailconsult&param_deal=$deal_id") . "\">
+      <img border=\"0\"  src=\"/images/$set_theme/$ico_incident\"></a>
+      <font size=\"-1\">
+      <a href=\"" . url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id") . "\">
+      $l_incident_list</a></font>
+      <br />
+      <a href=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id") . "\">
+      <img border=\"0\" src=\"/images/$set_theme/$ico_incident\"></A>
+      <font size=\"-1\"><a href=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&tf_lcontract=$label") . "\">
+      $l_incident_new</a></font>
+      <br />
+      <font size=\"-1\"><a href=\"" . url_prepare("$path/deal_index.php?action=detailconsult&param_deal=$deal_id") . "\">
       <img border=0  src=\"/images/$set_theme/$ico_deal\"></a></font>
       <font size=-1><a href=\"" . url_prepare("$path/deal/deal_index.php?action=detailconsult&param_deal=$deal_id") . "\">$deal_label</a></font>
       </td>

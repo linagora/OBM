@@ -27,7 +27,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $owner = $incident["owner"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
-  $archive = ($incident["archive"] ? "1" : "0");
+  $archive = $incident["archive"];
 
   $req = "select
       Incident.incident_id as Id,
@@ -192,16 +192,16 @@ function run_query_insert($incident) {
   global $auth, $cdg_sql;
 
   $lincident = $incident["lincident"];
-  $owner =  $incident["owner"];
-  $logger =  $incident["logger"];
-  $desc =  $incident["description"];
-  $solu =  $incident["solution"];
-  $priority =  $incident["priority"];
-  $status =  $incident["status"];
-  $date =  $incident["date"];
-  $hour =  $incident["hour"];
-  $duration =  $incident["duration"];
-  $archive = ($incident["archive"] ? "1" : "0");
+  $owner = $incident["owner"];
+  $logger = $incident["logger"];
+  $desc = $incident["description"];
+  $solu = $incident["solution"];
+  $priority = $incident["priority"];
+  $status = $incident["status"];
+  $date = $incident["date"];
+  $hour = $incident["hour"];
+  $duration = $incident["duration"];
+  $archive = $incident["archive"];
   $contract_id = $incident["contract_id"];
   $call_date = "$date $hour:0:0";
 
@@ -256,16 +256,16 @@ function run_query_update($incident) {
   $param_incident = $incident["id"];
   $param_contract = $incident["contract_id"];
   $lincident = $incident["lincident"];
-  $owner =  $incident["owner"];
-  $logger =  $incident["logger"];
-  $desc =  $incident["description"];
-  $solu =  $incident["solution"];
-  $priority =  $incident["priority"];
-  $status =  $incident["status"];
-  $date =  $incident["date"];
-  $hour =  $incident["hour"];
-  $duration =  $incident["duration"];
-  $archive = ($incident["archive"] ? "1" : "0");
+  $owner = $incident["owner"];
+  $logger = $incident["logger"];
+  $desc = $incident["description"];
+  $solu = $incident["solution"];
+  $priority = $incident["priority"];
+  $status = $incident["status"];
+  $date = $incident["date"];
+  $hour = $incident["hour"];
+  $duration = $incident["duration"];
+  $archive = $incident["archive"];
   $call_date = "$date $hour:0:0";
 
   $query = "update Incident set
