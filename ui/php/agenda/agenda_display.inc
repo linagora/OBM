@@ -1050,7 +1050,7 @@ function html_userwritable_bar($writable_user,$user_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_right_admin($user_q,$user_id) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
-  global $l_everyone,  $l_list,$l_authorize,$l_deny;
+  global $l_everyone,  $l_list,$l_authorize,$l_deny,$set_theme, $ico_delete;
   
   while ($user_q->next_record()) {
     $u_id = $user_q->f("userobm_id");
@@ -1062,9 +1062,23 @@ function html_dis_right_admin($user_q,$user_id) {
       $sel_write_no .= "<option value=\"$u_id\">$lname $fname</option>";
     } else {
       if ($user_q->f("calendarright_write") == 1) {
+	$dis_write_ok .= "<div class=\"elementRow\" id=\"sel_user$u_id\">
+        <a href=\"javascript: remove_element('sel_user$u_id','sel_user');\">
+        <img src=\"/images/$set_theme/$ico_delete\">
+        </a>
+        $lname $fname
+       <input value=\"$u_id\" name=\"sel_user[]\" type=\"hidden\" />
+       </div>";
 	$sel_write_ok .= "<option value=\"$u_id\">$lname $fname</option>";
       }
       if ($user_q->f("calendarright_read") == 1) {
+	$dis_read_ok .= "<div class=\"elementRow\" id=\"sel_user$u_id\">
+        <a href=\"javascript: remove_element('sel_user$u_id','sel_user');\">
+        <img src=\"/images/$set_theme/$ico_delete\">
+        </a>
+        $lname $fname
+       <input value=\"$u_id\" name=\"sel_user[]\" type=\"hidden\" />
+       </div>";	
 	$sel_read_ok .= "<option value=\"$u_id\">$lname $fname</option>";
       }
       if ($user_q->f("calendarright_read") == 0) { 
@@ -1075,20 +1089,52 @@ function html_dis_right_admin($user_q,$user_id) {
       }
     }
   }
-    // Category 1 select field
-    while ($usr_q->next_record()) {
 
-      if (in_array($u_id, $p_user_array)) {
-	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user$u_id\">
-      <a href=\"javascript: remove_element('sel_user$u_id','sel_user');\">
-      <img src=\"/images/$set_theme/$ico_delete\">
+    $block_user_read = "
+    <td class=\"detailLabel\">
+    $l_users
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
-      $u_lname $u_fname
-      <input value=\"$u_id\" name=\"sel_user[]\" type=\"hidden\" />
-      </div>";
-      }
-    }
+     </td>    
+     <td class=\"detailForm\" id=\"sel_user_id\">
+       $dis_read_ok
+     </td>
+     ";
+
+
+    $block_user_write = "
+    <td class=\"detailLabel\">
+    $l_users
+    <a href=\"javascript: return false;\" 
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
+      </a>
+     </td>    
+     <td class=\"detailForm\" id=\"sel_user_id\">
+       $dis_write_ok
+     </td>
+     ";
+     
   $block = "
+  <table class=\"detail\">  
+   <tr>
+   <td colspan=\"2\" class=\"detailHead\">$l_read_permission</td>
+   </tr>
+   </tr>
+   $block_user_read
+   <tr>
+   <tr>
+   </tr>
+   <td colspan=\"2\" class=\"detailHead\">$l_write_permission</td>
+   <tr>
+   $block_user_write
+   </tr>
+   </table>
+  
   <table class=\"agendaRight\" >
    <tr>
     <td colspan=\"3\" class=\"detailLabel\">
@@ -1145,7 +1191,7 @@ function html_dis_right_admin($user_q,$user_id) {
    <tr>
     <td colspan=\"3\" class=\"detailHead\">$l_write_permission</td>
    </tr>
-   <tr>
+
    <tr>
     <td colspan=\"3\" class=\"detailLabel\">
      &nbsp;
