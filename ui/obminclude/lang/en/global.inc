@@ -25,6 +25,7 @@ $l_archive_first = "Arc";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
+$l_color = "Color";
 
 // Mysql Date format
 $l_datetime_format = "%m-%d-%Y %H:%i:%s"; // Complete Date + Time

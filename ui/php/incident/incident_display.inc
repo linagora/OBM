@@ -54,17 +54,9 @@ function dis_data_incident(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "incident_priority") {
     $pri = $OD->data_set->f($fieldname);
-    if ($pri == "Red Hot") {
-      $col = $col_inc_redhot;
-    } elseif ($pri == "Hot") {
-      $col = $col_inc_hot;
-    } elseif ($pri == "Normal") {
-      $col = $col_inc_closed;
-    } else {
-      $col = "AAAAA";
-    }
-      $col = "AAAAA";
-    $res["name"] = "<font color=\"#$col\">$pri</font>";
+    $col = $OD->data_set->f("incidentpriority_color");
+    $res["name"] = $pri;
+    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
   }
 
   return $res;
@@ -615,16 +607,28 @@ function dis_admin_index() {
 //   - $pri_q : Priority list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_priority_form($pri_q) {
-  global $l_pri_manage,$l_pri_exist, $l_label, $l_order;
+  global $l_pri_manage,$l_pri_exist, $l_label, $l_order, $l_color;
   global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
 
   // Priority select construction
-  $sel_pri = "<select name=\"sel_priority\" size=\"4\" >";
+  $sel_pri = "<select name=\"sel_priority\" onChange=\"
+    text = this.options[this.selectedIndex].text;
+    pos = text.indexOf('(');
+    col = text.substr(pos+1);
+    pos2 = col.indexOf(')');
+    col = col.substr(0,pos2);
+    text = text.substr(0, pos);
+    pos = text.indexOf('-');
+    forms.form_pri_update.tf_pri.value=text.substr(pos+1);
+    forms.form_pri_update.tf_order.value=text.substr(0,pos);
+    forms.form_pri_update.tf_color.value=col;\"
+    size=\"4\" >";
   while ($pri_q->next_record()) {
     $id = $pri_q->f("incidentpriority_id");
     $order = $pri_q->f("incidentpriority_order");
+    $color = $pri_q->f("incidentpriority_color");
     $label = $pri_q->f("incidentpriority_label");
-    $sel_pri .= "\n<option value=\"$id\">$order-$label</option>";
+    $sel_pri .= "\n<option value=\"$id\">$order-$label ($color)</option>";
   }
   $sel_pri .= "</select>";
 
@@ -664,7 +668,7 @@ function html_priority_form($pri_q) {
 
         <tr>
           <td colspan=\"2\">
-            <form name=\"form_admin_pri_update\" method=\"get\"
+            <form name=\"form_pri_update\" method=\"get\"
               action=\"" . url_prepare("incident_index.php") . "\">
             <input type=\"hidden\" name=\"sel_priority\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"priority_update\" />
@@ -672,7 +676,7 @@ function html_priority_form($pri_q) {
           <tr>
             <td class=\"adminLabel\">$l_label : </td>
             <td><input type=\"text\" name=\"tf_pri\" /></td>
-            <td rowspan=\"2\">
+            <td rowspan=\"3\">
               <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_update\"
               onclick=\"if (check_priority_upd(this.form, document.form_pri_delete)) return true; else return false;\" />
             </td>
@@ -681,6 +685,12 @@ function html_priority_form($pri_q) {
             <td class=\"adminLabel\">$l_order : </td>
             <td>
 	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	    </td>
+          </tr>
+          <tr>
+            <td class=\"adminLabel\">$l_color : </td>
+            <td>
+	      <input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" />
 	    </td>
           </tr>
           </table>
@@ -694,7 +704,7 @@ function html_priority_form($pri_q) {
 
 <!-- New Priority Section -->
 
-        <form name=\"form_admin_pri_new\" method=\"get\"
+        <form name=\"form_pri_new\" method=\"get\"
           action=\"" . url_prepare("incident_index.php") . "\">
         <table>
         <tr>
@@ -703,6 +713,9 @@ function html_priority_form($pri_q) {
         </tr><tr>
           <td class=\"adminLabel\">$l_order : </td>
           <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">$l_color : </td>
+          <td><input type=\"text\" name=\"tf_color\" size=\"6\" maxlength=\"6\" /></td>
         </tr><tr>
           <td colspan=\"2\" class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
@@ -733,12 +746,17 @@ function html_status_form($sta_q) {
   global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
 
   // Status select construction
-  $sel_sta = "<select name=\"sel_status\" size=\"4\">";
-   while ($sta_q->next_record()) {
-     $id = $sta_q->f("incidentstatus_id");
-     $order = $sta_q->f("incidentstatus_order");
-     $label = $sta_q->f("incidentstatus_label");
-     $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
+  $sel_sta = "<select name=\"sel_status\" onChange=\"
+    text = this.options[this.selectedIndex].text;
+    pos = text.indexOf('-');
+    forms.form_status_update.tf_status.value=text.substr(pos+1);
+    forms.form_status_update.tf_order.value=text.substr(0,pos);\"
+   size=\"4\">";
+  while ($sta_q->next_record()) {
+    $id = $sta_q->f("incidentstatus_id");
+    $order = $sta_q->f("incidentstatus_order");
+    $label = $sta_q->f("incidentstatus_label");
+    $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
   }
   $sel_sta .= "</select>";
 

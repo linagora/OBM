@@ -329,15 +329,25 @@ class OBM_DISPLAY {
 	$align = "left";
 	$fieldname = $this->display_pref->f("display_fieldname");
 
+        //--------------------------------------------------
+        // Global field display disposition
+        //--------------------------------------------------
 	//------------------------------
 	// For any field to be used as a date field
 	//  -> start with "date_" 
 	//   * used in timemanagement
 	//------------------------------
-	// For date:
+	// Format dates
 	if (substr($fieldname,0,5) == "date_") {
 	  $name = date_format($this->data_set->f($fieldname));
 	}
+	elseif ($fieldname == "timeupdate") {
+	  $name = datetime_format($this->data_set->f($fieldname));
+	}
+	else if ($fieldname == "timecreate") {
+	  $name = datetime_format($this->data_set->f($fieldname));
+	}
+
 
         //-------------------------------------
 	// invoice from the deal display screen
@@ -378,14 +388,17 @@ class OBM_DISPLAY {
 	if (function_exists($dis_data_entity)) {
 	  $res = $dis_data_entity($this, $fieldname, $link_ok);
 	  $align = $res["align"];
-	  $name = $res["name"];
+	  if ($res["name"] != "") $name = $res["name"];
 	  $url = $res["url"];
+	  $style = $res["style"];
 	} else {
 	  $name = $this->data_set->f($fieldname);
 	}	  
 
-	// Set the alignment
-	if ($align == "center") {
+	// Set the style
+	if ($style != "") {
+	  $td = "<td $style>";
+	} elseif ($align == "center") {
 	  $td = "<td class=\"OBMDisplayTextCentered\">";
 	} else {
 	  $td = "<td class=\"OBMDisplayText\">";

@@ -893,7 +893,9 @@ function html_company_kind_form($kind_q) {
   global $l_kind_manage,$l_kind_exist;
   global $l_kind_checkdelete,$l_kind_update,$l_kind_new,$l_kind_insert;
 
-  $sel_kind = "<select name=\"sel_kind\" size=\"4\" >";
+  $sel_kind = "<select name=\"sel_kind\" onChange=\"
+    forms.form_kind_update.tf_kind.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
   while ($kind_q->next_record()) {
     $id = $kind_q->f("companytype_id");
     $label = $kind_q->f("companytype_label");
@@ -937,7 +939,7 @@ function html_company_kind_form($kind_q) {
 
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_admin_kind_update\" method=\"get\"
+            <form name=\"form_kind_update\" method=\"get\"
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
@@ -954,7 +956,7 @@ function html_company_kind_form($kind_q) {
 
 <!-- New Kind Section -->
 
-        <form name=\"form_admin_kind_new\" method=\"get\"
+        <form name=\"form_kind_new\" method=\"get\"
           action=\"" . url_prepare("company_index.php") . "\">
         <table>
         <tr>
@@ -1050,7 +1052,9 @@ function html_company_activity_form($act_q) {
   global $l_act_manage,$l_act_exist;
   global $l_act_checkdelete,$l_act_update,$l_act_new,$l_act_insert;
 
-  $sel_act = "<select name=\"sel_act\" size=\"8\" >";
+  $sel_act = "<select name=\"sel_act\" onChange=\"
+    forms.form_act_update.tf_act.value=this.options[this.selectedIndex].text;\"
+    size=\"8\">";
   while ($act_q->next_record()) {
     $id = $act_q->f("companyactivity_id");
     $label = $act_q->f("companyactivity_label");
@@ -1095,7 +1099,7 @@ function html_company_activity_form($act_q) {
 
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
-            <form name=\"form_admin_act_update\" method=\"get\"
+            <form name=\"form_act_update\" method=\"get\"
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_act\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"activity_update\" />
@@ -1111,7 +1115,7 @@ function html_company_activity_form($act_q) {
       <td>
 
 <!-- New Activity Section -->
-        <form name=\"form_admin_act_new\" method=\"get\"
+        <form name=\"form_act_new\" method=\"get\"
           action=\"" . url_prepare("company_index.php") . "\">
         <table>
         <tr>

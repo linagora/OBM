@@ -1249,32 +1249,53 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $l_hitrate;
 
   // Kind Select construction
-  $sel_kind = "<select name=\"sel_kind\" size=\"4\">";
-   while ($kind_q->next_record()) {
-     $id = $kind_q->f("dealtype_id");
-     $inout = $kind_q->f("dealtype_inout");
-     $label = $kind_q->f("dealtype_label");
-     $sel_kind .= "<option value=\"$id\">$inout $label</option>\n";
+  $sel_kind = "<select name=\"sel_kind\" onChange=\"
+    text = this.options[this.selectedIndex].text;
+    pos = text.indexOf(' ');
+    forms.form_kind_update.tf_kind.value=text.substr(pos+1);
+    pos = 0;
+    sign = text.substr(0,1);
+    if (sign == '+') { pos = 1; }
+    forms.form_kind_update.rd_kind_inout[pos].checked=true;\"
+    size=\"4\">";
+  while ($kind_q->next_record()) {
+    $id = $kind_q->f("dealtype_id");
+    $inout = $kind_q->f("dealtype_inout");
+    $label = $kind_q->f("dealtype_label");
+    $sel_kind .= "<option value=\"$id\">$inout $label</option>\n";
   }
   $sel_kind .= "</select>";
 
   // status select construction
-  $sel_sta = "<select name=\"sel_state\" size=\"4\">";
-   while ($status_q->next_record()) {
-     $id = $status_q->f("dealstatus_id");
-     $order = $status_q->f("dealstatus_order");
-     $label = $status_q->f("dealstatus_label");
-     $hitrate = $status_q->f("dealstatus_hitrate");
-     $sel_sta .= "<option value=\"$id\">$order-$label ($hitrate)</option>\n";
+  $sel_sta = "<select name=\"sel_state\" onChange=\"
+    text = this.options[this.selectedIndex].text;
+    pos = text.indexOf('(');
+    hit = text.substr(pos+1);
+    pos2 = hit.indexOf(')');
+    hit = hit.substr(0,pos2);
+    text = text.substr(0, pos);
+    pos = text.indexOf('-');
+    forms.form_status_update.tf_status.value=text.substr(pos+1);
+    forms.form_status_update.tf_order.value=text.substr(0,pos);
+    forms.form_status_update.tf_hitrate.value=hit;\"
+    size=\"4\">";
+  while ($status_q->next_record()) {
+    $id = $status_q->f("dealstatus_id");
+    $order = $status_q->f("dealstatus_order");
+    $label = $status_q->f("dealstatus_label");
+    $hitrate = $status_q->f("dealstatus_hitrate");
+    $sel_sta .= "<option value=\"$id\">$order-$label ($hitrate)</option>\n";
   }
   $sel_sta .= "</select>";
 
   // category select construction
-  $sel_cat = "<select name=\"sel_cat\" size=\"4\" >";
-   while ($cat_q->next_record()) {
-     $id = $cat_q->f("tasktype_id");
-     $mlabel = $cat_q->f("tasktype_label");
-     $sel_cat .= "<option value=\"$id\">$mlabel</option>\n";
+  $sel_cat = "<select name=\"sel_cat\" onChange=\"
+    forms.form_cat_update.tf_cat.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f("tasktype_id");
+    $mlabel = $cat_q->f("tasktype_label");
+    $sel_cat .= "<option value=\"$id\">$mlabel</option>\n";
   }
   $sel_cat .= "</select>";
 
@@ -1504,7 +1525,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
 
       <tr>
         <td colspan=\"3\">
-          <form name=\"form_category_update\"
+          <form name=\"form_cat_update\"
           method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
           <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
           <input type=\"hidden\" name=\"action\" value=\"cat_update\" />

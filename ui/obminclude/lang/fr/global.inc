@@ -25,6 +25,7 @@ $l_archive_first = "Arc";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
+$l_color = "Couleur";
 
 // Mysql Date format
 $l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time

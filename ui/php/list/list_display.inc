@@ -58,14 +58,6 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
   
-  else if ($fieldname == "timecreate") {
-    $res["name"] = datetime_format($OD->data_set->f($fieldname));
-  }
-
-  else if ($fieldname == "timeupdate") {
-    $res["name"] = datetime_format($OD->data_set->f($fieldname));
-  }
-
   // For contacts urls (link):
   else if ($fieldname == "list_contact_lastname") {
     $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("list_contact_id");

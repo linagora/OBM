@@ -39,6 +39,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incident_date,
       incident_priority_id,
       incidentpriority_label as incident_priority,
+      incidentpriority_color,
       incident_status_id,
       incidentstatus_label as incident_status,
       incident_logger,
@@ -349,19 +350,22 @@ function run_query_status() {
 function run_query_priority_insert($incident) {
   global $auth, $cdg_sql;
 	
-  $label = $incident["pri_label"];
   $order = $incident["pri_order"];
+  $color = $incident["pri_color"];
+  $label = $incident["pri_label"];
 
   $query = "insert into IncidentPriority (incidentpriority_timeupdate,
     incidentpriority_timecreate,
     incidentpriority_usercreate,
-    incidentpriority_label,
-    incidentpriority_order)
+    incidentpriority_order,
+    incidentpriority_color,
+    incidentpriority_label)
   values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
-    '$label',
-    '$order')";
+    '$order',
+    '$color',
+    '$label')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -381,13 +385,15 @@ function run_query_priority_update($incident) {
   global $auth, $cdg_sql;
 
   $priority = $incident["priority"];
-  $label = $incident["pri_label"];
   $order = $incident["pri_order"];
+  $color = $incident["pri_color"];
+  $label = $incident["pri_label"];
 
   $query = "update IncidentPriority set incidentpriority_label='$label',
     incidentpriority_timeupdate='".date("Y-m-d H:i:s")."',
     incidentpriority_userupdate='".$auth->auth["uid"]."',
-    incidentpriority_order='$order'
+    incidentpriority_order='$order',
+    incidentpriority_color='$color'
   where incidentpriority_id='$priority'";
 
   display_debug_msg($query, $cdg_sql);

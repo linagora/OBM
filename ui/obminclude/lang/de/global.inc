@@ -22,6 +22,7 @@ $l_comment = "Comment";
 $l_archive = "Archiv";
 $l_archive_first = "A";
 $l_invalid_data = "Falsche Daten";
+$l_color = "Color";
 
 // OBM_DISPLAY
 $l_field = "Field";

@@ -705,7 +705,9 @@ function html_contract_admin_form($type_q) {
   global $l_type_insert_ok, $l_type_insert_error, $l_type_update_ok;
   global $l_type_update_error, $l_type_delete_error, $l_type_delete_ok;
 
-  $dis_sel_type = "<select name=\"sel_type\" size=\"4\">";
+  $dis_sel_type = "<select name=\"sel_type\" onChange=\"
+    forms.form_type_update.tf_type.value=this.options[this.selectedIndex].text;\"
+    size=\"4\">";
   while ($type_q->next_record()) {
     $dis_sel_type .= "\n<option value=\"".$type_q->f("contracttype_id")."\">".$type_q->f("contracttype_label") .
            "</option>";
@@ -725,7 +727,7 @@ function html_contract_admin_form($type_q) {
         <table>
         <tr>
          <td colspan=\"3\">
-     <form name=\"form_admin_type_delete\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
+     <form name=\"form_type_delete\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
        <table>
         <tr>
           <td class=\"adminLabel\">$l_type_exist</td>
@@ -744,7 +746,7 @@ function html_contract_admin_form($type_q) {
 <!--  type update section -->
      <tr>
       <td colspan=\"2\" class=\"adminLabel\">
-       <form name=\"form_admin_type_update\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
+       <form name=\"form_type_update\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
        <table>
          <tr>
           <td>
@@ -754,7 +756,7 @@ function html_contract_admin_form($type_q) {
 	  </td>
 	  <td rowspan=\"2\">
 	    <input type=\"submit\" name=\"sub_type\" value=\"$l_type_update\"
-	    onclick=\"if (check_type_upd(this.form,document.form_admin_type_delete)) return true; else return false;\" />
+	    onclick=\"if (check_type_upd(this.form,document.form_type_delete)) return true; else return false;\" />
 	  </td>
 	</tr>
        </table>
@@ -766,7 +768,7 @@ function html_contract_admin_form($type_q) {
 <!-- new type section -->
    </td>
    <td>
-    <form name=\"form_admin_type_new\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
+    <form name=\"form_type_new\" method=\"post\" action=\"".url_prepare("contract_index.php")."\">
      <table>
       <tr>
        <td class=\"adminLabel\">
