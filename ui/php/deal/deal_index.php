@@ -64,14 +64,12 @@ update_last_visit("parentdeal", $param_parent, $action);
 
 
 // Updating the "last parentdeal" bookmark 
-if (false) {
 if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0) ) {
   $last_parentdeal = $last_parentdeal_default;
 } elseif ( ($param_parent > 0) && ($last_parentdeal != $param_parent) ) {
   $last_parentdeal = $param_parent;
   run_query_set_user_pref($uid, "last_parentdeal", $param_parent);
   $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
-}
 }
 
 page_close();
@@ -142,7 +140,8 @@ elseif (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   $usrc_q = run_query_all_users_from_group($cg_com);
   $usrp_q = run_query_all_users_from_group($cg_prod);
-  $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+  $cat1_q = run_query_dealcategory();
+  $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -172,7 +171,8 @@ elseif (($action == "index") || ($action == "")) {
       $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
       $usrc_q = run_query_all_users_from_group($cg_com, $users);
       $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-      $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+      $cat1_q = run_query_dealcategory();
+      $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
     } else {
       // this deal's page has "private" access
       $display["msg"] .= display_err_msg($l_error_visibility);
@@ -201,7 +201,8 @@ elseif (($action == "index") || ($action == "")) {
     $users = array($deal["market"], $deal["tech"]);
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    $cat1_q = run_query_dealcategory();
+    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
   }
   
 }elseif ($action == "update")  {
@@ -226,7 +227,8 @@ elseif (($action == "index") || ($action == "")) {
     $users = array($deal["market"], $deal["tech"]);
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    $cat1_q = run_query_dealcategory();
+    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $cat1_q, $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
@@ -292,9 +294,9 @@ elseif (($action == "index") || ($action == "")) {
   $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_dealstatus());
 
 } elseif ($action == "cat_checklink")  {
-///////////////////////////////////////////////////////////////////////////////
-   $display["detail"] .= dis_cat_links($deal);
-
+///////////////////////////////////////////////////////////////////////////////  
+$display["detail"] .= dis_cat_links($deal);
+ 
 } elseif ($action == "cat_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_delete($deal["category"]);
@@ -617,7 +619,6 @@ function get_param_deal() {
   if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
   if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
-  if (isset ($sel_cat)) $deal["category"] = $sel_cat;
   if (isset ($sel_cat1)) $deal["category"] = $sel_cat1;
   if (isset ($cb_archive)) {
     $deal["archive"] = $cb_archive;

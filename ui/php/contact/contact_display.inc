@@ -210,13 +210,15 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
   if ($show_cat1) {
     $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
     <option value=\"$c_all\">$l_all</option>";
-    while ($cat1_q->next_record()) {
-      $c1_id = $cat1_q->f("contactcategory1_id");
-      $c1_code = $cat1_q->f("contactcategory1_code");
-      $c1_label = $cat1_q->f("contactcategory1_label");
-      $sel_cat1 .= "\n<option value=\"$c1_id\"";
-      if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
-      $sel_cat1 .= ">$c1_label</option>";
+    if (is_object($cat1_q)) {
+      while ($cat1_q->next_record()) {
+        $c1_id = $cat1_q->f("contactcategory1_id");
+        $c1_code = $cat1_q->f("contactcategory1_code");
+        $c1_label = $cat1_q->f("contactcategory1_label");
+        $sel_cat1 .= "\n<option value=\"$c1_id\"";
+        if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
+        $sel_cat1 .= ">$c1_label</option>";
+      }
     }
     $sel_cat1 .= "</select>";
 
@@ -230,13 +232,15 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, 
   if ($show_cat2) {
     $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2\">
     <option value=\"$c_all\">$l_all</option>";
-    while ($cat2_q->next_record()) {
-      $c2_id = $cat2_q->f("contactcategory2_id");
-      $c2_code = $cat2_q->f("contactcategory2_code");
-      $c2_label = $cat2_q->f("contactcategory2_label");
-      $sel_cat2 .= "\n<option value=\"$c2_id\"";
-      if ($c2_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
-      $sel_cat2 .= ">$c2_label</option>";
+    if (is_object($cat2_q)) {
+      while ($cat2_q->next_record()) {
+        $c2_id = $cat2_q->f("contactcategory2_id");
+        $c2_code = $cat2_q->f("contactcategory2_code");
+        $c2_label = $cat2_q->f("contactcategory2_label");
+        $sel_cat2 .= "\n<option value=\"$c2_id\"";
+        if ($c2_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
+        $sel_cat2 .= ">$c2_label</option>";
+      }
     }
     $sel_cat2 .= "</select>";
 
@@ -582,7 +586,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $dis_cat1 = "";
 
     $i = 0;
-    while($cat1_q->next_record()) {
+    while ($cat1_q->next_record()) {
       if ($i==0) {
 	$dis_cat1 .= "<tr>";
       }
@@ -611,7 +615,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $dis_cat2 .= "</tr>";
     $dis_cat2 = "";
     $i = 0;
-    while($cat2_q->next_record()) {
+    while ($cat2_q->next_record()) {
       if ($i==0) {
 	$dis_cat2 .= "<tr>";
       }
@@ -874,6 +878,8 @@ function dis_contact_form($action, $co_q, $contact) {
 // HTML Display Contact Form
 // Parameters:
 //   - $action    : action called
+//   - $cat1_q    : Contact category1 database result 
+//   - $cat2_q    : Contact category2 database result 
 //   - $co_q      : contact database result 
 //   - $dsrc_q    : datasource database result 
 //   - $func_q    : function database result 
@@ -884,7 +890,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
@@ -954,6 +960,9 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       $c_new_name = $c_name;
       $mark = $contact["marketing_manager"];
     }
+  } elseif ( ($action == "insert") || ($action == "update") ) {
+    $cat1 = array();
+    $cat2 = array();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1077,12 +1086,11 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
 
   // Category 1 select field
   if ($show_cat1) {
-    $i=0; 
-    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
-    while($cat1_q->next_record()) {
+    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+    while ($cat1_q->next_record()) {
       $c1_id = $cat1_q->f("contactcategory1_id");
       $sel_cat1 .= "\n<option value=\"$c1_id\"";
-      if ($c1_id == $cat1[$i]) { $sel_cat1 .= " selected=\"selected\""; $i++;}
+      if (in_array($c1_id, $cat1)) { $sel_cat1 .= " selected=\"selected\""; }
       $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
     }
     $sel_cat1 .= "</select>";
@@ -1105,12 +1113,11 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
 
   // Category 2 select field
   if ($show_cat2) {
-    $i=0; 
     $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
     while ($cat2_q->next_record()) {
       $c2_id = $cat2_q->f("contactcategory2_id");
       $sel_cat2 .= "\n<option value=\"$c2_id\"";
-      if ($c2_id == $cat2[$i]) { $sel_cat2 .= " selected=\"selected\""; $i++; }
+      if (in_array($c2_id, $cat2)) { $sel_cat2 .= " selected=\"selected\""; }
       $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
     }
     $sel_cat2 .= "</select>";
