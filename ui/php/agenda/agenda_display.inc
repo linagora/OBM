@@ -2704,38 +2704,53 @@ function dis_category_delete_form($agenda) {
 function dis_category_links($agenda) {
   global $l_category_link_agenda, $l_category_link_agenda_no;
   global $l_category_can_delete, $l_category_cant_delete;
-  global $l_back,$l_link_events;
+  global $l_back,$l_link_events,$display;
 
   $label = get_category_label($agenda["category_id"]);
   $obm_q = run_query_category_links($agenda["category_id"]);
   $del_form = dis_category_delete_form($agenda["category_id"]);
+  
   $obm_q->next_record();
   if ($obm_q->f("numlink") > 0) {
+    $display["msg"] = display_warn_msg($l_category_cant_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_category_cant_delete ".$obm_q->f("numlink")." $l_link_events</td>
-    </tr><tr>
-      <td>&nbsp;</td>
+      <td class=\"detailHead\">$label : ".$obm_q->f("numlink")." $l_link_events</td>
     </tr>
+    </table>
+    <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <form name=\"form_back\" method=\"post\"
+          action=\"" .url_prepare("agenda_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+	
+	</p>
+    </div>
 ";
   } else {
+    $display["msg"] = display_ok_msg($l_category_can_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"messageOk\">
-      $l_category_link_agenda_no '$label' : $l_category_can_delete</td>
-    </tr><tr>
-      <td>$del_form</td>
-      <td>
+      <td colspan=\"2\" class=\"detailHead\">
+      $l_category_link_agenda_no '$label' </td>
+    </tr>
+    </table>
+    <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+      $del_form
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("agenda_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
-      </td>
-    </tr>
-    </table>";
+	</p>
+    </div>
+";
+
   }
   return "$dis_link";
 }

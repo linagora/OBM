@@ -465,8 +465,6 @@ elseif ($action == "rights_admin") {
 } elseif ($action == "category_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_category_links($agenda);//$sel_category);
-  require("agenda_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "category_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
