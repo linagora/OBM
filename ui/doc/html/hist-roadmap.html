@@ -11,14 +11,14 @@
 <h1>OBM History and Roadmap</h1>
 <i>Why OBM and where does it go </i>
 <br />
-Version 0.6.6 - 2003-07-18<br />
+Version 0.7.0 - 2003-09-08<br />
 Pierre Baudracco
 </center>
 <p />
 
 <h2>Events</h2>
 
-2003-07-18 : is getting sponsorship ! More info soon<br />
+2003-09-08 : version <b>0.7.0</b> released (major enhancement)<br />
 2003-07-18 : version <b>0.6.6</b> released (fixes and minor enhancement). OBM <b>mailing list new start !</b><br />
 2003-06-12 : version <b>0.6.5</b> released (fixes)<br />
 2003-05-28 : version <b>0.6.4</b> released (fixes)<br />
@@ -136,12 +136,12 @@ The calendar module was integrated for testing purpose but its code hadn't been 
 <p>
 0.5.3 continued on the global architecture clean up and enhancement for 0.6 preparation (session administration, input files rules, internal contact moved to userobm, date handling,..).
 <p />
-OBM coul now be viewed has a great framework for complex web applications. The strategy was now clearer for OBM.
+OBM could now be viewed has a great framework for complex web applications. The strategy was now clearer for OBM.
 
 
-<h3>Status - Current situation - 0.6.6</h3>
+<h3>Versions 0.6.x</h3>
 
-0.6.0 represent a major release with a great amount of work done.
+0.6.0 represented a major release with a great amount of work done.
 Quality, maintenance and usability had been the main goals.
 All the backoffice work (architecture changes) can now be visible through the new theme !
 <ul>
@@ -161,6 +161,23 @@ All the backoffice work (architecture changes) can now be visible through the ne
 0.6.1, 0.6.2, 0.6.3, 0.6.4, 0.6.5 and 0.6.6 enhanced and fixed the calendar module, fixed problems and added minor functionnality (new admin code tool to have functions reporting, company and contact can be archived, deal helps, incident admin screen) and fixes (bookmark, permissions,...).
 We now have a very capable agenda module with great features (native multi-user, multi-view, meeting handling, fine access rights, each kind of repetition, private events, event validation, email notices, vcalendar export works for evolution & pda,...) and great ui.
 <p />
+
+<h3>Status - Current situation - 0.7.0</h3>
+
+0.7.0 represents a major release with major functionnality and usability enhancements.
+The project management module has been added and interacts with the totally rewritten time management modulewith  Users, tasks and pogress tracking.
+The long waited document module is now here in its initial form.
+What cool is that the document repository can be viewed from both angles (database view and filesystem view).
+Document can be linked to entities such as deals.
+User groups module has been added too and used in the calendar module. Its use will increase in future releases.
+Contact lists based on query have been added.
+
+The OBM display handling had been redesigned to allow easier theme management with reducing maintenance and work.
+A unique and simple display function (display_page()) is now in charge of the screen display. Each graphical section returns a display block. display_page organize these blocks.
+Every attributes are now setted in CSS.
+<p>
+A great deal of work has been done to make OBM a mature product.
+
 <h3>Actual module status :</h3>
 
 <table border=1>
@@ -192,16 +209,32 @@ We now have a very capable agenda module with great features (native multi-user,
   <td>Production</td>
 </tr><tr>
   <td>PROD</td>
-  <td>Contracts</td>
+  <td>Time management</td>
+  <td>beta (just rewritten)</td>
+</tr><tr>
+  <td>PROD</td>
+  <td>Project</td>
+  <td>beta</td>
+</tr><tr>
+  <td>PROD</td>
+  <td>Contract</td>
   <td>Production</td>
 </tr><tr>
   <td>PROD</td>
-  <td>Incidents</td>
+  <td>Incident</td>
   <td>Production</td>
+</tr><tr>
+  <td>PROD</td>
+  <td>Document</td>
+  <td>beta</td>
 </tr><tr>
   <td>USERS</td>
   <td>User</td>
   <td>Production</td>
+</tr><tr>
+  <td>USERS</td>
+  <td>Group</td>
+  <td>beta</td>
 </tr><tr>
   <td>USERS</td>
   <td>Settings</td>
@@ -223,7 +256,7 @@ We now have a very capable agenda module with great features (native multi-user,
   <td>Admin_data</td>
   <td>Production</td>
 </tr><tr>
-  <td>ADMINS/td>
+  <td>ADMINS</td>
   <td>Admin_lang</td>
   <td>Production</td>
 </tr><tr>
@@ -244,37 +277,20 @@ We now have a very capable agenda module with great features (native multi-user,
   <td>COMPTA</td>
   <td>Accounting : Payments</td>
   <td>alpha : to be reviewed</td>
-</tr><tr>
-  <td>PROD</td>
-  <td>Time manager</td>
-  <td>alpha (being rewriten with project integration)</td>
-</tr><tr>
-  <td>PROD</td>
-  <td>Project</td>
-  <td>alpha (will be in OBM for 0.7)</td>
 </tr>
 </table>
 <p />
 
 
-<h2>Towards 0.7 and Future developments</h2>
+<h2>Future developments</h2>
 
-<h3>Functionality</h3>
+<h3>Functionnality</h3>
 
-Add users Groups in user section with uses in various modules (agenda,...)
-<p />
-Accountings (compta) modules (account, invoice and payment) will be up for a rewrite to integrate smoothly with the deal module.
-<p />
-Dynamic lists will be implemented to allow live lists based on queries.
+Accounting (compta) modules (account, invoice and payment) will be up for a rewrite to integrate smoothly with the deal module.
 <p />
 Improve marketing data analisys for the COM section (allow forecast, reporting,...).
 <p />
-Then we are planning a new module : The Document Module, designed to
-store all the documents a company can produce (letter, bill, ...).
-<p />
-This could replace the <b>Public Folders</b> feature of Exchange.
-<p />
-
+After the document module we are planning a document generation module.
 One intersting feature of this module would be the capability to automaticaly
 generate a document with data from the database and from a form depending on
 the document type.
@@ -282,13 +298,15 @@ the document type.
 The Document would be generated by specific modules (LaTex, Word, any capable
 Linux office tool) which could be added later. We are currently working on the
 LaTex module.
+<p />
+An home page will be inserted with a sum up for the user (new event, deal to cope with,...)
+<p />
+A simple todo module would be intersting too.
 
 
 <h3>Architecture</h3>
 
-Finish the OBM_DISPLAY clean up : export all specific fields process away from the class to the field module.
-<p />
-<b>not urgent</b> : evaluate and select a template engine (and really put each presentation output in separated files)
+<b>not urgent</b> : evaluate and select a template engine (and really put each presentation output in separated files). This is a controversial issue has PHP is already a template language, and OBM separate the HTML content.
 <p />
 <b>not urgent</b> : select a new database abstraction layer.
 <p />
@@ -303,7 +321,7 @@ Put all the documentation in one central guide (in latex) to be exported in pdf 
 <H2>RoadMap</H2>
 
 For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzilla for OBM</a> tool.
-<P>
+<p />
 
 <TABLE border=1>
 <TR><TH>Version</TH><TH>Date</TH><TH>Planned features or changes</TH></TR>
@@ -336,12 +354,12 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
 </ul>
 </td>
 </tr><tr>
-  <td><b>0.6</b></td>
+  <td>0.6</td>
   <td>2003-01-07 - 2003-08-xx</td>
   <td>
     <ul>
-    <li> (done, to complete - 0.6.0) <b>GUI work</b>
-    <li> Templates separation
+    <li> (done - 0.7.0) <b>GUI work</b>
+    <li> (not sure ?) Templates separation
     <li> (done - 0.6.0) New default theme with cleaner displays
     <li> (done - 0.6.0) Themes to use CSS
     <li> (done - 0.6.0) Section grouping of modules
@@ -349,15 +367,17 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
     </ul>
   </td>
 </tr><tr>
-  <td>0.7</td>
+  <td><b>0.7</b></td>
   <td>2003-08-xx</td>
   <td>
     <ul>
-    <li> Gui work on entities detailed view <b>GUI work</b>
+    <li> (done - 0.7.0) Gui work on entities detailed view <b>GUI work</b>
     <li> Templates separation ?
-    <li> User Groups
-    <li> Security audit
+    <li> (done - 0.7.0) User Groups
+    <li> (partially done - 0.7.0) Security audit
     <li> Documentation
+    <li> (done - 0.7.0) Document module
+    <li> (done - 0.7.0) User Groups
     </ul>
   </td>
 </tr><tr>
@@ -365,7 +385,6 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
   <td>200x-xx-xx</td>
   <td>
     <ul>
-    <li> Document module with latex connection (other word processors ?)
     <li> Document generation : latex connection (other word processors ?)
     <li> Bill module ?
     </ul>
