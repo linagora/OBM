@@ -454,6 +454,87 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
   return $block;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Publication Form                                                      //
+// Parameters:
+//   - $action    : action called
+//   - $pub_q      : publication database result 
+//   - $dsrc_q    : datasource database result 
+//   - $type_q    : type database result 
+//   - $usr_q     : userobm database result 
+//   - $ctry_q    : country database result 
+//   - $publication[] : default values
+//     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email ,com
+///////////////////////////////////////////////////////////////////////////////
+function html_group_subscription_form($action,$cat1_q, $publication) {
+  global $display, $auth, $set_dsrc;
+  global $set_theme,$l_category;
+  global $l_insert, $l_publication;
+  global $l_contact_category1,$l_auto_sub;
+
+  $auto_sub = array();
+  // If parameters have been given, they supercede the default action value
+  if (isset($publication["id"])) { $id = $publication["id"]; }
+  if (isset($publication["auto_sub"])) {  $auto_sub = $publication["auto_sub"]; }
+ 
+
+  $dis_button = "
+    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />  
+    <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_group_subscription\" />
+    <input type=\"submit\" value=\"$l_insert\" />
+    ";
+  $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
+  while($cat1_q->next_record()) {
+    $cat_id = $cat1_q->f("contactcategory1_id");
+    $cat_label = $cat1_q->f("contactcategory1_label");
+    $sel_contcat1 .= "<option value=\"".$cat_id ."\" ";
+    if($cat_id = current($auto_sub)) {
+      $sel_contcat1 .= "selected=\"selected\" ";
+      next($auto_sub);
+    }
+    $sel_contcat1 .= ">$cat_label</option>";
+  }
+  $sel_contcat1 .= "</select>";
+
+  $display["title"] = "<div class=\"title\">$l_publication : $title</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <form method=\"post\" name=\"form_publication\"
+      onsubmit=\"if (check_publication(this)) return true; else return false;\"
+      action=\"".url_prepare("publication_index.php")."\">
+
+    <div class=\"detailHead\">$l_publication</div>
+
+    <div class=\"detailHead\">$l_auto_sub</div>
+   
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_contact_category1</td>
+      <td class=\"detailForm\">
+       $sel_contcat1
+      </td>
+     </tr>   
+     <tr>
+      <td class=\"detailLabel\"></td>
+      <td class=\"detailForm\">
+      $sel_recept
+      </td>
+     </tr>       
+    </table>    
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>";
+
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Subscription Form                                                      //
 // Parameters:
@@ -588,7 +669,6 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
 
   return $block;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Subscription Form

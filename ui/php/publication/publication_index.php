@@ -208,6 +208,26 @@ if ($action == "ext_get_id") {
     require("publication_js.inc");
     $display["detail"] =html_subscription_form($action,$cont_q, $recept_q, $publication);        
   }
+} elseif ($action == "new_group_subscription")  {
+///////////////////////////////////////////////////////////////////////////////
+  $concat1_q = run_query_publication_contactcategory1();
+  $display["detail"] = html_group_subscription_form($action, $concat1_q,$publication);
+} elseif ($action == "insert_group_subscription")  {
+///////////////////////////////////////////////////////////////////////////////
+  // If the context (same publications) was confirmed ok, we proceed
+  $pub_q = run_query_detail($param_publication);
+  $publication["lang"] = $pub_q->f("publication_lang");
+  if(is_array($publication["auto_sub"]) &&
+     count($publication["auto_sub"])>0) {
+    $retour = run_query_auto_subscription($publication,$param_publication);
+  }
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_insert_error);
+  }
+  $display["detailInfo"] .= display_record_info($pub_q);
+  $display["detail"] = html_publication_consult($pub_q, $cat_q);
 
 } elseif ($action == "insert_auto")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -466,8 +486,9 @@ function get_param_publication() {
 function get_publication_action() {
   global $publication, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_auto;;
+  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_auto;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
+  global $l_subscription;
 
 // Index
   $actions["PUBLICATION"]["index"] = array (
@@ -497,14 +518,14 @@ function get_publication_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
                                      );
-// New
+// New Publication from an other one.
   $actions["PUBLICATION"]["new_auto"] = array (
     'Name'     => $l_header_new_auto,
     'Url'      => "$path/publication/publication_index.php?action=new_auto&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update','insert_auto')
                                      );
-
+	     
 // Detail Consult
   $actions["PUBLICATION"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
@@ -520,6 +541,20 @@ function get_publication_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update','insert_auto') 
                                      	      );
+
+// Subscribe a group of contact to a publication.
+  $actions["PUBLICATION"]["new_group_subscription"] = array (
+    'Name'     => $l_subscription,
+    'Url'      => "$path/publication/publication_index.php?action=new_group_subscription&amp;param_publication=".$publication["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'update','insert_auto', 'insert')
+                                     );		
+// Subscribe a group of contact to a publication.
+  $actions["PUBLICATION"]["insert_group_subscription"] = array (
+    'Url'      => "$path/publication/publication_index.php?action=insert_group_subscription",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                     );						     
 // Subscription Update
   $actions["PUBLICATION"]["detailupdate_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=detailupdate_subscription",

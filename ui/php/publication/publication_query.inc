@@ -296,7 +296,8 @@ function run_query_auto_subscription($publication,$p_id){
   group by contact_id";
   display_debug_msg($query, $cdg_sql);
 
-  $retour = $obm_q->query($query); 
+  $retour = $obm_q->query($query);
+  return $retour;
 }
 
  
