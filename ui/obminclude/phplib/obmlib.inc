@@ -27,9 +27,7 @@ $db_type_mysql="MYSQL";
 //////////////////////////////////////////////////////////////////////////////
 
 class DB_OBM extends DB_Sql {
-	  var $Host     = "localhost" ;
-	//var $Host     = "localhost" ;
-	//  var $Host     = "couguar" ;
+  var $Host     = "localhost" ;
   var $Database = "obm";             
   var $type = "MYSQL" ;
 //  var $type     = "PGSQL";
@@ -39,11 +37,8 @@ class DB_OBM extends DB_Sql {
     var $Password = "";
   //    var $User     = "web";
   //    var $Password = "web";
-  //var $type     = $db_type_mysql;
-  //var $User     = "web";               //Mysql 
-  //var $Password = "";                  //Mysql 
-
 }
+
 
 class OBM_CT_Sql extends CT_Sql {
 //  var $classname = "OBM_CT_Sql";

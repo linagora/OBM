@@ -725,7 +725,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       $datebegin = date($c_php_isodate_format); 
       $datealarm = $datebegin;
       // We pre-fill Hit rate
-      $hitrate = "0";
+      // $hitrate = "0";
     } else {
       $comp = stripslashes($deal["company_name"]);
       $ad1 = $deal["company_ad1"];

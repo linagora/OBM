@@ -631,10 +631,10 @@ function dis_debug_param($deal) {
   global $cdg_param, $action;
 
   if (debug_level_isset($cdg_param)) {
-    echo "<BR>action=$action";
+    echo "<br />action=$action";
     if ( $deal ) {
       while ( list( $key, $val ) = each( $deal ) ) {
-        echo "<BR>deal[$key]=$val";
+        echo "<br />deal[$key]=$val";
       }
     }
   }
