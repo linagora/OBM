@@ -335,8 +335,9 @@ function check_data_form($id, $import) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_field_mapping($import_q) {
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_expresspostal, $l_country, $l_phone, $l_fax, $l_web, $l_email;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
+  global $l_comment;
 
   $desc = $import_q->f("import_desc");
   eval ($desc);
@@ -460,8 +461,10 @@ function is_row_valid($fields, $map) {
 ///////////////////////////////////////////////////////////////////////////////
 function row_has_contact($fields) {
 
+  // we consider the row has a contact if lastname, firstname or job title
   if ( ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") )
-     || ( (isset($fields["con_fn"])) && ($fields["con_fn"] != "") ) ) {
+     || ( (isset($fields["con_fn"])) && ($fields["con_fn"] != "") )
+     || ( (isset($fields["con_tit"])) && ($fields["con_tit"] != "") ) ) {
     return true;
   } else {
     return false;
@@ -548,6 +551,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $ad3 = addslashes($fields["comp_ad3"]);
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
+  $cdx = addslashes($fields["comp_cdx"]);
   $ctry = $countries[$fields["comp_ctry"]];
   if ($ctry == "") {
     $ctry = "0";
@@ -574,6 +578,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     company_address3,
     company_zipcode,
     company_town,
+    company_expresspostal,
     company_country_id,
     company_phone,
     company_fax,
@@ -596,6 +601,7 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
     '$ad3',
     '$zip',
     '$town',
+    '$cdx',
     '$ctry',
     '$phone',
     '$fax',
@@ -675,6 +681,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $ad3 = addslashes($fields["comp_ad3"]);
   $zip = $fields["comp_zip"];
   $town = addslashes($fields["comp_town"]);
+  $cdx = addslashes($fields["comp_cdx"]);
   $ctry = $countries[$fields["comp_ctry"]];
   if ($ctry == "") {
     $ctry = "0";
@@ -697,6 +704,7 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
     company_address3='$ad3',
     company_zipcode='$zip',
     company_town='$town',
+    company_expresspostal='$cdx',
     company_country_id='$ctry',
     company_phone='$phone',
     company_fax='$fax',
@@ -801,6 +809,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $ad3 = addslashes($fields["con_ad3"]);
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
+  $cdx = addslashes($fields["con_cdx"]);
   $ctry = $countries[$fields["con_ctry"]];
   if ($ctry == "") {
     $ctry = "0";
@@ -830,6 +839,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_address3,
     contact_zipcode,
     contact_town,
+    contact_expresspostal,
     contact_country_id,
     contact_title,
     contact_phone,
@@ -855,6 +865,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$ad3',
     '$zip',
     '$town',
+    '$cdx',
     '$ctry',
     '$title',
     '$phone',
@@ -912,6 +923,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $ad3 = addslashes($fields["con_ad3"]);
   $zip = $fields["con_zip"];
   $town = addslashes($fields["con_town"]);
+  $cdx = addslashes($fields["con_cdx"]);
   $ctry = $countries[$fields["con_ctry"]];
   if ($ctry == "") {
     $ctry = "0";
@@ -939,6 +951,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_address3='$ad3',
     contact_zipcode='$zip',
     contact_town='$town',
+    contact_expresspostal='$cdx',
     contact_country_id='$ctry',
     contact_title='$title',
     contact_phone='$phone',

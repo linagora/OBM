@@ -40,7 +40,6 @@ $l_email = "@M";
 $l_fax = "Fax";
 $l_address = "Indirizzo";
 $l_postcode = "CP";
-$l_expresspostal = "Cedex";
 $l_town = "Città";
 $l_country = "Stato";
 

@@ -201,7 +201,7 @@ if ($action == "index" || $action == "") {
     } else {
       $display["msg"] .= display_warn_msg("$l_task_delete_error");
     }
-  } else {
+  } else {pr
     $display["msg"] .= display_err_msg("$l_no_task_del");
   }
   $project["name"] = run_query_projectname($param_project);

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Deutsch (German)
 //     - File     : contact.inc
@@ -25,7 +25,6 @@ $l_homephone = "Home";
 $l_fax = "Telefax";
 $l_address = "Adresse";
 $l_postcode = "PLZ";
-$l_expresspostal = "Eilzustellung";
 $l_country = "Land";
 
 $l_contact_select_company = "Firmenauswahl für den Kontakt";

@@ -37,6 +37,7 @@ $l_phone = "Phone";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";
+$l_expresspostal = "Express postal";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_after = "After";

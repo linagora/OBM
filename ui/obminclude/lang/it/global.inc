@@ -36,6 +36,7 @@ $l_phone = "Telefono";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
 $l_town = "Citta";
+$l_expresspostal = "CAP 2";
 $l_priority = "Priorita";
 $l_datasource = "Data sorgente";
 $l_cat = "Categoria";

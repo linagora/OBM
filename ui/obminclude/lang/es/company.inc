@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : company.inc                                              //
@@ -16,7 +16,6 @@ $l_category = "Categorías";
 $l_activity = "Actividad";
 $l_market = "Gerente de Mercadeo";
 $l_company_kind = "Tipo de Compañía";
-$l_expresspostal = "Express postal";
 $l_country = "País";
 $l_fax = "Fax";
 $l_web = "Web";

@@ -37,6 +37,7 @@ $l_phone = "Teléfono";
 $l_address = "Dirección";
 $l_postcode = "Código Postal";
 $l_town = "Ciudad";
+$l_expresspostal = "Dirección de correo";
 $l_datasource = "Fuente de Datos";
 $l_cat = "Categoría";
 $l_visibility = "Acceso";

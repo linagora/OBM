@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norwegian                                                //
 //     - File     : company.inc                                              //
@@ -21,8 +21,6 @@ $l_newdoc_first = "NA";
 $l_kind = "Kategori";
 $l_address = "Adresse";
 $l_postcode_first = "ZIP";
-$l_expresspostal = "Ekspresspost";
-$l_town = "By";
 $l_country = "Land";
 $l_fax = "Fax";
 $l_email = "E-post";

@@ -17,7 +17,6 @@ $l_activity = "Activity";
 $l_nafcode = "Code";
 $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
-$l_expresspostal = "Express postal";
 $l_country = "Country";
 $l_fax = "Fax";
 $l_web = "Web";

@@ -32,7 +32,6 @@ $l_minimphone = "(Mobile)";
 $l_email = "@M";
 $l_mailing_ok = "Activé pour mailing";
 $l_fax = "Fax";
-$l_expresspostal = "Cedex";
 $l_country = "Pays";
 $l_comment = "Commentaire";
 $l_coord = "Coordonnées";

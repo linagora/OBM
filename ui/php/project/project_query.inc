@@ -632,7 +632,7 @@ function run_query_task_update($project) {
         projecttask_parenttask_id='$ptask',
         projecttask_rank='1'
       where
-        projecttask_id='$task';
+        projecttask_id='$task'
         ";
 
   display_debug_msg($query, $cdg_sql, "run_query_task_update(2)");
@@ -677,21 +677,23 @@ function run_query_task_delete($project) {
       $delete_ok = false;
     }
 
-    // Check that neither the task to be deleted or its childre tasks are
-    // used in time management
-    $query = "
-      select timetask_id
-      from TimeTask, ProjectTask
-      where timetask_projecttask_id = projecttask_id
-        and (projecttask_id='$tsk_id'  or projecttask_parenttask_id='$tsk_id')
-      ";
+    if ($delete_ok == true) {
+      // Check that neither the task to be deleted or its childre tasks are
+      // used in time management
+      $query = "
+        select timetask_id
+        from TimeTask, ProjectTask
+        where timetask_projecttask_id = projecttask_id
+          and (projecttask_id='$tsk_id' or projecttask_parenttask_id='$tsk_id')
+        ";
     
-    display_debug_msg($query, $cdg_sql, "run_query_task_delete(2)");
-    $search_q = new DB_OBM;
-    $search_q->query($query);
+      display_debug_msg($query, $cdg_sql, "run_query_task_delete(2)");
+      $search_q = new DB_OBM;
+      $search_q->query($query);
 
-    if ($search_q->nf() > 0) {
-      $delete_ok = false;
+      if ($search_q->nf() > 0) {
+	$delete_ok = false;
+      }
     }
 
     // If the task can be deleted
@@ -874,7 +876,6 @@ function run_query_allocation($p_id) {
       left join UserObm
         on projectuser_user_id = userobm_id
     where projectuser_project_id = '$p_id'
-      and projectuser_projectedtime != '0'
       and projectuser_projectedtime is not null
     group by userobm_id, projectuser_projecttask_id, projected_time, missing_time
     ";

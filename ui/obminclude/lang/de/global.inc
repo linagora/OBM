@@ -37,6 +37,7 @@ $l_phone = "Telefon";
 $l_address = "Adresse";
 $l_postcode = "Postleitzahl";
 $l_town = "Ort";
+$l_expresspostal = "Eilzustellung";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_cat = "Kategorie";

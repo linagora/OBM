@@ -25,7 +25,6 @@ $l_listdoc_first = "D";
 $l_newdoc_first = "ND";
 $l_address = "Adresse";
 $l_postcode_first = "PLZ";
-$l_expresspostal = "Eilzustellung";
 $l_country = "Land";
 $l_fax = "Telefax";
 $l_web = "Web";

@@ -22,7 +22,6 @@ $l_minimphone = "(Mobile)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Mailing enabled";
 $l_fax = "Fax";
-$l_expresspostal = "Express Postal";
 $l_country = "Country";
 $l_comment = "Comment";
 $l_coord = "Details";

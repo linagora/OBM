@@ -20,7 +20,7 @@ $fieldnames["import_enclosed"] = $l_enclosed;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Import specific dataset fields                                    //
+// Display Import specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -190,6 +190,7 @@ function html_import_consult($import_q) {
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
+  global $l_expresspostal;
   global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
@@ -704,7 +705,7 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   $num_line = $log["num_line"];
 
   $name = $fields["comp_name"];
-  $info = $fields["comp_zip"] . " " . $fields["comp_town"];
+  $info = $fields["comp_zip"] . " " . $fields["comp_town"] . " " . $fields["comp_cdx"];
   $con = $fields["con_ln"] . " " . $fields["con_fn"];
   $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
   $res = $log["res"];
@@ -811,7 +812,7 @@ function display_import_log_line($log, $fields, $comps) {
 
   if ($display_log) {
     $name = $fields["comp_name"];
-    $info = $fields["comp_zip"] . " " . $fields["comp_town"];
+    $info = $fields["comp_zip"] . " " . $fields["comp_town"] . " " . $fields["comp_cdx"];
     $con = $fields["con_ln"] . " " . $fields["con_fn"];
     $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
     $res = $log["res"];
@@ -855,6 +856,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
+  global $l_expresspostal;
   global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
 
@@ -1009,6 +1011,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   </tr>
   <tr>
     <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_comp_cdx\" value=\"$comp_cdx\" /></td>
+    <td class=\"detailLabel\">$l_expresspostal</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_comp_cdx_d\" value=\"$comp_cdx_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
       <input type=\"text\" size=\"3\" name=\"tf_comp_ctry\" value=\"$comp_ctry\" /></td>
     <td class=\"detailLabel\">$l_country</td>
     <td class=\"detailForm\">
@@ -1107,6 +1116,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td class=\"detailLabel\">$l_town</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_con_town_d\" value=\"$con_town_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_con_cdx\" value=\"$con_cdx\" /></td>
+    <td class=\"detailLabel\">$l_expresspostal</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_con_cdx_d\" value=\"$con_cdx_d\" /></td>
   </tr>
   <tr>
     <td class=\"detailForm\">

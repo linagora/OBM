@@ -19,11 +19,19 @@ $obmdb_password = "obm";
 // Use specific site includes
 //$cgp_site_include = true;
 
+// Use Database sessions
+//$cgp_sess_db = true;
+
 // is Mail enabled ? (agenda)
 $cgp_mail_enabled = false;
 
 // is mailing enabled by default for a new user
 $cgp_mailing_default = true;
+
+// OBM System groups (groups id)
+$cg_adm = 1;
+$cg_com = 1;
+$cg_prod = 2;
 
 //-----------------//
 // Displayed Infos //

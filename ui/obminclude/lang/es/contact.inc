@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : contact.inc                                              //
@@ -22,7 +22,6 @@ $l_minimphone = "(Celular)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Correo habilitado";
 $l_fax = "Fax";
-$l_expresspostal = "Dirección de correo";
 $l_country = "Pais";
 $l_comment = "Comentarios";
 $l_coord = "Detalles";

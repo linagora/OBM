@@ -248,6 +248,8 @@ function get_import_desc($import) {
   $desc .= '\$comp_zip_d="'.$import["comp_zip_d"] . '";';
   $desc .= '\$comp_town="'.$import["comp_town"] . '";';
   $desc .= '\$comp_town_d="'.$import["comp_town_d"] . '";';
+  $desc .= '\$comp_cdx="'.$import["comp_cdx"] . '";';
+  $desc .= '\$comp_cdx_d="'.$import["comp_cdx_d"] . '";';
   $desc .= '\$comp_ctry="'.$import["comp_ctry"] . '";';
   $desc .= '\$comp_ctry_d="'.$import["comp_ctry_d"] . '";';
   $desc .= '\$comp_pho="'.$import["comp_pho"] . '";';
@@ -276,6 +278,8 @@ function get_import_desc($import) {
   $desc .= '\$con_zip_d="'.$import["con_zip_d"] . '";';
   $desc .= '\$con_town="'.$import["con_town"] . '";';
   $desc .= '\$con_town_d="'.$import["con_town_d"] . '";';
+  $desc .= '\$con_cdx="'.$import["con_cdx"] . '";';
+  $desc .= '\$con_cdx_d="'.$import["con_cdx_d"] . '";';
   $desc .= '\$con_ctry="'.$import["con_ctry"] . '";';
   $desc .= '\$con_ctry_d="'.$import["con_ctry_d"] . '";';
   $desc .= '\$con_pho="'.$import["con_pho"] . '";';
@@ -315,6 +319,9 @@ function get_import_desc($import) {
   $desc .= '\$comp["comp_town"]["value"] ="'.$import["comp_town"] . '";';
   $desc .= '\$comp["comp_town"]["label"] ="l_town";';
   $desc .= '\$comp["comp_town"]["default"]="'.$import["comp_town_d"] . '";';
+  $desc .= '\$comp["comp_cdx"]["value"] ="'.$import["comp_cdx"] . '";';
+  $desc .= '\$comp["comp_cdx"]["label"] ="l_expresspostal";';
+  $desc .= '\$comp["comp_cdx"]["default"]="'.$import["comp_cdx_d"] . '";';
   $desc .= '\$comp["comp_ctry"]["value"] ="'.$import["comp_ctry"] . '";';
   $desc .= '\$comp["comp_ctry"]["label"] ="l_country";';
   $desc .= '\$comp["comp_ctry"]["default"]="'.$import["comp_ctry_d"] . '";';
@@ -358,6 +365,9 @@ function get_import_desc($import) {
   $desc .= '\$con["con_town"]["value"] ="'.$import["con_town"] . '";';
   $desc .= '\$con["con_town"]["label"] ="l_town";';
   $desc .= '\$con["con_town"]["default"]="'.$import["con_town_d"] . '";';
+  $desc .= '\$con["con_cdx"]["value"] ="'.$import["con_cdx"] . '";';
+  $desc .= '\$con["con_cdx"]["label"] ="l_expresspostal";';
+  $desc .= '\$con["con_cdx"]["default"]="'.$import["con_cdx_d"] . '";';
   $desc .= '\$con["con_ctry"]["value"] ="'.$import["con_ctry"] . '";';
   $desc .= '\$con["con_ctry"]["label"] ="l_country";';
   $desc .= '\$con["con_ctry"]["default"]="'.$import["con_ctry_d"] . '";';
@@ -396,7 +406,8 @@ function get_param_import() {
   global $tf_comp_cat, $tf_comp_cat_d;
   global $tf_comp_ad1, $tf_comp_ad1_d, $tf_comp_ad2, $tf_comp_ad2_d;
   global $tf_comp_ad3, $tf_comp_ad3_d, $tf_comp_zip, $tf_comp_zip_d;
-  global $tf_comp_town, $tf_comp_town_d, $tf_comp_ctry, $tf_comp_ctry_d;
+  global $tf_comp_town, $tf_comp_town_d, $tf_comp_cdx, $tf_comp_cdx_d;
+  global $tf_comp_ctry, $tf_comp_ctry_d;
   global $tf_comp_pho, $tf_comp_pho_d, $tf_comp_fax, $tf_comp_fax_d;
   global $tf_comp_web, $tf_comp_web_d, $tf_comp_mail, $tf_comp_mail_d;
   global $tf_comp_com, $tf_comp_com_d;
@@ -404,7 +415,8 @@ function get_param_import() {
   global $tf_con_tit, $tf_con_tit_d;
   global $tf_con_ad1, $tf_con_ad1_d, $tf_con_ad2, $tf_con_ad2_d;
   global $tf_con_ad3, $tf_con_ad3_d, $tf_con_zip, $tf_con_zip_d;
-  global $tf_con_town, $tf_con_town_d, $tf_con_ctry, $tf_con_ctry_d;
+  global $tf_con_town, $tf_con_town_d, $tf_con_cdx, $tf_con_cdx_d;
+  global $tf_con_ctry, $tf_con_ctry_d;
   global $tf_con_pho, $tf_con_pho_d, $tf_con_hpho, $tf_con_hpho_d;
   global $tf_con_mpho, $tf_con_mpho_d, $tf_con_fax, $tf_con_fax_d;
   global $tf_con_mail, $tf_con_mail_d, $tf_con_com, $tf_con_com_d;
@@ -443,6 +455,8 @@ function get_param_import() {
   if (isset ($tf_comp_zip_d)) $import["comp_zip_d"] = trim($tf_comp_zip_d);
   if (isset ($tf_comp_town)) $import["comp_town"] = trim($tf_comp_town);
   if (isset ($tf_comp_town_d)) $import["comp_town_d"] = trim($tf_comp_town_d);
+  if (isset ($tf_comp_cdx)) $import["comp_cdx"] = trim($tf_comp_cdx);
+  if (isset ($tf_comp_cdx_d)) $import["comp_cdx_d"] = trim($tf_comp_cdx_d);
   if (isset ($tf_comp_ctry)) $import["comp_ctry"] = trim($tf_comp_ctry);
   if (isset ($tf_comp_ctry_d)) $import["comp_ctry_d"] = trim($tf_comp_ctry_d);
   if (isset ($tf_comp_pho)) $import["comp_pho"] = trim($tf_comp_pho);
@@ -472,6 +486,8 @@ function get_param_import() {
   if (isset ($tf_con_zip_d)) $import["con_zip_d"] = trim($tf_con_zip_d);
   if (isset ($tf_con_town)) $import["con_town"] = trim($tf_con_town);
   if (isset ($tf_con_town_d)) $import["con_town_d"] = trim($tf_con_town_d);
+  if (isset ($tf_con_cdx)) $import["con_cdx"] = trim($tf_con_cdx);
+  if (isset ($tf_con_cdx_d)) $import["con_cdx_d"] = trim($tf_con_cdx_d);
   if (isset ($tf_con_ctry)) $import["con_ctry"] = trim($tf_con_ctry);
   if (isset ($tf_con_ctry_d)) $import["con_ctry_d"] = trim($tf_con_ctry_d);
   if (isset ($tf_con_pho)) $import["con_pho"] = trim($tf_con_pho);
@@ -630,33 +646,6 @@ function get_import_action() {
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
-
-
-
-
-
-// Display
-  $actions["LIST"]["display"] = array (
-   'Name'     => $l_header_display,
-   'Url'      => "$path/list/list_index.php?action=display",
-   'Right'    => $list_read,
-   'Condition'=> array ('all') 
-                                      );
-
-// Display Préférence
-  $actions["LIST"]["dispref_display"] = array (
-   'Url'      => "$path/list/list_index.php?action=dispref_display",
-   'Right'    => $cright_write_admin,
-   'Condition'=> array ('None') 
-                                               );
-
-// Display level
-  $actions["LIST"]["dispref_level"] = array (
-   'Url'      => "$path/list/list_index.php?action=dispref_level",
-   'Right'    => $cright_write_admin,
-   'Condition'=> array ('None') 
-                                            );
-
 
 }
 
