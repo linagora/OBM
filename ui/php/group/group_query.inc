@@ -579,7 +579,7 @@ function check_data_form($group) {
     return false;
   }
 
-  // MANDATORY: List name unique
+  // MANDATORY: Group name unique
   if (get_group_name_exists($name, $id)) {
     $err_msg = "$l_group_exists ($name)";
     return false;
@@ -593,7 +593,7 @@ function check_data_form($group) {
 
   // If email not empty, must not already exists
   if ($email != "") {
-    //    $mails = get_email_used("", $id);
+    $mails = get_email_used("", $id);
 
     // Email address not already used
     if (array_key_exists($email, $mails)) {

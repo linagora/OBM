@@ -399,7 +399,7 @@ function html_group_form($action, $group_q, $group) {
   </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
-      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" /></td>
+      <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" />@</td>
   </tr>
   </table>";
 
@@ -469,7 +469,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       <td class=\"detailText\">$desc</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
-      <td class=\"detailText\">$email</td>
+      <td class=\"detailText\">$email@</td>
     </tr>
     </table>";
 
@@ -612,7 +612,7 @@ function dis_warn_delete($id) {
   $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
 
   $block = "
-  <p class=\"detailButton\">
+  <div class=\"detailButton\">
     <p class=\"detailButtons\">
       <form method=\"get\" name=\"form_delete\"
       action=\"" .url_prepare("group_index.php") . "\">
@@ -629,10 +629,9 @@ function dis_warn_delete($id) {
       <input type=\"submit\" value=\"$l_back\" />
       </form>
     </p>
-  </p>";
+  </div>";
 
   return $block;
-
 }
 
 

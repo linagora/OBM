@@ -113,6 +113,7 @@ $js_regexp_zip="/^[0-9A-Z]{4,8}$/";     // 4-8 digits or letters
 $php_regexp_zip="^[0-9A-Z]{4,8}$";      // 4-8 digits or letters
 $js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
 $php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
+$php_regexp_email_name="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*$/"; // Email name
 $js_regexp_web="/^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}$/";  // Web
 $php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
 $php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";

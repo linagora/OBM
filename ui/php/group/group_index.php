@@ -206,7 +206,7 @@ else if ($action == "insert") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    $dislpay["detail"] = dis_warn_delete($group["id"]);
+    $display["detail"] = dis_warn_delete($group["id"]);
   } else {
     $display["msg"] .= display_error_permission();
   }

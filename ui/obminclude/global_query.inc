@@ -862,6 +862,70 @@ function get_modules_array() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return an array of all used emails (users, groups)
+// Parameters:
+//   - $id  : User id to exclude from the result
+//   - $gid : Group id to exclude from the result
+//   - $lid : List id to exclude from the result
+// Returns:
+//   - $mails : array of used emails
+///////////////////////////////////////////////////////////////////////////////
+function get_email_used($id="", $gid="", $lid="") {
+  global $cdg_sql, $php_regexp_email_name;
+
+  $mails = array();
+  $query = "select userobm_lastname, userobm_firstname, userobm_email
+    from UserObm
+    where userobm_id != '$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $email = $obm_q->f("userobm_email");
+    $name = "Utilisateur : " . $obm_q->f("userobm_lastname") ." ". $obm_q->f("userobm_firstname");
+    $em = strtok($email, "\r\n");
+    while ($em) {
+      $mails["$em"] = "$name";
+      $em = strtok("\r\n");
+    }
+  }
+
+  $query = "select group_name, group_email
+    from UGroup
+    where group_id != '$gid'";
+
+  display_debug_msg($query, $cdg_sql);
+  $g_q = new DB_OBM;
+  $g_q->query($query);
+
+  while ($g_q->next_record()) {
+    $email = $g_q->f("group_email");
+    $name = "Groupe : " . $g_q->f("group_name");
+    $mails["$email"] = "$name";
+  }
+
+
+  $query = "select list_name, list_email
+    from List
+    where list_id != '$lid'";
+
+  display_debug_msg($query, $cdg_sql);
+  $l_q = new DB_OBM;
+  $l_q->query($query);
+
+  while ($l_q->next_record()) {
+    $email = $l_q->f("list_email");
+    $name = "List : " . $l_q->f("list_name");
+    $mails["$email"] = "$name";
+  }
+
+  return $mails;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Send a Mail to an user                                                    //
 // Parameters:
 //  - $subject    : mail subject
