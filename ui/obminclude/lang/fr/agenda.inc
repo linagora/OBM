@@ -160,7 +160,6 @@ $l_category_exist = "Catégories existantes";
 $l_header_meeting = "Nouvelle réunion";
 $l_category_new = "Nouvelle Catégorie";
 $l_header_right = "Gestion des droits";
-$l_header_export = "Exporter";
 $l_header_admin = "Administration";
 $l_authorize_list = "Personnes autorisées";
 $l_denie_list = "Personnes non-autorisées";

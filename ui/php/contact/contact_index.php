@@ -76,6 +76,9 @@ if ($action == "ext_get_ids") {
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] =  html_category2_list($contact);
+}  elseif ($action == "export") {
+    dis_export_handle($contact);
+    exit();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -505,7 +508,7 @@ function get_param_contact() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_contact_action() {
   global $contact, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_export,$l_header_update,$l_header_delete;
   global $l_header_consult, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -546,6 +549,15 @@ function get_contact_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('','index','search','new','detailconsult','update','admin','display') 
                                      );
+
+// Export
+  $actions["CONTACT"]["export"] = array (
+    'Name'     => $l_header_export,
+    'Url'      => "$path/contact/contact_index.php?action=export&amp;popup=1&amp;param_contact=".$contact["id"]."",
+    'Right'    => $cright_read,
+    'Privacy'  => true,    
+    'Condition'=> array ('detailconsult','detailupdate','update') 
+                                       );
 
 // Detail Consult
  $actions["CONTACT"]["detailconsult"]   = array (

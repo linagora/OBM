@@ -237,8 +237,11 @@ function run_query_contact_company($c_id) {
       company_zipcode,
       company_town,
       company_expresspostal,
-      company_country_id
+      company_country_id,
+      country_name
     from Company
+    left join Country on
+    company_country_id = country_id
     where company_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -586,22 +589,20 @@ function run_query_contact_update($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if ($cat1 != "") { 
-    $query = "delete
-    from ContactCategory1Link
-    where contactcategory1link_contact_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-  }
+  $query = "delete
+  from ContactCategory1Link
+  where contactcategory1link_contact_id='$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+    
+    
+  $query = "delete
+  from ContactCategory2Link
+  where contactcategory2link_contact_id='$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
 
-  if ($cat2 != "") { 
-    $query = "delete
-    from ContactCategory2Link
-    where contactcategory2link_contact_id='$id'";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-  }
-
+    
   if ($retour && is_array($cat1)) {
     foreach($cat1 as $categoryid) {
       $query = "insert into ContactCategory1Link (
