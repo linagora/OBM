@@ -110,7 +110,8 @@ function change_status(user_id, user_status, form)
   form.submit();
 }
 
-function check_membertimevalid(form, nb_mem)
+// Function that check the allocation form validation
+function check_allo_valid(form, nb_mem)
 {
   error = 0;
   idx = 0;
@@ -124,23 +125,27 @@ function check_membertimevalid(form, nb_mem)
       if ((i_value != \"\") && (!(check_number(i_value)))) {
 	error = 1;
       } else if (i_value != \"\") {
+	// we mark this user as having a task
 	i_nb[idx]=1;
       } else {
 	;
       }
 
       idx++;
-      
+
+      // return to the first user
       if (idx == nb_mem) {
 	idx = 0;
       }
     }
   }
-  
-  for (idx=0; idx<nb_mem; idx++) {
-    if (i_nb[idx] != 1) {
-      error += 2;
-    }
+
+  // Require that each member be assigned to at least one task
+  //
+  //  for (idx=0; idx<nb_mem; idx++) {
+  //    if (i_nb[idx] != 1) {
+  //      error += 2;
+  //    }
   }
 
   if (error == 1) {
@@ -150,7 +155,6 @@ function check_membertimevalid(form, nb_mem)
     alert (\"$l_fill_projected\");
     return false;
   } else {
-    form.action = \"project_index.php?action=validate\";
     //    form.submit();
     return true;
   }
@@ -197,7 +201,7 @@ function check_advancevalid(form)
 function submit_memberadd(form, p_id)
 {
     window.name='Liste';
-    window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_member_add&ext_action=member_add&ext_url=../project/project_index.php&ext_id='+ p_id +'&ext_target=Liste','','height=400,width=620,scrollbars=yes');
+    window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_add_member&ext_action=member_add&ext_url=../project/project_index.php&ext_id='+ p_id +'&ext_target=Liste','','height=400,width=620,scrollbars=yes');
     return false;
 }
 

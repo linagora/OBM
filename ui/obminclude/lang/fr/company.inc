@@ -27,6 +27,7 @@ $l_coord = "Coordonnées";
 $l_comment = "Commentaire";
 $l_contact_new = "Nouveau Contact";
 $l_deal_new = "Nouvelle Affaire";
+$l_project_new = "Nouveau Projet";
 $l_kind_manage = "Gestion des Types de Société";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";

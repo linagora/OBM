@@ -23,7 +23,8 @@ $l_email = "E-Mail";
 
 // Labels and texts
 $l_contact_new = "Nuovo Contatto";
-$l_deal_new = "New Deal";
+$l_deal_new = "Nuovo Deal";
+$l_project_new = "Nuovo Projet";
 $l_kind_manage = "Azienda Tipo Management";
 $l_kind_exist = "Tipi esistente";
 $l_kind_new = "Nuovo Tipo";

@@ -27,6 +27,7 @@ $l_coord = "Details";
 $l_comment = "Comment";
 $l_contact_new = "New Contact";
 $l_deal_new = "New Deal";
+$l_project_new = "New Projet";
 $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";

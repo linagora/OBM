@@ -43,7 +43,6 @@ class DB_Sql {
   var $Query_ID = 0;
   
 
-
   /* public: constructor */
   function DB_Sql($query = "") {
       $this->query($query);
@@ -107,7 +106,7 @@ class DB_Sql {
       return 0;
     if (!$this->connect()) {
       return 0; /* we already complained in connect() about that. */
-    };
+    }
 
     // Store the query string - PB Aliacom
     $this->obm_query = $Query_String;

@@ -31,7 +31,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
       project_id,
       project_name,
       project_soldtime,
-      company_name as project_company_name,
+      company_name as project_company,
       tasktype_label as project_tasktype,
       project_archive
     from Project
@@ -414,7 +414,7 @@ function run_query_projectname($pid) {
 //   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasklist_insert($project) {
+function run_query_task_insert($project) {
   global $auth, $cdg_sql;
 
   $pid = $project["id"];
@@ -423,20 +423,22 @@ function run_query_tasklist_insert($project) {
 
   $search_q = new DB_OBM;
 
-  if (!(isset($ptask)))
+  // If a parent task has been given, check that there are no links from
+  // User to the parent task (a parent task can't be assigned to users)
+  if (!(isset($ptask))) {
     $ptask = 0;
-  else {
+  } else {
     $query = "
       select projectuser_user_id
       from ProjectUser
-      where projectuser_projecttask_id = $ptask
+      where projectuser_projecttask_id = '$ptask'
       ";
 
-    display_debug_msg($query, $cdg_sql, "run_query_tasklist_insert(1)");
+    display_debug_msg($query, $cdg_sql, "run_query_task_insert(1)");
     $search_q->query($query);
   }
 
-  if (($search_q->nf() == 0) or ($ptask == 0))  {
+  if (($ptask == 0) or ($search_q->nf() == 0))  {
     $query = "
       insert into ProjectTask (
         projecttask_project_id,
@@ -454,11 +456,11 @@ function run_query_tasklist_insert($project) {
         '1')
         ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_tasklist_insert(2)");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql, "run_query_task_insert(2)");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
   
-  return $obm_q;
+    return $obm_q;
   } else {
     return 0;
   }
@@ -470,41 +472,64 @@ function run_query_tasklist_insert($project) {
 // Parameters:
 //   - $project[] : hash info : keys used : id, task_nb, tskX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasklist_delete($project) {
+function run_query_task_delete($project) {
   global $auth, $cdg_sql;
 
   $id = $project["id"];
   $cpt = 0;
   $cpt_del = 0;
+  $delete_ok = true;
   
   while ($cpt < $project["tsk_nb"]) {
     $cpt++;
     $tsk_id = $project["tsk$cpt"];
 
+    // Check that neither the task to be deleted or its childre tasks are
+    // assigned to users
     $query = "
       select projectuser_user_id
       from ProjectUser, ProjectTask
       where projectuser_projecttask_id = projecttask_id
-        and (projecttask_id = $tsk_id  or projecttask_parenttask_id = $tsk_id)
+        and (projecttask_id='$tsk_id'  or projecttask_parenttask_id='$tsk_id')
       ";
     
-    display_debug_msg($query, $cdg_sql, "run_query_tasklist_delete(1)");
+    display_debug_msg($query, $cdg_sql, "run_query_task_delete(1)");
     $search_q = new DB_OBM;
     $search_q->query($query);
+
+    if ($search_q->nf() > 0) {
+      $delete_ok = false;
+    }
+
+    // Check that neither the task to be deleted or its childre tasks are
+    // used in time management
+    $query = "
+      select timetask_id
+      from TimeTask, ProjectTask
+      where timetask_projecttask_id = projecttask_id
+        and (projecttask_id='$tsk_id'  or projecttask_parenttask_id='$tsk_id')
+      ";
     
-    if ($search_q->nf() == 0) {
-      
+    display_debug_msg($query, $cdg_sql, "run_query_task_delete(2)");
+    $search_q = new DB_OBM;
+    $search_q->query($query);
+
+    if ($search_q->nf() > 0) {
+      $delete_ok = false;
+    }
+
+    // If the task can be deleted
+    if ($delete_ok) {
       $query = "
         delete
         from ProjectTask
-        where projecttask_id = $tsk_id
-          or  projecttask_parenttask_id = $tsk_id
+        where projecttask_id = '$tsk_id'
+          or  projecttask_parenttask_id = '$tsk_id'
         ";
-      
-      display_debug_msg($query, $cdg_sql, "run_query_tasklist_delete(2)");
+
+      display_debug_msg($query, $cdg_sql, "run_query_task_delete(3)");
       $obm_q = new DB_OBM;
       $retour = $obm_q->query($query);
-      
       if ($retour)
 	$cpt_del++;
     }
@@ -661,16 +686,18 @@ function run_query_memberstatus_change($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project Update query execution                                            //
+// Project Allocation Update query execution                                 //
 // Parameters:
 //   - $project[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_projectupdate($project) {
+function run_query_allocate_update($project) {
   global $auth, $cdg_sql;
 
   $p_id = $project["id"];
   $new = $project["projected"];
-  
+  $uid = $auth->auth["uid"];  
+  $date_now = date("Y-m-d H:i:s");
+
   $query = "
     select
       projectuser_user_id as mt_user,
@@ -682,7 +709,7 @@ function run_query_projectupdate($project) {
     order by mt_user, mt_task";
 
   $old_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql, "run_query_projectupdate(old)");
+  display_debug_msg($query, $cdg_sql, "run_query_allocate_update(old)");
   $old_q->query($query);
 
   while ($old_q->next_record()) {
@@ -703,32 +730,32 @@ function run_query_projectupdate($project) {
       $tnew = ($new[$m_id][$t_id] != "")  ? 1 : 0;
       $told = (isset ($old[$m_id][$t_id])) ? 1 : 0;
     
+      // if an allocation existed, but has been removed
       if (!($tnew) and ($told)) {
-
 	$query = "
         delete from ProjectUser
-        where projectuser_user_id = $m_id
-          and projectuser_projecttask_id = $t_id";
+        where projectuser_user_id = '$m_id'
+          and projectuser_projecttask_id = '$t_id'";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
+ 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(2)");
 	$obm_q->query($query);
 
+      // if an allocation existed, and a new has been given
       } else if (($tnew) and ($told)) {
-
-	$set_miss_time = (isset($miss_tab[$m_id][$t_id])) ? "" : ", projectuser_missingtime = $proj";
-
+	$set_miss_time = (isset($miss_tab[$m_id][$t_id])) ? "" : ", projectuser_missingtime = '$proj'";
 	$query = "
          update ProjectUser
-         set projectuser_timeupdate = '".date("Y-m-d H:i:s")."',
-             projectuser_userupdate = ". $auth->auth["uid"] .",
-             projectuser_projectedtime = $proj
+         set projectuser_timeupdate = '$date_now',
+             projectuser_userupdate = '$uid',
+             projectuser_projectedtime = '$proj'
              $set_miss_time
-         where projectuser_user_id = $m_id
-           and projectuser_projecttask_id = $t_id";
+         where projectuser_user_id = '$m_id'
+           and projectuser_projecttask_id = '$t_id'";
 
-	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
+	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
 	$obm_q->query($query);
 
+      // if a new allocation has been given
       } else if (($tnew) and !($told)){
 
 	$query = "	
@@ -745,25 +772,16 @@ function run_query_projectupdate($project) {
           ('$m_id',
            '$p_id',
            '$t_id',
-           '".date("Y-m-d H:i:s")."',
-           ". $auth->auth["uid"] .",
+           '$date_now',
+           '$uid',
            '$proj',
            '$proj'
           )";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
+ 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(4)");
 	$obm_q->query($query);
       }
     }
-
-    $query = "
-      delete from ProjectUser
-      where projectuser_user_id = '$m_id'
-        and projectuser_project_id = '$p_id'
-        and projectuser_projecttask_id is null";
-  
-    display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
-    $obm_q->query($query);
   }
  
   return $ins_err;
@@ -869,25 +887,6 @@ function run_query_statlog($p_id) {
 }
 
 
-// bcontins : pour les projets internes : non géré sur la 0.7?
-///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
-// Parameters:
-//   - $p_id : company id
-///////////////////////////////////////////////////////////////////////////////
-// function run_query_delete($p_id) {
-//   global $cdg_sql;
-
-//   $query = "delete from  where ";
-
-//   display_debug_msg($query, $cdg_sql);
-//   $obm_q = new DB_OBM;
-//   $retour = $obm_q->query($query);
-
-//   return $retour;
-// }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Project tasks query
 // Parameters :
@@ -962,7 +961,7 @@ function run_query_members($p_id = 0) {
 // Parameters :
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_membertime($p_id) {
+function run_query_allocation($p_id) {
   global $cdg_sql, $c_day_fraction;
 
   $frac = $c_day_fraction;
@@ -985,7 +984,32 @@ function run_query_membertime($p_id) {
     group by userobm_id, projecttask_id
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_membertime");
+  $query = "
+    select
+      userobm_id,
+      projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time
+    from UserObm, ProjectTask
+      left join TimeTask
+        on timetask_projecttask_id = projecttask_id
+          and timetask_user_id = userobm_id
+      left join ProjectUser
+        on projecttask_id = projectuser_projecttask_id
+          and projectuser_user_id = userobm_id
+    where projecttask_project_id = '$p_id'
+      and (userobm_id=6 or userobm_id=19)
+    group by userobm_id, projecttask_id
+    ";
+
+  // Ideee qui manque : comment avoir le temps passe meme si une affectation n'existe plus !
+  // XXX Supprimer les users en dur !! :)
+  // Decouper sans doute en 2 requets
+  // - timetask
+  // - projectUser
+
+  display_debug_msg($query, $cdg_sql, "run_query_allocation");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1159,9 +1183,8 @@ function check_project_form($pid, $project) {
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-function check_taskadd_form($pid, $project) {
-  global $l_fill_tasklabel;
-  global $err_msg;
+function check_task_form($pid, $project) {
+  global $err_msg, $l_fill_tasklabel;
 
   $tasklabel = $project["tasklabel"];
 
@@ -1173,6 +1196,7 @@ function check_taskadd_form($pid, $project) {
 
   return true; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Advance Form Data checking and formatting                                 //

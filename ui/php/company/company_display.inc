@@ -285,10 +285,11 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
-  global $ico_document,$ico_document_new;
+  global $ico_document,$ico_document_new, $ico_project;
   global $l_header_contact, $l_contact_new;
   global $l_header_deal, $l_deal_new;
   global $l_header_document, $l_document_new, $l_document_add;
+  global $l_header_project, $l_project_new;
   global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
 
   $uname = urlencode($name);
@@ -300,7 +301,9 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$p_id&amp;entity=Company");
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$p_id&amp;ext_target=$l_company";
   $nb_document = run_query_document_nb ($p_id,"Company");
-
+  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$p_id");
+  $nb_pro = run_query_linked_project_nb ($p_id,"company");
+  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$p_id&amp;tf_company_name=$uname");
   
   $block = "<div class=\"link\"> 
   <div class=\"linkTitle\">:: $l_header_contact</div>
@@ -310,13 +313,23 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
     <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
         <a href=\"$url_con_new\">$l_contact_new</a></li>
   </ul>
+
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
         <a href=\"$url_deal_list\">$l_header_deal ($deal_num)</a></li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>
-   </ul>
+  </ul>
+
+  <div class=\"linkTitle\">:: $l_header_project</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+        <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>
+    <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+        <a href=\"$url_pro_new\">$l_project_new</a></li>
+  </ul>
+
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>

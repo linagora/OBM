@@ -537,10 +537,13 @@ function html_deal_links($deal_q, $inv_nb) {
         <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>";
 
-  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
-  $dis_ico_project .= "
+  // New project allowed only if hitrate = 100
+  if ($hitrate == "100") {
+    $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
+    $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_project_new</a></li>";
+  }
     
   $dis_project_link = "
      <div class=\"linkTitle\">:: $l_header_project</div>

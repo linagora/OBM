@@ -13,7 +13,7 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["project_name"] = $l_name;
-$fieldnames["project_company_name"] = $l_company_name;
+$fieldnames["project_company"] = $l_company;
 $fieldnames["project_tasktype"] = $l_tasktype;
 $fieldnames["project_soldtime"] = $l_soldtime;
 $fieldnames["project_archive"] = $l_archive_first;
@@ -57,7 +57,7 @@ function dis_project_consult($pid) {
   $project_q = run_query_detail($pid);
   $tasks_q = run_query_tasks($pid);
   $members_q = run_query_members($pid);
-  $membertime_q = run_query_membertime($pid);
+  $allo_q = run_query_allocation($pid);
 
   if ($project_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $project_q->query . " !");
@@ -66,7 +66,7 @@ function dis_project_consult($pid) {
   if (($project_q->f("project_visibility") == 0) ||
       ($project_q->f("usercreate") == $uid) ) {
     $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
-    $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q);
+    $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $allo_q);
   } else {
     // this project's page has "private" access
     $display["msg"] .= display_err_msg($l_error_visibility);
@@ -103,7 +103,7 @@ function dis_project_search_form($project) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
-  global $l_name, $l_company_name, $l_tasktype, $l_manager, $l_member;
+  global $l_name, $l_company, $l_tasktype, $l_manager, $l_member;
   global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
   global $c_all;
 
@@ -168,7 +168,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       <div class=\"searchLabel\">$l_name<br />
         <input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" />
       </div>
-      <div class=\"searchLabel\">$l_company_name<br />
+      <div class=\"searchLabel\">$l_company<br />
         <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
       </div>
       <div class=\"searchLabel\">$l_tasktype<br />
@@ -197,6 +197,65 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Project search result                                         //
+// Parameters:
+//   - $project[] : project search criteria
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_search_list($project) {
+  global $display, $l_no_found;
+  global $auth, $new_order, $order_dir;
+
+  $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
+  $obm_q = run_query_search($project, $new_order, $order_dir);
+
+  $nb_project = $obm_q->num_rows();
+
+  if ($nb_project == 0) {
+    $display["msg"] .= display_warn_msg($l_no_found);
+  } else {
+    $block = html_project_search_list($obm_q, $pref_q, $nb_project, $project);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Project Search result                                    //
+// Parameters:
+//   - $obm_q_projects : list of projects
+//   - $pref_q      : fields to display in the list of projects 
+//   - $nb_deal     : nb projects found
+//   - $project[]   : project search criteria
+//     keys used    : name, company_name, tt, manager, member
+///////////////////////////////////////////////////////////////////////////////
+function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
+  global $display, $perms_user, $l_found;
+
+  $name = $project["name"];
+  $company_name = $project["company_name"];
+  $tt = $project["tt"];
+  $manager = $project["manager"];
+  $member = $project["member"];
+
+  $url = url_prepare("project_index.php?tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;action=search");
+
+  $dis_projects_list=new OBM_DISPLAY("DATA", $pref_q, "project");
+  $dis_projects_list->data_set = $obm_q_projects;
+  $dis_projects_list->data_url = $url;
+  $dis_projects_list->data_header = "both";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $display["msg"] .= display_info_msg($nb_project." ".$l_found);
+  $block = $dis_projects_list->display("dis_data_project");
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Project Consult (main infos, advance infos, members infos)   //
 // Parameters :
 //   - $project_q : DBO : information about the project
@@ -204,15 +263,15 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 //   - $members_q : DBO : list of members and related time infos
 //      keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
-  global $set_theme, $display, $action;
-  global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
-  global $l_company, $l_deal, $l_project, $l_progress, $l_progressinfos;
+function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
+  global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
+  global $l_name, $l_tasktype, $l_company, $l_total;
+  global $l_deal, $l_project, $l_progress, $l_progressinfos;
   global $l_projected, $l_used, $l_missing, $l_sold;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
-  global $l_allosold, $l_usedsold, $l_progeval, $l_nbtask;
-  global $l_nbmem, $l_tasksdef, $l_membersdef, $l_archive, $l_yes, $l_no;
-  global $l_projected, $l_alloproj, $l_usedproj, $l_no_tasks;
+  global $l_allosold, $l_usedsold, $l_progeval, $l_tasks;
+  global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
+  global $l_alloproj, $l_usedproj, $l_no_tasks;
 
   $cpt_t = 0;
   $cpt_m = 0;
@@ -245,14 +304,22 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
       $dis_deal = "
     </tr><tr>
       <td class=\"detailLabel\">$l_deal</td>
-      <td class=\"detailText\">$deal_label</td>";
+      <td class=\"detailText\">
+        <a href=\"". url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal")."\">
+        <img src=\"/images/$set_theme/$ico_deal\" alt=\"[details]\" /></a>
+        $deal_label
+      </td>";
     }
     $dis_comp = "
     <div class=\"detailHead\">$l_company</div>
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">$company_name</td>
+      <td class=\"detailText\">
+        <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$company")."\">
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        $company_name
+      </td>
     $dis_deal
     </tr>
     </table>";
@@ -272,7 +339,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
   $nb_tsk = ($has_tasks) ? $tasks_q->nf() : 0;
 
   // we don't have informations about time allocation
-  //  if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
+  //  if (($allo_q == 0) or ($allo_q->num_rows() == 0)) {
   if (!($has_tasks) or !($has_members)) {
 
     $tab_style = "class=\"detail\"";
@@ -291,7 +358,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
 
 	$dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_tasksdef :</td>
+        <td class=\"detailLabel\" colspan=\"2\">$l_task_list :</td>
        </tr>";
 
 	while ($tasks_q->next_record()) {
@@ -322,7 +389,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
      
 	$dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_membersdef :</td>
+        <td class=\"detailLabel\" colspan=\"2\">$l_members_info :</td>
        </tr>";
 
 	while (list($key,$val) = each($array_mem)) {
@@ -368,23 +435,23 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
       $cpt_t++; 
     }
   
-    if ($membertime_q->nf() == 0) $action = "consultnoadv";
+    if ($allo_q->nf() == 0) $action = "consultnoadv";
 
     // list the members of the project
-    while ($membertime_q->next_record()) {
+    while ($allo_q->next_record()) {
       
-      $m_id = $membertime_q->f("userobm_id");
-      $m_task = $membertime_q->f("projectuser_projecttask_id");
-      $m_proj = $membertime_q->f("projected_time");
-      $m_miss = $membertime_q->f("missing_time");
-      $m_used = $membertime_q->f("used_time");
+      $m_id = $allo_q->f("userobm_id");
+      $m_task = $allo_q->f("projectuser_projecttask_id");
+      $m_proj = $allo_q->f("projected_time");
+      $m_miss = $allo_q->f("missing_time");
+      $m_used = $allo_q->f("used_time");
 
-      //time (used/missing/projected) for each (task/member) couple
+      // time (used/missing/projected) for each (task/member) couple
       $array_time["proj"][$m_task][$m_id] = $m_proj;
       $array_time["miss"][$m_task][$m_id] = $m_miss;
       $array_time["used"][$m_task][$m_id] = $m_used;
 
-      //totals by parent tasks
+      // totals by parent tasks
       if ($array_parent[$m_task] == 0) {
 	$array_partot["proj"][$m_task] += $m_proj;
 	$array_partot["miss"][$m_task] += $m_miss;
@@ -533,7 +600,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
     else
       $symbol_progeval = "=";
 
-
     $span = $cpt_m + 2;
   
     //advance array
@@ -590,7 +656,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
      </tr>
      <tr>
       <td class=\"detailLabel\">$l_resume</td>
-      <td class=\"detailText\"># $l_nbtask : $nb_tsk / # $l_nbmem : $cpt_m</td>
+      <td class=\"detailText\"># $l_tasks : $nb_tsk / # $l_members : $cpt_m</td>
      </tr>
      <tr>
       <td class=\"detailLabel\">$l_archive</td>
@@ -881,19 +947,14 @@ function dis_delete_form($p_id) {
 //   - $project[] : default form values
 //     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_taskadd_form($ptask_q, $project) {
+function html_project_task_form($ptask_q, $project) {
   global $display;
-  global $l_none, $l_taskname, $l_parent, $l_task_add, $l_project;
-  global $l_tasksinfos;
+  global $l_none, $l_name, $l_parent, $l_task_new, $l_task_add, $l_project;
   
   $pid = $project["id"];
   $pname = $project["name"];
-
-  $tf_taskname = "
-    <tr>
-      <td class=\"detailLabel\">$l_taskname</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" /></td>
-    </tr>";
+  $label = $project["tasklabel"];
+  $ptask = $project["ptask"];
 
   if (($ptask_q != 0) && ($ptask_q->num_rows() != 0)) {
     // ptask select
@@ -907,22 +968,21 @@ function html_project_taskadd_form($ptask_q, $project) {
 
     while ($ptask_q->next_record()) {
       $parent = $ptask_q->f("parent_id");
-
       if ($parent == 0) {
 	$ptask_id = $ptask_q->f("projecttask_id");
-	$sel_ptask .= "<option value=\"$ptask_id\"";
-	$sel_ptask .= ">". $ptask_q->f("projecttask_label") . "</option>\n";
+	$ptask_label = $ptask_q->f("projecttask_label");
+	if ($ptask_id == $ptask) {
+	  $selected = "selected";
+	} else {
+	  $selected = "";
+	}
+	$sel_ptask .= "<option value=\"$ptask_id\" $selected>$ptask_label</option>\n";
       }
     }
 
     $sel_ptask .= "</select></td></tr>\n";
     $ptask_q->seek(0);
   }
-
-  $dis_button = "
-       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-       <input type=\"hidden\" name=\"action\" value=\"task_add\" />
-       <input type=\"submit\" value=\"$l_task_add\" />";
 
   $display["title"] = "<div class=\"title\">$l_project : $pname</div>";
 
@@ -933,77 +993,26 @@ function html_project_taskadd_form($ptask_q, $project) {
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
  
-    <div class=\"detailHead\">$l_tasksinfos</div>
+    <div class=\"detailHead\">$l_task_new</div>
 
     <table class=\"detail\">
-       $tf_taskname
-       $sel_ptask
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" value=\"$label\" /></td>
+    </tr>
+    $sel_ptask
     </table>
 
     <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
+    <p class=\"detailButtons\">
+     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+     <input type=\"hidden\" name=\"action\" value=\"task_add\" />
+     <input type=\"submit\" value=\"$l_task_add\" />
+    </p>
     </div>
 
    </form>
    ";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Project search result                                         //
-// Parameters:
-//   - $project[] : project search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_project_search_list($project) {
-  global $display, $l_no_found;
-  global $auth, $new_order, $order_dir;
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
-  $obm_q = run_query_search($project, $new_order, $order_dir);
-
-  $nb_project = $obm_q->num_rows();
-
-  if ($nb_project == 0) {
-    $display["msg"] .= display_warn_msg($l_no_found);
-  } else {
-    $block = html_project_search_list($obm_q, $pref_q, $nb_project, $project);
-  }
-
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Project Search result                                    //
-// Parameters:
-//   - $obm_q_projects : list of projects
-//   - $pref_q      : fields to display in the list of projects 
-//   - $nb_deal     : nb projects found
-//   - $project[]   : project search criteria
-//     keys used    : name, company_name, tt, manager, member
-///////////////////////////////////////////////////////////////////////////////
-function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
-  global $display, $perms_user, $l_found;
-
-  $name = $project["name"];
-  $company_name = $project["company_name"];
-  $tt = $project["tt"];
-  $manager = $project["manager"];
-  $member = $project["member"];
-
-  $url = url_prepare("project_index.php?tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;action=search");
-
-  $dis_projects_list=new OBM_DISPLAY("DATA", $pref_q, "project");
-  $dis_projects_list->data_set = $obm_q_projects;
-  $dis_projects_list->data_url = $url;
-  $dis_projects_list->data_header = "both";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $display["msg"] .= display_info_msg($nb_project." ".$l_found);
-  $block = $dis_projects_list->display("dis_data_project");
 
   return $block;
 }
@@ -1018,15 +1027,13 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
   global $set_theme;
-  global $l_tasksinfos, $l_del_task_sel, $l_task_add;
-  global $l_no_tasks;
+  global $l_task_list, $l_task_del, $l_no_tasks;
 
   $pid = $project["id"];
 
   if (($tasks_q != 0) && ($tasks_q->num_rows() != 0)) {
 
     while ($tasks_q->next_record()) {
-
       $t_id = $tasks_q->f("projecttask_id");
       $t_label = $tasks_q->f("projecttask_label");
       $t_parent = $tasks_q->f("parent_id");
@@ -1056,7 +1063,7 @@ function html_project_tasklist($tasks_q, $project) {
     $dis_button  = "
       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
       <input type=\"hidden\" name=\"action\" value=\"task_del\" />
-      <input type=\"submit\" value=\"$l_del_task_sel\" />";
+      <input type=\"submit\" value=\"$l_task_del\" />";
 
   } else {
     
@@ -1064,6 +1071,9 @@ function html_project_tasklist($tasks_q, $project) {
   }
   
   $block = "
+    <p>&nbsp;</p>
+    <div class=\"detailHead\">$l_task_list</div>
+
     <form name=\"form_tasklist\" method=\"post\">
      <table class=\"detail\">
       $dis_task
@@ -1090,7 +1100,7 @@ function html_project_tasklist($tasks_q, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_member_form($members_q, $project) {
   global $display;
-  global $l_no_members, $l_member_add, $l_membersinfos, $l_del_member_sel;
+  global $l_no_members, $l_members_info, $l_del_member_sel;
   global $l_project, $l_manager, $l_member;
 
   $pid = $project["id"];
@@ -1157,7 +1167,7 @@ function html_project_member_form($members_q, $project) {
    <form name=\"form_memberdel\" method=\"post\"
          action=\"".url_prepare("project_index.php")."\">
 
-    <div class=\"detailHead\">$l_membersinfos</div>
+    <div class=\"detailHead\">$l_members_info</div>
 
     <table class=\"$class\">
        $dis_member
@@ -1182,9 +1192,9 @@ function html_project_member_form($members_q, $project) {
 //   - $project[]   : project search criteria
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project) {
+function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
   global $display, $set_theme;
-  global $l_memberstimeinfos, $l_del_member_sel, $l_validate, $l_member_add;
+  global $l_memberstimeinfos, $l_del_member_sel, $l_validate;
   global $l_no_members, $l_project;
 
   $cpt_t=0;
@@ -1216,11 +1226,11 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
     $cpt_m++;
   }
 
-    if (($membertime_q != 0) && ($membertime_q->num_rows() != 0)) {
-      while ($membertime_q->next_record()) {
-	$m_id = $membertime_q->f("userobm_id");
-	$m_task = $membertime_q->f("projectuser_projecttask_id");
-	$m_proj = $membertime_q->f("projected_time");
+    if (($allo_q != 0) && ($allo_q->num_rows() != 0)) {
+      while ($allo_q->next_record()) {
+	$m_id = $allo_q->f("userobm_id");
+	$m_task = $allo_q->f("projectuser_projecttask_id");
+	$m_proj = $allo_q->f("projected_time");
 	$array_time[$m_task][$m_id] = $m_proj;
       } 
     }
@@ -1276,7 +1286,7 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
     
     $dis_button .= "
        <input type=\"submit\" value=\"$l_validate\"
-          onclick=\"if(check_membertimevalid(this.form, $cpt_m)) return true; else return false;\" />";
+          onclick=\"if(check_allo_valid(this.form, $cpt_m)) return true; else return false;\" />";
      
      $span = $cpt_m*2 + 1;
      
@@ -1285,7 +1295,8 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
   // --- HTML Template --------------------------------------------------------
 
    $block = "
-     <form name=\"form_membertimevalid\" method=\"post\">
+     <form name=\"form_allocate\" method=\"post\">
+      <input type=\"hidden\" name=\"action\" value=\"allocate_update\" />
 
       <div class=\"detailHead\">$l_memberstimeinfos</div>
 
@@ -1315,10 +1326,10 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 //   - $project[]   : project search criteria
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
+function html_project_advance($members_q, $allo_q, $tasks_q, $project) {
   global $display, $set_theme;
-  global $l_project, $l_name, $l_tasktype, $l_company_name, $l_soldtime;
-  global $l_projected, $l_used, $l_progress_info, $l_progress_update;
+  global $l_project, $l_name, $l_tasktype;
+  global $l_used, $l_progress_info, $l_progress_update;
 
   $cpt_t=0;
   $cpt_m=0;
@@ -1347,13 +1358,12 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
     $cpt_m++;
   }
 
-  if (($membertime_q != 0) && ($membertime_q->num_rows() != 0)) {
-    while ($membertime_q->next_record()) {
-      $m_id = $membertime_q->f("userobm_id");
-      $m_task = $membertime_q->f("projectuser_projecttask_id");
-
-      $array_time["proj"][$m_task][$m_id] = $membertime_q->f("projected_time");
-      $array_time["miss"][$m_task][$m_id] = $membertime_q->f("missing_time");
+  if (($allo_q != 0) && ($allo_q->num_rows() != 0)) {
+    while ($allo_q->next_record()) {
+      $m_id = $allo_q->f("userobm_id");
+      $m_task = $allo_q->f("projectuser_projecttask_id");
+      $array_time["proj"][$m_task][$m_id] = $allo_q->f("projected_time");
+      $array_time["miss"][$m_task][$m_id] = $allo_q->f("missing_time");
     } 
   }
 
@@ -1447,11 +1457,11 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 //   - $display_searchpref_q : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_display_pref($display_searchpref_q) {
-  global $l_searchproject_display;
+  global $l_project_display;
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
   $dis_pref->display_entity = "project"; 
-  $dis_pref->pref_title = $l_searchproject_display;
+  $dis_pref->pref_title = $l_project_display;
 
   $block .= "<td>";
   $block .= $dis_pref->display();
