@@ -1042,7 +1042,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
   }
   $sel_dsrc .= "</select>";
-  if($kind_q->nf()>0) {
+  if ($kind_q->nf()>0) {
     $i=0;
     $j=0;
     $k=0;
@@ -1052,17 +1052,17 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       $k_lang = $kind_q->f("kind_lang");
       $k_label = $kind_q->f("kind_minilabel");
       $k_header = $kind_q->f("kind_header");
-      if($k_lang != $k_old_lang) {
+      if ($k_lang != $k_old_lang) {
 	$k_kind_js .= "lang_array[\"$k_lang\"] = new Array ();\n";
 	$k_old_lang = $k_lang;
       }     
-      if($k_label != $k_old_label) {
+      if ($k_label != $k_old_label) {
 	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Array ();\n";
 	$k_old_label = $k_label;
       }
       $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"][\"$k_header\"] = '$k_id';\n";
       $k_kind[$k_lang][$k_label][$k_header] = $k_id;
-      if($k_id == $kind){
+      if ($k_id == $kind) {
 	$kind_lang = $k_lang;
 	$kind_label = $k_label;
 	$kind_header = $k_header;

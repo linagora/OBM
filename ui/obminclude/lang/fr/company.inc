@@ -46,6 +46,7 @@ $l_naf_exist = "Codes NAF existants";
 $l_naf_new = "Nouveau Code NAF";
 $l_naf_label = "Label";
 $l_naf_code = "Code";
+$l_naf_istitle = "Est un titre";
 
 // Titres
 $l_company = "Société";

@@ -94,6 +94,7 @@ if ($action == "ext_get_id") {
   $extra_css = "category.css";
   require("company_js.inc");
   $display["detail"] =  html_category_code_tree($company);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -467,7 +468,7 @@ function get_param_company() {
   global $tf_email, $sel_act, $sel_naf, $sel_kind, $sel_cat, $sel_market;
   global $ta_com, $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
-  global $tf_naf_code, $tf_naf_label;
+  global $tf_naf_code, $tf_naf_label, $cb_naf_title;
   global $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -540,6 +541,7 @@ function get_param_company() {
   // $sel_naf -> "naf" is already set
   if (isset ($tf_naf_code)) $company["naf_code"] = $tf_naf_code;
   if (isset ($tf_naf_label)) $company["naf_label"] = $tf_naf_label;
+  if (isset ($cb_naf_title)) $company["naf_title"] = $cb_naf_title;
 
   // Admin - Cat fields
   if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;

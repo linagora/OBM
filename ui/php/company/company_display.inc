@@ -147,13 +147,13 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
-  $cat_q = get_ordered_companycat();
+  $cats = get_ordered_companycat();
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country();
   $dsrc_q = run_query_datasource();
-  $block .= html_company_search_form($type_q, $cat_q, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
+  $block .= html_company_search_form($type_q, $cats, $act_q, $naf_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -222,13 +222,15 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   if ($show_cat) {
     $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\">
     <option value=\"$c_all\">$l_all</option>";
-    foreach ($cats as $one_cat) {
-      $c_id = $one_cat["id"];
-      $c_code = str_pad($one_cat["code"], 8, ".");
-      $c_label = $one_cat["label"];
-      $sel_cat .= "\n<option value=\"$c_id\"";
-      if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
-      $sel_cat .= ">$c_code $c_label</option>\n";
+    if (is_array($cats)) {
+      foreach ($cats as $one_cat) {
+	$c_id = $one_cat["id"];
+	$c_code = str_pad($one_cat["code"], 8, ".");
+	$c_label = $one_cat["label"];
+	$sel_cat .= "\n<option value=\"$c_id\"";
+	if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
+	$sel_cat .= ">$c_code $c_label</option>\n";
+      }
     }
     $sel_cat .= "</select>";
 
@@ -1995,23 +1997,37 @@ function dis_activity_links($company) {
 //   - $naf_q : Naf Code list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_nafcode_form($naf_q) {
-  global $l_naf_manage,$l_naf_exist,$l_naf_code,$l_naf_label,$l_naf_no;
-  global $l_naf_checkdelete,$l_naf_update,$l_naf_new,$l_naf_insert;
+  global $l_naf_manage,$l_naf_exist,$l_naf_code,$l_naf_label,$l_naf_istitle;
+  global $l_naf_checkdelete,$l_naf_update,$l_naf_new,$l_naf_insert,$l_naf_no;
+
+  $char_title = '=';
 
   if ($naf_q->num_rows() > 0) {
     $sel_naf = "<select name=\"sel_naf\" onChange=\"
     mytext = this.options[this.selectedIndex].text;
+    title = mytext.substr(0, 1);
     pos = mytext.indexOf('-');
-    code = mytext.substr(0, pos-1);
+    code = mytext.substr(1, pos-1);
     mytext = mytext.substr(pos+2); 
+    if (title == '$char_title') {
+     forms.form_naf_update.cb_naf_title.checked=true;
+    } else {
+     forms.form_naf_update.cb_naf_title.checked=false;
+    }
     forms.form_naf_update.tf_naf_label.value=mytext;
     forms.form_naf_update.tf_naf_code.value=code;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
     while ($naf_q->next_record()) {
       $id = $naf_q->f("companynafcode_id");
+      $title = $naf_q->f("companynafcode_title");
+      if ($title) {
+	$pre = "$char_title";
+      } else {
+	$pre = ".";
+      }
       $code = $naf_q->f("companynafcode_code");
       $label = $naf_q->f("companynafcode_label");
-      $sel_naf .= "\n<option value=\"$id\">$code - $label</option>";
+      $sel_naf .= "\n<option value=\"$id\">$pre$code - $label</option>";
     }
     $sel_naf .= "</select>";
   } else {
@@ -2058,7 +2074,8 @@ function html_company_nafcode_form($naf_q) {
               action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_naf\" value=\"\" />
 	    <input type=\"hidden\" name=\"action\" value=\"nafcode_update\" />
-	    <input type=\"text\" size=\"4\" maxlength=\"4\" name=\"tf_naf_code\" />
+            <input type=\"checkbox\" name=\"cb_naf_title\" />
+ 	    <input type=\"text\" size=\"4\" maxlength=\"4\" name=\"tf_naf_code\" />
             <input type=\"text\" name=\"tf_naf_label\" />
             <input type=\"submit\" name=\"sub_naf\" value=\"$l_naf_update\"
               onclick=\"if (check_naf_upd(this.form,document.form_naf_delete)) return true; else return false;\" />
@@ -2076,9 +2093,14 @@ function html_company_nafcode_form($naf_q) {
           action=\"" . url_prepare("company_index.php") . "\">
         <table>
 	<tr>
-	 <td class=\"adminLabel\">$l_naf_code :
-	  <input type=\"text\" name=\"tf_naf_code\" size=\"4\" maxlength=\"4\" />
+	 <td class=\"adminLabel\">$l_naf_istitle :
+	  <input type=\"checkbox\" name=\"cb_naf_title\" value=\"1\"/>
 	 </td>
+        </tr>
+	<tr>
+	  <td class=\"adminLabel\">$l_naf_code :
+	  <input type=\"text\" name=\"tf_naf_code\" size=\"4\" maxlength=\"4\" />
+	  </td>
         </tr>
         <tr>
          <td class=\"adminLabel\">$l_naf_label

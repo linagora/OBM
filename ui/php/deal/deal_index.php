@@ -204,9 +204,9 @@ elseif (($action == "index") || ($action == "")) {
     $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
   }
   
-   }elseif ($action == "update")  {
+}elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-    if (check_deal_form("", $deal)) {
+  if (check_deal_form("", $deal)) {
     $retour = run_query_update($deal);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
@@ -216,10 +216,10 @@ elseif (($action == "index") || ($action == "")) {
     $deal_q = run_query_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
     $cid = $deal_q->f("deal_company_id");
-    $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-    $q_invoices->next_record();
+    $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
+    $inv_q->next_record();
     $invoices_options = run_query_display_pref ($uid, "invoice");
-    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
+    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $invoices_options);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     $param_company = $deal["company"];

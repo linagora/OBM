@@ -1061,17 +1061,20 @@ function run_query_nafcode_insert($company) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
+  $title = (isset($company["naf_title"]) ? $company["naf_title"] : '0');
   $code = $company["naf_code"];
   $label = $company["naf_label"];
 
   $query = "insert into CompanyNafCode (
       companynafcode_timecreate,
       companynafcode_usercreate,
+      companynafcode_title,
       companynafcode_code,
       companynafcode_label)
     values (
       '$timecreate',
       '$usercreate',
+      '$title',
       '$code',
       '$label')";
 
