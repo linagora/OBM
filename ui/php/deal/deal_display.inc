@@ -500,9 +500,11 @@ function html_deal_links($deal_q, $inv_nb) {
   global $set_theme, $ico_pdeal, $ico_pdeal_upd, $ico_contract;
   global $ico_contract_new, $ico_invoice, $ico_invoice_new;
   // -- Labels
-  global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new; 
+  global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
+  global $l_header_document,$ico_document,$l_deal;
   global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
-  global $perms_user, $path, $auth;
+  global $l_document_new,$l_document_add,$ico_document_new;
+  global $perms_user, $path, $auth,$popup_height,$popup_width;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -530,6 +532,10 @@ function html_deal_links($deal_q, $inv_nb) {
   $nb_inv_arch = run_query_nb_archived_invoices ($id);
   $contract_nb = run_query_contract_nb ($id);
 
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=deal");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=deal");
+  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
+  $nb_document = run_query_document_nb ($id,"Deal");
 
   $block = "<div class=\"link\">
   <div class=\"linkTitle\">:: $l_parentdeal</div>
@@ -554,7 +560,21 @@ function html_deal_links($deal_q, $inv_nb) {
     <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice_new\" /></a>
         <a href=\"$url_inv_new\">$l_invoice_new</a></li>
   </ul>
-</div>";
+  <div class=\"linkTitle\">:: $l_header_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_document_new</a></li>
+	<li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>
+       
+ </div>
+";
 
   return $block;
 }

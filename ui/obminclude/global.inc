@@ -26,6 +26,7 @@ $last_incident_default = 0;
 // Document constants 
 $link_to = "Link : "; // Name of the prefix of a link document
 $default_mime = "text/html"; //Default Mime Type
+$default_path = "/X-Files"; //Default repository
 
 // Agenda constants
 $set_weekstart_default = "monday"; //First day of the week, in english

@@ -52,6 +52,7 @@ $ico_account        = "ico_account.gif";
 $ico_invoice        = "ico_invoice.gif";
 $ico_payment        = "ico_payment.gif";
 $ico_document       = "ico_document.gif";
+$ico_document_new   = "ico_document_new.gif";
 
 //$ico_time           = "ico_time.gif";
 //$ico_project        = "ico_project.png";
@@ -81,7 +82,7 @@ $ico_browse_file    = "ico_file_browse.gif";
 $ico_directory_open = "ico_directory_opened.gif";
 $ico_directory_close= "ico_directory_closed.gif";
 $ico_directory      = "ico_directory.gif";
-$ico_file           = "ico_document.png";
+$ico_file           = "ico_file.gif";
 
 $ico_web            = "ico_web.gif";        // WWW Icon
 $ico_mail           = "ico_mail.gif";       // Mail Icon

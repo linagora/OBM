@@ -181,3 +181,7 @@ $l_header_statsuser = "User stats";
 $l_header_weeklyview = "Week";
 $l_header_monthlyview = "Month";
 $l_header_globalview = "Validation";
+
+//document headers
+$l_document_new = "New document";
+$l_document_add = "Affect a document";

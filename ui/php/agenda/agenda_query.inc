@@ -396,8 +396,10 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   if ($force == 1 || count($return_info) == 0){  
     $event_id = run_query_insert_event_data($agenda);   
     foreach($event_repeat_dates as $dates) {
-      foreach($groups as $group_id) {
-          run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+      if(is_array($groups)) {
+	foreach($groups as $group_id) {
+	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+	}
       }
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
@@ -889,11 +891,14 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
     $agenda["repeat_days"] ="0000000";
     $agenda["repeat_end"] = "";
   }
-  foreach($groups as $group_id) {
-    $user_group_array = run_query_get_groupsusers($group_id);
+  if(is_array($groups)) {
+    foreach($groups as $group_id) {
+      $user_group_array = run_query_get_groupsusers($group_id);
+    }
+    $contacts_array .= $user_group_array;
+    $contacts_array = array_unique($contacts_array);
   }
-  $contacts_array .= $user_group_array;
-  $contacts_array = array_unique($contacts_array);
+  
   $return_info = array();
   $event_repeat_dates = get_event_repetition_dates($agenda);
   foreach($event_repeat_dates as $dates) {
@@ -904,8 +909,10 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
     run_query_update_deprecated_events($agenda);
     $event_id = run_query_insert_event_data($agenda);   
     foreach($event_repeat_dates as $dates) {
-      foreach($groups as $group_id) {
-          run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+      if(is_array($groups)) {
+	foreach($groups as $group_id) {
+	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+	}
       }
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
@@ -1455,21 +1462,22 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 	if(count($current_event[$current_time][$db_customer_id]) == 0) {
 	  $current_event[$current_time][$db_customer_id] = -1;
 	}	
-	$event_data[$db_id]["end"] = substr($db_date,8,2).":".substr($db_date,10,2);      }
-	else{
-	  if(!is_array($current_event[$current_time][$db_customer_id])) {
-	    $current_event[$current_time][$db_customer_id] = array();
-	  }
-  	  if(!is_array($past_time[$current_time][$db_customer_id])) {
-	    $current_event[$current_time][$db_customer_id] = array();
-  	  }	  
-  	  $current_event[$past_time][$db_customer_id][] = $db_id;
-  	  $current_event[$current_time][$db_customer_id][] = $db_id;
-	  $status = $event_data[$db_id]["status"] + 1;
-	  $event_data[$db_id] = 
-  	  array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status,"privacy" => $db_privacy);
-	  
-      	}	
+	$event_data[$db_id]["end"] = substr($db_date,8,2).":".substr($db_date,10,2);    
+      }
+      else{
+	if(!is_array($current_event[$current_time][$db_customer_id])) {
+	  $current_event[$current_time][$db_customer_id] = array();
+	}
+	if(!is_array($current_event[$past_time][$db_customer_id])) {
+	  $current_event[$past_time][$db_customer_id] = array();
+	}	  
+	$current_event[$past_time][$db_customer_id][] = $db_id;
+	$current_event[$current_time][$db_customer_id][] = $db_id;
+	$status = $event_data[$db_id]["status"] + 1;
+	$event_data[$db_id] = 
+	array("title"=>$db_title,"type"=>$db_cat_label,"description"=>$db_desc,"begin"=>substr($db_date,8,2).":".substr($db_date,10,2),"status" => $status,"privacy" => $db_privacy);
+	
+      }	
       $obm_q->next_record(); 
       $db_date = $obm_q->f("calendarsegment_date");
       $db_customer_id = $obm_q->f("calendarsegment_customerid");

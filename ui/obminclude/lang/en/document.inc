@@ -45,7 +45,7 @@ $l_kind = "Kind of document";
 $l_auto = "Default value";
 $l_consult = "Consult document";
 $l_url = "URL";
-
+$l_add = "Add documents";
 // Message
 $l_cat1_checkdelete = "Check or delete Category 1"; 
 $l_cat1_update = "Update category 1"; 
@@ -98,6 +98,9 @@ $l_update_ok = "The document has been updated successfully.";
 $l_update_error = "The update of the document has failed !";
 $l_header_tree = "Tree";
 $invalid_link_file = "Cannot create a alias over a link";
+$l_have_link = "This document is linked with various objects";
+$l_have_no_link = "This document isn't linked and can be deleted";
+$l_no_document = "Document not found";
 
 // Actions
 $l_checkdelete = "Check or Delete the Document";

@@ -452,7 +452,7 @@ function run_query_delete($id) {
 
   // update the company total deal number
   run_query_company_total_deal_dec($comp_id);
-
+  run_query_delete_document($id,"Deal");
   $query = "delete from Deal where deal_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

@@ -165,6 +165,16 @@ CREATE TABLE DocumentMimeType (
   documentmimetype_mime varchar(255) default NULL,
   PRIMARY KEY (documentmimetype_id)
 );
+--
+-- Table structure for table 'DocumentEntity'
+--
+CREATE TABLE DocumentEntity (
+  documententity_documentid int(8) NOT NULL,
+  documententity_entityid int(8) NOT NULL,
+  documententity_entity varchar(255) NOT NULL,
+  PRIMARY KEY (documententity_documentid,documententity_entityid,documententity_entity)
+);
+
 
 -------------------------------------------------------------------------------
 -- Tasktype

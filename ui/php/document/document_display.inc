@@ -60,6 +60,20 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
   $name = stripslashes($document["filename"]);
+  $popup = $document["popup"];
+  if ($popup) {
+    $ext_action = $document["ext_action"];
+    $ext_title = $document["ext_title"];
+    $ext_url = $document["ext_url"];
+    $ext_id = $document["ext_id"];
+    $ext_target = $document["ext_target"];
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["msg"] .= display_info_msg($ext_title);
+  }
   
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
@@ -123,6 +137,8 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+      $ext&nbsp; 
     </div>
     <div class=\"searchEnd\"></div>
   </div>
@@ -165,7 +181,7 @@ function dis_document_search_list($document) {
 //     keys used   : archive, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
-  global $display, $l_found;
+  global $display, $l_found, $l_add,$l_close;
 
   // we urlencode to avoid breakage for space char
   $title = stripslashes($document["title"]);
@@ -174,18 +190,52 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
   $author = stripslashes($document["author"]);
   $mime = $document["mime"];
   $name = stripslashes($document["name"]);
+  $entity =$document["entity"];
+  $entity_id = $document["entity_id"];
+  $popup = $document["popup"];
   
-  $url = url_prepare("document_index.php?tf_title=$title&sel_cat1=$cat1&sel_cat2=$cat2&tf_author=$author&tf_name=$name&sel_mime=$mime&action=search");
+ if ($popup) {
+    $ext_action = $document["ext_action"];
+    $ext_url = $document["ext_url"];
+    $ext_id = $document["ext_id"];
+    $ext_target = $document["ext_target"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
+  }  
+  $url = url_prepare("document_index.php?tf_title=$title&sel_cat1=$cat1&sel_cat2=$cat2&tf_author=$author&tf_name=$name&sel_mime=$mime&entity=$entity&amp;param_entity=$entity_id&amp;action=search$url_ext");
+
 
   $doc_q->seek($first_row);
 
   $doc_d = new OBM_DISPLAY("DATA", $pref_q, "document");
+
+  if ($popup) {
+    $doc_d->display_link = false;
+    $doc_d->data_cb_text = "X";
+    $doc_d->data_idfield = "document_id";
+    $doc_d->data_cb_name = "cb_d";
+    $display_popup_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    $display_popup_end = "
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </p>
+      </form>
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+    }
+    
   $doc_d->data_set = $doc_q;
   $doc_d->data_url = $url;
   $doc_d->data_header = "both";
   $display["msg"] .= display_info_msg("$nb_document $l_found");
-  $block = $doc_d->display("dis_data_document");
-
+  $block = $display_popup_head;
+  $block .= $doc_d->display("dis_data_document");
+  $block .= $display_popup_end;
   return $block;
 }
 
@@ -198,13 +248,13 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 //   - $document[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////popup/////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
   global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
   global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url;
   global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
-  global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto;
+  global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto,$default_path;
 
 
   // if update mode and first display values are taken from database
@@ -240,7 +290,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   if (isset($document["path"])) { $fi_path = stripslashes($document["path"]); }
   if (isset($document["file"])) { $file = stripslashes($document["file"]); } 
   if (isset($document["kind"])) { $kind = $document["kind"]; }
-
+  if (isset($document["entity"])) { $entity = $document["entity"]; }
+  if (isset($document["entity_id"])) { $entity_id = $document["entity_id"]; }
+  if ($fi_path =="") $fi_path = $default_path;
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
   while($cat1_q->next_record()) {
@@ -380,8 +432,12 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">$dis_button</p>
+   <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_button
+    <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />
+    <input type=\"hidden\" name=\"entity\" value=\"$entity\" />
+    </p>
     </div>
     </form>
    ";
@@ -1264,8 +1320,10 @@ function dis_repository_rec($document,$repository,$display_file) {
     if($popup) {
       $js = "onclick=\"fill_ext_form('$relative_path/$file');return false;\"";
     }
+    
     $file = stripslashes($file);
-    $block .= "<div class=\"documentFile\"><img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
+    $block .= "<div class=\"documentFile\">
+     <a href=\"document_index.php?action=detailconsult&amp;name_document=$file&amp;tf_path=$relative_path\" $js><img src=\"/images/$set_theme/$ico_file\" alt=\"\" /></a>
      <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>
       $file</a><br /></div>";
   }

@@ -42,7 +42,7 @@ $l_header_tree = "Arborescence";
 $l_auto = "Par défaut";
 $l_consult = "Consulter le document";
 $l_url = "Adresse";
-
+$l_add = "Ajouter les documents";
 // Message
 $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 
 $l_cat1_update = "Mettre à jour la catégorie 1"; 
@@ -98,6 +98,9 @@ $l_link = "Lien HTML";
 $l_existing_file = "Fichier déjà envoyé";
 $l_kind = "Type de document";
 $l_invalid_link_file = "Impossible de creer un alias sur un lien";
+$l_have_link = "Ce document est lié à divers éléments d'obm";
+$l_have_no_link = "Ce document n'est lié à aucun éléments et peut etre supprimer";
+$l_no_document = "Document introuvable";
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";

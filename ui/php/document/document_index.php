@@ -46,11 +46,21 @@ if ($action == "ext_get_path") {
 } elseif ($action == "accessfile") {
     dis_file($document);
     exit();
+} elseif ($action == "ext_get_ids") {
+  $cat1_q = run_query_documentcategory1();
+  $cat2_q = run_query_documentcategory2();
+  $mime_q = run_query_documentmime();    
+  $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,$document);
+  if ($set_display == "yes") {
+    $display["result"] = dis_user_search_list($document);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "index" || $action == "") {
+elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
@@ -90,13 +100,13 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_document > 0) {
-    $doc_q = run_query_detail($param_document);
+  if ($param_document > 0 || $name_document != "") {
+    $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
       $display["detail"] = html_document_consult($doc_q);
     } else {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
+      $display["msg"] .= display_err_msg("$l_no_document !");
     }
   }
 
@@ -344,10 +354,15 @@ function get_param_document() {
   global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype,$tf_repository_name,$popup;
   global $param_document,$fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
   global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url,$hd_document_id;
-  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
-  
+  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target,$name_document;
+  global $param_entity, $entity; 
   if (isset ($param_document)) $document["id"] = $param_document;
+  if (isset ($name_document)) $document["name"] = $name_document;
 
+  if (isset ($param_entity)) $document["entity_id"] = $param_entity;
+  if (isset ($entity)) $document["entity"] = $entity;
+
+  
   if (isset ($hd_document_id)) $document["id"] = $hd_document_id;
   
   if (isset ($tf_url)) $document["url"] = $tf_url;

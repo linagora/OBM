@@ -31,6 +31,92 @@ function run_query_id_user($login, $passwd) {
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// query execution : Count the number of document linked with a entity      //
+// Parameters:
+//   - $id  :  Id of entity
+//   - $entity  :  Type of entity (deal, company..)
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_document_nb ($id,$entity) {
+  global $cdg_sql;
+
+  $query = "select count(*) as nb from DocumentEntity where documententity_entity = '$entity'
+            and documententity_entityid = '$id'"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+  return $obm_q->f("nb");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// query execution : Delete document linked with a entity      //
+// Parameters:
+//   - $id  :  Id of entity
+//   - $entity  :  Type of entity (deal, company..)
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete_document($id,$entity) {
+  global $cdg_sql;
+
+  $query = "Delete from DocumentEntity where documententity_entity = '$entity'
+            and documententity_entityid = '$id'"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// query execution : Insert document linked with a entity      //
+// Parameters:
+//   - $id  :  Id of entity
+//   - $entity  :  Type of entity (deal, company..)
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_insert_documents($ids,$entity) {
+  global $cdg_sql,$auth;
+
+  $id = $ids["id"];
+  $cpt = 0;
+  $cpt_ins = 0;
+  while ($cpt < $ids["doc_nb"]) {
+    $cpt++;
+    $d_id = $ids["doc$cpt"];
+    
+    $query = "select * from DocumentEntity
+      where documententity_entity='$entity'
+      and documententity_entityid='$id'
+      and documententity_documentid = '$d_id'";
+    display_debug_msg($query, $cdg_sql);
+    $test_q = new DB_OBM;
+    $retour = $test_q->query($query);
+    
+    // If the entry doesn't already exist, we insert it
+    if ($test_q->num_rows() == 0) {
+      $query = "insert into DocumentEntity (
+       	documententity_entity,
+	documententity_entityid,
+	documententity_documentid
+      )
+      values (    
+	'$entity',
+	'$id',
+	'$d_id'
+      )";
+      display_debug_msg($query, $cdg_sql);
+      $obm_q = new DB_OBM;
+      $retour = $obm_q->query($query);
+      $cpt_ins++;
+    }
+  }
+
+  return $cpt_ins;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution : All users                                       //

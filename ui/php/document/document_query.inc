@@ -73,6 +73,15 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   $author = $document["author"];
   $mime = $document["mime"];
   $name = $document["filename"];
+  $entity =$document["entity"];
+  $entity_id = $document["entity_id"];  
+
+
+  if ($entity != "") {
+    $leftjoin = "LEFT JOIN DocumentEntity on document_id = documententity_documentid";
+    $where .= " documententity_entity = '$entity' and documententity_entityid = '$entity_id' ";
+    $and = "and";
+  }
   
   $req = "select
       document_id as Id,
@@ -86,15 +95,15 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
       documentcategory1_label,
       documentcategory2_label,
       documentmimetype_label
-      from ((Document
+      from (((Document
          LEFT JOIN DocumentCategory1 on document_category1 = documentcategory1_id)
          LEFT JOIN DocumentCategory2 on document_category2 = documentcategory2_id)
-	 LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id";
+	 LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id)
+	 $leftjoin";
       
 
-  $and = "";
   if ($title != "") {
-    $where .= " document_title like '%$title%'";
+    $where .= "$and document_title like '%$title%'";
     $and = "and";
   }
   
@@ -102,7 +111,6 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
     $where .= "$and document_name like '%$name%'";
     $and = "and";
   }
-
 
   if (($cat1 != $c_all) && ($cat1 != "")) { 
     $where .= " $and document_category1 = '$cat1'";
@@ -148,7 +156,7 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert(&$document) {
-  global $auth, $cdg_sql,$c_auto;
+  global $auth, $cdg_sql,$c_auto,$document_path;
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -161,7 +169,10 @@ function run_query_insert(&$document) {
   $kind = $document["kind"];
   $url = $document["url"];
   $kind = $document["kind"];  
+  $entity = $document["entity"];
+  $entity_id = $document["entity_id"];
 
+  
   if($kind == "link") {
     $name = $url;
     $document["name"]=$name;
@@ -228,7 +239,26 @@ function run_query_insert(&$document) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  if($entity != "") {
+    $document["entity_id"] = "";
+    $document["entity"] = "";
+    $new_doc = run_query_search ($document, $new_order, $order_dir);
+    $new_doc->next_record();
+    $new_doc_id = $new_doc->f("document_id");
+    
+    $query = "insert into DocumentEntity (
+      documententity_entity,
+      documententity_entityid,
+      documententity_documentid
+    )
+    values (    
+      '$entity',
+      '$entity_id',
+      '$new_doc_id'
+      )";
+    $obm_q->query($query);
 
+  }
   return $retour;
 }
 
@@ -340,7 +370,13 @@ function run_query_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_document_links($document_id) {
-return 0;
+  $obm_q = new DB_OBM;
+  $obm_q2 = new DB_OBM;
+
+  $query = "select * from DocumentEntity where documententity_documentid =
+           '$document_id'";
+  $obm_q->query($query);
+  return $obm_q->nf();
 
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -582,9 +618,14 @@ function check_data_form($cid, $document) {
 // Parameters :
 //   - $p_id  : document id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_detail($document) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
-
+  $p_id = $document["id"];
+  $name = $document["name"];
+  $path = $document["path"];
+  if(islink($name)) {
+    $name = getlink($name,$path);
+  }
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
@@ -594,11 +635,10 @@ function run_query_detail($p_id) {
          LEFT JOIN DocumentCategory1 on document_category1 = documentcategory1_id)
          LEFT JOIN DocumentCategory2 on document_category2 = documentcategory2_id)
 	 LEFT JOIN DocumentMimeType on document_mimetype = documentmimetype_id
-	 where document_id='$p_id'";
+	 where document_id='$p_id' or (document_name = '$name' and document_path = '$path')";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select *,document_timeupdate as timeupdate, document_timecreate as timecreate from Document where document_id='$p_id'";
   }
-
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   $obm_q->next_record();

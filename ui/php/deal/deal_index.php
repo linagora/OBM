@@ -245,6 +245,21 @@ elseif (($action == "index") || ($action == "")) {
   }
   $display["search"] = dis_deal_index();
   
+} elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($deal["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($deal,"Deal");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+    $deal_q = run_query_detail($deal["id"]);
+    $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+    $cid = $deal_q->f("deal_company_id");
+    $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);
+    $q_invoices->next_record();
+    $invoices_options = run_query_display_pref ($uid, "invoice");
+    $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid,"deal",1);
@@ -536,8 +551,35 @@ function get_param_deal() {
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat, $tf_hitrate;
-  global $rd_cat_internal;
+  global $rd_cat_internal,$ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
+  if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $deal["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $deal["ext_id"] = $ext_id;
+  if (isset ($ext_id)) $deal["id"] = $ext_id;
+  if (isset ($ext_title)) $deal["ext_title"] = $ext_title;
+  if (isset ($ext_target)) $deal["ext_target"] = $ext_target;
+
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_d = 0;
+    $nb_deal = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$deal["doc$nb_d"] = $d_num;
+      }
+    }
+    $deal["doc_nb"] = $nb_d;
+  }
+  
   // Deal fields
   if (isset ($param_deal)) $deal["id"] = $param_deal;
   if (isset ($tf_num)) $deal["num"] = $tf_num;
@@ -749,6 +791,13 @@ function get_deal_action() {
     'Condition'=> array ('detailconsult', 'update') 
                                      );
 
+// Document add
+  $actions["DEAL"]["document_add"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=document_add",
+    'Right'    => $deal_write,
+    'Condition'=> array ('None')
+  );
+  
   // Parent Delete
   $actions["DEAL"]["parent_delete"] = array (
     'Name'     => $l_header_delete,
