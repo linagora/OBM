@@ -252,7 +252,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
   global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
-  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url;
+  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url,$l_links;
   global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto,$default_path;
 
@@ -269,6 +269,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     if(islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
+      $proto = substr($doc_q->f("document_name"),0,strrpos($doc_q->f("document_name"),'/')+1);
       $url = substr($doc_q->f("document_name"),strrpos($doc_q->f("document_name"),'/')+1);
       if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
@@ -361,16 +362,26 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
    $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"file\" $checked/> $l_existing_file<br />";
   
 
-  if($kind == "link") {
+  if($kind == "link" && $proto == "http://") {
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
-     $tp = "http://";
+     $tp = "$proto";
    }else 
      $checked = "";
 
-   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link<br />";
+   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link &nbsp;&nbsp;";
 
+  if($kind == "link" && $proto == "https://") {
+     $dis_field = " style=\"display: none;\" ";
+     $dis_img2 = " style=\"display: none;\" ";
+     $checked = "checked=\"checked\"";
+     $tp = "$proto";
+   }else 
+     $checked = "";
+   
+     $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_links<br />";
+ 
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
   $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
