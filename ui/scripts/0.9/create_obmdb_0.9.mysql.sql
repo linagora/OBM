@@ -1263,6 +1263,7 @@ CREATE TABLE UGroup (
   group_userupdate  int(8),
   group_usercreate  int(8),
   group_system      int(1) DEFAULT 0,
+  group_privacy     int(2) NULL DEFAULT 0, 
   group_local       int(1) DEFAULT 1,
   group_ext_id      int(8),
   group_name        varchar(32) NOT NULL,

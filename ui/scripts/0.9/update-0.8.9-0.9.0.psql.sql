@@ -29,6 +29,7 @@ DROP TABLE RepeatKind;
 -- Add column _local
 ALTER TABLE UserObm ADD COLUMN userobm_local integer DEFAULT 1;
 ALTER TABLE UGroup ADD COLUMN group_local integer DEFAULT 1;
+ALTER TABLE UGroup ADD COLUMN group_privacy integer;
 
 -- Add column _ext_id
 ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16);
@@ -150,3 +151,4 @@ UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='co
 -- Update Contact table
 -------------------------------------------------------------------------------
 ALTER TABLE Contact ADD COLUMN contact_company varchar(64);
+

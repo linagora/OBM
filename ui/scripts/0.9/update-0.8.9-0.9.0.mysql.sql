@@ -29,6 +29,7 @@ DROP TABLE IF EXISTS RepeatKind;
 -- Add column _local
 ALTER TABLE UserObm ADD COLUMN userobm_local int(1) DEFAULT 1 after userobm_usercreate;
 ALTER TABLE UGroup ADD COLUMN group_local int(1) DEFAULT 1 after group_usercreate;
+ALTER TABLE UGroup ADD COLUMN group_privacy int(2) NULL DEFAULT 0 after group_system;
 
 -- Add column _ext_id
 ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16) after userobm_local;
@@ -143,3 +144,5 @@ UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='co
 -- Update Contact table
 -------------------------------------------------------------------------------
 ALTER TABLE Contact ADD COLUMN contact_company varchar(64) AFTER contact_company_id;
+
+
