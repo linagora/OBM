@@ -36,8 +36,10 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incident_contract_id,
       incident_label,
       incident_date,
-      incident_priority,
-      incident_state,
+      incident_priority_id,
+      incidentpriority_label as incident_priority,
+      incident_status_id,
+      incidentstatus_label as incident_status,
       incident_logger,
       incident_owner,
       incident_archive,
@@ -46,18 +48,20 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
-    from Incident, Contract,
+    from Incident, IncidentPriority, IncidentStatus, Contract,
       UserObm u1, UserObm u2, Company
     where u1.userobm_id = Incident.incident_logger
       AND u2.userobm_id = Incident.incident_owner
       AND Incident.incident_contract_id = Contract.contract_id
-      AND Contract.contract_company_id = Company.company_id";
+      AND Contract.contract_company_id = Company.company_id
+      AND Incident.incident_priority_id = IncidentPriority.incidentpriority_id
+      AND Incident.incident_status_id = IncidentStatus.incidentstatus_id";
 
   if ($lincident != "") {
      $req .= " and Incident.incident_label like '$lincident%'";
   }
   if (($priority != $c_all) && ($priority != "")) { 
-     $req .= " and Incident.incident_priority_id ='$priority'";
+     $req .= " and Incident.incident_priority_id = '$priority'";
   }
   if($param_contract != "") {
      $req .= " and Contract.contract_id = '$param_contract'";
@@ -82,8 +86,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   }
   // ORDER construction
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Incident.incident_state";
-  $req .= " order by $order $p_order_dir, Incident.incident_priority";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "incidentstatus_order";
+  $req .= " order by $order $p_order_dir, incidentpriority_order";
 
   $obm_db=new DB_OBM;
   $obm_db->query($req);
@@ -210,8 +214,8 @@ function run_query_insert($incident) {
     incident_label,
     incident_contract_id,
     incident_date,
-    incident_priority,
-    incident_state,
+    incident_priority_id,
+    incident_status_id,
     incident_logger,
     incident_owner,
     incident_duration,
@@ -271,8 +275,8 @@ function run_query_update($incident) {
     incident_owner='$owner',
     incident_label='$lincident',
     incident_date='$call_date', 
-    incident_priority='$priority',
-    incident_state='$status',
+    incident_priority_id='$priority',
+    incident_status_id='$status',
     incident_resolution = '$solu',
     incident_description = '$desc',
     incident_duration = '$duration',

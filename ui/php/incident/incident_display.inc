@@ -12,7 +12,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["incident_state"] = $l_status;
+$fieldnames["incident_status"] = $l_status;
 $fieldnames["incident_label"] = $l_label;
 $fieldnames["incident_priority"] = $l_priority;
 $fieldnames["incident_date"] = $l_date;
@@ -216,7 +216,6 @@ function html_incident_consult($inc_q,$con_q) {
 
   $label = $inc_q->f("incident_label");
   $priority = $inc_q->f("incidentpriority_label");
-  $state = $inc_q->f("incident_state");
   $status = $inc_q->f("incidentstatus_label");
   $date = datetime_format($inc_q->f("date"));
   $inc_id = $inc_q->f("incident_id");
@@ -315,7 +314,7 @@ function html_incident_consult($inc_q,$con_q) {
   <td class=\"detailText\">$priority</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_status</td>
-  <td class=\"detailText\">$state $status</td>
+  <td class=\"detailText\">$status</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_date</td>
   <td class=\"detailText\">$date</td>
@@ -348,7 +347,7 @@ function html_incident_consult($inc_q,$con_q) {
 //   - $incident[]: default values
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
+function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $incident) {
   global $path, $set_theme, $ico_contract;
   global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -366,8 +365,8 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $desc = $inc_q->f("incident_description");
     $duration = $inc_q->f("incident_duration");
     $solu = $inc_q->f("incident_resolution");
-    $priority = $inc_q->f("incident_priority");
-    $status = $inc_q->f("incident_state");
+    $priority = $inc_q->f("incident_priority_id");
+    $status = $inc_q->f("incident_status_id");
     $date = date_format($inc_q->f("date"));
     $hour = get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
@@ -409,36 +408,29 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   }
   $dis_sel_logger.="</select>";
 
-  $dis_sel_prio="<select name=\"sel_priority\" >\n<option value=\"redhot\"";
-  if ($priority == "redhot") 
-   $dis_sel_prio.= " selected=\"selected\"";
-  $dis_sel_prio.=">$l_redhot</option>\n<option value=\"hot\"";
-  if ($priority == "hot") 
-   $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.=">$l_hot</option>\n<option value=\"normal\"";
-  if ($priority == "normal") 
-   $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.= ">$l_normal</option>\n<option value=\"low\"";
-  if ($priority == "low") 
-   $dis_sel_prio.=" selected=\"selected\"";
-  $dis_sel_prio.=">$l_low</option>\n</select>";
+  // Priority select
+  $sel_pri = "<select name=\"sel_priority\">";
+  while ($pri_q->next_record()) {
+    $id = $pri_q->f("incidentpriority_id");
+    $label = $pri_q->f("incidentpriority_label");
+    $sel_pri .= "\n<option value=\"$id\"";
+    if ($id == $priority) 
+      $sel_pri .= " selected=\"selected \"";
+    $sel_pri .= ">$label</option>";
+  }
+  $sel_pri .= "</select>";
 
-  $dis_sel_stat="<select name=\"sel_status\" onchange=\"auto_archive(this.form)\">\n<option value=\"open\"";
-  if ($status == "open") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.= ">$l_open</option>\n<option value=\"call\"";
-  if ($status == "call") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.= ">$l_call</option>\n<option value=\"waitcall\"";
-  if ($status == "waitcall") 
-   $dis_sel_stat.= " selected=\"selected\"";
-  $dis_sel_stat.=">$l_waitcall</option>\n<option value=\"paused\"";
-  if ($status == "paused") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.=">$l_paused</option>\n<option value=\"closed\"";
-  if ($status == "closed") 
-   $dis_sel_stat.=" selected=\"selected\"";
-  $dis_sel_stat.=">$l_closed</option>\n</select>";
+  // Status select
+  $sel_sta = "<select name=\"sel_status\">";
+  while ($sta_q->next_record()) {
+    $id = $sta_q->f("incidentstatus_id");
+    $label = $sta_q->f("incidentstatus_label");
+    $sel_sta .= "\n<option value=\"$id\"";
+    if ($id == $status) 
+      $sel_sta .= " selected=\"selected \"";
+    $sel_sta .= ">$label</option>";
+  }
+  $sel_sta .= "</select>";
 
   // Hour select
   $sel_hour = "<select name=\"sel_hour\">";
@@ -524,10 +516,10 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   </td>
  </tr><tr>
   <td class=\"detailLabel\">$l_priority</td>
-  <td>$dis_sel_prio</td>
+  <td>$sel_pri</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_status</td>
-  <td>$dis_sel_stat</td>
+  <td>$sel_sta</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_date</td>
   <td>

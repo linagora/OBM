@@ -86,7 +86,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-  html_incident_form($action, "", "", run_query_userobm(), $incident);
+  html_incident_form($action, "", "", run_query_userobm(), run_query_priority(), run_query_status(), $incident);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ if ($action == "index" || $action == "") {
       $contr_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
       require("incident_js.inc");
       display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
-      html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), $incident);
+      html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), run_query_priority(), run_query_status(), $incident);
     } else {
       display_err_msg($l_query_error . " - " . $con_q->query . " !");
       html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
@@ -126,7 +126,7 @@ if ($action == "index" || $action == "") {
   } else {
     require("incident_js.inc");
     display_warn_msg($err_msg);
-    html_incident_form($action, "", run_query_userobm(), $incident);
+    html_incident_form($action, "", "", run_query_userobm(), run_query_priority(), run_query_status(), $incident);
   }
 
 } elseif ($action == "update")  {
@@ -205,7 +205,7 @@ function get_param_incident() {
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
     if ( $incident ) {
       while ( list( $key, $val ) = each( $incident ) ) {
-        echo "<BR>incident[$key]=$val";
+        echo "<br />incident[$key]=$val";
       }
     }
   }

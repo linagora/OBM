@@ -25,7 +25,7 @@ UPDATE Deal set deal_hitrate = '100' where deal_status_id = '1' or deal_status_i
 
 
 -------------------------------------------------------------------------------
--- Create incident dico tables
+-- Create incident ref tables
 -------------------------------------------------------------------------------
 --
 -- New table 'IncidentPriority'
@@ -103,3 +103,6 @@ ALTER table Incident drop column incident_priority;
 
 -- Drop column incident_state
 ALTER table Incident drop column incident_state;
+
+-- Update Display preferences for Incident Status
+UPDATE DisplayPref set display_fieldname='incident_status' where display_fieldname='incident_state';

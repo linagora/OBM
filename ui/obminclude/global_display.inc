@@ -101,7 +101,7 @@ class OBM_DISPLAY {
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
-    global $sess, $fieldnames;
+    global $fieldnames;
     
     $nb_field = $this->display_pref->nf() - 1;
 
@@ -266,11 +266,11 @@ class OBM_DISPLAY {
   // Function that display the dataset
   /////////////////////////////////////////////////////////////////////////////
   function dis_data() {
-    global $col_textem, $col_table, $col_tableh,$col_error,$col_ok,$col_text_hot;
+    global $col_textem,$col_table,$col_tableh,$col_error,$col_ok,$col_text_hot;
     global $col_frs, $col_client,$col_balance_pos, $col_balance_neg,$col_text_redhot;
     global $col_inc_redhot,$col_inc_hot,$col_inc_closed;
     global $ico_mail,$ico_contact_new,$ico_web,$ico_ball, $ico_crow;
-    global $auth, $sess, $cdg_id, $set_debug, $set_theme, $set_rows;
+    global $cdg_id, $set_debug, $set_theme, $set_rows;
     global $time;
 
     $link_ok = $this->display_link;
@@ -775,7 +775,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_index($url) {
-    global $sess, $page, $new_order;
+    global $page, $new_order;
     global $set_rows, $set_rows_default;
 
     // If displayed without links (in popup) add this in url
@@ -822,7 +822,7 @@ class OBM_DISPLAY {
   // Function that display the dataset headers (col names)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $sess, $page, $new_order, $order_dir;
+    global $page, $new_order, $order_dir;
     global $col_tableh, $col_textem;
     global $fieldnames, $cdg_id, $set_debug;
 
@@ -892,12 +892,13 @@ class OBM_DISPLAY {
     echo "\n";
   }
 
+
   /////////////////////////////////////////////////////////////////////////////
   // Function that display the dataset
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_file($sep) {
-    global $auth, $sess, $cdg_id, $set_debug;
+    global $cdg_id, $set_debug;
     global $time;
 
     $this->dis_data_header_file($sep);
@@ -913,7 +914,6 @@ class OBM_DISPLAY {
    	    $fieldname = $this->display_pref->f("display_fieldname");
 
  
-
         echo $this->data_set->f($fieldname) . $sep;
 	  }
 	  echo "\n";
