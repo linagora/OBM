@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : statistic_index.php                                            //
-//     - Desc : Statistic Index File                                           //
+// OBM - File : statistic_index.php                                          //
+//     - Desc : Statistic Index File                                         //
 // 2004-04-19 Rande Mehdi                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -62,7 +62,7 @@ elseif ($action == "company") {
   $cat_q = run_query_company_per_country_per_cat();
   $nb_comp = run_query_nb_company();
   $display["title"] = display_title($l_header_comp_stats);
-  $display["detail"] = dis_cat_stats($cat_q,$nb_comp);
+  $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
 
 }

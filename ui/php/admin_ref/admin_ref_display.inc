@@ -58,15 +58,16 @@ function html_country_form($ctry_q) {
       forms.form_ctry_update.tf_name.value=myname;
       forms.form_ctry_update.tf_iso.value=iso;
       forms.form_ctry_update.tf_lang.value=lang;
-      forms.form_ctry_update.tf_phone.value=phone;\"
+      forms.form_ctry_update.tf_phone.value=phone;
+      forms.form_ctry_update.hd_old_iso.value=iso;
+      forms.form_ctry_update.hd_old_lang.value=lang;\"
       size=\"20\">";
     while ($ctry_q->next_record()) {
-      $id = $ctry_q->f("country_id");
       $iso = $ctry_q->f("country_iso3166");
       $lang = $ctry_q->f("country_lang");
       $name = $ctry_q->f("country_name");
       $phone = $ctry_q->f("country_phone");
-      $sel_ctry .= "\n<option value=\"$id\">$iso-$lang-$name ($phone)</option>";
+      $sel_ctry .= "\n<option value=\"$iso-$lang\">$iso-$lang-$name ($phone)</option>";
     }
     $sel_ctry .= "</select>";
 
@@ -100,7 +101,8 @@ function html_country_form($ctry_q) {
       <td colspan=\"2\">
         <form name=\"form_ctry_update\" method=\"get\"
           action=\"" . url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"sel_ctry\" value=\"\" />
+        <input type=\"hidden\" name=\"hd_old_iso\" value=\"\" />
+        <input type=\"hidden\" name=\"hd_old_lang\" value=\"\" />
         <input type=\"hidden\" name=\"action\" value=\"country_update\" />
 
         <table>
@@ -195,9 +197,9 @@ function html_country_form($ctry_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Country links                                                //
+// Display: Country links
 // Parameters:
-//   - $ref : country hash info : keys used : id, name
+//   - $ref : country hash info : keys used : name, iso, lang
 ///////////////////////////////////////////////////////////////////////////////
 function dis_country_links($ref) {
   global $display, $l_back, $l_ctry_link_company, $l_ctry_link_company_no;
@@ -205,11 +207,12 @@ function dis_country_links($ref) {
   global $l_ctry_delete, $l_ctry_can_delete, $l_ctry_cant_delete;
 
   $delete_ok = true;
-  $id = $ref["country"];
-  $name = get_country_name($id);
+  $iso = $ref["iso"];
+  $lang = $ref["lang"];
+  $name = get_country_name($iso, $lang);
 
   // Company Links
-  $obm_q = run_query_country_company_links($id);
+  $obm_q = run_query_country_company_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
     $dis_link_comp = "
@@ -231,12 +234,12 @@ function dis_country_links($ref) {
   } else {
     $dis_link_comp = "
     <tr>
-      <td class=\"detailHead\">$l_ctry_link_company_no</td>
+      <td class=\"detailHead\">$name : $l_ctry_link_company_no</td>
     </tr>";
   }
 
   // Contacts Links
-  $obm_q = run_query_country_contact_links($id);
+  $obm_q = run_query_country_contact_links($iso);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
     $dis_link_cont = "
@@ -258,7 +261,7 @@ function dis_country_links($ref) {
   } else {
     $dis_link_cont = "
     <tr>
-      <td class=\"detailHead\">$l_ctry_link_contact_no</td>
+      <td class=\"detailHead\">$name : $l_ctry_link_contact_no</td>
     </tr>";
   }
 
@@ -275,10 +278,11 @@ function dis_country_links($ref) {
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_ctry_can_delete);
-    $dis_del = "<form name=\"form_act_delete\".
+    $dis_del = "<form name=\"form_ctry_delete\".
           method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"country_delete\" />
-        <input type=\"hidden\" name=\"sel_ctry\" value=\"$id\" />
+        <input type=\"hidden\" name=\"tf_iso\" value=\"$iso\" />
+        <input type=\"hidden\" name=\"tf_lang\" value=\"$lang\" />
         <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_delete\" />
         </form>";
     $block .= "

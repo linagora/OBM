@@ -48,23 +48,29 @@ function run_query_company_per_resp() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// statistic about category and country                         //
+// statistic about category and country
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company_per_country_per_cat() {
   global $cdg_sql;
- 
+
+  $lang = get_lang();
+
   $query = "Select  
-  country_id,country_iso3166, country_name,
-  companycategory_id, companycategory_code,companycategory_label,
-  count(company_id) as nb 
-  FROM Company
-  LEFT OUTER JOIN Country ON company_country_id = country_id
-  LEFT OUTER JOIN CompanyCategoryLink ON companycategorylink_company_id = company_id
-  LEFT OUTER JOIN CompanyCategory ON companycategory_id = companycategorylink_category_id
-  GROUP BY  country_id,country_iso3166, country_name,
-  companycategory_id, companycategory_code,companycategory_label
-  ORDER BY country_id,companycategory_id";
+      country_iso3166,
+      country_name,
+      companycategory_id,
+      companycategory_code,
+      companycategory_label,
+      count(company_id) as nb 
+    FROM Company
+      LEFT JOIN Country ON company_country_iso3166 = country_iso3166
+                           and country_lang='$lang'
+      LEFT JOIN CompanyCategoryLink ON companycategorylink_company_id = company_id
+      LEFT JOIN CompanyCategory ON companycategory_id = companycategorylink_category_id
+    GROUP BY country_iso3166, country_name,
+      companycategory_id, companycategory_code,companycategory_label
+    ORDER BY country_iso3166, companycategory_id";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;

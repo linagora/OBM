@@ -1196,7 +1196,7 @@ function run_query_list_static_contact_id($id) {
 
 
 
-// Utilise que par adresses.php
+// Utilise que par adresses.php XXXX
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Distincts contacts from several lists for export        //
 // Parameters:

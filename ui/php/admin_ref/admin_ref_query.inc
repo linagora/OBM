@@ -47,20 +47,21 @@ function run_query_country_insert($ctry) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Country update query execution                                        //
+// Country update query execution
 // Parameters:
-//   - $ctry : data source hash info : keys used : act, name
+//   - $ctry : data source hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_country_update($ctry) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-  $id = $ctry["country"];
   $name = $ctry["name"];
   $iso = $ctry["iso"];
   $lang = $ctry["lang"];
   $phone = $ctry["phone"];
+  $old_iso = $ctry["old_iso"];
+  $old_lang = $ctry["old_lang"];
 
   $query = "update Country set
       country_iso3166='$iso',
@@ -70,7 +71,8 @@ function run_query_country_update($ctry) {
       country_timeupdate='$timeupdate',
       country_userupdate='$userupdate'
     where
-      country_id='$id'";
+      country_iso3166='$old_iso'
+      and country_lang='$old_lang'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -81,16 +83,19 @@ function run_query_country_update($ctry) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Country deletion query execution                                      //
+// Country deletion query execution
 // Parameters:
-//   - $ctry : data source hash info : keys used : id
+//   - $ctry : data source hash info : keys used : old_iso, old_lang
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_country_delete($ctry) {
   global $cdg_sql;
 
-  $id = $ctry["country"];
+  $iso = $ctry["iso"];
+  $lang = $ctry["lang"];
 
-  $query = "delete from Country where country_id='$id'";
+  $query = "delete from Country
+    where country_iso3166='$iso'
+      and country_lang='$lang'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -101,18 +106,18 @@ function run_query_country_delete($ctry) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Country - Company links query execution                               //
+// Country - Company links query execution
 // Parameters:
-//   - $id : country_id
+//   - $iso : country_iso3166
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_company_links($id) {
+function run_query_country_company_links($iso) {
   global $cdg_sql;
 
   $query = "select company_id,
       company_name,
-      company_country_id
+      company_country_iso3166
     from Company
-    where company_country_id='$id'";
+    where company_country_iso3166='$iso'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -123,18 +128,18 @@ function run_query_country_company_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Country - Contact links query execution                               //
+// Country - Contact links query execution
 // Parameters:
-//   - $id : country_id
+//   - $iso : country_iso3166
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_country_contact_links($id) {
+function run_query_country_contact_links($iso) {
   global $cdg_sql;
 
   $query = "select contact_id,
       contact_lastname,
       contact_firstname,
-      contact_country_id
-    from Contact where contact_country_id='$id'";
+      contact_country_iso3166
+    from Contact where contact_country_iso3166='$iso'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -145,16 +150,18 @@ function run_query_country_contact_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the name of a Country from its id                                 //
+// Get the name of a Country from its iso, lang
 // Parameters:
-//   - $id : id
+//   - $iso  : country_iso3166
+//   - $lang : country_lang
 ///////////////////////////////////////////////////////////////////////////////
-function get_country_name($id) {
+function get_country_name($iso, $lang) {
   global $cdg_sql;
 
   $query = "select country_name
     from Country
-    where country_id='$id'";
+    where country_iso3166='$iso'
+      and country_lang='$lang'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

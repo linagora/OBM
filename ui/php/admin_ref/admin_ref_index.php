@@ -199,7 +199,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_ref() {
   global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
-  global $sel_tt, $tf_label, $rd_tt_internal;
+  global $sel_tt, $tf_label, $rd_tt_internal, $hd_old_iso, $hd_old_lang;
   global $cdg_param;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
@@ -210,10 +210,16 @@ function get_param_ref() {
   if (isset ($sel_dsrc)) $ref["datasource"] = $sel_dsrc;
 
   // Admin - Country fields
-  if (isset ($sel_ctry)) $ref["country"] = $sel_ctry;
+  if (isset ($sel_ctry)) {
+    $pos = strpos($sel_ctry, "-");
+    $ref["iso"] = substr($sel_ctry, 0, $pos);
+    $ref["lang"] = substr($sel_ctry, $pos+1);
+  }
   if (isset ($tf_iso)) $ref["iso"] = $tf_iso;
   if (isset ($tf_lang)) $ref["lang"] = $tf_lang;
   if (isset ($tf_phone)) $ref["phone"] = $tf_phone;
+  if (isset ($hd_old_iso)) $ref["old_iso"] = $hd_old_iso;
+  if (isset ($hd_old_lang)) $ref["old_lang"] = $hd_old_lang;
 
   // Admin - Task Type fields
   if (isset ($sel_tt)) $ref["tasktype"] = $sel_tt;
