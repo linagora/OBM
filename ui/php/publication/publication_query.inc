@@ -244,6 +244,7 @@ function run_query_auto_subscription($publication,$p_id){
   $auto_sub =   $publication["auto_sub"];
   $recept =   $c_focsys;
   $lang = $publication["lang"];
+  $lang_array = split("-",$lang);
   $query = "insert into Subscription (
     subscription_timeupdate,
     subscription_timecreate,
@@ -266,6 +267,7 @@ function run_query_auto_subscription($publication,$p_id){
     '1'  
   from Contact Left Join 
   ContactCategory1Link ON contactcategory1link_contact_id = contact_id
+  Left Join Kind ON kind_id = contact_kind_id
   where 
   contactcategory1link_category_id IN (";
 
@@ -273,7 +275,16 @@ function run_query_auto_subscription($publication,$p_id){
     $query .= "$coma '$category_id'";
     $coma =',';
   }
-  $query .= ") group by contact_id";
+  $query .= ") 
+  AND 
+  kind_lang IN (";
+  $coma = "";
+  foreach($lang_array as $lang_id) {
+    $query .= "$coma '$lang_id'";
+    $coma =',';
+  }
+  $query .= ") 
+  group by contact_id";
   
   display_debug_msg($query, $cdg_sql);
 
