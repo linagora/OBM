@@ -4,7 +4,7 @@
 //     - Desc : Standard global display File                                 //
 // 2003-09-18 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id:
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -196,41 +196,41 @@ function display_menu_bar($section, $menu) {
   else
     $dico = "";
 
-  $block = "
+  $ret = "
     <div class=\"action\"> 
      <div class=\"actionTitle\">&nbsp;:: Action</div>
     ";
 
    if (is_array($actions[$menu])) {
      foreach ($actions[$menu] as $key => $value){
-       if (in_array("all",$value["Condition"])
+        if (in_array("all",$value["Condition"])
            || in_array($action,$value["Condition"])) {
          if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
            if ($value["Popup"] == 1) {
-	     if ($value["Target"]) {
+ 	     if ($value["Target"]) {
 	       $wtarget = "window.name='" . $value['Target'] . "';";
 	     }
              $ret .= "
-              <a href=\"\" class=\"menuBar\" 
-              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	      ".$value["Name"]."</a> &nbsp;";
-           } else {
-	     $block .= "
                <div class=\"actionLine\">&nbsp;
-                <a href=\"".$value["Url"]."\"> 
-                   ".$value["Name"]."</a></div> 
-                ";
+               <a href=\"\" 
+                 onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">".
+                 $value["Name"]."</a></div>";
+           } else {
+	     $ret .= "
+               <div class=\"actionLine\">&nbsp;
+                 <a href=\"".$value["Url"]."\">".
+                 $value["Name"]."</a></div>";
            }
          }
        }
      }
    }
    
-   $block .= "
+   $ret .= "
      </div>
      ";
 
-   return $block;
+   return $ret;
 }
 
 

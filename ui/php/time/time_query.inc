@@ -16,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($time) {
-  global $auth, $c_day_fraction, $cdg_sql;
+  global $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
 
@@ -63,13 +63,13 @@ function run_query_search($time) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_stat_project($time) {
-  global $auth, $c_day_fraction, $cdg_sql;
+  global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
   $user = $time["user_id"];
   $uid_tab = "(";
 
-  while($key = each($time["user_id"])) {
+  while ($key = each($time["user_id"])) {
     $uid = $key["value"];
     $uid_tab .= ($tail) ? ", $uid" : "$uid";
     $tail = 1;
@@ -119,13 +119,13 @@ function run_query_stat_project($time) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_stat_tasktype($time) {
-  global $auth, $c_day_fraction, $cdg_sql;
+  global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
   $user = $time["user_id"];
   $uid_tab = "(";
 
-  while($key = each($time["user_id"])) {
+  while ($key = each($time["user_id"])) {
     $uid = $key["value"];
     $uid_tab .= ($tail) ? ", $uid" : "$uid";
     $tail = 1;
@@ -163,6 +163,7 @@ function run_query_stat_tasktype($time) {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // return array with date where task have been validate 
 //   in the given period of time
@@ -176,7 +177,6 @@ function run_query_stat_tasktype($time) {
 //   ("20010911" => 2, "20010912" => 1, "20010913" => 1)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_valid_search($time) {
-
   global $cdg_sql;
 
   $week_span = get_week_point($time["date"]);
@@ -207,7 +207,7 @@ function run_query_valid_search($time) {
   
 
   $i=0; //for loop
-  while($obm_db->next_record()) {
+  while ($obm_db->next_record()) {
     $valid_array[substr($obm_db->f("timetask_date"),0,8)]= $obm_db->f("timetask_status");
   }
    
@@ -240,8 +240,9 @@ function run_query_get_task($id) {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Task Insertion query execution                                         //
+// Task Insertion query execution
 // Parameters:
 //   - $task[] : Entry's values
 //     keys used  : tasktype, project, time, label, date
@@ -584,6 +585,7 @@ function run_query_short_month($time) {
   return $obm_db; 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: qet tasks for given user and month                 
 //   - $time[]    :    time search criteria
@@ -624,6 +626,7 @@ function run_query_task_one_month($time) {
   return $obm_db; 
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: qet tasks for given user and week
 //   - $time[]    :    time search criteria
@@ -653,8 +656,8 @@ global $cdg_sql, $cdg_param;
   $obm_db->query($query);
   
   return $obm_db; 
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: TaskType select query execution                              //
@@ -747,6 +750,7 @@ function run_query_project($time) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: ProjectTask select query execution                           //
 // Returns : DB object result with project satisfying criteria
@@ -771,6 +775,7 @@ function run_query_projecttask($time) {
 
   return $obm_q;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Return th Id of people that will see the globalview
@@ -863,12 +868,12 @@ function get_this_week($date, $num_days) {
     return $array_date;
 }
 
+
 //////////////////////////////////////////////////////////////////////////
 // Get the starting and ending date of a week
 //  params :
 //////////////////////////////////////////////////////////////////////////
 function get_week_point($sel_date) {
-  global $auth, $debug;
   global $cdg_sql;
 
 
@@ -1041,6 +1046,7 @@ function array_to_list($array) {
   return $list;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // Test if the given day is an "Open days" (jours ouvrables)               //
 //   we mean by "open day" $c_days_in_a_week, starting on Monday
@@ -1080,8 +1086,7 @@ function in_workingdays($date) {
 // - $date = a date in 20020917 format 
 ///////////////////////////////////////////////////////////////////////////
 function get_nb_working_days($date) {
-    global $cdg_param;
-
+  global $cdg_param;
 
   $year=substr($date,0,4);
   $month=substr($date,4,2);
@@ -1109,13 +1114,12 @@ function get_nb_working_days($date) {
   */
 
   return $workingdays;
-
 }
 
 
 
 function get_nb_working_days2($date) {
-    global $c_days_in_a_week, $cdg_param;
+  global $c_days_in_a_week, $cdg_param;
 
 
   $year=substr($date,0,4);
@@ -1166,12 +1170,10 @@ function get_nb_working_days2($date) {
   }
 
   return $workingdays;
-
 }
 
 
 function weekday_name ($num_day) {
- 
   global $l_monday,$l_tuesday,$l_wednesday,$l_thursday,$l_friday,$l_saturday,$l_sunday,$l_unknown; 
   
   switch($num_day) {
@@ -1187,8 +1189,8 @@ function weekday_name ($num_day) {
   return $day_name;
 }
 
-function weekday_short_name ($num_day) {
 
+function weekday_short_name ($num_day) {
   global $l_short_monday,$l_short_tuesday,$l_short_wednesday,$l_short_thursday,$l_short_friday,$l_short_saturday,$l_short_sunday,$l_unknown; 
  
   switch($num_day) {
@@ -1204,4 +1206,4 @@ function weekday_short_name ($num_day) {
   return $day_name;
 }
 
-</SCRIPT>
+</script>

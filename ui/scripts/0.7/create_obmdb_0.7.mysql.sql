@@ -51,6 +51,7 @@ CREATE TABLE UserObm_SessionLog (
   PRIMARY KEY  (userobm_sessionlog_sid)
 );
 
+
 --
 -- Table structure for table 'UserObm'
 --
@@ -309,14 +310,13 @@ CREATE TABLE DealType (
   PRIMARY KEY (dealtype_id)
 );
 
+
 -------------------------------------------------------------------------------
 -- Document module tables
 -------------------------------------------------------------------------------
 --
 -- Table structure for table 'Document'
 --
-
-
 CREATE TABLE Document (
   document_timeupdate timestamp(14) NOT NULL,
   document_timecreate timestamp(14) NOT NULL,
@@ -336,6 +336,7 @@ CREATE TABLE Document (
   PRIMARY KEY (document_id)
 );
 
+
 --
 -- Table structure for table 'DocumentCategory1'
 --
@@ -348,6 +349,7 @@ CREATE TABLE DocumentCategory1 (
   documentcategory1_label varchar(255) default NULL,
   PRIMARY KEY (documentcategory1_id)
 );
+
 
 --
 -- Table structure for table 'DocumentCategory2'
@@ -378,6 +380,7 @@ CREATE TABLE DocumentMimeType (
   PRIMARY KEY (documentmimetype_id)
 );
 
+
 --
 -- Table structure for table 'DocumentEntity'
 --
@@ -404,6 +407,7 @@ CREATE TABLE ProjectStat (
   PRIMARY KEY (projectstat_deal_id, projectstat_date)
 );
 
+
 --
 -- Table structure for table 'ProjectTask'
 --
@@ -419,6 +423,7 @@ CREATE TABLE ProjectTask (
   projecttask_rank int(8) default NULL,
   PRIMARY KEY (projecttask_id)
 );
+
 
 --
 -- Table structure for table 'ProjectUser'
@@ -439,6 +444,7 @@ CREATE TABLE ProjectUser (
   projectuser_manager int(1) default NULL,
   PRIMARY KEY (projectuser_id)
 );
+
 
 -------------------------------------------------------------------------------
 -- List module tables
@@ -511,7 +517,7 @@ CREATE TABLE CalendarEvent (
 
     
 --
--- Table structure for the table  'CalendarCategory'
+-- Table structure for table 'CalendarCategory'
 --
 CREATE TABLE CalendarCategory (
   calendarcategory_id         int(8) NOT NULL auto_increment,
@@ -524,6 +530,9 @@ CREATE TABLE CalendarCategory (
 );
 
 
+--
+-- Table structure for table 'CalendarRight'
+--
 CREATE TABLE CalendarRight (
   calendarright_ownerid int(8) NOT NULL default '0',
   calendarright_customerid int(8) NOT NULL default '0',
@@ -616,7 +625,6 @@ CREATE TABLE Contract (
 --
 -- New table 'ContractType'
 --
-
 CREATE TABLE ContractType (
   contracttype_id int(8) NOT NULL auto_increment,
   contracttype_timeupdate timestamp(14) NOT NULL,
@@ -876,10 +884,14 @@ CREATE TABLE UserObmGroup (
 );    
 
 
+--
+-- Table structure for table 'GroupGroup'
+--
 CREATE TABLE GroupGroup (
    groupgroup_parentid int(8) DEFAULT '0' NOT NULL,
    groupgroup_childid int(8) DEFAULT '0' NOT NULL
 );
+
 
 -------------------------------------------------------------------------------
 -- Todo

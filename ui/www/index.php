@@ -24,6 +24,16 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2003-10-13</b> : version <b>0.7.2</b> released (major fixes)
+        <ol>
+          <li> Major fixes on install script (Todo table)
+          <li> Minor fixes in Contract, Incident
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-09-29</b> : version <b>0.7.1</b> released (fixes and enhancement)
         <ol>
           <li> New module : todo
@@ -53,18 +63,6 @@
         <br />
       </li>
 
-      <li>
-        <div align="left"><b>2003-07-18</b> : version <b>0.6.6</b> released (fixes and enhancement) and <b>mailing List is back</b> !
-        <ol>
-          <li> Company, Contact, Deal, Agenda, Settings and Install fixes and enhancement
-	  <li> New pref to allow deal comment sorting (chronological or reverse)
-	  <li> Companies can be archived
-	  <li> global form parameters handling polishment
-	  <li> Install now works flawlessly on RedHat
-        </ol>
-        </div>
-        <br />
-      </li>
     </ul>
     </div>
 

@@ -1086,35 +1086,30 @@ function run_query_projecttype($type = 'all') {
 // Returns:
 //   - (true | false) : true if user have write rights for this project 
 ///////////////////////////////////////////////////////////////////////////////
-function manager_rights($uid, $project) {
+function manager_rights($uid, $project, $project_q) {
+  global $uid, $perms;
 
   $pid = $project["id"];
 
   $query = "
-    select userobm_id
-    from UserObm
-    where userobm_perms='admin'
-      and userobm_id = $uid";
-
-  display_debug_msg($query, $cdg_sql, "manager_rights(admins)");
-  $admins_q = new DB_OBM;
-  $admins_q->query($query);
-
-  $query = "
     select projectuser_id
     from ProjectUser
-    where projectuser_deal_id = $pid
+    where projectuser_deal_id = '$pid'
       and projectuser_manager != 0";
 
   display_debug_msg($query, $cdg_sql, "manager_rights(managers)");
   $managers_q = new DB_OBM;
   $managers_q->query($query);
 
-  $manager_rights = (($admins_q->nf()!=0) or ($managers_q->nf() !=0)) ? true : false;
+  $manager_rights = (($perms == "admin")
+    or ( (is_object($project_q))
+        && ( ($project_q->f("usercreate") == $uid) 
+	     or ($project_q->f("userupdate") == $uid) ) )
+    or ($managers_q->nf() != 0)) ? true : false;
 
   return $manager_rights;
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // New Project Form Data checking and formatting                             //

@@ -386,7 +386,7 @@ function html_incident_consult($inc_q,$con_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $incident) {
   global $display;
-  global $path, $set_theme, $ico_contract, $c_php_isodate_format;
+  global $path, $uid, $set_theme, $ico_contract, $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
@@ -431,8 +431,10 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
   if (isset($incident["lcontract"])) { $c_name = stripslashes($incident["lcontract"]); }
 
 
+  // Owner select
+  if (! isset($owner)) { $owner = $uid; }
   $dis_sel_owner="<select name=\"sel_owner\">";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $dis_sel_owner.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
     if ($usr_q->f("userobm_id") == $owner) 
       $dis_sel_owner.=" selected=\"selected\"";
@@ -442,8 +444,10 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
 
   $usr_q->seek();
 
+  // Logger select
+  if (! isset($logger)) { $logger = $uid; }
   $dis_sel_logger="<select name=\"sel_logger\">";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $dis_sel_logger.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
     if ($usr_q->f("userobm_id") == $logger) 
       $dis_sel_logger.=" selected=\"selected\"";

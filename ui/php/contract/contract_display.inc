@@ -219,7 +219,7 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_links($id, $deal_id, $deal_label) {
+function html_contract_links($id, $con_label, $deal_id, $deal_label) {
   // -- Themes
   global $set_theme, $ico_incident, $ico_deal;
   // -- Labels
@@ -227,7 +227,7 @@ function html_contract_links($id, $deal_id, $deal_label) {
   global $perms_user, $path, $auth;
 
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
-  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id");
+  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;tf_lcontract=$con_label");
   $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
 
   $block = "<div class=\"link\">
@@ -299,7 +299,7 @@ function html_contract_consult($contract_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  $display["link"] = html_contract_links($id, $deal_id, $deal_label);
+  $display["link"] = html_contract_links($id, $label, $deal_id, $deal_label);
   $display["title"] = "<div class=\"title\">$l_contract : $label</div>";
 
   $block = "

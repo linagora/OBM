@@ -25,7 +25,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "PROD";
-$menu="INCIDENT";
+$menu = "INCIDENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");

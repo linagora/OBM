@@ -1,4 +1,4 @@
-<?
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : agenda_query.inc                                             //
 //     - Desc : Agenda query File                                            //
@@ -1382,6 +1382,7 @@ function run_query_category_links($p_id) {
   $obm_q->query($query);
   return $obm_q;
 }
+
   
 /////////////////////////////////////////////////////////////////////////////
 // Return if the event is valid or not. It permit to keep only valid event in
@@ -1391,11 +1392,12 @@ function run_query_category_links($p_id) {
 // -----------
 //    $status_event : status of a event
 /////////////////////////////////////////////////////////////////////////////
-
 function valid_event($status_event) {
   return ($status_event != -1);
   
-} 
+}
+
+ 
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event (hashed by the time units
 //define in global.inc)
@@ -1406,9 +1408,8 @@ function valid_event($status_event) {
 //    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
 //    - $groups_array   : array containing the id of the group(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
-
 function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_end) {
-  global  $set_start_time, $set_stop_time,$set_weekstart_default,$set_cal_interval;
+  global $set_start_time, $set_stop_time,$set_weekstart_default,$set_cal_interval;
   
   $obm_q->next_record();
   $db_date = $obm_q->f("calendarsegment_date");
@@ -1547,6 +1548,8 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
   }while($obm_q->next_record());
   ksort($current_event);
 }
+
+
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event.(hashed by day for year
 //                 and month view)
@@ -1557,7 +1560,6 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
 //    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
 //    - $groups_array   : array containing the id of the group(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
-
 function store_daily_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_end) {
   global $set_cal_interval;
   $obm_q->next_record();
@@ -1613,6 +1615,7 @@ function store_daily_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p
 
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed users.
 //////////////////////////////////////////////////////////////////////////////
@@ -1620,10 +1623,10 @@ function store_daily_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p
 // -----------
 //    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
-
 function store_users($user_q) {
   global $ico_calendar_user0,$ico_calendar_user1,$ico_calendar_user2,$ico_calendar_user3,$ico_calendar_user4;
   global $ico_calendar_user5;
+
   $i = 0;
   while($user_q->next_record()) {
     $user_tab[$user_q->f("userobm_id")] = array("name"=>$user_q->f("userobm_firstname")." ".$user_q->f("userobm_lastname"),
@@ -1632,15 +1635,15 @@ function store_users($user_q) {
   }
   return $user_tab;
 }
-/////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Hash a event table a perform where it's free for all, and when the 
 // meeting could take place.
-//////////////////////////////////////////////////////////////////////////////
-// Arguments : 
-// -----------
+// Parameters:
 //    - $current_event : Week event table 
 //    - $duration : duration of the event
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function store_meeting_cell($current_events,$duration,$calendar_user,$getdate) {
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval;
   $time_unit = 60 / $set_cal_interval;
@@ -1653,92 +1656,94 @@ function store_meeting_cell($current_events,$duration,$calendar_user,$getdate) {
   for($unix_time=$start_week_time;$unix_time<=$end_week_time;$current_time=date("YmdHi",$unix_time)) {
     $row_free = 0;
     $row_meeting = 0;
-    if(is_array($current_events[$current_time])) {
+    if (is_array($current_events[$current_time])) {
       
       $isvalid = FALSE;
-      foreach($calendar_user as $id => $user_data ) {
-	if(is_array($current_events[$current_time][$id])){
-	  do{
+      foreach ($calendar_user as $id => $user_data ) {
+	if (is_array($current_events[$current_time][$id])){
+	  do {
 	    $isvalid = TRUE;
 	    $meeting_event[$current_time] = 2;
 	    $temp_array = $current_events[$current_time][$id];
 	    $unix_time = strtotime("+$time_unit minutes",$unix_time);
 	    $current_time = date("YmdHi",$unix_time);
 	    $hour_time = substr($current_time,8,2);
-	  }while(is_array($current_events[$current_time][$id]) 
+	  } while (is_array($current_events[$current_time][$id]) 
 	  && count(array_intersect($temp_array,$current_events[$current_time][$id])) != 0  && $hour_time < $set_stop_time);
 	}
       }
-      if(!$isvalid)
+      if (!$isvalid)
       {
 	$is_free = TRUE;
 	$hour_time = substr($current_time,8,2);
 	$temp_unix_time = $unix_time;
-	while($is_free == TRUE &&  $hour_time < $set_stop_time){
+	while ($is_free == TRUE &&  $hour_time < $set_stop_time){
 	  $temp_unix_time = strtotime("+$time_unit minutes",$temp_unix_time);
 	  $temp_current_time = date("YmdHi",$temp_unix_time);
-	  if($row_meeting == $duration) {
+	  if ($row_meeting == $duration) {
 	    $row_free ++;
-	  }else{
+	  } else {
 	    $row_meeting ++;
 	  }
 	  $hour_time = substr($temp_current_time,8,2);
-	  foreach($calendar_user as $id => $user_data ) {
+	  foreach ($calendar_user as $id => $user_data ) {
 	    $is_free = FALSE;
-	    if(is_array($current_events[$temp_current_time][$id]))
+	    if (is_array($current_events[$temp_current_time][$id]))
 	      break;
 	    $is_free = TRUE;
 	  }	     
 	}
-	for($count = 0;$count < $row_free; $count++) {
+	for ($count = 0;$count < $row_free; $count++) {
 	  $meeting_event[$current_time] = 0;
 	  $unix_time = strtotime("+$time_unit minutes",$unix_time);
 	  $current_time = date("YmdHi",$unix_time);	    
 	}	    
-	for($count = 0;$count < $row_meeting; $count++) {	    
+	for ($count = 0;$count < $row_meeting; $count++) {	    
 	  $meeting_event[$current_time] = 1;
 	  $unix_time = strtotime("+$time_unit minutes",$unix_time);
 	  $current_time = date("YmdHi",$unix_time);	
 	}
       }
-    }else {
+    } else {
       $is_free = TRUE;
       $hour_time = substr($current_time,8,2);
       $temp_unix_time = $unix_time;
-      while($is_free == TRUE &&  $hour_time < $set_stop_time){
+      while ($is_free == TRUE &&  $hour_time < $set_stop_time){
 	$temp_unix_time = strtotime("+$time_unit minutes",$temp_unix_time);
 	$temp_current_time = date("YmdHi",$temp_unix_time);
-	if($row_meeting == $duration) {
+	if ($row_meeting == $duration) {
 	  $row_free ++;
-	}else{
+	} else {
 	  $row_meeting ++;
 	}
 	$hour_time = substr($temp_current_time,8,2);
-	foreach($calendar_user as $id => $user_data ) {
+	foreach ($calendar_user as $id => $user_data ) {
 	  $is_free = FALSE;
-	  if(is_array($current_events[$temp_current_time][$id]))
+	  if (is_array($current_events[$temp_current_time][$id]))
 	    break;
 	  $is_free = TRUE;
 	}	     
       }
-      for($count = 0;$count < $row_free; $count++) {
+      for ($count = 0;$count < $row_free; $count++) {
 	$meeting_event[$current_time] = 0;
 	$unix_time = strtotime("+$time_unit minutes",$unix_time);
 	$current_time = date("YmdHi",$unix_time);	    
       }	   
-      for($count = 0;$count < $row_meeting; $count++) {	    
+      for ($count = 0;$count < $row_meeting; $count++) {	    
 	$meeting_event[$current_time] = 1;
 	$unix_time = strtotime("+$time_unit minutes",$unix_time);
 	$current_time = date("YmdHi",$unix_time);	
       }
     }
-    if(date("G",$unix_time) >= $set_stop_time){
+    if (date("G",$unix_time) >= $set_stop_time){
       $tonextday = $set_start_time - $set_stop_time;
       $unix_time = strtotime("+1 day $tonextday hours",$unix_time);
     }     
   }
   return $meeting_event;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Agenda Form Data checking and formatting                                 //
 // Parameters:
@@ -1781,7 +1786,7 @@ function check_data_form($agenda) {
     $err_msg = $l_fill_datebegin;
     return false;
   }
-  elseif(!checkdate($this_month_b,$this_day_b,$this_year_b)) {    
+  elseif (!checkdate($this_month_b,$this_day_b,$this_year_b)) {    
     $err_msg = $l_err_datebegin;
     return false;
   }  
@@ -1790,50 +1795,50 @@ function check_data_form($agenda) {
     $err_msg = $l_fill_dateend;
     return false;
   }
-  elseif(!checkdate($this_month_e,$this_day_e,$this_year_e)) {    
+  elseif (!checkdate($this_month_e,$this_day_e,$this_year_e)) {    
     $err_msg = $l_err_dateend;
     return false;
   }  
   
   if (trim($repeat_end) != "" && $kind != "none") {
-    if(!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
+    if (!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
       $err_msg = $l_err_repeat;
       return false;
     }  
   }
 
-  if($dateend<$datebegin || ($dateend==$datebegin && $timeend<=$timebegin)) {
+  if ($dateend<$datebegin || ($dateend==$datebegin && $timeend<=$timebegin)) {
     $err_msg =  $l_err_begin_end;
     return false;
   } 
   
-  if(trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
+  if (trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
     $err_msg =  $l_err_end_repeat;
     return false;
   }
   
-  if($kind == "weekly" && $repeat_days == "0000000") {
+  if ($kind == "weekly" && $repeat_days == "0000000") {
     $err_msg =  $l_err_days_repeat;
     return false;
   }  
 
-  if($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
+  if ($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
     $err_msg =  $l_err_weekly_repeat;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
+  if (trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
     $err_msg =  $l_err_end_repeat3;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
+  if (trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
     $err_msg =  $l_err_end_repeat2;
     return false;
   }  
 
   
-  if($kind != "none" && $dateend > $datebegin) {
+  if ($kind != "none" && $dateend > $datebegin) {
     $err_msg =  $l_err_repeat;
     return false;
   }  
@@ -1842,17 +1847,14 @@ function check_data_form($agenda) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Agenda Form Data checking and formatting                                 //
+// Agenda Form Data checking and formatting
 // Parameters:
 //   - $agenda[] : values checked
 //     keys used  : num, name, zip, phone, fax, web, email
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
-
-
 function get_event_repetition_dates($agenda) {
   global $set_weekstart_default;
 
@@ -1965,6 +1967,7 @@ function get_event_repetition_dates($agenda) {
   return $event_dates;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // localizeDate() - similar to strftime but uses a preset arrays of localized
 // months and week days and only supports %A, %a, %B, %b, %e, and %Y
@@ -1999,8 +2002,9 @@ function localizeDate($format, $timestamp) {
  $date = str_replace('%a', $l_daysofweekshort[$dayofweek], $date);
 	
  return $date;	
-	
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
 // and returns the date of that day. (ie: "sun" or "sunday" would be 
@@ -2011,9 +2015,9 @@ function localizeDate($format, $timestamp) {
 //     - $Ymd 
 //     - $day
 ///////////////////////////////////////////////////////////////////////////////
-
 function dateOfWeek($Ymd, $day) {
   global $set_weekstart_default;
+
   if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
   $timestamp = strtotime($Ymd);
   $num = date('w', strtotime($set_weekstart_default));
@@ -2022,8 +2026,8 @@ function dateOfWeek($Ymd, $day) {
   $ret_unixtime = strtotime('+12 hours', $ret_unixtime);
   $ret = date('Ymd',$ret_unixtime);
   return $ret;
-  
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Vcalendar Exportation : SQL Query for non repeated event
@@ -2059,6 +2063,7 @@ function run_query_get_vevent_norepeat($agenda) {
   $obm_db->query($query);
   return $obm_db;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Vcalendar Exportation : SQL Query for repeated event
@@ -2096,6 +2101,8 @@ function run_query_get_vevent_repeat($agenda) {
   $obm_db->query($query);
   return $obm_db;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Slice the number of user
 //------------------------------------------------------------------------
@@ -2109,3 +2116,6 @@ function slice_user($sel_user_id) {
   }
   return $sel_user_id;
 }
+
+
+</script>

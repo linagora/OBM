@@ -24,7 +24,7 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple lists (return id) 
 ///////////////////////////////////////////////////////////////////////////////
-$www ="   <p class=\"messageInfo\">
+$www = "<p class=\"messageInfo\">
     	<a href=\"http://validator.w3.org/check/referer\"><img
         src=\"http://www.w3.org/Icons/valid-xhtml10\"
         alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>

@@ -51,6 +51,7 @@ require("project_display.inc");
 require("project_js.inc");
 
 $uid = $auth->auth["uid"];
+$perms = $auth->auth["perm"];
 
 // updating the project bookmark : 
 if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
@@ -62,15 +63,12 @@ if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
 }
 
 page_close();
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 
 $project = get_param_project();
-// get_project_action();
+get_project_action();
 $perm->check();
 
-// if (! $contact["popup"]) {
-//   $display["header"] = generate_menu($menu,$section);
-// }
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +108,6 @@ if ($action == "index" || $action == "") {
   $project["label"] = run_query_projectname($param_project);
   $tasks_q = run_query_tasks($param_project);
   $members_q = run_query_members($param_project);
-
   $display["detail"] .= html_project_member_form($members_q, $project );
 
 } elseif ($action == "membertime_fill")  {
@@ -122,15 +119,12 @@ if ($action == "index" || $action == "") {
     $membertime_q = run_query_membertime($param_project);
 
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
-
       $display["msg"] = display_warn_msg($l_no_tasks);
 
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
-
       $display["msg"] = display_warn_msg($l_no_members);
 
     } else {
-
       $display["detail"] = html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project); 
     }
   }
@@ -182,12 +176,8 @@ if ($action == "index" || $action == "") {
       
       if ($retour) {
 	$display["msg"] .= display_ok_msg($l_insert_ok);
-	
 	$project_q = run_query_detail($param_project);
-	
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
-						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
-
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       } else {
 	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
@@ -195,7 +185,6 @@ if ($action == "index" || $action == "") {
       
     } else { 
       $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-      
       $project_q = run_query_detail($param_project);
       $display["detail"] = html_project_init_form($action, $project_q, $project);
     }
@@ -207,15 +196,11 @@ if ($action == "index" || $action == "") {
       
       if ($retour) {
 	$display["msg"] .= display_ok_msg($l_insert_ok);
-	
 	$project_q = run_query_detail($param_project);
 	$tasks_q = run_query_tasks($param_project);
 	$members_q = run_query_members($param_project);
 	$membertime_q = run_query_membertime($param_project);
-	
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
-						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
-
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       } else {
 	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
@@ -223,7 +208,6 @@ if ($action == "index" || $action == "") {
       
     } else { 
       $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-      
       $project_q = run_query_detail($param_project);
       $display["detail"] = html_project_init_short_form($action, $project_q, $project);
     }
@@ -235,11 +219,8 @@ if ($action == "index" || $action == "") {
       
       if ($param_project) {
 	$project["id"] = $param_project;
-	
 	$project_q = run_query_detail($param_project);
-	
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
-						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       }
       else {
@@ -248,7 +229,6 @@ if ($action == "index" || $action == "") {
       
     } else { 
       $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-      
       $tt_q = run_query_projecttype('intern');
       $display["detail"] = html_project_form($action, "", $tt_q, $project);
     }
@@ -265,9 +245,7 @@ if ($action == "index" || $action == "") {
 
     if (($project_q->f("project_visibility")==0) ||
         ($project_q->f("usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
-						   $project_q->f("timecreate"),$project_q->f("timeupdate"));
-      
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
       $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
     } else {
       // this project's page has "private" access
@@ -284,10 +262,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_project > 0) {
     $project_q = run_query_detail($param_project);
-    
-    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
-						 $project_q->f("timecreate"),$project_q->f("timeupdate"));
-    
+    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
     if ($project_q->f("project_status")==1) {
       $display["detail"] = html_project_init_form($action, $project_q, $project);
     }
@@ -512,25 +487,20 @@ if ($action == "index" || $action == "") {
   }
 
 }  elseif ($action == "display") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
-
   $display["detail"] = dis_project_display_pref($pref_search_q);
 
 } else if ($action == "dispref_display") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
-
   $display["detail"] = dis_project_display_pref($pref_search_q);
 
 } else if ($action == "dispref_level") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
-
   $display["detail"] = dis_project_display_pref($pref_search_q);
 }
 
@@ -542,12 +512,12 @@ $consult_actions = Array('detailconsult', 'consultnoproj', 'consultnoadv',
                          'd_update', 'a_update', 'validate');
 
 if (in_array($action, $consult_actions))
-     $action = (manager_rights($uid, $project)) ? $action : "consultnoright";
+     $action = (manager_rights($uid, $project, $project_q)) ? $action : "consultnoright";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-get_project_action();
+//get_project_action();
 if (! $contact["popup"]) {
   $display["header"] = generate_menu($menu,$section);
 }
@@ -651,7 +621,7 @@ function get_param_project() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_project_action() {
   global $project, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update, $l_list;
+  global $l_header_find,$l_header_new,$l_header_update, $l_project;
   global $l_header_display,$l_header_admin, $l_header_add_member;
   global $project_read, $project_write, $project_admin_read, $project_admin_write;
   global $l_header_man_task, $l_header_man_member, $l_header_man_advance;
@@ -699,8 +669,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $project_read,
-    'Condition'=> array ('detailupdate', 'd_update', 'task_fill', 'task_add', 'task_del', 'member_fill', 'member_add',
-                         'member_del', 'member_change', 'membertime_fill', 'advanceupdate') 
+    'Condition'=> array ('detailupdate', 'd_update', 'task_fill', 'task_add', 'task_del', 'member_fill', 'member_add', 'member_del', 'member_change', 'membertime_fill', 'advanceupdate') 
     );
 
 // Detail Update
@@ -716,8 +685,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate',
-			 'member_fill', 'member_add', 'member_del', 'member_change', 'membertime_fill', 'advanceupdate') 
+    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate', 'member_fill', 'member_add', 'member_del', 'member_change', 'membertime_fill', 'advanceupdate') 
     );
 
 // Member Fill
@@ -725,8 +693,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate',
-			 'task_fill', 'task_add', 'task_del', 'membertime_fill', 'advanceupdate') 
+    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate', 'task_fill', 'task_add', 'task_del', 'membertime_fill', 'advanceupdate') 
                                      );
 
 // MemberTime Fill
@@ -734,8 +701,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=membertime_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoadv', 'd_update', 'a_update', 'validate', 'advanceupdate',
-			 'member_fill', 'member_add', 'member_del', 'member_change','task_fill', 'task_add', 'task_del') 
+    'Condition'=> array ('detailconsult', 'consultnoadv', 'd_update', 'a_update', 'validate', 'advanceupdate', 'member_fill', 'member_add', 'member_del', 'member_change','task_fill', 'task_add', 'task_del') 
                                      );
 
 // Validate
@@ -757,8 +723,7 @@ function get_project_action() {
     'Name'     => $l_header_man_advance,
     'Url'      => "$path/project/project_index.php?action=advanceupdate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate', 'membertime_fill',
-			 'member_fill', 'member_add', 'member_del', 'member_change','task_fill', 'task_add', 'task_del') 
+    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate', 'membertime_fill', 'member_fill', 'member_add', 'member_del', 'member_change','task_fill', 'task_add', 'task_del') 
                                      	 );
 
 // Update
@@ -768,13 +733,13 @@ function get_project_action() {
     'Condition'=> array ('None') 
                                      	 );
 
-// Ext get Ids : Lists selection
-  $actions["PROJECT"]["ext_get_ids"] = array (
+// Select members : Lists selection
+  $actions["PROJECT"]["sel_member"] = array (
     'Name'     => $l_header_add_member,
-    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$project["id"]."&amp;ext_target=$l_list",
-    'Right'    => $user_write,
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_add_contact)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$project["id"]."&amp;ext_target=$l_project",
+    'Right'    => $project_write,
     'Popup'    => 1,
-    'Target'   => $l_list,
+    'Target'   => $l_project,
     'Condition'=> array ('member_fill', 'member_add','member_del', 'member_change') 
                                     	  );
 
@@ -837,4 +802,4 @@ function get_project_action() {
 
 }
 
-</SCRIPT>
+</script>

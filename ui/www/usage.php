@@ -18,9 +18,11 @@ If you are using OBM and want to be referenced here drop us a note.
   <p>
   <ul>
     <li>Pôle universitaire Léonard De Vinci
-    <li><a href="http://www.obs.coe.int/"><img src="images/logo-oea.png"></a>
+<!--     <li><a href="http://www.obs.coe.int/"><img src="images/logo-oea.png"></a>
         Observatoire Européen de l'Audiovisuel -
         European Audiovisual Observatory
+-->
+    <li><a href="http://spazioinwind.libero.it/augustoit/">Augusto Fagioli and some customers as users / contributors</a>
     <li><a href="http://www.aliacom.fr/"><img src="images/logo-aliacom.jpg"></a>
          Aliacom - gestion interne de la société
     <li>GMX
