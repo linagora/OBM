@@ -393,11 +393,11 @@ $hidden_div
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit,$ico_new_event;
+  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
-  $time_unit = 60 / $set_time_unit;
+  $time_unit = 60 / $set_cal_interval;
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
   $tomorrows_date = date( "Ymd", strtotime("+1 day",  $unix_time));
@@ -419,6 +419,9 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   $td_width = floor(70/$nb_user);
   $td_colspan = $nb_user;
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
+//  var_dump($current_events);
+//  echo "<br><br><br><br><br><br><br>";
+//  var_dump($event_data);
 // Week day listcount($contacts_array)
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {
     $this_date = date("Ymd", $i);
@@ -432,7 +435,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 // Hour of the day
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= 	"<tr>";
-    $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_time_unit\" class=\"agendaHour\">$i:00</td>";
+    $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
     $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++) {
       $current_time = date("YmdHi", strtotime("+$j days $i hours",$start_week_day));  
@@ -440,7 +443,10 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	$user_indice=1;
 	foreach($calendar_user as $id => $user_data ) {
 	  if(is_array($current_events[$current_time][$id])){
-	    if($event_data[$current_events[$current_time][$id][0]]["status"] > 0 || $i==$set_start_time) {
+	    $temp_data =$event_data[$current_events[$current_time][$id][0]];
+	    $temp_ib = substr("0$i:00",-5);
+	    $temp_ie = date("H:i", strtotime("+$j days $i hours $time_unit minutes",$start_week_day));
+	    if(($temp_data["status"] > 0 && $temp_data["begin"] >= $temp_ib && $temp_data["begin"] < $temp_ie) || $i==$set_start_time) {
   	      $is_title = FALSE;	  
 	      reset($current_events);
 	      $indice_time = $current_time;
@@ -458,7 +464,11 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $is_title = TRUE;
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($indice_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($indice_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
+	 
+		     
 		    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
+	
+		    
 		    if($nb_user == 1) {	      
      		      $event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 		    }else {
@@ -466,12 +476,19 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt\"[D]\" />";
 		    }
 		    $event_head_display .= "</a>";	 
-		    $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
+		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
+		    }
 		  }
 		  elseif(!in_array($idOfEvent,$temp_array)) {	
 		    $event_head_display .= "<br />";
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($indice_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($current_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
-                    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
+		     
+		     
+		    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		  
+
+
+		     
 		    if($nb_user == 1) {
      		      $event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 
@@ -480,14 +497,17 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      $event_head_display .= "<img class=\"agendaEvent\" src=\"/images/$set_theme/$ico_event\" alt\"[D]\" />";
 		    }
 		    $event_head_display .= "</a>";	 
-		    $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
+		    if($event_data[$idOfEvent]["status"] > 0 && $event_data[$idOfEvent]["begin"] >= $temp_ib && $event_data[$idOfEvent]["begin"] < $temp_ie) {
+		      $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;  
+		    }
 		  }
 		}
 		$rowspan_event++;
 		$temp_array = $current_events[$indice_time][$id];
 		$temp_array2 = next($current_events);
 		$indice_time = key($current_events);
-	      }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
+	      }while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
+	             && substr($current_time,8,2)<$set_stop_time);
 	      $rowspan = "rowspan=\"$rowspan_event\"";
 	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 	      $hour_day_list .= "</td>";		    
@@ -508,7 +528,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       }
     }
     $hour_day_list .=   "</tr>\n";
-    for($k=1;$k<$set_time_unit;$k++) {
+    for($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
       for($j=0; $j<7;$j++) {
       	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
@@ -516,7 +536,10 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  $user_indice=1;
 	  foreach($calendar_user as $id => $user_data ) {
 	    if(is_array($current_events[$current_time][$id])){    
-	      if($event_data[$current_events[$current_time][$id][0]]["status"] > 0) {
+	      $temp_data =$event_data[$current_events[$current_time][$id][0]];
+	      $temp_ib = substr($current_time,8,2).":".substr($current_time,10,2);
+	      $temp_ie = date("H:i", strtotime("+$j days $i hours ".(($k+1)*$time_unit)." minutes",$start_week_day));
+	      if($temp_data["status"] > 0 && $temp_data["begin"] >= $temp_ib && $temp_data["begin"] < $temp_ie) {	     
 		$is_title = FALSE;	  
 	       	$indice_time = $current_time;
 		reset($current_events);
@@ -562,7 +585,8 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  	  $temp_array = $current_events[$indice_time][$id];
 	  	  $temp_array2 = next($current_events);
 	  	  $indice_time = key($current_events);
-		}while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0);
+		}while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
+	               && substr($indice_time,8,2)<$set_stop_time);
   		$rowspan = "rowspan=\"$rowspan_event\"";
 		$hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 		$hour_day_list .= "</td>";	
@@ -665,13 +689,13 @@ $hidden_div
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
-  global $set_start_time, $set_stop_time,$set_time_unit,$l_description;
+  global $set_start_time, $set_stop_time,$set_cal_interval,$l_description;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
   $tomorrows_date = date( "Ymd", strtotime("+1 day",  $unix_time));
   $yesterdays_date = date( "Ymd", strtotime("-1 day",  $unix_time));
-  $time_unit = 60 / $set_time_unit; 
+  $time_unit = 60 / $set_cal_interval; 
   $display_date = localizeDate("day", $unix_time);
   $start_time = strtotime("+$set_start_time hours",strtotime($getdate));
   $end_time =  strtotime("+$set_stop_time hours",strtotime($getdate));
@@ -686,7 +710,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_time),date("YmdHi",$end_time));
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= 	"<tr>";
-    $hour_day_list .= 	"<td height=\"15\" width=\"60\" rowspan=\"2\" class=\"agendaHour\">$i:00</td>";
+    $hour_day_list .= 	"<td height=\"15\" width=\"60\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
     $hour_day_list .= 	"<td height=\"15\" width=\"1\"></td>";
     $current_time = date("YmdHi", strtotime("+$i hours",strtotime($getdate)));  
     if(is_array($current_events[$current_time])) {
@@ -759,7 +783,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $hour_day_list .= "<td colspan=\"$td_colspan\" class=\"agendaVide\">&nbsp;</td>";
     }    
     $hour_day_list .=   "</tr>\n";
-    for($k=1;$k<$set_time_unit;$k++) {
+    for($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
       $current_time = date("YmdHi", strtotime("+$i hours ".($k*$time_unit)." minutes",strtotime($getdate)));  
       if(is_array($current_events[$current_time])) {
@@ -1242,14 +1266,14 @@ echo "
 //    -$groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
-  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit,$ico_mini_cal;
+  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail;
-  
+  $time_unit = 60 / $set_cal_interval;  
   if($action == "detailupdate") {
     $title = $obm_q_event->f("calendarevent_title");
     $category_id = $obm_q_event->f("calendarevent_category_id");
@@ -1444,8 +1468,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   $dis_hour_e .= "</select>";  
 
   $dis_min_b = "<select name=\"sel_min_begin\">";
-  for($i=1;$i<=$set_time_unit;$i++) {
-    $current_min = substr("0".(60 - (60/$i)),-2,2);
+   for($i=$set_cal_interval;$i>=1;$i--) {
+    $current_min = substr("0".(60 - ($time_unit*$i)),-2);
     if($current_min  == $minbegin) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     }
@@ -1456,8 +1480,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   $dis_min_b .= "</select>";  
 
  $dis_min_e = "<select name=\"sel_min_end\">";
-  for($i=1;$i<=$set_time_unit;$i++) {
-    $current_min = substr("0".(60 - (60/$i)),-2,2);
+  for($i=$set_cal_interval;$i>=1;$i--) {
+    $current_min = substr("0".(60 - ($time_unit*$i)),-2);
     if($current_min  == $minend){
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
     }
