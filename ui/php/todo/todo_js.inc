@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
@@ -15,16 +15,14 @@ echo "
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
-echo "
+$extra_js .= "
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
   else
     return false;
 }
-";
 
-echo "
 function check_addtodoform(form) {
 
   if (trim(form.tf_title.value) == \"\") {
@@ -37,10 +35,9 @@ function check_addtodoform(form) {
   } else
     return true;
 }
-";
 
 // Copy paste from mehdi's calendar.js
-echo "
+
 var calendarWindow = null;
 var calendarColors = new Array();
 calendarColors['bgColor'] = '#BDC5D0';
@@ -90,7 +87,5 @@ function killCalendar()
         calendarWindow.close();
     }
 }
-";
 
-echo "
 --></script>\n\n";

@@ -4,23 +4,24 @@
 //     - Desc  : invoice javascript functions File                           //
 // 2001-08-03 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <SCRIPT LANGUAGE=\"JavaScript\">
 <!--
 ";
 
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
+$extra_js .= "
 // vérification des entrées de recherche :
 // points à vérifier :
 // number et amount : que des chiffres
 // date_after et date_before doivent être des dates valides...
 // idéalement, vérifier que date_after < date_before...
-echo "
 function check_search_form (f_pay){
   // number :
   if ((f_pay.tf_number.value!='')&&(check_number(f_pay.tf_number.value)==null)) {
@@ -40,10 +41,9 @@ function check_search_form (f_pay){
    return false;
   }
  return true;
-}";
+}
 
 // vérification des entrées à la création de paiements
-echo "
 function check_payment (f_pay) {
   if (f_pay.tf_label.value==\"\") {
    alert(\"$l_fill_label\");
@@ -66,11 +66,10 @@ function check_payment (f_pay) {
     return false;
   }
    return true;
-}";
+}
 
 // vérification des entrées à l'encaissement de paiements
 // - the payment is being banked, it must have an account, a number and a kind.
-echo "
 function check_payment_banking (f_pay) {
   // first, we check fields that are always mandatory :
   if (f_pay.tf_label.value==\"\"){
@@ -129,10 +128,9 @@ function check_payment_banking (f_pay) {
   }
 */
   return true;
-}";
+}
 
 // confirmation de la suppression :
-echo "
 function valider_suppression() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -140,7 +138,6 @@ function valider_suppression() {
     return false;
 }
 
-";
 
 // evoqued on the banking screen to help the user
 // affecting the payment
@@ -149,7 +146,6 @@ function valider_suppression() {
 // not_paid_before : initial amount not paid on the invoice/line
 // still_not_paid : amount not paid yet of that invoice/line
 // instant : amount already used of the payment for all invoices/lines
-echo "
 function update_values (share, old_share, not_paid_before, still_not_paid, instant) {
   var v_before = parseFloat(not_paid_before.value);
   var v_old_share = parseFloat(old_share.value);
@@ -178,9 +174,8 @@ function update_values (share, old_share, not_paid_before, still_not_paid, insta
   still_not_paid.value = v_still_not_paid;
   instant.value = v_instant;
   old_share.value = v_share;
-}";
+}
 
-echo "
 // --> 
 </SCRIPT>
 ";

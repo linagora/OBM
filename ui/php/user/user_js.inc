@@ -7,13 +7,14 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
+$extra_js .= "
 <SCRIPT LANGUAGE=\"JavaScript\">
 <!--
 ";
 
 require("$obminclude/javascript/check_js.inc");
-echo "
+
+$extra_js .= "
 function valider_suppression() {
   if (confirm (\"$l_delete_confirm\"))
     return true;

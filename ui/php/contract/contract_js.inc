@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
@@ -17,7 +17,7 @@ echo "
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
-echo "
+$extra_js .= "
 function check_search_form(f_con) {
   if ((f_con.tf_dateafter.value != \"\") &&
       (check_date(f_con.tf_dateafter, \"$l_date_alarm_after\") == false)) {
@@ -94,10 +94,8 @@ function check_get_id_url(form, p_url) {
     return true;
   }
 }
-";
 
 
-echo "
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Deal Type deletion is possible                               //
 ///////////////////////////////////////////////////////////////////////////////

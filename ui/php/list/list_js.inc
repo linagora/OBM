@@ -7,12 +7,12 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
-<SCRIPT LANGUAGE=\"JavaScript\">" ;
+$extra_js .= "
+<script language=\"JavaScript\">" ;
 
 require("$obminclude//javascript/check_js.inc");
 
-echo "
+$extra_js .= "
 
 function check_name_list(form) {
   name_list = form.tf_name.value ;
@@ -36,8 +36,4 @@ function check_name_list(form) {
   return true ;
 }
 
-</SCRIPT>" ;
-
-
-
-
+</script>" ;

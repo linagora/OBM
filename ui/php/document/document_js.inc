@@ -1,18 +1,20 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : document_js.inc                                              //
-//     - Desc  : Document javascript functions File                           //
+// OBM - File : document_js.inc                                              //
+//     - Desc : Document javascript functions File                           //
 // 2003-08-22 Rande Mehdi                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-echo "
+
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
 
 require("$obminclude/javascript/check_js.inc");
-echo "
+
+$extra_js .= "
 function check_document(form) {
   // MANDATORY : Check that the Document title is not empty
   if (trim(form.tf_title.value) == \"\") {
@@ -232,31 +234,31 @@ function show_hide_field()
     basic_show('browse_img');
     basic_show('browse_field');
     basic_hide('url_field');";
-    if(!isset($document["path"])) {
-      echo "
+    if (!isset($document["path"])) {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '$default_path';
       ";
-    }else {
-      echo "
+    } else {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
       ";
     }
-    echo "
+    $extra_js .= "
   }
   else if(radios[1].checked == true) {
     basic_show('browse_img');
     basic_hide('browse_field');
     basic_show('url_field');";
-    if(!isset($document["path"])) {
-      echo "
+    if (!isset($document["path"])) {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '$default_path';
       ";
-    }else {
-      echo "
+    } else {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
       ";
     }
-    echo "
+    $extra_js .= "
     document.f_mod_document.preurl.value = \"http://\";
   }
   else if(radios[2].checked == true) {
@@ -264,16 +266,16 @@ function show_hide_field()
     basic_hide('browse_field');
     basic_show('url_field');
     ";
-    if(!isset($document["path"])) {
-      echo "
+    if (!isset($document["path"])) {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '$default_path';
       ";
-    }else {
-      echo "
+    } else {
+      $extra_js .= "
       document.f_mod_document.tf_path.value = '".dirname($document["path"])."';
       ";
     }
-    echo "
+    $extra_js .= "
     document.f_mod_document.preurl.value =\"https://\";
   }  
 }
@@ -302,16 +304,10 @@ function basic_show(name)
 
   }
 }
-
-
-
-
-
-
-
 ";
-if(isset($ext_target)) {
-  echo "
+
+if (isset($ext_target)) {
+  $extra_js .= "
    function fill_ext_form(repo_path) {
      ext_field = window.opener.document.$ext_target;
      ext_field.value = repo_path;
@@ -319,9 +315,9 @@ if(isset($ext_target)) {
   }
   ";
 }
-echo "
+
+$extra_js .= "
 -->
 </script>
 ";
-</SCRIPT>
-
+</script>

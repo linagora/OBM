@@ -7,12 +7,12 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
+$extra_js .= "
 <script language=\"JavaScript\">";
 
 require("obminclude/javascript/check_js.inc");
 
-echo "
+$extra_js .= "
 
 function fill_ext_form(int_form) {
    size = int_form.length;
@@ -29,8 +29,6 @@ function fill_ext_form(int_form) {
        }
      }
    }
- 
-
 }
 </script>" ;
 

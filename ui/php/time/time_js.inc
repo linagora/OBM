@@ -1,4 +1,4 @@
-<?php
+<SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
@@ -15,7 +15,7 @@ echo "
 require("$obminclude/javascript/check_js.inc");
 
 
-echo "
+$extra_js .= "
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -32,12 +32,10 @@ function select_all(form) {
   }
   return false;
 }
-";
 
 ////////////////////////
 // Deal Form checking //
 ////////////////////////
-echo "
 function check_addtaskform(f_aff) {
 
   if (! check_sel_date(f_aff)) {
@@ -49,9 +47,7 @@ function check_addtaskform(f_aff) {
   else
     return true;
 }
-";
 
-echo "
 function check_sel_date(form) {
   error = 1;
   cb = 0;

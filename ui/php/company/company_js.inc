@@ -8,14 +8,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
 
 require("$obminclude/javascript/check_js.inc");
 
-echo "
+$extra_js .= "
 
 function check_get_id(form) {
   comp_pos = form.param_company.selectedIndex;

@@ -12,7 +12,7 @@
 // trim(string) function : Removes the leading and trailing spaces and tabs of
 // a string
 // return the trimmed string
-echo "
+$extra_js .= "
 function trim(str_data) {
   var str_trimmed = String(str_data);
 

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
@@ -20,7 +20,7 @@ require("$obminclude/javascript/check_js.inc");
 ///////////////////////////////////////////
 // Deal Search Form checking (Dates,...) //
 ///////////////////////////////////////////
-echo "
+$extra_js .= "
 function check_search_form(f_aff) {
   if ((f_aff.tf_dateafter.value != \"\") &&
       (check_date(f_aff.tf_dateafter, \"$l_date_alarm_after\") == false)) {

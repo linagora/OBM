@@ -1,22 +1,23 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : invoice_js.inc                                              //
-//     - Desc  : invoice javascript functions File                           //
+// OBM - File : invoice_js.inc                                               //
+//     - Desc : invoice javascript functions File                            //
 // 2001-08-03 Nicolas Roman
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <SCRIPT LANGUAGE=\"JavaScript\">
 <!--
 ";
 
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
+$extra_js .= "
 // user input check in  html_invoice_search_form :
-echo "
 function check_form(f_inv){
   j_ht=f_inv.tf_amount_HT.value;
   j_ttc=f_inv.tf_amount_TTC.value;
@@ -49,10 +50,9 @@ function check_form(f_inv){
   }
 
   return true;
-}";
+}
 
 // input check when creating an invoice
-echo "
 function check_invoice(f_inv) {
   var j_ht=f_inv.tf_amount_HT.value;
   var j_ttc=f_inv.tf_amount_TTC.value;
@@ -107,9 +107,9 @@ function check_invoice(f_inv) {
     return (confirm(\"$l_no_number_confirm\"));
   }
   return true;
-}"; 
+}
 
-echo "
+
 function check_invoice_link(f_inv) {
   var j_ht=f_inv.tf_amount_HT.value;
   var j_ttc=f_inv.tf_amount_TTC.value;
@@ -144,10 +144,9 @@ function check_invoice_link(f_inv) {
     return (confirm(\"$l_no_number_confirm\"));
   }
   return true;
-}"; 
+}
 
 // deletion confirm 
-echo "
 function valider_suppression() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -155,12 +154,10 @@ function valider_suppression() {
     return false;
 }
 
-";
 
 // automagic compute of the tas included amount...
 // TODO : if result is NaN, popup an alert and give focus 
 // back to HT or rate...
-echo "
 function compute_tax (form) {
  var rate = parseFloat(form.tf_tax_rate.value);
  var ht   = parseFloat(form.tf_amount_HT.value);
@@ -180,8 +177,7 @@ function compute_tax (form) {
 
  form.tf_amount_TTC.value = (Math.round (ht * rate*100))/100;
 }
-";
-echo "
+
 // --> 
 </SCRIPT>
 ";

@@ -10,7 +10,8 @@
 // Une date incorrecte ou vide "" renvoie false et affiche un message        //
 // Le champ passe en parametre recoit la date correcte au format ISO         //
 ///////////////////////////////////////////////////////////////////////////////
-echo "
+
+$extra_js .= "
 function check_date(champ_date, nom_date) {
   var day = \"\";
   var month = \"\";
@@ -78,7 +79,7 @@ function check_date(champ_date, nom_date) {
 
   return true;  
 }  
-"; // Fin de l' echo initial
+";
 
 
 

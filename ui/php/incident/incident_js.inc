@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
@@ -16,7 +16,7 @@ echo "
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
-echo "
+$extra_js .= "
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;

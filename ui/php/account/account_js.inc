@@ -8,25 +8,27 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-echo "
+$extra_js .= "
 <SCRIPT LANGUAGE=\"JavaScript\">
 <!--
 ";
 
-
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 
+
+$extra_js .= "
 // user input checking in html_account_search_form()
-echo "function check_form(f_acc){
+function check_form(f_acc){
   j_number=f_acc.tf_number.value;
   if ((j_number != \"\") && check_number(j_number)==null){
     alert (\"$l_check_number\"); 
     return false;
   }
   return true;
-}";
-echo "function check_cpte(f_acc){
+}
+
+function check_cpte(f_acc){
  // moving spaces away
  f_acc.tf_number.value=f_acc.tf_number.value.replace(/ /g,\"\");
 
@@ -50,9 +52,9 @@ echo "function check_cpte(f_acc){
   return false;
  }
  return true;
-}";
+}
 
-echo "
+
 function valider_suppression() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -60,19 +62,16 @@ function valider_suppression() {
     return false;
 }
 
-";
 
 // balance compute date checking
-echo "
 function check_balance_form (f_acc) {
  if (check_date (f_acc.tf_balance_date,\"".$l_choose_balance_date."\") == false) {
   return false;
  }
  return true;
 }
-";
 
-echo "
+
 // --> 
 </SCRIPT>
 ";

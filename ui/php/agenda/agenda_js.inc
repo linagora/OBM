@@ -1,12 +1,14 @@
-<?php
+<SCRIPT language="php">
 
-echo "
+$extra_js .= "
 <script type=\"text/javascript\">
 <!--
 ";
+
 require("$obminclude/javascript/check_js.inc");
 require("$obminclude/lang/$set_lang/check_date_js.inc");
-echo "
+
+$extra_js .= "
 
 function check_calendar(form) {
 
@@ -227,6 +229,4 @@ function check_meeting(form) {
 
 -->
 </script>
-
 ";
-?>
