@@ -18,6 +18,7 @@ $l_validate = "Validate";
 $l_all = "Alle";
 $l_all_f = "Alle";
 $l_archive = "Arkiv";
+$l_archive_first = "A";
 $l_none = "---";
 $l_invalid_data = "Ugyldig data";
 

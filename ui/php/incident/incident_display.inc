@@ -95,58 +95,53 @@ function html_incident_search_form ($usr_q, $incident) {
   // --- html template --------------------------------------------------------
 
   echo "
-     <form method=\"get\" name=\"f_incident\" action=\"" .
-     url_prepare("incident_index.php") . " \" onsubmit=\"if (verifier_inc(this)) return true; else return false;\">
-     <table class=\"details\">
-      <tr><td>
-       <table>
-        <tr>
-         <td class=\"textLabelForm\">$l_label</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_contract</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_archive</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_date_after</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_date_before</td>
-        </tr><tr>
-         <td><input type=\"text\" name=\"tf_lincident\" size=\"20\" value=\"$lincident\" /></td>
-         <td>&nbsp;&nbsp;</td>
-         <td><input type=\"text\" name=\"tf_lcontract\" size=\"20\" value=\"$lcontract\" /></td>
-         <td>&nbsp;&nbsp;</td>
-         <td><input name=\"cb_archive\" type=\"checkbox\" size=\"10\" value=\"1\" $archive /></td>
-         <td>&nbsp;&nbsp;</td>
-   	 <td><input name=\"tf_dateafter\" type=\"text\" size=\"10\" value=\"$dateafter\" /></td>
-         <td>&nbsp;&nbsp;</td>
-   	 <td><input name=\"tf_datebefore\" type=\"text\" size=\"10\" value=\"$datebefore\" /></td>
-        </tr>
-       </table>
-      </td>
-     </tr><tr>
+    <form method=\"get\" name=\"f_incident\" action=\"" .
+    url_prepare("incident_index.php") . " \" onsubmit=\"if (verifier_inc(this)) return true; else return false;\">
+
+    <table class=\"details\">
+    <tr>
       <td>
-       <table class=\"details\">     	
-        <tr>
-         <td class=\"textLabelForm\">$l_priority</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_status</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$l_owner</td>
-        </tr><tr>
-         <td class=\"textLabelForm\">$dis_sel_prio</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$dis_sel_stat</td>
-         <td>&nbsp;&nbsp;</td>
-         <td class=\"textLabelForm\">$dis_sel_owner</td>
-         <td>&nbsp;&nbsp;</td>
-         <td>
-         <input name=\"action\" type=\"hidden\" value=\"search\" />
-         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-         </td>
-        </tr>
-       </table>
+      <table>
+      <tr>
+        <td class=\"textLabelForm\">$l_label<br />
+          <input type=\"text\" name=\"tf_lincident\" size=\"20\"
+            value=\"$lincident\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_contract<br />
+          <input type=\"text\" name=\"tf_lcontract\" size=\"20\"
+            value=\"$lcontract\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_archive<br />
+          <input name=\"cb_archive\" type=\"checkbox\" size=\"10\"
+            value=\"1\" $archive /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_date_after<br />
+   	  <input name=\"tf_dateafter\" type=\"text\" size=\"10\"
+            value=\"$dateafter\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_date_before<br />
+   	  <input name=\"tf_datebefore\" type=\"text\" size=\"10\"
+            value=\"$datebefore\" /></td>
+      </tr>
+      </table>
+      <table class=\"details\">     	
+      <tr>
+        <td class=\"textLabelForm\">$l_priority<br />
+          $dis_sel_prio</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_status<br />
+          $dis_sel_stat</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_owner<br />
+          $dis_sel_owner</td>
+      </tr>
+      </table>
       </td>
-     </tr>
+      <td>
+        <input name=\"action\" type=\"hidden\" value=\"search\" />
+        <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      </td>
+    </tr>
     </table>
     </form>
     <hr />

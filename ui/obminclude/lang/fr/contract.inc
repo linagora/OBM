@@ -23,7 +23,6 @@ $l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
 $l_deal_label = "Affaire";
 $l_label = "Label";
 $l_label_libelle = "Mot-clef du libellé";
-$l_label_start = "Numéro";
 $l_kind = "Type";
 $l_marketing_manager = "Resp Commercial";
 $l_technical_manager = "Resp Technique";

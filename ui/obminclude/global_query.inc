@@ -221,7 +221,6 @@ function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Update an user preference
 // Parameters:
@@ -302,7 +301,7 @@ function session_load_global_prefs() {
 function session_load_user_prefs() {
   global $sess, $auth;
   global $last_company_name,$last_contact_name,$last_deal_name,$last_list_name;
-  global $last_contract_name, $last_incident_name;
+  global $last_parentdeal_name, $last_contract_name, $last_incident_name;
   global $last_account_name, $last_invoice_name, $last_payment_name;
 
   $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
@@ -319,6 +318,8 @@ function session_load_user_prefs() {
   $sess->register("last_contact_name");
   $last_deal_name = run_query_global_deal_label($last_deal);
   $sess->register("last_deal_name");
+  $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
+  $sess->register("last_parentdeal_name");
   $last_list_name = run_query_global_list_name ($last_list); 
   $sess->register("last_list_name");
   $last_account_name = run_query_global_account_label($last_account);
@@ -462,6 +463,25 @@ function run_query_global_deal_label($d_id) {
   $obm_db->query($query);
   $obm_db->next_record();
   return $obm_db->f("deal_label");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Parent deal label from the parent deal Id
+// Parameters:
+//   - $p_id : parent deal id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_parentdeal_label($p_id) {
+  global $cdg_sql;
+
+  $query = "select parentdeal_label
+    from ParentDeal
+    where parentdeal_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+  return $obm_db->f("parentdeal_label");
 }
 
 

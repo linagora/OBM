@@ -227,7 +227,6 @@ function dis_amp_file($mode, $file) {
       <td class=\"adminHead\">#&nbsp;Line</td>
       <td class=\"adminHead\">$file</td>
     </tr>";
-
 	}
       }
 
@@ -310,7 +309,8 @@ function dis_unused_func_content($mode, $def, $used) {
       $html_func = "<a href=\"" . url_prepare("admin_code_index.php?action=function_uses&amp;function=$func&amp;mode=html") . "\">$func</a>";
     } else {
       $used_cpt = "No";
-      $class = "class=\"adminLabel\"";
+      $classl = "class=\"adminLabel\"";
+      $classr = "class=\"adminLabel\"";
       $html_func = $func;
     }
 

@@ -29,7 +29,7 @@ $fieldnames["contract_marketmanager"] = $l_marketing_manager;
 //   - $obm_q_type : DB result object (contract kind list)
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_form($contract, $usr_q, $obm_q_type) {
-  global $l_label_start,$l_label_libelle,$l_company,$l_kind,$l_after,$l_before;
+  global $l_number,$l_label_libelle,$l_company,$l_kind,$l_after,$l_before;
   global $l_find,$l_marketing_manager,$l_technical_manager; 
   global $c_all, $l_all;
 
@@ -74,45 +74,53 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     <form method=\"get\" name=\"form_contract\" 
     onsubmit=\"if (check_search_form(this) == false) return false;
     else return true;\" action=\"".url_prepare("contract_index.php")."\">
-     <table class=\"details\">   
+
+    <table class=\"details\">
+    <tr>
+      <td class=\"detailHead\">$l_deal</td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+
+      <td>
+      <table class=\"details\">   
       <tr>
-       <td class=\"textLabelForm\">$l_label_start</td>
-       <td>&nbsp;&nbsp;</td>
-       <td class=\"textLabelForm\">$l_company</td>
-       <td>&nbsp;&nbsp;</td>
-       <td class=\"textLabelForm\">$l_after</td>
-       <td>&nbsp;&nbsp;</td>
-       <td class=\"textLabelForm\">$l_before</td>
-      </tr><tr>
-       <td><input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" /></td>
-       <td>&nbsp;&nbsp;</td>
-       <td><input name=\"tf_company_name\" size=\"20\" maxlength=\"20\" value=\"$comp\" /></td>
-       <td>&nbsp;&nbsp;</td>
-       <td><input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" /></td>
-       <td>&nbsp;&nbsp;</td>
-       <td><input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$p_datebefore\" /></td>
-       </tr>
-     </table>
-     <table class=\"details\">
+        <td class=\"textLabelForm\">$l_number<br />
+          <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_company<br />
+          <input name=\"tf_company_name\" size=\"20\" maxlength=\"20\"
+            value=\"$comp\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_after<br />
+          <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
+        </td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_before<br />
+          <input type=\"text\" name=\"tf_datebefore\" size=\"10\"
+            value=\"$p_datebefore\" /></td>
+      </tr>
+      </table>
+      <table class=\"details\">
       <tr>
-       <td class=\"textLabelForm\">$l_label_libelle</td>
-       <td>&nbsp;&nbsp;</td>
-       <td class=\"textLabelForm\">&nbsp;&nbsp;$l_kind</td>
-       <td>&nbsp;&nbsp;</td>
-       <td class=\"textLabelForm\">$l_technical_manager</td>
-      </tr><tr>
-       <td><input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$p_label\" /></td>
-       <td>&nbsp;&nbsp;</td>
-       <td>$dis_cont_typ</td>
-       <td>&nbsp;&nbsp;</td>
-       <td>$dis_resp_tec</td>
-       <td>&nbsp;&nbsp;</td>
-       <td>
+        <td class=\"textLabelForm\">$l_label_libelle<br />
+          <input type=\"text\" name=\"tf_label\" size=\"20\"
+            value=\"$p_label\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">&nbsp;&nbsp;$l_kind<br />
+          $dis_cont_typ</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_technical_manager<br />
+          $dis_resp_tec</td>
+      </tr>
+      </table>
+
+      </td>
+      <td>
         <input name=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-       </td>
-      </tr>
-     </table>
+      </td>
+    </tr>
+    </table>
     </form>
     <hr />";
 }

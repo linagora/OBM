@@ -23,7 +23,6 @@ $l_contract_select_deal = "Select the Deal.";
 $l_deal_label = "Deal";
 $l_label = "Label";
 $l_label_libelle = "Key-word of the label";
-$l_label_start = "Number";
 $l_kind = "Kind";
 $l_marketing_manager = "Marketing Man.";
 $l_technical_manager = "Technical Man.";

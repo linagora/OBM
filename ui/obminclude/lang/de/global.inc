@@ -19,6 +19,7 @@ $l_all = "Alle";
 $l_all_f = "Alle";
 $l_none = "---";
 $l_archive = "Archiv";
+$l_archive_first = "A";
 $l_invalid_data = "Falsche Daten";
 
 // OBM_DISPLAY

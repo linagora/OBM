@@ -22,6 +22,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $lname = $contact["lname"];
   $phone = stripslashes($contact["phone"]);
   $company = $contact["company"];
+  $archive = $contact["archive"];
 
   $query = "select
       contact_id as Id,
@@ -36,6 +37,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       contact_homephone,
       contact_mobilephone,
       contact_email,
+      contact_archive,
       contact_visibility,
       company_name as contact_company_name, company_phone
     from Contact, Company
@@ -58,6 +60,10 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   // If a company was sent as parameter, get it
   if ($company_id != "") {
     $query .= " company_id='$company_id' and";
+  }
+  // Get only not archived by default
+  if ($archive != "1") {
+    $query .= " contact_archive=0 and";
   }
 
   // only the one which are allowed (ie. publics )
@@ -190,6 +196,7 @@ function run_query_insert($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $com = $contact["com"];
+  $arch = ($contact["archive"] == 1 ? 1 : 0);
   $vis = ($contact["vis"] == 1 ? 1 : 0);
 
   $query = "insert into Contact (contact_timeupdate,
@@ -212,8 +219,9 @@ function run_query_insert($contact) {
     contact_mobilephone,
     contact_fax,
     contact_email,
-    contact_comment,
-    contact_visibility)
+    contact_archive,
+    contact_visibility,
+    contact_comment)
   values (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
@@ -234,8 +242,9 @@ function run_query_insert($contact) {
     '$mphone',
     '$fax',
     '$email',
-    '$com',
-    '$vis')";
+    '$arch',
+    '$vis',
+    '$com')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -283,6 +292,7 @@ function run_query_update($contact) {
   $fax = $contact["fax"];
   $email = $contact["email"];
   $com = $contact["com"];
+  $arch = ($contact["archive"] == 1 ? 1 : 0);
   $vis = ($contact["vis"] == 1 ? 1 : 0);
 
   $query = "update Contact set
@@ -304,8 +314,9 @@ function run_query_update($contact) {
     contact_mobilephone='$mphone',
     contact_fax='$fax',
     contact_email='$email',
-    contact_comment='$com',
-    contact_visibility='$vis'
+    contact_archive='$arch',
+    contact_visibility='$vis',
+    contact_comment='$com'
   where contact_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

@@ -23,7 +23,6 @@ $l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
 $l_deal_label = "Impegno";
 $l_label = "Label";
 $l_label_libelle = "Key-word di the etichetta";
-$l_label_start = "numero";
 $l_kind = "Tipo";
 $l_marketing_manager = "Marketing Resp.";
 $l_technical_manager = "Tecnico Resp.";

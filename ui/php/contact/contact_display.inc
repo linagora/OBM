@@ -19,6 +19,7 @@ $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
 $fieldnames["contact_mobilephone"] = $l_mphone;
 $fieldnames["contact_email"] = $l_email;
+$fieldnames["contact_archive"] = $l_archive_first;
 // Calculated fields
 $fieldnames["contact_company_name"] = $l_company;
 
@@ -30,12 +31,14 @@ $fieldnames["contact_company_name"] = $l_company;
 //     keys used  : name, company
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact) {
-  global $l_contact_name, $l_phone, $l_from_company, $l_find;
+  global $l_contact_name, $l_phone, $l_from_company, $l_archive, $l_find;
   global $popup;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
   $company = stripslashes($contact["company"]);
+  $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
+
   if ($popup) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
@@ -51,13 +54,23 @@ function html_contact_search_form ($contact) {
   echo "
     <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"".url_prepare("contact_index.php")."\">
     <table class=\"details\">
-      <tr>
-        <td class=\"textLabelForm\">$l_contact_name</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_phone</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_from_company</td>
-        <td rowspan=\"2\">&nbsp;&nbsp;&nbsp;&nbsp;
+    <tr>
+      <td class=\"textLabelForm\">$l_contact_name<br />
+        <input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" />
+      </td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_phone<br />
+        <input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" />
+      </td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_from_company<br />
+        <input type=\"text\" name=\"tf_company\" size=\"16\"
+        value=\"$company\" /></td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_archive<br />
+        <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+      </td>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;
         <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
@@ -65,17 +78,9 @@ function html_contact_search_form ($contact) {
         $ext&nbsp;
         </td>
       </tr>
-      <tr>
-        <td><input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td><input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td><input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" /></td>
-      </tr>
     </table>
     </form>
     <hr />";
-
 }
 
 
@@ -165,10 +170,12 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
 //   - $co_q      : contact database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_consult($co_q) {
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax;
-  global $l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_public,$l_private,$l_visibility;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
+  global $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode,$l_expresspostal;
+  global $l_town,$l_country,$l_email,$l_comment;
+  global $l_public,$l_private,$l_archive,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
-  global $set_theme,  $ico_mail;
+  global $c_yes, $c_no, $set_theme,  $ico_mail;
   global $action, $auth;
   global $perms_user, $l_perms_user;
 
@@ -197,16 +204,16 @@ function html_contact_consult($co_q) {
   $email = $co_q->f("contact_email");
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
+  $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
 
   if ($usercreate == $auth->auth["uid"]) {
     if ($vis == 1) 
-	$l_priv= $l_private;
+      $l_priv = $l_private;
     else 
-	$l_priv= $l_public;  
-   $l_priv = "<tr>
-      <td class=\"detailLabel\">$l_visibility<td>
-      <td class=\"detailText\">$l_priv</td>
-              </tr> ";	
+      $l_priv = $l_public;  
+    $l_priv = "</tr><tr>
+      <td class=\"detailLabel\">$l_visibility</td>
+      <td class=\"detailText\">$l_priv</td>";
   }
   
   // --- HTML Template --------------------------------------------------------
@@ -224,6 +231,10 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailText\">$kind</td>
+    $l_priv
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
@@ -297,7 +308,10 @@ function html_contact_consult($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $set_theme, $ico_company;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_private,$l_coord, $l_contact;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
+  global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
+  global $l_town,$l_country,$l_email,$l_comment;
+  global $l_archive, $l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $auth;
@@ -323,8 +337,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     $mphone = $co_q->f("contact_mobilephone");
     $fax = $co_q->f("contact_fax");
     $email = $co_q->f("contact_email");
-    $com = $co_q->f("contact_comment");
+    $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $vis = $co_q->f("contact_visibility");
+    $com = $co_q->f("contact_comment");
 
   // New form and first time
   } elseif ($action == "new") {
@@ -361,6 +376,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     $fax = stripslashes($contact["fax"]);
     $email = stripslashes($contact["email"]);
     $com = stripslashes($contact["com"]);
+    $archive = ($contact["archive"] == 1 ? "checked" : "");
     $vis = $contact["vis"];
   }
 
@@ -378,9 +394,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action=="detailupdate") || ($action=="update")) &&
          ($usercreate == $auth->auth["uid"]) ) ) {
-      $display_private = "<input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
-      if ($vis == '1') echo " checked=\"checked\"";
-       $display_private .= " />";
+    $display_private = "<input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
+    if ($vis == '1') $display_private .= " checked=\"checked\"";
+    $display_private .= " />";
   }
 
   // UPDATE 
@@ -420,6 +436,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </tr><tr>
     <td class=\"detailLabel\">$l_private</td>
     <td>$display_private</td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_archive</td>
+    <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_company</td>
     <td>

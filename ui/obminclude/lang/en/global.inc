@@ -21,6 +21,7 @@ $l_all_f = "All";
 $l_none = "---";
 $l_comment = "Comment";
 $l_archive = "Archive";
+$l_archive_first = "Arc";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
@@ -117,7 +118,7 @@ $l_header_new = "New";
 $l_header_find = "Find";
 $l_header_display = "Display";
 $l_header_export = "Export";
-$l_header_update = "Modify";
+$l_header_update = "Update";
 $l_header_delete = "Delete";
 
 $l_header_new_parent = "New ParentDeal";

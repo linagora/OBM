@@ -34,7 +34,6 @@ $l_contacts = "Kontaktar";
 $l_comment = "Kommentar";
 $l_company = "Firma";
 $l_show_archive = "Vis arkiv";
-$l_archive_first = "A";
 $l_date = "Dato";
 $l_date_init = "Startdato";
 $l_date_alarm = "Varslingsdato";

@@ -44,7 +44,6 @@ $l_label_start = "Nome inizio";
 $l_manager = "Resp. ";
 $l_proposition = "Proposta";
 $l_show_archive = "Mostra archivi";
-$l_archive_first = "A";
 $l_date_alarm_after = "Data Avviso dopo";
 $l_date_alarm_before = "Data avviso prima";
 $l_after = "Dopo";

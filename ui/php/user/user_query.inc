@@ -299,7 +299,9 @@ function check_data_form($p_id, $user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Executions - Delete all references to one (UserObmPref, DisplayPref)
+// Query Executions - Purge a deleted user
+// Delete all references to the user (UserObmPref, DisplayPref)
+// Move all user private contact to public 
 // Parameters:
 //   - $param_user : user id
 ///////////////////////////////////////////////////////////////////////////////
@@ -313,6 +315,22 @@ function run_query_delete_profil($param_user)  {
   $obm_q->query($query);
 
   $query = "Delete from DisplayPref where display_user_id='$param_user'"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  // Move all the user contact from private to public
+  $query = "Update Contact set
+      contact_visibility='0'
+    where contact_usercreate='$param_user'
+      and contact_visibility != '0'"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  // Move all the user deal from private to public
+  $query = "Update Deal set
+      deal_visibility='0'
+    where deal_usercreate='$param_user'
+      and deal_visibility != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 }

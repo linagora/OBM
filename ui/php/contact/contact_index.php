@@ -246,8 +246,8 @@ display_end();
 function get_param_contact() {
   global $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_ad1, $tf_ad2;
   global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_func, $tf_phone, $tf_hphone;
-  global $tf_mphone, $tf_fax, $tf_email, $ta_com, $cb_vis, $param_company;
-  global $param_contact, $hd_usercreate, $cdg_param;
+  global $tf_mphone, $tf_fax, $tf_email, $ta_com, $cb_vis, $cb_archive;
+  global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
   global $ext_action, $ext_url, $ext_id, $ext_target;
 
@@ -273,8 +273,9 @@ function get_param_contact() {
   if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
   if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
-  if (isset ($ta_com)) $contact["com"] = $ta_com;
+  if (isset ($cb_archive)) $contact["archive"] = $cb_archive;
   if (isset ($cb_vis)) $contact["vis"] = $cb_vis;
+  if (isset ($ta_com)) $contact["com"] = $ta_com;
 
   // External param
   if (isset ($ext_action)) $contact["ext_action"] = $ext_action;

@@ -433,6 +433,11 @@ class OBM_DISPLAY {
        	else if (($fieldname == "contact_company_name") && $link_ok){
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contact_company_id");
 	}
+	else if ($fieldname == "contact_archive") {
+          $align = "center";
+          if ($this->data_set->f($fieldname)) $name ="X";
+          else $name="&nbsp;";
+	}
 	else if ($fieldname == "contact_function") {
 	  $name = $this->data_set->f("contact_function");
 	}

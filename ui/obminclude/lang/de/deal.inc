@@ -32,7 +32,6 @@ $l_amount = "Bemerkung";
 $l_hitrate = "Hit Rate";
 $l_contacts = "Kontakte";
 $l_show_archive = "anzeigen Archiv";
-$l_archive_first = "A";
 $l_date = "Datum";
 $l_date_init = "Startdatum";
 $l_date_alarm = "Stichdatum";

@@ -64,12 +64,20 @@ $uid = $auth->auth["uid"];
 // Updating the "last deal" bookmark 
 if ( ($param_deal == $last_deal) && (strcmp($action,"delete")==0) ) {
   $last_deal=$last_deal_default;
-} elseif  ( ($param_deal > 0) && ($last_deal != $param_deal) ) {
+} elseif ( ($param_deal > 0) && ($last_deal != $param_deal) ) {
   $last_deal=$param_deal;
   run_query_set_user_pref($uid,"last_deal",$param_deal);
   $last_deal_name = run_query_global_deal_label($last_deal);
-  //$sess->register("last_deal");
 }
+// Updating the "last parentdeal" bookmark 
+if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0) ) {
+  $last_parentdeal=$last_parentdeal_default;
+} elseif ( ($param_parent > 0) && ($last_parentdeal != $param_parent) ) {
+  $last_parentdeal = $param_parent;
+  run_query_set_user_pref($uid,"last_parentdeal",$param_parent);
+  $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
+}
+
 
 page_close();
 if($action == "") $action = "index";

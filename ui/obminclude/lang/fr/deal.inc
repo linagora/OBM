@@ -44,7 +44,6 @@ $l_label_start = "Nom Affaire";
 $l_manager= "Responsable";
 $l_proposition = "Proposition";
 $l_show_archive = "Voir les archives";
-$l_archive_first = "Arc";
 $l_date_alarm_after = "Date Alarme Après";
 $l_date_alarm_before = "Date Alarme Avant";
 $l_zipcode = "Code Postal";

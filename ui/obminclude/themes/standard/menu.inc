@@ -302,8 +302,9 @@ function display_bookmarks($path="..") {
   global $set_theme;
   global $last_company,$last_contact,$last_deal, $last_contract;
   global $last_account,$last_invoice, $last_payment, $last_incident;
-  global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
-  global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
+  global $last_company_name, $last_contact_name, $last_deal_name;
+  global $last_parentdeal_name, $last_contract_name, $last_payment_name;
+  global $last_account_name, $last_invoice_name,$last_incident_name;
 
   $book = "
   <table class=\"bookmarks\">
@@ -320,6 +321,12 @@ function display_bookmarks($path="..") {
     <td class=\"bookmarks\">
       <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
       <a class=\"bookmarks\" href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">".substr($last_contact_name,0,30)."</a></td>";
+
+  if ($last_parentdeal_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$last_parentdeal)."\">".substr($last_parentdeal_name,0,30)."</a></td>";
 
   if ($last_deal_name != "")
     $book .= "

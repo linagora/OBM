@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.0p2";
+$obm_version = "0.6.0p3";
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -19,6 +19,7 @@ $set_date_default = "Y-m-d";
 $set_menu_default = "both";
 //$set_debug_default=0;
 $last_deal_default = 0;
+$last_parentdeal_default = 0;
 $last_company_default = 0;
 $last_contact_default = 0;
 $last_contract_default = 0;

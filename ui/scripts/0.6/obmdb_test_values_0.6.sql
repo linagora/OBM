@@ -29,4 +29,4 @@ INSERT INTO Company (company_timeupdate, company_timecreate, company_userupdate,
 -------------------------------------------------------------------------------
 -- Default Contact creation
 -------------------------------------------------------------------------------
-INSERT INTO Contact VALUES (1,'','',NULL,1,1,1,'Rabbit','Roger','','','','','','','','','','','','','',0);
+INSERT INTO Contact VALUES (1,'','',NULL,1,1,1,'Rabbit','Roger','','','','','','','','','','','','',0,0,'');

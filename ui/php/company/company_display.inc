@@ -90,39 +90,34 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
     <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"" . url_prepare("company_index.php") . "\">
     <table class=\"details\">
     <tr>
-      <td class=\"textLabelForm\">$l_company_name</td>
+      <td class=\"textLabelForm\">$l_company_name<br />
+        <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\"
+        value=\"$name\" /></td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_phone</td>
+      <td class=\"textLabelForm\">$l_phone<br />
+        <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
+        value=\"$phone\" /></td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_company_kind</td>
+      <td class=\"textLabelForm\">$l_company_kind<br />
+        $sel_kind</td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_activity</td>
+      <td class=\"textLabelForm\">$l_activity<br />
+        $sel_act</td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_postcode</td>
+      <td class=\"textLabelForm\">$l_postcode<br />
+        <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
+        value=\"$zip\" /></td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_market</td>
+      <td class=\"textLabelForm\">$l_market<br />
+        $sel_market</td>
       <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_internal</td>
-      <td rowspan=\"2\">&nbsp;&nbsp;&nbsp;&nbsp;
+      <td class=\"textLabelForm\">$l_internal<br />
+        <input type=\"checkbox\" name=\"cb_state\" id=\"cb_state\" value=\"1\"
+        $cstate /></td>
+      <td>&nbsp;&nbsp;&nbsp;&nbsp;
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       </td>
-    </tr>
-    <tr>
-      <td><input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"16\" value=\"$name\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td><input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\" value=\"$phone\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td>$sel_kind</td>
-      <td>&nbsp;&nbsp;</td>
-      <td>$sel_act</td>
-      <td>&nbsp;&nbsp;</td>
-      <td><input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\" value=\"$zip\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td>$sel_market</td>
-      <td>&nbsp;&nbsp;</td>
-      <td><input type=\"checkbox\" name=\"cb_state\" id=\"cb_state\" value=\"1\" $cstate /></td>
-      <td>&nbsp;&nbsp;</td>
     </tr>
     </table>
     </form>

@@ -21,6 +21,7 @@ $l_all_f = "Toutes";
 $l_none = "---";
 $l_comment = "Commentaire";
 $l_archive = "Archive";
+$l_archive_first = "Arc";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";

@@ -201,8 +201,9 @@ CREATE TABLE Contact (
   contact_mobilephone varchar(16),
   contact_fax varchar(16),
   contact_email varchar(52),
-  contact_comment text,
+  contact_archive char(1) DEFAULT '0',
   contact_visibility int(2) DEFAULT '0',
+  contact_comment text,
   PRIMARY KEY (contact_id)
 );
 

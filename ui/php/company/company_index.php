@@ -404,7 +404,7 @@ function get_company_action() {
 // Detail Consult
   $actions["COMPANY"]["detailconsult"]  = array (
     'Url'      => "$path/company/company_index.php?action=detailconsult",
-    'Right'    => $company_write,
+    'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
 
