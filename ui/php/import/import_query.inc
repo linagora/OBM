@@ -337,7 +337,7 @@ function get_import_field_mapping($import_q) {
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
   global $l_expresspostal, $l_country, $l_phone, $l_fax, $l_web, $l_email;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
-  global $l_comment;
+  global $l_comment, $l_lang;
 
   $desc = $import_q->f("import_desc");
   eval ($desc);
@@ -791,8 +791,9 @@ function get_similar_contact($fields, $cid) {
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
+//   - $kinds[]     : Kinds hash (from lang)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries) {
+function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries, &$kinds) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -810,6 +811,13 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $market = $import_q->f("import_marketingmanager_id");
   $lname = addslashes($fields["con_ln"]);
   $fname = addslashes($fields["con_fn"]);
+  // If a lang has been found we get the corresponding kind
+  if (isset($kinds[$fields["con_lang"]])) {
+    $kind_id = $kinds[$fields["con_lang"]];
+  } else {
+    $kind_id = "0";
+  }
+  $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
   $ad3 = addslashes($fields["con_ad3"]);
@@ -823,7 +831,6 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   } else {
     $ctry = trim($fields["con_ctry"]);
   }
-  $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];
   $mphone = $fields["con_mpho"];
@@ -840,6 +847,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     contact_usercreate,
     contact_datasource_id,
     contact_company_id,
+    contact_kind_id,
     contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
@@ -866,6 +874,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
     '$uid',
     '$dsrc',
     '$comp_id',
+    '$kind_id',
     '$market',
     '$lname',
     '$fname',
@@ -907,9 +916,10 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
 //   - $fields[]    : Company and Contact Entry's values
 //   - $defaults[]  : Default values hash
 //   - $countries[] : Country hash
+//   - $kinds[]     : Kind hash
 //   - $contact_id  : Company id to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, $contact_id) {
+function run_query_import_contact_update(&$import_q, $fields, $defaults, &$countries, &$kinds, $contact_id) {
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
@@ -927,6 +937,12 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $market = $import_q->f("import_marketingmanager_id");
   $lname = addslashes($fields["con_ln"]);
   $fname = addslashes($fields["con_fn"]);
+  // If a lang has been found we get the corresponding kind
+  if (isset($kinds[$fields["con_lang"]])) {
+    $kind_id = $kinds[$fields["con_lang"]];
+    $q_kind = "contact_kind_id='$kind_id',";
+  }
+  $title = addslashes($fields["con_tit"]);
   $ad1 = addslashes($fields["con_ad1"]);
   $ad2 = addslashes($fields["con_ad2"]);
   $ad3 = addslashes($fields["con_ad3"]);
@@ -940,7 +956,6 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   } else {
     $ctry = trim($fields["con_ctry"]);
   }
-  $title = addslashes($fields["con_tit"]);
   $phone = $fields["con_pho"];
   $hphone = $fields["con_hpho"];
   $mphone = $fields["con_mpho"];
@@ -955,6 +970,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
     contact_timeupdate='". date("Y-m-d H:i:s") ."',
     contact_userupdate='$uid',
     contact_datasource_id='$dsrc',
+    $q_kind
     contact_marketingmanager_id='$market',
     contact_lastname='$lname',
     contact_firstname='$fname',
@@ -1020,6 +1036,45 @@ function get_import_companycategory_hash() {
   }
 
   return $cats;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the kind hash : kinds["lang"] = kind_id
+///////////////////////////////////////////////////////////////////////////////
+function get_import_kind_hash() {
+  global $cdg_sql;
+
+  $kind_q = run_query_kind();
+
+  while ($kind_q->next_record()) {
+    $lang = $kind_q->f("kind_lang");
+    $id = $kind_q->f("kind_id");
+    if (! isset($kinds[$lang])) {
+      $kinds[$lang] = $id;
+    }
+  }
+
+  return $kinds;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact: Kind select query execution                                      //
+// Returns : DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind() {
+  global $cdg_sql;
+
+  $query = "select kind_id, kind_minilabel, kind_header, kind_lang
+    from Kind
+    order by kind_lang, kind_minilabel, kind_header";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 

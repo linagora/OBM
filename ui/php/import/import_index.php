@@ -219,7 +219,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_list);
+$display["head"] = display_head($l_import);
 $display["end"] = display_end();
 
 display_page($display);
@@ -266,6 +266,8 @@ function get_import_desc($import) {
   $desc .= '\$con_ln_d="'.$import["con_ln_d"] . '";';
   $desc .= '\$con_fn="'.$import["con_fn"] . '";';
   $desc .= '\$con_fn_d="'.$import["con_fn_d"] . '";';
+  $desc .= '\$con_lang="'.$import["con_lang"] . '";';
+  $desc .= '\$con_lang_d="'.$import["con_lang_d"] . '";';
   $desc .= '\$con_tit="'.$import["con_tit"] . '";';
   $desc .= '\$con_tit_d="'.$import["con_tit_d"] . '";';
   $desc .= '\$con_ad1="'.$import["con_ad1"] . '";';
@@ -347,6 +349,9 @@ function get_import_desc($import) {
   $desc .= '\$con["con_fn"]["value"] ="'.$import["con_fn"] . '";';
   $desc .= '\$con["con_fn"]["label"] ="l_firstname";';
   $desc .= '\$con["con_fn"]["default"]="'.$import["con_fn_d"] . '";';
+  $desc .= '\$con["con_lang"]["value"] ="'.$import["con_lang"] . '";';
+  $desc .= '\$con["con_lang"]["label"] ="l_lang";';
+  $desc .= '\$con["con_lang"]["default"]="'.$import["con_lang_d"] . '";';
   $desc .= '\$con["con_tit"]["value"] ="'.$import["con_tit"] . '";';
   $desc .= '\$con["con_tit"]["label"] ="l_title";';
   $desc .= '\$con["con_tit"]["default"]="'.$import["con_tit_d"] . '";';
@@ -412,7 +417,7 @@ function get_param_import() {
   global $tf_comp_web, $tf_comp_web_d, $tf_comp_mail, $tf_comp_mail_d;
   global $tf_comp_com, $tf_comp_com_d;
   global $tf_con_ln, $tf_con_ln_d, $tf_con_fn, $tf_con_fn_d;
-  global $tf_con_tit, $tf_con_tit_d;
+  global $tf_con_lang, $tf_con_lang_d, $tf_con_tit, $tf_con_tit_d;
   global $tf_con_ad1, $tf_con_ad1_d, $tf_con_ad2, $tf_con_ad2_d;
   global $tf_con_ad3, $tf_con_ad3_d, $tf_con_zip, $tf_con_zip_d;
   global $tf_con_town, $tf_con_town_d, $tf_con_cdx, $tf_con_cdx_d;
@@ -474,6 +479,8 @@ function get_param_import() {
   if (isset ($tf_con_ln_d)) $import["con_ln_d"] = trim($tf_con_ln_d);
   if (isset ($tf_con_fn)) $import["con_fn"] = trim($tf_con_fn);
   if (isset ($tf_con_fn_d)) $import["con_fn_d"] = trim($tf_con_fn_d);
+  if (isset ($tf_con_lang)) $import["con_lang"] = trim($tf_con_lang);
+  if (isset ($tf_con_lang_d)) $import["con_lang_d"] = trim($tf_con_lang_d);
   if (isset ($tf_con_tit)) $import["con_tit"] = trim($tf_con_tit);
   if (isset ($tf_con_tit_d)) $import["con_tit_d"] = trim($tf_con_tit_d);
   if (isset ($tf_con_ad1)) $import["con_ad1"] = trim($tf_con_ad1);

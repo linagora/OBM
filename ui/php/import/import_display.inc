@@ -190,7 +190,7 @@ function html_import_consult($import_q) {
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal;
+  global $l_expresspostal, $l_lang;
   global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
@@ -454,6 +454,7 @@ function html_import_file_import($import_q, $import) {
     // Get the country hash : countries["name"] = $id
     $countries = get_import_country_hash();
     $cats = get_import_companycategory_hash();
+    $kinds = get_import_kind_hash();
   }
     
   $map = get_import_field_mapping($import_q);
@@ -496,7 +497,7 @@ function html_import_file_import($import_q, $import) {
 
       // If contact, insert
       if (row_has_contact($fields)) {
-	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
 	$nb_con_ins++;
       }
 
@@ -539,7 +540,7 @@ function html_import_file_import($import_q, $import) {
 	  if ($fields["con_ln"] == "") {
 	    $log["res"] .= $l_contact_defaultname;
 	  }
-	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
+	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds);
 	  $nb_con_ins++;
 	}
 
@@ -552,14 +553,14 @@ function html_import_file_import($import_q, $import) {
       list($num_line, $line) = each($r);
       $row = get_file_row_fields($line, $csv_sep, $enclosed);
       $fields = get_import_row_mapping($row, $map);
-      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $contact_id);
+      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $kinds, $contact_id);
       $nb_con_upd++;
 
     } else if ($conflict_action == "contact_insert") {
       list($num_line, $line) = each($r);
       $row = get_file_row_fields($line, $csv_sep, $enclosed);
       $fields = get_import_row_mapping($row, $map);
-      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
+      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries, $kinds);
       $nb_con_ins++;
 
     } else if ($conflict_action == "contact_nothing") {
@@ -620,12 +621,12 @@ function html_import_file_import($import_q, $import) {
 	  if (row_has_contact($fields)) {
 	    // We insert If lastname filled, or if lastname empty but default
 	    if ($fields["con_ln"] != "") {
-	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
 	      $nb_con_ins++;
 	    } else if ($fields["con_ln"] == "") {
 	      if ($map["default"]["con_ln"] != "") {
 		$log["res"] .= $l_contact_defaultname;
-		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries, $kinds);
 		$nb_con_ins++;
 	      }
 	    }
@@ -856,7 +857,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal;
+  global $l_expresspostal, $l_lang;
   global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
 
@@ -1077,6 +1078,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   </tr>
   <tr>
     <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_con_lang\" value=\"$con_lang\" /></td>
+    <td class=\"detailLabel\">$l_lang</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_con_lang_d\" value=\"$con_lang_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
       <input type=\"text\" size=\"3\" name=\"tf_con_tit\" value=\"$con_tit\" /></td>
     <td class=\"detailLabel\">$l_title</td>
     <td class=\"detailForm\">
@@ -1205,11 +1213,11 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display warning before a list deletion                                    //
+// Display warning before an import deletion
 // We ask confirmation or cancel
 // Parameters:
-//   - $id : list id
-/////////////////////////////////////////////////////////////////////////////
+//   - $id : import id
+///////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back;
 
@@ -1246,7 +1254,7 @@ function dis_warn_delete($id) {
 //   - $import_q : import database result (at least 1 row)
 //   - $import[] : values for insertion/update (if confirmation)
 //     keys used : name, subject
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_import_warn_insert($import_q, $import) {
   global $l_check_sameimport, $l_confirm, $l_back;
   global $display, $c_yes, $c_no;
