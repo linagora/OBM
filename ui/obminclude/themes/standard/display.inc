@@ -135,52 +135,29 @@ function generate_menu($menu, $section) {
   $display["todo"] = display_todo_toplist();
 
   $block = "
-<table cellpadding=\"0\" cellspacing=\"0\" class=\"global\">
-<tr>
-<!-- Logo OBM -->
-  <td class=\"globalLogo\">
-    <img src=\"/images/$set_theme/logo_obm.png\" alt=\"\" />
-  </td>
+<!-- Bandeau -->
 
-<!-- Tableau partie droite du bandeau (Login, Onglets, menus) -->
+<div class='header'>
+<img src=\"/images/$set_theme/logo_obm.png\" alt=\"\" id='logo' />
+<span id='version'>OBM v.".$obm_version." Société Aliacom</span> 
+<!-- Login -->
+<ul class='login'>
+<li><img src='/images/".$set_theme."/login.gif' alt='' /> Login : ".$login."</li>
+<li><img src='/images/".$set_theme."/profil.gif' alt='' /> Profil : ".$profil."</li>
+<li><img src='/images/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>Logout</a></li>
+</ul>
+<!-- Fin Login -->
+<!-- Onglets -->
+" . $display["section"] ."
+<!-- Fin Onglets -->
+<!-- Menu -->
+" . $display["menu"] ."
+<!-- Fin Menu -->
+</div>
 
-  <td class=\"globalHeader\">
-    <table cellpadding=\"0\" cellspacing=\"0\" class=\"header\">
-    <tr>
-    <!-- zone Login -->
+<!-- Fin Bandeau -->
 
-      <td class=\"header\">
-        <img class=\"header\" src=\"/images/$set_theme/login.gif\" alt=\"\" />
-        Login&nbsp;: $login&nbsp;&nbsp;
-        <img class=\"header\" src=\"/images/$set_theme/profil.gif\" alt=\"\" />
-        Profil&nbsp;: $profil&nbsp;
-        <img class=\"header\" src=\"/images/$set_theme/logout.gif\" alt=\"\" />
-        <a class=\"header\" href=\"$path/obm.php?action=logout\">Logout</a>
-      </td>
-      <td class=\"headerRight\">OBM v. $obm_version &nbsp;
-        Société Aliacom
-      </td>
-      <td>&nbsp;</td>
-    <!-- Fin zone Login -->
-    </tr><tr>
-
-    <!-- zone Onglets -->
-      <td colspan=\"2\">" . $display["section"] ."
-      </td>
-    <!-- Fin zone Onglets -->
-
-    </tr><tr>
-    <!-- zone Menu -->
-      <td colspan=\"2\" class=\"headerMenu\">" . $display["menu"] ."
-      </td>
-    <!-- Fin zone Menu -->
-    </tr>
-    </table>
-  </td>
-</tr>
-</table>
-<p>
-</p>" . $display["action"];
+" . $display["action"];
 
   return $block;
 }
@@ -260,40 +237,29 @@ function display_menus($section) {
     $ftext = true;
   else $ftext = false;
 
-  $block = "
-    <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
-      <tr>
-    ";
-  if (is_array($menus[$section])) {
-    foreach ($menus[$section] as $key => $value) {
-      if (($key != "Name" && $key != "Url" && $key != "Right") 
-          && 
-         (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"])) {
-	if ($fico) {
-	  $ico = $value["Ico"];
-	  if ($ico)
-	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/$ico\" alt=\"\" /></a>";
-	  else
-	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/puce.gif\" alt=\"\" /></a>";
-	}
-
-	if ($ftext) {
-	  $dis_text = "<a class=\"menus\" href=\"".$value["Url"]."\">".$value["Name"]."</a>";
-	}
-
-        $block .= "
-          <td>&nbsp;&nbsp;</td>
-          <td class=\"menusLabel\">&nbsp; $dis_ico $dis_text
-          </td>
-        ";
+  if(is_array($menus[$section]))
+    {
+    $block .= "<ul class='menu'>\n";
+    foreach($menus[$section] as $key => $value)
+      {
+      if(($key != "Name" && $key != "Url" && $key != "Right") && (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]))
+        {
+        $block .= "<li>";
+          if ($fico)
+          {
+           $ico = $value["Ico"];
+           if ($ico)
+             {
+             $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='".$value["Name"]."' /></a> ";
+             }
+          }
+	$block .= "<a href='".$value["Url"]."'>";
+	if($ftext)	$block .= $value["Name"];
+        $block .= "</a></li>\n";
+        }
       }
-    }
-  }
-  $block .= "
-          <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td class=\"menusText\"></td>
-        </tr>  
-      </table>";
+    $block .= "</ul>";
+   }
 
   return $block;
 }
@@ -307,90 +273,17 @@ function display_menus($section) {
 function display_sections($section) {
   global $menus, $auth, $perm;
   global $perm_admin;
-
-  $ret = "
-        <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
-        <tr>
-          ";
+  
+  $ret = "<div class='section'>\n";
   foreach ($menus as $key => $value) {
     if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
-      if ($key == $section) {
-        $ret .= "<td>" . display_active_tab($value) . "</td>";
-      } else {
-        $ret .= "<td>" . display_inactive_tab($value) . "</td>";
-      }
+      if ($key == $section)     $ret .= "<p class='actif'>".$value["Name"]."</p>\n";
+      else      $ret .= "<p class='inactif'><a href='".$value["Url"]."'>".$value["Name"]."</a></p>\n";
     }
   }
-  $ret .= "
-        <!-- Remplissage apres tabs -->
-	  <td class=\"sectionsfilling\">
-          <table cellpadding=\"0\" cellspacing=\"0\" class=\"sectionsfilling\">
-          <tr>
-            <td></td>
-	  </tr><tr>
-            <td class=\"sectionsLine\"></td>  
-          </tr>	 
-          </table>
-        </td>
-      </tr>
-      </table>
-";
-
+  $ret .= "</div>";
+                                                                                                                                                           
   return $ret;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the active tab display
-// Parameters:
-//   - $tab : selected menu
-///////////////////////////////////////////////////////////////////////////////
-function display_active_tab($tab) {
-  global $set_theme;
-
-  $block = "
-    <table cellpadding=\"0\" cellspacing=\"0\" class=\"sections\">
-      <tr>
-        <td><img src=\"/images/$set_theme/tab_actif_hg.gif\" alt=\"\" /></td>
-        <td><img src=\"/images/$set_theme/tab_actif_h.gif\" alt=\"\" /></td>
-        <td><img src=\"/images/$set_theme/tab_actif_hd.gif\" alt=\"\" /></td>
-      </tr><tr>
-        <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_g.gif\" alt=\"\" /></td>  
-        <td class=\"sectionsActifLabel\">".$tab["Name"]."</td>
-        <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_d.gif\" alt=\"\" /></td>  
-      </tr>	 
-    </table>	 
-";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the active tab display
-// Parameters:
-//   - $tab : selected menu
-///////////////////////////////////////////////////////////////////////////////
-function display_inactive_tab($tab) {
-  global $set_theme;
-
-  $block = "
-    <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
-      <tr>
-        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hg.gif\" alt=\"\" /></td>
-        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_h.gif\" alt=\"\" /></td>
-        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hd.gif\" alt=\"\" /></td>
-      </tr><tr>
-        <td rowspan=\"2\"><img src=\"/images/$set_theme/tab_inactif_g.gif\" alt=\"\" /></td>
-        <td class=\"sectionsInactifLabel\"><a class=\"sections\" href=\"".$tab["Url"]."\">".$tab["Name"]."</a></td>
-        <td rowspan=\"2\"><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_d.gif\" alt=\"\" /></td>
-      </tr><tr>
-        <td class=\"sectionsLine\"></td>
-      </tr>  
-    </table>
-";
-
-  return $block;
 }
 
 

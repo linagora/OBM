@@ -110,6 +110,7 @@ function html_account_search_form ($p_action, $account) {
     <input name=\"action\" type=\"hidden\" value=\"search\" />
     <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
    </div>
+  <div class='searchEnd'></div>
   </div>
   </form>";
   return $block;
