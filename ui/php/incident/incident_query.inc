@@ -24,7 +24,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $lcontract = $incident["lcontract"];
   $company = $incident["company"];
   $priority = $incident["priority"];
-  $param_contract =  $incident["contract_id"];
+  $contract_id =  $incident["contract_id"];
   $owner = $incident["owner"];
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
@@ -44,9 +44,6 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   if (($priority != $c_all) && ($priority != "")) { 
      $where .= " and Incident.incident_priority_id = '$priority'";
   }
-  if ($param_contract != "") {
-     $where .= " and Contract.contract_id = '$param_contract'";
-  }
   if ($owner != $c_all && ($owner != "")) {
      $where .=" and (Incident.incident_owner = '$owner') ";
   }
@@ -56,11 +53,17 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   if ($datebefore !="") {
      $where .=" and (Incident.incident_date <= '$datebefore') ";
   }
-  if ($company != "") {
-     $where .= " and Company.company_name $like '$company%'";
+  if ($contract_id != "") {
+     $where .= " and incident_contract_id = '$contract_id'";
   }
   if ($lcontract != "") {
-     $where .= " and Contract.contract_label $like '$lcontract%'";
+     $where .= " and contract_label $like '$lcontract%'";
+     $join_contr = "left join Contract on incident_contract_id=contract_id";
+  }
+  if ($company != "") {
+     $where .= " and company_name $like '$company%'";
+     $join_contr = "left join Contract on incident_contract_id=contract_id";
+     $join_comp = "left join Company on contract_company_id=company_id";
   }
   if (($status != $c_all) && ($status != "")) { 
      $where .= " and Incident.incident_status_id = '$status'";
@@ -108,15 +111,11 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 ";
 
   if ($ctu_sql_limit) {
-    $cq = "select count(*)
-      from Incident
-         left join Contract on incident_contract_id=contract_id
-         left join Company on contract_company_id=company_id
-      $whereq";
+    $cq = "select count(*) from Incident $join_contr $join_comp $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }
-  if (($count > 0)  || (! $ctu_sql_limit)) {
+  if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg($req, $cdg_sql);
     $obm_q->query($req);
   }
@@ -274,7 +273,7 @@ function run_query_insert($incident) {
   $subject = "$l_mail_incident_new_subject : $lincident";
   $message = "$cgp_host/incident/incident_index.php?action=detailconsult&amp;param_incident=$i_id";
 
-  send_mail($subject, $message, array($logger, $owner), "pierre.baudracco@aliacom.fr", 1);
+  send_mail($subject, $message, array($logger, $owner), array("pierre.baudracco@aliacom.fr"), 1);
 
   return $i_id;
 }

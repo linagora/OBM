@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obminta/";
+$cgp_host = "http://obmintra/";
 
 // Use specific site includes
 //$cgp_site_include = true;

@@ -63,10 +63,11 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
     $where .= " and company_name $like '$company%'";
+    $join_comp = "left join Company on contact_company_id=company_id";
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
-    $where .= " and company_id='$company_id'";
+    $where .= " and contact_company_id='$company_id'";
   }
   // If a post code has been specified, get it 
   if ($zip != "") {
@@ -158,7 +159,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Contact $join_cat1 $join_cat2 $whereq");
+    $count = get_query_count("select count(*) from Contact $join_comp $join_cat1 $join_cat2 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 

@@ -43,11 +43,12 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if ($p_num != "")
     $where .= " and (contract_number $like '%$p_num%')";
   
-  if ($comp != "")
+  if ($comp != "") {
     $where .= " and (company_name $like '$comp%')";
-
+    $join_comp = "left join Company on contract_company_id=company_id";
+  }
   if ($company_id != "")
-    $where .= " and company_id = '$company_id'";
+    $where .= " and contract_company_id = '$company_id'";
 
   if ($p_dateafter != "")
     $where .= " and (contract_dateexp >= '$p_dateafter')";
@@ -109,10 +110,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 ";
 
   if ($ctu_sql_limit) {
-    $cq = "select count(*)
-      from Contract
-           left join Company on contract_company_id=company_id
-      $whereq";
+    $cq = "select count(*) from Contract $join_comp $whereq";
     $count = get_query_count($cq);
     $obm_q->set_num_rows_total($count);
   }

@@ -47,6 +47,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 
   if ($company_name != "") {
     $where .= " and company_name $like '$company_name%'";
+    $join_comp = "left join Company on project_company_id=company_id";
   }
 
   if ($deal) {
@@ -106,7 +107,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
  ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Project $whereq");
+    $count = get_query_count("select count(*) from Project $join_comp $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {

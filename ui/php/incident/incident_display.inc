@@ -183,7 +183,7 @@ function dis_incident_search_list($incident) {
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "incident");
   $obm_q = run_query_search($incident, $new_order, $order_dir);
-  $nb_incident = $obm_q->num_rows();
+  $nb_incident = $obm_q->num_rows_total();
   if ($nb_incident == 0) {
     $display["msg"] = display_info_msg($l_no_found);
   } else {

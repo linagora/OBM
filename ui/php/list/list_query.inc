@@ -37,6 +37,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   }
   if ($contact != '') {
     $where .= " and contact_lastname $like '$contact%'";
+    $join_con = "LEFT JOIN ContactList ON list_id=contactlist_list_id
+    LEFT JOIN Contact ON contactlist_contact_id=contact_id";
   }
   if ($email != '') {
     $where .= " and list_email $like '%$email%'";
@@ -57,8 +59,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     $timeupdate,
     A.userobm_login as usercreate,
     B.userobm_login as userupdate
-  from 
-    (List LEFT JOIN ContactList ON list_id=contactlist_list_id)
+  from List
+    LEFT JOIN ContactList ON list_id=contactlist_list_id
     LEFT JOIN Contact ON ContactList.contactlist_contact_id=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
@@ -67,7 +69,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from List $whereq");
+    $count = get_query_count("select count(*) from List $join_con $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {

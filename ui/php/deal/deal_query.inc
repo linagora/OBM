@@ -55,14 +55,16 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $join_cat = "LEFT JOIN DealCategoryLink on deal_id=dealcategorylink_deal_id";
     $where .= " and dealcategorylink_category_id='$cat'";
   }
+  if ($company_id != "") {
+    $where .= " and deal_company_id='$company_id'";
+  }
   if ($name != "") {
     $where .= " and company_name $like '$name%'";
+    $join_comp = "left join Company on deal_company_id=company_id";
   }
   if ($zip != "") {
     $where .= " and company_zipcode $like '$zip%'";
-  }
-  if ($company_id != "") {
-    $where .= " and company_id='$company_id'";
+    $join_comp = "left join Company on deal_company_id=company_id";
   }
   if (($state != $c_all) && ($state != "")) {
     $where .= " and dealstatus_id='$state'";
@@ -75,9 +77,6 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   }
   if ($archive != "1") {
     $where .= " and deal_archive=0";
-  }
-  if ($param_company != "") {
-    $where .= " and deal_company_id='$param_company'";
   }
   if (($manager != $c_all) && ($manager != "")) {
     $where .= " and (deal_technicalmanager_id='$manager'
@@ -130,7 +129,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Deal $whereq");
+    $count = get_query_count("select count(*) from Deal $join_comp $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {

@@ -59,14 +59,16 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   if (($inout != "") && ($inout != "$c_all")){
     $where .= " and invoice_inout = '$inout'";
   }
-  if ($company != "") {
-    $where .= " and company_name $like '$company%'";
-  }
   if ($comp_id != "") {
     $where .= " and invoice_company_id = '$comp_id'";
   }
+  if ($company != "") {
+    $where .= " and company_name $like '$company%'";
+    $join_comp = "left join Company on invoice_company_id=company_id";
+  }
   if ($deal != "") {
     $where .= " and deal_label $like '$deal%'";
+    $join_deal = "left join Deal on invoice_deal_id=deal_id";
   }
   if ($deal_id != "") {
     $where .= " and invoice_deal_id = '$deal_id'";
@@ -101,17 +103,17 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Invoice $whereq");
+    $count = get_query_count("select count(*) from Invoice $join_comp $join_deal $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
-  if (($count > 0)  || (! $ctu_sql_limit)) {
+  if (($count > 0) || (! $ctu_sql_limit)) {
     display_debug_msg ($query, $cdg_sql, "run_query_search()"); 
     $obm_q->query($query);
   }
 
   return $obm_q;
-} 
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
