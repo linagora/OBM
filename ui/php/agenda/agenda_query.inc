@@ -739,10 +739,14 @@ function run_query_userobm_readable() {
 // Get the list of calendar group for the current user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_group() {
-  global $cdg_sql, $auth;
+  global $cdg_sql, $auth, $cagenda_public_groups;
 
   $uid = $auth->auth["uid"];
   $where = sql_obm_entity_privacy("group");
+  if (! $cagenda_public_groups) {
+    $where .= " and group_privacy=1";
+  }
+
   $query = "
     SELECT group_id, group_privacy, group_name
     FROM UGroup

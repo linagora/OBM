@@ -19,7 +19,7 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://jaguar/";
+$cgp_host = "http://obm-panthere/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
@@ -46,7 +46,7 @@ $cgp_mail_enabled = true;
 $cs_lifetime = 0;
 
 // Use Database sessions
-$cgp_sess_db = true;
+//$cgp_sess_db = true;
 
 // authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 //$auth_kind="CAS";
@@ -65,19 +65,25 @@ $password_encryption = "md5";
 // Generic E-mail for Incident module
 //$cmail_incident = "support@mydomain";
 
-// is mailing enabled by default for a new contact
+// Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
 
-// is a new contact private by default
+// Contact : is a new contact private by default
 $ccontact_private_default = true;
 
-// Root of the document repository
+// Document : Root of the document repository
 $document_path = "/var/www/obmdocuments";
 $default_path = "/Default";                  // Default directory
 
-// Auto format fields
+// Company : Auto format fields
 $caf_company_name = true;
 $caf_town = true;
+
+// Calendar : show public groups
+$cagenda_public_groups = true;
+
+// Group : is a new group private by default
+$cgroup_private_default = true;
 
 //----------------------//
 // Profiles definitions //

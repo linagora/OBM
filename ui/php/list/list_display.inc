@@ -48,7 +48,7 @@ $fieldnames["publication_title"] = $l_publication." ".$l_title;
 $fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display List specific dataset fields                                      //
+// Display List specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -263,6 +263,30 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     } else {
       if ($OD->data_set->f("company_country") != "") {
 	$res["name"] .= $OD->data_set->f("company_country");
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_phone") {
+    // If a contact phone is present we get it
+    if ($OD->data_set->f("contact_phone") != "") {
+      $res["name"] .= $OD->data_set->f("contact_phone");
+      // else we get the contact Company phone
+    } else {
+      if ($OD->data_set->f("company_phone") != "") {
+	$res["name"] .= "(".$OD->data_set->f("company_phone").")";
+      }
+    }
+  }
+
+  else if ($fieldname == "contact_fax") {
+    // If a contact fax is present we get it
+    if ($OD->data_set->f("contact_fax") != "") {
+      $res["name"] .= $OD->data_set->f("contact_fax");
+      // else we get the contact Company fax
+    } else {
+      if ($OD->data_set->f("company_fax") != "") {
+	$res["name"] .= "(".$OD->data_set->f("company_fax").")";
       }
     }
   }
@@ -523,16 +547,17 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   }
 
   if ($query != "") {
-    $query_nb = get_list_query_num_rows($query);
+    $query_nb = get_list_query_num_rows($query, $list_q);
     if ($query_nb >= 0) {
       run_query_update_num_rows($id, $query_nb);
     } else {
       $query_nb = $l_invalid_query;
     }
+
     // Company query nb
     $comp_query_nb = get_list_dynamic_company_nb($query);
 
-    // Contact query nb (= query_nb if no supplement info needed as pub)
+    // Contact query nb (= query_nb if no supplement info needed as publi)
     if ($dis_info_pub == $l_yes) {
       $con_query_nb = get_list_dynamic_contact_nb($query);
     } else {
@@ -542,7 +567,10 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $query_nb = "0";
     $comp_query_nb = "0";
   }
+
+
   $comp_static_nb = get_list_static_company_nb($id);
+
   // If no search criteria, we display the query (empty or manual)
   if ($criteria == "") {
     $d_query = nl2br($query);

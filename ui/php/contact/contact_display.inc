@@ -1569,7 +1569,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
 
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
-       ( (($action=="detailupdate") || ($action=="update")) &&
+       ( (($action == "detailupdate") || ($action == "update")) &&
          ($usercreate == $auth->auth["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";

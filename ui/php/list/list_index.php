@@ -120,6 +120,10 @@ else if ($action == "new_criterion") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
     $list["query"] = make_query_from_criteria($list);
+  } else {
+    // To change : we do not know if expert mode (query should be stripslashed)
+    // or no more graphical criteria (query should be set to empty)
+    $list["query"] = stripslashes($list["query"]);
   }
   if (check_data_form("", $list)) {
     // If the context (same list) was confirmed ok, we proceed
@@ -158,6 +162,10 @@ else if ($action == "new_criterion") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($list["criteria"] != "") {
     $list["query"] = make_query_from_criteria($list);
+  } else {
+    // To change : we do not know if expert mode (query should be stripslashed)
+    // or no more graphical criteria (query should be set to empty)
+    $list["query"] = stripslashes($list["query"]);
   }
   if (check_data_form($list["id"], $list)) {
     $retour = run_query_update($list);

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : project_display.inc                                          //
 //     - Desc : Project Display File                                         //
-// 2003-07-08 Bastien Continsouzas                                           //
+// 2003-07-08 Aliacom                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ $fieldnames["project_archive"] = $l_archive_first;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display project specific dataset fields                                   //
+// Display project specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -69,7 +69,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Project detail page                                               //
+// Display Project detail page
 // Parameters:
 //   - $pid : project id
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ function dis_project_consult($pid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Project search Form                                               //
+// Display Project search Form
 // Parameters:
 //   - $project[] : default form values
 //     keys used  : name, company_name, tt, manager, member,
@@ -110,7 +110,7 @@ function dis_project_search_form($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Html Project search Form                                          //
+// Display Html Project search Form
 // Parameters:
 //   - $tt_q      : database object with tasktype list
 //   - $manager_q : database object with project manager list
@@ -245,7 +245,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Project search result                                         //
+// Display the Project search result
 // Parameters:
 //   - $project[] : project search criteria
 //     keys used  : 
@@ -833,7 +833,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display New Project Form                                                  //
+// Display Project Form
 // Parameters:
 //   - $action    : 
 //   - $project_q : database object with project infos
@@ -1098,7 +1098,7 @@ function dis_check_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Displays the delete form (button)                                         //
+// Displays the delete form (button)
 // Parameters:
 //   - $p_id : project Id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1118,7 +1118,7 @@ function dis_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Task Add Form                                                     //
+// Display Task Add Form
 // Parameters:
 //   - $ptask_q   : database object with project tasks list
 //   - $project[] : default form values
@@ -1270,7 +1270,7 @@ function html_project_task_form($ptask_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Project Tasklist                                             //
+// HTML Display Project Tasklist
 // Parameters :
 //   - $tasks_q     : DBO : list of tasks related to the deal
 //   - $project[]   : project search criteria
@@ -1343,7 +1343,7 @@ function html_project_tasklist($tasks_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Project Member List                                          //
+// HTML Display Project Member List
 // Parameters :
 //   - $tasks_q     : DBO : list of tasks related to the deal
 //   - $members_q   : DBO : list of members
@@ -1437,7 +1437,7 @@ function html_project_member_form($members_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Project Member Time List                                     //
+// HTML Display Project Member Time List
 // Parameters :
 //   - $tasks_q     : DBO : list of tasks related to the deal
 //   - $members_q   : DBO : list of members

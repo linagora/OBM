@@ -312,7 +312,8 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group) {
-  global $l_group, $l_name, $l_desc, $l_email, $l_private, $l_insert, $l_update, $l_back;
+  global $cgroup_private_default, $l_group, $l_name, $l_desc, $l_email;
+  global $l_private, $l_insert, $l_update, $l_back;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -322,21 +323,22 @@ function html_group_form($action, $group_q, $group) {
     $desc = $group_q->f("group_desc");
     $email = $group_q->f("group_email");
     $priv = $group_q->f("group_privacy");
-  } else {
-    // Values are taken from parameters
-    $id = $group["id"];
-    $name = stripslashes($group["name"]);
-    $desc = stripslashes($group["desc"]);
-    $email = stripslashes($group["email"]);
-    $priv = stripslashes($group["priv"]);
+  } elseif ($action == "new") {
+    if ($cgroup_private_default) {
+      $private_c = " checked";
+    }
   }
 
-  //  $mail = get_mail_info();
-  //  $main_domain = $mail["main_domain"];
+  // If parameters have been given, they supercede the default action value
+  if (isset($group["id"])) { $id = $group["id"]; }
+  if (isset($group["name"])) { $name = stripslashes($group["name"]); }
+  if (isset($group["desc"])) { $desc = stripslashes($group["desc"]); }
+  if (isset($group["email"])) { $email = stripslashes($group["email"]); }
+  if (isset($group["priv"])) { $priv = stripslashes($group["priv"]); }
 
   // If new group or group update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
-       ( (($action=="detailupdate") || ($action=="update")) &&
+       ( (($action == "detailupdate") || ($action == "update")) &&
          ($usercreate == $auth->auth["uid"]) ) ) {
     if ($priv == '1') {
       $private_c = " checked";
