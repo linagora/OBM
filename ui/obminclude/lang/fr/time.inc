@@ -44,7 +44,7 @@ $l_validate_task = "Validée";
 $l_valid = "Valider";
 $l_add = "Ajouter";
 $l_update = "Modifier";
-
+$l_fill= "compléter";
 
 //------------------------------------//
 // Fields that appear in result lists //
