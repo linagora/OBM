@@ -32,6 +32,7 @@ $l_sample_file = "Vérifier avec fichier exemple";
 $l_conflict = "Conflit";
 $l_nb_insert = "insertions";
 $l_nb_update = "mises à jour";
+$l_mailing_ok_msg = "'X', '1', 'Y' pour mailing activé";
 
 // Actions
 $l_insert = "Enregistrer l'import";

@@ -564,7 +564,7 @@ function get_publication_action() {
 // Delete
   $actions["PUBLICATION"]["delete_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=delete_subscription",
-    'Right'    => $cright_write_admin,
+    'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 

@@ -109,7 +109,10 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
   else if (($fieldname == "company_new_contact") && $link_ok){
     $res["align"] = "center";
-    $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id");
+    $market = $OD->data_set->f("company_marketingmanager_id");
+    $email = $OD->data_set->f("company_email");
+    $ctry = $OD->data_set->f("company_country_iso3166");
+    $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id")."&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email";
     $res["name"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
     $res["txt_name"] = " ";
   }
@@ -179,7 +182,7 @@ function dis_company_search_form($company="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Company search Form
 // Parameters:
 //   - $kind_q    : database object with kind list
 //   - $cats      : array of company categories
@@ -460,8 +463,10 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
+  $dateafter = stripslashes($company["dateafter"]);
+  $datebefore = stripslashes($company["datebefore"]);
 
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_cat=$cat&amp;sel_act=$act&amp;sel_naf=$naf&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore$url_ext");
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {

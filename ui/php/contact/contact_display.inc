@@ -29,6 +29,7 @@ $fieldnames["contact_address"] = $l_address;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
 $fieldnames["contact_mobilephone"] = $l_mphone;
+$fieldnames["contact_fax"] = $l_fax;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["contact_archive"] = $l_archive_first;
 // Calculated fields

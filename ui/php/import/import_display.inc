@@ -190,8 +190,8 @@ function html_import_consult($import_q) {
   global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal, $l_lang;
-  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_expresspostal, $l_lang, $l_country;
+  global $l_phone, $l_fax, $l_web, $l_email, $l_mailing_ok, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $display;
@@ -857,8 +857,8 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
   global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
-  global $l_expresspostal, $l_lang;
-  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_expresspostal, $l_lang, $l_country, $l_mailing_ok_msg;
+  global $l_phone, $l_fax, $l_web, $l_email, $l_mailing_ok, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
 
   // if update mode and first time, values are taken from db
@@ -1173,6 +1173,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
     <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_con_mail_d\" value=\"$con_mail_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_con_mailok\" value=\"$con_mailok\" /></td>
+    <td class=\"detailLabel\">$l_mailing_ok</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_con_mailok_d\" maxlength=\"1\" value=\"$con_mailok_d\" /> $l_mailing_ok_msg</td>
   </tr>
   <tr>
     <td class=\"detailForm\">

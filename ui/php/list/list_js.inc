@@ -392,10 +392,10 @@ function contact_criterion(form,labels,values,i) {
   return i;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Perform the Publication Criteria's insertion                              //
 ///////////////////////////////////////////////////////////////////////////////
-
 function publication_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
@@ -413,7 +413,6 @@ function publication_criterion(form,labels,values,i) {
   }  
 
 
-  
   if(form.tf_publication_lang.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_lang';      
@@ -466,14 +465,16 @@ function publication_criterion(form,labels,values,i) {
 ///////////////////////////////////////////////////////////////////////////////
 // Show the manual query field
 ///////////////////////////////////////////////////////////////////////////////
-function show_query_field(value1,value2,field) {
-  ta_display = document.getElementById('ta_query').style.display;
-  di_display = document.getElementById('di_query').style.display;
+function show_query_field(value_exp, value_nor, field) {
+  ta = document.getElementById('ta_query');
+  di = document.getElementById('di_query');
+  ta_display = ta.style.display;
+  di_display = di.style.display;
 
   exp_to_nor = '$l_warning_exp_to_nor';
   nor_to_exp = '$l_warning_nor_to_exp';
 
-  if (value2 == 'none') {
+  if (value_nor == 'none') {
     txt = nor_to_exp;
   } else {
     txt = exp_to_nor;
@@ -482,6 +483,12 @@ function show_query_field(value1,value2,field) {
   if (ta_display != di_display && !confirm(txt)) {
     return false;
   }
+
+  // We delete the query
+  if (value_exp == 'none') {
+    ta.value = '';
+  }
+
   if (W3C) {
     table = document.getElementById('list_criterion');
   } else if (NS4) {
@@ -489,15 +496,16 @@ function show_query_field(value1,value2,field) {
   } else {
     table = document.all['list_criterion'];
   }
+
   if (W3C) {
-    document.getElementById('ta_query').style.display = value1;
-    document.getElementById('di_query').style.display = value2;
+    ta.style.display = value_exp;
+    di.style.display = value_nor;
   } else if (NS4) {
-    document.layers['ta_query'].display = value1;
-    document.getElementById('di_query').style.display = value2;
+    document.layers['ta_query'].display = value_exp;
+    di.style.display = value_nor;
   } else {
-    document.all['ta_query'].style.display = value1;
-    document.getElementById('di_query').style.display = value2;
+    document.all['ta_query'].style.display = value_exp;
+    di.style.display = value_nor;
   }  
   len = table.rows.length
   for(i=0;i<len;i++) 

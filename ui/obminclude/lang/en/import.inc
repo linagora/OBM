@@ -32,6 +32,7 @@ $l_sample_file = "Sample file to check";
 $l_conflict = "Conflict";
 $l_nb_insert = "inserts";
 $l_nb_update = "updates";
+$l_mailing_ok_msg = "'X', '1', 'Y' to enable mailing";
 
 // Actions
 $l_insert = "Insert the import";

@@ -294,6 +294,8 @@ function get_import_desc($import) {
   $desc .= '\$con_fax_d="'.$import["con_fax_d"] . '";';
   $desc .= '\$con_mail="'.$import["con_mail"] . '";';
   $desc .= '\$con_mail_d="'.$import["con_mail_d"] . '";';
+  $desc .= '\$con_mailok="'.$import["con_mailok"] . '";';
+  $desc .= '\$con_mailok_d="'.$import["con_mailok_d"] . '";';
   $desc .= '\$con_com="'.$import["con_com"] . '";';
   $desc .= '\$con_com_d="'.$import["con_com_d"] . '";';
 
@@ -391,6 +393,9 @@ function get_import_desc($import) {
   $desc .= '\$con["con_mail"]["value"] ="'.$import["con_mail"] . '";';
   $desc .= '\$con["con_mail"]["label"] ="l_email";';
   $desc .= '\$con["con_mail"]["default"]="'.$import["con_mail_d"] . '";';
+  $desc .= '\$con["con_mailok"]["value"] ="'.$import["con_mailok"] . '";';
+  $desc .= '\$con["con_mailok"]["label"] ="l_mailing_ok";';
+  $desc .= '\$con["con_mailok"]["default"]="'.$import["con_mailok_d"] . '";';
   $desc .= '\$con["con_com"]["value"] ="'.$import["con_com"] . '";';
   $desc .= '\$con["con_com"]["label"] ="l_comment";';
   $desc .= '\$con["con_com"]["default"]="'.$import["con_com_d"] . '";';
@@ -424,7 +429,8 @@ function get_param_import() {
   global $tf_con_ctry, $tf_con_ctry_d;
   global $tf_con_pho, $tf_con_pho_d, $tf_con_hpho, $tf_con_hpho_d;
   global $tf_con_mpho, $tf_con_mpho_d, $tf_con_fax, $tf_con_fax_d;
-  global $tf_con_mail, $tf_con_mail_d, $tf_con_com, $tf_con_com_d;
+  global $tf_con_mail, $tf_con_mail_d, $tf_con_mailok, $tf_con_mailok_d;
+  global $tf_con_com, $tf_con_com_d;
   global $sample_file, $sample_file_name, $sample_file_size;
   global $test_file, $test_file_name, $test_file_size;
   global $import_file, $import_file_name, $import_file_size, $file_saved;
@@ -507,6 +513,8 @@ function get_param_import() {
   if (isset ($tf_con_fax_d)) $import["con_fax_d"] = trim($tf_con_fax_d);
   if (isset ($tf_con_mail)) $import["con_mail"] = trim($tf_con_mail);
   if (isset ($tf_con_mail_d)) $import["con_mail_d"] = trim($tf_con_mail_d);
+  if (isset ($tf_con_mailok)) $import["con_mailok"] = trim($tf_con_mailok);
+  if (isset ($tf_con_mailok_d)) $import["con_mailok_d"] = trim($tf_con_mailok_d);
   if (isset ($tf_con_com)) $import["con_com"] = trim($tf_con_com);
   if (isset ($tf_con_com_d)) $import["con_com_d"] = trim($tf_con_com_d);
 

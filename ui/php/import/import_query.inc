@@ -797,6 +797,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
+  $mailoks = array("X",'x','1',"1","Y","y");
 
   // Set default values when needed
   if (is_array($defaults)) {
@@ -836,7 +837,7 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $mphone = $fields["con_mpho"];
   $fax = $fields["con_fax"];
   $email = $fields["con_mail"];
-  $mailok = "0";
+  $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
   $priv = '0';
@@ -923,6 +924,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   global $auth, $cdg_sql;
 
   $uid = $auth->auth["uid"];
+  $mailoks = array("X",'x','1',"1","Y","y");
 
   // Set default values when needed
   if (is_array($defaults)) {
@@ -961,7 +963,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
   $mphone = $fields["con_mpho"];
   $fax = $fields["con_fax"];
   $email = $fields["con_mail"];
-  $mailok = "0";
+  $mailok = (in_array($fields["con_mailok"], $mailoks) ? '1' : '0');
   $com = addslashes($fields["con_com"]);
   $arch = '0';
   $priv = '0';
@@ -1048,7 +1050,7 @@ function get_import_kind_hash() {
   $kind_q = run_query_kind();
 
   while ($kind_q->next_record()) {
-    $lang = $kind_q->f("kind_lang");
+    $lang = strtoupper($kind_q->f("kind_lang"));
     $id = $kind_q->f("kind_id");
     if (! isset($kinds[$lang])) {
       $kinds[$lang] = $id;
