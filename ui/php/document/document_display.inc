@@ -541,12 +541,7 @@ function html_document_consult($doc_q) {
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
 
   // --- HTML Template --------------------------------------------------------
-  if(islink($name)) {
-    $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$link_to$title&amp;popup=1";
-  }
-  else {
     $url = "document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1";
-  }
   $block = "
     <div class=\"detailHead\">$l_document</div>
 
