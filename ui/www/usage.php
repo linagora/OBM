@@ -12,7 +12,9 @@
 
 <div class="center"> 
   <h1>OBM in use</h1>
-These entities have contributed, helped or are using OBM.
+Some examples of entities that have contributed, helped or are using OBM.
+If you are using OBM and want to be referenced here drop us a note.
+
   <p>
   <ul>
     <li>Pôle universitaire Léonard De Vinci
@@ -22,6 +24,7 @@ These entities have contributed, helped or are using OBM.
     <li><a href="http://www.aliacom.fr/"><img src="images/logo-aliacom.jpg"></a>
          Aliacom - gestion interne de la société
     <li>GMX
+    <li>SOPRA
     <li>...
   </ul>
   </p>
