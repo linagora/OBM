@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.6.4 - 2003-05-25<br>
+Version 0.6.6 - 2003-07-17<br>
 Pierre Baudracco
 </center>
 <p>
@@ -134,7 +134,7 @@ The <i>$action</i> variable dictates the module execution.
 </tr>
 </table>
 
-<H3>The module index file : module_index.php</H3>
+<h3>The module index file : module_index.php</h3>
 
 Each module index file must have an header, referencing all actions implemented, as described below :
 <p>
@@ -294,7 +294,7 @@ require("company_display.inc");
 
 <h3>Parameters handling</h3>
 
-No parameter should be uses "as is" or as passed.
+No parameter should be used "as is" or as passed.
 For each module the function <b>get_param_module()</b> is in charge of collecting the parameters and assigning these to the <b>$module</b> associative array which is then be used all over the module to get the values.
 <p>
 This allows to change easily forms widget names in the templates without numerous modifications on the code.
@@ -336,6 +336,103 @@ function get_param_company() {
 With php set to <b>magic_quotes_gpc = On</b>, parameters strings are automatically backslashed (quotes).
 <p>
 <b>All the variable formatting must be done here</b>, but there is an exception : some code parts used backslashed var form (ex: in queries) and other not (eg: when value must be displayed in a text field). So some "stripslashes()" calls will remains in module_display.inc functions.
+
+
+<h3>The module display file : module_display.inc</h3>
+
+<h4>Form data handling</h4>
+
+A generic module offers forms to create and update an entity.
+These forms are handled by a unique function (<b>html_module_form()</b>) which act depending on paratemers given.
+
+Depending on the action, default parameters can be set, but can be superceded if values are given.
+
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// Display Company Form                                                      //
+// Parameters:
+//   - $action    : action called
+//   - $co_q      : company database result 
+//   - $kind_q    : kind database result 
+//   - $usr_q     : userobm database result 
+//   - $company[] : default values
+//     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
+//                : ctry, phone, fax, web, email ,com
+///////////////////////////////////////////////////////////////////////////////
+function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
+  ....
+
+  // if update mode and first display values are taken from database
+  if ($action == "detailupdate") {
+    $id = $co_q->f("company_id");
+    $num = $co_q->f("company_number");
+    $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
+    $name = $co_q->f("company_name");
+    $kind = $co_q->f("company_type_id");
+    ....
+  }
+
+  // If parameters have been given, they supercede the default action value
+  if (isset($company["id"])) { $id = $company["id"]; }
+  if (isset($company["num"])) { $num = stripslashes($company["num"]); }
+  if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
+  if (isset($company["name"])) { $name = stripslashes($company["name"]); }
+  if (isset($company["kind"])) { $kind = $company["kind"]; }
+  ....
+
+</pre>
+</td></tr>
+</table>
+<p>
+
+<h4>HTML Templates</h4>
+
+For the moment OBM doesn't use any external template engine, but template principle must be followed.
+As far as possible, each display function should contain only one <b>echo</b> call. All data processing must be done before this call and stored in variables.
+
+Only simple $var must be used, so all the processing is done by PHP and the template handles only the display.
+<p>
+A future enhancement will be to export the HTML Template in externals files.  
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  ....
+  // kind select
+  $sel_kind = "&lt;select name=\"sel_kind\" id=\"sel_kind\">";
+  while($kind_q->next_record()) {
+    $k_id = $kind_q->f("companytype_id");
+    $sel_kind .= "\n&lt;option value=\"$k_id\"";
+    if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
+    $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
+  }
+  $sel_kind .= "&lt;/select>";
+
+  ....
+
+  // --- HTML Template --------------------------------------------------------
+  echo "
+    &lt;form method=\"post\" name=\"f_mod_societe\"
+      onsubmit=\"if (check_company(this)) return true; else return false;\"
+      action=\"".url_prepare("company_index.php")."\">
+    &lt;table class=\"details\">
+    &lt;tr>
+      &lt;td colspan=\"2\" class=\"detailHead\">$l_company&lt;/td>
+    &lt;/tr>&lt;tr>
+      &lt;td class=\"detailLabel\">$l_name&lt;/td>
+      &lt;td>&lt;input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" />&lt;/td>
+    &lt;/tr>&lt;tr>
+      &lt;td class=\"detailLabel\">$l_kind&lt;/td>
+      &lt;td>$sel_kind&lt;/td>
+    ....
+</pre>
+</td></tr>
+</table>
+<p>
+
 
 <h2>Functions</h2>
 

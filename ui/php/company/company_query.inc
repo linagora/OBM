@@ -295,11 +295,13 @@ function run_query_delete($p_id) {
 // Contact: Company select query execution                                   //
 // Returns : DB object result with all companies
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_company() {
+function run_query_active_company() {
   global $cdg_sql;
 
   $query = "select company_id, company_name, company_town
-            from Company order by company_name";
+            from Company
+            where company_archive='0'
+            order by company_name";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

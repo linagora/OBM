@@ -7,11 +7,11 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2, 0.6.3, 0.6.4, 0.6.5
+<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2, 0.6.3, 0.6.4, 0.6.5, 0.6.6
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
-<h1>Basic steps to build and install OBM 0.6.5</h1>
+<h1>Basic steps to build and install OBM 0.6.6</h1>
 
 <h2> Assumptions</h2>
 
@@ -34,24 +34,36 @@ And uncompress it in /var/www (or where your document root will be located).
 <tr>
   <td><pre>
 cd /var/www
-tar -xzvf obm-0.6.5.tar.gz
+tar -xzvf obm-0.6.6.tar.gz
 </pre>
   </td>
 </tr>
 </table>
 
 
-<h2>2: PHP command line configuration</h2>
+<h2>2: PHP (module and command line configuration)</h2>
 
 Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).
-So the command line PHP must be configured : file php.ini for php-cgi (on Debian : /etc/php4/cgi/php.ini).
+So the command line PHP must be configured : file php.ini for php-cgi (on Debian : /etc/php4/cgi/php.ini); /etc/php.ini on RedHat.
 <p />
-Only the include_path directive is needed.
+The include_path directive must be set :
 
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
 include_path = ".:/php/includes:/var/www/obm"
+</pre>
+  </td>
+</tr>
+</table>
+<p>
+
+The short_open_tag must be On :
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+short_open_tag = On
 </pre>
   </td>
 </tr>
@@ -77,7 +89,8 @@ Edit your httpd.conf or srm.conf file and add:
   </td>
 </tr>
 </table>
-
+<p>
+On RedHat 8 with apache2, chech that your /etc/httpd/conf.d/php.conf is correct
 
 <p />
 We set up a virtual host to handle one occurence of OBM (there can be several on one server).
@@ -103,7 +116,8 @@ load the env module
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-    LoadModule env_module /usr/lib/apache/1.3/mod_env.so
+    LoadModule env_module /usr/lib/apache/1.3/mod_env.so (apache 1.3 on Debian)
+    LoadModule env_module modules/mod_env.so (apache 2 on Redhat)
 </pre>
   </td>
 </tr>
@@ -468,6 +482,35 @@ mysql -u web -pweb obm < scripts/0.6/update-0.6.4-0.6.5.mysql.sql
   </td>
 </tr>
 </table>
+<br /><br />
+<a href="javascript:back();">back</a>
+
+
+<p />
+<a name="upgrade-0.6.6"><h1>UPGRADE OBM DATABASE 0.6.5 to 0.6.6</h1></a>
+<p />
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/update-0.6.5-0.6.6.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/obmdb_default_values_0.6.sql
+</pre>
+  </td>
+</tr>
+</table>
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
 <br /><br />
 <a href="javascript:back();">back</a>
 

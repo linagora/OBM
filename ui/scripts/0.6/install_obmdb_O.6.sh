@@ -7,10 +7,22 @@
 # $Id$ #
 ###############################################################################
 
-
 # Mysql User and Password var definition
-U=web
-P=web
+U=root
+P=""
+
+
+# We search for the PHP interpreter (different name on Debian, RedHat)
+PHP=`which php4 2> /dev/null`
+if [ $? != 0 ]; then
+  PHP=`which php 2> /dev/null`
+  if [ $? != 0 ]; then
+    echo "Can't find php interpreter"
+    exit
+  fi
+fi
+echo $PHP : PHP interpreter found
+
 
 # Database creation
 echo "Database creation"
@@ -30,8 +42,8 @@ mysql -u $U -p$P obm < obmdb_default_values_0.6.sql
 
 # Default preferences propagation on created users
 echo "Default preferences propagation on created users"
-php4 ../../php/admin_pref/admin_pref_index.php -a user_pref_update
+$PHP ../../php/admin_pref/admin_pref_index.php -a user_pref_update
 
 # Update calculated values
 echo "Update calculated values"
-php4 ../../php/admin_data/admin_data_index.php -a data_update
+$PHP ../../php/admin_data/admin_data_index.php -a data_update

@@ -74,11 +74,11 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
   if ($action == "ext_get_id") {
     require("company_js.inc");
-    $comp_q = run_query_company();
+    $comp_q = run_query_active_company();
     html_select_company($comp_q, $company["title"]);
   } elseif ($action == "ext_get_id_url") {
     require("company_js.inc");
-    $comp_q = run_query_company();
+    $comp_q = run_query_active_company();
     html_select_company($comp_q, $company["title"], $company["url"]);
   } else {
     display_err_msg($l_error_permission);

@@ -305,20 +305,6 @@ function run_query_contract_incident_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query   : company List         : Table Company                            //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company() {
-  global $cdg_sql;
-
-  $connect_db=new DB_OBM;
-  $query = "select company_id,company_name from Company order by company_name";
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query execution : Company info
 // Parameters:
 //   - $id : company Id
