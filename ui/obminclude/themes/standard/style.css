@@ -3,7 +3,7 @@
 /* //////////////////GLOBALS///////////////// */
 /* ///// Globals items style definition ///// */
 /* ////////////////////////////////////////// */
-body {
+body 			{
 	background-color: 	#d7dfe7;
 	color:			#000000;
         border:                 0px;
@@ -11,9 +11,9 @@ body {
         padding:                0px;
 }
 
-a:link { color: #000000; background-color: transparent;}
-a:active { color: #000000; background-color: transparent;}
-a:visited { color: #000000; background-color: transparent;}
+a:link 		{ color: #000000; background-color: transparent;}
+a:active 	{ color: #000000; background-color: transparent;}
+a:visited 	{ color: #000000; background-color: transparent;}
 
 td			{
 	margin:			0;
@@ -54,7 +54,7 @@ p			{
 	background-color:	transparent;	
 }
 
-.messageWarning	{
+.messageWarning		{
         margin-left:		auto;
 	margin-right:		auto;
 	font-family:		sans-serif;
@@ -222,7 +222,7 @@ td.menuBarText		{
 
 }
 
-img.menuBarIconG		{
+img.menuBarIconG	{
 	float:			right;
 	border:			0;
 	text-align:		right;
@@ -230,7 +230,7 @@ img.menuBarIconG		{
 	padding:		0;
 }
 
-img.menuBarIconD		{
+img.menuBarIconD	{
 	float:			left;
 	border:			0;
 	text-align:		left;
@@ -345,9 +345,9 @@ table.sectionsfilling	{
 		
 }
 
-a.sections:link { color: #d7d6e0; background-color: transparent;}
-a.sections:active { color: #d7d6e0; background-color: transparent;}
-a.sections:visited { color: #d7d6e0; background-color: transparent;}
+a.sections:link 	{ color: #d7d6e0; background-color: transparent;}
+a.sections:active	{ color: #d7d6e0; background-color: transparent;}
+a.sections:visited 	{ color: #d7d6e0; background-color: transparent;}
 
 /* //////////////////BOOKMARKS/////////////// */
 /* ///// Bokmarks item style definition ///// */
@@ -368,15 +368,15 @@ td.bookmarks		{
 	padding:		0;
 }
 
-a.bookmarks:link { color: #000000; background-color: transparent;}
-a.bookmarks:active { color: #000000; background-color: transparent;}
-a.bookmarks:visited { color: #000000; background-color: transparent;}
+a.bookmarks:link 	{ color: #000000; background-color: transparent;}
+a.bookmarks:active	{ color: #000000; background-color: transparent;}
+a.bookmarks:visited	{ color: #000000; background-color: transparent;}
 
 /* ////////////////OBM DISPLAY/////////////// */
 /* ////// Obm display style definition ////// */
 /* ////////////////////////////////////////// */
 
-table.OBMDisplayData		{
+table.OBMDisplayData	 {
         margin-left:		auto;
 	margin-right:		auto;
 	background-color:	#93919c;
@@ -385,7 +385,7 @@ table.OBMDisplayData		{
 	border:			0;
 }
 
-table.OBMDisplayPref		{
+table.OBMDisplayPref	 {
         margin-left:		auto;
 	margin-right:		auto;
 	background-color:	#93919c;
@@ -395,7 +395,7 @@ table.OBMDisplayPref		{
 
 }
 
-td.OBMDisplayHead		{
+td.OBMDisplayHead	 {
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
@@ -404,7 +404,7 @@ td.OBMDisplayHead		{
 	background-color:	#93919c;
 }
 
-td.OBMDisplayLabel		{
+td.OBMDisplayLabel	 {
 	font-family:		sans-serif;
 	font-size:		12px;
 	color:			#ffff00;
@@ -412,7 +412,7 @@ td.OBMDisplayLabel		{
 	background-color:	#93919c;
 }
 
-td.OBMDisplayText		{
+td.OBMDisplayText  	 {
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		left;
@@ -420,7 +420,7 @@ td.OBMDisplayText		{
 	background-color:	#ffffff;
 }
 
-td.OBMDisplayTextCentered	{
+td.OBMDisplayTextCentered{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		center;
@@ -428,12 +428,12 @@ td.OBMDisplayTextCentered	{
 	background-color:	#ffffff;
 }
 
-a.OBMDisplayHead:link { color: #ffff00; background-color: transparent;}
-a.OBMDisplayHead:active { color: #ffff00; background-color: transparent;}
+a.OBMDisplayHead:link	 { color: #ffff00; background-color: transparent;}
+a.OBMDisplayHead:active	 { color: #ffff00; background-color: transparent;}
 a.OBMDisplayHead:visited { color: #ffff00; background-color: transparent;}
 
-a.OBMDisplayText:link { color: #0ba589; background-color: transparent;}
-a.OBMDisplayText:active { color: #0ba589; background-color: transparent;}
+a.OBMDisplayText:link 	 { color: #0ba589; background-color: transparent;}
+a.OBMDisplayText:active  { color: #0ba589; background-color: transparent;}
 a.OBMDisplayText:visited { color: #0ba589; background-color: transparent;}
 
 /* //////////////////DETAILS///////////////// */
@@ -473,9 +473,9 @@ td.detailText		{
 	
 }
 
-a.details:link { color: #000000; background-color: transparent;}
-a.details:active { color: #000000; background-color: transparent;}
-a.details:visited { color: #000000; background-color: transparent;}
+a.details:link 		{ color: #000000; background-color: transparent;}
+a.details:active 	{ color: #000000; background-color: transparent;}
+a.details:visited 	{ color: #000000; background-color: transparent;}
 
 
 /* //////////////////DIVERS////////////////// */
@@ -496,7 +496,7 @@ td.recordInfo		{
 	background-color:	transparent;
 }
 
-td.textLabelForm		{
+td.textLabelForm	{
 	font-family:		sans-serif;
 	font-size:		10px;
 	color:			#000000;
@@ -535,6 +535,9 @@ td.adminLabel		{
 /* //////////////////AGENDA////////////////// */
 /* ////// Agenda table style definition ///// */
 /* ////////////////////////////////////////// */
+a.agendaHead:link 	{ color: #ffff00; background-color: transparent;}
+a.agendaHead:active 	{ color: #ffff00; background-color: transparent;}
+a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
 
 table.agenda		{
         margin-left:		auto;
@@ -545,13 +548,7 @@ table.agenda		{
 }
 
 
-td.agendaHead		{
-	font-family:		sans-serif;
-	color:			#ffff00;
-	background-color:	#93919c;
-}
-
-td.agendaText	{
+td.agendaText		{
 	font-family:		sans-serif;
 	font-size:		14px;
 	font-weight:		bold;
@@ -560,7 +557,7 @@ td.agendaText	{
 	background-color:	#ffffff;
 }
 
-td.agendaVide	{
+td.agendaVide		{
 	font-family:		sans-serif;
 	font-size:		14px;
 	font-weight:		bold;
@@ -569,8 +566,90 @@ td.agendaVide	{
 	background-color:	#bbbbbb;
 }
 
-a.agendaHead:link { color: #ffff00; background-color: transparent;}
-a.agendaHead:active { color: #ffff00; background-color: transparent;}
-a.agendaHead:visited { color: #ffff00; background-color: transparent;}
 
+table.agendaMain	{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			auto;
+	border:			0;
+	background-color:	transparent;
+	color:			#000000;
+}
+
+td.agendaHead		{
+	text-align:		center;
+	font-family:		sans-serif;
+	font-size:		18px;
+	color: 			#000000; 
+	vertical-align:		top;
+	white-space:		nowrap;	
+	background-image: 	url(time_bg.gif); 
+}
+
+
+.eventborder	{ background-color: #336699; border: 1px #006699 solid; }
+.eventbg 	{ background-color: #6699CC; }
+.eventbg2  	{ background-color: #6699CC; border-right: 1px solid #FFFFFF; }
+.eventbg2week 	{ background-color: #6699CC; border-right: 1px solid #A1A5A9; }
+.calborder 	{ background-color: #FFFFFF; border: 1px #A1A5A9 solid; }
+.dateback	{ background-color: #EEEEEE; }
+.dayborder 	{ border-top: 1px solid #A1A5A9; }
+.dayborder2 	{ border-top: 1px dashed #CCCCCC; }
+.weekborder 	{ border-top: 1px dashed #A1A5A9; border-right: 1px solid #A1A5A9; }
+.weekborder2 	{ border-right: 1px solid #A1A5A9; }
+.timeborder 	{ border-right: 2px solid #A1A5A9; border-top: 1px dashed #A1A5A9; background-image: url(time_bg.gif); }
+.timeborder2 	{ border-right: 2px solid #A1A5A9; border-top: 1px solid #A1A5A9; background-image: url(time_bg.gif); }
+.navback 	{ background-image: url(time_bg.gif); }
+.sideback 	{ background-image: url(side_bg.gif); }
+.monthback	{ background-color: #A1A5A9; }
+.monthreg	{ background-color: #FFFFFF; }
+.monthoff	{ background-color: #F2F2F2; }
+.monthon	{ background-color: #F2F9FF; }
+.montheventtop	{ background-image: url(side_bg.gif); border-top: 1px solid #A1A5A9; }
+.montheventline	{ border-right: 1px dotted #A1A5A9; }
+.yearmonth		{ background: #CCCCCC; }
+
+/* Link colors and attributes */
+/* This is the main link style */
+a.psf		{ text-decoration:	none; }
+a.psf:link	{ color: #0066FF; background-color: transparent; }
+a.psf:visited	{ color: #0066FF; background-color: transparent; }
+a.psf:active	{ color: #3366CC; background-color: transparent; }
+a.psf:hover	{ color: #000099; background-color: transparent; }
+
+/* This is the link style for the mini-cals */	
+a.ps2		{ text-decoration:	underline; }
+a.ps2:link	{ color: #0066FF; background-color: transparent; }
+a.ps2:visited	{ color: #0066FF; background-color: transparent; }
+a.ps2:active	{ color: #3366CC; background-color: transparent; }
+a.ps2:hover	{ color: #000099; background-color: transparent; }
+
+/* This is the link style for year months */	
+a.ps3		{ text-decoration:	none; }
+a.ps3:link	{ color: #000000; background-color: transparent; }
+a.ps3:visited	{ color: #000000; background-color: transparent; }
+a.ps3:active	{ color: #000000; background-color: transparent; }
+a.ps3:hover	{ color: #000000; background-color: transparent; text-decoration:underline;}
+	
+/* CSS definitions for fonts */
+.G10BOLD 		{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; font-weight: 900; }
+.G10G 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #A1A5A9; }
+
+.V9 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; color: #000000; }
+.V10W 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #FFFFFF; }
+.V10WB 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #FFFFFF; font-weight: 900; }
+.V9G 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; color: #666666; }
+.V10 			{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 10px; color: #000000; }
+.V9BOLD 		{ font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 9px; font-weight: 900; }
+.G10 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #0066FF; }
+.G10B 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #000000; }
+.V12 			{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px;  color: #000000; }
+.H20 			{ font-family: Helvetica, sans-serif; font-size: 18px; color: #000000; }
+.eventfont 		{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #FFFFFF; }
+
+
+/* Length of the form drop downs */
+
+.query_style 	{ font-size: 11px; font-family: verdana, geneva, arial, sans-serif; width: 156px; margin-bottom: 0; }
+.search_style 	{ font-size: 12px; font-family: verdana, geneva, arial, sans-serif; width: 134px; margin-bottom: 0; }
 

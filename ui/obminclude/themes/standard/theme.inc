@@ -62,30 +62,35 @@ $col_error="FF0000";    // Errors messages color (rouge)
 // Images //
 ////////////
 //$img_bg="bgvert.jpg";                  // Background Picture
-$ico_principal="aliacom.jpg";          // BIG LOG
-$ico_contact="contact.gif";            // Contact Icon
-$ico_obm="obm.jpg";                    // OBM icon
+$ico_principal		=	"aliacom.jpg";          // BIG LOG
+$ico_contact		=	"contact.gif";            // Contact Icon
+$ico_obm		=	"obm.jpg";                    // OBM icon
 
 // Menus Icons
-$ico_contact="ico_contact.gif";
-$ico_contact_list="ico_contact.gif";  // Contact List Icon
-$ico_contact_new="ico_contact_new.gif";    // New Contact Icon
-$ico_deal="ico_deal.gif";
-$ico_deal_list="ico_deal.gif";     // Contact List Icon
-$ico_deal_new="ico_deal_new.gif";       // New Contact Icon
-$ico_company="ico_company.gif";  // Company Icon
-$ico_change_company="ico_change_company.gif";       // Contract Icon
-$ico_contract="ico_deal.gif";
-$ico_web="ico_web.gif";                    // WWW Icon
-$ico_mail="ico_mail.gif";                  // Mail Icon
-$ico_arrow_up="arrow_up.gif";          // The up arrow
-$ico_arrow_down="arrow_down.gif";      // The down arrow
-$ico_crow = "crow-red.gif";
-$ico_ball = "ball-green.gif";
-$ico_back = "arrow_back.gif" ;
-$ico_forbidden = "forbidden.gif";
-$ico_warning = "warning.gif";
-$ico_new_event="new_event.gif";
+$ico_contact		=	"ico_contact.gif";
+$ico_contact_list	=	"ico_contact.gif";  // Contact List Icon
+$ico_contact_new	=	"ico_contact_new.gif";    // New Contact Icon
+$ico_deal		=	"ico_deal.gif";
+$ico_deal_list		=	"ico_deal.gif";     // Contact List Icon
+$ico_deal_new		=	"ico_deal_new.gif";       // New Contact Icon
+$ico_company		=	"ico_company.gif";  // Company Icon
+$ico_change_company	=	"ico_change_company.gif";       // Contract Icon
+$ico_contract		=	"ico_deal.gif";
+$ico_web		=	"ico_web.gif";                    // WWW Icon
+$ico_mail		=	"ico_mail.gif";                  // Mail Icon
+$ico_arrow_up		=	"arrow_up.gif";          // The up arrow
+$ico_arrow_down		=	"arrow_down.gif";      // The down arrow
+$ico_crow 		=	"crow-red.gif";
+$ico_ball 		= 	"ball-green.gif";
+$ico_back 		=	 "arrow_back.gif" ;
+$ico_forbidden 		=	 "forbidden.gif";
+$ico_warning 		=	 "warning.gif";
+
+//Agenda Icons
+$ico_new_event		=	"new_event.gif";
+$ico_left_day 		=	"left_day.gif";
+$ico_right_day 		=	"right_day.gif";
+$ico_spacer 		=	"spacer.gif";
 
 // Export icons
 $ico_html = "ico_netscape.png";
