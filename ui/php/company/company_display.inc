@@ -22,9 +22,9 @@ $fieldnames["company_web"] = $l_web;
 // Calculated or indirect fields
 $fieldnames["companytype_label"] = $l_kind;
 $fieldnames["companyactivity_label"] = $l_activity;
-$fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact_list\" alt=\"C\" />";
+$fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact\" alt=\"C\" />";
 $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
-$fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal_list\" alt=\"D\" />";
+$fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" alt=\"D\" />";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -195,17 +195,17 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -- Themes
-  global $set_theme,$ico_contact_list,$ico_contact_new;
+  global $set_theme,$ico_contact,$ico_contact_new;
   // -- Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
-  global $perms_user,$ico_deal_new,$ico_deal_list;  
+  global $perms_user,$ico_deal_new;  
   global $auth;
 
   $uname = urlencode($name);
 
   // -------| Menu Liste Contacts
   $r = "<a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
-        <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
+        <img border=0 src=\"/images/$set_theme/$ico_contact\"></a>
         <font size=-1>
          <a href=\"".url_prepare("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
          $l_contact_list</a> ($con_num)</font>";
@@ -223,7 +223,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   // -------| Menu Liste Affaires
   $r .= "<br>
          <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
-         <img border=0 src=\"/images/$set_theme/$ico_deal_list\"></a>
+         <img border=0 src=\"/images/$set_theme/$ico_deal\"></a>
          <font size=-1>
          <a href=\"".url_prepare("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
          $l_deal_list</a> ($deal_num)</font>";
@@ -248,7 +248,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 function html_company_consult($co_q) {
   // - Themes
   global $set_theme;
-  global $ico_contact_list,$ico_contact_new,$ico_web,$ico_mail;
+  global $ico_contact,$ico_contact_new,$ico_web,$ico_mail;
   // - Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
   global $l_name,$l_number,$l_kind,$l_activity;

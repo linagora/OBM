@@ -10,14 +10,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Fonction which perform the menu                   //
 // Parametres:
-//   - $tab : active tab 
-//   - $menu   : menu selected
+//   - $tab  : active tab 
+//   - $menu : menu selected
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($menu, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
-  global $auth, $sess, $obminclude; 
+  global $auth, $obminclude; 
   global $obm_version;
 
   if ($menu == "")
@@ -119,17 +119,24 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 // Fonction which perform the item of the selected module                    //
 // Parameters:
-//   - $menu   : selected menu 
+//   - $menu : selected menu 
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $menu) {
   global $set_theme, $menus, $action, $popup_height, $perm ;
   global $actions, $popup_width, $auth;
 
+  $name = $menus[$section][$menu]["Name"];
+  $ico = $menus[$section][$menu]["Ico"];
+  if ($ico != "")
+    $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
+  else
+    $dico = "";
+
   echo "
 <table cellpadding=\"0\" cellspacing=\"0\" class=\"menuBar\">
   <tr>
     <td><img class=\"menuBarIconG\" src=\"/images/$set_theme/barre_g.gif\" alt=\"\" /></td>
-    <td class=\"menuBarLabel\">".$menus[$section][$menu]["Name"]."</td>
+    <td class=\"menuBarLabel\">$dico$name</td>
     <td class=\"menuBarText\">
 ";
 
@@ -146,8 +153,7 @@ function display_menu_bar($section, $menu) {
            }
            else {
             echo "
-               <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;
-            ";
+               <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
            }
          }
        }
@@ -178,14 +184,19 @@ function display_menus($section) {
       <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
         <tr>
     ";
-  if(is_array($menus[$section])) {
-    foreach($menus[$section] as $key => $value) {
-      if(($key != "Name" && $key != "Url" && $key != "Right") 
+  if (is_array($menus[$section])) {
+    foreach ($menus[$section] as $key => $value) {
+      if (($key != "Name" && $key != "Url" && $key != "Right") 
           && 
          (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"])) {
+	$ico = $value["Ico"];
+	if ($ico)
+          $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />";
+	else
+	  $dico = "<img src=\"/images/$set_theme/puce.gif\" alt=\"\" />";
         echo "
             <td>&nbsp;&nbsp;</td>
-            <td class=\"menusLabel\"><img src=\"/images/$set_theme/puce.gif\" alt=\"\" />&nbsp;
+            <td class=\"menusLabel\">&nbsp; $dico
             <a class=\"menus\" href=\"".$value["Url"]."\">".$value["Name"]."</a></td>
         ";
       }

@@ -11,7 +11,7 @@
 // search for the specified payment in the database
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($p_payment, $p_new_order="") {
-  global $auth, $cdg_sql, $l_date_format;
+  global $auth, $cdg_sql;
 
   $label = $p_payment["label"];
   $number = $p_payment["number"];
@@ -41,8 +41,8 @@ function run_query_search($p_payment, $p_new_order="") {
     Payment.payment_number, 
     Payment.payment_inout, 
     Payment.payment_date,
-    DATE_FORMAT(Payment.payment_date,'$l_date_format') as date,
-    DATE_FORMAT(Payment.payment_expected_date,'$l_date_format') as expect_date,
+    UNIX_TIMESTAMP(Payment.payment_date) as date,
+    UNIX_TIMESTAMP(Payment.payment_expected_date) as expect_date,
     Payment.payment_expected_date as payment_expect_date".
   // expect_date, without 'ed' because display_fieldname is varchar(20)...
   ", Payment.payment_paymentkind_id".
@@ -194,18 +194,17 @@ function run_query_account () {
 // récupération de tous les champs du payment
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_payment_id) {
-  global $l_datetime_format, $l_date_format, $db_type_mysql, $db_type_pgsql;
-  global $cdg_sql;
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $go = new DB_OBM;
 
   if ($go->type == $db_type_mysql){
     $query = "select *,
-      DATE_FORMAT(Payment.payment_date,'$l_date_format') as date,
-      DATE_FORMAT(Payment.payment_expected_date,'$l_date_format') as expect_date,
-      DATE_FORMAT(payment_timeupdate,'$l_datetime_format') as datemodif,
-      DATE_FORMAT(payment_timeupdate, '$l_datetime_format') as timeupdate,
-      DATE_FORMAT(payment_timecreate,'$l_datetime_format') as timecreate,
+      UNIX_TIMESTAMP(Payment.payment_date) as date,
+      UNIX_TIMESTAMP(Payment.payment_expected_date) as expect_date,
+      UNIX_TIMESTAMP(payment_timeupdate) as datemodif,
+      UNIX_TIMESTAMP(payment_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(payment_timecreate) as timecreate,
       sum(paymentinvoice_amount) as pay_inv_paid
     from Payment left outer join PaymentInvoice
          on (payment_id=paymentinvoice_payment_id)
@@ -335,7 +334,7 @@ function run_query_search_connectable_invoices ($payment) {
       invoice_inout,
       invoice_invoicestatus_id,
       invoicestatus_label as invoice_status,
-      DATE_FORMAT(invoice_date,'$l_date_format') as date,
+      UNIX_TIMESTAMP(invoice_date) as date,
       sum(paymentinvoice_amount),
       company_name as invoice_company,
       company_id,
@@ -378,7 +377,7 @@ function run_query_search_connectable_invoices ($payment) {
 // if not_paid = 1, we return only not paid invoices
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
-  global $cdg_sql, $l_date_format;
+  global $cdg_sql;
 
   $go = new DB_OBM;
   
@@ -391,7 +390,7 @@ function run_query_search_connected_invoices ($p_payment_id, $not_paid=0) {
       invoice_inout,
       invoice_invoicestatus_id,
       invoicestatus_label as invoice_status,
-      DATE_FORMAT(invoice_date,'$l_date_format') as date,
+      UNIX_TIMESTAMP(invoice_date) as date,
       sum(paymentinvoice_amount),
       company_id,
       company_name as invoice_company,

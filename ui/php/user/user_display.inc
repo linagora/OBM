@@ -247,7 +247,7 @@ function html_user_consult($obm_q) {
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
   $email = $obm_q->f("userobm_email");
-  $lastaccess = $obm_q->f("userobm_timelastaccess");
+  $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"));
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
 
   if ($perms == $perms_user) $l_perms = $l_perms_user;
@@ -368,7 +368,6 @@ function dis_check_links($p_id) {
   global $col_textem;
   global $l_no_user;
   global $l_check_usercreate, $l_check_userupdate;
-  global $sess;
 
   $delete_ok = true;
 

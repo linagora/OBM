@@ -121,13 +121,13 @@ function run_query_kind() {
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q= new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select Contact.*,
-        DATE_FORMAT(contact_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(contact_timecreate,'$l_datetime_format') as timecreate,
+        UNIX_TIMESTAMP(contact_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(contact_timecreate) as timecreate,
         company_id, company_name, company_phone,
         kind_minilabel
       from

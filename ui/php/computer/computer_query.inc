@@ -126,12 +126,12 @@ function run_query_search_computer($tf_name,
 ///                  Function to get datas of a computer                    ///
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_data_compu($computer_id) {
-  global $l_datetime_format, $db_type_mysql, $db_type_pgsql, $cdg_sql;
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $connect_db = new DB_OBM ;
   
   if ($connect_db->type == $db_type_mysql) {
-    $query = "select *, DATE_FORMAT(Computer.computer_timecreate,'$l_datetime_format') as computer_timecreate, DATE_FORMAT(Computer.computer_timeupdate,'$l_datetime_format') as computer_timeupdate,  DATE_FORMAT(Computer.computer_date_lastscan,'$l_datetime_format') as computer_date_lastscan from Computer where computer_id = $computer_id " ;
+    $query = "select *, UNIX_TIMESTAMP(Computer.computer_timecreate) as computer_timecreate, UNIX_TIMESTAMP(Computer.computer_timeupdate) as computer_timeupdate, UNIX_TIMESTAMP(Computer.computer_date_lastscan) as computer_date_lastscan from Computer where computer_id = $computer_id " ;
   } else if($connect_db->type == $db_type_pgsql) {
     $query = "select Computer.*, Computer.computer_timecreate as timecreate, Computer.computer_timeupdate as timeupdate, Computer.computer_date_lastscan as timelastscan from Computer where computer_id = $computer_id" ;
   }

@@ -392,7 +392,6 @@ table.OBMDisplayPref	 {
 	color:			#000000;
 	width:			auto;
 	border:			3px outset green;
-
 }
 
 td.OBMDisplayHead	 {
@@ -432,9 +431,12 @@ a.OBMDisplayHead:link	 { color: #ffff00; background-color: transparent;}
 a.OBMDisplayHead:active	 { color: #ffff00; background-color: transparent;}
 a.OBMDisplayHead:visited { color: #ffff00; background-color: transparent;}
 
-a.OBMDisplayText:link 	 { color: #0ba589; background-color: transparent;}
-a.OBMDisplayText:active  { color: #0ba589; background-color: transparent;}
-a.OBMDisplayText:visited { color: #0ba589; background-color: transparent;}
+a.OBMDisplayText:link, a.OBMDisplayText:active, a.OBMDisplayText:visited {
+	color:            #0ba589;
+	text-decoration:  none;
+	background-color: transparent;
+}
+
 
 /* //////////////////DETAILS///////////////// */
 /* ///// Details table style definition ///// */
@@ -444,7 +446,6 @@ table.details		{
         margin-left:		auto;
 	margin-right:		auto;
 	width:			auto;
-	
 }
 
 td.detailHead		{
@@ -462,7 +463,6 @@ td.detailLabel		{
 	font-weight:		bold;
 	color:			#59519e;
 	background-color:	#ffffff;
-	
 }
 
 td.detailText		{
@@ -470,13 +470,14 @@ td.detailText		{
 	font-size:		12px;
 	color:			#000000;
 	background-color:	#ffffff;
-	
 }
 
-a.details:link 		{ color: #000000; background-color: transparent;}
-a.details:active 	{ color: #000000; background-color: transparent;}
-a.details:visited 	{ color: #000000; background-color: transparent;}
-
+a.detailText:link, a.detailText:active, a.detailText:visited {
+	color:            #0ba589;
+	font-weight:      bold;
+	text-decoration:  none;
+	background-color: transparent;
+}
 
 /* //////////////////DIVERS////////////////// */
 /* ///// Diverstable style definition ////// */

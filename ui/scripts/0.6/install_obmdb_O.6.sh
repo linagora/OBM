@@ -30,5 +30,8 @@ mysql -u $U -p$P obm < obmdb_default_values_0.6.sql
 
 # Default preferences propagation on created users
 echo "Default preferences propagation on created users"
-php4 ../../php/admin_pref/admin_pref_index.php?action=user_pref_update&mode=txt
+php4 ../../php/admin_pref/admin_pref_index.php -a user_pref_update
 
+# Update calculated values
+echo "Update calculated values"
+php4 ../../php/admin_data/admin_data_index.php -a data_update

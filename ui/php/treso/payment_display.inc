@@ -69,8 +69,8 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
     $label = $q_payment->f("payment_label");
     $amount = $q_payment->f("payment_amount");
     $comment = $q_payment->f("payment_comment");
-    $date = $q_payment->f("date");
-    $expected_date = $q_payment->f("expect_date");
+    $date = isodate_format($q_payment->f("date"));
+    $expected_date = isodate_format($q_payment->f("expect_date"));
     $type = $q_payment->f("payment_paymentkind_id");
     $inout = $q_payment->f("payment_inout");
     $account = $q_payment->f("payment_account_id");
@@ -312,7 +312,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 
   echo "
    <center>
-    <form method=\"post\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">";
+    <form method=\"get\" name=\"form_search_payment\" onSubmit=\"if (check_search_form(this) == false) return false ; else return true;\" action=\"".url_prepare("payment_index.php?action=search")."\">";
   echo "
      <table border=$border cellspacing=$cellspacing>
       <tr><td>";
@@ -521,12 +521,9 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   global $l_label,$l_comment,$l_number, $l_date, $l_amount, $l_expected_date;
   global $l_account, $l_kind, $l_type;
   global $l_no_invoices_connected, $l_invoices_connected, $l_break_asso;
-
   // session
   global $perms_user,$l_perms_user;
   global $auth, $sess, $perm, $param_payment;
-  
-  // dev
   global $border, $cellspacing;
 
   // amount display color
@@ -566,10 +563,10 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
      <tr><td>
       <table width=\"100%\" border=$border cellspacing=$cellspacing>
        <tr><td>
-        <font color=\"#$col_label\">$l_expected_date</font><br>".$q_payment->f("expect_date")."
+        <font color=\"#$col_label\">$l_expected_date</font><br>".date_format($q_payment->f("expect_date"))."
        </td><td>
         <font color=\"#$col_label\">$l_date</font><br>".
-    ( ($q_payment->f("date") == "") ? "&nbsp;" :$q_payment->f("date") )  ."
+    ( ($q_payment->f("date") == "") ? "&nbsp;" : date_format($q_payment->f("date")) )  ."
        </td></tr>
       </table>
      </td></tr>";

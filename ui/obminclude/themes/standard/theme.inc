@@ -62,20 +62,37 @@ $col_error="FF0000";    // Errors messages color (rouge)
 // Images //
 ////////////
 //$img_bg="bgvert.jpg";                  // Background Picture
-$ico_principal		=	"aliacom.jpg";          // BIG LOG
-$ico_contact		=	"contact.gif";            // Contact Icon
-$ico_obm		=	"obm.jpg";                    // OBM icon
+$ico_principal      = "aliacom.jpg";  // BIG LOG
+$ico_contact        = "contact.gif";            // Contact Icon
+$ico_obm            = "obm.jpg";                    // OBM icon
 
 // Menus Icons
-$ico_contact		=	"ico_contact.gif";
-$ico_contact_list	=	"ico_contact.gif";  // Contact List Icon
-$ico_contact_new	=	"ico_contact_new.gif";    // New Contact Icon
-$ico_deal		=	"ico_deal.gif";
-$ico_deal_list		=	"ico_deal.gif";     // Contact List Icon
-$ico_deal_new		=	"ico_deal_new.gif";       // New Contact Icon
-$ico_company		=	"ico_company.gif";  // Company Icon
-$ico_change_company	=	"ico_change_company.gif";       // Contract Icon
-$ico_contract		=	"ico_deal.gif";
+$ico_contact        = "ico_contact.gif";         // Contact Icon
+$ico_contact_new    = "ico_contact_new.gif";     // New Contact Icon
+$ico_deal           = "ico_deal.gif";            // Deal Icon
+$ico_deal_new       = "ico_deal_new.gif";        // New Deal Icon
+$ico_company        = "ico_company.gif";         // Company Icon
+$ico_change_company = "ico_change_company.gif";  // Contract Icon
+$ico_list           = "ico_list.gif";            // List Icon
+$ico_agenda         = "ico_agenda.gif";          // Agenda Icon
+
+$ico_contract       = "ico_contract.gif";
+$ico_incident       = "ico_incident.gif";
+
+$ico_account        = "ico_account.gif";
+$ico_invoice        = "ico_invoice.gif";
+$ico_payment        = "ico_payment.gif";
+
+$ico_time           = "ico_time.gif";
+$ico_user           = "ico_user.gif";
+$ico_setting        = "ico_setting.gif";
+
+$ico_admin          = "ico_admin.gif";
+$ico_code           = "ico_code.gif";
+$ico_pref           = "ico_pref.gif";
+$ico_data           = "ico_data.gif";
+$ico_lang           = "ico_lang.gif";
+
 $ico_web		=	"ico_web.gif";                    // WWW Icon
 $ico_mail		=	"ico_mail.gif";                  // Mail Icon
 $ico_arrow_up		=	"arrow_up.gif";          // The up arrow

@@ -4,9 +4,8 @@
 //     - File     : global.inc                                               //
 // 01/08/2002 Augusto Fagioli                                                //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
 
 // Common actions
 $l_find = "Trova";
@@ -22,12 +21,6 @@ $l_none = "---";
 $l_comment = "Commento";
 $l_archive = "Archivio";
 $l_invalid_data = "Dati non valida";
-
-// Mysql Date format
-$l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
-$l_date_format = "%Y-%m-%d"; // Date only 
-$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
-$l_time_format = "%H:%i:%s"; // Time only
 
 // OBM_DISPLAY
 $l_field = "Campo";

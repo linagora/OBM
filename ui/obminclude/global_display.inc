@@ -266,11 +266,11 @@ class OBM_DISPLAY {
   // Function that display the dataset
   /////////////////////////////////////////////////////////////////////////////
   function dis_data() {
-    global $col_textem, $col_table, $col_tableh,$col_error,$col_text_hot;
+    global $col_textem, $col_table, $col_tableh,$col_error,$col_ok,$col_text_hot;
     global $col_frs, $col_client,$col_balance_pos, $col_balance_neg,$col_text_redhot;
-    global $l_minimphone, $l_minihphone,$col_inc_redhot,$col_inc_hot,$col_inc_closed;
-    global $set_theme,$ico_mail,$ico_contact_list,$ico_contact_new,$ico_web,$ico_ball, $ico_crow, $set_rows;
-    global $auth, $sess, $cdg_id, $set_debug;
+    global $col_inc_redhot,$col_inc_hot,$col_inc_closed;
+    global $ico_mail,$ico_contact_new,$ico_web,$ico_ball, $ico_crow;
+    global $auth, $sess, $cdg_id, $set_debug, $set_theme, $set_rows;
     global $time;
 
     $link_ok = $this->display_link;
@@ -354,10 +354,6 @@ class OBM_DISPLAY {
 	else if ($fieldname == "list_contact_company") {
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("list_contact_company_id");
         }
-	// To put udp||tcp in the middle: ????
-	else if ($fieldname == "service_proto") {
-	  $align = "middle";
-	}
 	
 	//------------------------------
 	// For the companies 
@@ -446,7 +442,6 @@ class OBM_DISPLAY {
 	  }
         }
 
-
 	//------------------------------
 	// For the parentdeals and deals
 	//------------------------------
@@ -478,15 +473,11 @@ class OBM_DISPLAY {
         } 
 	else if ($fieldname == "deal_datealarm") {
 	  $date = $this->data_set->f($fieldname);
-	  $datealarm = $this->data_set->f("datealarm");
-	  $year = substr($date,0,4);
-	  $month = substr($date,5,2);
-	  $day = substr($date,8,2);
-	  $timestamp = mktime (23,59,59,$month,$day,$year);
+	  $datealarm = date_format($date);
 	  $time = time();
-	  if ($time > $timestamp) {
+	  if ($time > ($date + 86400)) {
             $name="<font color=\"#$col_error\">$datealarm</font>";
-	  } else if (($time + 86400) > $timestamp) {
+	  } else if ($time > $date) {
 	    $name="<font color=\"#$col_ok\">$datealarm</font>";
 	  } else {
 	    $name="$datealarm";
@@ -508,26 +499,11 @@ class OBM_DISPLAY {
 	  $name = $nb_q->f(0);
           $align = "center";
 	}
-	else if ($fieldname == "deal_company_name") {
-	  $name="";
-	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");
-        } 
-	else if ($fieldname == "deal_datealarm") {
-	  $date = $this->data_set->f($fieldname);
-	  $year = substr($date,0,4);
-	  $month = substr($date,5,2);
-	  $day = substr($date,8,2);
-	  $timestamp = mktime (23,59,59,$month,$day,$year);
-	  $time = time();
-	  if ($time > $timestamp) {
-            $name="<FONT COLOR=\"#$col_error\">".
-	      $this->data_set->f($fieldname) . "</FONT>";
-	  } else if (($time + 86400) > $timestamp) {
-	    $name="<FONT COLOR=\"#$col_ok\">".
-	      $this->data_set->f($fieldname) . "</FONT>";
-	  } else {
-	    $name="";
-	  }
+	else if ($fieldname == "timecreate") {
+	  $name = datetime_format($this->data_set->f($fieldname));
+	}
+	else if ($fieldname == "timeupdate") {
+	  $name = datetime_format($this->data_set->f($fieldname));
 	}
 
         //-------------------------------------
@@ -622,7 +598,7 @@ class OBM_DISPLAY {
 	  $name = "$amount";
 	}
         else if ($fieldname == "invoice_date") {
-	  $name = $this->data_set->f("date");
+	  $name = date_format($this->data_set->f("date"));
 	}
 
         //------------------------
@@ -650,12 +626,11 @@ class OBM_DISPLAY {
 	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
 	}
         else if ($fieldname == "payment_date") {
-	  $name = $this->data_set->f("date");
+	  $name = date_format($this->data_set->f("date"));
 	}
         else if ($fieldname == "payment_expect_date") {
-	  $name = $this->data_set->f("expect_date");
+	  $name = date_format($this->data_set->f("expect_date"));
 	}
-
 
 	//For Image scan (crow or round):
 	if($fieldname == "service_status") {
@@ -672,9 +647,6 @@ class OBM_DISPLAY {
        	else if ($fieldname == "contract_company_name") {
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");
        	}
-        else if ($fieldname == "contract_dateexp") {
-	  $name = $this->data_set->f("dateexp");
-	}
         else if ($fieldname == "contract_marketmanager") {
 	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_techmanager_id");
 	  $name = $this->data_set->f("lmarket") . " " . $this->data_set->f("fmarket");
@@ -683,8 +655,12 @@ class OBM_DISPLAY {
 	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_marketmanager_id");
 	  $name = $this->data_set->f("ltech") . " " . $this->data_set->f("ftech");
 	}
+        else if ($fieldname == "contract_dateexp") {
+	  $date = $this->data_set->f($fieldname);
+	  $name = date_format($date);
+	}
 	//------------------------------
-	// For the incidentss 
+	// For the incidents 
 	//------------------------------
         else if ($fieldname == "incident_label") {
 	  $url = "../contract/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
@@ -696,7 +672,7 @@ class OBM_DISPLAY {
 	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
 	}
         else if ($fieldname == "incident_date") {
-	  $name = $this->data_set->f("date");
+	  $name = date_format($this->data_set->f("date"));
 	}
 	
         //------------------------------

@@ -112,13 +112,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 //   - $p_id  : company id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select *,
-        DATE_FORMAT(company_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(company_timecreate,'$l_datetime_format') as timecreate
+        UNIX_TIMESTAMP(company_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(company_timecreate) as timecreate
       from (Company LEFT JOIN CompanyType on company_type_id=companytype_id)
            LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
       where company_id='$p_id'";

@@ -4,7 +4,7 @@
 //     - Desc : User Index File                                              //
 // 2000-01-13 Florent Goalabre                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
 // - index (default) -- search fields  -- show the user search form
@@ -266,7 +266,7 @@ function get_user_action() {
     'Condition'=> array ('detailconsult') 
                                     );
 
-// Detail Uopate
+// Detail Update
   $actions["USER"]["detailupdate"] = array (
      'Name'     => $l_header_modify,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
@@ -292,7 +292,7 @@ function get_user_action() {
   $actions["USER"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
-    'Right'    => $incident_write,
+    'Right'    => $user_write,
     'Condition'=> array ('detailconsult') 
                                      	   );
 
@@ -310,6 +310,14 @@ function get_user_action() {
     'Right'    => $user_admin_read,
     'Condition'=> array ('all') 
                                     );
+
+// Dispay
+  $actions["USER"]["display"] = array (
+    'Name'     => $l_header_display,
+    'Url'      => "$path/user/user_index.php?action=display",
+    'Right'    => $user_read,
+    'Condition'=> array ('all') 
+                                      	 );
 
 }
 

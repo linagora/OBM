@@ -57,7 +57,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
   global $sess, $obm_version, $l_version, $l_date, $l_host;
 
-  $date = date("Y-m-d H:i:s");
+  $date = datetime_format();
   if ($lifetime > 0) {
     $nb_sess_to_clear = run_query_count_passive_sess($lifetime);
     $d_lifetime = $lifetime;
@@ -69,13 +69,12 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   $nbua = $obm_u->nf();
   $list_user = "";
   while ($obm_u->next_record()) {
-    $a = $obm_u->f("activeuserobm_timecreate");
-    $last_acces = $obm_u->f("timeupdate");
+    $last_acces = datetime_format($obm_u->f("timeupdate"));
     $login = $obm_u->f("userobm_login");
+    $login_date = datetime_format($obm_u->f("timecreate"));
     $nb_con = $obm_u->f("activeuserobm_nb_connexions");
     $lastpage = $obm_u->f("activeuserobm_lastpage");
     $ip = $obm_u->f("activeuserobm_ip");
-    $login_date = substr($a,0,4)."-".substr($a,4,2)."-".substr($a,6,2)." ".substr($a,8,2).":".substr($a,10,2).":".substr($a,12,2);
     $list_user .= "<tr align=center>
       <td bgcolor=\"#$col_a_table\">
         <font color=\"#$col_a_text\">$login</font></td>

@@ -4,6 +4,8 @@
 //     - Desc : Admin Query File                                             //
 // 2001-12-27 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Return the number of entries in ActiveSessions Table    //
@@ -56,7 +58,7 @@ function get_usersession_number() {
 //   - DBO : list of active user session
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_active_user($delay) {
-  global $cdg_sql, $l_datetime_format;
+  global $cdg_sql;
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
   if ($delay > 0)
@@ -67,7 +69,8 @@ function run_query_active_user($delay) {
   $query = "select UserObm.userobm_login,
        UserObm.userobm_timelastaccess,
        ActiveUserObm.*,
-       DATE_FORMAT(activeuserobm_timeupdate, '$l_datetime_format') as timeupdate
+       UNIX_TIMESTAMP(activeuserobm_timecreate) as timecreate,
+       UNIX_TIMESTAMP(activeuserobm_timeupdate) as timeupdate
     from UserObm, ActiveUserObm
     where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
       and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";

@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($incident, $p_new_order, $p_order_dir) {
-  global $c_all ,$l_datetime_format, $l_date_format, $cdg_sql;  
+  global $c_all, $cdg_sql;  
 
   $status = $incident["status"];
   $lincident = $incident["lincident"];
@@ -41,8 +41,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
       incident_logger,
       incident_owner,
       incident_archive,
-      DATE_FORMAT(incident_date,'$l_date_format') as date,
-      DATE_FORMAT(incident_timeupdate,'$l_datetime_format') as timeupdate,
+      UNIX_TIMESTAMP(incident_date) as date,
+      UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
       u1.userobm_lastname as incident_logger_lastname,
       u2.userobm_lastname as incident_owner_lastname,
       Company.company_name as incident_company_name
@@ -99,7 +99,6 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
 //   - $id : incident id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_datetime_format, $l_date_format; 
   global $db_type_mysql,$db_type_pgsql;  
   global $cdg_sql;
 
@@ -108,9 +107,9 @@ function run_query_detail($id) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(incident_date,'$l_date_format') as date,
-        DATE_FORMAT(incident_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(incident_timecreate,'$l_datetime_format') as timecreate
+        UNIX_TIMESTAMP(incident_date) as date,
+        UNIX_TIMESTAMP(incident_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(incident_timecreate) as timecreate
       from (Incident
               left join UserObm u1 on incident_logger=u1.userobm_id)
               left join UserObm u2 on incident_owner=u2.userobm_id

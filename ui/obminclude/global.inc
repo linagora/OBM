@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $obm_version = "0.6.0";
-//$set_debug=0;
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -16,6 +15,7 @@ $set_lang_default = "en";
 $set_theme_default = "aliacom";
 $set_rows_default = 10;
 $set_display_default = "no";
+$set_date_default = "Y-m-d";
 //$set_debug_default=0;
 $last_deal_default = 0;
 $last_company_default = 0;
@@ -53,6 +53,10 @@ $c_task_adminvalid = 2;
 
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
+$cda_iso = "Y-m-d"; // Iso format
+$cda_en = "m/d/Y";  // us format
+$cda_fr = "d/m/Y";  // fr format
+$cda_txt = "d M Y";  // fr format
 
 // Perms
 $perms_user = "user" ;
@@ -469,20 +473,49 @@ function debug_level_isset($debug) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display date part of timestamp                                            //
+// Format a date according to user preference                                //
 ///////////////////////////////////////////////////////////////////////////////
-function timestamp_to_date($timestamp) {
-  $date=substr($timestamp,0,10);
+function date_format($timestamp="") {
+  global $set_date_default, $set_date;
+
+  $format = $set_date;
+  if (trim($format) == "") $format = $set_date_default;
+  if ($timestamp != "")
+    $date = date($format, $timestamp);
+  else
+    $date = date($format);
 
   return $date;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display time part of timestamp                                            //
+// Iso Format a date                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-function timestamp_to_time($timestamp) {
-  $date=substr(trim($timestamp),11,8);
+function isodate_format($timestamp="") {
+  global $c_php_isodate_format;
+
+  if ($timestamp != "")
+    $date = date($c_php_isodate_format, $timestamp);
+  else
+    $date = date($c_php_isodate_format);
+
+  return $date;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Format a date-time according to user preference                           //
+///////////////////////////////////////////////////////////////////////////////
+function datetime_format($timestamp="") {
+  global $set_date_default, $set_date;
+
+  $format = $set_date;
+  if (trim($format) == "") $format = $set_date_default;
+  if ($timestamp != "")
+    $date = date("$format H:i:s", $timestamp);
+  else
+    $date = date("$format H:i:s");
 
   return $date;
 }
@@ -502,7 +535,7 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
   if ($p_usercreate_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
-    echo "created :".$obm_q->f("userobm_login")." (".timestamp_to_date($p_timecreate)." ".timestamp_to_time($p_timecreate).")";
+    echo "created:".$obm_q->f("userobm_login")." (".datetime_format($p_timecreate).")";
   }
   echo "</td>
 	</tr><tr>
@@ -511,7 +544,7 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
   if ($p_userupdate_id != "") {
     $obm_q->query($query_modified);
     $obm_q->next_record();
-    echo "modified:" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timeupdate). " " .timestamp_to_time($p_timeupdate) .")";
+    echo "modified:" . $obm_q->f("userobm_login") . " (". datetime_format($p_timeupdate) .")";
   }
   echo "  </td></tr>";
   echo "</table>";

@@ -24,7 +24,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $archive = $user["archive"];
 
   $select = "select UserObm.*, userobm_id as Id from UserObm";
-  $where="";
+  $where = "";
 
   // If a login indication has been specified, get it
   if (trim($login) != "") {
@@ -69,14 +69,15 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $l_datetime_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_datetime_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_datetime_format') as timecreate from UserObm where userobm_id='$p_id'";
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_datetime_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_datetime_format') as timecreate from UserObm where userobm_id='$p_id'";
-  } 
+  $query = "select UserObm.*,
+      UNIX_TIMESTAMP(userobm_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(userobm_timecreate) as timecreate,
+      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+    from UserObm
+    where userobm_id='$p_id'";
 
   $obm_q->query($query);
   $obm_q->next_record();

@@ -22,7 +22,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
-  global $auth, $c_all, $cdg_sql, $l_date_format;
+  global $auth, $c_all, $cdg_sql;
 
   $parent = $deal["parent"];
   $label = $deal["label"];
@@ -60,7 +60,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
       tasktype_label,
       dealstatus_label,
       userobm_lastname as deal_marketingmanager,
-      DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
+      UNIX_TIMESTAMP(deal_datealarm) as deal_datealarm
     from Deal, DealType, TaskType, Company, DealStatus, UserObm
     where deal_type_id=dealtype_id
      and tasktype_id=deal_tasktype_id
@@ -132,8 +132,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $l_datetime_format, $l_date_format, $cdg_sql;
-  global $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
@@ -147,11 +146,11 @@ function run_query_detail($id) {
         c1.contact_lastname as lnamec1, c1.contact_firstname as fnamec1,
         c1.contact_phone as phonec1, c2.contact_phone as phonec2,
         c2.contact_lastname as lnamec2, c2.contact_firstname as fnamec2,
-        DATE_FORMAT(deal_datebegin,'$l_date_format') as datebegin,
-        DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm,
-        DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as datemodif,
-        DATE_FORMAT(deal_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(deal_timecreate,'$l_datetime_format') as timecreate
+        UNIX_TIMESTAMP(deal_datebegin) as datebegin,
+        UNIX_TIMESTAMP(deal_datealarm) as datealarm,
+        UNIX_TIMESTAMP(deal_timeupdate) as datemodif,
+        UNIX_TIMESTAMP(deal_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(deal_timecreate) as timecreate
       from
         (((Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
            left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id)
@@ -1138,8 +1137,7 @@ function run_query_insert_parentdeal($deal) {
 //   - $pid : parentdeal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail_parentdeal($pid) {
-  global $l_datetime_format, $cdg_sql; 
-  global $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
   
@@ -1147,9 +1145,8 @@ function run_query_detail_parentdeal($pid) {
     $query = "select ParentDeal.*,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(parentdeal_timeupdate,'$l_datetime_format') as datemodif,
-        DATE_FORMAT(parentdeal_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(parentdeal_timecreate,'$l_datetime_format') as timecreate
+        UNIX_TIMESTAMP(parentdeal_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(parentdeal_timecreate) as timecreate
       from (ParentDeal
           left join UserObm u1 on parentdeal_marketingmanager_id=u1.userobm_id)
           left join UserObm u2 on parentdeal_technicalmanager_id=u2.userobm_id
@@ -1158,7 +1155,6 @@ function run_query_detail_parentdeal($pid) {
     $query = "select ParentDeal.*,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        parentdeal_timeupdate as datemodif,
         parentdeal_timeupdate as timeupdate,
         parentdeal_timecreate as timecreate
       from (ParentDeal

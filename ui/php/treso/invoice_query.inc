@@ -11,7 +11,7 @@
 // Account search query :
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search ($invoice, $p_new_order, $p_order_dir) {
-  global $auth, $cdg_sql, $l_date_format;
+  global $auth, $cdg_sql;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -28,7 +28,7 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
   
   $query = "select Invoice.*, Invoice.invoice_id as Id,
-      DATE_FORMAT(Invoice.invoice_date,'$l_date_format') as date,
+      UNIX_TIMESTAMP(Invoice.invoice_date) as date,
       company_id, company_name as invoice_company,
       deal_id, deal_label as invoice_deal,
       invoicestatus_id, invoicestatus_label as invoice_status,
@@ -95,16 +95,15 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
 // Invoice: Select query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_invoice_id) {
-  global $l_datetime_format, $l_date_format, $cdg_sql; 
-  global $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $connect_db = new DB_OBM;
   if ($connect_db->type == $db_type_mysql) {
     $query = "select *,
-       DATE_FORMAT(Invoice.invoice_date,'$l_date_format') as date,
-       DATE_FORMAT(invoice_timeupdate,'$l_datetime_format') as datemodif,
-       DATE_FORMAT(invoice_timeupdate,'$l_datetime_format') as timeupdate,
-       DATE_FORMAT(invoice_timecreate,'$l_datetime_format') as timecreate,
+       UNIX_TIMESTAMP(Invoice.invoice_date) as date,
+       UNIX_TIMESTAMP(invoice_timeupdate) as datemodif,
+       UNIX_TIMESTAMP(invoice_timeupdate) as timeupdate,
+       UNIX_TIMESTAMP(invoice_timecreate) as timecreate,
        sum(paymentinvoice_amount) as invoice_paid
      from Invoice left outer join PaymentInvoice
           on (invoice_id = paymentinvoice_invoice_id)
@@ -363,8 +362,7 @@ function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search_payment_invoice ($p_invoice, $not_paid=0) {
   // trouble with date format with MySQL
-  global $l_date_format, $db_type_mysql, $db_type_pgsql;
-  global $cdg_sql;
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $connect = new DB_OBM;
   $query = "select ".
@@ -374,7 +372,7 @@ function run_query_search_payment_invoice ($p_invoice, $not_paid=0) {
     $query .= " ,payment_date ";
   }
   elseif ($connect->type ==$db_type_mysql) {
-    $query .= " ,DATE_FORMAT(payment_date,'$l_date_format') ";
+    $query .= " , UNIX_TIMESTAMP(payment_date) ";
   }
   $query.= " ,payment_amount ".
      " ,payment_id ".
@@ -403,7 +401,7 @@ function run_query_search_payment_invoice ($p_invoice, $not_paid=0) {
 // not completly connected with invoices
 function run_query_payment ($q_invoice, $p_payment_label="") { 
   // trouble with date format with MySQL 
-  global $l_date_format, $db_type_mysql, $db_type_pgsql, $cdg_sql; 
+  global $db_type_mysql, $db_type_pgsql, $cdg_sql; 
 
   $go = new DB_OBM; 
 
@@ -437,7 +435,7 @@ function run_query_payment ($q_invoice, $p_payment_label="") {
     $query .= " ,payment_date as invoice_pay_date "; 
       } 
   elseif ($go->type ==$db_type_mysql) { 
-    $query .= " ,DATE_FORMAT(payment_date,'$l_date_format') as invoice_pay_date "; 
+    $query .= " ,UNIX_TIMESTAMP(payment_date) as invoice_pay_date "; 
   } 
   $query.= ",payment_amount as invoice_pay_amount". 
      " from Payment where ". 

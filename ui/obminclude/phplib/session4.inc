@@ -364,16 +364,17 @@ class Session {
   // Set the OBM cookie                                                      //
   /////////////////////////////////////////////////////////////////////////////
   function setcookie() {
-   global $lifetime, $session_cookie;
+    global $lifetime, $session_cookie;
 
-   if ($session_cookie) {
-     setcookie(session_name(), session_id(), 0, "/");
-   } else {
-     if ($lifetime == 0)
+    if ($session_cookie) {
+      setcookie(session_name(), session_id(), 0, "/");
+    } else {
+      if ($lifetime == 0) {
         $lifetime = $this->lifetime_default;
-     // Use setcookie() as session_set_cookie_params() doesn't seem to work!
-     setcookie(session_name(), session_id(), time()+$lifetime, "/");
-   //   session_set_cookie_params($lifetime);
+      }
+      // Use setcookie() as session_set_cookie_params() doesn't seem to work!
+      setcookie(session_name(), session_id(), time()+$lifetime, "/");
+      //   session_set_cookie_params($lifetime);
     }
   }
 
@@ -390,6 +391,7 @@ class Session {
     } else {
       $this->mode = "get";
     }
+    session_start();
     $this->id = session_id();
 
    }

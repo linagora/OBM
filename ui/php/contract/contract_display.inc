@@ -149,8 +149,8 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
     $label = $contract_q->f("contract_label");
     $comp_id = $contract_q->f("contract_company_id");
     $number = $contract_q->f("contract_number");
-    $datebegin = $contract_q->f("datebegin");
-    $dateexp = $contract_q->f("dateexp");
+    $datebegin = isodate_format($contract_q->f("datebegin"));
+    $dateexp = isodate_format($contract_q->f("dateexp"));
     $type_id = $contract_q->f("contract_type_id");
     $con1_id = $contract_q->f("contract_contact1_id");
     $con2_id = $contract_q->f("contract_contact2_id");
@@ -165,9 +165,6 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
     $zip = $comp_q->f("company_zipcode");
     $town = $comp_q->f("company_town");
 
-    $timeupdate = $contract_q->f("timeupdate");
-    $dateu = timestamp_to_date($timeupdate);
-    $timeu = timestamp_to_time($timeupdate);
     if(is_object($deal_q)) {
       $param_deal = $deal_q->f("deal_id");
       $c_name = $deal_q->f("deal_label");
@@ -202,10 +199,6 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
       $ad1 = $contract["company_ad1"];
       $zip = $contract["company_zip"];
       $town = $contract["company_town"];
-
-      $timeupdate = $contract["timeupdate"];
-      $dateu = timestamp_to_date($timeupdate);
-      $timeu = timestamp_to_time($timeupdate);
     }
   }
   
@@ -408,7 +401,8 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_company_id,$deal_q) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact,$ico_contact_list,$ico_contact_new,$ico_deal_list;
+  global $set_theme,$col_label,$col_table,$col_textem,$col_ok;
+  global $ico_company,$ico_contact,$ico_contact_new;
   // - labels
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_clause,$l_project_manager,$l_marketing_manager,$l_technical_manager,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_visibility,$l_public,$l_private,$l_dateexp,$l_client_manager;
@@ -416,10 +410,17 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
   global $perms_user,$l_perms_user;
   global $auth, $sess;
 
+  $label = $contract_q->f("contract_label");
+  $number = $contract_q->f("contract_number");
   $market = $contract_q->f("lname1") . " " . $contract_q->f("fname1");
   $tech = $contract_q->f("lname2") . " " . $contract_q->f("fname2");
   $com = nl2br($contract_q->f("contract_comment"));
   $clause = nl2br($contract_q->f("contract_clause"));
+  $datebegin = date_format($contract_q->f("datebegin"));
+  $dateexp = date_format($contract_q->f("dateexp"));
+  $dateu = date_format($contract_q->f("timeupdate"));
+  $timeu = date("H:i:s",$contract_q->f("timeupdate"));
+
   while($type_q->next_record()) {
     if ($type_q->f("contracttype_id") == $contract_q->f("contract_type_id"))
       $dis_cont_type = $type_q->f("contracttype_label");
@@ -439,8 +440,6 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
        $dis_cont_cli2 = $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone");
     }
 
-  $dis_date_date = timestamp_to_date($contract_q->f("timeupdate"));
-  $dis_date_time = timestamp_to_time($contract_q->f("timeupdate"));
 
     $dis_update = "<form method=\"get\" name=\"form_contract_update\" action=\"".url_prepare("contract_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
@@ -459,7 +458,7 @@ echo "
 echo "
     <td rowspan=\"25\"> 
       <A HREF=\"".url_prepare("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\">
-      <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
+      <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact\"></A>
       <font SIZE=-1>
       <A HREF=\"" . url_prepare("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
       $l_incident_list</A></font>
@@ -470,7 +469,7 @@ echo "
       $l_incident_new</A></FONT>
       <BR>
       <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
-      <img BORDER=0  SRC=\"/images/$set_theme/$ico_deal_list\"></A></FONT>
+      <img BORDER=0  SRC=\"/images/$set_theme/$ico_deal\"></A></FONT>
       <FONT SIZE=-1><A HREF=\"" . url_prepare("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
       ".$deal_q->f("deal_label")."</A></FONT>
       </TD>";
@@ -510,16 +509,16 @@ echo "
    <td class=\"detailHead\" colspan=\"2\">$l_contract</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_label</td>
-  <td class=\"detailText\">".$contract_q->f("contract_label")."</td>
+  <td class=\"detailText\">$label</td>
  </tr><tr>
   <td class=\"detailLabel\"><font color=\"#$col_label\">$l_number</font></td>
-  <td class=\"detailText\">".$contract_q->f("contract_number")."</td>
+  <td class=\"detailText\">$number</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_date_init</td>
-  <td class=\"detailText\">".$contract_q->f("datebegin")."</td>
+  <td class=\"detailText\">$datebegin</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_dateexp</td>
-  <td class=\"detailText\">".$contract_q->f("dateexp")."</td>
+  <td class=\"detailText\">$dateexp</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_kind</td>
   <td class=\"detailText\">$dis_cont_type</td>
@@ -531,7 +530,7 @@ echo "
   <td class=\"detailText\">$tech</td>
  </tr><tr>
   <td class=\"detailLabel\">$l_last_update</td>
-  <td class=\"detailText\">$l_last_update $dis_date_date $l_at $dis_date_time</td>
+  <td class=\"detailText\">$dateu $l_at $timeu</td>
  </tr><tr>
    <td class=\"detailHead\" colspan=\"2\"> $l_comment</td>
  </tr><tr>

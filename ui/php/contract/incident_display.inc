@@ -246,7 +246,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $solu =  $inc_q->f("incident_resolution");
     $priority =  $inc_q->f("incident_priority");
     $status =  $inc_q->f("incident_state");
-    $date =  $inc_q->f("date");
+    $date =  date_format($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
     $c_name = $contr_q->f("contract_label");
@@ -322,13 +322,17 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $dis_button .="<input type=\"submit\" value=\"$l_update\" />\n";
 
   // check delete
-    $dis_delete .=     "<form method=\"get\" name=\"f_del_con\" onsubmit=\"if (confirm_del()) return true; else return false;\" ";
-    $dis_delete .=     "action=\"" . $sess->url("incident_index.php") . "\">\n";
-    $dis_delete .=     "<table class=\"details\"><tr><td>";
-    $dis_delete .=     "<input type=\"hidden\" name=\"action\" value=\"delete\" />\n";
-    $dis_delete .=     "<input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />\n";
-    $dis_delete .=     "<input type=\"submit\" value=\"$l_checkdelete\" />\n";
-    $dis_delete .=     "</td></tr></table></form>";
+    $dis_delete .= "<form method=\"get\" name=\"f_del_con\"
+        onsubmit=\"if (confirm_del()) return true; else return false;\"
+        action=\"" . $sess->url("incident_index.php") . "\">
+      <table class=\"details\">
+      <tr><td>
+        <input type=\"hidden\" name=\"action\" value=\"delete\" />
+        <input type=\"hidden\" name=\"param_incident\" value=\"$param_incident\" />
+        <input type=\"submit\" value=\"$l_checkdelete\" />
+        </td>
+      </tr>
+      </table></form>";
 
   // insert
   } elseif (($action=="new") || ($action=="insert")) {
@@ -419,7 +423,7 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
   $label = $inc_q->f("incident_label");
   $pri = $inc_q->f("incident_priority");
   $state = $inc_q->f("incident_state");
-  $date = $inc_q->f("date");
+  $date = date_format($inc_q->f("date"));
   $inc_id = $inc_q->f("incident_id");
   $inc_desc = nl2br($inc_q->f("incident_description"));
   $inc_reso = nl2br($inc_q->f("incident_resolution"));

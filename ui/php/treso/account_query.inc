@@ -73,16 +73,15 @@ function run_query_insert ($account) {
 // the balance returned by this query is the true balance at date == today... 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_account_id) {
-  global $l_datetime_format, $cdg_sql; 
-  global $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $connect_db = new DB_OBM;
   if ($connect_db->type == $db_type_mysql) {
-    $query = "select * ".
-       ", DATE_FORMAT(account_timeupdate,'$l_datetime_format') as datemodif ".
-       ", DATE_FORMAT(account_timeupdate,'$l_datetime_format') as timeupdate ".
-       ", DATE_FORMAT(account_timecreate,'$l_datetime_format') as timecreate ".
-       " from Account where account_id =".$p_account_id;
+    $query = "select *,
+        UNIX_TIMESTAMP(account_timeupdate) as datemodif,
+        UNIX_TIMESTAMP(account_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(account_timecreate) as timecreate
+      from Account where account_id ='$p_account_id'";
   } else if ($connect_db->type == $db_type_pgsql) {
     $query = "select *,account_timeupdate as datemodif,account_timeupdate as timeupdate,account_timecreate as timecreate from Account where account_id=".$p_account_id;
   }

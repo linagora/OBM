@@ -71,8 +71,7 @@ function dis_deal_index($deal="") {
 function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $obm_q_manager) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_category, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_zipcode;
-  global $l_all, $l_all_f, $l_find; 
-  global  $sess, $c_all;
+  global $l_all, $l_all_f, $l_find, $c_all;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -242,7 +241,6 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   global $l_parentdeal, $l_label_start,$l_all,$l_all_f,$l_manager;
   global $l_find,$l_show_archive; 
-  global  $sess;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -344,7 +342,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
   global $perms_user,$l_perms_user;
-  global $auth, $sess;
 
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
@@ -422,7 +419,7 @@ function beautify_deal_comment($com) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$ico_company,$ico_contact, $ico_contact_list;
+  global $set_theme,$ico_company,$ico_contact;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
@@ -432,7 +429,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $l_contract_list;
-  global $auth, $sess, $c_yes, $c_no;
+  global $auth, $c_yes, $c_no;
   global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
@@ -440,7 +437,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $usercreate = $deal_q->f("deal_usercreate");
   $label = $deal_q->f("deal_label");
   $num = $deal_q->f("deal_number");
-  $datebegin = $deal_q->f("datebegin");
+  $datebegin = date_format($deal_q->f("datebegin"));
   $kind = $deal_q->f("dealtype_label");
   $cat = $deal_q->f("tasktype_label");
   $lvis = ($deal_q->f("deal_visibility") == 0 ? $l_public : $l_private);
@@ -455,10 +452,10 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $con2 = $deal_q->f("deal_contact2_id");
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = $deal_q->f("phonec2");
-  $datealarm = $deal_q->f("datealarm");
+  $datealarm = date_format($deal_q->f("datealarm"));
   $status = $deal_q->f("dealstatus_label");
-  $dateu = timestamp_to_date($deal_q->f("datemodif"));
-  $timeu = timestamp_to_time($deal_q->f("datemodif"));
+  $dateu = date_format($deal_q->f("datemodif"));
+  $timeu = date("H:i:s",$deal_q->f("datemodif"));
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
   $com = beautify_deal_comment(nl2br($deal_q->f("deal_comment")));
@@ -494,7 +491,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   }
   echo "
   <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  <img border=0  src=\"/images/$set_theme/$ico_contact_list\"></a>
+  <img border=0  src=\"/images/$set_theme/$ico_contact\"></a>
   <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
@@ -668,7 +665,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none, $l_deal,$l_infos,$l_company;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_private;
   global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
-  global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
+  global $action, $auth,$c_all,$l_all,$l_add_contrat;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -677,7 +674,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $usercreate = $deal_q->f("deal_usercreate");
     $label = $deal_q->f("deal_label");
     $num = $deal_q->f("deal_number");
-    $datebegin = $deal_q->f("datebegin");
+    $datebegin = isodate_format($deal_q->f("datebegin"));
     $kind = $deal_q->f("deal_type_id");
     $cat = $deal_q->f("deal_tasktype_id");
     $vis = ($deal_q->f("deal_visibility") == 0 ? "0" : "1");
@@ -688,10 +685,8 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $hitrate = $deal_q->f("deal_hitrate");
     $con1 = $deal_q->f("deal_contact1_id");
     $con2 = $deal_q->f("deal_contact2_id");
-    $datealarm = $deal_q->f("datealarm");
+    $datealarm = isodate_format($deal_q->f("datealarm"));
     $status = $deal_q->f("deal_status_id");
-    $dateu = timestamp_to_date($deal_q->f("datemodif")); // ???? timeupdate
-    $timeu = timestamp_to_time($deal_q->f("datemodif"));
     $archive = ($deal_q->f("deal_archive") == 1 ? " checked" : "");
     $todo = $deal_q->f("deal_todo");
     $comment = $deal_q->f("deal_comment");
@@ -720,8 +715,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $datealarm = stripslashes($deal["datealarm"]);
     $status = $deal["state"];
     $timeupdate = $deal["timeupdate"];
-    $dateu = timestamp_to_date($timeupdate);
-    $timeu = timestamp_to_time($timeupdate);
     $archive = ($deal["archive"] == 1 ? "checked" : "");
     $todo = stripslashes($deal["todo"]);
     $comment = stripslashes($deal["com"]);
@@ -733,9 +726,10 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       $market = $comp_q->f("company_marketingmanager_id");
       // We pre-fill datebegin and datealarm with current date
       $today = getdate();
-      $datebegin = $today["year"]."-".$today["mon"]."-".$today["mday"];
       $datebegin = date($c_php_isodate_format); 
       $datealarm = $datebegin;
+      // We pre-fill Hit rate
+      $hitrate = "0";
     } else {
       $comp = stripslashes($deal["company_name"]);
       $ad1 = $deal["company_ad1"];
@@ -990,7 +984,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_affect($parent_q, $p_deal_id) {
     global $l_affect,$l_deal_select_parentdeal;  
-    global $sess;
 
     $sel_parent = "<select name=\"sel_parent\" size=\"10\">";
     while ($parent_q->next_record()) {
@@ -1042,7 +1035,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $l_status_update_error, $l_status_delete_error, $l_status_delete_ok;
   global $l_cat_insert_ok, $l_cat_insert_error, $l_cat_update_ok;
   global $l_cat_update_error, $l_cat_delete_error;
-  global $sess;
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind\" size=\"4\">";
@@ -1349,7 +1341,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
 function dis_kind_links($id) {
   global $l_kind_link_deal, $l_kind_can_delete, $l_kind_cant_delete, $l_back;
   global $l_kind_delete;
-  global $sess;
 
   $label = get_kind_label($id);
   $obm_q = run_query_kind_links($id);
@@ -1381,7 +1372,7 @@ function dis_kind_links($id) {
      <input type=submit value=\"$l_back\" />
      </form></td></tr></table>";
   }
-echo $dis_link;
+  echo $dis_link;
 }
 
 
@@ -1392,8 +1383,7 @@ echo $dis_link;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_status_links($id) {
   global $l_status_link_deal, $l_status_can_delete, $l_status_cant_delete;
-  global $l_status_delete;
-  global $sess, $l_back;
+  global $l_status_delete, $l_back;
 
   $label = get_status_label($id);
   $obm_q = run_query_status_links($id);
@@ -1436,8 +1426,7 @@ function dis_status_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_links($id) {
   global $l_cat_link_deal, $l_cat_can_delete, $l_cat_cant_delete;
-  global $l_cat_delete;
-  global $sess, $l_back;
+  global $l_cat_delete, $l_back;
 
   $label = get_cat_label($id);
   $obm_q = run_query_cat_links($id);
@@ -1552,7 +1541,6 @@ function dis_parentdeal_search_list($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $deal) {
   global $l_found_parent; 
-  global $sess;
 
   $plabel = stripslashes($deal["plabel"]);
   $pmanager = $deal["pmanager"];
@@ -1586,7 +1574,6 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
   // -- Labels
   global $l_update_parent,$l_delete_parent,$l_insert_parent,$l_label,$l_marketing_manager;
   global $l_parentdeal,$l_technical_manager,$l_comment;
-  global $sess,$auth;
 
   // if update mode and first time, values are taken from db
   if (($action == "parent_detailupdate") || ($action == "parent_delete")) {
@@ -1690,7 +1677,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
-  global $path,$sess,$auth,$perms_user;
+  global $path,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_comment,$l_marketing_manager,$l_state;
   global $l_invoices_connected,$l_no_invoices_connected, $l_infos;
@@ -1710,11 +1697,10 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $p_expense = get_parent_expense($parent);
   $p_income = get_parent_income($parent);
 
-
-    $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
-    $title = urlencode($l_deal_select_company);
-    $win_url = url_prepare("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
-    $f_new = "<form name=\"form_deal_new\"
+  $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
+  $title = urlencode($l_deal_select_company);
+  $win_url = url_prepare("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
+  $f_new = "<form name=\"form_deal_new\"
       action=\"" . url_prepare("deal_index.php") . "\" method=\"get\"
       onsubmit=\"window.open('$win_url','company','height=$popup_height,width=$popup_width'); return false;\">
 
@@ -1740,8 +1726,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
        <tr>
         <td class=\"detailLabel\">$l_technical_manager</td>
         <td class=\"detailText\">$ptech_name</td>
-       </tr>  echo $www;
-
+       </tr>
        <tr>
         <td class=\"detailLabel\">$l_date_proposal</td>
         <td class=\"detailText\">$p_dateproposal</td>
@@ -1830,7 +1815,6 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
 ///////////////////////////////////////////////////////////////////////////////
 function html_select_deal($deal_q, $title, $url="") {
   global $l_select_deal;
-  global $sess;
 
   if ($url != "") {
     $jsfunc = "check_get_id_url(this, '$url')";

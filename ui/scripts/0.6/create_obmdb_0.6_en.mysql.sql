@@ -7,11 +7,6 @@
 --/////////////////////////////////////////////////////////////////////////////
 
 --
--- Dumping data for table 'Company'
---
-INSERT INTO Company (company_timeupdate, company_timecreate, company_userupdate, company_usercreate, company_number,company_state,company_name, company_type_id, company_address1, company_address2, company_zipcode, company_town, company_expresspostal, company_country, company_phone, company_fax, company_web, company_email, company_comment) VALUES (null,null,2,0,'MyRef123',1,'MyCompany',3,'my address l1','my address l2','31520','MyTown','','MyCountry','00 11 22 33 44','44 33 22 11 00','www.myweb.fr','info@mydomain.fr',NULL);
-
---
 -- Dumping data for table 'CompanyType'
 --
 INSERT INTO CompanyType (companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (null,null,2,null,'Customer');
@@ -32,12 +27,6 @@ INSERT INTO CompanyActivity (companyactivity_timeupdate, companyactivity_timecre
 INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'Mr','Mister');
 INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'Mrs','Madam');
 INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'Miss','Miss');
-
-
---
--- Dumping data for table 'Contact'
---
-INSERT INTO Contact VALUES (1,'','',NULL,1,1,1,'Admin','admin','','','','','','','','','','','','','',0);
 
 
 --

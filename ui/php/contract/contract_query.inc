@@ -17,7 +17,7 @@
 //   - $p_order_dir : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($contract, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $c_all, $l_date_format;
+  global $cdg_sql, $c_all;
 
   $p_label = $contract["label"];
   $p_type = $contract["type"];
@@ -46,7 +46,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_marketmanager_id,
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
-      DATE_FORMAT(contract_dateexp,'$l_date_format') as dateexp
+      UNIX_TIMESTAMP(contract_dateexp) as contract_dateexp
     from ((Contract
       left join UserObm u1 on contract_techmanager_id=u1.userobm_id)
       left join UserObm u2 on contract_marketmanager_id=u2.userobm_id),
@@ -92,19 +92,17 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 // ContractContract: Select query construction                               //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_contract_id) {
-  global $cdg_sql;
-  global $l_datetime_format, $l_date_format; 
-  global $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $connect_db = new DB_OBM;
   if ($connect_db->type == $db_type_mysql) {
     $query = "select *,
         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        DATE_FORMAT(contract_datebegin,'$l_date_format') as datebegin,
-        DATE_FORMAT(contract_dateexp,'$l_date_format') as dateexp,
-        DATE_FORMAT(contract_timeupdate,'$l_datetime_format') as timeupdate,
-        DATE_FORMAT(contract_timecreate,'$l_datetime_format') as timecreate
+        UNIX_TIMESTAMP(contract_datebegin) as datebegin,
+        UNIX_TIMESTAMP(contract_dateexp) as dateexp,
+        UNIX_TIMESTAMP(contract_timeupdate) as timeupdate,
+        UNIX_TIMESTAMP(contract_timecreate) as timecreate
       from (Contract
             left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
             left join UserObm u2 on contract_techmanager_id=u2.userobm_id

@@ -53,6 +53,12 @@ if ($form_user_pref) {
     $sess->register("set_rows");
     run_query_set_user_pref($uid, "set_rows", $set_rows, 1);
   }
+
+  if ($param_date != "") {
+    $set_date = $param_date;
+    $sess->register("set_date");
+    run_query_set_user_pref($uid, "set_date", $set_date, 1);
+  }
 }
 page_close();
 
@@ -62,6 +68,12 @@ require("settings_display.inc");
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
+
+if ($set_date == $cda_iso) $da_iso = "checked";
+if ($set_date == $cda_en) $da_en = "checked";
+if ($set_date == $cda_fr) $da_fr = "checked";
+if ($set_date == $cda_txt) $da_txt = "checked";
+
 if ($action == "") $action = "index";
 get_settings_actions();
 $perm->check();
@@ -162,6 +174,16 @@ echo "></td>
     <td align=center $lbgcolor>
       <font color=\"#$col_a_text\">$l_set_rows</font></td>
     <td $lbgcolor><input size=3 name=param_rows value=\"$set_rows\"></td>
+  </tr><tr>
+    <td align=center $lbgcolor>
+      <font color=\"#$col_a_text\">$l_set_date</font></td>
+    <td $lbgcolor><font color=\"#$col_a_text\">
+      <input type=radio name=param_date value=\"$cda_iso\" $da_iso>$l_da_iso
+      <input type=radio name=param_date value=\"$cda_en\" $da_en>$l_da_en
+      <input type=radio name=param_date value=\"$cda_fr\" $da_fr>$l_da_fr
+      <input type=radio name=param_date value=\"$cda_txt\" $da_txt>$l_da_txt
+      </font>
+    </td>
   </tr>
   $dis_debug
   <tr>

@@ -225,7 +225,7 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
-      <a href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
+      <a class=\"detailText\" href=\"".url_prepare("../company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
       </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>

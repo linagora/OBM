@@ -4,7 +4,7 @@
 //     - File     : global.inc                                               //
 // 2002-08-10 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Common actions
@@ -20,12 +20,6 @@ $l_all_f = "Alle";
 $l_none = "---";
 $l_archive = "Archiv";
 $l_invalid_data = "Falsche Daten";
-
-// Mysql Date format
-$l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
-$l_date_format = "%Y-%m-%d"; // Date only 
-$l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
-$l_time_format = "%H:%i:%s"; // Time only
 
 // OBM_DISPLAY
 $l_field = "Field";

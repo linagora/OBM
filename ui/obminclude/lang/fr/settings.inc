@@ -16,8 +16,14 @@ $l_new_settings = "Pour changer votre configuration, Selectionner ici les nouvea
 $l_set_lang = "Choisissez votre langue";
 $l_set_theme = "Choisissez votre theme";
 $l_set_rows = "# lignes affichées par page";
+$l_set_date = "Format de date";
 $l_set_debug = "Niveau de debug";
 
 $l_dg_id = "Id";
 $l_dg_param = "Paramètres";
 $l_dg_sql = "SQL";
+
+$l_da_iso = "yyyy-mm-dd";
+$l_da_en = "mm/dd/yyyy";
+$l_da_fr = "dd/mm/yyyy";
+$l_da_txt = "dd mois yyyy";

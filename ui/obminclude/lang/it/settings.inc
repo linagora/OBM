@@ -17,12 +17,14 @@ $l_new_settings = "Scegli qui le nuove impostazioni";
 $l_set_lang = "Scegli la lingua";
 $l_set_theme = "Scegli la grafica";
 $l_set_rows = "Quante righe per pagina?";
+$l_set_date = "Date format";
 $l_set_debug = "Debugging level";
 
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";
 $l_dg_sql = "SQL";
 
-$l_last_deal="Last deal";
-$l_last_company = "Ultima Azienda";
-$l_last_contact = "Ultimo Contatto";
+$l_da_iso = "yyyy-mm-dd";
+$l_da_en = "mm/dd/yyyy";
+$l_da_fr = "dd/mm/yyyy";
+$l_da_txt = "dd month yyyy";

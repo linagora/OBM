@@ -610,10 +610,8 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   global $l_add_deal, $l_del_deal;
   global $l_label,$l_comment,$l_number, $l_date, $l_amount_HT, $l_amount_TTC, 
     $l_deal, $l_status;
-  
   global $perms_user,$l_perms_user;
   global $auth, $sess, $perm, $param_invoice;
-
   global $border, $cellspacing;
 
   dis_invoice_detail ($action,$q_invoice, $q_status);
@@ -808,26 +806,30 @@ function dis_invoice_detail ($p_action, $q_invoice, $q_status){
     $l_status, $l_date, $l_label, $col_label,$l_number, $l_inout, 
     $l_fournisseur, $l_client, $l_duplicate;
 
+
+  $date = date_format($q_invoice->f("date"));
+  $label = $q_invoice->f("invoice_label");
+  $num = $q_invoice->f("invoice_number");
+
   echo "<center>
-   <table border=$border cellspacing=$cellspacing>
-   <tr><td>";
-  //----------------------------------------------------------------------
-  echo "<table border=$border cellspacing=$cellspacing width=\"100%\">
-   <tr>";
-  // invoice number
-  echo"
-   <td width=\"30%\"><font color=\"#$col_label\">$l_number</font><br>".
-   $q_invoice->f("invoice_number")."</td>"; 
-  // invoice label
-  echo "
-   <td width=\"60%\"><font color=\"#$col_label\">$l_label</font><br>".
-   $q_invoice->f("invoice_label")."</td>"; 
-  // date :
-  echo "
-   <td><font color=\"#$col_label\">$l_date</font><br>".
-    $q_invoice->f("date")."</td>";
-  echo "</tr>
-   </table></td></tr>"; 
+    <table border=$border cellspacing=$cellspacing>
+    <tr>
+      <td>
+      <table border=$border cellspacing=$cellspacing width=\"100%\">
+      <tr>
+        <td width=\"30%\"><font color=\"#$col_label\">$l_number</font>
+          <br>$num
+        </td> 
+        <td width=\"60%\"><font color=\"#$col_label\">$l_label</font>
+          <br>$label
+        </td>
+        <td><font color=\"#$col_label\">$l_date</font>
+          <br>$date
+        </td>
+      </tr>
+      </table>
+      </td>
+    </tr>"; 
 
   //----------------------------------------------------------------------
   // invoice status

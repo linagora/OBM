@@ -25,7 +25,7 @@ $l_from = "Du";
 $l_manager = "Responsable";
 $l_client_manager = "Responsable Client";
 $l_date_before ="Date Avant";
-$l_date_after ="Date Apr&egrave;s";
+$l_date_after ="Date Après";
 $l_archive_new = "Archiver";
 $l_archive = "Voir les archives";
 $l_archive_consult = "Archivé";
@@ -45,17 +45,17 @@ $l_closed = "Fermé";
 $l_incident_lastupdate = "Date de dernière modification";
 
 // Action
-$l_select_contract = "S&eacute;lectionner le contrat";
+$l_select_contract = "Sélectionner le contrat";
 $l_insert = "Enregistrer l'incident";
 $l_update = "Modifier l'incident";
 $l_checkdelete = "Supprimer l'incident";
 $l_incident_select_contract = "Selectionner le contrat lié à cet incident";
 //Message
 $l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
-$l_found = "incident(s) trouv&eacute;(s).";
-$l_no_found = "Aucun Incident ne correspond &agrave; ces crit&egrave;res !";
+$l_found = "incident(s) trouvé(s).";
+$l_no_found = "Aucun Incident ne correspond à ces critères !";
 $l_insert_ok = "L'insertion de l'incident a été correctement effectuée.";
-$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur &lt; Chercher &gt; pour obtenir la liste des contrats de support correspondants.";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
 // For the display preferences modification screen 
 
 $l_incident_display = "Options d'affichage des Incidents";
