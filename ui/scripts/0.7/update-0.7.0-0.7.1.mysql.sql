@@ -34,6 +34,12 @@ CREATE TABLE Todo (
 -------------------------------------------------------------------------------
 -- add missing lines
 --ALTER TABLE ProjectStat ADD projectstat_timeupdate timestamp(14) AFTER projectstat_date;
+
+-------------------------------------------------------------------------------
+-- Document
+-------------------------------------------------------------------------------
+ALTER TABLE Document ADD document_kind int(2) AFTER document_name;
+=======
 --ALTER TABLE ProjectStat ADD projectstat_userupdate int(8) AFTER projectstat_usercreate;
 
 

@@ -2096,3 +2096,16 @@ function run_query_get_vevent_repeat($agenda) {
   $obm_db->query($query);
   return $obm_db;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Slice the number of user
+//------------------------------------------------------------------------
+// Argument:
+// ---------
+//     - $sel_user
+///////////////////////////////////////////////////////////////////////////////
+function slice_user($sel_user_id) {
+  if($action != "perform_meeting" && count($sel_user_id) > 6) {
+    $sel_user_id = array_slice ($sel_user_id, 0, 6);
+  }
+  return $sel_user_id;
+}

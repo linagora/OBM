@@ -57,8 +57,7 @@ if(count($sel_user_id) != 0 ) {
 $sess->register("agenda_user_view");
 page_close();
 $sel_user_id = $agenda_user_view;
-if($action != "perform_meeting" && count($sel_user_id) > 6)
-$sel_user_id = array_slice ($sel_user_id, 0, 6);
+
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
@@ -86,6 +85,7 @@ if ($popup) {
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   $obm_wait = run_query_waiting_events();
   if($obm_wait->nf() != 0) {
     $display["msg"] .= display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
@@ -109,6 +109,7 @@ if ($action == "index") {
 
 elseif($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   $conflict = run_query_insert_decision($agenda);
   if (count($conflict) == 0) {
     $obm_wait = run_query_waiting_events();
@@ -137,6 +138,7 @@ elseif($action == "decision") {
 
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
@@ -154,6 +156,7 @@ elseif ($action == "view_day") {
 
 elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array =  $sel_user_id;
@@ -170,6 +173,7 @@ elseif ($action == "view_week") {
 
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   require("agenda_js.inc");
   if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
@@ -186,6 +190,7 @@ elseif ($action == "view_month") {
 
 elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
+  $sel_user_id = slice_user($sel_user_id);
   if (count($sel_user_id) != 0) {
     $p_user_array = $sel_user_id;
   }
@@ -301,7 +306,7 @@ elseif ($action == "detailconsult") {
 elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 if ($param_event > 0) {  
-  require("$obminclude/calendar.js");  
+  $sel_user_id = slice_user($sel_user_id);
   require("agenda_js.inc");
   $user_obm = run_query_userobm_writable();
   $grp_obm = run_query_group_writable();

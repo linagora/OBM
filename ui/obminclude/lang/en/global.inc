@@ -55,6 +55,8 @@ $l_help_display_no = "The field is not displayed. Click on this button if you wa
 $l_help_mandatory = "This field is mandatory";
 $l_help_down  = "Move the field down";
 $l_help_up = "Move the field up";
+$l_document_added = " added documents";
+$l_no_document_added = "No documents added";
 
 // Javascript common messages
 $l_fill_label = "You have to fill the label";

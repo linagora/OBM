@@ -97,7 +97,7 @@ $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
 
 // Mail.
-$gp_mail_enabled = 1;
+$gp_mail_enabled = 0;
 
 // Display size
 $popup_width = 620;

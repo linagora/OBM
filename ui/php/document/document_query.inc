@@ -273,7 +273,7 @@ function run_query_get_mime($document){
   $file = $document["name"];
   $mime = $document["mime_file"];
   $kind = $document["kind"];
-  
+  var_dump($document); 
   if($mime != "") {
     $return = run_query_get_type_by_mime($mime);
     if($return) {

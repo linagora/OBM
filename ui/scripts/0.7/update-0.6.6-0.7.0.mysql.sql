@@ -62,10 +62,8 @@ alter table Task rename to TimeTask;
 CREATE TABLE ProjectStat (
   projectstat_deal_id int(8) NOT NULL,
   projectstat_date timestamp(14) NOT NULL,
---  projectstat_timeupdate timestamp(14),
-  projectstat_timecreate timestamp(14),
---  projectstat_userupdate int(8),
-  projectstat_usercreate int(8),
+  projectstat_timecreate timestamp(14) NOT NULL,
+  projectstat_usercreate int(8) default NULL,
   projectstat_useddays int(8) default NULL,
   projectstat_remainingdays int(8) default NULL,
   PRIMARY KEY (projectstat_deal_id, projectstat_date)
