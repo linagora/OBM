@@ -45,9 +45,23 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Project search Form                                               //
+// Parameters:
+//   - $project[] : default form values
+//     keys used  : name, company_name, tt, manager, member,
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_search_form ($project) {
+  $tt_q = run_query_projecttype();
+  $manager_q = run_query_managers();
+  $member_q = run_query_members();
+
+  $block = html_project_search_form ($tt_q, $manager_q, $member_q, $project);
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Html Project search Form                                          //
 // Parameters:
 //   - $tt_q      : database object with tasktype list
 //   - $manager_q : database object with project manager list
@@ -110,36 +124,32 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "    
+  $block = "    
     <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"" . url_prepare("project_index.php") . "\">
-    <table class=\"details\">
-    <tr>
-      <td class=\"textLabelForm\">$l_name<br />
-        <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"40\"
-        value=\"$name\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_company_name<br />
-        <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\"
-        value=\"$company_name\" /></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_tasktype<br />
-        $sel_tt</td>
-    </tr><tr>
-      <td class=\"textLabelForm\">$l_manager<br />
-        $sel_manager</td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"textLabelForm\">$l_member<br />
-        $sel_member</td>
-      <td colspan = 2>&nbsp;&nbsp;</td>
-
-      <td>&nbsp;&nbsp;&nbsp;&nbsp;
+     <div class=\"search\">
+      <div class=\"searchLabel\">$l_name<br />
+        <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"40\" value=\"$name\" />
+      </div>
+      <div class=\"searchLabel\">$l_company_name<br />
+        <input type=\"text\" name=\"tf_company_name\" id=\"tf_company_name\" size=\"20\" value=\"$company_name\" />
+      </div>
+      <div class=\"searchLabel\">$l_tasktype<br />
+        $sel_tt
+      </div>
+      <div class=\"searchLabel\">$l_manager<br />
+        $sel_manager
+      </div>
+      <div class=\"searchLabel\">$l_member<br />
+        $sel_member
+      </div>
+      <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
         <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    </table>
-    </form>
-    <hr />";
+      </div>
+     </div>
+    </form>";
+
+  return $block;
 }
 
 
@@ -169,8 +179,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
   }
 
   // tt select
-  $sel_tt = "<td>
-             <select id=\"sel_tt\" name=\"sel_tt\">
+  $sel_tt = "<select id=\"sel_tt\" name=\"sel_tt\">
              <option value=\"0\">$l_none</option>";
   while($tt_q->next_record()) {
     $tt_id = $tt_q->f("tasktype_id");
@@ -178,7 +187,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
     if ($tt_id == $tt) { $sel_tt .= " selected=\"selected\""; }
     $sel_tt .= ">". $tt_q->f("tasktype_label") . "</option>\n";
   }
-  $sel_tt .= "</select></td>";
+  $sel_tt .= "</select>";
   
  // target action
   if ($action == "detailupdate") {
@@ -189,40 +198,38 @@ function html_project_form($action, $project_q, $tt_q, $project) {
 
   $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
 
+  $dis_button ="$dis_action
+      <input type=\"hidden\" name=\"param_project\" value=$pid />
+      <input type=\"hidden\" name=\"hd_status\" value=2 />
+      <input type=\"submit\" value=\"$l_button\" />";
+
   // --- HTML Template --------------------------------------------------------
-  echo "
+  $block = "
     <form method=\"post\" name=\"form_project_create\" 
       onsubmit=\"if (check_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
-     <table class=\"details\">
-       <tr>
-         <td colspan=\"2\" class=\"detailHead\">$l_interninfos</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_name</td>
-        <td class=\"detailText\">
-         <input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\"/></td>
-        </td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_tasktype</td>
-        $sel_tt
-       </tr><tr>
-        <td class=\"detailLabel\">$l_soldtime</td>
-        <td><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
-      </tr>
-     </table>
-     <table class =\"details\">
-      <tr>
-       <td class=\"detailHead\">
-        $dis_action
-        <input type=\"hidden\" name=\"param_project\" value=$pid />
-        <input type=\"hidden\" name=\"hd_status\" value=2 />
-        <input type=\"submit\" value=\"$l_button\" />
-       </td>
-      </tr>
-     </table>
-    </form>
-";
 
+    <div class=\"detailHead\">$l_interninfos</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\"/></td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_tasktype</td>
+      <td class=\"detailForm\">$sel_tt</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_soldtime</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
+    </tr>
+   </table>
+
+   <div class=\"detailButton\">
+   <p class=\"detailButtons\">$dis_button</p>
+   </div>
+   ";
+
+  return $block;
 }
 
 
@@ -259,43 +266,47 @@ function html_project_init_form($action, $project_q, $project) {
 
   $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
 
+  $dis_button = "$dis_action
+    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+    <input type=\"hidden\" name=\"hd_status\" value=1 />
+    <input type=\"submit\" value=\"$l_button\" />";
+
   // --- HTML Template --------------------------------------------------------
-  echo "
+  $block = "
     <form method=\"post\" name=\"form_project_init\" 
       onsubmit=\"if (check_init_project(this)) return true; else return false;\"
       action=\"".url_prepare("project_index.php")."\">
-     <table class=\"details\">
-       <tr>
-         <td colspan=\"2\" class=\"detailHead\">$l_dealinfos</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_name</td>
-        <td class=\"detailText\">$name</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_company_name</td>
-        <td class=\"detailText\">$company</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_tasktype</td>
-        <td class=\"detailText\">$tt</td>
-       </tr><tr>
-         <td colspan=\"2\" class=\"detailHead\">$l_projectinfos</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_soldtime</td>
-        <td><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
-      </tr>
-     </table>
-     <table class =\"details\">
-      <tr>
-       <td class=\"detailHead\">
-        $dis_action
-        <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-        <input type=\"hidden\" name=\"hd_status\" value=1 />
-        <input type=\"submit\" value=\"$l_button\" />
-       </td>
-      </tr>
-     </table>
-     </form>
-";
 
+    <div class=\"detailHead\">$l_dealinfos</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_company_name</td>
+      <td class=\"detailText\">$company</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_tasktype</td>
+      <td class=\"detailText\">$tt</td>
+    </table>
+
+    <div class=\"detailHead\">$l_projectinfos</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_soldtime</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
+     </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>
+    ";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -310,12 +321,18 @@ function html_project_taskadd_form($ptask_q, $project) {
   global $l_tasksinfos;
   
   $pid = $project["id"];
+  $origin = $project["origin"];
+
+  $tf_taskname = "<tr>
+                   <td class=\"detailLabel\">$l_taskname</td>
+                   <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\"/></td>
+                  </tr>";
 
   if (($ptask_q != 0) && ($ptask_q->num_rows() != 0)) {
     // ptask select
     $sel_ptask = "<tr>
                    <td class=\"detailLabel\">$l_parent</td>
-                   <td><select id=\"sel_ptask\" name=\"sel_ptask\">
+                   <td class=\"detailForm\"><select id=\"sel_ptask\" name=\"sel_ptask\">
                     <option value=\"0\">$l_none</option>\n";
 
     $nrows = $ptask_q->num_rows();
@@ -336,36 +353,34 @@ function html_project_taskadd_form($ptask_q, $project) {
     $ptask_q->seek(0);
   }
 
+  $dis_button = "
+       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+       <input type=\"hidden\" name=\"param_origin\" value=\"$origin\" />
+       <input type=\"hidden\" name=\"action\" value=\"task_add\" />
+       <input type=\"submit\" value=\"$l_task_add\" />";
+
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-    <form method=\"post\" name=\"form_taskadd\"
+  $block = "
+   <form method=\"post\" name=\"form_taskadd\"
      onsubmit=\"if (check_taskadd(this)) return true; else return false;\"
      action=\"". url_prepare("project_index.php") ."\">
-    <table class=\"details\">
-      <tr>
-       <td colspan=\"2\" class=\"detailHead\">$l_tasksinfos</td>
-      </tr>
-      <tr><td colspan=\"2\">&nbsp;</td></tr>
-      <tr>
-       <td class=\"detailLabel\">$l_taskname</td>
-       <td><input type=\"text\" name=\"tf_tasklabel\" size=\"30\"/></td>
-      </tr>
+ 
+    <div class=\"detailHead\">$l_tasksinfos</div>
+
+    <table class=\"detail\">
+       $tf_taskname
        $sel_ptask
     </table>
-                 
-    <table class=\"details\">
-     <tr>
-      <td align=\"center\">
-       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-       <input type=\"hidden\" name=\"action\" value=\"task_add\" />
-       <input type=\"submit\" value=\"$l_task_add\" />
-      </td>
-     </tr>
-   </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+
    </form>
    ";
 
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -384,11 +399,13 @@ function html_project_memberadd_form($project) {
   $ext_open .= "&ext_url=../project/project_index.php&ext_id=$pid";
   $ext_open .= "&ext_target=Liste','','height=400,width=620,scrollbars=yes')";
 
-  echo "
+  $block = "
     <script type=\"text/javascript\">
       $ext_open
     </script>
   ";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -398,7 +415,7 @@ function html_project_memberadd_form($project) {
 //     keys used  : status, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_new_list($project) {
-  global $auth;
+  global $auth, $display;
   global $l_new_projects, $l_no_display;
   
   $pref_q = run_query_display_pref($auth->auth["uid"], "project_new");
@@ -408,12 +425,13 @@ function dis_project_new_list($project) {
   $nb_newprojects = $obm_q->num_rows();
 
   if ($nb_newprojects != 0) {
-    display_info_msg($l_new_projects) ;
-    html_project_new_list($obm_q, $pref_q, $nb_newprojects, $project);
+    $display["msg"] .= display_info_msg($l_new_projects) ;
+    $block = html_project_new_list($obm_q, $pref_q, $nb_newprojects, $project);
   }
   else
-    display_info_msg($l_no_projects) ;
+    $display["msg"] .= display_info_msg($l_no_projects) ;
 
+  return $block;
 }
 
 
@@ -437,7 +455,8 @@ function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) 
   $dis_newprojects_list->data_header = "both";
   $dis_newprojects_list->data_order = false;
 
-  $dis_newprojects_list->display("dis_data_project");
+  $block = $dis_newprojects_list->display("dis_data_project");
+  return $block;
 }
 
 
@@ -448,19 +467,21 @@ function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) 
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_list($project) {
-  global $l_no_found;
+  global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
+  $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
   $obm_q = run_query_search($project, $new_order, $order_dir);
 
   $nb_project = $obm_q->num_rows();
 
   if ($nb_project == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    $pref_q = run_query_display_pref($auth->auth["uid"], "project", 0);
-    html_project_search_list($obm_q, $pref_q, $nb_project, $project);
+    $block = html_project_search_list($obm_q, $pref_q, $nb_project, $project);
   }
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -474,7 +495,7 @@ function dis_project_search_list($project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
   //-- Labels
-  global $perms_user,$l_perms_user, $l_found;
+  global $display, $perms_user,$l_perms_user, $l_found;
 
   $name = $project["name"];
   $company_name = $project["company_name"];
@@ -491,10 +512,10 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 
   // --- HTML Template --------------------------------------------------------
 
-  display_info_msg($nb_project." ".$l_found);
+  $display["msg"] .= display_info_msg($nb_project." ".$l_found);
+  $block = $dis_projects_list->display("dis_data_project");
 
-  $dis_projects_list->display("dis_data_project");
-
+  return $block;
 }
 
 
@@ -526,25 +547,26 @@ function html_project_infos($project_q, $project) {
   }
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-     <table class=\"details\">
-       <tr>
-         <td colspan=\"2\" class=\"detailHead\">$title</td>
-       </tr>
-       <tr><td colspan=5>&nbsp;</td></tr>
-       <tr>
-        <td class=\"detailLabel\">$l_name</td>
-        <td class=\"detailText\">$name</td>
-       </tr><tr>
-        $dis_company
-        <td class=\"detailLabel\">$l_tasktype</td>
-        <td class=\"detailText\">$tt</td>
-       </tr><tr>
-        <td class=\"detailLabel\">$l_soldtime</td>
-        <td class=\"detailText\">$soldtime</td>
-       </tr>
-     </table>
+  $block = "
+
+    <div class=\"detailHead\">$title</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+     </tr><tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_tasktype</td>
+      <td class=\"detailText\">$tt</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_soldtime</td>
+      <td class=\"detailText\">$soldtime</td>
+     </tr>
+    </table>
   ";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -560,17 +582,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
   global $l_interninfos, $l_externinfos, $l_membersinfos, $l_advanceinfos;
   global $l_projected, $l_used, $l_remaining, $l_missing, $l_diff, $l_sold;
-  global $l_allotted, $l_no_members, $l_adv_update;
+  global $l_allotted, $l_no_members, $l_adv_update, $l_project;
   global $l_allosold, $l_usedsold, $l_progeval, $l_progress;
 
-  $allotted = 0;
-  $usedtime = 0;
-  $missingtime = 0;
-
-  $idx = 0;
-  $cpt_r=0;
-  $cpt_t=0;
-  $cpt_m=0;
   $pid = $project["id"];
 
   // retrieve project related infos
@@ -578,7 +592,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
   $tt = $project_q->f("project_tasktype_label");
   $company = $project_q->f("project_company_name");
   $status = $project_q->f("project_status");
-  
+  $soldtime = $project_q->f("project_soldtime");
+
   // Table header
   $title = ($status == 1 ? $l_externinfos : $l_interninfos);
 
@@ -588,6 +603,17 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
                     <td class=\"detailText\">$company</td>
                     </tr><tr>";
   }
+
+  if (($members_q != 0) && ($members_q->num_rows() != 0)) {
+    
+  $allotted = 0;
+  $usedtime = 0;
+  $missingtime = 0;
+
+  $idx = 0;
+  $cpt_r=0;
+  $cpt_t=0;
+  $cpt_m=0;
 
   // list the tasks of the project
   while ($tasks_q->next_record()) {
@@ -683,16 +709,16 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
     }
   }
 
-  $dis_memhead = "<td>&nbsp;</td>";
+  $dis_memhead = "<td class=\"projectHead\">&nbsp;</td>\n";
 
   // diplay the members of the project
   for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
     $m_id = $array_mem[$cpt_e]["id"];
     $m_name = $array_mem[$cpt_e]["name"];
-    $dis_memhead .= "<td class=\"detailLabel\">$m_name</td>\n";
+    $dis_memhead .= "<td class=\"projectHead\">$m_name</td>\n";
   }
 
-  $dis_memhead .= "<td class=\"detailLabel\">$l_total</td>\n";
+  $dis_memhead .= "<td class=\"projectHead\">$l_total</td>\n";
 
   // display the rest of the array (ie. tasknames - projected times)
   for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
@@ -703,8 +729,12 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
 
     $t_haschild = $array_child[$t_id];
 
-    $dis_member .= "<tr>\n<td class=\"detailLabel\">$t_label</td>\n";
-      
+    if ($t_parent) {
+      $dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
+    } else {
+      $dis_member .= "<tr>\n<td class=\"projectCtask\">$t_label</td>\n";
+    }
+
     //write a line (corresponding to a task)
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
 
@@ -719,9 +749,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
 	$tm_label = "";
 
       if ($t_haschild) {
-	$dis_member .= "<td class=\"detailText\">&nbsp;</td>\n";
+	$dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+      } else if ($t_parent) {
+	$dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
       } else {
-	$dis_member .= "<td class=\"detailText\">$tm_label</td>\n";
+	$dis_member .= "<td class=\"projectCtime\">$tm_label</td>\n";
       }
     }
 
@@ -730,17 +762,21 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
       $tm_proj = $array_partot["proj"][$t_id];
       $tm_miss = $array_partot["miss"][$t_id];
       $tm_used = $array_partot["used"][$t_id];
+
+      if (!(isset($tm_miss))) $tm_miss = 0;
+      if (!(isset($tm_proj))) $tm_proj = 0;
+
       $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-      $dis_member .= "<td class=\"detailText\">$tm_label</td>\n";
+      $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     } else {
-      $dis_member .= "<td>&nbsp;</td>";
+      $dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
     }
 
     $dis_member .= "</tr>\n";
   }
 
   //display the last line (totals by members)
-  $dis_member .= "<tr>\n <td class=\"detailLabel\">$l_total</td>\n";
+  $dis_member .= "<tr>\n <td class=\"projectPtask\">$l_total</td>\n";
 
   for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
     $m_id = $array_mem[$cpt_e]["id"];
@@ -749,7 +785,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
     $tm_miss = $array_memtot["miss"][$m_id];
     $tm_used = $array_memtot["used"][$m_id];
     $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-    $dis_member .= "<td class=\"detailText\">$tm_label</td>\n";
+
+    $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
   }
 
   //last cell (total of totals)
@@ -757,13 +794,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
   $tm_miss = $timetot["miss"];
   $tm_used = $timetot["used"];
   $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-  $dis_member .= "<td class=\"detailText\">$tm_label</td>\n";
+  $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
   $dis_member .= "</tr>\n";
-
-  // Project advance stats
-  $soldtime = $project_q->f("project_soldtime");
-  //   $remainingtime = $soldtime - $usedtime;
-  //   $difftime = $remainingtime - $missingtime;
 
   $ratio_allosold = intval(($allotted/$soldtime)*100);
   $ratio_usedsold = intval(($usedtime/$soldtime)*100);
@@ -775,6 +807,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
     $ratio_progress = intval(($usedtime/($usedtime + $missingtime))*100);
   
   $ratio_progeval = intval((($usedtime + $missingtime)/$soldtime)*100);
+
+  $span = $cpt_m + 2;
 
   //advance array
   $dis_advance = "<tr>
@@ -806,64 +840,55 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
                    <td class=\"detailText\" align=\"right\">$ratio_progeval</td>
                   </tr>";
 
-  // diplay buttons
+  } else {
     
-  $span = $cpt_m + 2;
+    $dis_member = "<tr>
+                    <td class=\"detailText\">$l_no_members</td>
+                   </tr>";
 
-  $dis_button = "<form method=\"post\" name=\"form_advance\"
-                   action=\"".url_prepare("project_index.php")."\">
-                   <table class=\"details\">
-                    <tr>
-                     <td align=\"center\">
-                      <input type=\"hidden\" name=\"action\" value=\"advanceupdate\" />
-                      <input type=\"hidden\" name=\"param_project\" value=$pid />
-                      <input type=\"submit\" value=\"$l_adv_update\" />
-                     </td>
-                    </tr>
-                   </table>
-                  </form>
-                  ";
+    $dis_advance = "<tr>
+                   <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
+                   <td class=\"detailText\" align=\"right\">$soldtime</td>
+                   <td width=10%>&nbsp;&nbsp;</td>
+                   <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
+                   <td class=\"detailText\" align=\"right\">0 %</td>
+                  </tr>";
+  }
+    
+  $display["title"] = "<div class=\"title\">$l_project : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-     <table class=\"details\">
-       <tr>
-         <td colspan=\"2\" class=\"detailHead\">$title</td>
-       </tr>
-       <tr><td colspan=5>&nbsp;</td></tr>
-       <tr>
-        <td class=\"detailLabel\">$l_name</td>
-        <td class=\"detailText\">$name</td>
-       </tr><tr>
-        $dis_company
-        <td class=\"detailLabel\">$l_tasktype</td>
-        <td class=\"detailText\">$tt</td>
-       </tr>
-     </table>
-	
-     <br>
+  $block = "
+    <div class=\"detailHead\">$title</div>
 
-     <table class=\"details\">
-       <tr>
-        <td colspan=\"5\" class=\"detailHead\">$l_advanceinfos</td>
-       </tr>
-       <tr><td colspan=5>&nbsp;</td></tr>
-       $dis_advance
-     </table>
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+     </tr>
+     <tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_tasktype</td>
+      <td class=\"detailText\">$tt</td>
+     </tr>
+    </table>
+ 	
+    <div class=\"detailHead\">$l_advanceinfos</div>
 
-     <br>
+    <table class=\"detail\">
+      $dis_advance
+    </table>
 
-     <table class=\"details\">
-       <tr>
-        <td colspan=\"$span\" class=\"detailHead\">$l_membersinfos</td>
-       </tr>
-       <tr><td colspan=\"$span\">&nbsp;</td></tr>
-       $dis_memhead
-       $dis_member
-     </table>
+    <div class=\"detailHead\">$l_membersinfos</div>
 
-     $dis_button";
+    <table cellpadding=\"20%\" cellspacing=\"0\">
+      $dis_memhead
+      $dis_member
+    </table>
+    ";
+  //remettre le cellpadding
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -878,6 +903,7 @@ function html_project_tasklist($tasks_q, $project) {
   global $l_no_tasks;
 
   $pid = $project["id"];
+  $origin = $project["origin"];
 
   if (($tasks_q != 0) && ($tasks_q->num_rows() != 0)) {
 
@@ -889,7 +915,9 @@ function html_project_tasklist($tasks_q, $project) {
       $t_rank = $tasks_q->f("projecttask_rank");
       
       if ($t_parent == 0) {
-	$array_task[$t_id] = "<tr>\n<td align=\"right\"><input type=\"checkbox\" name=\"cb_task$t_id\"/></td>\n";
+	$array_task[$t_id] = "<tr>\n<td align=\"right\" width=\"5%\">";
+	$array_task[$t_id] .= "<input type=\"checkbox\" name=\"cb_task$t_id\"/>";
+	$array_task[$t_id] .= "</td>\n";
 	$array_task[$t_id] .= "<td class=\"detailLabel\" colspan=\"3\">$t_label</td>\n</tr>\n";
       } else {
 	$array_task[$t_parent] .= "<tr>\n<td align=\"right\"><input type=\"checkbox\" name=\"cb_task$t_id\"/></td>\n";
@@ -901,40 +929,113 @@ function html_project_tasklist($tasks_q, $project) {
       $dis_task .= $val;
     }
 
-    $dis_button  = "<tr>\n";
-    $dis_button .= " <td>&nbsp;</td>\n";
-    $dis_button .= " <td>\n";
-    $dis_button .= "  <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />\n";
+    $action = ($origin=="consult" ? "detailconsult" : "member_fill");
+
+    //bcontins mettre dans un block
+    $dis_button  = "  <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />\n";
+    $dis_button .= "  <input type=\"hidden\" name=\"param_origin\" value=\"$origin\" />\n";
     $dis_button .= "  <input type=\"hidden\" name=\"action\" value=\"task_del\" />\n";
     $dis_button .= "  <input type=\"submit\" value=\"$l_del_task_sel\" />\n";
-    $dis_button .= " <td>\n";
     $dis_button .= " </form>\n";
     $dis_button .= " <form name=\"form_taskvalid\" method=\"post\">\n";
-    $dis_button .= " <td>\n";
     $dis_button .= "  <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />\n";
-    $dis_button .= "  <input type=\"hidden\" name=\"action\" value=\"member_fill\" />\n";
+    $dis_button .= "  <input type=\"hidden\" name=\"action\" value=\"$action\" />\n";
     $dis_button .= "  <input type=\"submit\" value=\"$l_valid_task\" />\n";
-    $dis_button .= " <td>\n";
-    $dis_button .= "</tr>\n";
 
   } else {
 
     $dis_task = "<tr><td>&nbsp;</td><td class=\"detailText\" colspan=\"2\">$l_no_tasks</td></tr>\n";
   }
   
-  echo "
+  $block = "
     <form name=\"form_tasklist\" method=\"post\">
-     <table class=\"details\">
+     <table class=\"detail\">
       $dis_task
-      $dis_button
      </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+
     </form>
   ";
 
+  return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Project Member List                                          //
+// Parameters :
+//   - $tasks_q     : DBO : list of tasks related to the deal
+//   - $members_q   : DBO : list of members
+//   - $project[]   : project search criteria
+//     keys used    : id
+///////////////////////////////////////////////////////////////////////////////
+function html_project_member_form($members_q, $project) {
+  global $l_no_members, $l_member_add, $l_membersinfos, $l_del_member_sel;
+  global $l_valid_member;
+
+  $pid = $project["id"];
+
+  if (($members_q != 0) && ($members_q->num_rows() != 0)) {
+
+    while ($members_q->next_record()) {
+
+      $m_id = $members_q->f("member_id");
+      $m_name = $members_q->f("member_lastname"). " " .$members_q->f("member_firstname");
+
+      $dis_member .= "<tr><td align=\"right\"><input type=\"checkbox\" name=\"cb_user$m_id\"/></td> ";
+      $dis_member .= "<td class=\"detailLabel\" colspan=\"2\">$m_name</td></tr>\n";
+    }
+
+    $dis_button  = " <input type=\"hidden\" name=\"param_project\" value=$pid>";
+    $dis_button .= " <input type=\"hidden\" name=\"action\" value=\"member_del\">";
+    $dis_button .= " <input type=\"submit\" value=\"$l_del_member_sel\"";
+    $dis_button .= "  onclick=\"submit_memberdel(this.form)\" />";
+    $dis_button .= "</form>";
+    $dis_button .= "<form name=\"form_membervalid\" method=\"post\"";
+    $dis_button .= "      action=\"".url_prepare("project_index.php")."\">";
+    $dis_button .= " <input type=\"hidden\" name=\"param_project\" value=$pid>";
+    $dis_button .= " <input type=\"hidden\" name=\"action\" value=\"membertime_fill\">";
+    $dis_button .= " <input type=\"submit\" value=\"$l_valid_member\" />";
+
+    $span = 3;
+
+  } else {
+
+    $dis_member  = "<tr>\n";
+    $dis_member .= "  <td class=\"detailText\">$l_no_members</td>\n";
+    $dis_member .= "</tr>\n";
+
+    $dis_button .= "<input type=\"submit\" value=\"$l_member_add\"";
+    $dis_button .= "  onclick=\"if(submit_memberadd(this.form, $pid)) return true; else return false;\" />";
+
+    $span = 1;
+  }
+
+  $block = "
+   <form name=\"form_memberdel\" method=\"post\"
+         action=\"".url_prepare("project_index.php")."\">
+
+    <div class=\"detailHead\">$l_membersinfos</div>
+
+    <table class=\"detail\">
+       $dis_member
+    </table>
+
+    <div class=\"detailButton\">
+     <p class=\"detailButtons\">$dis_button</p>
+    </div>
+
+   </form>
+   ";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Project Member Time List                                     //
 // Parameters :
 //   - $tasks_q     : DBO : list of tasks related to the deal
 //   - $members_q   : DBO : list of members
@@ -1013,15 +1114,18 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
       }
     }
 
-    $dis_memhead = "<td>&nbsp;</td>";
+    $dis_memhead = "<tr><td>&nbsp;</td>";
 
     // diplay the members of the project
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
       $m_name = $array_mem[$cpt_e]["name"];
-      $dis_memhead .= "<td><input type=\"checkbox\" name=\"cb_user$m_id\"/></td> ";
+      //smpl ca bouge
+      //       $dis_memhead .= "<td><input type=\"checkbox\" name=\"cb_user$m_id\"/></td> ";
       $dis_memhead .= "<td class=\"detailLabel\">$m_name</td>\n";
     }
+
+    $dis_memhead .= "<tr>";
 
     // display the rest of the array (ie. tasknames - projected times)
     for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
@@ -1040,9 +1144,9 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
 	$tm_proj = $array_time[$t_id][$m_id];
 
 	if ($t_parent) {
- 	  $dis_member .= "<td class=\"detailText\" colspan=\"2\">&nbsp;</td>\n";
+ 	  $dis_member .= "<td class=\"detailText\">&nbsp;</td>\n";
 	} else {
-	  $dis_member .= "<td colspan=\"2\">";
+	  $dis_member .= "<td>";
 	  $dis_member .= "<input type=\"text\" name=\"tf_projected[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\"/>";
 	  $dis_member .= "</td>\n";
 	}
@@ -1051,13 +1155,8 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
       $dis_member .= "</tr>\n";
     }
     
-    $dis_button  = "<td>";
-    $dis_button .= " <input type=\"submit\" value=\"$l_del_member_sel\"";
-    $dis_button .= "  onclick=\"submit_memberdel(this.form)\" />";
-    $dis_button .= "</td><td>";
-    $dis_button .= " <input type=\"submit\" value=\"$l_valid_member\"";
-    $dis_button .= "  onclick=\"if(check_membervalid(this.form, $cpt_m)) return true; else return false;\" />";
-    $dis_button .= "</td>";
+     $dis_button .= "<input type=\"submit\" value=\"$l_valid_member\"";
+     $dis_button .= " onclick=\"if(check_membertimevalid(this.form, $cpt_m)) return true; else return false;\" />";
     
     $span = $cpt_m*2 + 1;
 
@@ -1067,31 +1166,32 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
     $dis_memtab .= "  <td class=\"detailText\">$l_no_members</td>\n";
     $dis_memtab .= "</tr>\n";
     
-    $dis_button  = "<td>";
-    $dis_button .= "  <input type=\"submit\" value=\"$l_member_add\"";
-    $dis_button .= "   onclick=\"if(submit_memberadd(this.form, $pid)) return true; else return false;\" />";
-    $dis_button .= "</td>";
+    $dis_button  = "<input type=\"submit\" value=\"$l_member_add\"";
+    $dis_button .= " onclick=\"if(submit_memberadd(this.form, $pid)) return true; else return false;\" />";
     
     $span = 1;
 
   }
  
-   echo "
-     <form name=\"form_memberlist\" method=\"post\">
-     <table class=\"details\">
-      <tr>
-       <td colspan=\"$span\" class=\"detailHead\">$l_membersinfos</td>
-      </tr><tr>
+   $block = "
+     <form name=\"form_membertimevalid\" method=\"post\">
+
+      <div class=\"detailHead\">$l_membersinfos</div>
+
+      <table class=\"detail\">
        $dis_memhead
-      </tr>
-      $dis_member
-     </table>
-      <input type=\"hidden\" name=\"param_project\" value=$pid>
-     <table class=\"details\">
-     <tr>$dis_button</tr>
-     </table>
+       $dis_member
+      </table>
+       <input type=\"hidden\" name=\"param_project\" value=$pid>
+
+     <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_button</p>
+     </div>
+
      </form>
      ";
+
+   return $block;
 }
 
 
@@ -1108,7 +1208,7 @@ function html_project_advance($members_q, $tasks_q, $project) {
   global $l_projected, $l_used, $l_remaining, $l_prevmissing, $l_nextmissing;
   global $l_advanceinfos, $l_adv_update;
 
-  //smlp tout refaire la
+  //smlp tout refaire là
   $idx = 0;
   $cpt_r=0;
   $cpt_t=0;
@@ -1215,36 +1315,34 @@ function html_project_advance($members_q, $tasks_q, $project) {
     $dis_member .= "</tr>\n";
   }
     
-  $dis_button = "<table class=\"details\">
-                   <tr>
-                    <td align=\"center\">
-                     <input type=\"hidden\" name=\"action\" value=\"a_update\" />
-                     <input type=\"hidden\" name=\"param_project\" value=$pid />
-                     <input type=\"submit\" value=\"$l_adv_update\" />
-                    </td>
-                   </tr>
-                  </table>
-                 </form>
+  $dis_button = "<input type=\"hidden\" name=\"action\" value=\"a_update\" />
+                 <input type=\"hidden\" name=\"param_project\" value=$pid />
+                 <input type=\"submit\" value=\"$l_adv_update\" />
                 ";
     
   $span = $cpt_m + 1;
 
   // --- HTML Template --------------------------------------------------------
   
-  echo "
+  $block = "
      <form method=\"post\" name=\"form_advance2\"
          onsubmit=\"if (check_advancevalid(this)) return true; else return false;\"
          action=\"".url_prepare("project_index.php")."\">
-     <table class=\"details\">
-       <tr>
-        <td colspan=\"$span\" class=\"detailHead\">$l_membersinfos</td>
-       </tr>
-       <tr><td colspan=$span>&nbsp;</td></tr>
+
+     <div class=\"detailHead\">$l_membersinfos</div>
+
+     <table class=\"detail\">
        $dis_memhead
        $dis_member
      </table>
-      $dis_button
+
+     <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_button</p>
+     </div>
+
      </form>";
+
+  return $block;
 }
 
 
@@ -1261,19 +1359,20 @@ function dis_project_display_pref($display_newpref_q, $display_searchpref_q) {
   $dis_pref->display_entity = "project_new"; 
   $dis_pref->pref_title = $l_newproject_display;
 
-  echo "<table class=\"details\"><tr><td>";
-  $dis_pref->display();
-  echo "</td>";
+  $block .= "<table class=\"detail\"><tr><td>";
+  $block .= $dis_pref->display();
+  $block .= "</td>";
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
   $dis_pref->display_entity = "project"; 
   $dis_pref->pref_title = $l_searchproject_display;
 
-  echo "<td>";
-  $dis_pref->display();
-  echo "</td></tr></table>";
+  $block .= "<td>";
+  $block .= $dis_pref->display();
+  $block .= "</td></tr></table>";
 
-  $dis_pref->dis_pref_help();
+  $block .= $dis_pref->dis_pref_help();
+  return $block;
 }
 
 </SCRIPT>

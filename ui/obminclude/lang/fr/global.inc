@@ -136,6 +136,11 @@ $l_header_dupplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
+
+$l_header_ = "";
+$l_header_man_task = "Tâches";
+$l_header_man_member = "Participants";
+$l_header_man_advance = "Avancement";
 $l_header_add_member = "Ajouter participant";
 
 $l_header_reset = "Préférence par défaut";
@@ -154,6 +159,13 @@ $l_header_month = "Mois";
 $l_header_year = "Année";
 $l_header_new_event = "Nouveau rdv";
 
-//TIME
 $l_header_admin = "Administration";
+$l_header_stats = "Statistiques";
+$l_header_statsmonth = "Statistiques mensuelles";
+$l_header_statsuser = "Statistiques utilisateur";
+
+//time headers
+$l_header_weeklyview = "Semaine";
+$l_header_monthlyview = "Mois";
+$l_header_globalview = "Vue Globale";
 $l_header_stats = "Statistiques";

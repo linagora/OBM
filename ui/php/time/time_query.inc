@@ -15,15 +15,10 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($time, $p_new_order, $p_order_dir) {
+function run_query_search($time) {
   global $auth, $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
-
-  //debug_array($time);
-  //reset($time);
-  //  echo "date $date<br>";
-  //  echo "interval $interval<br>";
 
   if ($time["interval"] == "week") {
       $array_date = get_week_point($date);
@@ -50,39 +45,6 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
       and timetask_user_id = ". $time["user_id"] ."
     order by timetask_date
     ";
- 
-  //bcontins les parametres de recherche servent ils ?
-  // If a time interval has been specified, get it 
-//   if (is_array($array_date)) {
-//     $query .= "and task_date  >='" . $array_date[0] . "' and " .
-//               "task_date  <'" . $array_date[1] . "'";
-//   }
-
-  // If a company indication has been specified, get it 
-//   if ($company != "") {
-//     $query .= " and company_name like '" . $company . "%'";
-//   }
-
-  // If a company was sent as parameter, get it
-//   if ($company_id != "") {
-//     $query .= " and company_id =" . $company_id ;
-//   }
-
-  // user_id : array -> size 1 or more 
-//   if (sizeof($time["user_id"]) == 1)
-// 	  $query .= " and task_user_id = ". $time["user_id"];
-//   else {
-// 	$users_list = array_to_list($time["user_id"]);
-// 	$query .= " and task_user_id in $users_list";
-//   }
-
-  // order
-//   if (strcmp($p_new_order,"") != 0)
-//     $order = $p_new_order;
-//   else
-//     $order = "Task.task_date";
-
-//   $query .= " order by $order $p_order_dir";
    
   display_debug_msg($query, $cdg_sql,"run_query_search");
   $obm_db = new DB_OBM;
@@ -93,7 +55,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task grouped by day and summed by task length                             //
+// Task grouped by month and summed by task length                           //
 // Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       week, user_id, date, date_end
@@ -102,42 +64,151 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 // Returns:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_by_day($time, $p_new_order, $p_order_dir) {
+function run_query_stat_project_by_month($time) {
   global $auth, $c_day_fraction, $cdg_sql;
 
-  $week = $time["week"];
-  $user_id = $time["user_id"];
-  $week_start = $time["date"];
-  $week_end = $time["date_end"];
+  $year=substr($time["date"],0,4);
+  $month=substr($time["date"],4,2);
+  $day=1;
+
+  // First and last days of month
+  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
+  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
 
   // task_valid 0 if checkbox not to be shown
-  $query = "select
-      concat(sum(task_length),concat('/',$c_day_fraction)) as task_totallength,
-      UNIX_TIMESTAMP(task_date) as date_task,
-      (1=sum(task_length)/$c_day_fraction and task_status<>2) as task_valid,
-      task_status
-    from Task
-    where task_date>='$week_start'
-      and task_date<='$week_end' ";
+  $query = "
+    select
+      deal_label,
+      company_name,
+      FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
+      FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
+      FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
+    from TimeTask, ProjectTask, Deal
+    left join Company on deal_company_id = company_id
+    where timetask_date <= '$month_end'
+      and timetask_projecttask_id = projecttask_id
+      and projecttask_deal_id = deal_id
+    group by deal_id
+    having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
+    ";
 
-  // user_id : array -> size 1 or more 
-  if (sizeof($time["user_id"]) == 1)
-	  $query .= " and task_user_id = ". $time["user_id"];
-  else {
-	$users_list = array_to_list($time["user_id"]);
-	$query .= " and task_user_id in $users_list";
-  }
+  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
 
-  // group and order
-  $query .=   "  group by task_date order by task_date ";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_by_day");
-//  echo "$query <br>";
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   return $obm_db;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Task grouped by month and summed by task length                           //
+// Parameters:
+//   - $time[]    :    time search criteria
+//     keys used       week, user_id, date, date_end
+//   - $p_new_order  : infos for order clause
+//   - $p_order_dir  : direction for order clause (asc, desc)
+// Returns:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_stat_tasktype_by_month($time) {
+  global $auth, $c_day_fraction, $cdg_sql;
+
+  $year=substr($time["date"],0,4);
+  $month=substr($time["date"],4,2);
+  $day=1;
+
+  // First and last days of month
+  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
+  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
+
+  // task_valid 0 if checkbox not to be shown
+  $query = "
+    select
+      tasktype_label,
+      FORMAT(sum(if (timetask_date < '$month_begin', timetask_length, 0)) / $c_day_fraction,3) as total_before,
+      FORMAT(sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0)) / $c_day_fraction,3) as total_length,
+      FORMAT(sum(timetask_length) / $c_day_fraction,3) as total_after
+    from TimeTask, TaskType
+    where timetask_date <= '$month_end'
+      and timetask_tasktype_id = tasktype_id
+    group by tasktype_id
+    having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
+
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Task grouped by month and summed by task length                           //
+// Parameters:
+//   - $time[]    :    time search criteria
+//     keys used       week, user_id, date, date_end
+//   - $p_new_order  : infos for order clause
+//   - $p_order_dir  : direction for order clause (asc, desc)
+// Returns:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_stat_project_by_user($time) {
+  global $auth, $c_day_fraction, $cdg_sql;
+
+  $user_id = $time["user_id"];
+
+  $query = "
+    select
+      deal_label,
+      company_name,
+      FORMAT(sum(timetask_length / $c_day_fraction),3) as total_spent
+    from TimeTask, ProjectTask, Deal
+    left join Company on deal_company_id = company_id
+    where timetask_user_id = $user_id
+      and timetask_projecttask_id = projecttask_id
+      and projecttask_deal_id = deal_id
+      and deal_archive = 0
+      and deal_project_status in (1,2)
+    group by deal_id
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
+
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Task grouped by month and summed by task length                           //
+// Parameters:
+//   - $time[]    :    time search criteria
+//     keys used       week, user_id, date, date_end
+//   - $p_new_order  : infos for order clause
+//   - $p_order_dir  : direction for order clause (asc, desc)
+// Returns:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_stat_tasktype_by_user($time) {
+  global $auth, $c_day_fraction, $cdg_sql;
+
+  $user_id = $time["user_id"];
+
+  $query = "
+    select
+      tasktype_label,
+      FORMAT(sum(timetask_length / $c_day_fraction),3) as total_spent
+    from TimeTask, TaskType
+    where timetask_user_id = $user_id
+      and timetask_tasktype_id = tasktype_id
+    group by tasktype_id 
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
+
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  return $obm_db;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Task grouped by task and deal and summed by task length               //
@@ -342,7 +413,7 @@ function run_query_valid_search($time) {
   $user_id = $time["user_id"];
   //  echo "Run_query_valid_search<br>";
   //  print_r($time);
-  $query = "select timetask_date, timetask_status 
+  $query = "select timetask_date, timetask_status
       from TimeTask 
       where timetask_status != 0 
         and timetask_date >= '". $week_span[0] ."' 
@@ -366,7 +437,7 @@ function run_query_valid_search($time) {
 
   $i=0; //for loop
   while($obm_db->next_record()) {
-    $valid_array[substr($obm_db->f("task_date"),0,8)]= $obm_db->f("task_status");
+    $valid_array[substr($obm_db->f("timetask_date"),0,8)]= $obm_db->f("timetask_status");
   }
    
   return $valid_array; 
@@ -634,12 +705,11 @@ function run_query_validate($who) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and month                 
-//   - $option : 'all' allow a request for all users
-// Returns : DB object result
+// Task Validation                                                          //
+// Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_one_month($time, $option='') {
-global $cdg_sql, $cdg_param;
+function run_query_adminvalidate($time) {
+  global $cdg_sql, $cdg_param;
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
@@ -650,17 +720,86 @@ global $cdg_sql, $cdg_param;
   $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
 
   $user_id = $time["user_id"];
-  //  echo "Run_query_valid_search<br>";
-  //  print_r($time);
-  $query = "select sum(task_length) as total_length, substring(task_date,7,2) as day_in_month, 
-        task_user_id as userid from Task where  
-         task_date >= '$month_begin' 
-        and task_date <= '$month_end' ";
+
+  $query = "
+    update TimeTask
+    set timetask_status = 2
+    where timetask_user_id = $user_id
+      and timetask_date >= '$month_begin' 
+      and timetask_date <= '$month_end' 
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_adminvalidate");
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Validation                                                          //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function run_query_adminunvalidate($time) {
+  global $cdg_sql, $cdg_param;
+
+  $year=substr($time["date"],0,4);
+  $month=substr($time["date"],4,2);
+  $day=1;
+
+  // First and last days of month
+  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
+  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
+
+  $user_id = $time["user_id"];
+
+  $query = "
+    update TimeTask
+    set timetask_status = 1
+    where timetask_user_id = $user_id
+      and timetask_date >= '$month_begin' 
+      and timetask_date <= '$month_end' 
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_adminvalidate");
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Timemanager: qet tasks for given user and month                 
+//   - $option : 'all' allow a request for all users
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_task_one_month($time, $option='') {
+  global $cdg_sql, $cdg_param;
+
+  $year=substr($time["date"],0,4);
+  $month=substr($time["date"],4,2);
+  $day=1;
+
+  // First and last days of month
+  $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
+  $month_end = date("Ymd", mktime(23,0,0,$month+1, $day-1, $year));
+
+  $user_id = $time["user_id"];
+
+  $query = "
+    select sum(timetask_length) as total_length,
+      substring(timetask_date,7,2) as day_in_month, 
+      timetask_user_id as userid,
+      timetask_status
+    from TimeTask, UserObm
+    where timetask_date >= '$month_begin' 
+      and timetask_date <= '$month_end'
+      and timetask_user_id = userobm_id
+    ";
 
   // user_id : array -> size 1 or more 
   if (empty($option))
-	  // && (sizeof($time["user_id"]) == 1))
-	  $query .= " and task_user_id = ". $time["user_id"];
+	  $query .= " and timetask_user_id = ". $time["user_id"];
   elseif ($option == 'all')
 	  display_debug_msg("\$option='all', select for all users", $cdg_param,
 						"run_query_task_one_month");
@@ -669,7 +808,10 @@ global $cdg_sql, $cdg_param;
   }
 
   // Group
-  $query .= " group by task_user_id, day_in_month order by task_user_id, day_in_month ";
+  $query .= "
+    group by timetask_user_id, day_in_month
+    order by userobm_lastname, userobm_firstname, day_in_month 
+    ";
   
   display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
   $obm_db = new DB_OBM;

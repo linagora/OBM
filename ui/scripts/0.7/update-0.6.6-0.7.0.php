@@ -290,7 +290,21 @@ function fill_preferences() {
         ($id,'project','project_company_name',2,1),
         ($id,'project','project_tasktype',3,1),
         ($id,'project','project_soldtime',4,1),
-        ($id,'project','project_archive',5,1)
+        ($id,'project','project_archive',5,1),
+        ($id,'time_projmonth','deal_label',1,2),
+        ($id,'time_projmonth','company_name',2,2),
+        ($id,'time_projmonth','total_length',3,1),
+        ($id,'time_projmonth','total_before',4,1),
+        ($id,'time_projmonth','total_after',5,1),
+        ($id,'time_ttmonth','tasktype_label',1,2),
+        ($id,'time_ttmonth','total_length',2,1),
+        ($id,'time_ttmonth','total_before',3,1),
+        ($id,'time_ttmonth','total_after',4,1),
+        ($id,'time_projuser','deal_label',1,2),
+        ($id,'time_projuser','company_name',2,2),
+        ($id,'time_projuser','total_spent',3,1),
+        ($id,'time_ttuser','tasktype_label',1,2),
+        ($id,'time_ttuser','total_spent',2,1)
     ";
 
     //     echo "$query \n ---------------------------------------------\n";

@@ -35,24 +35,53 @@ function uncheck_days(data) {
 ////////////////////////
 // Deal Form checking //
 ////////////////////////
-//bcontins sert-ce ?
 echo "
-function check_form(f_aff) {
+function check_addtaskform(f_aff) {
 
-  if (! check_sel_tasktype(f_aff)) {
+  if (! check_sel_date(f_aff)) {
     return false;
   }
-  else if (! check_sel_project(f_aff)) {
+  else if (! check_sel_tasktype(f_aff)) {
     return false;
   }
+//   else if (! check_sel_project(f_aff)) {
+//     return false;
+//   }
+//   else if (! check_sel_projecttask(f_aff)) {
+//     return false;
+//   }
   else
     return true;
 }
 ";
 
 echo "
+function check_sel_date(form) {
+  error = 1;
+
+  for (i = 0; i < form.length; i++) {
+    i_name = form.elements[i].name.substr(0,6);
+    i_checked = form.elements[i].checked;
+    
+    if (i_name == \"cb_day\") { 
+      cb = 1;
+
+      if (i_checked != \"\") {
+	error = 0;
+      }
+    }
+  }
+
+  if (error && cb) {
+    alert (\"$l_j_select_day\");
+    return false;
+  } else {
+    return true;
+  }
+
+}
+
 function check_sel_tasktype(form) {
-  //  alert(\"value\" + form.sel_tasktype.selectedIndex);
   if (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value == 0) {
     alert (\"$l_j_select_tasktype\");
     return false;
@@ -60,15 +89,23 @@ function check_sel_tasktype(form) {
     return true;
 }
 
-function check_sel_project(form) {
-  //alert(\"value\" + form.sel_tasktype.selectedIndex);
-  if ((form.sel_project.options[form.sel_project.selectedIndex].value == 0) &&
-       (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value < 10)) {
-    alert (\"$l_j_select_project\");
-    return false;
-  } else
-    return true;
-}
+// function check_sel_project(form) {
+//   if ((form.sel_project.options[form.sel_project.selectedIndex].value == 0) &&
+//        (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value < 10)) {
+//     alert (\"$l_j_select_project\");
+//     return false;
+//   } else
+//     return true;
+// }
+
+// function check_sel_projecttask(form) {
+//   if ((form.sel_project.options[form.sel_projecttask.selectedIndex].value == 0) &&
+//        (form.sel_tasktype.options[form.sel_project.selectedIndex].value != 0)) {
+//     alert (\"$l_j_select_projecttask\");
+//     return false;
+//   } else
+//     return true;
+// }
 
 /////////////////////////////////////
 // project dynamic list generation //

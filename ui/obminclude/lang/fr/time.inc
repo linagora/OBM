@@ -21,10 +21,11 @@ $l_task_del="Suppr";
 $l_company = "Société";
 $l_delete = "Supprimer les tâches";
 $l_length="Durée";
-$l_total_length="Durée cumulée";
-$l_total_before="Durée cumulée précédente";
+
 $l_total_period="Durée sur la période";
-$l_total="Total";
+$l_total_spent="Temps utilisé";
+$l_total_before="Durée cumulée précédente";
+$l_total_after="Durée cumulée suivante";
 $l_day="Jour";
 $l_period="Période";
 
@@ -39,6 +40,7 @@ $l_all_users="Tous ?";
 $l_see = "Voir";
 $l_validate_task = "Validée";
 $l_valid = "Valider";
+$l_unvalid = "Annuler";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 $l_fill= "compléter";
@@ -48,11 +50,12 @@ $l_week_next = "Semaine suivante";
 $l_week_prev = "Semaine précédente";
 $l_month_next = "Mois suivant";
 $l_month_prev = "Mois précédent";
-$l_date = "Date:";
-$l_project = "Projet:";
-$l_task = "Tache:";
-$l_label = "Label:";
-$l_duration = "Durée:";
+$l_date = "Date";
+$l_project = "Projet";
+$l_cat = "Catégorie";
+$l_task = "Tache";
+$l_label = "Label";
+$l_duration = "Durée";
 
 $show_events="Voir le Détail";
 $total_menu="Récapitulatifs";
@@ -79,7 +82,7 @@ $l_time = "Gestion des temps";
 $l_projects_manager = "Confirmation de la validation des taches par l'administrateur:";
 $l_found_task = "Voici les tâches réalisées et saisies pour la semaine en cours:";
 $l_found = "Taches trouvées.";
-$l_no_found = "Aucune Taches pour cet utilisateur!";
+$l_no_found = "Aucune tache pour cet utilisateur!";
 $l_addtask_start = "Saisissez les tâches réalisées pour la semaine en cours. La durée s'entend en fraction de journée (entre 1/";
 $l_addtask_end = " et 1).";
 $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
@@ -93,6 +96,15 @@ $l_total_days_msg3 = " sur ";
 $l_total_days_msg4 = " (total à remplir)";
 $l_total_user_msg1 = "Total jours pour cet utilisateur ";
 
+$l_projuser_stats = "Participation de cette personne aux projets en cours";
+$l_no_projuser_stats = "Cette personne ne participe à aucun projet";
+$l_ttuser_stats = "Répartition du temps de travail par type de tâche";
+$l_no_ttuser_stats = "Cette personne n'utilise pas la gestion des temps";
+$l_projmonth_stats = "Participation aux projets ce mois-ci";
+$l_no_projmonth_stats = "Aucun renseignement sur la participation aux projets ce mois-ci";
+$l_ttmonth_stats = "Répartition du temps de travail par type de tâche ce mois-ci";
+$l_no_ttmonth_stats = "Aucun renseignement n'a été saisi pour la gestion des temps ce mois-ci";
+
 // Type de tâches à rechercher
 $l_tasktype = "Type des tâches";
 $l_task_all = "Toutes";
@@ -100,7 +112,9 @@ $l_task_uservalid = "Validées par l'admin ou l'utilisateur";
 $l_task_adminvalid= "Validées par l'admin uniquement";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_tasktype = "Vous devez sélectionner un type de tâche.";
+$l_j_select_day = "Vous devez sélectionner un jour.";
+$l_j_select_tasktype = "Vous devez sélectionner une catégorie.";
 $l_j_select_project = "Vous devez sélectionner un project pour une tâche facturée.";
+$l_j_select_projecttask = "Vous devez sélectionner une tâche du projet project pour une tâche facturée.";
 $l_delete_confirm = "Confirmer la suppression de ces taches ?";
 

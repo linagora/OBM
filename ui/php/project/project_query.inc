@@ -32,7 +32,10 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
       deal_project_status as project_status,
       company_name as project_company_name,
       tasktype_label as project_tasktype
-    from Deal, ProjectTask, TaskType";
+    from Deal, TaskType";
+
+  if (($member != $c_all) || ($manager != $c_all))
+  $query .= ", ProjectTask";
 
   if ($member != $c_all)
   $query .= ", ProjectUser Member";
@@ -561,36 +564,14 @@ function run_query_statlog($p_id) {
 
   $frac = $c_day_fraction;
 
-  // Will change to a sub subselect when running with mysql 4.1
-  
   $query = "
-    select projecttask_id as pt_id
-    from ProjectTask
-    where projecttask_deal_id = $p_id";
+    select (sum(timetask_length)/8) as time_used
+      from TimeTask, ProjectTask
+    where timetask_projecttask_id = projecttask_id
+      and projecttask_deal_id = $p_id
+    group by projecttask_deal_id";
 
   display_debug_msg($query, $cdg_sql, "run_query_statlog(1)");
-  $ptask_q = new DB_OBM;
-  $ptask_q->query($query);
-
-  $ptask_q->next_record();
-  $pt_id = $ptask_q->f("pt_id");
-  $pt_tab = "($pt_id";
-
-  $obm_q = new DB_OBM;
-
-  while($ptask_q->next_record()) {
-    $pt_id = $ptask_q->f("pt_id");
-    $pt_tab .= ", $pt_id";  
-  }
-
-  $pt_tab .= ")";
-
-  $query = "select (sum(timetask_length)/$frac) as time_used
-            from TimeTask
-            where timetask_projecttask_id in $pt_tab
-            group by timetask_projecttask_id, timetask_user_id";
-
-  display_debug_msg($query, $cdg_sql, "run_query_statlog(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -599,11 +580,12 @@ function run_query_statlog($p_id) {
   if ($time_used == "")  $time_used = 0;
 
   $query = "select sum(projectuser_missingtime) as time_left
-            from ProjectUser
-            where projectuser_projecttask_id in $pt_tab
-            group by projectuser_projecttask_id, projectuser_user_id";
+            from ProjectUser, ProjectTask
+            where projectuser_projecttask_id = projecttask_id
+              and projecttask_deal_id = $p_id
+            group by projecttask_deal_id";
 
-  display_debug_msg($query, $cdg_sql, "run_query_statlog(3)");
+  display_debug_msg($query, $cdg_sql, "run_query_statlog(2)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
@@ -710,33 +692,49 @@ function run_query_tasks($pid) {
 // Project members query
 // Parameters :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_members() {
+function run_query_members($p_id = 0) {
   global $cdg_sql;
+  
+  if ($p_id) {
 
-  $query = "
-    select userobm_id as member_id,
-      userobm_firstname as member_firstname,
-      userobm_lastname as member_lastname
-    from UserObm, ProjectUser
-    where projectuser_user_id = userobm_id
-      and userobm_archive = 0
-    group by member_id
-    order by member_firstname
-    ";
-
-  display_debug_msg($query, $cdg_sql, "run_query_members");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
+    $query = "
+      select
+        userobm_id as member_id,
+        userobm_firstname as member_firstname,
+        userobm_lastname as member_lastname
+      from UserObm, ProjectUser, ProjectTask
+      where projecttask_deal_id = $p_id
+        and projecttask_id = projectuser_projecttask_id
+        and projectuser_user_id = userobm_id
+        and userobm_archive = 0
+      group by member_id
+      order by member_lastname
+      "; 
+  } else { 
+    $query = "
+      select
+        userobm_id as member_id,
+        userobm_firstname as member_firstname,
+        userobm_lastname as member_lastname
+      from UserObm, ProjectUser
+      where projectuser_user_id = userobm_id
+         and userobm_archive = 0
+      group by member_id
+      order by member_lastname
+      ";
+  }  
+    display_debug_msg($query, $cdg_sql, "run_query_members");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    return $obm_q;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Members time informations query
 // Parameters :
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_memberstime($p_id) {
+function run_query_membertime($p_id) {
   global $cdg_sql, $c_day_fraction;
 
   $frac = $c_day_fraction;
@@ -763,7 +761,7 @@ function run_query_memberstime($p_id) {
     order by projectuser_manager desc,userobm_lastname, userobm_firstname
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_memberstime");
+  display_debug_msg($query, $cdg_sql, "run_query_membertime");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 

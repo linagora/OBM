@@ -116,7 +116,7 @@ function submit_memberdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 // each member should be assigned to at least one task
 
-function check_membervalid(form, nb_mem)
+function check_membertimevalid(form, nb_mem)
 {
   error = 0;
   idx = 0;

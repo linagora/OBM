@@ -109,6 +109,11 @@ Update TaskType set tasktype_internal = 2 where tasktype_internal = 1;
 -------------------------------------------------------------------------------
 -- DisplayPref
 -------------------------------------------------------------------------------
+-- delete old time prefs
+DELETE
+FROM DisplayPref
+WHERE display_entity like "time%";
+
 -- add new preferences for the project displays
 INSERT INTO DisplayPref
 (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display)
@@ -119,4 +124,23 @@ VALUES (0,'project_new','project_initlabel',1,2),
        (0,'project','project_company_name',2,1),
        (0,'project','project_tasktype',3,1),
        (0,'project','project_soldtime',4,1),
-       (0,'project','project_archive',5,1);
+       (0,'project','project_archive',5,1),
+       (0,'time_projmonth','deal_label',1,2),
+       (0,'time_projmonth','company_name',2,2),
+       (0,'time_projmonth','total_length',3,1),
+       (0,'time_projmonth','total_before',4,1),
+       (0,'time_projmonth','total_after',5,1),
+       (0,'time_ttmonth','tasktype_label',1,2),
+       (0,'time_ttmonth','total_length',2,1),
+       (0,'time_ttmonth','total_before',3,1),
+       (0,'time_ttmonth','total_after',4,1),
+       (0,'time_projuser','deal_label',1,2),
+       (0,'time_projuser','company_name',2,2),
+       (0,'time_projuser','total_spent',3,1),
+--       (0,'time_projuser','total_before',3,1),
+--       (0,'time_projuser','total_after',4,1),
+       (0,'time_ttuser','tasktype_label',1,2),
+       (0,'time_ttuser','total_spent',2,1),
+--       (0,'time_ttuser','total_before',3,1),
+--       (0,'time_ttuser','total_after',4,1)
+;
