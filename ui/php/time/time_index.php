@@ -333,9 +333,9 @@ elseif ($action == "update") {
   if ( $popup == 1 ) {
     // Get elements for insertion of new task
     // TaskType
-    $obm_tasktype_q = run_query_tasktype();
+    $obm_tasktype_q = run_query_tasktype($time["user"]);
     // Project
-    $obm_project_q = run_query_project();
+    $obm_project_q = run_query_project($time);
     //get the current start and end of week
     $d_start_week = first_day_week($time);
     // Creating the dates for the selected (or current) date
@@ -355,9 +355,9 @@ elseif ($action == "update") {
 
   else {
     run_query_update($time);
-    run_query_validate($time["user_id"][0]);
+    run_query_validate($time["user_id"]["0"]);
   
-    $user_id = $time["user_id"][0];
+    $user_id = $time["user_id"]["0"];
     
     echo "
     <Script language=\"javascript\">

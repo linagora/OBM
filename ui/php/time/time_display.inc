@@ -545,9 +545,9 @@ function dis_time_list($time) {
 
   // Get elements for insertion of new task
   // TaskType
-  $obm_tasktype_q = run_query_tasktype();
+  $obm_tasktype_q = run_query_tasktype($time["user_id"]);
   // Project
-  $obm_project_q = run_query_project();
+  $obm_project_q = run_query_project($time);
 
   // dis_form_addtask does not display anything if days are full
   //   and validated
@@ -1285,7 +1285,7 @@ function dis_time_one_week($obm_dq, $time) {
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $c_day_fraction, $c_days_in_a_week;
 
-  $obm_user_q = run_query_userobm($time["user_id"][0]);
+  $obm_user_q = run_query_userobm($time["user_id"]);
   $obm_user_q->next_record();
 
   $userid = $obm_user_q->f("userobm_id");

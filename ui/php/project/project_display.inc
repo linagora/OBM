@@ -156,6 +156,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
     $tt = $project_q->f("project_tasktype_id");
     $soldtime = $project_q->f("project_soldtime");
   } else {
+    $name = $project["name"];
     $pid = $project["id"];
     $tt = $project["tt"];
     $soldtime = $project["soldtime"];
@@ -647,18 +648,19 @@ function html_project_consult($project_q, $members_q, $project) {
 //   -  $comp_id   : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_memberlist($members_q, $project) {
-  global $l_membersinfos, $l_del_member_sel, $l_valid_member;
+  global $l_membersinfos, $l_del_member_sel, $l_valid_member, $l_member_add;
+  global $l_no_members;
 
   $id = $project["id"];
 
-  if ($members_q != 0) {
+  if (($members_q != 0) && ($members_q->num_rows() != 0)) {
 
     while ($members_q->next_record()) {
-
+      
       $m_id = $members_q->f("userobm_id");
       $m_name = $members_q->f("userobm_lastname") ." ". $members_q->f("userobm_firstname");
       $m_miss = $members_q->f("missing_time");
-
+      
       $dis_members .= "<tr>\n";
       $dis_members .= "  <td align=\"right\">";
       $dis_members .= "    <input type=\"checkbox\" name=\"cb_user$m_id\" size=\"10\" maxlength=\"8\" value=\"\"/>";
@@ -667,13 +669,27 @@ function html_project_memberlist($members_q, $project) {
       $dis_members .= "  <td><input type=\"text\" name=\"tf_projected[$m_id]\" size=\"10\" maxlength=\"8\" value=\"$m_miss\"/></td>\n";;
       $dis_members .= "</tr>\n";
     }
+
+    $dis_button  = "<td>";
+    $dis_button .= "  <input type=\"submit\" value=\"$l_del_member_sel\"";
+    $dis_button .= "   onclick=\"submit_memberdel(this.form)\" />";
+    $dis_button .= "</td><td>";
+    $dis_button .= "  <input type=\"submit\" value=\"$l_valid_member\"";
+    $dis_button .= "   onclick=\"if(submit_valid(this.form)) return true; else return false;\" />";
+    $dis_button .= "</td>";
     
   } else {
-      $dis_members .= "<tr>\n";
-      $dis_members .= "  <td class=\"detailLabel\">y a personne</td>\n";
-      $dis_members .= "</tr>\n";
-  }
 
+    $dis_members  = "<tr>\n";
+    $dis_members .= "  <td class=\"detailText\">$l_no_members</td>\n";
+    $dis_members .= "</tr>\n";
+    
+    $dis_button  = "<td>";
+    $dis_button .= "  <input type=\"submit\" value=\"$l_member_add\"";
+    $dis_button .= "   onclick=\"if(submit_addmember(this.form)) return true; else return false;\" />";
+    $dis_button .= "</td>";
+    
+  }
  
   echo "
     <form name=\"form_memberlist\" method=\"post\">
@@ -686,13 +702,7 @@ function html_project_memberlist($members_q, $project) {
     </table>
      <table class=\"details\">
        <tr>
-         <td>
-           <input type=\"submit\" value=\"$l_del_member_sel\"
-                  onclick=\"submit_memberdel(this.form)\" />
-         </td><td>
-           <input type=\"submit\" value=\"$l_valid_member\"
-                  onclick=\"if(submit_valid(this.form)) return true; else return false;\" />
-         </td>
+         $dis_button
          <input type=\"hidden\" name=\"param_project\" value=\"$id\" />
        </tr>
      </table>

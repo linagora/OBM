@@ -101,20 +101,28 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $pid = run_query_insert($project);
+  if (check_new_form($param_project, $project)) {
+    $pid = run_query_insert($project);
+    
+    if ($pid) {
+      display_ok_msg($l_insert_ok);
+      
+      $project["id"] = $pid;
+      $project_q = run_query_detail($pid);
+      
+      html_project_infos($project_q, $project);
+      html_project_memberadd_form($project);
+      html_project_memberlist(0, $project);
+    }
+    else {
+      display_err_msg("$l_insert_error : $err_msg");
+    }
 
-  if ($pid) {
-    display_ok_msg($l_insert_ok);
+  } else { 
+    display_warn_msg($l_invalid_data . " : " . $err_msg);
 
-    $project["id"] = $pid;
-    $project_q = run_query_detail($pid);
-
-    html_project_infos($project_q, $project);
-    html_project_memberadd_form($project);
-    html_project_memberlist(0, $project);
-  }
-  else {
-    display_err_msg("$l_insert_error : $err_msg");
+    $tt_q = run_query_projecttype('intern');
+    html_project_form($action, "", $tt_q, $project);
   }
 
 } elseif ($action == "init")  {
@@ -124,19 +132,26 @@ if ($action == "index" || $action == "") {
   html_project_init_form($action, $project_q, $project);
 
 } elseif ($action == "create")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_create($project);
-
-  if ($retour) {
-    display_ok_msg($l_insert_ok);
-
+  ///////////////////////////////////////////////////////////////////////////////
+  if (check_init_form($param_project, $project)) {
+    $retour = run_query_create($project);
+    
+    if ($retour) {
+      display_ok_msg($l_insert_ok);
+      
+      $project_q = run_query_detail($param_project);
+      
+      html_project_infos($project_q, $project);
+      html_project_memberadd_form($project);
+      html_project_memberlist(0, $project );
+    } else {
+      display_err_msg("$l_insert_error : $err_msg");
+    }
+  } else { 
+    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    
     $project_q = run_query_detail($param_project);
-
-    html_project_infos($project_q, $project);
-    html_project_memberadd_form($project);
-    html_project_memberlist(0, $project );
-  } else {
-    display_err_msg("$l_insert_error : $err_msg");
+    html_project_init_form($action, $project_q, $project);
   }
 
  } elseif ($action == "validate")  {

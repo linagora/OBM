@@ -632,4 +632,79 @@ function run_query_memberstime($p_id) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Company Form Data checking and formatting                                 //
+// Parameters:
+//   - $cid   : company id
+//   - $company[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_new_form($pid, $project) {
+  global $l_fill_name, $l_fill_tt, $l_fill_soldtime, $l_fill_soldnumber;
+  global $err_msg;
+  global $php_regexp_number;
+
+  $name = $project["name"];
+  $tt = $project["tt"];
+  $soldtime = $project["soldtime"];
+
+  // MANDATORY: Project name
+  if (trim($name) == "") {
+    $err_msg = $l_fill_name;
+    return false;
+  }
+
+  // MANDATORY: TaskType selection
+  if ($tt == 0) {
+    $err_msg = $l_fill_tt;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+  if (trim($soldtime) == "") {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+//   if (ereg($php_regexp_number, $soldtime) == false) {
+//     $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
+//     return false;
+//   }
+
+  return true; 
+}
+///////////////////////////////////////////////////////////////////////////////
+// Company Form Data checking and formatting                                 //
+// Parameters:
+//   - $cid   : company id
+//   - $company[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_init_form($pid, $project) {
+  global $l_fill_soldtime, $l_fill_soldnumber;
+  global $err_msg;
+  global $php_regexp_number;
+
+  $soldtime = $project["soldtime"];
+
+  // MANDATORY: Soldtime
+  if (trim($soldtime) == "") {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+//    if (ereg($php_regexp_number, $soldtime) == false) {
+//      $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
+//      return false;
+//    }
+
+  return true; 
+}
+
 </SCRIPT>

@@ -94,25 +94,39 @@ function submit_memberdel(form)
 function submit_valid(form)
 {
   error = 0;
+  i_nb = 0;
 
   for (i = 0; i < document.forms[0].length; i++) {
     i_name = document.forms[0].elements[i].name.substr(0,12);
     i_value = document.forms[0].elements[i].value;
 
-    if ((i_name == \"tf_projected\") && 
-       ((i_value == \"\") || (!(check_number(i_value))))) {
-      error = 1;
+    if (i_name == \"tf_projected\") { 
+      if ((i_value == \"\") || (!(check_number(i_value)))) {
+	error = 1;
+      } else {
+	i_nb = i_nb + 1;
+      }
     }
-
   }
 
   if (error) {
     alert (\"$l_fill_projected\");
     return false;
+  } else if (i_nb == 0) {
+    alert (\"$l_fill_member\");
+    return false;
   } else {
-    form.action = \"project_index.php?action=validate\"
+    form.action = \"project_index.php?action=validate\";
+    form.submit();
     return true;
   }
+}
+
+function submit_addmember(form)
+{
+    window.name='Liste';
+    window.open('../user/user_index.php?action=ext_get_ids&popup=1&title=$l_member_add&ext_action=member_add&ext_url=../project/project_index.php&ext_id=$id&ext_target=Liste','','height=400,width=620,scrollbars=yes');
+    return false;
 }
 
 // -->

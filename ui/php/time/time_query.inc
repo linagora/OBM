@@ -129,7 +129,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
 
   // user_id : array -> size 1 or more 
   if (sizeof($time["user_id"]) == 1)
-	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+	  $query .= " and task_user_id = ". $time["user_id"];
   else {
 	$users_list = array_to_list($time["user_id"]);
 	$query .= " and task_user_id in $users_list";
@@ -679,7 +679,7 @@ global $cdg_sql, $cdg_param;
 
   $week = get_week_point($time["date"]);
 
-  $user_id = $time["user_id"][0];
+  $user_id = $time["user_id"]["0"];
   //  echo "Run_query_valid_search<br>";
   //  print_r($time);
   $query = "select sum(task_length) as total_length, substring(task_date,1,8) as day_in_week
@@ -705,12 +705,24 @@ global $cdg_sql, $cdg_param;
 // Timemanager: TaskType select query execution                              //
 // Returns : DB object result with all type of task
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype() {
+function run_query_tasktype($uid = 0) {
   global $cdg_sql;
 
-  $query = "select *
-            from TaskType
-            order by tasktype_internal";
+  if ($uid) {
+    $query = "
+      select distinct TaskType.*
+      from TaskType
+        left join Deal on tasktype_id=deal_tasktype_id
+        left join ProjectUser on (deal_id=projectuser_deal_id and projectuser_userobm_id=$uid)
+      where (tasktype_internal in (0,1) and (projectuser_userobm_id=$uid))
+        or tasktype_internal=2
+      order by tasktype_internal, tasktype_label";
+  } else {
+    $query = "
+      select *
+      from TaskType
+      order by tasktype_internal, tasktype_label";
+  }
 
   display_debug_msg($query, $cdg_sql, "run_query_tasktype");
   $obm_q= new DB_OBM;
@@ -726,16 +738,20 @@ function run_query_tasktype() {
 //    or payed (garantee, hosting...)
 // Returns : DB object result with project satisfying criteria
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_project() {
+function run_query_project($time) {
   global $cdg_sql;
+
+  $uid = $time["user_id"];
 
   $query = "
     select
       deal_id, deal_label, company_name, deal_tasktype_id
-    from Deal
+    from Deal, ProjectUser
       left join Company on company_id = deal_company_id
     where deal_state in (1,2)
       and deal_archive=0
+      and projectuser_deal_id=deal_id
+      and projectuser_userobm_id=$uid
       order by deal_tasktype_id, company_name";
 
   display_debug_msg($query, $cdg_sql, "run_query_project");
@@ -744,7 +760,6 @@ function run_query_project() {
 
   return $obm_q;
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 // Return th Id of people that will see the globalview
