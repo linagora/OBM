@@ -327,6 +327,8 @@ function get_import_field_mapping($import_q) {
   eval ($desc);
 
   // Get the mapping field_num -> $field[]
+  // $map[1][lable] = "Company"
+  // $map[1][field] = comp_name
   while (list($field, $el) = each($comp)) {
     $label = ${$el["label"]};
     $value = $el["value"];
@@ -383,6 +385,78 @@ function get_file_row_fields($row, $sep, $enclosed) {
   }
 
   return $rows;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the mapping from a file row in an array
+// Parameters:
+//   - $row : row diect hash
+//   - $map : import field mapping
+// Returns:
+//   hash : $fields[comp_name] = value
+///////////////////////////////////////////////////////////////////////////////
+function get_import_row_mapping($row, $map) {
+
+  while (list($num, $value) = each ($row)) {
+    $field = $map[$num]["field"];
+    if ($field != "") {
+      $fields[$field] = trim($value);
+    }
+  }
+
+  return $fields;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if an import row is valid
+// Parameters:
+//   - $fields : row fields content
+// Returns:
+//   true if valid
+///////////////////////////////////////////////////////////////////////////////
+function is_row_valid($fields) {
+
+  if ($fields["comp_name"] == "") {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the existing companies similar to the one given
+// Parameters:
+//   - $fields : company Id not to return
+///////////////////////////////////////////////////////////////////////////////
+function get_similar_company($fields) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
+
+  $name = $fields["comp_name"];
+  $zip = $fields["comp_zip"];
+
+  $query = "select distinct company_id, company_name, company_zipcode 
+            from Company
+            where company_name $like '$name%'
+              and company_zipcode $like '$zip'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $cpt = 0;
+  while ($obm_q->next_record()) {
+    $comps[$cpt]["comp_id"] = $obm_q->f("company_id");
+    $comps[$cpt]["comp_name"] = $obm_q->f("company_name");
+    $comps[$cpt]["comp_zip"] = $obm_q->f("company_zipcode");
+    $cpt++;
+  }
+
+  return $comps;
 }
 
 

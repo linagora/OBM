@@ -549,7 +549,7 @@ function get_import_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'update', 'file_sample') 
+     'Condition'=> array ('detailconsult', 'update', 'file_sample', 'file_test') 
                                            );
 
 // Insert

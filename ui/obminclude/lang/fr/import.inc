@@ -2,39 +2,32 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : list.inc                                                 //
-// 2001-02-16 Vincent MARGUERIT                                              //
+// 2004-01-17 Aliacom - Pierre Baudracco                                     //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_subject = "Sujet";
-$l_email = "E-mail";
-$l_query = "Requête";
 $l_creator = "Créateur";
 $l_date_creation = "Création";
-$l_updater = "Mise à jour par" ;
-$l_date_last_update = "Mise à jour" ;
+$l_updater = "Mise à jour par";
+$l_date_last_update = "Mise à jour";
 
-// Labels et textes
-$l_list = "Liste";
-$l_nb_contact = "# Contacts";
-$l_list_contact = "Ayant comme contact";
-$l_list_display = "Options d'affichage des listes de listes";
-$l_contact_display = "Options d'affichage des listes de contacts";
-$l_list_set = "Listes cibles";
-$l_export_format = "Formats d'export disponibles";
+// Title
+$l_import = "Import";
+
+// Labels and texts
+$l_file = "Fichier";
 $l_desc = "Description";
-$l_export_intro = "Sélectionner le format d'export souhaité";
-$l_select_list = "Sélectionner les listes cibles de l'export";
-
-// Contact
-$l_lastname = "Nom";
-$l_firstname = "Prénom";
-$l_function = "Fonction";
-$l_company = "Société";
-$l_hphone = "Tél perso";
-$l_town = "Ville";
+$l_format = "Format";
+$l_csv_sep = "Separateur CSV";
+$l_enclosed = "Champs entourés par";
+$l_mapping = "Correspondance de champs";
+$l_field_num = "# champ";
+$l_field = "Champ";
+$l_default = "Valeur par défaut";
+$l_result = "Résultat";
+$l_info = "Information";
 
 // Actions
 $l_insert = "Enregistrer l'import";
@@ -55,36 +48,11 @@ $l_import_exists = "Cet import existe déjà !";
 $l_check_sameimport = "Ces imports sembles similaires au nouveau !";
 $l_warn_delete = "Effacer cet import ?";
 
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les listes correspondantes.";
-$l_found = "listes trouvées.";
-$l_no_found = "Aucune liste ne correspond à ces critères !";
-$l_add_contact = "Ajouter des contacts à la liste";
-$l_del_contact_sel = "Enlever ces contacts";
-$l_contact_added = "Contact(s) ajouté(s)";
-$l_contact_removed = "Contact(s) enlevé(s)";
-$l_static_con_found = "contacts statiques enregistrés";
-$l_dyn_con_found = "contacts dynamiques enregistrés";
-$l_no_static_contact = "Il n'y a pas de contact statique dans cette liste";
-$l_no_dyn_contact = "Il n'y a pas de contact dynamique dans cette liste";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les imports correspondants.";
+$l_found = "imports trouvés.";
+$l_no_found = "Aucun import ne correspond à ces critères !";
 
-$l_fill_name = "Le nom de la liste doit être saisi !";
-$l_fill_subject = "Le sujet doit être saisi !";
-$l_invalid_query = "La requête saisie est incorrecte !";
-$l_banned_word = "Mot interdit";
-$l_hungry_query = "La requête est trop consommatrice de ressource !";
+$l_fill_name = "Le nom d'Import doit être saisi !";
 
-//------------------------------------//
-// Export Format informations         //
-//------------------------------------//
-// Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "Etiquettes HTML";
-$c_export_format[0]["info"] = "Prévisualisation d'étiquettes en HTML";
-// Format 1 : HTML Table
-$c_export_format[1]["name"] = "Tableau HTML";
-$c_export_format[1]["info"] = "Prévisualisation tableau HTML";
-// Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "Etiquettes RTF";
-$c_export_format[2]["info"] = "Génération d'étiquettes RTF";
-// Format 3 : Excel data
-$c_export_format[3]["name"] = "Tableau Excel";
-$c_export_format[3]["info"] = "Tableau Excel pour publipostage";
+$l_csvd_sc = ";";
+$l_csvd_tab = "tab";

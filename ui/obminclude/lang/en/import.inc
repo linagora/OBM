@@ -26,7 +26,8 @@ $l_mapping = "Fields mapping";
 $l_field_num = "# field";
 $l_field = "field";
 $l_default = "Default value";
-
+$l_result = "Result";
+$l_info = "Information";
 
 // Actions
 $l_insert = "Insert the import";

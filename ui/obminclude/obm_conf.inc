@@ -37,7 +37,7 @@ $cgp_mailing_default = true;
 
 //$cgp_show["module"]["deal"] = false;
 //$cgp_show["module"]["agenda"] = false;
-//$cgp_show["module"]["time"] = false;
+$cgp_show["module"]["time"] = false;
 //$cgp_show["module"]["todo"] = false;
 //$cgp_show["module"]["user"] = false;
 //$cgp_show["module"]["group"] = false;

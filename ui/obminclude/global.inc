@@ -61,7 +61,7 @@ $popup_contact_height = 600;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 2;
+$cg_com = 3;
 $cg_prod = 3;
 
 

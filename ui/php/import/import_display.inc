@@ -314,13 +314,12 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   $mapping_head .= "</tr>";
 
   // Sample file display
-  $regexp_sep = "/$enclosed$csv_sep$enclosed/";
   $r = file($file);
   while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
-    $rows = get_file_row_fields($line, $csv_sep, $enclosed);
+    $row = get_file_row_fields($line, $csv_sep, $enclosed);
 
     $mapping .= "<tr>";
-    while (list($num, $value) = each($rows)) {
+    while (list($num, $value) = each($row)) {
       if ($map[$num]["label"] != "") {
 	$mapping .= "<td class=\"detailForm\">$value</td>";
       }
@@ -351,6 +350,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 function html_import_file_test($import_q, $import) {
   global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
   global $l_mapping, $l_field_num, $l_field, $l_default;
+  global $l_company, $l_contact, $l_info, $l_result;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $display, $perm, $action;
 
@@ -362,40 +362,112 @@ function html_import_file_test($import_q, $import) {
 
   $map = get_import_field_mapping($import_q);
 
-  // Sample header
-  $mapping_head .= "<tr>";
-  while (list($num, $el) = each($map)) {
-    $label = $el["label"];
-    $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
-  }
-  $mapping_head .= "</tr>";
+  // Test header
+  $log_head .= "<tr>
+    <td class=\"detailLabel\">#</td>
+    <td class=\"detailLabel\">$l_company</td>
+    <td class=\"detailLabel\">$l_info</td>
+    <td class=\"detailLabel\">$l_contact</td>
+    <td class=\"detailLabel\">$l_info</td>
+    <td class=\"detailLabel\">$l_result</td>
+  </tr>";
 
   // Sample file display
-  $regexp_sep = "/$enclosed$csv_sep$enclosed/";
   $r = file($file);
-  while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
-    $rows = get_file_row_fields($line, $csv_sep, $enclosed);
+  while (list($num_line, $line) = each($r)) {
+    $log = "";
+    $log["num_line"] = $num_line;
 
-    $mapping .= "<tr>";
-    while (list($num, $value) = each($rows)) {
-      if ($map[$num]["label"] != "") {
-	$mapping .= "<td class=\"detailForm\">$value</td>";
+    $row = get_file_row_fields($line, $csv_sep, $enclosed);
+    $fields = get_import_row_mapping($row, $map);
+
+    // Test if company is valid
+    if (is_row_valid($fields)) {
+
+      // Test if similar companies exist
+      $comps = get_similar_company($fields);
+      if (is_array($comps)) {
+	$log["display"] = true;
+
+	// Automatic mode
+	if ($run_mode == "auto") {
+
+	  // Check mode (no database updates) Do nothing : only log
+	} else if ($run_mode == "check") {
+
+	  // Normal mode
+	} else {
+	  
+	}
+	
+	// No similar companies exists
+      } else {
+	// Insert the company
       }
+
+      // Company row not valid
+    } else {
+      $log["res"] = "Invalid row!";
     }
-    $mapping .= "</tr>";
+
+    $log_block .= display_import_check_log_line($log, $fields, $comps);
   }
 
   $block = "
     <div class=\"detailHead\">$file_name</div>
     <table class=\"detail\">
     <tr>
-      $mapping_head
+      $log_head
     </tr>
-      $mapping
+      $log_block
     </table>
     </form>";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Import Form                                                       //
+// Parameters :
+//   - $log    : log line info array
+//   - $fields : company row info array
+//   - $comps  : similar company info array
+///////////////////////////////////////////////////////////////////////////////
+function display_import_check_log_line($log, $fields, $comps) {
+
+  $step = 1;
+  $num_line = $log["num_line"];
+  $display_log = false;
+
+  // Test if similar companies exist
+  if ( ($log["display"]) || (($num_line % $step) == 0) ) {
+    $display_log = true;
+  }
+
+  if ($display_log) {
+    $name = $fields["comp_name"];
+    $info = $fields["comp_zip"];
+    $res = $log["res"];
+    $line_log .= "<tr>
+      <td class=\"detailForm\">$num_line</td>
+      <td class=\"detailForm\">$name</td>
+      <td class=\"detailForm\">$info</td>
+      <td class=\"detailForm\">Contact</td>
+      <td class=\"detailForm\">C info</td>
+      <td class=\"detailForm\">$res";
+
+    if (is_array($comps)) {
+      while ( list($num, $comp) = each($comps) ) {
+	$line_log .= "<br />";
+	$line_log .= $comp["comp_name"] . " - " . $comp["comp_zip"];
+      }
+      $line_log .= "</td>
+      </tr>";
+    }
+  }
+
+  return $line_log;
 }
 
 
