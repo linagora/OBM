@@ -701,8 +701,6 @@ function dis_time_export_stats($time) {
 //   an HTML table
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_menu($time) {
-  global $col_tableh, $col_table;
-
   global $show_events, $total_menu, $total_tasks, $total_companies, $total_projects;
 
   // checked the show event checkbox or not
@@ -748,7 +746,7 @@ function dis_time_menu($time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list_result($task_q,$pref_q,$time) {
   //-- Themes
-  global $set_theme,$set_date,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_theme,$set_date,$ico_mail;
   //-- Labels
   global $l_date_task, $l_company, $l_deallabel, $l_tasklabel, $l_tasktype;
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
@@ -851,7 +849,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days) {
   //-- Themes
-  global $set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
+  global $set_lang,$set_theme,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
   global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
@@ -920,7 +918,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   //-- Themes
-  global $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
@@ -983,7 +981,7 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_deal_export($obm_dq,$pref_dq,$time) {
   //-- Themes
-  global $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $l_workingdays, $l_total_days_msg1, $l_total_days_msg2, $l_total_days_msg3, $l_total_days_msg4; 
@@ -1032,7 +1030,7 @@ function dis_time_deal_export($obm_dq,$pref_dq,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_one_month($obm_dq,$pref_dq,$time, $shortview=false) {
   //-- Themes
-  global $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $c_day_fraction, $c_days_in_a_week;
@@ -1149,9 +1147,8 @@ function dis_time_one_month($obm_dq,$pref_dq,$time, $shortview=false) {
 function display_monthview($time, $array_res, $total, $title, $shortview=false) {
   global $working_days;  // array of the days in a week where we are supposed to work
   global $c_day_fraction, $c_days_in_a_week;
-  global $col_orange, $col_grey, $col_blue;
-  global $l_total;
-  global $l_fill;
+  global $col_orange, $col_blue;
+  global $l_total, $l_fill;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   //  $col = "b2ebe8";
@@ -1253,7 +1250,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_one_week($obm_dq, $time) {
   //-- Themes
-  global $set_theme,$col_tableh,$col_textem,$col_table;
+  global $set_theme;
   //-- Labels
   global $l_found, $_task_del, $l_delete, $l_total_deal;
   global $c_day_fraction, $c_days_in_a_week;
@@ -1302,7 +1299,7 @@ function dis_time_one_week($obm_dq, $time) {
 function display_weekview($time, $result, $total, $title) {
   global $working_days;  // array of the days in a week where we are supposed to work
   global $c_day_fraction, $c_days_in_a_week;
-  global $col_orange, $col_grey, $col_blue;
+  global $col_orange,$col_blue;
   global $l_total;
   global $l_fill, $l_daysofweekshort;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
@@ -1398,7 +1395,7 @@ function dis_table_title($message) {
 function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$time, $validate_days) {
 
   global $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
-  global $col_table, $col_tableh, $col_textem, $l_add, $task_list, $l_none;
+  global $l_add, $task_list, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   //for list classement of task
   global $l_task_fac,$l_task_div,$l_task_int, $l_intern;
@@ -1626,7 +1623,7 @@ function col_table($col, $data) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Time search form with params                                 //
+// Display the Time search form with params                                  //
 // Parameters:
 //   - $time[] : time search criteria
 //     keys used  : 

@@ -55,7 +55,7 @@ $fieldnames["invoice_company"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_deal(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $col_ok, $col_error;
+  global $path, $set_theme, $col_ok, $col_error, $col_client, $col_frs;
 
   if ($fieldname == "parentdeal_label") {
     $res["url"] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$OD->data_set->f("parentdeal_id");
@@ -95,12 +95,30 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     $datealarm = date_format($date);
     $time = time();
     if ($time > ($date + 86400)) {
-      $res["name"] = "<font color=\"#$col_error\">$datealarm</font>";
+      $col = $col_error;
     } else if ($time > $date) {
-      $res["name"] = "<font color=\"#$col_ok\">$datealarm</font>";
-    } else {
-      $res["name"] = "$datealarm";
+      $col = $col_ok;
     }
+    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+    $res["name"] = "$datealarm";
+  }
+
+  // Invoice fields ?????? USED ??????
+  else if ($fieldname == "deal_invoice_label") {
+    $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$OD->data_set->f("invoice_id");
+  }
+
+  else if ( ($fieldname == "deal_invoice_HT") 
+	   || ($fieldname == "deal_invoice_TTC") ) {
+    $amount = $OD->data_set->f($fieldname);
+    if ($OD->data_set->f("invoice_inout") == '+') {
+      $col = $col_client;
+    }
+    else {
+      $col = $col_frs;
+    }
+    $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
+    $res["name"] = "AAAAAA $amount";
   }
   
   return $res;
@@ -692,7 +710,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     $dis_invoice_list->data_header = "top";
     $dis_invoice_list->data_url = $url;
 
-    $dis_invoice_list->display();
+    $dis_invoice_list->display("dis_data_deal");
     // and a button to allow displaying archived invoices :
     $url = url_prepare ("deal_index.php?action=detailconsult".
 		       "&amp;param_deal=$id".
@@ -2102,7 +2120,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $dis_list_deal->data_idfield = "deal_id"; 
   $dis_list_deal->data_set->seek($first_row);
 
-  $dis_list_deal->display();
+  $dis_list_deal->display("dis_data_deal");
 }
 
 

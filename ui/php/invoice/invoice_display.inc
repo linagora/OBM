@@ -254,7 +254,7 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
 // formulaire de création de facture :
 function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_deal_linked="") {
   // - Themes :
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  global $set_theme,$col_label,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_label, $l_number, $l_comment, $l_deal,
     $l_amount_HT, $l_amount_TTC, $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_fournisseur;
@@ -511,7 +511,7 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
 //
 function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice, $invoice) {
   //-- Themes
-  global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
+  global $col_frs, $col_client;
   //-- Labels
   global $l_found, $l_archive_invoices, $l_archive_update;
   global $l_label, $l_number, $l_amount_HT, $l_amount_TTC, 
@@ -616,7 +616,7 @@ function dis_invoice_display_pref ($invoice_options_display, $deal_options_displ
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_deals, $q_payment, $options_payments) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok;
+  global $set_theme,$col_label,$col_ok;
   // - Labels
   global $l_update,$l_delete,$l_insert, $l_invoice_infos,$l_deals_todel, 
     $l_invoice_del_deal, $l_del_deal_chosen, $l_list_deal,$l_no_deal, 

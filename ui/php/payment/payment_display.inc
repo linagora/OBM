@@ -102,7 +102,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   // debug :
   global $border, $cellspacing;
   // themes :
-  global $set_theme, $col_label, $col_table, $coltextem, $col_ok;
+  global $set_theme, $col_label, $coltextem, $col_ok;
   // labels :
   global $l_insert, $l_update, $l_delete, $l_bank, $l_add_invoices;
   global $l_label, $l_amount, $l_type, $l_date, $l_expected_date;
@@ -512,8 +512,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 // matching payment found display
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_search_list ($q_payment, $payment_options, $nb_payment, $payment){
-  // themes
-  global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
+  global $col_frs, $col_client;
   global $l_found;
 
   // get payment data :
@@ -549,7 +548,7 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payment, $p
 ///////////////////////////////////////////////////////////////////////////////
 function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok, $col_client, $col_frs;
+  global $set_theme,$col_label,$col_ok, $col_client, $col_frs;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_bank,$l_payment_infos,$l_duplicate;
   global $l_label,$l_comment,$l_number, $l_date, $l_amount, $l_expected_date;
@@ -730,8 +729,6 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
   global $cellspacing, $border;
   // display stuff 
   global $l_no_invoices, $l_invoices_found;
-  // themes
-  global $col_tableh, $col_textem, $col_table, $col_error;
   //  global $col_frs, $col_client;
   // Labels
   global $l_found, $l_select_invoice, $l_affect_invoices;
@@ -1157,11 +1154,10 @@ function html_choose_csv_file () {
 // $q_et_prefs display prefs for EntryTemp
 ///////////////////////////////////////////////////////////////////////////////
 function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
-  global $col_textem;
   global $l_import_ok, $l_restart_import;
 
   // il faut displayer les entrytemp, puis un form de confirm..
-  echo "<center><font color=\"#$col_textem\">";
+  echo "<center><font color=\"#FF00FF\">";
   echo $q_entrytemp->nf(). " opérations temporaires";
   echo "</FONT><BR></CENTER>";
 

@@ -174,7 +174,7 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_consult($obm_q_account, $p_action){
   // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok;
+  global $set_theme,$col_label,$col_ok;
   // - Labels
   global $l_update,$l_delete,$l_insert;
   global $col_balance_neg, $col_balance_pos;
@@ -280,7 +280,7 @@ function html_account_consult($obm_q_account, $p_action){
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_form($obm_q_account, $action) {
   // - Themes :
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  global $set_theme,$col_label,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_label, $l_owner, $l_bank, $l_number;
   global $l_initial_balance, $l_comment;
@@ -449,11 +449,11 @@ function dis_account_display_pref ($account_options, $payment_options) {
 // an account connected to payments is being deleted 
 ///////////////////////////////////////////////////////////////////////////////
 function html_impossible_deletion ($p_account_id, $q_related_payments) {
-  global $col_error ,$l_impossible_deletion, $l_cancel;
+  global $l_impossible_deletion, $l_cancel;
 
   echo "
    <center>
-    <font color=\"#$col_error\">".$q_related_payments->nf()." ".$l_impossible_deletion." : </font><br>";
+    <font color=\"#$FF00FF\">".$q_related_payments->nf()." ".$l_impossible_deletion." : </font><br>";
   while ($q_related_payments->next_record()) {
     echo "
      <a href=\"payment_index.php?action=detailconsult&amp;param_payment=".$q_related_payments->f("payment_id")."\">".$q_related_payments->f("payment_label") . "</a><br>\n";

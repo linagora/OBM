@@ -96,7 +96,6 @@ class OBM_DISPLAY {
   // Function that display the preferences screen for the dataset            //
   /////////////////////////////////////////////////////////////////////////////
   function dis_preferences() {
-    global $col_tableh,$col_textem,$col_table;
     global $l_displayed, $l_order, $l_field, $l_move, $l_mandatory;
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
@@ -207,7 +206,6 @@ class OBM_DISPLAY {
   // Function that display the preference help screen
   /////////////////////////////////////////////////////////////////////////////
   function dis_pref_help() {
-    global $col_tableh,$col_textem,$col_table;
     global $l_help, $l_help_display_yes, $l_help_display_no, $l_help_mandatory, $l_help_down, $l_help_up;
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
@@ -268,8 +266,6 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $col_textem,$col_table,$col_tableh,$col_error,$col_ok,$col_text_hot;
-    global $col_text_redhot;
     global $cdg_id, $set_debug, $set_theme, $set_rows;
     global $path, $time;
 
@@ -332,11 +328,6 @@ class OBM_DISPLAY {
         //--------------------------------------------------
         // Global field display disposition
         //--------------------------------------------------
-	//------------------------------
-	// For any field to be used as a date field
-	//  -> start with "date_" 
-	//   * used in timemanagement
-	//------------------------------
 	// Format dates
 	if (substr($fieldname,0,5) == "date_") {
 	  $name =date_format($this->data_set->f($fieldname));
@@ -349,23 +340,6 @@ class OBM_DISPLAY {
 	}
 
 
-        //-------------------------------------
-	// invoice from the deal display screen
-        //-------------------------------------
-	elseif ($fieldname == "deal_invoice_label") {
-	  $url = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
-	} elseif (($fieldname == "deal_invoice_HT") 
-		   || ($fieldname == "deal_invoice_TTC") ) {
-	  $amount = $this->data_set->f($fieldname);
-	  if ($this->data_set->f("invoice_inout") == '+') {
-	    $couleur = $col_client;
-	  }
-	  else {
-	    $couleur = $col_frs;
-	  }
-	  $name = "$amount";
-	}
-	
         //------------------------------
         // For the time management
         //------------------------------
@@ -429,15 +403,25 @@ class OBM_DISPLAY {
       }
       
 
-      //-----------------------------------------------------
-      // Row end : if action and right, we display a checkbox
-      //-----------------------------------------------------
-      if (($this->data_cb_side == "right")
-            && ($this->data_cb_text != "")) {
-	echo "<td align=\"center\" bgcolor=\"#$col_table\">
-                <input type=\"checkbox\" id=\"".$this->data_cb_name.$this->data_set->f($this->data_idfield)."\" 
-                 name=\"".$this->data_cb_name.$this->data_set->f($this->data_idfield)."\" /></td>";
+      // If a left checkbox has to be displayed
+      if (($this->data_cb_side == "right") && ($this->data_cb_text != "")) {
+	$col_show = $this->data_cb_show;
+        // If cb are to be displayed or column telling visibility is true
+        if (($col_show == "1") || ($this->data_set->f($col_show))) {
+	  $name = $this->data_cb_name;
+	  $name .= $this->data_set->f($this->data_idfield);
+	  if ($this->data_set->f($this->data_cb_field)) {
+	    $cb_check = "checked";
+	  } else {
+	    $cb_check = "";
+	  }
+	  echo "<td class=\"OBMDisplayText\">
+                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
+	}
+	else
+	  echo "<td class=\"OBMDisplayText\">&nbsp;</td>";
       }
+
       $this->display_pref->seek(0);
       echo "</tr>";
     }
@@ -506,7 +490,6 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
     global $page, $new_order, $order_dir;
-    global $col_tableh, $col_textem;
     global $fieldnames, $cdg_id, $set_debug;
 
     // If displayed without links (in popup) add this in url
