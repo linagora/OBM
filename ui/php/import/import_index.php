@@ -434,7 +434,7 @@ function get_param_import() {
   global $sample_file, $sample_file_name, $sample_file_size;
   global $test_file, $test_file_name, $test_file_size;
   global $import_file, $import_file_name, $import_file_size, $file_saved;
-  global $row_start, $rd_conflict, $company_id, $contact_id;
+  global $row_start, $rd_conflict, $rd_comp, $rd_con, $company_id;
 
   // Import fields
   if (isset ($param_import)) $import["id"] = $param_import;
@@ -447,7 +447,8 @@ function get_param_import() {
   if (isset ($row_start)) $import["row_start"] = $row_start;
   if (isset ($rd_conflict)) $import["conflict_action"] = $rd_conflict;
   if (isset ($company_id)) $import["company_id"] = $company_id;
-  if (isset ($contact_id)) $import["contact_id"] = $contact_id;
+  if (isset ($rd_comp)) $import["company_id"] = $rd_comp;
+  if (isset ($rd_con)) $import["contact_id"] = $rd_con;
 
   // Mapping : company
   if (isset ($tf_comp_name)) $import["comp_name"] = trim($tf_comp_name);

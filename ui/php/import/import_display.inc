@@ -378,7 +378,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   // Sample header
   $mapping_head .= "<tr>";
   while (list($num, $el) = each($map)) {
-    if ($num != "default") {
+    if (($num != "default") && ($num != "field")) {
       $label = $el["label"];
       $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
     }
@@ -695,7 +695,7 @@ function html_import_file_import($import_q, $import) {
 function display_import_conflict_block($import, $log, &$log_head, $fields, $comps, $cons="") {
   global $path, $l_validate;
   global $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update;
-  global $l_conflict, $l_con_nothing, $l_con_insert, $l_con_update;
+  global $l_con_nothing, $l_con_insert, $l_con_update;
 
   $id = $import["id"];
   $file = $import["file"];
@@ -719,11 +719,15 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
       <td class=\"detailForm\">$res";
 
   if (is_array($comps)) {
+    $checked = false;
     while ( list($num, $comp) = each($comps) ) {
+      $rd_check = ($checked) ? "" : "checked";
+      $checked = true;
       $comp_id = $comp["comp_id"];
       $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id");
-      $line_log .= "<br />";
-      $line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
+      $line_log .= "<br />
+        <input type=\"radio\" name=\"rd_comp\" value=\"$comp_id\" $rd_check />
+        <a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
     }
     $line_log .= "</td>
       </tr>";
@@ -736,11 +740,15 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   }
 
   if (is_array($cons)) {
+    $checked = false;
     while ( list($num, $con) = each($cons) ) {
+      $rd_check = ($checked) ? "" : "checked";
+      $checked = true;
       $con_id = $con["con_id"];
       $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_id");
-      $line_log .= "<br />";
-      $line_log .= "<a target=\"New\" href=\"$url\">".$con["con_lname"] . " ".$con["con_fname"] ."</a>";
+      $line_log .= "<br />
+        <input type=\"radio\" name=\"rd_con\" value=\"$con_id\" $rd_check />
+        <a target=\"New\" href=\"$url\">".$con["con_lname"] . " ".$con["con_fname"] ."</a>";
     }
     $line_log .= "</td>
       </tr>";
@@ -755,6 +763,8 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
   $url = url_prepare("import_index.php");
 
   $block = "
+    <form method=\"post\" name=\"f_file\" action=\"$url\">
+
     <div class=\"detailHead\">$l_conflict</div>
     <table class=\"detail\">
     <tr>
@@ -762,8 +772,6 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     </tr>
       $line_log
     </table>
-
-    <form method=\"post\" name=\"f_file\" action=\"$url\">
 
     <table class=\"detail\">
     <tr>    
@@ -781,7 +789,6 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
         <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
         <input type=\"hidden\" name=\"row_start\" value=\"$num_line\" />
         <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
-        <input type=\"hidden\" name=\"contact_id\" value=\"$con_id\" />
         <input type=\"hidden\" name=\"action\" value=\"file_import\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
       </td> 

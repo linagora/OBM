@@ -343,7 +343,7 @@ function get_import_field_mapping($import_q) {
   eval ($desc);
 
   // Get the mapping field_num -> $field[]
-  // $map[1][lable] = "Company"
+  // $map[1][label] = "Company"
   // $map[1][field] = comp_name
   while (list($field, $el) = each($comp)) {
     $label = ${$el["label"]};
@@ -352,6 +352,7 @@ function get_import_field_mapping($import_q) {
     if (($label != "") && ($value != "")) {
       $map["$value"]["label"] = $label;
       $map["$value"]["field"] = $field;
+      $map["field"][$field] = $value;
     }
     if ($default != "") {
       $map["default"][$field] = $default;
@@ -365,6 +366,7 @@ function get_import_field_mapping($import_q) {
     if (($label != "") && ($value != "")) {
       $map["$value"]["label"] = $label;
       $map["$value"]["field"] = $field;
+      $map["field"][$field] = $value;
     }
     if ($default != "") {
       $map["default"][$field] = $default;
@@ -414,19 +416,19 @@ function get_file_row_fields($row, $sep, $enclosed) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the mapping from a file row in an array
+// Return the mapping : database fields - content from row
 // Parameters:
-//   - $row : row diect hash
+//   - $row : row direct hash
 //   - $map : import field mapping
 // Returns:
-//   hash : $fields[comp_name] = value
+//   hash : $fields[comp_name] = $content
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_row_mapping($row, $map) {
 
-  while (list($num, $value) = each ($row)) {
-    $field = $map[$num]["field"];
-    if ($field != "") {
-      $fields[$field] = trim($value);
+  while (list($field, $num) = each ($map["field"])) {
+    if ($num != "") {
+      $content = $row[$num];
+      $fields[$field] = trim($content);
     }
   }
 

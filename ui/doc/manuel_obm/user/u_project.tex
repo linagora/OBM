@@ -99,11 +99,53 @@ L'avancement est l'estimation par le chef de projet du temps restant à passer pa
 La comparaison des ces temps permet de connaitre les débordements ou avances du projet de façon globale et par tâche.\\
 
 L'avancement peut être estimé régulièrement lors de la réalisation d'un projet.
+
+
+\subsection{La consultation d'un projet}
+\label{u_project_consult}
+
+L'accès à l'écran de consultation d'un projet s'effectue depuis l'écran de recherche, depuis les bookmarks ou dernières visites ou depuis le menu Consulter.
+
+La consultation du projet affiche différents types d'informations :\\
+
+\begin{itemize}
+\item les informations générales : le nom du projet, la société pour qui il est réalisé.
+\item les indicateurs d'avancement : ces indicateurs permettent d'évaluer globalement l'état de réalisation du projet (cf les indicateurs).
+\item le tableau de détail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).
+\end{itemize}
+
+\subsubsection{Les indicateurs}
+
+Ils sont destinés à permettre un suivi global de l'état d'avancement du projet.
+Les différents indicateurs présents sont :
+
+\begin{itemize}
+\item temps vendu/prévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.
+\item temps attribué : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.
+\item temps utilisé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.
+\item temps estimé restant : c'est la somme des temps estimé restant qui ont été saisi dans l'écran d'avancement du projet.
+\item Attribution du temps prévu : c'est le rapport entre le temps attribué et le temps prévu.
+\item Utilisation du temps prévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.
+\item Avancement du projet : c'est le rapport entre le temps utilisé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).
+\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.
+\end{itemize}
+
+\subsubsection{Détail de l'avancement}
+
+Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
+
+\begin{itemize}
+\item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
+\item temps estimé restant : cette valeur est saisie à l'écran de mise à jour de l'avancement.
+\item temps prévu : c'est la valeur saisie à l''écran d'affectation.
+\end{itemize}
+
+Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.
  
 
 \subsection{Les sous-menus du module \project}
 
-Le module \project comporte 11 sous-menus :
+Le module \project comporte 11 sous-menus :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
 \hline
@@ -168,6 +210,12 @@ Un formulaire vierge de projet propose la saisie des champs :
 Les champs Tâche et Participant sont facultatifs et permettent un raccourci pour la création directe d'une tâche et d'un participant au projet (pratique pour les projets simple comprenant une seule tâche et une seul participant, comme les formations).\\
 
 Si le projet est valide, il est inséré dans la base de données et un message d'acceptation est affiché; sinon le formulaire de saisie de nouveau projet est affiché de nouveau avec un message indiquant la cause de non validité.
+
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de retourner en mode consultation du projet en cours.
+Voir la section \ref{u_project_consult} ``Consultation d'un projet.
 
 
 \subsubsection{Le sous-menu : Modifier}
@@ -238,43 +286,3 @@ Ce menu permet de mettre à jour l'avancement des participants pour les tâches au
 \subsubsection{Le sous-menu : Affichage}
 
 Ce menu permet de paramétrer l'affichage de la liste des projets. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.
-
-\subsection{La consultation d'un projet}
-
-L'accès à l'écran de consultation d'un projet se fait soit depuis l'écran de recherche, soit depuis les bookmarks.
-
-La consultation du projet affiche différents types d'informations :
-
-\begin{itemize}
-\item les informations générales : le nom du projet, la société pour qui il est réalisé.
-\item les indicateurs d'avancement : ces indicateurs permettent d'évaluer globalement l'état de réalisation du projet (cf les indicateurs).
-\item le tableau de détail de l'avancement : permet de visualiser plus précisément l'avancement du projet (cf détail de l'avancement).
-\end{itemize}
-
-\subsection{Les indicateurs}
-
-Ils sont destinés à permettre un suivi global de l'état d'avancement du projet.
-Les différents indicateurs présents sont :
-
-\begin{itemize}
-\item temps vendu/prévu : c'est une estimation, faite au moment ou le projet est crée, du temps qui sera nécessaire à la réalisation du projet.
-\item temps attribué : c'est la somme des temps de travail prévu qui on déjà été affectés aux différents participants au projet.
-\item temps utilisé : cette donnée, calculée à partir des informations collectées par le module \timemanager, est la somme des durées des tâches qui ont déjà été effectuées dans le cadre de ce projet.
-\item temps estimé restant : c'est la somme des temps estimé restant qui ont été saisi dans l'écran d'avancement du projet.
-\item Attribution du temps prévu : c'est le rapport entre le temps attribué et le temps prévu.
-\item Utilisation du temps prévu : c'est le rapport entre le temps utilisé en le temps prévu. Il est ainsi possible d'avoir une idée de la quantité de temps qui a été utilisée.
-\item Avancement du projet : c'est le rapport entre le temps utilisé et une estimation du temps nécessaire pour réaliser l'intégralité du projet (temps utilisé + temps estimé restant).
-\item Evaluation de l'avance retard : C'est un indicateur obtenu en comparant l'utilisation du temps prévu et l'avancement du projet. On peut considérer que si la quantité de temps utilisé est supérieure à l'avancement, le projet aura du retard.
-\end{itemize}
-
-\subsection{Détail de l'avancement}
-
-Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
-
-\begin{itemize}
-\item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
-\item temps estimé restant : cette valeur est saisie à l'écran de mise à jour de l'avancement.
-\item temps prévu : c'est la valeur saisie à l''écran d'affectation.
-\end{itemize}
-
-Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.

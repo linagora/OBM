@@ -246,12 +246,11 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display User Form                                                         //
 // Parameters:
-//   - $first_try : 1: first time, 0 : redisplay the form (error)
 //   - $usr_q     : user database result
 //   - $user      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($first_try, $usr_q, $user) {
+function html_user_form($usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_phone, $l_user, $l_email, $l_archive, $l_insert, $l_update;
   global $l_datebegin;
@@ -259,7 +258,7 @@ function html_user_form($first_try, $usr_q, $user) {
   global $action;
 
   // if update mode and first time value are taken from database
-  if (($action == "detailupdate") && ($first_try == 1)) {
+  if ($action == "detailupdate") {
     $id = $usr_q->f("userobm_id");
     $login = $usr_q->f("userobm_login");
     $passwd = "";

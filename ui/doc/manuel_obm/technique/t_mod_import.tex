@@ -1,0 +1,144 @@
+% Documentation technique d'OBM : module Import
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+\clearpage
+\section{Import}
+
+Le module \import \obm.
+
+\subsection{Organisation de la base de données}
+
+Le module \import utilise 1 table :
+\begin{itemize}
+ \item Import
+\end{itemize}
+
+\subsubsection{La table Import}
+Table principale des informations d'un import.\\
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_name & varchar 64 & Nom de l'import & \\
+\hline
+\_datasource\_id & int 8 & Source de données & \\
+\hline
+\_marketingmanager\_id & int 8 & Responsable affecté aux données & \\
+\hline
+\_separator & char 3 & Séparateur de champ & \\
+\hline
+\_enclosed & char 1 & caractère d'encadrement des champs & \\
+\hline
+\_desc & text (64k) & Description de l'import (mapping des champs,...) &\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le champ description (mapping des champs)}
+
+L'idée globale du fonctionnement de l'import est d'effectuer un mapping des champs du fichier à importer dans les champs définis de la base de données.
+
+Ce mappin gest stocké dans le champ \variable{import\_desc}, sous forme de définitions de variables, qui est évalué par OBM.\\
+
+Les informations concernant les champs société sont stockées dans le tableau global \variable{\$comp}, celles concernant les champs contact dans \variable{\$con}.
+
+Pour chaque champ défini et proposé par le module \import, le champ description stocke 3 informations : Exemple pour le nom de la société, le tableau \variable{\$comp[``comp\_name'']} contient ces 3 informations :\\
+
+\begin{tabular}{|p{3cm}|p{5.6cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Description} & \textbf{Exemple} \\
+\hline
+[``value''] & numéro de colonne dans fichier & 1 \\
+\hline
+[``label''] & nom du label du champ & l\_company \\
+\hline
+[``default''] & valeur par défaut si non présent & ZZ \\
+\hline
+\end{tabular}
+
+
+\subsection{Précisions sur le mapping des champs}
+
+L'association des champs du fichier aux champs de la base de données utilise plusieurs structures :\\
+
+\begin{tabular}{|p{1.5cm}|p{3.6cm}|p{4.8cm}|p{4cm}|}
+\hline
+\textbf{Structure} & \textbf{Description} & \textbf{Exemple} & \textbf{Fonction}\\
+\hline
+\$row[] & Tableau des valeurs d'une ligne du fichier & \$row[1]=Aliacom & \fonction{get\_file\_row\_fields} \\
+\hline
+\$map[] & Mapping descriptif de l'import & \$map[l][field]=comp\_name \$map[1][label]=l\_company \$map[default][comp\_name]=ZZ \$map[field][comp\_name]=l & \fonction{get\_import\_field\_mapping}\\
+\hline
+\$fields[] & Valeurs des champs & \$fields[comp\_name]=Aliacom & \fonction{get\_import\_row\_mapping}\\
+\hline
+\end{tabular}
+
+\vspace{0.3cm}
+La structure \variable{\$row} est récupérée par une lecture de la ligne du fichier en tenant compte des paramètres CSV (séparateur, caractère encadrant).\\
+
+La structure \variable{\$map} est construite à partir du mapping entré par l'utilisateur.
+Elle comporte 3 sous structures :\\
+
+\begin{tabular}{|p{2cm}|p{3.2cm}|p{4.8cm}|p{3.8cm}|}
+\hline
+\textbf{Structure} & \textbf{Description} & \textbf{Exemple} & \textbf{Commentaire}\\
+\hline
+\$map[N] & Mapping num colonne vers champ & \$map[l][field]=comp\_name \$map[1][label]=l\_company & N numéro de colonne du fichier. Utile pour afficher exemple du fichier \\
+\hline
+\$map[default] & Mapping valeurs des champs par défaut & \$map[default][comp\_name]=ZZ & \\
+\hline
+\$map[field] & Mapping champ recoit colonne & \$map[field][comp\_name]=l & Permet qu'une colonne soit mappée sur plusieurs champs\\
+\hline
+\end{tabular}
+
+\vspace{0.3cm}
+La structure \variable{\$fields} est construite à partir des 2 structures précédents (\variable{\$row} et \variable{\$map}. Elle contient le mapping final des valeurs dans les champs.
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \import, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+ \hline
+  index & read\_admin & (Défaut) formulaire de recherche d'imports. \\ 
+ \hline
+  search & read\_admin & Résultat de recherche. \\
+ \hline
+  new & write\_admin & Formulaire de création d'un import. \\
+ \hline
+  detailconsult & read\_admin & Fiche détail d'un import. \\
+ \hline
+  detailupdate & write\_admin & Formulaire de modification d'un import. \\
+ \hline
+  insert & write\_admin & Insertion d'un import. \\
+ \hline
+  update & write\_admin & Mise à jour d'un import. \\
+ \hline
+  check\_delete & write\_admin & Vérification avant suppression d'un import. \\
+ \hline
+  delete & write\_admin & Suppression d'un import. \\
+ \hline
+  file\_sample & write\_admin & Vérification d'un fichier. Affichage 1eres lignes\\
+ \hline
+  file\_test & write\_admin & Test d'un import du fichier. \\
+ \hline
+  file\_import & write & Importer un fichier. \\
+ \hline
+\end{tabular}

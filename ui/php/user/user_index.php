@@ -72,7 +72,7 @@ if ($action == "ext_get_ids") {
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_user_form(1,"",$obm_user);
+  $display["detail"] = html_user_form("",$obm_user);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -83,7 +83,7 @@ if ($action == "ext_get_ids") {
   $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_user_form(1, $obm_q, $obm_user);
+    $display["detail"] = html_user_form($obm_q, $obm_user);
   } else {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -127,7 +127,7 @@ if ($action == "ext_get_ids") {
   // Form data are not valid
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $display["detail"] = html_user_form(0, "", $obm_user);
+    $display["detail"] = html_user_form("", $obm_user);
   }
 
 } elseif ($action == "reset")  {
@@ -149,6 +149,7 @@ if ($action == "ext_get_ids") {
     $display["detail"] = dis_user_consult($obm_user);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
+    $display["detail"] = html_user_form("", $obm_user);
   }
 
 } elseif ($action == "check_delete")  {

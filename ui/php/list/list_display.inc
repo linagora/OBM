@@ -451,7 +451,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $userupdate = $list_q->f("list_userupdate");
   $timecreate = $list_q->f("timecreate");
   $timeupdate = $list_q->f("timeupdate");
-  $lvis = ($list_q->f("list_visibility") == 0 ? $l_public : $l_private);
+  $lpriv = ($list_q->f("list_privacy") == 0 ? $l_public : $l_private);
   $dis_mailing = ($list_q->f("list_mailing_ok") == 0 ? $l_no : $l_yes);
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
@@ -504,7 +504,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       <td class=\"detailText\">$name</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$lvis</td>
+      <td class=\"detailText\">$lpriv</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mailing</td>
     <td class=\"detailText\">$dis_mailing</td>
@@ -659,13 +659,13 @@ function html_list_form($action, $list_q, $list) {
     $structure = $list_q->f("list_structure");
     $criteria = unserialize($structure);
     $query = $list_q->f("list_query");
-    $vis = ($list_q->f("list_visibility") == 0 ? "0" : "1");
+    $priv = ($list_q->f("list_privacy") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
   }
   
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
-  if (isset($list["vis"])) { $vis = $list["vis"]; }
+  if (isset($list["priv"])) { $priv = $list["priv"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
@@ -676,11 +676,11 @@ function html_list_form($action, $list_q, $list) {
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
-    $dis_vis = "
+    $dis_priv = "
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
-    if ($vis == 1) $dis_vis .= "checked = \"checked\"";
-    $dis_vis .= " /></td>
+      <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" ";
+    if ($priv == 1) $dis_priv .= "checked = \"checked\"";
+    $dis_priv .= " /></td>
   </tr><tr>";
   }
 
@@ -707,7 +707,7 @@ function html_list_form($action, $list_q, $list) {
       <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
   </tr>
   <tr>
-  $dis_vis
+  $dis_priv
     <td class=\"detailLabel\">$l_subject</td>
     <td class=\"detailForm\">
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>

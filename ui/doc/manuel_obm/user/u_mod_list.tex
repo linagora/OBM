@@ -1,0 +1,219 @@
+% Manuel d'utilisation d'OBM : module Liste
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Le module \List}
+
+\subsection{Présentation du module \List}
+
+Ce module est une gestion de liste de contacts.
+Il permet de créer des listes ou cibles de contacts en fonction de nombreux critères portant sur les données de la société, du contact ou des abonnements du contact.\\
+
+A une liste peuvent être associés des contacts directs et des critères permettant de sélectionner des contacts dynamiquement.
+
+Les critères peuvent être saisis graphiquement ou par un mode avancé qui autorise l'utilisation directe de requêtes SQL.\\
+
+La sauvegarde des listes et l'export CSV font de ce module un outil de ciblage complet ouvert vers les autres outils (publipostage,...).
+
+Ce module comporte une composante unique : l'entité Liste.
+
+
+\subsection{Description d'une liste}
+
+Composantes d'une liste :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom de la liste \\
+\hline
+Privée & Visibilité de la liste qui peut être publique ou privée. Une liste privée n'est visible que par son auteur.\\
+\hline
+Sujet & Sujet de la liste.\\
+\hline
+E-mail & Adresse e-mail de la liste, utile pour utilisation en tant que liste de diffusion.\\
+\hline
+Mailing activé & Indicateur de restriction de la liste aux contacts étant notés comme OK pour l'envoi d'e-mail.\\
+\hline
+Contacts directs & Contacts associés directement (statiquement) à la liste.\\
+\hline
+Requête & Critères de sélection des contacts. La requête supporte deux modes, le mode Normal ou le mode expert.\\
+\hline
+\end{tabular}
+
+
+\subsection{Description du champ requête / critères}
+\label{u_list_req}
+
+Les critères de ciblage supportent 2 modes de saisie :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Mode} & \textbf{Description} \\
+\hline
+Normal & Critères saisis graphiquement par l'interface dédiée \\
+\hline
+Expert & Une requête SQL est attendue, donc libre de proposer ses critères.\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le mode Normal}
+Le mode normal propose de siasir graphiquement les critères de ciblage.
+
+La fenêtre de critères comporte 3 parties : \\
+
+\begin{itemize}
+\item Critères relatifs à la société du contact
+\item Critères relatifs au contact
+\item Critères relatifs aux abonnements du contact
+\end{itemize}
+\vspace{0.3cm}
+
+Les critères de la même fenêtre sont cumulés et liés par des ET logiques.\\
+
+Entre 2 lignes (ou fenêtre de critères) il est possible de choisir le mode de combinaison logique (OU ou ET) et d'inverser le critère (opérateur NOT).
+
+
+\subsubsection{Le mode Expert}
+
+Le mode expert propose la saisie directe d'une requête SQL.\\
+
+Ce mode nécessite donc la connaissance du language SQL et du modèle de la base de données d'OBM pour être utilisé.
+
+\paragraph{Avertissement} Ce mode est réservé aux utilisateurs avertis car le modèle de la base de données OBM étant susceptible d'évoluer, certaines requêtes peuvent ne plus être fonctionnelles après une mise à jour d'OBM.
+
+\paragraph{La Sécurité} est prise en compte. En effet le mode expert permettant un accès SQL direct à la base, et donc potentiellement la saisie de toute commande SQL, les requêtes saisies sont vérifiées avant leur validation.
+Ainsi certains mot clés SQL sont interdits comme : Alter, Drop, Insert, Delete, Update, Create; ou la récupération de certains champs (mots de passe,...).
+
+\paragraph{Les ressources} Une vérification est aussi effectuée sur l'estimation des ressources requises pour la requête afin d'interdire les requêtes trop lourdes, souvent dues à des erreurs. Les paramètres de limite de ressources sont ajustables.
+
+
+\subsubsection{Changement de mode de critères}
+
+Il est possible à tout moment dans une liste de donnée de basculer de mode de sélection de critères.
+Cependant il est important de noter que ceci ne s'effectue pas sans conséquences.
+Lors du changement de mode, un message d'alerte est affiché détaillant ces conséquences.\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Bascule} & \textbf{Description} \\
+\hline
+Normal -> Expert & Les critères saisis sont conservés et transformés en requête SQL qui est reprise.\\
+\hline
+Expert -> Normal & La requête saisie est perdue, la détermination des critères est à effectuer graphiquement.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+La modification du mode de sélection des critères n'est validée que lorsque la mise à jour de la liste est validée.
+En cas de problème ou de mauvaise manipulation, il suffit donc de ne pas valider la mise à jour.
+ 
+
+\subsection{La consultation d'une liste}
+\label{u_list_consult}
+
+L'accès à l'écran de consultation d'une liste s'effectue depuis l'écran de recherche, depuis les bookmarks ou dernières visites ou depuis le menu Consulter.
+
+La consultation d'une liste affiche différents types d'informations :\\
+
+\begin{itemize}
+\item les informations générales : le nom de la liste, le sujet, l'email,...
+\item la liste des contacts directs sélectionnés
+\item la cible complète comprenant les contact correspondant aux critères de recherche plus les contacts directs.
+\end{itemize}
+
+
+\subsection{Les sous-menus du module \List}
+
+Le module \List comporte 7 sous-menus :
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritères des listes \\
+\hline
+Nouveau & Créer une nouvelle liste \\
+\hline
+Consulter & Consulter les informations de la liste en cours et du résultat de ciblage \\
+\hline
+Modifier & Modifier les informations de la liste en cours liste\\
+\hline
+Supprimer & Vérifier les liens puis si besoin Supprimer une liste\\
+\hline
+Ajouter Contact & Permet d'ajouter des contacts directs à la liste\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des listes et de la cible\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche selon différents critères :
+
+\begin{itemize}
+\item Nom
+\item ontact membre
+\item E-mail
+\item Responsable
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Nouveau}
+
+Ce menu permet de créer une nouvelle liste.
+
+Un formulaire vierge de création propose la saisie des champs :
+
+\begin{itemize}
+\item Nom (obligatoire),
+\item Indicateur de liste privée,
+\item Sujet (obligatoire),
+\item E-mail,
+\item Indicateur de restriction sur contacts activés pour mailing.
+\item Mode de requête / critères.
+\end{itemize}
+\vspace{0.3cm}
+
+Le mode de requête / critères est détaillé dans la section \ref{u_list_req}.
+
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de retourner en mode consultation de la liste en cours.
+Voir la section \ref{u_list_consult} ``Consultation d'une liste''.
+
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations de la liste dans un formulaire.
+Il est possible de modifier les informations suivantes :
+
+\begin{itemize}
+\item Nom,
+\item Sujet,
+\item Email,
+\item Indicateur de restriction sur contacts activés pour mailing.
+\item Mode de requête / critères.
+\end{itemize}
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton``valider les modifications''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+Ce menu permet la suppression d'une liste.
+
+
+\subsubsection{Le sous-menu : Ajouter Contact}
+
+Ce menu permet d'ajouter des contacts directs à une liste.
+Il ouvre une fenêtre qui permet de rechercher et sélectionner les contacts à associer.
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des listes et de la liste des contacts résultant du ciblage. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.

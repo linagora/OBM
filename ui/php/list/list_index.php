@@ -298,7 +298,7 @@ function get_param_list() {
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
-  if (isset( $cb_priv)) $list["priv"] = $cb_priv == 1 ? 1 : 0;
+  if (isset( $cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
   if (isset($ch_mailing_ok)) $list["mailing_ok"] = $ch_mailing_ok == 1 ? 1 : 0; 
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;

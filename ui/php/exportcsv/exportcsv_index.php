@@ -32,19 +32,22 @@ if (($action == "index") || ($action == "")) {
   echo "Action incorrecte";
   dis_end();
 
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "message")  {
+///////////////////////////////////////////////////////////////////////////////
   dis_head("Téléchargement");        // Head & Body
   echo "Téléchargement en cours";
   dis_end();
 
-///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "export_page")  {
-
-  $query = stripslashes($params["query"]);
-  $query_pref = stripslashes($params["query_pref"]);
+///////////////////////////////////////////////////////////////////////////////
   $first_row = $params["first_row"];
   $nb_rows = $params["nb_rows"];
+  $query = stripslashes($params["query"]);
+  if ($ctu_sql_limit && ($nb_rows > $set_rows)) {
+    // We remove the limit clause
+    $query = preg_replace("/(limit .*)$/i", "", $query);
+  }
+  $query_pref = stripslashes($params["query_pref"]);
   $module = $params["module"];
   if ($module != "") {
     require_once("$obminclude/lang/$set_lang/${module}.inc");
