@@ -1325,7 +1325,7 @@ function get_cat2_label($id) {
 function run_query_cat2_links($p_id) {
   global $cdg_sql;
   $query = "select contact_title, contact_id, '$p_id' as contact_category2
-    from Contact,ContactCategory2Link where contact_id = contactcategory2link_contact_id and contactcategory1link_category_id = '$p_id'";
+    from Contact,ContactCategory2Link where contact_id = contactcategory2link_contact_id and contactcategory2link_category_id = '$p_id'";
 
     display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
