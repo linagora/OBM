@@ -38,7 +38,9 @@ Société & Pour les projets facturés. Indique le client.\\
 \hline
 Affaire & Pour les projets facturés. Indique l'affaire origine.\\
 \hline
-Temps vendu (prévu) & Chiffrage en temps du projet. Temps vendu pour un projet commercial.\\
+Temps vendu & Temps vendu pour un projet commercial.\\
+\hline
+Temps prévu & Temps prévu (peut être différent de vendu) du projet.\\
 \hline
 Archive & Etat d'archivage du projet. Un projet archivé ne pourra plus être modifié.\\
 \hline
@@ -136,8 +138,8 @@ Il s'agit d'un tableau indiquant pour chaque participant affecté à une tâche :
 
 \begin{itemize}
 \item le temps utilisé : cette valeur est calculée à partir des informations saisies dans le module \timemanager.
-\item temps estimé restant : cette valeur est saisie à l'écran de mise à jour de l'avancement.
-\item temps prévu : c'est la valeur saisie à l''écran d'affectation.
+\item temps estimé restant : valeur saisie dans le tableau d'avancement (avancement).
+\item temps prévu : valeur saisie dans le tableau d'avancement (affectation).
 \end{itemize}
 
 Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe de tâches.
@@ -145,7 +147,7 @@ Ce tableau indique aussi les sommes de ces valeurs par participant et par groupe
 
 \subsection{Les sous-menus du module \project}
 
-Le module \project comporte 11 sous-menus :\\
+Le module \project comporte 10 sous-menus :\\
 
 \begin{tabular}{|p{2.5cm}|p{9.5cm}|}
 \hline
@@ -167,9 +169,7 @@ Participants & Gérer (mettre à jour / supprimer) les utilisateurs affectés au pr
 \hline
 Ajouter participant & Ajouter des participants au projet\\
 \hline
-Affectation & Assigner des participants aux différentes tâches du projet\\
-\hline
-Avancement & Actualiser l'état d'avancement des différentes tâches pour chaque participant au projet\\
+Avancement & Actualiser les affectations et l'état d'avancement des différentes tâches pour chaque participant au projet\\
 \hline
 Affichage & Personnalisation de l'affichage de la liste des projets\\
 \hline
@@ -272,15 +272,18 @@ Ce menu permet de visualiser la liste des utilisateurs référencés pour le projet
 Ce menu ouvre une fenêtre qui permet de sélectionner des utilisateurs à affecter au projet.
 
 
-\subsubsection{Le sous-menu : Affectation}
-
-Ce menu permet de modifier l'affectation des participants aux différentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait nécessiter la réalisation de la tâche en question.
-
-Il est possible de supprimer une affectation en laissant sa case vide.
-
 \subsubsection{Le sous-menu : Avancement}
 
-Ce menu permet de mettre à jour l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards du projet.
+Ce menu permet de mettre à jour :\\
+\begin{itemize}
+\item l'affectation des participants aux différentes tâches. On affecte un participant à une tâche en indiquant le nombre de jours que devrait nécessiter la réalisation de la tâche en question.
+\item l'avancement des participants pour les tâches auquelles ils sont affectés. En indiquant le nombre de jour estimé restant pour accomplir une tâche, il devient possible de détecter les avances ou retards du projet.
+\end {itemize}
+\vspace{0.3cm}
+
+Il est possible de supprimer une affectation en laissant sa case vide.\\
+
+A l'initialisation d'une nouvelle affectation, si l'avancement (temps estimé restant) n'est pas renseigné il est automatiquement positonné à la durée affectée.
 
 
 \subsubsection{Le sous-menu : Affichage}

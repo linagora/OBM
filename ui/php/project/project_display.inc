@@ -69,30 +69,6 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Project detail page
-// Parameters:
-//   - $pid : project id
-///////////////////////////////////////////////////////////////////////////////
-function dis_project_consult($pid) {
-  global $display, $l_query_error;
-
-  $project_q = run_query_detail($pid);
-  $tasks_q = run_query_tasks($pid);
-  $members_q = run_query_members($pid);
-  $times = run_query_allocation_and_time($pid);
-
-  if ($project_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error);
-  }
-
-  $display["detailInfo"] = display_record_info($project_q);
-  $block = html_project_consult($project_q, $tasks_q, $members_q, $times);
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display Project search Form
 // Parameters:
 //   - $project[] : default form values
@@ -394,6 +370,30 @@ function html_project_links($p_q) {
   $block_doc
   $block_invoice
 </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Project detail page
+// Parameters:
+//   - $pid : project id
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_consult($pid) {
+  global $display, $l_query_error;
+
+  $project_q = run_query_detail($pid);
+  $tasks_q = run_query_tasks($pid);
+  $members_q = run_query_members($pid);
+  $times = run_query_allocation_and_time($pid);
+
+  if ($project_q->num_rows() != 1) {
+    $display["msg"] .= display_err_msg($l_query_error);
+  }
+
+  $display["detailInfo"] = display_record_info($project_q);
+  $block = html_project_consult($project_q, $tasks_q, $members_q, $times);
 
   return $block;
 }
@@ -1834,6 +1834,332 @@ function html_project_advance_form($tasks_q, $members_q, $allo_q, $project) {
 
   </form>
 ";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Project dashboard
+// Parameters:
+//   - $project : project hash infos
+///////////////////////////////////////////////////////////////////////////////
+function dis_project_dashboard($project) {
+  global $display;
+
+  $pid = $project["id"];
+  $project_q = run_query_detail($pid);
+  $tasks_q = run_query_tasks($pid);
+  $members_q = run_query_members($pid);
+  $times = run_query_allocation_and_time($pid);
+
+  if ($project_q->num_rows() != 1) {
+    $display["msg"] .= display_err_msg($l_query_error);
+  }
+
+  $block = html_project_dashboard($project_q, $tasks_q, $members_q, $times);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display Project Dashboard
+// Parameters :
+//   - $project_q : DBO : information about the project
+//   - $tasks_q   : DBO : list of tasks in the project 
+//   - $members_q : DBO : list of members and related time infos
+//   - $times     : array of hash with uid,task_id,allo,miss,used valued 
+//      keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function html_project_dashboard($project_q, $tasks_q, $members_q, $times) {
+  global $path, $set_theme, $display, $action;
+  global $l_board_no_data, $l_total;
+  global $l_project, $l_progress, $l_progressinfos;
+  global $l_used, $l_missing;
+  global $l_allotted, $l_progress_update, $l_project, $l_resume;
+  global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
+  global $l_yes, $l_no;
+  global $l_alloproj, $l_usedproj;
+
+  $cpt_t = 0;
+  $cpt_m = 0;
+
+  // retrieve project related infos
+  $pid = $project_q->f("project_id");
+  $name = $project_q->f("project_name");
+
+  if (($members_q != 0) && ($members_q->num_rows() != 0)){
+    while ($members_q->next_record()) {
+      $array_mem[$cpt_m]["id"] = $members_q->f("member_id");
+      $array_mem[$cpt_m]["name"] = $members_q->f("member_lastname");
+      $array_mem[$cpt_m]["firstname"] = $members_q->f("member_firstname");
+      $cpt_m++;
+    }
+  }
+
+  $has_tasks = ($tasks_q != 0) && ($tasks_q->num_rows() != 0);
+  $has_members = ($members_q != 0) && ($members_q->num_rows() != 0);
+  $nb_tsk = ($has_tasks) ? $tasks_q->nf() : 0;
+
+
+  //---------------------------------------------------------------------------
+  // tasks or members not defined, we just display task or member list
+  //---------------------------------------------------------------------------
+  if (!($has_tasks) or !($has_members)) {
+    $display["msg"] = display_warn_msg($l_board_no_data);
+
+  //---------------------------------------------------------------------------
+  // Display the detailled progress array
+  //---------------------------------------------------------------------------
+  } else {
+    
+    $allotted = 0;
+    $usedtime = 0;
+    $missingtime = 0;
+    $tab_style = "class=\"projectDetail\"";
+
+    while ($tasks_q->next_record()) {
+      $t_id = $tasks_q->f("projecttask_id");
+      $t_parent = $tasks_q->f("parent_id");
+
+      $array_tsk[$cpt_t]["id"] = $t_id;
+      $array_tsk[$cpt_t]["label"] = $tasks_q->f("projecttask_label");
+      $array_tsk[$cpt_t]["parent"] = ($t_parent == 0) ? 1 : 0;
+
+      if ($t_parent) {
+	$array_child[$t_parent] = 1;
+      }
+      $array_parent[$t_id] = $t_parent;
+
+      $cpt_t++; 
+    }
+
+    // list the members of the project
+    while (list($key,$cell) = each($times)) {
+      $m_id = $cell["uid"];
+      $m_task = ($cell["task_id"] ? $cell["task_id"] : 0);
+      $m_proj = ($cell["allo"] ? $cell["allo"] : 0);
+      $m_miss = ($cell["miss"] ? $cell["miss"] : 0);
+      $m_used = ($cell["used"] ? $cell["used"] : 0);
+
+      // time (used/missing/projected) for each (task/member) couple
+      $array_time["proj"][$m_task][$m_id] = $m_proj;
+      $array_time["miss"][$m_task][$m_id] = $m_miss;
+      $array_time["used"][$m_task][$m_id] = $m_used;
+
+      // totals by parent tasks
+      if ($array_parent[$m_task] == 0) {
+	$array_partot["proj"][$m_task] += $m_proj;
+	$array_partot["miss"][$m_task] += $m_miss;
+	$array_partot["used"][$m_task] += $m_used;
+      } else {
+	$m_ptask = $array_parent[$m_task];
+	$array_partot["proj"][$m_ptask] += $m_proj;
+	$array_partot["miss"][$m_ptask] += $m_miss;
+	$array_partot["used"][$m_ptask] += $m_used;
+      }
+
+      //totals by members
+      $array_memtot["proj"][$m_id] += $m_proj;
+      $array_memtot["miss"][$m_id] += $m_miss;
+      $array_memtot["used"][$m_id] += $m_used;
+
+      //complete total
+      $timetot["proj"] += $m_proj;
+      $timetot["miss"] += $m_miss;
+      $timetot["used"] += $m_used;
+
+      //used for evaluation of the project progress
+      $allotted += $m_proj;
+      $missingtime += $m_miss;
+      $usedtime += $m_used;
+    }
+
+    $dis_memhead = "<td class=\"projectHead\">&nbsp;</td>\n";
+
+    // diplay the members of the project
+    for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
+      $m_id = $array_mem[$cpt_e]["id"];
+      $m_name = $array_mem[$cpt_e]["name"];
+      $dis_memhead .= "<td class=\"projectHead\">$m_name</td>\n";
+    }
+
+    $dis_memhead .= "<td class=\"projectHead\">$l_total</td>\n";
+
+    // display the rest of the array (ie. tasknames - projected times)
+    for ($cpt_d=0; $cpt_d<$cpt_t; $cpt_d++) {
+
+      $t_id = $array_tsk[$cpt_d]["id"];
+      $t_label = $array_tsk[$cpt_d]["label"];
+      $t_parent = $array_tsk[$cpt_d]["parent"];
+
+      $t_haschild = $array_child[$t_id];
+
+      if ($t_parent) {
+	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
+      } else {
+	$dis_member .= "<tr>\n<td class=\"projectCtask\">
+        <img border=\"0\" src=\"".C_IMAGE_PATH."/$set_theme/hierarchy.png\" alt=\"\" />
+        $t_label</td>\n";
+      }
+
+      // write a line (corresponding to a task)
+      for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
+
+	$m_id = $array_mem[$cpt_e]["id"];
+	$tm_proj = $array_time["proj"][$t_id][$m_id];
+	$tm_miss = $array_time["miss"][$t_id][$m_id];
+	$tm_used = $array_time["used"][$t_id][$m_id];
+
+	// We write the cell only if not 0/0/0
+	if ( ( ($tm_used != "0.0") && ($tm_used != ""))
+	     || ( ($tm_miss != "0") && ($tm_miss != "") )
+             || ( ($tm_proj != "0") && ($tm_proj != "") ) ) {
+	  $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+	} else {
+	  $tm_label = "";
+	}
+
+	if ($t_haschild) {
+	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+	} else if ($t_parent) {
+	  $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+	} else {
+	  $dis_member .= "<td class=\"projectCtime\">$tm_label</td>\n";
+	}
+      }
+
+      if ($t_parent) {
+	// write the total for a parent task
+	$tm_proj = $array_partot["proj"][$t_id];
+	$tm_miss = $array_partot["miss"][$t_id];
+	$tm_used = $array_partot["used"][$t_id];
+
+	if (!(isset($tm_miss))) $tm_miss = 0;
+	if (!(isset($tm_proj))) $tm_proj = 0;
+
+	if (($tm_used + $tm_miss) > (1.10 * $tm_proj))
+	  $class = "projectPlate";
+	else if (($tm_used + $tm_miss) < (0.90 * $tm_proj))
+	  $class = "projectPearly";
+	else
+	  $class = "projectPtime";
+
+	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
+
+      } else {
+	$dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
+      }
+
+      $dis_member .= "</tr>\n";
+    }
+
+    // display the last line (totals by members)
+    $dis_member .= "<tr>\n <td class=\"projectPtask\">$l_total</td>\n";
+
+    for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
+      $m_id = $array_mem[$cpt_e]["id"];
+
+      $tm_proj = $array_memtot["proj"][$m_id];
+      $tm_miss = $array_memtot["miss"][$m_id];
+      $tm_used = $array_memtot["used"][$m_id];
+      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
+
+      $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+    }
+
+    //last cell (total of totals)
+    $tm_proj = $timetot["proj"];
+    $tm_miss = $timetot["miss"];
+    $tm_used = $timetot["used"];
+
+    if (!(isset($tm_miss))) $tm_miss = 0;
+    if (!(isset($tm_proj))) $tm_proj = 0;
+
+    $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+    $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
+    $dis_member .= "</tr>\n";
+
+
+    // ratios
+    $ratio_alloestimated = intval(($allotted/$estimated)*100);
+    $ratio_usedestimated = intval(($usedtime/$estimated)*100);
+
+    $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
+    $ratio_progeval = intval((($usedtime + $missingtime)/$estimated)*100);
+
+    if ($ratio_progeval < 70)
+      $symbol_progeval = "++";
+    else if ($ratio_progeval < 85)
+      $symbol_progeval = "+";
+    else if ($ratio_progeval > 140)
+      $symbol_progeval = "--";
+    else if ($ratio_progeval > 120)
+      $symbol_progeval = "-";
+    else
+      $symbol_progeval = "=";
+
+    $span = $cpt_m + 2;
+
+    //advance array
+    $dis_progress = "
+    <tr>
+     <td class=\"detailLabel\">&nbsp;$text_time&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$value_time</td>
+     <td>&nbsp;&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_alloestimated&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$ratio_alloestimated %</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">&nbsp;$l_allotted&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$allotted</td>
+     <td>&nbsp;&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_usedestimated&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$ratio_usedestimated %</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">&nbsp;$l_used&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$usedtime</td>
+     <td>&nbsp;&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_progress&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$ratio_progress %</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">&nbsp;$l_missing&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$missingtime</td>
+     <td>&nbsp;&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_progeval&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$symbol_progeval</td>
+    </tr>";
+
+  } 
+
+  // --- HTML Template --------------------------------------------------------
+
+  $display["title"] = "<div class=\"title\">$l_project : $name</div>";
+
+  $block = "
+    $dis_comp
+
+    <div class=\"detailHead\">$l_progress</div>
+
+    <table class=\"detail\">
+      $dis_progress
+    </table>
+
+    <div class=\"detailHead\">$l_progressinfos</div>
+
+    <div class=\"projectCenter\">
+    <table $tab_style>
+    <tr>
+      $dis_memhead
+    </tr>
+      $dis_member
+    </table>
+    </div>
+    ";
 
   return $block;
 }

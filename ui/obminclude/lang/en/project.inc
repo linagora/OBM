@@ -97,6 +97,8 @@ $l_no_member_add = "No member to add";
 $l_no_member_del = "No member to remove";
 $l_add_member = "Add members to the project";
 
+$l_board_no_data = "Dashboard can't be displayed if tasks or members definitions are missing !";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "You have to fill the name before submitting.";
 $l_fill_tt = "You have to fill the category before submitting.";

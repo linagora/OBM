@@ -262,7 +262,7 @@ function run_query_allocation_and_time($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Insertion query execution                                                 //
+// Insertion query execution
 // Parameters:
 //   - $project[] : Entry's values
 //     keys used  : name, soldtime, tt
@@ -430,7 +430,7 @@ function run_query_insert($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Update query execution                                                    //
+// Update query execution
 // Parameters:
 //   - $pid       : project id
 //   - $project[] : Entry's values
@@ -502,7 +502,7 @@ function run_query_project_timetask_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Deletion query execution                                                  //
+// Deletion query execution
 // Parameters:
 //   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
@@ -541,7 +541,7 @@ function run_query_delete($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : UserList conditionnal insertion                         //
+// Query execution : UserList conditionnal insertion
 // Parameters:
 //   - $project[] : Entry's values
 //     keys used  : id
@@ -570,7 +570,7 @@ function run_query_projectname($pid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Task conditionnal insertion                         //
+// Query execution : Task conditionnal insertion
 // Parameters:
 //   - $project[] : Entry's values
 //     keys used  : id, ptask, tasklabel
@@ -661,7 +661,7 @@ function run_query_task_update($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Tasklist deletion                                       //
+// Query execution : Tasklist deletion
 // Parameters:
 //   - $project[] : hash info : keys used : id, task_nb, tskX
 ///////////////////////////////////////////////////////////////////////////////
@@ -698,10 +698,10 @@ function run_query_task_delete($project) {
       // Check that neither the task to be deleted or its childre tasks are
       // used in time management
       $query = "
-        select timetask_id
-        from TimeTask, ProjectTask
-        where timetask_projecttask_id = projecttask_id
-          and (projecttask_id='$tsk_id' or projecttask_parenttask_id='$tsk_id')
+        SELECT timetask_id
+        FROM TimeTask, ProjectTask
+        WHERE timetask_projecttask_id = projecttask_id
+          AND (projecttask_id='$tsk_id' or projecttask_parenttask_id='$tsk_id')
         ";
     
       display_debug_msg($query, $cdg_sql, "run_query_task_delete(2)");
@@ -716,10 +716,10 @@ function run_query_task_delete($project) {
     // If the task can be deleted
     if ($delete_ok) {
       $query = "
-        delete
-        from ProjectTask
-        where projecttask_id = '$tsk_id'
-          or  projecttask_parenttask_id = '$tsk_id'
+        DELETE
+        FROM ProjectTask
+        WHERE projecttask_id = '$tsk_id'
+          OR  projecttask_parenttask_id = '$tsk_id'
         ";
 
       display_debug_msg($query, $cdg_sql, "run_query_task_delete(3)");
@@ -752,10 +752,10 @@ function run_query_memberlist_insert($project) {
     $mem_id = $project["mem$cpt"];
 
     $query = "
-      select *
-      from ProjectUser
-      where projectuser_project_id = '$id'
-        and projectuser_user_id = '$mem_id'";
+      SELECT *
+      FROM ProjectUser
+      WHERE projectuser_project_id = '$id'
+        AND projectuser_user_id = '$mem_id'";
 
     display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(2)");
     $test_q = new DB_OBM;
@@ -764,7 +764,7 @@ function run_query_memberlist_insert($project) {
     // If the entry doesn't already exist, we insert it
     if ($test_q->num_rows() == 0) {
       $query = "
-        insert into ProjectUser 
+        INSERT INTO ProjectUser 
           (projectuser_user_id,
            projectuser_project_id,
            projectuser_projecttask_id,
@@ -773,7 +773,7 @@ function run_query_memberlist_insert($project) {
            projectuser_projectedtime,
            projectuser_manager
           )
-        values
+        VALUES
           ('$mem_id',
           '$id',
           null,
@@ -814,11 +814,11 @@ function run_query_memberlist_delete($project) {
 
     // Check if the user has filled time management for this project
     $query = "
-        select timetask_id
-        from TimeTask, ProjectTask
-        where timetask_user_id = '$mem_id'
-          and timetask_projecttask_id = projecttask_id
-          and projecttask_project_id = '$id'
+        SELECT timetask_id
+        FROM TimeTask, ProjectTask
+        WHERE timetask_user_id = '$mem_id'
+          AND timetask_projecttask_id = projecttask_id
+          AND projecttask_project_id = '$id'
         ";
     
     display_debug_msg($query, $cdg_sql, "run_query_member_delete(2b)");
@@ -826,10 +826,10 @@ function run_query_memberlist_delete($project) {
     
     if ($search_q->nf() == 0) {
       $query = "
-        delete
-        from ProjectUser
-        where projectuser_project_id = '$id'
-          and projectuser_user_id = '$mem_id'
+        DELETE
+        FROM ProjectUser
+        WHERE projectuser_project_id = '$id'
+          AND projectuser_user_id = '$mem_id'
         ";
       
       display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(3b)");
@@ -845,7 +845,7 @@ function run_query_memberlist_delete($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project Update query execution                                            //
+// Member status Update query execution
 // Parameters:
 //   - $project[] : hash info : user_id, user_status
 ///////////////////////////////////////////////////////////////////////////////
@@ -857,11 +857,11 @@ function run_query_memberstatus_change($project) {
   $m_val = $project["user_status"];
 
   $query = "
-    update ProjectUser
-    set projectuser_manager = '$m_val'
-    where projectuser_user_id = '$m_id'
-      and projectuser_project_id = '$p_id'
-      and projectuser_projecttask_id is null";
+    UPDATE ProjectUser
+    SET projectuser_manager = '$m_val'
+    WHERE projectuser_user_id = '$m_id'
+      AND projectuser_project_id = '$p_id'
+      AND projectuser_projecttask_id is null";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_memberstatus_change");
@@ -882,19 +882,19 @@ function run_query_allocation($p_id) {
   $frac = $c_day_fraction;
 
   $query = "
-    select
+    SELECT
       userobm_id,
       projectuser_projecttask_id,
       projectuser_projectedtime as projected_time,
       projectuser_missingtime as missing_time
-    from ProjectUser
+    FROM ProjectUser
       left join ProjectTask
         on projectuser_projecttask_id = projecttask_id
       left join UserObm
         on projectuser_user_id = userobm_id
-    where projectuser_project_id = '$p_id'
-      and projectuser_projectedtime is not null
-    group by userobm_id, projectuser_projecttask_id, projected_time, missing_time
+    WHERE projectuser_project_id = '$p_id'
+      AND projectuser_projectedtime is not null
+    GROUP BY userobm_id, projectuser_projecttask_id, projected_time, missing_time
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_allocation");
@@ -906,7 +906,7 @@ function run_query_allocation($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project Allocation Update query execution                                 //
+// Project Allocation Update query execution
 // Parameters:
 //   - $project[] : hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
@@ -953,9 +953,9 @@ function run_query_allocate_update($project) {
       // if an allocation existed, but has been removed
       if (!($tnew) and ($told)) {
 	$query = "
-        delete from ProjectUser
-        where projectuser_user_id = '$m_id'
-          and projectuser_projecttask_id = '$t_id'";
+        DELETE from ProjectUser
+        WHERE projectuser_user_id = '$m_id'
+          AND projectuser_projecttask_id = '$t_id'";
 
  	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(2)");
 	$obm_q->query($query);
@@ -972,13 +972,13 @@ function run_query_allocate_update($project) {
 	}
 
 	$query = "
-         update ProjectUser
-         set projectuser_timeupdate = '$date_now',
+         UPDATE ProjectUser
+         SET projectuser_timeupdate = '$date_now',
              projectuser_userupdate = '$uid',
              projectuser_projectedtime = '$proj'
              $set_miss_time
-         where projectuser_user_id = '$m_id'
-           and projectuser_projecttask_id = '$t_id'";
+         WHERE projectuser_user_id = '$m_id'
+           AND projectuser_projecttask_id = '$t_id'";
 
 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
 	$obm_q->query($query);
@@ -987,7 +987,7 @@ function run_query_allocate_update($project) {
       } else if (($tnew) and !($told)){
 
 	$query = "	
-        insert into ProjectUser 
+        INSERT INTO ProjectUser 
           (projectuser_user_id,
            projectuser_project_id,
            projectuser_projecttask_id,
@@ -996,7 +996,7 @@ function run_query_allocate_update($project) {
            projectuser_projectedtime,
            projectuser_missingtime
           )
-        values
+        VALUES
           ('$m_id',
            '$p_id',
            '$t_id',
@@ -1033,13 +1033,13 @@ function run_query_progress($project) {
       if ($misstime != "") {
 	
 	$query = "
-          update ProjectUser set
+          UPDATE ProjectUser SET
             projectuser_timeupdate = '$date_now',
             projectuser_userupdate = '". $auth->auth["uid"] ."',
             projectuser_validity = '$date_now',
             projectuser_missingtime = '$misstime'
-          where projectuser_projecttask_id = '$t_id'
-            and projectuser_user_id = '$m_id'
+          WHERE projectuser_projecttask_id = '$t_id'
+            AND projectuser_user_id = '$m_id'
           ";
 	
 	display_debug_msg($query, $cdg_sql, "run_query_progress");
@@ -1117,21 +1117,20 @@ function run_query_advance_update($project) {
       } else if (($proj_new || $miss_new) && ($proj_old || $miss_old)) {
 	// if missing time not and never set or never updated (=old projected)
 	// we set missing time to new projected
-	if ( ((! miss_old) && (! miss_new))
-             || ($miss_old == $proj_old) ) {
+	if ( (! $miss_old) && (! $miss_new) ) {
 	  $set_miss_time = $proj_new;
 	} else {
 	  $set_miss_time = $miss_new;
 	}
 
 	$query = "
-         update ProjectUser
-         set projectuser_timeupdate = '$date_now',
+         UPDATE ProjectUser
+         SET projectuser_timeupdate = '$date_now',
              projectuser_userupdate = '$uid',
              projectuser_projectedtime = '$proj_new',
              projectuser_missingtime = '$set_miss_time'
-         where projectuser_user_id = '$m_id'
-           and projectuser_projecttask_id = '$t_id'";
+         WHERE projectuser_user_id = '$m_id'
+           AND projectuser_projecttask_id = '$t_id'";
 
 	display_debug_msg($query, $cdg_sql, "run_query_allocate_update(3)");
 	$obm_q->query($query);
@@ -1139,14 +1138,14 @@ function run_query_advance_update($project) {
       // if a new entry has been given, we insert it
       } else if (($proj_new || $miss_new) && (!($proj_old) && !($miss_old))) {
 	// if missing time not set, we set missing time to new projected
-	if (! miss_new) {
+	if (! $miss_new) {
 	  $set_miss_time = $proj_new;
 	} else {
 	  $set_miss_time = $miss_new;
 	}
 
 	$query = "	
-        insert into ProjectUser 
+        INSERT into ProjectUser 
           (projectuser_user_id,
            projectuser_project_id,
            projectuser_projecttask_id,
@@ -1155,7 +1154,7 @@ function run_query_advance_update($project) {
            projectuser_projectedtime,
            projectuser_missingtime
           )
-        values
+        VALUES
           ('$m_id',
            '$p_id',
            '$t_id',
@@ -1176,7 +1175,7 @@ function run_query_advance_update($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Stat Log query execution (creates an entry in the project progress log)   //
+// Stat Log query execution (creates an entry in the project progress log)
 // Parameters:
 //   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////

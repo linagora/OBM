@@ -63,6 +63,12 @@ $cgp_sql_star = true;
 // Tuning constants
 $ctu_sql_limit = false;
 
+// MySQL (only 4.1+) charset used (for database and files !)
+//$cmy_character_set = "_latin1";
+
+// MySQL (only 4.1+) charset collation used (for database and files !)
+//$cmy_charset_collation = "latin1_general_ci";
+
 // is Mail enabled (is a mail server configured for OBM)
 $cgp_mail_enabled = false;
 

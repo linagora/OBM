@@ -1,0 +1,451 @@
+\section{Installation pas à pas d'OBM 0.9.x}
+
+Cette documentation est valide pour la version 0.9.0. Seules les
+manipulations spécifiques à OBM sont décrites. Pour l'installation de
+PHP, MySQL, PostgreSQL, Apache ou autres composants libres, merci de vous référer
+à la documentation de votre distribution.
+
+\subsection{Hypothèses}
+
+Cette documentation suppose que vous disposez d'un serveur Apache,
+d'un serveur de BD MySQL ou PostgreSQL et de PHP correctement configurés. 
+
+Sous Debian, il faut installer les packages : php4, php4-cgi,
+php4-mysql or php4-pgsql, apache, apache-common. 
+
+Dans la suite du document, on suppose que la racine d'OBM se trouve
+dans \fichier{/var/www/obm}.
+
+\subsection{Télécharger les sources}
+
+L'installation serait plus difficile sans...
+
+Il faut donc télécharger les sources et les décompresser dans
+\fichier{/var/www} (en fait dans le répertoire qui contiendra la
+racine de votre OBM).
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+wget http://obm.aliacom.fr/obm-archives/obm-0.9.0.tar.gz
+tar -C /var/www -xzvf obm-0.9.0.tar.gz
+cd /var/www
+ln -s obm-0.9.0 obm
+\end{verbatim}
+  \end{minipage}
+}
+
+Changer le propriétaire des fichiers sources d'OBM (nécessaire pour le
+safe\_mode activé dans le module documents). 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+cd /var/www/obm
+chown -R www-data:www-data *  (sur Debian)
+chown -R apache:apache *  (sur Redhat)
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsection{configuration de PHP}
+
+Fichier de configuration de PHP : 
+
+\begin{description}
+\item[sur debian] \fichier{/etc/php/apache/php.ini}
+\item[sur RedHat] \fichier{/etc/php.ini}
+\end{description}
+
+La version ligne de commande de PHP doit également être configurée
+(certains outils d'administration ou certains scripts d'installation
+sont aussi utilisables dans ce mode de fonctionnement).
+
+\begin{description}
+\item[sur debian] \fichier{/etc/php4/cgi/php.ini}, ou 
+\fichier{/etc/php4/cli/php.ini} sur les version récentes.
+\end{description}
+
+
+La directive include\_path doit être renseignée ainsi : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+include_path = ".:/php/includes:/var/www/obm"
+\end{verbatim}
+  \end{minipage}
+}
+
+Depuis la version 0.7.3, la directive short\_open\_tag peut être
+positionnée à Off. Pour les versions antérieures, elle doit toutefois
+être positionnée à On.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+short_open_tag = On (can be switched to Off since OBM 0.7.3)
+\end{verbatim}
+  \end{minipage}
+}
+
+Les variables globales doivent être automatiquement enregistrées : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+register_globals = On
+\end{verbatim}
+  \end{minipage}
+}
+
+La directive Magic\_quote doit être à On :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+magic_quotes_gpc = On
+\end{verbatim}
+  \end{minipage}
+}
+
+De plus, selon  le propriétaire des fichiers, il faut aussi activer le
+safe\_mode (mais OBM peut fonctionner sans également) : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+safe_mode = On
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection{Vérification du support Mysql (ou PostgreSQL) par PHP}
+
+Selon le serveur de base de données utilisé, une de ces deux lignes
+doit être présente dans votre \fichier{php.ini} : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+extension=mysql.so 
+extension=pgsql.so
+\end{verbatim}
+  \end{minipage}
+}
+
+Cette modification doit être faite pour le module Apache
+\emph{et} pour le mode ligne de commande s'ils utilisent des fichiers
+\fichier{php.ini} distincts.
+
+\subsection{Configuration d'Apache et de PHP}
+
+Les sources d'OBM sont dans le répertoire \fichier{php}, les fichiers
+à inclure sont dans le répertoire \fichier{obminclude}. Depuis la
+version 0.5.2, le répertoire \fichier{obminclude} est en dehors de la
+racine des documents pour des considérations de sécurité.
+
+Pour l'application web OBM, toutes les configurations Apache et PHP se
+font dans le fichier \fichier{httpd.conf} d'Apache.
+
+\subsubsection*{Configurer Apache pour le traitement des fichiers PHP}
+
+Éditer le fichier \fichier{httpd.conf} (ou \fichier{srm.conf}) et
+ajouter :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+AddType application/x-httpd-php .php
+\end{verbatim}
+  \end{minipage}
+}
+
+Sous RedHat 8, avec Apache2, vérifier que le
+\fichier{/etc/httpd/conf.d/php.conf} est correct.
+
+Nous allons  configurer un \emph{virtual host} pour gérer une instance
+d'OBM (vous pouvez avoir plusieurs \emph{virtuals hosts} sur un seul
+serveur). 
+
+Dans la section \emph{virtual host} du \fichier{httpd.conf},
+positionner le \emph{Document Root} à /var/www/obm/php.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+DocumentRoot /var/www/obm/php
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection*{Répertoires d'include d'OBM}
+
+Le nom du répertoire d'include (\fichier{obminclude} par défaut) est
+maintenant une variable d'environnement pour permettre à plusieurs
+instances d'OBM basées sur le même répertoire de source de tourner
+simultanément. Seul ce répertoire est à modifier sur chaque instance
+car il contient les réglages spécifiques (thèmes, bases de données,
+langues) pour chaque instance.
+
+Cette variable est donc positionnée dans le fichier
+\fichier{httpd.conf} d'Apache. Il faut d'abord charger le module
+\fichier{env} : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+LoadModule env_module /usr/lib/apache/1.3/mod_env.so (apache 1.3 on Debian)
+LoadModule env_module modules/mod_env.so (apache 2 on Redhat)
+\end{verbatim}
+  \end{minipage}
+}
+
+Puis renseigner la variable OBM\_INCLUDE\_VAR avec le nom du
+répertoire d'include : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+Setenv OBM_INCLUDE_VAR obminclude
+\end{verbatim}
+  \end{minipage}
+}
+
+Le chemin d'accès au répertoire d'include d'OBM doit être donné
+(D'ailleurs, le répertoire \fichier{obminclude} peut être déplacé) :  
+
+Renseigner la variable include\_path avec le chemin vers le répertoire
+d'include : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+php\_value include\_path ".:/var/www/obm"
+\end{verbatim}
+  \end{minipage}
+}
+
+
+\subsubsection*{Alias pour les images}
+
+Il faut installer un alias images vers le répertoire de themes : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+Alias /images /var/www/obm/obminclude/themes
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection*{Directory Index}
+
+Il faut enfin spécifier le fichier par défaut : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+DirectoryIndex obm.php
+\end{verbatim}
+  \end{minipage}
+}
+
+Nous recommandons \textbf{chaudement} d'interdire l'accès direct aux fichiers
+\fichier{.inc} :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+<Files ~ "\.inc$">
+   Order allow,deny
+   Deny from all
+</Files>
+\end{verbatim}
+  \end{minipage}
+}
+
+
+\subsubsection*{Section virtual host d'exemple complète}
+
+Vérifier que votre IP soit définie comme un \emph{named virtual
+  host} et insérer cette section :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+NameVirtualHost 127.0.0.1
+
+<VirtualHost 192.168.1.5>
+ ServerAdmin root@localhost
+ DocumentRoot /var/www/obm/php
+ ServerName obm
+ ErrorLog /var/log/apache/obm-error.log
+ CustomLog /var/log/apache/obm-access.log common
+ SetEnv OBM_INCLUDE_VAR obminclude
+ Alias /images /var/www/obm/obminclude/themes
+ DirectoryIndex obm.php
+</VirtualHost>
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsection{Création de la base de données OBM}
+
+\subsubsection{Configuration d'OBM}
+
+Éditer le fichier \fichier{obm\_conf.inc} dans \fichier{obminclude} et
+
+\begin{itemize}
+\item choisir la base de données à utiliser ; 
+\item la déclarer ;
+\item déclarer le nom d'utilisateur et le mot de passe à utiliser.
+\item déclarer l'url d'accès à OBM (\$cgp\_host).
+\end{itemize}
+
+Il est également possible de modifier des préférences globales dans ce
+fichier, comme cgp\_mail\_enabled par exemple.
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+// Database infos
+$obmdb_host = "localhost";
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_db = "obm";
+$obmdb_user = "obm";
+$obmdb_password = "obm";
+
+// is Mail enabled ? (agenda)
+$gp_mail_enabled = false;
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection{Configuration et création de la base de données}
+
+Les scripts de création de la base de données se trouvent dans le
+répertoire \fichier{scripts/0.9}.
+
+\subsubsection*{Langue par défaut des données}
+
+Certaines valeurs de références sont insérées par défaut. Ces valeurs
+peuvent être en français (par défaut) ou en anglais. Pour passer de
+l'un à l'autre, il faut éditer le fichier
+\fichier{scripts/0.9/install\_obmdb\_0.9.mysql.sh} (ou
+\fichier{scripts/0.9/install\_obmdb\_0.9.pgsql.sh}) pour changer la
+valeur de DATA\_LANG à \texttt{en} : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+# Mysql User, Password and Data lang var definition 
+U=obm 
+P="obm" 
+DB="obm" 
+DATA_LANG="en"
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection*{MySQL}
+
+Pré-requis : disposer d'un login/mot de passe valide pour MySQL.
+
+Exemple de création d'un utilisation MySQL : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX
+ON obm.* TO obm@localhost IDENTIFIED BY 'obm'; 
+\end{verbatim}
+  \end{minipage}
+}
+ou plus simplement :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
+\end{verbatim}
+  \end{minipage}
+}
+
+Le script \fichier{install\_obmdb\_0.9.mysql.sh} gère les différentes
+étapes de création de la base de données. Positionner les bonnes
+valeurs de login/mot de passe dans ce script et le lancer :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+cd obm/scripts/0.9
+emacs install_obmdb_0.9.mysql.sh
+./install_obmdb_0.9.mysql.sh
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection*{PostgreSQL}
+
+OBM supporte PostgreSQL depuis la version 0.7.5.
+
+Création de l'utilisateur obm et de la base de données éponyme :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+create user obm password 'obm';
+create database obm with owner = obm;
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection{Pour OBM depuis la version 0.8.3}
+
+Si votre server PostgreSQL n'est pas configuré pour le jeu de
+caractères latin1, éditez le fichier \fichier{scripts/0.9/postgres-pre.sql}
+et décommentez la ligne : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+\encoding latin1
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsubsection{Pour toutes les versions d'OBM}
+
+Le script \fichier{install\_obmdb\_0.9.pgsql.sh} gère toutes les
+étapes de création de la base de données.
+
+Ajoutez les informations login/mot de passe (et base de données) dans
+ce script et lancez-le :
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+cd obm/scripts/0.9
+emacs install_obmdb_0.9_pgsql.sh
+./install_obmdb_0.9_pgsql.sh
+\end{verbatim}
+  \end{minipage}
+}
+
+\subsection{Lancer OBM (accéder à obm.php depuis un navigateur)}
+
+D'abord, redémarrer le serveur web apache : 
+
+\shadowbox{
+  \begin{minipage}{13cm}
+\begin{verbatim}
+/etc/init.d/apache restart
+\end{verbatim}
+  \end{minipage}
+}
+
+Si tout marche bien, lancer un navigateur (Firefox par exemple) et
+aller à l'URL : \url{http://yourvirtualhost/}, puis se connecter en
+utilisant le compte \texttt{uadmin/padmin}.
+

@@ -214,10 +214,11 @@ $l_header_add_contact = "Ajouter contact";
 // Project headers
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";
-$l_header_progress = "Avancement";
-$l_header_advance = "Avancement2";
+$l_header_progress = "Avancement old";
+$l_header_advance = "Avancement";
 $l_header_man_affect = "Affectation";
 $l_header_add_member = "Ajouter participant";
+$l_header_dashboard = "Tableau de bord";
 
 // Admin headers
 $l_header_index = "Accueil";

@@ -175,7 +175,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   if ((! $fuzzy) || ($name == "")) {
     if ($ctu_sql_limit) {
-      $count = get_query_count("SELECT count(*) FROM Company $left_join $whereq");
+      $count = get_query_count("SELECT count(distinct company_id) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0) || (! $ctu_sql_limit)) {

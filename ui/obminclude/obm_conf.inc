@@ -19,7 +19,7 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm-panthere/";
+$cgp_host = "http://obm/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
@@ -38,6 +38,12 @@ $cgp_sql_star = true;
 
 // Tuning constants
 $ctu_sql_limit = true;
+
+// MySQL (only 4.1+) charset used (for database and files !)
+//$cmy_character_set = "_latin1";
+
+// MySQL (only 4.1+) charset collation used (for database and files !)
+//$cmy_charset_collation = "latin1_general_ci";
 
 // is Mail enabled for OBM ? (eg: agenda)
 $cgp_mail_enabled = true;
@@ -62,8 +68,9 @@ $password_encryption = "md5";
 
 // Modules specific parameters ----------------------------------------------//
 
-// Generic E-mail for Incident module
-//$cmail_incident = "support@mydomain";
+// Company : Auto format fields
+$caf_company_name = true;
+$caf_town = true;
 
 // Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
@@ -71,16 +78,15 @@ $cgp_mailing_default = true;
 // Contact : is a new contact private by default
 $ccontact_private_default = true;
 
+// Calendar : show public groups
+$cagenda_public_groups = true;
+
+// Generic E-mail for Incident module
+//$cmail_incident = "support@mydomain";
+
 // Document : Root of the document repository
 $document_path = "/var/www/obmdocuments";
 $default_path = "/Default";                  // Default directory
-
-// Company : Auto format fields
-$caf_company_name = true;
-$caf_town = true;
-
-// Calendar : show public groups
-$cagenda_public_groups = true;
 
 // Group : is a new group private by default
 $cgroup_private_default = true;

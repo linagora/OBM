@@ -38,7 +38,9 @@ Liste des paramètres définis :\\
 \hline
 \textbf{Option} & \textbf{Valeur défaut} & \textbf{Description} \\
 \hline
-\multicolumn{3}{c}{Paramètres globaux}\\
+\hline
+\multicolumn{3}{c}{\textbf{Paramètres globaux}}\\
+\hline
 \hline
 \$cgp\_host & http://obm/ & Hôte utilisé dans les liens (ex dans les mails envoyés) \\ 
 \hline
@@ -76,6 +78,10 @@ Liste des paramètres définis :\\
 \hline
 \$ctu\_sql\_limit & false & Indique si les requètes envoyées à la base de données doivent gérer la clause limit afin de restreindre les résultats au niveau base de données à la place de l'affichage \\ 
 \hline
+\$cmy\_character\_set & & Indique le jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\hline
+\$cmy\_charset\_collation & & Indique la collation du jeu de caractères utilisé (base + fichiers). (uniquement pour MySQL 4.1 et +) \\ 
+\hline
 \$cgp\_mail\_enabled & false & Indique si l'envoi de mail est activé pour OBM\\
 \hline
 \$cs\_lifetime & 7200 & Durée de session. Temps d'inactivité avant déconnexion \\ 
@@ -98,27 +104,20 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 \hline
 \$password\_encryption & md5 & Indique le format de stockage des mots de passe en base de données (plain | md5 | crypt) \\ 
 
-
 \hline
-\multicolumn{3}{c}{Paramètres spéciques aux modules}\\
 \hline
-\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\multicolumn{3}{c}{\textbf{Paramètres spéciques aux modules}}\\
 \hline
-\$cgp\_mailing\_default & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
-\hline
-\$ccontact\_private\_default & false & Indicateur contact sont privés par défaut \\ 
-\hline
-\$document\_path & /var/www/docs & Chemin du dépôt de document sur disque \\ 
-\hline
-\$default\_path & /Default & Répertoire par défaut dans le dépot de documents \\ 
-\hline
-\$default\_mime & application/octet-stream & Type mime par défaut des documents \\ 
 \hline
 \$caf\_company\_name & false & Indicateur de formattage automatique du nom de société \\ 
 \hline
 \$caf\_town & false & Indicateur de formattage automatique du nom de ville \\ 
 \hline
-\$tmp\_path & /tmp & Chemin pour stocake temporaire (module import) \\ 
+\$cgp\_mailing\_default & true & Indicateur contact ``activé pour mailing'' par défaut \\ 
+\hline
+\$ccontact\_private\_default & false & Indicateur contacts sont privés par défaut \\ 
+\hline
+\$cagenda\_public\_groups & false & Indicateur d'affichage des groupes publics dans l'agenda \\ 
 \hline
 \$c\_day\_fraction & 8 & Nombre de fractions d'une journée (gestion des temps)\\ 
 \hline
@@ -126,7 +125,24 @@ serveur. Utilisé seulement si le mode d'authentification est "CAS".\\
 \hline
 \$c\_week\_first\_day & 1 & Premier jour de la semaine (0=dimanche, 1=lundi,..) (gestion des temps)\\ 
 \hline
-\$cgp\_show & Voir \ref{cgp_show} et \ref{cgp_show_2} & Indicateurs d'affichage des sections et modules \\ 
+\$cmail\_incident & & Adresse e-mail de destination des messages automatiques du module Incident \\ 
+\hline
+\$document\_path & /var/www/docs & Chemin du dépôt de document sur disque \\ 
+\hline
+\$default\_path & /Default & Répertoire par défaut dans le dépot de documents \\ 
+\hline
+\$default\_mime & application/octet-stream & Type mime par défaut des documents \\ 
+\hline
+\$tmp\_path & /tmp & Chemin pour stocake temporaire (module import) \\ 
+\hline
+\$cgroup\_private\_default & false & Indicateur groupes sont privés par défaut \\ 
+
+\hline
+\hline
+\multicolumn{3}{c}{\textbf{Paramètres d'affichage des sections, modules et champs}}\\
+\hline
+\hline
+\$cgp\_show & Voir \ref{cgp_show_section} et \ref{cgp_show_module} & Indicateurs d'affichage des sections et modules \\ 
 \hline
 \$cgp\_hide & Voir \ref{cgp_hide} & Indicateurs d'affichage des champs \\ 
 \hline
@@ -212,7 +228,7 @@ $cgp_show["section"]["admin"]["right"] = "$cright_read";
 
 
 \subsection{La définition des modules affichés}
-\label{cgp_show_2}
+\label{cgp_show_module}
 
 \obm permêt de définir, via le fichier de configuration, quels modules sont disponibles et dans quelle section.
 

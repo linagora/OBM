@@ -31,6 +31,7 @@
 // - progress_update -- form fields    -- update the project progress
 // - advance         -- $param_project -- show the project allocation/progress
 // - advance_update  -- form fields    -- update project allocation/progress
+// - dashboard       -- $param_project -- dashboard / stats of the project
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
@@ -328,6 +329,12 @@ if ($action == "ext_get_id") {
     $display["detail"] = dis_project_consult($project["id"]);
   }
 
+} elseif ($action == "dashboard")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($project["id"] > 0) {
+    $display["detail"] = dis_project_dashboard($project);
+  }
+  
 } elseif ($action == "member_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $project["ext_id"];
@@ -525,6 +532,7 @@ function get_project_action() {
   global $l_header_display, $l_header_add_member, $l_add_member;
   global $l_header_man_task, $l_header_man_member, $l_header_progress;
   global $l_header_advance, $l_header_man_affect, $l_header_consult;
+  global $l_header_dashboard;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // External call : select one deal
@@ -562,7 +570,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update', 'advance', 'advance_update') 
+    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_update', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update', 'advance', 'advance_update', 'dashboard') 
     );
 
 // Detail Update
@@ -607,7 +615,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'advance', 'advance_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'dashboard') 
     );
 
 // Add a task
@@ -636,7 +644,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_update', 'task_del', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'task', 'task_add', 'task_update', 'task_del', 'allocate', 'allocate_update', 'advance', 'advance_update', 'dashboard') 
                                      );
 
 // Select members : Lists selection
@@ -705,15 +713,23 @@ function get_project_action() {
     'Name'     => $l_header_advance,
     'Url'      => "$path/project/project_index.php?action=advance&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
                                      );
 
 // Advance Update
   $actions["project"]["advance_update"] = array (
-    'Url'      => "$path/project/project_index.php?action=advance_update&amp;param_project=".$project["id"]."",
+    'Url'      => "$path/project/project_index.php?action=advance_update&amp;param_project=".$project["id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );
+
+// Dashboard
+   $actions["project"]["dashboard"] = array (
+     'Name'     => $l_header_dashboard,
+     'Url'      => "$path/project/project_index.php?action=dashboard&amp;param_project=".$project["id"],
+     'Right'    => $cright_read,
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate', 'allocate_update', 'advance', 'advance_update', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_update', 'task_del') 
+                                       	 );
 
 // Display
    $actions["project"]["display"] = array (
