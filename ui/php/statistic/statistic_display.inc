@@ -122,6 +122,7 @@ function dis_resp_stats($cont_q,$comp_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
 // Parameters:
+//  - $lisy_q : DB Object with all list
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_select($list_q) {
@@ -147,6 +148,8 @@ function dis_list_select($list_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Statistics About the companies 
 // Parameters:
+// - comp_q : DB Object with all companies datas
+// - tot : Total of companies... unused for now
 // Returns:
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_stats($comp_q,$tot) {
@@ -266,4 +269,92 @@ function dis_cat_stats($comp_q,$tot) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Statistics About the companies 
+// Parameters:
+// - comp_q : DB Object with all companies datas
+// - tot : Total of companies... unused for now
+// Returns:
+///////////////////////////////////////////////////////////////////////////////
+function export_cat_stats($comp_q,$tot) {
+  global $path, $set_theme;
+  global $l_header_company,$l_header_contact,$l_key;
+  global $l_null,$l_totals, $l_header_country,$l_compcat;
+  global $set_csv_sep;
+
+  while ($comp_q->next_record()) {
+    if ($comp_q->f("companycategory_id") == NULL) {
+      $cat_id = 0;
+      $cat_c = $l_null;
+    } else {
+      $code = $comp_q->f("companycategory_code");
+      $cat_id = $comp_q->f("companycategory_id");
+      $cat_c = $code; 
+      $cat_d = $comp_q->f("companycategory_label");
+      $cat_major_code = substr($code,0,strpos($code,'.'));
+      // If code is a major code (not .)
+      if ($cat_major_code == "") {
+	$cat_major_code = $code;
+      }
+    }
+    if ($comp_q->f("country_iso3166") == NULL || $comp_q->f("country_iso3166") == "") {
+      $cty_iso = $l_null;
+    } else {
+      $cty_iso = $comp_q->f("country_iso3166") ;
+      $cty_d = $comp_q->f("country_name") ;
+    }
+    $nb = $comp_q->f("nb");
+    $stat[$cty_iso][$cat_id] += $nb;
+    $cty_count[$cty_iso] += $nb;
+    
+    if ((!$cat_count[$cat_id]) && ($cat_id != 0)) {
+      $cat_major_col[$cat_major_code] += 1;
+    }
+    $cat_count[$cat_id] += $nb;
+    if ($cat_id != 0) {
+      $cat_major_count[$cat_major_code] += $nb;
+    }
+    $cat[$cat_id] = $cat_c;
+    $cty_desc[$cty_iso] = $cty_d;
+    $cat_desc[$cat_id] = $cat_d;
+  }
+
+  $cat_link_total = array_sum($cat_count);
+  natsort($cat); 
+  foreach($cat as $cat_id =>$cat_name) {
+    if ($cat_id != 0) {
+      $cat_label .= "$set_csv_sep\"$cat_name ".$cat_desc[$cat_id]."\""; 
+    } else {
+      $cat_label .=  "$set_csv_sep\"$cat_name\"";
+    }
+    $percent = round(($cat_count[$cat_id])*100/$cat_link_total,1);    
+    $cat_percent .= "$set_csv_sep\"$percent\"";
+    $cat_tots .= "$set_csv_sep\"".$cat_count[$cat_id]."\"";
+  }   
+
+  
+  $block .= "\"\"$cat_label$set_csv_sep\"$l_totals\"$set_csv_sep\"%\"\n";
+  foreach ($stat as $cty_iso => $data) {
+    if($cty_iso != $l_null) {
+      $block .= "\"$cty_desc[$cty_iso]\"";
+    } else {
+      $block .= "\"$l_null\"";
+    }
+    foreach($cat as $cat_id => $cat_name) {
+      $block .= "$set_csv_sep\"".$data[$cat_id]."\"";
+    }
+    $percent = round(($cty_count[$cty_iso])*100/$cat_link_total,1);
+    $block .= "$set_csv_sep\"".$cty_count[$cty_iso]."\"";
+    $block .= "$set_csv_sep\"$percent\"";
+    $block .= "\n";
+  }
+
+  $block .= "\"$l_totals\"$cat_tots$set_csv_sep\"$cat_link_total\"$set_csv_sep\"\"\n";
+  $block .= "\"%\"$cat_percent$set_csv_sep\"\"$set_csv_sep\"100\"\n";
+  header("Content-Type: text/comma-separated-values");  
+  header("Content-Disposition: inline; filename=companies_stats.csv");
+  header("charset=utf-8");  
+  echo $block;
+  exit();
+}
 </script>

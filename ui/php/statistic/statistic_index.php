@@ -79,6 +79,20 @@ if ($action == "index" || $action == "") {
   }
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
+} elseif ($action == "company_statistic_export") {
+///////////////////////////////////////////////////////////////////////////////  
+  if($statistic["list"] == $c_all) {
+    $cat_q = run_query_company_per_country_per_cat();
+    $nb_comp = run_query_nb_company();
+  }
+  else {
+    $obm_q = run_query_get_list($statistic["list"]);
+    $query = $obm_q->f("list_query");
+    $com_q = run_query_get_selected_company($query,$statistic["list"]);
+    $cat_q = run_query_selected_company_per_country_per_cat($com_q);
+    $nb_comp = $com_q->nf();
+  }
+  export_cat_stats($cat_q, $nb_comp);
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Display
@@ -108,9 +122,9 @@ function get_param_statistic() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_statistic_action() {
   global $cright_read, $cright_write,$cright_admin_read,$cright_admin_write;
-  global $path,$actions;
+  global $path,$actions,$statistic;
   global $ico_contact,$ico_company;
-  global $l_header_resp_stats,$l_header_comp_stats,$l_header_index;
+  global $l_header_resp_stats,$l_header_comp_stats,$l_header_index,$l_header_export;
 // Index
   $actions["STATISTIC"]["index"] = array (
     'Name'     => $l_header_index,
@@ -142,20 +156,23 @@ function get_statistic_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
-
-// 
-  $actions["STATISTIC"]["company_statistic"] = array (
-    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic",
+					
+  $actions["STATISTIC"]["company_statistic_export"] = array (
+    'Name'     => $l_header_export,    
+    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic_export&amp;popup=1&amp;sel_list=".$statistic["list"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                        );
+    'Popup'    => 1,   
+    'Target'   => $l_statistic,
+    'Condition'=> array ('company_statistic') 
+                                        );					
 					
 // Sel user add : Users selection
   $actions["GROUP"]["sel_statistic"] = array (
     'Url'      => "$path/list/list_index?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=company_statistic",
     'Right'    => $cright_read,    
     'Popup'    => 1,
-    'Target'   => $l_statistic
+    'Target'   => $l_statistic,
+    'Condition'=> array ('None')     
   );
 
 }

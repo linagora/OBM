@@ -895,7 +895,7 @@ function get_this_week($date, $num_days) {
          $dis_date = weekday_short_name($i+1);
        
 	   // We add day of month and month
-       $dis_date .= " $p_day " . $l_monthsofyearshort[$p_month];
+       $dis_date .= " $p_day " . $l_monthsofyearshort[$p_month -1];
        // We create an array 
        $array_date[$i][0]=$dis_date;
        $array_date[$i][1]="$p_year$p_month$p_day";
