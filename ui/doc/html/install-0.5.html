@@ -155,13 +155,18 @@ In this virtual host section set :
 
 
 <H2>5: Configure PHP (include path in "php.ini" ...)</H2>
-# Edit the php.ini file (/usr/local/lib/php.ini)
+# Edit the php.ini file (/usr/local/lib/php.ini or /etc/php/apache/php.ini on Debian)
 <BR># Add the phplib and the working directories in the include path
 <BR>include_path = "what_was_here_before:/home/web/obm:."
 <P># unfill the auto_prepend_file and auto_append_file vars.
 <BR>auto_prepend_file = ;
 <BR>auto_append_file = ;
-
+<p>
+It is also possible to put this config in the apache vitual host if set.
+<pre>
+     php_value include_path .:/home/web/obm:
+or   php_value include_path .:/var/www/obm: (on Debian)
+</pre>
 
 <H2>6: Create the OBM database</H2>
 
@@ -317,6 +322,7 @@ mysql -u web -pweb obm < update-after-export-0.4.x-0.5.0.mysql.sql   &nbsp;<i>  
 
 <br><br>
 
+
 <A NAME="upgrade-0.5.2">
 <H1>UPGRADE OBM DATABASE 0.5.1 to 0.5.2</H1></a>
 <p>
@@ -337,15 +343,22 @@ mysql -u web -pweb obm < update-after-export-0.4.x-0.5.0.mysql.sql   &nbsp;<i>  
 # In OBM, from the admin module (must be connected with an admin user), select the Data menu and execute the action data_update for the company module (which update these values)
 
 
-
-<h3>[0.5.2] apache specific config</h3>
+<h3>[0.5.2] specific config</h3>
 Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
 <p>So now the OBM archive can be put directly on your web tree (no more copying the php directory content). After unpacking :
 <br>mv obm/ /home/web
 <br> or : mv obm /var/www (on Debian)
 
+<p>Update the include path in the php.ini (if necessary)
+<br>
+It is also possible to put this config in the apache vitual host if set.
+<pre>
+     php_value include_path .:/home/web/obm:
+or   php_value include_path .:/var/www/obm: (on Debian)
+</pre>
+
 <p>We encourage to set up a virtual host to handle one occurence of OBM (there can be several now on one server).
-In this virtual host section set :
+In this virtual host section :
 
 <p>
 # Set your document root to : /home/web/obm/php
@@ -373,6 +386,7 @@ In this virtual host section set :
     CustomLog /var/log/apache/obm-access.log common
     Alias /images /home/pierre/cvs/obm/obminclude/themes
     SetEnv OBM_INCLUDE_VAR obminclude
+#   php_value include_path .:/home/pierre/cvs/obm
     DirectoryIndex obm.php
 < /VirtualHost>
 </pre>
