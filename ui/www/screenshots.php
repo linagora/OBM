@@ -188,7 +188,7 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
     </tr>
   </table>
   <br>
-  <h2>New Theme<a name="6" id="6"></a></h2>
+  <h2>Theme : Grey<a name="6" id="6"></a></h2>
   <table class="picture">
     <tr> 
       <td><a href="#6"><img src="images/vignettes/theme01.png" alt="Zoom" width="159" height="128" border="0" onClick="MM_openBrWindow('zoom_theme01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
