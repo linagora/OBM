@@ -1241,11 +1241,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
         select_default(document.f_add_task.sel_project, $is_proj);
         select_default(document.f_add_task.sel_projecttask, $is_projtask);
       </script>";
-  } else {
+    } else {
     $dis_script .= "
-      <script type=\"text/javascript\">
-        fill_projectall(document.f_add_task.sel_project);
-      </script>";
+    <script type=\"text/javascript\">
+     fill_projectall(document.f_add_task.sel_project);
+    </script>";
+
   }
   
   //-------------------------------------------------------------

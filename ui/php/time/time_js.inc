@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_js.inc                                                  //
 //     - Desc : Time javascript functions File                               //
@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -239,8 +239,7 @@ function select_default(sel_list, def_value) {
       sel_list.options[i].selected=true;
   }
 }
-
 // -->
-</SCRIPT>
+</script>
 ";
 

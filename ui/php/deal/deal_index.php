@@ -755,7 +755,7 @@ function get_deal_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'update','insert') 
                                      	    );
 
   // Parent Detail Update
@@ -785,7 +785,7 @@ function get_deal_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'update','insert') 
                                      );
 
 // Document add

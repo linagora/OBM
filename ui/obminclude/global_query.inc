@@ -963,7 +963,7 @@ function get_email_used($id="", $gid="", $lid="") {
 ///////////////////////////////////////////////////////////////////////////////
 function send_mail($subject, $message, $recipients, $force) {
   global $gp_mail_enabled;
-
+  $message = stripslashes($message);
   if (! $gp_mail_enabled) {
     return 0;
   }

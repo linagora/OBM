@@ -15,12 +15,11 @@
 //   - $obm_q_events : list of event's records 
 //   - $contacts_array : array of selected contacts 
 //   - $groups_array : array of selected groups 
-///////////////////////////////////////////////////////////////////////////////
+/////////////////////sds//////////////////////////////////////////////////////////
 function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;
   $getdate = $agenda["date"];
-
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $getdate, $day_array2);
   $this_day = $day_array2[3]; 
   $this_month = $day_array2[2];
@@ -43,10 +42,9 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $td_width = 8;
   $td_colspan = count($calendar_user);
   store_daily_events($obm_q, $current_events, $event_data,$this_year,$stop_year);
-
   $start_day = strtotime($set_weekstart_default);
   for ($i=0; $i<7; $i++) {
-    $day_num = date("w", $start_day);
+    $day_num = date("w","$start_day");
     $day = $l_daysofweekshort[$day_num];
     $dis_day .= "<td class=\"agendaHead2\">$day</td>";
     $start_day = strtotime("+1 day", $start_day); 
@@ -62,11 +60,11 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     $i = 0;
     $whole_month = TRUE;
     $num_of_events = 0;
- 
+    $num_week = 0;
     $dis_calendar .= "<td width=\"210\">
     <table border=\"0\" width=\"210\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
-      <td colspan=\"7\" class=\"agendaHead2\">
+      <td colspan=\"7\" esz$dfsqdsqdqsdis_data_filedis_data_fileclass=\"agendaHead2\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthlink")."\">" . localizeDate ("month", $startYear) . "</a>
       </td>
     </tr>
@@ -76,7 +74,7 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     <tr>
       <td colspan=\"7\">
       <table border=\"0\" width=\"210\" cellspacing=\"1\" cellpadding=\"0\" class=\"agendaYear\">\n";
-    do {
+     do {
       $day = date ("j", $start_day);
       $daylink = date ("Ymd", $start_day);
       $check_month = date ("m", $start_day);
@@ -133,12 +131,16 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
       $start_day = strtotime("+1 day", $start_day); 
       $i++;
       if ($i == 7) { 
+	$num_week++; 
 	$dis_calendar .= "</tr>";
         $i = 0;
         $checkagain = date ("m", $start_day);
         if ($checkagain != $minical_month) $whole_month = FALSE;	
       }
     }  while ($whole_month == TRUE);
+    if($num_week < 6) {
+      $dis_calendar .= "<tr><td  height=\"30\" class=\"agendaMonthOff\" colspan=\"7\"></td></tr>";
+    }
     $startYear = strtotime ("+1 month", $startYear);
     $dis_calendar .= "</table></td></tr></table></td>\n";
     if ($m < 2) $dis_calendar .= "<td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>";

@@ -65,7 +65,7 @@ tr.logintable {
   </td><td>
 
   <div align="center">
-  <input name="imageField" type="image" src="/images/images/bouton_login.gif">
+  <input name="imageField" type="image" src="/images/images/bouton_login.gif" onclick="doChallengeResponse()">
   </div>
   </td>
 </tr>

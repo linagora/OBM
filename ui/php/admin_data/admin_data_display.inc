@@ -450,7 +450,7 @@ at least as much in the file system.
 	  $cpt_du ++;
 	  $fs_err = "X";
 	  $bool_bd = $d_q->next_record();
-	  $url = "<a href=\"$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id\">$id</a>";
+	  $url = "<a href=\"$path/document/document_index.php?action=detailconsult&amp;param_document=$id\">$id</a>";
 	  if($action == "data_update") {
 	    $update = "<td class=\"adminText\">Manual</td>";
 	  }
