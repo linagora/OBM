@@ -264,7 +264,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $cat1 = $doc_q->f("document_category1");
     $cat2 = $doc_q->f("document_category2");
     $author = $doc_q->f("document_author");
-    $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
+    $privacy = ($doc_q->f("document_private") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
     if (islink($doc_q->f("document_name"))) {
       $kind = "link";
@@ -294,7 +294,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
-  if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked" : ""); }
+  if (isset($document["privacy"])) { $privacy = ($document["privacy"] == 1 ? "checked=\"checked\"" : ""); }
   if (isset($document["category1"])) { $cat1 = $document["category1"]; }
   if (isset($document["category2"])) { $cat2 = $document["category2"]; }
   if (isset($document["author"])) { $author = stripslashes($document["author"]); }
@@ -526,7 +526,7 @@ function html_document_consult($doc_q) {
   $cat1 = $doc_q->f("documentcategory1_label");
   $cat2 = $doc_q->f("documentcategory2_label");
   $author = $doc_q->f("document_author");
-  $privacy = ($doc_q->f("document_privacy") == 1 ? $c_yes : $c_no );
+  $privacy = ($doc_q->f("document_private") == 1 ? $c_yes : $c_no );
   $mimetype = $doc_q->f("documentmimetype_label");
   $path = $doc_q->f("document_path");
   $size = $doc_q->f("document_size");

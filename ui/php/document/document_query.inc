@@ -65,7 +65,7 @@ function run_query_documentmime() {
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($document, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;  
+  global $c_all, $cdg_sql,$auth;  
 
   $title = $document["title"];
   $cat1 = $document["category1"];
@@ -125,7 +125,8 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
     $where .= " and document_mimetype = '$mime'";
   }
   
-  $where = " where document_kind != '0' $where";
+  $where = " where document_kind != '0' AND 
+  (document_private = '0' OR (document_private = '1' AND document_usercreate = ".$auth->auth["uid"].")) $where";
 
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "document_title";
@@ -663,7 +664,6 @@ function run_query_update($did, &$document) {
   $url = $document["url"];
   $id = $document["id"];
   $file_update = $document["file_update"];
-  
   if(strrpos($path,'/') != strlen($path) -1) {
     $path = $path.'/';
   }
@@ -693,13 +693,14 @@ function run_query_update($did, &$document) {
 
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
 
-  if($kind == "new_file") {
+  if($kind == "new_file" && $file_update=="yes") {
     $file_kind = 1;
     $obm_q = run_query_detail($document);
     if(!run_query_delete_file($obm_q->f("document_path"),$obm_q->f("document_name"))) 
     
-    if(!run_query_create_file($document)) 
+    if(!run_query_create_file($document)) {
       return false;
+    }
   }
   
   //////
@@ -1236,10 +1237,10 @@ function getlink($name,$path) {
 
 
 function run_query_get_tree($display_file) {
-  global $cdg_sql;
-
+  global $cdg_sql,$auth;
+  $where = "where (document_private = '0' OR (document_private = '1' AND document_usercreate = ".$auth->auth["uid"]."))";
   if($display_file != "true") {
-    $where = "where document_kind = '0'";
+    $where .= " AND document_kind = '0'";
   }
   $query = "select *  from Document $where 
   order by CONCAT(document_path,document_name)
