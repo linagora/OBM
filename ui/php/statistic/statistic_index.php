@@ -14,7 +14,6 @@
 // Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "COM";
 $module = "statistic";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

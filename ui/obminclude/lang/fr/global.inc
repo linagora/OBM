@@ -16,6 +16,7 @@ $l_validate = "Valider";
 $l_execute = "Exécuter";
 $l_confirm = "Confirmer";
 $l_home = "Accueil";
+
 // Common messages
 $l_yes = "Oui";
 $l_no = "Non";
@@ -68,6 +69,11 @@ $l_new = "Créer";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
 $l_last = "Dernier";
+$l_login = "Utilisateur";
+$l_logout = "Déconnexion";
+$l_profile = "Profil";
+$l_connection_end = "Fin de connexion";
+$l_reconnect = "Cliquer ici pour se reconnecter";
 
 // Entities
 $l_company = "Société";

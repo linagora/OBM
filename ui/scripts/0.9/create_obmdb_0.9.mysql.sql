@@ -82,27 +82,28 @@ CREATE TABLE UserObm_SessionLog (
 -- Table structure for table 'UserObm'
 --
 CREATE TABLE UserObm (
-  userobm_id              int(8) DEFAULT 0 NOT NULL auto_increment,
-  userobm_timeupdate      timestamp(14),
-  userobm_timecreate      timestamp(14),
-  userobm_userupdate      int(8),
-  userobm_usercreate      int(8),
-  userobm_local           int(1) default 1;
-  userobm_ext_id          varchar(16),
-  userobm_login           varchar(32) DEFAULT '' NOT NULL,
-  userobm_password        varchar(32) DEFAULT '' NOT NULL,
-  userobm_perms           varchar(254),
-  userobm_datebegin       date,
-  userobm_archive         char(1) not null default '0',
-  userobm_lastname        varchar(32),
-  userobm_firstname       varchar(32),
-  userobm_phone           varchar(32),
-  userobm_phone2          varchar(32),
-  userobm_fax             varchar(32),
-  userobm_fax2            varchar(32),
-  userobm_email           varchar(60),
-  userobm_description     varchar(255),
-  userobm_timelastaccess  timestamp(14),
+  userobm_id                int(8) DEFAULT 0 NOT NULL auto_increment,
+  userobm_timeupdate        timestamp(14),
+  userobm_timecreate        timestamp(14),
+  userobm_userupdate        int(8),
+  userobm_usercreate        int(8),
+  userobm_local             int(1) default 1,
+  userobm_ext_id            varchar(16),
+  userobm_login             varchar(32) DEFAULT '' NOT NULL,
+  userobm_password          varchar(32) DEFAULT '' NOT NULL,
+  userobm_perms             varchar(254),
+  userobm_calendar_version  timestamp(14),
+  userobm_datebegin         date,
+  userobm_archive           char(1) not null default '0',
+  userobm_lastname          varchar(32),
+  userobm_firstname         varchar(32),
+  userobm_phone             varchar(32),
+  userobm_phone2            varchar(32),
+  userobm_fax               varchar(32),
+  userobm_fax2              varchar(32),
+  userobm_email             varchar(60),
+  userobm_description       varchar(255),
+  userobm_timelastaccess    timestamp(14),
   PRIMARY KEY (userobm_id),
   UNIQUE k_login_user (userobm_login)
 );
@@ -553,39 +554,59 @@ CREATE TABLE ContactList (
 --
 -- Table structure for the table  'CalendarSegment'
 --
-CREATE TABLE CalendarSegment (
-  calendarsegment_eventid     int(8) NOT NULL default '0',
-  calendarsegment_customerid  int(8) NOT NULL default '0',
-  calendarsegment_date        timestamp(14) NOT NULL,
-  calendarsegment_flag        varchar(5) NOT NULL default '',
-  calendarsegment_type        varchar(5) NOT NULL default '',
-  calendarsegment_state       char(1) NOT NULL default '',
-  PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
+CREATE TABLE CalendarEvent (
+  calendarevent_id int(8)        NOT NULL auto_increment,
+  calendarevent_timeupdate       timestamp(14),
+  calendarevent_timecreate       timestamp(14),
+  calendarevent_userupdate       int(8) default NULL,
+  calendarevent_usercreate       int(8) default NULL,
+  calendarevent_owner	         int(8) default NULL, 
+  calendarevent_title            varchar(255) default NULL,
+  calendarevent_description      text,
+  calendarevent_category_id      int(8) default NULL,
+  calendarevent_priority         int(2) default NULL,
+  calendarevent_privacy          int(2) NOT NULL default 0,
+  calendarevent_date             timestamp(14) NOT NULL,
+  calendarevent_duration         int(8) NOT NULL default 0,
+  calendarevent_allday	         int(1) NOT NULL default 0,
+  calendarevent_repeatkind       varchar(20) default NULL,
+  calendarevent_repeatfrequence  int(3) default NULL,
+  calendarevent_repeatdays       varchar(7) default NULL,
+  calendarevent_endrepeat        timestamp(14) NOT NULL,
+  PRIMARY KEY (calendarevent_id)
 );
 
 
 --
 -- Table structure for the table  'CalendarEvent'
 --
-CREATE TABLE CalendarEvent (
-  calendarevent_id int(8)    NOT NULL auto_increment,
-  calendarevent_timeupdate   timestamp(14),
-  calendarevent_timecreate   timestamp(14),
-  calendarevent_userupdate   int(8) default NULL,
-  calendarevent_usercreate   int(8) default NULL,
-  calendarevent_title        varchar(255) default NULL,
-  calendarevent_description  text,
-  calendarevent_category_id  int(8) default NULL,
-  calendarevent_priority     int(2) default NULL,
-  calendarevent_privacy      int(2) NOT NULL default '0',
-  calendarevent_length       int(4) NOT NULL default '',
-  calendarevent_repeatkind   varchar(20) default NULL,
-  calendarevent_repeatdays   varchar(7) default NULL,
-  calendarevent_endrepeat    timestamp(14) NOT NULL,
-  PRIMARY KEY (calendarevent_id)
+CREATE TABLE CalendarUser (
+  calendaruser_timeupdate   timestamp(14),
+  calendaruser_timecreate   timestamp(14),
+  calendaruser_userupdate   int(8) default NULL,
+  calendaruser_usercreate   int(8) default NULL,
+  calendaruser_user_id      int(8) NOT NULL default 0,
+  calendaruser_event_id     int(8) NOT NULL default 0,
+  calendaruser_state        char(1) NOT NULL default 0,
+  calendaruser_required     int(1) NOT NULL default 0,
+  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
 );
 
-    
+
+--
+-- Table structure for table 'CalendarException'
+--
+CREATE TABLE CalendarException (
+  calendarexception_timeupdate  timestamp(14),
+  calendarexception_timecreate  timestamp(14),
+  calendarexception_userupdate  int(8) default NULL,
+  calendarexception_usercreate  int(8) default NULL,
+  calendarexception_event_id    int(8) NOT NULL auto_increment,
+  calendarexception_date        timestamp(14) NOT NULL,
+  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
+);
+
+  
 --
 -- Table structure for table 'CalendarCategory'
 --

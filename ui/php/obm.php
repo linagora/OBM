@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-$section = "";
+
 $module = "";
 $path = ".";
 $extra_css = "portal.css";
@@ -73,6 +73,7 @@ display_page($display);
 // Display detail of logout page                                             //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_logout_detail() {
+  global $l_connection_end, $l_reconnect;
 
   $block = "
 <table width=\"100%\">
@@ -81,7 +82,7 @@ function dis_logout_detail() {
     <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"".C_IMAGE_PATH."/standard/standard.jpg\"></a>$obm_version</td>
   <td width=\"5%\">&nbsp;</td>
   <td width=\"50%\" align=\"center\">
-    <h1>OBM CONNECTION CLOSED</h1></td>
+    <h1>OBM : $l_connection_end</h1></td>
   <td width=\"25%\" align=\"center\">&nbsp;</td>
 </tr>
 <tr>
@@ -94,7 +95,7 @@ function dis_logout_detail() {
 
 <P>
 <center>
-<a href=\"obm.php\">click here to Login</a>
+<a href=\"obm.php\">OBM : $l_reconnect</a>
 </center>";
 
   return $block;

@@ -25,7 +25,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "PROD";
 $module = "incident";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

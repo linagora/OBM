@@ -60,8 +60,14 @@ $l_supplier = "Proveedor";
 $l_total = "Todos";
 $l_active = "Active";
 $l_new = "Nuevo";
+$l_last = "Last";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
+$l_login = "Login";
+$l_logout = "Logout";
+$l_profile = "Profile";
+$l_connection_end = "Connection end";
+$l_reconnect = "Click here to reconnect";
 
 // Entities
 $l_company = "Compañía";

@@ -92,6 +92,7 @@ CREATE TABLE UserObm (
   userobm_login           varchar(32) DEFAULT '' NOT NULL,
   userobm_password        varchar(32) DEFAULT '' NOT NULL,
   userobm_perms           varchar(254),
+  userobm_calendar_version  timestamp,
   userobm_archive         char(1) not null DEFAULT '0',
   userobm_datebegin       date,
   userobm_lastname        varchar(32),
@@ -551,41 +552,61 @@ CREATE TABLE ContactList (
 -- Calendar module tables
 -------------------------------------------------------------------------------
 --
--- Table structure for the table  'CalendarSegment'
---
-CREATE TABLE CalendarSegment (
-  calendarsegment_eventid     integer NOT NULL DEFAULT '0',
-  calendarsegment_customerid  integer NOT NULL DEFAULT '0',
-  calendarsegment_date        TIMESTAMP NOT NULL,
-  calendarsegment_flag        varchar(5) NOT NULL DEFAULT '',
-  calendarsegment_type        varchar(5) NOT NULL DEFAULT '',
-  calendarsegment_state       char(1) NOT NULL DEFAULT '''',
-  PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
-);
-
-
---
 -- Table structure for the table  'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
   calendarevent_id           serial,
-  calendarevent_timeupdate   TIMESTAMP,
-  calendarevent_timecreate   TIMESTAMP,
-  calendarevent_userupdate   integer DEFAULT NULL,
-  calendarevent_usercreate   integer DEFAULT NULL,
-  calendarevent_title        varchar(255) DEFAULT NULL,
+  calendarevent_timeupdate   timestamp,
+  calendarevent_timecreate   timestamp,
+  calendarevent_userupdate   integer,
+  calendarevent_usercreate   integer,
+  calendarevent_owner        integer default NULL,    
+  calendarevent_title        varchar(255) default NULL,
   calendarevent_description  text,
-  calendarevent_category_id  integer DEFAULT NULL,
-  calendarevent_priority     integer DEFAULT NULL,
-  calendarevent_privacy      integer DEFAULT NULL,
-  calendarevent_length       integer NOT NULL DEFAULT 0,
-  calendarevent_repeatkind   varchar(20) DEFAULT NULL,
-  calendarevent_repeatdays   varchar(7) DEFAULT NULL,
-  calendarevent_endrepeat    TIMESTAMP NOT NULL,
+  calendarevent_category_id  integer,
+  calendarevent_priority     integer,
+  calendarevent_privacy      integer,
+  calendarevent_date         timestamp NOT NULL,
+  calendarevent_duration     integer NOT NULL default 0,
+  calendarevent_allday       integer NOT NULL default 0,
+  calendarevent_repeatkind   varchar(20) default NULL,
+  calendarevent_repeatfrequence  integer default NULL,
+  calendarevent_repeatdays   varchar(7) default NULL,
+  calendarevent_endrepeat    timestamp NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 
-    
+
+--
+-- Table structure for the table  'CalendarUser'
+--
+CREATE TABLE CalendarUser (
+  calendaruser_timeupdate   timestamp,
+  calendaruser_timecreate   timestamp,
+  calendaruser_userupdate   integer default NULL,
+  calendaruser_usercreate   integer default NULL,
+  calendaruser_user_id      integer NOT NULL default 0,
+  calendaruser_event_id     integer NOT NULL default 0,
+  calendaruser_state        char(1) NOT NULL default '',
+  calendaruser_required     integer NOT NULL default 0,
+  PRIMARY KEY (calendaruser_user_id,calendaruser_event_id)
+);
+
+
+--
+-- Table structure for the table  'CalendarException'
+--
+CREATE TABLE CalendarException (
+  calendarexception_timeupdate   timestamp,
+  calendarexception_timecreate   timestamp,
+  calendarexception_userupdate   integer default NULL,
+  calendarexception_usercreate   integer default NULL,
+  calendarexception_event_id     serial,
+  calendarexception_date         timestamp NOT NULL,
+  PRIMARY KEY (calendarexception_event_id,calendarexception_date)
+);
+
+
 --
 -- Table structure for table 'CalendarCategory'
 --

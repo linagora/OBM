@@ -18,7 +18,6 @@
 // Session, Auth, Perms  Management                                          //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "COM";
 $module = "todo";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

@@ -17,7 +17,6 @@
 
 $debug = 0;
 $path = "..";
-$section = "ADMIN";
 $module = "admin_data";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -26,16 +25,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc"); 
 require("admin_data_display.inc");
 require("admin_data_query.inc");
-
-// If in text mode we get the document path from DB as session var not here
-if ($mode != "html") {
-  $db = new DB_OBM;
-  $query = "select globalpref_value from GlobalPref where
-          globalpref_option ='document_path'";
-  $db->query($query);
-  $db->next_record();
-  $document_path = $db->f("globalpref_value");	
-}
 
 $target_modules = array ('company', 'deal', 'list', 'document');
 //$target_modules = get_modules_array();

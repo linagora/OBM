@@ -118,16 +118,14 @@ function display_head($p_module) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($module) {
-  global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
-  global $popup_width, $popup_height, $l_home;
-  global $auth, $obminclude, $display; 
-  global $path, $obm_version , $cgp_module_link;
+  global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
+  global $l_login, $l_logout, $l_profile, $l_home;
   global $aliamin_link, $aliacms_link, $blogs_link;
   
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
   $profil = $auth->auth["perm"];
-  $section = $cgp_module_link[$module];
+  $section = $cgp_show["module"][$module];
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section, $module);
   $display["action"] = display_menu_bar($section, $module);
@@ -155,9 +153,9 @@ function generate_menu($module) {
   $dis_aliacms  
   $dis_aliamin
   $dis_blogs
-  <li class=\"login\">&nbsp;Login : $login&nbsp;</li>
-  <li class=\"profil\">&nbsp;Profil : $profil&nbsp;</li>
-  <li class=\"logout\">&nbsp;<a href='".$path."/obm.php?action=logout'>Logout</a>&nbsp;</li>
+  <li class=\"login\">&nbsp;$l_login : $login&nbsp;</li>
+  <li class=\"profil\">&nbsp;$l_profile : $profil&nbsp;</li>
+  <li class=\"logout\">&nbsp;<a href='".$path."/obm.php?action=logout'>$l_logout</a>&nbsp;</li>
 </ul>
 " . $display["section"] ."
 <p style=\"clear:both\" />
@@ -176,17 +174,20 @@ function generate_menu($module) {
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections($section) {
-  global $sections, $perm;
+  global $cgp_show, $sections, $perm;
   
   $ret = "<ul class='section'>\n";
-  foreach ($sections as $key => $value) {
-    $section_name = $value["Name"];
-    $section_right = $perm->get_section_rights($key); 
-    if (($section_right & $value["Right"]) == $value["Right"]) {
-      if ($key == $section) {
-	$ret .= "<li>$section_name</li>\n";
-      }	else {
-	$ret .= "<li><a href='".$value["Url"]."'>$section_name</a></li>\n";
+  foreach ($cgp_show["section"] as $key => $show) {
+    if ($show) {
+      $value = $sections[$key];
+      $section_name = $value["Name"];
+      $section_right = $perm->get_section_rights($key); 
+      if (($section_right & $value["Right"]) == $value["Right"]) {
+        if ($key == $section) {
+          $ret .= "<li>$section_name</li>\n";
+        } else {
+	  $ret .= "<li><a href='".$value["Url"]."'>$section_name</a></li>\n";
+        }
       }
     }
   }
@@ -200,10 +201,11 @@ function display_sections($section) {
 // Display : Returns the section menus display block
 // Parameters:
 //   - $section : selected section
+//   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
 function display_menus($section, $module) {
   global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
-  global $path, $modules, $perm, $cgp_module_link;
+  global $path, $modules, $perm, $cgp_show;
 
   if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
     $fico = true;
@@ -212,33 +214,34 @@ function display_menus($section, $module) {
   if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
     $ftext = true;
   else $ftext = false;
-  
-  $section_link = array_keys($cgp_module_link,$section);
 
-  if (is_array($section_link)) {
-    $block .= "<ul class='menu'>\n";
+  if ($section != "") {
+    $section_link = array_keys($cgp_show["module"],$section);
+    if (is_array($section_link)) {
+      $block .= "<ul class='menu'>\n";
 
-    foreach ($section_link as $current_module) {
-      $module_name = $modules[$current_module]["Name"];
-      $module_right = $perm->get_module_rights($current_module); 
-      if (($module_right & $modules[$current_module]["Right"]) == $modules[$current_module]["Right"]) {
-	if($current_module == $module) {
-          $block .= "<li class=\"activeTab\">";
-	} else {
-	  $block .= "<li class=\"inactiveTab\">";
-	}
-	if ($fico) {
-	  $ico = $modules[$current_module]["Ico"];
-	  if ($ico) {
-	    $block .= "<a href='".$modules[$current_module]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+      foreach ($section_link as $mod) {
+        $module_name = $modules[$mod]["Name"];
+        $module_right = $perm->get_module_rights($mod); 
+        if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
+          if ($mod == $module) {
+            $block .= "<li class=\"activeTab\">";
+	  } else {
+	    $block .= "<li class=\"inactiveTab\">";
 	  }
-	}
-	$block .= "<a href='".$modules[$current_module]["Url"]."'>";
-	if ($ftext) $block .= $module_name;
-        $block .= "</a></li>\n";
+          if ($fico) {
+	    $ico = $modules[$mod]["Ico"];
+	    if ($ico) {
+	      $block .= "<a href='".$modules[$mod]["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	    }
+	  }
+	  $block .= "<a href='".$modules[$mod]["Url"]."'>";
+	  if ($ftext) $block .= $module_name;
+          $block .= "</a></li>\n";
+        }
       }
+      $block .= "</ul>";
     }
-    $block .= "</ul>";
   }
 
   return $block;

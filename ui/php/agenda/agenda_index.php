@@ -37,7 +37,6 @@ $www = "   <p class=\"messageInfo\">
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "COM";
 $module = "agenda";
 $extra_css = "calendar.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");

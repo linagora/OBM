@@ -36,7 +36,6 @@ $clist_mode_expert = "expert";
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "COM";
 $module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

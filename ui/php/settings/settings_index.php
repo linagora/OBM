@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "USER";
 $module = "settings";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude="obminclude";

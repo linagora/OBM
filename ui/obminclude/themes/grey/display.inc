@@ -124,11 +124,8 @@ function display_head($p_module) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($module, $section) {
-  global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
-  global $perms_user, $perms_editor, $perms_admin;
-  global $popup_width, $popup_height;
-  global $auth, $obminclude, $display; 
-  global $obm_version;
+  global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
+  global $l_login, $l_logout, $l_profile;
 
   if ($module == "")
     $path = "";
@@ -154,11 +151,11 @@ function generate_menu($module, $section) {
 
      <!-- zone Login -->
      <div> 
-      OBM v. $obm_version Société Aliacom<br />
-      Login&nbsp;: $login&nbsp;&nbsp;<br />
+      OBM v. $obm_version Aliacom<br />
+      $l_login&nbsp;: $login&nbsp;&nbsp;<br />
 
-      Profil&nbsp;: $profil&nbsp; <br />
-      <a href=\"$path/obm.php?action=logout\">Logout</a>
+      $l_profile&nbsp;: $profil&nbsp; <br />
+      <a href=\"$path/obm.php?action=logout\">$l_logout</a>
      </div>
     </div>
     <!-- Fin zone Login -->

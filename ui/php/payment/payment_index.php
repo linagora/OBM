@@ -11,7 +11,6 @@
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "COMPTA";
 $module = "payment";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

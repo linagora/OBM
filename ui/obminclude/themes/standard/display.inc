@@ -88,7 +88,7 @@ function display_page(&$display) {
 // Display: XHTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($p_module) { 
-  global $l_obm_title, $set_theme, $obminclude, $extra_css, $extra_js;
+  global $l_obm_title, $set_theme, $extra_css, $extra_js;
 
   if (isset($extra_css))
     $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"".C_IMAGE_PATH."/$set_theme/$extra_css\" />";
@@ -118,17 +118,15 @@ function display_head($p_module) {
 //   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($module) {
-  global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
-  global $popup_width, $popup_height;
-  global $auth, $obminclude, $display; 
-  global $path, $obm_version , $cgp_module_link;
+  global $path, $auth, $display, $obm_version, $cgp_show,$set_lang, $set_theme;
+  global $l_login, $l_logout, $l_profile;
 
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
   $profil = $auth->auth["perm"];
-  $section = $cgp_module_link[$module];
+  $section = $cgp_show["module"][$module];
   $display["section"] = display_sections($section);
-  $display["menu"] = display_menus($section);
+  $display["menu"] = display_menus($section, $module);
   $display["action"] = display_menu_bar($section, $module);
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
@@ -143,9 +141,9 @@ function generate_menu($module) {
 <span id='version'>OBM v.".$obm_version." Société Aliacom</span> 
 <!-- Login -->
 <ul class='login'>
-<li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> Login : ".$login."</li>
-<li><img src='".C_IMAGE_PATH."/".$set_theme."/profil.gif' alt='' /> Profil : ".$profil."</li>
-<li><img src='".C_IMAGE_PATH."/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>Logout</a></li>
+<li><img src='".C_IMAGE_PATH."/".$set_theme."/login.gif' alt='' /> $l_login : $login</li>
+<li><img src='".C_IMAGE_PATH."/".$set_theme."/profil.gif' alt='' /> $l_profile : $profil</li>
+<li><img src='".C_IMAGE_PATH."/".$set_theme."/logout.gif' alt='' /> <a href='".$path."/obm.php?action=logout'>$l_logout</a></li>
 </ul>
 <!-- Fin Login -->
 <div class=\"entries\">
@@ -169,17 +167,20 @@ function generate_menu($module) {
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_sections($section) {
-  global $sections, $perm;
+  global $cgp_show, $sections, $perm;
   
   $ret = "<div class='section'>\n";
-  foreach ($sections as $key => $value) {
-    $section_name = $value["Name"];
-    $section_right = $perm->get_section_rights($key); 
-    if (($section_right & $value["Right"]) == $value["Right"]) {
-      if ($key == $section) {
-	$ret .= "<p class='actif'>$section_name</p>\n";
-      }	else {
-	$ret .= "<p class='inactif'><a href='".$value["Url"]."'>$section_name</a></p>\n";
+  foreach ($cgp_show["section"] as $key => $show) {
+    if ($show) {
+      $value = $sections[$key];
+      $section_name = $value["Name"];
+      $section_right = $perm->get_section_rights($key); 
+      if (($section_right & $value["Right"]) == $value["Right"]) {
+        if ($key == $section) {
+          $ret .= "<p class='actif'>$section_name</p>\n";
+        } else {
+	  $ret .= "<p class='inactif'><a href='".$value["Url"]."'>$section_name</a></p>\n";
+        }
       }
     }
   }
@@ -193,10 +194,11 @@ function display_sections($section) {
 // Display : Returns the section menus display block
 // Parameters:
 //   - $section : selected section
+//   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_menus($section) {
+function display_menus($section, $module) {
   global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
-  global $path,  $perm, $modules, $cgp_module_link ;
+  global $path, $perm, $modules, $cgp_show;
 
   if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
     $fico = true;
@@ -205,27 +207,32 @@ function display_menus($section) {
   if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
     $ftext = true;
   else $ftext = false;
-  $section_link = array_keys($cgp_module_link,$section);
-  if (is_array($section_link)) {
-    $block .= "<ul class='menu'>\n";
 
-    foreach ($section_link as $module) {
-      $module_name = $modules[$module]["Name"];
-      $module_right = $perm->get_module_rights($module); 
-      if (($module_right & $modules[$module]["Right"]) == $modules[$module]["Right"]) {
-        $block .= "<li>";
-	if ($fico) {
-	  $ico = $modules[$module]["Ico"];
-	  if ($ico) {
-	    $block .= "<a href='".$value["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+
+  if ($section != "") {
+    $section_link = array_keys($cgp_show["module"],$section);
+
+    if (is_array($section_link)) {
+      $block .= "<ul class='menu'>\n";
+
+      foreach ($section_link as $mod) {
+        $module_name = $modules[$mod]["Name"];
+        $module_right = $perm->get_module_rights($mod); 
+        if (($module_right & $modules[$mod]["Right"]) == $modules[$mod]["Right"]) {
+          $block .= "<li>";
+          if ($fico) {
+	    $ico = $modules[$mod]["Ico"];
+            if ($ico) {
+	      $block .= "<a href='".$value["Url"]."' class='ico'><img src='".C_IMAGE_PATH."/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
+	    }
 	  }
-	}
-	$block .= "<a href='".$modules[$module]["Url"]."'>";
-	if ($ftext) $block .= $module_name;
-        $block .= "</a></li>\n";
+	  $block .= "<a href='".$modules[$mod]["Url"]."'>";
+	  if ($ftext) $block .= $module_name;
+          $block .= "</a></li>\n";
+        }
       }
+      $block .= "</ul>";
     }
-    $block .= "</ul>";
   }
 
   return $block;

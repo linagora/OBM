@@ -12,7 +12,6 @@
 // Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "";
 $module = "exportcsv";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

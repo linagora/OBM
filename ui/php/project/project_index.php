@@ -38,7 +38,6 @@
 
 
 $path = "..";
-$section = "PROD";
 $module = "project";
 $extra_css = "project.css";
 

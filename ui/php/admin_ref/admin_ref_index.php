@@ -26,7 +26,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "ADMIN";
 $module = "admin_ref";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

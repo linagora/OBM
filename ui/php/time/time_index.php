@@ -35,7 +35,6 @@
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "PROD";
 $module = "time";
 $extra_css = "time.css";
 

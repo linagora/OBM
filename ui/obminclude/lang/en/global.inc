@@ -67,6 +67,11 @@ $l_total = "Total";
 $l_active = "Active";
 $l_new = "New";
 $l_last = "Last";
+$l_login = "Login";
+$l_logout = "Logout";
+$l_profile = "Profile";
+$l_connection_end = "Connection end";
+$l_reconnect = "Click here to reconnect";
 
 // Entities
 $l_company = "Company";

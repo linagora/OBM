@@ -33,7 +33,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "COM";
 $module = "contact";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

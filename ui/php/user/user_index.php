@@ -24,7 +24,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "USER";
 $module = "user";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

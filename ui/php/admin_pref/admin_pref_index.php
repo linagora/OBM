@@ -15,7 +15,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "ADMIN";
 $module = "admin_pref";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");

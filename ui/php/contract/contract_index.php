@@ -32,7 +32,6 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "PROD";
 $module = "contract";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

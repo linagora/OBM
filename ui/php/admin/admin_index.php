@@ -12,7 +12,6 @@
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMIN";
 $module = "admin";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

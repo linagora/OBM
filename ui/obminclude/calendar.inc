@@ -139,7 +139,7 @@ if (typeof(calendarColors['dateSelectedColor']) == 'undefined') {
 }
 
 if (typeof(window.opener.calendarMonths) == 'undefined' || window.opener.calendarMonths.length != 12) {
-    var calendarMonths = new Array('January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
+    var calendarMonths = new Array(<?php echo "'$l_monthsofyear[0] A'" ?>, 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December');
 }
 else {
     var calendarMonths = window.opener.calendarMonths;

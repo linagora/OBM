@@ -42,6 +42,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
 
+  // If company module used (external from Contact)
   if ($cgp_show["module"]["company"]) {
     $join_comp = "LEFT JOIN Company on contact_company_id=company_id";
     $join_ctry2 = "LEFT JOIN Country as ctry2 ON
@@ -184,10 +185,13 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_archive,
       contact_privacy,
       $company_fields
-      function_label as contact_function,
-    from Contact
+      function_label as contact_function
+    FROM Contact
         $join_comp
         left join Function on contact_function_id=function_id
+        left join Country as ctry1 ON
+                  contact_country_iso3166 = ctry1.country_iso3166
+                  and ctry1.country_lang='$lang'
         $join_ctry2
         $join_cat1
         $join_cat2
@@ -240,14 +244,15 @@ function run_query_contact_detail($p_id) {
         company_town,
         company_expresspostal,
         company_country_iso3166,
-        C2.country_name as company_country_name,";
+        C2.country_name as company_country_name";
   } else {
-    $company_fields = "contact_company,";
+    $company_fields = "contact_company";
   }
 
   $query = "SELECT Contact.*,
         $timeupdate,
         $timecreate,
+        $company_fields,
         kind_lang,
         kind_minilabel,
         kind_header,

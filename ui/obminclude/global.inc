@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.9.0pre6";
+$obm_version = "0.9.0pre7";
 $l_obm_title = "O.B.M.";
 
 // Agenda constants
@@ -19,8 +19,7 @@ $set_weekstart_default = "monday + 2 hours"; // First day of the week,
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
-//Id of the Publication reception type which is dedicated to the auto
-//subscription.
+// Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
 
 //---------------------------------------------------------------------------//
@@ -31,8 +30,6 @@ $c_focsys = 3;
 // OBM host (for mail links)
 $cgp_host = "http://obm/";
 
-
-define("C_IMAGE_PATH",$cgp_host."images");
 // Generic E-mail for Incident module
 $cmail_incident = "";
 
@@ -103,10 +100,7 @@ $c_task_notvalid = 0;    // task not valiated
 $c_task_uservalid = 1;   // validated by user (auto when day is full)
 $c_task_adminvalid = 2;  // validated by admin
 
-// authentification 
-// can be 'CAS' => SSO within AliaSuite
-// or 'standalone' => OBM alone 
-// defaults to 'standalone'
+// authentification : 'CAS' (SSO AliaSuite) or 'standalone' (default)
 $auth_kind="standalone"; 
 // CAS specific parameters are in obm_conf.inc.
 
@@ -122,62 +116,56 @@ $cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
 $cgp_show["section"]["aliamin"] = "http://aliamin/";
 
 // modules
-$cgp_show["module"]["company"] = true;
-$cgp_show["module"]["contact"] = true;
-$cgp_show["module"]["deal"] = true;
-$cgp_show["module"]["list"] = true;
-$cgp_show["module"]["agenda"] = true;
-$cgp_show["module"]["todo"] = true;
-$cgp_show["module"]["publication"] = true;
-$cgp_show["module"]["statistic"] = true;
-$cgp_show["module"]["time"] = true;
-$cgp_show["module"]["project"] = true;
-$cgp_show["module"]["contract"] = true;
-$cgp_show["module"]["incident"] = true;
-$cgp_show["module"]["document"] = true;
-$cgp_show["module"]["account"] = true;
-$cgp_show["module"]["invoice"] = true;
-$cgp_show["module"]["payment"] = true;
-$cgp_show["module"]["settings"] = true;
-$cgp_show["module"]["user"] = true;
-$cgp_show["module"]["group"] = true;
-
-$cgp_module_link["company"] = "COM";
-$cgp_module_link["contact"] = "COM";
-$cgp_module_link["deal"] = "COM";
-$cgp_module_link["list"] = "COM";
-$cgp_module_link["agenda"] = "COM";
-$cgp_module_link["todo"] = "COM";
-$cgp_module_link["publication"] = "COM";
-$cgp_module_link["statistic"] = "COM";
-$cgp_module_link["time"] = "PROD";
-$cgp_module_link["project"] = "PROD";
-$cgp_module_link["contract"] = "PROD";
-$cgp_module_link["incident"] = "PROD";
-$cgp_module_link["document"] = "PROD";
-$cgp_module_link["account"] = "COMPTA";
-$cgp_module_link["invoice"] = "COMPTA";
-$cgp_module_link["payment"] = "COMPTA";
-$cgp_module_link["settings"] = "USER";
-$cgp_module_link["user"] = "USER";
-$cgp_module_link["group"] = "USER";
-$cgp_module_link["admin"] = "ADMIN";
-$cgp_module_link["admin_code"] = "ADMIN";
-$cgp_module_link["admin_pref"] = "ADMIN";
-$cgp_module_link["admin_data"] = "ADMIN";
-$cgp_module_link["admin_lang"] = "ADMIN";
-$cgp_module_link["admin_ref"] = "ADMIN";
-$cgp_module_link["import"] = "ADMIN";
-
-
+$cgp_show["module"]["company"] = "COM";
+$cgp_show["module"]["contact"] = "COM";
+$cgp_show["module"]["deal"] = "COM";
+$cgp_show["module"]["list"] = "COM";
+$cgp_show["module"]["agenda"] = "COM";
+$cgp_show["module"]["todo"] = "COM";
+$cgp_show["module"]["publication"] = "COM";
+$cgp_show["module"]["statistic"] = "COM";
+$cgp_show["module"]["time"] = "PROD";
+$cgp_show["module"]["project"] = "PROD";
+$cgp_show["module"]["contract"] = "PROD";
+$cgp_show["module"]["incident"] = "PROD";
+$cgp_show["module"]["document"] = "PROD";
+$cgp_show["module"]["account"] = "COMPTA";
+$cgp_show["module"]["invoice"] = "COMPTA";
+$cgp_show["module"]["payment"] = "COMPTA";
+$cgp_show["module"]["settings"] = "USER";
+$cgp_show["module"]["user"] = "USER";
+$cgp_show["module"]["group"] = "USER";
+$cgp_show["module"]["admin"] = "ADMIN";
 
 
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
+define("C_IMAGE_PATH",$cgp_host."images");
+$section = $cgp_show["module"][$module];
+
 //----------------------------//
 // Calculated Displayed Infos //
 //----------------------------//
+if (! $cgp_show["module"]["company"]) {
+  $cgp_show["module"]["deal"] = false;
+  $cgp_show["module"]["project"] = false;
+  $cgp_show["module"]["contract"] = false;
+  $cgp_show["module"]["invoice"] = false;
+}
+
+if (! $cgp_show["module"]["project"]) {
+  $cgp_show["module"]["time"] = false;
+}
+
+if (! $cgp_show["module"]["contract"]) {
+  $cgp_show["module"]["incident"] = false;
+}
+
+if (! $cgp_show["module"]["invoice"]) {
+  $cgp_show["module"]["payment"] = false;
+}
+
 if (! $cgp_show["module"]["deal"]) {
   $cgp_hide["company"]["company_deal_number"] = true;
 }
@@ -210,7 +198,7 @@ if ($cgp_hide["contact"]["contact_function"]) {
 //---------------------------------------------------------------------------//
 if ($auth_kind == "CAS") {
   $auth_class_name = "CAS_Auth";
-} elseif($auth_kind == "standalone") {
+} elseif ($auth_kind == "standalone") {
   $auth_class_name = "OBM_Challenge_Auth";
 } else {
   echo "unknown Authentication kind !<br/>";

@@ -41,7 +41,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "COM";
 $module = "company";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

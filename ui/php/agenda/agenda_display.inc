@@ -2098,8 +2098,8 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
       </a>
       </td>";
     }
-    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($daylink)));
-    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($daylink)));
+    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($current_day)));
+    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($current_day)));
 
     $dis_month_cal .= "
       <td $bgclass style=\"width:105px;height:105px\">

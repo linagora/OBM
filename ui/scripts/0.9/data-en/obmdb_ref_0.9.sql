@@ -104,10 +104,10 @@ INSERT INTO IncidentStatus (incidentstatus_timeupdate, incidentstatus_timecreate
 
 
 --
--- Dumping data for table 'IncidentSolutionType'
+-- Dumping data for table 'IncidentCategory1'
 --
-INSERT INTO IncidentSolutionType (incidentsolutiontype_order, incidentsolutiontype_label) VALUES (1, 'by email / phone');
-INSERT INTO IncidentSolutionType (incidentsolutiontype_order, incidentsolutiontype_label) VALUES (2, 'on site');
+INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (1, 'by email / phone');
+INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (2, 'on site');
 
 
 --

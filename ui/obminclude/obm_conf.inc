@@ -11,16 +11,17 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
+$cgp_host = "http://obm-panthere/";
+define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // Use Database sessions
 //$cgp_sess_db = true;
@@ -43,7 +44,7 @@ $cg_com = 2;
 $cg_prod = 3;
 
 // Root of the document repository
-$document_path = "/var/www/documents";
+$document_path = "/var/www/obmdocuments";
 
 // Auto format fields
 $caf_company_name = true;
@@ -62,32 +63,43 @@ $cgp_todo_nb = 5;
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
-//$cgp_show["section"]["prod"] = false;
-//$cgp_show["section"]["compta"] = false;
-$cgp_show["section"]["aliamin"] = false;
+$cgp_show["section"] = ""; // Needed if module order to change
+$cgp_show["section"]["com"] = "$path/agenda/agenda_index.php";
+$cgp_show["section"]["user"] = "$path/user/user_index.php";
+$cgp_show["section"]["prod"] = "$path/document/document_index.php";
+$cgp_show["section"]["SETTINGS"] = "$path/settings/settings_index.php";
+$cgp_show["section"]["ADMIN"] = "$path/admin/admin_index.php?mode=html";
 
-// modules -- Default is true
-//$cgp_show["module"]["contact"] = false;
-//$cgp_show["module"]["deal"] = false;
-//$cgp_show["module"]["agenda"] = false;
-//$cgp_show["module"]["todo"] = false;
-//$cgp_show["module"]["user"] = false;
-//$cgp_show["module"]["group"] = false;
-//$cgp_show["module"]["project"] = false;
-//$cgp_show["module"]["contract"] = false;
-//$cgp_show["module"]["document"] = false;
-//$cgp_show["module"]["account"] = false;
-//$cgp_show["module"]["invoice"] = false;
-//$cgp_show["module"]["payment"] = false;
-//$cgp_show["module"]["time"] = false;
-//$cgp_show["module"]["statistic"] = false;
+// modules -- false to hide, otherwise section
+$cgp_show["module"] = ""; // Needed if module order to change
+$cgp_show["module"]["company"] = false;
+$cgp_show["module"]["agenda"] = "com";
+$cgp_show["module"]["todo"] = "com";
+$cgp_show["module"]["contact"] = "com";
+$cgp_show["module"]["deal"] = false;
+$cgp_show["module"]["list"] = false;
+$cgp_show["module"]["publication"] = false;
+$cgp_show["module"]["statistic"] = false;
+$cgp_show["module"]["user"] = "user";
+$cgp_show["module"]["group"] = "user";
+$cgp_show["module"]["project"] = false;
+$cgp_show["module"]["contract"] = false;
+$cgp_show["module"]["document"] = "prod";
+$cgp_show["module"]["settings"] = "SETTINGS";
+$cgp_show["module"]["admin"] = "ADMIN";
+$cgp_show["module"]["admin_code"] = "ADMIN";
+$cgp_show["module"]["admin_pref"] = "ADMIN";
+$cgp_show["module"]["admin_data"] = "ADMIN";
+$cgp_show["module"]["admin_lang"] = "ADMIN";
+$cgp_show["module"]["admin_ref"] = "ADMIN";
+$cgp_show["module"]["import"] = "ADMIN";
 
 // Company module
 $cgp_hide["company"]["company_number"] = true;
 $cgp_hide["company"]["company_vat"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
-//$cgp_hide["company"]["companynafcode_code"] = true;
+$cgp_hide["company"]["companynafcode_code"] = true;
 //$cgp_hide["company"]["category"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
@@ -100,20 +112,16 @@ $cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 
 // Deal module
-
 $cgp_hide["deal"]["category1"] = true;
 
-// authentification 
-// 'CAS' or 'standalone'
-// defaults to 'standalone'
-//$auth_kind="CAS"; 
-// CAS specific parameters.
-// useless in standalone mode
+// authentification : 'CAS' or 'standalone' : defaults to 'standalone'
+//$auth_kind="CAS";
+
+// CAS specific parameters. useless in standalone mode
 // Authentication used :
 $cas_server = "sso.aliacom.local";
 $cas_server_port = 8443;
 $cas_server_uri = "";
-
 
 //Set if there is a link for Aliamin, Blogs and Aliacms
 //$aliamin_link = "http://aliamin.aliacom.local/";
