@@ -19,7 +19,7 @@ $obmdb_password = "obm";
 // Global parameters --------------------------------------------------------//
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
+$cgp_host = "http://obm-panthere/";
 define("C_IMAGE_PATH",$cgp_host."images");
 
 // Use specific site includes

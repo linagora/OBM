@@ -1117,7 +1117,7 @@ function run_query_advance_update($project) {
       } else if (($proj_new || $miss_new) && ($proj_old || $miss_old)) {
 	// if missing time not and never set or never updated (=old projected)
 	// we set missing time to new projected
-	if ( (! $miss_old) && (! $miss_new) ) {
+	if ( (! $proj_old) && (! $miss_old) && (! $miss_new) ) {
 	  $set_miss_time = $proj_new;
 	} else {
 	  $set_miss_time = $miss_new;
