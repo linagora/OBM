@@ -484,7 +484,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_town,
          contact_expresspostal,
          contact_country_iso3166,
-         Country.country_name,
+         ctry1.country_name as country_name,
          contact_function_id,
          function_label,
          contact_title,
@@ -507,8 +507,8 @@ function run_query_contacts_list($list, $entity="") {
       from ContactList
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
-         LEFT JOIN Country ON Contact.contact_country_iso3166 = country_iso3166
-                              and country_lang='$lang'
+         LEFT JOIN Country as ctry1 ON Contact.contact_country_iso3166 = ctry1.country_iso3166
+                              and ctry1.country_lang='$lang'
          LEFT JOIN Country as ctry2 ON Company.company_country_iso3166 = ctry2.country_iso3166
                               and ctry2.country_lang='$lang'
          LEFT JOIN Function ON Contact.contact_function_id = function_id
@@ -1152,7 +1152,7 @@ function make_query_from_criteria($list) {
         contact_town,
         contact_expresspostal,
         contact_country_iso3166,
-        Country.country_name,
+        ctry1.country_name,
         contact_phone,
         contact_homephone,
         contact_fax,
@@ -1185,7 +1185,7 @@ function make_query_from_criteria($list) {
         contact_town,
         contact_expresspostal,
         contact_country_iso3166,
-        Country.country_name,
+        ctry1.country_name,
         contact_phone,
         contact_homephone,
         contact_fax,
@@ -1202,7 +1202,7 @@ function make_query_from_criteria($list) {
         ctry2.country_name";
 	
   $join = " Contact left join Company on contact_company_id=company_id
-                    left join Country on Contact.contact_country_iso3166=country_iso3166 and country_lang='$lang'
+                    left join Country as ctry1 on Contact.contact_country_iso3166=ctry1.country_iso3166 and ctry1.country_lang='$lang'
                     left join Country as ctry2 on Company.company_country_iso3166=ctry2.country_iso3166 and ctry2.country_lang='$lang'
                     left join Kind on contact_kind_id = kind_id
                     left join Function on contact_function_id = function_id";
