@@ -370,7 +370,7 @@ function beautify_deal_comment($com) {
   }
 
   $result .= "
-    <table border=\"1\">
+    <table border=\"1\" width=\"100%\">
     <tr>
       <td>$res</td>
     </tr>
