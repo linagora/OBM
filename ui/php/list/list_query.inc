@@ -18,7 +18,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($list, $p_new_order, $p_order_dir) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
   
   $name = $list["name"];
   $email = $list["email"];
@@ -52,7 +52,6 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 
 
   // ORDER construction
-
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
   $query .= " order by $order $p_order_dir";
 
@@ -68,7 +67,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
 //   - $id : list id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $type = $obm_q->type;

@@ -579,7 +579,7 @@ function dis_warn_delete($id) {
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
         <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-        <input type=\"submit\" VALUE=\"$l_back\" />
+        <input type=\"submit\" value=\"$l_back\" />
         </form>
       </p>
     </div>";
@@ -723,4 +723,4 @@ function dis_export_form($list) {
 }
 
 
-</SCRIPT>
+</script>

@@ -1100,9 +1100,3 @@ CREATE TABLE Import (
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
 );
-
-
-
-
-
-

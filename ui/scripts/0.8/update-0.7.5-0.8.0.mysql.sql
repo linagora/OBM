@@ -26,3 +26,29 @@ UPDATE CalendarEvent SET calendarevent_endrepeat = CONCAT(calendarevent_endrepea
 ALTER table CalendarEvent change column calendarevent_endrepeat calendarevent_endrepeat timestamp(14);
 
 ALTER table CalendarEvent change column calendarevent_length calendarevent_length INT(14);
+
+
+-------------------------------------------------------------------------------
+-- Import module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Import'
+--
+CREATE TABLE Import (
+  import_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  import_timeupdate     timestamp(14),
+  import_timecreate     timestamp(14),
+  import_userupdate     int(8),
+  import_usercreate     int(8),
+  import_name           varchar(64) NOT NULL,
+  import_datasource_id  int(8),
+  import_format         varchar(128),
+  import_desc           text,
+  PRIMARY KEY (import_id),
+  UNIQUE (import_name)
+);
+
+-- module 'import'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_name', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_datasource', 2, 2);
