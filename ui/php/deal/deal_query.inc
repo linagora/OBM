@@ -1594,38 +1594,42 @@ function run_query_nb_archived_invoices ($p_deal_id) {
 }
 
 
+//////////////////////////////////////////////////////////////////////////////
+// returns the number of contracts connected to a deal
+//////////////////////////////////////////////////////////////////////////////
+function run_query_contract_nb ($deal_id) {
+  global $cdg_sql;
+
+  if ($deal_id) {
+    $query = "select count(*) as Nb from Contract
+      Where contract_deal_id='$deal_id'";
+    display_debug_msg ("<b> run_query_contract_nb() : </b>".$query, $cdg_sql);
+
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("Nb");
+  }
+  else
+    return 0;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Selection of the Deal according to Company id           //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal($comp_id = "0") {
   global $cdg_sql;
+
   if ($comp_id == "0")
    $query = "select * from Deal ";
   else
-   $query = "select * from Deal Where deal_company_id = $comp_id";
+   $query = "select * from Deal Where deal_company_id = '$comp_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Search for contact linked to this Deal                  //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_linked_contract($deal_id) {
-  global $cdg_sql;
-  if($deal_id) {
-    $query = "select count(*) as Num from Contract Where contract_deal_id = $deal_id";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    $obm_q->next_record();
-    return $obm_q->f("Num");
-  }
-  else
-    return 0;
 }
 
 

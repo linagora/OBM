@@ -10,7 +10,7 @@
 // Labels et textes
 $l_contract = "Contratto";
 $l_contract_company = "Company";
-$l_contract_contracttype = "Tipo di contract";
+$l_contract_contracttype = "Tipo di contratto";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Scadenza date Dopo";
 $l_date_alarm_before = "Scadenza date Prima";

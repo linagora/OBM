@@ -347,16 +347,18 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_search_list($deal) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $display, $auth, $new_order, $order_dir;
 
   $obm_q = run_query_search($deal, 0, $new_order, $order_dir);
   $nb_deal = $obm_q->num_rows();
   if ($nb_deal == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
     $pref_q = run_query_display_pref($auth->auth["uid"], "deal", 0);
-    html_deal_search_list($obm_q, $pref_q, $nb_deal, $deal);
+    $block = html_deal_search_list($obm_q, $pref_q, $nb_deal, $deal);
   }
+
+  return $block;
 }
 
 
@@ -374,7 +376,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Labels
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
-  global $perms_user,$l_perms_user;
+  global $display, $perms_user,$l_perms_user;
 
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
@@ -399,10 +401,10 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   // --- HTML Template --------------------------------------------------------
 
-  display_info_msg($nb_deal." ".$l_found);
+  $display["msg"] .= display_info_msg($nb_deal." ".$l_found);
+  $block = $dis_deals_list->display("dis_data_deal");
 
-  $dis_deals_list->display("dis_data_deal");
-
+  return $block;
 }
 
 
@@ -486,7 +488,74 @@ function beautify_deal_comment($com, $p_order="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// Display: Deal links menu                                                  //
+// Parameters:
+//   - $id     : deal id
+//   - $pid    : parent deal id
+//   - $inv_nb : invoices number
+//   - $deal_num : deal number
+// Returns:
+//   $r : string with HTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_deal_links($id, $pid, $inv_nb) {
+  // -- Themes
+  global $set_theme, $ico_pdeal, $ico_pdeal_upd, $ico_contract;
+  global $ico_contract_new, $ico_invoice, $ico_invoice_new;
+  // -- Labels
+  global $l_parentdeal, $l_affect_deal, $l_contracts, $l_contract_new; 
+  global $l_invoices, $l_archived_invoices, $l_invoice_new;
+  global $perms_user, $path, $auth;
+
+  $uname = urlencode($name);
+  if ($pid > 0) {
+    $plabel = get_parent_label($pid);
+    $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$pid");
+    $dis_pdeal = "
+    <li><a href=\"$url_pdeal\"><img src=\"/images/$set_theme/$ico_pdeal\" /></a>
+        <a href=\"$url_pdeal\">$l_parentdeal ($label)</a></li>";
+  }
+  $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid");
+
+  $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
+  $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id");
+
+  $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
+  $url_inv_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id");
+  $nb_inv_arch = run_query_nb_archived_invoices ($id);
+  $contract_nb = run_query_contract_nb ($id);
+
+
+  $block = "<div class=\"link\">
+  <div class=\"linkTitle\">:: $l_parentdeal</div>
+  <ul class=\"linkList\">
+    $dis_pdeal
+    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_pdeal_upd\" /></a>
+        <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
+  </ul>
+  <div class=\"linkTitle\">:: $l_contracts</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+        <a href=\"$url_contract\">$l_contracts ($contract_nb)</a></li>
+    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract_new\" /></a>
+        <a href=\"$url_contract_new\">$l_contract_new</a></li>
+  </ul>
+  <div class=\"linkTitle\">:: $l_invoices</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" /></a>
+        <a href=\"$url_inv\">$l_invoices ($inv_nb)</a></li>
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" /></a>
+        <a href=\"$url_inv\">$l_archived_invoices ($nb_inv_arch)</a></li>
+    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice_new\" /></a>
+        <a href=\"$url_inv_new\">$l_invoice_new</a></li>
+  </ul>
+</div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contact Consult                                                  //
 // Parameters :
 //   -  $deal_q    : DBO : information about the deal
 //   -  $con_q     : DBO : list of contact from the company 
@@ -502,8 +571,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoices, $l_no_invoice, $l_create_invoice, $l_archived_invoices;
   global $l_see_archived_invoices, $incl_arch;
-  global $l_contract_list;
-  global $path, $auth, $c_yes, $c_no;
+  global $l_contracts;
+  global $display, $path, $auth, $c_yes, $c_no;
   global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
@@ -545,54 +614,18 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
                  <td class=\"detailText\">$lvis</td>";
   }
 
-  $nb_invoices = $q_invoices->num_rows ();
+  $inv_nb = $q_invoices->num_rows ();
+  $display["link"] = html_deal_links($id, $pid, $inv_nb);
 
-
-  echo "
-    <table class=\"detail\">
-    <tr>
-      <td rowspan=\"4\">";
-
-//////////////////
-//LIENS EXTERNES//
-//////////////////
-  // parent deal info (if exists) : link and bind
-  if ($pid > 0) {
-    $plabel = get_parent_label($pid);
-    echo "<a href=\"". url_prepare("deal_index.php?action=parent_detailconsult&amp;param_parent=$pid")." \">$l_parentdeal</a><br />$plabel<br />";
-  }
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<a href=\"". url_prepare("deal_index.php?action=affect&amp;param_deal=$id") . "\">$l_affect_deal</a><br><br>";
-  }
-  echo "
-  <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  <img border=0  src=\"/images/$set_theme/$ico_contract\"></a>
-  <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  $l_contract_list</a><br><br>";
-  // to create an invoice connected to this deal
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<a href=\"".url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br /><br />";
-    // this is displayed close to links so we use that color too
-    echo "$nb_invoices $l_invoices";
-    // how many archived invoices connected :
-    $nb_arch_invoices = run_query_nb_archived_invoices ($id);
-    echo "<br /><br />$nb_arch_invoices $l_archived_invoices.";
-  } else {
-    echo "probleme...";
-  }
-//////////////////////
-//FIN LIENS EXTERNES//
-//////////////////////
-
-  echo "
-      </td>
-    </tr>
+  $block = "
+    <table width=100%>
     <tr>
       <td valign=\"top\">
+
+    <div class=\"detailHead\">$l_deal</div>
+
       <table class=\"detail\">
       <tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
-      </tr><tr>
         <td class=\"detailLabel\">$l_label</td>
         <td class=\"detailText\">$label</td>
         $visibility
@@ -626,12 +659,12 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
       </tr>
       </table>
       </td>
-
       <td>
+
+    <div class=\"detailHead\">$l_company</div>
+
       <table class=\"detail\">
       <tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_company</td>
-      </tr><tr>
         <td class=\"detailLabel\">$comp
         <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
@@ -651,9 +684,13 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         </td>
         <td class=\"detailText\">$phone_con2
         </td>
-      </tr><tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
-      </tr><tr>
+      </tr>
+      </table>
+
+    <div class=\"detailHead\">$l_infos</div>
+
+      <table class=\"detail\">
+      <tr>
         <td class=\"detailLabel\">$l_date_alarm</td>
         <td class=\"detailText\">$datealarm</td>
       </tr><tr>
@@ -670,19 +707,28 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         <td class=\"detailText\">$todo</td>
       </tr>
       </table>
+
       </td>
     </tr><tr>
-      <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
-    </tr><tr>
-      <td colspan=\"2\" class=\"detailText\">$com</td>
+      <td colspan=\"2\">
+
+    <div class=\"detailHead\">$l_comment</div>
+
+      <table class=\"detail\">
+      <tr>
+        <td colspan=\"2\" class=\"detailText\">$com</td>
+      </tr>
+      </table>
+
+      </td>
     </tr>
     </table>";
 
   // we display invoices list
-  if ($nb_invoices == 0) {
-    display_info_msg ($l_no_invoice);
+  if ($inv_nb == 0) {
+    $display["msg"] .= display_info_msg ($l_no_invoice);
   } else {
-    display_info_msg ($nb_invoices." ".$l_invoice);
+    $display["msg"] .= display_info_msg ($inv_nb." ".$l_invoice);
 
     $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
     
@@ -692,12 +738,12 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     $dis_invoice_list->data_header = "top";
     $dis_invoice_list->data_url = $url;
 
-    $dis_invoice_list->display("dis_data_deal");
+    $block .= $dis_invoice_list->display("dis_data_deal");
     // and a button to allow displaying archived invoices :
     $url = url_prepare ("deal_index.php?action=detailconsult".
 		       "&amp;param_deal=$id".
 		       "&amp;incl_arch=1");
-    echo "
+    $block .= "
        <form method=\"post\" action=\"$url\">
         <table class=\"detail\">
 	 <tr><td class=\"detailHead\">
@@ -707,6 +753,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
        </form>
     ";
   }
+
+  return $block;
 }
 
 
@@ -948,11 +996,11 @@ function auto_set_hitrate(select, targetField, pos) {
         <td class=\"detailLabel\">$l_upd_comment</td>
         <td>&nbsp;</td>
       </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
 
-  if($contr_q == 0) 
+  if ($contr_q == 0) 
     $ch_add_contr = "<input type=\"checkbox\" name=\"ch_contrat\" />";
 
   if ( ($action=="new") ||
@@ -960,7 +1008,7 @@ function auto_set_hitrate(select, targetField, pos) {
          ($usercreate == $uid) ) ) {
     $dis_visibility = "
              <td class=\"detailLabel\">$l_private</td>
-             <td><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
+             <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
     if ($vis==1) $dis_visibility .= "checked = \"checked\"";
     $dis_visibility .= " /></td></tr><tr>";
   }
@@ -984,17 +1032,6 @@ function auto_set_hitrate(select, targetField, pos) {
         <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
         <input type=\"submit\" value=\"$l_update\" />
       ";
-    $dis_button2 =" <form method=\"post\" name=\"form_deal_delete\"
-      onsubmit=\"if (confirm_del()) return true; else return false;\"
-      action=\"" . url_prepare("deal_index.php") . "\">
-      <table class =\"detail\">
-       <tr><td class=\"detailHead\">
-        <input type=\"hidden\" name=\"action\" value=\"delete\" />
-        <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
-        <input type=\"submit\" value=\"$l_delete\" />
-        </td></tr>
-        </table>
-        </form>";
   } else {
     $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -1007,95 +1044,109 @@ function auto_set_hitrate(select, targetField, pos) {
   }
 
 
-  echo "
+  $block = "
     $js_state
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
-     <table class=\"detail\">
-       <tr>
-         <td colspan=\"2\" class=\"detailHead\">$l_company</td>
-       </tr><tr>
-         <td class=\"detailLabel\">$comp&nbsp;
+
+  <div class=\"detailHead\">$l_company</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$comp&nbsp;
         <a href=\"" . url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
-         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
-         <td class=\"detailText\">
-          $ad1
-          <br />$zip $town 
-        </td>
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
+      <td class=\"detailText\">
+        $ad1
+        <br />$zip $town 
+      </td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_contact 1</td>
+      <td class=\"detailForm\">$sel_con1 $dis_contact_1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_contact 2</td>
+      <td class=\"detailForm\">$sel_con2 $dis_contact_2</td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_deal</div>
+
+    <table class=\"detail\">
+    <tr>
+      $dis_visibility
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_contact 1</td>
-        <td>$sel_con1 $dis_contact_1</td>
-      </tr><tr>
-        </tr><tr>
-        <td class=\"detailLabel\">$l_contact 2</td>
-        <td>$sel_con2 $dis_contact_2</td>
-      </tr><tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
-      </tr><tr>
-        $dis_visibility
-        <td class=\"detailLabel\">$l_label</td>
-        <td><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
-      </tr><tr>
-         <td class=\"detailLabel\">$l_number</td>
-        <td><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
+        <td class=\"detailLabel\">$l_number</td>
+        <td class=\"detailForm\"><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_date_init</td>
-        <td><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_kind</td>
-        <td>$sel_kind</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_category</td>
-        <td>$sel_cat</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_marketing_manager</td>
-        <td>$sel_market</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_technical_manager</td>
-        <td>$sel_tech</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_proposition date</td>
-        <td><input name=\"tf_dateprop\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateprop\" /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_proposition $l_amount</td>
-        <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_hitrate</td>
-        <td><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
-      </tr><tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_date_alarm</td>
-        <td><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_state</td>
-        <td>$sel_state</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_todo</td>
-        <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_archive</td>
-        <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_add_contrat</td>
-        <td>$ch_add_contr</td>
-      </tr><tr>
-        <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_add_comment</td>
-        <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
-      </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-        $dis_comment
-      </tr>
-     </table>
-    <table class =\"detail\">
-      <tr><td class=\"detailHead\">$dis_button1</td></tr>
+        <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailForm\">$sel_kind</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category</td>
+      <td class=\"detailForm\">$sel_cat</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_marketing_manager</td>
+      <td class=\"detailForm\">$sel_market</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_technical_manager</td>
+      <td class=\"detailForm\">$sel_tech</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_proposition date</td>
+      <td class=\"detailForm\"><input name=\"tf_dateprop\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateprop\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_proposition $l_amount</td>
+      <td class=\"detailForm\"><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_hitrate</td>
+      <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
+    </tr>
     </table>
+
+  <div class=\"detailHead\">$l_infos</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_date_alarm</td>
+      <td class=\"detailForm\"><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_state</td>
+      <td class=\"detailForm\">$sel_state</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_todo</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_add_contrat</td>
+      <td class=\"detailForm\">$ch_add_contr</td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
+    </tr>
+    </table>
+
+    <div class =\"detailButton\">
+      <p class=\"detailButtons\">$dis_button1</p>
+    </div>
     </form>
-    $dis_button2
 ";
+
+  return $block;
 }
 
 

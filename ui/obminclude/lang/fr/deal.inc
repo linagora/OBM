@@ -57,10 +57,10 @@ $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
 $l_deal_select_parentdeal = "Sélectionner la surAffaire à laquelle l'affaire doit être affectée";
 $l_affect_deal = "Affecter à une surAffaire";
-$l_invoices = "Facture(s)";
+$l_invoices = "Factures";
 $l_no_invoice = "Aucune Facture en cours associée";
-$l_create_invoice = "Créer une facture";
-$l_archived_invoices = " Facture(s) archivée(s)";
+$l_invoice_new = "Nouvelle facture";
+$l_archived_invoices = "Factures archivées";
 $l_see_archived_invoices = "Voir aussi les factures archivées";
 $l_kind_manage = "Gestion des Types d'Affaires";
 $l_kind_exist = "Types existants";
@@ -80,7 +80,8 @@ $l_invoice_TTC = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
-$l_contract_list = "Contrats";
+$l_contracts = "Contrats";
+$l_contract_new = "Nouveau contrat";
 
 // Titres
 $l_deal = "Affaire";

@@ -272,7 +272,7 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the Display Company links menu                                     //
+// Display: Company links menu                                               //
 // Parameters:
 //   - $p_id     : company id
 //   - $name     : company name
@@ -304,7 +304,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   </ul>
   <div class=\"linkTitle\">:: Affaires associees</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal.gif\" /></a>
+    <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
         <a href=\"$url_deal_list\">$l_deal_list ($deal_num)</a></li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>

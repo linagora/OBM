@@ -69,6 +69,7 @@ if ( ($param_deal == $last_deal) && (strcmp($action,"delete")==0) ) {
   run_query_set_user_pref($uid,"last_deal",$param_deal);
   $last_deal_name = run_query_global_deal_label($last_deal);
 }
+
 // Updating the "last parentdeal" bookmark 
 if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0) ) {
   $last_parentdeal = $last_parentdeal_default;
@@ -79,7 +80,7 @@ if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0)
 }
 
 page_close();
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $deal = get_param_deal();
 get_deal_action();
 $perm->check();
@@ -128,14 +129,14 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm();
-  html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
-  dis_deal_search_list($deal);
+  $display["search"] = html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
+  $display["result"] = dis_deal_search_list($deal);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm_active();
-  html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
+  html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_contract_nb($param_deal), $deal);
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,15 +144,15 @@ if (($action == "index") || ($action == "")) {
     $deal_q = run_query_detail($param_deal);
     if ( ($deal_q->f("deal_visibility")==0) ||
          ($deal_q->f("deal_usercreate")==$uid) ) {
-      display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
       $cid = $deal_q->f("deal_company_id");
       // we retrieve invoices data :
       $inv_q = run_query_search_connected_invoices ($param_deal, $incl_arch);
       $pref_q = run_query_display_pref ($uid, "invoice");
-      html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $pref_q);
+      $display["detail"] = html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $pref_q);
     } else {
       // this deal's page has "private" access
-      display_err_msg($l_error_visibility);
+      $display["msg"] .= display_err_msg($l_error_visibility);
     } 	
   }
   
@@ -160,11 +161,11 @@ if (($action == "index") || ($action == "")) {
   if ($param_deal > 0) {
     require("deal_js.inc");
     $deal_q = run_query_detail($param_deal);
-    display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
     $param_company = $deal_q->f("deal_company_id");
     $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
     $usr_q = run_query_userobm_active($users);
-    html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
+    $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_contract_nb($param_deal), $deal);
   }
   
 } elseif ($action == "insert")  {
@@ -190,7 +191,7 @@ if (($action == "index") || ($action == "")) {
     display_err_msg($err_msg);
     $users = array($deal["market"], $deal["tech"]);
     $usr_q = run_query_userobm_active($users);
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_contract_nb($param_deal), $deal);
   }
   
 } elseif ($action == "update")  {
@@ -222,10 +223,10 @@ if (($action == "index") || ($action == "")) {
     $param_company = $deal["company"];
     $users = array($deal["market"], $deal["tech"]);
     $usr_q = run_query_userobm_active($users);
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
+    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_contract_nb($param_deal), $deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
-    if ($cb_arc_aff=="archives") {
+    if ($cb_arc_aff == "archives") {
       echo "update<br>";
       $obm_q=run_query_detail($param_deal);
       $obm_q->next_record();

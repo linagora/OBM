@@ -59,7 +59,7 @@ $l_deal_select_parentdeal = "Select the parentdeal to which the deal must be aff
 $l_affect_deal= "Change Parent Deal";
 $l_invoices = "Invoice(s)";
 $l_no_invoice = "No invoice connected";
-$l_create_invoice = "Create an invoice";
+$l_invoice_new = "New invoice";
 $l_archived_invoices = " Archived Invoices";
 $l_see_archived_invoices = "See archived invoices too";
 $l_kind_manage = "Deal Kind Management";
@@ -75,7 +75,8 @@ $l_category_label="Label";
 $l_category_minilabel="Mini Label";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_add_contrat = "Add a contract";
-$l_contract_list = "Contracts";
+$l_contracts = "Contracts";
+$l_contract_new = "New contract";
 
 // Titles
 $l_deal = "Deal";
