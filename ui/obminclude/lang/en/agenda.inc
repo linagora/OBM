@@ -17,6 +17,7 @@ $l_public  = "Public";
 $l_category = "Catégory";
 $l_description = "Description";
 $l_state = "Status";
+$l_back_mono = "Current user view";
 
 $l_high = "High";
 $l_low = "Low";

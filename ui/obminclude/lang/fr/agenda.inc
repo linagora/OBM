@@ -64,7 +64,7 @@ $l_to = "au";
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
-
+$l_back_mono = "Vue utilisateur courant";
 // actions 
 $l_insert = "Enregistrer le rdv";
 $l_update = "Modifier le rdv";

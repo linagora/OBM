@@ -1061,7 +1061,6 @@ echo "
         <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"148\" height=\"6\" alt=\"\" /></td>
        </tr>
       </table>
-      
      </td>
     </tr>
     <tr>

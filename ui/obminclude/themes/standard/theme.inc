@@ -107,12 +107,12 @@ $ico_new_event      = "new_event.gif";
 $ico_left_day       = "left_day.gif";
 $ico_right_day      = "right_day.gif";
 $ico_spacer         = "spacer.gif";
-$ico_calendar_user0 = "ico_calendar0.gif";
-$ico_calendar_user1 = "ico_calendar1.gif";
-$ico_calendar_user2 = "ico_calendar2.gif";
-$ico_calendar_user3 = "ico_calendar3.gif";
-$ico_calendar_user4 = "ico_calendar4.gif";
-$ico_calendar_user5 = "ico_calendar5.gif";
+$ico_calendar_user0 = "ico_calendar5.gif";
+$ico_calendar_user1 = "ico_calendar4.gif";
+$ico_calendar_user2 = "ico_calendar3.gif";
+$ico_calendar_user3 = "ico_calendar2.gif";
+$ico_calendar_user4 = "ico_calendar1.gif";
+$ico_calendar_user5 = "ico_calendar0.gif";
 $ico_calendar_nouser= "ico_calendarno.gif";
 
 // Export icons

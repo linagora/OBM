@@ -658,7 +658,15 @@ td.agendaVide		{
         border-top: 		1px dashed #a1a4a8;
         border-right: 		1px solid #a1a4a8;
 }
-
+td.agendaNoEvent	{
+	font-family:		sans-serif;
+	font-size:		14px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+	background-color:	#ffffff;
+        border-top: 		1px dashed #a1a4a8;
+}
 
 td.agendaHour		{
 	font-family:		sans-serif;
@@ -704,9 +712,9 @@ td.agendaHead2		{
 	
 td.agendaEventHead	{ 
         background-color:       #336699;
-		border:                 1px #a1a4a8 solid; 
-		text-align:				center;	
-		font-weight: 			800;		
+		border:         1px #a1a4a8 solid; 
+		text-align:	center;	
+		font-weight: 	800;		
 	}
 td.agendaEventBg5 	{ 
     background-color: 		#b1d29d; 
