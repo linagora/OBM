@@ -33,13 +33,14 @@ $fieldnames["incident_company_name"] = $l_company;
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
-  global $l_label,$l_contract,$l_priority,$l_status, $l_find,$l_owner;
+  global $l_label,$l_company,$l_contract,$l_priority,$l_status,$l_find,$l_owner;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$c_all,$l_all;
   global $l_date_after,$l_date_before,$l_archive;
 
   $lincident = stripslashes($incident["lincident"]);
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
+  $company = $incident["company"];
   $status = $incident["status"];
   $owner = $incident["owner"];
   $dateafter = $incident["date_after"];
@@ -94,16 +95,16 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
       <table>
       <tr>
         <td class=\"textLabelForm\">$l_label<br />
-          <input type=\"text\" name=\"tf_lincident\" size=\"20\"
+          <input type=\"text\" name=\"tf_lincident\" size=\"16\"
             value=\"$lincident\" /></td>
         <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_contract<br />
-          <input type=\"text\" name=\"tf_lcontract\" size=\"20\"
-            value=\"$lcontract\" /></td>
+        <td class=\"textLabelForm\">$l_company<br />
+          <input type=\"text\" name=\"tf_company\" size=\"16\"
+            value=\"$company\" /></td>
         <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_archive<br />
-          <input name=\"cb_archive\" type=\"checkbox\" size=\"10\"
-            value=\"1\" $archive /></td>
+        <td class=\"textLabelForm\">$l_contract<br />
+          <input type=\"text\" name=\"tf_lcontract\" size=\"16\"
+            value=\"$lcontract\" /></td>
         <td>&nbsp;&nbsp;</td>
         <td class=\"textLabelForm\">$l_date_after<br />
    	  <input name=\"tf_dateafter\" type=\"text\" size=\"10\"
@@ -124,6 +125,10 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
         <td>&nbsp;&nbsp;</td>
         <td class=\"textLabelForm\">$l_owner<br />
           $dis_sel_owner</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_archive<br />
+          <input name=\"cb_archive\" type=\"checkbox\" size=\"10\"
+            value=\"1\" $archive /></td>
       </tr>
       </table>
       </td>
@@ -368,7 +373,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $solu = $inc_q->f("incident_resolution");
     $priority = $inc_q->f("incident_priority_id");
     $status = $inc_q->f("incident_status_id");
-    $date = date_format($inc_q->f("date"));
+    $date = isodate_format($inc_q->f("date"));
     $hour = get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");

@@ -22,6 +22,7 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $status = $incident["status"];
   $lincident = $incident["lincident"];
   $lcontract = $incident["lcontract"];
+  $company = $incident["company"];
   $priority = $incident["priority"];
   $param_contract =  $incident["contract_id"];
   $owner = $incident["owner"];
@@ -74,6 +75,9 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   }
   if ($datebefore !="") {
      $req .=" and (Incident.incident_date <= '$datebefore') ";
+  }
+  if ($company != "") {
+     $req .= " and Company.company_name like '$company%'";
   }
   if ($lcontract != "") {
      $req .= " and Contract.contract_label like '$lcontract%'";

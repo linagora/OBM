@@ -11,7 +11,7 @@
 
 <H1>OBM-DISPLAY-LIST-HOWTO</H1>
 <I>Comment utiliser un affichage générique pour les tableaux de résutats</I><BR>
-Version 0.5.2 - 2002-07-09<BR>
+Version 0.6.4 - 2003-05-09<BR>
 </CENTER>
 
 <hr>
@@ -79,7 +79,7 @@ Version 0.5.2 - 2002-07-09<BR>
 <tr>
   <td><b>display_link</b></td>
   <td>(<b>true</b> | false) or (<b>1</b> | 0)</td>
-  <td>Indique si les liens doivent être affichés (ex: non dans le cas d'affichaege en popup)</td>
+  <td>Indique si les liens doivent être affichés (ex: non dans le cas d'affichage en popup)</td>
 </tr>
 <tr>
   <td><b>data_set</b></td>
@@ -248,18 +248,14 @@ include("obminclude/global_display.inc");<br>
 $dis_deals_list=new OBM_DISPLAY("DATA",$obm_q_display_options);<br>
 $dis_deals_list->data_set = $obm_q_deals ;<br>
 $dis_deals_list->data_header = "both";<br>
-$dis_deals_list->elem_order_for = "" ;<br>
 </i>
 <p>
 
-<UL>
-<LI>l'attribut <i>data_set</i> doit recevoir <b>l'ensemble de données à afficher</b> (résultat de la requête de recherche). La requête peut très bien retourner des champs calculés.
-
-<LI><i>si l'attribut </i>data_header</i> vaut 'both' les titres des colonnes seront affichés à la fois en haut et en bas du tableau.
+<ul>
+<li>l'attribut <i>data_set</i> doit recevoir <b>l'ensemble de données à afficher</b> (résultat de la requête de recherche). La requête peut très bien retourner des champs calculés.
+<li><i>si l'attribut </i>data_header</i> vaut 'both' les titres des colonnes seront affichés à la fois en haut et en bas du tableau.
 Sinon ils ne seront affichés qu'en haut.
-
-<LI>l'attribut <i>elem_order_for</i> n'est utilise que par le module "List" et n'est donc conserve que par souci de compatibilite. Il sert à specifier le champ par defaut selon lequel on trie la liste : la clause "order by" de la requete de recherche et l'utilisation des variables de tri des colonnes <i>(voir plus loin : "Tri des colonnes")</i> le rendent obsolete. 
-</UL>
+</ul>
 <br>
 
 <a name="nom_col"><h3>Spécifier le titre des colonnes</h3>

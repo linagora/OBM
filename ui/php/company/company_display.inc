@@ -163,10 +163,11 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $name = urlencode(stripslashes($company["name"]));
   $phone = urlencode(stripslashes($company["phone"]));
   $kind = $company["kind"];
+  $act = $company["activity"];
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
   
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;tf_zip=$zip&amp;cb_state=$state&amp;sel_market=$market");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_state=$state&amp;sel_market=$market");
 
   $obm_q_comp->seek($first_row);
 

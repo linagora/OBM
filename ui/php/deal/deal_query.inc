@@ -969,7 +969,7 @@ function run_query_cat_links($c_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_form($did, $deal) {
   global $php_regexp_isodate, $l_invalid_date, $l_date_init;
-  global $err_msg, $l_err_label_empty, $l_err_hitrate;
+  global $err_msg, $l_err_label_empty, $l_err_hitrate, $l_err_hitrate;
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
@@ -999,6 +999,12 @@ function check_deal_form($did, $deal) {
   // Check if the tech resp. is filled
   if ($deal["tech"] < 1) {
     $err_msg = $l_err_tech_empty;
+    return false;
+  }
+
+  // Check if the hitrate is numerical
+  if (! is_numeric($deal["hitrate"])) {
+    $err_msg = $l_err_hitrate;
     return false;
   }
 

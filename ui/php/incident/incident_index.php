@@ -262,7 +262,7 @@ display_end();
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-  global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority;
+  global $tf_lcontract, $tf_lincident, $tf_company, $sel_status, $sel_priority;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
   global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
@@ -286,6 +286,7 @@ function get_param_incident() {
   $incident["archive"] = ( ($cb_archive == '1') ? '1' : '0');
   if (isset ($param_contract)) $incident["contract_id"] = $param_contract;
   if (isset ($contract_new_id)) $incident["cont_new_id"] = $contract_new_id;
+  if (isset ($tf_company)) $incident["company"] = $tf_company;
 
   // Admin - Priority fields
   // $sel_priority -> "priority" is already set
