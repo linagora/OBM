@@ -382,7 +382,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\">";
-  while($kind_q->next_record()) {
+  while ($kind_q->next_record()) {
     $k_id = $kind_q->f("kind_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
     if ($k_id == $kind) { $sel_kind .= "selected = \"selected\""; }
@@ -516,7 +516,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $cid = $contact["company_id"];
+  $cid = ($contact["comp_new_id"] ? $contact["comp_new_id"] : $contact["company_id"]);
   $kind = $contact["kind"];
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
@@ -585,7 +585,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     </form>
     </td><td>
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
-    action=\"" .url_prepare("company_index.php") . "\">
+    action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"param_company\" value=\"$cid\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
@@ -605,7 +605,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" 
-     <input type=\"submit\" value=\"$l_back\" />
+    <input type=\"submit\" value=\"$l_back\" />
     </form>
     </td></tr>
     </table>";

@@ -244,6 +244,7 @@ display_end();
 // returns : $contact hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contact() {
+  global $action;
   global $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_ad1, $tf_ad2;
   global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_func, $tf_phone, $tf_hphone;
   global $tf_mphone, $tf_fax, $tf_email, $ta_com, $cb_vis, $cb_archive;
@@ -284,9 +285,10 @@ function get_param_contact() {
   if (isset ($ext_target)) $contact["ext_target"] = $ext_target;
 
   if (debug_level_isset($cdg_param)) {
+    echo "<br />action=$action";
     if ( $contact ) {
       while ( list( $key, $val ) = each( $contact ) ) {
-        echo "<BR>contact[$key]=$val";
+        echo "<br />contact[$key]=$val";
       }
     }
   }
@@ -324,7 +326,7 @@ function get_contact_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $contact_write,
-    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+    'Condition'=> array ('','index','search','new','detailconsult','admin','display') 
                                      );
 
 // Detail Consult
@@ -404,4 +406,3 @@ function get_contact_action() {
 }
 
 </SCRIPT>
-
