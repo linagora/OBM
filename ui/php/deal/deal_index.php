@@ -132,27 +132,23 @@ if (($action == "index") || ($action == "")) {
   if ($set_display == "yes") {
     dis_deal_search_list($deal);
   } else {
-    display_ok_msg($l_no_display);
+    display_info_msg($l_no_display);
   }
-
+ echo $www;
 } elseif ($action == "search")  { // tester si hd_parent mis ??? pour form :oui
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm();
   html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
   dis_deal_search_list($deal);
+  echo $www;
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    require("deal_js.inc");
-    $usr_q = run_query_userobm();
-    html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
-  }
-  else {
-    display_error_permission();
-  }
-
+  require("deal_js.inc");
+  $usr_q = run_query_userobm();
+  html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
+  echo $www;
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_deal > 0) {
@@ -183,7 +179,7 @@ if (($action == "index") || ($action == "")) {
     $usr_q = run_query_userobm();
     html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
   }
-
+  echo $www;
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
@@ -420,6 +416,7 @@ if (($action == "index") || ($action == "")) {
   $usr_q = run_query_userobm();
   html_parentdeal_search_form($deal, $usr_q);
   dis_parentdeal_search_list($deal);
+  echo $www;
 
 } elseif ($action == "parent_new") {
 ///////////////////////////////////////////////////////////////////////////////

@@ -195,12 +195,13 @@ class Session {
    
   function url($url){
     $url=ereg_replace("[&?]+$", "", $url);
-
+//A VIRER
+    $this->mode = "get";
+// A VIRER
     switch ($this->mode) {
       case "get":
-
         if ( strpos($url, urlencode($this->name)) == false ) { 
-          $url .= ( strpos($url, "?") != false ?  "&" : "?" ).
+          $url .= ( strpos($url, "?") != false ?  "&amp;" : "?" ).
                 urlencode($this->name)."=".$this->id;
         }
  
@@ -535,9 +536,20 @@ class Session {
     } else {
       $this->mode = "get";
     }
-
-    session_start();
+// A VIRER les COMMENTAIRE   session_start();
     $this->id = session_id();
+ //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
+
+    global $set_theme,$last_contact,$last_contact_name,$last_contract,$last_contract_name,$set_debug,$set_lang;
+    $set_theme = "standard";
+    $last_contact = "1132";
+    $last_contact_name = "ADELL";
+    $last_contract = "2";
+    $last_contract_name = "Support IO Box pour leurs clients";
+    $set_debug = "0";
+    $set_lang = "fr";	
+ //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
+
    }
 }
 ?>

@@ -35,14 +35,14 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_category, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive;
   global $l_all, $l_all_f, $l_find; 
-  global $col_textem, $sess, $c_all;
+  global  $sess, $c_all;
 
   // --- Var preparation ------------------------------------------------------
 
   $parent = $deal["parent"];
   $label = stripslashes($deal["label"]);
   $name = stripslashes($deal["company_name"]);
-  $archive = ($deal["archive"] == "1" ? "checked" : "");
+  $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
   $cat = $deal["cat"];
   $state = $deal["state"];
@@ -52,121 +52,141 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   $company_id = $deal["company"];
 
   // Kind select construction
-  $sel_kind = "<SELECT name=sel_kind>
-     <OPTION value=\"$c_all\">$l_all";
+  $sel_kind = "<select name=\"sel_kind\">
+     <option value=\"$c_all\">$l_all</option>";
   while($obm_q_type->next_record()) {
     $id = $obm_q_type->f("dealtype_id");
     $klabel = $obm_q_type->f("dealtype_label");
-    $sel_kind .= "<OPTION value=\"$id\"";
-    if ($kind == $id) $sel_kind .= " selected";
-    $sel_kind .= ">$klabel";
+    $sel_kind .= "<option value=\"$id\"";
+    if ($kind == $id) $sel_kind .= " selected = \"selected\"";
+    $sel_kind .= ">$klabel</option>";
   }
-  $sel_kind .= "</SELECT>";
+  $sel_kind .= "</select>";
 
 
   //TaskType select construction
-  $sel_cat = "<SELECT name=sel_cat>
-              <OPTION value=\"$c_all\">$l_all";
+  $sel_cat = "<select name=\"sel_cat\">
+              <option value=\"$c_all\">$l_all</option>";
   while($obm_q_cat->next_record()) {
     //put menu titles
     $id = $obm_q_cat->f("tasktype_id");
     $tt_label = $obm_q_cat->f("tasktype_label");
-    $sel_cat .= "\n<OPTION value=\"$id\"";
-    if ($cat == $id) $sel_cat .= " selected";
-    $sel_cat .= ">$tt_label</OPTION>\n";
+    $sel_cat .= "\n<option value=\"$id\"";
+    if ($cat == $id) $sel_cat .= "selected =\"selected\"";
+    $sel_cat .= ">$tt_label</option>\n";
   }
-  $sel_cat .= "</SELECT>";
+  $sel_cat .= "</select>";
 
   // State select construction
-  $sel_state = "<SELECT name=sel_state>
-     <OPTION value=\"$c_all\">$l_all";
+  $sel_state = "<select name=\"sel_state\">
+     <option value=\"$c_all\">$l_all</option>";
   while($obm_q_state->next_record()) {
     $id = $obm_q_state->f("dealstatus_id");
     $slabel = $obm_q_state->f("dealstatus_label");
-    $sel_state .= "<OPTION value=\"$id\"";
-    if ($state == $id) $sel_state .= " selected";
-    $sel_state .= ">$slabel";
+    $sel_state .= "<option value=\"$id\"";
+    if ($state == $id) $sel_state .= "selected =\" selected\"";
+    $sel_state .= ">$slabel</option>";
   }
-  $sel_state .= "</SELECT>";
+  $sel_state .= "</select>";
 
   // Manager select construction
   if ($obm_q_manager->num_rows() > 0) {
     $obm_q_manager->seek(0);
   }
-  $sel_manager = "<select name=sel_manager>
-     <option value=\"$c_all\">$l_all";
+  $sel_manager = "<select name=\"sel_manager\">
+     <option value=\"$c_all\">$l_all</option>";
   while($obm_q_manager->next_record()) {
     $id = $obm_q_manager->f("userobm_id");
     $lname = $obm_q_manager->f("userobm_lastname");
     $sel_manager .= "<option value=\"$id\"";
-    if ($manager == $id) $sel_manager .= " selected";
-    $sel_manager .= ">$lname";
+    if ($manager == $id) $sel_manager .= "selected =\"selected\"";
+    $sel_manager .= ">$lname</option>";
   }
   $sel_manager .= "</select>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<center>
-    <form method=get name=form_deal
-    onSubmit=\"if (check_search_form(this) == false) return false; else return true;\"
+  echo "
+
+
+    <form method=\"get\" name=\"form_deal\"
+    onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
     action=\"" . $sess->url("deal_index.php") . "\">
 
-    <table border=0>
+    <table class=\"details\">
     <tr>
-      <td align=left><font color=\"#$col_textem\">$l_deal</font></td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"detailHead\" colspan=\"9\">$l_deal</td>
+    </tr>
+    <tr>
 <!-- Label -->
-      <td><font size=-2>$l_label_start</font><br>
-      <input name=tf_label size=16 maxlength=128 value=\"$label\"></td>
+      <td class=\"textLabelForm\">$l_label_start</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_company</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_show_archive</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_after</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_before</td>
+      <td>&nbsp;&nbsp;</td>
+    </tr>
+    <tr>
+      <td><input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" /></td>
       <td>&nbsp;&nbsp;</td>
 <!-- Name -->
-      <td><font size=-2>$l_company</font><br>
-      <input name=tf_company_name size=12 maxlength=16 value=\"$name\"></td>
+      <td><input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" /></td>
       <td>&nbsp;&nbsp;</td>
 <!-- Archive -->
-      <td align=center><font size=-2>$l_show_archive</font><br>
-      <input type=checkbox name=cb_archive value=1 $archive>
-      </td>
+      <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
       <td>&nbsp;&nbsp;</td>
 <!-- Alarm date after -->
-      <td><font size=-2>$l_after</font><br>
-      <input name=tf_dateafter size=10 maxlength=10 value=\"$dateafter\"></td>
+      <td><input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\" value=\"$dateafter\" /></td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Alarm date before -->
-      <td><font size=-2>$l_before</font><br>
-      <input name=tf_datebefore size=10 maxlength=10 value=\"$datebefore\"></td>
+      <td><input name=\"tf_datebefore\" size=\"10\" maxlength=\"10\" value=\"$datebefore\" /></td>
       <td>&nbsp;&nbsp;</td>
 <!-- Search -->
-      <td valign=bottom> 
-      <input name=action type=hidden value=search>
-      <input name=param_parent type=hidden value=\"$parent\">
-      <input name=param_company type=hidden value=\"$company_id\">
-      <input name=submit type=submit value=\"$l_find\">
+      <td rowspan=\"4\"> 
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"param_parent\" type=\"hidden\" value=\"$parent\" />
+      <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
       </td>
     </tr>
-    </table>
-
-    <table border=0>
     <tr>
 <!-- Kind -->
-      <td><font size=-2>&nbsp;&nbsp;$l_kind</font><br>
+      <td class=\"textLabelForm\">$l_kind</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_category</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_state</td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_manager</td>
+      <td>&nbsp;&nbsp;</td>
+    </tr>
+    <tr>
+      <td>
       $sel_kind
       </td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Categories -->
-      <td><font size=-2>&nbsp;&nbsp;$l_category</font><br>
+      <td>
       $sel_cat
       </td>
+      <td>&nbsp;&nbsp;</td>
 <!-- State -->
-      <td><font size=-2>&nbsp;&nbsp;$l_state</font><br>
+      <td>
       $sel_state
       </td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Manager -->
-      <td><font size=-2>&nbsp;&nbsp;$l_manager</font><br>
+      <td>
       $sel_manager
       </td>
     </tr>
     </table>
   </form>
-  <hr>";
+  <hr />";
 }
 
 
@@ -180,7 +200,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   global $l_parentdeal, $l_label_start,$l_all,$l_all_f,$l_manager;
   global $l_find,$l_show_archive; 
-  global $col_textem, $sess;
+  global  $sess;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -192,48 +212,56 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   if ($obm_q_pmanager->num_rows() > 0) {
     $obm_q_pmanager->seek(0);
   }
-  $sel_pmanager = "<select name=sel_pmanager>
-     <option value=\"$c_all\">$l_all";
+  $sel_pmanager = "<select name=\"sel_pmanager\">
+     <option value=\"$c_all\">$l_all</option>";
   while($obm_q_pmanager->next_record()) {
     $id = $obm_q_pmanager->f("userobm_id");
     $lname = $obm_q_pmanager->f("userobm_lastname");
     $sel_pmanager .= "<option value=\"$id\"";
-    if ($pmanager == $id) $sel_pmanager .= " selected";
-    $sel_pmanager .= ">$lname";
+    if ($pmanager == $id) $sel_pmanager .= "selected = \"selected\"";
+    $sel_pmanager .= ">$lname</option>";
   }
   $sel_pmanager .= "</select>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<CENTER><FORM METHOD=GET NAME=\"form_search_parentdeal\"
-    ACTION=\"" . $sess->url("deal_index.php") . "\">
-    <TABLE BORDER=0>
-    <TR>
-      <TD align=left><font color=\"#$col_textem\">$l_parentdeal</font></TD>
-      <TD>&nbsp;&nbsp;&nbsp;</TD>
-<!-- Label -->
-      <TD><FONT SIZE=-2>$l_label_start</FONT><BR>
-      <INPUT TYPE=text NAME=tf_plabel size=20 value=\"$plabel\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
-<!-- Manager -->
-      <TD><FONT SIZE=-2>&nbsp;&nbsp;$l_manager</FONT><BR>
+  echo "<form method=\"get\" name=\"form_search_parentdeal\"
+    action=\"" . $sess->url("deal_index.php") . "\">
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"6\" class=\"detailHead\">$l_parentdeal</td>
+    </tr>
+    <tr>
+      <td class=\"textLabelForm\">$l_label_start</td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_manager</td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td class=\"textLabelForm\">$l_show_archive</td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
+      <td rowspan=\"2\"> 
+      <input name=\"action\" type=\"hidden\" value=\"parent_search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      </td>
+    </tr>
+    <tr>
+<!-- label -->
+      <td><input type=\"text\" name=\"tf_plabel\" size=\"20\" value=\"$plabel\" /></td>
+      <td>&nbsp;&nbsp;</td>
+<!-- manager -->
+      <td>
       $sel_pmanager
-      </TD>
-      <TD>&nbsp;&nbsp;</TD>
-<!-- Archive -->
-      <TD ALIGN=center><FONT SIZE=-2>$l_show_archive</FONT><BR>
-      <INPUT TYPE=checkbox NAME=cb_parchive VALUE=\"1\" $parchive>
-      </TD>
-      <TD>&nbsp;&nbsp;</TD>
-<!-- Search -->
-      <TD VALIGN=bottom> 
-      <INPUT NAME=action TYPE=hidden VALUE=parent_search>
-      <INPUT NAME=submit TYPE=submit VALUE=\"$l_find\">
-      </TD>
-    </TR>
-    </TABLE>
-  </FORM>
-  <HR>";
+      </td>
+      <td>&nbsp;&nbsp;</td>
+<!-- archive -->
+      <td>
+      <input type=\"checkbox\" name=\"cb_parchive\" value=\"1\" $parchive />
+      </td>
+      <td>&nbsp;&nbsp;</td>
+<!-- search -->
+    </tr>
+    </table>
+  </form>
+  <hr />  ";
 }
 
 
@@ -271,7 +299,6 @@ function dis_deal_search_list($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Themes
-  global $col_tableh,$col_textem,$col_table,$col_error;
   //-- Labels
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
@@ -300,7 +327,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<FONT color=\"#$col_textem\">$nb_deal $l_found</FONT><BR>";
+  display_info_msg($nb_deal." ".$l_found);
 
   $dis_deals_list->display();
 
@@ -319,7 +346,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link,$ico_contact_list;
   // - Labels
   global $l_update,$l_delete,$l_insert;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo;
+  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
+  global $l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
+  global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoices_connected,$l_no_invoices_connected;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
@@ -347,19 +376,25 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $timeu = timestamp_to_time($deal_q->f("datemodif"));
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
-  $com = $deal_q->f("deal_comment");
+  $com = nl2br($deal_q->f("deal_comment"));
   $comp = $deal_q->f("company_name");
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
   $town = $deal_q->f("company_town");
+ 
+  if ($usercreate == $auth->auth["uid"]) {   
+   $visibility = "<td><font color=\"#$col_label\">$l_visibility</font></td>
+                 <td>$lvis</td>";
+  }
+
 
   $nb_invoices = $q_invoices->num_rows ();
-  echo "<CENTER>
-    <TABLE border=0 width=100%><TR><TD valign=top width=130>";
+  echo "<center>
+    <table border=0 width=100%><tr><td valign=top width=130>";
 //////////////////
 //LIENS EXTERNES//
 //////////////////
-  // Parent deal info (if exists) : link and bind
+  // parent deal info (if exists) : link and bind
   if ($pid > 0) {
     $plabel = get_parent_label($pid);
     echo "<a href=\"". $sess->url("deal_index.php?action=parent_detailconsult&amp;param_parent=$pid")." \">$l_parentdeal</a><br>$plabel<br>";
@@ -369,10 +404,10 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
            . "\">$l_affect_deal</a><br><br>";
   }
   echo "
-  <A HREF=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-  <A HREF=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  $l_contract_list</A><BR><BR>";
+  <a href=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  <img border=0  src=\"/images/$set_theme/$ico_contact_list\"></a>
+  <a href=\"".$sess->url("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
+  $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
   if ($auth->auth["perm"] == $perms_admin) {
     echo "<a href=\"".$sess->url("../treso/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br><br>";
@@ -390,147 +425,116 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //FIN LIENS EXTERNES//
 //////////////////////
 
-  echo "</TD><TD>
-    <TABLE border=0><TR><TD>
-      <TABLE border=0><TR><TD valign=top align=left>
-        <TABLE border=0>
-        <TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_label</FONT></TD>
-          <TD>$label</TD>";
-   
-  if ($usercreate == $auth->auth["uid"]) {   
-   echo "<TD><FONT COLOR=\"#$col_label\">$l_visibility</FONT></TD>
-     <TD>$lvis</TD>";
-  }
-
-  echo "</TR><TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_number</FONT></TD>
-          <TD>$num</TD>
-        </TR><TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_date_init</FONT></TD>
-          <TD>$datebegin</TD>
-        </TR><TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_kind</FONT></TD>
-          <TD>$kind</TD>
-        </TR><TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_category</FONT></TD>
-          <TD>$cat</TD>
-        </TR>
-        </TABLE>
-
-        <table border=0>
+  echo "</td><td>
+    <table class=\"\"details\">
+     <tr><td>
+      <table class=\"details\">
         <tr>
-          <td><font color=\"#$col_label\">$l_marketing_manager</font></td>
-          <td>$market</td>
+          <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
         </tr><tr>
-          <td><font color=\"#$col_label\">$l_technical_manager</font></td>
-          <td>$tech</td>
+          <td class=\"detailLabel\">$l_label</td>
+          <td class=\"detailText\">$label</td>
+          $visibility
+        </tr><tr>
+          <td class=\"detailLabel\">$l_number</td>
+          <td class=\"detailText\">$num</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_date_init</td>
+          <td class=\"detailText\">$datebegin</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_kind</td>
+          <td class=\"detailText\">$kind</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_category</td>
+          <td class=\"detailText\">$cat</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_marketing_manager</td>
+          <td class=\"detailText\">$market</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_technical_manager</td>
+          <td class=\"detailText\">$tech</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_proposition date</td>
+          <td class=\"detailText\">$datepro</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_amount</td>
+	  <td class=\"detailText\">$amount</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_date_alarm</td>
+	  <td class=\"detailText\">$datealarm</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_state</td>
+	  <td class=\"detailText\">$status</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_last_update</td>
+	  <td class=\"detailText\">$dateu</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_at</td>
+	  <td class=\"detailText\">$timeu</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_archive</td>
+	  <td class=\"detailText\">$archive</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_todo</td>
+	  <td class=\"detailText\">$todo</td>
+        </tr><tr>
+          <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
+        </tr><tr>
+	  <td colspan=\"2\" class=\"detailText\">$com</td>
         </tr>
         </table>
 
-        <br>
-        <TABLE border=2 bgcolor=\"#$col_table\"><TR><TD>
-          <TABLE>
-          <TR>
-            <TD>$l_proposition :</TD>
-            <TD>Date <BR>$datepro</TD>
-            <TD>$l_amount<BR>$amount</TD>
-          </TR>
-          </TABLE>
-        </TD>
-        </TR>
-        </TABLE>
-<!-- Company and contacts Panel -->
-      </TD><TD valign=top>
-        <TABLE bgcolor=\"#$col_label\">
-        <TR>
-          <TD bgcolor=\"#$col_table\" colspan=2>
-          <FONT color=\"#$col_textem\">$comp</FONT>&nbsp;&nbsp;&nbsp;&nbsp;
-          <A HREF=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\"><IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
-          <BR>$ad1
-          <BR>$zip $town</TD>
-        </TR><TR>
-          <TD valign=center colspan=2>$l_contacts</TD>
-        </TR><TR>";
+        
+<!-- company and contacts panel -->
+      </td><td valign=top>
+        <table bgcolor=\"#$col_label\">
+        <tr>
+          <td bgcolor=\"#$col_table\" colspan=2>
+          <font color=\"#$col_textem\">$comp</font>&nbsp;&nbsp;&nbsp;&nbsp;
+          <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\"><img align=middle src=\"/images/$set_theme/$ico_company\"></a>
+          <br>$ad1
+          <br>$zip $town</td>
+        </tr><tr>
+          <td valign=center colspan=2>$l_contacts</td>
+        </tr><tr>";
 
-    // Contact 1
+    // contact 1
     while($con_q->next_record()) {
       if ($con_q->f("contact_id") == $con1)
-        echo "<TD>".$con_q->f("contact_lastname") . " " .
+        echo "<td>".$con_q->f("contact_lastname") . " " .
         $con_q->f("contact_firstname") . " - " . $con_q->f("contact_phone") .
-        "</TD>";
+        "</td>";
     }
-    echo "<TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\"><IMG ALIGN=middle
-        SRC=\"/images/$set_theme/$ico_contact\"></A></TD>
-        </TR><TR>";
+    echo "<td><a href=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\"><img align=middle
+        src=\"/images/$set_theme/$ico_contact\"></a></td>
+        </tr><tr>";
 
-    // Contact 2
+    // contact 2
     if ($con_q->nf()>0) {  
       $con_q->seek(0);
     }
 
     while($con_q->next_record()) {
       if ($con_q->f("contact_id") == $con2) 
-        echo "<TD>".$con_q->f("contact_lastname")." ". $con_q->f("contact_firstname") .  " - " . $con_q->f("contact_phone")."</TD>";
+        echo "<td>".$con_q->f("contact_lastname")." ". $con_q->f("contact_firstname") .  " - " . $con_q->f("contact_phone")."</td>";
     }
-    echo "<TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\"><IMG ALIGN=middle
-          SRC=\"/images/$set_theme/$ico_contact\"></A></TD>
-        </TR>
-        </TABLE>
-        <TABLE width=100%>
-        <TR>
-          <TD><FONT color=\"#$col_ok\">$l_date_alarm</FONT>&nbsp;&nbsp;</TD>
-          <TD>$datealarm</TD>
-        </TR><TR>
-          <TD><FONT color=\"#$col_label\">$l_state</FONT>&nbsp;&nbsp;</TD>
-          <TD>$status</TD> 
-        </TR><TR>
-          <TD colspan=2>
-          <FONT color=\"#$col_label\">$l_last_update </FONT> $dateu
-          <FONT color=\"#$col_label\"> $l_at </FONT> $timeu
-          </TD>
-        </TR><TR>
-          <TD><FONT color=\"#$col_label\">$l_archive</FONT>&nbsp;&nbsp;</TD>
-          <TD>$archive</TD>
-        </TR>
-        </TABLE>
-      </TD>
-      </TR>
-      </TABLE>
-    </TD>
-    </TR><TR>
-      <TD>
-      <TABLE width=100%>
-        <TR>
-          <TD valign=top><FONT COLOR=\"#$col_label\">$l_todo</FONT>
-          <BR>$todo<br></TD>
-        </TR><TR>
-          <TD valign=top><FONT COLOR=\"#$col_label\">$l_comment</FONT>
-          <BR>" . nl2br($com) . "</TD>
-          <TD align=right>";
+    echo "<td><a href=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\"><img align=middle
+          src=\"/images/$set_theme/$ico_contact\"></a></td>
+        </tr>
+        </table>";
 
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<FORM METHOD=GET NAME=form_deal_update ACTION=\"".
-      $sess->url("deal_index.php")."\">";
-    echo "
-      <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
-      <INPUT TYPE=hidden NAME=param_deal VALUE=\"$id\">
-      <INPUT TYPE=submit value=\"$l_update\">
-      </FORM>";
-  }
-
-  echo "&nbsp;</TD>
-        </TR>
-        </TABLE>
-      </TD>
-      </TR>
-      </TABLE>
-    </TD>
-    </TR>
-    </TABLE>
-  </CENTER>";
+  echo "&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      </tr>
+      </table>
+    </td>
+    </tr>
+    </table>
+  </center>";
 
   // we display invoices list
   echo "<br><br><br>";
@@ -588,10 +592,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$contr_q,$deal) {
   // - Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  global $set_theme,$ico_company,$ico_contact,$l_header_company;
   // -- Labels
-  global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_private,$l_todo;
+  global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none, $l_deal,$l_infos,$l_company;
+  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_private;
+  global $l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
   
   // if update mode and first time, values are taken from db
@@ -667,38 +672,38 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }  
 
   // Kind select construction
-  $sel_kind = "<select name=sel_kind>
+  $sel_kind = "<select name=\"sel_kind\">
     <option value=\"0\">$l_none</option>";
   while ($kind_q->next_record()) {
     $kid = $kind_q->f("dealtype_id");
     $klabel = $kind_q->f("dealtype_label");
     $sel_kind .= "\n<option value=\"$kid\"";
-    if ($kind == $kid) $sel_kind .= " selected"; 
+    if ($kind == $kid) $sel_kind .= " selected = \"selected\""; 
     $sel_kind .= ">$klabel</option>";
   }
   $sel_kind .= "</select>";
 
   // Category select construction
-  $sel_cat = "<select name=sel_cat>
+  $sel_cat = "<select name=\"sel_cat\">
     <option value=\"0\">$l_none</option>";
   while($cat_q->next_record()) {
     $cid = $cat_q->f("tasktype_id");
     $tt_label = $cat_q->f("tasktype_label");
     $sel_cat .= "\n<option value=\"$cid\"";
-    if ($cat == $cid) $sel_cat .= " selected"; 
+    if ($cat == $cid) $sel_cat .= "selected = \"selected\""; 
     $sel_cat .= ">$tt_label</option>\n";
   }
   $sel_cat .= "</select>";
  
   // Marketing manager select construction
-  $sel_market = "<select name=sel_market>
+  $sel_market = "<select name=\"sel_market\">
     <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname") . " " .
              $usr_q->f("userobm_firstname");
     $sel_market .= "<option value=\"$cid\"";
-    if ($market == $cid) $sel_market .= " selected"; 
+    if ($market == $cid) $sel_market .= " selected = \"selected\""; 
     $sel_market .= ">$cname</option>\n";
   }
   $sel_market .= "</select>";
@@ -707,242 +712,207 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   if ($usr_q->nf()>0) {
     $usr_q->seek(0);
   }
-  $sel_tech = "<select name=sel_tech>
+  $sel_tech = "<select name=\"sel_tech\">
     <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname") . " " .
              $usr_q->f("userobm_firstname");
     $sel_tech .= "<option value=\"$cid\"";
-    if ($tech == $cid) $sel_tech .= " selected"; 
+    if ($tech == $cid) $sel_tech .= " selected = \"selected\""; 
     $sel_tech .= ">$cname</option>\n";
   }
   $sel_tech .= "</select>";
 
-  // Contact 1 select construction
-  $sel_con1 = "<SELECT name=sel_contact1>";
+  // contact 1 select construction
+  $sel_con1 = "<select name=\"sel_contact1\">";
   while ($con_q->next_record()) {
     $cid = $con_q->f("contact_id");
     $cinfo = $con_q->f("contact_lastname") . " " .
              $con_q->f("contact_firstname") . " - " .
              $con_q->f("contact_phone");
-    $sel_con1 .= "<OPTION value=\"$cid\"";
-    if ($con1 == $cid) $sel_con1 .= " selected"; 
-    $sel_con1 .= ">$cinfo</OPTION>\n";
+    $sel_con1 .= "<option value=\"$cid\"";
+    if ($con1 == $cid) $sel_con1 .= "  selected = \"selected\""; 
+    $sel_con1 .= ">$cinfo</option>\n";
   }
-  $sel_con1 .= "</SELECT>";
+  $sel_con1 .= "</select>";
 
-  // Contact 2 select construction
+  // contact 2 select construction
   if ($con_q->nf()>0) {
     $con_q->seek(0);
   }
-  $sel_con2 = "<SELECT name=sel_contact2>";
+  $sel_con2 = "<select name=\"sel_contact2\">";
   while ($con_q->next_record()) {
     $cid = $con_q->f("contact_id");
     $cinfo = $con_q->f("contact_lastname") . " " .
              $con_q->f("contact_firstname") . " - " .
              $con_q->f("contact_phone");
-    $sel_con2 .= "<OPTION value=\"$cid\"";
-    if ($con2 == $cid) $sel_con2 .= " selected"; 
-    $sel_con2 .= ">$cinfo</OPTION>\n";
+    $sel_con2 .= "<option value=\"$cid\"";
+    if ($con2 == $cid) $sel_con2 .= " selected = \"selected\""; 
+    $sel_con2 .= ">$cinfo</option>\n";
   }
-  $sel_con2 .= "</SELECT>";
+  $sel_con2 .= "</select>";
 
-  // State select construction
-  $sel_state = "<SELECT name=sel_state>";
+  // state select construction
+  $sel_state = "<select name=\"sel_state\">";
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $slabel = $sta_q->f("dealstatus_label");
-    $sel_state .= "<OPTION value=\"$sid\"";
-    if ($status == $sid) $sel_state .= " selected"; 
-    $sel_state .= ">$slabel</OPTION>\n";
+    $sel_state .= "<option value=\"$sid\"";
+    if ($status == $sid) $sel_state .= " selected = \"selected\""; 
+    $sel_state .= ">$slabel</option>\n";
   }
-  $sel_state .= "</SELECT>";
+  $sel_state .= "</select>";
   
   if($contr_q == 0) 
-    $ch_add_contr = "<INPUT type=checkbox name=ch_contrat>$l_add_contrat";
-
-
-  echo "<CENTER>
-    <FORM METHOD=POST NAME=form_deal_update 
-      onSubmit=\"if (check_form(this)) return true; else return false;\"
-      ACTION=\"".$sess->url("deal_index.php")."\">
-
-    <TABLE><TR><TD>
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_label</FONT><BR>
-        <INPUT NAME=tf_label TYPE=text size=40 value=\"$label\">
-        </TD>";
+    $ch_add_contr = "<input type=\"checkbox\" name=\"ch_contrat\" />";
 
   if ( ($action=="new") ||
        ( (($action=="detailupdate") || ($action=="update")) && 
          ($usercreate == $auth->auth["uid"]) ) ) {
-    echo "<TD>
-        <TABLE border=2 bgcolor=\"#$col_table\">
-          <TR><TD>&nbsp; $l_private &nbsp;
-          <INPUT NAME=cb_vis TYPE=checkbox value=\"1\" ";
-    if ($vis==1) echo " checked";
-    echo "></TD></TR>
-        </TABLE>
-        </TD>";
+    $dis_visibility = "
+             <td class=\"detailLabel\">$l_private</td>
+             <td><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
+    if ($vis==1) $dis_visibility .= "checked = \"checked\"";
+    $dis_visibility .= " /></td></tr><tr>";
   }
 
-  echo "</TR>
-      </TABLE>
-
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_number</FONT><BR>
-          <INPUT NAME=tf_num size=40 maxlength=32 value=\"$num\"></TD>
-        <TD><FONT COLOR=\"#$col_label\">$l_date_init</FONT><BR>
-          <INPUT NAME=tf_datebegin TYPE=text size=10 value=\"$datebegin\"></TD>
-      </TR>
-      </TABLE>
-
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_kind</FONT><BR>
-        $sel_kind
-        </TD>
-        <TD><FONT COLOR=\"#$col_label\">$l_category</FONT><BR>
-        $sel_cat
-        </TD>
-      </TR>
-      </TABLE>
-
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_marketing_manager</FONT><BR>
-        $sel_market
-        </TD>
-        <TD><FONT COLOR=\"#$col_label\">$l_technical_manager</FONT><BR>
-        $sel_tech
-        </TD>
-      </TR>
-      </TABLE>
-
-      <TABLE border=2 bgcolor=\"#$col_table\">
-      <TR>
-        <TD>
-        <TABLE>
-        <TR>
-          <TD>$l_proposition</TD>
-          <TD>Date <BR>
-            <INPUT NAME=tf_dateprop TYPE=text size=10 value=\"$dateprop\"></TD>
-          <TD>$l_amount<BR>
-            <INPUT NAME=tf_amount TYPE=text size=10 value=\"$amount\"></TD>
-        </TR>
-        </TABLE>
-        </TD>
-      </TR>
-      </TABLE>
-
-  <!-- Company and contact block -->
-  
-    </TD>
-    <TD valign=top>
-      <TABLE bgcolor=\"#$col_label\">
-      <TR>
-        <TD bgcolor=\"#$col_table\">
-        <FONT color=\"#$col_textem\">$comp</FONT>&nbsp;
-        <A HREF=\"" . $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\"><IMG ALIGN=MIDDLE
-          SRC=\"/images/$set_theme/$ico_company\"></A>
-        <BR>$ad1
-        <BR>$zip $town
-        </TD>
-      </TR><TR>
-        <TD valign=center>$l_contacts<BR>
-        $sel_con1";
-
-  if ($action == "detailupdate") {
-    echo "<A HREF=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\"><IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
+ if ($action == "detailupdate") {
+    $dis_contact_2 = "<a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
+                      <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+ 		      </a>";
+    $dis_contact_1 = "<a href=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\">
+                      <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+		      </a>";
   }
-  echo "<BR>
-      $sel_con2";
-
-  if ($action == "detailupdate") {
-    echo "<A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\"><img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
-  }
-  echo " </TD>
-      </TR>
-      </TABLE>
-    <P>
-      <TABLE>
-      <TR>
-        <TD><FONT color=\"#$col_ok\">$l_date_alarm</FONT><BR>
-        <INPUT NAME=tf_datealarm TYPE=text SIZE=10 value=\"$datealarm\">
-        </TD>
-        <TD><FONT color=\"#$col_label\">$l_state</FONT><BR>
-        $sel_state
-        </TD>
-      </TR>
-      <TR>
-        <TD colspan=2>
-          <FONT color=\"#$col_label\">$l_last_update </FONT>
-          $dateu
-          <FONT color=\"#$col_label\"> $l_at </FONT>
-          $timeu
-        </TD>
-      </TR>
-      <TR>
-        <TD>
-          <INPUT TYPE=checkbox NAME=cb_archive VALUE=\"1\" $archive>$l_archive
-        </TD>
-      </TR>
-      </TABLE>
-
-      </TD>
-    </TR>
-    </TABLE>
-
-    <TABLE>
-    <TR>
-      <TD><FONT COLOR=\"#$col_label\">$l_todo</FONT><BR>
-      <INPUT type=text name=tf_todo size=60 maxlength=128 value=\"$todo\">
-      </TD>
-      <TD><FONT COLOR=\"#$col_label\" ><br>$ch_add_contr</FONT></TD>
-    </TR>
-    <TR>
-      <TD colspan = 2><FONT COLOR=\"#$col_label\">$l_comment</FONT><BR>
-        <TEXTAREA NAME=ta_com ROWS=6 COLS=72>$comment</TEXTAREA>
-      </TD>
-      <TD align=center>";
-
   if (($action == "detailupdate") || ($action == "update")) {
-    echo "<INPUT TYPE=hidden NAME=param_company VALUE=\"$comp_id\">
-        <INPUT TYPE=hidden NAME=param_parent VALUE=\"$pid\">
-        <INPUT TYPE=hidden NAME=tf_company_name VALUE=\"$comp\">
-        <INPUT TYPE=hidden NAME=hd_company_ad1 VALUE=\"$ad1\">
-        <INPUT TYPE=hidden NAME=hd_company_zip VALUE=\"$zip\">
-        <INPUT TYPE=hidden NAME=hd_company_town VALUE=\"$town\">
-        <INPUT TYPE=hidden NAME=action VALUE=\"update\">
-        <INPUT TYPE=hidden NAME=param_deal VALUE=\"$id\">
-        <INPUT TYPE=submit value=\"$l_update\">
-      </FORM>
-      <BR>
-      <FORM METHOD=POST NAME=form_deal_delete
-      onSubmit=\"if (valider_suppression()) return true; else return false;\"
-      ACTION=\"" . $sess->url("deal_index.php") . "\">
-        <INPUT TYPE=hidden NAME=action VALUE=delete>
-        <INPUT TYPE=hidden NAME=param_deal VALUE=\"$id\">
-        <INPUT TYPE=submit value=\"$l_delete\">";
+    $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+        <input type=\"hidden\" name=\"param_parent\" value=\"$pid\" />
+        <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
+        <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
+        <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
+        <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
+        <input type=\"hidden\" name=\"action\" value=\"update\" />
+        <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
+        <input type=\"submit\" value=\"$l_update\" />
+      ";
+    $dis_button2 =" <form method=\"post\" name=\"form_deal_delete\"
+      onsubmit=\"if (valider_suppression()) return true; else return false;\"
+      action=\"" . $sess->url("deal_index.php") . "\">
+      <table class =\"details\">
+       <tr><td class=\"detailHead\">
+        <input type=\"hidden\" name=\"action\" value=\"delete\" />
+        <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
+        <input type=\"submit\" value=\"$l_delete\" />
+        </td></tr>
+        </table>
+
+        </form>";
   } else {
-    echo "<INPUT TYPE=hidden NAME=param_company VALUE=\"$comp_id\">
-      <INPUT TYPE=hidden name=action value=insert>
-      <INPUT TYPE=hidden name=param_parent value=\"$pid\">
-      <INPUT TYPE=hidden NAME=tf_company_name VALUE=\"$comp\">
-      <INPUT TYPE=hidden NAME=hd_company_ad1 VALUE=\"$ad1\">
-      <INPUT TYPE=hidden NAME=hd_company_zip VALUE=\"$zip\">
-      <INPUT TYPE=hidden NAME=hd_company_town VALUE=\"$town\">
-      <INPUT TYPE=submit value=\"$l_insert\">";
+     $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"hidden\" name=\"param_parent\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
+      <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
+      <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
+      <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  echo "</FORM>
-      </TD> 
-    </TR>
-    </TABLE>
-  </CENTER>";
+
+  echo "
+    <form method=\"post\" name=\"form_deal_update\" 
+      onsubmit=\"if (check_form(this)) return true; else return false;\"
+      action=\"".$sess->url("deal_index.php")."\">
+
+    <table class=\"details\">
+     <tr>
+      <td>
+      <table class=\"details\">
+      <tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
+      </tr><tr>
+        $dis_visibility
+        <td class=\"detailLabel\">$l_label</td>
+        <td><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
+      </tr><tr>
+         <td class=\"detailLabel\">$l_number</td>
+        <td><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_date_init</td>
+        <td><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_kind</td>
+        <td>$sel_kind</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_category</td>
+        <td>$sel_cat</td>
+      </tr><tr>
+        <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_marketing_manager</td>
+        <td>$sel_market</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_technical_manager</td>
+        <td>$sel_tech</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_proposition date</td>
+        <td><input name=\"tf_dateprop\" type=\"text\" size=\"10\" value=\"$dateprop\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_proposition $l_amount</td>
+        <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_date_alarm</td>
+        <td><input name=\"tf_datealarm\" type=\"text\" size=\"10\" value=\"$datealarm\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_state</td>
+        <td>$sel_state</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_todo</td>
+        <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_archive</td>
+        <td><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_add_contrat</td>
+        <td>$ch_add_contr</td>
+      </tr><tr>
+      <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
+      </tr><tr>
+        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
+      </tr>
+     </table>
+     </td>
+     <td>
+  <!-- company and contact block -->
+      <table  class=\"details\">
+       <tr>
+         <td class=\"detailHead\">$l_header_company</td>
+       </tr><tr>
+         <td class=\"detailText\">
+         <span class=\"messageInfo\">$comp&nbsp;</span>
+        <a href=\"" . $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
+         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+        <br />$ad1
+        <br />$zip $town
+        </td>
+      </tr><tr>
+        <td class=\"detailHead\">$l_contacts</td>
+      </tr><tr>
+        <td>$sel_con1 $dis_contact_1</td>
+      </tr><tr>
+        <td>$sel_con2 $dis_contact_2</td>
+      </tr>
+      </table>
+    </td> 
+    </tr>
+    </table>
+    <table class =\"details\">
+      <tr><td class=\"detailHead\">$dis_button1</td></tr>
+    </table>
+    </form>
+    $dis_button2
+";
   
 }
 
@@ -1506,8 +1476,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $plabel = stripslashes($deal["plabel"]);
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
-
-  echo "<FONT color=\"#$col_textem\">$nb_parentdeals $l_found_parent</font>";
+  display_info_msg($nb_parentdeals." ".$l_found_paren);
 
   $url = $sess->url("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
@@ -1517,7 +1486,6 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $obm_dis_list_parentdeal->data_header = "both";
   $obm_dis_list_parentdeal->data_idfield = "parentdeal_id"; 
   $obm_dis_list_parentdeal->data_set->seek($first_row);
-  echo "<br>";
   $obm_dis_list_parentdeal->display();
 
 }

@@ -9,7 +9,7 @@
 
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -317,6 +317,6 @@ function check_category_new(form)
 
 echo "
 // -->
-</SCRIPT>
+</script>
 ";
 

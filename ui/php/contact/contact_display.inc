@@ -94,7 +94,7 @@ function dis_contact_search_list($contact, $popup=false) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
-  global $sess, $col_textem, $l_found, $l_add, $l_close;
+  global $sess,  $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -150,7 +150,7 @@ function html_contact_consult($co_q) {
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax;
   global $l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_public,$l_private,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
-  global $set_theme, $col_label, $ico_mail;
+  global $set_theme,  $ico_mail;
   global $action, $auth, $sess;
   global $perms_user,$l_perms_user;
 
@@ -279,7 +279,7 @@ function html_contact_consult($co_q) {
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $kind_q, $contact) {
-  global $set_theme, $ico_mail, $col_table;
+  global $set_theme, $ico_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
@@ -418,7 +418,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('../company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"/images/$set_theme/$ico_mail\" alt=\"\" /></a>
+      <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
     </tr><tr>
@@ -664,14 +664,14 @@ function dis_delete_form($p_id) {
   global $sess;
 
   // --- HTML Template --------------------------------------------------------
+  echo "\n<form name=\"form_delete\" " .
+      "method=\"post\" action=\"" . $sess->url("contact_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_contact\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+  </form>\n";
 
-  return "\n<FORM name=\"form_delete\" " .
-      "METHOD=post action=\"" . $sess->url("contact_index.php") . "\">
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"delete\">
-    <INPUT TYPE=\"hidden\" name=\"param_contact\" value=\"$p_id\">
-    <INPUT TYPE=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\">
-  </FORM>\n";
 }
 
 

@@ -868,7 +868,6 @@ function dis_delete_form($p_id) {
 //   - $kind_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_kind_form($kind_q) {
-  global $col_a_table, $col_a_tableh, $col_textem;
   global $l_kind_manage,$l_kind_exist;
   global $l_kind_checkdelete,$l_kind_update,$l_kind_new,$l_kind_insert;
   global $sess;

@@ -67,11 +67,12 @@ $ico_contact="contact.gif";            // Contact Icon
 $ico_obm="obm.jpg";                    // OBM icon
 
 // Menus Icons
+$ico_contact="contact_list.gif";
 $ico_contact_list="contact_list.gif";  // Contact List Icon
 $ico_contact_new="contact_new.gif";    // New Contact Icon
 $ico_deal_list="contact_list.gif";     // Contact List Icon
 $ico_deal_new="contact_new.gif";       // New Contact Icon
-$ico_company="aliacom_mini.jpg";       // Company Icon
+$ico_company="ico_mail.gif";       // Company Icon
 $ico_change_company="ico_change_company.gif";       // Company Icon
 $ico_web="ico_web.gif";                    // WWW Icon
 $ico_mail="ico_mail.gif";                  // Mail Icon

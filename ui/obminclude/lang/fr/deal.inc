@@ -33,6 +33,7 @@ $l_invoice_deal = "Affaire";
 $l_archived_invoices_connected = " Facture(s) archivée(s) connectée(s) à cette Affaire";
 $l_see_archived_invoices = "Voir aussi les factures archivées";
 // Labels et textes
+$l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordre";
