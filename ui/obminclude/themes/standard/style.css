@@ -358,13 +358,13 @@ table.resultPref	 {
 	width:			auto;
 }
 
-a.resultHead:link	 { color: #ffffff; background-color: transparent;}
-a.resultHead:active	 { color: #ffff00; background-color: transparent;}
-a.resultHead:visited { color: #ffff00; background-color: transparent;}
+a.resultHead:link	{ color: #ffffff; background-color: transparent;}
+a.resultHead:active	{ color: #ffffff; background-color: transparent;}
+a.resultHead:visited 	{ color: #ffffff; background-color: transparent;}
 
-a.resultText:link 	 { color: #0ba589; background-color: transparent;}
-a.resultText:active  { color: #0ba589; background-color: transparent;}
-a.resultText:visited { color: #0ba589; background-color: transparent;}
+a.resultText:link 	{ color: #0ba589; background-color: transparent;}
+a.resultText:active  	{ color: #0ba589; background-color: transparent;}
+a.resultText:visited 	{ color: #0ba589; background-color: transparent;}
 
 
 
