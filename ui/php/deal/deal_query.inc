@@ -1816,55 +1816,6 @@ function get_parent_potential($p_id)  {
 }
 
 
-//
-////
-//////
-//////////////////////////////////////////////////////////////////////////////
-// Invoice stuff below :
-//////////////////////////////////////////////////////////////////////////////
-//////
-////
-//
-
-
-//////////////////////////////////////////////////////////////////////////////
-// returns all invoices connected to the $p_deal_id deal :
-// if $incl_arch = 1, we include archived invoices as well
-//////////////////////////////////////////////////////////////////////////////
-function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
-  global $cdg_sql;
-
-  $go = new DB_OBM;
-
-  $query = "select invoice_id, invoice_inout ".
-     ", invoice_label ".
-     ", invoice_number ".
-     ", invoice_amount_ht ".
-     ", invoice_amount_ttc ".
-     ", invoicestatus_label as invoice_status ".
-     ", invoice_date as date".
-     ", deal_label as invoice_deal ".
-     ", company_name as invoice_company ".
-     ", company_id".
-     ", deal_id ".
-     " from Deal, DealInvoice, Invoice, InvoiceStatus, Company ".
-     " where deal_id = dealinvoice_deal_id ".
-     " and dealinvoice_invoice_id = invoice_id ".
-     " and invoice_status_id = invoicestatus_id ".
-     " and deal_company_id = company_id ".
-     " and deal_id = '$p_deal_id'";
-  if ($incl_arch == 0) {
-    $query .= " and invoice_archive = '0' ";
-  }
-
-  display_debug_msg ("<b>run_query_search_connected_invoices () : </b>".$query, $cdg_sql);
-  
-  $go->query($query);
-
-  return $go;
-}
-
-
 //////////////////////////////////////////////////////////////////////////////
 // returns the number of total (active + archived) invoices connected to a deal
 // Parameters:
@@ -1877,11 +1828,10 @@ function run_query_nb_total_invoices($id) {
 
   $obm_q = new DB_OBM;
 
-  $query = "select invoice_id from DealInvoice, Invoice
-    where dealinvoice_invoice_id = invoice_id
-      and dealinvoice_deal_id = '$id'";
+  $query = "select invoice_id from Invoice
+    where invoice_deal_id = '$id'";
 
-  display_debug_msg("<b>run_query_nb_total_invoices():</b> $query", $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_nb_total_invoices()");
   $obm_q->query($query);
 
   return $obm_q->nf();

@@ -14,8 +14,6 @@ $l_date_init = "Date Debut";
 $l_parentdeal = "SurAffaire";
 $l_kind = "Type";
 $l_tt = "Type de tâche";
-$l_company = "Société";
-$l_contact = "Contact";
 $l_marketing_manager = "Resp Commercial";
 $l_technical_manager = "Resp Technique";
 $l_date_proposal = "Date de proposition";
@@ -70,9 +68,6 @@ $l_invoice_date = "Date";
 $l_parentdeal_deals = "Affaires appartenant à la SurAffaire";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
 $l_contract_new = "Nouveau contrat";
-
-// Titres
-$l_deal = "Affaire";
 
 // Actions
 $l_select_deal = "Sélectionner l'Affaire";

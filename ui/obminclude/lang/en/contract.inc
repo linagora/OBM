@@ -9,8 +9,6 @@
 
 // Labels et textes
 $l_archive = "Archive";
-$l_contract = "Contract";
-$l_company = "Company";
 $l_contract_contracttype = "Kind of contract";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Expiration date After";
@@ -21,8 +19,6 @@ $l_incident_list = "List of the Incidents";
 $l_incident_new = "Add a new Incident";
 
 $l_contract_select_deal = "Select the Deal.";
-$l_deal = "Deal";
-$l_label = "Label";
 $l_label_libelle = "Key-word of the label";
 $l_kind = "Kind";
 $l_marketing_manager = "Marketing Man.";
@@ -33,7 +29,6 @@ $l_date_init = "Initial date";
 $l_dateexp = "Expiration date";
 $l_last_update = "Last update";
 $l_at = "at";
-$l_number = "Number";
 
 $l_select_contract = "Select the contract";
 

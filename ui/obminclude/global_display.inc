@@ -720,6 +720,8 @@ class OBM_DISPLAY {
 
 	  if ($res["txt_name"] != "") {
 	    echo $res["txt_name"] . $sep;
+	  } else if ($res["name"] != ""){
+	    echo $res["name"] . $sep;
 	  } else {
 	    echo $txt_name . $sep;
 	  }

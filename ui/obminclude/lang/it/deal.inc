@@ -12,12 +12,9 @@ $l_task_fac = "Impegni comuni";
 $l_task_int = "Impegni interni";
 
 // Database fields
-$l_number = "Numero";
-$l_label = "Nome";
 $l_date_init = "Data inizio";
 $l_parentdeal="Impegno";
 $l_kind = "Tipo";
-$l_company = "Azienda";
 $l_contacts = "Contatti";
 $l_marketing_manager = "Resp. Marketing";
 $l_technical_manager = "Resp. Tecnico ";
@@ -27,7 +24,6 @@ $l_hitrate = "Hit Rate";
 $l_state = "Stato";
 $l_date_alarm = "Data Avviso";
 $l_date_comment = "Data Commento";
-$l_todo = "Da fare";
 
 // Labels and texts
 $l_minus = "-";
@@ -69,9 +65,6 @@ $l_category_minilabel="Nome breve";
 $l_parentdeal_deals = "Impegni appartengono a questo impegno";
 $l_add_contrat = "Nuovo contratto";
 $l_contract_new = "Nuovo contratto";
-
-// Titles
-$l_deal = "Impegni";
 
 // Actions
 $l_insert = "Inserisci Impegno";

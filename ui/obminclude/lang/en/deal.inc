@@ -7,16 +7,11 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 // Database fields
-$l_number = "Number";
-$l_label = "Label";
 $l_date_init = "Init Date";
 $l_parentdeal="Parent Deal";
 $l_kind = "Kind";
 $l_tt = "Task Type";
-$l_company = "Company";
-$l_contact = "Contact";
 $l_marketing_manager = "Marketing manager";
 $l_technical_manager = "Technical manager";
 $l_date_proposal = "Proposal Date";
@@ -66,9 +61,6 @@ $l_cat_new = "New category";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_add_contrat = "Add a contract";
 $l_contract_new = "New contract";
-
-// Titles
-$l_deal = "Deal";
 
 // Actions
 $l_select_deal = "Select Deal";

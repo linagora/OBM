@@ -8,40 +8,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-
-$l_label = "Label";
 $l_label_start = "Label start";
-$l_number = "Number";
 $l_amount = "Amount";
 $l_geninvoice = "Caractéristics";
 $l_amount_ht = "HT amount";
 $l_amount_ttc = "TTC Amount";
-$l_comment = "Comment";
-$l_deal="Deal";
-$l_company = "Company";
 $l_status="Status";
-$l_date="Date";
 $l_date_apres = "After";
 $l_date_avant = "Before";
 $l_paid = "Paid TTC Amount";
 $l_pick_deal = "Choose a deal";
 $l_no_deal = "no deals related to this invoice";
-$l_list_deal = "deals related to this invoice";
 $l_no_payment = "no payments related to this invoice";
 $l_list_payment = "payments related to this invoice";
-$l_invoice_deal_label = "Deal Label";
-$l_invoice_deal_number = "Deal Number";
-$l_invoice_deal_category_label = "Deal Category";
-$l_invoice_company = "Deal Company";
-$l_invoice_dealtodo = "Deal Todo";
-$l_invoice_payment_label = "Payment Label";
-$l_invoice_payment_number = "Payment Number";
-$l_invoice_payment_date = "Payment Date";
-$l_invoice_payment_amount = "Payment Amount";
+$l_expected_date = "Expected Date";
 $l_inout = "Kind";
 $l_both = "Both"; 
-$l_client = "Customer";
-$l_supplier = "Supplier";
 $l_no_deals_related_error = "You cannot add payments to this invoice because it has no deals connected";
 $l_last_deal_remove_error = "You cannot remove more deal : there remains only one related to this invoice, and there are still payments...<br>Remove payments first.";
 $l_archive_ok="successfully archived invoices";
@@ -50,7 +32,6 @@ $l_payment_exist="Payments exist !";
 $l_invoice_dealtype_label="deal type";
 $l_invoice_dealstatus="deal status";
 $l_invoice_deal_datealarm="deal alarm date";
-$l_invoice_payment_expect_date="expected payment date";
 $l_include_archive="include archives";
 $l_compute_tax="compute full tax amount";
 $l_tax_rate="tax rate";
@@ -59,8 +40,7 @@ $l_archive_update="archive updates";
 $l_invoice_deal_company="linked to company";
 $l_invoice_deal_archive="";
 $l_ht_nan="out of tax amount is invalid";
-// Titres
-$l_invoice = "Invoice";
+
 $l_invoice_infos = "Informations about the invoice";
 $l_remaining_amount = "Amount not used";
 $l_to_use_amount = "Amount to affect to this invoice";

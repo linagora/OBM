@@ -57,8 +57,12 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "contact_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] ="X";
-    else $res["name"] = " ";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "contact_function") {
@@ -79,6 +83,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["txt_name"] = $email;
     }
   }
 

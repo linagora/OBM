@@ -20,7 +20,6 @@ $l_cat2_delete =  "Supprimer";
 $l_category1 = "Categorie 1";
 $l_category2 = "Categorie 2";
 $l_createtime = "Date de création";
-$l_document = "Document";
 $l_extension = "Extension";
 $l_file = "Fichier";
 $l_mime_label = "Label";
@@ -110,6 +109,7 @@ $l_rep_have_link = "Ce répertoire soit est un répertoire system, soit contient d
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut être supprimé";
 $l_rep_have_no_link = "Ce répertoire n'est lié à aucun éléments et peut être supprimé";
 $l_no_document = "Document introuvable";
+
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";

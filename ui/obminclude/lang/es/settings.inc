@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : settings.inc                                             //
@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_settings = "Opciones";
 $l_cur_settings = "Su configuración actual";
 $l_auto_display = "Despliegue automático de listas";
 $l_cur_lang = "Idioma actual";

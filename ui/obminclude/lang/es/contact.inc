@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Compañía";
 $l_lastname = "Apellido";
 $l_firstname = "Nombre";
 $l_kind = "Tipo";
@@ -22,7 +21,6 @@ $l_minimphone = "(Celular)";
 $l_email = "E-Mail";
 $l_mailing_ok = "Correo habilitado";
 $l_fax = "Fax";
-$l_comment = "Comentarios";
 $l_coord = "Detalles";
 $l_contact_name = "Nombre contacto";
 $l_from_company = "De la Compañía";
@@ -36,9 +34,6 @@ $l_kind_manage = "Manejo del tipo de Contacto";
 $l_kind_exist = "Tipos Existentes";
 $l_kind_new = "Nuevo Tipo";
 $l_header = "Encabezado";
-
-// Titles
-$l_contact = "Contacto";
 
 // Actions
 $l_insert = "Ingresar el Contacto";

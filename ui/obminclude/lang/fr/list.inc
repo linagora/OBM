@@ -18,7 +18,6 @@ $l_date_last_update = "Mise à jour" ;
 $l_static = "Statique";
 
 // Labels et textes
-$l_list = "Liste";
 $l_nb_contact = "# Contacts";
 $l_list_contact = "Ayant comme contact";
 $l_list_display = "Options d'affichage des listes de listes";
@@ -45,9 +44,7 @@ $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_function = "Fonction";
 $l_service = "Service";
-$l_company = "Société";
 $l_hphone = "Tél perso";
-$l_contact = "Contact";
 $l_status = "Genre";
 $l_letter = "En tête";
 

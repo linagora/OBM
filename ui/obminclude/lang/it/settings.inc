@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_settings = "Impostazioni";
 $l_cur_settings = "Impostazioni Attuali";
 $l_auto_display = "Elenco Automatico";
 $l_submit = "Conferma";

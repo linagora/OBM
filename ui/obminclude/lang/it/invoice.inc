@@ -8,40 +8,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label = "Etichetta";
 $l_label_start = "Inizio Etichetta";
-$l_number = "Numero";
 $l_amount = "Totale";
 $l_amount_ht = "Totale HT ";
 $l_amount_ttc = "TTC Totale";
-$l_deal="Affare";
-$l_status="Stato";
-$l_date="Data";
+$l_status = "Stato";
 $l_date_apres = "Dopo";
 $l_date_avant = "Prima";
 $l_paid = "Pagato Totale TTC";
 $l_pick_deal = "Scegli un affare";
 $l_no_deal = "Nessun affare collegato a questa fattura";
-$l_list_deal = "Affari legati a questa fattura";
 $l_no_payment = "Nessun pagamento collegato a questa fattura";
 $l_list_payment = "Pagamenti relativi a questa fattura";
-$l_invoice_deal_label = "Etichetta dell'affare";
-$l_invoice_deal_number = "Numero affare";
-$l_invoice_deal_category_label = "Categoria dell'affare";
-$l_invoice_company = "Azienda Affare";
-$l_invoice_dealtodo = "Affari da fare";
-$l_invoice_payment_label = "Etichetta del pagamento";
-$l_invoice_payment_number = "Numero del pagamento";
-$l_invoice_payment_date = "Data del pagamento";
-$l_invoice_payment_amount = "Totale del pagamento";
 $l_inout = "Tipo";
 $l_both = "Entrambi";
-$l_client = "Cliente";
-$l_supplier = "Fornitore";
-$l_no_deals_related_error = "Non puoi aggiungere pagamenti a quista fattura perche non ha affari collegati";
-$l_last_deal_remove_error = "Non puoi eliminare altri affari: è presente un solo pagamento collegato <br>Elimina prima il pagamento.";
-// Titres
-$l_invoice = "Fattura";
+
 $l_invoice_infos = "Informazioni sulla fattura";
 $l_remaining_amount = "Totale non usato";
 $l_to_use_amount = "Totale relativo a questa fattura";

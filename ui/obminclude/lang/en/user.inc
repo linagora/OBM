@@ -23,8 +23,6 @@ $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
 $l_group = "Group";
 
-// Titres
-$l_user = "User";
 $l_group_member = "Member of groups";
 
 // Actions

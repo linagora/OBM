@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Compañía";
 $l_tasktype = "Categoría";
 $l_task = "Tarea";
 $l_soldtime = "Tiempo vendido";
@@ -37,10 +36,8 @@ $l_total = "Total";
 $l_resume = "Resumen";
 $l_tasks = "tareas";
 $l_members= "miembros";
-$l_deal = "Negocio";
 
 // Titres
-$l_project = "Proyecto";
 $l_members_info = "Miembros del Proyecto";
 $l_progressinfos = "Evaluación de progreso: las siguientes datos son<br>(tiempo usado / tiempo perdido / tiempo total proyectoado)";
 $l_memberstimeinfos = "Llene la duración proyectada del trabajo (en días) para cada persona asignada a una tarea";

@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Número (NIT)";
 $l_aka = "Tambien Conocida como";
 $l_company_name = "Nombre de la Compañía";
 $l_kind = "Tipo";
@@ -22,7 +21,6 @@ $l_email = "E-Mail";
 $l_coord = "Detalles";
 
 // Labels and texts
-$l_comment = "Comentarios";
 $l_contact_new = "Nuevo Contacto";
 $l_deal_new = "Nuevo negocio";
 $l_project_new = "Nuevo Proyecto";
@@ -38,9 +36,6 @@ $l_cat_code = "Codigo";
 $l_act_manage = "Manejo de Actividades de la Compañía";
 $l_act_exist = "Actividades Existentes";
 $l_act_new = "Nueva Actividad";
-
-// Titres
-$l_company = "Compañía";
 
 // Actions
 $l_add = "Adicionar";

@@ -43,22 +43,25 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
     if (strcmp($email ,"") != 0) {
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\">$email";
+      $res["txt_name"] = $email;
     }
   } 
   else if ($fieldname == "userobm_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-    else $res["name"] = "&nbsp;";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
   else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = datetime_format($date, 1);
-    $res["txt_name"] = $res["name"];
   }
   else if ($fieldname == "datebegin") {
     $datebegin = $OD->data_set->f($fieldname);
     $res["name"] = date_format($datebegin, 1);
-    $res["txt_name"] = $res["name"];
   }
 
   return $res;

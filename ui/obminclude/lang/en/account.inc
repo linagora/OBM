@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : account.inc                                              //
@@ -8,17 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label = "Label";
 $l_label_start = "Label start";
 $l_number = "Number";
 $l_balance = "Balance";
 $l_initial_balance = "Creation Balance";
-$l_comment = "Comment";
 $l_choose_balance_date = "Balance compute Date";
-$l_date = "Date";
 $l_expected_date = "Expected Date";
 $l_amount = "Amount";
-
 
 $l_include_expected = "Include expected operations ?";
 $l_in_total ="In Total";
@@ -29,8 +25,6 @@ $l_nb_expected_used = " expected operations used during the computing.";
 $l_expected = "expected";
 $l_used_payments = "Payments used to compute balance ";
 $l_used_expected_payments = "Expected Payments used to compute balance";
-// Titres
-$l_account = "Account";
 
 // Actions
 $l_insert= "Insert Account";

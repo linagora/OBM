@@ -70,14 +70,17 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "deal_label") {
-    $res["name"] = "";
     $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
   }
 
   else if ($fieldname == "deal_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-    else $res["name"] = "&nbsp;";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "deal_hitrate") {
@@ -86,7 +89,6 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "deal_company_name") {
-    $res["name"] = "";
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("deal_company_id");
   }
   
@@ -101,7 +103,6 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
     }
     $res["style"] = "style=\"color: #$col; font-family: sans-serif; font-size: 10px; background-color: #ffffff;\"";
     $res["name"] = $datealarm;
-    $res["txt_name"] = $res["name"];
   }
 
   // Invoice fields ?????? USED ??????
@@ -592,13 +593,7 @@ function dis_deal_consult($deal) {
   if ($deal["id"] > 0) {
     $deal_q = run_query_detail($deal["id"]);
     $display["detailInfo"] = display_record_info($deal_q);
-    $cid = $deal_q->f("deal_company_id");
-    $con_q = run_query_contact_deal($cid);
-    // we retrieve invoices data :
-    $inv_q = run_query_search_connected_invoices ($deal["id"], $incl_arch);
-    $pref_q = run_query_display_pref ($uid, "invoice");
-
-    $block = html_deal_consult($deal_q, $con_q, $inv_q, $pref_q);
+    $block = html_deal_consult($deal_q);
   }
 
   return $block;
@@ -609,11 +604,9 @@ function dis_deal_consult($deal) {
 // Display: Contact Consult                                                  //
 // Parameters :
 //   - $deal_q  : DBO : information about the deal
-//   - $con_q   : DBO : list of contact from the company 
-//   - $comp_id : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_consult($deal_q, $con_q, $inv_q, $pref_inv_q) {
-  global $set_theme,$ico_company, $ico_contact, $display;
+function html_deal_consult($deal_q) {
+  global $set_theme, $ico_company, $ico_contact, $display;
   global $l_infos, $l_company, $l_contact, $l_label,$l_date_init,$l_kind;
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
@@ -642,7 +635,7 @@ function html_deal_consult($deal_q, $con_q, $inv_q, $pref_inv_q) {
   $archive = ($deal_q->f("deal_archive") == 1 ? $c_yes : $c_no);
   $todo = $deal_q->f("deal_todo");
   $com = beautify_comment(nl2br($deal_q->f("deal_comment")));
-  $comp_id = $deal_q->f("company_id");
+  $comp_id = $deal_q->f("deal_company_id");
   $comp = $deal_q->f("company_name");
   $ad1 = $deal_q->f("company_address1");
   $zip = $deal_q->f("company_zipcode");
@@ -656,7 +649,6 @@ function html_deal_consult($deal_q, $con_q, $inv_q, $pref_inv_q) {
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
-  $inv_nb = $inv_q->num_rows ();
   $display["link"] = html_deal_links($deal_q, $inv_nb);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
    
@@ -807,32 +799,6 @@ function html_deal_consult($deal_q, $con_q, $inv_q, $pref_inv_q) {
       </td>
     </tr>
     </table>";
-
-  // we display invoices list
-  if ($inv_nb != 0) {
-    $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
-
-    $dis_invoice_list = new OBM_DISPLAY("DATA", $pref_inv_q, "deal");
-    $dis_invoice_list->display_entity = "invoice";
-    $dis_invoice_list->data_set = $inv_q;
-    $dis_invoice_list->data_header = "top";
-    $dis_invoice_list->data_url = $url;
-
-    $block .= $dis_invoice_list->display("dis_data_deal");
-    // and a button to allow displaying archived invoices :
-    $url = url_prepare ("deal_index.php?action=detailconsult".
-		       "&amp;param_deal=$id".
-		       "&amp;incl_arch=1");
-    $block .= "
-       <form method=\"post\" action=\"$url\">
-        <table class=\"detail\">
-	 <tr><td class=\"detailHead\">
-	  <input type=\"submit\" value=\"$l_see_archived_invoices\" />
-         </td></tr>
-        </table>
-       </form>
-    ";
-  }
 
   return $block;
 }

@@ -9,8 +9,6 @@
 
 // Labels et textes
 $l_archive = "Archive";
-$l_contract = "Contrat";
-$l_company = "Société";
 $l_contract_contracttype = "Type";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Date Expiration Après";
@@ -21,8 +19,6 @@ $l_incident_list = "Liste des incidents";
 $l_incident_new = "Ajouter un incident";
 
 $l_contract_select_deal = "Sélection de l'Affaire liée au contrat.";
-$l_deal = "Affaire";
-$l_label = "Label";
 $l_label_libelle = "Mot-clef du libellé";
 $l_kind = "Type";
 $l_marketing_manager = "Resp Commercial";

@@ -50,12 +50,12 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "todo_id") {
     $t_id = $OD->data_set->f("todo_id");
-
     $res["popup"] = true;
     $res["popup_width"] = 700;
     $res["popup_height"] = 260;
     $res["url"] = "todo_index.php?action=update&amp;param_todo=$t_id&amp;popup=1";
     $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\" alt=\"\" />";
+    $res["txt_name"] = " ";
   }
 
   return $res;

@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_settings = "Settings";
 $l_cur_settings = "Your actual Setup";
 $l_auto_display = "Automatic listing display";
 $l_submit = "Validate";

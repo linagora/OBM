@@ -9,21 +9,14 @@
 
 // Labels et textes
 // payment only stuff
-$l_label = "Label";
 $l_label_start = "Début du Label";
-$l_number = "Numéro";
 $l_amount = "Montant"; 
-$l_comment = "Commentaire";
-$l_date = "Date";
 $l_expected_date = "Date Prévisionnelle";
 $l_date_apres = "Ayant la date après";
 $l_date_avant = "Ayant la date avant";
-$l_account = "Compte";
 $l_type = "Type du Paiement";
 $l_inout = "Type";
 $l_both = "Both"; 
-$l_client = "Client";
-$l_fournisseur = "Fournisseur";
 $l_pick_paymentkind = "Choisissez un type de Paiement";
 $l_kind = "Type";
 $l_pick_account = "Choisissez un Compte";
@@ -49,11 +42,8 @@ $l_invoice_inout = "Type";
 $l_invoice_paid = "Montant déjà payé";
 $l_already_used_share = "Montant du paiement déjà utilisé ";
 $l_invoice_company = "reliée à la Companie" ;
-$l_deal = "Affaire";
-$l_company = "Société";
 
 // Titres 
-$l_payment = "Paiement";
 $l_payment_infos = "Informations concernant le Paiement";
 $l_entrytemp_date = "Date";
 $l_entrytemp_type = "Type";

@@ -16,7 +16,6 @@ $l_taskdate="Data Operazione";
 $l_tasktype = "Tipo Operazione";
 $l_project = "Progetto:";
 $l_task_del="Elimina?";
-$l_company = "Azienda";
 $l_delete = "Elimina  Operazioni";
 $l_length="Durata";
 $l_total_length="Durata totale";
@@ -39,7 +38,6 @@ $l_week_prev = "Settimana precedente";
 $l_week_next = "Prossima settimana";
 $l_date = "Data:";
 $l_task = "Operazione:";
-$l_label = "Etichetta:";
 $l_duration = "Durata:";
 
 // Titres

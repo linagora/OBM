@@ -7,8 +7,6 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_todo = "A faire";
-$l_user = "Utilisateur";
 $l_author = "Auteur";
 $l_date = "Date de saisie";
 $l_deadline = "Date limite";

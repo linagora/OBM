@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : user.inc                                                 //
@@ -20,9 +20,6 @@ $l_perms_admin = "Administrador";
 $l_check_usercreate = " entradas que pertenecen a este usuario.";
 $l_check_userupdate = " últimas entradas actualizadas por este usuario. ";
 $l_no_user = "No hay campos de usuarios en esta tabla";
-
-// Titres
-$l_user = "Usuario";
 
 // Actions
 $l_insert = "Ingresar Usuario";

@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Société";
 $l_tasktype = "Catégorie";
 $l_task = "Tâche";
 $l_soldtime = "Temps vendu";
@@ -38,10 +37,8 @@ $l_total = "Total";
 $l_resume = "Résumé";
 $l_tasks = "tâches";
 $l_members = "participants";
-$l_deal = "Affaire";
 
 // Titres
-$l_project = "Projet";
 $l_members_info = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
@@ -93,7 +90,6 @@ $l_allocate_update_ok = "La mise à jour des affectations a été correctement effe
 $l_allocate_update_error = "La mise à jour des affectations a échoué !";
 $l_progress_update_ok = "La mise à jour des avancements a été correctement effectuée";
 $l_progress_update_error = "La mise à jour des avancements a échoué !";
-$l_query_error = "Problème en executant la requete";
 $l_del_member_sel = "Enlever ces participants";
 $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";

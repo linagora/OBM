@@ -8,27 +8,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-
-$l_label = "Label";
 $l_label_start = "Label start";
-$l_number = "Number";
 $l_amount = "Amount"; 
-$l_comment = "Comment";
-$l_date = "Date";
 $l_expected_date = "Expected Date";
 $l_date_apres = "Date After";
 $l_date_avant = "Date Before";
-$l_account = "Account";
 $l_type = "Kind";
 $l_inout = "Kind";
 $l_both = "Both"; 
-$l_client = "Customer";
-$l_fournisseur = "Supplier";
 $l_pick_paymentkind = "choose a payment kind";
 $l_kind = "Kind";
 $l_pick_account = "choose an account";
 $l_payment_account = "Account ";
-$l_account = "Account" ; 
 $l_status = "Status";
 $l_paid = "Paid";
 $l_unpaid = "Not Paid";
@@ -43,8 +34,7 @@ $l_invoice_share = "Share affected";
 $l_invoice_inout = "Invoice Kind";
 $l_invoice_paid = "Paid TTC Amount";
 $l_already_used_share = "Part of the Payment already used ";
-// Titres
-$l_payment = "Payment";
+
 $l_payment_infos = "Informations about the payment ";
 
 // Actions 

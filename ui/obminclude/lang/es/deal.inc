@@ -8,13 +8,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Número";
-$l_label = "Referencia";
 $l_date_init = "Fecha de inicio";
 $l_parentdeal="Negocio original (Padre)";
 $l_kind = "Tipo";
-$l_company = "Compañía";
-$l_contact = "Contacto";
 $l_marketing_manager = "Gerente de Mercadeo";
 $l_technical_manager = "Gerente Técnico";
 $l_date_proposal = "Fecha de Propuesta";
@@ -23,7 +19,6 @@ $l_hitrate = "Rata de Exito";
 $l_state = "Estado";
 $l_date_alarm = "Fecha de Alarma";
 $l_date_comment = "Fecha de Comentario";
-$l_todo = "Tareas";
 
 // Labels and texts
 $l_infos = "Información";
@@ -70,8 +65,6 @@ $l_invoice_date = "Fecha";
 $l_add_contrat = "Adicionar un contrato";
 $l_contract_new = "Nuevo contrato";
 
-// Titles
-$l_deal = "Negocio";
 $l_parentdeal_deals = "Negocios pertenecientes a este Negocio Original(Padre)";
 
 // Actions

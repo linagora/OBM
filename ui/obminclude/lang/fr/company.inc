@@ -47,9 +47,6 @@ $l_naf_label = "Label";
 $l_naf_code = "Code";
 $l_naf_istitle = "Est un titre";
 
-// Titres
-$l_company = "Société";
-
 // Actions
 $l_add = "Ajouter";
 $l_insert = "Enregistrer la Société";

@@ -31,6 +31,7 @@ $l_archive_first = "Arch";
 $l_date = "Fecha";
 $l_name = "Nombre";
 $l_label = "Referencia";
+$l_number = "Número";
 $l_invalid_data = "Datos Inválidos";
 $l_error_permission = "Ud. NO tiene permitido ejecutar esta acción";
 $l_error_visibility = "Ud. NO puede tiene acceso a esta información, es privada.";
@@ -48,8 +49,28 @@ $l_visibility = "Acceso";
 $l_private = "Privado";
 $l_public = "Publico";
 $l_manager = "Gerente";
+$l_client = "Cliente";
+$l_supplier = "Proveedor";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
+
+// Entities
+$l_company = "Compañía";
+$l_contact = "Contacto";
+$l_deal = "Negocio";
+$l_list = "Lista";
+$l_todo = "Tareaa";
+$l_publication = "Publication";
+$l_project = "Proyecto";
+$l_contract = "Contrato";
+$l_incident = "Incidente";
+$l_document = "Documento";
+$l_account = "Cuenta";
+$l_invoice = "Factura";
+$l_payment = "Pago";
+$l_user = "Usuario";
+$l_group = "Grupo";
+$l_settings = "Opciones";
 
 // OBM_DISPLAY
 $l_entries = "Entradas";

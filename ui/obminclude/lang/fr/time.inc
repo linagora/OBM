@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : time.inc                                                 //
@@ -9,9 +9,7 @@
 
 // Database fields
 $l_date_task="Date";
-$l_project = "Projet";
 $l_task_del="Suppr";
-$l_company = "Société";
 $l_delete = "Supprimer les tâches";
 $l_length="Durée";
 $l_total = "Total";

@@ -8,14 +8,11 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label = "Etichetta";
 $l_label_start = "Inizio Etichetta";
 $l_bank = "Banca";
-$l_number = "Numero";
 $l_balance = "Saldo";
 $l_initial_balance = "Creazione Saldo";
 $l_choose_balance_date = "Data Saldo";
-$l_date = "Data";
 $l_expected_date = "Data Prevista";
 $l_amount = "Totale";
 
@@ -28,8 +25,6 @@ $l_nb_expected_used = " operazioni previste per il calcolo.";
 $l_expected = "previsto";
 $l_used_payments = "Pagamenti Considerati nel conteggio del saldo ";
 $l_used_expected_payments = "Pagameni previsti usati nel calcolo del saldo";
-// Titres
-$l_account = "Account";
 
 // Actions
 $l_insert= "Inserisci Account";

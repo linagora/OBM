@@ -61,8 +61,12 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "company_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-    else $res["name"] = "&nbsp;";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if (($fieldname == "company_email") && $link_ok) {
@@ -70,6 +74,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     if (strcmp($email,"") != 0) {
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+      $res["txt_name"] = $email;
     }
   }
 
@@ -88,6 +93,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["popup_width"] = 800;
       $res["popup_height"] = 600;
       $res["name"] = "<img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" />";
+      $res["txt_name"] = $web;
     }
   }
 
@@ -103,12 +109,13 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
     $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id");
     $res["name"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
+    $res["txt_name"] = " ";
   }
 
   else if ($fieldname == "company_deal_number") {
     $res["name"] = $OD->data_set->f("company_deal_number") . " / ";
     $res["name"] .= $OD->data_set->f("company_deal_total");
-    $res["txt_name"] .= $res["name"];
+
     $c_id = $OD->data_set->f("company_id");
     if (($res["name"] != "0 / 0") && $link_ok) {
       $res["url"] = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";

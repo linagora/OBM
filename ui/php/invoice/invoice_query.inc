@@ -134,9 +134,15 @@ function run_query_detail($p_invoice_id) {
       $timecreate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
-      sum(paymentinvoice_amount) as invoice_paid
+      company_name,
+      deal_label,
+      project_name,
+      sum(payment_amount) as invoice_paid
     from Invoice
-      left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
+      left join Company on invoice_company_id=company_id
+      left join Deal on invoice_deal_id=deal_id
+      left join Project on invoice_project_id=project_id
+      left outer join Payment on invoice_id=payment_invoice_id
       left join UserObm as c on invoice_usercreate=c.userobm_id
       left join UserObm as u on invoice_userupdate=u.userobm_id
     where invoice_id='$p_invoice_id'
@@ -294,7 +300,7 @@ function run_query_invoicestatus() {
 // ie. lines having paymetinvoice_amoount != 0.0
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_invoice_payment ($p_invoice, $not_paid=0) {
-  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;

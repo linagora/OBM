@@ -1004,10 +1004,10 @@ CREATE TABLE  Payment (
   payment_label           varchar(40) NOT NULL DEFAULT '',
   payment_paymentkind_id  int(8),
   payment_account_id      int(8),
-  payment_comment         text,
   payment_inout           char(1) NOT NULL,
   payment_paid            char(1) NOT NULL DEFAULT '0',
   payment_checked         char(1) NOT NULL DEFAULT '0',
+  payment_comment         text,
   PRIMARY KEY (payment_id)
 );
 

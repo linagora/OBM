@@ -34,10 +34,10 @@ $l_auto_sub = "Abonnement automatique";
 $l_contact_category1 = "Categorie contact 1";
 
 // Titres
-$l_publication = "Publication";
 $l_publication_orig = "Publication d'origine";
 $l_publication_dest = "Publication destination";
 $l_subscription = "Abonnement";
+
 // Actions
 $l_insert = "Enregistrer la Publication";
 $l_update = "Modifier la Publication";

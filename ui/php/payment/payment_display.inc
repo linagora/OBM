@@ -79,6 +79,7 @@ function dis_data_payment(&$OD, $fieldname, $link_ok) {
       $couleur = $col_frs;
     }
     $res["name"] = "<font color=\"#$couleur\">$amount</font>";
+    $res["txt_name"] = $amount;
   }
   
   else if ($fieldname == "payment_date") {
@@ -107,7 +108,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   global $display;
   global $l_insert, $l_update, $l_delete, $l_bank, $l_add_invoices;
   global $l_label, $l_amount, $l_type, $l_date, $l_expected_date;
-  global $l_number, $l_comment, $l_inout, $l_client, $l_fournisseur;
+  global $l_number, $l_comment, $l_inout, $l_client, $l_supplier;
   global $l_account, $l_pick_paymentkind, $l_pick_account;
 
   // we use those vars to skip tests on the action value
@@ -180,7 +181,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
 
   $rd_type = "
     <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck $readonly/>$l_client &nbsp;
-    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck $readonly/>$l_fournisseur &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck $readonly/>$l_supplier &nbsp;
     ";
 
   // various form actions :
@@ -347,7 +348,7 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   // 	$block .= " checked";
   //       }
   //     }
-  //     $block .= " $readonly>$l_fournisseur &nbsp;
+  //     $block .= " $readonly>$l_supplier &nbsp;
   //       </td></tr>";
   //   }
   //   if (($p_action != "new" && ($p_action != "new_with_invoices"))) {
@@ -413,7 +414,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   global $l_label_start, $l_number, $l_amount, $l_date_apres;
   global $l_date_avant, $l_inout, $l_kind, $l_account;
   global $l_deal, $l_company, $l_include_checked;
-  global $l_find, $l_all, $l_both, $l_client, $l_fournisseur;
+  global $l_find, $l_all, $l_both, $l_client, $l_supplier;
   global $l_status, $l_paid, $l_unpaid;
   global $cellspacing,$border;
 
@@ -438,7 +439,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   $rd_inout = "
     <input type=\"radio\" name=\"rd_inout\" value=\"$c_all\" $bcheck />$l_both &nbsp;
     <input type=\"radio\" name=\"rd_inout\" value=\"+\" $pcheck />$l_client &nbsp;
-    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />$l_fournisseur &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"-\" $mcheck />$l_supplier &nbsp;
     ";
 
   // Paid
@@ -592,7 +593,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   //   if ($inout == "-"){
   //     $block .= "checked";
   //   }
-  //   $block .= ">$l_fournisseur &nbsp;
+  //   $block .= ">$l_supplier &nbsp;
   //         </td></tr>";
   //   // Paid or unpaid payments ?
   //   $block .= "

@@ -7,10 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_todo = "Todo";
-$l_user = "User";
 $l_author = "Author";
-$l_date = " Date";
 $l_deadline = "Deadline";
 $l_todotitle = "Title";
 $l_content = "Content";

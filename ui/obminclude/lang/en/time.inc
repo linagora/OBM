@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : time.inc                                                 //
@@ -8,10 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_date_task="Task date";
-$l_project = "Project";
-$l_task_del="Remove ?";
-$l_company = "Company";
+$l_date_task = "Task date";
+$l_task_del = "Remove ?";
 $l_delete = "Remove Tasks";
 $l_length="Duration";
 $l_total="Total";
@@ -27,7 +25,6 @@ $l_to = "to";
 $l_week="Week";
 $l_month="Month";
 $l_month2=" ";
-$l_user="User";
 $l_see = "See";
 $l_valid = "Validation";
 $l_unvalid = "Cancel";
@@ -37,7 +34,6 @@ $l_fill= "Fill";
 $l_intern = "Intern";
 
 $l_task = "Task";
-$l_label = "Label";
 $l_duration = "Duration";
 
 $l_searchtime_display = "Display options for tasks list";

@@ -40,20 +40,22 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "project_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-    else $res["name"] = "&nbsp;";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "project_datebegin") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = date_format($date);
-    $res["txt_name"] = $res["name"];
   }
 
   else if ($fieldname == "project_dateend") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = date_format($date);
-    $res["txt_name"] = $res["name"];
   }
 
   return $res;

@@ -18,7 +18,6 @@ $l_date_last_update = "Last update";
 $l_static = "Static";
 
 // Labels and texts
-$l_list = "List";
 $l_nb_contact = "# contacts";
 $l_list_contact = "Having as contact";
 $l_list_display = "Display options for Lists list";
@@ -43,15 +42,12 @@ $l_mailing = "Mailing enabled only";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_function = "Function";
-$l_company = "Company";
 $l_service = "Service";
 $l_hphone = "Home phone";
-$l_contact = "Contact";
 $l_status = "Status";
 $l_letter = "L. Head";
 
 //Publication
-$l_publication = "Publication";
 $l_title = "Title";
 $l_year = "Year";
 $l_quantity = "Quantity";

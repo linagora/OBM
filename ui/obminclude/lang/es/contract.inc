@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : contract.inc                                             //
@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_contract = "Contrato";
-$l_company = "Compañía";
 $l_contract_contracttype = "Tipo de contrato";
 $l_contract_exp = "Expiración";
 $l_date_alarm_after = "Antes de Fecha de vencimiento";
@@ -20,8 +18,6 @@ $l_incident_list = "Lista de  incidentes";
 $l_incident_new = "Adicione un nuevo incidente";
 
 $l_contract_select_deal = "Seleccionar el Negocio.";
-$l_deal = "Negocio";
-$l_label = "Referencia";
 $l_label_libelle = "Palabra clave de la Referencia";
 $l_kind = "Tipo";
 $l_marketing_manager = "Gerente de Mercadeo";
@@ -32,7 +28,6 @@ $l_date_init = "Fecha de Inicio";
 $l_dateexp = "Fecha Final";
 $l_last_update = "Última actualización";
 $l_at = "a las";
-$l_number = "Número";
 
 // Actions
 $l_insert = "Ingresar el contrato";

@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_label = "Label";
 $l_status = "Etat";
 $l_date = "Date";
 $l_logger = "Récepteur";
@@ -17,18 +16,14 @@ $l_duration = "Durée de résolution";
 $l_description = "Description";
 $l_solution = "Solution apportée";
 $l_num = "Numéro de Contrat";
-$l_contract = "Contrat";
 $l_to = "Au"; 
 $l_from = "Du";
-$l_manager = "Responsable";
 $l_client_manager = "Responsable Client";
 $l_date_before ="Date Avant";
 $l_date_after ="Date Après";
 $l_archive_new = "Archiver";
 $l_archive = "Voir les archives";
 $l_archive_consult = "Archivé";
-$l_company = "Société";
-$l_incident = "Incident";
 
 $l_pri_manage = "Gestion des priorités d'incident";
 $l_pri_exist = "Priorités existantes";

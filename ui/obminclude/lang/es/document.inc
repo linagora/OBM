@@ -20,7 +20,6 @@ $l_cat2_delete =  "Borrar";
 $l_category1 = "Categoría 1";
 $l_category2 = "Categoría 2";
 $l_createtime = "Crear tiempo";
-$l_document = "Manejo de Documentos";
 $l_extension = "Extensión";
 $l_file = "Archivo";
 $l_mime_label = "Referencia : ";

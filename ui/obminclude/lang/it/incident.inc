@@ -8,26 +8,21 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_label = "Etichetta";
 $l_status = "Stato";
-$l_date = "Data";
 $l_owner = "Possessore";
 $l_logger = "Resp. Tecnico";
 $l_duration = "Durata";
 $l_description = "Descrizione";
 $l_solution = "Solutione trovata";
 $l_num = "Numero del Contratto ";
-$l_contract = "Etichetta del Contratto";
 $l_date_before ="Data Precedente";
 $l_date_after ="Data Seguente";
 $l_to = "A";
 $l_from = "Da";
-$l_manager = "Responsabile";
 $l_client_manager = "Responsabile Clienti";
 $l_lastupdate = "Data ultima modifica";
 $l_archive_new = "In Archivio";
 $l_archive_consult = "Archiviato";
-$l_company = "Azienda";
 
 // Title
 $l_redhot = "Redhot";

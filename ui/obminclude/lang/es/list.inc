@@ -18,7 +18,6 @@ $l_date_last_update = "Última actualización";
 $l_static = "Estáticos";
 
 // Labels and texts
-$l_list = "Lista";
 $l_nb_contact = "Número del contacto";
 $l_list_contact = "Tiene un contacto";
 $l_list_display = "Opciones de despliegue para listas de Listas";
@@ -33,9 +32,7 @@ $l_select_list = "Seleccione la lista a exportar";
 $l_lastname = "Apellido";
 $l_firstname = "Nombre";
 $l_function = "Puesto";
-$l_company = "Compañía";
 $l_hphone = "Teléfono Casa";
-$l_town = "Ciudad";
 
 // Actions
 $l_insert = "Ingresar lista";

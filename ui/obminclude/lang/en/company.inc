@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Number";
 $l_aka = "Also known as";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
@@ -45,9 +44,6 @@ $l_naf_new = "New Code";
 $l_naf_label = "Label";
 $l_naf_code = "Code";
 $l_naf_istitle = "Is title";
-
-// Titres
-$l_company = "Company";
 
 // Actions
 $l_add = "Add";

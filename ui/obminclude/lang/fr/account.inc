@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : account.inc                                              //
@@ -8,18 +8,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label = "Label";
 $l_label_start = "Début du Label";
 $l_bank = "Banque"; 
 $l_number = "Numéro";
 $l_balance = "Solde";
 $l_initial_balance = "Solde Initial";
-$l_comment = "Commentaire";
 $l_choose_balance_date = "Date de calcul du Solde";
-$l_date = "Date";
 $l_expected_date = "Date Prévisionnelle";
 $l_amount = "Montant";
-
 
 $l_include_expected = "Inclure les opérations prévisionnelles ?";
 $l_in_total ="Total des entrées";
@@ -34,11 +30,8 @@ $l_expected_payments = "Paiements prévisionnels";
 $l_payments = "Paiements";
 $l_totals = "Totaux";
 
-// Titres
-$l_account = "Comptes";
-
 // Actions
-$l_insert= "Insérer le Compte";
+$l_insert = "Insérer le Compte";
 $l_update = "Mettre à jour le Compte";
 $l_delete = "Supprimer le Compte";
 $l_delete_confirm = "Etes vous sur de vouloir supprimer ce Compte ?";
@@ -46,7 +39,7 @@ $l_compute_balance = "Calculer le solde";
 
 // Messages 
 $l_no_display = "Remplissez les critères de recherche et appuyez sur <$l_find> pour lancer la recherche";
-$l_found="Compte(s) trouvé(s).";
+$l_found = "Compte(s) trouvé(s).";
 $l_no_found="Aucun Compte ne correspond à votre requête";
 $l_delete_ok = "Le compte a bien été supprimé.";
 $l_delete_error = "La suppression du compte a échoué !";

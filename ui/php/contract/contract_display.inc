@@ -54,13 +54,16 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "contract_dateexp") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = date_format($date);
-    $res["txt_name"] = $res["name"];
   }
 
  else if ($fieldname == "contract_archive") {
     $res["align"] = "center";
-    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-    else $res["name"] = "&nbsp;";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   return $res;

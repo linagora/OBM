@@ -8,16 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_label = "Label";
 $l_status = "Status";
-$l_date = "Date";
 $l_owner = "Owner";
 $l_logger = "Technical manager";
 $l_duration = "Resolution duration";
 $l_description = "Description";
 $l_solution = "Solution founded";
 $l_num = "Number";
-$l_contract = "Contract";
 $l_date_before ="Date Before";
 $l_date_after ="Date After";
 $l_to = "To"; 
@@ -28,8 +25,6 @@ $l_lastupdate = "Date of last update";
 $l_archive_new = "To File";
 $l_archive = "Archives";
 $l_archive_consult = "Filed";
-$l_company = "Company";
-$l_incident = "Incident";
 
 $l_pri_manage = "Incident Priority Management";
 $l_pri_exist = "Existing Priorities";

@@ -20,19 +20,11 @@ $fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
 $fieldnames["invoice_status"] = $l_status;
 $fieldnames["invoice_date"] = $l_date;
 $fieldnames["invoice_paid"] = $l_paid;
-$fieldnames["deal_label"] = $l_invoice_deal_label;
-$fieldnames["deal_number"] = $l_invoice_deal_number;
-$fieldnames["tasktype_label"] = $l_invoice_deal_category_label;
-$fieldnames["deal_company_name"] = $l_invoice_company;
-$fieldnames["deal_todo"] = $l_invoice_dealtodo;
-$fieldnames["dealtype_label"] = $l_invoice_dealtype_label;
-$fieldnames["dealstatus_label"] = $l_invoice_dealstatus ;
-$fieldnames["deal_datealarm"] = $l_invoice_deal_datealarm;
-$fieldnames["payment_label"] = $l_invoice_payment_label;
-$fieldnames["payment_number"] = $l_invoice_payment_number;
-$fieldnames["payment_expect_date"] = $l_invoice_payment_expect_date;
-$fieldnames["payment_date"] = $l_invoice_payment_date;
-$fieldnames["payment_amount"] = $l_invoice_payment_amount;
+$fieldnames["payment_label"] = $l_label;
+$fieldnames["payment_number"] = $l_number;
+$fieldnames["payment_expect_date"] = $l_expected_date;
+$fieldnames["payment_date"] = $l_date;
+$fieldnames["payment_amount"] = $l_amount;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -78,6 +70,14 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
 
   else if ($fieldname == "invoice_date") {
     $res["name"] = date_format($OD->data_set->f("date"));
+  }
+
+  else if ($fieldname == "payment_date") {
+    $res["name"] = date_format($OD->data_set->f("payment_date"));
+  }
+
+  else if ($fieldname == "payment_expect_date") {
+    $res["name"] = date_format($OD->data_set->f("payment_expect_date"));
   }
 
   return $res;
@@ -372,63 +372,85 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
 }
 
 
-/////////////////////////////////////////////////////////////////////////////
-// Displays an invoice details :
-/////////////////////////////////////////////////////////////////////////////
-function dis_invoice_detail ($inv_q){
+//////////////////////////////////////////////////////////////////////////////
+// XHTML Display invoice detail info part
+//////////////////////////////////////////////////////////////////////////////
+function dis_invoice_detail($inv_q) {
   global $display;
-  global $l_update, $l_comment,$l_amount_ht, $l_amount_ttc, $l_status;
-  global $l_date, $l_label, $l_number, $l_inout, $l_supplier;
-  global $l_client, $l_duplicate, $l_invoice, $l_geninvoice;
+  global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
+  global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
+  global $l_status, $l_comment, $l_invoice, $l_geninvoice;
 
   $label = $inv_q->f("invoice_label");
   $num = $inv_q->f("invoice_number");
   $date = date_format($inv_q->f("date"));
   $status = $inv_q->f("invoicestatus_label");
   $inout = ($inv_q->f("invoice_inout")=='-') ? $l_supplier : $l_client;
+  $title = $inout;
   $ht = $inv_q->f("invoice_amount_ht");
   $ttc = $inv_q->f("invoice_amount_ttc");
   $comment = nl2br($inv_q->f("invoice_comment"));
+  $company = $inv_q->f("company_name");
+  $deal = $inv_q->f("deal_label");
+  $project = $inv_q->f("project_name");
 
   $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
 
   $block .= "
+    <div class=\"detailHead\">$title</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_company</td>
+      <td class=\"detailText\">$company</td>
+    </tr>
+    <tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_deal</td>
+      <td class=\"detailText\">$deal</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_project</td>
+      <td class=\"detailText\">$project</td>
+    </tr>
+    </table>
+ 
     <div class=\"detailHead\">$l_geninvoice</div>
 
     <table class=\"detail\">
-     <tr>
+    <tr>
       <td class=\"detailLabel\">$l_label</td>
       <td class=\"detailText\">$label</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       $dis_company
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailText\">$num</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailText\">$date</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_status</td>
       <td class=\"detailText\">$status</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_inout</td>
       <td class=\"detailText\">$inout</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_amount_ht</td>
       <td class=\"detailText\">$ht</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_amount_ttc</td>
       <td class=\"detailText\">$ttc</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_comment</td>
       <td class=\"detailText\">$comment</td>
-     </tr>
+    </tr>
     </table>";
 
   return $block;
@@ -473,7 +495,6 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   global $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_supplier;
   global $l_insert,$l_update, $l_delete, $l_invoice;
   global $default_invoice_numbering;
-  global $q_company;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
 
   if ($action == "new" && $p_deal_linked != "") 

@@ -1,4 +1,4 @@
-<SCRIPT LANGUAGE="PHP">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : incident.inc                                             //
@@ -8,27 +8,22 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Referencia
-$l_label = "Referencia";
 $l_priority = "Prioridad";
 $l_status = "Estado";
-$l_date = "Fecha";
 $l_logger = "Gerente Técnico";
 $l_owner = "Responsable";
 $l_duration = "Tiempo tomado para solución";
 $l_description = "Descripción";
 $l_solution = "Solución encontrada";
 $l_num = "Número";
-$l_contract = "Contracto";
 $l_to = "Para"; 
 $l_from = "De";
-$l_manager = "Gerente";
 $l_client_manager = "Gerente de Cliente";
 $l_date_before ="Fecha Anterior";
 $l_date_after ="Fecha Posterior";
 $l_archive_new = "Para archivar";
 $l_archive = "Archivos";
 $l_archive_consult = "Arhivado";
-$l_company = "Compañía";
 $l_incident = "Incidente";
 
 $l_pri_manage = "Manejo de Prioridad de Incidente";

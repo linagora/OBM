@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Azienda";
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_kind = "Tipo";
@@ -27,9 +26,6 @@ $l_contact_name = "Nome Contatto";
 $l_from_company = "Azienda";
 $l_telother = "Altro Tel";
 $l_contact_select_company = "Scegli l'azienda per il contatto.";
-
-// Titles
-$l_contact = "Contatto";
 
 // Actions
 $l_insert = "Inserisci Contatto ";

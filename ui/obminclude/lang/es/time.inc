@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : time.inc                                                 //
@@ -9,9 +9,7 @@
 
 // Database fields
 $l_date_task="Fecha de Tarea";
-$l_project = "Proyecto";
 $l_task_del="Borrar.";
-$l_company = "Compañía";
 $l_delete = "Borrar Tareas";
 $l_length="Duración";
 $l_total="Total";
@@ -37,7 +35,6 @@ $l_fill= "Llenar";
 $l_intern = "Interno";
 
 $l_task = "Tarea";
-$l_label = "Referencia";
 $l_duration = "Duración";
 
 $l_searchtime_display = "Opciones de despligue de lista de tareas";

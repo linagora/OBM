@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Company";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_kind = "Kind";
@@ -26,11 +25,9 @@ $l_mailing_ok = "Mailing enabled";
 $l_fax = "Fax";
 $l_coord = "Details";
 $l_code = "Code";
-$l_label = "Label";
 $l_letter = "Letter Head";
 $l_category1 = "Category 1";
 $l_category2 = "Category 2";
-$l_contact = "Contact";
 
 // Labels and texts
 $l_contact_name = "Contact Name";

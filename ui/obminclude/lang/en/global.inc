@@ -31,6 +31,7 @@ $l_archive_first = "Arc";
 $l_date = "Date";
 $l_name = "Name";
 $l_label = "Label";
+$l_number = "Number";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";
@@ -52,6 +53,26 @@ $l_visibility = "Access";
 $l_private = "Private";
 $l_public = "Public";
 $l_manager = "Manager";
+$l_client = "Customer";
+$l_supplier = "Supplier";
+
+// Entities
+$l_company = "Company";
+$l_contact = "Contact";
+$l_deal = "Deal";
+$l_list = "List";
+$l_publication = "Publication";
+$l_todo = "To Do";
+$l_project = "Project";
+$l_contract = "Contract";
+$l_incident = "Incident";
+$l_document = "Document";
+$l_account = "Account";
+$l_invoice = "Invoice";
+$l_payment = "Payment";
+$l_user = "User";
+$l_group = "Group";
+$l_settings = "Settings";
 
 // Global display
 $l_last_visit = "Bookmarks";

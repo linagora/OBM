@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_settings = "Configuration";
 $l_cur_settings = "Votre configuration actuelle";
 $l_auto_display = "Afficher les listes automatiquement";
 $l_cur_lang = "Votre langue actuelle";

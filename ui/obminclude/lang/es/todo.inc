@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : todo.inc                                                 //
@@ -7,8 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_todo = "Tarea";
-$l_user = "Usuario";
 $l_author = "Autor";
 $l_date = "Fecha";
 $l_deadline = "Fecha Final";

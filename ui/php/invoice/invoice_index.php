@@ -369,35 +369,6 @@ function get_invoice_action() {
     'Condition'=> array ('None') 
                                         );
 
-// Add Deal
-  $actions["INVOICE"]["add_deal"] = array (
-    'Name'     => $l_header_add_deal,
-    'Url'      => "$path/invoice/invoice_index.php?action=add_deal",
-    'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
-                                        );
-
-// Search Deal
-  $actions["INVOICE"]["search_deal"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=search_deal",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                        );
-
-// Add Deal Chosen
-  $actions["INVOICE"]["add_deal_chosen"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=add_deal_chosen",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                        );
-
-// Delete Deal 
-  $actions["INVOICE"]["del_deal"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=del_deal",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                        );
-
 // Delete
   $actions["INVOICE"]["delete"] = array (
     'Name'     => $l_header_delete,

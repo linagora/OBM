@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_document = "Gestione lettera";
 $l_document_new = "Nuovo documento";
 $l_document_insert = "Inserisci documento";
 $l_document_generate= "Crea documento Tex";

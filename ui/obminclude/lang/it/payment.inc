@@ -8,12 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-
-$l_label = "Etichetta";
 $l_label_start = "Etichetta inizio";
-$l_number = "Numero";
 $l_amount = "Importo";
-$l_date = "Data";
 $l_expected_date = "Scadenza";
 $l_date_apres = "Data Prima";
 $l_date_avant = "Data Dopo";
@@ -21,13 +17,10 @@ $l_account = "Account";
 $l_type = "Tipo";
 $l_inout = "Tipo";
 $l_both = "Entrambi";
-$l_client = "Cliente";
-$l_fournisseur = "Fornitore";
 $l_pick_paymentkind = "Scegli un tipo di pagamento";
 $l_kind = "Tipo";
 $l_pick_account = "Scegli un account";
 $l_payment_account = "Account ";
-$l_account = "Account" ;
 $l_status = "Status";
 $l_paid = "Pagato";
 $l_unpaid = "Non Pagato";
@@ -42,8 +35,7 @@ $l_invoice_share = "Share affected";
 $l_invoice_inout = "Tipo fattura";
 $l_invoice_paid = "Paid TTC Amount";
 $l_already_used_share = "Part of the Pagamento already used ";
-// Titres
-$l_payment = "Pagamenti";
+
 $l_payment_infos = "Informazioni sui pagamenti";
 
 // Actions

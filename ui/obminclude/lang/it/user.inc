@@ -20,10 +20,6 @@ $l_perms_admin = "Amministratore";
 $l_check_usercreate = " voci dell'utente.";
 $l_check_userupdate = " voci aggiornate dall'utente.";
 $l_no_user = "No campi utente nella tabella";
-$l_group = "Gruppo";
-
-// Titres
-$l_user = "Utente";
 $l_group_member = "dai gruppi";
 
 // Actions

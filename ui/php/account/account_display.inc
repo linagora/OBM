@@ -53,6 +53,7 @@ function dis_data_account(&$OD, $fieldname, $link_ok) {
       $couleur = $col_balance_neg;
     }
     $res["name"] = "<font color=\"#$couleur\">$balance</font>";
+    $res["txt_name"] = $balance;
   }
 
   elseif ($fieldname == "account_pay_label") {
@@ -68,6 +69,7 @@ function dis_data_account(&$OD, $fieldname, $link_ok) {
       $couleur = $col_balance_neg;
     }
     $res["name"] = "<font color=\"#$couleur\">$amount</font>";
+    $res["txt_name"] = $amount;
   }
 
   return $res;

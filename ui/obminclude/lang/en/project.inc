@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Company";
 $l_tasktype = "Category";
 $l_task = "Task";
 $l_soldtime = "Sold time";
@@ -37,10 +36,8 @@ $l_total = "Total";
 $l_resume = "Résumé";
 $l_tasks = "tasks";
 $l_members = "members";
-$l_deal = "Deal";
 
 // Titres
-$l_project = "Project";
 $l_members_info = "Project members";
 $l_progressinfos = "Progress evaluation : time (used / missing / projected)";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";

@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_company = "Société";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_kind = "Genre";
@@ -41,7 +40,6 @@ $l_code = "Code";
 $l_label = "Label";
 $l_category1 = "Categorie 1";
 $l_category2 = "Categorie 2";
-$l_contact = "Contact";
 $l_letter = "En-tête de Lettre";
 
 // Actions

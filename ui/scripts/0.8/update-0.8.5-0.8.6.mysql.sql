@@ -69,6 +69,7 @@ DROP Table IF EXISTS DealInvoice;
 -------------------------------------------------------------------------------
 -- Maintenance for old database which had different fields order
 ALTER TABLE Payment CHANGE COLUMN payment_usercreate payment_usercreate int(8) after payment_userupdate;
+ALTER TABLE Payment CHANGE COLUMN payment_comment payment_comment text after payment_checked;
 
 -- New columns
 ALTER TABLE Payment ADD COLUMN payment_invoice_id int(8) NOT NULL after payment_usercreate;

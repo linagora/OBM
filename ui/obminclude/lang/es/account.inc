@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : account.inc                                              //
@@ -8,18 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_label = "Referencia";
 $l_label_start = "Referencia de Inicio";
 $l_bank = "Banco"; 
-$l_number = "Número";
 $l_balance = "Balance";
 $l_initial_balance = "Balance de Creación";
-$l_comment = "Comentario";
 $l_choose_balance_date = "Fecha de Computo de Balance";
-$l_date = "Fecha";
 $l_expected_date = "Fecha Esperada";
 $l_amount = "Cantidad";
-
 
 $l_include_expected = "Incluir operaciones esperadas ?";
 $l_in_total ="Total Entrada";
@@ -34,11 +29,8 @@ $l_expected_payments = "Pagos esperados";
 $l_payments = "Pagos";
 $l_totals = "Totales";
 
-// Titres
-$l_account = "Cuenta";
-
 // Actions
-$l_insert= "Insertar Cuenta";
+$l_insert = "Insertar Cuenta";
 $l_update = "Actualizar Cuenta";
 $l_delete = "Borrar Cuenta";
 $l_delete_confirm = "Confirme la destrucción de esta cuenta?";

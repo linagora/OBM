@@ -31,6 +31,7 @@ $l_archive_first = "Arc";
 $l_date = "Date";
 $l_name = "Nom";
 $l_label = "Label";
+$l_number = "Numéro";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
@@ -52,8 +53,28 @@ $l_visibility = "Accès";
 $l_private = "Privé";
 $l_public = "Public";
 $l_manager = "Responsable";
+$l_client = "Client";
+$l_supplier = "Fournisseur";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
+
+// Entities
+$l_company = "Société";
+$l_contact = "Contact";
+$l_deal = "Affaire";
+$l_list = "Liste";
+$l_publication = "Publication";
+$l_todo = "A faire";
+$l_project = "Projet";
+$l_contract = "Contrat";
+$l_incident = "Incident";
+$l_document = "Document";
+$l_account = "Compte";
+$l_invoice = "Facture";
+$l_payment = "Paiement";
+$l_user = "Utilisateur";
+$l_group = "Groupe";
+$l_settings = "Configuration";
 
 // OBM_DISPLAY
 $l_entries = "Entrées";

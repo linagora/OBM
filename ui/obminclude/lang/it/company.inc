@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Numero";
 $l_aka = "Altri nome";
 $l_company_name = "Nome Azienda";
 $l_kind = "Tipo";
@@ -31,9 +30,6 @@ $l_act_manage = "Attività Gestione Azienda";
 $l_act_exist = "Attività esistente";
 $l_act_new = "Nuova Attività";
 $l_internal = "Interno";
-
-// Titres
-$l_company = "Azienda";
 
 // Actions
 $l_insert = "Inserisci Azienda";

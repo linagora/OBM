@@ -8,8 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_contract = "Contratto";
-$l_company = "Azienda";
 $l_contract_contracttype = "Tipo di contratto";
 $l_contract_exp = "Scadenza";
 $l_date_alarm_after = "Data Scadenza Dopo";
@@ -20,8 +18,6 @@ $l_incident_list = "Elenco degli eventi";
 $l_incident_new = "Aggiungi a nuovo evento";
 
 $l_contract_select_deal = "Scegli un affare per un contratto";
-$l_deal = "Impegno";
-$l_label = "Etichette";
 $l_label_libelle = "parola chiave etichetta";
 $l_kind = "Tipo";
 $l_marketing_manager = "Responsabile Marketing";
@@ -32,7 +28,6 @@ $l_date_init = "Data inizio";
 $l_dateexp = "Data scadenza ";
 $l_last_update = "Ultimo aggiornamento";
 $l_at = "a";
-$l_number = "Numero";
 
 $l_select_contract = "Scegli il contratto";
 

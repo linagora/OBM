@@ -9,26 +9,18 @@
 
 // Referencias et textes
 // invoice only
-$l_label = "Referencia";
 $l_label_start = "Inicio de Referencia";
-$l_number = "Número";
 $l_amount = "Cantidad";
 $l_geninvoice = "Características";
 $l_amount_ht = "Cantidad HT";
 $l_amount_ttc = "Cantidad TTC";
-$l_comment = "Comentario";
-$l_deal="Negocio";
-$l_company = "Compañía";
 $l_status="Estado";
-$l_date="Fecha";
 $l_date_apres = "Despues";
 $l_date_avant = "Antes";
 $l_paid = "Cantidad TTC pagado";
 $l_pick_deal = "Escoja un negocio";
 $l_inout = "Tipo";
 $l_both = "Ambos"; 
-$l_client = "Cliente";
-$l_supplier = "Proveedor";
 $l_tax_rate="tasa de impuestos";
 $l_compute_tax="calcule total impuestos";
 $l_include_archive="archivos incluidos";
@@ -37,34 +29,11 @@ $l_archive_update="actualizaciones de archivos";
 $l_archive_ok="facturas archivadas exitosamente";
 $l_archive_number=" facturas archivadas";
 
-// deal
-$l_no_deal = "no hay negocios relacionados con esta factura";
-$l_list_deal = "negocios relacionados con esta factura";
-$l_invoice_deal_company ="vinculado a compañía";
-$l_invoice_deal_label = "Referencia del Negocio";
-$l_invoice_deal_number = "Negocio Número";
-$l_invoice_deal_category_label = "Categoría del Negocio";
-$l_invoice_company = "Compañía del Negocio";
-$l_invoice_dealtodo = "Tareas del Negocio";
-$l_invoice_deal_archive = "Incluir los archivos ?";
-$l_invoice_dealtype_label = "tipo de negocio";
-$l_invoice_dealstatus = "estado del negocio";
-$l_invoice_deal_datealarm = "fecha de alarma del negocio";
-$l_no_deals_related_error = "No puede ingresar pagos a esta factura porque no tiene negocios relacionados.";
-$l_last_deal_remove_error = "No puede borrar mas negocios: permanece solo uno relacionado a esta factura, y aun existen pagos .. <br>
-	Borre primero los pagos.";
-
 //payment
 $l_no_payment = "no hay pagos relacionados con esta factura";
 $l_list_payment = "pagos  relacionados con esta factura";
-$l_invoice_payment_label = "Referencia del Pago";
-$l_invoice_payment_number = "Pago Número";
-$l_invoice_payment_date = "Fecha del Pago";
-$l_invoice_payment_amount = "Monto del Pago";
-$l_invoice_payment_expect_date="fecha de pago esperado";
 
 // Titres
-$l_invoice = "Factura";
 $l_invoice_infos = "Información de la factura";
 $l_remaining_amount = "Cantidad no usada";
 $l_to_use_amount = "Cantidad para afectar esta factura";

@@ -9,21 +9,14 @@
 
 // Referencias et textes
 // payment only stuff
-$l_label = "Referencia";
 $l_label_start = "Inicio de Referencia";
-$l_number = "Número";
 $l_amount = "Cantidad"; 
-$l_comment = "Comentario";
-$l_date = "Fecha";
 $l_expected_date = "Fecha Esperada";
 $l_date_apres = "Fecha Posterior";
 $l_date_avant = "Fecha Anterior";
-$l_account = "Cuenta";
 $l_type = "Tipo";
 $l_inout = "Tipo";
 $l_both = "Ambos"; 
-$l_client = "Cliente";
-$l_fournisseur = "Proveedor";
 $l_pick_paymentkind = "escoja un tipo de pago";
 $l_kind = "Tipo";
 $l_pick_account = "escoja una cuenta";
@@ -49,11 +42,8 @@ $l_invoice_inout = "Tipo Factura";
 $l_invoice_paid = "Cantidad TTC cancelada";
 $l_already_used_share = "Parte del pago ya usada ";
 $l_invoice_company = "relacionar a la compañía" ;
-$l_deal = "Negocio";
-$l_company = "Compañía";
 
 // Titres 
-$l_payment = "Pago";
 $l_payment_infos = "Información acerca de los pagos ";
 $l_entrytemp_date = "Fecha";
 $l_entrytemp_type = "Tipo";
