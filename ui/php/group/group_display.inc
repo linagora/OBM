@@ -110,7 +110,7 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group search Form                                                 //
+// Display Group search Form
 // Parameters : 
 //   - $group[]   : default form values
 //     keys used  : name, user
@@ -177,7 +177,7 @@ function html_group_search_form ($group) {
       <input name=\"tf_user\" size=\"16\" maxlength=\"16\" value=\"$user\" />
     </div>
     <div class=\"searchLabel\">$l_email<br />
-      <input name=\"tf_email\" size=\"20\" maxlength=\"20\" value=\"$email\" />
+      <input name=\"tf_email\" size=\"24\" maxlength=\"64\" value=\"$email\" />
     </div>
     <div class=\"searchLabel\">$l_visibility<br />
       $sel_privacy

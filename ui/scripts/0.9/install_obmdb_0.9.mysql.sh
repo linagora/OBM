@@ -57,5 +57,5 @@ echo "Update calculated values"
 $PHP ../../php/admin_data/admin_data_index.php -a data_update
 
 # Update phonetics ans approximative searches
-echo "Update phonetics ans approximative searches"
+echo "Update phonetics and approximative searches"
 $PHP ../../php/admin_data/admin_data_index.php -a sound_aka_update

@@ -113,27 +113,27 @@ INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label)
 --
 -- Dumping data for table 'TaskType'
 --
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (1,'Development',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (2,'Support / Assistance',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (3,'Learning course',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (4,'Studies',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (5,'Network / Integration',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (6,'Graphics',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (7,'Others',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (8,'Hosting',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (9,'Hardware',0);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (11,'Before selling',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (12,'Support making',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (13,'Internal development',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (14,'Internal project',1);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (15,'Self formation',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (16,'Contract garanty',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17,'Miscellaneaous(direction,others)',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Holydays,...',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Outgoings',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Graphics/Communication',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (21,'Administrative',2);
-INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22,'Meetings',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Development',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Support / Assistance',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Learning course',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Studies',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Network / Integration',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Graphics',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Others',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Hosting',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Hardware',0);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Before selling',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Support making',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Internal development',1);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Internal project',1);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Self formation',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Contract garanty',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Miscellaneaous(direction,others)',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Holydays,...',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Outgoings',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Graphics/Communication',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Administrative',2);
+INSERT INTO TaskType (tasktype_label, tasktype_internal) VALUES ('Meetings',2);
 
 
 --
@@ -145,47 +145,47 @@ INSERT INTO Document (document_title, document_name, document_kind, document_pri
 --
 -- Dumping data for table 'DocumentCategory1'
 --
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (1,'Others');
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (2,'Quotation');
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (3,'Propal');
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (4,'Documentation');
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (5,'Contract');
-INSERT INTO DocumentCategory1 (documentcategory1_id,documentcategory1_label) VALUES (6,'CR');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Others');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Quotation');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Propal');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Documentation');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('Contract');
+INSERT INTO DocumentCategory1 (documentcategory1_label) VALUES ('CR');
 
 
 --
 -- Dumping data for table 'DocumentCategory2'
 --
-INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (1,'Internal');
-INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (2,'Tradesman');
-INSERT INTO DocumentCategory2 (documentcategory2_id,documentcategory2_label) VALUES (3,'Customers');
+INSERT INTO DocumentCategory2 (documentcategory2_label) VALUES ('Internal');
+INSERT INTO DocumentCategory2 (documentcategory2_label) VALUES ('Tradesman');
+INSERT INTO DocumentCategory2 (documentcategory2_label) VALUES ('Customers');
 
 
 --
 -- Dumping data for table 'DocumentMimeType'
 --
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (1,'Html File','html','text/html');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (2,'PNG Image','png','image/png');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (3,'Gif Image','gif','image/gif');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (4,'JPG Image','JPG','image/jpg');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (5,'PDF File','pdf','application/pdf');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (6,'Excel File','xls','application/vnd.ms-excel');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (7,'Text File','txt','text/plain');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (8,'Word File','doc','application/msword');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (9,'Binary File','exe','application/octet-stream');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (10,'PowerPoint File','ppt','application/vnd.ms-powerpoint');
-INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
-VALUES (11,'CSV File','csv','text/c-xsv');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Html File','html','text/html');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('PNG Image','png','image/png');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Gif Image','gif','image/gif');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('JPG Image','JPG','image/jpg');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('PDF File','pdf','application/pdf');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Excel File','xls','application/vnd.ms-excel');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Text File','txt','text/plain');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Word File','doc','application/msword');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('Binary File','exe','application/octet-stream');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('PowerPoint File','ppt','application/vnd.ms-powerpoint');
+INSERT INTO DocumentMimeType (documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES ('CSV File','csv','text/c-xsv');
 
 
 --

@@ -281,14 +281,17 @@ function get_file_list($repository) {
 function update_sound_aka_one_company($id, $aka, $sound) {
   global $cdg_sql;
 
+  $aka_s = addslashes($aka);
+
   $query = "update Company set
-      company_aka='$aka',
+      company_aka='$aka_s',
       company_sound='$sound'
     where company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $u_q = new DB_OBM;
   $retour = $u_q->query($query);
+
   return $retour;
 }
 
