@@ -379,7 +379,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   $block = "
     <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
       onsubmit=\"if (check_document(this)) return true; else return false;\"
-      action=\"document_index.php\">
+      action=\"document_index.php/\">
 
     <div class=\"detailHead\">$l_document</div>
 
@@ -434,6 +434,8 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
    </table>
    <div class=\"detailButton\">
     <p class=\"detailButtons\">
+    <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"30000\">
+    <input type=\"hidden\" name=\"upload\" value=\"yes\">
     $dis_button
     <input type=\"hidden\" name=\"param_entity\" value=\"$entity_id\" />
     <input type=\"hidden\" name=\"entity\" value=\"$entity\" />

@@ -199,7 +199,7 @@ $l_delete_event_mail_subject = "Suppression d'un evenement sur Obm";
 $l_event_mail_body = "Date : ";
 $l_update_event_mail_body = "\nAu lieu de :";
 $l_delete_event_mail_body = "Il aurait du avoir lieu : ";
-$l_confirm_mail = "Confirmer+envoie de mail";
+$l_confirm_mail = "Confirmer+forcer l'envoie de mail";
 
 
 $l_unknown="Inconnu";
