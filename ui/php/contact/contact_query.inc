@@ -999,8 +999,8 @@ function check_contact_data_form($cid, $contact) {
   $hphone = $contact["hphone"];
   $mphone = $contact["mphone"];
   $fax = $contact["fax"];
-  $email = $contact["email"];
-  $email2 = $contact["email2"];
+  $email = stripslashes($contact["email"]);
+  $email2 = stripslashes($contact["email2"]);
   $c_id = $contact["company_id"];
   $c_new_id = $contact["comp_new_id"];
   $cat1 = $contact["category1"];

@@ -268,6 +268,20 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     }
   }
 
+  else if ($fieldname == "country_name") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("country_name") != "") {
+	$res["name"] .= $OD->data_set->f("country_name");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_country") != "") {
+	$res["name"] .= $OD->data_set->f("company_country");
+      }
+    }
+  }
+
   return $res;
 }
 
