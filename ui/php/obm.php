@@ -190,7 +190,7 @@ function dis_time_portal() {
     $num $l_unfilled
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_youre_time</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_youre_time</a></div>
   </div>
   ";
   return $block;
