@@ -443,7 +443,8 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </tr> 
     <tr id=\"browse_field\" $dis_field>
       <td class=\"detailLabel\">$l_file</td>
-      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
+      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file
+\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
     </tr>
     <tr id=\"url_field\" $dis_url>
       <td class=\"detailLabel\">$l_url</td>

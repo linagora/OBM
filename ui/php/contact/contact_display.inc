@@ -708,7 +708,6 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   $sel_cat2 .= "</select>";
  
 
-  
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
   onchange=\"fill_select_label(this)\">
@@ -746,6 +745,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     <script type=\"text/javascript\">
       $k_kind_js
     </script>\n";
+
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
     <option value=\"0\">$l_none</option>";
@@ -850,17 +850,17 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       <td class=\"detailLabel\">$l_function</td> 
       <td class=\"detailForm\">$sel_func</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailForm\">$sel_cat1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailForm\">$sel_cat2</td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_title</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td class=\"detailForm\">$sel_market</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category1</td>
+      <td class=\"detailForm\">$sel_cat1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category2</td>
+      <td class=\"detailForm\">$sel_cat2</td>
     </tr>
     </table>
 

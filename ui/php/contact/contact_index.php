@@ -198,7 +198,9 @@ if ($action == "index" || $action == "") {
     }
     $con_q = run_query_detail($param_contact);
     $display["detailInfo"] = display_record_info($con_q);
-    $display["detail"] = html_contact_consult($con_q);
+    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
+    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
+    $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
   } else {
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
     require("contact_js.inc");
@@ -410,7 +412,9 @@ if ($action == "index" || $action == "") {
   }
   if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
     $display["detailInfo"] = display_record_info($con_q);
-    $display["detail"] = html_contact_consult($con_q);
+    $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
+    $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
+    $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
   } else {
     // this contact's page has "private" access
     $display["msg"] .= display_err_msg($l_error_visibility);

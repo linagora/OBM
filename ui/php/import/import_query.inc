@@ -17,7 +17,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($import, $p_new_order, $p_order_dir) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
   
   $name = $import["name"];
   $contact = $list["contact"];
@@ -35,6 +35,8 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
   $query = "select distinct import_id as Id,
     import_id,
     import_name,
+    import_separator,
+    import_enclosed,
     $timecreate,
     $timeupdate,
     A.userobm_login as usercreate,
@@ -103,19 +105,28 @@ function run_query_insert($import) {
   $id = $import["id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
+  $sep = $import["sep"];
+  $enc = $import["enclosed"];
+  $desc = get_import_desc($import);
 
   $query = "insert into Import (import_timeupdate,
     import_timecreate,
     import_userupdate,
     import_usercreate,
     import_name,
-    import_datasource_id)
+    import_datasource_id,
+    import_separator,
+    import_enclosed,
+    import_desc)
   values (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
     '$name',
-    '$dsrc')";
+    '$dsrc',
+    '$sep',
+    '$enc',
+    '$desc')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -136,11 +147,17 @@ function run_query_update($import) {
   $id = $import["id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
+  $sep = $import["sep"];
+  $enc = $import["enclosed"];
+  $desc = get_import_desc($import);
   
   $query = "update Import set import_timeupdate='". date("Y-m-d H:i:s")."',
     import_userupdate='".$auth->auth["uid"]."',
     import_name='$name',
-    import_datasource_id='$dsrc'
+    import_datasource_id='$dsrc',
+    import_separator='$sep',
+    import_enclosed='$enc',
+    import_desc='$desc'
   where import_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

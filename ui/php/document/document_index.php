@@ -123,9 +123,9 @@ if ($param_document > 0) {
     }
   }
 }
+
 elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  
   if (check_data_form("", $document)) {
     $retour = run_query_insert($document);
     if ($retour) {
@@ -347,6 +347,7 @@ $display["end"] = display_end();
 
 display_page($display);
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Company parameters transmited in $document hash
 // returns : $document hash with parameters set
@@ -358,6 +359,7 @@ function get_param_document() {
   global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url,$hd_document_id;
   global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target,$name_document;
   global $param_entity, $entity,$rd_file_update; 
+
   if (isset ($param_document)) $document["id"] = $param_document;
   if (isset ($name_document)) $document["name"] = $name_document;
 

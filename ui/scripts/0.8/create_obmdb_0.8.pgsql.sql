@@ -1098,7 +1098,8 @@ CREATE TABLE Import (
   import_usercreate     integer,
   import_name           varchar(64) NOT NULL,
   import_datasource_id  integer,
-  import_format         varchar(128),
+  import_separator      varchar(3),
+  import_enclosed       char(1),
   import_desc           text,
   PRIMARY KEY (import_id),
   UNIQUE (import_name)

@@ -21,6 +21,12 @@ $l_file = "File";
 $l_desc = "Description";
 $l_format = "Format";
 $l_csv_sep = "CSV Separator";
+$l_enclosed = "Fields enclosed by";
+$l_mapping = "Fields mapping";
+$l_field_num = "# field";
+$l_field = "field";
+$l_default = "Default value";
+
 
 // Actions
 $l_insert = "Insert the import";
