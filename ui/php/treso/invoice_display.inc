@@ -222,7 +222,7 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
       "}\">
        </td>";
     // we can delete only if not paid
-    $payments_connected = run_query_search_payment_invoice($invoice, $new_order, $new_order2, $order_dir, -1);
+    $payments_connected = run_query_search_payment_invoice($invoice, -1, $new_order, $order_dir);
     $url_delete = $sess->url ("invoice_index.php?action=delete".
 			      "&amp;param_invoice=".$q_invoice->f("invoice_id"));
     if ($payments_connected->nf() == 0) {
@@ -468,8 +468,6 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
   global $l_found, $l_archive_invoices, $l_archive_update;
   global $l_label, $l_number, $l_amount_HT, $l_amount_TTC, 
     $l_date, $l_status, $l_deal;
-  //-- Search parameters
-  global $set_rows, $set_rows_default;
   //-- Authentication
   global $perms_user,$l_perms_user, $perms_admin;
   global $auth, $sess;
@@ -582,7 +580,6 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   global $l_add_deal, $l_del_deal;
   global $l_label,$l_comment,$l_number, $l_date, $l_amount_HT, $l_amount_TTC, 
     $l_deal, $l_status;
-  global $set_rows, $set_rows_default;
   
   global $perms_user,$l_perms_user;
   global $auth, $sess, $perm, $param_invoice;
@@ -690,7 +687,6 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
   global $l_invoice_deal_archive ;
   global $l_add_deal, $l_add_deal_chosen, $l_no_deal_found, $l_no_deal_display;
   global $cellspacing, $border;
-  global $set_rows, $set_rows_default;
   global $action, $perm, $sess, $col_label;
   //$param_invoice;
   global $l_invoice_deal_company;

@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : time_index.php                                              //
-//     - Desc  : Time management Index File                                  //
+// OBM - File : time_index.php                                               //
+//     - Desc : Time management Index File                                   //
 // 2002-04-01 Pierre Carlier                                                 //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -30,10 +30,8 @@ page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" 
 $perm->check("user");
 
 require("../agenda/agenda_functions.inc");
-
 require("time_display.inc");
 require("time_query.inc");
-
 
 $uid = $auth->auth["uid"]; //current user uid
 
@@ -42,38 +40,34 @@ page_close();
 include("$obminclude/global_pref.inc");
 require("time_js.inc");
 
-//echo "afficher ici les paramètres HTTP_POST_VARS <br><br><hr>";
-
 //////////////////////////////////////////////////////////////////////////////
-//perms for manage task
+//perms for manage task ??? To update when access rights model will change
 $project_managers = array( '6' , '7' , '8' ) ;
 /////////////////////////////////////////////////////////////////////////////
 
-
 $time = get_param_time();
-  if ($set_debug > 0) {
-    if ( $time ) {
-      while ( list( $key, $val ) = each( $time ) ) {
-        echo "<BR>task[$key]=$val";
-      }
+if ($set_debug > 0) {
+  if ( $time ) {
+    while ( list( $key, $val ) = each( $time ) ) {
+      echo "<BR>task[$key]=$val";
     }
- 	echo "<br>HTTP_POST_VARS<br>";
-	foreach($HTTP_POST_VARS as $key => $val) {
-	  	echo "clé $key val $val <br>";
-	}
-    echo "sel_contact_id $sel_contact_id";
-    if (!is_null($sel_contact_id))
-       echo " sel_contact_id is not null <br>";
-    else
-       echo " sel_contact_id is NULL <br>";
   }
-
+  echo "<br>HTTP_POST_VARS<br>";
+  foreach($HTTP_POST_VARS as $key => $val) {
+    echo "clé $key val $val <br>";
+  }
+  echo "sel_contact_id $sel_contact_id";
+  if (!is_null($sel_contact_id))
+    echo " sel_contact_id is not null <br>";
+  else
+    echo " sel_contact_id is NULL <br>";
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_contact);     // Head & Body
+display_head($l_time);     // Head & Body
 if (! $popup) {
   generate_menu($menu);         // Menu
   display_bookmarks();
@@ -81,9 +75,9 @@ if (! $popup) {
 
 ///////////////////////////////////////////////////////////////////////////////
 //Initialisation                                                             //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //set contact_id if not set
-if( ! isset($time["contact_id"]) )
+if ( ! isset($time["contact_id"]) )
   $time["contact_id"] = run_query_get_contact_id( $uid);
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -91,12 +85,12 @@ if( ! isset($time["contact_id"]) )
 ///////////////////////////////////////////////////////////////////////////////
 
 if ($action == "index" or $action == "search") {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time['interval'] = "week";
   html_time_links($time,"week");
   html_time_search_form($time, run_query_get_mycontacts(),
-  array(run_query_contactid_user($uid)));
+    array(run_query_contactid_user($uid)));
   dis_time_list($time);
 } 
 elseif ($action == "insert") {

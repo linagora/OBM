@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contact_index.php                                           //
-//     - Desc  : Contact Index File                                          //
-// 1999-03-19 Pierre Baudracco : Last Update 2001-09-17 - PB                 //
+// OBM - File : contact_index.php                                            //
+//     - Desc : Contact Index File                                           //
+// 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////

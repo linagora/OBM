@@ -7,7 +7,21 @@
 // $Id //
 ///////////////////////////////////////////////////////////////////////////////
 
+// Common actions
+$l_find = "Chercher";
+$l_back = "Retour";
+$l_cancel = "Annuler";
 $l_close = "Fermer la fenêtre";
+$l_validate = "Valider";
+
+// Common messages
+$l_all = "Tout";
+$l_all_f = "Toutes";
+$l_none = "---";
+$l_archive = "Archive";
+$l_invalid_data = "Données invalides";
+$l_date_format = "%Y-%m-%d %H:%i:%s"; // Mysql date format
+$l_time_format = "%Y-%m-%d %H:%i:%s";
 
 // OBM_DISPLAY
 $l_field = "Champ";

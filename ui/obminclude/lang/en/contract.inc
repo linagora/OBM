@@ -1,13 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                 //
-//     - File     : company.inc                                             //
-// 1999-01-25 Rande Mehdi                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                  //
+//     - File     : contract.inc                                             //
+// 1999-01-25 Rande Mehdi                                                    //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
-
-// Database fields
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_contract_num="Contract number";
@@ -22,6 +20,9 @@ $l_before = "Expiration date Before";
 $l_incident_list = "List of the Incidents";
 $l_incident_new = "Add a new Incident";
 
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
 $fieldnames["contract_label"] = $l_contract_label;
 $fieldnames["contract_company_name"] = $l_contract_company;
 $fieldnames["contract_numero"] = $l_contract_num;
@@ -31,9 +32,6 @@ $fieldnames["contracttype_label"] = $l_contract_contracttype;
 $l_minus="-";
 $l_plus="+";
 $l_order="Ordrer";
-$l_last_contract = "Last support contract";
-$l_last_contact = "Last contact";
-$l_last_company = "Last company";
 $l_todo = "To Do";
 $l_label = "Label";
 $l_label_libelle = "Key-word of the label";
@@ -50,8 +48,6 @@ $l_contacts = "Contacts";
 $l_clause = "Clauses";
 $l_comment = "Comment";
 $l_company = "Name of the company";
-$l_all_f = "all";
-$l_all = "all";
 $l_date = "Date";
 $l_date_init = "Initial date";
 $l_date_expir = "Expiration date";
@@ -79,7 +75,6 @@ $l_deal_update = "Contract update";
 $l_deal_delete = "Contract deletion";
 
 // Actions
-$l_find = "Find";
 $l_insert = "Insert the contract";
 $l_update = "Update the contract";
 $l_delete = "Delete the contract";
@@ -94,8 +89,6 @@ $l_status_insert = "Create Status";
 $l_category_delete = "Delete Category"; 
 $l_category_update = "Update Category";
 $l_category_insert = "Create Category";
-
-$l_cancel = "Cancel";
 
 // Messages
 
@@ -144,31 +137,7 @@ $mj_category_create = "You have to enter a new category name to create it !";
 $l_length_label = " The Label is to long ";
 $l_length_number = " The Number of Contract is too long";
 
-// champs specifiques
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-
-
-
 // For the display preferences modification screen 
 $l_contract_display = "Display options for Support contracts";
 $l_updater = "Last update by" ;
 $l_date_last_update = "Date of the last update" ;
-$l_options_dis = "Display options" ;
-$l_query_display = "Displayed" ;
-$l_order_dis = "Display order" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Ne pas afficher ce champs" ;
-$l_ch_to_dis_no_help = "Cela signifie que le champs est affiché<br>Cliquer sur cet icône si vous ne souhaitez afficher pas ce champs" ;
-$l_ch_to_dis_yes = "Afficher ce champs" ;
-$l_ch_to_dis_yes_help = "Cela signifie que le champs n'est pas affiché<br>Cliquer sur cet icône si vous souhaitez afficher ce champs" ;
-$l_dis_obligatory = "L'affichage de ce champs est obligatoire" ;
-$l_dis_obligatory_help = "Cet icône signifie que vous êtes obligé d'afficher ce champs" ;
-$l_down_option = "Descendre cette option d'un cran" ;
-$l_down_option_help  = "Cliquez sur cet icône pour descendre le champs d'un cran" ;
-$l_up_option = "Monter cette option d'un cran" ;
-$l_up_option_help = "Cliquez sur cet icône pour monter le champs d'un cran" ;
-$l_subject = "Sujet" ;
-$l_help_options = "Aide contextuelle";
-
-

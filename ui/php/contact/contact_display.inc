@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contact_display.php                                         //
-//     - Desc  : Contact Display File                                        //
-// 2000-01-20 Pierre Baudracco : Last Update 2001-09-17                      //
+// OBM - File : contact_display.php                                          //
+//     - Desc : Contact Display File                                         //
+// 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -64,10 +64,10 @@ function html_contact_search_form ($contact) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_search_list($contact, $popup=false) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contact");
-  $obm_q = run_query_search($contact, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($contact, $new_order, $order_dir);
   $nb_contact = $obm_q->num_rows();
   if ($nb_contact == 0) {
     display_warn_msg($l_no_found);
@@ -88,10 +88,7 @@ function dis_contact_search_list($contact, $popup=false) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
-  //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
-  //-- Labels
-  global $l_found, $l_add, $l_close;
+  global $sess, $col_textem, $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -106,9 +103,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   $company = stripslashes($contact["company"]);
   $company_id = $contact["company_id"];
 
-  echo "<center><FONT color=\"#$col_textem\">";
-  echo "$nb_con $l_found";
-  echo "</FONT><br>";
+  echo "<center><font color=\"#$col_textem\">$nb_con $l_found</font><br>";
 
   $url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
 
@@ -276,7 +271,7 @@ function html_contact_consult($co_q) {
 
   if ($auth->auth["perm"] != $perms_user) {
     echo "<FORM METHOD=GET NAME=form_mod_contact 
-        ACTION=\"".$sess->self_url("contact_index.php")."\">
+        ACTION=\"".$sess->url("contact_index.php")."\">
       <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"detailupdate\">
       <INPUT TYPE=\"hidden\" NAME=\"param_contact\" VALUE=$id>
       <INPUT TYPE=submit value=\"$l_update\">

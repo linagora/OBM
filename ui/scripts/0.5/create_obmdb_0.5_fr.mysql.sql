@@ -1,6 +1,6 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File  : create_obmdb_0.5_fr.mysql.sql                             //
---//     - Desc  : French MySQL Database 0.5 creation script                 //
+--// OBM - File : create_obmdb_0.5_fr.mysql.sql                              //
+--//     - Desc : French MySQL Database 0.5 creation script                  //
 --// 2001-07-27 ALIACOM                                                      //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$ //

@@ -1,12 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : company.inc                                             //
-// 1999-01-24 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : deal.inc                                                 //
+// 1999-01-24 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
-
+///////////////////////////////////////////////////////////////////////////////
 
 //for list
 $l_task_fac = "Taches Facturées";
@@ -28,29 +27,22 @@ $l_amount = "Montant";
 $l_state = "Etat";
 $l_date_alarm = "Date Alarme";
 $l_comment = "Commentaire";
-$l_archive = "Archive";
 $l_todo = "A faire";
 $l_visibility ="Accès";
 $l_invoice_deal = "Affaire";
 $l_archived_invoices_connected = " Facture(s) archivée(s) connectée(s) à cette Affaire";
 $l_see_archived_invoices = "Voir aussi les factures archivées";
 // Labels et textes
-$l_back = "Retour";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordre";
-$l_last_deal = "Dernière affaire";
-$l_last_contact = "Dernier contact";
-$l_last_company = "Dernière société";
 $l_amount_in = "Montant des entrées";
 $l_amount_out = "Montant des sorties";
 $l_label_start = "Nom Affaire";
 $l_manager= "Responsable";
 $l_proposition = "Proposition";
 $l_show_archive = "Voir les archives";
-$l_archive_first = "A";
-$l_all_f = "Toutes";
-$l_all = "Tous";
+$l_archive_first = "Arc";
 $l_date_alarm_after = "Date Alarme Après";
 $l_date_alarm_before = "Date Alarme Avant";
 $l_after = "Date Alarme Après";
@@ -89,6 +81,7 @@ $l_invoice_date = "Date";
 // Direct fields
 $fieldnames["deal_label"] = $l_label;
 $fieldnames["deal_datealarm"] = $l_date_alarm;
+$fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
@@ -119,7 +112,6 @@ $l_deal = "Affaire";
 $l_parentdeal_deals = "Affaires appartenant a la SurAffaire";
 
 // Actions
-$l_find = "Chercher";
 $l_insert = "Enregistrer l'Affaire";
 $l_update = "Modifier l'Affaire";
 $l_delete = "Supprimer l'Affaire";
@@ -217,12 +209,6 @@ $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
 $l_j_status_create = "Vous devez saisir un nom d'état pour le créer !";
 $l_j_category_create = "Vous devez saisir un nom de catégorie pour le créer !";
 
-
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%d-%m %H:%i:%s";
 
 // For the display preferences modification screen 
 $l_deal_display = "Options d'affichage des listes d'affaires";

@@ -1,19 +1,17 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                   //
+// OBM - Language : English                                                  //
 //     - File     : user.inc                                                 //
-// 1999-01-24 Florent Goalabre - Last update 2001-09-22 PB                   //
+// 1999-01-24 Florent Goalabre                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_back = "Back";
-$l_none = "---";
-$l_user_name = "User";
+$l_login = "Login";
+$l_lastname = "Lastname";
+$l_firstname = "Firstname";
 $l_user_perms = "Authorization";
 $l_password = "Password";
-$l_all = "All";
-$l_find = "Find";
 $l_lastaccess = "Last access";
 $l_email = "@M";
 $l_associated_contact = "Associated Contact";
@@ -24,18 +22,15 @@ $l_check_usercreate = " entries owned by this user.";
 $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
 
-$l_invalid_data = "Invalid data";
-
-$l_last_deal="Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
-
 //------------------------------------//
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["userobm_username"] = $l_user_name;
+$fieldnames["userobm_login"] = $l_login;
 $fieldnames["userobm_perms"] = $l_user_perms;
+$fieldnames["userobm_archive"] = $l_archive;
+$fieldnames["userobm_lastname"] = $l_lastname;
+$fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
@@ -62,7 +57,7 @@ $l_update_ok = "The user has been updated successfully.";
 $l_update_error = "The update of the user has failed !";
 $l_reset_ok = "User's preferences reseted to default values";
 $l_query_error = "Error while executing the query";
-$l_username_error = "Invalid user name !";
+$l_login_error = "Invalid login !";
 $l_password_error = "Invalid password !";
 $l_email_error = "Invalid email";
 $l_err_user_contact = "This contact is already asigned to these users";
@@ -70,12 +65,7 @@ $l_exist_error = "already exists";
 $l_check_sameuser = "These users seem similar to this new entry !";
 
 // JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
-$l_fill_username = "You have to fill the user before submitting.";
+$l_fill_login = "You have to fill the login before submitting.";
 $l_fill_password = "You have to fill the password before submitting.";
 $l_delete_confirm = "Really delete the user?";
 $l_j_check_email = "The email adress is not valid.";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
-

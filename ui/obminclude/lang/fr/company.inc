@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : company.inc                                             //
-// 1999-01-24 Pierre Baudracco - Last Update : 1999-10-29                   //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : company.inc                                              //
+// 1999-01-24 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_number = "Numéro";
@@ -25,12 +25,6 @@ $l_web = "W";
 $l_email = "@M";
 
 // Labels et textes
-$l_back = "Retour";
-$l_last_company = "Derniere societe";
-$l_last_contact = "Dernier contact";
-$l_last_deal = "Derniere affaire";
-$l_all = "Tous";
-$l_find = "Chercher";
 $l_mailing_first = "M";
 $l_comment = "Commentaire";
 $l_contact_list = "Liste Contacts";
@@ -40,7 +34,6 @@ $l_deal_new = "Nouvelle Affaire";
 $l_kind_manage = "Gestion des Types de Société";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";
-$l_invalid_data = "Données invalides";
 $l_internal = "Interne";
 
 //------------------------------------//
@@ -123,10 +116,6 @@ $l_j_kind_delete = "Sélectionnez un type pour le vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
 $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
 $l_j_select_company = "Vous devez sélectionner une société !";
-
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_date_format = "%Y-%d-%m %H:%i:%s";
 
 // For the display preferences modification screen 
 $l_company_display = "Options d'affichage des listes de sociétés";

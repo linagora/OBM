@@ -1,12 +1,15 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : global_pref.inc                                             //
-//     - Desc  : Global preference OBM include file                          //
+// OBM - File : global_pref.inc                                              //
+//     - Desc : Global preference OBM include file                           //
 // 2002-07-31 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-$sess->setcookie();
+
+// Update the cookie expires time : now + lifetime (not in txt mode)
+if ($mode != "txt") $sess->setcookie();
+
 if ($set_lang == "") $set_lang = $set_lang_default;
 if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;
@@ -32,14 +35,13 @@ if (file_exists("$path/../$theme_file")) {
   include ("$obminclude/themes/$set_theme_default/theme.inc");
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Language File, depending from which module this  //
 // page is called and the selected language.                                 //
 ///////////////////////////////////////////////////////////////////////////////
-
 $lang_file = "$obminclude/lang/$set_lang/global.inc";
-if (file_exists("$path/../".$lang_file)) 
-{
+if (file_exists("$path/../".$lang_file)) {
   include("$lang_file");
 }
 
@@ -51,6 +53,7 @@ if ($menu != "") {
     include("$obminclude/lang/$set_lang_default/".strtolower($menu).".inc");
   }
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Menu (function generate_menu($menu) in menu.inc) //

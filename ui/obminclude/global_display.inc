@@ -1,7 +1,7 @@
 <?
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : global_display.inc                                          //
-//     - Desc  : Global Display File (OBM_DISPLAY)                           //
+// OBM - File : global_display.inc                                           //
+//     - Desc : Global Display File (OBM_DISPLAY)                            //
 // 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -464,6 +464,11 @@ class OBM_DISPLAY {
 	  $name="";
 	  $url = "../deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
 	}
+	else if ($fieldname == "deal_archive") {
+          $align = "center";
+          if ($this->data_set->f($fieldname)) $name ="X";
+          else $name="&nbsp;";
+	}
 	else if ($fieldname == "deal_company_name") {
 	  $name="";
 	  $url = "../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");
@@ -543,7 +548,7 @@ class OBM_DISPLAY {
 	//------------------------------
 	// For the users 
 	//------------------------------
-	else if ($fieldname == "userobm_username") {
+	else if ($fieldname == "userobm_login") {
 	   $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("userobm_id");
 	}
 	else if ($fieldname == "userobm_email") {
@@ -553,6 +558,11 @@ class OBM_DISPLAY {
 	    $name = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_mail\" ALT=\"$email\">$email";
           }
         } 
+	else if ($fieldname == "userobm_archive") {
+          $align = "center";
+          if ($this->data_set->f($fieldname)) $name ="X";
+          else $name="&nbsp;";
+	}
 
 	//------------------------
 	// For the accounts :
@@ -761,7 +771,7 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_index($url) {
-    global $sess, $page, $new_order, $new_order2;
+    global $sess, $page, $new_order;
     global $set_rows, $set_rows_default;
 
     // If displayed without links (in popup) add this in url
@@ -792,7 +802,7 @@ class OBM_DISPLAY {
       while ($i <= ($nb_page)) {
         if ($i != 0) echo " | ";
         if ($i != $page) {
-          echo "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;new_order2=$new_order2\">\n";
+          echo "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">\n";
 	}
 	echo ($i + 1);
 	if ($i != $page) echo "</a>\n";
@@ -808,7 +818,7 @@ class OBM_DISPLAY {
   // Function that display the dataset headers (col names)
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
-    global $sess, $page, $new_order, $order_dir, $new_order2;
+    global $sess, $page, $new_order, $order_dir;
     global $col_tableh, $col_textem;
     global $fieldnames, $cdg_id, $set_debug;
 
@@ -843,8 +853,7 @@ class OBM_DISPLAY {
       if ($this->data_order) {
         echo "<a href=\"".$url.
           (($url != "") ? "&amp;page=$page" : "" ) .
-          "&amp;new_order=$fieldname&amp;order_dir=$order".
-          "&amp;new_order2=". ( ($new_order2!="") ? "":$new_order2) . "\">";
+          "&amp;new_order=$fieldname&amp;order_dir=$order\">";
       }
       echo $label;
       if ($this->data_order) {

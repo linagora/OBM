@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Frenc                                              
-//     - File     : account.inc
-// 2001-07-31 Nicolas Roman
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Frenc                                                    //
+//     - File     : account.inc                                              //
+// 2001-07-31 Nicolas Roman                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_label = "Label";
@@ -37,12 +39,10 @@ $l_totals = "Totaux";
 $l_account = "Comptes";
 
 // Actions
-$l_find = "Chercher";
 $l_insert= "Insérer le Compte";
 $l_update = "Mettre à jour le Compte";
 $l_delete = "Supprimer le Compte";
 $l_delete_confirm = "Etes vous sur de vouloir supprimer ce Compte ?";
-$l_cancel = "Annuler";
 $l_compute_balance = "Calculer le solde";
 
 // Messages 
@@ -57,12 +57,8 @@ $l_update_ok = "Le compte a bien été mis à jour.";
 $l_update_error = "La mise à jour du compte a échoué !";
 $l_query_error = "Problème durant l'exécution d'une requête...";
 $l_impossible_deletion = " paiements sont liés à ce compte. La suppression est impossible"; // must be used with the number of payments leading...
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
+
+$l_time_format = "%Y-%m-%d %H:%i:%s";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe numéro du compte n\\'est pas valide !";

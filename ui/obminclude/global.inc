@@ -1,13 +1,13 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : global.inc                                                  //
-//     - Desc  : Global common OBM include file                              //
+// OBM - File : global.inc                                                   //
+//     - Desc : Global common OBM include file                               //
 // 1999-01-24 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version="0.5.2";
+$obm_version="0.5.3pre2";
 //$set_debug=0;
 $l_title="O.B.M.";
 $status="";
@@ -26,12 +26,7 @@ $last_account_default=0;
 $last_payment_default=0;
 $last_contract_default=0;
 $last_incident_default=0;
-$order_servicecomputer_default="service_port";
-$order_contactslist_default="contact_lastname";
 $set_weekstart_default="monday";
-//Time of inactivity during which a user is regarded as active (second), you 
-//can modify it or modify the php session time in the session4.inc file.
-$time_active_session = $lifetime;
 //Timemanager module
 // In how many parts we can chop a day
 $fraction_jour = 8;
@@ -72,15 +67,18 @@ $php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
 $js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
+$php_regexp_lifetime = "^[0-9]{1,6}$";
 
-// Path to the OBM php root 
-if ($menu == "")
-  $path = "";
-else 
-  $path = "../";
+// Path to the OBM php root (if not set)
+if ($path == "") {
+  if ($menu == "")
+    $path = "";
+  else 
+    $path = "..";
+}
 
 
-//thoose functions must be defined before the global_query and global display
+//those functions must be defined before the global_query and global display
 //includes.
 ///////////////////////////////////////////////////////////////////////////////
 // Display a debug message
@@ -97,7 +95,9 @@ function display_debug_msg($msg, $debug=0) {
   }
 }  
 
+///////////////////////////////////////////////////////////////////////////////
 //Includes
+///////////////////////////////////////////////////////////////////////////////
 require_once("$obminclude/global_query.inc");
 require_once("$obminclude/global_display.inc");
 
@@ -116,9 +116,8 @@ function display_head($l_module) {
   global $col_text,$col_bg,$col_link,$img_bg;
   global $set_theme;
 
-  echo "<HTML><HEAD><TITLE>" . $l_title . " - " . $l_module . "</TITLE></HEAD>";
-  echo "<BODY " .
-     "TEXT=\"#$col_text\" ";
+  echo "<html><head><title>$l_title - $l_module</title></head>
+    <body TEXT=\"#$col_text\" ";
      if ($img_bg != "") {echo "BACKGROUND=\"/images/$set_theme/$img_bg\" ";}
      if ($col_bg != "") {echo "BGCOLOR=\"#$col_bg\" ";}
      if ($col_link != "") {echo "LINK=\"#$col_link\" ";}
@@ -132,8 +131,8 @@ function display_head($l_module) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
 echo "
-</BODY>
-</HTML>
+</body>
+</html>
 ";
 
 }
@@ -200,8 +199,6 @@ function display_ok_msg($msg) {
 // from the first screen after login...
 ///////////////////////////////////////////////////////////////////////////////
 function display_bookmarks($path="..") {
-
-  global $l_last_company,$l_last_contact,$l_last_deal;
   global $last_company,$last_contact,$last_deal, $last_contract;
   global $last_account,$last_invoice, $last_payment, $last_incident;
   global $last_company_name, $last_contact_name, $last_deal_name,$last_contract_name;
@@ -273,8 +270,8 @@ function timestamp_to_time($timestamp) {
 function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_timeupdate) {
 
   $obm_q= new DB_OBM;
-  $query_created = "select userobm_username from UserObm where userobm_id=".$p_usercreate_id;
-  $query_modified = "select userobm_username from UserObm where userobm_id=".$p_userupdate_id;
+  $query_created = "select userobm_login from UserObm where userobm_id=".$p_usercreate_id;
+  $query_modified = "select userobm_login from UserObm where userobm_id=".$p_userupdate_id;
 
   echo "<table width=\"100%\">";
   echo "  <tr><td width=\"60%\">";
@@ -284,7 +281,7 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
     $obm_q->query($query_created);
     $obm_q->next_record();
     echo "    <font size=1>";
-    echo "      created :" . $obm_q->f("userobm_username") . " (". timestamp_to_date($p_timecreate). " " .timestamp_to_time($p_timecreate) .")";
+    echo "      created :" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timecreate). " " .timestamp_to_time($p_timecreate) .")";
     echo "    </font>";
   }
   echo "<br>";
@@ -293,7 +290,7 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
     $obm_q->query($query_modified);
     $obm_q->next_record();
     echo "    <font size=1>";
-    echo "      modified:" . $obm_q->f("userobm_username") . " (". timestamp_to_date($p_timeupdate). " " .timestamp_to_time($p_timeupdate) .")";
+    echo "      modified:" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timeupdate). " " .timestamp_to_time($p_timeupdate) .")";
     echo "    </font>";
   }
   echo "  </td><tr>";
@@ -386,8 +383,6 @@ function month_short_name ($num_month) {
 
   return $month_name;
 }
-
-
 
 
 </SCRIPT>

@@ -1,11 +1,11 @@
 <SCRIPT LANGUAGE="PHP">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : incident.inc                                            //
-// 2001-08-20  Mehdi RANDE                                                  //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : incident.inc                                             //
+// 2001-08-20  Mehdi RANDE                                                   //
+///////////////////////////////////////////////////////////////////////////////
 //   $Id   //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 //Fields Label
 $l_incident_label = "Label";
@@ -42,8 +42,8 @@ $l_call = "Appel en abscence";
 $l_waitcall = "Attente de retour";
 $l_paused = "En Attente";
 $l_closed = "Fermé";
-$l_all = "Tous";
 $l_incident_lastupdate = "Date de dernière modification";
+
 //------------------------------------//
 // Fields that appear in result lists //
 //------------------------------------//
@@ -59,7 +59,6 @@ $fieldnames["incident_logger_lastname"] = $l_incident_logger;
 $fieldnames["incident_company_name"] = $l_incident_company;
 // Action
 
-$l_find = "Chercher";
 $l_select_contract = "S&eacute;lectionner le contrat";
 $l_insert = "Enregistrer l'incident";
 $l_update = "Modifier l'incident";
@@ -84,7 +83,6 @@ $l_j_select_contract = "Vous devez sélectionner un Contrat!";
 $l_delete_confirm="Confirmer la suppression de l'Incident ?";
 $l_date_after_js ="Date Après";
 
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
+$l_time_format = "%Y-%m-%d %H:%i:%s";
 
 

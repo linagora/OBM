@@ -1,23 +1,24 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : account_query.inc                                           //
-//     - Desc  : account query File                                          //
+// OBM - File : account_query.inc                                            //
+//     - Desc : account query File                                           //
 // 2001-07-30 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
-// Account search query :
-// search for accounts in dbase, using various criteria :
-// label, bank and number...
-// $p_new_order and $p_new_order2 are related to display lists...
+// Account search query
+// Parameters:
+//   - $account     : account current infos (after insert, update)
+//   - $p_new_order : infos for order clause
+//   - $p_order_dir : direction for order clause (asc, desc)
 //
 // Problem here : we get from dbase the balance at the account creation.
 // We want to display the balance "today". But, as we are looking for accounts,
 // it's hard to compute the account at the same time...
 //////////////////////////////////////////////////////////////////////////////
-function run_query_search ($account, $p_new_order, $p_new_order2, $p_order_dir) {
+function run_query_search ($account, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql;
 
   $label = $account["label"];
@@ -40,10 +41,6 @@ function run_query_search ($account, $p_new_order, $p_new_order2, $p_order_dir) 
 
   $query.=" order by $order $p_order_dir";
   
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", ".$p_new_order2;
-  }
-
   display_debug_msg("<b>run_query_search() : </b>$query", $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

@@ -7,13 +7,11 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-$l_back = "Retour";
-$l_none = "---";
-$l_user_name = "Utilisateur";
+$l_login = "Login";
+$l_lastname = "Nom";
+$l_firstname = "Prénom";
 $l_user_perms = "Permissions";
 $l_password = "Password";
-$l_all = "Toutes";
-$l_find = "Chercher";
 $l_lastaccess = "Dernier accès";
 $l_email = "@M";
 $l_associated_contact = "Contact associé";
@@ -24,18 +22,15 @@ $l_check_usercreate = " entrées créées par cet utilisateur.";
 $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
 
-$l_invalid_data = "Donn&eacute;es invalides";
-
-$l_last_deal = "Derniere affaire";
-$l_last_contact = "Dernier contact";
-$l_last_company = "Derniere societe";
-
 //------------------------------------//
 // Fields that appear in result lists //
 //------------------------------------//
 // Direct fields
-$fieldnames["userobm_username"] = $l_user_name;
+$fieldnames["userobm_login"] = $l_login;
 $fieldnames["userobm_perms"] = $l_user_perms;
+$fieldnames["userobm_archive"] = $l_archive;
+$fieldnames["userobm_lastname"] = $l_lastname;
+$fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
@@ -62,20 +57,15 @@ $l_update_ok = "La modification de l'utilisateur a été correctement effectuée";
 $l_update_error = "La modification de l'utilisateur a échoué !";
 $l_reset_ok = "Les préférences de l'utilisateur ont été remises aux valeurs par défaut";
 $l_query_error = "Problème en exécutant la requete";
-$l_username_error = "Le nom doit être renseigné !";
+$l_login_error = "Le login doit être renseigné !";
 $l_password_error = "Le mot de passe doit être renseigné !";
 $l_email_error = "L'adresse E-mail saisie n'est pas valide !";
 $l_check_sameuser = "Ces utilisateurs semblent similaires à cette nouvelle entrée !";
-$l_exist_error = "Un utilisateur portant ce nom existe déjà !";
+$l_exist_error = "Ce login est déjà utilisé !";
 $l_err_user_contact = "Ce contact est déjà associé à ces utilisateurs";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_username = "Vous devez renseigner l'utilisateur  avant de valider.";
+$l_fill_login = "Vous devez renseigner le login avant de valider.";
 $l_fill_password = "Vous devez renseigner le mot de passe avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de l'utilisateur ?";
 $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
-
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-

@@ -76,10 +76,10 @@ function html_list_search_form ($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_search_list($list, $popup=false) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "list");
-  $obm_q = run_query_search($list, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($list, $new_order, $order_dir);
   $nb_list = $obm_q->num_rows();
   if ($nb_list == 0) {
     display_warn_msg($l_no_found);
@@ -230,7 +230,7 @@ function html_list_form($action, $list_q, $list) {
 //   - $name : company name
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_links($id, $list_name, $l_action="") {
-  global $sess, $perm, $page;
+  global $sess, $perm;
   global $l_add_contact, $l_delete, $l_mail, $l_update, $l_export;
   global $popup_width, $popup_contact_height;
 
@@ -266,10 +266,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $col_label, $col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Label
   global $l_name, $l_subject, $l_email, $l_list_infos, $l_no_contact, $l_list_infos_short;
-  global $perm;
-  global $l_del_contact_sel, $l_con_found;
-  //Variable
-  global $page, $set_rows, $set_rows_default, $perm, $action, $sess, $nb_contact_added, $nb_contact_deleted;
+  global $sess, $perm, $action;
+  global $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");

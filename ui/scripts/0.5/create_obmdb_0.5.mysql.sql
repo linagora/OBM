@@ -1,6 +1,6 @@
 --/////////////////////////////////////////////////////////////////////////////
---// OBM - File  : create_obmdb_0.5_fr.mysql.sql                             //
---//     - Desc  : MySQL Database 0.5 creation script                        //
+--// OBM - File : create_obmdb_0.5.mysql.sql                                 //
+--//     - Desc : MySQL Database 0.5 creation script                         //
 --// 2001-07-27 ALIACOM                                                      //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$ //
@@ -10,18 +10,6 @@
 -- User, Preferences tables
 -- 1 user (uadmin/padmin) is created with admin rights
 -------------------------------------------------------------------------------
---
--- Table structure for table 'ActiveSessions'
---
-CREATE TABLE ActiveSessions (
-  sid				varchar(32) DEFAULT '' NOT NULL,
-  name				varchar(32) DEFAULT '' NOT NULL,
-  val				text,
-  changed			varchar(14) DEFAULT '' NOT NULL,
-  PRIMARY KEY (name,sid),
-  KEY changed (changed)
-);
-
 
 --
 -- Table structure for table 'ActiveUserObm'
@@ -58,25 +46,28 @@ CREATE TABLE UserObm_SessionLog (
 -- Table structure for table 'UserObm'
 --
 CREATE TABLE UserObm (
-  userobm_id			int(8) DEFAULT '0' NOT NULL auto_increment,
-  userobm_timeupdate		timestamp(14),
-  userobm_timecreate		timestamp(14),
-  userobm_userupdate		int(8),
-  userobm_usercreate		int(8),
-  userobm_username		varchar(32) DEFAULT '' NOT NULL,
-  userobm_password		varchar(32) DEFAULT '' NOT NULL,
-  userobm_perms			varchar(254),
-  userobm_email			varchar(60),
-  userobm_timelastaccess	timestamp(14),
-  userobm_contact_id		int(8),
+  userobm_id                int(8) DEFAULT '0' NOT NULL auto_increment,
+  userobm_timeupdate        timestamp(14),
+  userobm_timecreate        timestamp(14),
+  userobm_userupdate        int(8),
+  userobm_usercreate        int(8),
+  userobm_login             varchar(32) DEFAULT '' NOT NULL,
+  userobm_password          varchar(32) DEFAULT '' NOT NULL,
+  userobm_perms             varchar(254),
+  userobm_archive           char(1) not null default '0',
+  userobm_lastname          varchar(32),
+  userobm_firstname         varchar(32),
+  userobm_email             varchar(60),
+  userobm_timelastaccess    timestamp(14),
+  userobm_contact_id        int(8),
   PRIMARY KEY (userobm_id),
-  UNIQUE k_username_user (userobm_username)
+  UNIQUE k_login_user (userobm_login)
 );
 
 -- Dumping data for table 'UserObm'
-INSERT INTO UserObm (userobm_username,userobm_password,userobm_perms, userobm_contact_id) VALUES ('uadmin','padmin','admin','1');
-INSERT INTO UserObm (userobm_username,userobm_password,userobm_perms) VALUES ('ueditor','peditor','editor');
-INSERT INTO UserObm (userobm_username,userobm_password,userobm_perms) VALUES ('uuser','puser','user');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname, userobm_contact_id) VALUES ('uadmin','padmin','admin', 'Admin Lastname', 'Admin Firstname','1');
+INSERT INTO UserObm (userobm_login,userobm_password,userobm_perms) VALUES ('ueditor','peditor','editor');
+INSERT INTO UserObm (userobm_login,userobm_password,userobm_perms) VALUES ('uuser','puser','user');
 
 
 --
@@ -376,7 +367,7 @@ CREATE TABLE ParentDeal (
    parentdeal_label varchar(128) NOT NULL,
    parentdeal_marketingmanager_id int(8),
    parentdeal_technicalmanager_id int(8),
-   parentdeal_archive int(2) DEFAULT '0',
+   parentdeal_archive char(1) DEFAULT '0',
    parentdeal_comment text,
    PRIMARY KEY (parentdeal_id)
 );
@@ -407,7 +398,7 @@ CREATE TABLE Deal (
   deal_status_id int(2),
   deal_datealarm date,
   deal_comment text,
-  deal_archive int(2) DEFAULT '0',
+  deal_archive char(1) DEFAULT '0',
   deal_todo varchar(128),
   deal_visibility int(2) DEFAULT '0',
   PRIMARY KEY (deal_id)
@@ -810,7 +801,7 @@ CREATE TABLE Incident (
   incident_logger int(8) default NULL,
   incident_owner int(8) default NULL,
   incident_resolution text,
-  incident_archive int(2) NOT NULL default '0',
+  incident_archive char(1) NOT NULL default '0',
   PRIMARY KEY  (incident_id)
 ) TYPE=MyISAM;
 

@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : deal_index.php                                              //
-//     - Desc  : Deal Index File                                             //
-// 1999-04-10 Pierre Baudracco - Last Update : 2000-10-05                    //
+// OBM - File : deal_index.php                                               //
+//     - Desc : Deal Index File                                              //
+// 1999-04-10 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,11 +40,6 @@
 // - parent_insert        -- form fields    -- insert the deal
 // - parent_update        -- form fields    -- update the parent
 // - parent_delete        -- $param_parent  -- delete the parent
-
-// ??? - updatearchive ???
-// - optionconsult_parent
-// - ch_opt_dis_parent
-// - ch_opt_level_parent
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -92,6 +87,11 @@ display_bookmarks();
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
+// when searching deals belonging to a parent, we display the parent
+if (($action == "search") && ($param_parent)) {
+  $action = "parent_detailconsult";
+}
+
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ if (($action == "index") || ($action == "")) {
       $q_invoices = run_query_search_connected_invoices ($param_deal, $incl_arch);
       //      $q_invoices->next_record();
       $invoices_options = run_query_display_pref ($uid, "invoice");
-      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options,$page);
+      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
     }
     else {
       // this deal's page has "private" access
@@ -158,7 +158,7 @@ if (($action == "index") || ($action == "")) {
     } else {
       display_err_msg("$l_insert_error : $err_msg");
     }
-    dis_deal_index();
+    dis_deal_index($deal);
   } else {
     require("deal_js.inc");
     display_warn_msg($err_msg);
@@ -180,7 +180,7 @@ if (($action == "index") || ($action == "")) {
     $q_invoices = run_query_search_connected_invoices ($param_deal, $incl_arch);
     $q_invoices->next_record();
     $invoices_options = run_query_display_pref ($uid, "invoice");
-    html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options,$page);
+    html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
   } else {
     display_err_msg($err_msg);
     $param_company = $deal["company"];
@@ -229,38 +229,12 @@ if (($action == "index") || ($action == "")) {
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
 
-
-
-} elseif ($action == "updatearchive")  {
-///////////////////////////////////////////////////////////////////////////////
-  $nb_aff=0;
-  reset($HTTP_POST_VARS);
-  while (list( $key, $val) = each( $HTTP_POST_VARS )) {
-    if (($key != "menu") && ($key != "action")) {
-      if(strcmp(substr($key, 0, 8),"archive_") == 0) {
-	$obm_q=run_query_detail(substr($key,8));
-	$obm_q->next_record(); 
-	run_query_update_archive(substr($key,8),$obm_q->f("deal_parentdeal_id"));
-	$nb_aff++;
-      }
-    }
-   }
- 
-    display_ok_msg($l_archive_ok);
-    echo $nb_aff . " " . $l_archive_number . "<BR>\n";
-    
-  require("deal_js.inc");
-  html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), run_query_internal_contact());
-
-
-
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
     require("deal_js.inc");
     html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
-  }
-  else {
+  } else {
     display_error_permission();
   }
 
@@ -393,7 +367,7 @@ if (($action == "index") || ($action == "")) {
   html_parentdeal_search_form($deal, run_query_internal_contact());
   dis_parentdeal_search_list($deal);
 
-} elseif ($action=="parent_new") {
+} elseif ($action == "parent_new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
     require("deal_js.inc");
@@ -404,16 +378,16 @@ if (($action == "index") || ($action == "")) {
     display_error_permission();
   }
 
-} elseif ($action=="parent_detailconsult") {
+} elseif ($action == "parent_detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail_parentdeal($param_parent);
   $obm_q_options = run_query_display_pref ($uid,"deal");
-  $deal_q = run_query_search($deal, 0, $new_order, $new_order2);
+  $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
   $num_rows = $deal_q->num_rows();
 	
-  html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,$page,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact(),$new_order,$new_order2);
+  html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact());
 
-} elseif ($action=="parent_detailupdate") {
+} elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {	
     if ($param_parent > 0) {
@@ -426,7 +400,7 @@ if (($action == "index") || ($action == "")) {
     display_error_permission();
   }
 
-} elseif ($action=="parent_insert") {
+} elseif ($action == "parent_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_parent_form("", $deal)) {
     $retour = run_query_insert_parentdeal($deal);
@@ -442,7 +416,7 @@ if (($action == "index") || ($action == "")) {
     html_parentdeal_search_form($deal, run_query_internal_contact());
   }
 
-} elseif ($action=="parent_delete") {
+} elseif ($action == "parent_delete") {
 /////////////////////////////////////////////////////////////////////
   if (check_parent_has_deal($param_parent)) {
     display_err_msg($l_err_parent_has_deal);
@@ -456,7 +430,7 @@ if (($action == "index") || ($action == "")) {
     html_parentdeal_search_form($deal, run_query_internal_contact());
   }    
 
-} elseif  ($action=="parent_update") {
+} elseif  ($action == "parent_update") {
 /////////////////////////////////////////////////////////////////////
   if (check_parent_form("", $deal)) {
     $retour = run_query_update_parentdeal($deal);
@@ -467,9 +441,9 @@ if (($action == "index") || ($action == "")) {
     }
     $obm_q = run_query_detail_parentdeal($param_parent);
     $obm_q_options = run_query_display_pref ($uid,"deal");
-    $deal_q = run_query_search($deal, 0, $new_order, $new_order2);
+    $deal_q = run_query_search($deal, 0, $new_order, $order_dir);
     $num_rows = $deal_q->num_rows();
-    html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,$page,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact(),$new_order,$new_order2);
+    html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_internal_contact());
   } else {
     display_err_msg($err_msg);
     require("deal_js.inc");
@@ -484,7 +458,7 @@ if (($action == "index") || ($action == "")) {
   $list_parent_q = run_query_search_parentdeal('');
   html_deal_affect($list_parent_q, $param_deal);
 
-} elseif ($action=="affect_update") {
+} elseif ($action == "affect_update") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_deal>0) {
     run_query_affect_deal_parentdeal($param_deal, $deal);
@@ -499,7 +473,7 @@ if (($action == "index") || ($action == "")) {
       $q_invoices = run_query_search_connected_invoices ($param_deal, $incl_arch);
       $q_invoices->next_record();
       $invoices_options = run_query_display_pref ($uid,"invoice");
-      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options,$page);
+      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
       //      html_deal_consult($deal_q, run_query_internal_contact(), run_query_contact_deal($cid), $cid);
     }
   } else {
@@ -530,7 +504,7 @@ function get_param_deal() {
   global $tf_company_name, $sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
-  global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat, $tf_cat_ml;
+  global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat;
 
   // Deal fields
   if (isset ($param_deal)) $deal["id"] = $param_deal;
@@ -590,7 +564,6 @@ function get_param_deal() {
   // Admin - Category fields
   // $sel_cat -> "cat" is already set
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
-  if (isset ($tf_cat_ml)) $deal["cat_mlabel"] = $tf_cat_ml;
 
   dis_debug_param($deal);
   return $deal;

@@ -1,10 +1,10 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : incident_display.php                                        //
-//     - Desc  : Incident File                  		             //   
-// 2002-03-14  : Mehdi Rande                                                 //
+// OBM - File : incident_display.php                                         //
+//     - Desc : Incident File                                                //
+// 2002-03-14 : Mehdi Rande                                                  //
 ///////////////////////////////////////////////////////////////////////////////
-//      $Id$
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -67,7 +67,7 @@ function html_incident_search_form ($obm_q_contacts_obm,$incident) {
   $dis_sel_stat.=">$l_closed</OPTION>\n</SELECT>";
  
   echo "<CENTER>
-     <FORM METHOD=POST NAME=f_incident ACTION=\"" .
+     <FORM METHOD=GET NAME=f_incident ACTION=\"" .
      $sess->url("incident_index.php") . " \" onSubmit=\"if (verifier_inc(this)) return true; else return false;\">
      <TABLE BORDER=0><TR><TD>
       <TABLE BORDER=0><TR>
@@ -123,10 +123,10 @@ function html_incident_search_form ($obm_q_contacts_obm,$incident) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_incident_search_list($incident) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "incident");
-  $obm_q = run_query_search($incident, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($incident, $new_order, $order_dir);
   $nb_incident = $obm_q->num_rows();
   if ($nb_incident == 0) {
     display_warn_msg($l_no_found);
@@ -200,7 +200,7 @@ function html_new_incident_contract($contr_q) {
   echo "<CENTER>
     <FORM METHOD=POST NAME=form_contr
           onSubmit=\"if (verifie(this)) return true; else return false;\"
-          ACTION=\"".$sess->self_url()."\">";
+          ACTION=\"".$sess->url("incident_index.php")."\">";
 
   echo $l_incident_select_contract;
   echo "<P>
@@ -321,7 +321,7 @@ function html_incident_form($action, $contr_q, $co_q, $incident) {
 
   // CHECK DELETE
     $dis_submit .=     "<TD valign=top>\n";
-    $dis_submit .=     "<FORM METHOD=POST NAME=f_del_con onSubmit=\"if (confirm_del()) return true; else return false;\" ";
+    $dis_submit .=     "<FORM METHOD=GET NAME=f_del_con onSubmit=\"if (confirm_del()) return true; else return false;\" ";
     $dis_submit .=     "ACTION=\"" . $sess->url("incident_index.php") . "\">\n";
     $dis_submit .=     "<INPUT TYPE=hidden NAME=action VALUE=delete>\n";
     $dis_submit .=     "<INPUT TYPE=hidden NAME=param_incident VALUE=\"$param_incident\">\n";
@@ -451,7 +451,6 @@ echo "
 //      $p_company_id  : id of the company concerned by the contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id) {
-
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // - Labels
@@ -459,14 +458,34 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
   global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status;
   global $l_update,$l_incident_description,$l_incident_solution,$l_incident_date,$l_contract_num;
   global $l_to, $l_from,$l_manager,$l_client_manager,$l_update,$l_archive_consult;
-
   global $perms_user,$l_perms_user;
   global $auth, $sess;
 
-   
+  $label = $inc_q->f("incident_label");
+  $pri = $inc_q->f("incident_priority");
+  $state = $inc_q->f("incident_etat");
+  $date = $inc_q->f("incident_date");
+  $inc_id = $inc_q->f("incident_id");
+  $inc_desc = nl2br($inc_q->f("incident_description"));
+  $inc_reso = nl2br($inc_q->f("incident_resolution"));
+  $con_id = $con_q->f("contract_id");
+  $con_label = $con_q->f("contract_label");
+  $con_num = $con_q->f("contract_numero");
+  $con_debut = $con_q->f("contract_debut");
+  $con_exp = $con_q->f("contract_expiration");
+  $con_tech = $con_q->f("contract_responsable_tech_id");
+  $con_com = $con_q->f("contract_responsable_com_id");
+  $con_cli = $con_q->f("contract_responsable_client_id");
+  $con_cli2 = $con_q->f("contract_responsable_client2_id");
+  $obm_q_company->next_record();
+  $comp_name = $obm_q_company->f("company_name");
+  $comp_ad1 = $obm_q_company->f("company_address1");
+  $comp_zip = $obm_q_company->f("company_zipcode");
+  $comp_town = $obm_q_company->f("company_town");
+
   while($obm_q_contacts_obm->next_record()) {
     if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_owner")) 
-	$dis_lab_owner = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
+      $dis_lab_owner = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
   }
 
   if ($obm_q_contacts_obm->nf()>0) {
@@ -475,7 +494,7 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
 
   while($obm_q_contacts_obm->next_record()) {
     if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_logger")) 
-        $dis_lab_logger = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
+      $dis_lab_logger = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
   }
 
   if ($inc_q->f("incident_archive") == 1) {
@@ -487,8 +506,8 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
   }
 
   while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") ==$con_q->f("contract_responsable_tech_id")) 
-        $dis_lab_tec = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+    if ($obm_q_contacts_obm->f("contact_id") == $con_tech) 
+      $dis_lab_tec = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
   }
 
   if ($obm_q_contacts_obm->nf()>0) {
@@ -496,13 +515,13 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
   }
 
   while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $con_q->f("contract_responsable_com_id")) 
-        $dis_lab_com = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+    if ($obm_q_contacts_obm->f("contact_id") == $con_com) 
+      $dis_lab_com = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
   }
 
   while($obm_q_contacts->next_record()) {
-    if ($obm_q_contacts->f("contact_id") == $con_q->f("contract_responsable_client_id")) 
-        $dis_lab_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+    if ($obm_q_contacts->f("contact_id") == $con_cli) 
+      $dis_lab_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
     }
 
  if ($obm_q_contacts->nf()>0) {
@@ -510,139 +529,132 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
  }
  
  while($obm_q_contacts->next_record()) {
-   if ($obm_q_contacts->f("contact_id") == $con_q->f("contract_responsable_client2_id")) 
-    $dis_lab_cli2 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+   if ($obm_q_contacts->f("contact_id") == $con_cli2) 
+     $dis_lab_cli2 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
     }
 
-
   if ($auth->auth["perm"] != $perms_user) {
-    $dis_update = "<FORM METHOD=POST NAME=form_contract_update ACTION=\"".$sess->self_url()."\">\n";
-    $dis_update .= "<INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">\n";
-    $dis_update .= "<INPUT TYPE=hidden NAME=param_incident VALUE=\"".$inc_q->f("incident_id")."\">\n";
-    $dis_update .= "<INPUT TYPE=hidden NAME=param_contract VALUE=\"".$con_q->f("contract_id")."\">\n";
-    $dis_update .= "<INPUT TYPE=submit value=\"$l_update\">\n";
-    $dis_update .= "</FORM>\n";
+    $dis_update = "<FORM METHOD=GET NAME=form_contract_update ACTION=\"".$sess->url("incident_index.php") . "\">
+      <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
+      <INPUT TYPE=hidden NAME=param_incident VALUE=\"$inc_id\">
+      <INPUT TYPE=hidden NAME=param_contract VALUE=\"$con_id\">
+      <INPUT TYPE=submit value=\"$l_update\">
+      </FORM>";
+  }
 
-}
-
-  echo "
-<CENTER>
-
-<TABLE border=0><TR><TD valign=top>
-</TD><TD>
-<TABLE border=0><TR><TD>";
-
-echo "
-<TABLE border=0><TR><TD valign=top align=left>";
-echo "<TABLE>
-<TR>
-   <TD><FONT COLOR=\"#$col_label\">$l_incident_label</FONT></TD><TD>";
-echo $inc_q->f("incident_label");
-echo "</TD>
-      </TR><TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_incident_priority</FONT></TD><TD>";
-echo $inc_q->f("incident_priority");
-echo "</TD>
-</TR>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_incident_status</FONT></TD><TD>";
-echo $inc_q->f("incident_etat");
-echo "</TD>
-</TR>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_incident_date</FONT></TD><TD>";
-echo $inc_q->f("incident_date");
-echo "</TD>
-</TR>
-</TABLE>
-
-<TABLE border=0>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_incident_owner</FONT></TD><TD>
-  ".$dis_lab_owner."
-  </TD></TR><TR><TD><FONT COLOR=\"#$col_label\">$l_incident_logger</FONT></TD><TD>
-  ".$dis_lab_logger .
-  $dis_lab_archive ."
-  </TD>
-</TR>
-</TABLE>";
-
-  // Pave Contract
-  echo " </TD><TD valign=top>
-  <TABLE bgcolor=\"#$col_label\">
-    <TR>
-    <TD bgcolor=\"#$col_table\" colspan=2>";
-    echo "<A HREF=\"".
-      $sess->url("contract_index.php?action=detailconsult_contract&amp;param_contract=".$con_q->f("contract_id"))."\">";
-    echo "<FONT color=\"#$col_textem\">".$con_q->f("contract_label")."</FONT></A>
-    <BR>".$l_contract_num." : ".$con_q->f("contract_numero") ."
-    <BR>".$l_from." ".$con_q->f("contract_debut")." ".$l_to." ".$con_q->f("contract_expiration")."
-    </TD>
-    </TR><TR>
-    <TD valign=center colspan=2>$l_manager</TD>";
-    echo "</TR><TR>
-    ".$dis_lab_tec."
-    <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_tech_id"))."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
-    echo "</TR><TR>
-    ".$dis_lab_com."
-    <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_com_id"))."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
-    echo "</TR>
-
-  </TABLE>
-
-";
-  // Pave Societe, contact
-  $obm_q_company->next_record();
-  echo " </TD><TD valign=top>
-  <TABLE bgcolor=\"#$col_label\">
-    <TR>
-    <TD bgcolor=\"#$col_table\" colspan=2>
-    <FONT color=\"#$col_textem\">".$obm_q_company->f("company_name")."</FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-    echo "<A HREF=\"".
-      $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">";
-    echo "<IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
-    <BR>".$obm_q_company->f("company_address1") ."
-    <BR>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
-    </TD>
-    </TR><TR>
-    <TD valign=center colspan=2>$l_client_manager</TD>";
-    echo "</TR><TR>
-    ".$dis_lab_cli1."
-    <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_client_id"))."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
-    echo "</TR><TR>
-    ".$dis_lab_cli2."
-    <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_client2_id"))."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
-    echo "</TR>
-
-  </TABLE>
-</TD>
-</TR>
-</TABLE>
-
-</TD></TR>
-<TR><TD>
-
-<TABLE width=100% border=0>
-<TR>";
-echo "<TD valign=top><FONT COLOR=\"#$col_label\">".$l_incident_description."</FONT><BR>";
-echo nl2br($inc_q->f("incident_description")); 
-echo "<BR><BR><TD valign=top><FONT COLOR=\"#$col_label\">".$l_incident_solution."</FONT><BR>";
-echo nl2br($inc_q->f("incident_resolution")); 
-echo "</TD></TR><TR>
-<TD align=center colspan=2><BR>
-". $dis_update."
-&nbsp;</TD></TR></TABLE>
-</TD></TR></TABLE>
-</TD></TR></TABLE>";
-echo "</CENTER>";
+  echo "<center>
+  <table border=0>
+  <tr>
+    <td valign=top></td>
+    <td>
+      <table border=0>
+      <tr>
+        <td>
+          <table border=0>
+          <tr>
+            <td valign=top align=left>
+              <table>
+              <tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_label</font></td>
+                <td>$label</td>
+              </tr><tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_priority</font></td>
+                <td>$pri</td>
+              </tr><tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_status</font></td>
+                <td>$state</td>
+              </tr><tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_date</font></td>
+                <td>$date</td>
+              </tr>
+              </table>
+              <table border=0>
+              <tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_owner</font></td>
+                <td>$dis_lab_owner</td>
+              </tr><tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_logger</font></td>
+                <td>$dis_lab_logger $dis_lab_archive</td>
+              </tr>
+              </table>
+<!--  Pave Contract -->
+            </td>
+            <td valign=top>
+              <table bgcolor=\"#$col_label\">
+              <tr>
+                <td bgcolor=\"#$col_table\" colspan=2>
+                  <A HREF=\"".$sess->url("contract_index.php?action=detailconsult_contract&amp;param_contract=$con_id") . "\"><font color=\"#$col_textem\">$con_label</font></a>
+                  <br>$l_contract_num : $con_num
+                  <br>$l_from $con_debut $l_to $con_exp
+                </td>
+              </tr><tr>
+                <td valign=center colspan=2>$l_manager</td>
+              </tr><tr>
+                <td>$dis_lab_tec <A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_tech") . "\">
+                  <img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                </td>
+              </tr><tr>
+                <td>$dis_lab_com <A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_com") . "\"><img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                </td>
+              </tr>
+              </table>
+            </td>
+<!-- Compan,contact -->
+            <td valign=top>
+              <table bgcolor=\"#$col_label\">
+              <tr>
+                <td bgcolor=\"#$col_table\" colspan=2>
+                  <font color=\"#$col_textem\">$comp_name</FONT>
+                  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                  <A HREF=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">
+                  <img ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></a>
+                  <br>$comp_ad1
+                  <br>$comp_zip $comp_town
+                </td>
+              </tr><tr>
+                <td valign=center colspan=2>$l_client_manager</td>
+              </tr><tr>
+                <td>$dis_lab_cli1 <A HREF=\"".
+                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli")."\">
+                  <IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                </td>
+              </tr><tr>
+                <td>$dis_lab_cli2 <A HREF=\"".
+                  $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
+                  <img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></a>
+                </td>
+              </tr>
+              </table>
+            </td>
+          </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <table width=100% border=1>
+          <tr>
+            <td valign=top>
+              <font COLOR=\"#$col_label\">$l_incident_description</font>
+              <br>$inc_desc
+              <br>
+            </td>
+            <td valign=top>
+              <font COLOR=\"#$col_label\">$l_incident_solution</font>
+              <br>$inc_reso
+            </td>
+          </tr><tr>
+            <td align=center colspan=2>
+              <br>$dis_update &nbsp;</td>
+          </tr>
+          </table>
+        </td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  </table>
+  </center>";
 
 }
 

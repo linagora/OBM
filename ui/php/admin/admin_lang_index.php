@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : admin_lang_index.php                                        //
-//     - Desc  : lang admin index File                                       //
+// OBM - File : admin_lang_index.php                                         //
+//     - Desc : lang admin index File                                        //
 // 2001-12-17 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //

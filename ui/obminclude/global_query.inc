@@ -1,51 +1,32 @@
-<?
+<?php
 ///////////////////////////////////////////////////////////////////////////////
-//       Query functions that can be called on several place in OBM          //
+// OBM - File : global_query.inc                                             //
+//     - Desc : Global Query File                                            //
+// 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-//-----------------------------------------------------------------
-// 2001-07-19 / Fink / changed double quotes to single quotes (SQL-Standard and required by PostgreSQL)
-// 2001-07-20 / Fink / fixed typo in query_id_user
-//-----------------------------------------------------------------
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//           Function to get the name of the OBM user's name                ///
+// Query Execution : get the Id of one User from its login / pass
+// Parameters:
+//   - $login  : login
+//   - $passwd : password
+// Returns:
+//   - user's Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_name_user($usercreate_id) {
-  global $cdg_sql;
-
-  if(isset($usercreate_id)) {
-    $query = "select userobm_username
-              from UserObm
-              where userobm_id='$usercreate_id'" ;
-    display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM ;
-    $obm_q->query($query) ;
-    $obm_q->next_record() ;
-    return $obm_q->f("userobm_username") ;
-  }else {
-    return "" ;
-  }
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-//           Function to get the id of the OBM user's login / pass          ///
-///////////////////////////////////////////////////////////////////////////////
-function run_query_id_user($username,$passwd) {
+function run_query_id_user($login, $passwd) {
   $connect_db = new DB_OBM ;
-  if (isset($username) && isset($passwd)) {
-    $query = "select userobm_id from UserObm where userobm_username = '$username' and userobm_password='$passwd' " ;
+  if (isset($login) && isset($passwd)) {
+    $query = "select userobm_id from UserObm where userobm_login='$login' and userobm_password='$passwd' " ;
     $connect_db->query($query) ;
     $connect_db->next_record() ;
     return $connect_db->f("userobm_id") ;
-  }else {
+  } else {
     return "" ;
   }
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -68,98 +49,34 @@ function run_query_contactid_user($user_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_default_preferences_insert($user_id) {
   global $cdg_sql;
-  global $set_lang_default, $set_theme_default, $set_display_default, $set_rows_default;
-  global $last_company_default, $last_deal_default, $last_contact_default, $last_invoice_default;
-  global $last_account_default, $last_payment_default;
-  global $set_day_weekstart_default;
 
-  $set_debug_default = 0;	       	
   $obm_q = new DB_OBM;
 
+  //---------------------------------------------------------------------------
+  // Default User Preferences (tableUserObmPref)
+  // We copy each entry with user id = 0 to the new user
+  //---------------------------------------------------------------------------
+
+  $obm_q = new DB_OBM;
   //-- Drop current user preferences
   $query = "delete from UserObmPref where userobmpref_user_id='$user_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
-  //-- Default language
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_lang','$set_lang_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default theme
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_theme','$set_theme_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  
-  //-- Default auto-display flag
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_display','$set_display_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default debug level
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_debug','$set_debug_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default number of rows displayed in the list
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_rows','$set_rows_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default "last visited" company 
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_company','$last_company_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  
-  //-- Default "last visited" deal
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_deal','$last_deal_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default "last visited" contact
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_contact','$last_contact_default')";
+  //-- We get default parameters (user id 0)
+  $query = "select * from UserObmPref where userobmpref_user_id='0'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
-  //-- Default "last visited" account
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_account','$last_account_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+  $line_q = new DB_OBM;
+  while ($obm_q->next_record()) {
+    $option = $obm_q->f("userobmpref_option");
+    $value = $obm_q->f("userobmpref_value");
 
-  //-- Default "last visited" payment
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_payment','$last_payment_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //-- Default "last visited" invoice
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_invoice','$last_invoice_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //-- Default value for "order_contactslist"
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'order_contactslist','$order_contactslist_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //-- Default value for "order_servicecomputer"
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'order_servicecomputer','$order_servicecomputer_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //-- Default value for the day the week start 
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'set_day_weekstart','$set_day_weekstart_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-   
-  //-- Default "last visited" payment
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_contract','$last_contract_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-
-  //-- Default "last visited" invoice
-  $query="insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ($user_id,'last_incident','$last_incident_default')";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+    $query = "insert into UserObmPref (userobmpref_user_id, userobmpref_option, userobmpref_value) values ('$user_id', '$option', '$value')";
+    display_debug_msg($query, $cdg_sql);
+    $line_q->query($query);
+  }
 
 
   //---------------------------------------------------------------------------
@@ -248,7 +165,7 @@ function run_query_display_pref_update($entity, $fieldname, $display) {
 //   - $fieldname : fieldname to change the display value
 //   - $display   : current display value
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref_level_update($entity, $new_level, $fieldorder) {
+function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
   global $auth, $cdg_sql;
 
   $num_new_level = ($new_level == "up") ? $fieldorder-1 : $fieldorder+1;
@@ -299,7 +216,7 @@ function run_query_set_options_user($p_user_id, $option, $new_value) {
 // Return all the preferences of the specified user
 /////////////////////////////////////////////////////////////////////////////
 function run_query_get_all_options_user($p_user_id) {
-  global $sess, $cdg_sql;
+  global $cdg_sql;
 
   $query = "select * from UserObmPref where userobmpref_user_id='$p_user_id'";
   // Problem because called before include global.inc in setting module
@@ -310,12 +227,12 @@ function run_query_get_all_options_user($p_user_id) {
   return $obm_q_pref;
 }
 
+
 /////////////////////////////////////////////////////////////////////////////
 // Return all the global preferences
 /////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_all__global_options() {
-  $cdg_sql;
+  global $cdg_sql;
 
   $query = "select * from GlobalPref";
   display_debug_msg($query, $cdg_sql);
@@ -326,18 +243,18 @@ function run_query_get_all__global_options() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get and register into session the global preferences
+// Get and register the global preferences into session at login 
 // This must be called in before page_open 
 ///////////////////////////////////////////////////////////////////////////////
-function session_load_params() {
+function session_load_global_prefs() {
   global $sess;
   $obm_q_name_var = run_query_get_all__global_options();
   while ($obm_q_name_var->next_record()) {
     $tab[0]=$obm_q_name_var->f("globalpref_option");
     $tab[1]=$obm_q_name_var->f("globalpref_value");
-// Define the variable in the database as global ($tab[0] contain the name of
-// the variable so ${$tab[0]} while be a variable which label while be the 
-// value of $tab[0].
+
+    // Define the variable in the database as global ($tab[0] contain the
+    // variable name so ${$tab[0]} will define the var
     global ${$tab[0]};
     ${$tab[0]}=$tab[1];
     $sess->register("$tab[0]");
@@ -346,23 +263,17 @@ function session_load_params() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get and register into session the user's preferences
-// This must be called in an open session (between page_open and page_close 
+// Get and register the user's preferences into session
+// This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
-function session_load_preferences() {
+function session_load_user_prefs() {
   global $sess, $auth;
-  global $set_theme, $set_lang, $set_display, $set_rows, $set_debug;
-  global $last_company, $last_contact, $last_deal,$last_contract;
-  global $last_payment, $last_account, $last_invoice,$last_incident;
-  global $last_company_name, $last_contact_name, $last_deal_name;
-  global $last_contract_name ,$last_incident_name;
-  global $last_payment_name, $last_account_name, $last_invoice_name;  
-  global $order_contactslist, $order_servicecomputer, $set_day_weekstart;
 
   $obm_q_name_var = run_query_get_all_options_user($auth->auth["uid"]);
   while ($obm_q_name_var->next_record()) {
     $tab[0]=$obm_q_name_var->f("userobmpref_option");
     $tab[1]=$obm_q_name_var->f("userobmpref_value");
+    global ${$tab[0]};
     $$tab[0]=$tab[1];
     $sess->register("$tab[0]");
   }
@@ -387,32 +298,38 @@ function session_load_preferences() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Anction on ActiveUserObm and UserObm_Session Log during //
+// Query Execution - Action on ActiveUserObm and UserObm_Session Log during  //
 // the logout
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_logout() {
   global $sess, $cdg_sql;
+
+  // get the Active connexion
   $obm_q = new DB_OBM ; 
   $query = "Select * from ActiveUserObm 
             where activeuserobm_sid = '".$sess->id."'";
   display_debug_msg($query, $cdg_sql);
-
   $obm_q->query($query) ;
+
   if($obm_q->next_record()) {
-    run_query_store($obm_q);
+    // Log the connexion in the session log
+    run_query_log_session($obm_q);
+
+    // drop the connexion from the active user session table
     $query = "delete from ActiveUserObm where 
               activeuserobm_sid = '".$obm_q->f('activeuserobm_sid')."'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query) ;
   }
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Insertion or update of the Session logs		     //
 // during the logout						  	     //
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_store($obm_q) {
+function run_query_log_session($obm_q) {
+  global $cdg_sql;
 
   $uquery = sprintf("
     update UserObm_SessionLog set 
@@ -447,11 +364,15 @@ function run_query_store($obm_q) {
     $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'));
 
   $obm_q2 = new DB_OBM ;
+  display_debug_msg($uquery, $cdg_sql);
   $obm_q2->query($uquery);
-  if ( $obm_q2->affected_rows() == 0
-     && $obm_q2->query($squery)
-     && $obm_q2->next_record() && $obm_q2->f(0) == 0
-     && !$obm_q2->query($iquery)) {
+  if ( $obm_q2->affected_rows() == 0) {
+    display_debug_msg($squery, $cdg_sql);
+    if ( $obm_q2->query($squery)
+         && $obm_q2->next_record() && $obm_q2->f(0) == 0 ) {
+      display_debug_msg($iquery, $cdg_sql);
+      $obm_q2->query($iquery);
+    }
   }
 }
 

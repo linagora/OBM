@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : admin_index.php                                             //
-//     - Desc  : Administration (Language, themes,...) management index file //
+// OBM - File : admin_index.php                                              //
+//     - Desc : Administration (Language, themes,...) management index file  //
 // 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -15,11 +15,12 @@ $menu="ADMIN";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
-$actions = array ('help', 'index', 'data_show', 'data_update','clear_sess');
+$actions = array ('help', 'index', 'data_show', 'data_update', 'clear_sess');
 
 require("$obminclude/phplib/obmlib.inc");
 require("admin_display.inc");
 require("admin_query.inc");
+require("admin_pref_query.inc");  // for get_global_pref_lifetime()
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -35,15 +36,21 @@ switch ($mode) {
    break;
  case "html":
    $menu = "ADMIN";
+
    include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
-   //   $debug = $set_debug;
-//   if($action!="clear_sess") {
-     display_head("Admin_Code");
-     generate_menu($menu);
-//   }
+   display_head("Admin_Code");
+   generate_menu($menu);
+
    break;
+}
+
+
+if ($action != "help") {
+  // We get lifetime from the database and not from the session variable
+  // in case it has been updated since (session value last during the session)
+  $lifetime = get_global_pref_lifetime();
 }
 
 
@@ -52,29 +59,38 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_index($mode);
+    dis_index($mode, $lifetime);
     break;
   case "clear_sess":
-    dis_clear_sess($mode);
+    dis_clear_sess($mode, $lifetime);
     break;
   default:
     echo "No action specified !";
     break;
 }
-///////////////////////////////////////////////////////////////////////////////
-// Agrgument parsing                                                         //
-///////////////////////////////////////////////////////////////////////////////
 
+
+// Program End
+switch ($mode) {
+ case "txt":
+   echo "bye...\n";
+   break;
+ case "html":
+   page_close();
+   display_end();
+   break;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display command use                                                       //
+///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
   global $actions, $modules, $langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
     if ($nb == 0) $lactions .= "$val";
     else $lactions .= ", $val";
-  }
-  while (list($nb, $val) = each ($modules)) {
-    if ($nb == 0) $lmodules .= "$val";
-    else $lmodules .= ", $val";
   }
 
   echo "$msg
@@ -87,16 +103,6 @@ Ex: php4 admin_clear_sess.php -a clear_sess
 ";
 }
 
-// Program End
-switch ($mode) {
- case "txt":
-   echo "bye...\n";
-   break;
- case "html":
-   page_close();
-   display_end();
-   break;
-}
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////

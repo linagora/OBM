@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : payment_query.inc 
-//     - Desc  : payment query File
+// OBM - File : payment_query.inc 
+//     - Desc : payment query File
 // 2001-08-21 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // search for the specified payment in the database
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($p_payment, $p_new_order="", $p_new_order2="") {
+function run_query_search($p_payment, $p_new_order="") {
   global $auth, $cdg_sql;
 
   $label = $p_payment["label"];
@@ -60,31 +60,31 @@ function run_query_search($p_payment, $p_new_order="", $p_new_order2="") {
   $query .= " where  Payment.payment_id = P2.payment_id ";
   // search criterias :
   if ($label) {
-    $query .= " and Payment.payment_label like '".$label."%'";
+    $query .= " and Payment.payment_label like '$label%'";
   }
   if ($number) {
-    $query .= " and Payment.payment_number like '%".$number."%'";
+    $query .= " and Payment.payment_number like '%$number%'";
   }
   if ($amount) {
-    $query .= " and Payment.payment_amount ='".$amount."'";
+    $query .= " and Payment.payment_amount ='$amount'";
   }
   if ($date_after) {
-    $query .= " and Payment.payment_date >='".$date_after."'";
+    $query .= " and Payment.payment_date >='$date_after'";
   }
   if ($date_before) {
-    $query .= " and Payment.payment_date <='".$date_before."'";
+    $query .= " and Payment.payment_date <='$date_before'";
   }
   if (($inout != "")&&($inout != "_TOUT_")) {
-    $query .= " and Payment.payment_inout ='".$inout."'";
+    $query .= " and Payment.payment_inout ='$inout'";
   }
   if (($paid != "")&&($paid != "_TOUT_")) {
-    $query .= " and Payment.payment_paid = '".$paid."'";
+    $query .= " and Payment.payment_paid = '$paid'";
   }
   if (($kind != "")&&($kind!="-1")) {
-    $query .= " and Payment.payment_paymentkind_id ='".$kind."'";
+    $query .= " and Payment.payment_paymentkind_id ='$kind'";
   }
   if (($account != "")&&($account != "-1")) {
-    $query .= " and Payment.payment_account_id ='".$account."'";
+    $query .= " and Payment.payment_account_id ='$account'";
   }
   if ($deal != "" || $company != "" ) {
     $query .= " and dealinvoice_deal_id = deal_id ".
@@ -92,10 +92,10 @@ function run_query_search($p_payment, $p_new_order="", $p_new_order2="") {
     " and paymentinvoice_invoice_id = invoice_id ".
     " and paymentinvoice_payment_id = P4.payment_id ".
     " and Payment.payment_id = P4.payment_id ".
-    " and deal_label like '".$deal."%'";
+    " and deal_label like '$deal%'";
     if ($company != "") {
       $query .= " and deal_company_id = company_id ".
-	 " and company_name like '".$company."%'";
+	 " and company_name like '$company%'";
     }
   }
   if ($checked != 'y') {
@@ -103,9 +103,6 @@ function run_query_search($p_payment, $p_new_order="", $p_new_order2="") {
   }
 
   $query .= " order by ".$order;
-  if ($p_new_order2!="") {
-    $query .= ", ".$p_new_order2;
-  }
 
   display_debug_msg ("<b>run_query_search() : </b>$query", $cdg_sql);
 

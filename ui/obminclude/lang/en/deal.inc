@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                 //
-//     - File     : deal.inc                                                //
-// 1999-01-26 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                  //
+//     - File     : deal.inc                                                 //
+// 1999-01-26 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
 //for list
@@ -28,27 +28,20 @@ $l_amount = "Amount";
 $l_state = "State";
 $l_date_alarm = "Alarm Date";
 $l_comment = "Comment";
-$l_archive = "Archive";
 $l_todo = "To Do";
 $l_visibility = "Access";
 
 // Labels and texts
-$l_back = "Back";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Order";
-$l_last_deal = "Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
 $l_amount_in = "Amout of inputs";
 $l_amount_out = "Amout of outputs";
 $l_label_start = "Label start";
 $l_manager = "Manager";
 $l_proposition = "Proposal";
 $l_show_archive = "Show the archives";
-$l_archive_first = "A";
-$l_all_f = "All";
-$l_all = "All";
+$l_archive_first = "Arc";
 $l_date_alarm_after = "Alarm Date after";
 $l_date_alarm_before = "Alarm Date before";
 $l_after = "After";
@@ -79,6 +72,7 @@ $l_parentdeal_deals = "Deals belonging to this parentdeal";
 // Direct fields
 $fieldnames["deal_label"] = $l_label;
 $fieldnames["deal_datealarm"] = $l_date_alarm;
+$fieldnames["deal_archive"] = $l_archive_first;
 $fieldnames["deal_todo"] = $l_todo;
 $fieldnames["parentdeal_label"] = $l_label;
 $fieldnames["parentdeal_comment"] = $l_comment;
@@ -99,7 +93,6 @@ $fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
 $l_deal = "Deal";
 
 // Actions
-$l_find = "Find";
 $l_insert = "Insert the Deal";
 $l_update = "Update the  Deal";
 $l_delete = "Delete the Deal";
@@ -198,10 +191,6 @@ $l_j_category_update = "You have to select a category and enter a new name to up
 $l_j_kind_create = "You have to enter a new kind name to create it !";
 $l_j_status_create = "You have to enter a new state name to create it !";
 $l_j_category_create = "You have to enter a new category name to create it !";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
 
 // For the display parameters modification screen
 $l_deal_display = "Display options for deals list";

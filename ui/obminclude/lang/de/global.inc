@@ -1,27 +1,25 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English for global                                       //
+// OBM - Language : Deutsch (German)                                         //
 //     - File     : global.inc                                               //
-// 2001-12-27 Pierre Baudracco                                               //
+// 2002-08-10 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Common actions
-$l_find = "Find";
-$l_back = "Back";
-$l_cancel = "Cancel";
+$l_find = "Suche";
+$l_back = "Zurück";
+$l_cancel = "Abbruch";
 $l_close = "Close the window";
 $l_validate = "Validate";
 
 // Common messages
-$l_all = "All";
-$l_all_f = "All";
+$l_all = "Alle";
+$l_all_f = "Alle";
 $l_none = "---";
-$l_archive = "Archive";
-$l_invalid_data = "Invalid Data";
-$l_date_format = "%Y-%d-%m %H:%i:%s"; // Mysql date format
-$l_time_format = "%Y-%d-%m %H:%i:%s";
+$l_archive = "Archiv";
+$l_invalid_data = "Falsche Daten";
 
 // OBM_DISPLAY
 $l_field = "Field";
@@ -38,9 +36,9 @@ $l_up = "Move the field up one row";
 $l_help = "Help";
 $l_help_display_yes = "The field is displayed. Click on this button if you want the field not to be displayed";
 $l_help_display_no = "The field is not displayed. Click on this button if you want the field to be displayed";
-$l_help_mandatory = "This field is mandatory";
-$l_help_down  = "Move the field down";
-$l_help_up = "Move the field up";
+$l_help_mandatory = "Dieses Feld wird immer angezeigt";
+$l_help_down  = "Feld nach unten schieben";
+$l_help_up = "Feld nach oben schieben";
 
 
 //used by many modules

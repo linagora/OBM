@@ -1,27 +1,25 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English for global                                       //
+// OBM - Language : Norwegian                                                //
 //     - File     : global.inc                                               //
-// 2001-12-27 Pierre Baudracco                                               //
+// 2002-08-10 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Common actions
-$l_find = "Find";
+$l_find = "Finn";
 $l_back = "Back";
 $l_cancel = "Cancel";
 $l_close = "Close the window";
 $l_validate = "Validate";
 
 // Common messages
-$l_all = "All";
-$l_all_f = "All";
+$l_all = "Alle";
+$l_all_f = "Alle";
+$l_archive = "Arkiv";
 $l_none = "---";
-$l_archive = "Archive";
-$l_invalid_data = "Invalid Data";
-$l_date_format = "%Y-%d-%m %H:%i:%s"; // Mysql date format
-$l_time_format = "%Y-%d-%m %H:%i:%s";
+$l_invalid_data = "Ugyldig data";
 
 // OBM_DISPLAY
 $l_field = "Field";

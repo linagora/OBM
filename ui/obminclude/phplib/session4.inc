@@ -15,37 +15,37 @@ class Session {
   ## Define the parameters of your session by either overwriting
   ## these values or by subclassing session (recommended).
 
-//  var $magic = "";                    ## Some string you should change.
-  var $mode = "";               ## We propagate session IDs with cookies
-  var $cookiename = "";			## Name of the session cookie, defaults to classname
-//  var $fallback_mode;                 ## If this doesn't work, fall back...
+//  var $magic = "";              ## Some string you should change.
+  var $mode = "";                 ## We propagate session IDs with cookies
+  var $cookiename = "";           ## Name of session cookie default : classname
+//  var $fallback_mode;           ## If this doesn't work, fall back...
 
-//  var $cookie_domain = "";            ## If set, the domain for which the
-                                      ## session cookie is set.
+//  var $cookie_domain = "";      ## If set, the domain for which the
+                                  ## session cookie is set.
 
-//  var $gc_time  = 2;               ## Purge all session data older than 1440 minutes.
-//  var $gc_probability = 1;            ## Garbage collect probability in percent
+//  var $gc_time  = 2;            ## Purge all session data older than 1440 minutes.
+//  var $gc_probability = 1;      ## Garbage collect probability in percent
 
-  var $auto_init = "";                ## Name of the autoinit-File, if any.
-  var $secure_auto_init = 1;          ## Set to 0 only, if all pages call
-                                      ## page_close() guaranteed.
-  var $in = false;                    ## Marker: Did we already include the autoinit file?
+  var $auto_init = "";            ## Name of the autoinit-File, if any.
+  var $secure_auto_init = 1;      ## Set to 0 only, if all pages call
+                                  ## page_close() guaranteed.
+  var $in = false;                ## Marker: Did we already include the autoinit file?
 
-  var $allowcache = "passive";        ## "passive", "no", "private", "public"
-  var $allowcache_expire = 1440;      ## If you allowcache, data expires in this
-                                      ## many minutes.
-//  var $that_class = "";               ## Name of data storage container
-  var $lifetime = 7200;                  ## 0 = do session cookies, else minutes
+  var $allowcache = "passive";    ## "passive", "no", "private", "public"
+  var $allowcache_expire = 1440;  ## If you allowcache, data expires in this
+                                  ## many minutes.
+//  var $that_class = "";         ## Name of data storage container
+  var $lifetime = 7200;           ## 0 = do session cookies, else minutes
 
   ##
   ## End of parameters.
   ##
 
-  var $name;                          ## Session name
-  var $id;                            ## Unique Session ID
+  var $name;                      ## Session name
+  var $id;                        ## Unique Session ID
 //  var $that;
 
-//  var $pt = array();                  ## This Array contains the registered things
+//  var $pt = array();            ## This Array contains the registered things
 
   ## register($things):
   ##
@@ -503,13 +503,15 @@ class Session {
 
   function setcookie() {
    global $lifetime;
-   if($lifetime == 0) $lifetime = $this->lifetime_default;
-   session_set_cookie_params($lifetime);
+
+   if ($lifetime == 0) $lifetime = $this->lifetime_default;
+   // Use setcookie() as session_set_cookie_params() doesn't seem to work!
+   setcookie(session_name(), session_id(), time()+$lifetime, "/");
+   //   session_set_cookie_params($lifetime);
   }
 
   function start($sid = "") {
     global $HTTP_COOKIE_VARS;
-
 //    $this->set_container();
 //    $this->set_tokenname(); 
 //    $this->release_token($sid);
@@ -524,7 +526,6 @@ class Session {
     } else {
       $this->mode = "get";
     }
-//    session_set_cookie_params(2);
     session_start();
     $this->id = session_id();
   }

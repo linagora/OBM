@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contact_query.inc                                           //
-//     - Desc  : contact query File                                          //
+// OBM - File : contact_query.inc                                            //
+//     - Desc : contact query File                                           //
 // 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -14,9 +14,8 @@
 //     keys used       company_id, name, phone, company
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($contact, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_search($contact, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql;
 
   $company_id = $contact["company_id"];
@@ -30,7 +29,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir,$p_new_order2) {
 
   // If a contact indication has been specified, get it 
   if ($lname != "") {
-    $query .= " contact_lastname like '" . $lname . "%' and";
+    $query .= " contact_lastname like '$lname%' and";
   }
   // If a phone number hes been specified, get it 
   if ($phone != "") {
@@ -40,7 +39,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir,$p_new_order2) {
   }
   // If a company indication has been specified, get it 
   if ($company != "") {
-    $query .= " company_name like '" . $company . "%' and";
+    $query .= " company_name like ' $company%' and";
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
@@ -56,9 +55,6 @@ function run_query_search($contact, $p_new_order, $p_order_dir,$p_new_order2) {
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
   $query .= " order by $order $p_order_dir";
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", ".$p_new_order2;
-  }
   
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;

@@ -1,13 +1,81 @@
 --/////////////////////////////////////////////////////////////////////////////
--- OBM - File  : obm_default_value.sql                                       //
---     - Desc  : Insertion of Default values (database independant)          //
+-- OBM - File : obm_default_value.sql                                        //
+--     - Desc : Insertion of Default values (database independant)           //
 -- 2001-12-30 Pierre Baudracco                                               //
 --/////////////////////////////////////////////////////////////////////////////
 -- $Id$
 --/////////////////////////////////////////////////////////////////////////////
 
 
+-------------------------------------------------------------------------------
+-- Default Global preferences values (tableGlobaPref)
 --
+
+-- Delete current default values
+DELETE FROM GlobalPref;
+
+-- Session lifetime
+INSERT INTO GlobalPref VALUES ('lifetime', '14400');
+
+
+-------------------------------------------------------------------------------
+-- Default values for the table 'UserObmPref'
+-- user 0 represent default values (affected to new users for ex:)
+--
+
+-- Delete current default values
+DELETE FROM UserObmPref where userobmpref_user_id='0';
+
+-- Language
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_lang','en');
+
+-- Theme
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_theme','aliacom');
+
+-- Auto-Display list results
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_display','no');
+
+-- # Rows displayed in a result page
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_rows','12');
+
+-- Debug Level
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_debug','0');
+
+-- Company bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_company','0');
+
+-- Contact bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_contact','0');
+
+-- Deal bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_deal','0');
+
+-- List bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_list','0');
+
+-- User bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_user','0');
+
+-- Contract bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_contract','0');
+
+-- Incident bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_incident','0');
+
+-- Account bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_account','0');
+
+-- Invoice bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_invoice','0');
+
+-- Payment bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_payment','0');
+
+-- Day the week start 
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
+
+
+-------------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'
 -- user 0 represent default values (affected to new users for ex:)
 --
@@ -46,8 +114,9 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','dealtype_label',3,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','tasktype_label',4,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','dealstatus_label',5,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','deal_todo',6,1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','deal_datealarm',7,2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','deal_archive',6,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','deal_todo',7,1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) values (0,'deal','deal_datealarm',8,2);
 
 -- module 'parentdeal'
 
@@ -76,12 +145,15 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'list_contact', 'list_contact_mobilephone', 7, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'list_contact', 'list_contact_email', 8, 1);
 
--- module 'user'
+-- module 'userobm'
 
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_username', 1, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_perms', 2, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_timelastaccess', 3, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_email', 4, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_login', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_archive', 2, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_lastname', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_firstname', 4, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_perms', 5, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_timelastaccess', 6, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'user', 'userobm_email', 7, 2);
 
 -- module 'contract'
 
@@ -166,10 +238,3 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_totallength',4,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_deal_label',3,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'time_deal','task_company_name',2,1);
-
-#
-# Dumping data for table `GlobalPref`
-#
-
-INSERT INTO GlobalPref VALUES ('lifetime', '14400');
-

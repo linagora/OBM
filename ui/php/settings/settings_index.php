@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : settings_index.php                                         //
-//     - Desc  : Settings (Language, themes,...) management index file       //
-// 1999-03-19 Pierre Baudracco - Last Update : 2001-09-29                    //
+// OBM - File : settings_index.php                                           //
+//     - Desc : Settings (Language, themes,...) management index file        //
+// 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -18,8 +18,6 @@ require("$obminclude/phplib/obmlib.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-
-include("$obminclude/global.inc");
 
 if ($param_lang != "") {
   $set_lang=$param_lang;
@@ -56,7 +54,6 @@ page_close();
 require("$obminclude/global_pref.inc");
 require("settings_display.inc");
 
-
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
@@ -72,29 +69,30 @@ display_bookmarks();
 ///////////////////////////////////////////////////////////////////////////////
 // Display the CURRENT configuration                                         //
 ///////////////////////////////////////////////////////////////////////////////
-echo "\n<CENTER>
-     <P>$l_cur_settings<P>";
-
 if ($col_a_table != "") {
-    $lbgcolor = " BGCOLOR=\"#$col_a_table\"";
+  $lbgcolor = " bgcolor=\"#$col_a_table\"";
 } else {
-    $lbgcolor = "";
+  $lbgcolor = "";
 }
 
-// Configuration variables
-echo "\n<TABLE border=1>
-     <FORM ACTION=\"".$sess->self_url()."\" METHOD=POST>
-     <TR><TD align=center $lbgcolor>
-         <FONT COLOR=\"#$col_a_text\">$l_auto_display</FONT></TD>
-       <TD $lbgcolor><INPUT TYPE=checkbox NAME=param_display value=yes ";
+echo "<center>
+  <p>$l_cur_settings
+  <p>
+  <table border=1>
+   <form action=\"".$sess->url("settings_index.php")."\" method=get>
+   <tr>
+     <td align=center $lbgcolor>
+       <font color=\"#$col_a_text\">$l_auto_display</font></td>
+     <td $lbgcolor><INPUT TYPE=checkbox NAME=param_display value=yes ";
 if ($set_display == "yes") echo "checked";
-echo "></TD>
-     </TR><TR>
+echo "></td>
+   </tr><tr>
 <!-- ROWS Parameter -->
-       <TD align=center $lbgcolor>
-       <FONT COLOR=\"#$col_a_text\">$l_set_rows</FONT></TD><TD $lbgcolor>
-       <INPUT SIZE=3 NAME=param_rows value=\"$set_rows\"></TD></TR>
-     <TR><TD";
+     <td align=center $lbgcolor>
+       <font color=\"#$col_a_text\">$l_set_rows</font></td>
+     <td $lbgcolor><input SIZE=3 name=param_rows value=\"$set_rows\"></td>
+   </tr><tr>
+     <td";
 
 if ($auth->auth["perm"] == $perms_admin) {
   echo " align=center $lbgcolor>
@@ -109,7 +107,7 @@ if ($auth->auth["perm"] == $perms_admin) {
 }
 
 echo " colspan=2 ALIGN=center $lbgcolor>\n<FONT COLOR=\"#$col_a_text\">
-     <INPUT name=submit TYPE=submit value=\"$l_submit\"></FONT>
+     <INPUT name=submit TYPE=submit value=\"$l_validate\"></FONT>
      </FORM>
      </TD></TR></TABLE>\n<P>";
 

@@ -1,11 +1,13 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Deutsch (German)
-//     - File     : deal.inc
-// 1999-01-26 Pierre Baudracco
-// 1999-12-06 / Fink / created from english version
-// 2001-07    / Fink / check
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Deutsch (German)                                         //
+//     - File     : deal.inc                                                 //
+// 1999-01-26 Pierre Baudracco                                               //
+// 1999-12-06 / Fink / created from english version                          //
+// 2001-07    / Fink / check                                                 //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels and texts
 $l_minus="-";
@@ -28,10 +30,8 @@ $l_manager= "Manager";
 $l_proposition = "Vorschlag";
 $l_amount = "Bemerkung";
 $l_contacts = "Kontakte";
-$l_archive = "Archiv";
 $l_show_archive = "anzeigen Archiv";
 $l_archive_first = "A";
-$l_all_f = "Alle";
 $l_date = "Datum";
 $l_date_init = "Startdatum";
 $l_date_alarm = "Stichdatum";

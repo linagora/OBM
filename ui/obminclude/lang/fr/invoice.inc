@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French
-//     - File     : invoice.inc
-// 2001-08-02 Nicolas Roman
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : invoice.inc                                              //
+// 2001-08-02 Nicolas Roman                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 // invoice only 
@@ -22,8 +24,6 @@ $l_date="Date";
 $l_date_apres = "Ayant la date après";
 $l_date_avant = "Ayant la date avant";
 $l_paid = "Montant TTC payé";
-$l_all= "Tout"; 
-$l_all_f = "Toutes";
 $l_pick_deal = "Choisissez une affaire";
 $l_inout = "Type";
 $l_both = "Tous"; 
@@ -73,7 +73,6 @@ $l_affect = "Affecter";
 // Actions 
 $l_select_nb_deals = "How many deals will be linked to the new invoice ?";
 $l_select_deals = "choose number of deals";
-$l_find = "Chercher";
 $l_insert= "Insérer la Facture";
 $l_update = "Mettre à jour la Facture";
 $l_duplicate = "Dupliquer cette Facture";
@@ -127,9 +126,8 @@ $l_try_again = "Try Again !";
 // format de date et heure pour MySQL pour affichage dans ecran detail affaire
 // Specifics fields
 // MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-$l_short_date_format = "%Y-%d-%m";
+$l_time_format = "%Y-%m-%d %H:%i:%s";
+$l_short_date_format = "%Y-%m-%d";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";

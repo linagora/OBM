@@ -207,8 +207,6 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   //-- Labels
   global $l_label,$l_bank,$l_number;
   global $l_found;
-  //-- Search parameters
-  global $set_rows, $set_rows_default;
   //-- Authentication
   global $perms_user,$l_perms_user;
   global $auth, $sess;  

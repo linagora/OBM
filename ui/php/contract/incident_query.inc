@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - File  : company_query.inc                                          //
-//     - Desc  : company query File                                         //
-// 2000-01-20 Florent Goalabre : Last Update 2001-09-16 - PB                //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : incident_query.inc                                           //
+//     - Desc : Incident query File                                          //
+// 2000-01-20 Florent Goalabre                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -15,9 +15,8 @@
 //     keys used       status, label incident, priority, label contract
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 //////////////////////////////////////////////////////////////////////////////
-function run_query_search($incident, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_search($incident, $p_new_order, $p_order_dir) {
   global $c_all,$l_date_format, $cdg_sql;  
 
   $status = $incident["status"];
@@ -66,10 +65,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir,$p_new_order2) {
   }
   // ORDER construction
 
-  $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "Incident.incident_etat";
-  $order2=(strcmp($p_new_order2,"") != 0) ? $p_new_order2 : "Incident.incident_priority";
-
-  $req .= " order by $order $p_order_dir, $order2";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Incident.incident_etat";
+  $req .= " order by $order $p_order_dir, Incident.incident_priority";
 
   $obm_db=new DB_OBM;
   $obm_db->query($req);

@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contact_query.inc                                           //
-//     - Desc  : contact query File                                          //
+// OBM - File : time_query.inc                                               //
+//     - Desc : time manager query File                                      //
 // 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -14,17 +14,15 @@
 //     keys used       interval, date
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($time, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_search($time, $p_new_order, $p_order_dir) {
   global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
 
   $date = $time["date"];
   //  echo "date $date<br>";
   if ($time['interval'] = "week") {
       $array_date = get_week_point($date);
-  }
-  else
+  } else
     die ("interval != 'week' not fonctionnal"); 
 
   // 0 = task_status renamed as test_status : if =0, check box visible
@@ -53,9 +51,6 @@ function run_query_search($time, $p_new_order, $p_order_dir,$p_new_order2) {
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Task.task_date";
   $query .= " order by $order $p_order_dir";
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", ".$p_new_order2;
-  }
    
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
@@ -72,9 +67,8 @@ function run_query_search($time, $p_new_order, $p_order_dir,$p_new_order2) {
 //     keys used       week,contact_id, date, date_end
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_by_day($time, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_by_day($time, $p_new_order, $p_order_dir) {
   global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
@@ -101,9 +95,8 @@ function run_query_by_day($time, $p_new_order, $p_order_dir,$p_new_order2) {
 //     keys used       contac_id, date, date_end
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_by_deal($time, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_by_deal($time, $p_new_order, $p_order_dir) {
   global $auth, $l_date_format, $l_jour_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
@@ -412,13 +405,13 @@ function run_query_get_mycontacts() {
 
 //////////////////////////////////////////////////////////////////////////
 // return contact_id 
-// Param : $user_id
+// Param : $usr_id
 //////////////////////////////////////////////////////////////////////////
-function run_query_get_contact_id($user_id) {
+function run_query_get_contact_id ($usr_id) {
   global $cdg_sql;
 
   $obm_db = new DB_OBM;
-  $query="select userobm_contact_id from UserObm where $user_id  = userobm_id";
+  $query = "select userobm_contact_id from UserObm where userobm_id='$usr_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $obm_db->next_record(); 

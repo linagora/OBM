@@ -31,7 +31,6 @@ $l_date_creation = "Erstellungsdatum" ;
 $l_creator = "Ersteller" ;
 $l_add_contact = "Kontakt einfügen" ;
 $l_del_contact = "Kontakt löschen" ;
-$l_dis_choice = "Display preference" ;
 $l_new_contact1 = "NK" ;
 $l_list_contact1 = "K" ;
 $l_list_infos = "Maillisten-Information" ;

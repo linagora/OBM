@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : list_query.inc                                              //
-//     - Desc  : list query File                                             //
+// OBM - File : list_query.inc                                               //
+//     - Desc : list query File                                              //
 // 2000-06-07 Vincent MARGUERIT                                              //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -16,9 +16,8 @@
 //     keys used     : name, contact
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($list, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_search($list, $p_new_order, $p_order_dir) {
   global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
   
   $name = $list["name"];
@@ -38,8 +37,8 @@ function run_query_search($list, $p_new_order, $p_order_dir,$p_new_order2) {
     $query = "select distinct List.*, list_id as Id,
       DATE_FORMAT(List.list_timecreate,'$l_date_format') as timecreate,
       DATE_FORMAT(List.list_timeupdate,'$l_date_format') as timeupdate,
-      A.userobm_username as usercreate,
-      B.userobm_username as userupdate
+      A.userobm_login as usercreate,
+      B.userobm_login as userupdate
     from 
       (List LEFT JOIN ContactList ON list_id=ContactList_listid)
       LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
@@ -69,10 +68,6 @@ function run_query_search($list, $p_new_order, $p_order_dir,$p_new_order2) {
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "list_name";
   $query .= " order by $order $p_order_dir";
-
-  if (strcmp($p_new_order2,"") != 0) {
-    $req .= ", $p_new_order2";
-  }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

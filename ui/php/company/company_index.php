@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : company_index.php                                           //
-//     - Desc  : Company Index File                                          //
+// OBM - File : company_index.php                                            //
+//     - Desc : Company Index File                                           //
 // 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -33,18 +33,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session, Auth, Perms  Management                                          //
 ///////////////////////////////////////////////////////////////////////////////
-$menu="COMPANY";
+$menu = "COMPANY";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 include("$obminclude/global_pref.inc");
 
-
 require("company_query.inc");
 require("company_display.inc");
-
 
 // updating the company bookmark : 
 if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
@@ -57,7 +56,6 @@ if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
 }
 
 page_close();
-
 
 $company = get_param_company();
 

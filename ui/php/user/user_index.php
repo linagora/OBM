@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : user_index.php                                              //
-//     - Desc  : User Index File                                             //
+// OBM - File : user_index.php                                               //
+//     - Desc : User Index File                                              //
 // 2000-01-13 Florent Goalabre                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id //
@@ -102,7 +102,7 @@ if ($action == "index") {
       if ($retour) {
         display_ok_msg($l_insert_ok);
         // insertion of his default preferences : 
-        $user_id = run_query_id_user($obm_user["name"], $obm_user["passwd"]);
+        $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
         run_query_default_preferences_insert($user_id);
       } else {
       display_err_msg($l_insert_error);
@@ -118,7 +118,7 @@ if ($action == "index") {
         $retour = run_query_insert($obm_user);
         if ($retour) {
           // insertion of his default preferences : 
-          $user_id = run_query_id_user($obm_user["name"], $obm_user["passwd"]);
+          $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
           run_query_default_preferences_insert($user_id);
           display_ok_msg($l_insert_ok);
         } else {
@@ -137,7 +137,7 @@ if ($action == "index") {
 } elseif ($action == "reset")  {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_default_preferences_insert($param_user);
-  session_load_preferences();
+  session_load_user_prefs();
   display_ok_msg($l_reset_ok);
   $obm_q = run_query_detail($param_user);
   if ($obm_q->num_rows() == 1) {
@@ -201,13 +201,18 @@ display_end();
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
   global $cdg_param;
-  global $param_user, $tf_name, $tf_passwd, $sel_perms, $tf_email,$sel_contact;
+  global $param_user, $tf_login, $tf_passwd, $sel_perms,$tf_email,$sel_contact;
+  global $tf_lastname, $tf_firstname, $cb_archive;
 
   if (isset ($param_user)) $obm_user["id"] = $param_user;
-  if (isset ($tf_name)) $obm_user["name"] = $tf_name;
+  if (isset ($tf_login)) $obm_user["login"] = $tf_login;
+  if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
+  if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
+  if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;
+  if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
   if (isset ($sel_contact)) $obm_user["contact"] = $sel_contact;
 
   if (debug_level_isset($cdg_param)) {

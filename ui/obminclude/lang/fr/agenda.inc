@@ -1,10 +1,10 @@
 <?php
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : agenda.inc                                              //
-// 2001-06-28 by Francois Bloque                                            //
-//////////////////////////////////////////////////////////////////////////////
-// Last Update 2001-07-19                                                   //
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : agenda.inc                                               //
+// 2001-06-28 by Francois Bloque                                             //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 //////////////////////////////////////////////////////////////////////////////
 
 
@@ -64,7 +64,6 @@ $l_validate = "Valider";
 $l_accept = "Accepter";
 $l_reject = "Refuser";
 $l_select = "S&eacute;lectionner";
-$l_cancel = "Annuler";
 
 // Messages 
 $l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";

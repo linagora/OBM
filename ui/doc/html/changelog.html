@@ -19,18 +19,36 @@ To do<BR>
 <UL>
 <LI> When deleting a user, move all his contacts from private to public
 <LI> Move run_query_mycontacts (in user) to global
-<LI> Remove all $sess->self_url(), replace with $sess->url() (pb with action)
 <LI> theme.inc was included twice (in menu.inc and global.inc) => optimisation : inclusion only in global.inc and parameter $theme passed to the generate_menu function(). So all themes vars in the $theme array
 <LI> Look at the bookmark implementation.
+<LI> Look at the display_record() implementation.
 <LI> Improve OBM_DISPLAY and its way to implement special field case. If possible no update of the dis_data() function should be needed when adding a module.
 <LI> how to detect doublons ?
 <LI> Pour les listes : listes dynamiques ? supprimer les listes dans export ? trier requete exports ?
+<LI> Remplacer contacts associes par users dans Time manager
 </UL>
 
 
 2002-08-30 : version 0.5.3<BR>
 <UL>
-<LI> BUG#58 : After inserting a Task, the week is now kept
+<LI> Added User archive flag : an archived user can not login in OBM
+<LI> Made some cleanups in lang files and display files
+<LI> Removed all the $order2 parameters that were not used.
+<LI> BUG#33 : users (profile user) can now change between calendar view
+<LI> Deal: Archive list of deal directly from result set deprecated and removed
+<LI> Deal fixes : create new deal from parent, nav. through deal of a parent
+<LI> User Preferences now handled like DisplayPref (default values : user = 0)
+<LI> BUG#65 : Now global preferences can be updated via admin pref module.
+<LI> BUG#67 : Cleaned up sessions (cookies, vars $lifetime, admin module)
+<LI> BUG#61 : company_deal_number now should be always updated correctly
+<LI> BUG#29 : UI fixes for radio buttons in Payment module
+<LI> BUG#66 : DealCategory (TaskType) insertion works again
+<LI> BUG#63 : Links to Contacts from the deal update page are now correct
+<LI> Remove all $sess->self_url(), replace with $sess->url() (pb with action)
+<LI> Table ActiveSessions deprecated and removed. Old *Dipslay tables removed
+<LI> Added User lastname and firstname in User table. username now called login
+<LI> OBM version now showed again in login page
+<LI> BUG#58 : After inserting a Task, the current selected week is now kept
 </UL>
 
 2002-07-30 : version 0.5.2<BR>

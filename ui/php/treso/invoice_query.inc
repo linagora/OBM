@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : invoice_query.inc
-//     - Desc  : invoice query File
+// OBM - File : invoice_query.inc
+//     - Desc : invoice query File
 // 2001-07-30 Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -10,7 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Account search query :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search ($invoice, $p_new_order, $p_new_order2, $p_order_dir) {
+function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql;
 
   $label = $invoice["label"];
@@ -47,34 +47,34 @@ function run_query_search ($invoice, $p_new_order, $p_new_order2, $p_order_dir) 
 
   // fields to use 
   if ($label != ""){
-    $query .= " and Invoice.invoice_label like'%".$label."%' ";
+    $query .= " and Invoice.invoice_label like'%$label%' ";
   }
   if ($number != ""){
-    $query .= " and Invoice.invoice_number like '%".$number."%' ";
+    $query .= " and Invoice.invoice_number like '%$number%' ";
   }
   if ($amount_HT != ""){
-    $query .= " and Invoice.invoice_amount_HT ='".$amount_HT ."' ";
+    $query .= " and Invoice.invoice_amount_HT ='$amount_HT' ";
   }
   if ($amount_TTC != ""){
-    $query .= " and Invoice.invoice_amount_TTC ='".$amount_TTC."' ";
+    $query .= " and Invoice.invoice_amount_TTC ='$amount_TTC' ";
   }
   if (($status != '') && ($status != "_TOUT_")){
-    $query .= " and invoicestatus_id ='".$status."' ";
+    $query .= " and invoicestatus_id ='$status' ";
   }
   if ($date_after != ""){
-    $query .= " and Invoice.invoice_date >='".$date_after."' ";
+    $query .= " and Invoice.invoice_date >='$date_after' ";
   }
   if ($date_before != ""){
-    $query .= " and Invoice.invoice_date <='".$date_before."' ";
+    $query .= " and Invoice.invoice_date <='$date_before' ";
   }
   if (($inout != "")&&($inout!="_TOUT_")){
-    $query .= " and Invoice.invoice_inout ='".$inout."' ";
+    $query .= " and Invoice.invoice_inout ='$inout' ";
   }
   if ($company != "") {
-    $query .= " and company_name like '".$company."%' ";
+    $query .= " and company_name like '$company%' ";
   }
   if ($deal != "") {
-    $query .= " and deal_label like '".$deal."%' ";
+    $query .= " and deal_label like '$deal%' ";
   }
   if ($archive != 'y') {
     $query .= " and Invoice.invoice_archive = '0' ";
@@ -84,9 +84,6 @@ function run_query_search ($invoice, $p_new_order, $p_new_order2, $p_order_dir) 
   $query .= " group by invoice_id ";
 
   $query .= "order by $order $order_dir";
-  if ($p_new_order2 != "") {
-    $query .= ", $p_new_order2 ";
-  }
   
   display_debug_msg ("<b>run_query_search() :</b>$query", $cdg_sql); 
   $obm_q = new DB_OBM;
@@ -135,7 +132,7 @@ function run_query_detail($p_invoice_id) {
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($invoice, $p_deal_linked="") {
-  global $auth, $cdg_sql, $new_order, $new_order2, $order_dir;
+  global $auth, $cdg_sql, $new_order, $order_dir;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -182,7 +179,7 @@ function run_query_insert($invoice, $p_deal_linked="") {
   // following code is only when creating an invoice from a deal :
   if ($p_deal_linked != "") {
     // we need to re-get the id of the invoice freshly inserted
-    $new_invoice = run_query_search ($invoice, $new_order, $new_order2, $order_dir);
+    $new_invoice = run_query_search ($invoice, $new_order, $order_dir);
     $new_invoice->next_record();
     $new_invoice_id = $new_invoice->f("invoice_id");
     

@@ -1,9 +1,12 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : No_Y                                                    //
-//     - File     : list.inc                                                //
-// 200-16-02 Vincent MARGUERIT : Last Update 2000-16-02                      //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : No_Y                                                     //
+//     - File     : list.inc                                                 //
+// 2000-16-02 Vincent MARGUERIT                                              //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
 $l_list_name = "Name list :" ;
 $l_list_subject = "List subject :";
 $l_list_insert = "Save list";
@@ -12,10 +15,6 @@ $l_name_list_nomatch = "List name is not valid" ;
 $l_subject_list_empty = "List subject is not valid" ;
 $l_list_exists = "Sorry but this list already exists";
 $l_list_list = "List" ;
-
-$l_last_deal="Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
 
 $l_yes = "yes" ;
 $l_no = "no" ;
@@ -34,7 +33,6 @@ $l_date_creation = "Date creation" ;
 $l_creator = "Creator" ;
 $l_add_contact = "Add contacts" ;
 $l_del_contact = "Remove contacts" ;
-$l_dis_choice = "Display preference" ;
 $l_new_contact1 = "NC" ;
 $l_list_contact1 = "C" ;
 $l_list_infos = "List informations" ;
@@ -42,26 +40,8 @@ $l_list_infos_short = "List informations" ;
 $l_list_noinfo = "No information is available" ;
 $l_updater = "Last updater" ;
 $l_date_last_update = "Date of the last update" ;
-$l_options_dis = "options of display" ;
-$l_query_display = "Displayed" ;
-$l_order_dis = "Order of display" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Not to display it fields" ;
-$l_ch_to_dis_no_help = "That indicates the appropriate field is displayed<br>Click on this button if you don't want to display the field" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "That indicates the appropriate field is not displayed<br>Click on this button if you want to display the field" ;
-$l_dis_obligatory = "Display of this fields is mandatory" ;
-$l_dis_obligatory_help = "This button means you don't have choice. The field appropriate field is be displayed" ;
-$l_down_option = "To descend this option from a notch" ;
-$l_down_option_help  = "Click on this button to move down the field" ;
-$l_up_option = "To assemble this option of a notch" ;
-$l_up_option_help = "Click on this button to move up the field" ;
-$l_back_tolist = "Back to list display" ;
-$l_help_options = "Contextual help" ;
-$l_option_contacts = "Options of contacts list  display" ;
 $l_list_contacts = "Contacts belonging to list" ;
 $l_no_contact = "There is no contact in this list" ;
-$l_list_contacts_todel = "Here withdrawable contacts of this list" ;
 $l_list_del_contact = "Remove" ;
 $l_list_del_contact_chosen = "Remove selected contacts" ;
 $l_nb_contact_deleted = "Number of contact deleted" ;
@@ -119,6 +99,3 @@ $l_tel = "Phone";
 $l_telp = "Phone perso";
 $l_town = "Town";
 $l_email = "E-Mail";
-
-// Actions
-$l_find = "find";

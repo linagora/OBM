@@ -1,6 +1,6 @@
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : admin_lang_help.inc                                         //
-//     - Desc  : lang admin Help File                                        //
+// OBM - File : admin_lang_help.inc                                          //
+//     - Desc : lang admin Help File                                         //
 // 2001-12-27 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //

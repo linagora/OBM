@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                 //
-//     - File     : company.inc                                             //
-// 1999-01-25 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                  //
+//     - File     : company.inc                                              //
+// 1999-01-25 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_number = "Number";
@@ -25,12 +25,6 @@ $l_web = "Web";
 $l_email = "E-Mail";
 
 // Labels and texts
-$l_back = "Back";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
-$l_last_deal = "Last deal";
-$l_all = "All";
-$l_find = "Find";
 $l_mailing_first = "M";
 $l_listdoc_first = "D";
 $l_newdoc_first = "ND";
@@ -42,7 +36,6 @@ $l_deal_new = "New Deal";
 $l_kind_manage = "Company Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
-$l_invalid_data = "Invalid Data";
 $l_internal = "Internal";
 
 //------------------------------------//
@@ -124,10 +117,6 @@ $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
 $l_j_kind_create = "You have to enter a new kind name to create it !";
 $l_j_select_company = "You have to select a company !";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
 
 // For the display parameters modification screen
 $l_company_display = "Display options for companies list"; 

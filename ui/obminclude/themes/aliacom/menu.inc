@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : menu.inc (standard)                                         //
-//     - Desc  : Standard menu display File                                  //
+// OBM - File : menu.inc (standard)                                          //
+//     - Desc : Standard menu display File                                   //
 // 2000-07-01 Pierre Baudracco modified by Frodo                             //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -61,6 +61,8 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     <font color=black size=-1>$l_header_admin</font></a>)";
   }
 
+echo "lifetime auth=".$auth->lifetime."<br>
+".$auth->auth["exp"]. "<br>". time();
   echo "
 <center>
 <br>
@@ -264,12 +266,10 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
   // Agenda Submenu                                                          //
   /////////////////////////////////////////////////////////////////////////////
   else if ($menu == "AGENDA") {
-    if ($auth->auth["perm"] != $perms_user) {
-      echo "<a class=header_green href=\"".$sess->url("agenda_index.php?action=new")."\">$l_header_new_event</a>";
-      echo " | <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_week")."\">$l_header_week</a> | 
-            <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_day")."\">$l_header_day</a> | 
-            <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_month")."\">$l_header_month</a>";
-    }
+    echo "<a class=header_green href=\"".$sess->url("agenda_index.php?action=new")."\">$l_header_new_event</a>";
+    echo " | <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_week")."\">$l_header_week</a> | 
+          <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_day")."\">$l_header_day</a> | 
+          <a class=header_green href=\"".$sess->url("agenda_index.php?action=view_month")."\">$l_header_month</a>";
   }
   /////////////////////////////////////////////////////////////////////////////
   // User Submenu                                                            //

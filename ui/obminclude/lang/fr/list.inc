@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : list.inc                                                //
-// 2001-02-16 Vincent MARGUERIT                                             //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : list.inc                                                 //
+// 2001-02-16 Vincent MARGUERIT                                              //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
 $l_name = "Nom";
@@ -17,9 +17,6 @@ $l_updater = "Mise à jour par" ;
 $l_date_last_update = "Mise à jour" ;
 
 // Labels et textes
-$l_last_deal = "Dernière affaire";
-$l_last_contact = "Dernier contact";
-$l_last_company = "Dernière société";
 $l_list_list = "Liste";
 $l_yes = "oui";
 $l_no = "non";
@@ -67,8 +64,6 @@ $fieldnames["list_contact_email"] = $l_email;
 $l_insert = "Enregistrer la liste";
 $l_update = "Modifier la liste";
 $l_delete = "Supprimer la liste";
-$l_find = "Chercher";
-$l_back = "Retour";
 $l_confirm = "Confirmer l'action";
 $l_add = "Ajouter ces listes";
 $l_mail = "Mailer les membres";
@@ -164,4 +159,3 @@ $l_error_authentification = "Error::: Wrong Authentification... Please Check you
 // Champs specifiques
 // Format de date et heure pour MySQL pour affichage dans ecran detail affaire
 $l_time_format = "%d-%m-%Y %H:%i";
-$l_date_format = "%d-%m-%Y %H:%i";

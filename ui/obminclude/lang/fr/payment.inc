@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : invoice.inc                                             //
-// 2001-08-02 Nicolas Roman                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : payment.inc                                              //
+// 2001-08-02 Nicolas Roman                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 // payment only stuff
@@ -18,8 +20,6 @@ $l_expected_date = "Date Prévisionnelle";
 $l_date_apres = "Ayant la date après";
 $l_date_avant = "Ayant la date avant";
 $l_account = "Compte";
-$l_all = "Tout";
-$l_all_f = "Toutes";
 $l_type = "Type du Paiement";
 $l_inout = "Type";
 $l_both = "Both"; 
@@ -65,7 +65,6 @@ $l_entrytemp_label = "Libellé";
 $l_entrytemp_comment = "Commentaire";
 
 // Actions 
-$l_find = "Chercher";
 $l_insert= "Insérer le  Paiement";
 $l_update = "Mettre à jour le Paiement";
 $l_delete = "Supprimer le Paiement";
@@ -109,8 +108,7 @@ $l_insert_paymentinvoice_ok = "L'association Paiement/Facture s'est bien passé";
 
 // Specifics fields
 // MySQL Date and time format for display in the detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
+$l_time_format = "%Y-%m-%d %H:%i:%s";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_no_number = "\\nLe numérod u Paiement est invalide !";

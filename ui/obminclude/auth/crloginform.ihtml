@@ -1,8 +1,10 @@
 <!--
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : crloginform.ihtml                                           //
-//     - Desc  : OBM Login Page                                              //
+// OBM - File : crloginform.ihtml                                            //
+//     - Desc : OBM Login Page                                               //
 // 1999-03-19 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
   This loginform uses a challenge/response mechanism to
@@ -11,7 +13,7 @@
 
   $auth->auth_loginform() creates a challenge value which is incorporated
   into this form. When the user tries to submit the form,
-  md5("username:password:challenge") is calculated and filled
+  md5("login:password:challenge") is calculated and filled
   into the reply field. The password field is erased. The server
   can calculate the exspected reply and compare it to the actual
   reply value. If they match, the user is authenticated.
@@ -33,12 +35,11 @@
     td   { font-family: Arial, Helvetica, sans-serif }
   -->
   </style>
-<? 
-include("$obminclude/auth/md5.js"); ?>
+<?php include("$obminclude/auth/md5.js"); ?>
 <script language="javascript">
 <!--
   function doChallengeResponse() {
-    str = document.login.username.value + ":" +
+    str = document.login.login.value + ":" +
           document.login.password.value + ":" +
           document.login.challenge.value;
 
@@ -52,34 +53,46 @@ include("$obminclude/auth/md5.js"); ?>
 
 
 <BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCCC" VLINK="#00CCCC">
-<CENTER><TABLE Width=100% BORDER=0><TR>
-<TD WIDTH="24%"><A HREF="http://www.aliacom.fr/"><IMG align=middle border=0 SRC="/images/images/obm.jpg"></A><?php print $obm_version ?></TD>
+<CENTER>
+<table Width=100% BORDER=0>
+<tr>
+  <td WIDTH="24%"><A HREF="http://www.aliacom.fr/">
+    <IMG align=middle border=0 SRC="/images/images/obm.jpg"></A>
+    <?php print $obm_version; ?>
+  </td>
+  <td WIDTH="18%" align=center>&nbsp;</td>
+  <td WIDTH="40%" align=center><H1>DEMO</H1></td>
+  <td WIDTH="18%" align=center>&nbsp;</td>
+  <td WIDTH="18%" align=right>
+    <table BORDER=0>
+    <tr>
+      <td ALIGN=center><A HREF="obm.php" TARGET="_top">
+        <IMG BORDER=0 SRC="/images/standard/obm.jpg"></A>
+      </td>
+    </tr>
+    <tr>
+      <td ALIGN=center>&nbsp;</td>
+    </tr>
+    <tr>
+      <td ALIGN=center>&nbsp;</td>
+    </tr>
+    </table>
+  </td>
+</tr>
+<tr>
+  <td COLSPAN=4><HR></td>
+</tr>
+</table>
 
-<TD WIDTH="18%" align=center>&nbsp;</TD>
-<TD WIDTH="40%" align=center><H1>DEMO</H1></TD>
-<TD WIDTH="18%" align=center>&nbsp;</TD>
-<TD WIDTH="18%" align=right>
-<TABLE BORDER=0><TR><TD ALIGN=center><A HREF="obm.php" TARGET="_top"><IMG BORDER=0 SRC="/images/standard/obm.jpg"></A></TD>
-</TR>
-<TR>
-<TD ALIGN=center>&nbsp;</TD></TR>
-<TR><TD ALIGN=center>&nbsp;</TD><TR>
-</TABLE></FONT></TD></TR>
-<TR><TD COLSPAN=4><HR></TD></TR></TABLE>
 
+Please identify yourself with a Login and a password:<br>
+<? $form_action="$path/obm.php"; ?>
 
-Please identify yourself with a username and a password:<br>
-<?
-  if(MENU=="")
-	$form_action="obm.php";
-  else
-        $form_action="../obm.php";
-?>
 <form name="login" action=<?echo $form_action;?>  method=post>
 <table border=0 bgcolor="#000000" align="center" cellspacing=0 cellpadding=4>
  <tr valign=top align=left>
-  <td>Username:</td>
-  <td><input type="text" name="username" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>" size=32 maxlength=32></td>
+  <td>Login:</td>
+  <td><input type="text" name="login" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>" size=32 maxlength=32></td>
  </tr>
 
  <tr valign=top align=left>
@@ -99,7 +112,7 @@ Available login and pass for Demo
 <br>
 <table border =1>
   <tr>
-    <th>Username</th>
+    <th>Login</th>
     <th>Password</th>
     <th>Authorization</th>
   </tr>
@@ -120,14 +133,14 @@ Available login and pass for Demo
   </tr>
 </table>
 
- <?php global $username; if ( isset($username) ): ?>
+ <?php global $login; if ( isset($login) ): ?>
  <!-- failed login code -->
 
  <p>
  <table>
   <tr>
-   <td colspan=2><font color=red><b>Either your username or your password
-       are invalid.<br>
+   <td colspan=2><font color=red><b>Either your login or your password
+       are invalid or your session may have expired.<br>
        Please try again!</b></font></td>
   </tr>
  </table>
@@ -144,8 +157,8 @@ Available login and pass for Demo
 <script language="JavaScript">
 <!--
   // Activate the appropriate input form field.
-  if (document.login.username.value == '') {
-    document.login.username.focus();
+  if (document.login.login.value == '') {
+    document.login.login.focus();
   } else {
     document.login.password.focus();
   }

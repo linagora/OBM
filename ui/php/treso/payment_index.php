@@ -1,6 +1,11 @@
 <?php
-// payment_index.php
-// creating/updating/handling payments
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : payment_index.php 
+//     - Desc : payment Index File
+// 2001-08-21 Nicolas Roman
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
@@ -11,7 +16,6 @@ require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("admin");
-
 
 require("$obminclude/global_pref.inc");
 require("payment_display.inc");

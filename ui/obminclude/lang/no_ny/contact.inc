@@ -1,16 +1,14 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Norwegian                                               //
-//     - File     : contact.inc                                             //
-// 2000-07-20 Magni Onsoien                                                 //
-//////////////////////////////////////////////////////////////////////////////
-$l_last_contact = "Last contact";
-$l_last_company = "Last company";
-$l_last_deal="Last deal";
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Norwegian                                                //
+//     - File     : contact.inc                                              //
+// 2000-07-20 Magni Onsoien                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
 $l_contact_name = "Kontaktnamn";
 $l_from_company = "Frå firma";
-$l_all = "Alle";
-$l_find = "Finn";
 $l_lastname = "Etternamn";
 $l_firstname = "Fornamn";
 $l_function = "Funksjon";
@@ -31,7 +29,6 @@ $l_email = "E-post";
 $l_comment = "Kommentar";
 
 $l_contact_select_company = "Velg firma for kontakten.";
-$l_invalid_data = "Ugyldig data";
 
 $l_private="Private";
 $l_public = "Public";
@@ -51,7 +48,6 @@ $l_insert = "Legg til kontakt";
 $l_update = "Oppdater kontakten";
 $l_delete = "Slett kontakten";
 $l_select_company = "Velg firma";
-$l_cancel = "Cancel";
 
 // Messages
 $l_company_del_verif_error = " deal(s) are attached to this company : it can't be deleted";
@@ -84,24 +80,5 @@ $l_time_format = "%Y-%m-%d %H:%i:%s";
 $l_date_format = "%Y-%m-%d %H:%i:%s";
 
 
-
 // For the display parameters modification screen
 $l_contact_options = "Display options for contacts list"; 
-$l_subject = "Subject" ;
-$l_options_dis = "options of display" ;
-$l_query_display = "Displayed" ;
-$l_order_dis = "Order of display" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Not to display it fields" ;
-$l_ch_to_dis_no_help = "That indicates the appropriate field is displayed<br>Click on this button if you don't want to display the field" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "That indicates the appropriate field is not displayed<br>Click on this button if you want to display the field" ;
-$l_dis_obligatory = "Display of this fields is mandatory" ;
-$l_dis_obligatory_help = "This button means you don't have choice. The field appropriate field is be displayed" ;
-$l_down_option = "To descend this option from a notch" ;
-$l_down_option_help  = "Click on this button to move down the field" ;
-$l_up_option = "To assemble this option of a notch" ;
-$l_up_option_help = "Click on this button to move up the field" ;
-$l_back_tolist = "Back to list display" ;
-$l_help_options = "Contextual help" ;
-$l_option_contacts = "Options of contacts list display" ;

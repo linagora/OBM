@@ -22,9 +22,9 @@ function valider_suppression() {
 }
 
 function check_user(form) {
-  // MANDATORY : Check that User name is not empty
-  if (trim(form.tf_user_name.value) == \"\") {
-    alert (\"$l_fill_username\");
+  // MANDATORY : Check that Login is not empty
+  if (trim(form.tf_login.value) == \"\") {
+    alert (\"$l_fill_login\");
     return false;
   }
 

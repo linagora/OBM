@@ -10,7 +10,6 @@
 <br>
 
 
-
 <H2>Présentation générale des sessions</H2>
 
 <H2>Les sessions web : </H2>
@@ -25,13 +24,52 @@ Les sessions web sont gérées au sein d'OBM par l'Objet OBM_Session (obmlib.inc) 
 Les sessions sont gérées grâce à deux outils, les fichiers de sessions (géré par le serveur applicatif PHP), et les cookies.
 Le cookie permettant de faire transiter entre les pages l'identificateur de la session, le fichier permettant
 de stocker les variables de session.
-La gestion des accès au fichier est totalement trasparente, les paramètres de la session, et notamment sa durée de vie
+La gestion des accès au fichier est totalement transparente, les paramètres de la session, et notamment sa durée de vie
 seront configurés via les paramètres passés au cookie. Ainsi la variable <b>$lifetime</b> définie dans l'Objet OBM_Session (obmlib.inc)
 définit le temps (en secondes) pendant lequel une session est valide. Si l'utilisateur ne fait aucune requête au delà de ce delai, le cookie sera perdu et donc la session perdue (cela se traduira par une déconnexion au niveau d'OBM).
 La session web sera également détruite lors de l'utilisation de la fonction <b>logout</b>. Ici le cookie <b> et </b> le fichier de session seront detruits.
 <p>
 Enfin les sessions web servent à faire transiter des variables nécessaire à l'execution du code, et ne contiennent pas d'information exploitable en termes de statistiques, ou d'administration.
 <p>
+
+<table border=1>
+<tr>
+  <th colspan=2 align=center>Les Sessions Web</th>
+</tr><tr>
+  <td>Objectifs</td>
+  <td><ul>
+        <li>Reconnaître un utilisateur et lui fournir un contexte de "session"
+non présent dans le web
+        <li>Permettre de stocker des variables de session (valables tout au long de la session et non plus pour une seule exécution) par utilisateur
+      </ul>
+  </td>
+</tr><tr>
+  <td>Fichiers concernés</td>
+  <td><ul>
+        <li>session4.inc (objet SESSION)
+        <li>obmlib.inc (objet OBM_SESSION)
+      </ul>
+  </td>
+</tr><tr>
+  <td>mécanismes internes à PHP</td>
+  <td>Cookie et fichier de session
+      <ul>
+        <li>Cookie : mécanisme de bas niveau représentant l'échange entre le client et le serveur d'une clé (ou cookie) afin de reconnaître (associer à une précédente connexion) le client. La durée de vie d'un cookie (temps maximal entre 2 connexions ?) est paramétrable.
+Dans OBM la durée donnée au cookie est définie par la préférence global <b>$lifetime</b>
+        <li>Fichier de session : zone de stockage gérée directement et de façon transparente par PHP pour stocker les données des sessions web. (Il est possible de définir un autre conteneur comme une base de données à la place du fichier)
+      </ul>
+     <br> <b>Note</b>: l'utilisation de sess->url() permet de passer le Session Id (sid) par l'url et donc théoriquement de faire fonctionner OBM sans les cookies activés</td>
+</tr><tr>
+  <td>API d'utilisation simple</td>
+  <td><ul>
+        <li>page_open() : ouvre la session ou récupère les données
+        <li>$sess->register("var") : enregistre var en variable de session
+        <li>$sess->unregister("var") : supprime la variable de la session
+        <li>page_close() : stocke les variables de la session (ferme la session pour cette page)
+      </ul>
+  </td>
+</tr>
+</table>
 
 <br>
 
@@ -41,7 +79,7 @@ Les limites des sessions Web pour une application sont :
 <ul>
 <li> Non connaissance de l'utilisateur loggué à l'application
 <li> Possibilité de se connecter simultanément un nombre illimité de fois avec le même login.
-<li> Difficulté de consulter les données des sessions (lister les utilisateurs connectés,...)
+<li> Difficulté de consulter les données des sessions (lister les utilisateurs connectés,...). Il faudrait en effet ouvrir et récupérer chaque session.
 </ul>
 
 Les limites des anciennes sessions utilisées par OBM (via table Active Session)
@@ -51,10 +89,11 @@ Les limites des anciennes sessions utilisées par OBM (via table Active Session)
 <li> Et donc lourdeur et pénalités au niveau performance.
 </ul>
 
-Afin de remédier à ces contraintes, un nouveau niveau de session a été défini
-pour OBM, permettant d'utiliser les sessions web natives de PHP pour le bas niveau et en rajoutant des informations utiles (comme le login de l'utilisateur) permettant d'afficher la liste des utilisateurs connectés et d'obtenir des informations plus détaillées sur une session (nombre de hit, page...).
+Afin de remédier à ces contraintes, un nouveau niveau de session (session
+utilisateur) a été défini pour OBM, de plus haut niveau que les sessions Web.
+Il permet d'utiliser les sessions web natives de PHP pour le bas niveau, et définit des informations utiles (comme le login de l'utilisateur) permettant d'afficher la liste des utilisateurs connectés et d'obtenir des informations plus détaillées sur une session (nombre de hit, page...).
 <p>
-De plus un archivage des sessions a été mis en place à des fins statistiques.
+De plus un archivage des sessions utilisateur a été mis en place à des fins statistiques.
 
 <p>
 Les sessions utilisateur sont utilisées pour récolter des informations sur les utilisateurs connectés à l'application OBM.
@@ -62,7 +101,7 @@ Ces sessions sont gérées au sein du code, par des fonctionnalités programmées pa
 <p>
 Les sessions web sont gérées via deux tables, <b>ActiveUserObm</b> qui stoque les sessions utilisateurs n'ayant pas été supprimées (utilisateurs actifs ou ne s'étant pas déconnectés correctement), et <b>ObmSessionLog</b> qui loggue toutes les sessions utilisateur détruites (utilisateurs s'étant déconnectés correctement, ou après l'execution de la routine <b>Clear all passive users sessions</b>).
 <p>
-Ces sessions sont gérées au niveau de la fonction <b>page_close()</b> (page4.inc). Elles sont consultables dans le module d'administration de l'application OBM. La variable <b>$time_actif_session</b> définit la durée d'une session utilisateur. Par défaut celle-ci est synchronisée sur la variable <b>$lifetime</b>.
+Ces sessions sont gérées au niveau de la fonction <b>page_close()</b> (page4.inc). Elles sont consultables dans le module d'administration de l'application OBM. La variable <b>$lifetime</b> définit la durée d'une session utilisateur.
  Si l'utilisateur ne fait aucune requête au delà de ce delai, il sera alors considéré comme inactif.
 Les sessions utilisateurs lorsqu'elles sont détruites sont archivées dans la table <b>ObmSessionLog</b>. Ces sessions sont détruites lorsque l'utilisateur se déconnecte via la fonction <b>logout</b> ou lorsque la routine <b>Clear all passive users sessions</b> est lancée.
 La routine <b>Clear all passive users sessions</b> ne detruit que les sessions passives.
@@ -73,7 +112,127 @@ La destruction d'une session utilisateur n'a aucune influence sur sa session web
 
 
 <h2>Fonctionnement des sessions au travers du suivi de l'utilisation d'OBM</h2>
- Ici nous allons étudier le fonctionnement des deux types de sessions dans l'application OBM, en commençant juste après l'identification.
+
+Une session OBM est donc une session web + une session utilisateur.
+Si une des deux sessions est coupée, la session OBM tombe et l'utilisateur doitse reconnecter.
+
+
+<H3>Scénario de déroulement de session OBM</h3>
+
+<table border=1>
+<tr>
+  <th>Etape</th>
+  <th>Action</th>
+</tr><tr>
+  <td>Arrivée dans OBM : demande de la page obm.php</td>
+  <td>Rien n'existe à ce moment au niveau session.
+    <br> La fonction page_open() est appelée. Elle détourne le traitement vers l'affichage du formulaire de login.
+    <ul>
+      <li> Création de la session Web, et du cookie par la classe OBM_Session. Le cookie à ce moment n'a pas de date d'expiration.
+      <li> Création de l'authentification par la classe auth qui affiche le formulaire de login
+    </ul>
+</tr><tr>
+  <td>Login dans OBM (page obm.php avec paramètres de login)</td>
+  <td>
+    <br> La fonction page_open() est appelée. L'authentification est verifiée.
+    <br> Si l'authentification est correcte
+    <ul>
+      <li> L'expiration de l'authentification (auth->auth["exp"]) est
+positionnée à Auth->lifetime (seule utilisation) car la valeur globale
+$lifetime n'est pas encore chargée (page_open() avant session_load_global_prefs() car celui-ci se sert de $sess défini dans page_open()).
+Ceci dans Auth->start()
+      <li> Les préférences globales sont chargées et mises en session (session_load_global_prefs()). A partir d'ici (pour toutes les autres pages) la durée de session est définie par le paramètre global $lifetime.
+Une date d'expiration (time() + $lifetime) est donnée au cookie.
+      <li> Les préférences de l'utilisateur sont chargées et mises en session (session_load_user_prefs()).
+      <li> <b>La session OBM est ouverte</b>.
+    </ul>
+    sinon la page de login est affichée de nouveau avec un message.
+  </td>
+</tr><tr>
+  <td>Toute page ou action dans OBM (autre que login)</td>
+  <td>
+    La fonction page_open() est appelée (la session est chargée).
+    <ul>
+      <li> Si l'authentification n'a pas expiré, la date d'expiration est repoussée à (time() + $lifetime) dans Auth->start().
+      <li> La date d'expiration du cookie est repoussée à (time() + $lifetime).
+    </ul>
+    <p>
+    Remarque: il existe la possibilité de faire revalider le login au bout d'uncertain temps (auth->auth["refresh"]). Cela n'est pas mis en oeuvre pour le moment (utilité pour applications avec attribution et désattribution fréquente de comptes).
+  </td>
+</tr><tr>
+  <td> Logout d'OBM</td>
+  <td>
+    Après l'initialisation normale de la page (page_open()) :
+    <ul>
+      <li>La session utilisateur est supprimée (ActiveUserObm) et logguée dans UserObm_SessionLog (run_query_logout()).
+      <li>L'authentification (auth) est invalidée et supprimée de la session web.
+      <li>La session web est vidée (unregister() sur lesvariables).
+      <li>La page de logout est affichée.
+    </ul>
+  </td>
+</tr><tr>
+  <td> Cas de fin de session</td>
+  <td>
+    <ul>
+      <li>Logout de l'utilisateur.
+      <li>Expiration du cookie dans le navigateur web du client.
+A la prochaine requète du client, sans le cookie, le serveur ne fait plus la liaison avec la session web.
+Fin de session.
+      <li>Expiration de l'authentification (classe Auth, teste par is_authenticated()). A la prochaine requête du client la fonction Auth->unauth() est appelée et détruit l'authentification.
+    </ul>
+    Dans les 2 derniers cas, la table des sessions utilisateurs actives n'est pas mise à jour automatiquement (même si cela était fait, cela ne couvrirait que les cas ou le client génère une nouvelle requête après l'expiration).
+    <p>
+    Pour y remédier un outil d'administration gère ces cas.
+il supprime les sessions utilisateurs (ActiveUserObm) ayant dépassé le délai d'inactivité ($lifetime) et les loggue dans la table UserObm_SessionLog. Il peut être exécuté :
+    <ul>
+      <li> dans OBM de façon intéractive: module admin : clear_sess
+      <li> via ligne de commande et donc automatisable par cron (php4 admin_index.php -a clear_sess)
+    </ul>
+    <p>
+    A noter :
+    <ul>
+      <li> Les sessions web ne sont jamais supprimées physiquement par OBM car gérées directement par PHP (la fonction $sess->delete() supprime les données et détruit le cookie (est-ce suffisant ?) et démarre une nouvelle session).
+Il faut donc veiller à ce que la configuration de PHP (dans php.ini: session.gc_maxlifetime = 1440, session.gc_probability = 1) soit cohérente.
+      <br>Si politique de suppression des sessions PHP trop aggressive, des sessions OBM seront coupées par la suppression de sessions web.
+    </ul>
+    <p>
+    Points en suspends :
+    <ul>
+      <li> y a-t'il un moyen de forcer une suppression de session web (et autre que la session en cours) ?
+      <li> Que devient une session web quand : authentification a expiré (mais pas cookie). Session web gardée pour le relogin ? (à titre plus informatif qu'autre chose..)
+    </ul>
+  </td>
+</tr><tr>
+  <td>Durée de sessions</td>
+  <td>
+    Afin de simplifier la configuration, dans OBM le paramètre global <b>$lifetime</b>, stocké dans la table des préférences globales et modifiable depuis l'outil d'administration des préférences, agit sur toutes les sessions :
+    <ul>
+      <li> Les sessions web (coté client) : le cookie est illimité sur la page de login, puis prend la valeur de $lifetime.
+      <li> Les sessions utilisateurs (coté serveur) : l'authentification (classe Auth) prend sa durée de vie de $lifetime (à l'exception de la première page au login qui a une valeur fixe, voir Login dans OBM).
+      <li> L'outil d'archivage "clear_sess" utilise $lifetime pour déterminer les sessions utilisateurs expirées.
+    </ul>
+
+    Une valeur de <b>$lifetime = 0</b> supprime l'expiration des sessions (expiration à la date maximale). L'expiration s'effectuera, à la fermeture du navigateur pour le client (on ne peut garder le cookie ?), selon la configuration de PHP pour le serveur (sessions web).
+    <br>
+     Pour les sessions utilisateurs...
+    <ul>
+      <li> pour l'authentification : en tant que variable de session elle sera détruite lors de la destruction de la session web.
+      <li> pour la table des sessions actives (ActiveUserObm)... ne convient pas, car la table ne sera jamais vidée.
+    </ul>
+    <b>$lifetime = 0 : déconseillé dans OBM</b> pour des raisons de sécurité (certaines données peuvent être sensibles) et pour la pertinence de la table des sessions actives et l'archivage des sessions.
+    <p>
+    Remarques :
+    <ul>
+      <li>Problème potentiel : un cookie est crée au niveau du serveur (avec l'heure du serveur) et vérifié sur le client (avec l'heure du client).
+Si le client a un décalage d'horloge par rapport au serveur, la durée de vie du cookie sera diminuée ou augmentée de ce décalage. Pour des durées faibles celapeut être très génant et nécessiter de ne pas faire expirer les cookies.
+      <li>Lorsque on change la valeur de <b>$lifetime</b> cela n'affectera que les nouvelles sessions et non les sessions en cours (car la valeur est lue au login au chargement des préférences mais en suite stockée en variable de session pour ne pas effectuer la requête à chaque page) pour les expirations de cookie et d'authentification. Par contre l'effet est immédiat sur l'outil <i>clear_sess</i> via OBM ou en mode commande car celui-ci va chercher le paramètre en base.
+      <br>
+    </ul>
+  </td>
+</tr>
+</table>
+
+
 <h3>Connexion : </h3>
 <p>
  En debut de page, lors de l'appel de la fonction <b>page_open()</b>, la session web est alors créée, ainsi que le cookie. Les paramètres de l'utilisateur ( langue, thème, favoris ) sont alors enregistrés dans les variables de sessions.
@@ -93,15 +252,15 @@ Ensuite le contenu de la page est envoyé.
 <p>
  Si la temps durant lequel l'utilisateur n'émet aucune requête dépasse la durée définie dans la variable <b>$lifetime</b> alors le cookie de session se detruit automatiquement. L'utilisateur perd alors sa connection à l'application OBM, et devra donc se reconnecter.
 <p>
- La session utilisateur sera elle considérée comme inactive (si <b>$lifetime</b>  = <b>$time_actif_session</b>), sans pour autant être detruite.
+ La session utilisateur sera elle considérée comme inactive (si non mise à jour depuis <b>$lifetime</b> secondes), sans pour autant être detruite.
 <p>
 <h3>Déconnexion : </h3>
- Au moment du "logout" la fonction $sess->delete() est appellée. Elle detruit physiquement et le cookie de session et le fichier de session. Est aussi appellé a ce moment la fonction run_query_store() qui permet de supprimer la session utilisateur de la table <b>ActiveUserObm</b> et de l'archiver dans la table <b>ObmSessionLog</b>.
+ Au moment du "logout" la fonction $sess->delete() est appellée. Elle detruit physiquement et le cookie de session et le fichier de session. Est aussi appellé a ce moment la fonction run_query_log_session() qui permet de supprimer la session utilisateur de la table <b>ActiveUserObm</b> et de l'archiver dans la table <b>ObmSessionLog</b>.
 <p>
 <h3>Administration : </h3>
 <p>
- Lorsque un administrateur ira consulter les données relatives aux sessions, OBM affichera alors deux informations majeures, le nombre de sessions utilisateurs total (actives + inactives) et les données relatives aux sessions utilisateurs actives. Les sessions utilisateurs actives sont séléctionnés en selectionnant toute les sessions utilisateurs dont le laps de temps depuis la dernière modification est inférieur à <b>$time_actif_session</b>.
-Lorsque la routine <b>Clear all passive users sessions</b> est lancée les session utilisateur inactives seront alors supprimées de la table <b>ActiveUserObm</b>et seront d'archivées dans la table <b>ObmSessionLog</b>.
+ Lorsque un administrateur ira consulter les données relatives aux sessions, OBM affichera alors deux informations majeures, le nombre de sessions utilisateurs total (actives + inactives) et les données relatives aux sessions utilisateurs actives. Les sessions utilisateurs actives sont séléctionnés en selectionnant toute les sessions utilisateurs dont le laps de temps depuis la dernière modification est inférieur à <b>$lifetime</b>.
+Lorsque la routine <b>Clear all passive users sessions</b> est lancée les session utilisateur inactives seront alors supprimées de la table <b>ActiveUserObm</b> et seront d'archivées dans la table <b>ObmSessionLog</b>.
 <p>
 
 
@@ -118,7 +277,7 @@ Ce module se trouve dans la partie administration. Elle est consultable en cliqu
 <li><b>Entrées dans ActiveUserObm : </b> Nombres total de sessions "ouvertes" sur OBM. Par ouverte on entend toutes les sessions dont 
 dont l'utilisateur ne c'est pas déconnecté via le lien <b>logout</b>.
 <li><b>Utilisateurs actuellement actifs : </b> Ce sont les pseudonymes des utilisateurs dit actifs, c'est à dire qui ont éxécuté 
-une action sur OBM depuis moins de X secondes ( X étant la valeur données à la variable <b>$time_actif_session</b>., par défaut 14400).
+une action sur OBM depuis moins de X secondes ( X étant la valeur données à la variable <b>$lifetime</b>, par défaut 14400).
 <li><b>Date de Login : </b> Date de dernier login de l'utilisateur sur OBM.
 <lI><b>Nombre de hit :</b> Nombre d'appel de fichier fait par l'utilisateur lors de la session courante.
 <li><b>Dernière page consultée : </b> Page sur laquelle l'utilisateur se trouve actuellement ( ou qu'il à appelé en dernier si il s'est déconnecté du site sans passer par la fonction de <b>logout</b>).

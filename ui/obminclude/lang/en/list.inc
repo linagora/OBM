@@ -18,9 +18,6 @@ $l_updater = "Last updater";
 $l_date_last_update = "Last update";
 
 // Labels and texts
-$l_last_deal="Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
 $l_list_list = "List";
 $l_yes = "yes";
 $l_no = "no";
@@ -69,8 +66,6 @@ $l_insert = "Insert the list";
 $l_update = "Update the list";
 $l_delete = "Delete the list";
 $l_change_auth = "Change auth";
-$l_find = "find";
-$l_back = "Back";
 $l_confirm = "Confirm the action";
 $l_add = "Add these lists";
 $l_mail = "Send mail to members" ;
@@ -160,8 +155,3 @@ $l_nb_message_send = "Number of mail(s) sent : " ;
 //Error:
 $l_error_which = "Error::: The which variable is NOT CORRECTLY set... Please Check your administrator" ;
 $l_error_authentification = "Error::: Wrong Authentification... Please Check your administrator " ;
-
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%d-%m %H:%i";

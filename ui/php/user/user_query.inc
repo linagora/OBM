@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : user_query.inc                                              //
-//     - Desc  : User query & db File                                        //
+// OBM - File : user_query.inc                                               //
+//     - Desc : User query & db File                                         //
 // 2000-01-13 Florent Goalabre : Last Update 2001-07-27 Francois Bloque      //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -18,27 +18,41 @@
 function run_query_search($user, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql;
 
-  $name = $user["name"];
+  $login = $user["login"];
+  $lname = $user["lastname"];
   $perms = $user["perms"];
+  $archive = $user["archive"];
 
   $select = "select UserObm.*, userobm_id as Id from UserObm";
   $where="";
 
-  // If a user indication has been specified, get it
-  if (trim($name) != "") {
-     $where .= " userobm_username like '" . $name . "%' ";
+  // If a login indication has been specified, get it
+  if (trim($login) != "") {
+     $where .= " userobm_login like '$login%'";
   }
 
-  // If a user perms  indication has been specified, get it
+  // If a user perms indication has been specified, get it
   if (($perms != $c_all) && ($perms != "")) {
-     if (trim($where) != "") $where = " and" ;
-     $where .= " userobm_perms='" . $perms . "'" ;
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_perms='$perms'";
   }
+
+  // If a name indication has been specified, get it
+  if (trim($lname) != "") {
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_lastname like '$lname%'";
+  }
+
+  if ($archive != "1") {
+    if (trim($where) != "") $where .= " and";
+    $where .= " userobm_archive = '0'";
+  }
+
   if (trim($where) != "") $where = " where" .$where;
   $query = $select . $where;
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_username";
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
@@ -76,14 +90,17 @@ function run_query_detail($p_id) {
 // User insert query execution                                               //
 // Parameters:
 //   - $user[]   : entry values
-//     keys used : name, passwd, perms, email, contact
+//     keys used : login, passwd, perms, archive, *name, email, contact
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($user) {
   global $auth, $cdg_sql;
 
-  $name = $user["name"];
+  $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
+  $archive = ($user["archive"] ? "1" : "0");
+  $lname = $user["lastname"];
+  $fname = $user["firstname"];
   $email = $user["email"];
   $contact = $user["contact"];
 
@@ -91,23 +108,29 @@ function run_query_insert($user) {
     userobm_timecreate,
     userobm_userupdate,
     userobm_usercreate,
-    userobm_username,
+    userobm_login,
     userobm_password,
     userobm_perms,
+    userobm_archive,
+    userobm_lastname,
+    userobm_firstname,
+    userobm_email,
     userobm_timelastaccess,
-    userobm_contact_id,
-    userobm_email)
+    userobm_contact_id)
   values (
     null,
     '" . date("Y-m-d H:i:s") . "',
     null,
     ". $auth->auth["uid"] . ",
-    '$name',
+    '$login',
     '$passwd',
     '$perms',
+    '$archive',
+    '$lname',
+    '$fname',
+    '$email',
     null,
-    '$contact',
-    '$email')";
+    '$contact')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -122,25 +145,31 @@ function run_query_insert($user) {
 // Parameters:
 //   - $p_id     : user id
 //   - $user[]   : entry values
-//     keys used : name, passwd, perms, email, contact
+//     keys used : login, passwd, perms, archive, *name, email, contact
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($p_id, $user) {
   global $auth, $cdg_sql;
 
-  $name = $user["name"];
+  $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
+  $archive = ($user["archive"] ? "1" : "0");
+  $lname = $user["lastname"];
+  $fname = $user["firstname"];
   $email = $user["email"];
   $contact = $user["contact"];
 
   $query = "update UserObm set
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate=". $auth->auth["uid"] .",
-    userobm_username='$name',
+    userobm_login='$login',
     userobm_password='$passwd',
     userobm_perms='$perms',
-    userobm_contact_id='$contact',
-    userobm_email='$email'
+    userobm_archive='$archive',
+    userobm_lastname='$lname',
+    userobm_firstname='$fname',
+    userobm_email='$email',
+    userobm_contact_id='$contact'
   where userobm_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -201,14 +230,16 @@ function run_query_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_user_context($p_id, $user) {
 
-  $name = $user["name"];
+  $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
+  $lname = $user["lastname"];
+  $fname = $user["firstname"];
   $email = $user["email"];
   $contact = $user["contact"];
 
   // if a user with same name exists, return false
-  $co_q = run_query_check_user($p_id, $name);
+  $co_q = run_query_check_user($p_id, $login);
   return $co_q;
 }
 
@@ -216,15 +247,15 @@ function check_user_context($p_id, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 // Return the user with similar names
 // Parameters:
-//   - $p_id    : user id
-//   - $name    : username
+//   - $p_id  : user id
+//   - $login : login
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_user($p_id, $name) {
+function run_query_check_user($p_id, $login) {
   global $cdg_sql;
 
-  $query = "select distinct userobm_id, userobm_username
+  $query = "select distinct userobm_id, userobm_login
             from UserObm
-            where userobm_id!='$p_id' and userobm_username like '$name%'";
+            where userobm_id!='$p_id' and userobm_login like '$login%'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -242,20 +273,22 @@ function run_query_check_user($p_id, $name) {
 //     keys used : name, passwd, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($p_id, $user) {
-  global $l_exist_error,$l_username_error,$l_password_error,$l_email_error;
+  global $l_exist_error, $l_login_error, $l_password_error, $l_email_error;
   global $l_err_user_contact, $php_regexp_email;
   global $err_msg, $action, $cdg_sql;
 
   $id = $user["id"];
-  $name = $user["name"];
+  $login = $user["login"];
   $passwd = $user["passwd"];
   $perms = $user["perms"];
+  $lname = $user["lastname"];
+  $fname = $user["firstname"];
   $email = $user["email"];
   $contact = $user["contact"];
 
-  // MANDATORY: User name
-  if (trim($name) == "") {
-    $err_msg = $l_username_error." : ". $name;
+  // MANDATORY: Login
+  if (trim($login) == "") {
+    $err_msg = $l_login_error." : ". $login;
     return false;
   }
   // MANDATORY: User password
@@ -272,7 +305,7 @@ function check_data_form($p_id, $user) {
   /////////////////////////////////////////////////////////////////////////////
   // if a user with the same name already exists  return false               //
   /////////////////////////////////////////////////////////////////////////////
-  $query = "select * from UserObm where userobm_username='$name'";
+  $query = "select * from UserObm where userobm_login='$login'";
   if ($p_id > 0) {
     $query .= " and userobm_id!='$p_id'";
   }
@@ -280,7 +313,7 @@ function check_data_form($p_id, $user) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
-    $err_msg = $name . " : " . $l_exist_error;
+    $err_msg = "$login : $l_exist_error";
     return false;
   }
 
@@ -296,9 +329,9 @@ function check_data_form($p_id, $user) {
   $obm_q->query($query);
   if ($obm_q->num_rows() > 0) {
     while ($obm_q->next_record()) {
-      $username = $obm_q->f("userobm_username");
+      $login = $obm_q->f("userobm_login");
       $id = $obm_q->f("userobm_id");
-      $list .= "<A HREF=\"user_index.php?action=detailconsult&amp;param_user=$id\">$username<BR>";
+      $list .= "<A HREF=\"user_index.php?action=detailconsult&amp;param_user=$id\">$login<BR>";
     }
     $err_msg = $l_err_user_contact . "<P>" . $list;
     return false;

@@ -1,12 +1,15 @@
 <SCRIPT language="php">
-/////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Deutsch (German)
 //     - File     : company.inc
 // 1999-01-25 Pierre Baudracco
 // 1999-12-06 / Fink / created from english version
 // 2000-01-10 / Fink / check
 // 2001-07    / Fink / check for version 0.4
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
 // Labels and texts
 $l_company_name = "Firma";
 $l_company_kind = "Firmenart";
@@ -32,7 +35,6 @@ $l_deal_new = "Neuer Vertrag";
 $l_kind_manage = "Verwaltung Firmenart";
 $l_kind_exist = "Vorhandene Firmenarten";
 $l_kind_new = "Neue Firmenart";
-$l_invalid_data = "Falsche Daten";
 $l_internal = "Intern";
 $l_number_soc = "Nummer";
 

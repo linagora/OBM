@@ -1,15 +1,15 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : obmlib.inc                                                  //
-//     - Desc  : Local PHPLIB file for OBM                                   //
+// OBM - File : obmlib.inc                                                   //
+//     - Desc : Local PHPLIB file for OBM                                    //
 // 1999-03-18 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////
-// Required packages                                                        //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Required packages                                                         //
+///////////////////////////////////////////////////////////////////////////////
 //require("$obminclude/phplib/db_pgsql.inc");       //Postgres
 require("$obminclude/phplib/db_mysql.inc");     //Mysql
 require("$obminclude/phplib/ct_sql.inc");
@@ -49,8 +49,9 @@ class OBM_CT_Sql extends CT_Sql {
 
 class OBM_User_Sql extends CT_Sql {
 //  var $classname = "OBM_CT_Sql";
-  var $database_class = "DB_OBM";           ## Which database to connect...
-  var $database_table = "ActiveUserObm";  ## and find our session data in this table.
+  var $database_class = "DB_OBM";         ## Which database to connect...
+  var $database_table = "ActiveUserObm";  ## our session data in this table.
+
   function ac_store($id, $name, $str) {
     $ret = true;
     $name = addslashes($name);
@@ -61,26 +62,40 @@ class OBM_User_Sql extends CT_Sql {
     $module_name = substr($module_name,0,strlen($module_name)-10);
   //  $module_name = substr(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),0,strpos(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),"_"));
     $now = date("YmdHis", time());
-    $uquery = sprintf("update %s set activeuserobm_userobm_id='%d', activeuserobm_timeupdate='%s', 
-		       activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1, activeuserobm_lastpage= '%s'
-	               where activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
+    $uquery = sprintf("update %s
+               set activeuserobm_userobm_id='%d',
+                 activeuserobm_timeupdate='%s', 
+                 activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
+                 activeuserobm_lastpage= '%s'
+	       where activeuserobm_sid='%s'
+               and activeuserobm_session_name='%s'",
       $this->database_table,
       $str,
       $now,
       ucfirst($module_name).":".ucfirst($action),
       $id,
       $name);
-    $squery = sprintf("select count(*) from %s where activeuserobm_userobm_id ='%s' and activeuserobm_timeupdate='%s' 
-		       and activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
+    $squery = sprintf("select count(*)
+        from %s
+        where activeuserobm_userobm_id='%s'
+          and activeuserobm_timeupdate='%s' 
+          and activeuserobm_sid='%s'
+          and activeuserobm_session_name='%s'",
       $this->database_table,
       $str,
       $now,
       $id,
       $name);
-    $iquery = sprintf("insert into %s ( activeuserobm_sid, activeuserobm_session_name, activeuserobm_userobm_id,
-				        activeuserobm_timeupdate, activeuserobm_timecreate, activeuserobm_nb_connexions,
-				        activeuserobm_lastpage, activeuserobm_ip ) 
-	                               values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
+    $iquery = sprintf("insert into %s
+          (activeuserobm_sid,
+           activeuserobm_session_name,
+           activeuserobm_userobm_id,
+           activeuserobm_timeupdate,
+           activeuserobm_timecreate,
+           activeuserobm_nb_connexions,
+           activeuserobm_lastpage,
+           activeuserobm_ip) 
+        values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
       $this->database_table,
       $id,
       $name,
@@ -145,12 +160,12 @@ class OBM_User_Sql extends CT_Sql {
 class OBM_Session extends Session {
   var $classname 	= "OBM_Session";
 
-  var $cookiename     	= "";                ## defaults to classname
-  var $magic          	= "Falcon030";       ## ID seed
-  var $mode           	= "cookie";          ## We propagate session IDs with cookies
+  var $cookiename     	= "";           ## defaults to classname
+  var $magic          	= "Falcon030";  ## ID seed
+  var $mode           	= "cookie";     ## We propagate session IDs with cookies
   var $fallback_mode  	= "get";
-  var $lifetime_default = 14400;                 ## 0 = do session cookies, else minutes
-  var $that_class     	= "OBM_CT_Sql";      ## Which database to connect...
+  var $lifetime_default = 0x7fffffff;   ## session cookie if global lifetime=0
+  var $that_class     	= "OBM_CT_Sql"; ## Which database to connect...
   var $gc_probability 	= 5;
   var $allowcache	= "" ;
 }
@@ -158,8 +173,8 @@ class OBM_Session extends Session {
 class OBM_User extends User {
   var $classname = "OBM_User";
 
-  var $magic          = "Abracadabra";     ## ID seed
-  var $that_class     = "OBM_CT_Sql";      ## data storage container
+  var $magic          = "Abracadabra";  ## ID seed
+  var $that_class     = "OBM_CT_Sql";   ## data storage container
 }
 
 #class Example_Auth extends Auth {
@@ -212,15 +227,14 @@ class OBM_User extends User {
 
 class OBM_Challenge_Auth extends Auth {
   var $classname      = "OBM_Challenge_Auth";
-
-  var $lifetime       =  0;
+  var $lifetime       =  1200;
 
   var $magic          = "Simsalabim";  ## Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $sess, $obminclude;
+    global $sess, $obminclude, $obm_version, $menu, $path;
     global $challenge;
     global $_PHPLIB;
     $login_form = "$obminclude/auth/crloginform.ihtml";
@@ -232,22 +246,22 @@ class OBM_Challenge_Auth extends Auth {
   }
   
   function auth_validatelogin() {
-    global $username, $password, $challenge, $response;
+    global $login, $password, $challenge, $response;
 
-    if(isset($username)) {
-      $this->auth["uname"]=$username;        ## This provides access for "loginform.ihtml"
+    if(isset($login)) {
+      $this->auth["uname"]=$login;     ## This provides access for "loginform.ihtml"
     }
     $this->db->query(sprintf("select userobm_id,userobm_perms,userobm_password ".
-                "from %s where userobm_username = '%s'",
+                "from %s where userobm_login = '%s' and userobm_archive = '0'",
                           $this->database_table,
-                          addslashes($username)));
+                          addslashes($login)));
 
     while($this->db->next_record()) {
       $uid   = $this->db->f("userobm_id");
       $perm  = $this->db->f("userobm_perms");
       $pass  = $this->db->f("userobm_password");
     }
-    $exspected_response = md5("$username:$pass:$challenge");
+    $exspected_response = md5("$login:$pass:$challenge");
 
     ## True when JS is disabled
     if ($response == "") {
@@ -269,73 +283,6 @@ class OBM_Challenge_Auth extends Auth {
   }
 }
 
-##
-## Example_Challenge_Crypt_Auth: Keep passwords in md5 hashes rather 
-##                           than cleartext in database
-## Author: Jim Zajkowski <jim@jimz.com>
-/*
-class OBM_Default_Auth extends OBM_Challenge_Auth {
-  var $classname = "OBM_Default_Auth";
-
-  var $nobody    = true;
-}
-
-class Example_Challenge_Crypt_Auth extends Auth {
-  var $classname      = "Example_Challenge_Crypt_Auth";
-
-  var $lifetime       =  1;
-
-  var $magic          = "Frobozzica";  ## Challenge seed
-  var $database_class = "DB_Example";
-  var $database_table = "auth_user_md5";
-
-  function auth_loginform() {
-    global $sess;
-    global $challenge;
-    
-    $challenge = md5(uniqid($this->magic));
-    $sess->register("challenge");
-    
-    include("crcloginform.ihtml");
-  }
-  
-  function auth_validatelogin() {
-    global $username, $password, $challenge, $response;
-
-    $this->auth["uname"]=$username;        ## This provides access for "loginform.ihtml"
-    
-    $this->db->query(sprintf("select user_id,perms,password ".
-                "from %s where username = '%s'",
-                          $this->database_table,
-                          addslashes($username)));
-
-    while($this->db->next_record()) {
-      $uid   = $this->db->f("user_id");
-      $perm  = $this->db->f("perms");
-      $pass  = $this->db->f("password");   ## Password is stored as a md5 hash
-    }
-    $exspected_response = md5("$username:$pass:$challenge");
-
-    ## True when JS is disabled
-    if ($response == "") {
-      if (md5($password) != $pass) {       ## md5 hash for non-JavaScript browsers
-        return false;
-      } else {
-        $this->auth["perm"] = $perm;
-        return $uid;
-      }
-    }
-    
-    ## Response is set, JS is enabled
-    if ($exspected_response != $response) {
-      return false;
-    } else {
-      $this->auth["perm"] = $perm;
-      return $uid;
-    }
-  }
-}
-*/
 
 class OBM_Perm extends Perm {
   var $classname = "OBM_Perm";

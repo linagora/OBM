@@ -45,7 +45,11 @@ class Auth {
   ##
   function start() {
     $cl = $this->cancel_login;
-    global $sess, $$cl;
+    global $sess, $$cl, $lifetime;
+
+    // OBM : We set the auth lifetime with the global session lifetime (if set)
+    // It is not set at the login (cause page_open before session_load_global)
+    if ($lifetime) $this->lifetime = $lifetime;
 
     ## This is for performance, I guess but I'm not sure if it could
     ## be safely removed -- negro
@@ -145,16 +149,22 @@ class Auth {
         # Refresh expire info
         ## DEFAUTH handling: do not update exp for nobody.
         if ($uid != "nobody")
-          $this->auth["exp"] = time() + (60 * $this->lifetime);
+//          $this->auth["exp"] = time() + (60 * $this->lifetime);
+          // OBM : we get the global lifetime which is in seconds
+          $this->auth["exp"] = time() + $this->lifetime;
         break;
       case 3:
         # Login in progress, check results and act accordingly
+        // OBM : login paramaters has been submitted
         switch ($this->mode) {
           case "yes":
           case "log":
+            // OBM : if login successfull (valid auth)
             if ( $uid = $this->auth_validatelogin() ) {
               $this->auth["uid"] = $uid;
-              $this->auth["exp"] = time() + (60 * $this->lifetime);
+//              $this->auth["exp"] = time() + (60 * $this->lifetime);
+              // OBM : in OBM each time is in seconds. this->lifetime too.
+              $this->auth["exp"] = time() + $this->lifetime;
               $this->auth["refresh"] = time() + (60 * $this->refresh);
               return true;
             } else {

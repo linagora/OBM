@@ -104,20 +104,8 @@ if ($action == "index") {
   html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
   dis_contract_search_list($contract);
 
-} elseif ($action == "company_new")  {
-//OK/////////////////////h//////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-        $obm_q_company=run_query_company();
-  	require("contract_js.inc");
-  	html_new_contract_company($obm_q_company,$contract);
-  } 
-  else {
-	display_error_permission();
-  }
-  
-
 } elseif ($action == "new")  {
-//OK/////////////////////h//////////////////////////////////////////////////////
+//OK///////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
   	require("contract_js.inc");
         html_contract_form(new DB_OBM,$action,run_query_contracttype(),run_query_contract_dealtype(),run_query_contact_company_obm(),run_query_company_contract($param_company),run_query_contact_contract($param_company),$param_company);

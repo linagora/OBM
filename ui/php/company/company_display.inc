@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : company_display.inc                                         //
-//     - Desc  : Company Display File                                        //
-// 2000-01-20 Florent Goalabre : Last Update 2001-09-16 - PB                 //
+// OBM - File : company_display.inc                                          //
+//     - Desc : Company Display File                                         //
+// 2000-01-20 Florent Goalabre                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -27,7 +27,7 @@ function html_company_search_form ($kind_q, $company) {
   $zip = stripslashes($company["zip"]);
 
   echo "<CENTER>
-    <FORM METHOD=POST NAME=f_societe
+    <FORM METHOD=GET NAME=f_societe
       ACTION=\"" . $sess->url("company_index.php") . "\">
     <TABLE BORDER=0>
     <TR>
@@ -72,10 +72,10 @@ function html_company_search_form ($kind_q, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_list($company) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "company");
-  $obm_q = run_query_search($company, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($company, $new_order, $order_dir);
   $nb_company = $obm_q->num_rows();
   if ($nb_company == 0) {
     display_warn_msg($l_no_found);
@@ -95,8 +95,7 @@ function dis_company_search_list($company) {
 //     keys used   : state, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
-  global $sess;
-  global $col_textem, $l_found;
+  global $sess, $col_textem, $l_found;
 
   // we urlencode to avoid breakage for space char
   $state = $company["state"];
@@ -105,9 +104,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $kind = $company["kind"];
   $zip = urlencode(stripslashes($company["zip"]));
   
-  echo "<FONT color=\"#$col_textem\">";
-  echo "$nb_company $l_found";
-  echo "</FONT><BR>";
+  echo "<font color=\"#$col_textem\">$nb_company $l_found</font><br>";
 
   $url = $sess->url("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;tf_zip=$zip&amp;cb_state=$state");
 
@@ -119,7 +116,6 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $dis_companies_list->data_header = "both";
 
   $dis_companies_list->display();
- 
 }
 
 
@@ -339,8 +335,8 @@ function html_company_consult($co_q, $kind_q) {
 
 
   if ($auth->auth["perm"] != $perms_user) {
-    // -------| BITBTN  - Update Mode 
-    echo "<FORM METHOD=POST NAME=f_mod_societe ACTION=\"".$sess->url("company_index.php")."\">
+    // -------| BITBTN - Update Mode 
+    echo "<FORM METHOD=GET NAME=f_mod_societe ACTION=\"".$sess->url("company_index.php")."\">
       <INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
       <INPUT TYPE=\"hidden\" name=\"action\" value=\"detailupdate\">
       <INPUT TYPE=\"submit\" value=\"$l_update\">
@@ -761,7 +757,7 @@ function dis_delete_form($p_id) {
 //   - $kind_q : Kind list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_kind_form($kind_q) {
-  global $col_a_table,$col_textem;
+  global $col_a_table, $col_a_tableh, $col_textem;
   global $l_kind_manage,$l_kind_exist;
   global $l_kind_checkdelete,$l_kind_update,$l_kind_new,$l_kind_insert;
   global $sess;

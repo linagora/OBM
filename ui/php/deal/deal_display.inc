@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_display.php                                             //
 //     - Desc : Deal Display File                                            //
-// 2000-01-20 Pierre Baudracco : Last Update 2000-10-10                      //
+// 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -62,17 +62,6 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   }
   $sel_kind .= "</SELECT>";
 
-  // Categories select construction
-//  $sel_cat = "<SELECT name=sel_cat>
-  //   <OPTION value=\"$c_all\">$l_all_f";
-  //while($obm_q_cat->next_record()) {
-   // $id = $obm_q_cat->f("tasktype_id");
-   // $mlabel = $obm_q_cat->f("tasktype_label");
-   // $sel_cat .= "<OPTION value=\"$id\"";
-   // if ($cat == $id) $sel_cat .= " selected";
-    //$sel_cat .= ">$mlabel";
-  //}
-  //$sel_cat .= "</SELECT>";
 
   //TaskType select construction
   $sel_cat = "<SELECT name=sel_cat>
@@ -117,66 +106,66 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 
   // --- HTML Page display ----------------------------------------------------
 
-  echo "<CENTER>
-    <FORM METHOD=GET NAME=form_deal
+  echo "<center>
+    <form method=get name=form_deal
     onSubmit=\"if (check_search_form(this) == false) return false; else return true;\"
-    ACTION=\"" . $sess->url("deal_index.php") . "\">
+    action=\"" . $sess->url("deal_index.php") . "\">
 
-    <TABLE BORDER=0>
-    <TR>
-      <TD align=left><font color=\"#$col_textem\">$l_deal</font></TD>
-      <TD>&nbsp;&nbsp;&nbsp;</TD>
+    <table border=0>
+    <tr>
+      <td align=left><font color=\"#$col_textem\">$l_deal</font></td>
+      <td>&nbsp;&nbsp;&nbsp;</td>
 <!-- Label -->
-      <TD><FONT SIZE=-2>$l_label_start</FONT><BR>
-      <INPUT TYPE=text NAME=tf_label size=16 value=\"$label\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
+      <td><font size=-2>$l_label_start</font><br>
+      <input name=tf_label size=16 maxlength=128 value=\"$label\"></td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Name -->
-      <TD><FONT SIZE=-2>$l_company</FONT><BR>
-      <INPUT TYPE=text NAME=tf_company_name size=12 value=\"$name\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
+      <td><font size=-2>$l_company</font><br>
+      <input name=tf_company_name size=12 maxlength=16 value=\"$name\"></td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Archive -->
-      <TD ALIGN=center><FONT SIZE=-2>$l_show_archive</FONT><BR>
-      <INPUT TYPE=checkbox NAME=cb_archive VALUE=1 $archive>
-      </TD>
-      <TD>&nbsp;&nbsp;</TD>
+      <td align=center><font size=-2>$l_show_archive</font><br>
+      <input type=checkbox name=cb_archive value=1 $archive>
+      </td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Alarm date after -->
-      <TD><FONT SIZE=-2>$l_after</FONT><BR>
-      <INPUT TYPE=text NAME=tf_dateafter size=10 value=\"$dateafter\"></TD>
+      <td><font size=-2>$l_after</font><br>
+      <input name=tf_dateafter size=10 maxlength=10 value=\"$dateafter\"></td>
 <!-- Alarm date before -->
-      <TD><FONT SIZE=-2>$l_before</FONT><BR>
-      <INPUT TYPE=text NAME=tf_datebefore size=10 value=\"$datebefore\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
+      <td><font size=-2>$l_before</font><br>
+      <input name=tf_datebefore size=10 maxlength=10 value=\"$datebefore\"></td>
+      <td>&nbsp;&nbsp;</td>
 <!-- Search -->
-      <TD VALIGN=bottom> 
-      <INPUT NAME=action TYPE=hidden VALUE=search>
-      <INPUT NAME=param_parent type=hidden value=\"$parent\">
-      <INPUT NAME=submit TYPE=submit VALUE=\"$l_find\">
-      </TD>
-    </TR>
-    </TABLE>
+      <td valign=bottom> 
+      <input name=action type=hidden value=search>
+      <input name=param_parent type=hidden value=\"$parent\">
+      <input name=submit type=submit value=\"$l_find\">
+      </td>
+    </tr>
+    </table>
 
-    <TABLE BORDER=0>
-    <TR>
+    <table border=0>
+    <tr>
 <!-- Kind -->
-      <TD><FONT SIZE=-2>&nbsp;&nbsp;$l_kind</FONT><BR>
+      <td><font size=-2>&nbsp;&nbsp;$l_kind</font><br>
       $sel_kind
-      </TD>
+      </td>
 <!-- Categories -->
-      <TD><FONT SIZE=-2>&nbsp;&nbsp;$l_category</FONT><BR>
+      <td><font size=-2>&nbsp;&nbsp;$l_category</font><br>
       $sel_cat
-      </TD>
+      </td>
 <!-- State -->
-      <TD><FONT SIZE=-2>&nbsp;&nbsp;$l_state</FONT><BR>
+      <td><font size=-2>&nbsp;&nbsp;$l_state</font><br>
       $sel_state
-      </TD>
+      </td>
 <!-- Manager -->
-      <TD><FONT SIZE=-2>&nbsp;&nbsp;$l_manager</FONT><BR>
+      <td><font size=-2>&nbsp;&nbsp;$l_manager</font><br>
       $sel_manager
-      </TD>
-    </TR>
-    </TABLE>
-  </FORM>
-  <HR>";
+      </td>
+    </tr>
+    </table>
+  </form>
+  <hr>";
 }
 
 
@@ -256,9 +245,9 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_search_list($deal) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
-  $obm_q = run_query_search($deal, 0, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($deal, 0, $new_order, $order_dir);
   $nb_deal = $obm_q->num_rows();
   if ($nb_deal == 0) {
     display_warn_msg($l_no_found);
@@ -285,7 +274,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Labels
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
-  global $set_rows, $set_rows_default;
   global $perms_user,$l_perms_user;
   global $auth, $sess;
 
@@ -311,24 +299,8 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $dis_deals_list->data_url = $url;
   $dis_deals_list->data_header = "both";
 
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<form method=\"post\" name=\"update_archive_deals\" action=\"".$sess->self_url()."\">";
-    $dis_deals_list->data_cb_text = $l_archive_first;
-    $dis_deals_list->data_idfield = "deal_id";
-    $dis_deals_list->data_cb_side = "left";
-    $dis_deals_list->data_cb_name = "archive_";
-    $dis_deals_list->data_cb_field = "deal_archive";
-  }
-
   $dis_deals_list->display();
 
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<br>
-       <input type=hidden name=page value=\"$page\">
-       <input type=hidden name=action value=\"updatearchive\">
-       <input type=submit value=\"$l_archive_update\">
-     </form>";
-  }
 }
 
 
@@ -340,13 +312,13 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 //   -  $con_q     : DBO : list of contact from the company 
 //   -  $comp_id   : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_consult($deal_q,$int_con_q,$con_q,$comp_id, $q_invoices, $invoices_options,$page) {
+function html_deal_consult($deal_q,$int_con_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link;
   // - Labels
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo;
-  global $l_invoices_connected,$l_no_invoices_connected,$set_rows;
+  global $l_invoices_connected,$l_no_invoices_connected;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $perms_user,$l_perms_user, $perms_admin;
@@ -540,7 +512,7 @@ echo "</TD>
           <TD align=right>";
 
   if ($auth->auth["perm"] != $perms_user) {
-    echo "<FORM METHOD=POST NAME=form_deal_update ACTION=\"".
+    echo "<FORM METHOD=GET NAME=form_deal_update ACTION=\"".
       $sess->url("deal_index.php")."\">";
     echo "
       <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
@@ -612,7 +584,7 @@ echo "</TD>
 //   - $sta_q     : DBO : list of deal status
 //   - $comp_id   : id of the company concerned by the deal
 //   - deal[]     : default or transmitted values
-//     keys used  : id, usercreate, num,label,
+//     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
   // - Themes
@@ -622,7 +594,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_private,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all;
   
-
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $deal_q->f("deal_id");
@@ -876,16 +847,13 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
         $sel_con1";
 
   if ($action == "detailupdate") {
-    echo "<A HREF=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id")."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
+    echo "<A HREF=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\"><IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
   }
   echo "<BR>
       $sel_con2";
 
   if ($action == "detailupdate") {
-    echo "<A HREF=\"".
-    $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\">";
-    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
+    echo "<A HREF=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\"><img ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";
   }
   echo " </TD>
       </TR>
@@ -970,45 +938,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display new deal : Company Form                                           //
-// Parameters :
-//   $comp_q    : list of all the companies  
-//   - deal[]     : default or transmitted values
-//     keys used  : parent, parent_market, parent_tech
-///////////////////////////////////////////////////////////////////////////////
-function html_new_deal_company($comp_q, $deal) {
-  global $l_deal_select_company,$l_select_company;
-  global $sess;
-
-  $parent = $deal["parent"];
-  $market = $deal["pmarket"];
-  $tech = $deal["ptech"];
-
-  echo "<CENTER>
-    <FORM METHOD=POST NAME=form_company
-      onSubmit=\"if (verifie(this)) return true; else return false;\"
-      ACTION=\"" . $sess->url("deal_index.php") . "\">
-    $l_deal_select_company
-    <P>
-    <SELECT name=\"param_company\" size=10>";
-
-  while($comp_q->next_record()) {
-    echo "\n<OPTION value=".$comp_q->f("company_id").">".$comp_q->f("company_name");
-  }
-
-  echo "</SELECT>
-    <P>
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
-    <INPUT TYPE=\"hidden\" name=\"param_parent\" value=\"$parent\">
-    <INPUT TYPE=\"hidden\" name=\"sel_pmarket\" value=\"$market\">
-    <INPUT TYPE=\"hidden\" name=\"sel_ptech\" value=\"$tech\">
-    <INPUT TYPE=\"submit\" value=\"$l_select_company\">
-    </FORM>
-    </CENTER>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Form used to affect a deal to a parentdeal chosen in the list of  
 // the existing parentdeals.
 // Parameters :
@@ -1048,7 +977,7 @@ function html_deal_affect($parent_q, $p_deal_id) {
 //   - $status_q : DBO : Deal Status list
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_admin_form($kind_q, $cat_q, $status_q) {
-  global $col_a_table,$col_textem;
+  global $col_a_table, $col_a_tableh, $col_textem;
   // Labels : 
   global $l_kind_manage,$l_kind_new,$l_kind_exist;
   global $l_status_manage,$l_status_exist,$l_status_new;
@@ -1536,9 +1465,9 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_parentdeal_search_list($deal) {
   global $l_no_found_parent;
-  global $auth, $page, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
-  $obm_q = run_query_search_parentdeal($deal, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search_parentdeal($deal, $new_order, $order_dir);
   
   $nb_parentdeals = $obm_q->num_rows();
   if ($obm_q->num_rows() == 0) {
@@ -1563,15 +1492,12 @@ function dis_parentdeal_search_list($deal) {
 function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $deal) {
   global $l_found_parent,$col_textem; 
   global $sess;
-  global $set_rows,$set_rows_default; 
 
   $plabel = stripslashes($deal["plabel"]);
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
 
-  echo "<FONT color=\"#$col_textem\">
-    $nb_parentdeals  $l_found_parent
-    </FONT><BR>";
+  echo "<FONT color=\"#$col_textem\">$nb_parentdeals  $l_found_parent</font>";
 
   $url = $sess->url("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
@@ -1581,7 +1507,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $obm_dis_list_parentdeal->data_header = "both";
   $obm_dis_list_parentdeal->data_idfield = "parentdeal_id"; 
   $obm_dis_list_parentdeal->data_set->seek($first_row);
-  echo "<BR><BR>";
+  echo "<br>";
   $obm_dis_list_parentdeal->display();
 
 }
@@ -1715,22 +1641,18 @@ function html_parentdeal_form($action, $deal_q, $int_con_q, $deal) {
 //     keys used      : forwarded to html_deal_search_form
 //   - $pref_q  : display preferences for the deal list
 //   - $nbdeals       : number of deals in the list
-//   - $page          : current page in the list of deals
 //     //---> used by the deal search form :
 //   - $kind_q        : list of deal types available
 //   - $cat_q         : list of deal categpries available
 //   - $state_q       : list of deal status available 
 //   - $int_con_q     : DBO : list of contacts from internal companies 
-//     //--->
-//   - $p_new_order ,   
-//   - $p_new_order2  : the new "order by" values of the deals ' query   
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$page,$kind_q,$cat_q,$state_q,$int_con_q,$p_new_order="",$p_new_order2="") {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$int_con_q) {
   global $col_textem,$col_label,$col_ok; 
-  global $sess,$auth,$perms_user;
-  global $set_rows,$set_rows_default; 
+  global $path,$sess,$auth,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager,$l_marketing_manager,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_comment,$l_state;
-  global $l_invoices_connected,$l_no_invoices_connected,$set_rows;
+  global $l_invoices_connected,$l_no_invoices_connected;
+  global $popup_width, $popup_height, $l_deal_select_company;
 
   $parent = $parent_q->f("parentdeal_id");
   $plabel = $parent_q->f("parentdeal_label");
@@ -1754,12 +1676,14 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$page
       <input type=hidden name=param_parent value=\"$parent\">
       <input type=submit name=sub_detailupdate value=\"$l_update_parent\">
       </FORM>";
+
+    $ret_url = urlencode($path."deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
+    $title = urlencode($l_deal_select_company);
+    $win_url = $sess->url("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
     $f_new = "<FORM NAME=\"form_deal_new\"
-      ACTION=\"" . $sess->url("deal_index.php") . "\" METHOD=GET>
-      <input type=hidden name=action value=\"company_new\">
-      <input type=hidden name=param_parent value=\"$parent\">
-      <input type=hidden name=param_marketing value=\"$pmarket\">
-      <input type=hidden name=param_technical value=\"$ptech\">
+      ACTION=\"" . $sess->url("deal_index.php") . "\" METHOD=GET
+      onsubmit=\"window.open('$win_url','Company','height=$popup_height,width=$popup_width'); return false;\">
+
       <input type=submit name=detailupdate value=\"$l_parentdeal_deal_new\">
       </FORM>";
   } else {
@@ -1836,49 +1760,20 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$page
     return;
   }
 
-  // At least 1 deal exist
-  if(!isset($page)) {
-    $page = 0 ;
-  }    
+  echo "<font color=\"#$col_textem\">$nb_deals $l_found</font>";
 
-  echo "<FONT color=\"#$col_textem\">$nb_deals $l_found</FONT><BR>";
+  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
-  // Page display management
-  if ($set_rows < 1) {
-    $set_rows=$set_rows_default;
-    $sess->register("set_rows");
-  }
-  if($page != 0) {
-    if($deal_q->nf() < ($page*$set_rows)+1) {
-      $page-- ;
-    }
-  }
+  // Display the list of deals attached to the parentdeal
+  $dis_list_deal = new OBM_DISPLAY("DATA", $pref_q);
+  $dis_list_deal->data_set = $deal_q;
+  $dis_list_deal->data_url = $url;
+  $dis_list_deal->data_header = "both";
+  $dis_list_deal->data_idfield = "deal_id"; 
+  $dis_list_deal->data_set->seek($first_row);
 
-  $nb_page = floor(($nb_deals-1) / $set_rows);
-  $first_row = $page * $set_rows;
-  $i=0;
-
-  // Table of content (pages)
-  while ($i <= ($nb_page)) {
-    if ($i != 0) echo " | ";
-    if ($i != $page) {
-      echo "<a href=\"" . $sess->url("deal_index.php?" .
-      "action=parent_detailconsult&amp;page=$i&amp;param_parent=$parent&amp;new_order=$p_new_order&amp;new_order2=$p_new_order2")."\">";
-    }
-    echo ($i + 1);
-    if ($i != $page) echo "</a>";
-    $i++;
-  }
-  
-  // Display the list of deals attached to the parentdeal 
-  $obm_dis_list_deal = new OBM_DISPLAY("DATA", $pref_q);
-  $obm_dis_list_deal->data_set = $deal_q;
-  $obm_dis_list_deal->data_header = "both";
-  $obm_dis_list_deal->data_idfield = "deal_id"; 
-  $obm_dis_list_deal->data_set->seek($first_row);
-
-  echo "<BR><BR>";
-  $obm_dis_list_deal->display();
+  echo "<br>";
+  $dis_list_deal->display();
   echo "<br>";      
 }
 

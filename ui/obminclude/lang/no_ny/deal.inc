@@ -1,9 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Norwegian                                               //
-//     - File     : deal.inc                                                //
-// 2000-07-20 Magni Onsoien                                                 //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Norwegian                                                //
+//     - File     : deal.inc                                                 //
+// 2000-07-20 Magni Onsoien                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // This translation has lots of errors due to misunderstandings. A better 
 // version will come.
@@ -12,9 +14,6 @@
 $l_minus="-";
 $l_plus="+";
 $l_order="Order";
-$l_last_deal="Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";
 $l_todo = "To Do";
 $l_date_proposal="Proposal Date";
 $l_amount_in="Amout of inputs";
@@ -34,11 +33,8 @@ $l_amount = "Sum";
 $l_contacts = "Kontaktar";
 $l_comment = "Kommentar";
 $l_company = "Firma";
-$l_archive = "Arkiv";
 $l_show_archive = "Vis arkiv";
 $l_archive_first = "A";
-$l_all_f = "Alle";
-$l_all = "Alle";
 $l_date = "Dato";
 $l_date_init = "Startdato";
 $l_date_alarm = "Varslingsdato";
@@ -84,7 +80,6 @@ $l_parentdeal_deals = "Deals belonging to this parentdeal";
 
 
 // Actions
-$l_find = "Finn";
 $l_insert = "Legg til avtale";
 $l_update = "Oppdater avtalen";
 $l_delete = "Slett avtalen";
@@ -106,8 +101,6 @@ $l_status_insert = "Insert State";
 $l_category_delete = "Delete Category";
 $l_category_update = "Update Category";
 $l_category_insert = "Insert Category";
-
-$l_cancel = "Cancel";
 
 // Messages
 
@@ -188,26 +181,6 @@ $l_time_format = "%Y-%m-%d %H:%i:%s";
 $l_date_format = "%Y-%m-%d %H:%i:%s";
 
 
-
 // For the display parameters modification screen
 $l_deal_options = "Display options for deals list"; 
 $l_parentdeal_options = "Display options for parentdeals list";
-$l_subject = "Subject" ;
-$l_options_dis = "options of display" ;
-$l_query_display = "Displayed" ;
-$l_order_dis = "Order of display" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Not to display it fields" ;
-$l_ch_to_dis_no_help = "That indicates the appropriate field is displayed<br>Click on this button if you don't want to display the field" ;
-$l_ch_to_dis_yes = "To display it fields" ;
-$l_ch_to_dis_yes_help = "That indicates the appropriate field is not displayed<br>Click on this button if you want to display the field" ;
-$l_dis_obligatory = "Display of this fields is mandatory" ;
-$l_dis_obligatory_help = "This button means you don't have choice. The field appropriate field is be displayed" ;
-$l_down_option = "To descend this option from a notch" ;
-$l_down_option_help  = "Click on this button to move down the field" ;
-$l_up_option = "To assemble this option of a notch" ;
-$l_up_option_help = "Click on this button to move up the field" ;
-$l_back_tolist = "Back to list display" ;
-$l_help_options = "Contextual help" ;
-$l_option_contacts = "Options of contacts list display" ;
-

@@ -71,7 +71,6 @@ $l_compu_test_compu = "Vous devriez tester si l'ordinateur est bien branché. <br
 $l_compu_compu = "Computer" ;
 $l_compu_infos = "Computer-Daten" ;
 $l_compu_verify = "Verifizierung" ;
-$l_dis_choice = "Anzeige-Optionen" ;
 $l_add_port = "zuorden Ports" ;
 $l_del_port = "entfernen Ports" ;
 $l_update_port = "Port-Scan" ;
@@ -79,8 +78,6 @@ $l_modify_compu = "Computer-Daten ändern" ;
 $l_del_compu = "Computer löschen" ;
 
 //Computer options
-
-
 
 
 // Champs specifiques

@@ -9,7 +9,7 @@
 <CENTER>
 <H1>OBM Development Guidelines</H1>
 <I>Coding standards now mandatory to harmonize the OBM code</I><BR>
-Version 0.5.2 - 2002-07-15<BR>
+Version 0.5.3 - 2002-08-08<BR>
 Pierre Baudracco
 </CENTER>
 <P>
@@ -102,11 +102,11 @@ The <i>$action</i> variable dictates the module execution.
   <td>Display module file which contains display functions
   </td>
 </tr><tr>
-  <td>module_display.php</td>
+  <td>module_query.php</td>
   <td>Query module file which contains query functions (database access)
   </td>
 </tr><tr>
-  <td>module_display.php</td>
+  <td>module_js.php</td>
   <td>Javascript module file which contains javascript functions.
   </td>
 </tr>
@@ -172,6 +172,70 @@ Default actions names should be used :
 and others, specific to the module.
 
 
+<h3>Module_index.php global variable to define</h3>
+the_index.php file must define :
+<p>
+<table border=1>
+<tr>
+  <th>variable</th>
+  <th>content</th>
+</tr><tr>
+  <td>$path</td>
+  <td>relative path to the obm php root(usually .. for a module)</td>
+</tr><tr>
+  <td>$menu</td>
+  <td>Id of the module (USER, CONTACT,...), module name capitalized</td>
+</tr><tr>
+  <td>$obminclude</td>
+  <td>get from the ENV var : $OBM_INCLUDE_VAR or default to "obminclude"</td>
+</tr>
+</table>
+<p>
+
+Here is a correct module_index.php variable definition :
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+$path = "..";
+$menu = "COMPANY";
+$obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
+</pre>
+</td></tr>
+</table>
+<P>
+
+<h3>Included files : how to, order</h3>
+<i>To do</i>
+
+<p>
+Here is a correct module_index.php includes bloc :
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+$path = "..";
+$menu = "COMPANY";
+$obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
+require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
+page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+$perm->check("user");
+include("$obminclude/global_pref.inc");
+
+require("company_query.inc");
+require("company_display.inc");
+</pre>
+</td></tr>
+</table>
+<P>
+
+
+<h3>Main action branch switch</h3>
+<i>To do</i>
+
 <h2>Functions</h2>
 
 Each function must have an header, referencing all parameters and the return value (if any).
@@ -235,6 +299,14 @@ Here is a correct function header :
 <li>The file has to be called in the <i>_index.php</i> file with an "include" and not a "require".
 </ul>  
 </ul>
+
+
+<h3>Display functions</h3>
+Explain separation logic / template where template should consist of html with simple $var. 
+<br>
+HTML indentation.
+<p>
+<i>To do</i>
 
 
 <H2>Debug Infos</H2>

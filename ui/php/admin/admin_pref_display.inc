@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : admin_pref_display.inc                                      //
-//     - Desc  : Pref admin display File                                     //
+// OBM - File : admin_pref_display.inc                                       //
+//     - Desc : Pref admin display File                                      //
 // 2002-07-02 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -11,7 +11,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display the help screen
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_help($mode) {
 
@@ -25,16 +25,20 @@ function dis_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the search form for pref module
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_pref_index($mode, $actions) {
+
+  // We get lifetime from the database and not from the session variable
+  // in case it has been updated since (session value last during the session)
+  $lifetime = get_global_pref_lifetime();
 
   switch ($mode) {
   case "txt":
     echo "try -h to help\n";
     break;
   case "html":
-    html_pref_index($actions);
+    html_pref_index($lifetime);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -46,26 +50,55 @@ function dis_pref_index($mode, $actions) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the HTML index screen for the pref admin module
 // Parameters:
+//   - $plifetime : $lifetime value (taken from database)
 ///////////////////////////////////////////////////////////////////////////////
-function html_pref_index($actions) {
+function html_pref_index($plifetime) {
   global $sess;
-  global $l_execute, $l_help;
+  global $l_validate, $l_execute, $l_help, $l_user_pref, $l_global_pref;
+  global $l_session_lifetime;
   global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
 
   echo "
     <a href=\"" . $sess->url("admin_pref_index.php?action=help&amp;mode=html"). "\">$l_help</a>
     <p>
-    <FORM method=get action=\"" . $sess->url("admin_pref_index.php"). "\">
-    <table border=1>
+
+    <form method=get action=\"" . $sess->url("admin_pref_index.php") . "\">
+    <table width=90% border=1 bgcolor=\"#$col_a_table\">
     <tr>
-      <td>action : pref_update<br>
+      <td colspan=2 bgcolor=\"#$col_a_tableh\">
+        <i><font color=\"#$col_textem\">$l_user_pref</font></i>
+      </td>
+    </tr>
+    <tr>
+      <td>action : user_pref_update<br>
         <font color=\"#$col_textem\">Update all users preferences with default values</font></td>
-      <td><input type=hidden name=mode value=\"html\">
-          <input type=hidden name=action value=pref_update>
+      <td align=center><input type=hidden name=mode value=\"html\">
+          <input type=hidden name=action value=user_pref_update>
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>";
+    </form>
+
+    <form method=get action=\"" . $sess->url("admin_pref_index.php") . "\">
+    <table width=90% border=1 bgcolor=\"#$col_a_table\">
+    <tr>
+      <td colspan=2 bgcolor=\"#$col_a_tableh\">
+        <i><font color=\"#$col_textem\">$l_global_pref</font></i>
+      </td>
+    </tr>
+    <tr>
+      <td>$l_session_lifetime</td>
+      <td align=center><input name=tf_lifetime size=6 maxlength=6 value=\"$plifetime\"></td>
+    </tr>
+    <tr>
+      <td align=center colspan=2>
+        <input type=hidden name=mode value=\"html\">
+        <input type=hidden name=action value=global_pref_update>
+        <input type=submit value=\"$l_validate\"></td>
+    </tr>
+    </table>
+    </form>
+";
 
 }
 
@@ -75,7 +108,7 @@ function html_pref_index($actions) {
 // Parameters:
 //   - $mode   : "txt" or "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_pref_update($mode) {
+function dis_user_pref_update($mode) {
   global $debug;
 
   // Get the user list
@@ -98,7 +131,7 @@ function dis_pref_update($mode) {
         $update
       </tr><tr>
         <th>Id</th>
-        <th>Name</th>
+        <th>Login</th>
         $update
       </tr>";
   }
@@ -107,14 +140,14 @@ function dis_pref_update($mode) {
     $cpt_u++;
 
     $id = $u_q->f("userobm_id");
-    $name = $u_q->f("userobm_username");
+    $login = $u_q->f("userobm_login");
 
     if ($mode == "txt") {
-      echo "\nUser (id=$id) : $name ";
+      echo "\nUser (id=$id) : $login ";
     } else {
       echo "<tr>
         <td>$id</td>
-        <td>$name</td>";
+        <td>$login</td>";
     }
 
     $retour = run_query_default_preferences_insert($id);

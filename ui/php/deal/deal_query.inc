@@ -1,8 +1,8 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : deal_query.inc                                              //
-//     - Desc  : Deal query File                                             //
-// 2000-01-20 Pierre Baudracco : Last Update 2000-09-04                      //
+// OBM - File : deal_query.inc                                               //
+//     - Desc : Deal query File                                              //
+// 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -20,9 +20,8 @@
 //   - $all : if it is set to 1 then return also the private deals ...
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : the "order by" uses this value too if it's set.
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($deal, $all="", $p_new_order="", $p_order_dir, $p_new_order2="") {
+function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   global $auth, $c_all, $cdg_sql;
 
   $parent = $deal["parent"];
@@ -93,10 +92,6 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir, $p_new_
   // Order by clause
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "deal_datealarm";
   $query .= " order by $order $p_order_dir";
-
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", ".$p_new_order2;
-  }
 
   display_debug_msg($query, $cdg_sql);
 
@@ -184,7 +179,7 @@ function run_query_insert($deal) {
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
-  $archive = $deal["archive"];
+  $archive = ($deal["archive"] ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["com"];
 
@@ -241,7 +236,7 @@ function run_query_insert($deal) {
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($retour) && ($archive == '0')) {
-    run_query_company_deal_inc($comp_id);
+    run_query_company_deal_inc($comp);
   }
 
   return $retour;
@@ -314,6 +309,7 @@ function run_query_update($deal) {
     }
   }
 
+
   return $retour;
 }
 
@@ -359,7 +355,7 @@ function run_query_dealtype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Deal Category list                                      //
+// Query execution : Deal TaskType list                                      //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_tasktype() {
   global $cdg_sql;
@@ -706,13 +702,12 @@ function run_query_status_links($s_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Category insert                                         //
 // Parameters:
-//   - $deal[] : deal hash info : keys used : cat_label, cat_mlabel
+//   - $deal[] : deal hash info : keys used : cat_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["cat_label"];
-  $ml = $deal["cat_mlabel"];
 
   $query = "insert into TaskType (tasktype_timeupdate,
     tasktype_timecreate,
@@ -723,8 +718,7 @@ function run_query_cat_insert($deal) {
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '0',
-    '$label',
-    '$ml')";
+    '$label')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -737,14 +731,13 @@ function run_query_cat_insert($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Category update                                         //
 // Parameters:
-//   - $deal[] : deal hash info : keys used : cat, cat_label, cat_mlabel
+//   - $deal[] : deal hash info : keys used : cat, cat_label
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_cat_update($deal) {
   global $auth, $cdg_sql;
 
   $cat = $deal["cat"];
   $label = $deal["cat_label"];
-  $ml = $deal["cat_mlabel"];
 
   $query = "update TaskType set tasktype_label='$label',
       tasktype_timeupdate='".date("Y-m-d H:i:s")."',
@@ -894,51 +887,12 @@ function check_parent_has_deal($pid) {
 }
 
 
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////
-// Set a deal to an "archived" state.
-// If all the other deals of the parentdeal are archived, then the 
-// parentdeal becomes "archived"
-//////////////////////////////////////////////////////////////////////////
-function run_query_update_archive($p_deal_id,$p_parentdeal_id) {
-  global $cdg_sql;
- 
-   $connect_db=new DB_OBM;
-	
-   // the deal becomes "archived" 
-   $query="update Deal set deal_archive=1 where deal_id=".$p_deal_id;
-   $connect_db->query($query);	   
-   
-   if ($p_parentdeal_id > 0) {
-     
-     // is there any other non archived deals attached to the parentdeal ?
-     $query="select count(*) from Deal".
- 	 " where deal_parentdeal_id=".$p_parentdeal_id.
- 	 " and deal_archive=0";    
-     $connect_db->query($query);
-     $connect_db->next_record();
-   
-     // if the answer is no then the parentdeal becomes "archived"
-     if ($connect_db->f("count(*)") == 0) {
-	 $query="update ParentDeal set parentdeal_archive=1".
-	        " where parentdeal_id=".$p_parentdeal_id;
-   	 $connect_db->query($query);
-     }
-   }
-}
-
-
 //
 //
 //
-/////////////////////////////////////////////////////////////
-// -- ParentDeal's  Requests  ---->
-/////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// -- ParentDeal Requests  ---->
+///////////////////////////////////////////////////////////////////////////////
 //
 //
 //
@@ -951,9 +905,8 @@ function run_query_update_archive($p_deal_id,$p_parentdeal_id) {
 //     keys used     : plabel, pmanager, parchive
 //   - $p_new_order  : if it's set, it replaces the default "order by" value
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : the "order by" uses this value too if it's set.
 //////////////////////////////////////////////////////////////////////////////
-function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="", $p_new_order2="") {
+function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   global $auth, $c_all, $cdg_sql;
 
   $plabel = $deal["plabel"];
@@ -983,10 +936,6 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="", $p
   // Order by clause
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "parentdeal_timecreate"; 
   $query .= " order by $order $p_order_dir";
-
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", $p_new_order2 asc";
-  }
 
   display_debug_msg($query, $cdg_sql);
 
@@ -1367,6 +1316,8 @@ function get_parent_income($p_id)  {
 
   return $obm_q->f("sum(deal_amount)");
 }
+
+
 //
 ////
 //////

@@ -9,7 +9,7 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Array content                                         //
+// HTML Display Array content
 // Parameters:
 //   - $array : any array
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,12 +102,11 @@ function html_time_search_form ($time, $obm_q_contact_list, $contacts_array) {
   global $l_contact_name, $l_from_company, $l_see, $l_week, $l_from_user, $project_managers;
   global $l_user;
   global $sess , $uid;
- 
 
   $hum_date_start = dis_human_date($time["date"]);
   $hum_date_end = dis_human_date($time["date_end"]);
 
-  if( in_array($uid,$project_managers)) {
+  if (in_array($uid, $project_managers)) {
     $sel_contact_id = $time["contact_id"];
   
     echo "<BR><CENTER>
@@ -175,18 +174,18 @@ function html_time_search_form ($time, $obm_q_contact_list, $contacts_array) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list($time) {
   global $l_no_found, $l_addtask, $set_debug;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
   global $status_id; // "Signed" status for deals
   global $fraction_jour; // nbre de fraction possible d'une journée
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  $obm_q = run_query_search($time, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($time, $new_order, $order_dir);
   $nb_task = $obm_q->num_rows();
   $pref_day_q = run_query_display_pref($auth->auth["uid"], "time_day");
-  $obm_day_q = run_query_by_day($time, $new_order, $order_dir, $new_order2);
+  $obm_day_q = run_query_by_day($time, $new_order, $order_dir);
 
   $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
-  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir, $new_order2);
+  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
 
   // Get elements for insertion of new task
   // TaskType
@@ -247,15 +246,12 @@ function html_time_list($obm_q,$pref_q,$nb_task,$time) {
   global $l_found, $_task_del, $l_delete, $l_modify, $l_task_del, $l_found_task;
 
   dis_table_title($l_found_task) ;
-  echo "<FONT color=\"#$col_textem\">";
-  echo "$nb_task $l_found";
-  echo "</FONT><BR>";
+  echo "<font color=\"#$col_textem\">$nb_task $l_found</font><br>";
 
   $url = $sess->url("time_index.php?action=index&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"]."&amp;user_id=".$time["contact_id"]."&amp;tf_week=".urlencode($week));
  
   echo "
-    <form METHOD=POST NAME=f_task_del ACTION=\"".$sess->self_url("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >
-       ";
+    <form METHOD=POST NAME=f_task_del ACTION=\"".$sess->url("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
   $dis_task_list->data_set = $obm_q;
@@ -312,8 +308,7 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
 
  dis_table_title("$l_total_day"); 
  echo "
-   <form METHOD=POST NAME=f_task_val ACTION=\"".$sess->self_url("time_index.php")."\" >
-      ";
+   <form METHOD=POST NAME=f_task_val ACTION=\"".$sess->url("time_index.php")."\">";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
@@ -350,8 +345,7 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
     $admin_db = run_query_admin($time);
 
     echo "
-      <form METHOD=POST NAME=f_task_val_admin ACTION=\"".$sess->self_url("time_index.php")."\" >
-         ";
+      <form METHOD=POST NAME=f_task_val_admin ACTION=\"".$sess->url("time_index.php")."\">";
 
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
@@ -528,7 +522,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
     echo "
 <FORM METHOD=POST NAME=form_add_task 
-        ACTION=\"".$sess->self_url("time_index.php")."\">
+        ACTION=\"".$sess->url("time_index.php")."\">
       <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"$action\">
       <INPUT TYPE=\"hidden\" NAME=\"popup\" VALUE=0>
   ";
@@ -537,7 +531,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     dis_table_title($l_modtask);
     echo "
 <FORM METHOD=POST  NAME=form_add_task 
-        ACTION=\"".$sess->self_url("time_index.php")."\">
+        ACTION=\"".$sess->url("time_index.php")."\">
       <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"$action\">
       <INPUT TYPE=\"hidden\" NAME=\"popup\" VALUE=0>
   ";
@@ -585,10 +579,10 @@ function col_table($col, $data) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_search($time) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  $obm_q = run_query_search($time, $new_order, $order_dir, $new_order2);
+  $obm_q = run_query_search($time, $new_order, $order_dir);
   $nb_contact = $obm_q->num_rows();
   if ($nb_contact == 0) {
     display_warn_msg($l_no_found);
@@ -598,5 +592,4 @@ function dis_time_search($time) {
 }
 
  
-
 </SCRIPT>

@@ -29,17 +29,12 @@ $l_comment = "Comment";
 $l_visibility ="Access";
 
 // Labels and texts
-$l_last_contact = "Last contact";
-$l_last_company = "Last company";
-$l_last_deal="Last deal";
 $l_contact_name = "Contact Name";
 $l_from_company = "From Company";
-$l_find = "Find";
 $l_telother = "Other tel";
 $l_private = "Private";
 $l_public = "Public";
 $l_contact_select_company = "Select the company for the contact.";
-$l_invalid_data = "Invalid Data";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -63,7 +58,6 @@ $l_insert = "Insert the Contact";
 $l_update = "Update the Contact";
 $l_checkdelete = "Check or Delete the Contact";
 $l_delete = "Delete the Contact";
-$l_back = "Back";
 $l_confirm= "Confirm the action";
 $l_add = "Add these contacts";
 
@@ -99,10 +93,6 @@ $l_j_check_hphone = "The personal phone number is not valid.";
 $l_j_check_mphone = "The mobile phone number is not valid.";
 $l_j_check_fax = "The fax number is not valid.";
 $l_j_check_email = "The email adress is not valid.";
-
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_date_format = "%Y-%m-%d %H:%i:%s";
 
 // For the display parameters modification screen
 $l_contact_display = "Display options for contacts list"; 

@@ -34,5 +34,4 @@ $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
 
 // champs specifiques
 // format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_date_format = "%d/%m/%Y";
 $l_time_format = "%H:%i";

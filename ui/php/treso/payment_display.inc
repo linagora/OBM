@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : payment_index.php                                            //
 //     - Desc : payment display File                                         //
-// 2002-07-16 Pierre Baudracco (from Nicolas. Roman)                         //
+// 2002-07-16 Pierre Baudracco (from Nicolas Roman)                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -180,23 +180,24 @@ function html_payment_form ($p_action, $q_payment, $q_paymentkind, $q_account) {
   // radio buttons inout
   // not needed when banking...
   if ($p_action != "add_invoices") {
-    echo "<tr><td>\n".
-      "<font color=\"#$col_label\">".$l_inout."</font><br>\n";
-    echo "$l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
+    echo "<tr>
+      <td><font color=\"#$col_label\">$l_inout</font>
+        <br>
+        <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
     if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices") {
       if ($q_payment->f("payment_inout")=='+') {
 	echo " checked";
       }
     }
-    echo " $readonly>\n".
-      "$l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
+    echo " $readonly>$l_client &nbsp;
+      <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
     if ($p_action=="update" || $p_action == "detailupdate" || $p_action == "add_invoices"){
       if ($q_payment->f("payment_inout")=='-'){
 	echo " checked";
       }
     }
-    echo " $readonly>\n";
-    echo "</td></tr>";
+    echo " $readonly>$l_fournisseur &nbsp;
+      </td></tr>";
   }
   if (($p_action != "new" && ($p_action != "new_with_invoices"))) {
     // we need that, but not shown 
@@ -297,20 +298,20 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   // label :
   echo "
           <td>
-           <font size=-2>".$l_label_start."</font><br>
-           <input type=text name=tf_label size=20 value=\"".$label."\">
+           <font size=-2>$l_label_start</font><br>
+           <input type=text name=tf_label size=20 value=\"$label\">
           </td>";
   // number :
   echo "
           <td>
-           <font size=-2>".$l_number."</font><br>
-           <input type=text name=tf_number size=12 value=\"".$number."\">
+           <font size=-2>$l_number</font><br>
+           <input type=text name=tf_number size=12 value=\"$number\">
           </td>";
   // amount :
   echo "
           <td>
-           <font size=-2>".$l_amount."</font><br>
-           <input type=text name=tf_amount size=12 value=\"".$amount."\">
+           <font size=-2>$l_amount</font><br>
+           <input type=text name=tf_amount size=12 value=\"$amount\">
           </td>";
   echo "
          </tr>
@@ -322,64 +323,65 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   // date after which the payment must be
   echo "
          <td>
-          <font size=-2>".$l_date_apres."</font><br>
-          <input type=text name=tf_date_after size=12 value=\"".$date_after."\">
+          <font size=-2>$l_date_apres</font><br>
+          <input type=text name=tf_date_after size=12 value=\"$date_after\">
          </td>";
   // date before which the payment must be
   echo "
          <td>
-          <font size=-2>".$l_date_avant."</font><br>
-          <input type=text name=tf_date_before size=12 value=\"".$date_before."\">
+          <font size=-2>$l_date_avant</font><br>
+          <input type=text name=tf_date_before size=12 value=\"$date_before\">
          </td>";
   // payment kind : from a customer or to a provider...
   echo "
-         <td>
-          <font size=-2>".$l_inout."</font><br>
-          $l_both &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
+        <td>
+          <font size=-2>$l_inout</font><br>
+          <input type=\"radio\" name=\"rd_inout\" value=\"_TOUT_\"";
   if (($inout == "_TOUT_")||($inout=="")){
     echo "checked";
   }
-  echo "> 
-          $l_client &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"+\"";
+  echo ">$l_both &nbsp;
+    <input type=\"radio\" name=\"rd_inout\" value=\"+\"";
   if ($inout == "+"){
     echo "checked";
   }
-  echo ">
-          $l_fournisseur &nbsp;<input type=\"radio\" name=\"rd_inout\" value=\"-\"";
+  echo ">$l_client &nbsp;
+          <input type=\"radio\" name=\"rd_inout\" value=\"-\"";
   if ($inout == "-"){
     echo "checked";
   }
-  echo ">\n
+  echo ">$l_fournisseur &nbsp;
         </td></tr>";
   // Paid or unpaid payments ?
   echo "
         <tr><td>
-          <font size=-2>".$l_status."</font><br>
-          $l_both &nbsp;<input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\"";
+          <font size=-2>$l_status</font>
+          <br>
+          <input type=\"radio\" name=\"rd_paid\" value=\"_TOUT_\"";
   if (($paid == "_TOUT_")||($paid=="")){
     echo "checked"; 
   }
-  echo "> 
-          $l_paid &nbsp;<input type=\"radio\" name=\"rd_paid\" value=\"y\"";
+  echo ">$l_both &nbsp;
+          <input type=\"radio\" name=\"rd_paid\" value=\"y\"";
   if ($paid == "y"){
     echo "checked";
   }
-  echo ">
-          $l_unpaid &nbsp;<input type=\"radio\" name=\"rd_paid\" value=\"n\"";
+  echo ">$l_paid &nbsp;
+          <input type=\"radio\" name=\"rd_paid\" value=\"n\"";
   if ($paid == "n"){
     echo "checked";
   }
-  echo ">";
+  echo ">$l_unpaid &nbsp;";
   // deal :
   echo "
         </td><td>
-         <font size=\"-2\">".$l_deal."</font><br>
-         <input type=\"text\" name=\"tf_deal\" value=\"".$deal."\">
+         <font size=\"-2\">$l_deal</font><br>
+         <input type=\"text\" name=\"tf_deal\" value=\"$deal\">
         </td>";
   // company :
   echo "<td>
-         <font size=\"-2\">".$l_company."</font><br>
-         <input type=\"text\" name=\"tf_company\" value=\"".$company."\">
+         <font size=\"-2\">$l_company</font><br>
+         <input type=\"text\" name=\"tf_company\" value=\"$company\">
         </td></tr>";
   // account connected
   echo "
@@ -447,9 +449,6 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
   // Labels
   global $l_found;
-  global $l_label, $l_number, $l_amount, $l_kind, $l_date, $l_expected_date;
-  // search parameters
-  global $set_rows, $set_rows_default;
   // session stuff
   global $perms_user,$l_perms_user;
   global $auth, $sess;
@@ -483,6 +482,8 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
 
   $dis_payment->display ();
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // display of payment details 
 ///////////////////////////////////////////////////////////////////////////////
@@ -494,11 +495,10 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   global $l_label,$l_comment,$l_number, $l_date, $l_amount, $l_expected_date;
   global $l_account, $l_kind, $l_type;
   global $l_no_invoices_connected, $l_invoices_connected, $l_break_asso;
-  global $set_rows, $set_rows_default;
 
   // session
   global $perms_user,$l_perms_user;
-  global $auth, $sess, $perm, $param_payment, $page;
+  global $auth, $sess, $perm, $param_payment;
   
   // dev
   global $border, $cellspacing;
@@ -967,7 +967,7 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
   global $l_break_asso_strong_confirm, $l_break_asso_go;
   global $l_break_asso_soft_confirm, $l_break_asso_easy_confirm;
   global $l_payment_break_asso;
-  global $sess,$perm,$set_rows;
+  global $sess,$perm;
 
   // we display payment infos :
   html_payment_consult ($p_action, $q_payment, run_query_paymentkind(),

@@ -1,9 +1,12 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : computer.inc                                                //
-// 1999-01-24 Vincent MARGUERIT                                             //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : computer.inc                                             //
+// 1999-01-24 Vincent MARGUERIT                                              //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+
 $l_compu_name = "Nom de la machine" ;
 $l_compu_domain_name = "Nom du domaine" ; 
 $l_compu_ip = "Adresse ip de la machine" ;
@@ -15,10 +18,6 @@ $l_compu_creator = "Créateur de l'ordinateur" ;
 $l_compu_datecreation = "Date de la création" ;
 $l_compu_lastupdater = "Dernier changement par" ;
 $l_compu_date_lastupdate = "Date du dernier changement" ;
-
-$l_last_deal = "Derniere affaire";
-$l_last_contact = "Dernier contact";
-$l_last_company = "Derniere societe";
 
 //Options;
 $l_compu_option = "Les options d'affichage des ordinateurs" ;
@@ -39,22 +38,6 @@ $l_port_num = "Nombre de port ajouté :" ;
 $l_should_scan = "Vous devriez cliquez sur 'Scanner les ports' pour savoir lesquels sont ouverts." ;
 $l_port_found = " service(s) scanné(s)" ;
 
-
-$l_query_display = "Affiché" ;
-$l_order_dis = "Ordre d'affichage" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Ne pas afficher ce champs" ;
-$l_ch_to_dis_no_help = "Cela signifie que le champs est affiché<br>Cliquer sur cet icône si vous ne souhaitez afficher pas ce champs" ;
-$l_ch_to_dis_yes = "Afficher ce champs" ;
-$l_ch_to_dis_yes_help = "Cela signifie que le champs n'est pas affiché<br>Cliquer sur cet icône si vous souhaitez afficher ce champs" ;
-$l_dis_obligatory = "L'affichage de ce champs est obligatoire" ;
-$l_dis_obligatory_help = "Cet icône signifie que vous êtes obligé d'afficher ce champs" ;
-$l_down_option = "Descendre cette option d'un cran" ;
-$l_down_option_help  = "Cliquez sur cet icône pour descendre le champs d'un cran" ;
-$l_up_option = "Monter cette option d'un cran" ;
-$l_up_option_help = "Cliquez sur cet icône pour monter le champs d'un cran" ;
-$l_subject = "Sujet" ;
-
 $l_services_found = " service(s) trouvé(s) à ajouter" ;
 
 $l_save_compu = "Enregistrer l'ordionateur" ;
@@ -65,7 +48,6 @@ $l_compu_name_short = "Nom" ;
 $l_compu_domain_short = "Domaine" ;
 $l_compu_user_short = "Utilisateur" ;
 $l_compu_ip_short = "Adresse ip" ;
-$l_find = "Chercher" ;
 $l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir les ordinateurs correspondants.";
 $l_no_compu = "Aucun ordinateur ne correspond à ces critères." ;
 $l_compu_found = "Ordinateurs trouvés" ;
@@ -92,7 +74,6 @@ $l_compu_test_compu = "Vous devriez tester si l'ordinateur est bien branché. <br
 $l_compu_compu = "Ordinateur" ;
 $l_compu_infos = "Informations sur l'ordinateur" ;
 $l_compu_verify = "Vérifier les informations" ;
-$l_dis_choice = "Choix d'affichage" ;
 $l_add_port = "Ajouter des ports" ;
 $l_del_port = "Enlever des ports" ;
 $l_update_port = "Scanner les ports" ;
@@ -100,8 +81,6 @@ $l_modify_compu = "Modifier l'ordinateur" ;
 $l_del_compu = "Supprimer l'ordinateur" ;
 
 //Computer options
-
-
 
 
 // Champs specifiques

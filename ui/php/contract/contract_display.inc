@@ -1,11 +1,13 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contract_display.php                                        //
-//     - Desc  : Contract Support Display File                                //   
-// 2001-07-17  : Richard FILIPPI                                             //
+// OBM - File : contract_display.php                                         //
+//     - Desc : Contract Support Display File                                //
+// 2001-07-17 : Richard FILIPPI                                              //
 ///////////////////////////////////////////////////////////////////////////////
-//      $Id$
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
+
+
 function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id){
 
   // - Themes
@@ -125,131 +127,130 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
   }
 
   if ($action == "detailupdate") {
+    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc_aff VALUE=\"$p_company_id\">
+      <INPUT TYPE=hidden NAME=action VALUE=\"update\">
+      <INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=submit value=\"$l_update\">
+      </FORM>
+      &nbsp;  &nbsp;  &nbsp;  &nbsp;
+      <FORM METHOD=GET NAME=form_contract_delete onSubmit=\"if (valider_suppression()) return true; else return false;\" ACTION=\"".$sess->url("contract_index.php")."\">
+      <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"delete\">
+      <INPUT TYPE=\"hidden\" NAME=\"param_contract\" VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=submit value=\"$l_delete\">";
+  } else {
+    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc_aff VALUE=\"$p_company_id\">
+      <INPUT TYPE=\"hidden\" name=\"action\" value=\"insert\">
+      <INPUT TYPE=\"submit\" value=\"$l_insert\">";
+  }
 
-  $dis_sub="<INPUT TYPE=hidden NAME=hd_soc_aff VALUE=\"".$p_company_id."\">";
-  $dis_sub.="<INPUT TYPE=hidden NAME=action VALUE=\"update\">";
-  $dis_sub.="<INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">";
-  $dis_sub.="<INPUT TYPE=submit value=\"$l_update\">";
-  $dis_sub.="</FORM>";
-  $dis_sub.="&nbsp;  &nbsp;  &nbsp;  &nbsp; ";
-  $dis_sub.="<FORM METHOD=POST NAME=form_contract_delete onSubmit=\"if (valider_suppression()) return true; else return false;\" ACTION=\"".$sess->self_url()."\">";
-  $dis_sub.="<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"delete\">";
-  $dis_sub.="<INPUT TYPE=\"hidden\" NAME=\"param_contract\" VALUE=\"".$obm_q_contract->f("contract_id")."\">";
-  $dis_sub.="<INPUT TYPE=submit value=\"$l_delete\">";
-} else {
-  $dis_sub="<INPUT TYPE=\"hidden\" NAME=\"hd_soc_aff\" VALUE=\"".$p_company_id."\">";
-  $dis_sub.="<INPUT TYPE=\"hidden\" name=\"action\" value=\"insert\">";
-  $dis_sub.="<INPUT TYPE=\"submit\" value=\"$l_insert\">";
+  echo "<center>
+    <FORM METHOD=POST NAME=form_contract_update onSubmit=\"if (verifier_aff(this)) return true; else return false;\" ACTION=\"".$sess->url("contract_index.php")."\">
 
-};
+  <table border=0>
+  <tr>
+    <td>
+      <table border=0>
+      <tr>
+        <td><font COLOR=\"#$col_label\">$l_label</font>
+          <br>
+          <INPUT NAME=tf_label_aff TYPE=text size=40 value=\"$label\">
+        </td>
+      </tr>
+      </table>
 
-  echo "
-<CENTER>
-<FORM METHOD=POST NAME=form_contract_update onSubmit=\"if (verifier_aff(this)) return true; else return false;\" ACTION=\"".$sess->self_url()."\">
+      <table>
+      <tr>
+        <td><font COLOR=\"#$col_label\">$l_number_deal</font>
+          <br>
+          <INPUT NAME=tf_number_contract TYPE=text size=20 maxlength=40 value=\"$number\">
+        </td>
+        <td><font COLOR=\"#$col_label\">$l_date_init</font>
+          <br>
+          <INPUT NAME=tf_datedebut_aff TYPE=text size=10 value=\"$datebegin\">
+        </td>
+        <td><font COLOR=\"#$col_label\">$l_date_expir</font>
+          <br>
+          <INPUT NAME=tf_datefin_aff TYPE=text size=10 value=\"$datefin\">
+        </td>
+      </tr>
+      </table>
 
-<TABLE border=0><TR><TD>";
+      <table border=0>
+      <tr>
+        <td>
+          <font COLOR=\"#$col_label\">$l_kind</font>
+          <br>$dis_sel_taff
+        </td>
+        <td> &nbsp; &nbsp;</td>
+        <td><font COLOR=\"#$col_label\">$l_kind_deal</font>
+          <br>$dis_sel_tdeal
+        </td>
+      </tr>
+      </table>
 
-echo "
-<TABLE border=0>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_label</FONT><BR>
-  <INPUT NAME=tf_label_aff TYPE=text size=40 value=\"$label\">
-</TD>
-</TR>
-</TABLE>
+      <table border=0>
+      <tr>
+        <td><font COLOR=\"#$col_label\">$l_marketing_manager</font>
+          <br>$dis_sel_respc
+        </td>
+        <td><font COLOR=\"#$col_label\">$l_technical_manager</font>
+          <br>$dis_sel_respt
+        </td>
+        <td> &nbsp; </td> 
+      </tr>
+      </table>
+    </td>
+<!-- Company, Contact -->
+    <td valign=top>
+      <table bgcolor=\"#$col_label\">
+      <tr>
+        <td bgcolor=\"#$col_table\">
+          <font color=\"#$col_textem\">".$obm_q_company->f("company_name")."</font>&nbsp;<A HREF=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id"). "\"><IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
+          <br>".$obm_q_company->f("company_address1") ."
+          <br>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
+        </td>
+      </tr><tr>
+        <td valign=center>$l_client_manager
+          <br>$dis_sel_con1
+          <br>$dis_sel_con2
+        </td>
+      </tr>
+      </table>
+      <p>
+      $dis_last_update
+    </td>
+  </tr>
+  </table>
 
-<TABLE>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_number_deal</FONT><BR>
-  <INPUT NAME=tf_number_contract TYPE=text size=20 maxlength=40 value=\"$number\">
-  </TD>
-  <TD><FONT COLOR=\"#$col_label\">$l_date_init</FONT><BR>
-  <INPUT NAME=tf_datedebut_aff TYPE=text size=10 value=\"$datebegin\">
-</TD>
-<TD><FONT COLOR=\"#$col_label\">$l_date_expir</FONT><BR>
-  <INPUT NAME=tf_datefin_aff TYPE=text size=10 value=\"$datefin\">
-</TD>
-</TR>
-</TABLE>
-
-<TABLE border=0>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_kind</FONT><BR>
-  ".$dis_sel_taff."
-  </TD><TD> &nbsp; &nbsp; </TD>
-  <TD><FONT COLOR=\"#$col_label\">$l_kind_deal</FONT><BR>
-  ".$dis_sel_tdeal."
-  </TD>
-</TR>
-</TABLE>
-
-
-<TABLE border=0>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_marketing_manager</FONT><BR>
-  ".$dis_sel_respc."
-  </TD><TD><FONT COLOR=\"#$col_label\">$l_technical_manager</FONT><BR>
-  ".$dis_sel_respt."
-  </TD><TD> &nbsp; </TD> 
-   </TR>
-   </TABLE>";
-  
-  // Pave Societe, contact
-  
-  echo " </TD><TD valign=top>
-  <TABLE bgcolor=\"#$col_label\">
-    <TR>
-    <TD bgcolor=\"#$col_table\">
-    <FONT color=\"#$col_textem\">".$obm_q_company->f("company_name")."</FONT>&nbsp;";
-  echo "<A HREF=\"".
-      $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id"). "\">";
-  echo "<IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
-    <BR>".$obm_q_company->f("company_address1") ."
-    <BR>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
-    </TD>
-    </TR><TR>
-    <TD valign=center>$l_client_manager<BR>
-    ".$dis_sel_con1."
-    <BR>
-    ".$dis_sel_con2."
-    </TD>
-    </TR>
-  </TABLE>
-  <P>
-  ".$dis_last_update."
-</TD>
-</TR>
-</TABLE>
-
-<TABLE border=2>
-<TR>
-<TD><FONT COLOR=\"#$col_label\">".$l_comment."</FONT><BR>
-<TEXTAREA NAME=ta_com_aff ROWS=6 COLS=72>";
-  echo $comment;
-  echo "</TEXTAREA></TD>
-<TD align=center colspan=2> &nbsp;  &nbsp;  &nbsp; </TD></TR>
-<TR>
-<TD align=center valign=bottom colspan=3>";
-  
-echo "</TD></TR>
-<TR>
-<TD><FONT COLOR=\"#$col_label\">".$l_clause."</FONT><BR>
-<TEXTAREA NAME=ta_clause_aff ROWS=6 COLS=72>";
-echo $clause;
-echo "</TEXTAREA></TD>
-<TD align=center colspan=2> &nbsp;  &nbsp;  &nbsp;
-".$dis_sub."
-</FORM>
-</TD></TR></TABLE>
-</CENTER>
-";
-
+  <table border=2>
+  <tr>
+    <td><font COLOR=\"#$col_label\">$l_comment</font>
+      <br>
+      <textarea NAME=ta_com_aff ROWS=6 COLS=72>$comment</textarea>
+    </td>
+    <td align=center colspan=2> &nbsp;  &nbsp;  &nbsp; </td>
+  </tr>
+  <tr>
+    <td align=center valign=bottom colspan=3>
+    </td>
+  </tr>
+  <tr>
+    <td><font COLOR=\"#$col_label\">$l_clause</font>
+      <br>
+      <textarea NAME=ta_clause_aff ROWS=6 COLS=72>$clause</textarea>
+    </td>
+    <td align=center colspan=2> &nbsp;  &nbsp;  &nbsp; $dis_sub
+    </td>
+  </tr>
+  </table>
+  </FORM>
+  </center>";
   
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract Consult                                                   //
+// Display Contract Consult                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // Parameters :
 // ------------
@@ -281,7 +282,7 @@ function html_contract_consult($obm_q_contract,$obm_q_type,$obm_q_type_deal,$obm
   while($obm_q_type_deal->next_record()) {
    if ($obm_q_type_deal->f("dealtype_id") == $obm_q_contract->f("contract_typedeal"))
 	$dis_deal_type = $obm_q_type_deal->f("dealtype_label");
-  };
+  }
 
   while($obm_q_contacts_obm->next_record()) {
     if ($obm_q_contacts_obm->f("contact_id") == $obm_q_contract->f("contract_responsable_com_id"))
@@ -316,22 +317,20 @@ function html_contract_consult($obm_q_contract,$obm_q_type,$obm_q_type_deal,$obm
   $dis_date_time = timestamp_to_time($obm_q_contract->f("datemodif"));
 
   if ($auth->auth["perm"] != $perms_user) {
-    $dis_update = "<FORM METHOD=POST NAME=form_contract_update ACTION=\"".$sess->self_url()."\">";
-    $dis_update .= "<INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">";
-    $dis_update .= "<INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">";
-    $dis_update .= "<INPUT TYPE=submit value=\"$l_update\">";
-    $dis_update .= "</FORM>";
+    $dis_update = "<FORM METHOD=GET NAME=form_contract_update ACTION=\"".$sess->url("contract_index.php")."\">
+      <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
+      <INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=submit value=\"$l_update\">
+      </FORM>";
 
 }
 
-  echo "
-<CENTER>
-
-<TABLE border=0><TR><TD valign=top> 
-
-  <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."")."\">
-   <IMG BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-        <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."") . "\">$l_incident_list</A></FONT>";
+  echo "<center>
+  <table border=0>
+  <tr>
+    <td valign=top> 
+      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."")."\"><img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
+      <font SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."") . "\">$l_incident_list</A></font>";
 
   if ($auth->auth["perm"] != $perms_user) {
     echo "<BR>
@@ -620,10 +619,10 @@ echo "</FORM>" .
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contract");
-  $obm_q = run_query_search($contract, $order_dir, $new_order, $new_order2);
+  $obm_q = run_query_search($contract, $new_order, $order_dir);
   $nb_contract = $obm_q->num_rows();
   if ($nb_contract == 0) {
     display_warn_msg($l_no_found);
@@ -642,7 +641,6 @@ function dis_contract_search_list($contract) {
 //     $obm_q_deals : list of deals
 //     $obm_q_display_options : fields to display in the list of deals 
 //     $nb_deals : nb deals found
-//     $page : number of the current page 
 //
 //     $p_label, 
 //     $p_company,
@@ -652,55 +650,26 @@ function dis_contract_search_list($contract) {
 //     $p_dateafter,
 //     $p_datebefore,
 //     $p_manager_id, 
-//     $p_new_order, $p_new_order2 : new values for the "order by" of the query
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_list($obm_q_contracts,$obm_q_display_options,$nb_contract,$contract) {
-
-  //-- Themes
-  global $col_tableh,$col_textem,$col_table,$col_error;
-  //-- Labels
-  global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state,$l_date_alarm;
-  global $l_archive_update, $l_found, $l_options_dis;
-  //-- Search parameters
- 
-  global $set_rows, $set_rows_default;
-  //-- Authentication
-  global $perms_user,$l_perms_user;
-  global $auth, $sess;
-
-
+  global $col_textem, $l_found, $sess;
 
   $p_label = $contract["label"];
   $p_type_id = $contract["type"];
   $p_dateafter = $contract["dateafter"];
   $p_datebefore = $contract["datebefore"];
   $p_company = $contract["companyname"];
-
-//  $p_status_id = $contract["etat"]; 
-//  $p_manager_id = $contract["manager"];
-//  $p_archive = $contract["arc"];
-//  $p_cat_id = $contract["cat"];
-
   $sel_com_aff = $contract["comercial"];
   $sel_tech_aff = $contract["technical"];
   $p_num_aff = $contract["numero"]; 
 
-  echo "<FONT color=\"#$col_textem\">";
-  echo "$nb_contract $l_found";
-  echo "</FONT>";
+  echo "<font color=\"#$col_textem\">$nb_contract $l_found</font>";
 
-
-
-  // Table of content (pages)
-
- $url = $sess->url("contract_index.php?" .
-      "action=search&amp;tf_label_aff=$p_label&amp;tf_soc_aff=$p_company&amp;sel_respcomm_aff=$sel_com_aff&amp;sel_type_aff=$p_type_id&amp;sel_etat_aff=$p_status_id&amp;tf_number_contract=$p_num_aff&amp;sel_resptech_aff=$sel_tech_aff&amp;tf_dateapres_aff=$p_dateafter&amp;tf_dateavant_aff=$p_datebefore");
+  $url = $sess->url("contract_index.php?action=search&amp;tf_label_aff=$p_label&amp;tf_soc_aff=$p_company&amp;sel_respcomm_aff=$sel_com_aff&amp;sel_type_aff=$p_type_id&amp;sel_etat_aff=$p_status_id&amp;tf_number_contract=$p_num_aff&amp;sel_resptech_aff=$sel_tech_aff&amp;tf_dateapres_aff=$p_dateafter&amp;tf_dateavant_aff=$p_datebefore");
   echo "<br>";
 
    $obm_q_contracts->seek($first_row);
-   $cpt = 0;
 
-  
    $dis_contracts_list=new OBM_DISPLAY("DATA",$obm_q_display_options);
    $dis_contracts_list->data_set = $obm_q_contracts;
    $dis_contracts_list->data_url = $url;
@@ -710,54 +679,10 @@ function html_contract_search_list($obm_q_contracts,$obm_q_display_options,$nb_c
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display new contract : Company Form                                        //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// ------------
-//   $obm_q_company    : list of all the companies  
-//   $param_marketing  : id of the marketing manager of the parentdeal (= the default marketing manager of the new deal) 
-//   $param_technical  : id of the technical manager of the parentdeal (= the default technical manager of the new deal)
-///////////////////////////////////////////////////////////////////////////////
-function html_new_contract_company($obm_q_company,$contract) {
-
-  global $l_deal_select_company,$l_select_company;
-  global $sess;
-
-  $param_marketing = $contract["marketing_id"];
-  $param_technical = $contract["technical_id"];
-
-  $dis_compagny="<SELECT name=\"param_company\" size=10>";
-  while($obm_q_company->next_record()) {
-    $dis_compagny.="\n<OPTION value=".$obm_q_company->f("company_id").">".$obm_q_company->f("company_name")."</OPTION>";
-  }
-
-  $dis_compagny.="</SELECT>";
-
-echo "
-<CENTER>
-<FORM METHOD=POST NAME=form_company onSubmit=\"if (verifie(this)) return true; else return false;\" ACTION=\"".$sess->self_url()."\">";
-
-echo $l_deal_select_company;
-echo "
-<P>
-".$dis_compagny."
-<P>
-<INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
-<INPUT TYPE=\"hidden\" name=\"param_marketing\" value=\"$param_marketing\">
-<INPUT TYPE=\"hidden\" name=\"param_technical\" value=\"$param_technical\">
-<INPUT TYPE=\"submit\" value=\"$l_select_company\">
-</FORM>
-</CENTER>";
-
-}
-
-
 ///////////////////////////////////////////////////////////////////////////
-//  Contracts Administration Forms :                                              
+//  Contracts Administration Forms :                                           
  ///////////////////////////////////////////////////////////////////////////
 function html_contract_admin_form($obm_q_type) {
-  
   // Theme : 
   global $col_a_table,$col_textem;
   // Labels : 
@@ -789,78 +714,77 @@ function html_contract_admin_form($obm_q_type) {
 
   //$obm_temp=new DB_OBM;	
 	  
-  echo "<CENTER>";
-  echo "\n<FORM name=\"form_admin_type_delete\" " .
-        "METHOD=post action=\"".$sess->self_url()."\">";
-  echo "\n<TABLE WIDTH=90% border=1 bgcolor=\"#$col_a_table\">" .
-        "\n<TR><TD colspan=5 BGCOLOR=\"#$col_a_tableh\">" .
-        "<I><FONT COLOR=\"#$col_textem\">" . $l_type_manage .
-        "</FONT></I></TD></TR>\n";
-  echo "<TR><TD>";
+  echo "<center>
+    <FORM name=\"form_admin_type_delete\" METHOD=post action=\"".$sess->url("contract_index.php")."\">
+    <table WIDTH=90% border=1 bgcolor=\"#$col_a_table\">
+    <tr>
+      <td colspan=5 BGCOLOR=\"#$col_a_tableh\">
+        <i><font COLOR=\"#$col_textem\">$l_type_manage</font></i>
+      </td>
+    </tr>
+    <tr>
+      <td>
 
+<!-- Type Delete Section -->
 
-//---------------------//
-// Type Delete Section //
-//---------------------//
- echo "\n<TABLE border=0><TR><TD>" .
-        $l_type_exist . "</TD>" .
-       "\n<TD> ".$dis_sel_type."</TD>";
-  echo "\n<TD>".
-        "<INPUT TYPE=\"hidden\" name=\"action\" value=\"admintypedelete\">".
-        "<INPUT TYPE=\"submit\" name=\"sub_type\" value=\"" . $l_type_delete .
-        "\" onClick=\"if (check_type_del(this.form)) return true; " .
-        "else return false;\">" . "</TD>";
-  echo "\n</TR>";
-  echo "</FORM>\n";
+        <table border=0>
+        <tr>
+          <td>$l_type_exist</td>
+          <td>$dis_sel_type</td>
+          <td>
+            <input TYPE=hidden name=action value=\"admintypedelete\">
+            <input TYPE=\"submit\" name=\"sub_type\" value=\"$l_type_delete\"
+              onClick=\"if (check_type_del(this.form)) return true;
+                        else return false;\">
+          </td>
+        </tr>
+        </form>
 
-//---------------------//
-// Type Update Section //
-//---------------------//
-  echo "\n<FORM name=\"form_admin_type_update\" " .
-        "METHOD=post action=\"".$sess->self_url()."\">";
+<!--  Type Update Section -->
 
-  echo "\n<TR><TD colspan=2 align=center>" .
-        "<INPUT TYPE=hidden name=\"sel_type\" value=\"\">".
-        "<INPUT TYPE=hidden name=\"action\" value=\"admintypeupdate\">".
-        "<TABLE border=0><TR><TD>".
-        "<INPUT TYPE=text name=\"tf_type_upd\">" .
-        "</TD></TR>".
-        "</TABLE>".
-        "</TD><TD>".
-        "<INPUT TYPE=submit name=\"sub_type\" value=\"" . $l_type_update .
-        "\" onClick=\"if (check_type_upd(this.form,document.form_admin_type_delete)) return true; " .
-        "else return false;\">".
-    "</TD><TD valign=center>";
-        
+        <form name=\"form_admin_type_update\" METHOD=post action=\"".$sess->url("contract_index.php")."\">
+	<tr>
+	  <td colspan=2 align=center>
+	    <INPUT TYPE=hidden name=sel_type value=\"\">
+	    <INPUT TYPE=hidden name=\"action\" value=\"admintypeupdate\">
+	    <table border=0>
+	    <tr>
+	      <td><INPUT TYPE=text name=\"tf_type_upd\"></td>
+	    </tr>
+	    </table>
+	  </td>
+	  <td><INPUT TYPE=submit name=\"sub_type\" value=\"$l_type_update\"
+	    onClick=\"if (check_type_upd(this.form,document.form_admin_type_delete)) return true; else return false;\">
+	  </td>
+	  <td valign=center>
+          </td>
+        </tr>
+        </table>
+      </td>
+      <td>
+      </form>
 
+<!-- New Type Section -->
 
-   // End of the contract contract type management left cell
-  echo "</TD></TR></TABLE>\n" .
-  "</TD>";
-  echo "<TD>";
-
-  echo "</FORM>\n";
-//------------------//
-// New Type Section //
-//------------------//
-  echo "\n<FORM name=\"form_admin_type_new\" " .
-        "METHOD=post action=\"".$sess->self_url()."\">";
-  echo "\n<TABLE border=0><TR>\n" .
-        "<TD align=right>" . $l_type_new .
-        " : <INPUT type=\"text\" name=\"tf_type_new\"></TD>".
-        "</TR>\n" .
-        "<TR><TD align=center>" .
-        "<INPUT TYPE=hidden name=\"action\" value=\"admintypeinsert\">".
-        "<INPUT type=submit name=\"sub_type\" value=\"" . $l_type_insert .
-        "\" onClick=\"if (check_type_new(this.form)) return true; " .
-        "else return false;\">";
-         
-
-  echo "</TD></TR></TABLE>\n" .
-        "</TD></TR></TABLE>\n";
-
-  echo "</FORM>\n";
-  echo "</CENTER>";
+        <form name=\"form_admin_type_new\" METHOD=post action=\"".$sess->url("contract_index.php")."\">
+        <table border=0>
+        <tr>
+          <td align=right>$l_type_new : <INPUT type=text name=\"tf_type_new\">
+          </td>
+        </tr><tr>
+          <td align=center>
+            <input TYPE=hidden name=\"action\" value=\"admintypeinsert\">
+            <input type=submit name=\"sub_type\" value=\"$l_type_insert\"
+              onClick=\"if (check_type_new(this.form)) return true;
+                       else return false;\">
+          </td>
+        </tr>
+        </table>
+      </td>
+    </tr>
+    </table>
+    </form>
+  </center>";
 
 }
 

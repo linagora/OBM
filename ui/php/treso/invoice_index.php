@@ -6,14 +6,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+
 $menu="INVOICE";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("admin");
-
-
 
 include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
@@ -51,7 +50,7 @@ if ($action == "index") {
   html_invoice_search_form ($action,run_query_invoicestatus(), $invoice); 
   if ($set_display == "yes") { 
 
-    $obm_q=run_query_search($invoice, $new_order, $new_order2, $order_dir); 
+    $obm_q = run_query_search($invoice, $new_order, $order_dir); 
     $nb_invoices = $obm_q->num_rows(); 
     if ($nb_invoices == 0) { 
       display_warn_msg($l_no_found);
@@ -71,7 +70,7 @@ if ($action == "index") {
   require("invoice_js.inc");
   html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
     
-  $obm_q=run_query_search($invoice, $new_order, $new_order2, $order_dir);
+  $obm_q=run_query_search($invoice, $new_order, $order_dir);
   
   $nb_invoices = $obm_q->num_rows();
   
@@ -282,7 +281,7 @@ if ($action == "index") {
   }
 
 } /*elseif ($action =="add_payment") {
-  ///////////////////////h//////////////////////////////////////////////////////
+////////////////////////h//////////////////////////////////////////////////////
   if (true) {
     $q_invoice = run_query_detail ($invoice["invoice"]);
     $q_invoice->next_record();
@@ -300,7 +299,7 @@ if ($action == "index") {
     display_error_permissions();
   }
 } elseif ($action =="search_payment") {
-  ///////////////////////h//////////////////////////////////////////////////////
+////////////////////////h//////////////////////////////////////////////////////
   if (true) {
     display_ok_msg ("PERMISSIONS");
     $q_invoice = run_query_detail ($invoice["invoice"]);
@@ -312,12 +311,12 @@ if ($action == "index") {
     display_error_permissions();
   }
 } elseif ($action == "check_payment_chosen") {
-  //////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   
   html_check_payments ($invoice["invoice"], $hd_payments_used, $tf_to_use_amount, $hd_solde, $hd_invoice_reste_a_payer); 
   
 }elseif ($action == "affect_payment") {
-  //////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if (true){
     display_debug_msg ("FIXME : PERMISSIONS", $cdg_param);
     reset($HTTP_POST_VARS);
@@ -344,7 +343,7 @@ if ($action == "index") {
     display_error_permissions();
   }
 }elseif ($action == "del_payment") {
-  ///////////////////////h//////////////////////////////////////////////////////
+////////////////////////h//////////////////////////////////////////////////////
   if (true) {
     display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
     $q_invoice = run_query_detail ($invoice["invoice"]);
@@ -360,7 +359,7 @@ if ($action == "index") {
   }
 
 } elseif ($action =="del_payment_chosen") {
-  ///////////////////////h//////////////////////////////////////////////////////
+////////////////////////h//////////////////////////////////////////////////////
   if (true) {
     display_ok_msg ("FIXME PERMISSIONS");
     reset($HTTP_POST_VARS);

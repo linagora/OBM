@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 //  $Id  //
 ///////////////////////////////////////////////////////////////////////////////
+
 // Labels et textes
 $l_contract_num="Numéro";
 $l_contract_label="Label ";
@@ -28,9 +29,6 @@ $fieldnames["contracttype_label"] = $l_contract_contracttype;
 $l_minus="-";
 $l_plus="+";
 $l_order="Ordre";
-$l_last_contract = "Dernier Contrat de Support";
-$l_last_contact = "Dernier contact";
-$l_last_company = "Derniere societe";
 $l_todo = "A faire";
 
 $l_label = "Label";
@@ -48,8 +46,6 @@ $l_contacts = "Contacts";
 $l_clause = "Clauses ";
 $l_comment = "Commentaire";
 $l_company = "Nom Soci&eacute;t&eacute;";
-$l_all_f = "Toutes";
-$l_all = "Tous";
 $l_date = "Date";
 $l_date_init = "Date Debut";
 $l_date_expir = "Date Expiration";
@@ -76,7 +72,6 @@ $l_deal_update = "Modification Contrat";
 $l_deal_delete = "Suppression Contrat";
 
 // Actions
-$l_find = "Chercher";
 $l_insert = "Enregistrer le Contrat";
 $l_update = "Modifier le Contrat";
 $l_delete = "Supprimer le Contrat";
@@ -92,8 +87,6 @@ $l_category_delete = "Supprimer la categorie";
 $l_category_update = "Modifier la categorie";
 $l_category_insert = "Créer la categorie";
 $l_select_contract = "Selectionner le contrat";
-
-$l_cancel = "Annuler";
 
 // Messages
 
@@ -143,31 +136,9 @@ $l_length_label = " Le champ Label est trop long ";
 $l_length_number = " Le champ Numéro de contrat est trop long";
 
 // MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%d-%m %H:%i:%s";
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-
-
+$l_time_format = "%Y-%m-%d %H:%i:%s";
 
 // For the display preferences modification screen 
 $l_contract_display = "Options d'affichage des Contrats de Support";
 $l_updater = "Derniere mise à jour par" ;
 $l_date_last_update = "Date de la dernière mise à jour" ;
-$l_options_dis = "Options d'affichage" ;
-$l_query_display = "Affiché" ;
-$l_order_dis = "Ordre d'affichage" ;
-$l_action = "Action" ;
-$l_ch_to_dis_no = "Ne pas afficher ce champs" ;
-$l_ch_to_dis_no_help = "Cela signifie que le champs est affiché<br>Cliquer sur cet icône si vous ne souhaitez afficher pas ce champs" ;
-$l_ch_to_dis_yes = "Afficher ce champs" ;
-$l_ch_to_dis_yes_help = "Cela signifie que le champs n'est pas affiché<br>Cliquer sur cet icône si vous souhaitez afficher ce champs" ;
-$l_dis_obligatory = "L'affichage de ce champs est obligatoire" ;
-$l_dis_obligatory_help = "Cet icône signifie que vous êtes obligé d'afficher ce champs" ;
-$l_down_option = "Descendre cette option d'un cran" ;
-$l_down_option_help  = "Cliquez sur cet icône pour descendre le champs d'un cran" ;
-$l_up_option = "Monter cette option d'un cran" ;
-$l_up_option_help = "Cliquez sur cet icône pour monter le champs d'un cran" ;
-$l_subject = "Sujet" ;
-$l_help_options = "Aide contextuelle";
-
-
-

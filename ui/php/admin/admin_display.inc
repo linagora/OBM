@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : admin_display.inc                                           //
-//     - Desc  : Admin Display File                                          //
+// OBM - File : admin_display.inc                                            //
+//     - Desc : Admin Display File                                           //
 // 2000-01-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -24,10 +24,10 @@ function dis_help($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the search form for data module
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode     : "txt" ou "html"
+//   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
-function dis_index($mode) {
-  global $time_active_session;
+function dis_index($mode, $lifetime) {
 
   switch ($mode) {
   case "txt":
@@ -35,8 +35,8 @@ function dis_index($mode) {
     break;
   case "html":
     $nb_user_ses = get_usersession_number();
-    $obm_u = run_query_active_user($time_active_session);
-    html_admin_status( $nb_user_ses, $obm_u);
+    $obm_u = run_query_active_user($lifetime);
+    html_admin_status($lifetime, $nb_user_ses, $obm_u);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -47,131 +47,157 @@ function dis_index($mode) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Admin Status                                                      //
 // Parameters
-//   - $nb_ses      : web session number
+//   - $lifetime    : session lifetime
 //   - $nb_user_ses : user session number
 //   - $obm_u       : DBO : List of Active User Session
 ///////////////////////////////////////////////////////////////////////////////
-function html_admin_status( $nb_user_ses, $obm_u) {
+function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $col_textem, $col_a_table, $col_a_tableh, $col_a_text, $l_help;
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
-  global $l_session_stats, $l_session, $l_user_session, $l_active_user, $l_last_acces,$l_nb_connec,$sess;
-  global $obm_version, $l_version, $time_active_session;
+  global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
+  global $sess, $obm_version, $l_version, $l_date;
 
-  $nb_sess_to_clear = run_query_count_passive_sess($time_active_session);
-  $nbua= $obm_u->nf();
-  $list_user="";
-  while($obm_u->next_record()) {
+  $date = date("Y-m-d H:i:s");
+  if ($lifetime > 0) {
+    $nb_sess_to_clear = run_query_count_passive_sess($lifetime);
+    $d_lifetime = $lifetime;
+  } else {
+    $nb_sess_to_clear = 0;
+    $d_lifetime = "unlimited";
+  }
+
+  $nbua = $obm_u->nf();
+  $list_user = "";
+  while ($obm_u->next_record()) {
     $a = $obm_u->f("activeuserobm_timecreate");
-    $username = $obm_u->f("userobm_username");
+    $last_acces = $obm_u->f("timeupdate");
+    $login = $obm_u->f("userobm_login");
     $nb_con = $obm_u->f("activeuserobm_nb_connexions");
     $lastpage = $obm_u->f("activeuserobm_lastpage");
     $ip = $obm_u->f("activeuserobm_ip");
-    $lastaccess = substr($a,0,4)."/".substr($a,4,2)."/".substr($a,6,2)." ".substr($a,8,2).":".substr($a,10,2).":".substr($a,12,2);
-    $list_user .= "<TR ALIGN=center>
-      <TD bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$username</font></TD>
-      <TD bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$lastaccess</font></TD>
-      <TD bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$nb_con</font></TD>
-      <TD bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$lastpage</font></TD>
-      <TD bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$ip</font></TD>
-   </TR>";
+    $login_date = substr($a,0,4)."-".substr($a,4,2)."-".substr($a,6,2)." ".substr($a,8,2).":".substr($a,10,2).":".substr($a,12,2);
+    $list_user .= "<tr align=center>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$login</font></td>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$login_date</font></td>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$last_acces</font></td>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$nb_con</font></td>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$lastpage</font></td>
+      <td bgcolor=\"#$col_a_table\">
+        <font color=\"#$col_a_text\">$ip</font></td>
+   </tr>";
 }
 
   echo "
-   <CENTER>
+   <center>
 
     <a href=\"" . $sess->url("admin_index.php?action=help&amp;mode=html"). "\">$l_help</a>
     <p>
-        <TABLE BORDER=1 WIDTH=50%>
-    <TR ALIGN=center> 
-      <TD COLSPAN=2 bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">&nbsp;$l_check&nbsp;</font></TD>
-    </TR><TR ALIGN=center> 
-      <TD WIDTH=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_version</font></TD>
+        <table border=1 width=50%>
+    <tr align=center> 
+      <td colspan=2 bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">&nbsp;$l_check&nbsp;</font></td>
+    </tr><tr align=center> 
+      <td width=50% bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_version</font></td>
       <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$obm_version</font></TD>
-    </TR><TR ALIGN=center> 
-      <TD WIDTH=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_database_server</font></TD>
+      <font color=\"#$col_a_text\">$obm_version</font></td>
+    </tr><tr align=center> 
+      <td width=50% bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_database_server</font></td>
       <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">". strtoupper($obm_u->type). "</font></TD>
-    </TR><TR ALIGN=center>
-      <TD WIDTH=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_database</font></TD>
-      <TD bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">" . $obm_u->Database . "</font></TD>
-    </TR></TABLE>
-    </CENTER>
+      <font color=\"#$col_a_text\">". strtoupper($obm_u->type). "</font></td>
+    </tr><tr align=center>
+      <td width=50% bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_database</font></td>
+      <td bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">" . $obm_u->Database . "</font></td>
+    </tr></table>
+    </center>
 
   <!--  Mini stats section -->
 
-    <P><CENTER>
-    <TABLE BORDER=1 >
-    <TR ALIGN=center> 
-      <TD COLSPAN=5 bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">&nbsp;$l_session_stats&nbsp;</font></TD>
-    </TR><TR ALIGN=center> 
-      <TD COLSPAN=3 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_user_session</font></TD>
-      <TD COLSPAN=2 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$nb_user_ses</font></TD>
-    </TR><TR ALIGN=center> 
-      <TD bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_active_user</font></TD>
+    <p><center>
+    <table border=1 >
+    <tr align=center> 
+      <td colspan=6 bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">&nbsp;$l_session_stats&nbsp;</font></td>
+    </tr><tr align=center> 
+      <td colspan=4 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_date</font></td>
+      <td colspan=2 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$date</font></td>
+    </tr><tr align=center> 
+      <td colspan=4 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_lifetime</font></td>
+      <td colspan=2 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$lifetime</font></td>
+    </tr><tr align=center> 
+      <td colspan=4 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_user_session</font></td>
+      <td colspan=2 bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$nb_user_ses</font></td>
+    </tr><tr align=center> 
       <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_last_acces</font></TD>
-      <TD bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_nb_connec</font></TD>
-      <TD bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_last_page</font></TD>
-      <TD bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_user_ip</font></TD>
+      <font color=\"#$col_textem\">$l_active_user</font></td>
+      <td bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">$l_login_date</font></td>
+      <td bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">$l_last_acces</font></td>
+      <td bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">$l_nb_connec</font></td>
+      <td bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">$l_last_page</font></td>
+      <td bgcolor=\"#$col_a_tableh\">
+      <font color=\"#$col_textem\">$l_user_ip</font></td>
 
-    </TR>
+    </tr>
     $list_user
-    </TABLE>
-    </CENTER>
-    <BR>
-    <FORM method=get action=\"" . $sess->url("admin_index.php"). "\">
+    </table>
+    </center>
+    <br>
+    <form method=get action=\"" . $sess->url("admin_index.php"). "\">
     <table border=1>
     <tr>
       <td>action : clear_sess<br>
         <font color=\"#$col_textem\">Clear all passive users sessions</font></td>
-      <td>Passive Sessions :<br><center>$nb_sess_to_clear</center></td>
+      <td>Passive Sessions (delay > $d_lifetime) :
+        <br><center>$nb_sess_to_clear</center></td>
       <td><input type=hidden name=mode value=\"html\">
           <input type=hidden name=action value=clear_sess>
           <input type=submit value=\"$l_execute\"></td>
     </tr>
     </table>
-    </FORM>";
+    </form>";
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Clear the Sessions and file it       				     //
 // Parameters:								     //
-//   - $mode : "txt" or "html" 						     //
+//   - $mode     : "txt" or "html"                                           //
+//   - $lifetime : session lifetime
 ///////////////////////////////////////////////////////////////////////////////
-function dis_clear_sess($mode) {
+function dis_clear_sess($mode, $lifetime) {
   global $cdg_sql;
-  global $time_active_session;
 
-  $date_limit = date("YmdHis",time()-$time_active_session);
+  if ($lifetime > 0) {
+    $date_limit = date("YmdHis",time() - $lifetime);
+    $obm_q = run_query_passive_user($lifetime);
 
-  $obm_q = run_query_passive_user($time_active_session);
-
-  while($obm_q->next_record()) {
-    run_query_store($obm_q);
-    run_query_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
+    while($obm_q->next_record()) {
+      run_query_log_session($obm_q);
+      run_query_activeuserobm_delete($obm_q->f('activeuserobm_sid'));
+    }
+  } else {
+    echo "Sessions are unlimited (lifetime = 0) !";
   }
 
   if($mode == "html")
-    dis_index($mode);
+    dis_index($mode, $lifetime);
 
 }
-

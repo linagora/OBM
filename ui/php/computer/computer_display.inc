@@ -694,7 +694,7 @@ function dis_action_compu($compu_name, $auth_port_update, $l_action) {
             </td>
           <tr>
             <td align=\"center\" valign=\"top\" width=\"100%\" nowrap>
-   <form name=\"del_computer\" action=\"".$sess->self_url()."\" method=\"post\">
+   <form name=\"del_computer\" action=\"".$sess->url("computer_index.php")."\" method=\"post\">
        <input type=\"hidden\" name=\"action\" value=\"del_computer\">
        <input type=\"hidden\" name=\"computer_id\" value=\"$computer_id\">" ;
     echo "<a href=\"".$sess->url("computer_index.php?action=detailconsult&amp;computer_id=$computer_id")."\">$l_compu_infos</a> " ;

@@ -1,12 +1,11 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : agenda_display.inc                                          //
-//     - Desc  : Agenda Display File                                         //
+// OBM - File : agenda_display.inc                                           //
+//     - Desc : Agenda Display File                                          //
 // 2001-07-03 Francois Bloque                                                //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -110,7 +109,7 @@ function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_aff
   $hour_end=substr($timeend,0,2);
   $minute_end=substr($timeend,2,2);
   
-  echo "<FORM name=\"form_event\" method=POST onSubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->self_url()."\" onSubmit=\"\">"; 
+  echo "<FORM name=\"form_event\" method=POST onSubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->url("agenda_index.php")."\" onSubmit=\"\">"; 
   echo "<TABLE border=0 width=80%>       
         <TR><TD align=center>";
 
@@ -499,10 +498,10 @@ function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_aff
     case $next_year : $tag_next = "selected"; break;
     }
     echo "<SELECT name=\"sel_year_repeatend\">
-         \n<OPTION value=\"0\">----</OPTION>
-         \n<OPTION value=".$current_year." ".$tag_current.">".$current_year."</OPTION>
-         \n<OPTION value=".$last_year." ".$tag_last.">".$last_year."</OPTION>
-         \n<OPTION value=".$next_year." ".$tag_next.">".$next_year."</OPTION>
+         <OPTION value=\"0\">----</OPTION>
+         <OPTION value=\"$current_year $tag_current\">$current_year</OPTION>
+         <OPTION value=\"$last_year $tag_last\">$last_year</OPTION>
+         <OPTION value=\"$next_year $tag_next\">$next_year</OPTION>
          </SELECT>"; 
   } else {
     // when update ...
@@ -510,54 +509,65 @@ function dis_event_form($action,$obm_q_event,$obm_q_affected_contacts,$obm_q_aff
     echo $year_repeatend."-".$month_repeatend."-".$day_repeatend." &nbsp;";
   }
   
-  echo "</TD></TR></TABLE>";
+  echo "
+                </td>
+              </tr>
+              </table>
+            </td>
+          </tr>
+          </table>
+        </td>
+      </tr>
+      </table>
+      <br>
 
-  echo "</TD></TR>
-        </TABLE>";
+<!--  Event Description -->
 
-  echo "</TD></TR></TABLE>";
-
-  echo "<BR>";
-
-  // Event Description
-  echo "<TABLE border=0>
-       <TR><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_description."</FONT><br>
-       <TEXTAREA NAME=\"ta_event_description\" rows=6 cols=72>";
-  echo $description;
-  echo "</TEXTAREA>";
-  echo "</TD><TD>&nbsp;</TD><TD valign=center align=right>";
+      <table border=0>
+      <tr>
+        <td>
+          <font COLOR=\"#$col_label\">$l_description</font>
+          <br>
+          <textarea NAME=\"ta_event_description\" rows=6 cols=72>$description</textarea>
+        </td>
+        <td>&nbsp;</td>
+        <td valign=center align=right>";
   
   // Actions : 
   if ($action == "detailupdate") { 
-    echo "<TABLE border=0><TR><TD align=center>";
-    echo "\n<INPUT type=submit name=\"sub_update_event\" value=\"".$l_update."\">
-          \n<INPUT type=hidden name=\"action\" value=\"update\">
-          \n<INPUT type=hidden name=\"param_event\" value=".$param_event.">
-          </FORM>";
-    echo "</TD></TR><TR><TD align=center>";
-    echo "\n<FORM name=\"form_delete_event\" onSubmit=\"if (deletion_valid()) return true; else return false;\" method=POST action=\"".$sess->self_url()."\">
-          \n<INPUT type=submit name=\"sub_delete_event\" value=\"".$l_delete."\">
-          \n<INPUT type=hidden name=\"param_event\" value=".$param_event.">
-          \n<INPUT type=hidden name=\"action\" value=\"delete\">
-          </FORM>";
-    echo "</TD></TR><TR><TD align=center>";
-    echo "\n<FORM name=\"form_delete_event_all\"onSubmit=\"if (deletion_all_valid()) return true; else return false;\" method=POST action=\"".$sess->self_url()."\">
-          \n<INPUT type=submit name=\"sub_delete_event_all\" value=\"".$l_delete_all."\">
-          \n<INPUT type=hidden name=\"param_event\" value=".$param_event.">
-          \n<INPUT type=hidden name=\"action\" value=\"delete_all\">";
-    echo "</TD></TR></TABLE>";
+    echo "<table border=0><TR><TD align=center>
+	  <INPUT type=submit name=\"sub_update_event\" value=\"$l_update\">
+	  <INPUT type=hidden name=\"action\" value=\"update\">
+	  <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
+          </FORM>
+        </td>
+      </tr><tr>
+        <td align=center>
+          <form name=\"form_delete_event\" onSubmit=\"if (deletion_valid()) return true; else return false;\" method=POST action=\"".$sess->url("agenda_index.php")."\">
+          <INPUT type=submit name=\"sub_delete_event\" value=\"$l_delete\">
+          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
+          <INPUT type=hidden name=\"action\" value=\"delete\">
+          </form>
+        </td>
+      </tr><tr>
+        <td align=center>
+          <FORM name=\"form_delete_event_all\"onSubmit=\"if (deletion_all_valid()) return true; else return false;\" method=POST action=\"".$sess->url("agenda_index.php")."\">
+          <INPUT type=submit name=\"sub_delete_event_all\" value=\"".$l_delete_all."\">
+          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
+          <INPUT type=hidden name=\"action\" value=\"delete_all\">
+        </td>
+      </tr>
+      </table>";
   } else { 
-    echo "\n<INPUT type=submit name=\"sub_new_event\" value=\"".$l_insert."\">
-          \n<INPUT type=hidden name=\"param_event\" value=".$param_event.">
-          \n<INPUT type=hidden name=\"action\" value=\"insert\">";
+    echo "<INPUT type=submit name=\"sub_new_event\" value=\"$l_insert\">
+          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
+          <INPUT type=hidden name=\"action\" value=\"insert\">";
   }
    
-  echo "</TD></TR>
-      </TABLE>";
- 
-  echo "</FORM>";
-
+  echo "</td>
+  </tr>
+  </table>
+  </form>";
 
 }
 
@@ -826,7 +836,7 @@ function dis_event_consult($obm_q_event,$obm_q_eventcategories,$obm_q_eventconta
    
   if (/*($obm_q_event->f("calendarevent_privacy")==0) ||*/ ($member==1) || ($obm_q_event->f("calendarevent_usercreate")==$auth->auth["uid"])) {
     echo "<TR><TD colspan=2 align=center><br>";
-    echo "\n<FORM name=\"form_event_detailconsult\" method=POST action=\"".$sess->self_url()."\">";
+    echo "\n<FORM name=\"form_event_detailconsult\" method=POST action=\"".$sess->url("agenda_index.php")."\">";
     echo "\n<INPUT type=submit name=\"sub_event_detailupdate\" value=\"".$l_update."\">";
     echo "\n<INPUT type=hidden name=\"action\" value=\"detailupdate\">";
     echo "</FORM>"; 
@@ -1542,9 +1552,9 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
 
 
 
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Form used to chose contacts and/or groups which will appear in the planning 
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Args :
 // ------
 //   $action : current_action 
@@ -1553,9 +1563,8 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_contact_id,$conta
 //   $obm_q_group_list : list of available groups
 //   $contacts_array : array of selected contacts
 //   $groups_array : array of selected groups
-///////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_planning_contacts($action,$p_start_date,$obm_q_contact_list,$obm_q_group_list,$contacts_array,$groups_array) {
-
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$col_a_table;
   // - Labels 
@@ -1563,10 +1572,11 @@ function dis_planning_contacts($action,$p_start_date,$obm_q_contact_list,$obm_q_
   // - Variables 
   global $sess;
 
-  echo "<HR>";
-  echo "\n<FORM name=\"form_planning_contacts\" method=POST action=\"".$sess->self_url()."\">";
-  echo "\n<TABLE border=0 width=30%>
-        <TR><TD>";
+  echo "<hr>
+    <form name=\"form_planning_contacts\" method=POST action=\"".$sess->url("agenda_index.php")."\">
+    <table border=0 width=30%>
+    <tr>
+      <td>";
 
   // Available Contacts 
   echo "\n<FONT COLOR=\"#$col_label\">".$l_users."</FONT><BR>";
@@ -1622,15 +1632,14 @@ function dis_planning_contacts($action,$p_start_date,$obm_q_contact_list,$obm_q_
 
 
 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Display the waiting events list for the current user 
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Args :
 // ------
 //    $omb_q_waiting_events : list of user's waiting events
-////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_waiting_events_list($obm_q_waiting_events) {
-
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$col_a_table;
   // - Labels 
@@ -1638,15 +1647,14 @@ function dis_waiting_events_list($obm_q_waiting_events) {
   // - Session variables
   global $sess;
 
-  echo "\n<FORM name=\"form_event_accept\" method=POST action=\"".$sess->self_url()."\">";
-  echo "\n<TABLE border=0>";
-  echo "\n<TR><TD colspan=2>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_waiting_events." : </FONT>";
-  echo "</TD><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_accept." ?</FONT>";
-  echo "</TD><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_reject." ?</FONT>";
-  echo "</TD></TR>";
+  echo "<form name=\"form_event_accept\" method=POST action=\"".$sess->url("agenda_index.php")."\">
+    <table border=0>
+    <tr>
+      <td colspan=2>
+        <font COLOR=\"#$col_label\">$l_waiting_events : </font></td>
+      <td><font COLOR=\"#$col_label\">$l_accept ?</font></td>
+      <td><font COLOR=\"#$col_label\">$l_reject ?</font></td>
+    </tr>";
   while ($obm_q_waiting_events->next_record()) {
     $begin=$obm_q_waiting_events->f("calendarevent_datebegin");
     $end=$obm_q_waiting_events->f("calendarevent_dateend");
@@ -1753,7 +1761,7 @@ function dis_conflict_events_form($action,$p_event_id,$events_array,$contacts_co
   echo "<TABLE border=0><TR><TD>";
   
   // To confirm the event 
-  echo "\n<FORM name=form_confirm_conflict_event method=POST action=\"".$sess->self_url()."\">";
+  echo "<FORM name=form_confirm_conflict_event method=POST action=\"".$sess->url("agenda_index.php")."\">";
   switch ($action) {
    case "insert": $value="confirm_insert"; break;
    case "update": $value="confirm_update"; break;
@@ -1786,7 +1794,7 @@ function dis_conflict_events_form($action,$p_event_id,$events_array,$contacts_co
   echo "</TD><TD>";
 
   // To cancel the event 
-  echo "\n<FORM name=form_cancel_conflict_event method=POST action=\"".$sess->self_url()."\">";
+  echo "<FORM name=form_cancel_conflict_event method=POST action=\"".$sess->url("agenda_index.php")."\">";
   switch ($action) {
    case "insert": $value="cancel_insert"; break;
    case "update": $value="cancel_update"; break;

@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : English                                                 //
-//     - File     : settings.inc                                            //
-// 1999-03-18 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                  //
+//     - File     : settings.inc                                             //
+// 1999-03-18 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 $l_settings = "Settings";
 $l_cur_settings = "Your actual Setup";
@@ -22,7 +22,3 @@ $l_set_debug = "Debugging level";
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";
 $l_dg_sql = "SQL";
-
-$l_last_deal="Last deal";
-$l_last_company = "Last company";
-$l_last_contact = "Last contact";

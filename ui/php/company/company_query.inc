@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_query.inc                                            //
 //     - Desc : company query File                                           //
-// 2000-01-20 Florent Goalabre : Last Update 2001-09-16 - PB                 //
+// 2000-01-20 Florent Goalabre                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -15,9 +15,8 @@
 //     keys used       state, name, phone, kind, zip
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
-//   - $p_new_order2 : infos for order clause
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($company, $p_new_order, $p_order_dir,$p_new_order2) {
+function run_query_search($company, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql;  
 
   $state = $company["state"];
@@ -55,11 +54,6 @@ function run_query_search($company, $p_new_order, $p_order_dir,$p_new_order2) {
   }
 
   $req .= " order by $order $p_order_dir";
-
-  // Contact list and new contact column haven't any meaning for sorting
-  if ( (strcmp($p_new_order2,"") != 0) && (strcmp($p_new_order2,"company_new_contact")!=0) && (strcmp($p_new_order2,"company_contacts") != 0) ) {
-    $req .= ", ".$p_new_order2;
-  }
 
   display_debug_msg($req, $cdg_sql);
   $obm_db = new DB_OBM;

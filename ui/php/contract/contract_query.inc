@@ -1,44 +1,35 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contract_query.inc                                              //
-//     - Desc  : Contract Support query File                                             //
+// OBM - File : contract_query.inc                                           //
+//     - Desc : Contract Support query File                                  //
+// 2002-02-02 : Cedric Bellegarde
 ///////////////////////////////////////////////////////////////////////////////
-//   $Id$
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Contract Search query 
-///////////////////////////////////////////////////////////////////////////////
 // Parameters :
-// ------------
-//    $p_new_order : if it's set, it replaces the default "order by" value
-//    $p_new_order2 : the "order by" uses this value too if it's set.
-//    $p_label : keyword for libelle
-//    $p_type : contract'type
-//    $p_company_name : society name
-//    $p_dateafter :
-//    $p_datebefore :
-//    $p_numero :
-//    $p_tech : technique responsable name
-//    $p_com : commercial responsable name
-//////////////////////////////////////////////////////////////////////////////
-
-function run_query_search($contract, $p_order_dir,$p_new_order="",$p_new_order2="") {
+//   - $contract[]  : contract search criteria
+//     keys used       status, label incident, priority, label contract
+//   - $p_new_order : if it's set, replaces the default "order by" value
+//   - $p_order_dir : direction for order clause (asc, desc)
+///////////////////////////////////////////////////////////////////////////////
+function run_query_search($contract, $p_new_order, $p_order_dir) {
 
   global $auth;
   global $set_debug;
   global $cdg_sql;
 
- $p_label = $contract["label"];
- $p_type = $contract["type"];
- $p_dateafter = $contract["dateafter"];
- $p_datebefore = $contract["datebefore"];
- $p_companyname = $contract["companyname"];
- $p_numero = $contract["numero"];
- $p_tech = $contract["technical"];
- $p_com = $contract["comercial"];
-
+  $p_label = $contract["label"];
+  $p_type = $contract["type"];
+  $p_dateafter = $contract["dateafter"];
+  $p_datebefore = $contract["datebefore"];
+  $p_companyname = $contract["companyname"];
+  $p_numero = $contract["numero"];
+  $p_tech = $contract["technical"];
+  $p_com = $contract["comercial"];
 
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_expiration";
   
@@ -76,10 +67,6 @@ function run_query_search($contract, $p_order_dir,$p_new_order="",$p_new_order2=
   
   $query .= " order by  $order $p_order_dir";
 
-  if (strcmp($p_new_order2,"") != 0) {
-    $query .= ", $p_new_order2";
-  }
-  
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
   return($connect_db);

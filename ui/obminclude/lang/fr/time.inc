@@ -1,11 +1,11 @@
 <SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
-//     - File     : contact.inc                                             //
-// 1999-01-24 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
+//     - File     : time.inc                                                 //
+// 1999-01-24 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 
 //for list
@@ -72,18 +72,12 @@ $fieldnames["contact_email"] = $l_email;
 // Calculated fields
 $fieldnames["contact_company_name"] = $l_company;
 
-
-$l_last_contact = "Dernier contact";
-$l_last_company = "Derniere societe";
-$l_last_deal = "Derniere affaire";
 $l_week_sel = "Semaine recherchée";
 $l_from_company = "&nbsp;&nbsp;Société";
-$l_find = "Chercher";
 $l_telother = "Autres tel";
 $l_private = "Privé";
 $l_public = "Publique";
 $l_contact_select_company = "Sélectionner la société du Contact.";
-$l_invalid_data = "Données invalides";
 $l_week_next = "Semaine Suivante";
 $l_week_prev = "Semaine précédente";
 $l_date = "Date:";
@@ -91,9 +85,6 @@ $l_project = "Projet:";
 $l_task = "Tache:";
 $l_label = "Label:";
 $l_duration = "Durée:";
-
-
-
 
 // Titres
 $l_time = "Gestion des temps";
@@ -103,7 +94,6 @@ $l_insert = "Enregistrer le Contact";
 $l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
 $l_select_company = "Sélectionner la société";
-$l_back = "Retour";
 $l_confirm= "Confirmer l'action";
 $l_close = "Fermer";
 
@@ -148,8 +138,7 @@ $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 
 // champs specifiques
 // format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_date_format = "%Y-%d-%m %H:%i:%s";
-$l_jour_format = "%a %d %M";
+$l_jour_format = "%a %M %d";
 
 
 // For the display preferences modification screen 
