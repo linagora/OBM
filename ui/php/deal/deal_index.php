@@ -764,7 +764,13 @@ function get_deal_action() {
     'Condition'=> array ('detailconsult', 'update','insert') 
                                      );
 
-// Document add
+  // Delete
+  $actions["DEAL"]["delete"] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     );
+
+  // Document add
   $actions["DEAL"]["document_add"] = array (
     'Url'      => "$path/deal/deal_index.php?action=document_add",
     'Right'    => $cright_write,
@@ -783,14 +789,14 @@ function get_deal_action() {
   $actions["DEAL"]["affect"] = array (
     'Url'      => "$path/deal/deal_index.php?action=affect&amp;param_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                      	     );
 
   // Affect Update
   $actions["DEAL"]["affect_update"] = array (
     'Url'      => "$path/deal/deal_index.php?action=affect_update&amp;sel_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('None') 
                                      	     );
 
   // Admin  

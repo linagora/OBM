@@ -514,9 +514,11 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
   $uid = $auth->auth["uid"];
 
   // Set default values when needed
-  while (list($field, $value) = each ($defaults)) {
-    if ($fields[$field] == "") {
-      $fields[$field] = $value;
+  if (is_array($defaults)) {
+    while (list($field, $value) = each ($defaults)) {
+      if ($fields[$field] == "") {
+	$fields[$field] = $value;
+      }
     }
   }
 
@@ -596,7 +598,9 @@ function run_query_import_company_insert(&$import_q, $fields, $defaults, &$count
       from Company
       where company_name = '$name'
         and company_phone = '$phone'
-        and company_zipcode = '$zip'";
+        and company_address1 = '$ad1'
+        and company_zipcode = '$zip'
+        and company_town = '$town'";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -637,9 +641,11 @@ function run_query_import_company_update(&$import_q, $fields, $defaults, &$count
   $uid = $auth->auth["uid"];
 
   // Set default values when needed
-  while (list($field, $value) = each ($defaults)) {
-    if ($fields[$field] == "") {
-      $fields[$field] = $value;
+  if (is_array($defaults)) {
+    while (list($field, $value) = each ($defaults)) {
+      if ($fields[$field] == "") {
+	$fields[$field] = $value;
+      }
     }
   }
 
@@ -726,9 +732,11 @@ function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $default
   $uid = $auth->auth["uid"];
 
   // Set default values when needed
-  while (list($field, $value) = each ($defaults)) {
-    if ($fields[$field] == "") {
-      $fields[$field] = $value;
+  if (is_array($defaults)) {
+    while (list($field, $value) = each ($defaults)) {
+      if ($fields[$field] == "") {
+	$fields[$field] = $value;
+      }
     }
   }
 

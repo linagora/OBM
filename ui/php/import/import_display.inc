@@ -471,7 +471,7 @@ function html_import_file_import($import_q, $import) {
     next($r);
   }
 
-  // Conflict Management ------------------------------------------------------
+  // Company Conflict Management ----------------------------------------------
   if ($conflict_action != "") {
     $nb_line++;
 
@@ -486,9 +486,13 @@ function html_import_file_import($import_q, $import) {
       list($num_line, $line) = each($r);
       $row = get_file_row_fields($line, $csv_sep, $enclosed);
       $fields = get_import_row_mapping($row, $map);
-      run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
+      $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
 
-      // XXX If contact, insert
+      // If contact, insert
+      if (row_has_contact($fields)) {
+	echo "insert contact :" . $fields["con_ln"] . " " . $fields["con_fn"];
+	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+      }
 
       // Update the existing company
     } else if ($conflict_action == "company_update") {
@@ -497,10 +501,36 @@ function html_import_file_import($import_q, $import) {
       $fields = get_import_row_mapping($row, $map);
       run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats, $company_id);
 
-      // XXX test for contact ?
+      // test for contact
+      if (row_has_contact($fields)) {
 
+	// Test if similar contact exist --------------------------------------
+	$conts = get_similar_contact($fields, $company_id);
+	if (is_array($conts)) {
+	  $log["res"] = $l_similar_contact;
+	  echo "conflict contact :".$fields["con_ln"] ." ". $fields["con_fn"];
+	  // Automatic mode
+	  if ($run_mode == "auto") {
+	    // XXXX action auto
+	    
+	    // Test mode (no database updates) Should never happens here
+	  } else if ($run_mode == "test") {
+	    // Normal mode (Interactive)
+	  } else {
+	    $stop = true;
+	    $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps);
+	    $display["msg"] .= display_warn_msg($l_conflict_detected);
+	  }
+	}  
+	
+	// No similar contacts exists -----------------------------------------
+	run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
+      }
+
+      // Update the existing contact
+    } else if ($conflict_action == "contact_update") {
+      // XXX
     }
-
   }
 
   // Loop through the file ----------------------------------------------------
