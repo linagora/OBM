@@ -15,7 +15,6 @@
 // - duplicate          -- $invoice       -- new invoice form from existing one
 // - insert             -- form fields    -- insert the invoice
 // - update             -- form fields    -- update the invoice
-// - updatearchive      -- $invoice sess
 // - check_delete       -- $param_invoice -- check links before delete
 // - delete             -- $param_invoice -- delete the invoice
 // - display            --                -- display and set display parameters
@@ -118,23 +117,6 @@ if ($action == "index" || $action == "") {
     $display["search"] = dis_invoice_form($action, $invoice); 
   }
 
-} elseif ($action == "updatearchive")  {
-///////////////////////////////////////////////////////////////////////////////
-  reset ($HTTP_POST_VARS);
-  $nb_invoices = 0;
-
-  while (list($key, $val) = each ($HTTP_POST_VARS)) {
-    if(strcmp(substr($key, 0, 8),"archive_") == 0) {
-      run_query_update_archive (substr($key,8));
-      $nb_invoices++;
-    }
-  }
-  $display["msg"] .= display_ok_msg ($l_archive_ok);
-  echo $nb_invoices . " " . $l_archive_number . "<br />\n";
-  
-  require ("invoice_js.inc");
-  $display["search"] = dis_invoice_search_form($invoice); 
-
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
@@ -197,8 +179,9 @@ display_page($display);
 function get_param_invoice() {
   global $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
   global $ta_comment, $sel_status, $param_invoice, $tf_date, $tf_payment_date;
-  global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
-  global $tf_deal, $tf_company, $cb_archive;
+  global $tf_expiration_date, $tf_date_after, $tf_date_before;
+  global $tf_deal, $tf_company, $cb_archive, $rd_inout, $hd_inout;
+  global $ta_comment, $sel_usercomment, $tf_datecomment, $ta_add_comment;
   global $param_company, $company_name, $company_new_name, $company_new_id;
   global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
   global $param_project, $project_name, $project_new_name, $project_new_id;
@@ -214,6 +197,7 @@ function get_param_invoice() {
   if (isset ($sel_status)) $invoice["status"] = $sel_status;
   if (isset ($tf_date)) $invoice["date"] = $tf_date;
   if (isset ($tf_payment_date)) $invoice["pdate"] = $tf_payment_date;
+  if (isset ($tf_expiration_date)) $invoice["edate"] = $tf_expiration_date;
   if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
   if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
   if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;
@@ -221,6 +205,9 @@ function get_param_invoice() {
   if (isset ($tf_balance)) $invoice["balance"] = $tf_balance;
   if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
   if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;
+  if (isset ($tf_datecomment)) $invoice["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $invoice["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $invoice["add_comment"] = trim($ta_add_comment);
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
 
@@ -297,7 +284,7 @@ function get_invoice_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate', 'duplicate') 
+    'Condition'=> array ('detailupdate', 'duplicate', 'update') 
                                    );
 
 // Duplicate
@@ -319,13 +306,6 @@ function get_invoice_action() {
 // Update
   $actions["INVOICE"]["update"] = array (
     'Url'      => "$path/invoice/invoice_index.php?action=update",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                        );
-
-// Update Archive
-  $actions["INVOICE"]["updatearchive"] = array (
-    'Url'      => "$path/invoice/invoice_index.php?action=updatearchive",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );

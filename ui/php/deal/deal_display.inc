@@ -678,7 +678,7 @@ function html_deal_consult($deal_q) {
   global $l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
-  global $l_invoice, $l_no_invoice, $l_see_archived_invoices, $incl_arch, $param_deal;
+  global $l_invoice, $l_no_invoice, $incl_arch, $param_deal;
   global $display, $path, $auth, $cgp_hide, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
@@ -1526,6 +1526,7 @@ $js_state_loop
   $block = "
     $js_state
     <form method=\"post\" name=\"form_deal_update\" 
+      onsubmit=\"if (check_quick_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
   <div class=\"detailHead\">$l_infos</div>

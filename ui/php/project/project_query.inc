@@ -69,7 +69,8 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 
   if (($member != "") && ($member != $c_all)) {
     $join_member = "left join ProjectUser as Member on project_id=Member.projectuser_project_id";
-    $where .= "and Member.projectuser_id = '$member'";
+    $where .= " and Member.projectuser_user_id = '$member'
+                and Member.projectuser_manager = 0";
   }
 
   if (($manager != "") && ($manager != $c_all)) {
@@ -107,7 +108,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
  ";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Project $join_comp $whereq");
+    $count = get_query_count("select count(*) from Project $join_comp $join_member $join_manager $whereq");
     $obm_q->set_num_rows_total($count);
   }
   if (($count > 0)  || (! $ctu_sql_limit)) {

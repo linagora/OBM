@@ -14,6 +14,8 @@ $l_amount = "Cantidad";
 $l_amount_ht = "Cantidad HT";
 $l_amount_ttc = "Cantidad TTC";
 $l_status="Estado";
+$l_expiration_date = "Expiration date";
+$l_payment_date = "Payment date";
 $l_date_apres = "Despues";
 $l_date_avant = "Antes";
 $l_paid = "Cantidad TTC pagado";
@@ -21,12 +23,8 @@ $l_pick_deal = "Escoja un negocio";
 $l_inout = "Tipo";
 $l_both = "Ambos"; 
 $l_tax_rate="tasa de impuestos";
-$l_compute_tax="calcule total impuestos";
-$l_include_archive="archivos incluidos";
-$l_archive_invoices="A";
-$l_archive_update="actualizaciones de archivos";
-$l_archive_ok="facturas archivadas exitosamente";
-$l_archive_number=" facturas archivadas";
+$l_compute_tax = "calcule total impuestos";
+$l_include_archive = "archivos incluidos";
 
 //payment
 $l_no_payment = "no hay pagos relacionados con esta factura";

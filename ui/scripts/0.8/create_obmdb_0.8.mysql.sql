@@ -971,6 +971,7 @@ CREATE TABLE Invoice (
   invoice_amount_ttc        double(10,2),
   invoice_status_id         int(4) DEFAULT '0' NOT NULL,
   invoice_date              date not NULL DEFAULT '0000-00-00',
+  invoice_expiration_date   date,
   invoice_payment_date      date,
   invoice_inout             char(1),
   invoice_archive           char(1) NOT NULL DEFAULT '0',

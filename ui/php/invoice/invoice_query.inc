@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_query.inc
 //     - Desc : invoice query File
-// 2001-07-30 Nicolas Roman
+// 2001-07-30 - Aliacom - Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -126,6 +126,7 @@ function run_query_detail($p_invoice_id) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $date = sql_date_format($db_type, "Invoice.invoice_date", "date");
+  $edate = sql_date_format($db_type, "Invoice.invoice_expiration_date", "expiration_date");
   $pdate = sql_date_format($db_type, "Invoice.invoice_payment_date", "payment_date");
   $datemodif = sql_date_format($db_type, "invoice_timeupdate", "datemodif");
   $timeupdate = sql_date_format($db_type, "invoice_timeupdate", "timeupdate");
@@ -134,6 +135,7 @@ function run_query_detail($p_invoice_id) {
   // XXXXX ???? exporter le calcul des paiements a par (pour eviter group by)
   $query = "select Invoice.*,
       $date,
+      $edate,
       $pdate,
       $datemodif,
       $timeupdate,
@@ -158,7 +160,8 @@ function run_query_detail($p_invoice_id) {
       invoice_userupdate, invoice_usercreate, invoice_company_id,
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
-      invoice_payment_date, invoice_comment, invoice_inout, invoice_archive,
+      invoice_expiration_date, invoice_payment_date, invoice_comment,
+      invoice_inout, invoice_archive,
       invoicestatus_label,
       c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
@@ -184,10 +187,16 @@ function run_query_insert($invoice) {
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
   $status = $invoice["status"];
-  $comment = $invoice["comment"];
   $date = $invoice["date"];
+  $edate = $invoice["edate"];
   $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
+  $add_comment = $invoice["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $invoice["datecomment"];
+    $usercomment = $invoice["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
   $comp_id = $invoice["comp_new_id"];
   if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
   if ($comp_id == "") { $comp_id = "0"; }
@@ -201,7 +210,7 @@ function run_query_insert($invoice) {
   if ($status == ""){
     $status = "0";
   }
-  $arch = (isset($project["archive"]) ? $project["archive"] : '0');
+  $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
 
   $query = "insert into Invoice (
       invoice_timeupdate,
@@ -218,6 +227,7 @@ function run_query_insert($invoice) {
       invoice_status_id,
       invoice_comment,
       invoice_date,
+      invoice_expiration_date,
       invoice_payment_date,
       invoice_inout,
       invoice_archive
@@ -236,6 +246,7 @@ function run_query_insert($invoice) {
      '$status',
      '$comment',
      '$date',
+     '$edate',
      '$pdate',
      '$inout',
      '$arch')"; 
@@ -260,17 +271,24 @@ function run_query_update ($invoice) {
   $id = $invoice["id"];
   $label = $invoice["label"];
   $number = $invoice["number"];
+  $arch = (isset($invoice["archive"]) ? $invoice["archive"] : '0');
   $ht = $invoice["ht"];
   $ttc = $invoice["ttc"];
   $status = $invoice["status"];
-  $comment = $invoice["comment"];
   $date = $invoice["date"];
+  $edate = $invoice["edate"];
   $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
   if ($status == ""){
     $status = "0";
   }
-  $arch = (isset($project["archive"]) ? $project["archive"] : '0');
+  $comment = $invoice["comment"];
+  $add_comment = $invoice["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $invoice["datecomment"];
+    $usercomment = $invoice["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   $comp_id = $invoice["comp_new_id"];
   if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
   if ($comp_id == "") { $comp_id = "0"; }
@@ -294,6 +312,7 @@ function run_query_update ($invoice) {
       invoice_status_id='$status',
       invoice_comment='$comment',
       invoice_date='$date',
+      invoice_expiration_date='$edate',
       invoice_payment_date='$pdate',
       invoice_inout='$inout',
       invoice_archive='$arch'
@@ -398,35 +417,6 @@ function run_query_remove_payment ($p_invoice_id, $p_payment_id=""){
   $db->query($query);
 }
 */
-///////////////////////////////////////////////////////////////////////////////
-// Set an invoice to an "archived" state
-// Parameters:
-//   - $p_id : invoice Id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_update_archive($p_id) {
-  global $cdg_sql;
-
-  $query = "update Invoice set invoice_archive='1' where invoice_id='$p_id'";
-  display_debug_msg ("<b>run_query_update_archive : </b>$query", $cdg_sql);
-  $go = new DB_OBM;
-  $go->query($query);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Function to update the updater of an invoice
-///////////////////////////////////////////////////////////////////////////////
-function run_query_update_updater ($auth, $param_invoice){
-  global $cdg_sql;
-
-  $connect_db = new DB_OBM ;
-  $query = "update Invoice
-      set invoice_userupdate='".$auth->auth["uid"]."',
-        invoice_timeupdate='".date("Y-m-d H:i:s")."'
-      where invoice_id='$param_invoice'";
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -528,11 +518,13 @@ function check_invoice_data_form($id, $invoice) {
   global $php_regexp_isodate;
   global $l_fill_label, $l_fill_company, $l_fill_number, $l_error_number_exist;
   global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
+  global $l_expiration_date, $l_payment_date;
   global $err_msg, $l_exist_error;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
   $date = $invoice["date"];
+  $edate = $invoice["edate"];
   $pdate = $invoice["pdate"];
   $inout = $invoice["inout"];
   $ht = $invoice["ht"];
@@ -561,12 +553,21 @@ function check_invoice_data_form($id, $invoice) {
     return false;
   }
 
+  // Expiration Date check
+  if ($edate == "") {
+    $err_msg = "$l_expiration_date : $l_fill_date";
+    return false;
+  } else if (preg_match($php_regexp_isodate, $edate) == 0) {
+    $err_msg = "$l_expiration_date : $edate : $l_invalid_date"; 
+    return false;
+  }
+
   // Payment Date check
   if ($pdate == "") {
-    $err_msg = $l_fill_date;
+    $err_msg = "$l_payment_date : $l_fill_date";
     return false;
   } else if (preg_match($php_regexp_isodate, $pdate) == 0) {
-    $err_msg = "$l_date : $pdate : $l_invalid_date"; 
+    $err_msg = "$l_payment_date : $pdate : $l_invalid_date"; 
     return false;
   }
 

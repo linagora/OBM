@@ -1,8 +1,8 @@
-<?php
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_display.inc
 //     - Desc : Invoice Display file
-// 2001-07-30 Nicolas Roman
+// 2001-07-30 - Aliacom - Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -11,6 +11,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
+$fieldnames["invoice_archive"] = $l_archive;
 $fieldnames["invoice_number"] = $l_number;
 $fieldnames["invoice_company"] = $l_company;
 $fieldnames["invoice_deal"] = $l_deal;
@@ -20,6 +21,7 @@ $fieldnames["invoice_amount_ht"] = $l_amount_ht;
 $fieldnames["invoice_amount_ttc"] = $l_amount_ttc;
 $fieldnames["invoice_status"] = $l_status;
 $fieldnames["invoice_date"] = $l_date;
+$fieldnames["invoice_expiration_date"] = $l_expiration_date;
 $fieldnames["invoice_payment_date"] = $l_payment_date;
 $fieldnames["invoice_paid"] = $l_paid;
 $fieldnames["payment_label"] = $l_label;
@@ -59,6 +61,16 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
   
   elseif ($fieldname == "invoice_pay_label") {
     $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("invoice_payment_id");
+  }
+
+  else if ($fieldname == "invoice_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   // amount column color 
@@ -270,7 +282,7 @@ function dis_invoice_search_list($invoice) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
   global $col_frs, $col_client;
-  global $l_found, $l_archive_invoices, $l_archive_update, $l_deal;
+  global $l_found, $l_deal;
   global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
   global $display, $perm, $menu, $cright_write_admin;
 
@@ -309,22 +321,8 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
   $dis_invoice->data_header = "top";
   $dis_invoice->data_url = $url;
 
-  // checkbox to allow archiving..
-  if ($perm->check_right($menu, $cright_write_admin)) {
-    $url_archive = url_prepare("invoice_index.php?action=updatearchive");
-    $block .= "<form method=\"post\" action=\"$url_archive\">";
-    $dis_invoice->data_cb_text = $l_archive_invoices;
-    $dis_invoice->data_idfield = "invoice_id";
-    $dis_invoice->data_cb_side = "left";
-    $dis_invoice->data_cb_name = "archive_";
-  }
-
   $display["msg"] .= display_info_msg("$nb_invoice $l_found");
   $block .= $dis_invoice->display("dis_data_invoice");
-  if ($perm->check_right($menu, $cright_write_admin)) {
-    $block .= "<input type=\"submit\" value=\"$l_archive_update\" />
-      </form>";
-  }
 
   return $block;
 }
@@ -458,24 +456,28 @@ function dis_invoice_detail($inv_q) {
   global $display, $set_theme, $path, $ico_company, $ico_deal, $ico_project;
   global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
-  global $l_status, $l_comment, $l_invoice, $l_payment_date;
+  global $l_archive, $l_status, $l_comment, $l_invoice;
+  global $l_expiration_date, $l_payment_date;
+  global $l_yes, $l_no;
 
   $label = $inv_q->f("invoice_label");
   $num = $inv_q->f("invoice_number");
-  $date = date_format($inv_q->f("date"));
-  $payment_date = date_format($inv_q->f("payment_date"));
+  $date = date_format($inv_q->f("date"), 1);
+  $expiration_date = date_format($inv_q->f("expiration_date"), 1);
+  $payment_date = date_format($inv_q->f("payment_date"), 1);
   $status = $inv_q->f("invoicestatus_label");
   $inout = ($inv_q->f("invoice_inout") == '-') ? $l_supplier : $l_client;
   $title = $inout;
   $ht = $inv_q->f("invoice_amount_ht");
   $ttc = $inv_q->f("invoice_amount_ttc");
-  $comment = nl2br($inv_q->f("invoice_comment"));
+  $comment = beautify_comment(nl2br($inv_q->f("invoice_comment")));
   $comp_id = $inv_q->f("invoice_company_id");
   $company = $inv_q->f("company_name");
   $deal_id = $inv_q->f("invoice_deal_id");
   $deal = $inv_q->f("deal_label");
   $project_id = $inv_q->f("invoice_project_id");
   $project = $inv_q->f("project_name");
+  $archive = ($inv_q->f("invoice_archive") == 1 ? $l_yes : $l_no);
 
   $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
 
@@ -520,8 +522,16 @@ function dis_invoice_detail($inv_q) {
       <td class=\"detailText\">$num</td>
     </tr>
     <tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_date</td>
       <td class=\"detailText\">$date</td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_expiration_date</td>
+      <td class=\"detailText\">$expiration_date</td>
     </tr>
     <tr>
       <td class=\"detailLabel\">$l_payment_date</td>
@@ -571,7 +581,8 @@ function dis_invoice_form($action, $invoice) {
     $inv_q = "";
   }
   $stat_q = run_query_invoicestatus();
-  $block = html_invoice_form($action, $invoice, $inv_q, $stat_q);
+  $usr_q = run_query_userobm_active();
+  $block = html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q);
 
   return $block;
 }
@@ -584,25 +595,32 @@ function dis_invoice_form($action, $invoice) {
 //   - $invoice[] : invoice hash parameters
 //   - $inv_q     : if updating, contains the invoice current info
 //   - $stat_q    : Database result with status list
+//   - $usr_q     : userobm database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
-  global $path, $display, $set_theme, $ico_company, $ico_deal, $ico_project;
-  global $l_label, $l_number, $l_comment, $l_deal, $l_amount_ht, $l_amount_ttc;
-  global $l_status, $l_date, $l_pick_deal, $l_inout, $l_client, $l_supplier;
-  global $l_insert, $l_update;
+function html_invoice_form($action, $invoice, $inv_q, $stat_q, $usr_q) {
+  global $auth, $path, $display, $set_theme;
+  global $ico_company, $ico_deal, $ico_project;
+  global $l_label, $l_number, $l_comment, $l_add_comment, $l_upd_comment;
+  global $l_amount_ht, $l_amount_ttc;
+  global $l_status, $l_date, $l_inout, $l_client, $l_supplier;
+  global $l_insert, $l_update, $l_archive, $l_expiration_date;
   global $l_invoice, $l_company, $l_deal, $l_project, $l_payment_date;
   global $default_invoice_numbering, $c_php_isodate_format;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
+
+  $uid = $auth->auth["uid"];
 
   // if update mode and first time values are taken from database
   if (($action == "detailupdate") || ($action == "duplicate")) {
     $id = $inv_q->f("invoice_id");
     $label = $inv_q->f("invoice_label");
     $number = $inv_q->f("invoice_number");
+    $archive = ($inv_q->f("invoice_archive") == 1 ? " checked" : "");
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
-    $date = isodate_format($inv_q->f("date"));
-    $pdate = isodate_format($inv_q->f("payment_date"));
+    $date = isodate_format($inv_q->f("date"), 1);
+    $edate = isodate_format($inv_q->f("expiration_date"), 1);
+    $pdate = isodate_format($inv_q->f("payment_date"), 1);
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -612,16 +630,21 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
     $d_label = $inv_q->f("deal_label");
     $p_id = $inv_q->f("invoice_project_id");
     $p_name = $inv_q->f("project_name");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
 
   // New form and first time
   } elseif ($action == "new") {
     $date = date($c_php_isodate_format); 
+    $edate = $date;
     $pdate = $date;
     $number = date ($default_invoice_numbering);
     // when creating from a deal, default to use same "inout" as the dealtype
     if ($d_id >= 1) {
       $inout = run_query_deal_get_inout ($d_id);
     }
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   }
 
   // if we duplicate we have to modify some fields :
@@ -635,13 +658,18 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   if (isset($invoice["id"])) { $id = $invoice["id"]; }
   if (isset($invoice["label"])) { $label = stripslashes($invoice["label"]); }
   if (isset($invoice["number"])) { $number = $invoice["number"]; }
+  if (isset($invoice["archive"])) { $archive = ($invoice["archive"] == 1 ? "checked" : ""); }
   if (isset($invoice["date"])) { $date = $invoice["date"]; }
+  if (isset($invoice["edate"])) { $edate = $invoice["edate"]; }
   if (isset($invoice["pdate"])) { $pdate = $invoice["pdate"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
   if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
   if (isset($invoice["ttc"])) { $ttc = $invoice["ttc"]; }
   if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
+  if (isset($invoice["add_comment"])) { $add_comment = stripslashes($invoice["add_comment"]); }
+  if (isset($invoice["usercomment"])) { $usercomment = $invoice["usercomment"]; }
+  if (isset($invoice["datecomment"])) { $datecomment = $invoice["datecomment"]; }
 
   if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
   if (isset($invoice["company_name"])) { $c_name = stripslashes($invoice["company_name"]); }
@@ -681,6 +709,33 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
       <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
       <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
       </td>";
+
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_comment\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+  }
+
+  // User comment select construction
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    // First time default to uid of connected user (uid) then set to name
+    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+      $sel_usercomment .= " selected = \"selected\"";
+    }
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
 
   // Buttons
   if (($action == "update") || ($action == "detailupdate")) {
@@ -758,9 +813,17 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
       <input name=\"tf_number\" type=\"text\" size=\"11\" value=\"$number\" />
     </td>
   </tr><tr>
+    <td class=\"detailLabel\">$l_archive</td>
+    <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
+  </tr><tr>
     <td class=\"detailLabel\">$l_date</td>
     <td class=\"detailForm\">
       <input name=\"tf_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$date\" />
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_expiration_date</td>
+    <td class=\"detailForm\">
+      <input name=\"tf_expiration_date\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$edate\" />
     </td>
   </tr><tr>
     <td class=\"detailLabel\">$l_payment_date</td>
@@ -787,13 +850,20 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
     <td class=\"detailForm\">
       <input name=\"tf_amount_ttc\" type=\"text\" size=\"15\" value=\"$ttc\" />
     </td>
-  </tr><tr>
-    <td class=\"detailLabel\">$l_comment</td>
-    <td class=\"detailForm\">
-      <textarea name=\"ta_comment\" rows=\"3\" cols=\"64\">$comment</textarea>
-    </td>
   </tr>
   </table>
+
+    <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_add_comment</td>
+      <td class=\"detailForm\"><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+    </tr><tr>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      $dis_comment
+    </tr>
+    </table>
 
   <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>

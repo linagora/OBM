@@ -11,13 +11,13 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
-$obmdb_db = "obm";
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_db = "obmtest";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // OBM host (for mail links)
-$cgp_host = "http://obm/";
+$cgp_host = "http://obmtest/";
 
 // Use specific site includes
 //$cgp_site_include = true;

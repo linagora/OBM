@@ -256,9 +256,9 @@ function html_incident_consult($inc_q,$con_q) {
   $status = $inc_q->f("incidentstatus_label");
   $date = datetime_format($inc_q->f("date"));
   $inc_id = $inc_q->f("incident_id");
-  $inc_desc = nl2br($inc_q->f("incident_description"));
+  $inc_desc = nl2br(htmlentities($inc_q->f("incident_description")));
   $inc_dur = nl2br($inc_q->f("incident_duration"));
-  $inc_reso = nl2br($inc_q->f("incident_resolution"));
+  $inc_reso = nl2br(htmlentities($inc_q->f("incident_resolution")));
   $con_id = $con_q->f("contract_id");
   $comp_id = $con_q->f("contract_company_id");
   $con_label = $con_q->f("contract_label");

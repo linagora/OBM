@@ -44,7 +44,6 @@ $l_deal_select_company = "Select the company which whom the deal must be filled"
 $l_deal_select_parentdeal = "Select the parentdeal to which the deal must be affected";
 $l_affect_deal= "Change Parent Deal";
 $l_no_invoice = "No invoice connected";
-$l_see_archived_invoices = "See archived invoices too";
 $l_kind_manage = "Deal Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
@@ -61,7 +60,6 @@ $l_select_deal = "Select a Deal";
 $l_insert = "Insert the Deal";
 $l_update = "Update the Deal";
 $l_delete = "Delete the Deal";
-$l_archive_update = "Update Archives";
 $l_select_company = "Select the Company";
 $l_affect = "Affect";
 
@@ -111,9 +109,6 @@ $l_insert_error = "The insertion of the deal has failed !";
 $l_update_ok = "The deal has been updated successfully.";
 $l_update_error = "The update of the deal has failed !";
 $l_query_error = "Probl&egrave;me en executant la requete";
-$l_archive_ok = "The archives have been updated successfully.";
-$l_archive_error = "The update of the archives has failed !";
-$l_archive_number = "deals inserted in the archives.";
 $l_no_display_parent ="Fill the search fields and press < Find > to retrieve the parentdeals"; 
 
 $l_kind_insert_ok = "The kind has been inserted successfully.";

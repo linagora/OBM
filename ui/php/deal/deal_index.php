@@ -134,6 +134,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "quick_detail")  {
 ///////////////////////////////////////////////////////////////////////////////
+  require("deal_js.inc");
   $display["detail"] = dis_deal_quick_form($deal);
   
 } elseif ($action == "detailupdate")  {

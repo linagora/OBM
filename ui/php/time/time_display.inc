@@ -549,7 +549,6 @@ function dis_form_addtask($time, $validate_days) {
   $d_start_week = first_day_week($time["date"]);  
   $work_day_dates = get_week_working_days_dates($d_start_week);
 
-  echo "<p>size validate=".sizeof($validate_days). " nb_worked=$nb_worked_days";
   if (sizeof($validate_days) == $nb_worked_days) {
     $block .= "<p></p>";
     return;

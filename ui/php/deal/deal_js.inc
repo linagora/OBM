@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : company_js.inc                                              //
-//     - Desc  : Company javascript functions File                           //
+// OBM - File  : deal_js.inc                                                 //
+//     - Desc  : Deal javascript functions File                              //
 // 2000-01-13 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -93,6 +93,41 @@ function check_form(f_aff) {
     // Check if date alarm is in the past
     today = new Date();
     dalarm = f_aff.tf_datealarm.value;
+    year = dalarm.substring(0,4);
+    month = dalarm.substring(5,7) - 1;
+    day = dalarm.substring(8,10);
+    date_alarm = new Date(year, month, day);
+    today.setHours(0);
+    date_alarm.setHours(12);
+    // We set the hours not to alert if alarm date is today
+    if (date_alarm < today) {
+      if (confirm(\"$l_confirm_datealarm\")) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check the Quick update deal form
+///////////////////////////////////////////////////////////////////////////////
+function check_quick_form(fdeal) {
+
+  if (trim(fdeal.tf_datealarm.value) == \"\") {
+    alert (\"$l_fill_datealarm\");
+    return false;
+  } else if (check_date(fdeal.tf_datealarm, \"$l_date_alarm\") == false) {
+    return false;
+  } else {
+    // Check if date alarm is in the past
+    today = new Date();
+    dalarm = fdeal.tf_datealarm.value;
     year = dalarm.substring(0,4);
     month = dalarm.substring(5,7) - 1;
     day = dalarm.substring(8,10);

@@ -653,7 +653,7 @@ function html_company_links($co_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Company Consultation                                         //
+// HTML Display Company Consultation
 // Parameters:
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
@@ -663,12 +663,12 @@ function html_company_consult($co_q, $cat_q) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
   global $l_insert,$l_update, $l_company, $l_coord,$l_category;
-  global $display, $c_yes, $c_no, $cgp_hide;
+  global $display, $l_yes, $l_no, $cgp_hide;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
   $vat = $co_q->f("company_vat");
-  $archive = ($co_q->f("company_archive") == 1 ? $c_yes : $c_no);
+  $archive = ($co_q->f("company_archive") == 1 ? $l_yes : $l_no);
   $name = $co_q->f("company_name");
   $aka = $co_q->f("company_aka");
   $kind = $co_q->f("companytype_label");
@@ -847,7 +847,7 @@ function html_company_consult($co_q, $cat_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company Form                                                      //
+// Display Company Form
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : company database result 
