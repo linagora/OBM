@@ -276,7 +276,7 @@ CREATE TABLE Deal (
   deal_todo varchar(128),
   deal_visibility int(2) DEFAULT '0',
   deal_soldtime int(8) DEFAULT NULL,
-  deal_state int(1) DEFAULT 0,
+  deal_project_status int(1) DEFAULT 0,
   PRIMARY KEY (deal_id)
 );
 
@@ -396,13 +396,27 @@ CREATE TABLE DocumentEntity (
 CREATE TABLE ProjectStat (
   projectstat_deal_id int(8) NOT NULL,
   projectstat_date timestamp(14) NOT NULL,
-  projectstat_timeupdate timestamp(14) NOT NULL,
   projectstat_timecreate timestamp(14) NOT NULL,
-  projectstat_userupdate int(8) default NULL,
   projectstat_usercreate int(8) default NULL,
   projectstat_useddays int(8) default NULL,
   projectstat_remainingdays int(8) default NULL,
   PRIMARY KEY (projectstat_deal_id, projectstat_date)
+);
+
+--
+-- Table structure for table 'ProjectTask'
+--
+CREATE TABLE ProjectTask (
+  projecttask_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  projecttask_deal_id int(8) NOT NULL,
+  projecttask_timeupdate timestamp(14) NOT NULL,
+  projecttask_timecreate timestamp(14) NOT NULL,
+  projecttask_userupdate int(8) default NULL,
+  projecttask_usercreate int(8) default NULL,
+  projecttask_label varchar(255) default NULL,
+  projecttask_parenttask_id int(8) default 0,
+  projecttask_rank int(8) default NULL,
+  PRIMARY KEY (projecttask_id)
 );
 
 --
