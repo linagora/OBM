@@ -1214,7 +1214,6 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   if (isset($contact["add_comment"])) { $add_comment = stripslashes($contact["add_comment"]); }
   if (isset($contact["usercomment"])) { $usercomment = $contact["usercomment"]; }
   if (isset($contact["datecomment"])) { $datecomment = $contact["datecomment"]; }
-  if (isset($company["cat"])) { $compcat = $company["cat"]; }  
   if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
   if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
   if (isset($contact["priv"])) { $priv = stripslashes($contact["priv"]); }

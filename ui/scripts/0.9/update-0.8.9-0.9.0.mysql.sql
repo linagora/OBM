@@ -14,12 +14,12 @@ UPDATE ObmInfo set obminfo_value='0.9.0' where obminfo_name='db_version';
 -------------------------------------------------------------------------------
 -- Global Preferences update
 -------------------------------------------------------------------------------
-DROP TABLE GlobalPref;
+DROP TABLE IF EXISTS GlobalPref;
 
 -------------------------------------------------------------------------------
 -- RepeatKind table drop 
 -------------------------------------------------------------------------------
-DROP TABLE RepeatKind;
+DROP TABLE IF EXISTS RepeatKind;
 
 -------------------------------------------------------------------------------
 -- Update Contract tables
