@@ -11,10 +11,10 @@
 $l_find = "Find";
 $l_back = "Back";
 $l_cancel = "Cancel";
-$l_validate = "Validate";
 $l_close = "Close the window";
 $l_validate = "Validate";
 $l_execute = "Execute action";
+$l_confirm = "Confirm";
 
 // Common messages
 $l_yes = "Yes";

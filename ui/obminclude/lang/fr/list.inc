@@ -53,7 +53,7 @@ $l_delete_ok = "La suppression de la liste a été correctement effectuée.";
 $l_delete_error = "La suppression de la liste a échoué !";
 $l_name_list_nomatch = "Le nom de la liste n'est pas valide" ;
 $l_check_samelist = "Ces listes sembles similaires à la nouvelle !" ;
-$l_list_exists = "Désolé mais cette liste existe déjà";
+$l_list_exists = "Cette liste existe déjà !";
 $l_j_check_email = "L'adresse e-mail n'est pas valide !";
 $l_warn_delete = "contacts enregistrés dans cette liste";
 

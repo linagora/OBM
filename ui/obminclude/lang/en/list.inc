@@ -55,7 +55,7 @@ $l_fill_name = "You have to fill the list name";
 $l_name_list_nomatch = "List name is not valid";
 $l_list_exists = "Sorry but this list already exists";
 $l_check_samelist = "These lists seem similar to this new entry !";
-$l_j_check_email = "The email adress is not valid.";
+$l_j_check_email = "The email address is not valid.";
 $l_warn_delete = "registered contacts in this list";
 
 $l_no_display = "Fill the search fields and press < Find > to retrieve the lists";

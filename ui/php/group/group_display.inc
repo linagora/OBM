@@ -602,12 +602,12 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
 // Display warning before a group deletion                                   //
 // We ask confirmation or cancel
 // Parameters:
-//   - $l_id : group id
+//   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_warn_delete($l_id) {
+function dis_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back;
 
-  $nb_u = get_group_nb_user($l_id);
+  $nb_u = get_group_nb_user($id);
   $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
 
   $block = "
@@ -616,7 +616,7 @@ function dis_warn_delete($l_id) {
       <form method=\"get\" name=\"form_delete\"
       action=\"" .url_prepare("group_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input type=\"hidden\" name=\"hd_group_id\" value=\"$l_id\" />
+      <input type=\"hidden\" name=\"hd_group_id\" value=\"$id\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
       </form>
     </p>
@@ -624,7 +624,7 @@ function dis_warn_delete($l_id) {
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("group_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_group\" value=\"$l_id\" />
+      <input type=\"hidden\" name=\"param_group\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
     </p>
@@ -639,12 +639,12 @@ function dis_warn_delete($l_id) {
 // Display the context about a group insertion or update                     //
 // When similar groups exist we show these and ask confirmation
 // Parameters:
-//   - $l_id     : group id
-//   - $l_q      : group database result (at least 1 row)
-//   - $group[]   : values for insertion/update (if confirmation)
+//   - $id       : group id
+//   - $g_q      : group database result (at least 1 row)
+//   - $group[]  : values for insertion/update (if confirmation)
 //     keys used : name, desc
 /////////////////////////////////////////////////////////////////////////////
-function dis_group_warn_insert($l_id, $l_q, $group) {
+function dis_group_warn_insert($id, $g_q, $group) {
   global $display, $l_check_samegroup, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
@@ -653,10 +653,10 @@ function dis_group_warn_insert($l_id, $l_q, $group) {
 
   $display["msg"] .= display_warn_msg($l_check_samegroup)
 ;
-  while ($l_q->next_record()) {
-    $id = $l_q->f("group_id");
-    $samename = $l_q->f("group_name");
-    $samedesc = $l_q->f("group_desc");
+  while ($g_q->next_record()) {
+    $id = $g_q->f("group_id");
+    $samename = $g_q->f("group_name");
+    $samedesc = $g_q->f("group_desc");
     $dis_same_group .= "
       <tr><td class=\"detailLabel\">
         <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;param_group=$id") . "\">$samename ($samedesc)</a>

@@ -447,13 +447,13 @@ function run_query_group_group($group_id, $new_order="", $order_dir="", $entity=
 ///////////////////////////////////////////////////////////////////////////////
 // Return the number of registered user in the group specified
 // Parameters:
-//   - $l_id : group id
+//   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
-function get_group_nb_user($l_id) {
+function get_group_nb_user($id) {
   global $cdg_sql;
 
   $query = "select count(*) from UserObmGroup
-    where userobmgroup_groupid='$l_id'";
+    where userobmgroup_groupid='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -468,11 +468,11 @@ function get_group_nb_user($l_id) {
 // Return the groups which matches the name or the desc
 // except the one given (update mode)
 // Parameters:
-//   - $l_id    : group id
-//   - $name    : group name
+//   - $id   : group id
+//   - $name : group name
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_check_group($l_id, $name, $desc) {
+function run_query_check_group($id, $name, $desc) {
   global $cdg_sql;
 
   // If name is short, we test equality, else similarity
@@ -494,7 +494,7 @@ function run_query_check_group($l_id, $name, $desc) {
 
   $query = "select distinct group_id, group_name, group_desc
      from UGroup
-     where group_id!='$l_id'
+     where group_id!='$id'
        and ($wname $wdesc)";
 
   display_debug_msg($query, $cdg_sql);
@@ -508,34 +508,34 @@ function run_query_check_group($l_id, $name, $desc) {
 ///////////////////////////////////////////////////////////////////////////////
 // Group context checking (same groups exists ?)
 // Parameters:
-//   - $l_id     : group id
-//   - $group[]   : group values
+//   - $id       : group id
+//   - $group[]  : group values
 //     keys used : name, desc, email
 // Returns:
 //   - Group Database object with group of similar groups
 ///////////////////////////////////////////////////////////////////////////////
-function check_group_context($l_id, $group) {
+function check_group_context($id, $group) {
   global $cdg_sql;
 
   $name = $group["name"];
   $desc = $group["desc"];
 
   // return the groups with same name or desc
-  $l_q = run_query_check_group($l_id, $name, $desc);
+  $q_q = run_query_check_group($id, $name, $desc);
 
-  return $l_q;
+  return $q_q;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Group Form Data checking and formatting
 // Parameters:
-//   - $l_id     : group id  (empty on insertion)
-//   - $group[]   : values checked
+//   - $id       : group id  (empty on insertion)
+//   - $group[]  : values checked
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($l_id, $group) {
-  global $php_regexp_email_name, $l_fill_name, $l_email_exist;
+function check_data_form($id, $group) {
+  global $php_regexp_email_name, $l_fill_name, $l_group_exists, $l_email_exist;
   global $err_msg, $l_j_check_email;
 
   $id = $group["id"];
@@ -549,6 +549,12 @@ function check_data_form($l_id, $group) {
     return false;
   }
 
+  // MANDATORY: List name unique
+  if (get_list_name_exists($name, $id)) {
+    $err_msg = "$l_group_exists ($name)";
+    return false;
+  }
+
   // Group email
   if (($email != "") && (! preg_match($php_regexp_email_name, $email))) {
     $err_msg = " $email : $l_j_check_email";
@@ -557,7 +563,7 @@ function check_data_form($l_id, $group) {
 
   // If email not empty, must not already exists
   if ($email != "") {
-    $mails = get_email_used("", $id);
+    //    $mails = get_email_used("", $id);
 
     // Email address not already used
     if (array_key_exists($email, $mails)) {

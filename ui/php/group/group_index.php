@@ -114,7 +114,7 @@ else if ($action == "new") {
   if ($perm->have_perm("editor")) {
     $display["detail"] = html_group_form($action, "", $group);
   } else {
-    $display["msg"] .= display_err_msg($l_error_authentification);
+    $display["msg"] .= display_err_msg($l_error_permission);
   }
 }
 

@@ -69,6 +69,33 @@ function display_page(&$display) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display: HTML Head
+///////////////////////////////////////////////////////////////////////////////
+function display_head($p_module) { 
+  global $l_title, $set_theme, $obminclude, $extra_css;
+
+  if (isset($extra_css))
+    $dis_extra_css = "<link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/$extra_css\" />";
+
+  $headers_e = "
+   <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+   <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
+  $headers_et = "<html>";
+
+  return "
+    $headers_e
+    <head>
+     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-15\" />
+     <title>$l_title - $p_module</title>
+     <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
+     $dis_extra_css
+    </head>
+    <body>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Fonction which perform the menu
 // Parametres:
 //   - $tab  : active tab 
@@ -477,4 +504,54 @@ function display_last_visited($path="..") {
   </div>";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: end of an HTML page
+///////////////////////////////////////////////////////////////////////////////
+function display_end() { 
+  return "
+    </body>
+    </html>
+";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Page title
+///////////////////////////////////////////////////////////////////////////////
+function display_title($title) { 
+  return "<div class=\"title\">$title</div>";
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Display an error message
+/////////////////////////////////////////////////////////////////////////////
+function display_err_msg($msg) {
+  return "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Display a warning message
+/////////////////////////////////////////////////////////////////////////////
+function display_warn_msg($msg) {
+  return "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
+}
+
+
+////////////////////////////////////////////////////////////////////////////
+// Display an OK message
+////////////////////////////////////////////////////////////////////////////
+function display_ok_msg($msg) {
+  //  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
+  return "<p class=\"messageOk\">$msg</p>";
+}
+
+////////////////////////////////////////////////////////////////////////////
+// Display an Info message
+////////////////////////////////////////////////////////////////////////////
+function display_info_msg($msg) {
+  return "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
 }

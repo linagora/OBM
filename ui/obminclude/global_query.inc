@@ -537,12 +537,12 @@ function run_query_global_parentdeal_label($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list name from the list Id
 // Parameters:
-//   - $l_id : list id 
+//   - $id : list id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_list_name($l_id) {
+function run_query_global_list_name($id) {
   global $cdg_sql;
   
-  $query = "select list_name from List where list_id='$l_id'";
+  $query = "select list_name from List where list_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
