@@ -1,14 +1,9 @@
 -- ////////////////////////////////////////////////////////////////////////////
 -- // Update OBM Database from 0.7.0 to 0.7.1                                //
 -- ////////////////////////////////////////////////////////////////////////////
--- // $Id
+-- // $Id$
 -- ////////////////////////////////////////////////////////////////////////////
 
--------------------------------------------------------------------------------
--- Contact
--------------------------------------------------------------------------------
--- Add new column : contact_address3
---ALTER TABLE Contact ADD contact_address3 varchar(50) AFTER contact_address2;
 
 -------------------------------------------------------------------------------
 -- Todo
@@ -29,18 +24,11 @@ CREATE TABLE Todo (
   PRIMARY KEY (todo_id)
 );
 
--------------------------------------------------------------------------------
--- ProjectStat
--------------------------------------------------------------------------------
--- add missing lines
---ALTER TABLE ProjectStat ADD projectstat_timeupdate timestamp(14) AFTER projectstat_date;
 
 -------------------------------------------------------------------------------
 -- Document
 -------------------------------------------------------------------------------
 ALTER TABLE Document ADD document_kind int(2) AFTER document_name;
-=======
---ALTER TABLE ProjectStat ADD projectstat_userupdate int(8) AFTER projectstat_usercreate;
 
 
 -------------------------------------------------------------------------------
@@ -49,3 +37,10 @@ ALTER TABLE Document ADD document_kind int(2) AFTER document_name;
 -- CSV Export separator
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_csv_sep',';');
 
+
+-------------------------------------------------------------------------------
+-- ProjectStat
+-------------------------------------------------------------------------------
+-- add missing lines (only from update-0.6.6-0.7.0 and not create)
+ALTER TABLE ProjectStat ADD projectstat_timeupdate timestamp(14) AFTER projectstat_date;
+ALTER TABLE ProjectStat ADD projectstat_userupdate int(8) AFTER projectstat_usercreate;
