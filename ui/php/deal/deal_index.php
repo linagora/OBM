@@ -573,7 +573,6 @@ function get_param_deal() {
 
   if (isset ($http_obm_vars)) {
     $nb_d = 0;
-    $nb_deal = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
 	$nb_d++;
@@ -770,7 +769,6 @@ function get_deal_action() {
 
   // Document add
   $actions["DEAL"]["document_add"] = array (
-    'Url'      => "$path/deal/deal_index.php?action=document_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None')

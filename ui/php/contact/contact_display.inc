@@ -808,7 +808,7 @@ function html_contact_header($co_q) {
 function html_contact_links($id) {
   global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
   global $l_header_document,$l_contact;
-  global $l_document_new,$l_document_add,$l_add_document;
+  global $l_document_new,$l_document_add;
   global $l_subscription_new, $l_subscription, $l_subscription_list;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
@@ -816,7 +816,7 @@ function html_contact_links($id) {
   if ($cgp_show["module"]["document"]) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=contact");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=contact");
-    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
     $nb_document = run_query_document_nb ($id, "contact");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>

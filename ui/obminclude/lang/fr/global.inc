@@ -232,7 +232,7 @@ $l_header_globalview = "Validation";
 
 //document headers
 $l_document_new = "Nouveau document";
-$l_document_add = "Affecter un document";
+$l_document_add = "Lier des documents";
 
 ////////////////////////////////////////////////////////
 ////// Theme 'Yours' lang files ////////////////////////

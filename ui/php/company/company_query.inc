@@ -505,7 +505,7 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  run_query_delete_document($p_id,"Company");
+  run_query_delete_document_links($p_id, "company");
 
   $query = "delete from CompanyCategoryLink
     where companycategorylink_company_id='$p_id'";

@@ -193,7 +193,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
   global $l_all, $l_find, $l_fuzzy, $l_datasource, $l_nafcode, $l_category;
-  global $display, $c_all, $cgp_hide;
+  global $display, $c_all, $cgp_hide, $l_select_company;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -325,7 +325,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
     $ext_action = $company["ext_action"];
     $ext_url = $company["ext_url"];
     $ext_id = $company["ext_id"];
-    $ext_title = $company["ext_title"];
+    $ext_title = ($company["ext_title"] ? $company["ext_title"] : $l_select_company);
     $ext_target = $company["ext_target"];
     $ext_widget = $company["ext_widget"];
     $ext_widget_text = $company["ext_widget_text"];
@@ -547,7 +547,7 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["document"]) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=company");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=company");
-    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
     $nb_document = run_query_document_nb ($id, "company");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>

@@ -22,6 +22,7 @@ $fieldnames["documentcategory1_label"] = $l_category1;
 $fieldnames["documentcategory2_label"] = $l_category2;
 $fieldnames["documentmimetype_label"] = $l_mimetype;
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Document specific dataset fields                                  //
 // Parameters:
@@ -51,8 +52,8 @@ function dis_data_document(&$OD, $fieldname, $link_ok) {
 //     keys used  : archive, name, cat1, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
-  global $l_title, $l_category1, $l_mimetype,$l_name;
-  global $l_all, $l_find, $l_author, $l_category2; 
+  global $display, $l_title, $l_category1, $l_mimetype,$l_name;
+  global $l_all, $l_find, $l_author, $l_category2, $l_document_add; 
   global $c_all;
 
   $title = stripslashes($document["title"]);
@@ -62,9 +63,10 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
   $mime = $document["mime"];
   $name = stripslashes($document["filename"]);
   $popup = $document["popup"];
+
   if ($popup) {
     $ext_action = $document["ext_action"];
-    $ext_title = $document["ext_title"];
+    $ext_title = ($document["ext_title"] ? $document["ext_title"] : $l_document_add);
     $ext_url = $document["ext_url"];
     $ext_id = $document["ext_id"];
     $ext_target = $document["ext_target"];
@@ -73,7 +75,7 @@ function html_document_search_form ($cat1_q, $cat2_q,$mime_q, $document) {
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-    $display["msg"] .= display_info_msg($ext_title);
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
   }
   
   // category 1 select

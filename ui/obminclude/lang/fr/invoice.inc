@@ -89,6 +89,14 @@ $l_link_payment_no = "La facture n'est liée à aucun paiment";
 $l_cant_delete = "La facture ne peut être supprimée !";
 $l_can_delete = "La facture peut être supprimée.";
 
+$l_fill_label = "Le label doit être renseigné !";
+$l_fill_number = "Le numéro doit être renseigné !";
+$l_fill_company = "La société doit être renseignée !";
+$l_fill_date = "La date doit être renseignée !";
+$l_fill_inout = "Le type doit être sélectionné : $l_client ou $l_supplier !";
+$l_fill_amount = "Les montants doivent être correctement renseignés !";
+$l_error_number_exist = "Ce numéro de facture est déjà attribué !";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";
 $l_check_money_ht = "\\n Le montant HT de la Facture est incorrect !";

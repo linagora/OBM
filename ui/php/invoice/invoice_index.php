@@ -72,14 +72,22 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_insert($invoice);
-  $display["msg"] .= display_ok_msg($l_insert_ok);
   require("invoice_js.inc");
-  $display["search"] = dis_invoice_search_form($invoice); 
+  if (check_invoice_data_form("", $invoice)) {
+    $retour = run_query_insert($invoice);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_insert_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_insert_error);
+    }
+    $display["search"] = dis_invoice_search_form($invoice);
+  } else {
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["detail"] = dis_invoice_form($action, $invoice);
+  }
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
   $display["detail"] = dis_invoice_consult($invoice);
 
 } elseif ($action == "detailupdate")  { 
@@ -89,10 +97,19 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_update($invoice); 
-  $display["msg"] .= display_ok_msg($l_update_ok); 
   require("invoice_js.inc"); 
-  $display["search"] = dis_invoice_search_form($invoice); 
+  if (check_invoice_data_form($invoice["id"], $invoice)) {
+    $retour = run_query_update($invoice); 
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_update_ok); 
+    } else {
+      $display["msg"] .= display_ok_msg($l_update_error); 
+    }
+    $display["detail"] = dis_invoice_consult($invoice);
+  } else {
+    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
+    $display["search"] = dis_invoice_search_form($invoice); 
+  }
 
 } elseif ($action == "updatearchive")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -116,19 +133,17 @@ if ($action == "index" || $action == "") {
   require("invoice_js.inc");
   $display["detail"] = dis_check_invoice_links($invoice["id"]);
 
-} elseif ($action == "delete")  { // delete means delete an invoice 
+} elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  // are there any payments (paid) connected to this invoice ?
-  $payments_connected = run_query_invoice_payment($invoice["id"], -1);
-  // if yes, we delete all associations
-  if ($payments_connected->nf() == 0) {
-    run_query_delete($invoice["id"]); 
+  $retour = run_query_invoice_delete($invoice["id"]); 
+  if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
+    require ("invoice_js.inc");
+    $display["search"] = dis_invoice_search_form($invoice);
   } else {
-    $display["msg"] .= display_err_msg ($l_delete_error."<br>".$l_payments_exist);
+    $display["msg"] .= display_err_msg ($l_delete_error);
+    $display["detail"] = dis_invoice_consult($invoice);
   }
-  require ("invoice_js.inc");
-  $display["search"] = dis_invoice_search_form($invoice);
 
 } elseif ($action == "duplicate") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -136,6 +151,16 @@ if ($action == "index" || $action == "") {
   require("invoice_js.inc"); 
   $display["detail"] = dis_invoice_form($action, $invoice);
   
+} elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($invoice["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($invoice, "invoice");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  $display["detail"] = dis_invoice_consult($invoice);
+
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "invoice", 1);
@@ -176,7 +201,10 @@ function get_param_invoice() {
   global $param_company, $company_name, $company_new_name, $company_new_id;
   global $param_deal, $deal_label, $deal_new_label, $deal_new_id;
   global $param_project, $project_name, $project_new_name, $project_new_id;
+  global $ext_id;
   global $set_debug, $cdg_param, $action;
+
+  get_global_param_document($invoice);
 
   if (isset ($param_invoice)) $invoice["id"] = $param_invoice;
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
@@ -213,6 +241,9 @@ function get_param_invoice() {
   if (isset ($project_name)) $invoice["project_name"] = $project_name;
   if (isset ($project_new_name)) $invoice["proj_new_name"] = $project_new_name;
   if (isset ($project_new_id)) $invoice["proj_new_id"] = $project_new_id;
+
+  // External parameters
+  if (isset ($ext_id)) $invoice["id"] = $ext_id;
 
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
     echo "<br />action = $action";
@@ -272,7 +303,7 @@ function get_invoice_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailupdate', 'duplicate') 
                                    );
 
 // Duplicate
@@ -341,6 +372,12 @@ function get_invoice_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
+
+// Document add
+  $actions["INVOICE"]["document_add"] = array (
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+  );     
 
 }
 

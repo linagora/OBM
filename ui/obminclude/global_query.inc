@@ -526,19 +526,32 @@ function run_query_document_nb ($id,$entity) {
 ///////////////////////////////////////////////////////////////////////////////
 // query execution : Delete document linked with a entity
 // Parameters:
-//   - $id  :  Id of entity
-//   - $entity  :  Type of entity (deal, company..)
+//   - $id     : entity Id
+//   - $entity : Type of entity (deal, company..)
+//   - $doc_id : [optionnal] document Id
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete_document($id,$entity) {
+function run_query_delete_document_links($ent_id, $entity, $doc_id="") {
   global $cdg_sql;
 
-  $query = "Delete from DocumentEntity where documententity_entity = '$entity'
-            and documententity_entity_id = '$id'"; 
+  $where = "1=1";
+
+  if ($ent_id != "") {
+    $where .= " and documententity_entity_id = '$ent_id'";
+  }
+  if ($entity != "") {
+    $where .= " and documententity_entity = '$entity'";
+  }
+  if ($doc_id != "") {
+    $where .= " and documententity_document_id = '$doc_id'";
+  }
+
+  $query = "Delete from DocumentEntity where $where";
+
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
 }
 
 

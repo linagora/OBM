@@ -224,12 +224,14 @@ function run_query_insert($invoice) {
      '$status',
      '$comment',
      '$date',
-     '$inout'
+     '$inout',
      '$arch')"; 
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $ret = $obm_q->query($query);
+
+  return $ret;
 }
 
 
@@ -409,17 +411,24 @@ function run_query_update_updater ($auth, $param_invoice){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete query construction                                                 //
+// Invoice Deletion query execution
+// Parameters:
+//   - $p_id : invoice id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_invoice_id) {
+function run_query_invoice_delete($p_id) {
   global $cdg_sql;
-  
-  $connect_db=new DB_OBM;
-  // suppression des asso avec des deals :
-  run_query_remove_deal ($p_invoice_id);
-  $query = "delete from Invoice where invoice_id='$p_invoice_id'";
+
+  $query = "delete from Invoice where invoice_id='$p_id'";
+
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  if ($retour) {
+    run_query_delete_document_links($p_id, "invoice");    
+  }
+
+  return $retour;
 }
 
 
@@ -444,39 +453,6 @@ function run_query_invoice_payment_links($p_id) {
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-// get all details about a payment
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail_payment ($p_payment_id) {
-  global $cdg_sql;
-
-  $db = new DB_OBM;
-  $query = "select *, paymentkind_longlabel from Payment,PaymentKind where payment_paymentkind_id = paymentkind_id and payment_id='$p_payment_id'";
-  // FIXME : besoin du compte aussi ?
-  display_debug_msg($query, $cdg_sql);
-  $db->query($query);
-
-  return $db;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// returns the details about invoices connected to a particular payment
-///////////////////////////////////////////////////////////////////////////////
-function run_query_search_invoice_payment ($p_payment_id) {
-  global $cdg_sql;
-
-  $db = new DB_OBM;
-  $query = "select * from Invoice, PaymentInvoice
-      where paymentinvoice_invoice_id=invoice_id
-        and paymentinvoice_payment_id='$p_payment_id'";
-  display_debug_msg($query, $cdg_sql);
-  $db->query($query);
-  return  $db;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // returns the value of the inout attribute of the given deal
 ///////////////////////////////////////////////////////////////////////////////
@@ -492,6 +468,113 @@ function run_query_deal_get_inout ($p_deal_id) {
   $obm_q->query($query);
   $obm_q->next_record();
   return $obm_q->f("dealtype_inout");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if an invoice number is already used
+// Parameters:
+//   - $number : invoice number to check
+//   - $id     : invoice id to exclude
+// Returns: $nb used
+///////////////////////////////////////////////////////////////////////////////
+function get_invoice_nb_having_number ($number, $id="") {
+  global $cdg_sql;
+
+  if ($id != "") {
+    $where_id = "and invoice_id != '$id'";
+  }
+
+  $query = "select invoice_id from Invoice
+      where invoice_number = '$number'
+        $where_id";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $nb = $obm_q->num_rows();
+
+  return $nb;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Invoice Form Data checking and formatting
+// Parameters:
+//   - $id        : invoice id  (empty on insertion)
+//   - $invoice[] : values checked
+//     keys used  : label, number, inout, company_id, comp_new_id
+///////////////////////////////////////////////////////////////////////////////
+function check_invoice_data_form($id, $invoice) {
+  global $php_regexp_isodate;
+  global $l_fill_label, $l_fill_company, $l_fill_number, $l_error_number_exist;
+  global $l_fill_inout, $l_fill_amount, $l_fill_date, $l_date, $l_invalid_date;
+  global $err_msg, $l_exist_error;
+
+  $label = $invoice["label"];
+  $number = $invoice["number"];
+  $date = $invoice["date"];
+  $inout = $invoice["inout"];
+  $ht = $invoice["ht"];
+  $ttc = $invoice["ttc"];
+  $c_id = $invoice["company_id"];
+  $c_new_id = $invoice["comp_new_id"];
+
+  // MANDATORY: Invoice label
+  if (trim($label) == "") {
+    $err_msg = $l_fill_label;
+    return false;
+  }
+
+  // MANDATORY: Invoice inout must be set
+  if (($inout != "+") && ($inout != "-")) {
+    $err_msg = $l_fill_inout;
+    return false;
+  }
+
+  // Date check
+  if ($date == "") {
+    $err_msg = $l_fill_date;
+    return false;
+  } else if (preg_match($php_regexp_isodate, $date) == 0) {
+    $err_msg = "$l_date : $l_invalid_date"; 
+    return false;
+  }
+
+  // MANDATORY: Invoice date must be set
+  if (($inout != "+") && ($inout != "-")) {
+    $err_msg = $l_fill_inout;
+    return false;
+  }
+
+  // MANDATORY: a company must be set
+  if (($c_id < 1) && ($c_new_id < 1)) {
+    $err_msg = $l_fill_company;
+    return false;
+  }
+
+  // MANDATORY: Amount must be set
+  if ( !($ht > 0) || !($ttc > 0)) {
+    $err_msg = $l_fill_amount;
+    return false;
+  }
+
+  // XXXXX MANDATORY: Invoice number, if state not "to be created"
+  if (true) {
+    if (trim($number) == "") {
+      $err_msg = $l_fill_number;
+      return false;
+    } else {
+      $nb = get_invoice_nb_having_number($number, $id);
+      if ($nb > 0) {
+	$err_msg = $l_error_number_exist;
+	return false;
+      }
+    }
+  }
+
+
+  return true;
 }
 
 

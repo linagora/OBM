@@ -512,6 +512,9 @@ function run_query_delete($p_id) {
   } else {
     $obm_q = new DB_OBM;
 
+    // Delete all links to documents
+    run_query_delete_document_links($p_id, "project");
+
     // Delete all users associations to the project
     $query = "delete from ProjectUser where projectuser_project_id='$p_id'";
     display_debug_msg($query, $cdg_sql);

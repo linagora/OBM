@@ -230,7 +230,7 @@ $l_header_globalview = "Validation";
 
 //document headers
 $l_document_new = "New document";
-$l_document_add = "Affect a document";
+$l_document_add = "Link some documents";
 
 //Portal labels
 $l_waiting_events = "Waiting event(s)";

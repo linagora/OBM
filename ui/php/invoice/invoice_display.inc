@@ -358,6 +358,7 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
 
   $i_id = $inv_q->f('invoice_id');
 
+  $display["link"] = html_invoice_links($inv_q);
   $block = dis_invoice_detail ($inv_q);
   
   //  payments data :
@@ -383,6 +384,55 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
     
     $block .= $dis_payment->display("dis_data_invoice");
   }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Invoice links menu
+// Parameters:
+//   - $p_q : invoice database result 
+// Returns:
+//   $r : string with XHTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_invoice_links($inv_q) {
+  global $set_theme, $ico_document, $ico_document_new;
+  global $l_invoice, $l_new, $l_header_document;
+  global $l_document_add;
+  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+
+  $id = $inv_q->f("invoice_id");
+  $name = $inv_q->f("invoice_label");
+
+  $uname = urlencode($name);
+
+  // Document
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=invoice");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=invoice");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/invoice/invoice_index.php")."&amp;ext_id=$id&amp;ext_target=$l_invoice";
+    $nb_document = run_query_document_nb ($id, "invoice");
+    $block_doc = "
+  <div class=\"linkTitle\">:: $l_header_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_new</a></li>
+    <li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_invoice'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>";
+  }
+
+  // Links Template  
+  $block = "
+<div class=\"link\"> 
+  $block_doc
+</div>";
 
   return $block;
 }
@@ -527,12 +577,12 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   global $default_tax, $l_tax_rate, $l_compute_tax; 
 
   // if update mode and first time values are taken from database
-  if ($action == "detailupdate") {
+  if (($action == "detailupdate") || ($action == "duplicate")) {
     $id = $inv_q->f("invoice_id");
     $label = $inv_q->f("invoice_label");
     $number = $inv_q->f("invoice_number");
     $comment = $inv_q->f("invoice_comment");
-    $invoice_status = $inv_q->f("invoice_status_id");
+    $status = $inv_q->f("invoice_status_id");
     $date = $inv_q->f("invoice_date");
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
@@ -548,8 +598,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   } elseif ($action == "new") {
     $number = date ($default_invoice_numbering);
     // when creating from a deal, default to use same "inout" as the dealtype
-    if ($p_deal_linked != "") {
-      $inout = run_query_deal_get_inout ($p_deal_linked);
+    if ($d_id >= 1) {
+      $inout = run_query_deal_get_inout ($d_id);
     }
   }
 
@@ -566,6 +616,14 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   if (isset($invoice["comp_new_id"])) { $c_new_id = $invoice["comp_new_id"]; }
   if (isset($invoice["comp_new_name"])) { $c_new_name = $invoice["comp_new_name"]; }
   if (isset($invoice["id"])) { $id = $invoice["id"]; }
+  if (isset($invoice["label"])) { $label = $invoice["label"]; }
+  if (isset($invoice["number"])) { $number = $invoice["number"]; }
+  if (isset($invoice["date"])) { $date = $invoice["date"]; }
+  if (isset($invoice["status"])) { $status = $invoice["status"]; }
+  if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
+  if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
+  if (isset($invoice["ttc"])) { $ttc = $invoice["ttc"]; }
+  if (isset($invoice["comment"])) { $comment = $invoice["comment"]; }
 
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
@@ -588,28 +646,25 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   $inout_s = ($inout == "-") ? "checked" : "";
 
   $dis_inout = "
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailForm\">
-       $l_client <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c />
-       $l_supplier <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s />
+    <td class=\"detailLabel\">$l_inout</td>
+    <td class=\"detailForm\">
+      <input type=\"radio\" name=\"rd_inout\" value=\"+\" $inout_c /> $l_client
+      <input type=\"radio\" name=\"rd_inout\" value=\"-\" $inout_s /> $l_supplier
       </td>";
 
   // Buttons
   if (($action == "update") || ($action == "detailupdate")) {
     $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\"/>
     <input type=\"hidden\" name=\"param_invoice\" value=\"$id\" />
-    <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">"; 
+    <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">
+    <input type=\"submit\" value=\"$l_update\"
+       onClick=\"if (check_invoice(this.form)) return true; else return false;\" />";
+  } elseif (($action == "new") || ($action == "insert")
+            || ($action == "duplicate")) {
     $dis_button .= "
-      <input type=\"submit\" value=\"$l_update\"
-        onClick=\"if (check_invoice (this.form)) return true; else return false;\" />";
-  } elseif ($action == "new" || $action == "insert"){
-    $dis_button .= "
-      <input type=\"submit\" value=\"$l_insert\" 
-        onClick=\"if(check_invoice(this.form)) return true ; else return false;\" />";
-    $dis_button .="
-      <input type=\"hidden\" name=\"action\" value=\"insert\" />";
-    $dis_button .= "
-      <input type=\"hidden\" name=\"hd_param_deal\" value=\"$p_deal_linked\">";
+    <input type=\"submit\" value=\"$l_insert\" 
+      onClick=\"if(check_invoice(this.form)) return true ; else return false;\" />
+    <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
   $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
@@ -787,7 +842,6 @@ function dis_check_invoice_links($p_id) {
 function dis_invoice_delete_form($p_id) {
   global $l_delete;
 
-  // --- HTML Template --------------------------------------------------------
   return "
     <form name=\"form_delete\" method=\"post\" action=\"" . url_prepare("invoice_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />

@@ -236,4 +236,4 @@ $l_header_globalview = "Validación";
 
 //document headers
 $l_document_new = "Nuevo documento";
-$l_document_add = "Adicionar un documento";
+$l_document_add = "Adicionar documentos";

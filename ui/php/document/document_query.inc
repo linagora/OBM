@@ -470,17 +470,21 @@ function run_query_delete($p_id) {
   if (islink($name)) {
     $truename = $link_to.$obm_q->f("document_title");
   }  
-  $query = "select count(*) as link from Document where document_path =
-           '$path' and document_name ='$name'";
+  $query = "select count(*) as link from Document
+    where document_path = '$path'
+      and document_name ='$name'";
   $obm_q->query($query);
   $obm_q->next_record();
-  if($truename != "") {
+  if ($truename != "") {
     $name = $truename;
   }
-  if($obm_q->f("link") == 1) {
+  if ($obm_q->f("link") == 1) {
     run_query_delete_file($path,$name);
- 
   }
+
+  // Delete all links to documents
+  run_query_delete_document_links("", "", $p_id);
+
   $query = "delete from Document where document_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -497,7 +501,7 @@ function run_query_delete($p_id) {
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_mime($document){
+function run_query_get_mime($document) {
   global $default_mime;
 
   $path = $document["path"];

@@ -21,22 +21,20 @@ $extra_js .= "
 function check_search_form(f_inv){
   j_ht=f_inv.tf_amount_ht.value;
   j_ttc=f_inv.tf_amount_ttc.value;
-  j_date_apres=f_inv.tf_date_after.value;
-  j_date_avant=f_inv.tf_date_before.value;
 
   if (trim(f_inv.tf_date_after.value) != \"\") {
     if (check_date(f_inv.tf_date_after,\"".$l_date_apres."\")==false) {
-      //alert(\"$l_invalid_date\");
+      alert(\"$l_invalid_date\");
       return false;
     }
   }
   if (trim(f_inv.tf_date_before.value) != \"\") {
     if (check_date(f_inv.tf_date_before,\"".$l_date_avant."\")==false) {
-     //alert(\"$l_invalid_date\");
+     alert(\"$l_invalid_date\");
      return false;
     }
   }
-  if ((j_ht!=\"\")&& check_money(j_ht)==null){
+  if ((j_ht != \"\") && check_money(j_ht)==null){
     alert(\"$l_check_money_ht\");
     return false;
   }
@@ -45,12 +43,10 @@ function check_search_form(f_inv){
     return false;
   }
   if ((j_ht!=\"\")&&(j_ttc!=\"\")) {
-    var ht = j_ht.value;
-    var ttc = j_ttc.value;
-    if (j_ht.value>j_ttc.value) {
-     alert(\"$l_check_amounts\");
+    if (j_ht>j_ttc) {
+      alert(\"$l_check_amounts\");
+      return false;
     }
-    return false;
   }
 
   return true;
@@ -62,27 +58,26 @@ function check_invoice(f_inv) {
   var j_ttc=f_inv.tf_amount_ttc.value;
   j_number=f_inv.tf_number.value;
   j_status=f_inv.sel_status.value;
-  j_date=f_inv.tf_date.value;
-  j_nb_deals = f_inv.hd_nb_deals.value;
+
   if (f_inv.tf_label.value==\"\"){
    alert(\"$l_fill_label\");
    return false;
   }
   
-  if (check_date(f_inv.tf_date,\"".$l_date."\")==false) {
-   //alert(\"$l_invalid_date\");
-   return false;
+  if (check_date(f_inv.tf_date, \"$l_date\") == false) {
+    return false;
   }
 
-  if ((j_ht!=\"\")&& check_money(j_ht)==null){
+  if ((j_ht != \"\") && check_money(j_ht)==null){
     alert(\"$l_check_money_ht\");
     return false;
   }
-  if ((j_ttc!=\"\")&& check_money(j_ttc)==null){
+  if ((j_ttc!=\"\") && check_money(j_ttc)==null){
     alert(\"$l_check_money_ttc\");
     return false;
   }
-  if ((j_ht!=\"\")&&(j_ttc!=\"\")&&(j_ht!=0)&&(j_ttc!=0)&&(j_ht-j_ttc>0)){
+  if ( (j_ht != \"\") && (j_ttc != \"\") && (j_ht != 0) && (j_ttc !=0 )
+       && (j_ht > j_ttc) ){
     alert(\"$l_check_amounts\");
     return false;
   }
@@ -92,24 +87,6 @@ function check_invoice(f_inv) {
     return false;
   }
 
-  // on ne peut pas changer le inout de la facture si elle
-  // est liée à des deals...
-  if ((j_nb_deals != \"\") && (j_nb_deals > 0)) {
-    j_inout_init = f_inv.hd_rd_inout.value;
-    // on parcours les rd_inout, et on cherche celui
-    // qui est checké
-    var i;
-    for (i=0; f_inv.rd_inout[i].checked != \"1\";i++) {};
-    if (f_inv.rd_inout[i].value != j_inout_init) {
-      alert (\"$l_changing_inout\");
-      return false;
-    }
-  }
-
-  // confirmation d'une création sans numéro de facture :
-  if (j_number==\"\") {
-    return (confirm(\"$l_no_number_confirm\"));
-  }
   return true;
 }
 
@@ -119,8 +96,7 @@ function check_invoice_link(f_inv) {
   var j_ttc=f_inv.tf_amount_ttc.value;
   j_number=f_inv.tf_number.value;
   j_status=f_inv.sel_status.value;
-  j_date=f_inv.tf_date.value;
-  j_nb_deals = f_inv.hd_nb_deals.value;
+
   if (f_inv.tf_label.value==\"\"){
    alert(\"$l_fill_label\");
    return false;

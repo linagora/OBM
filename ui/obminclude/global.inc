@@ -426,10 +426,44 @@ function get_lang() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the document related parameters in the array given
+// Parameters:
+//   - $mod_params
+// Returns:
+//   $lang
+///////////////////////////////////////////////////////////////////////////////
+function get_global_param_document(&$mod_params) {
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
+
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_d = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$mod_params["doc$nb_d"] = $d_num;
+      }
+    }
+    if ($nb_d > 0) {
+      $mod_params["doc_nb"] = $nb_d;
+    }
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Parse and prepare the layout of a comment as a blog
 // Separe comment in section displayed with different colors
 // The secion separator is a line beginning with "nnnn-nn-nn:aa:"
-// Parameters :
+// Parameters:
 //   - $com     : comment text to handle
 //   - $p_order : Comment order (1 = reverse, else chronological)
 //              : if not set, take $set_commentorder pref

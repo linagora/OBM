@@ -459,7 +459,6 @@ function get_param_project() {
     $nb_tsk = 0;
     // Document
     $nb_d = 0;
-    $nb_contact = 0;
 
     while ( list( $key ) = each( $http_obm_vars ) ) {
       // cb_u is likely to be called cb_user
@@ -708,7 +707,6 @@ function get_project_action() {
 
 // Document add
   $actions["PROJECT"]["document_add"] = array (
-    'Url'      => "$path/project/project_index.php?action=document_add",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     

@@ -478,7 +478,6 @@ function get_param_company() {
 
   if (isset ($http_obm_vars)) {
     $nb_d = 0;
-    $nb_comp = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
 	$nb_d++;
@@ -792,7 +791,6 @@ function get_company_action() {
 
 // Document add
   $actions["COMPANY"]["document_add"] = array (
-    'Url'      => "$path/company/company_index.php?action=document_add",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     

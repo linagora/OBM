@@ -421,7 +421,6 @@ function get_param_contact() {
 
   if (isset ($http_obm_vars)) {
     $nb_d = 0;
-    $nb_contact = 0;
     while ( list( $key ) = each( $http_obm_vars ) ) {
       if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
 	$nb_d++;
@@ -597,7 +596,6 @@ function get_contact_action() {
 					
 // Update
   $actions["CONTACT"]["document_add"] = array (
-    'Url'      => "$path/contact/contact_index.php?action=document_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
