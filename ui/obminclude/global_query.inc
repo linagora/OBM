@@ -684,7 +684,7 @@ function get_modules_array() {
 function send_mail($subject,$message,$receivers) {
   global $path,$activate_mail;
   if($activate_mail == 0) {
-    exit;
+    return 0;
   }
   
   $obm_q_send = run_query_get_sender();

@@ -500,7 +500,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=decision",
-    'Right'    => $agenda_write,
+    'Right'    => $agenda_read,
     'Condition'=> array ('None') 
                                          );
 
@@ -527,7 +527,7 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["insert_conflict"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=insert_conflict",
-    'Right'    => $agenda_write,
+    'Right'    => $agenda_read,
     'Condition'=> array ('None') 
                                          );
 
