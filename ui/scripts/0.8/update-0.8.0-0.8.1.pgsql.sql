@@ -6,6 +6,17 @@
 
 
 -------------------------------------------------------------------------------
+-- Table structure for table 'ObmSession'
+-------------------------------------------------------------------------------
+CREATE TABLE ObmSession (
+  obmsession_sid         varchar(32) NOT NULL default '',
+  obmsession_timeupdate  timestamp,
+  obmsession_name        varchar(32) NOT NULL default '',
+  obmsession_data        text,
+  PRIMARY KEY (obmsession_sid, obmsession_name)
+);
+
+-------------------------------------------------------------------------------
 -- Update Active User tables
 -------------------------------------------------------------------------------
 -- Change column : activeuserobm varchar(64)

@@ -289,10 +289,10 @@ display_page($display);
 // returns : $group hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_group() {
-  global $param_group, $cdg_param, $popup, $ext_title;
+  global $param_group, $cdg_param, $popup, $child_res;
   global $new_order, $order_dir, $entity;
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_target;
+  global $action, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   // Group fields
@@ -301,6 +301,8 @@ function get_param_group() {
   if (isset ($tf_desc)) $group["desc"] = trim($tf_desc);
   if (isset ($tf_email)) $group["email"] = $tf_email;
   if (isset ($tf_user)) $group["user"] = trim($tf_user);
+
+  if (isset ($child_res)) $group["children_restriction"] = $child_res;
 
   if (isset ($new_order)) $group["new_order"] = $new_order;
   if (isset ($order_dir)) $group["order_dir"] = $order_dir;
@@ -439,7 +441,7 @@ function get_group_action() {
 // sel group add : Groups selection
   $actions["GROUP"]["sel_group_add"] = array (
     'Name'     => $l_header_add_group,
-    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group",
+    'Url'      => "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_group)."&amp;ext_action=group_add&amp;ext_url=".urlencode($path."/group/group_index.php")."&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group&amp;child_res=1",
     'Right'    => $cright_write,
     'Popup'    => 1,
     'Target'   => $l_group,

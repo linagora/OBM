@@ -16,15 +16,24 @@ Répertoire de configuration spécifique & obminclude/site \\
 \hline
 \end{tabular}
 
-\subsection{Le paramétrage des sections visibles}
+\subsection{Le paramétrage des sections visibles et leur lien}
 
-Le tableau \$cgp\_show[``section''] définit pour chaque section si celle-ci doit être affichée ou non.
-Par défaut toutes les sections sont affichées.
+Le tableau \$cgp\_show[``section''] définit pour chaque section si celle-ci doit être affichée ou non et précise son lien (url) par défaut.
+Par défaut toutes les sections sont affichées et pointent vers le premier module affiché.
+
+\paragraph{La configuration des liens} des sections est disponible depuis OBM 0.8.1.\\
 
 Pour ne pas afficher une section il faut insérer dans le fichier de configuration la ligne :
 
 \begin{verbatim}  
 $cgp_show[``section''][``com''] = false;
+\end{verbatim}  
+\vspace{0.3cm}
+
+Pour modifier l'url par défaut d'une section il faut insérer dans le fichier de configuration la ligne (pour faire pointer la section Production vers le module Document) :
+
+\begin{verbatim}  
+$cgp_show[``section''][``prod''] = ``$path/document/document_index.php'';
 \end{verbatim}  
 \vspace{0.3cm}
 

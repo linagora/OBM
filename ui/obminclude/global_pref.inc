@@ -142,33 +142,33 @@ $c_export_format[3]["icon"] = $ico_excel;
 ///////////////////////////////////////////////////////////////////////////////
 if ($cgp_show["section"]["com"]) {
   $sections["COM"] = array('Name' => $l_header_com,
-                           'Url'  => "$path/company/company_index.php",
+                           'Url'  => $cgp_show["section"]["com"],
                            'Right'=> $cright_read);
 }
 if ($cgp_show["section"]["prod"]) {
   $sections["PROD"] = array('Name' => $l_header_prod,
-                            'Url'  => "$path/time/time_index.php",
+                            'Url'  => $cgp_show["section"]["prod"],
                             'Right'=> $cright_read);
 }
 if ($cgp_show["section"]["compta"]) {
   $sections["COMPTA"] = array('Name' => $l_header_compta,
-                              'Url'  => "$path/account/account_index.php",
+                              'Url'  => $cgp_show["section"]["compta"],
                               'Right'=> $cright_read);
 }
 if ($cgp_show["section"]["user"]) {
   $sections["USER"] = array('Name' => $l_header_users,
-                            'Url'  => "$path/settings/settings_index.php",
+                            'Url'  => $cgp_show["section"]["user"],
                             'Right'=> $cright_read);
 }
 if ($cgp_show["section"]["admin"]) {
   $sections["ADMIN"] = array('Name' => $l_header_admins,
-                             'Url'  => "$path/admin/admin_index.php?mode=html",
+                             'Url'  => $cgp_show["section"]["admin"],
                              'Right'=> $cright_read);
 }
 if ($cgp_show["section"]["aliamin"]) {
   $lurl = "http://aliamin.aliacom.local/aliamin.php";
   $sections["ALIAMIN"] = array('Name' => $l_header_aliamin,
-                               'Url'  => $lurl,
+                               'Url'  => $cgp_show["section"]["aliamin"],
                                'Right'=> $cright_read);
 }
 

@@ -288,7 +288,6 @@ class OBM_Perm {
     $rights = $profiles["$profile"];
     $right_start = $this->section_pos["$section"];
     $section_right = hexdec(substr($rights, $right_start, 1));
-    //    echo "<p>get_section_right: sec=$section, pro=$profile, rights=$rights, start=$right_start, sr=$section_right";
 
     return $section_right;
   }
@@ -305,7 +304,6 @@ class OBM_Perm {
     $rights = $profiles["$profile"];
     $right_start = $this->mod_pos["$menu"];
     $module_right = hexdec(substr($rights, $right_start, $this->mod_length));
-    // echo "<p>get_mod_right: menu=$menu, pro=$profile, rights=$rights, start=$right_start, mod_right=$module_right";
 
     return $module_right;
   }
@@ -354,47 +352,73 @@ class OBM_Perm {
 }
 
 
-
 //---------------------------------------------------------------------------//
-// Mysql Session Handler
+// Database sessions
 //---------------------------------------------------------------------------//
-function sess_db_open($save_path, $session_name) {
-  global $sess_save_path, $sess_session_name;
-     
-  $sess_save_path = $save_path;
-  $sess_session_name = $session_name;
-  return(true);
-}
+if ($cgp_sess_db) {
 
-function sess_db_close() {
-  return(true);
-}
-
-function sess_db_read ($id) {
-  global $sess_save_path, $sess_session_name;
-
-  $s_q = new DB_OBM;
-  $query = "select obmsession_data
-    from ObmSession
-    where obmsession_sid = '$id'";
-
-  if ($s_q->query($query)) {
-    $s_q->next_record();
-    $ret = $s_q->f("obmsession_data");
-  } else {
-    $ret = "";
+  function sess_db_open($save_path, $session_name) {
+    global $sess_save_path, $sess_session_name;
+    
+    $sess_save_path = $save_path;
+    $sess_session_name = $session_name;
+    return true;
   }
 
-  return $ret;
-}
+  function sess_db_close() {
+    return(true);
+  }
 
+  function sess_db_read ($id) {
+    global $sess_save_path, $sess_session_name;
+    
+    $s_q = new DB_OBM;
+    $query = "select obmsession_data
+    from ObmSession
+    where obmsession_sid = '$id'";
+    
+    if ($s_q->query($query)) {
+      $s_q->next_record();
+      $ret = $s_q->f("obmsession_data");
+    } else {
+      $ret = "";
+    }
+    
+    return $ret;
+  }
 
-function sess_db_write ($id, $sess_data) {
-  global $sess_save_path, $sess_session_name;
+  function sess_db_destroy ($id) {
+    global $sess_save_path, $sess_session_name;
+    
+    $s_q = new DB_OBM;
+    $query = "DELETE from ObmSession
+    where
+      obmsession_sid = '$id'
+      and obmsession_name = '$sess_session_name'";
+    
+    $ret = $s_q->query($query);
+    return $ret;
+  }
+  
+  /*********************************************
+   * WARNING - You will need to implement some *
+   * sort of garbage collection routine here.  *
+   *********************************************/
+  function sess_db_gc ($maxlifetime) {
+    return true;
+  }
 
-  $now = date("Y-m-d H:i:s");
-  $s_q = new DB_OBM;
-  $query = "REPLACE ObmSession ( 
+  //-------------------------------------------------------------------------//
+  // Mysql specific Session function Handler
+  //-------------------------------------------------------------------------//
+  if ($obmdb_dbtype == $db_type_mysql) {
+
+    function sess_db_write ($id, $sess_data) {
+      global $sess_save_path, $sess_session_name;
+    
+      $now = date("Y-m-d H:i:s");
+      $s_q = new DB_OBM;
+      $query = "REPLACE ObmSession ( 
       obmsession_sid,
       obmsession_timeupdate,
       obmsession_name,
@@ -404,35 +428,53 @@ function sess_db_write ($id, $sess_data) {
       '$now',
       '$sess_session_name',
       '".addslashes($sess_data)."')";
+      
+      $ret = $s_q->query($query);
 
-  //  echo "<p>query=$query";
-  $ret = $s_q->query($query);
+      return $ret;
+    }
+  }
 
-  return $ret;
+  //-------------------------------------------------------------------------//
+  // Postgres specific Session function Handler
+  //-------------------------------------------------------------------------//
+  if ($obmdb_dbtype == $db_type_pgsql) {
+
+    function sess_db_write ($id, $sess_data) {
+      global $sess_save_path, $sess_session_name;
+    
+      $now = date("Y-m-d H:i");
+      $s_q = new DB_OBM;
+      $query = "UPDATE ObmSession set
+        obmsession_timeupdate='$now',
+        obmsession_name='$sess_session_name',
+        obmsession_data='".addslashes($sess_data)."'
+      where
+        obmsession_sid='$id'";
+      
+      $ret = $s_q->query($query);
+
+      if ($s_q->affected_rows() == 0) {
+	$query = "INSERT INTO ObmSession ( 
+          obmsession_sid,
+          obmsession_timeupdate,
+          obmsession_name,
+          obmsession_data)
+        VALUES (
+          '$id',
+          '$now',
+          '$sess_session_name',
+          '".addslashes($sess_data)."')";
+      $ret = $s_q->query($query);
+      }
+    
+      return $ret;
+    }
+  }
+  
+
+  session_set_save_handler ("sess_db_open", "sess_db_close", "sess_db_read", "sess_db_write", "sess_db_destroy", "sess_db_gc");
+
 }
-
-function sess_db_destroy ($id) {
-  global $sess_save_path, $sess_session_name;
-     
-  $s_q = new DB_OBM;
-  $query = "DELETE from ObmSession
-    where
-      obmsession_sid = '$id'
-      and obmsession_name = '$sess_session_name'";
-
-  $ret = $s_q->query($query);
-  return $ret;
-}
-
-/*********************************************
- * WARNING - You will need to implement some *
- * sort of garbage collection routine here.  *
- *********************************************/
-function sess_db_gc ($maxlifetime) {
-  return true;
-}
-
-//session_set_save_handler ("sess_db_open", "sess_db_close", "sess_db_read", "sess_db_write", "sess_db_destroy", "sess_db_gc");
-
 
 </script>

@@ -38,7 +38,7 @@ $l_normal_mode = "Normal Mode";
 
 // Contact
 $l_lastname = "Lastname";
-$l_firstname = "Fisrtname";
+$l_firstname = "Firstname";
 $l_function = "Function";
 $l_company = "Company";
 $l_hphone = "Home phone";

@@ -83,7 +83,7 @@ $l_error_authentification = "Error::: Wrong Authentification... Please Check you
 
 //Contact
 $l_lastname = "Lastname";
-$l_firstname = "Fisrtname";
+$l_firstname = "Firstname";
 $l_function = "Function";
 $l_company = "Company";
 $l_tel = "Phone";

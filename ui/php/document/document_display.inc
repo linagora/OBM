@@ -1463,7 +1463,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"document_index.php?action=check_delete_repository&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
+	 <a href=\"document_index.php?action=folder_check_delete&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
 	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
 	 </a>
 	 ".$name."
@@ -1475,6 +1475,8 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
   }
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Document Tree
 // Parameters:

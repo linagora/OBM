@@ -32,6 +32,7 @@ If you are using OBM and want to be referenced here drop us a note.
     <li><a href="http://obm.lighthouse.com.br/">Lighthouse</a>
     <li>IB Group
     <li>Cellon - Philips
+    <li><a href="http://www.igtech.fr/"><img src="images/logo-igtech.png"></a> IGTech
     <li>...
   </ul>
   </p>

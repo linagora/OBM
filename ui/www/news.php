@@ -19,7 +19,21 @@
     <ul class="detailList">
 
       <li>
-    <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
+        <div align="left"><b>2004-04-21</b> : version <b>0.8.1</b> released (fixes)
+        <ol>
+          <li> Corrected some action rights on deal, document and user modules
+          <li> Corrected problem that prevent inserting Category with IE 6
+          <li> Calendar event users can now be updated again
+          <li> Fixes on Todo, Contact, Calendar, graphical Lists, sort order
+          <li> Postgres Sorts now case insensitive too
+          <li> Enhancements in Company, Contact, Subscriptions, site config, www links...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
+        <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
         <ol>
           <li> PostreSQL support (except time and document)
           <li> Spanish translation added

@@ -1512,6 +1512,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
+  global $l_agenda_select_group;
 
   $time_unit = 60 / $set_cal_interval;  
 
@@ -1764,12 +1765,12 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
     }
   }
-  $dis_min_e .= "</select>";  
+  $dis_min_e .= "</select>";
   $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
-  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  $url2 = "$path/group/group_index.php?action=ext_get_group&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
+  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[5]";
+  $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]&amp;ext_title=" . urlencode($l_agenda_select_group);
 
-      
+
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_mod_calendar\"

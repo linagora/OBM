@@ -184,10 +184,12 @@ elseif ($action == "insert")  {
     $mime_q = run_query_documentmime();
     $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
   }
+
 }elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
   $display["detail"] = dis_check_links($param_document);
+
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($hd_document_id);
@@ -201,10 +203,12 @@ elseif ($action == "insert")  {
   $mime_q = run_query_documentmime();
   $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
   $display["result"] = dis_document_search_list($document);
-}elseif ($action == "check_delete_repository")  {
+
+} elseif ($action == "folder_check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
   $display["detail"] = dis_check_repository_links($param_document);
+
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");
@@ -422,35 +426,16 @@ function get_param_document() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Company Action 
+//  Document Action 
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_action() {
   global $document, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_tree;
-  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_repository, $l_header_delete;
+  global $l_header_tree, $l_header_find, $l_header_new, $l_header_consult;
+  global $l_header_update,$l_header_delete;
+  global $l_header_display,$l_header_admin,$l_header_new_repository;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
-// Display Level
-  $actions["DOCUMENT"]["tree"]  = array (
-    'Name'     => $l_header_tree,
-    'Url'      => "$path/document/document_index.php?action=tree",
-    'Right'    => $cright_read,
-    'Condition'=> array ('all') 
-                                     		 );
 
-// Display Level
-  $actions["DOCUMENT"]["ext_get_path"]  = array (
-    'Url'      => "$path/document/document_index.php?action=ext_get_path",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );
-
-// Display Level
-  $actions["DOCUMENT"]["ext_get_ids"]  = array (
-    'Url'      => "$path/document/document_index.php?action=ext_get_ids",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                     		 );
 // Index  
   $actions["DOCUMENT"]["index"] = array (
     'Name'     => $l_header_find,
@@ -458,6 +443,14 @@ function get_document_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
+
+// Tree view
+  $actions["DOCUMENT"]["tree"]  = array (
+    'Name'     => $l_header_tree,
+    'Url'      => "$path/document/document_index.php?action=tree",
+    'Right'    => $cright_read,
+    'Condition'=> array ('all') 
+                                     		 );
 
 // Search
   $actions["DOCUMENT"]["search"] = array (
@@ -483,13 +476,19 @@ function get_document_action() {
                          'tree','admin','display') 
                                      );
 
-
 // Detail Consult
   $actions["DOCUMENT"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/document/document_index.php?action=detailconsult&amp;param_document=".$document["id"]."",
     'Right'    => $cright_read,
     'Condition'=> array ('detailupdate') 
+                                     		 );
+
+// Access Document
+  $actions["DOCUMENT"]["accessfile"]  = array (
+    'Url'      => "$path/document/document_index.php?action=accessfile&amp;param_document=".$document["id"]."",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
                                      		 );
 
 // Detail Update
@@ -520,13 +519,20 @@ function get_document_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	      );
+
+// Folder Check Delete
+  $actions["DOCUMENT"]["folder_check_delete"] = array (
+    'Url'      => "$path/document/document_index.php?action=folder_check_delete&amp;param_document=".$document["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                     	      );
+
 // Insert
   $actions["DOCUMENT"]["insert"] = array (
     'Url'      => "$path/document/document_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  
-
 
 // Repository Insert
   $actions["DOCUMENT"]["insert_repository"] = array (
@@ -633,7 +639,7 @@ function get_document_action() {
     'Condition'=> array ('all') 
                                       	 );
 
-// Display Préférences
+// Display Preferences
   $actions["DOCUMENT"]["dispref_display"] = array (
     'Url'      => "$path/document/document_index.php?action=dispref_display",
     'Right'    => $cright_read,
@@ -643,6 +649,20 @@ function get_document_action() {
 // Display Level
   $actions["DOCUMENT"]["dispref_level"]  = array (
     'Url'      => "$path/document/document_index.php?action=dispref_level",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
+// External path view
+  $actions["DOCUMENT"]["ext_get_path"]  = array (
+    'Url'      => "$path/document/document_index.php?action=ext_get_path",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
+// External view
+  $actions["DOCUMENT"]["ext_get_ids"]  = array (
+    'Url'      => "$path/document/document_index.php?action=ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );

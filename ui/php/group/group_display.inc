@@ -79,6 +79,10 @@ function html_group_search_form ($group) {
 
   $popup = $group["popup"];
 
+  if ($group["children_restriction"]) {
+    $child_res = "<input name=\"child_res\" type=\"hidden\" value=\"1\">";
+  }
+
   if ($popup) {
     $ext_action = $group["ext_action"];
     $ext_target = $group["ext_target"];
@@ -118,6 +122,7 @@ function html_group_search_form ($group) {
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      $child_res
       $ext
     </div>
     <div class=\"searchEnd\"></div>
@@ -139,8 +144,10 @@ function dis_group_search_group($group, $popup=false) {
   global $l_no_found;
   global $display, $auth, $new_order, $order_dir;
 
+  $child_res = $group["children_restriction"];
+
   $pref_q = run_query_display_pref($auth->auth["uid"], "group");
-  if ($popup) {
+  if ($child_res) {
     $obm_q = run_query_search_possible_children($group,$new_order, $order_dir);
   }  else {
     $obm_q = run_query_search($group, $new_order, $order_dir);
@@ -169,6 +176,8 @@ function dis_group_search_group($group, $popup=false) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
   global $display, $l_found, $l_add, $l_close;
+
+  $child_res = $group["children_restriction"];
 
   if ($popup) {
     $ext_action = $group["ext_action"];
@@ -226,17 +235,19 @@ function html_get_group_search_form ($group) {
 
   $popup = $group["popup"];
 
-  $ext_action = $group["ext_action"];
-  $ext_target = $group["ext_target"];
-  $ext_url = $group["ext_url"];
-  $ext_id = $group["ext_id"];
-  $ext_title = stripslashes($group["ext_title"]);
-  $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
-    <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
-    <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
-    <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
-    <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
-  $display["msg"] .= display_info_msg($ext_title);
+  if ($popup) {
+    $ext_action = $group["ext_action"];
+    $ext_target = $group["ext_target"];
+    $ext_url = $group["ext_url"];
+    $ext_id = $group["ext_id"];
+    $ext_title = stripslashes($group["ext_title"]);
+    $ext = "<input name=\"ext_action\" type=\"hidden\" VALUE=\"$ext_action\">
+      <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+      <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+      <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+      <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
   
   // --- Var preparation ------------------------------------------------------
 
@@ -285,7 +296,8 @@ function dis_get_group_search_group($group, $popup=false) {
   global $display, $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "group");
-  $obm_q = run_query_search_possible_children($group,$new_order, $order_dir);
+  //$obm_q = run_query_search_possible_children($group,$new_order, $order_dir);
+  $obm_q = run_query_search($group, $new_order, $order_dir);
 
   $nb_group = $obm_q->num_rows();
   if ($nb_group == 0) {

@@ -24,7 +24,21 @@
     <ul class="detailList">
 
       <li>
-    <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
+        <div align="left"><b>2004-04-21</b> : version <b>0.8.1</b> released (fixes)
+        <ol>
+          <li> Corrected some action rights on deal, document and user modules
+          <li> Corrected problem that prevent inserting Category with IE 6
+          <li> Calendar event users can now be updated again
+          <li> Fixes on Todo, Contact, Calendar, graphical Lists, sort order
+          <li> Postgres Sorts now case insensitive too
+          <li> Enhancements in Company, Contact, Subscriptions, site config, www links...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
+        <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancments, fixes)
         <ol>
           <li> PostreSQL support (except time and document)
           <li> Spanish translation added
@@ -36,21 +50,6 @@
           <li> Graphical query construction in List
           <li> Many Fixes and enhancements in Project, Todo, Calendar,...
           <li> ...
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2003-12-24</b> : version <b>0.7.5</b> released (enhancement)
-        <ol>
-          <li> PostreSQL support is back (db scripts, modules Company, Contact,Deal and User for now)
-          <li> Company enhancements (Phonetics and approximate searches, Categories, datasource...)
-          <li> Contact enhancements (Categories, marketing manager, kind, functions, datasource,...)
-          <li> New module : Admin Referential to handle global entities
-    <li> New tables : Country and DataSource (
-          <li> Fixes and enhancements in Project, Deal,...
-          <li> Updates on install script and doc
         </ol>
         </div>
         <br />

@@ -19,6 +19,9 @@ $obmdb_password = "obm";
 // Use specific site includes
 $cgp_site_include = true;
 
+// Use Database sessions
+//$cgp_sess_db = true;
+
 // is Mail enabled ? (agenda)
 //$cgp_mail_enabled = false;
 
@@ -28,13 +31,13 @@ $cgp_mailing_default = true;
 //-----------------//
 // Displayed Infos //
 //-----------------//
-// sections -- Default is true
-//$cgp_show["section"]["prod"] = false;
+// sections -- Urls -- Default is set
+$cgp_show["section"]["prod"] = "$path/document/document_index.php";
 //$cgp_show["section"]["compta"] = false;
 $cgp_show["section"]["aliamin"] = false;
 
-// modules -- Default is true
 
+// modules -- Default is true
 //$cgp_show["module"]["deal"] = false;
 //$cgp_show["module"]["agenda"] = false;
 //$cgp_show["module"]["time"] = false;

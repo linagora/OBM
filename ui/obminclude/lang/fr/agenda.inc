@@ -93,7 +93,8 @@ $l_category_update = "Modifier la Catégorie";
 $l_category_checkdelete = "Vérifier ou Supprimer la Catégorie";
 $l_category_delete = "Supprimer la Catégorie";
 $l_category_insert = "Créer la Catégorie";
-	
+$l_agenda_select_group = "Sélectionner les groupes.";
+
 // Messages
 $l_category_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
 $l_category_delete_error = "La suppression de la catégorie a échoué !";

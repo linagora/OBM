@@ -525,7 +525,7 @@ function run_query_company_contract_links($p_id) {
   global $cdg_sql;
 
   $query = "select distinct contract_id, contract_label 
-            from Contract, Contact
+            from Contract
             where contract_company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);

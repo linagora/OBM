@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.1pre3";
+$obm_version = "0.8.1pre4";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -55,7 +55,7 @@ $c_task_adminvalid = 2;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;  // Maximum rows to be returned
-$cql_max_cost = 10000;  // Maximum query cost (Postgres)
+$cql_max_cost = 100000;  // Maximum query cost (Postgres)
 
 // Popup Display size
 $popup_width = 620;
@@ -67,17 +67,20 @@ $cg_adm = 1;
 $cg_com = 1;
 $cg_prod = 2;
 
+// Use Database sessions
+$cgp_sess_db = false;
+
 
 //-------------------------//
 // Default Displayed Infos //
 //-------------------------//
-// sections
-$cgp_show["section"]["com"] = true;
-$cgp_show["section"]["prod"] = true;
-$cgp_show["section"]["compta"] = true;
-$cgp_show["section"]["user"] = true;
-$cgp_show["section"]["admin"] = true;
-$cgp_show["section"]["aliamin"] = true;
+// sections -- Urls
+$cgp_show["section"]["com"] = "$path/company/company_index.php";
+$cgp_show["section"]["prod"] = "$path/time/time_index.php";
+$cgp_show["section"]["compta"] = "$path/account/account_index.php";
+$cgp_show["section"]["user"] = "$path/settings/settings_index.php";
+$cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["aliamin"] = "http://aliamin/";
 
 // modules
 $cgp_show["module"]["company"] = true;

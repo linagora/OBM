@@ -85,6 +85,9 @@ $l_category_update = "Update Category";
 $l_category_checkdelete = "Check or Delete Category";
 $l_category_delete = "Delete Category";
 $l_category_insert = "Insert Category";
+$l_agenda_select_group = "Select the groups.";
+
+
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 $l_meeting_perform = "Seek for free crenels";
