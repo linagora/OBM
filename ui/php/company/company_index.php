@@ -89,11 +89,11 @@ if ($action == "ext_get_id") {
 } elseif ($action == "ext_get_cat_ids") {
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] =  html_category_tree($document);
+  $display["detail"] =  html_category_tree($company);
 } elseif ($action == "ext_get_cat_code") {
   $extra_css = "category.css";
   require("company_js.inc");
-  $display["detail"] =  html_category_code_tree($document);
+  $display["detail"] =  html_category_code_tree($company);
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////

@@ -305,6 +305,40 @@ function fill_select_header(source)
   kind.selectedIndex=0;
   
 }
+";
+if (isset($ext_target) && $ext_target!="") {
+  $extra_js .= "
+  function get_elem(doc, name ) {
+    return doc.getElementById(name);
+  }  
+   function fill_ext_form(repo_path) {
+     ext_field = window.opener.document.$ext_target;
+     ext_field.value = repo_path;
+     window.close();
+  } 
+  
+  function fill_ext_form2(int_form) {
+   size = int_form.length;
+   ext_field = get_elem(window.opener.document, '$ext_target' );
+   for(i=0; i <size; i++) {
+     if(int_form.elements[i].type == 'checkbox'){
+       if(int_form.elements[i].checked == true) {
+	 ext_size = ext_field.length;
+	 bool = false;
+	 for(j=0; j< ext_size  && bool == false; j++) {
+	   if(ext_field.options[j].value == int_form.elements[i].name) {
+	     ext_field.options[j].selected =true;
+	     bool = true;
+	   }
+	 }
+       }
+     }
+   }
+ }
+
+";
+}
+$extra_js .= "
 // -->
 </script>
 ";

@@ -71,8 +71,15 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+} elseif ($action == "ext_get_cat1_ids") {
+  $extra_css = "category.css";
+  require("contact_js.inc");
+  $display["detail"] =  html_category1_list($contact);
+} elseif ($action == "ext_get_cat2_ids") {
+  $extra_css = "category.css";
+  require("contact_js.inc");
+  $display["detail"] =  html_category2_list($contact);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -502,9 +509,18 @@ function get_contact_action() {
 // ext_get_ids
   $actions["CONTACT"]["ext_get_ids"] = array (
     'Right'    => $cright_read,
-    'Condition'=> array ('all') 
+    'Condition'=> array ('None') 
                                         );
-
+// Category1 Select 
+  $actions["CONTACT"]["ext_get_cat1_ids"]  = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+// Category2 Select 
+  $actions["CONTACT"]["ext_get_cat2_ids"]  = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );						 
 // Index
   $actions["CONTACT"]["index"] = array (
     'Name'     => $l_header_find,

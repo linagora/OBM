@@ -2267,9 +2267,9 @@ function html_select_company($comp_q, $company) {
 // Display: category Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_category_tree($category) {
+function html_category_tree($company) {
   global $l_close,$l_add,$l_cat_no;
-  $popup = $category["popup"];
+  $popup = $company["popup"];
   $obm_d = run_query_get_tree();
   if($popup) {
     $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";

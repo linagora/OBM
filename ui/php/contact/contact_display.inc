@@ -804,7 +804,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company;
+  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
@@ -991,7 +991,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   // Category 1 select field
   if ($show_cat1) {
     $i=0; 
-    $sel_cat1 = "<select id=\"sel_cat1[]\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
     while($cat1_q->next_record()) {
       $c1_id = $cat1_q->f("contactcategory1_id");
       $sel_cat1 .= "\n<option value=\"$c1_id\"";
@@ -999,17 +999,27 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
     }
     $sel_cat1 .= "</select>";
-    
+    $url = "contact_index.php?action=ext_get_cat1_ids&amp;popup=1&amp;ext_target=sel_cat1";
     $block_cat1 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailForm\">$sel_cat1</td>";
+      <td class=\"detailForm\">
+       <table>
+	<tr><td>
+	  $sel_cat1
+	</td><td>
+	  <a href=\"javascript: return false;\" style=\"float:right;\"
+	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	   <img src=\"/images/$set_theme/$ico_add\" /></a>
+	</td></tr>
+       </table>      
+      </td>";
   }
 
   // Category 2 select field
   if ($show_cat2) {
     $i=0; 
-    $sel_cat2 = "<select id=\"sel_cat2[]\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+    $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
     while ($cat2_q->next_record()) {
       $c2_id = $cat2_q->f("contactcategory2_id");
       $sel_cat2 .= "\n<option value=\"$c2_id\"";
@@ -1017,11 +1027,21 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
     }
     $sel_cat2 .= "</select>";
-
+    $url = "contact_index.php?action=ext_get_cat2_ids&amp;popup=1&amp;ext_target=sel_cat2";
     $block_cat2 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailForm\">$sel_cat2</td>";
+      <td class=\"detailForm\">
+      <table>
+	<tr><td>
+	  $sel_cat2
+	</td><td>
+	  <a href=\"javascript: return false;\" style=\"float:right;\"
+	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	   <img src=\"/images/$set_theme/$ico_add\" /></a>
+	</td></tr>
+       </table>      
+       </td>";
   }
 
   $i=0;
@@ -1089,7 +1109,9 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $block_ad3 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
+      <td class=\"detailForm\">
+      <input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" />
+      </td>";
   }
 
 
@@ -2370,7 +2392,79 @@ function dis_kind_links($ref) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: category1 List
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_category1_list($contact) {
+  global $l_close,$l_add,$l_cat_no;
+  $popup = $contact["popup"];
+  $cat_q = run_query_contactcategory1();
+  
+  $block.= "
+  <div class=\"categoryTree\">
+   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
+   ";
+  while ($cat_q->next_record()) {
+    $label = $cat_q->f("contactcategory1_label");
+    $id = $cat_q->f("contactcategory1_id"); 
+    $block .= "
+    <div class=\"category\">
+      <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$label</span>
+    </div>
+    ";
+  } 
+  
+  $block.= "
+  <br />
+  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+  <input name=\"popup\" type=\"hidden\" value=\"1\" />
+  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+  </form>
+  </div>";
 
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: category 2 List
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_category2_list($contact) {
+  global $l_close,$l_add,$l_cat_no;
+  $popup = $contact["popup"];
+  $cat_q = run_query_contactcategory2();
+  if($popup) {
+    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link_end ="</a>";
+  }
+  $name = '/';
+  $kind = "0";
+  $realpath = $path.$name;
+  
+  $block .= "
+  <div class=\"categoryTree\">
+   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
+   ";
+  while ($cat_q->next_record()) {
+    $label = $cat_q->f("contactcategory2_label");
+    $id = $cat_q->f("contactcategory2_id"); 
+    $block .= "<div class=\"category\">
+      <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$label</span>
+    </div>
+    ";
+  } 
+  
+  $block .= "
+  <br />
+  <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
+  <input name=\"popup\" type=\"hidden\" value=\"1\" />
+  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+  </form>
+  </div>";
+
+  return $block;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Contact Display preference screen                             //
 // Parameters:
