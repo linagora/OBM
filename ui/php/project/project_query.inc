@@ -380,8 +380,9 @@ function run_query_tasklist_delete($project) {
 
     $query = "
       select projectuser_user_id
-      from ProjectUser
-      where projectuser_projecttask_id = $tsk_id
+      from ProjectUser, ProjectTask
+      where projectuser_projecttask_id = projecttask_id
+        and (projecttask_id = $tsk_id  or projecttask_parenttask_id = $tsk_id)
       ";
     
     display_debug_msg($query, $cdg_sql, "run_query_tasklist_delete(1)");
@@ -423,18 +424,6 @@ function run_query_memberlist_insert($project) {
   $cpt = 0;
   $cpt_ins = 0;
   
-//   $query = "
-//     select projecttask_id as pt_id
-//     from ProjectTask
-//     where projecttask_deal_id = $id";
-
-//   display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(1)");
-//   $ptask_q = new DB_OBM;
-//   $ptask_q->query($query);
-//   $ptask_q->next_record();
-
-//   $pt_id = $ptask_q->f("pt_id");
-
   while ($cpt < $project["mem_nb"]) {
     $cpt++;
     $mem_id = $project["mem$cpt"];
@@ -457,13 +446,15 @@ function run_query_memberlist_insert($project) {
            projectuser_deal_id,
            projectuser_timecreate,
            projectuser_usercreate,
-           projectuser_projectedtime
+           projectuser_projectedtime,
+           projectuser_manager
           )
         values
           ($mem_id,
           $id,
           '".date("Y-m-d H:i:s")."',
           ". $auth->auth["uid"] .",
+          0,
           0)";
 
       display_debug_msg($query, $cdg_sql, "run_query_memberlist_insert(3)");
@@ -489,30 +480,8 @@ function run_query_memberlist_delete($project, $all = 0) {
   $cpt = 0;
   $cpt_del = 0;
 
-  // WIll change to a sub subselect when running with mysql 4.1
-  
-//   $query = "
-//     select projecttask_id as pt_id
-//     from ProjectTask
-//     where projecttask_deal_id = $id";
-
-//   display_debug_msg($query, $cdg_sql, "run_query_memberlist_delete(1)");
-//   $ptask_q = new DB_OBM;
-//   $ptask_q->query($query);
-
-//   $ptask_q->next_record();
-//   $pt_id = $ptask_q->f("pt_id");
-//   $pt_tab = "($pt_id";
-
-   $obm_q = new DB_OBM;
-   $search_q = new DB_OBM;
-
-//   while($ptask_q->next_record()) {
-//     $pt_id = $ptask_q->f("pt_id");
-//     $pt_tab .= ", $pt_id";  
-//   }
-
-//   $pt_tab .= ")";
+  $obm_q = new DB_OBM;
+  $search_q = new DB_OBM;
 
   if ($all == 1) {
     $query = "
@@ -561,7 +530,28 @@ function run_query_memberlist_delete($project, $all = 0) {
   return $cpt_del;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Project Update query execution                                            //
+// Parameters:
+//   - $project[] : deal hash info : user_id, user_status
+///////////////////////////////////////////////////////////////////////////////
+function run_query_memberstatus_change($project) {
+  $p_id = $project["id"];
+  $m_id = $project["user_id"];
+  $m_val = $project["user_status"];
 
+  $query = "
+    update ProjectUser
+    set projectuser_manager = $m_val
+    where projectuser_user_id = $m_id
+      and projectuser_deal_id = $p_id";
+
+  $obm_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_memberstatus_change");
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Project Update query execution                                            //
 // Parameters:
@@ -871,7 +861,8 @@ function run_query_members($p_id = 0) {
       select
         userobm_id as member_id,
         userobm_firstname as member_firstname,
-        userobm_lastname as member_lastname
+        userobm_lastname as member_lastname,
+        projectuser_manager as member_manager
       from UserObm, ProjectUser
       where projectuser_deal_id = $p_id
         and projectuser_user_id = userobm_id
@@ -991,7 +982,44 @@ function run_query_projecttype($type = 'all') {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// New Project Form Data checking and formatting                             //
+// Parameters:
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : name, tt, soldtime
+// Returns:
+//   - (true | false) : true if user have write rights for this project 
+///////////////////////////////////////////////////////////////////////////////
+function manager_rights($uid, $project) {
 
+  $pid = $project["id"];
+
+  $query = "
+    select userobm_id
+    from UserObm
+    where userobm_perms='admin'
+      and userobm_id = $uid";
+
+  display_debug_msg($query, $cdg_sql, "manager_rights(admins)");
+  $admins_q = new DB_OBM;
+  $admins_q->query($query);
+
+  $query = "
+    select projectuser_id
+    from ProjectUser
+    where projectuser_deal_id = $pid
+      and projectuser_manager != 0";
+
+  display_debug_msg($query, $cdg_sql, "manager_rights(managers)");
+  $managers_q = new DB_OBM;
+  $managers_q->query($query);
+
+  $manager_rights = (($admins_q->nf()!=0) or ($managers_q->nf() !=0)) ? true : false;
+
+  return $manager_rights;
+
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // New Project Form Data checking and formatting                             //

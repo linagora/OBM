@@ -171,7 +171,7 @@ function dis_time_links ($time, $type="all") {
           </a>
          </td>
          <td class=\"timePeriod\">
-           $user $l_week $l_from $hum_date_start $l_to $hum_date_end
+           $user $l_from $hum_date_start $l_to $hum_date_end
          </td>
          <td align=\"right\">
           <a href=\"" .
@@ -306,8 +306,10 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
                                 onclick=\"select_all(f_time)\" />";
 
     $block = "<br>
+      <div class=\"timeBar\">
      <form method=post name=\"f_time\" action=\"" .
       url_prepare("time_index.php") . "\">
+
        <table class=\"timeUser\">
         <tr>
          <td class=\"timeUserhead\">$l_user</td>
@@ -322,7 +324,9 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
          </td>
         </tr>
        </table>
-      </form>";
+     </form>
+      </div>
+";
   }
 
   return $block;
@@ -452,13 +456,12 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_projuser_list->data_order = false;
     $dis_projuser_list->data_page = false;
     $dis_projuser_list->data_header = "top";
-    
+
     $block .= "<div class=\"detailHead\">$l_proj_stats</div>";
     $block .= $dis_projuser_list->display("dis_data_time");
   } else {
     $block .= display_warn_msg($l_no_proj_stats);
   }
-
 
   if ($stattt_q->num_rows() != 0) {
     $pref_tq = run_query_display_pref($auth->auth["uid"], "time_tt");
@@ -467,9 +470,8 @@ function dis_time_statsuser($statproj_q, $stattt_q, $time) {
     $dis_ttuser_list->data_set = $stattt_q;
     $dis_ttuser_list->data_order = false;
     $dis_ttuser_list->data_page = false;
-    $dis_ttuser_list->data_header = "top";
+    $dis_projuser_list->data_header = "top";
 
-    //$block .= display_ok_msg($l_ttuser_stats);
     $block .= "<div class=\"detailHead\">$l_tt_stats</div>";
     $block .= $dis_ttuser_list->display("dis_data_time");
   }else {
@@ -800,7 +802,7 @@ function display_shortview($time, $array_res) { //, $order) {
       $class= "timeValok";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"20\" width=\"20\" alt=\"\" /> $l_unvalid</a>";
+       <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
       $link_act = "$l_see";
     } else if ($fract != $tot_workingdays) {
       $class= "timeValunfilled";
@@ -810,7 +812,7 @@ function display_shortview($time, $array_res) { //, $order) {
       $class= "timeValfilled";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"20\" width=\"20\" alt=\"\" /> $l_valid</a>";
+       <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
       $link_act = "$l_see";
     }
 
@@ -974,7 +976,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
                           $day_q, $fraction_t, $time, $validate_days) {
 
   global $auth, $time, $fraction_jour ,$task_id_modify;
-  global $l_addtask_start, $l_addtask_end, $l_add, $task_list, $l_none;
+  global $l_addtask_start, $l_addtask_end, $l_add, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   global $l_fill_addtask;
   //for list classement of task
@@ -995,11 +997,11 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   }
 
   if (sizeof($validate_days) == $c_days_in_a_week) {
-    echo "<p></p>";
+    $block .= "<p></p>";
     return;
   }
   
-  $task_list  = array($l_task_fac, $l_task_div, $l_task_int);
+  $task_list  = array($l_task_fac, $l_task_int, $l_task_div);
   
   //get different attribute for task to be modify
   if ($action == "detailupdate") {
@@ -1054,7 +1056,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
       if ($company == "") $company = $l_intern;
 
-      $proj_name = $project_q->f("deal_label");
+      $proj_name = addslashes($project_q->f("deal_label"));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
 
       $proj_label = "\" $company -- ". $proj_name. "\"";
@@ -1089,7 +1091,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
       $projtask_id = $projecttask_q->f("projecttask_id");
     
-      $projtask_name = $projecttask_q->f("projecttask_label");
+      $projtask_name = addslashes($projecttask_q->f("projecttask_label"));
       $projtask_name = (strlen($projtask_name) > 35) ? substr($projtask_name,0,35)."..." : $projtask_name;
 
       $projtask_label = "\"". $projtask_name ."\"";
@@ -1228,7 +1230,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
    <div class=\"detailHead\">$l_fill_addtask</div>
 
    <div class=\"timeCenter\">
-   <table class=\"timeDetail\" width=\"95%\">
+   <table class=\"timeDetail\" width=\"100%\">
     <tr>
      <td class=\"timeForm\">$dis_date</td>
      <td class=\"timeForm\">$l_duration :</td>

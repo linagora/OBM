@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Number";
 $l_name = "Name";
 $l_label = "Name";
 $l_company_name = "Company Name";
@@ -20,10 +19,7 @@ $l_sold = "Sold";
 $l_allotted = "Alloted";
 $l_projected = "Projected";
 $l_used = "Used";
-$l_remaining = "Remaining";
 $l_missing = "Missing";
-$l_prevmissing = "Old estimation";
-$l_nextmissing = "New estimation";
 $l_diff = "Advance/Lateness";
 
 $l_allosold = "Sold time allocation";
@@ -55,7 +51,8 @@ $l_externinfos = "Project";
 $l_interninfos = "Internal project";
 $l_advanceinfos = "Project progress";
 $l_tasksinfos = "Project tasks";
-$l_membersinfos = "Progress evaluation : the following datas are<br>(used time / missing time / total projected time)";
+$l_membersinfos = "Project members";
+$l_progressinfos = "Progress evaluation : the following datas are<br>(used time / missing time / total projected time)";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";
 $l_advupdateinfos = "Fill in the working length (in days) missing for each person to complete a task";
 
@@ -89,11 +86,7 @@ $l_proj_update_ok = "The project allocation update has been updated successfully
 $l_proj_update_error = "The update of the project allocation has failed !";
 $l_adv_update_ok = "The project progress has been updated successfully.";
 $l_adv_update_error = "The update of the project progress has failed !";
-$l_close_ok = "---";
-$l_close_error = "---";
-$l_query_error = "---";
-$l_cant_delete = "---";
-$l_can_delete = "---";
+$l_query_error = "Problem executing the query";
 $l_member_add = "Add members";
 $l_task_add = "Add a task";
 $l_del_task_sel = "Delete a task";

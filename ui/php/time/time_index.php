@@ -187,13 +187,13 @@ if ($action == "index" || $action == "") {
   $time["action"] = "index";
 
   // display links to previous and next week
-  $display["detail"] = dis_time_links($time,"week");
+  $display["result"] = dis_time_links($time,"week");
 
   // week planning display
-  $display["detail"] .= dis_time_index($time);
+  $display["result"] .= dis_time_index($time);
 
   // display addtask form if necessary and full task list
-  $display["detail"] .= dis_time_list($time);
+  $display["result"] .= dis_time_list($time);
 
   // display user Search Form
   $display["features"] .= dis_time_search_form($time,
@@ -208,10 +208,10 @@ elseif ($action == "viewmonth") {
   $time["interval"] = "month";
 
   // display links to previous and next week
-  $display["detail"] = dis_time_links($time,"month");
+  $display["result"] = dis_time_links($time,"month");
 
   // display the month panel
-  $display["detail"] .= dis_time_index($time);
+  $display["result"] .= dis_time_index($time);
 
   // display user Search Form
   $display["features"] .= dis_time_search_form($time, 
@@ -224,10 +224,10 @@ if ($action == "globalview") {
   $time["interval"] = "month";
 
   // display links to previous and next week
-  $display["detail"] = dis_time_links($time,"month");
+  $display["result"] = dis_time_links($time,"month");
 
   // display validation panel
-  $display["detail"] .= dis_time_index($time);
+  $display["result"] .= dis_time_index($time);
 } 
 
 elseif ($action == "insert") {
@@ -236,13 +236,13 @@ elseif ($action == "insert") {
   $time["action"]="index";
   $time["interval"] = "week";
 
-  $display["detail"] = dis_time_links($time,"week");
+  $display["result"] = dis_time_links($time,"week");
 
   run_query_insert($time);
   run_query_validate($time["user_id"]);
 
-  $display["detail"] .= dis_time_index($time);
-  $display["detail"] .= dis_time_list($time);
+  $display["result"] .= dis_time_index($time);
+  $display["result"] .= dis_time_list($time);
   $display["features"] .= dis_time_search_form($time, 
 					     run_query_get_obmusers(),
 					     $uid);
@@ -255,10 +255,10 @@ elseif ($action == "validate") {
   run_query_adminvalidate($time);
 
   // display links to previous and next week
-  $display["detail"] = dis_time_links($time,"month");
+  $display["result"] = dis_time_links($time,"month");
 
   // display validation panel
-  $display["detail"] .= dis_time_index($time);
+  $display["result"] .= dis_time_index($time);
 }
 
 elseif ($action == "unvalidate") {
@@ -268,10 +268,10 @@ elseif ($action == "unvalidate") {
   run_query_adminunvalidate($time);
 
   // display links to previous and next week
-  $display["detail"] = dis_time_links($time,"month");
+  $display["result"] = dis_time_links($time,"month");
 
   // display validation panel
-  $display["detail"] .= dis_time_index($time);
+  $display["result"] .= dis_time_index($time);
 }
 
 elseif ($action == "stats") {
@@ -282,13 +282,13 @@ elseif ($action == "stats") {
   $statproj_q = run_query_stat_project($time);
   $stattt_q = run_query_stat_tasktype($time);
 
-  $display["detail"] = dis_time_links($time,$time["interval"]);
+  $display["result"] = dis_time_links($time,$time["interval"]);
   $display["features"] .= dis_time_search_form($time, 
 					       run_query_get_obmusers(),
 					       $uid, 1);
 
 
-  $display["detail"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
+  $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
 }
 
 // bcontins : pas utilise pour le moment
@@ -298,7 +298,7 @@ elseif ($action == "stats") {
 //   $time["interval"] = "month";
 
 //   //  echo "export stats<br>";
-//   $display["detail"] = dis_time_export_stats($time);
+//   $display["result"] = dis_time_export_stats($time);
 // }
 
 elseif ($action == "delete") {
@@ -308,13 +308,13 @@ elseif ($action == "delete") {
   $time["action"] = "index";
   $time["interval"] = "week";
  
-  $display["detail"] = dis_time_links($time,"week");
+  $display["result"] = dis_time_links($time,"week");
 
   run_query_delete($HTTP_POST_VARS);
   run_query_validate($time["user_id"]);
 
-  $display["detail"] .= dis_time_index($time);
-  $display["detail"] .= dis_time_list($time);
+  $display["result"] .= dis_time_index($time);
+  $display["result"] .= dis_time_list($time);
   $display["features"] .= dis_time_search_form($time, 
 					       run_query_get_obmusers(),
 					       $uid);
@@ -338,7 +338,7 @@ elseif ($action == "detailupdate") {
     // Creating the dates for the selected (or current) date
     $day_q = get_this_week($d_start_week, $c_days_in_a_week);
     
-    $display["detail"] .= dis_form_addtask("detailupdate",
+    $display["result"] .= dis_form_addtask("detailupdate",
 					   $obm_project_q, 
 					   $obm_projecttask_q, 
 					   $obm_tasktype_q, 
@@ -356,7 +356,7 @@ elseif ($action == "detailupdate") {
   
     $user_id = $time["user_id"];
     
-    $display["detail"] .= "
+    $display["result"] .= "
     <script language=\"javascript\">
      window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
      window.close();

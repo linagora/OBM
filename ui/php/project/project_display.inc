@@ -505,20 +505,20 @@ function html_project_taskadd_form($ptask_q, $project) {
 //   - $company[]  : company search criteria
 //     keys used   : status, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) {
-  global $l_found;
+// function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) {
+//   global $l_found;
 
-  $url = url_prepare("project_index.php?action=index");
+//   $url = url_prepare("project_index.php?action=index");
 
-  $dis_newprojects_list = new OBM_DISPLAY("DATA", $pref_q, "project");
-  $dis_newprojects_list->data_set = $obm_q_comp;
-  $dis_newprojects_list->data_url = $url;
-  $dis_newprojects_list->data_header = "both";
-  $dis_newprojects_list->data_order = false;
+//   $dis_newprojects_list = new OBM_DISPLAY("DATA", $pref_q, "project");
+//   $dis_newprojects_list->data_set = $obm_q_comp;
+//   $dis_newprojects_list->data_url = $url;
+//   $dis_newprojects_list->data_header = "both";
+//   $dis_newprojects_list->data_order = false;
 
-  $block = $dis_newprojects_list->display("dis_data_project");
-  return $block;
-}
+//   $block = $dis_newprojects_list->display("dis_data_project");
+//   return $block;
+// }
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -556,7 +556,7 @@ function dis_project_search_list($project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
   //-- Labels
-  global $display, $perms_user,$l_perms_user, $l_found;
+  global $display, $perms_user, $l_found;
 
   $name = $project["name"];
   $company_name = $project["company_name"];
@@ -593,7 +593,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   global $set_theme, $display, $action;
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
   global $l_interninfos, $l_externinfos, $l_progressinfos, $l_advanceinfos;
-  global $l_projected, $l_used, $l_remaining, $l_missing, $l_diff, $l_sold;
+  global $l_projected, $l_used, $l_missing, $l_sold;
   global $l_allotted, $l_no_members, $l_adv_update, $l_project, $l_resume;
   global $l_allosold, $l_usedsold, $l_progeval, $l_progress, $l_nbtask;
   global $l_nbmem, $l_tasksdef, $l_membersdef, $l_archive, $l_yes, $l_no;
@@ -886,13 +886,21 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     $ratio_allosold = intval(($allotted/$soldtime)*100);
     $ratio_usedsold = intval(($usedtime/$soldtime)*100);
 
-    //bcontins a transformer en indicateur compréhensible
-    if (($usedtime + $missingtime) == 0)
-      $ratio_progress = 0;
-    else
-      $ratio_progress = intval(($usedtime/($usedtime + $missingtime))*100);
+    $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
   
     $ratio_progeval = intval((($usedtime + $missingtime)/$soldtime)*100);
+
+    if ($ratio_progeval < 70)
+      $symbol_progeval = "++";
+    else if ($ratio_progeval < 85)
+      $symbol_progeval = "+";
+    else if ($ratio_progeval > 140)
+      $symbol_progeval = "--";
+    else if ($ratio_progeval > 120)
+      $symbol_progeval = "-";
+    else
+      $symbol_progeval = "=";
+
 
     $span = $cpt_m + 2;
   
@@ -924,7 +932,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
      <td class=\"detailText\" align=\"right\">$missingtime</td>
      <td>&nbsp;&nbsp;</td>
      <td class=\"detailLabel\">&nbsp;$l_progeval&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_progeval</td>
+     <td class=\"detailText\" align=\"right\">$symbol_progeval</td>
     </tr>";
 
   } 
@@ -987,7 +995,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
   global $set_theme;
-  global $l_tasksinfos, $l_del_task_sel, $l_valid_task, $l_task_add;
+  global $l_tasksinfos, $l_del_task_sel, $l_task_add;
   global $l_no_tasks;
 
   $pid = $project["id"];
@@ -1061,7 +1069,7 @@ function html_project_tasklist($tasks_q, $project) {
 function html_project_member_form($members_q, $project) {
   global $display;
   global $l_no_members, $l_member_add, $l_membersinfos, $l_del_member_sel;
-  global $l_valid_member, $l_project;
+  global $l_project, $l_manager, $l_member;
 
   $pid = $project["id"];
   $pname = $project["label"];
@@ -1072,16 +1080,33 @@ function html_project_member_form($members_q, $project) {
 
       $m_id = $members_q->f("member_id");
       $m_name = $members_q->f("member_lastname"). " " .$members_q->f("member_firstname");
+      $m_manager = $members_q->f("member_manager");
 
+      if ($m_manager)
+	$rd_manager = "
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\" checked
+                 onchange=\"change_status($m_id, 1, form_memberdel)\" />$l_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\"
+                 onchange=\"change_status($m_id, 0, form_memberdel)\" />$l_member";
+      else
+	$rd_manager = "
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"1\"
+                 onchange=\"change_status($m_id, 1, form_memberdel)\" />$l_manager
+          <input type=\"radio\" name=\"rd_man$m_id\" value=\"0\" checked
+                 onchange=\"change_status($m_id, 0, form_memberdel)\" />$l_member";
+      
       $dis_member .= "
         <tr>
          <td align=\"right\" width=\"5%\"><input type=\"checkbox\" name=\"cb_u$m_id\"/></td>
          <td class=\"detailText\" colspan=\"2\">$m_name</td>
+         <td align=\"right\">$rd_manager</td>
         </tr>";
     }
 
     $dis_button  = "
       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"param_user\" value=\"\" />
+      <input type=\"hidden\" name=\"param_status\" value=\"\" />
       <input type=\"hidden\" name=\"action\" value=\"member_del\" />
       <input type=\"submit\" value=\"$l_del_member_sel\"
              onclick=\"submit_memberdel(this.form)\" />";
@@ -1264,10 +1289,9 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
-  global $display;
+  global $display, $set_theme;
   global $l_project, $l_name, $l_tasktype, $l_company_name, $l_soldtime;
-  global $l_projected, $l_used, $l_remaining, $l_prevmissing, $l_nextmissing;
-  global $l_advupdateinfos, $l_adv_update, $set_theme;
+  global $l_projected, $l_used, $l_advupdateinfos, $l_adv_update;
 
   $cpt_t=0;
   $cpt_m=0;
@@ -1396,7 +1420,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 //   - $display_searchpref_q : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_display_pref($display_newpref_q, $display_searchpref_q) {
-  global $l_newproject_display, $l_searchproject_display;
+  global $l_searchproject_display;
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
   $dis_pref->display_entity = "project"; 

@@ -120,6 +120,25 @@ function submit_memberdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 // each member should be assigned to at least one task
 
+function change_status(user_id, user_status, form)
+{
+  for (i = 0; i < form.length; i++) {
+    i_name = form.elements[i].name;
+    i_value = form.elements[i].value;
+    
+    if (i_name == \"param_user\")
+      form.elements[i].value = user_id;
+    else if (i_name == \"param_status\")
+      form.elements[i].value = user_status;
+    else if (i_name == \"action\")
+      form.elements[i].value = \"member_change\";
+    else
+      null;
+  }
+
+  form.submit();
+}
+
 function check_membertimevalid(form, nb_mem)
 {
   error = 0;

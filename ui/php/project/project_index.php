@@ -13,16 +13,18 @@
 // - init            -- form fields    -- show the init project form
 // - task_fill       -- $param_project -- 
 // - member_fill     -- $param_project -- 
+// - membertime_fill -- $param_project -- 
+// - validate        -- $param_project -- 
 // - detailconsult   -- $param_project -- show the project detail
 // - detailupdate    -- $param_project -- show the project detail form
 // - d_update        -- form fields    -- update the project
 // - advanceupdate   -- $param_project -- show the project advance form
 // - a_update        -- form fields    -- update the project advance
+// - task_add        -- form fields    -- 
+// - task_del        -- form fields    -- 
 // - member_add      -- form fields    -- 
 // - member_del      -- form fields    -- 
-// // - check_delete    -- $param_project -- check links before delete
-// // - delete          -- $param_project -- delete the project
-// // - admin           --                -- admin index (kind)
+// - member_change   -- form fields    -- 
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
@@ -303,15 +305,15 @@ if ($action == "index" || $action == "") {
     }
   }
   
-} elseif ($action == "close")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_close($param_project);
+// } elseif ($action == "close")  {
+// ///////////////////////////////////////////////////////////////////////////////
+//   $retour = run_query_close($param_project);
 
-  if ($retour) {
-    $display["msg"] .= display_ok_msg($l_close_ok);
-  } else {
-    $display["msg"] .= display_err_msg($l_close_error);
-  }
+//   if ($retour) {
+//     $display["msg"] .= display_ok_msg($l_close_ok);
+//   } else {
+//     $display["msg"] .= display_err_msg($l_close_error);
+//   }
 
 } elseif ($action == "advanceupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -382,11 +384,11 @@ if ($action == "index" || $action == "") {
     } 	
   }
 
-} elseif ($action == "check_delete")  {
-///////////////////////////////////////////////////////////////////////////////
+// } elseif ($action == "check_delete")  {
+// ///////////////////////////////////////////////////////////////////////////////
 
-} elseif ($action == "delete")  {
-///////////////////////////////////////////////////////////////////////////////
+// } elseif ($action == "delete")  {
+// ///////////////////////////////////////////////////////////////////////////////
 
 } elseif ($action == "task_add")  {
   ///////////////////////////////////////////////////////////////////////////////
@@ -429,6 +431,7 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg("$l_no_task_del");
     }
     
+    $project["label"] = run_query_projectname($param_project);
     $tasks_q = run_query_tasks($param_project);
     
     $display["detail"] = html_project_taskadd_form($tasks_q, $project);
@@ -487,6 +490,23 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg($l_error_authentification);
   }
 
+} elseif ($action == "member_change")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($perm->have_perm("editor")) {
+
+    $pid = $project["id"];
+    $project["label"] = run_query_projectname($pid);
+
+    $retour = run_query_memberstatus_change($project);
+
+    // gets updated infos
+    $members_q = run_query_members($pid);
+
+    $display["detail"] = html_project_member_form($members_q, $project);
+  } else {
+    $display["msg"] .= display_err_msg($l_error_authentification);
+  }
+
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_new_q = run_query_display_pref($auth->auth["uid"], "project_new", 1);
@@ -515,6 +535,15 @@ if ($action == "index" || $action == "") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Update right for projectmanagers and admins
+///////////////////////////////////////////////////////////////////////////////
+$consult_actions = Array('detailconsult', 'consultnoproj', 'consultnoadv',
+                         'd_update', 'a_update', 'validate');
+
+if (in_array($action, $consult_actions))
+     $action = (manager_rights($uid, $project)) ? $action : "consultnoright";
+
+///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 get_project_action();
@@ -534,7 +563,8 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_project() {
 
-  global $param_project, $param_origin, $tf_missing, $tf_projected, $hd_status;
+  global $param_project, $param_origin, $param_user, $param_status;
+  global $tf_missing, $tf_projected, $hd_status;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel, $cb_archive;
   global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext, $cb_new;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
@@ -543,6 +573,8 @@ function get_param_project() {
 
   if (isset ($param_project)) $project["id"] = $param_project;
   if (isset ($param_origin)) $project["origin"] = $param_origin;
+  if (isset ($param_user)) $project["user_id"] = $param_user;
+  if (isset ($param_status)) $project["user_status"] = $param_status;
 
   // Project fields
   if (isset ($tf_soldtime)) $project["soldtime"] = $tf_soldtime;
@@ -617,8 +649,8 @@ function get_param_project() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_project_action() {
   global $project, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete, $l_list;
-  global $l_header_close,$l_header_display,$l_header_admin, $l_header_add_member;
+  global $l_header_find,$l_header_new,$l_header_update, $l_list;
+  global $l_header_display,$l_header_admin, $l_header_add_member;
   global $project_read, $project_write, $project_admin_read, $project_admin_write;
   global $l_header_man_task, $l_header_man_member, $l_header_man_advance;
   global $l_header_man_affect, $l_header_consult;
@@ -698,23 +730,15 @@ function get_project_action() {
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $project_read,
     'Condition'=> array ('detailupdate', 'd_update', 'task_fill', 'task_add', 'task_del', 'member_fill', 'member_add',
-                         'member_del', 'membertime_fill', 'advanceupdate') 
+                         'member_del', 'member_change', 'membertime_fill', 'advanceupdate') 
                                      		 );
 
 // Update
   $actions["PROJECT"]["d_update"] = array (
     'Url'      => "$path/project/project_index.php?action=update",
     'Right'    => $project_write,
-    'Condition'=> array ('None') 
- 
+    'Condition'=> array ('None')  
                                     	 );
-// Close
-  $actions["PROJECT"]["close"] = array (
-    'Name'     => $l_header_close,
-    'Url'      => "$path/project/project_index.php?action=close&amp;param_project=".$project["id"]."",
-    'Right'    => $project_write,
-    'Condition'=> array ('detailupdate') 
-                                     	 );
 
 // Advance Update
   $actions["PROJECT"]["advanceupdate"] = array (
@@ -738,32 +762,39 @@ function get_project_action() {
     'Right'    => $user_write,
     'Popup'    => 1,
     'Target'   => $l_list,
-    'Condition'=> array ('member_fill', 'member_add','member_del') 
+    'Condition'=> array ('member_fill', 'member_add','member_del', 'member_change') 
                                     	  );
 
-// Display
+// Add a task
   $actions["PROJECT"]["task_add"] = array (
     'Url'      => "$path/project/project_index.php?action=task_add",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                        );
 
-// Display
+// Remove a task
   $actions["PROJECT"]["task_del"] = array (
     'Url'      => "$path/project/project_index.php?action=task_del",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                        );
 
-// Display
+// Add a member
   $actions["PROJECT"]["member_add"] = array (
     'Url'      => "$path/project/project_index.php?action=member_add",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                        );
 
-// Display
+// Remove a member
   $actions["PROJECT"]["member_del"] = array (
+    'Url'      => "$path/project/project_index.php?action=member_del",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                       );
+
+// Change member status
+  $actions["PROJECT"]["member_change"] = array (
     'Url'      => "$path/project/project_index.php?action=member_del",
     'Right'    => $project_write,
     'Condition'=> array ('None') 

@@ -670,10 +670,10 @@ function run_query_tasktype($uid = 0) {
     $query = "
       select distinct TaskType.*
       from TaskType
-        left join Deal on (tasktype_id = deal_tasktype_id and deal_archive = 0 and deal_project_status != 0)
-        left join ProjectTask on (deal_id = projecttask_deal_id)
-        left join ProjectUser on (projecttask_id=projectuser_projecttask_id
-                                  and projectuser_user_id=$uid
+        left join Deal on (tasktype_id = deal_tasktype_id
+                           and deal_archive = 0
+                           and deal_project_status != 0)
+        left join ProjectUser on (deal_id=projectuser_deal_id
                                   and projectuser_projectedtime != 0)
       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
         or tasktype_internal=2

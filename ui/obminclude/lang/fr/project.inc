@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
-$l_number = "Numéro";
 $l_name = "Nom";
 $l_label = "Nom";
 $l_company_name = "Nom Société";
@@ -20,10 +19,7 @@ $l_sold = "Vendu";
 $l_allotted = "Attribué";
 $l_projected = "Prévu";
 $l_used = "Utilisé";
-$l_remaining = "Restant";
 $l_missing = "Manquant";
-$l_prevmissing = "Ancienne estimation";
-$l_nextmissing = "Nouvelle estimation";
 $l_diff = "Avance/Retard";
 
 $l_allosold = "Attribution du temps vendu";
@@ -31,7 +27,7 @@ $l_usedsold = "Utilisation du temps vendu";
 $l_alloproj = "Attribution du temps prévu";
 $l_usedproj = "Utilisation du temps prévu";
 $l_progress = "Avancement du projet";
-$l_progeval = "Evaluation de l'avance retard";
+$l_progeval = "Evaluation de l'avance/retard";
 
 // Labels et textes
 $l_list = "Liste";
@@ -90,11 +86,7 @@ $l_proj_update_ok = "La mise à jour des affectation a été correctement effectuée
 $l_proj_update_error = "La mise à jour des affectations a échoué !";
 $l_adv_update_ok = "La mise à jour des avancements a été correctement effectuée";
 $l_adv_update_error = "La mise à jour des avancements a échoué !";
-$l_close_ok = "Le projet est maintenant marqué comme terminé";
-$l_close_error = "Le changement d'état du projet à échoué !";
 $l_query_error = "Problème en executant la requete";
-$l_cant_delete = "La société ne peut être supprimée !";
-$l_can_delete = "La société peut être supprimée.";
 $l_member_add = "Ajouter des participants";
 $l_task_add = "Ajouter une tâche";
 $l_del_task_sel = "Enlever des tâches";

@@ -11,6 +11,11 @@
 	text-align:		center;
 	}
 
+div.timeBar {
+	width:			170px;
+	margin-bottom:		20px;
+}
+
 /* Time browsing panel */
 
 table.timeLinks			{
