@@ -14,6 +14,7 @@ $l_user_perms = "Authorization";
 $l_password = "Password";
 $l_lastaccess = "Last access";
 $l_email = "@M";
+$l_datebegin = "Entry date";
 $l_perms_user = "User";
 $l_perms_editor = "Editor";
 $l_perms_admin = "Administrator";

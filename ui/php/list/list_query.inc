@@ -563,7 +563,7 @@ function check_data_form($id, $list) {
   }
 
   // List email
-  if (($email != "") && (eregi($php_regexp_email, $email) == false)) {
+  if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
     $err_msg = " $email : $l_j_check_email";
     return false;
   }

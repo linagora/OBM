@@ -1366,6 +1366,27 @@ $js_state_loop
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the Deal quick form
+// Parameters:
+//   - $deal[]    : deal search criteria
+//     keys used  : company_id, name, company
+///////////////////////////////////////////////////////////////////////////////
+function dis_deal_quick_form($deal) {
+  global $display, $uid, $action;
+
+  if ($deal["id"] > 0) {
+    $deal_q = run_query_detail($deal["id"]);
+    $display["detailInfo"] = display_record_info($deal_q);
+    $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
+    $sta_q = run_query_dealstatus();
+    $block = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Deal Form                   
 // Parameters :
 //   - $action    : action called
@@ -1375,7 +1396,7 @@ $js_state_loop
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_quick_form($action,$deal_q, $usrc_q,$sta_q,$deal) {
+function html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal) {
   global $c_php_isodate_format, $l_update, $l_none;
   global $l_deal, $l_infos, $l_label;
   global $l_date_alarm, $l_state, $l_hitrate, $l_todo;
@@ -1469,7 +1490,6 @@ $js_state_loop
   $block = "
     $js_state
     <form method=\"post\" name=\"form_deal_update\" 
-      onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
 
   <div class=\"detailHead\">$l_infos</div>
@@ -1482,11 +1502,11 @@ $js_state_loop
       <td class=\"detailLabel\">$l_state</td>
       <td class=\"detailForm\">$sel_state</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_hitrate</td>
-      <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_todo</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_hitrate</td>
+      <td class=\"detailForm\"><input name=\"tf_hitrate\" type=\"text\" size=\"3\" value=\"$hitrate\" /> %</td>
     </tr>
     </table>
 
@@ -1502,13 +1522,13 @@ $js_state_loop
       <td class=\"detailLabel\">$l_upd_comment</td>
       <td>&nbsp;</td>
     </tr><tr>
-      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"10\" cols=\"78\">$comment</textarea></td>
+      <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"8\" cols=\"78\">$comment</textarea></td>
     </tr>
     </table>
 
     <div class=\"detailButton\">
       <p class=\"detailButtons\">
-        <input type=\"hidden\" name=\"action\" value=\"update\" />
+        <input type=\"hidden\" name=\"action\" value=\"quick_update\" />
         <input type=\"hidden\" name=\"param_deal\" value=\"$id\" />
         <input type=\"submit\" value=\"$l_update\" />
       </p>   

@@ -88,7 +88,7 @@ function check_company(form) {
   lemail = form.tf_email.value;
   if ((lemail != \"\") && (check_email(lemail) == null)) {
     alert (\"$l_j_check_email\");
-    return false;
+//    return false;
   }
 
   // Check the web

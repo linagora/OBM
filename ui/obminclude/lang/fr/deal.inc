@@ -23,6 +23,7 @@ $l_amount = "Montant";
 $l_hitrate = "% Réussite";
 $l_state = "Etat";
 $l_date_alarm = "Date Alarme";
+$l_date_comment = "Date Commentaire";
 $l_todo = "A faire";
 $l_category = "Catégorie";
 $l_code = "Code";

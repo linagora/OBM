@@ -196,25 +196,25 @@ $cright_write = 4;
 $cright_read_admin = 8;
 $cright_write_admin = 16;
 
-// JavaScript and PHP Fields masks (regexp)
+// JavaScript and PHP Fields masks (PCRE regexp)
 $js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
-$php_regexp_phone="^[0-9+ \(\)-\.]+$";  // digits + SPACE ( ) - in phone number
+$php_regexp_phone="/^[0-9+ \(\)-\.]+$/";
 $js_regexp_fax="/^[0-9+ \(\)-\.]+$/";   // digits + SPACE ( ) - in fax number
-$php_regexp_fax="^[0-9+ \(\)-\.]+$";    // digits + SPACE ( ) - in fax number
+$php_regexp_fax="/^[0-9+ \(\)-\.]+$/";
 $js_regexp_zip="/^[0-9A-Z ]{2,8}$/";     // 2-8 digits or letters
-$php_regexp_zip="^[0-9A-Z ]{2,8}$";      // 2-8 digits or letters
+$php_regexp_zip="/^[0-9A-Z ]{2,8}$/";
 $js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
-$php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
+$php_regexp_email="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$/i"; // Email
 $php_regexp_email_name="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*$/"; // Email name
 $js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-\/A-Za-z0-9])*$/";  // Web
-$php_regexp_web="^(http:\/\/)?(https:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}([\-\/A-Za-z0-9]*)$"; // Web
-$php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
+$php_regexp_web="/^(http:\/\/)?(https:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}([\-\/A-Za-z0-9]*)$/i"; // Web
+$php_regexp_isodate = "/^[0-9]{4}-[01][0-9]-[0123][0-9]$/";
 $js_regexp_list_name = "/^[0-9A-Za-z_- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
 $php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
-$php_regexp_lifetime = "^[0-9]{1,6}$";
+$php_regexp_lifetime = "/^[0-9]{1,6}$/";
 
 
 // Path to the OBM php root (if not set)

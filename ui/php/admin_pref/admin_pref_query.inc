@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_query.inc                                         //
 //     - Desc : Pref admin Query File                                        //
@@ -177,7 +177,7 @@ function check_data_form($pref) {
   if (trim($lifetime) == "") {
     $err_msg = $l_fill_lifetime;
     return false;
-  } else if (ereg($php_regexp_lifetime, $lifetime) == false) {
+  } else if (preg_match($php_regexp_lifetime, $lifetime) == 0) {
     $err_msg = $l_j_check_lifetime . " : $lifetime";
     return false;
   }

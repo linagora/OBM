@@ -1356,10 +1356,10 @@ function check_project_form($pid, $project) {
   }
 
   // MANDATORY: Soldtime
-//   if (ereg($php_regexp_number, $soldtime) == false) {
-//     $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
-//     return false;
-//   }
+  //  if (preg_match($php_regexp_number, $soldtime) == 0)) {
+  //     $err_msg = $l_fill_soldnumber ."".$soldtime."".$php_regexp_number;
+  //     return false;
+  //   }
 
   return true; 
 }

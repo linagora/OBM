@@ -997,34 +997,34 @@ function check_contact_data_form($cid, $contact) {
   $fname = ucfirst($fname);
 
   // Contact phone
-  if (($phone != "") && (ereg($php_regexp_phone, $phone) == false)) {
+  if (($phone != "") && (preg_match($php_regexp_phone, $phone) == 0)) {
     $err_msg = $l_j_check_phone . " : $phone";
     return false;
   }
 
   // Contact mobile or personal phone
-  if (($hphone != "") && (ereg($php_regexp_phone, $hphone) == false)) {
+  if (($hphone != "") && (preg_match($php_regexp_phone, $hphone) == 0)) {
     $err_msg = $l_j_check_hphone . " : $hphone";
     return false;
   }
-  if (($mphone != "") && (ereg($php_regexp_phone, $mphone) == false)) {
+  if (($mphone != "") && (preg_match($php_regexp_phone, $mphone) == 0)) {
     $err_msg = $l_j_check_mphone . " : $mphone";
     return false;
   }
   // Contact fax
-  if (($fax != "") && (ereg($php_regexp_fax, $fax) == false)) {
+  if (($fax != "") && (preg_match($php_regexp_fax, $fax) == 0)) {
     $err_msg = $l_j_check_fax . " : $fax";
     return false;
   }
 
   // Contact email
-  if (($email != "") && (eregi($php_regexp_email, $email) == false)) {
+  if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
     $err_msg = $l_j_check_email . " : $email";
     return false;
   }
 
   // Contact email
-  if (($email2 != "") && (eregi($php_regexp_email, $email2) == false)) {
+  if (($email2 != "") && (preg_match($php_regexp_email, $email2) == 0)) {
     $err_msg = $l_j_check_email . " : $email2";
     return false;
   }

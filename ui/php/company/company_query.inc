@@ -1307,31 +1307,31 @@ function check_data_form($cid, $company) {
 
 
   // Company Zip code
-  if (($zip != "") && (ereg($php_regexp_zip, $zip) == false)) {
+  if (($zip != "") && (preg_match($php_regexp_zip, $zip) == 0)) {
     $err_msg = $l_j_check_zip . " : $zip";
     return false;
   }
 
   // Company phone
-  if (($phone != "") && (ereg($php_regexp_phone, $phone) == false)) {
+  if (($phone != "") && (preg_match($php_regexp_phone, $phone) == 0)) {
     $err_msg = $l_j_check_phone . " : $phone";
     return false;
   }
 
   // Company fax
-  if (($fax != "") && (ereg($php_regexp_fax, $fax) == false)) {
+  if (($fax != "") && (preg_match($php_regexp_fax, $fax) == 0)) {
     $err_msg = $l_j_check_fax . " : $fax";
     return false;
   }
 
   // Company email
-  if (($mail != "") && (eregi($php_regexp_email, $email) == false)) {
+  if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
     $err_msg = $l_j_check_email . " : $email";
     return false;
   }
 
   // Company web
-  if (($web != "") && (eregi($php_regexp_web, $web) == false)) {
+  if (($web != "") && (preg_match($php_regexp_web, $web) == 0)) {
     $err_msg = $l_j_check_web . " : $web";
     return false;
   }
@@ -1348,8 +1348,8 @@ function run_query_get_tree() {
   global $cdg_sql,$auth;
 
   $query = "select *  from CompanyCategory $where 
-  order by companycategory_code
-";
+  order by companycategory_code";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

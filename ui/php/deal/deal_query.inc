@@ -346,7 +346,7 @@ function run_query_update($deal) {
   $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
   $con1 = ($deal["contact1"] ? "'".$deal["contact1"]."'" : "null");
   $con2 = ($deal["contact2"] ? "'".$deal["contact2"]."'" : "null");
-  $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
+  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
   $status = $deal["state"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
@@ -376,7 +376,7 @@ function run_query_update($deal) {
     deal_amount=$amount,
     deal_hitrate=$hitrate,
     deal_status_id='$status',
-    deal_datealarm='$datealarm',
+    deal_datealarm=$datealarm,
     deal_comment='$comment',
     deal_archive='$archive',
     deal_privacy='$priv',
@@ -417,6 +417,46 @@ function run_query_update($deal) {
       run_query_company_active_deal_inc($comp);
     }
   }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Deal Quick Update query execution
+// Parameters:
+//   - $deal[] : deal hash info : keys used : all
+///////////////////////////////////////////////////////////////////////////////
+function run_query_quick_update($deal) {
+  global $auth, $cdg_sql;
+
+  $id = $deal["id"];
+  $hitrate = ($deal["hitrate"] ? "'".$deal["hitrate"]."'" : "null");
+  $datealarm = ($deal["datealarm"] ? "'".$deal["datealarm"]."'" : "null");
+  $status = $deal["state"];
+  $todo = $deal["todo"];
+  $comment = $deal["com"];
+  $add_comment = $deal["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $deal["datecomment"];
+    $usercomment = $deal["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
+  $cat_m = $deal["category"];
+  
+  $query = "update Deal set
+    deal_timeupdate='". date("Y-m-d H:i:s")."',
+    deal_userupdate='".$auth->auth["uid"]."',
+    deal_hitrate=$hitrate,
+    deal_status_id='$status',
+    deal_datealarm=$datealarm,
+    deal_comment='$comment',
+    deal_todo='$todo'
+  where deal_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
 
   return $retour;
 }
@@ -1180,8 +1220,8 @@ function run_query_status_links($s_id) {
 // Return : true if check ok, else false
 ///////////////////////////////////////////////////////////////////////////////
 function check_deal_form($did, $deal) {
-  global $php_regexp_isodate, $l_invalid_date, $l_date_init;
-  global $err_msg, $l_err_label_empty, $l_err_hitrate, $l_err_hitrate;
+  global $php_regexp_isodate, $l_invalid_date, $l_date_init, $l_date_alarm;
+  global $err_msg, $l_err_label_empty, $l_err_hitrate, $l_date_comment;
   global $l_err_kind_empty, $l_err_task_empty, $l_err_market_empty, $l_err_tech_empty;
 
   // Check if the label is filled
@@ -1227,8 +1267,54 @@ function check_deal_form($did, $deal) {
   $datebegin = $deal["datebegin"];
 
   // Begin Date check
-  if (($datebegin != "") && (ereg($php_regexp_isodate, $datebegin) == false)) {
+  if (($datebegin != "") && (preg_match($php_regexp_isodate, $datebegin) == 0)) {
     $err_msg = "$l_date_init : $l_invalid_date"; 
+    return false;
+  }
+
+  $datealarm = $deal["datealarm"];
+
+  // Alarm Date check
+  if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
+    $err_msg = "$l_date_alarm : $l_invalid_date";
+    return false;
+  }
+
+  $datecomment = $deal["datecomment"];
+
+  // Comment Date check
+  if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
+    $err_msg = "$l_date_comment : $l_invalid_date";
+    return false;
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Deal Form Data checking and formatting
+// Parameters:
+//   - $deal[] : values to check
+// Return : true if check ok, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_deal_quick_form($deal) {
+  global $php_regexp_isodate, $l_invalid_date, $l_date_alarm, $l_date_comment;
+  global $err_msg;
+
+  $datealarm = $deal["datealarm"];
+
+  // Alarm Date check
+  if (($datealarm != "") && (preg_match($php_regexp_isodate, $datealarm) == 0)) {
+    $err_msg = "$l_date_alarm : $l_invalid_date";
+    return false;
+  }
+
+  $datecomment = $deal["datecomment"];
+
+  // Comment Date check
+  if (($datecomment != "") && (preg_match($php_regexp_isodate, $datecomment) == 0)) {
+    $err_msg = "$l_date_comment : $l_invalid_date";
     return false;
   }
 

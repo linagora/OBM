@@ -68,24 +68,26 @@ if ($action == "ext_get_ids") {
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
+
 } elseif ($action == "ext_get_cat1_ids") {
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] =  html_category1_list($contact);
+
 } elseif ($action == "ext_get_cat2_ids") {
   $extra_css = "category.css";
   require("contact_js.inc");
   $display["detail"] =  html_category2_list($contact);
-}  elseif ($action == "export") {
-    dis_export_handle($contact);
+
+} elseif ($action == "vcard") {
+    dis_vcard_export($contact);
     exit();
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index" || $action == "") {
+} else if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_contact_search_form($contact);
   if ($set_display == "yes") {
@@ -508,8 +510,8 @@ function get_param_contact() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_contact_action() {
   global $contact, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_export,$l_header_update,$l_header_delete;
-  global $l_header_consult, $l_header_display, $l_header_admin;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
+  global $l_header_consult,$l_header_vcard, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // ext_get_ids
@@ -550,15 +552,6 @@ function get_contact_action() {
     'Condition'=> array ('','index','search','new','detailconsult','update','admin','display') 
                                      );
 
-// Export
-  $actions["CONTACT"]["export"] = array (
-    'Name'     => $l_header_export,
-    'Url'      => "$path/contact/contact_index.php?action=export&amp;popup=1&amp;param_contact=".$contact["id"]."",
-    'Right'    => $cright_read,
-    'Privacy'  => true,    
-    'Condition'=> array ('detailconsult','detailupdate','update') 
-                                       );
-
 // Detail Consult
  $actions["CONTACT"]["detailconsult"]   = array (
     'Name'     => $l_header_consult,
@@ -567,6 +560,15 @@ function get_contact_action() {
     'Privacy'  => true,
     'Condition'=> array ('detailconsult','detailupdate') 
                                     		 );
+
+// Vcard Export
+  $actions["CONTACT"]["vcard"] = array (
+    'Name'     => $l_header_vcard,
+    'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;param_contact=".$contact["id"]."",
+    'Right'    => $cright_read,
+    'Privacy'  => true,    
+    'Condition'=> array ('detailconsult','detailupdate','update') 
+                                       );
 
 // Detail Update
   $actions["CONTACT"]["detailupdate"] = array (

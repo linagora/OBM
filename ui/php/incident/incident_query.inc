@@ -643,7 +643,7 @@ function check_incident_form($incident) {
   $date = $incident["date"];
 
   // Begin Date check
-  if (($date == "") || (ereg($php_regexp_isodate, $date) == false)) {
+  if (($date == "") || (preg_match($php_regexp_isodate, $date) == 0)) {
     $err_msg = "$l_incident_date : $l_invalid_date"; 
     return false;
   }

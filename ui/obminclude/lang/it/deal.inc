@@ -25,7 +25,8 @@ $l_date_proposal = "Data Proposta";
 $l_amount = "Totale";
 $l_hitrate = "Hit Rate";
 $l_state = "Stato";
-$l_date_alarm = "Data avviso";
+$l_date_alarm = "Data Avviso";
+$l_date_comment = "Data Commento";
 $l_todo = "Da fare";
 
 // Labels and texts

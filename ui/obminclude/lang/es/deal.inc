@@ -7,10 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//for list
-//$l_task_fac = "Factured Tasks";
-//$l_task_int = "Internal Tasks";
-
 // Database fields
 $l_number = "Número";
 $l_label = "Referencia";
@@ -26,6 +22,7 @@ $l_amount = "Cantidad";
 $l_hitrate = "Rata de Exito";
 $l_state = "Estado";
 $l_date_alarm = "Fecha de Alarma";
+$l_date_comment = "Fecha de Comentario";
 $l_todo = "Tareas";
 
 // Labels and texts

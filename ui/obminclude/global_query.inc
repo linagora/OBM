@@ -263,6 +263,37 @@ function get_user_id($login) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Query Execution : get the entry date of one User from its id
+// Parameters:
+//   - $id : id
+// Returns:
+//   - begin date
+///////////////////////////////////////////////////////////////////////////////
+function get_user_entrydate($id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
+
+  if (isset($id)) {
+    $query = "select userobm_datebegin,
+        $datebegin
+      from UserObm
+      where userobm_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $date["iso"] = $obm_q->f("userobm_datebegin");
+    $date["unix_timestamp"] = $obm_q->f("datebegin");
+    return $date;
+  } else {
+    return "" ;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // CompanyCategory query execution
 // Return:
 //   Database Object

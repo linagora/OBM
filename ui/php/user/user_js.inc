@@ -53,15 +53,8 @@ function check_user(form) {
     return false;
   }
 
-  // MANDATORY : Check that User password is not empty
-  lpassword = form.tf_user_password.value;
-  if (lpassword == \"\") {
-    alert (\"$l_fill_password\");
-    return false;
-  }
-
   // Check the email
-  lemail = form.tf_user_email.value;
+  lemail = form.tf_email.value;
   if ((lemail != \"\") && (check_email(lemail) == null)) {
     alert (\"$l_j_check_email\");
     return false;

@@ -24,6 +24,7 @@ $l_amount = "Amount";
 $l_hitrate = "Hit Rate";
 $l_state = "State";
 $l_date_alarm = "Alarm Date";
+$l_date_comment = "Comment Date";
 $l_todo = "To Do";
 $l_category = "Category";
 $l_code = "Code";

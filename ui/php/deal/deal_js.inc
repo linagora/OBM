@@ -136,9 +136,7 @@ function check_get_id_url(form, p_url) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Category update is possible
 ///////////////////////////////////////////////////////////////////////////////
-
-function check_cat_upd(form,formd)
-{
+function check_cat_upd(form,formd) {
   cat_pos = formd.sel_cat.selectedIndex;
   if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
     form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
@@ -148,17 +146,12 @@ function check_cat_upd(form,formd)
      return false;
    }
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////
 // Check if the Category check or deletion is possible                       //
 ///////////////////////////////////////////////////////////////////////////////
-
-function check_cat_checkdel(form)
-{
+function check_cat_checkdel(form) {
    if (form.sel_cat.selectedIndex >= 0)
    {
       return true;
@@ -169,7 +162,6 @@ function check_cat_checkdel(form)
       return false;
    }
 }
-///////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,8 +180,7 @@ function check_parentdeal(f_parent) {
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Deal Kind deletion is possible                               //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_checkdel(form)
-{
+function check_kind_checkdel(form) {
    if (form.sel_kind.selectedIndex >= 0)
    {
      return true;
@@ -203,8 +194,7 @@ function check_kind_checkdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Deal Status deletion is possible                            //
 ///////////////////////////////////////////////////////////////////////////////
-function check_status_checkdel(form)
-{  
+function check_status_checkdel(form) {  
    if (form.sel_state.selectedIndex >= 0)
    { 
      return true;
@@ -220,8 +210,7 @@ function check_status_checkdel(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind update is possible                                      //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_upd(form,formd)
-{
+function check_kind_upd(form,formd) {
   kind_pos = formd.sel_kind.selectedIndex;
   if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
     form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
@@ -236,8 +225,7 @@ function check_kind_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the status update is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
-function check_status_upd(form,formd)
-{
+function check_status_upd(form,formd) {
   status_pos = formd.sel_state.selectedIndex;
   if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
     form.sel_state.value=formd.sel_state.options[status_pos].value;
@@ -252,8 +240,7 @@ function check_status_upd(form,formd)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the Kind creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form)
-{
+function check_kind_new(form) {
    if (form.tf_kind.value != \"\")
       return true;
    else
@@ -265,15 +252,16 @@ function check_kind_new(form)
 
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Fill the Kind's header select.
 ///////////////////////////////////////////////////////////////////////////////
 function get_elem(doc, name ) {
-    return doc.getElementById(name);
-  }  
-  function fill_ext_form2(int_form) {
+  return doc.getElementById(name);
+}  
+
+
+///////////////////////////////////////////////////////////////////////////////
+function fill_ext_form2(int_form) {
    size = int_form.length;
    ext_field = get_elem(window.opener.document, '$ext_target' );
    for(i=0; i <size; i++) {
@@ -290,12 +278,8 @@ function get_elem(doc, name ) {
        }
      }
    }
- }
+}
 
-";
-
-
-$extra_js .= "
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the status creation is possible                                  //

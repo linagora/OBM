@@ -139,14 +139,7 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "quick_detail")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($deal["id"] > 0) {
-    $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $usrc_q = run_query_all_users_from_group($cg_com, array($uid));
-    $sta_q = run_query_dealstatus();
-    // we retrieve invoices data :
-    $display["detail"] = html_deal_quick_form($action, $deal_q, $usrc_q, $sta_q, $deal);
-  }
+  $display["detail"] = dis_deal_quick_form($deal);
   
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,6 +184,21 @@ if ($action == "ext_get_id") {
       $deal["parent"] = $obm_q->f("deal_parentdeal_id");
       run_query_update_archive($deal["id"], $deal["parent"]);
     }
+  }
+
+} elseif ($action == "quick_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_deal_quick_form($deal)) {
+    $retour = run_query_quick_update($deal);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_update_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_update_error);
+    }
+    $display["detail"] = dis_deal_consult($deal);
+  } else {
+    $display["msg"] .= display_err_msg($err_msg);
+    $display["detail"] = dis_deal_quick_form($deal);
   }
 
 } elseif ($action == "check_delete")  {
@@ -698,7 +706,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$deal["id"],
     'Right'    => $cright_read,
     'Privacy'  => true,
-    'Condition'=> array ('detailupdate', 'update', 'insert', 'quick_detail') 
+    'Condition'=> array ('detailupdate', 'update', 'insert', 'quick_detail', 'quick_update') 
                                     	    );
 
   // Quick Detail
@@ -707,7 +715,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=quick_detail&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'insert', 'update', 'quick_update')
                                     	    );
 
   // Parent Detail Consult
@@ -724,7 +732,7 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"],
     'Right'    => $cright_write,
     'Privacy'  => true,
-    'Condition'=> array ('detailconsult', 'update','insert') 
+    'Condition'=> array ('detailconsult', 'update','insert', 'quick_detail', 'quick_update')
                                      	    );
 					    
   //  Update

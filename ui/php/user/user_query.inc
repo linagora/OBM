@@ -28,10 +28,12 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $limit = sql_limit($db_type);
+  $datebegin = sql_date_format($db_type, "userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "timelastaccess");
 
   $select = "select UserObm.*,
       userobm_id as id,
+      $datebegin,
       $lastaccess
     from UserObm";
 
@@ -105,11 +107,13 @@ function run_query_detail($p_id) {
 
   $timeupdate = sql_date_format($db_type, "UserObm.userobm_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
+  $datebegin = sql_date_format($db_type, "UserObm.userobm_datebegin", "datebegin");
   $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
 
   $query = "select UserObm.*,
       $timeupdate,
       $timecreate,
+      $datebegin,
       $lastaccess,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
@@ -146,6 +150,7 @@ function run_query_insert($user) {
   $fname = $user["firstname"];
   $phone = $user["phone"];
   $email = $user["email"];
+  $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
 
   $query = "insert into UserObm (userobm_timeupdate,
     userobm_timecreate,
@@ -155,6 +160,7 @@ function run_query_insert($user) {
     userobm_password,
     userobm_perms,
     userobm_archive,
+    userobm_datebegin,
     userobm_lastname,
     userobm_firstname,
     userobm_phone,
@@ -169,6 +175,7 @@ function run_query_insert($user) {
     '$passwd_crypt',
     '$perms',
     '$archive',
+    $datebegin,
     '$lname',
     '$fname',
     '$phone',
@@ -201,6 +208,7 @@ function run_query_update($p_id, $user) {
   }
   $perms = $user["perms"];
   $archive = ($user["archive"] ? "1" : "0");
+  $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $phone = $user["phone"];
@@ -213,6 +221,7 @@ function run_query_update($p_id, $user) {
     $passwd_update
     userobm_perms='$perms',
     userobm_archive='$archive',
+    userobm_datebegin=$datebegin,
     userobm_lastname='$lname',
     userobm_firstname='$fname',
     userobm_phone='$phone',
@@ -432,7 +441,7 @@ function check_data_form($p_id, $user) {
     return false;
   }
   // User email
-  if (($email != "") && (eregi($php_regexp_email, $email) == false)) {
+  if (($email != "") && (preg_match($php_regexp_email, $email) == 0)) {
     $err_msg = $l_email_error." : ". $email;
     return false;
   }

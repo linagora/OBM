@@ -18,6 +18,7 @@ $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_phone"] = $l_phone;
+$fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
@@ -52,6 +53,11 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = datetime_format($date, 1);
+    $res["txt_name"] = $res["name"];
+  }
+  else if ($fieldname == "datebegin") {
+    $datebegin = $OD->data_set->f($fieldname);
+    $res["name"] = date_format($datebegin, 1);
     $res["txt_name"] = $res["name"];
   }
 
@@ -245,6 +251,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 function html_user_form($first_try, $usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_phone, $l_user, $l_email, $l_archive, $l_insert, $l_update;
+  global $l_datebegin;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action;
 
@@ -258,6 +265,7 @@ function html_user_form($first_try, $usr_q, $user) {
     $fname = $usr_q->f("userobm_firstname");
     $phone = $usr_q->f("userobm_phone");
     $email = $usr_q->f("userobm_email");
+    $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
   }
 
@@ -270,6 +278,7 @@ function html_user_form($first_try, $usr_q, $user) {
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["phone"])) { $phone = $user["phone"]; }
   if (isset($user["email"])) { $email = $user["email"]; }
+  if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
 
 
@@ -327,6 +336,9 @@ function html_user_form($first_try, $usr_q, $user) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailForm\"><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_datebegin</td>
+      <td class=\"detailForm\"><input name=\"tf_datebegin\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
     </tr>
     </table>
 
@@ -367,7 +379,7 @@ function dis_user_consult($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_phone, $l_email, $l_lastaccess, $l_archive;
+  global $l_user, $l_phone, $l_email, $l_lastaccess, $l_archive, $l_datebegin;
   global $l_group_member, $l_group;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $path, $display, $c_yes, $c_no;
@@ -380,6 +392,7 @@ function html_user_consult($obm_q) {
   $fname = $obm_q->f("userobm_firstname");
   $phone = $obm_q->f("userobm_phone");
   $email = $obm_q->f("userobm_email");
+  $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
 
@@ -438,6 +451,9 @@ function html_user_consult($obm_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_datebegin</td>
+      <td class=\"detailText\">$datebegin</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_lastaccess</td>
       <td class=\"detailText\">$lastaccess</td>

@@ -1,4 +1,11 @@
 <script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : obm_query.inc                                                //
+//     - Desc : OBM entry page query File                                    //
+// 2004-01-20 Aliacom - Pierre Baudracco                                     //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all not rejected events in a month for current user in current month
@@ -31,11 +38,11 @@ function run_query_month_event_list() {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return the number of waiting events
 // Parameters: 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_waiting_events() {
   global $cdg_sql,$auth;
 
@@ -59,6 +66,7 @@ function run_query_waiting_events() {
   $obm_db->query($query);
   return $obm_db->nf()/1;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the list of writable agenda users for the current user
@@ -146,6 +154,7 @@ function store_daily_events($obm_q) {
   return $current_event;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
 // and returns the date of that day. (ie: "sun" or "sunday" would be 
@@ -177,6 +186,17 @@ function run_query_days_unfilled() {
   global $cdg_sql, $cdg_param, $auth;
   global $c_day_fraction,$working_days;
 
+  $uid = $auth->auth["uid"];
+
+  $begindate = get_user_entrydate($uid);
+  $unix_ts = $begindate["unix_timestamp"];
+  $iso = $begindate["iso"];
+  $jan_first = mktime (0, 0, 0, 1, 1, date("Y"));
+  if ($unix_ts > $jan_first) {
+    $date = $iso;
+  } else {
+    $date = date("Y0101");
+  }
 
   // First and last days of month
   $query = "
@@ -184,18 +204,18 @@ function run_query_days_unfilled() {
       sum(timetask_length) as total_length
     from TimeTask
     where timetask_date <= '".date("Ymd")."'
-    and timetask_date >= '".date("Y0101")."'
-      and timetask_user_id = '".$auth->auth["uid"]."' 
+    and timetask_date >= '$date'
+      and timetask_user_id = '$uid'
     ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
+  display_debug_msg($query, $cdg_sql, "run_query_days_unfilled");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
   $filled_days = $obm_db->f("total_length");
   $filled_days = $filled_days/$c_day_fraction;
   $workingdays = 0;
-  $current_day = strtotime(date("Y0101"));
+  $current_day = strtotime($date);
   $today = time();
   while($current_day <= $today) {
     $day = date("w",$current_day);
@@ -206,4 +226,7 @@ function run_query_days_unfilled() {
   }
   return $workingdays - $filled_days;
 }
+
+
+
 </script>

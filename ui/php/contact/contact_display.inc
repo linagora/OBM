@@ -2635,12 +2635,12 @@ function dis_contact_display_pref($display_pref_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Export: Contact                                             //
+// Display Vcard Export
 // Parameters:
 //   - $contact[] : contact id
 //     keys used  : contact_id
 ///////////////////////////////////////////////////////////////////////////////
-function dis_export_handle($contact) {
+function dis_vcard_export($contact) {
   global $display, $path, $l_query_error;
   global $auth;
 
@@ -2650,18 +2650,18 @@ function dis_export_handle($contact) {
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
-  dis_export_vcard($con_q,$com_q);
+  export_vcard($con_q,$com_q);
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Export: Contact Vcard                                            //
+// Vcard Export
 // Parameters:
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
-function dis_export_vcard($co_q,$com_q) {
-
+function export_vcard($co_q,$com_q) {
   global $obm_version,$set_weekstart_default;
+
   $id = $co_q->f("contact_id");
   $kind_header = $co_q->f("kind_header");
   $lname = $co_q->f("contact_lastname");
@@ -2671,16 +2671,19 @@ function dis_export_vcard($co_q,$com_q) {
   $c_name = $co_q->f("company_name");
   $c_phone = $co_q->f("company_phone");
   
-  if($c_phone != "") 
+  if ($c_phone != "")
     $vcard_c_phone = "TEL;WORK;VOICE:$c_phone\n"; 
+
   $c_fax = $co_q->f("company_fax");
-  if($c_fax != "") 
+  if ($c_fax != "")
     $vcard_c_fax = "TEL;WORK;FAX:$c_fax\n";
+
   $function = $co_q->f("function_label");
-  if($function != "") 
+  if ($function != "")
     $vcard_function = "ROLE:$func\n";
+
   $title = $co_q->f("contact_title");
-  if($title != "")
+  if ($title != "")
     $vcard_title = "TITLE:$title\n";  
     
   $ad1 = $co_q->f("contact_address1");
@@ -2690,15 +2693,15 @@ function dis_export_vcard($co_q,$com_q) {
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
   $ctry_name = $co_q->f("country_name");
-  if($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
+  if ($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
     $vcard_contaddr = "ADR;HOME:$cdx;";
-    if($ad2) 
+    if ($ad2)
       $vcard_contaddr .= "$ad2\\n";
-    if($ad3)
+    if ($ad3)
       $vcard_contaddr .= "$ad3";
     $vcard_contaddr .= ";" ;
-    if($ad1) 
-     $vcard_contaddr .= "$ad1\\n";
+    if ($ad1)
+      $vcard_contaddr .= "$ad1\\n";
     $vcard_contaddr .= ";$town;;$zip;$ctry_name\n";
   }
   $ad1 = $com_q->f("company_address1");
@@ -2708,60 +2711,65 @@ function dis_export_vcard($co_q,$com_q) {
   $town = $com_q->f("company_town");
   $cdx = $com_q->f("company_expresspostal");
   $ctry_name = $com_q->f("country_name");    
-  if($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
+  if ($ad1 || $ad2 || $ad3 || $zip || $town || $cdx ||$ctry_name) {
     $vcard_compaddr = "ADR;WORK:$cdx;";
-    if($ad2) 
+    if ($ad2)
       $vcard_compaddr .= "$ad2\\n";
-    if($ad3)
+    if ($ad3)
       $vcard_compaddr .= "$ad3";
     $vcard_compaddr .= ";" ;
-    if($ad1) 
+    if ($ad1)
      $vcard_compaddr .= "$ad1\\n";
     $vcard_compaddr .= ";$town;;$zip;$ctry_name\n";
   }  
+
   $phone = $co_q->f("contact_phone");
-  if($phone != "")
+  if ($phone != "")
     $vcard_phone =  "TEL;WORK;VOICE:$phone\n"; 
+
   $hphone = $co_q->f("contact_homephone");
-  if($hphone != "")
+  if ($hphone != "")
     $vcard_hphone =  "TEL;HOME;VOICE:$hphone\n";
+
   $mphone = $co_q->f("contact_mobilephone");
-  if($mphone != "")
+  if ($mphone != "")
     $vcard_mphone = "TEL;CELL:$mphone\n";  
+
   $fax = $co_q->f("contact_fax");
-  if($fax != "")
+  if ($fax != "")
     $vcard_fax = "TEL;HOME;FAX:$fax\n"; 
+
   $email = $co_q->f("contact_email");    
-  if($email != "")
+  if ($email != "")
     $vcard_email = "EMAIL;WORK;INTERNET:$email\n";  
+
   $email2 = $co_q->f("contact_email2");    
-  if($email2 != "")
+  if ($email2 != "")
     $vcard_email2 = "EMAIL;OTHER;INTERNET:$email2\n";      
   
-header("Content-Type: text/x-vCard");
-header("Content-Disposition: inline; filename=".str_replace(" ","_",$lname).",_".str_replace(" ","_",$fname).".vcf");
-header("charset=utf-8"); 
+  header("Content-Type: text/x-vCard");
+  header("Content-Disposition: inline; filename=".str_replace(" ","_",$lname).",_".str_replace(" ","_",$fname).".vcf");
+  header("charset=utf-8"); 
 
-$vcard = "BEGIN:VCARD\n";
-$vcard .= "VERSION:3.0\n";
-$vcard .= "$vcard_title";
-$vcard .= "$vcard_function";
-$vcard .= "ORG:$c_name;$service;\n";
-$vcard .= "FN:$kind_header $lname $fname\n";
-$vcard .= "N:$lname;$fname;;$kind_header\n";
-$vcard .= "$vcard_contaddr";
-$vcard .= "$vcard_compaddr";
-$vcard .= "UID:OBM-$id-$fname\n";
-$vcard .= "$vcard_email";
-$vcard .= "$vcard_email2";
-$vcard .= "$vcard_phone";
-$vcard .= "$vcard_hphone";
-$vcard .= "$vcard_mphone";
-$vcard .= "$vcard_fax";
-$vcard .= "$vcard_c_fax";
-$vcard .= "END:VCARD";
-echo iconv("ISO-8859-15","UTF-8",$vcard);
-
-
+  $vcard = "BEGIN:VCARD\n";
+  $vcard .= "VERSION:3.0\n";
+  $vcard .= "$vcard_title";
+  $vcard .= "$vcard_function";
+  $vcard .= "ORG:$c_name;$service;\n";
+  $vcard .= "FN:$kind_header $lname $fname\n";
+  $vcard .= "N:$lname;$fname;;$kind_header\n";
+  $vcard .= "$vcard_contaddr";
+  $vcard .= "$vcard_compaddr";
+  $vcard .= "UID:OBM-$id-$fname\n";
+  $vcard .= "$vcard_email";
+  $vcard .= "$vcard_email2";
+  $vcard .= "$vcard_phone";
+  $vcard .= "$vcard_hphone";
+  $vcard .= "$vcard_mphone";
+  $vcard .= "$vcard_fax";
+  $vcard .= "$vcard_c_fax";
+  $vcard .= "END:VCARD";
+  echo iconv("ISO-8859-15","UTF-8",$vcard);
 }
+
 </script>
