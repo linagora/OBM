@@ -245,8 +245,9 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
   $tt = $project["tt"];
   $manager = $project["manager"];
   $member = $project["member"];
+  $archive = $project["archive"];
 
-  $url = url_prepare("project_index.php?tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;action=search");
+  $url = url_prepare("project_index.php?action=search&amp;tf_name=$name&amp;tf_company_name=$company_name&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;sel_member=$member&amp;cb_archive=$archive");
 
   $dis_projects_list=new OBM_DISPLAY("DATA", $pref_q, "project");
   $dis_projects_list->data_set = $obm_q_projects;
