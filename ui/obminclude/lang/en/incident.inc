@@ -68,6 +68,7 @@ $l_sta_insert = "Insert Status";
 $l_found = "incidents found";
 $l_no_found = "No incident found matching the query !";
 $l_insert_ok = "The incident has been inserted successfully.";
+$l_update_ok = "The incident has been updated successfully.";
 $l_delete_ok = "The incident has been deleted successfully.";
 $l_no_display = "Fill the search fields and press &lt; Find &gt; to retrieve the Incidents";
 

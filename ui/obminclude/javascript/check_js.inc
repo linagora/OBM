@@ -1,10 +1,12 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM   - Language : JavaScript Embedded in PHP                             //
-//       - File     : check_js.inc                                           //
-// 1999-12-30 Pierre Baudracco - Last Update : 1999-12-30                    //
+// OBM - Language : JavaScript Embedded in PHP                               //
+//     - File     : check_js.inc                                             //
+// 1999-12-30 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // Fonctions JAVASCRIPT utilitaires et generiques (trim(),...)               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // trim(string) function : Removes the leading and trailing spaces and tabs of
@@ -57,7 +59,8 @@ function check_money(field){
   // field containing a money amout
   // digits and eventually a '.'
   return field.match($js_regexp_money);
-}"; // End of initial echo
+}
+";
 
 
 

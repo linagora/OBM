@@ -23,7 +23,10 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $perms = $user["perms"];
   $archive = $user["archive"];
 
-  $select = "select UserObm.*, userobm_id as Id from UserObm";
+  $select = "select UserObm.*,
+      userobm_id as Id,
+      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+    from UserObm";
   $where = "";
 
   // If a login indication has been specified, get it

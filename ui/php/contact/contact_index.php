@@ -135,7 +135,7 @@ if ($action == "index" || $action == "") {
       display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
     require("contact_js.inc");
-    display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("contact_timecreate"),$con_q->f("contact_timeupdate")); 
+    display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("timecreate"),$con_q->f("timeupdate")); 
     html_contact_form($action, $con_q, $kind_q, $contact);
   }
 

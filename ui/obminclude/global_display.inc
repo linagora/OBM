@@ -555,6 +555,10 @@ class OBM_DISPLAY {
           if ($this->data_set->f($fieldname)) $name ="X";
           else $name="&nbsp;";
 	}
+	else if ($fieldname == "userobm_timelastaccess") {
+	  $date = $this->data_set->f($fieldname);
+	  $name = date_format($date);
+	}
 
 	//------------------------
 	// For the accounts :

@@ -185,7 +185,6 @@ page_close();
 display_end();
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Stores User parameters transmited in $obm_user hash
 // returns : $obm_user hash with parameters set

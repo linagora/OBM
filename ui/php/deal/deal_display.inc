@@ -694,7 +694,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       $town = $comp_q->f("company_town");
       $market = $comp_q->f("company_marketingmanager_id");
       // We pre-fill datebegin and datealarm with current date
-      $today = getdate();
       $datebegin = date($c_php_isodate_format); 
       $datealarm = $datebegin;
       // We pre-fill Hit rate

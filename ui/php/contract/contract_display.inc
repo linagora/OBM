@@ -339,7 +339,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   // - Themes
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   // -- Labels
-  global $path,$l_update,$l_delete,$l_insert;
+  global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_marketing_manager;
   global $l_technical_manager,$l_last_update;
   global $popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp;
@@ -393,6 +393,9 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
       $zip = $comp_q->f("company_zipcode");
       $town = $comp_q->f("company_town");
       $market = $comp_q->f("company_marketingmanager_id");
+      // We pre-fill date with current date
+      $datebegin = date($c_php_isodate_format);
+      $dateexp = date($c_php_isodate_format, time() + 31536000);
     } else {
       $comp_name = $contract["company_name"];
       $ad1 = $contract["company_ad1"];

@@ -24,18 +24,21 @@ OBM administration).
 4 actions are currently implemented (all are available in html and txt mode).
 
 ===============================================================================
-ACTIONS            | args   | Description
+ACTIONS              | args   | Description
 ===============================================================================
-help               |        | Show this help file
+help                 |        | Show this help file
 ===============================================================================
-index              |        | Specific to HTML version
-                   |        | Display the search screen form
+index                |        | Specific to HTML version
+                     |        | Display the search screen form
 ===============================================================================
-user_pref_update   |        | Update Users preferences (default values)
+user_pref_update     |        | Update Users preferences (default values)
 -------------------------------------------------------------------------------
-global_pref_update | $param | Update Global preferences (values as params)
+user_pref_update_one | -o -v  | Update one User preference (default values)
+-------------------------------------------------------------------------------
+global_pref_update   | -l -s  | Update Global preferences (values as params)
 -------------------------------------------------------------------------------
 txt: php admin_pref_index.php -a user_pref_update
+txt: php admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 txt: php4 admin_pref_index.php -a global_pref_update -lf 3600
 ===============================================================================
 
@@ -43,4 +46,7 @@ txt mode Usage: php admin_pref_index.php [Options]
 where Options:
 -h, --help help screen
 -a action  (avalaible actions)
--lifetime lifetime, -lf lifetime : session lifetime (seconds)
+-lifetime lifetime, -l lifetime : session lifetime (seconds)
+-s session_cookie, --session-cookie session_cookie : session_cookie (1=true |0)
+-o option, --option option
+-v value, --value value

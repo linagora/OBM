@@ -943,115 +943,163 @@ function run_query_delete($agenda) {
   send_mail($l_delete_event_mail_subject,$message,$contacts,$mail);
 } 
 
-/////////////////////////////////////////////////////////////////////////////
-// Retunr Users with their permissions.
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Get active Users or archived with rights set with their permissions
+///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_right() {
   global $cdg_sql,$auth;
+
+  $uid = $auth->auth["uid"];
+  $query = "
+    SELECT userobm_id,
+      calendarright_customerid,
+      u.userobm_lastname, u.userobm_firstname,
+      c.calendarright_write, c.calendarright_read 
+    FROM UserObm as u
+      LEFT OUTER JOIN CalendarRight as c
+        ON c.calendarright_ownerid = '$uid'
+          AND c.calendarright_customerid = userobm_id 
+    WHERE userobm_id != '$uid'
+      and (userobm_archive != '1' or c.calendarright_write is not null)
+    ORDER BY u.userobm_lastname";
+
   $obm_db = new DB_OBM;
-  $query = "SELECT userobm_id,calendarright_customerid,u.userobm_lastname,u.userobm_firstname,c.calendarright_write,c.calendarright_read 
-            FROM UserObm as u LEFT OUTER JOIN CalendarRight as c ON c.calendarright_ownerid = ".$auth->auth["uid"]." AND c.calendarright_customerid = userobm_id 
-	    WHERE userobm_id != ".$auth->auth["uid"]." ORDER BY u.userobm_lastname";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
 }  
 
-/////////////////////////////////////////////////////////////////////////////
-// Retunr User which permit the current user to read their calendar.
-//////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of readable agenda users for the current user
+///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_readable() {
-  global $cdg_sql,$auth;
+  global $cdg_sql, $auth;
+
+  $uid = $auth->auth["uid"];
+  $query = "SELECT u.*,
+      c.calendarright_read
+    FROM UserObm as u
+      LEFT OUTER JOIN CalendarRight as c 
+        ON c.calendarright_customerid = '$uid'
+          AND u.userobm_id = c.calendarright_ownerid 
+    WHERE (c.calendarright_read = 1 OR u.userobm_id='$uid')
+    ORDER BY u.userobm_lastname";
+
   $obm_db = new DB_OBM;
-  $query = "SELECT u.*,c.calendarright_read FROM UserObm as u LEFT OUTER JOIN CalendarRight as c 
-            ON c.calendarright_customerid = ".$auth->auth["uid"]." AND u.userobm_id = c.calendarright_ownerid 
-            WHERE  c.calendarright_read IS NULL OR c.calendarright_read = 0 
-	    ORDER BY u.userobm_lastname";
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);
   return $obm_db;
-}  
+}
 
-/////////////////////////////////////////////////////////////////////////////
-// Retunr User which permit the current user to write into their calendar.
-//////////////////////////////////////////////////////////////////////////////
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of writable agenda users for the current user
+///////////////////////////////////////////////////////////////////////////////
 function run_query_userobm_writable() {
   global $cdg_sql,$auth;
+
+  $uid = $auth->auth["uid"];
+  $query = "SELECT u.*,
+      c.calendarright_write
+    FROM UserObm as u
+      LEFT OUTER JOIN CalendarRight as c 
+        ON u.userobm_id = c.calendarright_ownerid
+          AND c.calendarright_customerid = '$uid'
+    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') 
+    ORDER BY u.userobm_lastname";
+
   $obm_db = new DB_OBM;
-  $query = "SELECT u.*,c.calendarright_write FROM UserObm as u LEFT OUTER JOIN CalendarRight as c 
-            ON u.userobm_id = c.calendarright_ownerid AND c.calendarright_customerid = ".$auth->auth["uid"]."
-            WHERE  c.calendarright_write IS NULL OR c.calendarright_write = 0 
-	    ORDER BY u.userobm_lastname";
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);
   return $obm_db;
-}  
+}
+
 
 /////////////////////////////////////////////////////////////////////////////
 // Update the list of the rights give to users. 
 //////////////////////////////////////////////////////////////////////////////
-
 function run_query_update_right($agenda) {
   global $cdg_sql,$auth;  
+
+  $uid = $auth->auth["uid"];
   $accept_write = $agenda["accept_w"];
   $deny_write = $agenda["deny_w"];
-  $deny_read = $agenda["deny_raccept_r"];
+  $deny_read = $agenda["deny_r"];
   $accept_read = $agenda["accept_r"];
   $obm_db = new DB_OBM;
-  if(is_array($accept_write)){
-    foreach($accept_write as $key => $id) {
-      $query = "UPDATE CalendarRight SET calendarright_write = 0 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
-                                     AND calendarright_customerid = $id";
+
+  if (is_array($accept_write)) {
+    foreach ($accept_write as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_write = 1
+        WHERE calendarright_ownerid = '$uid'
+          AND calendarright_customerid = '$id'";
       display_debug_msg($query, $cdg_sql);	    
       $obm_db->query($query);
-    }
-  }
-  if(is_array($deny_write)){
-    foreach($deny_write as $key => $id) {
-      $query = "UPDATE CalendarRight SET calendarright_write = 1 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
-                                     AND calendarright_customerid = $id";
-      display_debug_msg($query, $cdg_sql);	    
-      $obm_db->query($query);
-      if($obm_db->affected_rows() == 0) {
-	$query = "INSERT INTO CalendarRight VALUES(".$auth->auth["uid"].",$id,1,0)";
+      if ($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES('$uid','$id',1,0)";
       	display_debug_msg($query, $cdg_sql);	    
        	$obm_db->query($query);
       }
     }
   }
-  if(is_array($deny_read)){
-    foreach($deny_read as $key => $id) {
-      $query = "UPDATE CalendarRight SET calendarright_read = 1 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
-                                     AND calendarright_customerid = $id";
+
+  if (is_array($deny_write)) {
+    foreach ($deny_write as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_write = 0
+        WHERE calendarright_ownerid = '$uid'
+          AND calendarright_customerid = '$id'";
+      display_debug_msg($query, $cdg_sql);
+      $obm_db->query($query);
+      if ($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES('$uid','$id',0,1)";
+      	display_debug_msg($query, $cdg_sql);	    
+       	$obm_db->query($query);
+      }
+    }
+  }
+
+  if (is_array($deny_read)) {
+    foreach ($deny_read as $key => $id) {
+      $query = "UPDATE CalendarRight SET calendarright_read = 0
+        WHERE calendarright_ownerid = '$uid'
+          AND calendarright_customerid = '$id'";
       display_debug_msg($query, $cdg_sql); 
       $obm_db->query($query);
-      if($obm_db->affected_rows() == 0) {
-	$query = "INSERT INTO CalendarRight VALUES(".$auth->auth["uid"].",$id,0,1)";
+      if ($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES('$uid','$id',1,0)";
       	display_debug_msg($query, $cdg_sql);	    
        	$obm_db->query($query);
       }
     }
   }
-  if(is_array($accept_read)){
+
+  if (is_array($accept_read)) {
     foreach($accept_read as $key => $id) {
-      $query = "UPDATE CalendarRight SET calendarright_read = 0 WHERE calendarright_ownerid = ".$auth->auth["uid"]."
-                                     AND calendarright_customerid = $id";
+      $query = "UPDATE CalendarRight SET calendarright_read = 1
+        WHERE calendarright_ownerid = '$uid'
+          AND calendarright_customerid = '$id'";
       display_debug_msg($query, $cdg_sql);	    
       $obm_db->query($query);
+      if ($obm_db->affected_rows() == 0) {
+	$query = "INSERT INTO CalendarRight VALUES('$uid','$id',0,1)";
+      	display_debug_msg($query, $cdg_sql);	    
+       	$obm_db->query($query);
+      }
     } 
   }
-  $query = "DELETE FROM CalendarRight WHERE calendarright_read = 0 AND calendarright_write = 0";
+
+  // We delete users rows which have no rights
+  $query = "DELETE FROM CalendarRight
+    WHERE calendarright_read = 0 AND calendarright_write = 0";
   display_debug_msg($query, $cdg_sql);	    
   $obm_db->query($query);  
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category agenda query execution                                              //
+// Category agenda query execution                                           //
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////

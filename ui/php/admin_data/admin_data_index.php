@@ -24,10 +24,11 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc"); 
 require("admin_data_display.inc");
+require("admin_data_query.inc");
 
-$debug=1;
+$debug=0;
 
-$modules = array ('company');
+$modules = array ('company', 'deal');
 //$modules = get_modules_array();
 $acts = array ('help', 'index', 'data_show', 'data_update');
 
@@ -83,50 +84,6 @@ switch ($mode) {
    page_close();
    display_end();
    break;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution - company list                                            //
-///////////////////////////////////////////////////////////////////////////////
-function get_company_list() {
-  global $cdg_sql;
-
-  $query = "select company_id,
-      company_contact_number,
-      company_deal_number,
-      company_deal_total
-    from Company";
-
-  display_debug_msg($query, $cdg_sql);
-
-  $c_q = new DB_OBM;
-  $c_q->query($query);
-  return $c_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution - Company Update
-// Parametres:
-//   - $id         : company id
-//   - $con_num    : contact number
-//   - $deal_num   : active deal number
-//   - $deal_total : total deal number
-///////////////////////////////////////////////////////////////////////////////
-function update_one_company($id, $con_num, $deal_num, $deal_total) {
-  global $cdg_sql;
-
-  $query = "update Company set
-      company_contact_number='$con_num',
-      company_deal_number='$deal_num',
-      company_deal_total='$deal_total'
-    where company_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $u_q = new DB_OBM;
-  $retour = $u_q->query($query);
-  return $retour;
 }
 
 

@@ -9,6 +9,7 @@
 // Actions
 // - index
 // - user_pref_update
+// - user_pref_update_one -- update one preference for all users
 // - global_pref_update
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
@@ -24,8 +25,8 @@ include("$obminclude/global.inc");
 require("admin_pref_display.inc");
 require("admin_pref_query.inc");
 
-$debug=0;
-$actions = array ('help', 'index', 'user_pref_update', 'global_pref_update');
+$debug=1;
+$actions = array ('help', 'index', 'user_pref_update', 'user_pref_update_one', 'global_pref_update');
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -45,7 +46,7 @@ switch ($mode) {
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    display_head("Admin_Pref");
-   if($action == "") $action = "index";
+   if ($action == "") $action = "index";
    get_admin_pref_action();
    $perm->check();
    generate_menu($menu, $section);
@@ -64,6 +65,12 @@ switch ($action) {
     break;
   case "user_pref_update":
     dis_user_pref_update($mode);
+    break;
+  case "user_pref_update_one":
+    $option = $pref["up_option"];
+    $value = $pref["up_value"];
+    if (! $value) $value = get_userpref_value($option); 
+    dis_user_pref_update_one($mode, $option, $value);
     break;
   case "global_pref_update":
     if (check_data_form($pref)) {
@@ -130,9 +137,12 @@ where Options:
 -a action  ($lactions)
 -l lifetime, --lifetime lifetime : session lifetime (seconds)
 -s session_cookie, --session-cookie session_cookie : session_cookie (1=true |0)
+-o option, --option option
+-v value, --value value
 
 Ex: php4 admin_pref_index.php -a user_pref_update
 Ex: php4 admin_pref_index.php -a global_pref_update -l 3600 -s 1
+Ex: php4 admin_pref_index.php -a user_pref_update_one -o last_account -v 0
 ";
 }
 
@@ -143,6 +153,7 @@ Ex: php4 admin_pref_index.php -a global_pref_update -l 3600 -s 1
 function parse_arg($argv) {
   global $debug, $actions;
   global $action, $tf_lifetime, $cb_session_cookie;
+  global $sel_userpref, $tf_pref_value;
 
   // We skip the program name [0]
   next($argv);
@@ -164,15 +175,29 @@ function parse_arg($argv) {
 	return false;
       }
       break;
-    case '-l' || '--lifetime':
+    case '-l':
+    case '--lifetime':
       list($nb2, $val2) = each ($argv);
       $tf_lifetime = $val2;
-      if ($debug > 0) { echo "-a -> \$tf_lifetime=$val2\n"; }
+      if ($debug > 0) { echo "-l -> \$tf_lifetime=$val2\n"; }
       break;
-    case '-s' || '--session-cookie':
+    case '-s':
+    case '--session-cookie':
       list($nb2, $val2) = each ($argv);
       $cb_session_cookie = $val2;
-      if ($debug > 0) { echo "-a -> \$cb_session_cookie=$val2\n"; }
+      if ($debug > 0) { echo "-s -> \$cb_session_cookie=$val2\n"; }
+      break;
+    case '-o':
+    case '--option':
+      list($nb2, $val2) = each ($argv);
+      $sel_userpref = $val2;
+      if ($debug > 0) { echo "-o -> \$sel_userpref=$val2\n"; }
+      break;
+    case '-v':
+    case '--value':
+      list($nb2, $val2) = each ($argv);
+      $tf_pref_value = $val2;
+      if ($debug > 0) { echo "-v -> \$tf_pref_value=$val2\n"; }
       break;
     }
   }
@@ -186,11 +211,13 @@ function parse_arg($argv) {
 // returns : $pref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_pref() {
-  global $tf_lifetime, $cb_session_cookie;
+  global $tf_lifetime, $cb_session_cookie, $sel_userpref, $tf_pref_value;
   global $cdg_param;
 
   if (isset ($tf_lifetime)) $pref["lifetime"] = $tf_lifetime;
   if (isset ($cb_session_cookie)) $pref["session_cookie"] = 1;
+  if (isset ($sel_userpref)) $pref["up_option"] = $sel_userpref;
+  if (isset ($tf_pref_value)) $pref["up_value"] = $tf_pref_value;
 
   if (debug_level_isset($cdg_param)) {
     if ( $pref ) {
@@ -233,6 +260,13 @@ function get_admin_pref_action() {
      'Right' 	=> $admin_pref_write,
      'Condition'=> array ('index') 
                                     	);
+  // user_pref_update_one : update (set to default) one pref for all users
+  $actions["ADMIN_PREF"]["user_pref_update_one"] = array (
+     'Name'     => $l_header_pref_update,
+     'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update_one&amp;mode=html",
+     'Right' 	=> $admin_pref_write,
+     'Condition'=> array ('None') 
+                                    	);
   // global_pref_update : global preferences update
   $actions["ADMIN_PREF"]["global_pref_update"] = array (
      'Url'     => "$path/admin_pref/admin_pref_index.php?action=global_pref_update&amp;mode=html",
@@ -241,7 +275,6 @@ function get_admin_pref_action() {
                                     	);
 
 }
-
 
 </SCRIPT>
 

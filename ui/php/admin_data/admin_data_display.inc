@@ -120,6 +120,8 @@ function dis_data($action, $mode, $module) {
 
   } else if ($module == "company") {
     dis_data_company($action, $mode);
+  } else if ($module == "deal") {
+    dis_data_deal($action, $mode);
   } else {
     echo "No data inconsistency to check here... bye.";
   }
@@ -247,6 +249,132 @@ function dis_data_company($action, $mode) {
     echo "<tr>
         <td class=\"adminLabel\" colspan=\"8\">
           Company : $nb_comp to parse, $cpt_cu inconsistencies</td>
+      </tr>
+      </table>";
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display (/and update) data inconsistency for the Deal module
+// Parametres:
+//   - $action : data_show || data_update (proceed the update)
+//   - $mode : "txt" or "html"
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_deal($action, $mode) {
+  global $path, $debug, $c_all, $php_regexp_number;
+
+  // Get the deal list
+  $d_q = get_deal_list();
+  $cpt_d = 0;
+  $cpt_du = 0;
+  $nb_deal = $d_q->num_rows();
+  
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Company : $nb_comp to parse
+------------------------------------------------------------------------------
+";
+  } else {
+    if ($action == "data_update") {
+      $update = "<td class=\"adminHead\">Update</td>";
+    } else {
+      $update = "";
+    }
+    echo "
+      <table class=\"admin\">
+      <tr>
+        <td class=\"adminHead\">Deal ($nb_deal)</td>
+        <td class=\"adminHead\">Status</td>
+        <td class=\"adminHead\">Archive</td>
+        <td class=\"adminHead\">Hitrate</td>
+        <td class=\"adminHead\">Should be</td>
+        $update
+      </tr>";
+  }
+
+  while ($d_q->next_record()) {
+    $cpt_d++;
+
+    $id = $d_q->f("deal_id");
+    $status = $d_q->f("dealstatus_label");
+    $archive = $d_q->f("deal_archive");
+    $arch = (($archive == "1") ? "X" : "&nbsp;");
+    $hitrate = $d_q->f("deal_hitrate");
+    $new_hitrate = $d_q->f("dealstatus_hitrate");
+
+    // If current hitrate doesn't match status hitrate
+    // or hitrate not a number
+    // or deal archived but hit rate not 0 nor 100
+    // or deal archived but status tells deal not closed
+    if ( ( ($new_hitrate != "") && ($new_hitrate != $hitrate) )
+         || (! preg_match($php_regexp_number, $hitrate) )
+	 || ( ($archive == "1") && ($hitrate != "0") && ($hitrate != "100") )
+	 || ( ($archive == "1") && ($new_hitrate != "0") && ($new_hitrate != "100") )
+	 ) {
+      $cpt_du++;
+      if ($mode == "txt") {
+	$arch = (($archive == "1") ? "X" : " ");
+	echo "\nDeal (id=$id) : status $status, archive $arch hitrate $hitrate, new_hitrate $new_hitrate";
+      } else {
+	$arch = (($archive == "1") ? "X" : "&nbsp;");
+	echo "<tr>
+          <td class=\"adminText\"><a href=\"$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$id\">$id</a></td>
+          <td class=\"adminText\">$status</td>
+          <td class=\"adminText\">$arch</td>
+          <td class=\"adminText\">$hitrate</td>
+          <td class=\"adminText\">$new_hitrate</td>";
+      }
+
+      if ($action == "data_update") {
+	$retour = false;
+	if ( ($new_hitrate != "") && ($new_hitrate != $hitrate) ) {
+	  $retour = update_one_deal($id, $new_hitrate);
+	}
+	if ($retour) {
+	  if ($mode == "txt") {
+	    echo "OK";
+	  } else {
+	    echo "<td class=\"adminLabel\">OK</td>";
+	  }
+	} else {
+	  if ($mode == "txt") {
+	    echo "Manual !";
+	  } else {
+	    echo "<td class=\"adminLabel\">Manual !</td>";
+	  }
+	}
+      }
+
+      if ($mode == "html") {
+	echo "</tr>";
+      }
+
+    }
+
+    if ($cpt_d % 100 == 0) {
+      if ($mode =="txt") {
+	echo ".";
+      } else {
+	echo "<tr>
+          <td class=\"adminLabel\" colspan=\"8\">$cpt_d</td>
+        </tr>";
+	flush();
+      }
+    }
+  }
+
+  if ($mode == "txt") {
+    echo "
+------------------------------------------------------------------------------
+*** Deal : $nb_deal to parse, $cpt_du inconsistencies
+------------------------------------------------------------------------------
+";
+  } else {
+    echo "<tr>
+        <td class=\"adminLabel\" colspan=\"8\">
+          Deal : $nb_deal to parse, $cpt_du inconsistencies</td>
       </tr>
       </table>";
   }

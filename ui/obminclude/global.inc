@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.3.2";
+$obm_version = "0.6.3.3";
 $l_title = "O.B.M.";
 
 // VARS that go in session
@@ -110,6 +110,7 @@ $php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
 $php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
 $js_regexp_list_name = "/^[0-9A-Za-z_-]+$/";  //Name of a list
 $js_regexp_number = "/^([0-9][-]?)+$/"; // only numbers
+$php_regexp_number = "/^[0-9]*$/"; // only numbers
 $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_lifetime = "^[0-9]{1,6}$";
 

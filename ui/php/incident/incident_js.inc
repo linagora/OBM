@@ -25,11 +25,11 @@ function confirm_del() {
 }
 
 
-function verifier_inc(f_aff) {
-  if (f_aff.tf_dateafter.value != '' && check_date(f_aff.tf_dateafter, '".addslashes($l_date_after_js)."') == false) {
+function check_search_inc(f_inc) {
+  if (f_inc.tf_dateafter.value != '' && check_date(f_inc.tf_dateafter, '".addslashes($l_date_after_js)."') == false) {
     return false;
   }
-  if (f_aff.tf_datebefore.value != '' && check_date(f_aff.tf_datebefore,'".addslashes($l_date_before)."') == false) {
+  if (f_inc.tf_datebefore.value != '' && check_date(f_inc.tf_datebefore,'".addslashes($l_date_before)."') == false) {
     return false;
   }
   return true;

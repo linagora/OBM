@@ -90,7 +90,7 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
-generate_menu($menu,$section);         // Menu
+generate_menu($menu, $section); // Menu
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -103,6 +103,7 @@ if ($action == "index" || $action == "") {
   } else {
     display_info_msg($l_no_display);
   }
+
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
@@ -115,7 +116,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   require("company_js.inc");
   html_company_form($action,"",$type_q, $act_q, $usr_q, $company);
 
@@ -138,7 +139,8 @@ if ($action == "index" || $action == "") {
     if ($comp_q->num_rows() == 1) {
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
-      $usr_q = run_query_userobm();
+      $users = array($comp_q->f("company_marketingmanager_id"));
+      $usr_q = run_query_userobm_active($users);
       require("company_js.inc");
       display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
       html_company_form($action, $comp_q, $type_q, $act_q, $usr_q, $company);
@@ -146,6 +148,7 @@ if ($action == "index" || $action == "") {
       display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
+
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $company)) {
@@ -186,7 +189,8 @@ if ($action == "index" || $action == "") {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
-    $usr_q = run_query_userobm();
+    $users = array($company["marketing_manager"]);
+    $usr_q = run_query_userobm_active($users);
     html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
 
@@ -199,14 +203,15 @@ if ($action == "index" || $action == "") {
     } else {
       display_err_msg($l_update_error);
     }
-    $obm_q_soc = run_query_detail($param_company);
-    display_record_info($obm_q_soc->f("company_usercreate"),$obm_q_soc->f("company_userupdate"),$obm_q_soc->f("timecreate"),$obm_q_soc->f("timeupdate")); 
-    html_company_consult($obm_q_soc);
+    $comp_q = run_query_detail($param_company);
+    display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate")); 
+    html_company_consult($comp_q);
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
-    $usr_q = run_query_userobm();
+    $users = array($company["marketing_manager"]);
+    $usr_q = run_query_userobm_active($users);
     html_company_form($action, "", $type_q, $act_q, $usr_q, $company);
   }
 

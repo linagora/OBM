@@ -87,7 +87,7 @@ function html_incident_search_form ($usr_q, $pri_q, $sta_q, $incident) {
 
   echo "
     <form method=\"get\" name=\"f_incident\" action=\"" .
-    url_prepare("incident_index.php") . " \" onsubmit=\"if (verifier_inc(this)) return true; else return false;\">
+    url_prepare("incident_index.php") . " \" onsubmit=\"if (check_search_inc(this)) return true; else return false;\">
 
     <table class=\"details\">
     <tr>
@@ -354,7 +354,7 @@ function html_incident_consult($inc_q,$con_q) {
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $incident) {
-  global $path, $set_theme, $ico_contract;
+  global $path, $set_theme, $ico_contract, $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
@@ -378,7 +378,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
     $c_name = $contr_q->f("contract_label");
-    $c_id = $param_contract;
   } else {
     $param_contract = $incident["contract_id"];
     $lincident = $incident["lincident"];
@@ -393,6 +392,10 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
     $hour = $incident["hour"];
     $archive = ($incident["archive"] == "1" ? "checked" : "");
     $c_name = $incident["lcontract"];
+    if ($action == "new") {
+      // We pre-fill date with current date
+      $date = date($c_php_isodate_format);
+    }
   }
 
   $dis_sel_owner="<select name=\"sel_owner\">";
@@ -514,7 +517,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
  </tr><tr>
   <td class=\"detailLabel\">$l_contract</td>
   <td>
-   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$c_id")."\">$c_name</a>
+   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_name</a>
    <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
    <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
    <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">

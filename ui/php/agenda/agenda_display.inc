@@ -2134,37 +2134,37 @@ function html_dis_delete($agenda) {
   </table>
   ";
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display the new event form
+// Display Rights admin panel
 // Parameters:
-//    -$agenda: agenda parameters
-//    -$obm_q_events : list of event's records 
-//    -$contacts_array : array of selected contacts 
-//    -$groups_array : array of selected groups 
+//   - $user_q :
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_right_model($user_q) {
+function html_dis_right_admin($user_q) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
   global $l_everyone, $l_noone, $l_list,$l_authorize,$l_deny;
   
-  $sel_mul_gene = "";
-  $sel_mul_write = "";
-  while($user_q->next_record()) {
-    if($user_q->f("calendarright_write") == NULL) {
-      $sel_mul_gene_r .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
-      $sel_mul_gene_w .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
-      
-    }else{
-      if($user_q->f("calendarright_write") == 1) {
-	$sel_mul_write .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+  while ($user_q->next_record()) {
+    $u_id = $user_q->f("userobm_id");
+    $lname = $user_q->f("userobm_lastname");
+    $fname = $user_q->f("userobm_firstname");
+
+    if ($user_q->f("calendarright_write") == NULL) {
+      $sel_read_no .= "<option value=\"$u_id\">$lname $fname</option>";
+      $sel_write_no .= "<option value=\"$u_id\">$lname $fname</option>";
+    } else {
+      if ($user_q->f("calendarright_write") == 1) {
+	$sel_write_ok .= "<option value=\"$u_id\">$lname $fname</option>";
       }
-      if($user_q->f("calendarright_read") == 1) {
-	$sel_mul_read .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      if ($user_q->f("calendarright_read") == 1) {
+	$sel_read_ok .= "<option value=\"$u_id\">$lname $fname</option>";
       }
-      if($user_q->f("calendarright_read") == 0) { 
-	$sel_mul_gene_r .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";      
+      if ($user_q->f("calendarright_read") == 0) { 
+	$sel_read_no .= "<option value=\"$u_id\">$lname $fname</option>";
       }
-      if($user_q->f("calendarright_write") == 0) {
-	$sel_mul_gene_w .= "<option value=\"".$user_q->f("userobm_id")."\">".$user_q->f("userobm_lastname")." ".$user_q->f("userobm_firstname")."</option>";
+      if ($user_q->f("calendarright_write") == 0) {
+	$sel_write_no .= "<option value=\"$u_id\">$lname $fname</option>";
       }
     }
   }
@@ -2185,20 +2185,20 @@ function html_dis_right_model($user_q) {
    </tr>
    <tr>
     <td class=\"detailHead\">
-     $l_authorize_list
-    </td>
-    <td class=\"detailHead\">
-    </td>
-    <td class=\"detailHead\">
      $l_denie_list
+    </td>
+    <td class=\"detailHead\">
+    </td>
+    <td class=\"detailHead\">
+     $l_authorize_list
     </td>
    </tr>
    <tr>
     <form method=\"post\" action=\"agenda_index.php\">    
      <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
-      <select name=\"sel_deny_read[]\" multiple=\"multiple\" size=\"15\">
-       $sel_mul_gene_r 
+      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
+      <select name=\"sel_accept_read[]\" multiple=\"multiple\" size=\"15\">
+        $sel_read_no
       </select>
      </td>
      <td class=\"detailHead\">
@@ -2208,9 +2208,9 @@ function html_dis_right_model($user_q) {
       <br /><input type=\"submit\" value=\"$l_authorize\" />
      </td>
      <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
-      <select name=\"sel_accept_read[]\" multiple=\"multiple\" size=\"15\">
-       $sel_mul_read  
+      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
+      <select name=\"sel_deny_read[]\" multiple=\"multiple\" size=\"15\">
+        $sel_read_ok  
       </select>
     </td>  
     </form>
@@ -2231,20 +2231,20 @@ function html_dis_right_model($user_q) {
    </tr>    
    <tr>
     <td class=\"detailHead\">
-     $l_authorize_list
-    </td>
-    <td class=\"detailHead\">
-    </td>
-    <td class=\"detailHead\">
      $l_denie_list
+    </td>
+    <td class=\"detailHead\">
+    </td>
+    <td class=\"detailHead\">
+     $l_authorize_list
     </td>
    </tr>
    <tr>
     <form method=\"post\" action=\"agenda_index.php\">
      <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
-      <select name=\"sel_deny_write[]\" multiple=\"multiple\" size=\"15\">
-       $sel_mul_gene_w 
+      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
+      <select name=\"sel_accept_write[]\" multiple=\"multiple\" size=\"15\">
+        $sel_write_no
       </select>
      </td>
      <td class=\"detailHead\">
@@ -2254,9 +2254,9 @@ function html_dis_right_model($user_q) {
       <br /><input size=\"30\" type=\"submit\" value=\"$l_authorize\" />
      </td>
      <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"action\" value=\"perform_right\" />
-      <select name=\"sel_accept_write[]\" multiple=\"multiple\" size=\"15\">
-       $sel_mul_write  
+      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
+      <select name=\"sel_deny_write[]\" multiple=\"multiple\" size=\"15\">
+        $sel_write_ok
       </select>
      </td>
     </form>
@@ -2264,6 +2264,8 @@ function html_dis_right_model($user_q) {
   </table>
   ";
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the new event form
 // Parameters:

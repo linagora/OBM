@@ -33,7 +33,7 @@ function run_query_id_user($login, $passwd) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Userobm query execution                                                   //
+// Userobm query execution : All users                                       //
 // Parameters:
 //   - $id (optionnal) : UserObm Id 
 // Return:
@@ -47,6 +47,36 @@ function run_query_userobm($id="") {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg("run_query_userobm() : $query", $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Active Userobm query execution : All users not archived                   //
+// Parameters:
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm_active($ids="") {
+  global $cdg_sql;
+
+  if (is_array($ids)) {
+    $where_add = "";
+    $nb_add = count($ids);
+    for ($i=0; $i<$nb_add; $i++) {
+      $where_add .= " or userobm_id = '$ids[$i]'";
+    }
+  }
+
+  $query = "select * from UserObm
+    where userobm_archive != '1'
+      $where_add
+    order by userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg("run_query_userobm_active() : $query", $cdg_sql);
 
   return $obm_q;
 }
@@ -238,7 +268,18 @@ function run_query_set_user_pref($user_id, $option, $value) {
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM ;
-  $obm_q->query($query);
+  $ret = $obm_q->query($query);
+
+  // If nothing updated, we insert
+  if ($obm_q->affected_rows() == 0) {
+    $query = "insert into UserObmPref
+              (userobmpref_user_id, userobmpref_option, userobmpref_value)
+              values ('$user_id', '$option', '$value')";
+    display_debug_msg($query, $cdg_sql);
+    $ret = $obm_q->query($query);
+  }
+
+  return $ret;
 }
 
 
@@ -725,7 +766,9 @@ function run_query_get_recipients($recipients, $force) {
     $join = ", UserObmPref";
   }  
   $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (".$recipients[0];
-  for ($i=1;$i<count($recipients);$i++) {
+
+  $limit = count($recipients);
+  for ($i=1; $i<$limit; $i++) {
     $query.= ",".$recipients[$i];
   }
   $query.=") AND userobm_email != '' $mail_filter";

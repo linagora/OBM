@@ -54,7 +54,7 @@ function run_query_lifetime_update($lifetime) {
 //   - $session_cookie : new session_cookie flag to set (1 true, 0 false)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_session_cookie_update($session_cookie) {
-  global $auth, $cdg_sql;
+  global $cdg_sql;
 
   $query = "update GlobalPref set
               globalpref_value = '$session_cookie'
@@ -110,6 +110,52 @@ function get_global_pref_session_cookie() {
   
   $retour = $obm_q->f("globalpref_value");
   return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the default user preferences
+// Returns:
+//   - $obm_q : DB object of default User Preferences 
+///////////////////////////////////////////////////////////////////////////////
+function get_default_user_pref() {
+  global $cdg_sql;
+
+  $query = "select *
+            from UserObmPref
+            where userobmpref_user_id = '0'
+            order by userobmpref_option";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the user preference value of the option given
+// Parameters:
+//   - $option : preference to get
+// Returns:
+//   - $value : of the preference
+///////////////////////////////////////////////////////////////////////////////
+function get_userpref_value($option) {
+  global $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+  $query = "select userobmpref_value
+            from UserObmPref
+            where userobmpref_user_id = '$uid'
+              and userobmpref_option = '$option'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  return $obm_q->f("userobmpref_value");
 }
 
 

@@ -258,9 +258,6 @@ function html_contact_consult($co_q) {
       <td class=\"detailLabel\">$l_mphone</td>
       <td class=\"detailText\">$mphone</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailText\">$kind</td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_address 1</td>
       <td class=\"detailText\">$ad1</td>
     </tr><tr>

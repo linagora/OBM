@@ -67,7 +67,7 @@ if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $contract = get_param_contract();
 get_contract_action();
 $perm->check();
@@ -127,7 +127,7 @@ if ($action == "index" || $action == "") {
   require("contract_js.inc");
   if ($param_deal != "") 
     display_ok_msg(stripslashes($ok_message)."<br />".$l_add_contract_deal);
-  html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm_active(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -143,24 +143,29 @@ if ($action == "index" || $action == "") {
     $contract_q = run_query_detail($param_contract);
     require("contract_js.inc");
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
-    html_contract_form($action,$contract_q,run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
+    $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
+    $usr_q = run_query_userobm_active($users);
+    $company = $contract_q->f("contract_company_id");
+    html_contract_form($action,$contract_q,run_query_contracttype(), $usr_q, run_query_company_info($company), run_query_contact_contract($company), $contract);
   }
-  
+
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
- if (check_contract_form("", $contract)) {
-   $retour = run_query_insert($contract);
-   if ($retour) {
-     display_ok_msg($l_insert_ok);
-   } else {
-     display_err_msg($l_insert_error);
-   }
-   require("contract_js.inc");
-   $usr_q = run_query_userobm();
-   html_contract_search_form($contract, $usr_q, run_query_contracttype());
- } else {
-   display_err_msg($err_msg);
-   html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  if (check_contract_form("", $contract)) {
+    $retour = run_query_insert($contract);
+    if ($retour) {
+      display_ok_msg($l_insert_ok);
+    } else {
+      display_err_msg($l_insert_error);
+    }
+    require("contract_js.inc");
+    $usr_q = run_query_userobm();
+    html_contract_search_form($contract, $usr_q, run_query_contracttype());
+  } else {
+    display_err_msg($err_msg);
+    $users = array($contract["market"], $contract["tech"]);
+    $usr_q = run_query_userobm_active($users);
+    html_contract_form($action,new DB_OBM,run_query_contracttype(), $usr_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
  }
 
 } elseif ($action == "update")  {
@@ -177,7 +182,9 @@ if ($action == "index" || $action == "") {
   } else {
     require("contract_js.inc");
     display_err_msg($l_invalid_data . " : " . $err_msg);
-    html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    $users = array($contract["market"], $contract["tech"]);
+    $usr_q = run_query_userobm_active($users);
+    html_contract_form($action,new DB_OBM,run_query_contracttype(), $usr_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
   }
 
 } elseif ($action == "check_delete")  {
