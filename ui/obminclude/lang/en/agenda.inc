@@ -19,6 +19,7 @@ $l_description = "Description";
 $l_state = "Status";
 $l_back_mono = "Back to your own view";
 
+$l_go = "Go";
 $l_high = "High";
 $l_low = "Low";
 $l_medium = "Medium";

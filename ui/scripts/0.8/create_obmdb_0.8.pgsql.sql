@@ -486,7 +486,7 @@ CREATE TABLE ContactList (
 CREATE TABLE CalendarSegment (
   calendarsegment_eventid     integer NOT NULL DEFAULT '0',
   calendarsegment_customerid  integer NOT NULL DEFAULT '0',
-  calendarsegment_date        varchar(12) NOT NULL DEFAULT '',
+  calendarsegment_date        TIMESTAMP NOT NULL,
   calendarsegment_flag        varchar(5) NOT NULL DEFAULT '',
   calendarsegment_type        varchar(5) NOT NULL DEFAULT '',
   calendarsegment_state       char(1) NOT NULL DEFAULT '''',
@@ -508,10 +508,10 @@ CREATE TABLE CalendarEvent (
   calendarevent_category_id  integer DEFAULT NULL,
   calendarevent_priority     integer DEFAULT NULL,
   calendarevent_privacy      integer DEFAULT NULL,
-  calendarevent_length       varchar(14) NOT NULL DEFAULT '',
+  calendarevent_length       integer NOT NULL DEFAULT 0,
   calendarevent_repeatkind   varchar(20) DEFAULT NULL,
   calendarevent_repeatdays   varchar(7) DEFAULT NULL,
-  calendarevent_endrepeat    varchar(12) NOT NULL,
+  calendarevent_endrepeat    TIMESTAMP NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 

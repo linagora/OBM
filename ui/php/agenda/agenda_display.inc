@@ -41,7 +41,7 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $td_heigth = 8;
   $td_width = 8;
   $td_colspan = count($calendar_user);
-  store_daily_events($obm_q, $current_events, $event_data,$this_year,$stop_year);
+  store_daily_events($obm_q, $current_events, $event_data,strtotime($this_year),strtotime($stop_year));
   $start_day = strtotime($set_weekstart_default);
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
@@ -225,7 +225,7 @@ function dis_month_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $td_width = floor(105/$nb_user);
   $td_colspan = $nb_user;
     
-  store_daily_events($obm_q, $current_events, $event_data,$first_of_month,$stop_of_month);
+  store_daily_events($obm_q, $current_events, $event_data,strtotime($first_of_month),strtotime($stop_of_month));
   //Display the day of a week
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_day);
@@ -437,7 +437,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $nb_user = count($calendar_user);
   $td_width = ($nb_user > 0 ? floor(70/$nb_user) : 70);
   $td_colspan = $nb_user;
-  store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
+  store_events($obm_q, $current_events, $event_data,$start_week_time,$end_week_time);
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {
     $this_date = date("Ymd", $i);
     $this_date_l = localizeDate("week_list", $i);
@@ -461,7 +461,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
     $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++) {
-      $current_time = date("YmdHi", strtotime("+$j days $i hours",$start_week_day));  
+      $current_time = strtotime("+$j days $i hours",$start_week_day);  
       if(is_array($current_events[$current_time])) {
 	$user_indice=1;
 	foreach($calendar_user as $id => $user_data ) {
@@ -486,7 +486,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	  	  if($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $is_title = TRUE;
-		    $tempDate = substr($indice_time,0,8);
+		    $tempDate = date("Ymd",$indice_time);
 		    if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
@@ -527,7 +527,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		  }
 		  elseif(!in_array($idOfEvent,$temp_array)) {	
 		    $event_head_display .= "<br />";
-		    $tempDate = substr($indice_time,0,8);
+		    $tempDate = date("Ymd",$indice_time);
 		    if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
@@ -541,7 +541,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $typeEvent = $l_private;
 		    }  
 		    $event_head_display .= "
-		     <a class=\"agendaLink4\" href=\"$linkEvent\"
+		    <a class=\"agendaLink4\" href=\"$linkEvent\"
 		      onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
 		      onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		    $hidden_div .= "
@@ -571,7 +571,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		$temp_array2 = next($current_events);
 		$indice_time = key($current_events);
 	      } while (is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
-	             && substr($indice_time,8,2)<$set_stop_time);
+	             && date("H",$indice_time)<$set_stop_time);
 	      $rowspan = "rowspan=\"$rowspan_event\"";
 	      $hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 	      $hour_day_list .= "</td>";		    
@@ -595,7 +595,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     for ($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
       for ($j=0; $j<7;$j++) {
-      	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
+      	$current_time = strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day);  
 	if (is_array($current_events[$current_time])) {
 	  $user_indice=1;
 	  foreach ($calendar_user as $id => $user_data ) {
@@ -620,7 +620,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	  	    if ($is_title == FALSE) {
 	  	      $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		      $is_title = TRUE;
-		      $tempDate = substr($indice_time,0,8);
+		      $tempDate = date("Ymd",$indice_time);
 		      if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 			$titleEvent = $event_data[$idOfEvent]["title"];
 			$descEvent = $event_data[$idOfEvent]["description"];
@@ -659,7 +659,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		    }
 		    elseif(!in_array($idOfEvent,$temp_array)) {	
 		      $event_head_display .= "<br />";
-		      $tempDate = substr($indice_time,0,8);
+		      $tempDate = date("Ymd",$indice_time);
 		      if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 			$titleEvent = $event_data[$idOfEvent]["title"];
 			$descEvent = $event_data[$idOfEvent]["description"];
@@ -702,7 +702,7 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	  	  $temp_array2 = next($current_events);
 	  	  $indice_time = key($current_events);
 		}while(is_array($temp_array2[$id]) && count(array_intersect($temp_array,$temp_array2[$id])) != 0 
-	               && substr($indice_time,8,2)<$set_stop_time);
+	               && date("H",$indice_time)<$set_stop_time);
   		$rowspan = "rowspan=\"$rowspan_event\"";
 		$hour_day_list .= $td_begin."".$rowspan.">".$event_head_display;
 		$hour_day_list .= "</td>";	
@@ -814,13 +814,13 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   $nb_user = count($calendar_user);
   $td_width = floor(460/$nb_user);
   $td_colspan = $nb_user;
-  store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_time),date("YmdHi",$end_time));
+  store_events($obm_q, $current_events, $event_data,$start_time,$end_time);
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
     $hour_day_list .= "
       <tr>
         <td height=\"15\" width=\"60\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>
         <td height=\"15\" width=\"1\"></td>";
-    $current_time = date("YmdHi", strtotime("+$i hours",strtotime($getdate)));  
+    $current_time = strtotime("+$i hours",strtotime($getdate));  
     if (is_array($current_events[$current_time])) {
       $user_indice = 0;
       foreach ($calendar_user as $id => $user_data) {
@@ -842,7 +842,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		if ($is_title == FALSE) {
 		  $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		  $is_title = true;
-		  $tempDate = substr($indice_time,0,8);
+		  $tempDate = date("Ymd",$indice_time);
 		  if($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		    $titleEvent = $event_data[$idOfEvent]["title"];
 		    $descEvent = $event_data[$idOfEvent]["description"];
@@ -881,7 +881,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		}
 		elseif (!in_array($idOfEvent,$temp_array)){
 		  $event_head_display .= "<br />";
-		  $tempDate = substr($indice_time,0,8);
+		  $tempDate = date("Ymd",$indice_time);
 		  if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		    $titleEvent = $event_data[$idOfEvent]["title"];
 		    $descEvent = $event_data[$idOfEvent]["description"];
@@ -945,7 +945,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     $hour_day_list .=   "</tr>\n";
     for ($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"></td>";
-      $current_time = date("YmdHi", strtotime("+$i hours ".($k*$time_unit)." minutes",strtotime($getdate)));  
+      $current_time = strtotime("+$i hours ".($k*$time_unit)." minutes",strtotime($getdate));  
       if (is_array($current_events[$current_time])) {
 	$user_indice = 1;
 	foreach ($calendar_user as $id => $user_data ) {
@@ -966,7 +966,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	      	foreach($current_events[$indice_time][$id] as $h => $idOfEvent) {	
 		  if ($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
-		    $tempDate = substr($indice_time,0,8);
+		    $tempDate = date("Ymd",$indice_time);
 		    if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
@@ -1005,7 +1005,7 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		  }
 		  elseif (!in_array($idOfEvent,$temp_array)){
 		    $event_head_display .=" <br />";
-		    $tempDate = substr($indice_time,0,8);
+		    $tempDate = date("Ymd",$indice_time);
 		    if ($event_data[$idOfEvent]["privacy"] == 0 || $id == $auth->auth["uid"]) {
 		      $titleEvent = $event_data[$idOfEvent]["title"];
 		      $descEvent = $event_data[$idOfEvent]["description"];
@@ -1140,7 +1140,7 @@ return $block;
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
-  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono,$l_free,$l_possible,$l_occupied;
+  global $set_theme,$ico_spacer, $l_go_to,$l_user_calendar,$l_back_mono,$l_free,$l_possible,$l_go,$l_occupied;
   global $set_weekstart_default, $l_daysofweekreallyshort,$l_validate,$set_cal_interval,$l_meeting_legend;
   global $action,$auth;
  
@@ -1354,10 +1354,11 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
        <tr>
         <td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
 	<td colspan=\"2\">
-         <form action=\"\">
+         <form action=\"\" onsubmit=\"return false;\">
           <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
             $sel_year
           </select>
+	  <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);\" />
          </form>
         </td>
        </tr>
@@ -1371,6 +1372,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
           <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
             $sel_month
           </select>
+	  <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
          </form>
         </td>
        </tr>
@@ -1384,6 +1386,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
           <select name=\"action\" class=\"agendaQuery\" onchange=\"window.location=(this.options[this.selectedIndex].value);\">
 	    $sel_week
           </select>
+	  <input type=\"submit\" value=\"$l_go\" onclick=\"window.location=(this.form.action.options[this.form.action.selectedIndex].value);return false;\" />
          </form>
         </td>
        </tr>
@@ -1511,23 +1514,25 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $category_id = $obm_q_event->f("calendarevent_category_id");
     $priority = $obm_q_event->f("calendarevent_priority");
     $desc = $obm_q_event->f("calendarevent_description");
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("datebegin") , $day_array);
-    $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
-    $hourbegin = $day_array[4];
-    $minbegin = $day_array[5];
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("dateend") , $day_array2);
-    $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
-    $hourend = $day_array2[4];
-    $minend = $day_array2[5];
+    $datebegin = $obm_q_event->f("datebegin");
+    $old_begin = date("YmdHi",$datebegin);
+    $hourbegin = date("H",$datebegin);
+    $minbegin = date("i",$datebegin);
+    $datebegin = date("Y-m-d",$datebegin);
+    $dateend = $obm_q_event->f("dateend");
+    $old_end =date("YmdHi",$dateend);        
+    $hourend = date("H",$dateend);
+    $minend = date("i",$dateend);
+    $dateend = date("Y-m-d",$dateend);
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
-    $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
-    $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+    $repeat_days =$obm_q_event->f("calendarevent_repeatdays");
+    if($repeat_kind != "none") {
+      $repeat_end = date("Y-m-d",$obm_q_event->f("calendarevent_endrepeat"));
+    }
     $id = $obm_q_event->f("calendarevent_id");
-    $old_begin = $day_array[0];
-    $old_end = $day_array2[0];
+
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1569,15 +1574,16 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   
   if (($action == "detailupdate") || ($action == "update")) {
     if ($repeat_kind == "none") {
-      $check_activate = "disabled=\"disabled\"";
+      $check_activate = "disabled=\"disabled\" ";
       $check_case_style = "style=\"color:#cccccc; bacgound-color: #999999\"";
+      $hidden_repeat = "<input type=\"hidden\" name=\"cb_repeat_update\" value=\"1\" />";	
     } else {
       $check_case_style = "style=\"color:red;\"";      
     }	
     $dis_repeat_update = "
       <tr>
         <td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>
-        <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_repeat_update\" $check_activate value=\"1\"</td>
+        <td class=\"detailForm\"><input type=\"checkbox\"name=\"cb_repeat_update\" $check_activate value=\"1\"</td>
       </tr>"; 
     $dis_button = "
       <!-- Update button -->
@@ -1859,6 +1865,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
    <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
+    $hidden_repeat
   </form>
    ";
 
@@ -1904,19 +1911,18 @@ function html_waiting_events($obm_wait) {
     $day_array = "";
     $day_array1 = "";
     $day_array2 = "";
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_wait->f("datebegin") , $day_array);
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_wait->f("dateend") , $day_array1);
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$obm_wait->f("calendarevent_endrepeat") , $day_array2);
+    $date_begin = datetime_format($obm_wait->f("datebegin"));
+    $date_end = datetime_format($obm_wait->f("dateend"));
+    $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
     $dis_waiting_events .= "<tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
      <td class=\"detailForm\">$priority</td>
      <td class=\"detailForm\">$kind</td>
      <td class=\"detailForm\">$dis_repeat_days</td>
-     <td class=\"detailForm\">".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]."</td>
-     <td class=\"detailForm\">".$day_array[1]."-".$day_array[2]."-".$day_array[3]."</td>
-     <td class=\"detailForm\">".$day_array[4].":".$day_array[5]."</td>
-     <td class=\"detailForm\">".$day_array1[4].":".$day_array1[5]."</td>
+     <td class=\"detailForm\">$date_repeat</td>
+     <td class=\"detailForm\">$date_begin</td>
+     <td class=\"detailForm\">$date_end</td>
      <td class=\"detailForm\">
       <form method=\"get\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
@@ -1940,8 +1946,7 @@ function html_waiting_events($obm_wait) {
      <td class=\"detailText\">$l_repeatdays2</td>
      <td class=\"detailText\">$l_use_endrepeat</td>     
      <td class=\"detailText\">$l_datebegin</td>
-     <td class=\"detailText\">$l_timebegin2</td>
-     <td class=\"detailText\">$l_timeend2</td>
+     <td class=\"detailText\">$l_dateend</td>
      <td></td>
     </tr>
    <p />
@@ -1963,25 +1968,22 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state,$l_groups;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait,$l_none;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $obm_q_event->f("calendarevent_title");
   $category = $obm_q_event->f("calendarcategory_label");
   $priority = $obm_q_event->f("calendarevent_priority"); 
   $description = $obm_q_event->f("calendarevent_description");
-  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("datebegin") , $day_array);
-  $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
-  $timebegin = $day_array[4].":".$day_array[5];
-  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("dateend") , $day_array2);
-  $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
-  $timeend = $day_array2[4].":".$day_array2[5];
+  $datebegin = datetime_format($obm_q_event->f("datebegin"));
+  $dateend =  datetime_format($obm_q_event->f("dateend"));
   $privacy = $obm_q_event->f("calendarevent_privacy");
   $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
   $kind = ${"l_".$obm_q_event->f("calendarevent_repeatkind")};
   $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
-  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
-  $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+  if($kind != "none") {
+    $repeat_end = date_format($obm_q_event->f("calendarevent_endrepeat"));
+  }
   $id = $obm_q_event->f("calendarevent_id");
 
   switch ($priority ) {
@@ -2063,16 +2065,8 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
      <td class=\"detailText\">$datebegin</td>
     </tr>
     <tr>
-     <td class=\"detailLabel\">$l_timebegin</td>
-     <td class=\"detailText\">$timebegin</td>
-    </tr>
-    <tr>
      <td class=\"detailLabel\">$l_dateend</td>
      <td class=\"detailText\">$dateend</td>       
-    </tr>
-    <tr>    
-     <td class=\"detailLabel\">$l_timeend</td>
-     <td class=\"detailText\">$timeend</td>
     </tr>
     <tr>
      <td class=\"detailLabel\">$l_priority</td>
@@ -2142,10 +2136,8 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
     $date_end = $data["date_end"];
     $day_array = "";
     $day_array2 = "";
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})", $date_begin, $day_array); 
-    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})", $date_end, $day_array2); 
-    $date_b = $day_array[1]."-".$day_array[2]."-".$day_array[3]." ".$day_array[4].":".$day_array[5];
-    $date_e = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." ".$day_array2[4].":".$day_array2[5];
+    $date_b = datetime_format($data["date_begin"]);
+    $date_e = datetime_format($data["date_end"]);
     $dis_conflict .= "
       <tr>
         <td class=\"detailForm\">$title</td>
@@ -2225,7 +2217,7 @@ function html_dis_delete($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_right_admin($user_q) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
-  global $l_everyone, $l_noone, $l_list,$l_authorize,$l_deny;
+  global $l_everyone,  $l_list,$l_authorize,$l_deny;
   
   while ($user_q->next_record()) {
     $u_id = $user_q->f("userobm_id");
@@ -2470,7 +2462,7 @@ function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
   $start_week_time = strtotime("+$set_start_time hours",$start_week_day);
   $end_week_time = strtotime("+$set_stop_time hours",$end_week_time);  
   $calendar_user = store_users($user_q);
-  store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
+  store_events($obm_q, $current_events, $event_data,$start_week_time,$end_week_time);
   $duration = round($agenda["duration"]*$set_cal_interval) - 1;
   $meeting = store_meeting_cell($current_events,$duration,$calendar_user,$getdate);
   $display["detail"] = html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user);
@@ -2491,7 +2483,6 @@ function dis_free_interval($agenda,$obm_q,$user_q,$usr_q, $p_user_array){
 function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$sel_user_id;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
-  
   $getdate = $agenda["date"];
   $param_duration = $agenda["duration"];
   $real_duration = $param_duration * 60;
@@ -2519,9 +2510,10 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
     $hour_day_list .= 	"<td height=\"15\" rowspan=\"$set_cal_interval\" class=\"agendaHour\">$i:00</td>";
     $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++)  {
-      $current_time = date("YmdHi", strtotime("+$j days $i hours",$start_week_day));
+      $current_time = strtotime("+$j days $i hours",$start_week_day);
+      $current_date = date("Ymd",$current_time);
       $end_time =  date("YmdHi", strtotime("+$j days $i hours $real_duration minutes",$start_week_day));
-      $goto = "agenda_index.php?action=new&param_date_begin=$current_time&param_date_end=$end_time&p_user_meeting=1";
+      $goto = "agenda_index.php?action=new&param_date_begin=$current_date&param_date_end=$end_time&p_user_meeting=1";
       switch($meeting[$current_time]) {
 	case 0 : 
 	  $hour_day_list .="
@@ -2543,9 +2535,10 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
     for($k=1;$k<$set_cal_interval;$k++) {
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
        for($j=0; $j<7;$j++) {	 
-	$current_time = date("YmdHi", strtotime("+$j days $i hours ".($k*$time_unit)." minutes",$start_week_day));  
-	$end_time =  date("YmdHi", strtotime("+$j days $i hours ".(($k*$time_unit)+$real_duration)." minutes",$start_week_day));
-	$goto = "agenda_index.php?action=new&param_date_begin=$current_time&param_date_end=$end_time&p_user_meeting=1";
+	 $current_time = strtotime("+$j days $i hours".($k*$time_unit)." minutes",$start_week_day);
+   	 $current_date = date("Ymd",$current_time);
+      	 $end_time =  date("YmdHi", strtotime("+$j days $i hours ".(($k*$time_unit)+$real_duration)." minutes",$start_week_day));
+	$goto = "agenda_index.php?action=new&param_date_begin=$current_date&param_date_end=$end_time&p_user_meeting=1";
 	switch($meeting[$current_time]) {
 	  case 0 : 
 	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"
@@ -2829,10 +2822,10 @@ METHOD:PUBLISH";
       $description = "\n" . wordwrap($description,74,"\n ",1);
     }
     $date_b = $obm_event->f("calendarsegment_date");
-    $date_b = gmdate("Ymd\THis\Z",mktime(substr($date_b,8,2),substr($date_b,10,2),0,substr($date_b,4,2),substr($date_b,6,2),substr($date_b,0,4)));
+    $date_b = gmdate("Ymd\THis\Z",$date_b);
     $obm_event->next_record();
     $date_e = $obm_event->f("calendarsegment_date");
-    $date_e = gmdate("Ymd\THis\Z",mktime(substr($date_e,8,2),substr($date_e,10,2),0,substr($date_e,4,2),substr($date_e,6,2),substr($date_e,0,4)));
+    $date_e = gmdate("Ymd\THis\Z",$date_e);
     switch($priority) {
       case 1 : $priority = 3;
 	break;
@@ -2866,11 +2859,13 @@ END:VEVENT";
     $category = strtoupper($obm_event->f("calendarcategory_label")); 
     if($obm_event->f("calendarevent_description") != "") {
       $description = "\nDESCRIPTION:".$obm_event->f("calendarevent_description");
-    }
-    $date_b = substr($obm_event->f("calendarsegment_date"),0,8)."T".substr($obm_event->f("calendarsegment_date"),8,4)."00";
-    $start_date = $obm_event->f("calendarsegment_date");
+    } 
+    $date_b = $obm_event->f("calendarsegment_date");
+    $date_b = date("Ymd",$date_b)."T".date("His",$date_b);
+    $start_date = $date_b;
     $obm_event->next_record();
-    $date_e = substr($obm_event->f("calendarsegment_date"),0,8)."T".substr($obm_event->f("calendarsegment_date"),8,4)."00";
+    $date_e = $obm_event->f("calendarsegment_date");
+    $date_e = date("Ymd",$date_e)."T".date("His",$date_e);
     $kind = $obm_event->f("calendarevent_repeatkind");
     $end = substr($obm_event->f("calendarevent_endrepeat"),0,8)."T".substr($obm_event->f("calendarevent_endrepeat"),8,4)."00";
     $repeat_days = $obm_event->f("calendarevent_repeatdays");
@@ -2908,18 +2903,18 @@ END:VEVENT";
       $repeat = "FREQ=WEEKLY;UNTIL=$end;INTERVAL=1;BYDAY=$dis_repeat_days";
     }
     elseif($kind == "monthlybydate") {
-      $day = substr($start_date,6,2);
+      $day = date("d",$start_date);
       $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=1;BYDAY=$day"; 
     }
     elseif($kind == "monthlybyday") {
-      $start_week_day = date("w",strtotime($set_weekstart_default));
+      $start_week_day = date("w",$start_date);
       $daypos = ceil(substr($start_date,6,2)/7);
-      $day_num = date("w",strtotime(strtotime("+ $start_week_day days",substr($start_date,0,8))));
+      $day_num = date("w",strtotime("+ $start_week_day days",$start_date,0,8));
       $day = $l_day_repeat[$day_num];
       $repeat = "FREQ=MONTHLY;UNTIL=$end;INTERVAL=1;BYDAY=$daypos$day";
     }
     elseif($kind == "yearly") {
-      $monthpos = substr($start_date,4,2);
+      $monthpos = date("m",$start_date);
       $repeat = "FREQ=YEARLY;UNTIL=$end;INTERVAL=1;BYMONTH=$monthpos";
     }
     echo "

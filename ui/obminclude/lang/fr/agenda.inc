@@ -20,7 +20,7 @@ $l_state = "Etat";
 $l_high = "Haute";
 $l_low = "Basse";
 $l_medium = "Normale";
-
+$l_go = "Go";
 $l_datebegin = "Date de début";
 $l_dateend = "Date de fin";
 $l_timebegin = "Heure de début (HH:MM)";

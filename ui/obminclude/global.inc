@@ -510,7 +510,6 @@ function isodate_format($timestamp="", $null_empty="") {
 ///////////////////////////////////////////////////////////////////////////////
 function datetime_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
-
   $format = $set_date;
   if (trim($format) == "") $format = $set_date_default;
   if ($timestamp != "") {

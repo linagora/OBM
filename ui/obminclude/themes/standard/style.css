@@ -141,13 +141,14 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header .section	{
-	position:		absolute;
-	top: 			27px;
-	left: 			178px;
+	/*position:		relative;
+	top: 			9px;
+	left: 			178px;*/
 	text-align: 		center;
 	font-family: 		arial,sans-serif;
 	font-weight: 		bold;
-	backgound-color:	transparent;
+	margin-top:		9px;
+	background-color:	transparent;
 }
 
 .header .section p	{
@@ -177,9 +178,9 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header .menu	{
-	position:		absolute;
-	top:			60px;
-	left: 			188px;
+	position:		relative;
+	top : 			-6px;
+	float: 			left;
 	padding:		0px;
 	font-family: 		arial,sans-serif;
 }

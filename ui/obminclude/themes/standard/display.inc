@@ -147,7 +147,9 @@ function generate_menu($menu, $section) {
 " . $display["section"] ."
 <!-- Fin Onglets -->
 <!-- Menu -->
+<div>
 " . $display["menu"] ."
+</div>
 <!-- Fin Menu -->
 </div>
 
