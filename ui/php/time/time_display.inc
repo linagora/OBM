@@ -818,10 +818,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   $dis_task_list->data_page = false;
   $dis_task_list->data_url = $url;
 
-// display in another table to limit size
-  echo "<table border=0 width=50%><tr><td>";
   $dis_task_list->display();
-  echo "<td><tr></table>";
 
   echo "
     <br>
@@ -993,7 +990,6 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
    $dis_task_list->data_page = false;
    $dis_task_list->data_url = $url;
 
- // display in another table to limit size
    $dis_task_list->display();
 
    echo "
@@ -1051,11 +1047,10 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   $dis_task_list->data_header = "top";
   $dis_task_list->data_url = $url;
   
-// display in another table to limit size
-  echo "<table border=0 align=center width=80%><tr><td>";
   $dis_task_list->display();
-  echo "</td></tr>";
 
+
+  echo "<table>";
   if ($time["interval"] == "month") {
     echo "<tr><td>";
 	echo "$l_total_days_msg1 $nb_users $l_total_days_msg2  : $res $l_total_days_msg3 ".
@@ -1223,7 +1218,7 @@ function dis_time_one_month($obm_dq,$pref_dq,$time, $shortview=false) {
   while (list($uid) = each($array_res)) {
 	if ($shortview) {
       display_monthview($time, $array_res[$uid], $length_tot[$uid], $array_users[$uid], true);
-      echo "<br>\n";
+      echo "<br/>\n";
 	}
 	else
       display_monthview($time, $array_res[$uid], $length_tot[$uid], $array_users[$uid], false);
@@ -1265,12 +1260,12 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
   // Display the array
   while (list($key,$val) = each($array_res)) {
 	if ($working_days[$val["wday"]] == 0) {
-      $line1 .= "<td width=15 bgcolor=\"#$col_grey\" align=center>$key</td>\n";
-	  $line2 .= "<td bgcolor=\"#$col_grey\">&nbsp;</td>\n";
-	  $line3 .= "<td bgcolor=\"#$col_grey\">&nbsp;</td>\n";
+      $line1 .= "<td class=\"OBMDisplayHead\">$key</td>\n";
+	  $line2 .= "<td class=\"OBMDisplayHead\">&nbsp;</td>\n";
+	  $line3 .= "<td class=\"OBMDisplayHead\">&nbsp;</td>\n";
 	}
 	else {
-      $cell_1 = "<td width=$col_width align=center>$key</td>";
+      $cell_1 = "<td class=\"OBMDisplayPref\">$key</td>";
       $cell_1_short = $cell_1;
       if ($val["length"] == $c_day_fraction)
         $line2 .= "<td>OK</td>";
@@ -1339,7 +1334,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
 
   }
 
-  echo "<div align=left><table border=1>
+  echo "<table border=1>
            <tr><td width=200 align=left rowspan=3>&nbsp;&nbsp;<b>&nbsp;$title</b></td>
   $line1
   </tr><tr>
@@ -1350,7 +1345,7 @@ function display_monthview($time, $array_res, $total, $title, $shortview=false) 
   $line3
     </tr>";
 
-  echo "       </table></div>";
+  echo "       </table>";
 
   echo "$tab_total";
 }
