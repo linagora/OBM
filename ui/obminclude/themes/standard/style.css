@@ -139,14 +139,14 @@ select {
 .search {
 	clear: both;
 	font-size: 10px;
-#	border: 1px solid #009EC6;
+	border: 1px solid #009EC6;
 	height: 100%;
 	width: auto;
-	margin-top: 5px;
-	margin-bottom: 10px;
+#	margin-top: 10px;
+	margin-bottom: 20px;
 	font-style: italic;
 	color: #7B9EAD;
-	background-color: #FF0000;
+#	background-color: #FFFFFF;
 }
 
 .searchLabel {
@@ -161,6 +161,10 @@ select {
 	margin: 0px;
 	padding: 3px;
 #	background-color: #FF0000;
+}
+
+.searchEnd {
+	clear: both;
 }
 
 
@@ -272,7 +276,7 @@ table.detail {
 	background-color: #FF0000;
 	height: 100%;
 	width: auto;
-	margin-top: 20px;
+	margin-top: 0px;
 	font-style: italic;
 	color: #7B9EAD;
 }

@@ -231,8 +231,8 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   <form method=\"get\" name=\"form_deal\"
   onsubmit=\"if (check_search_form(this) == false) return false; else return true;\"
   action=\"" . url_prepare("deal_index.php") . "\">
+  <div class=\"detailHead\">$l_deal</div>
   <div class=\"search\">
-    <div class=\"detailHead\">$l_deal</div>
     <div class=\"searchLabel\">$l_label_start<br />
       <input name=\"tf_label\" size=\"16\" maxlength=\"128\" value=\"$label\" />
     </div>
@@ -271,6 +271,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
       <input name=\"param_company\" type=\"hidden\" value=\"$company_id\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
     </div>
+    <div class=\"searchEnd\"></div>
   </div>
   </form>";
 
@@ -315,8 +316,8 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   $block = "
   <form method=\"get\" name=\"form_search_parentdeal\"
     action=\"" . url_prepare("deal_index.php") . "\">
+  <div class=\"detailHead\">$l_parentdeal</div>
   <div class=\"search\">
-    <div class=\"detailHead\">$l_parentdeal</div>
     <div class=\"searchLabel\">$l_label_start<br />
       <input type=\"text\" name=\"tf_plabel\" size=\"20\" value=\"$plabel\" />
     </div>
@@ -330,6 +331,7 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
       <input name=\"action\" type=\"hidden\" value=\"parent_search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
     </div>
+    <div class=\"searchEnd\"></div>
   </div>
   </form>";
 

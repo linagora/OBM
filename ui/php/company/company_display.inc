@@ -204,6 +204,7 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
     </p>
+    <div class=\"searchEnd\"></div>
   </div>
   </form>";
 

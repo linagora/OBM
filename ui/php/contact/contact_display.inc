@@ -129,7 +129,9 @@ function html_contact_search_form ($contact) {
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
       $ext&nbsp;
     </div>
-    </form>";
+    <div style=\"clear: both;\"></div>
+  </div>
+  </form>";
 
   return $block;
 }
