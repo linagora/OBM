@@ -133,7 +133,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $order_next = ", company_address2, company_address3, company_zipcode, company_town";
   }
 
-  $req = "SELECT
+  $select = "SELECT distinct
       company_id as id,
       company_id,
       company_name,
@@ -163,7 +163,9 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       companynafcode_code,
       companynafcode_label,
       country_name
-    FROM Company
+    FROM Company";
+
+  $left_join = "
          LEFT JOIN CompanyType on company_type_id=companytype_id
          $join_cat
          LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
@@ -171,44 +173,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
          LEFT JOIN Country on company_country_iso3166=country_iso3166
                    and country_lang='$lang'";
 
-  $group_by = "GROUP BY
-      id,
-      company_id,
-      company_name,
-      company_number,
-      company_vat,
-      company_archive,
-      company_type_id,
-      company_activity_id,
-      company_nafcode_id,
-      company_marketingmanager_id,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
-      company_country_iso3166,
-      company_phone,
-      company_fax,
-      company_web,
-      company_email,
-      company_contact_number,
-      company_deal_number,
-      company_deal_total,
-      companytype_label,
-      companyactivity_label,
-      companynafcode_code,
-      companynafcode_label,
-      country_name";
-
   if ((! $fuzzy) || ($name == "")) {
     if ($ctu_sql_limit) {
-      $count = get_query_count("select count(*) FROM Company $join_cat $whereq $group_by");
+      $count = get_query_count("SELECT count(*) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0) || (! $ctu_sql_limit)) {
-      $query = "$req $whereq $group_by ORDER BY $order $p_order_dir $order_next $limit";
+      $query = "$select $left_join $whereq ORDER BY $order $p_order_dir $order_next $limit";
       display_debug_msg($query, $cdg_sql, "company_search(1)");
       $obm_q->query($query);
       if (! $ctu_sql_limit) {
@@ -223,11 +194,11 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
                  or company_sound = '$sound')";
     $whereq = " WHERE $where_name $where";
     if ($ctu_sql_limit) {
-      $count = get_query_count("select count(*) FROM Company $whereq $group_by");
+      $count = get_query_count("SELECT count(*) FROM Company $left_join $whereq");
       $obm_q->set_num_rows_total($count);
     }
     if (($count > 0)  || (! $ctu_sql_limit)) {
-      $query = "$req $whereq $group_by ORDER BY $order $p_order_dir $order_next $limit";
+      $query = "$select $left_join $whereq ORDER BY $order $p_order_dir $order_next $limit";
       display_debug_msg($query, $cdg_sql, "company_search(2)");
       $obm_q->query($query);
     }

@@ -47,7 +47,7 @@ $caf_town = true;
 $cgp_sql_star = true;
 
 // Tuning constants
-//$ctu_sql_limit = true;
+$ctu_sql_limit = true;
 
 // Todo lines to display
 $cgp_todo_nb = 5;

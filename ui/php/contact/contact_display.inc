@@ -54,6 +54,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
          || ($OD->data_set->f("contact_address3") != "")
          || ($OD->data_set->f("contact_zipcode") != "")
          || ($OD->data_set->f("contact_town") != "")
+         || (trim($OD->data_set->f("contact_country_iso3166")) != "")
          || ($OD->data_set->f("contact_expresspostal") != "") ) {
     $contact_has_address = true;
   } else {
@@ -83,12 +84,23 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_phone") {
-    $phone = $OD->data_set->f("contact_phone");
-    $c_phone = $OD->data_set->f("company_phone");
-    if ( (trim($phone) != "") && ($phone == $c_phone)) {
-      $phone = "($phone)";
+    $phone = trim($OD->data_set->f("contact_phone"));
+    $c_phone = trim($OD->data_set->f("company_phone"));
+    if ( (($phone == "") && ($c_phone != ""))
+         || ( ($phone != "") && ($phone == $c_phone)) ) {
+      $phone = "($c_phone)";
     }
     $res["name"] = $phone;
+  }
+
+  else if ($fieldname == "contact_fax") {
+    $fax = trim($OD->data_set->f("contact_fax"));
+    $c_fax = trim($OD->data_set->f("company_fax"));
+    if ( (($fax == "") && ($c_fax != ""))
+         || ( ($fax != "") && ($fax == $c_fax)) ) {
+      $fax = "($c_fax)";
+    }
+    $res["name"] = $fax;
   }
 
   else if ($fieldname == "contact_email") {
@@ -130,6 +142,10 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       if ($OD->data_set->f("contact_expresspostal") != "") {
 	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
+      }
+      if ($OD->data_set->f("country_name") != "") {
+	$res["name"] .= $OD->data_set->f("country_name")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("country_name");
       }
       // else we get the contact Company address
     } else {
@@ -1389,7 +1405,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
 
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"\">$l_none</option>";
   while ($ctry_q->next_record()) {
     $ctry_iso3166 = $ctry_q->f("country_iso3166");
     $sel_ctry .= "\n<option value=\"$ctry_iso3166\"";
