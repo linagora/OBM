@@ -353,7 +353,7 @@ function run_query_contactcategory1() {
 function run_query_contactcategory2() {
   global $cdg_sql, $cgp_hide;
 
-  if (! $cgp_hide["contact"]["category1"]) {
+  if (! $cgp_hide["contact"]["category2"]) {
     $query = "select * from ContactCategory2 order by contactcategory2_code"; 
     $obm_q = new DB_OBM;
     $obm_q->query($query);

@@ -66,6 +66,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
          || ($OD->data_set->f("contact_address3") != "")
          || ($OD->data_set->f("contact_zipcode") != "")
          || ($OD->data_set->f("contact_town") != "")
+         || (trim($OD->data_set->f("contact_country_iso3166")) != "")
          || ($OD->data_set->f("contact_expresspostal") != "") ) {
     $contact_has_address = true;
   } else {
@@ -127,6 +128,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 	$res["name"] .= $OD->data_set->f("contact_expresspostal")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("contact_expresspostal");
       }
+      if ($OD->data_set->f("country_name") != "") {
+	$res["name"] .= $OD->data_set->f("country_name")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("country_name");
+      }
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_address1") != "") {
@@ -152,6 +157,10 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       if ($OD->data_set->f("company_expresspostal") != "") {
 	$res["name"] .= $OD->data_set->f("company_expresspostal")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("company_expresspostal");
+      }
+      if ($OD->data_set->f("company_country") != "") {
+	$res["name"] .= $OD->data_set->f("company_country")."<br />\n";
+	$res["txt_name"] .= $OD->data_set->f("company_country");
       }
     }
   }
@@ -202,20 +211,6 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     }
   }
 
-  else if ($fieldname == "town") {
-    // If a contact address is present we get it
-    if ( $contact_has_address ) {
-      if ($OD->data_set->f("contact_town") != "") {
-	$res["name"] .= $OD->data_set->f("contact_town");
-      }
-      // else we get the contact Company address
-    } else {
-      if ($OD->data_set->f("company_town") != "") {
-	$res["name"] .= $OD->data_set->f("company_town");
-      }
-    }
-  }
-
   else if ($fieldname == "zipcode") {
     // If a contact address is present we get it
     if ( $contact_has_address ) {
@@ -226,6 +221,20 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     } else {
       if ($OD->data_set->f("company_zipcode") != "") {
 	$res["name"] .= $OD->data_set->f("company_zipcode");
+      }
+    }
+  }
+
+  else if ($fieldname == "town") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("contact_town") != "") {
+	$res["name"] .= $OD->data_set->f("contact_town");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_town") != "") {
+	$res["name"] .= $OD->data_set->f("company_town");
       }
     }
   }
@@ -243,6 +252,21 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
       }
     }
   }
+
+  else if ($fieldname == "country_name") {
+    // If a contact address is present we get it
+    if ( $contact_has_address ) {
+      if ($OD->data_set->f("country_name") != "") {
+	$res["name"] .= $OD->data_set->f("country_name");
+      }
+      // else we get the contact Company address
+    } else {
+      if ($OD->data_set->f("company_country") != "") {
+	$res["name"] .= $OD->data_set->f("company_country");
+      }
+    }
+  }
+
   
   return $res;
 }
@@ -333,11 +357,11 @@ function html_list_search_form ($list, $usr_q) {
   </form>";
 
   return $block;
- }
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the List search result                                            //
+// Display the List search result
 // Parameters:
 //   - $list[]    : list search criteria
 //     keys used  : name, subject, email
@@ -384,10 +408,11 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
   }
   $name = urlencode(stripslashes($list["name"]));
   $contact = urlencode(stripslashes($list["contact"]));
+  $mark = $list["marketing_manager"];
 
   $display["msg"] .= display_info_msg("$nb_list $l_found");
 
-  $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
+  $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact&amp;sel_market=$mark$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $pref_q, "list");
 /*  if ($popup) {
@@ -729,7 +754,7 @@ function html_list_form($action, $list_q, $list) {
   <tr>
     <td class=\"detailLabel\">$l_name</td>
     <td class=\"detailForm\">
-      <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
+      <input type=\"text\" name=\"tf_name\" size=\"32\" maxlength=\"32\" value=\"$name\" /></td>
   </tr>
   <tr>
   $dis_priv

@@ -149,7 +149,6 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       }
       // else we get the contact Company address
     } else {
-      $res["name"] = "($l_company) ";
       if ($OD->data_set->f("company_address1") != "") {
 	$res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
 	$res["txt_name"] .= $OD->data_set->f("company_address1") . " ";
@@ -655,13 +654,12 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $ctry_name = $co_q->f("country_name");
   if (($ad1 == "") && ($ad2 == "") && ($ad3 == "") && ($zip == "")
       && ($town == "") && ($cdx == "") && ($ctry_name == "")) {
-    $l_comp_ad = "($l_company) - ";
-    $ad1 = "$c_ad1";
-    $ad2 = "$c_ad2";
-    $ad3 = "$c_ad3";
-    $zip = "$c_zip";
-    $town = "$c_town";
-    $cdx = "$c_cdx";
+    $ad1 = ("$c_ad1" != "" ? "( $c_ad1 )" : "");
+    $ad2 = ("$c_ad2" != "" ? "( $c_ad2 )" : "");
+    $ad3 = ("$c_ad3" != "" ? "( $c_ad3 )" : "");
+    $zip = ("$c_zip" != "" ? "( $c_zip )" : "");
+    $town = ("$c_town" != "" ? "( $c_town )" : "");
+    $cdx = ("$c_cdx" != "" ? "( $c_cdx )" : "");
     $ctry_name = $c_ctry_name;
   }
   $func = $co_q->f("contact_function");
@@ -723,7 +721,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_ad3 = "
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$l_comp_ad$ad3</td>";
+      <td class=\"detailText\">$ad3</td>";
   }
 
   // Cedex field
@@ -731,7 +729,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_cdx = "
     </tr><tr>
       <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$l_comp_ad$cdx</td>";
+      <td class=\"detailText\">$cdx</td>";
   }
 
   if ($usercreate == $auth->auth["uid"]) {
@@ -870,21 +868,21 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     $block_service
     </tr><tr>
       <td class=\"detailLabel\">$l_address 1</td>
-      <td class=\"detailText\">$l_comp_ad$ad1</td>
+      <td class=\"detailText\">$ad1</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
-      <td class=\"detailText\">$l_comp_ad$ad2</td>
+      <td class=\"detailText\">$ad2</td>
     $block_ad3
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailText\">$l_comp_ad$zip</td>
+      <td class=\"detailText\">$zip</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
-      <td class=\"detailText\">$l_comp_ad$town</td>
+      <td class=\"detailText\">$town</td>
     $block_cdx
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
-      <td class=\"detailText\">$l_comp_ad$ctry_name</td>
+      <td class=\"detailText\">$ctry_name</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$link_email $email</td>
@@ -1031,7 +1029,7 @@ function html_contact_links($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contact Form                                                      //
+// Display Contact Form
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : contact database result 

@@ -730,12 +730,20 @@ class OBM_DISPLAY {
 	  }	  
 
 	  if ($res["txt_name"] != "") {
-	    echo $res["txt_name"] . $sep;
+	    $name = $res["txt_name"];
 	  } else if ($res["name"] != ""){
-	    echo $res["name"] . $sep;
+	    $name = $res["name"];
 	  } else {
-	    echo $txt_name . $sep;
+	    $name = $txt_name;
 	  }
+	  $delimiter = "";
+	  // If double quote in field, we double these and set field delimiter
+	  if (strstr($name, '"')) {
+	    $name = str_replace('"', '""', $name);
+	    $delimiter = '"';
+	  }
+	  echo "${delimiter}${name}${delimiter}$sep";
+
 	}
       }
 
