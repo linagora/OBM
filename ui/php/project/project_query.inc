@@ -64,7 +64,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   }
 
   if ($tt != 0) {
-    $query .= " and deal_tasktype_id = $tt";
+    $query .= " and deal_tasktype_id = '$tt'";
   }
 
   if ($manager != $c_all) {
@@ -154,7 +154,7 @@ function run_query_insert($project) {
     '" . $auth->auth["uid"] . "',
     '$name',
     '$tt',
-    $soldtime,
+    '$soldtime',
     2)";
 
   display_debug_msg($query, $cdg_sql, "run_query_insert");
@@ -164,7 +164,9 @@ function run_query_insert($project) {
   // search the id of the inserted deal
   $query = "select deal_id
             from Deal
-            where deal_label = '$name'";
+            where deal_label = '$name'
+              and deal_tasktype_id = '$tt'
+              and deal_soldtime = '$soldtime'";
 
   display_debug_msg($query, $cdg_sql, "run_query_insert (search)");
   $obm_q->query($query);
@@ -1182,22 +1184,14 @@ function check_init_form($pid, $project) {
   if (trim($soldtime) == "") {
     $err_msg = $l_fill_soldtime;
     return false;
-  }
-
-  // MANDATORY: Soldtime
-  if (trim($soldtime) == 0) {
+  } else if (trim($soldtime) == 0) {
     $err_msg = $l_fill_soldtime;
     return false;
   }
 
-  // MANDATORY: Soldtime
-//   if (ereg($php_regexp_number, $soldtime) == false) {
-//     $err_msg = $l_fill_soldnumber;
-//     return false;
-//   }
-
   return true; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Project Short Init Form Data checking and formatting                      //

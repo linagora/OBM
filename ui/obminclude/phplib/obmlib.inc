@@ -32,7 +32,7 @@ class DB_OBM extends DB_Sql {
   var $User     = "";
   var $Password = "";
 
-  function DB_OBM () {
+  function DB_OBM ($query = "") {
     global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
 
     $this->Host     = "$obmdb_host";
@@ -40,6 +40,8 @@ class DB_OBM extends DB_Sql {
     $this->Database = "$obmdb_db";
     $this->User     = "$obmdb_user";
     $this->Password = "$obmdb_password";
+
+    $this->query($query);
   }
 }
 

@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
-// Actions              -- Parameter
+// Actions           -- Parameter
 // - index (default) -- search fields  -- show the project search form
 // - search          -- search fields  -- show the result set of search
 // - new             -- $param_company -- show the new project form
@@ -18,6 +18,7 @@
 // - validate        -- $param_project -- 
 // - detailconsult   -- $param_project -- show the project detail
 // - detailupdate    -- $param_project -- show the project detail form
+// - insert          -- form fields    -- insert the project
 // - d_update        -- form fields    -- update the project
 // - advanceupdate   -- $param_project -- show the project advance form
 // - a_update        -- form fields    -- update the project advance
@@ -64,9 +65,7 @@ if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 if ($action == "") $action = "index";
-
 $project = get_param_project();
-get_project_action();
 $perm->check();
 
 
@@ -212,27 +211,6 @@ if ($action == "index" || $action == "") {
       $display["detail"] = html_project_init_short_form($action, $project_q, $project);
     }
 
-  } else if ($origin == "new") {
-
-    if (check_new_form($param_project, $project)) {
-      $param_project = run_query_insert($project);
-      
-      if ($param_project) {
-	$project["id"] = $param_project;
-	$project_q = run_query_detail($param_project);
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
-	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
-      }
-      else {
-	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
-      }
-      
-    } else { 
-      $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-      $tt_q = run_query_projecttype('intern');
-      $display["detail"] = html_project_form($action, "", $tt_q, $project);
-    }
-
   } else if ($param_project > 0) {
     $project_q = run_query_detail($param_project);
     $tasks_q = run_query_tasks($param_project);
@@ -273,6 +251,29 @@ if ($action == "index" || $action == "") {
     else {
       $display["msg"] .= display_err_msg($l_status_error);
     }
+  }
+
+} elseif ($action == "insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_new_form($param_project, $project)) {
+
+    $param_project = run_query_insert($project);
+    echo "AAAA $param_project BBB";    
+    if ($param_project) {
+      echo "YES1";
+      $project["id"] = $param_project;
+      $project_q = run_query_detail($param_project);
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+      $display["detail"] = html_project_consult($project_q, "", "", "", $project);
+    }
+    else {
+      $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
+    }
+    
+  } else { 
+    $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $tt_q = run_query_projecttype('intern');
+    $display["detail"] = html_project_form($action, "", $tt_q, $project);
   }
 
 } elseif ($action == "d_update")  {
@@ -333,7 +334,7 @@ if ($action == "index" || $action == "") {
   }
   
 } elseif ($action == "a_update")  {
-  ///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if (check_advance_form($project)) {
     
     $ins_err = run_query_advanceupdate($project);
@@ -514,10 +515,12 @@ $consult_actions = Array('detailconsult', 'consultnoproj', 'consultnoadv',
 if (in_array($action, $consult_actions))
      $action = (manager_rights($uid, $project, $project_q)) ? $action : "consultnoright";
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-//get_project_action();
+// Actions menus are retrieved here as $project values can be set in process
+get_project_action();
 if (! $contact["popup"]) {
   $display["header"] = generate_menu($menu,$section);
 }
@@ -533,7 +536,6 @@ display_page($display);
 // returns : $company hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_project() {
-
   global $param_project, $param_origin, $param_user, $param_status;
   global $tf_missing, $tf_projected, $hd_status, $hd_name;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel, $cb_archive;

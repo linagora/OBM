@@ -54,6 +54,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Project search Form                                               //
 // Parameters:
@@ -61,6 +62,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_form ($project) {
+
   $tt_q = run_query_projecttype();
   $manager_q = run_query_managers();
   $member_q = run_query_members();
@@ -68,6 +70,7 @@ function dis_project_search_form ($project) {
   $block = html_project_search_form ($tt_q, $manager_q, $member_q, $project);
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Html Project search Form                                          //
@@ -231,8 +234,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
     $dis_action = "<input type=\"hidden\" name=\"action\" value=\"d_update\" />";
   } else {
     $dis_action = "
-      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_origin\" value=\"new\" />";
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />";
   }
 
   $l_button = ($action == "detailupdate" ? $l_update : $l_insert);
