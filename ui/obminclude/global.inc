@@ -10,7 +10,7 @@
 
 require_once("$obminclude/obm_conf.inc");
 
-$obm_version = "0.7.3pre2";
+$obm_version = "0.7.3";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -27,11 +27,11 @@ $last_incident_default = 0;
 
 // Document constants 
 $link_to = "Link : "; // Name of the prefix of a link document
-$default_mime = "application/octet-stream"; //Default Mime Type
-$default_path = "/Default"; //Default repository
+$default_mime = "application/octet-stream"; // Default Mime Type
+$default_path = "/Default"; // Default repository
 
 // Agenda constants
-$set_weekstart_default = "monday + 2 hours"; //First day of the week, in english
+$set_weekstart_default = "monday + 2 hours"; // First day of the week, english
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
@@ -53,6 +53,10 @@ $working_days = array(0,1,1,1,1,1,0);
 $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
+
+//---------------------------------------------------------------------------//
+// OBM internal Constants : Do not change 
+//---------------------------------------------------------------------------//
 
 // TaskType caterogies (used by Project and time management)
 $ctt_sales = '0';    // Sales Activity tasks
@@ -510,16 +514,16 @@ function display_record_info($uc_id, $uu_id, $tc, $tu) {
   $query_created = "select userobm_login from UserObm where userobm_id='$uc_id'";
   $query_updated = "select userobm_login from UserObm where userobm_id='$uu_id'";
 
-  if ($uc_id != "") {
+  //  if ($uc_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
     $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" /> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
-  }
-  if ($uu_id != "") {
+    //  }
+    //  if ($uu_id != "") {
     $obm_q->query($query_updated);
     $obm_q->next_record();
     $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" /> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
-  }
+    //  }
 
   $block = "<div class=\"detailInfo\">$created<br />$updated
   </div>";

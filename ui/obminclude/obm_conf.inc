@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obm_conf.inc                                                 //
 //     - Desc : OBM specific site configuration file                         //
@@ -19,4 +19,4 @@ $obmdb_password = "";
 $gp_mail_enabled = false;
 
 
-</SCRIPT>
+</script>

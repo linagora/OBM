@@ -94,7 +94,7 @@ register_globals = On
 </table>
 <p>
 
-and depending on obm file's owner :
+and depending on obm file's owner (of course works well with safe_mode turne Off too !):
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
@@ -311,6 +311,9 @@ Scripts for postgres are not yet available.
 
 
 <h2>5: Select the database (MySQL or PostgreSQL) for OBM</h2>
+
+<h3>5.1: For OBM 0.7.0, 0.7.1 and 0.7.2 only</h3>
+
 # in obminclude/phplib edit the file <i>obmlib.inc</i> and comment one of these two lines in the DB_OBM class definition (near line 30) :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -335,6 +338,28 @@ var $Password = "web";
   </td>
 </tr>
 </table>
+
+<h3>5.2: For OBM 0.7.3 and ></h3>
+# in obminclude edit the file <i>obm_conf.inc</i> and select the database to use, declare the database, the database user and password.
+You can update some global preferences in this file too (eg: gp_mail_enabled)
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+// Database infos
+$obmdb_host = "localhost";
+$obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
+$obmdb_db = "obm";
+$obmdb_user = "root";
+$obmdb_password = "";
+
+// is Mail enabled ? (agenda)
+$gp_mail_enabled = false;
+</pre>
+  </td>
+</tr>
+</table>
+
 
 
 <h2>6: Run OBM (access the obm.php from your browser)</h2>
@@ -447,6 +472,52 @@ mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
 <a name="upgrade-0.7.2"><h1>Database hasn't evolved from 0.7.1 to 0.7.2</h1></a>
 <p />
 # Replace the obm directory from 0.7.1 by the 0.7.2 one and the update is done.
+
+
+<p/>
+<a name="upgrade-0.7.3"><h1>UPGRADE OBM DATABASE 0.7.2 to 0.7.3</h1></a>
+<p />
+# Database has evolved from 0.7.2 to 0.7.3
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/update-0.7.2-0.7.3.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# If you are using the Project module, data must be update (from Deal to Project).
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd scripts/0.7
+php4 update-0.7.2-0.7.3.php  (on Debian)
+php update-0.7.2-0.7.3.php  (on Redhat)
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+
+<p>
+<h3>Update stored values that are not calculated</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the company module (which update these values)
 
 
 <br /><br />

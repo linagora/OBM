@@ -23,11 +23,14 @@ $perm->check("user");
 
 if ($action == "logout") {
   include("$obminclude/global_pref.inc");
+  $display["head"] = display_head("OBM Version $obm_version");
+  $display["end"] = display_end();
+  $display["detail"] = dis_logout_detail();
   run_query_logout();
   $auth->logout();
   $sess->delete();
   $action = "";
-  include("$obminclude/auth/logout.ihtml");
+  display_page($display);
   exit;
 
 } else {
@@ -49,5 +52,37 @@ $display["detail"] = "
 $display["end"] = display_end();
 
 display_page($display);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display detail of logout page                                             //
+///////////////////////////////////////////////////////////////////////////////
+function dis_logout_detail() {
+
+  $block = "
+<table width=\"100%\">
+<tr>
+  <td width=\"20%\">
+    <a href=\"http://www.aliacom.fr/\"><img align=\"middle\" border=\"0\" src=\"/images/standard/standard.jpg\"></a>$obm_version</td>
+  <td width=\"5%\">&nbsp;</td>
+  <td width=\"50%\" align=\"center\">
+    <h1>OBM CONNEXION CLOSED</h1></td>
+  <td width=\"25%\" align=\"center\">&nbsp;</td>
+</tr>
+<tr>
+  <td align=\"center\">&nbsp;</td>
+</tr>
+<tr>
+  <td align=\"center\" colspan=\"4\"><hr></td>
+</tr>
+</table>
+
+<P>
+<center>
+<a href=\"obm.php\">click here to Login</a>
+</center>";
+
+  return $block;
+}
 
 </script>

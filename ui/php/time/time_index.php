@@ -242,7 +242,7 @@ elseif ($action == "insert") {
 
   $display["result"] .= dis_time_index($time);
   $display["result"] .= dis_time_list($time);
-  $display["features"] .= dis_time_search_form($time, 
+  $display["features"] .= dis_time_search_form($time,
 					     run_query_get_obmusers(),
 					     $uid);
 }
@@ -509,7 +509,7 @@ function get_time_actions() {
 // Insert 
   $actions["TIME"]["insert"] = array (
     'Url'      => "$path/time/time_index.php?action=insert",
-    'Right'    => $time_write,
+    'Right'    => $time_read,
     'Condition'=> array ('None') 
                                     );
 
@@ -550,4 +550,4 @@ function get_time_actions() {
                                      		 );
 }
 
-</SCRIPT>
+</script>

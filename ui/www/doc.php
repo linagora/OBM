@@ -21,6 +21,7 @@
       <a href="../doc/html/install-0.3.html">0.3.x</a> -
       <a href="../doc/html/install-0.2.html">0.2.x</a> 
     <li>Upgrade guide :
+      <a href="../doc/html/install-0.7.html#upgrade-0.7.3">0.7.2 to 0.7.3</a> -
       <a href="../doc/html/install-0.7.html#upgrade-0.7.2">0.7.1 to 0.7.2</a> -
       <a href="../doc/html/install-0.7.html#upgrade-0.7.1">0.7.0 to 0.7.1</a> -
       <a href="../doc/html/install-0.7.html#upgrade-0.7.0">0.6.6 to 0.7.0</a> -

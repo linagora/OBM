@@ -24,6 +24,19 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2003-11-24</b> : version <b>0.7.3</b> released (many fixes)
+        <ol>
+          <li> Project module rewrite
+          <li> CSS + Javascript enhancement improve Mozilla 1.0 and IE display
+          <li> Specific site configuration now in a separated file
+          <li> Fixes on install script (Contact address 3,...)
+     <li> Fixes in Project, Time management, Contact, User,...
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2003-10-13</b> : version <b>0.7.2</b> released (major fixes)
         <ol>
           <li> Major fixes on install script (Todo table)

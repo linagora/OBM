@@ -16,11 +16,11 @@
   <h2> OBM</h2>
     O.B.M. stands for Open Business Management.
     <p />
-    OBM is an Intranet application which goal is to help manage a company.
-    (in practice our own company, Aliacom, but other uses are reported).
+    OBM is an Intranet application which goal is to help manage a company or an organization.
+
     As OBM improve, it is approaching what are called CRM (with sales force
     , help desk, time tracking sections)
-    but can be used simply as a contact database or as a shared calendar.
+    but can be used simply as a <b>contact database</b> or as a <b>shared calendar</b>.
     <p />
     OBM represents a framework above wich many modules are written. 
     It is written by an evolving group of developpers from Aliacom (mains
@@ -35,7 +35,7 @@
     <p>OBM is protected by the GNU General Public License v2 (See file COPYING). 
     </p>
     <h2>Requirements</h2>
-    <p>OBM is developped under Linux, Apache, PHP, PHPlib, MySQL or PostgreSQL.
+    <p>OBM is a web application with full XHTML / CSS output. As so it works with Mozilla >= 1.0, IE and Netscape 7. OBM is developped under Linux, Apache, PHP, PHPlib, MySQL or PostgreSQL.
       <br />
     </p>
 

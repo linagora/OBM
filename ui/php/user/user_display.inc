@@ -216,6 +216,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display User search form                                                  //
 // Parameters:
@@ -364,6 +365,7 @@ function html_get_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display User Form                                                         //
 // Parameters:
@@ -416,8 +418,7 @@ function html_user_form($first_try, $usr_q, $user) {
   } elseif (($action=="detailupdate") || ($action=="update")) {
     $dis_button = "<input type=\"hidden\" name=\"action\" value=\"update\">
           <input type=\"hidden\" name=\"param_user\" value=\"$id\">
-          <input type=\"submit\" value=\"$l_update\">
-      </form>";
+          <input type=\"submit\" value=\"$l_update\">";
   }
 
   // --- HTML Template --------------------------------------------------------
