@@ -12,6 +12,7 @@ $l_check = "Vérifications";
 $l_version = "version d'OBM";
 $l_database_server = "Serveur SQL";
 $l_database = "Base de données";
+$l_host = "Hôte";
 $l_session_stats = "Statistiques des Sessions";
 $l_date = "Date";
 $l_user_session = " Entrées dans ActiveUserObm";

@@ -36,7 +36,7 @@ $l_header_invoice = "Factures";
 $l_header_payment = "Paiements";
 
 //TIME
-$l_header_time = "Gestion des temps" ;
+$l_header_time = "Gestion temps" ;
 $l_header_admin = "Administration";
 $l_header_stats = "Statistiques";
 $l_header_base = "Base";

@@ -27,10 +27,10 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
   if ($time["interval"] == "week") {
       $array_date = get_week_point($date);
   }
-  else {
-    echo "week ". $time["interval"] ." !!<br>";
-	//    die ("interval != 'week' not fonctionnal"); 
-  }
+  //  else {
+  //    echo "week ". $time["interval"] ." !!<br>";
+  //    die ("interval != 'week' not fonctionnal"); 
+  //}
 
   // Query to get any time event for the given User
   //  Optional parameters :
@@ -152,7 +152,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 /* OLD
 function run_query_by_deal($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_text_format, $l_jour_format, $c_day_fraction, $cdg_sql;
+  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
   $week_start = $time["date"];
@@ -194,25 +194,25 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
 */
 
 function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
-  global $auth, $l_date_text_format, $l_jour_format, $c_day_fraction, $cdg_sql;
+  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
   //  $time["all_users"] = true;
 
+  //     if(tasktype_internal=1, 'interne', company_name) as task_company_name, 
+
   $query="select 
-      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
-      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end', task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
-      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength, 
+     company_name as task_company_name, 
       deal_label as task_deal_label, 
       tasktype_internal, tasktype_label,
-     if(tasktype_internal=1, 'interne', company_name) as task_company_name 
-    from Task, Deal, TaskType, Company 
+      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
+      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end', task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
+      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength
+    from (Task left join Deal on task_deal_id = deal_id) left join Company on deal_company_id=company_id, TaskType 
     where tasktype_id=task_tasktype_id 
-      and task_deal_id = deal_id 
-      and task_date<='$week_end' 
-      and deal_company_id = company_id ";
+      and task_date<='$week_end'";
 
   //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
   if (isset($time) && $time["all_users"])
@@ -232,8 +232,8 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
  	$having_task = " having task_totalperiod <> 0";
 
   // order
-  $query .= $where_users. $where_task ." group by task_deal_id $having_task 
-      order by tasktype_internal, task_totalperiod desc, tasktype_label";
+  $query .= $where_users. $where_task ." group by task_deal_id, tasktype_id $having_task 
+      order by tasktype_internal, tasktype_id, task_totalperiod desc";
   
   display_debug_msg($query, $cdg_sql, "run_query_by_deal 2");
 
@@ -536,6 +536,39 @@ function run_query_validate($parms,$time,$who) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Timemanager: qet tasks for given user and month                        
+// Returns : DB object result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_task_one_month($time) {
+global $cdg_sql;
+
+  $user_id = $time["user_id"];
+  //  echo "Run_query_valid_search<br>";
+  //  print_r($time);
+  $query = "select sum(task_length) as total_length, substring(task_date,7,2) as day_in_month from Task where  
+         task_date >= '". $time["date"] ."' 
+        and task_date <= '". $time["date_end"] ."' ";
+
+  // user_id : array -> size 1 or more 
+  if (sizeof($time["user_id"]) == 1)
+	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+  else {
+      die("run_query_task_one_month : This function works only for one user");
+  }
+
+  // Group
+  $query .= " group by day_in_month order by day_in_month ";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  
+  //  echo "nombre ligne : " . $obm_db->num_rows() . "<br>";
+  return $obm_db; 
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // Timemanager: TaskType select query execution                              //
 // Returns : DB object result with all type of task
 ///////////////////////////////////////////////////////////////////////////////
@@ -685,12 +718,12 @@ function get_week_point($sel_date) {
   } else {
     $weekstart=mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
   }
-  $weekend=date("YmdHis",$weekstart + 7 * 86400);
+  $weekend=date("YmdHis",$weekstart + 6 * 86400);
   $weekstart=date("YmdHis",$weekstart);  
     
   // Date Couple in an array
-  if ($debug > 0)
-    echo "dates debut $weekstart fin $weekend<br>";
+  //  if ($debug > 0)
+  //    echo "dates debut $weekstart fin $weekend<br>";
   
   return array($weekstart, $weekend);
 	
@@ -796,7 +829,7 @@ function first_day_month(&$time) {
   }
   else {
     $today = date("Ymd");
-    echo "first_day_month : today $today <br>";
+	//    echo "first_day_month : today $today <br>";
     $year=substr($today,0,4);
     $month=substr($today,4,2);
     $d_start_month=mktime(0,0,0,$month,1,$year);

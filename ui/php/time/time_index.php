@@ -87,10 +87,17 @@ else {
 }
 page_close();
 
+// $popup = 2 => writing into a file
+if ($popup != 2) {
+  require("time_js.inc");
+  get_time_actions();
+}
+
 require("time_js.inc");
 if ($action == "" ) $action = "index";
 get_time_actions();
 $perm->check("user");
+
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = array( '6' , '7' , '8','23' ) ;
@@ -119,7 +126,9 @@ if (debug_level_isset($cdg_param)) {
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_time);     // Head & Body
+if ($popup != 2) {
+  display_head($l_time);     // Head & Body
+}
 if (! $popup) {
   generate_menu($menu,$section);         // Menu
   display_bookmarks();
@@ -141,8 +150,39 @@ if( ! isset($time["show_task_detail"]) )
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index" || $action == "search" || $action == "") {
+if ($action == "index" || $action == "") {
 //////////////////////////////////////////////////////////////////////////////
+  $time["interval"] = "month";
+
+  // USERS : only one for index (and others, except stats)
+  if (! in_array($u_id, $project_managers))
+	$time["user_id"] == array($u_id);
+  else if (sizeof($time["user_id"]) > 1) {
+	$tt = $time["user_id"];
+	$time["user_id"] == $tt[0];
+  }
+  else if (sizeof($time["user_id"]) == 0) {
+    echo "erreur \$time[user_id] vide !!! <br>";
+	$time["user_id"] == array($u_id);
+  }
+
+  // display links to previous and next week
+  dis_time_links($time,"month");
+
+  // run_query_contactid_user
+  //  -- THIS SHOULD CHANGE TO USE THE User TABLE --
+
+  dis_time_index($time);
+  // display user Search Form
+  dis_time_search_form($time, 
+                       run_query_get_obmusers(),
+                       $uid);
+  
+} 
+
+elseif ($action == "search") {
+//////////////////////////////////////////////////////////////////////////////
+
 	require("time_js.inc");
   // interval is week -- see if we may need to use other intervals
   $time["interval"] = "week";
@@ -195,7 +235,7 @@ elseif ($action == "show_details") {
 elseif ($action == "insert") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
-
+  $time["action"]="search";
   $time["interval"] = "week";
   dis_time_links($time,"week");
   dis_time_search_form($time, 
@@ -250,6 +290,16 @@ elseif ($action == "stats") {
       $uid);
   dis_time_stats($time);  // SHOW DETAILS
 }
+
+elseif ($action == "export_stats") {
+//////////////////////////////////////////////////////////////////////////////
+  // interval is week -- see if we may need to use others intervals
+  $time["interval"] = "month";
+
+  //  echo "export stats<br>";
+  dis_time_export_stats($time);
+}
+
 elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
@@ -293,7 +343,7 @@ elseif ($action == "update") {
   //  $user_id = $time["user_id"][0];
   echo "
     <Script language=\"javascript\">
-     window.opener.location.href='$path/time/time_index.php?action=index&param_begin=".
+     window.opener.location.href='$path/time/time_index.php?action=search&param_begin=".
      $param_begin."&param_end=".$param_end."';
      window.close();
     </script>
@@ -305,7 +355,9 @@ elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+// except export in file
+if ($popup != 2)
+  display_end();
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -370,13 +422,16 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 
 function get_time_actions() {
+  global $l_header_stats, $l_header_base;
 global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
+
 //Index
 
   $actions["TIME"]["index"] = array (
+	'Name'     => "$l_header_base",
     'Url'      => "$path/time/time_index.php?action=index",
     'Right'    => $time_read,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('search', 'stats','admin') 
                                     );
 
 //Search
@@ -406,9 +461,10 @@ global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 //Stats Update
 
   $actions["TIME"]["stats"] = array (
+	'Name'     => "$l_header_stats",
     'Url'      => "$path/time/time_index.php?action=stats",
     'Right'    => $time_write,
-    'Condition'=> array ('None') 
+    'Condition'=> array ('index', 'admin') 
                                     );
 //Insert 
 

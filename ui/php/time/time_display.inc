@@ -193,7 +193,7 @@ function dis_time_links (&$time, $type="all") {
 //   - $uid    : current user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_search_form ($time, $usr_q, $uid) {
-  global $l_from_company, $l_see, $l_week, $l_month, $l_from_user, $project_managers;
+  global $l_see, $l_week, $l_month, $project_managers;
   global $l_user;
   global $sess, $uid;
 
@@ -201,9 +201,9 @@ function dis_time_search_form ($time, $usr_q, $uid) {
   $hum_date_end = dis_human_date($time["date_end"]);
 
   if ($time["interval"] == "week")
-	$l_period = $l_week;
+	$period = $l_week;
   else if ($time["interval"] == "month")
-	$l_period = $l_month;
+	$period = $l_month;
 
   if (in_array($uid, $project_managers)) {
     $sel_user_id = $time["user_id"]["0"];
@@ -238,7 +238,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
       $sess->url("time_index.php") . "\">
       <table border=1>
       <tr>
-        <td><font size=-2>$l_period</font></td>
+        <td><font size=-2>$period</font></td>
         <td><font size=-1>Du $hum_date_start au $hum_date_end</font></td>
       </tr><tr>
         <td><font size=-2> $l_user </font></td>
@@ -272,8 +272,8 @@ function dis_time_search_form ($time, $usr_q, $uid) {
 //   - $uid    : current user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_selectusers_form ($time, $usr_q, $uid) {
-  global $l_from_company, $l_see, $l_week, $l_month, $l_from_user, $project_managers;
-  global $l_user, $l_all;
+  global $l_see, $l_week, $l_month, $project_managers;
+  global $l_user, $l_all_users;
   global $l_tasktype, $l_task_all, $l_task_uservalid, $l_task_adminvalid;
   global $sess, $uid;
 
@@ -326,7 +326,7 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
         <td><font size=-2>$l_period</font></td>
         <td><font size=-1>Du $hum_date_start au $hum_date_end</font></td>
       </tr><tr>
-        <td><font size=-2> $l_user <br>$l_all<input type=checkbox name=cb_allusers $allusers></font></td>
+        <td><font size=-2> $l_user <br>$l_all_users<input type=checkbox name=cb_allusers $allusers></font></td>
         <td align=left>
         $sel_user
         </td>
@@ -369,7 +369,7 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
 //   - $uid    : current user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_period ($time) {
-  global $l_from_company, $l_see, $l_week, $l_month, $l_from_user, $project_managers;
+  global $l_see, $l_week, $l_month, $project_managers;
   global $l_user;
   global $sess, $uid;
 
@@ -402,7 +402,7 @@ function dis_time_period ($time) {
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list($time) {
-  global $l_no_found, $l_addtask, $cdg_param;
+  global $l_no_found, $cdg_param;
   global $auth, $new_order, $order_dir;
   global $status_id; // "Signed" status for deals
   global $c_day_fraction; // nbre de fraction possible d'une journée
@@ -498,13 +498,61 @@ function dis_time_list($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the full TimeManager result page for Index Page                       //
+// Parameters:
+//   - $time[] : time search criteria
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_index($time) {
+  global $l_no_found, $cdg_param;
+  global $auth, $new_order, $order_dir;
+  global $status_id; // "Signed" status for deals
+  global $c_day_fraction; // nbre de fraction possible d'une journée
+  global $c_days_in_a_week; // how many days in a week have to be filled (5)
+  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
+  
+  // Display the total by day for a month
+  //echo "IN dis_time_list <br>";
+  // obm_q contains the time events for a user and an interval
+  $obm_q = run_query_search($time, $new_order, $order_dir);
+  $nb_task = $obm_q->num_rows();
+
+  $pref_day_q = run_query_display_pref($auth->auth["uid"], "time_day");
+  $obm_day_q = run_query_by_day($time, $new_order, $order_dir);
+
+  $pref_month_task_q = run_query_display_pref($auth->auth["uid"], "time_task_month");
+  $obm_month_task_q = run_query_task_one_month($time, $new_order, $order_dir);
+
+  // Get elements for insertion of new task
+  // TaskType
+  $obm_tasktype_q = run_query_tasktype();
+  // Project
+  $obm_project_q = run_query_project();
+
+  //get the current start and end of week
+  $d_start_week = first_day_week($time);   
+  
+  $date_start = date("Ymd",$d_start_week);
+  $date_end = date("Ymd",$d_start_week + (6*86400));
+     
+  $hum_date_start = dis_human_date($date_start);
+  $hum_date_end = dis_human_date($date_end);
+
+  // Task for the month
+  dis_time_one_month($obm_month_task_q, $pref_month_task_q, $time);
+
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display the Stats TimeManager result page                                 //
 // Parameters:
 //   - $time[] : time search criteria
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_stats($time) {
-  global $l_no_found, $l_addtask, $cdg_param;
+  global $l_no_found, $cdg_param;
   global $auth, $new_order, $order_dir, $new_order2;
   global $status_id; // "Signed" status for deals
   global $fraction_jour; // nbre de fraction possible d'une journée
@@ -562,8 +610,30 @@ function dis_time_stats($time) {
   }
 
   // OLD
-  //  dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
-  dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
+  //  dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);  
+dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
+
+  
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Export the Stats TimeManager result in a file                                 //
+// Parameters:
+//   - $time[] : time search criteria
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_export_stats($time) {
+
+  global $auth;
+  global $status_id; // "Signed" status for deals
+  global $fraction_jour; // nbre de fraction possible d'une journée
+  global $days_in_a_week; // how many days in a week have to be filled (5)
+  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
+  
+  $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
+  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
+
+  dis_time_deal_export($obm_deal_q,$pref_deal_q,$nb_task,$time);
 
   
 }
@@ -606,8 +676,9 @@ function dis_time_menu($time) {
                  ACTION=\"".$sess->self_url("time_index.php")."\">
               <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"show_details\">
               <INPUT TYPE=\"checkbox\" NAME=\"show_task_detail\" $dis_checked>
-              <INPUT TYPE=\"hidden\" NAME=\"user_id[]\" VALUE=\"".
+<!--              <INPUT TYPE=\"hidden\" NAME=\"user_id[]\" VALUE=\"".
                  $time["user_id"]."\">
+-->
               <INPUT TYPE=\"hidden\" NAME=\"param_begin\" VALUE=\"".
                  $time["date"] ."\">
               <INPUT TYPE=\"hidden\" NAME=\"param_end\" VALUE=\"".
@@ -693,7 +764,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
-  global $l_total_day, $l_projects_manager, $l_validate, $l_valid;
+  global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
   //session
   global $uid, $project_managers;
 
@@ -710,7 +781,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
 
-  $dis_task_list->data_cb_text = "$l_validate";;
+  $dis_task_list->data_cb_text = "$l_validate_task";;
   $dis_task_list->data_idfield = "task_date"; 
   $dis_task_list->data_cb_field = "task_status";
   $dis_task_list->data_cb_side = "left";
@@ -749,7 +820,7 @@ function dis_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
 
-   $dis_task_list->data_cb_text = "$l_validate";;
+   $dis_task_list->data_cb_text = "$l_validate_task";;
    $dis_task_list->data_idfield = "task_date";
    $dis_task_list->data_cb_field = "task_status"; 
    $dis_task_list->data_cb_side = "left";
@@ -794,7 +865,7 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
   global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
-  global $l_total_day, $l_projects_manager, $l_validate, $l_valid;
+  global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
   global $c_days_in_a_week, $c_task_adminvalid;
   //session
   global $uid, $project_managers;
@@ -819,7 +890,7 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
   $dis_task_list->data_set = $obm_dq;
 
-  $dis_task_list->data_cb_text = "$l_validate";;
+  $dis_task_list->data_cb_text = "$l_validate_task";;
   $dis_task_list->data_idfield = "task_date"; 
   $dis_task_list->data_cb_field = "task_status";
   $dis_task_list->data_cb_side = "left";
@@ -863,7 +934,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
   global $sess,$set_lang,$set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
   global $l_found, $_task_del, $l_delete;
-  global $l_total_day, $l_projects_manager, $l_validate, $l_valid;
+  global $l_total_day, $l_projects_manager, $l_validate_task, $l_valid;
   global $c_days_in_a_week, $c_task_notvalid;
   //session
   global $uid, $project_managers;
@@ -892,7 +963,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
    $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
    $dis_task_list->data_set = $admin_db;
 
-   $dis_task_list->data_cb_text = "$l_validate";;
+   $dis_task_list->data_cb_text = "$l_validate_task";;
    $dis_task_list->data_idfield = "task_date";
    $dis_task_list->data_cb_field = "task_status"; 
    $dis_task_list->data_cb_side = "left";
@@ -1037,7 +1108,206 @@ function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time, $customer =0) {
   }
   echo "       </table>";
 
+  // $popup = 2 -> file (no headers)
+  $url = "time_index.php?action=export_stats" .
+            "&amp;param_begin=".$time["date"]. 
+            "&amp;param_end=".$time["date_end"]. 
+	        "&amp;popup=2";
+  echo "<a href=\"".$sess->url($url)."\">exporter</a>";
+  // We build a file
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Time Deal result in a file                          //
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//     keys used : week
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_deal_export($obm_dq,$pref_dq,$time) {
+  //-- Themes
+  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
+  //-- Labels
+  global $l_found, $_task_del, $l_delete, $l_total_deal;
+
+
+
+  // Calculate the task length grand total 
+  if ($obm_dq->nf()) {
+    while ($obm_dq->next_record()) {
+	  $res += $obm_dq->f("task_totalperiod");
+	}
+	// Rewind the table
+	$obm_dq->seek() or 
+    die ("dis_time_deal_list2 : requete list2 sans résultat !");
+  }
+
+  // Number of users we grand total
+  $nb_users = sizeof($time["user_id"]);
+
+  $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
+  $dis_task_list->data_set = $obm_dq;
+  $dis_task_list->data_order = false;
+  $dis_task_list->data_page = false;
+  $dis_task_list->data_header = "top";
+  $dis_task_list->data_url = $url;
+  
+  $dis_task_list->dis_data_file($dis_task_list->separator);
+
+  if ($time["interval"] == "month") {
+
+	echo "\n\nTotal jours pour $nb_users users : $res sur ".
+		get_nb_working_days($time["date"]) * $nb_users. " à remplir\n\n";
+
+	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
+  }
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Time Deal  result                                        //
+// Parameters : 
+//   - $obm_q    : tasks list to display 
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//     keys used : week
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_one_month($obm_dq,$pref_dq,$time) {
+  //-- Themes
+  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
+  //-- Labels
+  global $l_found, $_task_del, $l_delete, $l_total_deal;
+  global $c_day_fraction, $c_days_in_a_week;
+
+
+  dis_table_title($l_total_month);  
+
+  $year=substr($time["date"],0,4);
+  $month=substr($time["date"],4,2);
+  $day=intval(substr($time["date"],6,2));
+
+  // first day of the month in second
+  $first_day_sec = mktime(0,0,0,$month, $day, $year);
+  // Fist Weekday
+  $first_wday =date("w", $first_day_sec);
+
+  // Last day
+  $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
+  $last_wday =date("w", $last_day_sec);
+
+  // Initialise our loop
+  // Build day array
+  //  $array_day = array("$first_wday $day");
+  //  $array_res = array($obm_dq->f("total_length"));
+  $day_in_sec = $first_day_sec;
+  $wday =date("w", $day_in_sec);
+  //  $array_res = array();
+  
+  //  echo "debut $day_in_sec, fin : $last_day_sec day $day<br>";
+  while ($obm_dq->next_record())  {
+	  //echo "day $day, weekday $wday, \$i $day_in_sec  " .
+	  //" day_in_month " . intval($obm_dq->f("day_in_month")) ."<br>";
+	while (($day_in_sec < $last_day_sec) && 
+			 ($day <= intval($obm_dq->f("day_in_month")))) {
+		//      echo "day $day loop ". $obm_dq->f("day_in_month") . " length ". 
+		//		  $obm_dq->f("total_length") . "<br>";
+      if (intval($obm_dq->f("day_in_month")) != $day)
+		$array_res[$day]["length"] = 0;
+      else
+		$array_res[$day]["length"] = $obm_dq->f("total_length");
+      $array_res[$day]["wday"] = $wday;
+	  $day++;        
+	  $day_in_sec = mktime(0,0,0,$month, $day, $year);
+	  $wday =date("w", $day_in_sec);
+	}
+
+  }
+  // we ends the array
+  while ($day_in_sec < $last_day_sec) {
+	$array_res[$day]["length"] = 0;
+	$array_res[$day]["wday"] = $wday;
+	$day++;        
+	$day_in_sec = mktime(0,0,0,$month, $day, $year);
+	$wday =date("w", $day_in_sec);
+  }
+
+  /*
+  echo "<br> res ";
+  print_r($array_res);
+  */
+
+  // Display the array
+  while (list($key,$val) = each($array_res)) {
+	if ($val["wday"] == 0 ||$val["wday"] == 6) {
+      $line1 .= "<td bgcolor=\"#b2ebe8\">$key</td>";
+	  $line2 .= "<td bgcolor=\"#b2ebe8\">&nbsp;</td>";
+	  $line3 .= "<td bgcolor=\"#b2ebe8\">&nbsp;</td>";
+	}
+	else {
+      $line1 .= "<td>$key</td>";
+      if ($val["length"] == $c_day_fraction)
+        $line2 .= "<td>OK</td>";
+      else
+  	    $line2 .= "<td bgcolor=\"#a00000\">".$val["length"]."/$c_day_fraction</td>";
+
+      // first day of the week 
+	  if ($val["wday"] == 1) {
+		// return first and last day of the week
+		$day = $key < 10 ? "0".$key : $key; 
+		$week = get_week_point($year.$month.$day);
+		$url= $sess->url("time_index.php?action=search".
+           "&amp;param_begin=".$week[0].
+           "&amp;param_end=".$week[1].
+						  //        "&amp;user_id=".$time["user_id"].
+		   "&amp;st_detail=".$time["show_task_detail"]);
+        $line3.="<td colspan=\"$c_days_in_a_week\"><a href=\"$url\">compléter</a></td>";
+	  }
+	  //or first day of the month
+	  else if ($key == 1) {
+		// return first and last day of the week
+		$week = get_week_point($year.$month."01");
+		$url= $sess->url("time_index.php?action=search".
+           "&amp;param_begin=".$week[0].
+           "&amp;param_end=".$week[1].
+						  //        "&amp;user_id=".$time["user_id"].
+		   "&amp;st_detail=".$time["show_task_detail"]);
+        // This week is not $c_days_in_a_week long
+        $week_length = $c_days_in_a_week - $val["wday"] +1;
+        $line3.="<td colspan=\"$week_length\"><a href=\"$url\">compléter</a></td>";
+	  }
+	}
+  }
+
+  echo "<table border=1>
+           <tr>";
+  print $line1;
+  echo "</tr><tr>";
+  print $line2;
+  echo "</tr><tr>";
+  print $line3;
+  echo "  </tr>
+        </table>";
+
+
+// display in another table to limit size
+  echo "<table border=0 align=center width=80%><tr><td>";
+  echo "</td></tr>";
+
+  if ($time["interval"] == "month") {
+    echo "<tr><td>";
+	echo "Total jours pour $nb_users users : $res sur ".
+		get_nb_working_days($time["date"]) * $nb_users. " à remplir";
+	echo "</td></tr>";
+	echo "<tr><td>";
+	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
+	echo "</td></tr>";
+  }
+  echo "       </table>";
+
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Table description or message                             //
 // Parameters:
@@ -1069,7 +1339,7 @@ function dis_table_title($message) {
 function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$time, $validate_days) {
   global $sess, $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
   global $col_table, $col_tableh, $col_textem, $l_add, $task_list, $l_none;
-  global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_modtask, $l_close;
+  global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   //for list classement of task
   global $l_task_fac,$l_task_int;
   global $c_days_in_a_week; // number of days to be displayed in a week

@@ -34,7 +34,7 @@ class OBM_DISPLAY {
   var $data_cb_show = 1;      // To set visible
                               //   1 -> visible
                               //   "string" if ->f["string"] == 0 -> visible
-
+  var $separator = ";";        // for file generation : .csv by default
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -888,7 +888,58 @@ class OBM_DISPLAY {
     echo "</tr>";
   }
 
+  /////////////////////////////////////////////////////////////////////////////
+  // Function that display the dataset headers (col names)
+  //   for result in a file (as .csv)
+  /////////////////////////////////////////////////////////////////////////////
+  function dis_data_header_file($sep) {
+    global $fieldnames, $cdg_id, $set_debug;
+
+    $this->display_pref->seek(0);
+    
+    while($this->display_pref->next_record()) {
+      $fieldname = $this->display_pref->f("display_fieldname");
+      $label = $fieldnames[$fieldname];
+
+      echo " $label $sep ";
+    }
+    echo "\n";
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // Function that display the dataset
+  //   for result in a file (as .csv)
+  /////////////////////////////////////////////////////////////////////////////
+  function dis_data_file($sep) {
+    global $auth, $sess, $cdg_id, $set_debug;
+    global $time;
+
+    $this->dis_data_header_file($sep);
+
+	//    echo "nb lignes : ". $this->data_set->num_rows() . "\n";
+    // Iteration on each data row of dataset
+    while ($this->data_set->next_record()) {
+      $this->display_pref->seek(0);
+
+      // For each field in the data row we walk through the pref dbo ordered
+      // and for each entry (field) we set special parameters and display it
+      while ($this->display_pref->next_record()) {
+   	    $fieldname = $this->display_pref->f("display_fieldname");
+
+ 
+
+        echo $this->data_set->f($fieldname) . $sep;
+	  }
+	  echo "\n";
+	}
+ 	echo "\n\n\n";
+
+  }
+
+
+
 } // End of the object OBM_DISPLAY
+
 
 
 ?>

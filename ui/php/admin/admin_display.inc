@@ -37,6 +37,7 @@ function dis_index($mode, $lifetime) {
     $nb_user_ses = get_usersession_number();
     $obm_u = run_query_active_user($lifetime);
     html_admin_status($lifetime, $nb_user_ses, $obm_u);
+    print_r($obm_u);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -55,7 +56,7 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
   global $col_textem, $col_a_table, $col_a_tableh, $col_a_text, $l_help;
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
-  global $sess, $obm_version, $l_version, $l_date;
+  global $sess, $obm_version, $l_version, $l_date, $l_host;
 
   $date = date("Y-m-d H:i:s");
   if ($lifetime > 0) {
@@ -116,6 +117,11 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
       <font color=\"#$col_a_text\">$l_database</font></td>
       <td bgcolor=\"#$col_a_table\">
       <font color=\"#$col_a_text\">" . $obm_u->Database . "</font></td>
+    </tr><tr align=center>
+      <td width=50% bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">$l_host</font></td>
+      <td bgcolor=\"#$col_a_table\">
+      <font color=\"#$col_a_text\">" . $obm_u->Host . "</font></td>
     </tr></table>
     </center>
 
