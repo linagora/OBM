@@ -1412,7 +1412,8 @@ function monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&
     $current_date =   strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$this_month);
     $event_end = $current_date + $event->duration;
     if(date("m",$this_month) == date("m",$current_date) 
-       && date("Ymd",$event_end) >= date("Ymd",$start_time)) {
+       && date("Ymd",$event_end) >= date("Ymd",$start_time)
+       && $current_date <= $end_date) {
       $day = &$day_events[date("Ymd",$current_date)];
       if(!is_object($day)) {
 	$day = &new Day($current_date);

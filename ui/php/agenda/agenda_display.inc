@@ -2260,7 +2260,6 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
   $td_width = floor(70/$nb_user)."px"; 
  
   $day_duration = 86400; 
-
   /* Week Days headers */
   for($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date = date("Ymd", $i);
@@ -2324,7 +2323,6 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	      $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
 	    else 
 	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
-	   
 	    if($events_data != null)  {
 	      if(is_array($events_data)) {
 		$duration = $events_data["duration"];
