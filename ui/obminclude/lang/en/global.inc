@@ -15,6 +15,7 @@ $l_close = "Close the window";
 $l_validate = "Validate";
 $l_execute = "Execute action";
 $l_confirm = "Confirm";
+$l_home = "Home";
 
 // Common messages
 $l_yes = "Yes";

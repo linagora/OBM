@@ -106,13 +106,19 @@ $cgp_hide["deal"]["category1"] = true;
 // authentification 
 // 'CAS' or 'standalone'
 // defaults to 'standalone'
-//$auth_kind="CAS"; 
+// $auth_kind="CAS"; 
 // CAS specific parameters.
 // useless in standalone mode
 // Authentication used :
 $cas_server ="sso.aliacom.local";
 $cas_server_port = 8443;
 $cas_server_uri = "";
+
+
+//Set if there is a link for Aliamin, Blogs and Aliacms
+$aliamin_link = "http://aliamin.aliacom.local/";
+$aliacms_link = "http://cms.aliacom.local/";
+$blogs_link = "http://blogs.aliacom.local/";
 
 
 </script>

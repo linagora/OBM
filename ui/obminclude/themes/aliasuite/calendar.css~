@@ -40,8 +40,7 @@ table.agendaHidden {
 	font-size:		12px;
 	border-spacing:		0;
         font-family:            sans-serif;
-        color:                  #000000;   
-        border:			1px solid black;
+        color:                  #000000;   	
 }
 
 .agendaMain	{
