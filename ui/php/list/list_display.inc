@@ -520,7 +520,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
-  global $l_timeupdate,$l_timecreate,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
+  global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete,$l_recept,$l_renew;
@@ -557,19 +557,19 @@ function html_list_graphical_form($action, $list_q, $list) {
     $field_kind = array(
       "company_name" => "tf",
       "company_country_id" => "sel",
-      "company_timeupdate"  =>  "tf",
+      "company_timeafter"  =>  "tf",
       "company_zipcode"  =>  "tf",
       "company_marketingmanager_id" => "sel",
-      "company_timecreate" =>  "tf",
+      "company_timebefore" =>  "tf",
       "company_town"  =>  "tf",
       "company_datasource_id" => "sel",
       "companycategory_code" => "sel",
       "contact_firstname"  =>  "tf",
       "contact_country_id" => "sel",
-      "contact_timeupdate"  =>  "tf",
+      "contact_timeafter"  =>  "tf",
       "contact_lastname"  =>  "tf",
       "contact_marketingmanager_id" => "sel",
-      "contact_timecreate"  => "tf",
+      "contact_timebefore"  => "tf",
       "contact_datasource_id" => "sel",
       "contact_town"  => "tf",
       "contact_zipcode"  => "tf",
@@ -587,8 +587,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["company_country_id"] = "$l_company: $l_country"; 
   $fields_label["company_zipcode"] = "$l_company: $l_postcode"; 
   $fields_label["company_town"] = "$l_company: $l_town"; 
-  $fields_label["company_timeupdate"] = "$l_company: $l_timeupdate"; 
-  $fields_label["company_timecreate"] = "$l_company: $l_timecreate"; 
+  $fields_label["company_timeafter"] = "$l_company: $l_timeafter"; 
+  $fields_label["company_timebefore"] = "$l_company: $l_timebefore"; 
   $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
   $fields_label["companycategory_code"] = "$l_company: $l_cat";   
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
@@ -597,8 +597,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contact_country_id"]= "$l_contact: $l_country";  
   $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";  
   $fields_label["contact_town"] = "$l_contact: $l_town"; 
-  $fields_label["contact_timeupdate"] = "$l_contact: $l_timeupdate"; 
-  $fields_label["contact_timecreate"] = "$l_contact: $l_timecreate"; 
+  $fields_label["contact_timeafter"] = "$l_contact: $l_timeafter"; 
+  $fields_label["contact_timebefore"] = "$l_contact: $l_timebefore"; 
   $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_market"; 
   $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
   $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
@@ -710,7 +710,7 @@ function html_list_graphical_form($action, $list_q, $list) {
    $dis_criteria
   </table>
   <input type=\"button\" value=\"$l_add_criterion\" 
-  onclick=\"window.open('$url2','','height=600,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
+  onclick=\"window.open('$url2','','height=650,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>
   </div>";
 
   return $block;
@@ -767,7 +767,7 @@ function dis_add_criterion_form($list) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
-  global $l_company,$l_country,$l_postcode,$l_town,$l_timecreate,$l_timeupdate;
+  global $l_company,$l_country,$l_postcode,$l_town,$l_timebefore,$l_timeafter;
   global $l_all,$l_market,$l_datasource,$l_cat;
   global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -801,28 +801,28 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   <tr>
     <td class=\"detailLabel\">$l_company</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_timeupdate</td>  
+    <td class=\"detailLabel\">$l_timeafter</td>  
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_country_id\">$sel_cty</select></td>
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeupdate\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeupdate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeafter\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_postcode</td>
     <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailLabel\">$l_timecreate</td>
+    <td class=\"detailLabel\">$l_timebefore</td>
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_zipcode\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timecreate\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timecreate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timebefore\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
        <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
     </td> 
@@ -853,7 +853,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q){
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
-  global $l_all,$l_timecreate,$l_timeupdate,$l_market,$l_datasource;  
+  global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
   global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
   global $set_theme,$ico_mini_cal;  
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
@@ -906,27 +906,27 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   <tr>
     <td class=\"detailLabel\">$l_lastname</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_timeupdate</td>
+    <td class=\"detailLabel\">$l_timeafter</td>
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lastname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_country_id\">$sel_cty</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeupdate\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeupdate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeafter\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeafter,'../agenda/agenda_index.php?action=calendar&popup=1');\">
      <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
     </td>    
   <tr>  
     <td class=\"detailLabel\">$l_firstname</td>
     <td class=\"detailLabel\">$l_market</td>
-    <td class=\"detailLabel\">$l_timecreate</td>    
+    <td class=\"detailLabel\">$l_timebefore</td>    
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_firstname\" value=\"\" /></td>
     <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>    
     <td class=\"detailForm\" style=\"white-space: nowrap;\">
-     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timecreate\" value=\"\" />
-     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timecreate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timebefore\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timebefore,'../agenda/agenda_index.php?action=calendar&popup=1');\">
        <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
      </a>
     </td>     

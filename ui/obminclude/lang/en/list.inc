@@ -28,13 +28,15 @@ $l_desc = "Description";
 $l_export_intro = "Select the export format needed";
 $l_criterion = "Search criteria";
 $l_select_list = "Select the lists to be exported";
-$l_timeupdate = "Time update";
-$l_timecreate = "Time create";
+$l_timeafter = "Updated after";
+$l_timebefore = "Updated before";
 $l_market = "Responsible";
 $l_contact_cat1 = "Category 1";
 $l_contact_cat2 = "Category 2";
 $l_expert_mode = "Expert Mode";
 $l_normal_mode = "Normal Mode";
+$l_renew = "Automatic renewal";
+$l_recept = "Reception mode";
 
 // Contact
 $l_lastname = "Lastname";

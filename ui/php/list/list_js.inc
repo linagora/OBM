@@ -189,26 +189,26 @@ function company_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_town[]\" value=\"\" />';
   }
 
-  if(form.tf_company_timeupdate.value != '') {    
+  if(form.tf_company_timeafter.value != '') {    
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company: $l_timeupdate'; 
+    cell.innerHTML = '$l_company: $l_timeafter'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeupdate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeupdate.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeafter.value+'\" />';
     i++;
   }
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timeupdate[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timeafter[]\" value=\"\" />';
   }
 
-  if(form.tf_company_timecreate.value != '') {    
+  if(form.tf_company_timebefore.value != '') {    
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_company: $l_timecreate'; 
+    cell.innerHTML = '$l_company: $l_timebefore'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timecreate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timecreate.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timebefore.value+'\" />';
     i++;
   }
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timecreate[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timebefore[]\" value=\"\" />';
   }
   
   if(form.sel_company_marketingmanager_id.value != '') {  
@@ -312,26 +312,26 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_town[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_timeupdate.value != '') {    
+  if(form.tf_contact_timeafter.value != '') {    
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_timeupdate'; 
+    cell.innerHTML = '$l_contact: $l_timeafter'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeupdate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeupdate.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeafter[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeafter.value+'\" />';
     i++;
   }
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeupdate[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeafter[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_timecreate.value != '') {    
+  if(form.tf_contact_timebefore.value != '') {    
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_contact: $l_timecreate'; 
+    cell.innerHTML = '$l_contact: $l_timebefore'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timecreate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timecreate.value+'\" />';
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timebefore[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timebefore.value+'\" />';
     i++;
   }
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timecreate[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timebefore[]\" value=\"\" />';
   }
 
   if(form.sel_contact_marketingmanager_id.value != '') {    

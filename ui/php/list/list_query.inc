@@ -829,24 +829,27 @@ function make_query($list) {
   $common_equal = "%f = '%v'";
   $category_equal = "(%f $like '%v.%' OR %f = '%v')";
   $pub_lang_like = "%f $like '%%v%'";
-
+  $comp_time_sup = "(company_timecreate >= '%v' OR company_timeupdate >= '%v')";
+  $comp_time_inf = "(company_timecreate <= '%v' OR company_timeupdate <= '%v')";
+  $cont_time_sup = "(contact_timecreate >= '%v' OR contact_timeupdate >= '%v')";
+  $cont_time_inf = "(contact_timecreate <= '%v' OR contact_timeupdate <= '%v')";
   
   $operateurs = array(
     "company_name" => $common_like,
     "company_country_id" => $common_equal,
-    "company_timeupdate"  => $common_equal,
+    "company_timeafter"  => $comp_time_sup,
+    "company_timebefore" => $comp_time_inf,
     "company_zipcode"  => $common_like,
     "company_marketingmanager_id" => $common_equal,
-    "company_timecreate" => $common_equal,
     "company_town"  => $common_like,
     "company_datasource_id" => $common_equal,
     "companycategory_code" => $category_equal,
     "contact_firstname"  => $common_like,
     "contact_country_id" => $common_equal,
-    "contact_timeupdate"  => $common_equal,
+    "contact_timeafter"  => $cont_time_sup,
+    "contact_timebefore"  => $cont_time_inf,
     "contact_lastname"  => $common_like,
     "contact_marketingmanager_id" => $common_equal,
-    "contact_timecreate"  => $common_equal,
     "contact_datasource_id" => $common_equal,
     "contact_town"  => $common_like,
     "contact_zipcode"  => $common_like,

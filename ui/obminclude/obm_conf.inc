@@ -11,13 +11,13 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // Use Database sessions
 //$cgp_sess_db = true;
@@ -52,6 +52,7 @@ $cgp_show["section"]["aliamin"] = false;
 //$cgp_show["module"]["account"] = false;
 //$cgp_show["module"]["invoice"] = false;
 //$cgp_show["module"]["payment"] = false;
+$cgp_show["module"]["statistic"] = true;
 
 // Company module
 //$cgp_hide["company"]["number"] = true;

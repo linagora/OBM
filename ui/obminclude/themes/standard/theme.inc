@@ -57,7 +57,7 @@ $ico_invoice        = "ico_invoice.gif";
 $ico_payment        = "ico_payment.gif";
 $ico_document       = "ico_document.gif";
 $ico_document_new   = "ico_document_new.gif";
-
+$ico_statistic      = "ico_stat.gif";
 //$ico_time           = "ico_time.gif";
 //$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";

@@ -82,10 +82,6 @@ $l_contact_category1 = "Contact Category 1";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
 
-$l_renew_manage = "Renewal modes management";
-$l_renew_exist = "Existing renewal modes";
-$l_renew_new = "New renewal mode";
-
 $l_recept_manage = "Reception modes management";
 $l_recept_exist = "Existing reception modes";
 $l_recept_new = "New reception mode";
@@ -106,17 +102,6 @@ $l_recept_checkdelete = "Verify or delete the reception mode";
 $l_recept_delete = "Delete the reception mode";
 $l_recept_insert = "Insert the reception mode";
 
-$l_renew_delete_ok = "Renewal mode deleted.";
-$l_renew_delete_error = "Renewal mode deletion canceled !";
-$l_renew_insert_ok = "Renewal mode insertion done.";
-$l_renew_insert_error = "Renewal mode insertion canceled !";
-$l_renew_update_ok = "Renewal mode updated";
-$l_renew_update_error = "Renewal mode updat canceled !";
-$l_renew_link_publication = "Those publication are from the renewal mode ";
-$l_renew_link_publication_no = "No publication linked to this renewal mode";
-$l_renew_cant_delete = "This mode cannot be deleted !";
-$l_renew_can_delete = "This mode can be deleted !";
-
 $l_recept_delete_ok = "Reception mode deleted.";
 $l_recept_delete_error = "Reception mode deletion canceled !";
 $l_recept_insert_ok = "Reception mode insertion done.";
@@ -128,9 +113,6 @@ $l_recept_link_publication_no = "No publication linked to this reception mode";
 $l_recept_cant_delete = "This mode cannot be deleted !";
 $l_recept_can_delete = "This mode can be deleted !";
 
-$l_j_renew_delete = "Select a renewal mode !";
-$l_j_renew_update = "Select a renewal mode !";
-$l_j_renew_create = "Enter a label for the renewal mode !";
 $l_j_recept_delete = "Select a reception mode !";
 $l_j_recept_update = "Select a reception mode !";
 $l_j_recept_create = "Enter a label for the reception mode !";

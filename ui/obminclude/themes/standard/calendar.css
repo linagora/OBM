@@ -282,12 +282,23 @@ td.agendaPossible 	{
     border-right: 		1px dashed #6a90c3;    
 }
 
+td.agendaPossibleHover 	{ 
+    background-color: 		#ffde01; 
+    border-top: 		1px dashed #6a90c3;
+    border-right: 		1px dashed #6a90c3;    
+}
+
 td.agendaFree 	{ 
     background-color: 		#cee1ed;  
     border-top: 		1px dashed #a0b3c4;
     border-right: 		1px dashed #a0b3c4;     
 }
 
+td.agendaFreeHover	{ 
+    background-color: 		#fdffbf;  
+    border-top: 		1px dashed #a0b3c4;
+    border-right: 		1px dashed #a0b3c4;     
+}
 
 td.agendaOccupied 	{ 
     background-color: 		#e3e5ea;  
