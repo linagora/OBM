@@ -27,7 +27,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $market = $company["marketing_manager"];
   $zip = $company["zip"];
 
-  // If a name has been given we serch its sound too
+  // If a name has been given we search its sound too
   if ($name != "") {
     $auto_aka = reduce_name($name);
     $sound = phonetic_key($name);
@@ -63,9 +63,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   $and = "";
   if ($name != "") {
-    $where .= " (company_name like '$name%'
-                 or company_aka like '%$auto_aka%'
-                 or company_sound = '$sound')";
+    $where_name = " company_name like '$name%'";
     $and = "and";
   }
   if (($kind != $c_all) && ($kind != "")) { 
@@ -95,8 +93,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $and = "and";
   }
 
-  if ($where != "") {
-    $where = " where $where";
+  if (($where != "") || ($where_name != "")) {
+    $whereq = " where $where_name $where";
   }
 
   // ORDER construction
@@ -107,12 +105,22 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $order = "company_name";
   }
 
-  $req .= "$where order by $order $p_order_dir";
+  $query = "$req $whereq order by $order $p_order_dir";
 
-  display_debug_msg($req, $cdg_sql);
+  display_debug_msg("company_search(1) : $query", $cdg_sql);
   $obm_db = new DB_OBM;
-  $obm_db->query($req);
-  
+  $obm_db->query($query);
+
+  if ( ($obm_db->num_rows() == 0) && ($name != "") ) {
+    $where_name = " (company_aka like '%$auto_aka%'
+                 or company_sound = '$sound')";
+    $whereq = " where $where_name $where";
+    $query = "$req $whereq order by $order $p_order_dir";
+    display_debug_msg("company_search(2) : $query", $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+  }
+
   return $obm_db;
 }
 
@@ -231,7 +239,7 @@ function run_query_insert($company) {
     '$sound',
     '$kind',
     '$act',
-    '$market',
+    $market,
     '$ad1',
     '$ad2',
     '$ad3',
@@ -248,7 +256,6 @@ function run_query_insert($company) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-
 
   $query = "select company_id as Id
     from Company

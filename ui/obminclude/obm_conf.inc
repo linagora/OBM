@@ -22,5 +22,4 @@ $gp_site_include = true;
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;
 
-
 </script>

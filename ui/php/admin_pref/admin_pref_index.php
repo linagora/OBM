@@ -75,18 +75,26 @@ switch ($action) {
   case "global_pref_update":
     if (check_data_form($pref)) {
       $retour = update_global_pref($pref);
-      if ($retour)
-        echo "$l_update_ok<p>\n";
-      else
-        echo "$l_update_error<p>\n";
+      if ($retour) {
+        $msg = $l_update_ok;
+        $display["msg"] .= display_ok_msg($msg);
+      } else {
+        $msg = $l_update_error;
+        $display["msg"] .= display_err_msg($msg);
+      }
+      echo (($mode == "txt") ? $msg : $display["msg"]);
       dis_pref_index($mode);
     } else {
-      echo "$l_invalid_data : ($err_msg)<p>\n";
+      $msg = "$l_invalid_data : ($err_msg)";
+      $display["msg"] .= display_err_msg("$msg");
+      echo (($mode == "txt") ? $msg : $display["msg"]);
       dis_pref_index($mode);
     }
     break;
   default:
-    echo "No action specified !";
+    $msg = "$action : Action not implemented !";
+    $display["msg"] .= display_err_msg("$msg");
+    echo (($mode == "txt") ? $msg : $display["msg"]);
     break;
 }
 

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : list.inc                                                 //
@@ -68,6 +68,7 @@ $l_contact_removed = "Contatti eliminati";
 $l_fill_subject = "Oggeto non valido";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";
+$l_hungry_query = "The query need too much resource !";
 
 $l_static_con_found = "Static Contatti registrati";
 $l_no_static_contact = "Non sono presenti static contatti registrati";

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : list.inc                                                 //
@@ -71,6 +71,7 @@ $l_fill_name = "Le nom de la liste doit être saisi !";
 $l_fill_subject = "Le sujet doit être saisi !";
 $l_invalid_query = "La requête saisie est incorrecte !";
 $l_banned_word = "Mot interdit";
+$l_hungry_query = "La requête est trop consommatrice de ressource !";
 
 //------------------------------------//
 // Export Format informations         //

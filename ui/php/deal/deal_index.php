@@ -128,8 +128,9 @@ elseif (($action == "index") || ($action == "")) {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $usr_q = run_query_userobm_active();
-  $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+  $usrc_q = run_query_all_users_from_group($cg_com);
+  $usrp_q = run_query_all_users_from_group($cg_prod);
+  $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -157,8 +158,9 @@ elseif (($action == "index") || ($action == "")) {
     $display["detailInfo"] = display_record_info($deal_q);
     $param_company = $deal_q->f("deal_company_id");
     $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
-    $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
   }
   
 } elseif ($action == "insert")  {
@@ -181,8 +183,9 @@ elseif (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     $display["msg"] .= display_err_msg($err_msg);
     $users = array($deal["market"], $deal["tech"]);
-    $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
   }
   
 } elseif ($action == "update")  {
@@ -205,8 +208,9 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($err_msg);
     $param_company = $deal["company"];
     $users = array($deal["market"], $deal["tech"]);
-    $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_deal_form($action, "", run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
@@ -361,7 +365,7 @@ elseif (($action == "index") || ($action == "")) {
 } elseif ($action == "parent_search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   $display["search"] = html_parentdeal_search_form($deal, $usr_q);
   $display["result"] = dis_parentdeal_search_list($deal);
 
@@ -369,8 +373,9 @@ elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $obm_q = new DB_OBM;
-  $usr_q = run_query_userobm_active();
-  $display["detail"] = html_parentdeal_form($action,$obm_q, $usr_q,'');
+  $usrc_q = run_query_all_users_from_group($cg_com);
+  $usrp_q = run_query_all_users_from_group($cg_prod);
+  $display["detail"] = html_parentdeal_form($action,$obm_q, $usrc_q,$usrp_q,'');
 
 } elseif ($action == "parent_detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -387,9 +392,10 @@ elseif (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usr_q = run_query_userobm_active($users);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_parentdeal_form($action,$obm_q, $usr_q, $deal);
+    $display["detail"] = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
   } 
   
 } elseif ($action == "parent_insert") {
@@ -414,9 +420,10 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_err_parent_has_deal);
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usr_q = run_query_userobm_active($users);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["search"] = html_parentdeal_form($action,$obm_q, $usr_q, $deal);
+    $display["search"] = html_parentdeal_form($action,$obm_q, $usrc_q, $usrp_q, $deal);
   } else {
     run_query_delete_parentdeal($deal["parent"]); 
     $display["msg"] .= display_ok_msg($l_delete_ok); 
@@ -443,9 +450,10 @@ elseif (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     $obm_q = run_query_detail_parentdeal($deal["parent"]);
     $users = array($obm_q->f("parentdeal_marketingmanager_id"), $obm_q->f("parentdeal_technicalmanager_id"));
-    $usr_q = run_query_userobm_active($users);
+    $usrp_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $display["detailInfo"] = display_record_info($obm_q);
-    $display["detail"] = html_parentdeal_form($action, $obm_q, $usr_q, $deal);
+    $display["detail"] = html_parentdeal_form($action, $obm_q, $usrc_q, $usrp_q, $deal);
   }
 
 } elseif ($action == "affect") {

@@ -547,7 +547,8 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   $sel_dsrc .= "</select>";
 
   // kind select
-  $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">";
+  $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">
+    <option value=\"0\">$l_none</option>";
   while ($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
@@ -592,7 +593,8 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   $sel_act .= "</select>";
 
   // Marketing manager select
-  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">";
+  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
+    <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";

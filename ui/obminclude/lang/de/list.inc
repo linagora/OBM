@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : German
 //     - File     : list.inc
-// 2000-16-02 Vincent MARGUERIT : Last Update 2000-16-02
+// 2000-16-02 Aliacom - Vincent MARGUERIT
 // 2001-07   / Fink / translated
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //

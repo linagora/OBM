@@ -209,14 +209,12 @@ if ($action == "index" || $action == "") {
     $project["name"] = run_query_projectname($param_project);
     $tasks_q = run_query_tasks($param_project);
     $members_q = run_query_members($param_project);
-    $allo_q = run_query_allocation($param_project);
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
-
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
-
     } else {
+      $allo_q = run_query_allocation($param_project);
       $display["detail"] = html_project_allocate_form($tasks_q, $members_q, $allo_q, $project); 
     }
   }
@@ -258,13 +256,10 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_advance_form($project)) {
     $ins_err = run_query_progress($project);
-  
     // Create an entry in the ProjectStat log
     $retour = run_query_statlog($param_project);
-  
     if (!($retour))
       $ins_err = 1;
-    
     if (!($ins_err)) {
       $display["msg"] .= display_ok_msg($l_progress_update_ok);
     } else {
@@ -276,21 +271,17 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "member_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-
     $pid = $project["ext_id"];
     $project["id"] = $pid;
     $project["name"] = run_query_projectname($pid);
-
     if ($project["mem_nb"] > 0) {
       $nb = run_query_memberlist_insert($project);
       $display["msg"] .= display_ok_msg("$nb $l_member_added");
     } else {
       $display["msg"] .= display_err_msg("$l_no_member_add");
     }
-
     // gets updated infos
     $members_q = run_query_members($pid);
-
     $display["detail"] = html_project_member_form($members_q, $project);
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
@@ -299,25 +290,19 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "member_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-
     $pid = $project["id"];
     $project["name"] = run_query_projectname($param_project);
-
     if ($project["mem_nb"] > 0) {
       $nb = run_query_memberlist_delete($project);
       $display["msg"] .= display_ok_msg("$nb $l_member_removed");
-
       if ($nb != $project["mem_nb"])
 	$display["msg"] .= display_warn_msg("$l_member_delete_error");
     } else {
       $display["msg"] .= display_err_msg("$l_no_member_del");
     }
-
     // gets updated infos
     $members_q = run_query_members($pid);
-      
     $display["detail"] = html_project_member_form($members_q, $project );
-
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
   }
@@ -325,15 +310,11 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "member_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-
     $pid = $project["id"];
     $project["name"] = run_query_projectname($pid);
-
     $retour = run_query_memberstatus_change($project);
-
     // gets updated infos
     $members_q = run_query_members($pid);
-
     $display["detail"] = html_project_member_form($members_q, $project);
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
@@ -516,7 +497,7 @@ function get_project_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $project_read,
-    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
+    'Condition'=> array ('detailupdate', 'update', 'task', 'task_add', 'task_del', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress', 'progress_update') 
     );
 
 // Detail Update

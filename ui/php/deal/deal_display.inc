@@ -821,7 +821,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
 //   - $cat_q     : DBO : deal category list
-//   - $usr_q     : DBO : list of userobm
+//   - $usrc_q    : DBO : list of userobm from system group Commercial
+//   - $usrp_q    : DBO : list of userobm from system group Production
 //   - $comp_q    : DBO : deal company infos (name, ad1, zip, town when new)
 //   - $con_q     : DBO : list of contact from the company 
 //   - $sta_q     : DBO : list of deal status
@@ -829,7 +830,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
+function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usrc_q,$usrp_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
   global $set_theme,$ico_company,$ico_contact,$l_company;
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
@@ -941,10 +942,10 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   // Marketing manager select construction
   $sel_market = "<select name=\"sel_market\">
     <option value=\"0\">$l_none</option>";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname") . " " .
-             $usr_q->f("userobm_firstname");
+  while ($usrc_q->next_record()) {
+    $cid = $usrc_q->f("userobm_id");
+    $cname = $usrc_q->f("userobm_lastname") . " " .
+             $usrc_q->f("userobm_firstname");
     $sel_market .= "\n<option value=\"$cid\"";
     if ($market == $cid) $sel_market .= " selected = \"selected\""; 
     $sel_market .= ">$cname</option>";
@@ -952,15 +953,12 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   $sel_market .= "</select>";
 
   // Technical manager select construction
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
-  }
   $sel_tech = "<select name=\"sel_tech\">
     <option value=\"0\">$l_none</option>";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname") . " " .
-             $usr_q->f("userobm_firstname");
+  while ($usrp_q->next_record()) {
+    $cid = $usrp_q->f("userobm_id");
+    $cname = $usrp_q->f("userobm_lastname") . " " .
+             $usrp_q->f("userobm_firstname");
     $sel_tech .= "<option value=\"$cid\"";
     if ($tech == $cid) $sel_tech .= " selected = \"selected\""; 
     $sel_tech .= ">$cname</option>\n";
@@ -1033,13 +1031,13 @@ function auto_set_hitrate(select, targetField, pos) {
 ";
   
   // User comment select construction
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
+  if ($usrc_q->nf()>0) {
+    $usrc_q->seek(0);
   }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usr_q->next_record()) {
-    $cid = $usr_q->f("userobm_id");
-    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+  while ($usrc_q->next_record()) {
+    $cid = $usrc_q->f("userobm_id");
+    $cname = $usrc_q->f("userobm_lastname")." ".$usrc_q->f("userobm_firstname");
     $sel_usercomment .= "<option value=\"$cname\"";
     // First time default to uid of connected user (uid) then set to name
     if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
@@ -1879,11 +1877,12 @@ function html_parentdeal_search_list($obm_q, $pref_q, $nb_parentdeals, $deal) {
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the parent deal (null for new deal)
-//   - $usr_q     : DBO : OBM user list
+//   - $usrc_q    : DBO : OBM user list from system group Commercial
+//   - $usrp_q    : DBO : OBM user list from system group Production
 //   - deal[]     : default or transmitted values
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
+function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
   // -- Themes
   global $ico_company,$ico_contact;
   // -- Labels
@@ -1908,22 +1907,19 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_pmarket\">";
-  while($usr_q->next_record()) {
-    $sel_market .= "<option value=\"" . $usr_q->f("userobm_id") . "\"";
-    if ($usr_q->f("userobm_id") == $pmarket) $sel_market .= " selected= \" selected \"";
-    $sel_market .= ">" . $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+  while ($usrc_q->next_record()) {
+    $sel_market .= "<option value=\"" . $usrc_q->f("userobm_id") . "\"";
+    if ($usrc_q->f("userobm_id") == $pmarket) $sel_market .= " selected= \" selected \"";
+    $sel_market .= ">" . $usrc_q->f("userobm_lastname") . " " . $usrc_q->f("userobm_firstname")."</option>";
   }
   $sel_market .= "</select>";
 
   // Technical manager select
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
-  }
   $sel_tech = "<select name=\"sel_ptech\">";
-  while($usr_q->next_record()) {
-    $sel_tech .= "<option value=\"" . $usr_q->f("userobm_id") . "\"";
-    if ($usr_q->f("userobm_id") == $ptech) $sel_tech .= "selected= \" selected \"";
-    $sel_tech .= ">" . $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+  while ($usrp_q->next_record()) {
+    $sel_tech .= "<option value=\"" . $usrp_q->f("userobm_id") . "\"";
+    if ($usrp_q->f("userobm_id") == $ptech) $sel_tech .= "selected= \" selected \"";
+    $sel_tech .= ">" . $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
   }
   $sel_tech .= "</select>";
 

@@ -474,8 +474,9 @@ function check_list_context($id, $list) {
 //     keys used : name, subject, email
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($id, $list) {
-  global $php_regexp_email, $l_fill_name, $l_invalid_query, $l_banned_word;
-  global $err_msg, $l_j_check_email, $l_list_exists;
+  global $php_regexp_email, $l_j_check_email, $l_list_exists, $l_fill_name;
+  global $l_invalid_query, $l_banned_word, $l_hungry_query;
+  global $err_msg, $cql_max_row, $cql_max_cost;
 
   $name = $list["name"];
   $subject = $list["subject"];
@@ -511,17 +512,23 @@ function check_data_form($id, $list) {
       }
     }
     // Check if query is syntaxically correct
-    $query = "explain $query";
-    display_debug_msg($query, $cdg_sql);
+    display_debug_msg("explain $query", $cdg_sql);
     $obm_q = new DB_OBM;
     // 1 indicate to PHPLIB not to report the error if any
-    $ret = $obm_q->query($query, 1);
+    $ret = $obm_q->query("explain $query", 1);
     if (substr($ret, 0,4) == "obm:") {
       $err_msg = "$l_invalid_query : " . substr($ret,4);
       return false;
+    } else {
+      $ret = sql_query_resource_high($query);
+      if ($ret["ret"]) {
+	$rows = $ret["rows"];
+	$cost = $ret["cost"];
+	$err_msg = "$l_hungry_query (rows=$rows [max=$cql_max_row] cost=$cost [max=$cql_max_cost])";
+	return false;
+      }
     }
   }
-
 
   return true;
 }
@@ -558,8 +565,12 @@ function get_query_num_rows($query="") {
   if (trim($query) != "") {
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    $ret = $obm_q->num_rows();
+    $r = $obm_q->query($query, 1);
+    if (is_string($r)) {
+      $ret = -1;
+    } else {
+      $ret = $obm_q->num_rows();
+    }
   } else {
     $ret = 0;
   }  
@@ -567,6 +578,70 @@ function get_query_num_rows($query="") {
   return $ret;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Evaluate if a query can be accepted based on resource consumption
+// Evaluation done specificaly for each database backend supported
+// Parameters:
+//   - $db_type : DB type
+//   - $query   : query to evaluate
+// Returns:
+//   - true if resource consumption is high for this query, else false
+///////////////////////////////////////////////////////////////////////////////
+function sql_query_resource_high($query) {
+  global $db_type_mysql, $db_type_pgsql;
+  global $cql_max_row, $cql_max_cost;
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  if ($type == $db_type_mysql) {
+    $q = "explain $query";
+    $obm_q->query($q);
+    $cpt = 1;
+    while ($obm_q->next_record()) {
+      $num = $obm_q->f("rows");
+      $cpt *= $num;
+    }
+    $ret["rows"] = $cpt;
+    if ($cpt > $cql_max_row) {
+      $ret["ret"] = true;
+      return $ret;
+    } else {
+      $ret["ret"] = false;
+      return $ret;
+    }
+
+    // Postgres Estimate
+  } elseif ($type == $db_type_pgsql) {
+    $q = "explain $query";
+    $obm_q->query($q, 1);
+    // We read the first row of explain command
+    $obm_q->next_record();
+    $line = $obm_q->f(0);
+    $pattern = "/cost=[0-9]*\.[0-9]*\.\.([0-9]*\.[0-9]*) rows=([0-9]*) /";
+    if (preg_match($pattern, $line, $match)) {
+      $cost = $match[1];
+      $rows = $match[2];
+      $ret["cost"] = $cost;
+      $ret["rows"] = $rows;
+    }
+
+    if (($cost > $cql_max_cost) || ($rows > $cql_max_row)) {
+      $ret["ret"] = true;
+      return $ret;
+    } else {
+      $ret["ret"] = false;
+      return $ret;
+    }
+
+    // Other DB backends
+  } else {
+    $ret["ret"] = false;
+  }
+
+  return $ret;
+}
 
 
 

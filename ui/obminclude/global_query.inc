@@ -72,8 +72,8 @@ function run_query_datasource() {
 
   $query = "select * from DataSource order by datasource_name"; 
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
 
   return $obm_q;
 }
@@ -300,6 +300,104 @@ function run_query_userobm_active($ids="") {
   display_debug_msg("run_query_userobm_active() : $query", $cdg_sql);
 
   return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the users list from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $group_id : Group id
+//   - $ids (optionnal) : array of UserObm Id to add to the result
+///////////////////////////////////////////////////////////////////////////////
+function run_query_all_users_from_group($g_id, $ids="") {
+  global $cdg_sql;
+
+  $gusers = get_all_users_from_group($g_id);
+
+  if (is_array($gusers)) {
+    $where_gusers = "";
+    $nb_add = count($gusers);
+    for ($i=0; $i<$nb_add; $i++) {
+      if ($gusers[$i] != "") {
+        $where_gusers .= " or userobm_id = '$gusers[$i]'";
+      }
+    }
+  }
+
+  if (is_array($ids)) {
+    $where_ids = "";
+    $nb_add = count($ids);
+    for ($i=0; $i<$nb_add; $i++) {
+      if ($ids[$i] != "") {
+        $where_ids .= " or userobm_id = '$ids[$i]'";
+      }
+    }
+  }
+
+  $query = "select userobm_id,
+      userobm_lastname,
+      userobm_firstname
+    from UserObm
+    where (userobm_archive != '1' and (1=0 $where_gusers))
+      $where_ids
+    order by userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg("run_query_all_users_from_group() : $query", $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution : Get the users list from the given group
+// Recursive search to handle group trees
+// Parameters:
+//   - $group_id : Group id
+///////////////////////////////////////////////////////////////////////////////
+function get_all_users_from_group($g_id) {
+  global $cdg_sql;
+
+  if (! ($g_id > 0)) {
+    return false;
+  }
+
+  $users = array();
+
+  // Groups members of this group
+  $query = "select groupgroup_childid as child_id
+      from GroupGroup
+      where groupgroup_parentid='$g_id'";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $child_id = $obm_q->f("child_id");
+    $gusers = get_all_users_from_group($child_id);
+    $users = array_merge($users, $gusers);
+  }
+
+  // Users members of this group
+  $query = "select userobmgroup_userobmid as user_id
+    from UserObmGroup
+    where userobmgroup_groupid='$g_id'
+  ";
+
+  $obm_q = new DB_OBM; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("user_id");
+    if (! in_array($u_id, $users)) {
+      array_push($users, $u_id);
+    }
+  }
+
+  return $users;
 }
 
 

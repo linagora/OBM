@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_index.php                                           //
 //     - Desc : Contract Support Index File                                  //
@@ -102,9 +102,12 @@ if ($action == "ext_get_id") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
-  if ($param_deal != "")
+  if ($param_deal != "") {
     $display["msg"] .= display_ok_msg(stripslashes($ok_message)."<br />".$l_add_contract_deal);
-  $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm_active(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  }
+  $usrc_q = run_query_all_users_from_group($cg_com);
+  $usrp_q = run_query_all_users_from_group($cg_prod);
+  $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,9 +124,10 @@ if ($action == "ext_get_id") {
     require("contract_js.inc");
     $display["detailInfo"] = display_record_info($contract_q);
     $users = array($contract_q->f("contract_marketmanager_id"), $contract_q->f("contract_techmanager_id"));
-    $usr_q = run_query_userobm_active($users);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
     $company = $contract_q->f("contract_company_id");
-    $display["detail"] = html_contract_form($action,$contract_q,run_query_contracttype(), $usr_q, run_query_company_info($company), run_query_contact_contract($company), $contract);
+    $display["detail"] = html_contract_form($action,$contract_q,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($company), run_query_contact_contract($company), $contract);
   }
 
 } elseif ($action == "insert")  {
@@ -141,8 +145,9 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     $users = array($contract["market"], $contract["tech"]);
-    $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usr_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
  }
 
 } elseif ($action == "update")  {
@@ -160,8 +165,9 @@ if ($action == "ext_get_id") {
     require("contract_js.inc");
     $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
     $users = array($contract["market"], $contract["tech"]);
-    $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usr_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+    $usrc_q = run_query_all_users_from_group($cg_com, $users);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_contract_form($action,new DB_OBM,run_query_contracttype(), $usrc_q, $usrp_q, run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
   }
 
 } elseif ($action == "check_delete")  {
@@ -177,7 +183,7 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   $display["search"] = html_contract_search_form($contract, $usr_q, run_query_contracttype());
 
 } elseif ($action == "display") {

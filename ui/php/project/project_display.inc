@@ -301,8 +301,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
   $estimated = $project_q->f("project_estimatedtime");
-  $datebegin = date_format($project_q->f("datebegin"));
-  $dateend = date_format($project_q->f("dateend"));
+  $datebegin = date_format($project_q->f("datebegin"), 1);
+  $dateend = date_format($project_q->f("dateend"), 1);
 
   // Labels are different for sales and R&D projects
   if ($company > 0) {
@@ -727,8 +727,8 @@ function html_project_form($action, $project_q, $project) {
     $arc_val = ($project_q->f("project_archive")) ? "checked" : "";
     $company_name = $project_q->f("company_name");
     $deal_label = $project_q->f("deal_label");
-    $datebegin = isodate_format($project_q->f("datebegin"));
-    $dateend = isodate_format($project_q->f("dateend"));
+    $datebegin = isodate_format($project_q->f("datebegin"), 1);
+    $dateend = isodate_format($project_q->f("dateend"), 1);
   } else {
     $pid = $project["id"];
     $name = $project["name"];
@@ -1245,7 +1245,6 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 
   // task list
   while ($tasks_q->next_record()) {
-    
     $pt_id = $tasks_q->f("projecttask_id");
     $par_id = $tasks_q->f("parent_id");
     $parent = $tasks_q->f("parent_group");
@@ -1261,7 +1260,6 @@ function html_project_allocate_form($tasks_q, $members_q, $allo_q, $project) {
 
   // list the members of the project
   while ($members_q->next_record()) {
-    
     $array_mem[$cpt_m]["id"] = $members_q->f("member_id");
     $array_mem[$cpt_m]["name"] = $members_q->f("member_lastname");  
     $cpt_m++;
@@ -1395,7 +1393,6 @@ function html_project_advance($members_q, $allo_q, $tasks_q, $project) {
     $array_mem[$cpt_m]["id"] = $members_q->f("member_id");
     $array_mem[$cpt_m]["name"] = $members_q->f("member_lastname");
     $array_mem[$cpt_m]["firstname"] = $members_q->f("member_firstname");
-
     $cpt_m++;
   }
 

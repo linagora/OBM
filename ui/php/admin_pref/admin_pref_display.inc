@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_display.inc                                       //
 //     - Desc : Pref admin display File                                      //
@@ -44,7 +44,7 @@ function dis_pref_index($mode) {
 
   switch ($mode) {
   case "txt":
-    echo "try -h to help\n";
+    echo "\ntry -h for help\n";
     break;
   case "html":
     html_pref_index($lifetime, $session_cookie);

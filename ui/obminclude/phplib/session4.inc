@@ -204,6 +204,11 @@ class Session {
 
   function start($sid = "") {
     global $HTTP_COOKIE_VARS;
+    global $action, $login_action;
+
+    if ($action == "logout") {
+      $login_action = "obm.php";
+    }
 
     $this->put_headers();
     $this->get_id($sid);

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obm.php                                                      //
 //     - Desc : OBM Home Page (Login / Logout)                               //

@@ -79,7 +79,9 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("incident_js.inc");
-   $display["detail"] = html_incident_form($action, "", "", run_query_userobm_active(), run_query_priority(), run_query_status(), $incident);
+  $usr_q = run_query_userobm_active();
+  $usrp_q = run_query_all_users_from_group($cg_prod);
+  $display["detail"] = html_incident_form($action, "", "", $usr_q, $usrp_q, run_query_priority(), run_query_status(), $incident);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -104,7 +106,8 @@ if ($action == "index" || $action == "") {
       $display["detailInfo"] = display_record_info($inc_q);
       $users = array($inc_q->f("incident_owner"),$inc_q->f("incident_logger"));
       $usr_q = run_query_userobm_active($users);
-      $display["detail"] = html_incident_form($action, $inc_q, $contr_q, $usr_q, run_query_priority(), run_query_status(), $incident);
+      $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+      $display["detail"] = html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, run_query_priority(), run_query_status(), $incident);
     } else {
       $display["msg"] = display_err_msg($l_query_error . " - " . $con_q->query . " !");
       $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
@@ -123,7 +126,8 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_warn_msg($err_msg);
     $users = array($incident["owner"], $incident["logger"]);
     $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_incident_form($action, "", "", $usr_q, $usrp_q, run_query_priority(), run_query_status(), $incident);
   }
 
 } elseif ($action == "update")  {
@@ -138,7 +142,8 @@ if ($action == "index" || $action == "") {
     $display["msg"] = display_warn_msg($err_msg);
     $users = array($incident["owner"], $incident["logger"]);
     $usr_q = run_query_userobm_active($users);
-    $display["detail"] = html_incident_form($action, "", "", $usr_q, run_query_priority(), run_query_status(), $incident);
+    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+    $display["detail"] = html_incident_form($action, "", "", $usr_q, $usrp_q, run_query_priority(), run_query_status(), $incident);
  }
  
 } elseif ($action == "delete")  {

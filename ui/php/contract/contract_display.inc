@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_display.php                                         //
 //     - Desc : Contract Support Display File                                //
@@ -386,13 +386,14 @@ function html_contract_consult($contract_q) {
 //   - $action     : action called
 //   - $contract_q : DBO : information about the contract (null for new)
 //   - $type_q     : DBO : contract type list
-//   - $usr_q      : DBO : list of userobm
+//   - $u_com_q    : DBO : list of userobm from group Commercial
+//   - $u_prod_q   : DBO : list of userobm from group Production
 //   - $comp_q     : DBO : company infos (name, ad1, zip, town when new)
 //   - $contact_q  : DBO : list of contact from the company 
 //   - contract[]  : default or transmitted values
 //     keys used   : all
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_q, $contract){
+function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract){
   // - Themes
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   // -- Labels
@@ -468,27 +469,23 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   }
   $dis_sel_t.="</select>";
 
-  $dis_sel_respc="<select name=\"sel_market\">";
-  while($usr_q->next_record()) {
-    $dis_sel_respc.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
-    if ($usr_q->f("userobm_id") == $market_id) 
-      $dis_sel_respc.=" selected=\"selected\"";
-    $dis_sel_respc.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+  $sel_market = "<select name=\"sel_market\">";
+  while ($u_com_q->next_record()) {
+    $sel_market .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
+    if ($u_com_q->f("userobm_id") == $market_id) 
+      $sel_market .= " selected=\"selected\"";
+    $sel_market .= ">". $u_com_q->f("userobm_lastname") . " " . $u_com_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_respc.="</select>";
+  $sel_market.="</select>";
  
-  if ($usr_q->nf()>0) {
-    $usr_q->seek(0);
+  $sel_tech = "<select name=\"sel_tech\">";
+  while ($u_prod_q->next_record()) {
+   $sel_tech .= "\n<option value=\"".$u_prod_q->f("userobm_id")."\"";
+   if ($u_prod_q->f("userobm_id") == $tech) 
+      $sel_tech.=" selected=\"selected\"";
+   $sel_tech.=">". $u_prod_q->f("userobm_lastname") . " " . $u_prod_q->f("userobm_firstname")."</option>";
   }
-
-  $dis_sel_respt="<select name=\"sel_tech\">";
-  while($usr_q->next_record()) {
-   $dis_sel_respt.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
-   if ($usr_q->f("userobm_id") == $tech) 
-      $dis_sel_respt.=" selected=\"selected\"";
-   $dis_sel_respt.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
-  }
-  $dis_sel_respt.="</select>";
+  $sel_tech.="</select>";
 
   if ($contact_q->nf()>0) {
     $contact_q->seek(0);
@@ -605,10 +602,10 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
       <td class=\"detailForm\">$dis_sel_t</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
-      <td class=\"detailForm\">$dis_sel_respc</td>
+      <td class=\"detailForm\">$sel_market</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_technical_manager</td>
-      <td class=\"detailForm\">$dis_sel_respt</td>    
+      <td class=\"detailForm\">$sel_tech</td>    
     </tr>
     </table>
 

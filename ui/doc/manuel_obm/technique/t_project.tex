@@ -111,7 +111,7 @@ Table d'affectation (avec informations associées) d'utilisateurs aux tâches d'un
 \hline
 \_soldprice & int 8 & Prix de vente de l'utilisateur & \\
 \hline
-\_manager & int 1 & Statut de l'utilisateur dans le projet & 1 = CP \\
+\_manager & int 1 & Statut de l'utilisateur dans le projet (si tâche est nulle) & 1 = CP \\
 \hline
 \end{tabular}
 
@@ -125,6 +125,7 @@ Table d'affectation (avec informations associées) d'utilisateurs aux tâches d'un
 ProjectUser est en fait la table de liaison entre Tâches et Membres d'un projet.
 L'ajout d'un membre au projet insère un tuple dans cette table avec une tâche nulle. Ainsi, la \textbf{liste des membres d'un projet} est directement tirée de cette table.
 
+L'information de statut d'un utilisateur (Chef de projet,...) doit être lue dans cet enregistrement dont la tâche est nulle.
 
 \subsection{ProjectStat}
 Table d'historique des informations relatives à l'avancement des projet.\\

@@ -117,7 +117,7 @@ if ($action == "ext_get_id") {
   $dsrc_q = run_query_datasource();
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm_active();
+  $usr_q = run_query_all_users_from_group($cg_com);
   $cat_q = run_query_companycat();
   $ctry_q = run_query_country();
   require("company_js.inc");
@@ -145,7 +145,7 @@ if ($action == "ext_get_id") {
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
       $users = array($comp_q->f("company_marketingmanager_id"));
-      $usr_q = run_query_userobm_active($users);
+      $usr_q = run_query_all_users_from_group($cg_com, $users);
       $cat_q = run_query_companycat();
       $compcat = run_query_get_companycat($param_company);
       $ctry_q = run_query_country();
@@ -200,7 +200,7 @@ if ($action == "ext_get_id") {
     $act_q = run_query_companyactivity();
     $cat_q = run_query_companycat();
     $users = array($company["marketing_manager"]);
-    $usr_q = run_query_userobm_active($users);
+    $usr_q = run_query_all_users_from_group($cg_com, $users);
     $ctry_q = run_query_country();
     $display["search"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q,$cat_q,"",$ctry_q, $company);
   }
@@ -225,7 +225,7 @@ if ($action == "ext_get_id") {
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
     $users = array($company["marketing_manager"]);
-    $usr_q = run_query_userobm_active($users);
+    $usr_q = run_query_all_users_from_group($cg_com, $users);
     $cat_q = run_query_companycat();
     $ctry_q = run_query_country();
     $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $cat_q, "", $ctry_q, $company);

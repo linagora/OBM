@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : incident_display.php                                         //
 //     - Desc : Incident File                                                //
@@ -381,10 +381,11 @@ function html_incident_consult($inc_q,$con_q) {
 //   - $inc_q     : incident database result 
 //   - $contr_q   : contract database result 
 //   - $usr_q     : userobm database result 
+//   - $usrp_q    : userobm list from system group Production
 //   - $incident[]: default values
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $incident) {
+function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, $sta_q, $incident) {
   global $display;
   global $path, $uid, $set_theme, $ico_contract, $c_php_isodate_format;
   global $l_label,$l_contract,$l_status, $l_find;
@@ -434,15 +435,13 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $pri_q, $sta_q, $
   // Owner select
   if (! isset($owner)) { $owner = $uid; }
   $dis_sel_owner="<select name=\"sel_owner\">";
-  while ($usr_q->next_record()) {
-    $dis_sel_owner.="\n<option value=\"".$usr_q->f("userobm_id")."\"";
-    if ($usr_q->f("userobm_id") == $owner) 
+  while ($usrp_q->next_record()) {
+    $dis_sel_owner.="\n<option value=\"".$usrp_q->f("userobm_id")."\"";
+    if ($usrp_q->f("userobm_id") == $owner) 
       $dis_sel_owner.=" selected=\"selected\"";
-    $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+    $dis_sel_owner.=">". $usrp_q->f("userobm_lastname") . " " . $usrp_q->f("userobm_firstname")."</option>";
   }
   $dis_sel_owner.="</select>";
-
-  $usr_q->seek();
 
   // Logger select
   if (! isset($logger)) { $logger = $uid; }

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_display.php                                             //
 //     - Desc : List Display File                                            //
@@ -233,11 +233,10 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 //   - $con_q  : contact database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
-  //-- Label
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
   global $display, $perm, $action;
   global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
-  global $l_no_dyn_contact, $l_dyn_con_found;
+  global $l_no_dyn_contact, $l_dyn_con_found, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
@@ -251,7 +250,11 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $query = $list_q->f("list_query");
   $dis_query = nl2br($query);
   $query_nb = get_query_num_rows($query);
-  run_query_update_num_rows($id, $query_nb);
+  if ($query_nb >= 0) {
+    run_query_update_num_rows($id, $query_nb);
+  } else {
+    $query_nb = $l_invalid_query;
+  }
 
   $display["detailInfo"] = display_record_info($list_q);
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";

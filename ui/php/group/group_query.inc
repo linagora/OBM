@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : group_query.inc                                              //
 //     - Desc : group query File                                             //
@@ -45,9 +45,7 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
     where group_name like '$name%'
       $where";
 
-
   // ORDER construction
-
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "group_name";
   $query .= " order by $order $p_order_dir";
 
@@ -377,7 +375,7 @@ function run_query_groupgroup_delete($group) {
 // Parameters:
 //   - $group_id : Group id
 // -- Optionnals
-//   - $entity   : dataset entity to order (to handle multiple Display in 1 p)
+//   - $entity : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_user_group($group, $entity="") {
   global $cdg_sql;
@@ -409,6 +407,7 @@ function run_query_user_group($group, $entity="") {
   $obm_q = new DB_OBM; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
+
   return $obm_q;
 }
 
@@ -610,28 +609,6 @@ function check_data_form($group) {
   }
 
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Name of a Group from its Id                                       //
-// Parameters:
-//   - $id : group id
-// Returns:
-//   - Group Name
-///////////////////////////////////////////////////////////////////////////////
-function get_group_name($id) {
-  global $cdg_sql;
-
-  $query = "select group_name from UGroup where group_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour = $obm_q->f("group_name");
-  return $retour;
 }
 
 

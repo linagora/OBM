@@ -45,7 +45,7 @@ tr.logintable {
 <p align="center">&nbsp;</p>
 <p align="center"><font size="2" face="sans-serif, Verdana, Arial"><em>Please 
   identify yourself with a Login and a password :</em></font></p>
-<form name="login" method="post" action="<?php echo $form_action;?>">
+<form name="login" method="post" action="<?php echo $login_action;?>">
 <table align="center">
 <tr>
   <td>

@@ -8,10 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-require_once("$obminclude/obm_conf.inc");
-require_once("$obminclude/phplib/obmlib.inc");
-
-$obm_version = "0.8.0pre1";
+$obm_version = "0.8.0pre2";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
@@ -54,6 +51,22 @@ $working_days = array(0,1,1,1,1,1,0);
 $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
+
+// OBM System groups
+$cg_com = 1;
+$cg_prod = 2;
+
+// Popup Display size
+$popup_width = 620;
+$popup_height = 480;
+$popup_contact_height = 600;
+
+// Query limits (for user queries)
+$cql_max_row = 50000;  // Maximum rows to be returned
+$cql_max_cost = 1000;  // Maximum query cost (Postgres)
+
+require_once("$obminclude/obm_conf.inc");
+require_once("$obminclude/phplib/obmlib.inc");
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 
@@ -112,11 +125,6 @@ $c_all = "_ALL_";		// Used in Form select
 $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
-
-// Display size
-$popup_width = 620;
-$popup_height = 480;
-$popup_contact_height = 600;
 
 // JavaScript and PHP Fields masks (regexp)
 $js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
@@ -243,7 +251,7 @@ $compta_admin_write 	= 2048;
 			//ACCOUNT //
 			////////////
 $account_read		= $compta_read;
-$account_write 	= $compta_read + $compta_write;
+$account_write 	        = $compta_read + $compta_write;
 $account_admin_read 	= $compta_admin_read;
 $account_admin_write	= $compta_admin_read + $compta_admin_write;
 			////////////
@@ -336,7 +344,7 @@ $admin_ref_admin_write	= $admins_admin_read + $admins_admin_write;
 ///////////////////////////////////////////////////////////////////////////////
 //                       PROFILES DEFINITIONS                                //
 ///////////////////////////////////////////////////////////////////////////////
-$perm_user   =  $com_read + $prod_read + $users_read ;
+$perm_user   =  $com_read + $prod_read + $users_read;
 $perm_editor =  $com_read + $prod_read + $users_read + $com_write +
 	        $prod_write + $users_write;
 $perm_admin = $com_read + $com_write + $com_admin_read + $com_admin_write +

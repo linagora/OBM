@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_query.inc                                               //
 //     - Desc : User query & db File                                         //
@@ -318,9 +318,14 @@ function check_user_context($p_id, $user) {
 function run_query_check_user($p_id, $login) {
   global $cdg_sql;
 
+  if ($p_id) {
+    $where_user = "and userobm_id != '$p_id'";
+  }
+
   $query = "select distinct userobm_id, userobm_login
             from UserObm
-            where userobm_id!='$p_id' and userobm_login like '$login%'";
+            where userobm_login like '$login%'
+              $where_user";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -429,4 +434,4 @@ function run_query_delete_profil($param_user)  {
 }
 
 
-</SCRIPT>
+</script>

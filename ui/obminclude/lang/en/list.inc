@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : list.inc                                                 //
-// 2001-02-16 Vincent MARGUERIT                                              //
+// 2001-02-16 Aliacom - Vincent MARGUERIT                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,6 +73,7 @@ $l_fill_name = "The list Name must be filled !";
 $l_fill_subject = "The subject must be filled !";
 $l_invalid_query = "The query is invalid !";
 $l_banned_word = "Banned word";
+$l_hungry_query = "The query need too much resource !";
 
 //------------------------------------//
 // Export Format informations         //

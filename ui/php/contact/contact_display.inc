@@ -225,8 +225,9 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   $phone = urlencode(stripslashes($contact["phone"]));
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
+  $mark = $contact["marketing_manager"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_market=$mark$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
   if ($popup) {
@@ -476,7 +477,7 @@ function html_contact_links($id) {
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
-  global $display;
+  global $display, $cg_com;
 
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
@@ -484,7 +485,7 @@ function dis_contact_form($action, $co_q, $contact) {
   if ($contact["marketing_manager"]) {
     $users = array($contact["marketing_manager"]);
   }
-  $usr_q = run_query_userobm_active($users);
+  $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country();
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
@@ -604,7 +605,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $sel_dsrc .= "</select>";
 
   // kind select
-  $sel_kind = "<select name=\"sel_kind\">";
+  $sel_kind = "<select name=\"sel_kind\">
+    <option value=\"0\">$l_none</option>";
   while ($kind_q->next_record()) {
     $k_id = $kind_q->f("kind_id");
     $k_lang = $kind_q->f("kind_lang");
@@ -617,7 +619,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $sel_kind .= "</select>";
 
   // Marketing manager select
-  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">";
+  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
+    <option value=\"0\">$l_none</option>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
