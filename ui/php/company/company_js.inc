@@ -144,17 +144,67 @@ function check_kind_upd(form,formd)
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the kind check or deletion is possible                           //
+///////////////////////////////////////////////////////////////////////////////
+function check_cat_checkdel(form)
+{
+   if (form.sel_cat.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_cat_delete\");
+      return false;
+   }
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_new(form)
+function check_cat_new(form)
 {
-   if (form.tf_kind.value != \"\")
+   if (form.tf_cat.value != \"\")
       return true;
    else
    {
-      alert(\"$l_j_kind_create\");
+      alert(\"$l_j_cat_create\");
+      return false;
+   }
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the cat update is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_cat_upd(form,formd)
+{
+  cat_pos = formd.sel_cat.selectedIndex;
+  if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
+    form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_cat_update\");
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the cat creation is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_cat_new(form)
+{
+   if (form.tf_cat.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_cat_create\");
       return false;
    }
 }

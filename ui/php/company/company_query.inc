@@ -550,6 +550,120 @@ function run_query_kind_links($p_id) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Category company query execution                                              //
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_companycat() {
+  global $cdg_sql;
+
+  $query = "select * from CompanyCategory order by companycategory_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Categorie insertion query construction and execution                           //
+// Parameters:
+//   - $company : company hash info : keys used : cat_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_insert($company) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $cat = $company["cat_label"];
+  $code = $company["cat_code"];
+
+  $query = "insert into CompanyCategory (
+    companycategory_timecreate,
+    companycategory_usercreate,
+    companycategory_label,
+    companycategory_code)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$cat',
+    '$code')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Categorie update query execution                                               //
+// Parameters:
+//   - $company : company hash info : keys used : cat, cat_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_update($company) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $company["cat"];
+  $cat = $company["cat_label"];
+  $code = $company["cat_code"];
+
+  $query = "update CompanyCategory set
+    companycategory_label='$cat',
+    companycategory_code='$code',
+    companycategory_timeupdate='$timeupdate',
+    companycategory_userupdate='$userupdate'
+      where
+    companycategory_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Categorie deletion query execution                                             //
+// Parameters:
+//   - $id : Categorie id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from CompanyCategory where companycategory_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Categorie - Company links query execution                                      //
+// Parameters:
+//   - $p_id : cat id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select company_name, company_id, '$p_id' as company_category_id from Company,CompanyCategoryLink where 
+  company_id= companycategorylink_companyid and companycategorylink_categoryid = '$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Activity company query execution                                          //
@@ -683,6 +797,27 @@ function get_kind_label($id) {
   return $retour;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a Kind from its id                                       //
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_cat_label($id) {
+  global $cdg_sql;
+
+  $query = "select companycategory_label
+    from CompanyCategory
+    where companycategory_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  $retour = $obm_q->f("companycategory_label");
+  return $retour;
+}      
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Activity from its id                                  //

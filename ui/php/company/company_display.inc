@@ -934,8 +934,10 @@ function dis_delete_form($p_id) {
 function dis_admin_index() {
 
   $kind_q = run_query_companytype();
+  $cat_q = run_query_companycat();
   $act_q = run_query_companyactivity();
   $block = html_company_kind_form($kind_q);
+  $block .= html_company_cat_form($cat_q);
   $block .= html_company_activity_form($act_q);
 
   return $block;
@@ -1037,6 +1039,116 @@ function html_company_kind_form($kind_q) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Company Category section                                             //
+// Parameters:
+//   - $cat_q : Category list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_company_cat_form($cat_q) {
+  global $l_cat_manage,$l_cat_exist,$l_cat_code,$l_cat_label;
+  global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
+
+  $sel_cat = "<select name=\"sel_cat\" onChange=\"
+    mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf('-');
+    ext = mytext.substr(0, pos-1);
+    mytext = mytext.substr(pos+2); 
+    forms.form_cat_update.tf_cat.value=mytext;
+    forms.form_cat_update.tf_cat_code.value=ext;\"
+    size=\"4\" >";
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f("companycategory_id");
+    $code = $cat_q->f("companycategory_code");
+    $label = $cat_q->f("companycategory_label");
+    $sel_cat .= "\n<option value=\"$id\">$code - $label</option>";
+  }
+  $sel_cat .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_cat_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Category Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_cat_delete\" method=\"post\"
+              action=\"" . url_prepare("company_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_cat_exist</td>
+              <td class=\"adminLabel\">$sel_cat</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"cat_checklink\" />
+              <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Category Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_cat_update\" method=\"get\"
+              action=\"" . url_prepare("company_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
+	    <input type=\"hidden\" name=\"action\" value=\"cat_update\" />
+	    <input type=\"text\" size=\"8\" name=\"tf_cat_code\" />
+            <input type=\"text\" name=\"tf_cat\" />
+            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_update\"
+              onclick=\"if (check_cat_upd(this.form,document.form_cat_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Category Section -->
+
+        <form name=\"form_cat_new\" method=\"get\"
+          action=\"" . url_prepare("company_index.php") . "\">
+        <table>
+        <tr>
+         <td class=\"adminLabel\">$l_cat_label
+	   <input type=\"text\" name=\"tf_cat\" />
+	 </td>
+	</tr>
+	<tr>
+	 <td class=\"adminLabel\">$l_cat_code :
+	  <input type=\"text\" name=\"tf_cat_code\" size=\"8\" />
+	 </td>
+        </tr>
+	<tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"cat_insert\" />
+            <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_insert\"
+              onclick=\"if (check_cat_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>
+";
+
+  return $block;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Displays the kind links                                                   //
@@ -1111,6 +1223,79 @@ function dis_kind_links($company) {
   return $block;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the cat links                                                   //
+// Parameters:
+//   - $company : company hash info : keys used : cat
+///////////////////////////////////////////////////////////////////////////////
+function dis_cat_links($company) {
+  global $display, $l_back, $l_cat_link_company, $l_cat_link_company_no;
+  global $l_cat_delete, $l_cat_can_delete, $l_cat_cant_delete;
+
+  $delete_ok = true;
+  $id = $company["cat"];
+  $label = get_cat_label($id);
+  $obm_q = run_query_cat_links($id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat_link_company</td>
+    </tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("company_id");
+      $cname = $obm_q->f("company_name");
+      $dis_link .="
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat_link_company_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_cat_can_delete);
+    $dis_del = "<form name=\"form_cat_delete\".
+          method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"cat_delete\" />
+        <input type=\"hidden\" name=\"sel_cat\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_cat_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Company Activity section                                         //

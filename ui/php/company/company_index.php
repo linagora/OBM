@@ -278,6 +278,46 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $display["detail"] .= dis_admin_index();
 
+} elseif ($action == "cat_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat_insert($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat_insert_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat_update($company);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat_update_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_cat_links($company);
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat_delete($company["cat"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat_delete_error);
+  }
+  require("company_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+
 } elseif ($action == "activity_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_activity_insert($company);
@@ -368,8 +408,8 @@ display_page($display);
 function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web;
-  global $tf_email, $sel_act, $sel_kind, $sel_market, $ta_com, $param_company;
-  global $sel_dsrc, $tf_kind, $tf_act;
+  global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com, $param_company;
+  global $sel_dsrc, $tf_kind, $tf_act,$tf_cat_code,$tf_cat;
   global $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -408,6 +448,7 @@ function get_param_company() {
   if (isset ($tf_aka)) $company["aka"] = $tf_aka;
   if (isset ($sel_dsrc)) $company["datasource"] = $sel_dsrc;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
+  if (isset ($sel_cat)) $company["cat"] = $sel_cat;
   if (isset ($sel_act)) $company["activity"] = $sel_act;
   if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
@@ -427,6 +468,11 @@ function get_param_company() {
   // $sel_kind -> "kind" is already set
   if (isset ($tf_kind)) $company["kind_label"] = $tf_kind;
 
+  // Admin - Kind fields
+  // $sel_kind -> "kind" is already set
+  if (isset ($tf_cat_code)) $company["cat_code"] = $tf_cat_code;
+  if (isset ($tf_cat)) $company["cat_label"] = $tf_cat;
+  
   // Admin - Activity fields
   // $sel_act -> "act" is already set
   if (isset ($tf_act)) $company["act_label"] = $tf_act;
