@@ -140,6 +140,23 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Task grouped by task and deal and summed by task length               //
+//   this function 
+//      - gets the tasks filled for this period
+//      - sum these tasks for the users selected
+//      - sum these same tasks on the previous period for EVERY USERS
+//      (this allow to see the real total for a project, taking into
+//        account the persons who leaved the project)
+// Parameters:
+//   - $time[]    :    time search criteria
+//     keys used       week, user_id, date, date_end
+//   - $p_new_order  : infos for order clause
+//   - $p_order_dir  : direction for order clause (asc, desc)
+//   - alltask : allow to display task with 0 for this period
+// Returns:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
 function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
   global $auth, $c_day_fraction, $cdg_sql;
 
@@ -149,17 +166,6 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
   //  $time["all_users"] = true;
 
   //     if(tasktype_internal=1, 'interne', company_name) as task_company_name, 
-
-  $query="select 
-     company_name as task_company_name, 
-      deal_label as task_deal_label, 
-      tasktype_internal, tasktype_label,
-      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
-      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end', task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
-      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength
-    from (Task left join Deal on task_deal_id = deal_id) left join Company on deal_company_id=company_id, TaskType 
-    where tasktype_id=task_tasktype_id 
-      and task_date<='$week_end'";
 
   //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
   if (isset($time) && $time["all_users"])
@@ -171,6 +177,18 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
 	$where_users = " and task_user_id in $users_list";
   }
 
+  $query="select 
+     company_name as task_company_name, 
+      deal_label as task_deal_label, 
+      tasktype_internal, tasktype_label,
+      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
+      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end' $where_users, task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
+      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength
+    from (Task left join Deal on task_deal_id = deal_id) left join Company on deal_company_id=company_id, TaskType 
+    where tasktype_id=task_tasktype_id 
+      and task_date<='$week_end'";
+
+
   // Do we display all tasks or those not empty for this period
 
   if (isset($time) && $time["alltask"]) 
@@ -179,11 +197,11 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
  	$having_task = " having task_totalperiod <> 0";
 
   // order
-    $query .= $where_users. $where_task ." group by task_deal_id, tasktype_id $having_task 
-        order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
-	//$query .= $where_users. $where_task .
-	//  " group by tasktype_internal, task_company_name, task_deal_id $having_task 
-    //  order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
+  //    $query .= $where_task ." group by task_deal_id, tasktype_id $having_task 
+  //        order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
+	$query .= $where_task .
+	  " group by tasktype_internal, task_company_name, task_deal_id $having_task 
+      order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
   
   display_debug_msg($query, $cdg_sql, "run_query_by_deal 2");
 
@@ -192,6 +210,83 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
 
   return $obm_db;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task grouped by deal and summed by task length                         //
+//   this function 
+//      - gets the tasks filled for this period
+//      - sum these tasks for the users selected
+//      - sum these same tasks on the previous period for EVERY USERS
+//      (this allow to see the real total for a project, taking into
+//        account the persons who leaved the project)
+//
+//   Diff with run_query_by_deal :
+//     groups by deal (and not task, deal)
+//
+// Parameters:
+//   - $time[]    :    time search criteria
+//     keys used       week, user_id, date, date_end
+//   - $p_new_order  : infos for order clause
+//   - $p_order_dir  : direction for order clause (asc, desc)
+//   - alltask : allow to display task with 0 for this period
+// Returns:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_stats_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
+  global $auth, $c_day_fraction, $cdg_sql;
+
+  $week = $time["week"];
+  $week_start = $time["date"];
+  $week_end = $time["date_end"];
+  //  $time["all_users"] = true;
+
+  //     if(tasktype_internal=1, 'interne', company_name) as task_company_name, 
+
+  //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
+  if (isset($time) && $time["all_users"])
+	$where_users = "";
+  else if (sizeof($time["user_id"]) == 1)
+	  $where_users = " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	$users_list = array_to_list($time["user_id"]);
+	$where_users = " and task_user_id in $users_list";
+  }
+
+  $query="select 
+     company_name as task_company_name, 
+      deal_label as task_deal_label, 
+      tasktype_internal,
+      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
+      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end' $where_users, task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
+      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength
+    from (Task left join Deal on task_deal_id = deal_id) left join Company on deal_company_id=company_id, TaskType 
+    where tasktype_id=task_tasktype_id 
+      and task_date<='$week_end'";
+
+
+  // Do we display all tasks or those not empty for this period
+
+  if (isset($time) && $time["alltask"]) 
+	$having_task = ""; 
+  else 
+ 	$having_task = " having task_totalperiod <> 0";
+
+  // order
+  //    $query .= $where_task ." group by task_deal_id, tasktype_id $having_task 
+  //        order by tasktype_internal, task_company_name, task_deal_label, tasktype_id, task_totalperiod desc";
+	$query .=  
+	  " group by tasktype_internal, task_company_name, task_deal_id $having_task 
+      order by tasktype_internal, task_company_name, task_deal_label, task_totalperiod desc";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_stats_by_deal");
+
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

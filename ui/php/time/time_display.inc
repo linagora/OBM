@@ -513,15 +513,10 @@ function dis_time_list($time) {
                      $val_days);  
 
   if($nb_task != 0) {
-
     dis_form_uservalid_day($obm_day_q,$pref_day_q,$nb_task,$time, $val_days);
     dis_form_adminvalid_day($obm_day_q,$pref_day_q,$nb_task,$time, $val_days);
 
-	// OLD
-	//    dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
-
-    dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
-
+	dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
   }
   
 }
@@ -609,6 +604,7 @@ function dis_time_stats($time) {
 
   $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
   $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
+  $obm_stats_q = run_query_stats_by_deal($time, $new_order, $order_dir);
 
   // Get elements for insertion of new task
   // TaskType
@@ -645,9 +641,9 @@ function dis_time_stats($time) {
     print_r($day_q);
   }
 
-  // OLD
-  //  dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);  
-dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
+
+  dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
+  dis_time_deal_list($obm_stats_q,$pref_deal_q,$nb_task,$time);
 
   
 }
@@ -667,9 +663,11 @@ function dis_time_export_stats($time) {
   $pref_q = run_query_display_pref($auth->auth["uid"], "time");
   
   $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
-  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
+  //  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
+  $obm_stats_q = run_query_stats_by_deal($time, $new_order, $order_dir);
 
-  dis_time_deal_export($obm_deal_q,$pref_deal_q,$nb_task,$time);
+  //  dis_time_deal_export($obm_deal_q,$pref_deal_q,$nb_task,$time);
+  dis_time_deal_export($obm_stats_q,$pref_deal_q,$nb_task,$time);
 
   
 }
@@ -1472,11 +1470,15 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   }
   $sel_proj .= "</select>";
 
+
+
   // Project Label
+
+
   if ($action == "detailupdate")
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\">";
+    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\" />";
   else
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30>";
+    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
 
   // Project time length
   $sel_time="<select name=sel_time>";
