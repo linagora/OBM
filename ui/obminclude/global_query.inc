@@ -61,6 +61,28 @@ function sql_casei_like($db_type) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the sql order clause handling case insensitive sorting
+// Parameters:
+//   - $db_type : DB type
+// Returns:
+//   - sql word "ilike"
+///////////////////////////////////////////////////////////////////////////////
+function sql_casei_sort($db_type, $field) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $ret = "$field";
+  } elseif ($db_type == $db_type_pgsql) {
+    $ret = "UPPER($field)";
+  } else {
+    $ret = "$field";
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the sql corresponding to concat function
 // Parameters:
 //   - $db_type : DB type

@@ -45,6 +45,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_lastname,
       contact_firstname,
       contact_function_id,
+      contact_title,
       contact_phone,
       contact_homephone,
       contact_mobilephone,
@@ -120,6 +121,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
+  if (($order == "contact_lastname") || ($order == "contact_firstname")) {
+    $order = sql_casei_sort($db_type, $order);
+  }
   $query .= " order by $order $p_order_dir";
   
   display_debug_msg($query, $cdg_sql);
@@ -706,6 +710,28 @@ function run_query_contact_list_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return all the publications where the contact has subscribed
+// Parameters:
+//   - $p_id : contact Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_publication_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select distinct subscription_publication_id,
+      publication_title
+    from Subscription 
+         Left join Publication on subscription_publication_id=publication_id
+            where subscription_contact_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Contact Deletion query execution                                          //
 // Parameters:
 //   - $p_id : contact id
@@ -724,7 +750,26 @@ function run_query_contact_delete($p_id) {
   if ($retour) {
     run_query_delete_document($p_id,"Contact");    
     run_query_company_contact_dec($comp_id);
+    run_query_delete_contact_subscription($p_id);    
   }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact Subscription deletion query execution                             //
+// Parameters:
+//   - $p_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete_contact_subscription($p_id) {
+  global $cdg_sql;
+
+  $query = "delete from Subscription where subscription_contact_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
 
   return $retour;
 }
@@ -1365,7 +1410,7 @@ function run_query_cat2_links($p_id) {
   $query = "select contact_title, contact_id, '$p_id' as contact_category2
     from Contact,ContactCategory2Link where contact_id = contactcategory2link_contact_id and contactcategory2link_category_id = '$p_id'";
 
-    display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
@@ -1408,9 +1453,10 @@ function run_query_cat2_delete($id) {
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
+  } else { 
+    $retour = 1;
   }
-  else 
-  $retour = 1;
+
   return $retour;
 }
 
@@ -1430,9 +1476,10 @@ function run_query_subscription_nb($id) {
     $obm_q->query($query);
     $obm_q->next_record();
     $retour = $obm_q->f("nb");
+  } else { 
+    $retour = 0;
   }
-  else 
-  $retour = 0;
+
   return $retour;
 }
 

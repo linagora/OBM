@@ -146,7 +146,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   if ( ($fuzzy)
        || ( ($obm_q->num_rows() == 0) && ($name != "") ) ) {
 	 if ($name != "") {
-	   $where_name .= " or (company_aka $like '%$auto_aka%'
+	   $where_name = " ($where_name or company_aka $like '%$auto_aka%'
                  or company_sound = '$sound')";
 	 }
     $whereq = " where $where_name $where";
@@ -430,7 +430,9 @@ function run_query_delete($p_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+
   run_query_delete_document($p_id,"Company");
+
   $query = "delete from CompanyCategoryLink
     where companycategorylink_company_id='$p_id'";
   $obm_q->query($query);

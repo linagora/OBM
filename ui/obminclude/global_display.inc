@@ -472,7 +472,7 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call (module formatting fields)
   /////////////////////////////////////////////////////////////////////////////
     function dis_data_index($url, $dis_data_entity) {
-    global $path, $page, $new_order, $entity;
+    global $path, $page, $new_order, $order_dir, $entity;
     global $set_theme, $set_rows, $set_rows_default;
     global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end;
@@ -512,20 +512,20 @@ class OBM_DISPLAY {
 
     // Rewind to 1st page
     if ($lpage > 1) {
-      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
+      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_begin\" class=\"resultIndexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
     }
 
     // Rewind nb_page_dis page
     if ($start_page > 1) {
       $i = $start_page - $nb_page_dis;
-      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;&nbsp;";
+      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">-$nb_page_dis</a>&nbsp;&nbsp;&nbsp;";
     }
 
     $i = $start_page;
     // Pages display
     while ($i <= $end_page) {
       if ($i != $lpage) {
-	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">$i</a> | \n";
+	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">$i</a> | \n";
       } else {
 	$content .= "$i | \n";
       }
@@ -535,13 +535,13 @@ class OBM_DISPLAY {
     // Go to next $nb_page_dis pages
     if ($end_page < $nb_page) {
       $i = $end_page + 1;
-      $content .= "&nbsp;&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;entity=$this_entity\">+$nb_page_dis</a>";
+      $content .= "&nbsp;&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\">+$nb_page_dis</a>";
     }
 
     // Go to last page
     if ($lpage < $nb_page) {
       $content .= "&nbsp;&nbsp;
-      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
+      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order&amp;order_dir=$order_dir&amp;entity=$this_entity\"><img src=\"/images/$set_theme/$ico_end\" class=\"resultIndexIcon\" alt=\">| $nb_page\"></a>";
     }
 
     // Export

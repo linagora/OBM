@@ -43,6 +43,9 @@ $l_after = "After";
 $l_before = "Before";
 $l_fuzzy = "Advanced";
 
+// Global display
+$l_last_visit = "Bookmarks";
+
 // OBM_DISPLAY
 $l_entries = "Entries";
 $l_page_res = "Result pages";

@@ -15,6 +15,7 @@
 $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
 $fieldnames["contact_function"] = $l_function;
+$fieldnames["contact_title"] = $l_title;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
 $fieldnames["contact_mobilephone"] = $l_mphone;
@@ -332,7 +333,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
   global $display, $l_no_found,$path;
-  global $auth, $new_order, $order_dir;
+  global $auth;
 
   $view = $contact["view"];
   $param_contact = $contact["id"];
@@ -1334,7 +1335,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 function dis_check_contact_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_contract, $l_link_contract_no;
-  global $l_link_list, $l_link_list_no;
+  global $l_link_list, $l_link_list_no, $l_link_publication, $l_link_publication_no;
   global $path, $display;
 
   $delete_ok = true;
@@ -1401,6 +1402,25 @@ function dis_check_contact_links($p_id) {
     $display_link_l = "<tr><td class=\"detailHead\">$l_link_list_no</td></tr>";
   }
 
+  // Links from Publications (Subscriptions)
+  $obm_q = run_query_contact_publication_links($p_id);
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_link_p = "<tr><td class=\"detailHead\">$l_link_publication</td></tr>";
+    while ($obm_q->next_record()) {
+      $pid = $obm_q->f("publication_id");
+      $ptitle = $obm_q->f("publication_title");
+      $display_link_p .= "
+        <tr>
+          <td class=\"detailLabel\">
+            <a class=\"detailLabel\" href=\"".url_prepare("$path/publication/publication_index.php?action=detailconsult&amp;param_publication=$pid")."\">
+            $ptitle</a>
+          </td>
+        </tr>";
+    }
+  } else {
+    $display_link_p = "<tr><td class=\"detailHead\">$l_link_publication_no</td></tr>";
+  }
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
      action=\"".url_prepare("contact_index.php") ."\">
@@ -1413,6 +1433,7 @@ function dis_check_contact_links($p_id) {
     $display_link_d
     $display_link_c
     $display_link_l
+    $display_link_p
     </table>";
 
   if ($delete_ok == true) {

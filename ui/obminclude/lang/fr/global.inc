@@ -60,6 +60,9 @@ $l_display_yes = "Afficher ce champ";
 $l_down = "Déscendre le champ d'une ligne";
 $l_up = "Monter le champ d'une ligne";
 
+// Global display
+$l_last_visit = "Bookmarks";
+
 // OBM_DISPLAY help screen
 $l_help = "Aide";
 $l_help_display_yes = "Le champ est affiché. Cliquer pour ne plus l'afficher";

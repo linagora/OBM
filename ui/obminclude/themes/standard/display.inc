@@ -300,11 +300,11 @@ function display_menu_bar($section, $menu) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited($path="..") {
-  global $path, $cgp_show, $last_v, $set_theme;
+  global $path, $cgp_show, $last_v, $set_theme, $l_last_visit;
 
   $block = "
   <div class=\"last\"> 
-  <div class=\"lastTitle\">:: Bookmarks</div>
+  <div class=\"lastTitle\">:: $l_last_visit</div>
   <ul class=\"lastList\">";
 
   foreach ($cgp_show["module"] as $module => $val) {
@@ -352,11 +352,11 @@ function display_last_visited($path="..") {
 function display_todo_toplist($path="..") {
   global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
   global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
-  global $todo_5_id, $todo_5_title;
+  global $todo_5_id, $todo_5_title, $l_header_todo;
 
   $block = "
     <div class=\"last\"> 
-     <div class=\"lastTitle\">:: Todo</div>
+     <div class=\"lastTitle\">:: $l_header_todo</div>
      <ul class=\"lastList\">";
 
   if ($todo_1_id) {
