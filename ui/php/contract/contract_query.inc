@@ -27,7 +27,9 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $p_num = $contract["number"];
   $manager = $contract["manager"];
   $p_deal = $contract["deal_id"];
-
+  
+  $archive = $contract["archive"];
+  
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
   
   $obm_q = new DB_OBM;
@@ -45,10 +47,14 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       company_name as contract_company_name,
       contracttype_label,
       contract_type_id,
+      
+      contract_archive,
+      
       contract_techmanager_id,
       contract_marketmanager_id,
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
+      contract_archive,
       $dateexp
     from Contract
          left join UserObm u1 on contract_techmanager_id=u1.userobm_id
@@ -81,6 +87,13 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   } 
   if ($p_deal != "")
     $query .= " and (contract_deal_id = '$p_deal')";
+
+  
+
+
+ $query .= " and contract_archive = '$archive'";
+
+
 
   $query .= " order by $order $p_order_dir";
 
@@ -164,6 +177,7 @@ function run_query_insert($contract) {
   $sel_tech  = $contract["tech"];
   $sel_market = $contract["market"];
   $deal_id = ($contract["deal_id"] ? $contract["deal_id"] : "0");
+  $archive = ($contract["archive"] ? $contract["archive"] : "0");
   $connect_db = new DB_OBM;
 
   $query = "insert into Contract
@@ -183,6 +197,7 @@ function run_query_insert($contract) {
       contract_techmanager_id,
       contract_marketmanager_id,
       contract_clause,
+      contract_archive,
       contract_comment)
     values (
       null,
@@ -201,6 +216,7 @@ function run_query_insert($contract) {
       '$sel_tech',
       '$sel_market',
       '$ta_clause',
+      '$archive',
       '$ta_com')";
 
   display_debug_msg($query, $cdg_sql);
@@ -230,6 +246,7 @@ function run_query_update($contract) {
   $p_comment = $contract["comment"];
   $p_clause = $contract["clause"];
   $deal_id = ($contract["deal_id"] ? $contract["deal_id"] : "0");
+  $archive = ($contract["archive"] ? $contract["archive"] : "0");
  
   $connect_db=new DB_OBM;
   
@@ -257,7 +274,8 @@ function run_query_update($contract) {
       contract_marketmanager_id = '$sel_market',
       contract_techmanager_id = '$sel_tech',
       contract_comment = '$p_comment',
-      contract_clause = '$p_clause'
+      contract_clause = '$p_clause',
+      contract_archive = '$archive'
     where contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);

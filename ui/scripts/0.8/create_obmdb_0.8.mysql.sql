@@ -833,6 +833,8 @@ CREATE TABLE Contract (
   contract_marketmanager_id  int(8) default NULL,
   contract_clause            text,
   contract_comment           text,
+  contract_archive           int(1) default 0,
+
   PRIMARY KEY  (contract_id)
 ) TYPE=MyISAM;
 

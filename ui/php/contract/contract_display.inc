@@ -18,6 +18,7 @@ $fieldnames["contract_dateexp"] = $l_contract_exp ;
 $fieldnames["contracttype_label"] = $l_contract_contracttype;
 $fieldnames["contract_techmanager"] = $l_technical_manager;
 $fieldnames["contract_marketmanager"] = $l_marketing_manager;
+$fieldnames["contract_archive"] = $l_archive_first;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -55,6 +56,12 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
     $res["name"] = date_format($date);
   }
 
+ else if ($fieldname == "contract_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
+    else $res["name"] = "&nbsp;";
+  }
+
   return $res;
 }
 
@@ -70,7 +77,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   global $l_number,$l_label_libelle,$l_company,$l_kind,$l_after,$l_before;
   global $l_find,$l_marketing_manager,$l_technical_manager; 
-  global $c_all, $l_all;
+  global $c_all, $l_all, $l_archive;
 
   $p_label = $contract["label"];
   $comp = $contract["company_name"];
@@ -81,7 +88,8 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   $sel_tech = $contract["tech"];
   $sel_manager = $contract["manager"];
   $p_num = $contract["number"]; 
- 
+  $archive = ($contract["archive"] == "1" ? "checked = \"checked\"" : ""); 
+
   $dis_cont_typ  = "<select name=\"sel_type\">
     <option value=\"$c_all\">$l_all</option>";
   while($obm_q_type->next_record()) {
@@ -117,13 +125,14 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   <div class=\"search\">
     <div class=\"searchLabel\">$l_number<br />
       <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
+    
     </div>
     <div class=\"searchLabel\">$l_company<br />
       <input name=\"tf_company_name\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
       <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
-    </div>
+   </div>
     <div class=\"searchLabel\">$l_before<br />
       <input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$p_datebefore\" />
     </div>
@@ -136,13 +145,22 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     <div class=\"searchLabel\">$l_technical_manager<br />
       $dis_resp_tec
     </div>
+    
+
+    <div class=\"searchLabel\">$l_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
+    </div>
+
+
+
     <div class=\"searchButton\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
     </div>
     <div class=\"searchEnd\"></div>
-  </div>
-  </form>";
+</div>
+ 
+ </form>";
 
   return $block;
 }
@@ -243,6 +261,7 @@ function html_contract_links($id, $con_label, $deal_id, $deal_label) {
     <li><a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
         <a href=\"$url_deal\">$deal_label</a></li>
   </ul>
+
 </div>";
 
   return $block;
@@ -259,7 +278,7 @@ function html_contract_consult($contract_q) {
   global $ico_company,$ico_contact, $ico_deal;
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_clause,$l_marketing_manager,$l_technical_manager,$l_last_update,$l_comment,$l_at,$l_number,$l_dateexp,$l_client_manager;
-  global $l_contract, $l_company, $l_deal;
+  global $l_contract, $l_company, $l_deal, $l_archive, $l_yes, $l_no;
 
   $id = $contract_q->f("contract_id");
   $label = $contract_q->f("contract_label");
@@ -283,8 +302,12 @@ function html_contract_consult($contract_q) {
   $comp_town = $contract_q->f("company_town");
   $con1_id = $contract_q->f("contract_contact1_id");
   $con2_id = $contract_q->f("contract_contact2_id");
+  $archive = $contract_q->f("contract_archive");
+ 
+ if ($archive == 1) { $archive = $l_yes;}
+    else $archive= $l_no;
 
-  $con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
+$con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
           " - " . $contract_q->f("cphone1"); 
   $con2 = $contract_q->f("clname2") . " " . $contract_q->f("cfname2") .
           " - " . $contract_q->f("cphone2"); 
@@ -294,7 +317,9 @@ function html_contract_consult($contract_q) {
     <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
     <input type=\"hidden\" name=\"param_contract\" value=\"$id\">
     <input type=\"submit\" value=\"$l_update\">
-    </form>";
+
+
+</form>";
 
 
   // --- HTML Template --------------------------------------------------------
@@ -310,6 +335,8 @@ function html_contract_consult($contract_q) {
       <td class=\"detailLabel\">$l_company
         <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
         <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+      
+      
       </td>
       <td class=\"detailText\">$comp_name
         <br />$comp_address1
@@ -325,6 +352,7 @@ function html_contract_consult($contract_q) {
       <td class=\"detailLabel\">$l_client_manager 2
         <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
         <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+      
       </td>
       <td class=\"detailText\">$con2</td>
     </tr>
@@ -357,16 +385,24 @@ function html_contract_consult($contract_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_last_update</td>
       <td class=\"detailText\">$dateu $l_at $timeu</td>
-    </tr>
-    </table>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailText\">$archive</td>
+     </tr>
+    
+  
+  
+  </table>
 
   <div class=\"detailHead\">$l_comment</div>
 
     <table class=\"detail\">
     <tr>
       <td class=\"detailText\" colspan=\"2\">$com</td>
-    </tr>
-    </table>
+  
+  </tr>
+  
+  </table>
 
   <div class=\"detailHead\">$l_clause</div>
 
@@ -374,7 +410,8 @@ function html_contract_consult($contract_q) {
     <tr>
       <td class=\"detailText\" colspan=\"2\">$clause</td>
     </tr>
-    </table>";
+  
+  </table>";
 
   return $block;
 }
@@ -397,7 +434,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // - Themes
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
-  global $l_label,$l_date_init,$l_kind,$l_marketing_manager;
+  global $l_label,$l_date_init,$l_kind,$l_marketing_manager, $l_archive;
   global $l_technical_manager,$l_last_update;
   global $popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
@@ -417,14 +454,17 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $tech = $contract_q->f("contract_techmanager_id");
     $clause = $contract_q->f("contract_clause");
     $comment = $contract_q->f("contract_comment");
+    $archive = $contract_q->f("contract_archive");
 
-    // comp info below could be directly fetched from contract_q query XXXXX
-    $comp_name = $comp_q->f("company_name");
+
+// comp info below could be directly fetched from contract_q query XXXXX
+   
+   $comp_name = $comp_q->f("company_name");
     $ad1 = $comp_q->f("company_address1");
     $zip = $comp_q->f("company_zipcode");
     $town = $comp_q->f("company_town");
-
-    $deal_id = $contract_q->f("deal_id");
+   
+   $deal_id = $contract_q->f("deal_id");
     $deal_label = $contract_q->f("deal_label");
 
   } elseif ($action == "new") {
@@ -458,6 +498,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["company_ad1"])) { $ad1 = stripslashes($contract["company_ad1"]); }
   if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }
   if (isset($contract["company_town"])) { $town = stripslashes($contract["company_town"]); }
+  if (isset($contract["contract_archive"])) { $archive = $contract["contract_archive"]; }
+  
+  if ($archive == 1) {
+    $archive_display = " checked=\"checked\"";
+ }
   
   $dis_type="<select name=\"sel_type\">
     <option value=\"0\">$l_none</option>";
@@ -614,7 +659,12 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_technical_manager</td>
       <td class=\"detailForm\">$sel_tech</td>    
+    </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailForm\"><input name=\"cb_archive\" $archive_display type=\"checkbox\"  size=\"40\" value=\"1\"/></td>
     </tr>
+    
+    
     </table>
 
   <div class=\"detailHead\">$l_comment</div>

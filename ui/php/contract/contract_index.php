@@ -153,7 +153,7 @@ if ($action == "ext_get_id") {
     $display["search"] = html_contract_search_form($contract, $usr_q, run_query_contracttype());
   } else {
     require("contract_js.inc");
-    $display["msg"] .= display_err_msg($l_invalid_data . " : " . $err_msg);
+    $display["msg"] .= display_err_msg($l_invalid_da. " : " . $err_msg);
     $users = array($contract["market"], $contract["tech"]);
     $usrc_q = run_query_all_users_from_group($cg_com, $users);
     $usrp_q = run_query_all_users_from_group($cg_prod, $users);
@@ -256,7 +256,7 @@ function get_param_contract() {
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
   global $param_contract,$tf_num,$sel_market, $sel_tech;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
-  global $hd_usercreate,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
+  global $hd_usercreate,$cb_archive,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $ext_title;
   global $cdg_param, $action;
@@ -268,7 +268,8 @@ function get_param_contract() {
   if (isset ($tf_datebegin)) $contract["datebegin"] = $tf_datebegin;
   if (isset ($tf_dateexp)) $contract["dateexp"] = $tf_dateexp;
   if (isset ($tf_num)) $contract["number"] = $tf_num;
-
+  if (isset ($cb_archive)) $contract["archive"] = $cb_archive;
+  else $contract["archive"] = 0;
   if (isset ($sel_market)) $contract["market"] = $sel_market;
   if (isset ($sel_tech)) $contract["tech"] = $sel_tech;
   if (isset ($sel_con1)) $contract["contact1"] = $sel_con1;

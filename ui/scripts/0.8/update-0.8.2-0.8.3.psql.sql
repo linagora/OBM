@@ -18,3 +18,9 @@ ALTER TABLE Contact ADD column contact_email2 varchar(128);
 -------------------------------------------------------------------------------
 -- Add column : list_mailing_ok
 ALTER TABLE List ADD column list_mailing_ok integer;
+-------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+-- Update Contract table
+-------------------------------------------------------------------------------
+-- Add column : contract_archive
+ALTER TABLE Contact ADD column contract_archive integer; -------------------------------------------------------------------------------

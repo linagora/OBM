@@ -837,6 +837,8 @@ CREATE TABLE Contract (
   contract_marketmanager_id  integer DEFAULT NULL,
   contract_clause            text,
   contract_comment           text,
+  contract_archive           integer DEFAULT 0;
+
   PRIMARY KEY (contract_id)
 );
 

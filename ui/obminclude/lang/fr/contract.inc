@@ -8,6 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
+$l_archive = "Archive";
 $l_contract = "Contrat";
 $l_company = "Société";
 $l_contract_contracttype = "Type";
