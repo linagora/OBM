@@ -40,7 +40,7 @@ $c_days_in_a_week = 5;
 $working_days = array(0,1,1,1,1,1,0);
 // task_status flag
 // task not valided by the user : $c_task_notvalid
-// task valided by user : $c_task_uservalid
+// task valided by user : $c_task_uservalid (automatically done when a day is full)
 // task valided by admin : $c_task_adminvalid
 $c_task_notvalid = 0;
 $c_task_uservalid = 1;

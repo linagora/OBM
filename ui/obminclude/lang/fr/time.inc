@@ -83,18 +83,12 @@ $l_projects_manager = "Confirmation de la validation des taches par l'administra
 $l_found_task = "Voici les tâches réalisées et saisies pour la semaine en cours:";
 $l_found = "Taches trouvées.";
 $l_no_found = "Aucune tache pour cet utilisateur!";
-$l_addtask_start = "Saisissez les tâches réalisées pour la semaine en cours. La durée s'entend en fraction de journée (entre 1/";
-$l_addtask_end = " et 1).";
+$l_fill_addtask = "Saisissez les tâches réalisées pour la semaine en cours. La durée s'entend en fraction de journée";
+$l_task_list = "Récapitulatif des tâches de la semaine";
 $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
-$l_total_day = "Récapitulatif des tâches par jour.Si une journée a été intégralement saisie,<BR> vous devez confirmer ci-dessous en sélectionnant les journées à valider et en validant le formulaire.";
-$l_total_deal = "Récapitulatif par taches :";
-$l_total_month = "Récapitulatif mensuel :";
-$l_validate_msg1="aucune tache validée par l'utilisateur, on affiche pas le tableau de validation admin";
-$l_total_days_msg1 = "Total jours pour ";
-$l_total_days_msg2 = " utilisateurs ";
-$l_total_days_msg3 = " sur ";
-$l_total_days_msg4 = " (total à remplir)";
-$l_total_user_msg1 = "Total jours pour cet utilisateur ";
+
+$l_admin_valid = "Ecran de validation administrateur";
+$l_admin_empty = "Il n'y a pas de renseignements pour ce mois";
 
 $l_projuser_stats = "Participation de cette personne aux projets en cours";
 $l_no_projuser_stats = "Cette personne ne participe à aucun projet";

@@ -42,8 +42,8 @@ function run_query_id_user($login, $passwd) {
 function run_query_userobm($id="") {
   global $cdg_sql;
 
-  if ($id) $where = "where userobm_id='$id'";
-  $query = "select * from UserObm $where order by userobm_lastname"; 
+  if ($id) $where = "and userobm_id='$id'";
+  $query = "select * from UserObm where userobm_archive = 0 $where order by userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg("run_query_userobm() : $query", $cdg_sql);

@@ -1104,24 +1104,27 @@ tr.timeHeader			{
 	}
 
 tr.timeUnvalid			{
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
 	background-color:	#ffcc00;
- 	text-align: 		left; 
-	vertical-align: 	middle;
-	font-size: 		10px;
 	}
 
 tr.timeValid0			{
-	background-color:	#ffffff;
- 	text-align: 		left; 
-	vertical-align: 	middle;
-	font-size: 		10px;
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#eeeeee;
 	}
 
 tr.timeValid1			{
-	background-color:	#eeeeee;
- 	text-align: 		left; 
-	vertical-align: 	middle;
-	font-size: 		10x;
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#ffffff;
 	}
 
 td.timeWorkdayHead 	 	 {
@@ -1167,6 +1170,7 @@ td.projectHead 	 	 {
 	color:			#000000;
 	text-align:		center;
 	background-color:	#a5bace;
+	padding : 5;
 }
 
 td.projectPtask 	 	 {
@@ -1175,6 +1179,7 @@ td.projectPtask 	 	 {
 	color:			#000000;
 	text-align:		left;
 	background-color:	#e9f7fe;
+	padding : 5;
 }
 
 td.projectCtask 	 	 {
@@ -1183,6 +1188,7 @@ td.projectCtask 	 	 {
 	color:			#000000;
 	text-align:		left;
 	background-color:	#ffffff;
+	padding : 5;
 }
 
 td.projectPtime 	 	 {
@@ -1191,6 +1197,7 @@ td.projectPtime 	 	 {
 	color:			#000000;
 	text-align:		center;
 	background-color:	#e9f7fe;
+	padding : 5;
 }
 
 td.projectCtime 	 	 {
@@ -1199,6 +1206,7 @@ td.projectCtime 	 	 {
 	color:			#000000;
 	text-align:		center;
 	background-color:	#ffffff;
+	padding : 5;
 }
 
 

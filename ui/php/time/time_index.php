@@ -487,7 +487,8 @@ function get_time_actions() {
 // General Monthly View
   $actions["TIME"]["globalview"] = array (
     'Name'     => "$l_header_globalview",
-    'Url'      => "$path/time/time_index.php?action=globalview",
+    'Url'      => "$path/time/time_index.php?action=globalview".
+                  "&amp;wbegin=" . $time["date"],
     'Right'    => $time_admin_write,
     'Condition'=> array ('all') //, 'display') 
                                     );

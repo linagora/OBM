@@ -71,7 +71,7 @@ function dis_project_search_form ($project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   global $l_name, $l_company_name, $l_tasktype, $l_manager, $l_member;
-  global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int; 
+  global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_new; 
   global $c_all;
 
   $name = $project["name"];
@@ -122,6 +122,8 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   }
   $sel_member .= "</select>";
 
+  $cb_new = "<input type=\"checkbox\" name=\"cb_new\"/>";
+
   // --- HTML Template --------------------------------------------------------
 
   $block = "    
@@ -141,6 +143,9 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">$l_member<br />
         $sel_member
+      </div>
+      <div class=\"searchLabel\">$l_new<br />
+        $cb_new
       </div>
       <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
@@ -393,11 +398,12 @@ function html_project_memberadd_form($project) {
   
   $pid = $project["id"];
 
-  $ext_open  = "window.name='Liste'\n";
-  $ext_open .= "window.open('../user/user_index.php?action=ext_get_ids";
-  $ext_open .= "&popup=1&title=$l_member_add&ext_action=member_add";
-  $ext_open .= "&ext_url=../project/project_index.php&ext_id=$pid";
-  $ext_open .= "&ext_target=Liste','','height=400,width=620,scrollbars=yes')";
+  $ext_open  = "
+    window.name='Liste'\n
+    window.open('../user/user_index.php?action=ext_get_ids
+      &popup=1&title=$l_member_add&ext_action=member_add
+      &ext_url=../project/project_index.php&ext_id=$pid
+      &ext_target=Liste','','height=400,width=620,scrollbars=yes')";
 
   $block = "
     <script type=\"text/javascript\">
@@ -882,7 +888,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
 
     <div class=\"detailHead\">$l_membersinfos</div>
 
-    <table cellpadding=\"20%\" cellspacing=\"0\">
+    <table cellpadding=\"20\" cellspacing=\"0\" >
       $dis_memhead
       $dis_member
     </table>

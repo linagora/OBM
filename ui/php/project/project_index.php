@@ -76,7 +76,11 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = dis_project_search_form($project);
-  $display["result"] = dis_project_search_list($project);
+
+  if ($project["newlist"])
+    $display["result"] = dis_project_new_list($project);
+  else
+    $display["result"] = dis_project_search_list($project);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -487,7 +491,7 @@ function get_param_project() {
 
   global $param_project, $param_origin, $tf_missing, $tf_projected, $hd_status;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel;
-  global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext;
+  global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext, $cb_new;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
   global $cdg_param;
@@ -514,6 +518,7 @@ function get_param_project() {
   if (isset ($sel_tt)) $project["tt"] = $sel_tt;
   if (isset ($sel_manager)) $project["manager"] = $sel_manager;
   if (isset ($sel_member)) $project["member"] = $sel_member;
+  if (isset ($cb_new)) $project["newlist"] = $cb_new;
 
   // External param
   if (isset ($ext_action)) $project["ext_action"] = $ext_action;

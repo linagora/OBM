@@ -294,14 +294,23 @@ class OBM_DISPLAY {
     // Iteration on each data row of dataset
     while ( ($this->data_set->next_record() )
             && ( ($cpt < $set_rows) || ( ! $this->data_page) ) ) {
+
+      if (function_exists($dis_data_entity)) {
+	$res = $dis_data_entity($this, "set_column_style", $link_ok);
+	$rowstyle = $res["style"];
+      }	  
+      
       $cpt++;
-      $block .= "<tr>";
+      $block .= "<tr ". $rowstyle .">";
 
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
 	$dg_id = $this->data_set->f("Id");
 	$block .= "<td class=\"resultText\">$dg_id</td>";
       }
+
+      if ($rowstyle == "")
+	$style = "class=\"resultText\"";
 
       // If a left checkbox has to be displayed
       if (($this->data_cb_side == "left") && ($this->data_cb_text != "")){
@@ -315,11 +324,12 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-	  $block .= "<td class=\"resultText\">
+
+	  $block .= "<td $style>
                 <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
-	  $block .= "<td class=\"resultText\">&nbsp;</td>";
+	  $block .= "<td $style>&nbsp;</td>";
       }
 
 
@@ -369,9 +379,11 @@ class OBM_DISPLAY {
         $content = "";
 
 	// Set the style
-	if ($style != "") {
+	if ($rowstyle != "") {
+	  $td = "<td>";
+	} else if ($style != "") {
 	  $td = "<td $style>";
-	} elseif ($align == "center") {
+	} else if ($align == "center") {
 	  $td = "<td class=\"resultTextC\">";
 	} else {
 	  $td = "<td class=\"resultText\">";

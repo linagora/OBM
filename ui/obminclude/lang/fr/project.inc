@@ -42,6 +42,7 @@ $l_taskname = "Nom";
 $l_parent = "Tâche parent";
 $l_manager = "Chef de projet";
 $l_member = "Participant";
+$l_new = "Nouveaux";
 $l_soldtime = "Temps vendu";
 $l_total = "Total";
 
