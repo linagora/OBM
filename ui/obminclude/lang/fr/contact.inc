@@ -9,31 +9,22 @@
 
 // Database fields
 $l_company = "Société";
-$l_cat1_manage = "Gestion des catégories 1";
-$l_cat1_exist = "Categories 1 existantes";
-$l_cat1_new = "Nouvelle categorie 1";
-$l_cat1_delete =  "Supprimer";
-$l_cat2_manage = "Gestion des catégories 2";
-$l_cat2_exist = "Categories 2 existantes";
-$l_cat2_new = "Nouvelle categorie 2";
-$l_cat2_delete =  "Supprimer";
-$l_category1 = "Categorie 1";
-$l_category2 = "Categorie 2";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_kind = "Genre";
 $l_market = "Responsable";
 $l_function = "Fonction";
 $l_title = "Titre";
+$l_service = "Service";
 $l_hphone = "Tel personnel";
 $l_minihphone = "(Perso)";
 $l_mphone = "Tel mobile";
 $l_minimphone = "(Mobile)";
 $l_email = "@M";
+$l_email_other = "Autre Mail";
 $l_mailing_ok = "Activé pour mailing";
 $l_fax = "Fax";
 $l_country = "Pays";
-$l_comment = "Commentaire";
 $l_coord = "Coordonnées";
 $l_contact_name = "Nom Contact";
 $l_from_company = "&nbsp;&nbsp;Société";
@@ -48,15 +39,13 @@ $l_kind_exist = "Genre existants";
 $l_kind_new = "Nouveau Genre";
 $l_header = "En-tête";
 $l_code = "Code";
-$l_lalbel = "Label";
-// Titres
+$l_label = "Label";
+$l_category1 = "Categorie 1";
+$l_category2 = "Categorie 2";
 $l_contact = "Contact";
 $l_letter = "En-tête de Lettre";
 
 // Actions
-$l_cat1_checkdelete = "Vérifier ou supprimer la catégorie 1"; 
-$l_cat1_update = "Mettre à jour la catégorie 1"; 
-$l_cat1_insert = "Insérer une catégorie 1"; 
 $l_cat1_delete_ok = "La suppression de la categorie 1 a été correctement effectuée.";
 $l_cat1_delete_error = "La suppression de la categorie 1 a échoué !";
 $l_cat1_insert_ok = "L'insertion de la categorie 1 a été correctement effectuée.";
@@ -104,7 +93,20 @@ $l_add_cats2 = "Ajouter ces categories 2";
 $l_subscription = "Abonnements";
 $l_subscription_list = "Abonnements";
 $l_subscription_new= "Nouvel abonnement";
+
 // Messages
+$l_cat1_manage = "Gestion des catégories 1";
+$l_cat1_exist = "Categories 1 existantes";
+$l_cat1_new = "Nouvelle categorie 1";
+$l_cat1_delete =  "Supprimer";
+$l_cat2_manage = "Gestion des catégories 2";
+$l_cat2_exist = "Categories 2 existantes";
+$l_cat2_new = "Nouvelle categorie 2";
+$l_cat2_delete =  "Supprimer";
+$l_cat1_checkdelete = "Vérifier ou supprimer la catégorie 1"; 
+$l_cat1_update = "Mettre à jour la catégorie 1"; 
+$l_cat1_insert = "Insérer une catégorie 1"; 
+
 $l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";
 $l_link_deal = "Le contact est référencé par ces affaires";
 $l_link_deal_no = "Le contact n'est pas référencé dans les affaires";

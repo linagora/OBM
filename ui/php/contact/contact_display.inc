@@ -74,6 +74,9 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   }
 
   else if ($fieldname == "contact_address") {
+    if ($OD->data_set->f("contact_service") != "") {
+      $res["name"] .= $OD->data_set->f("contact_service")."<br />\n";
+    }
     if ($OD->data_set->f("contact_address1") != "") {
       $res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
     }
@@ -94,7 +97,8 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     if ($OD->data_set->f("country_name") != "" ) {
       $res["name"] .= " " . $OD->data_set->f("country_name");
     }
-    $res["txt_name"] = trim($OD->data_set->f("contact_address1") . " " .
+    $res["txt_name"] = trim($OD->data_set->f("contact_service") . " " .
+                       $OD->data_set->f("contact_address1") . " " .
                        $OD->data_set->f("contact_address2") . " " .
                        $OD->data_set->f("contact_address3") . " " .
                        $OD->data_set->f("contact_zipcode") . " " .
@@ -116,7 +120,9 @@ function dis_contact_search_form($contact="") {
   $usr_q = run_query_userobm_active();
   $func_q = run_query_function();
   $ctry_q = run_query_country();
-  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q);
+  $cat1_q = run_query_contactcategory1();
+  $cat2_q = run_query_contactcategory2();
+  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q, $cat1_q, $cat2_q);
 
   return $block;
 }
@@ -130,11 +136,14 @@ function dis_contact_search_form($contact="") {
 //   - $usr_q     : database object with userobm list
 //   - $func_q    : database object with function list
 //   - $ctry_q    : database object with country list
+//   - $cat1_q    : database object with contact category 1 list
+//   - $cat2_q    : database object with contact category 2 list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
+function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q, $cat1_q, $cat2_q) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
   global $l_function, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
+  global $l_category1, $l_category2;
 
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
@@ -146,9 +155,14 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
   $ctry = $contact["country"];
   $func = $contact["function"];
   $mark = $contact["marketing_manager"];
+  $cat1 = $contact["category1"];
+  $cat2 = $contact["category2"];
+  $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
+  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
 
   // Function select
   if ($show_func) {
@@ -191,6 +205,47 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";
+
+  // Category 1 select
+  if ($show_cat1) {
+    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">
+    <option value=\"$c_all\">$l_all</option>";
+    while ($cat1_q->next_record()) {
+      $c1_id = $cat1_q->f("contactcategory1_id");
+      $c1_code = $cat1_q->f("contactcategory1_code");
+      $c1_label = $cat1_q->f("contactcategory1_label");
+      $sel_cat1 .= "\n<option value=\"$c1_id\"";
+      if ($c1_id == $cat1) { $sel_cat1 .= " selected=\"selected\""; }
+      $sel_cat1 .= ">$c1_label</option>";
+    }
+    $sel_cat1 .= "</select>";
+
+    $block_cat1 = "
+    <div class=\"searchLabel\">$l_category1<br />
+      $sel_cat1
+    </div>";
+  }
+
+  // Category 2 select
+  if ($show_cat2) {
+    $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2\">
+    <option value=\"$c_all\">$l_all</option>";
+    while ($cat2_q->next_record()) {
+      $c2_id = $cat2_q->f("contactcategory2_id");
+      $c2_code = $cat2_q->f("contactcategory2_code");
+      $c2_label = $cat2_q->f("contactcategory2_label");
+      $sel_cat2 .= "\n<option value=\"$c2_id\"";
+      if ($c2_id == $cat2) { $sel_cat2 .= " selected=\"selected\""; }
+      $sel_cat2 .= ">$c2_label</option>";
+    }
+    $sel_cat2 .= "</select>";
+
+    $block_cat2 = "
+    <div class=\"searchLabel\">$l_category2<br />
+      $sel_cat2
+    </div>";
+  }
+
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -238,6 +293,8 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
       $sel_ctry
     </div>
     $block_func
+    $block_cat1
+    $block_cat2
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
     </div>
@@ -403,6 +460,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
   global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
+  global $l_email_other, $l_service;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
   global $display, $path, $action, $auth, $cgp_hide;
@@ -420,6 +478,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
   $lname = $co_q->f("contact_lastname");
   $fname = $co_q->f("contact_firstname");
+  $service = $co_q->f("contact_service");
   $ad1 = $co_q->f("contact_address1");
   $ad2 = $co_q->f("contact_address2");
   $ad3 = $co_q->f("contact_address3");
@@ -436,6 +495,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $mphone = $co_q->f("contact_mobilephone");
   $fax = $co_q->f("contact_fax");
   $email = $co_q->f("contact_email");
+  $email2 = $co_q->f("contact_email2");
   $mailok = ($co_q->f("contact_mailing_ok") == 1 ? $c_yes : $c_no);
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
@@ -447,6 +507,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  $show_service = (! $cgp_hide["contact"]["service"]);
   $show_ad3 = (! $cgp_hide["contact"]["address3"]);
 
   // Function field
@@ -463,6 +524,15 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_title</td>
       <td class=\"detailText\">$title</td>";
+  }
+
+  // Service field
+  if ($show_service) {
+    $block_service = "
+    <tr>
+      <td class=\"detailLabel\">$l_service</td>
+      <td class=\"detailText\">$service</td>
+    </tr>";
   }
 
   // Address3 field
@@ -484,9 +554,16 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$l_priv</td>";
   }
 
-  if  ($email != "") {
+  if ($email != "") {
     $link_email = "
       <a href=\"mailto:$email\">
+      <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
+      </a>";
+  }
+
+  if ($email2 != "") {
+    $link_email2 = "
+      <a href=\"mailto:$email2\">
       <img src=\"/images/$set_theme/$ico_mail\" alt=\"C\" />
       </a>";
   }
@@ -600,6 +677,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_mphone</td>
       <td class=\"detailText\">$mphone</td>
+    $block_service
     </tr><tr>
       <td class=\"detailLabel\">$l_address 1</td>
       <td class=\"detailText\">$ad1</td>
@@ -622,6 +700,9 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$link_email $email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email_other</td>
+      <td class=\"detailText\">$link_email2 $email2</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_mailing_ok</td>
       <td class=\"detailText\">$mailok</td>
@@ -808,6 +889,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
+  global $l_service, $l_email_other;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
@@ -825,6 +907,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $mark = $co_q->f("contact_marketingmanager_id");
     $lname = $co_q->f("contact_lastname");
     $fname = $co_q->f("contact_firstname");
+    $service = $co_q->f("contact_service");
     $ad1 = $co_q->f("contact_address1");
     $ad2 = $co_q->f("contact_address2");
     $ad3 = $co_q->f("contact_address3");
@@ -839,6 +922,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $mphone = $co_q->f("contact_mobilephone");
     $fax = $co_q->f("contact_fax");
     $email = $co_q->f("contact_email");
+    $email2 = $co_q->f("contact_email2");
     $mailok = ($co_q->f("contact_mailing_ok") == 1 ? " checked" : "");
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $vis = $co_q->f("contact_visibility");
@@ -884,6 +968,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   if (isset($contact["marketing_manager"])) { $mark = $contact["marketing_manager"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
+  if (isset($contact["service"])) { $service = stripslashes($contact["service"]); }
   if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
   if (isset($contact["ad2"])) { $ad2 = stripslashes($contact["ad2"]); }
   if (isset($contact["ad3"])) { $ad3 = stripslashes($contact["ad3"]); }
@@ -898,6 +983,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   if (isset($contact["mphone"])) { $mphone = stripslashes($contact["mphone"]); }
   if (isset($contact["fax"])) { $fax = stripslashes($contact["fax"]); }
   if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
+  if (isset($contact["email2"])) { $email2 = stripslashes($contact["email2"]); }
   if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
   if (isset($contact["com"])) { $com = stripslashes($contact["com"]); }
   if (isset($company["cat"])) { $compcat = $company["cat"]; }  
@@ -911,6 +997,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
   $show_cat1 = (! $cgp_hide["contact"]["category1"]);
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  $show_service = (! $cgp_hide["contact"]["service"]);
   $show_ad3 = (! $cgp_hide["contact"]["address3"]);
 
   // some constants
@@ -1104,6 +1191,16 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   }
   $sel_ctry .= "</select>";
 
+  // Service field
+  if ($show_service) {
+    $block_service = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_service</td>
+      <td class=\"detailForm\">
+      <input type=\"text\" id=\"tf_service\" name=\"tf_service\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$service\" />
+      </td>";
+  }
+
   // Address 3 field
   if ($show_ad3) {
     $block_ad3 = "
@@ -1206,6 +1303,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     </tr><tr>
     <td class=\"detailLabel\">$l_mphone</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_mphone\" size=\"$csize_phone\" maxlength=\"$csize_phone\" value=\"$mphone\" /></td>
+    $block_service
     </tr><tr>
     <td class=\"detailLabel\">$l_address 1</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad1\" size=\"$csize_add\" maxlength=\"$cmax_add\" value=\"$ad1\" /></td>
@@ -1227,7 +1325,10 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     <td class=\"detailForm\">$sel_ctry</td>
     </tr><tr>
     <td class=\"detailLabel\">$l_email</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" value=\"$email\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email\" size=\"52\" maxlength=\"128\" value=\"$email\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_email_other</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_email2\" size=\"52\" maxlength=\"128\" value=\"$email2\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_mailing_ok</td>
     <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_mailok\" value=\"1\" $mailok /></td>
@@ -1271,6 +1372,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $fname = stripslashes($contact["fname"]);
   $dsrc = $contact["datasource"];
   $mark = $contact["marketing_manager"];
+  $service = stripslashes($contact["service"]);
   $ad1 = stripslashes($contact["ad1"]);
   $ad2 = stripslashes($contact["ad2"]);
   $ad3 = stripslashes($contact["ad3"]);
@@ -1285,6 +1387,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $mphone = stripslashes($contact["mphone"]);
   $fax = stripslashes($contact["fax"]);
   $email = stripslashes($contact["email"]);
+  $email2 = stripslashes($contact["email2"]);
   $com = stripslashes($contact["com"]);
   $vis = $contact["vis"];
   $archive = ($contact["archive"] == 1 ? "1" : "0");
@@ -1328,6 +1431,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
     <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
+    <input type=\"hidden\" name=\"tf_service\" value=\"$service\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
@@ -1340,6 +1444,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
@@ -1358,6 +1463,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
     <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
+    <input type=\"hidden\" name=\"tf_service\" value=\"$service\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
@@ -1370,6 +1476,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" 
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />

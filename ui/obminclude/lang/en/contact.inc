@@ -15,29 +15,25 @@ $l_kind = "Kind";
 $l_market = "Person in charge";
 $l_function = "Function";
 $l_title = "Job Title";
+$l_service = "Service";
 $l_hphone = "Home Phone";
 $l_minihphone = "(Home)";
 $l_mphone = "Mobile Phone";
 $l_minimphone = "(Mobile)";
 $l_email = "E-Mail";
+$l_email_other = "Other E-Mail";
 $l_mailing_ok = "Mailing enabled";
 $l_fax = "Fax";
 $l_country = "Country";
 $l_comment = "Comment";
 $l_coord = "Details";
-$l_cat1_manage = "Category 1 management";
-$l_cat1_exist = "Existing Category 1";
-$l_cat1_new = "New category 1";
-$l_cat1_delete = "Delete";
-$l_cat2_manage = "Category 2 management";
-$l_cat2_exist = "Existing Category 2";
-$l_cat2_new = "New category 2"; 
-$l_cat2_delete = "Delete";
+$l_code = "Code";
+$l_label = "Label";
+$l_letter = "Letter Head";
 $l_category1 = "Category 1";
 $l_category2 = "Category 2";
-$l_code = "Code";
-$l_lalbel = "Label";
-$l_letter = "Letter Head";
+$l_contact = "Contact";
+
 // Labels and texts
 $l_contact_name = "Contact Name";
 $l_from_company = "From Company";
@@ -55,8 +51,6 @@ $l_header = "Header";
 $l_subscription = "Subscriptions";
 $l_subscription_list = "Subscriptions";
 $l_subscription_new= "New subscription";
-// Titles
-$l_contact = "Contact";
 
 // Actions
 $l_insert = "Insert the Contact";
@@ -76,6 +70,14 @@ $l_add_cats1 = "Add these categories 1";
 $l_add_cats2 = "Add these categories 2";
 
 // Messages
+$l_cat1_manage = "Category 1 management";
+$l_cat1_exist = "Existing Category 1";
+$l_cat1_new = "New category 1";
+$l_cat1_delete = "Delete";
+$l_cat2_manage = "Category 2 management";
+$l_cat2_exist = "Existing Category 2";
+$l_cat2_new = "New category 2"; 
+$l_cat2_delete = "Delete";
 $l_cat1_checkdelete = "Check or delete Category 1"; 
 $l_cat1_update = "Update category 1"; 
 $l_cat1_insert = "Insert a category 1";

@@ -399,10 +399,10 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contact() {
   global $action;
-  global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company;
+  global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
-  global $sel_market, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
+  global $sel_market, $tf_email, $tf_email2, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header,$view;
@@ -447,6 +447,7 @@ function get_param_contact() {
   if (isset ($company_name)) $contact["company_name"] = $company_name;
   if (isset ($company_new_name)) $contact["comp_new_name"] = $company_new_name;
   if (isset ($company_new_id)) $contact["comp_new_id"] = $company_new_id;
+  if (isset ($tf_service)) $contact["service"] = $tf_service;
   if (isset ($tf_ad1)) $contact["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $contact["ad2"] = $tf_ad2;
   if (isset ($tf_ad3)) $contact["ad3"] = $tf_ad3;
@@ -461,6 +462,7 @@ function get_param_contact() {
   if (isset ($tf_mphone)) $contact["mphone"] = trim($tf_mphone);
   if (isset ($tf_fax)) $contact["fax"] = trim($tf_fax);
   if (isset ($tf_email)) $contact["email"] = trim($tf_email);
+  if (isset ($tf_email2)) $contact["email2"] = trim($tf_email2);
   if (isset ($cb_archive)) $contact["archive"] = ($cb_archive == 1 ? 1 : 0);
   if (isset ($cb_vis)) $contact["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);

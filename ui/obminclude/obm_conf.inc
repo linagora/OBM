@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // Use Database sessions
 //$cgp_sess_db = true;
@@ -70,6 +70,7 @@ $cgp_show["section"]["aliamin"] = false;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;
+//$cgp_hide["contact"]["service"] = true;
 //$cgp_hide["contact"]["address3"] = true;
 
 </script>
