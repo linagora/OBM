@@ -756,10 +756,46 @@ td.adminTextRight	{
 /* /////////////////////////////////////////////////////////////////////////
 // Classes divers
  ////////////////////////////////////////////////////////////////////////*/
-table.classic {
-  border :			3px solid black;
-  background-color : 		#000000;
+div.classic {
+  width :			100%;
+  height :			500px;
+  overflow:			auto;
 }
+
+table.classic {
+  border :			1px solid black;
+  background-color : 		#ffffff;
+  border-collapse:		collapse;
+}
+table.classic th {
+  background-color : 		#1482ab;
+  border :			1px solid black;
+  color :			#ffffff;
+  font-size:			12px;
+}
+
 table.classic td {
-  border:	inherit;
+  border:	1px dashed #999999;
+  font-size:	12px;
+  text-align:	center;
+}
+
+table.classic tr.pair {
+  background-color : 		#eff3f7;
+}
+
+table.classic tr.impair {
+  background-color : 		#ffffff;
+}
+
+table.classic td.totals {
+  color:	red;
+}
+
+span.hiddenLegend {
+  display:none;
+  background-color: #ffffcc;
+  font-size: 8px;
+  border: 1px solid black;
+  moz-border-radius:
 }

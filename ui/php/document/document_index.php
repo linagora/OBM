@@ -44,7 +44,6 @@ if ($action == "ext_get_path") {
   if ($param_document > 0) {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
-      $doc_q = run_query_detail($document);
       dis_file($doc_q);
       exit();
     }

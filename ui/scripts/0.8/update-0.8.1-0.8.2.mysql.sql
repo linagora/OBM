@@ -37,3 +37,7 @@ ALTER TABLE List ADD column list_visibility int(2) DEFAULT '0' after list_usercr
 -------------------------------------------------------------------------------
 -- Change column : country_phone -> varchar(5) (bug#339)
 ALTER TABLE Country CHANGE column country_phone country_phone VARCHAR(5);
+
+UPDATE DisplayPref set display_fieldorder = 11 WHERE display_entity = 'list_contact' AND display_fieldname ='contact_email' AND
+display_user_id = 0;
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'list_contact', 'subscription_quantity', 10, 1);

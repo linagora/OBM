@@ -543,7 +543,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
-  global $l_contact_cat2,$l_function,$l_cat;
+  global $l_contact_cat2,$l_function,$l_cat,$l_mailing;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete,$l_recept,$l_renew;
 
@@ -594,11 +594,12 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
       "kind_lang" => "sel",
+      "contact_mailing_ok"  => "tf",       
       "subscription_publication_id"  => "sel",
       "publication_lang"  => "tf",
       "publication_year"  => "tf",
       "subscriptionreception_id"  => "sel",
-      "subscription_renewal"  => "tf",      
+      "subscription_renewal"  => "tf"      
   );
   $fields_label["company_name"] = $l_company; 
   $fields_label["company_country_id"] = "$l_company: $l_country"; 
@@ -620,7 +621,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
   $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
   $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
-  $fields_label["kind_lang"] = "$l_contact: $l_lang";  
+  $fields_label["kind_lang"] = "$l_contact: $l_lang"; 
+  $fields_label["contact_mailing_ok"] = "$l_contact: $l_mailing";  
   $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
   $fields_label["subscription_publication_id"] = "$l_publication: $l_title"; 
   $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
@@ -868,7 +870,8 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q){
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timebefore,$l_timeafter,$l_market,$l_datasource;  
-  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
+  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang,$l_mailing;
+  global $l_none,$l_yes,$l_no;
   global $set_theme,$ico_mini_cal;  
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
@@ -967,12 +970,18 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
   </tr>
   <tr> 
     <td class=\"detailLabel\">$l_lang</td>
-    <td></td>
+    <td class=\"detailLabel\">$l_mailing</td>
     <td></td>
   </tr> 
   <tr>  
     <td class=\"detailForm\"><select name=\"sel_kind_lang\">$sel_lag</select></td>    
-    <td></td>
+    <td class=\"detailForm\">
+    <select name=\"tf_contact_mailing_ok\">
+     <option value=\"\">$l_none</option>
+     <option value=\"1\">$l_yes</option>
+     <option value=\"0\">$l_no</option>
+    </select>
+    </td>
     <td></td>
   </tr>
 

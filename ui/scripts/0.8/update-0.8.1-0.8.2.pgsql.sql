@@ -41,4 +41,8 @@ ALTER TABLE List ALTER column list_visibility SET DEFAULT '0';
 ALTER TABLE Country ADD COLUMN temp_country_phone VARCHAR(5);
 UPDATE Country SET temp_country_phone = country_phone;
 ALTER TABLE Country DROP COLUMN country_phone;
-ALTER TABLE Country RENAME COLUMN temp_country_phone TO country_phone; 
+ALTER TABLE Country RENAME COLUMN temp_country_phone TO country_phone;
+
+UPDATE DisplayPref set display_fieldorder = 11 WHERE display_entity = 'list_contact' AND display_fieldname ='contact_email' AND
+display_user_id = 0;
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'list_contact', 'subscription_quantity', 10, 1);

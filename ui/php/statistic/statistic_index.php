@@ -58,6 +58,7 @@ elseif ($action == "responsible") {
 }
 elseif ($action == "company") {
 ///////////////////////////////////////////////////////////////////////////////
+  require("statistic_js.inc");
   $cat_q = run_query_company_per_country_per_cat();
   $nb_comp = run_query_nb_company();
   $display["title"] = display_title($l_header_comp_stats);

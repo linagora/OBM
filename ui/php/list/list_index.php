@@ -298,6 +298,7 @@ function get_param_list() {
   global $sel_contact_country_id,$sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id,$sel_contact_function_id;
+  global $tf_contact_mailing_ok;
   
   global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
   global $sel_subscription_reception_id,$tf_subscription_renewal;
@@ -362,6 +363,7 @@ function get_param_list() {
   if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
   if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
   if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
+  if (isset ($tf_contact_mailing_ok)) $list["criteria"]["modules"]["contact"]["contact_mailing_ok"] = $tf_contact_mailing_ok; 
   
   //Publication
   if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;

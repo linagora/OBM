@@ -46,8 +46,9 @@ $working_days = array(0,1,1,1,1,1,0);
 $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
-
-
+//Id of the Publication reception type which is dedicated to the auto
+//subscription.
+$c_focsys = 3;
 //---------------------------------------------------------------------------//
 // OBM Default configurable Constants : Default values
 // To change site values => change these in obm_conf.inc 

@@ -137,6 +137,7 @@ function dis_cat_stats($comp_q,$tot) {
     else {
       $cat_id = $comp_q->f("companycategory_id");
       $cat_c = $comp_q->f("companycategory_code");
+      $cat_d = $comp_q->f("companycategory_label");
     }
     if($comp_q->f("country_id") == NULL || $comp_q->f("country_id") == 0) {
       $cty_id = 0;
@@ -145,6 +146,7 @@ function dis_cat_stats($comp_q,$tot) {
     else {
       $cty_id = $comp_q->f("country_id") ;
       $cty_c = $comp_q->f("country_iso3166") ;
+      $cty_d = $comp_q->f("country_name") ;
     }
     $nb = $comp_q->f("nb");
     $stat[$cty_id][$cat_id] += $nb;
@@ -152,6 +154,8 @@ function dis_cat_stats($comp_q,$tot) {
     $cat_count[$cat_id] += $nb;
     $cty[$cty_id] = $cty_c;
     $cat[$cat_id] = $cat_c;
+    $cty_desc[$cty_id] = $cty_d;
+    $cat_desc[$cat_id] = $cat_d;
   }
   ksort($cat);
   $block .= "
@@ -160,14 +164,31 @@ function dis_cat_stats($comp_q,$tot) {
   <tr>
   <th></th>";
   foreach($cat as $cat_id =>$cat_name) {
-    $block .= "<th>".$cat_name."</th >";
+    if($cat_id != 0) {
+      $onOver = "    onMouseOver=\"show(event,'cat_$cat_id'); return true;\"
+    onMouseOut=\"hide('cat_$cat_id'); return true;\"";
+      $infos .= "<span class=\"hiddenLegend\" id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
+    }else {
+      $onOver = "";
+    }
+    $block .= "<th $onOver>
+    ".$cat_name."
+    </th >";
     $percent = round(($cat_count[$cat_id])*100/$tot,1);    
     $cat_percent .= "<td  class=\"totals\">$percent</td>";
     $cat_tots .= "<td class=\"totals\">".$cat_count[$cat_id]."</td>";
+    $infos .= "<span class=\"hiddenLegend\"  id=\"cat_$cat_id\">".$cat_desc[$cat_id]."</span>";
   }
   $pair = 0;
   $block .= "<th>$l_totals</th><th>%</th></tr>";
   foreach($stat as $cty_id => $data) {
+    if($cty_id != 0) {
+      $onOver = "    onMouseOver=\"show(event,'cty_$cty_id'); return true;\"
+    onMouseOut=\"hide('cty_$cty_id'); return true;\"";
+      $infos .= "<span class=\"hiddenLegend\" id=\"cty_$cty_id\">".$cty_desc[$cty_id]."</span>";
+    } else {
+      $onOver = "";
+    }
     if($pair == 0) {
       $pair = 1;
       $block .= "<tr class=\"pair\">";
@@ -176,7 +197,9 @@ function dis_cat_stats($comp_q,$tot) {
       $pair = 0;
       $block .= "<tr class=\"impair\">";
     }
-    $block .= " <th> ".$cty[$cty_id]."</th>";
+    $block .= " <th $onOver>
+    ".$cty[$cty_id]."
+    </th>";
     foreach($cat as $cat_id => $cat_name) {
       $block .= "<td>".$data[$cat_id]."</td >";
     }
@@ -195,6 +218,7 @@ function dis_cat_stats($comp_q,$tot) {
   <div class=\"detailText\"> x = $l_compcat </div>
   <div class=\"detailText\"> y = $l_header_country</div>
   </div>
+  $infos
   ";
   return $block;
 }

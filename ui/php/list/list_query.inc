@@ -878,6 +878,7 @@ function make_query($list) {
     "contactcategory1link_category_id" => $common_equal,
     "contactcategory2link_category_id" => $common_equal,
     "contact_function_id" => $common_equal,
+    "contact_mailing_ok"  => $common_equal,
     "subscription_publication_id"  => $common_equal,
     "publication_lang"  => $pub_lang_like,
     "publication_year"  => $common_like,

@@ -240,10 +240,10 @@ function run_query_auto_insert($publication){
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_auto_subscription($publication,$p_id){
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $c_focsys;
   $auto_sub =   $publication["auto_sub"];
-  $recept =   $publication["recept"];
-
+  $recept =   $c_focsys;
+  $lang = $publication["lang"];
   $query = "insert into Subscription (
     subscription_timeupdate,
     subscription_timecreate,
@@ -566,9 +566,9 @@ function run_query_publicationtype() {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscriptionreception() {
-  global $cdg_sql;
+  global $cdg_sql,$c_focsys;
 
-  $query = "select * from SubscriptionReception order by subscriptionreception_label DESC"; 
+  $query = "select * from SubscriptionReception where subscriptionreception_id != $c_focsys order by subscriptionreception_label DESC "; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);

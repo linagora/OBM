@@ -397,7 +397,20 @@ function contact_criterion(form,labels,values,i) {
   }
   else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_kind_lang[]\" value=\"\" />';
-  }     
+  }    
+
+  if(form.tf_contact_mailing_ok.value != '') {
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_mailing';      
+    cell = values.insertCell(i);
+    field = form.tf_contact_mailing_ok;
+    cell.innerHTML = '<select name=\"tf_contact_mailing_ok[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_mailing_ok[]\" value=\"\" />';
+  }  
+  
   return i;
 }
 

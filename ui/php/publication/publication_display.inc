@@ -471,7 +471,7 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
       <input type=\"submit\" value=\"$l_insert\" />
       ";
     // reception mode select
-    $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
+/*    $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
     while ($recept_q->next_record()) {
       $k_id = $recept_q->f("subscriptionreception_id");
       $sel_recept .= "\n<option value=\"$k_id\"";
@@ -479,7 +479,7 @@ function html_publication_form($action, $pub_q,$type_q,$cat1_q,$recept_q, $publi
       $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
     }
     $sel_recept .= "</select>";
-
+*/
     $sel_contcat1 = "<select name=\"sel_contactcategory1[]\" multiple=\"multiple\"> "; 
     while($cat1_q->next_record()) {
       $cat_id = $cat1_q->f("contactcategory1_id");
@@ -690,6 +690,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
 
   return $block;
 }
+///////////////////////////////////////////////////////////////////////////////
 // Display Subscription Form                                                      //
 // Parameters:
 //   - $action    : action called

@@ -1431,7 +1431,7 @@ function display_tree($tree,$current_directory,$name,$indent,$d_id) {
 	  <img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
 	 </a>
 	 <a class=\"documentFile\" 
-	  href=\"document_index.php?action=accessfile&amp;tf_path=$current_directory&amp;fi_file_name=".$info["name"]."&amp;popup=1\" 
+	  href=\"document_index.php?action=accessfile&amp;param_document=$id&amp;popup=1\" 
 	  target=\"_blank\" >
 	  ".$info["name"]."
 	 </a>
