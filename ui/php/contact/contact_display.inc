@@ -343,8 +343,8 @@ function dis_contact_consult($contact) {
   if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
     $display["link"] = html_contact_links($id);
     $display["detailInfo"] = display_record_info($con_q);
-    $block .= html_contact_header($con_q);
     if($view != "") {
+      $block .= html_contact_header($con_q);
       include("$path/$view/".$view."_display.inc");
       include("$path/$view/".$view."_query.inc");
       $block .= dis_subscription_external_list($contact);
@@ -411,6 +411,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
 
+  $display["link"] = html_contact_links($id);
   // Conditionnal fields
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   $show_title = (! $cgp_hide["contact"]["contact_title"]);
