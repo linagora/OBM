@@ -198,7 +198,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   global $set_theme,$ico_contact_list,$ico_contact_new;
   // -- Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new; 
-  global $perms_user,$l_perms_user,$ico_deal_new,$ico_deal_list;  
+  global $perms_user,$ico_deal_new,$ico_deal_list;  
   global $auth;
 
   $uname = urlencode($name);
@@ -255,7 +255,7 @@ function html_company_consult($co_q) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
   global $l_insert,$l_update,$l_delete, $l_company;
-  global $perms_user,$l_perms_user,$l_coord;
+  global $perms_user,$l_coord;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");

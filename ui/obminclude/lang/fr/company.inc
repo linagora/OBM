@@ -17,7 +17,6 @@ $l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
-$l_postcode_first = "CP";
 $l_town = "Ville";
 $l_expresspostal = "Cedex";
 $l_country = "Pays";
@@ -28,7 +27,6 @@ $l_email = "@M";
 $l_coord = "Coordonnées";
 
 // Labels et textes
-$l_mailing_first = "M";
 $l_comment = "Commentaire";
 $l_contact_list = "Liste Contacts";
 $l_contact_new = "Nouveau Contact";
@@ -50,8 +48,6 @@ $l_insert = "Enregistrer la Société";
 $l_update = "Modifier la Société";
 $l_checkdelete = "Vérifier ou Supprimer la Société";
 $l_delete = "Supprimer la Société";
-$l_mailing_update = "Mise à jour Mailing";
-$l_mailing_reset = "Mise à zéro Mailing";
 $l_kind_update = "Modifier le Type";
 $l_kind_checkdelete = "Vérifier ou Supprimer le Type";
 $l_kind_delete = "Supprimer le Type";
@@ -64,7 +60,6 @@ $l_confirm = "Confirmer l'action";
 $l_select_company = "Sélectionner la société";
 
 // Messages
-$l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des sociétés correspondantes.";
 $l_found = "société trouvées.";
 $l_no_found = "Aucune société ne correspond à ces critères !";
@@ -76,9 +71,6 @@ $l_check_samecompany = "Ces sociétés semblent similaires à cette nouvelle entrée
 $l_update_ok = "La modification de la société a été correctement effectuée";
 $l_update_error = "La modification de la société a échoué !";
 $l_query_error = "Problème en executant la requete";
-$l_mailing_ok = "La mise à jour du mailing s'est bien effectuée.";
-$l_mailing_nb = "sociétés enregistrées dans le mailing.";
-$l_mailing_reset_ok = "La mise à zéro du mailing s'est bien effectuée";
 $l_link_deal = "La société est référencée par ces affaires";
 $l_link_deal_no = "La société n'est pas référencée dans les affaires";
 $l_link_contact = "Ces contacts appartiennent à cette société";

@@ -17,7 +17,6 @@ $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
 $l_address = "Address";
 $l_postcode = "Zip Code";
-$l_postcode_first = "ZIP";
 $l_town = "Town";
 $l_expresspostal = "Express postal";
 $l_country = "Country";
@@ -28,8 +27,6 @@ $l_email = "E-Mail";
 $l_coord = "Details";
 
 // Labels and texts
-$l_listdoc_first = "D";
-$l_newdoc_first = "ND";
 $l_comment = "Comment";
 $l_contact_list = "Contact List";
 $l_contact_new = "New Contact";
@@ -63,7 +60,6 @@ $l_confirm = "Confirm the action";
 $l_select_company = "Select the Company";
 
 // Messages
-$l_error_permission = "You doesn't have the rights to access this page";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the companies";
 $l_found = "companies found.";
 $l_no_found = "No company found matching the query !";

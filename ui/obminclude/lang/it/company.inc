@@ -16,7 +16,6 @@ $l_activity = "Activita";
 $l_company_kind = "Tipo Azienda";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
-$l_postcode_first = "CAP";
 $l_town = "Citta";
 $l_expresspostal = "CAP 2";
 $l_country = "Nazione";
@@ -26,12 +25,6 @@ $l_web = "Web";
 $l_email = "E-Mail";
 
 // Labels and texts
-$l_last_company = "Ultima Azienda";
-$l_last_contact = "Ultyimo Contatto";
-$l_last_deal = "Ultimo Impegno";
-$l_mailing_first = "M";
-$l_listdoc_first = "D";
-$l_newdoc_first = "ND";
 $l_contact_list = "Lista Contatti";
 $l_contact_new = "Nuovo Contatto";
 $l_deal_list = "Lista Impegni";
@@ -52,8 +45,6 @@ $l_insert = "Inserisci Azienda";
 $l_update = "Aggiorna Azienda";
 $l_checkdelete = "Controlla o Elimina Azienda";
 $l_delete = "Elimina Azienda";
-$l_mailing_update = "Aggiorna  Mailing";
-$l_mailing_reset = "Resetta Mailing";
 $l_kind_update = "Aggiorna Tipo";
 $l_kind_checkdelete = "Controlla o Elimina Tipo";
 $l_kind_delete = "Elimina Tipo";
@@ -66,7 +57,6 @@ $l_confirm = "Conferma azione";
 $l_select_company = "Seleziona Azienda";
 
 // Messages
-$l_error_permission = "Pagina riservata";
 $l_no_display = "Riempi i  campi  e premi < Trova> per la ricerca";
 $l_found = "Aziende Trovate.";
 $l_no_found = "Nessuna  Azienda trovata !";
@@ -78,9 +68,6 @@ $l_check_samecompany = "Queste Aziende sembra simili alla nuova ...";
 $l_update_ok = "Azienda modificata.";
 $l_update_error = "Modifica Azienda Fallita !";
 $l_query_error = "Errore critico nell'esecuzione della query.";
-$l_mailing_ok = "Mailing aggiornato.";
-$l_mailing_nb = "Aziende registrate nel mailing.";
-$l_mailing_reset_ok = "Reset Mailing completato con successo.";
 $l_link_deal = "l'Azienda ha degli impegni ";
 $l_link_deal_no = "l'Azienda non ha degli impegni ";
 $l_link_contact = "Questi contatti sono di questa Azienda";

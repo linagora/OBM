@@ -220,8 +220,8 @@ function html_contact_consult($co_q) {
       <td class=\"detailLabel\">$l_firstname</td>
       <td class=\"detailText\">$fname</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailText\">$func</td>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$kind</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
       <td class=\"detailText\">
@@ -391,14 +391,6 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       <input type=\"submit\" value=\"$l_update\" />
       ";
 
-  // CHECK DELETE
-  /*$display_update .= "<TD valign=top>
-        <form method=\"get\" name=\"f_del_con\"  
-        action=\"" . url_prepare("contact_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"check_delete\" />
-    <input type=\"hidden\" name=\"param_contact\" value=\"$id\" />
-    <input type=\"submit\" value=\"$l_checkdelete\" />\n";
-*/
   // INSERT
   } elseif (($action=="new") || ($action=="insert")) {
     $display_update = "<input type=\"hidden\" name=\"action\" value=\"insert\" />
@@ -421,11 +413,11 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     <td class=\"detailLabel\">$l_firstname</td>
     <td><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
     </tr><tr>
+    <td class=\"detailLabel\">$l_kind</td>
+    <td>$sel_kind</td>
+    </tr><tr>
     <td class=\"detailLabel\">$l_private</td>
     <td>$display_private</td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_function</td>
-    <td><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_company</td>
     <td>
@@ -439,8 +431,8 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_kind</td>
-    <td>$sel_kind</td>
+    <td class=\"detailLabel\">$l_function</td>
+    <td><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
     </tr><tr>
     <td colspan=\"2\" class=\"detailHead\">$l_coord</td>
     </tr><tr>
