@@ -294,7 +294,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     if ($perm->have_perm("editor")) {
       $dis_infos->data_cb_text = "X";
-      $dis_infos->data_idfield = "list_contact_id";
+      $dis_infos->data_idfield = "contact_id";
       $dis_infos->data_cb_name = "cb_con";
       $dis_infos->data_cb_field = "";
       $block .= "<form method=\"get\" action=\"list_index.php\">";

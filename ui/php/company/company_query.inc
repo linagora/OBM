@@ -724,7 +724,7 @@ function check_data_form($cid, $company) {
   }
 
   // Company activity filled
-  if ($company["act"] < 1) {
+  if ($company["activity"] < 1) {
     $err_msg = $l_err_act_empty;
     return false;
   }

@@ -218,9 +218,9 @@ else if ($action == "insert") {
 
 } elseif ($action == "contact_del")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($perm->have_perm("editor")) {
-    if ($list["con_nb"] > 0) {
-      $nb = run_query_contactlist_delete($list);
+if ($perm->have_perm("editor")) {
+  if ($list["con_nb"] > 0) {
+    $nb = run_query_contactlist_delete($list);
       $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
     } else {
       $display["msg"] .= display_err_msg("no contact to delete");
@@ -315,7 +315,6 @@ function get_param_list() {
   if (isset ($ext_id)) $list["ext_id"] = $ext_id;
   if (isset ($ext_target)) $list["ext_target"] = $ext_target;
   if (isset ($title)) $list["title"] = stripslashes($title);
-
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
     $http_obm_vars = $HTTP_POST_VARS;
   } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {

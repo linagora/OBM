@@ -221,6 +221,11 @@ INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documen
 VALUES (7,'Fichier Texte','txt','text/plain');
 INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES (8,'Fichier Word','doc','application/msword');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (9,'Fichier Binaire','exe','application/octet-stream');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (10,'Fichier PowerPoint','ppt','application/vnd.ms-powerpoint');
+
 -------------------------------------------------------------------------------
 -- Tasktype
 -------------------------------------------------------------------------------

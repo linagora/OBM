@@ -24,7 +24,7 @@ $last_incident_default = 0;
 
 // Document constants 
 $link_to = "Link : "; // Name of the prefix of a link document
-$default_mime = "text/html"; //Default Mime Type
+$default_mime = "application/octet-stream"; //Default Mime Type
 $default_path = "/Default"; //Default repository
 
 // Agenda constants

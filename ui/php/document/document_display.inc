@@ -280,7 +280,6 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
     }
   }
-  echo "proto=$proto";
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
