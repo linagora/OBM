@@ -548,7 +548,7 @@ function run_query_create_link($document) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($cid, $document) {
   global $l_fill_title, $l_fill_author, $l_fill_path, $l_invalid_repository_path;
-  global $l_invalid_file,$l_invalid_existing_file;
+  global $l_invalid_file,$l_invalid_existing_file,$l_invalid_url;
   global $err_msg,$document_path,$l_invalid_link_file;
 
   $title = $document["title"];
@@ -559,6 +559,8 @@ function check_data_form($cid, $document) {
   $name = $document["name"];
   $size = $document["size"];
   $kind = $document["kind"];
+  $url = $document["url"];
+
   if(strpos($path,'/') === 0) {
     $final_path = $document_path.$path;
   }
@@ -582,6 +584,11 @@ function check_data_form($cid, $document) {
     return false;
 
   }
+  
+  if($kind == "link" && $url == "") {
+      $err_msg = $l_invalid_url;
+      return false;
+  } 
   
   if($kind == "file" ) {
     if(!is_file($final_path)) {

@@ -101,7 +101,7 @@ $invalid_link_file = "Cannot create a alias over a link";
 $l_have_link = "This document is linked with various objects";
 $l_have_no_link = "This document isn't linked and can be deleted";
 $l_no_document = "Document not found";
-
+$l_invalid_url = "Incorrect URL";
 // Actions
 $l_checkdelete = "Check or Delete the Document";
 $l_delete = "Delete the Document";

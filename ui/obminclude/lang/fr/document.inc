@@ -98,6 +98,8 @@ $l_link = "Lien HTML";
 $l_existing_file = "Fichier déjà envoyé";
 $l_kind = "Type de document";
 $l_invalid_link_file = "Impossible de creer un alias sur un lien";
+$l_invalid_url = "Adresse invalide";
+
 $l_have_link = "Ce document est lié à divers éléments d'obm";
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut etre supprimer";
 $l_no_document = "Document introuvable";

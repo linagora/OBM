@@ -379,7 +379,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   $block = "
     <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
       onsubmit=\"if (check_document(this)) return true; else return false;\"
-      action=\"document_index.php/\">
+      action=\"document_index.php\">
 
     <div class=\"detailHead\">$l_document</div>
 
