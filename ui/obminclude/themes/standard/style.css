@@ -178,11 +178,13 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header .menu	{
-	position:		relative;
-	top : 			-6px;
-	float: 			left;
+  	position: 		relative;
+	top:			-22px;
+	left:			172px;
 	padding:		0px;
+	float:			left;
 	font-family: 		arial,sans-serif;
+	
 }
 
 .header .menu li {
@@ -199,7 +201,6 @@ table.menuBar		{
 	margin-right:		auto;
 	width:			90%;
 	border-spacing:		0;
-	padding:		50;
 	background-color:	transparent;	
 }
 		

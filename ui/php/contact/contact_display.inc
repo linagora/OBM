@@ -269,13 +269,13 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_consult($co_q) {
+function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   global $l_company,$l_lastname,$l_firstname,$l_kind,$l_function,$l_title;
   global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
   global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
-  global $c_yes, $c_no, $set_theme, $ico_mail;
+  global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
   global $display, $path, $action, $auth;
   global $perms_user, $l_perms_user;
 
@@ -331,6 +331,38 @@ function html_contact_consult($co_q) {
   }
   
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+
+
+  $cat1_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  $i = 0;
+  while($cat1_q->next_record()) {
+    if ($i==0) {
+      $cat_disp .= "<tr>";
+    }
+    $label = $cat1_q->f("contactcategory1_label");
+ 
+    $i++;
+    $cat1_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+    if ($i==3) {
+      $cat1_disp .= "</tr>";
+      $i = 0;
+    }    
+  }
+
+  $cat2_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
+  $i = 0;
+  while($cat2_q->next_record()) {
+    if ($i==0) {
+      $cat_disp .= "<tr>";
+    }
+    $label = $cat2_q->f("contactcategory2_label");      
+    $i++;
+    $cat2_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+    if ($i==3) {
+      $cat2_disp .= "</tr>";
+      $i = 0;
+    }    
+  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -411,7 +443,16 @@ function html_contact_consult($co_q) {
       <td class=\"detailText\">$mailok</td>
     </tr>
     </table>
-
+    <div class=\"detailHead\">$l_category1</div>
+  
+    <table class=\"detail\">
+    $cat1_disp
+    </table>
+    <div class=\"detailHead\">$l_category2</div>
+    
+    <table class=\"detail\">
+    $cat2_disp
+    </table>
     <div class=\"detailHead\">$l_comment</div>
 
     <table class=\"detail\">
@@ -478,7 +519,8 @@ function html_contact_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_form($action, $co_q, $contact) {
   global $display, $cg_com;
-
+  $cat1_q = run_query_contactcategory1();
+  $cat2_q = run_query_contactcategory2();  
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
   $func_q = run_query_function();
@@ -487,7 +529,7 @@ function dis_contact_form($action, $co_q, $contact) {
   }
   $usr_q = run_query_all_users_from_group($cg_com, $users);
   $ctry_q = run_query_country();
-  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
+  $block = html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
 
   return $block;
 }
@@ -507,7 +549,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
+function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company, $l_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
@@ -515,6 +557,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
+  global $l_category1, $l_category2;
   global $display, $path, $auth, $l_none;
 
   // if update mode and first time values are taken from database
@@ -545,6 +588,8 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
     $archive = ($co_q->f("contact_archive") == 1 ? " checked" : "");
     $vis = $co_q->f("contact_visibility");
     $com = $co_q->f("contact_comment");
+    $cat1 = run_query_get_contactcategory1($id);
+    $cat2 = run_query_get_contactcategory2($id);
 
   // New form and first time
   } elseif ($action == "new") {
@@ -590,6 +635,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   if (isset($contact["email"])) { $email = stripslashes($contact["email"]); }
   if (isset($contact["mailok"])) { $mailok = ($contact["mailok"] == 1 ? "checked" : ""); }
   if (isset($contact["com"])) { $com = stripslashes($contact["com"]); }
+  if (isset($company["cat"])) { $compcat = $company["cat"]; }  
+  if (isset($contact["category1"])) { $cat1 = $contact["category1"]; }
+  if (isset($contact["category2"])) { $cat2 = $contact["category2"]; }  
   if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
@@ -637,6 +685,30 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $sel_kind_lang = "<select name=\"sel_lang\">";
   $sel_kind_label = "<select name=\"sel_label\">";
 
+
+  $i=0; 
+  // category 1 select
+  $sel_cat1 = "<select id=\"sel_cat1[]\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+  while($cat1_q->next_record()) {
+    $c1_id = $cat1_q->f("contactcategory1_id");
+    $sel_cat1 .= "\n<option value=\"$c1_id\"";
+    if ($c1_id == $cat1[$i]) { $sel_cat1 .= " selected=\"selected\""; $i++;}
+    $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
+  }
+  $sel_cat1 .= "</select>";
+  $i=0; 
+  // category 2 select
+  $sel_cat2 = "<select id=\"sel_cat2[]\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+  while ($cat2_q->next_record()) {
+    $c2_id = $cat2_q->f("contactcategory2_id");
+    $sel_cat2 .= "\n<option value=\"$c2_id\"";
+    if ($c2_id == $cat2[$i]) { $sel_cat2 .= " selected=\"selected\""; $i++; }
+    $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
+  }
+  $sel_cat2 .= "</select>";
+ 
+
+  
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
   onchange=\"fill_select_label(this)\">
@@ -777,6 +849,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
     </tr><tr>    
       <td class=\"detailLabel\">$l_function</td> 
       <td class=\"detailForm\">$sel_func</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category1</td>
+      <td class=\"detailForm\">$sel_cat1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category2</td>
+      <td class=\"detailForm\">$sel_cat2</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_title</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
@@ -1113,9 +1191,207 @@ function dis_admin_index() {
 
   $func_q = run_query_function();
   $kind_q = run_query_kind();
-  $block = html_contact_kind_form($kind_q);
-  $block .= "<p></p>";
+  $cat1_q = run_query_contactcategory1();
+  $cat2_q = run_query_contactcategory2();
+
+  $block = html_contact_cat1_form($cat1_q);
+  $block .= "<hr />";
+  $block .= html_contact_cat2_form($cat2_q);
+  $block .= "<hr />";  
+  $block .= html_contact_kind_form($kind_q);
+  $block .= "<hr />";
   $block .= html_contact_function_form($func_q);
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contact Category1 section                                             //
+// Parameters:
+//   - $cat1_q : Category1 list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_cat1_form($cat1_q) {
+  global $l_cat1_manage,$l_cat1_exist;
+  global $l_cat1_checkdelete,$l_cat1_update,$l_cat1_new,$l_cat1_insert;
+
+  $sel_cat1 = "<select name=\"sel_cat1\" onChange=\"
+    forms.form_cat1_update.tf_cat1.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
+  while ($cat1_q->next_record()) {
+    $id = $cat1_q->f("contactcategory1_id");
+    $label = $cat1_q->f("contactcategory1_label");
+    $sel_cat1 .= "\n<option value=\"$id\">$label</option>";
+  }
+  $sel_cat1 .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_cat1_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Category1 Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_cat1_delete\" method=\"post\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_cat1_exist</td>
+              <td class=\"adminLabel\">$sel_cat1</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"cat1_checklink\" />
+              <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_checkdelete\" onclick=\"if (check_cat1_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Category1 Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_cat1_update\" method=\"get\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_cat1\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"cat1_update\" />
+            <input type=\"text\" name=\"tf_cat1\" />
+            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_update\"
+              onclick=\"if (check_cat1_upd(this.form,document.form_cat1_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Category1 Section -->
+
+        <form name=\"form_cat1_new\" method=\"get\"
+          action=\"" . url_prepare("contact_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_cat1_new :
+            <input name=\"tf_cat1\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"cat1_insert\" />
+            <input type=\"submit\" name=\"sub_cat1\" value=\"$l_cat1_insert\"
+              onclick=\"if (check_cat1_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>
+";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contact Category1 section                                             //
+// Parameters:
+//   - $cat2_q : Category2 list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_cat2_form($cat2_q) {
+  global $l_cat2_manage,$l_cat2_exist;
+  global $l_cat2_checkdelete,$l_cat2_update,$l_cat2_new,$l_cat2_insert;
+
+  $sel_cat2 = "<select name=\"sel_cat2\" onChange=\"
+    forms.form_cat2_update.tf_cat2.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
+  while ($cat2_q->next_record()) {
+    $id = $cat2_q->f("contactcategory2_id");
+    $label = $cat2_q->f("contactcategory2_label");
+    $sel_cat2 .= "\n<option value=\"$id\">$label</option>";
+  }
+  $sel_cat2 .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_cat2_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Category2 Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_cat2_delete\" method=\"post\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_cat2_exist</td>
+              <td class=\"adminLabel\">$sel_cat2</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"cat2_checklink\" />
+              <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_checkdelete\" onclick=\"if (check_cat2_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Category2 Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_cat2_update\" method=\"get\"
+              action=\"" . url_prepare("contact_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_cat2\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"cat2_update\" />
+            <input type=\"text\" name=\"tf_cat2\" />
+            <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_update\"
+              onclick=\"if (check_cat2_upd(this.form,document.form_cat2_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Category2 Section -->
+
+        <form name=\"form_cat2_new\" method=\"get\"
+          action=\"" . url_prepare("contact_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_cat2_new :
+            <input name=\"tf_cat2\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"cat2_insert\" />
+            <input type=\"submit\" name=\"sub_cat2\" value=\"$l_cat2_insert\"
+              onclick=\"if (check_cat2_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>
+";
 
   return $block;
 }
@@ -1225,6 +1501,180 @@ function html_contact_function_form($func_q) {
 
   return $block;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: the cat1 links                                               //
+// Parameters:
+//   - $contact : contact hash info : keys used : cat1
+///////////////////////////////////////////////////////////////////////////////
+function dis_cat1_links($contact) {
+  global $l_cat1_link_contact, $l_cat1_link_contact_no;
+  global $l_cat1_delete, $l_cat1_can_delete, $l_cat1_cant_delete;
+  global $l_back,$display;
+
+  $id = $contact["category1"];
+  $label = get_cat1_label($id);
+  $obm_q = run_query_cat1_links($id);
+
+  $nb_cat = $obm_q->num_rows();
+  if ($nb_cat > 0) {
+    $display["msg"] .= display_warn_msg($l_cat1_cant_delete);
+    $dis_link = "
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat1_link_contact ($nb_cat)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_title");
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a  href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_cat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+    $dis_link .="
+    </table>
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+	  <form name=\"form_back\" method=\"get\"
+	    action=\"" .url_prepare("contact_index.php") . "\">
+	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
+	  <input type=\"submit\" value=\"$l_back\" />
+	  </form>
+	</p>
+      </div>";
+
+  } else {
+    $display["msg"] .= display_ok_msg($l_cat1_can_delete);
+
+    $dis_link = "
+    <table class=\"detail\">
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+        $label : $l_cat1_link_contact_no </td>
+    </tr>
+    </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">    
+      <form name=\"form_act_delete\"
+	method=post action=\"" . url_prepare("contact_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"cat1_delete\">
+      <input type=\"hidden\" name=\"sel_cat1\" value=\"$id\">
+      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat1_delete\">
+      </form>
+      
+      <form name=\"form_back\" method=\"get\"
+	action=\"" .url_prepare("contact_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"admin\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </div>";
+
+  }
+
+  return $dis_link;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: the cat2 links                                               //
+// Parameters:
+//   - $contact : contact hash info : keys used : cat2
+///////////////////////////////////////////////////////////////////////////////
+function dis_cat2_links($contact) {
+  global $l_cat2_link_contact, $l_cat2_link_contact_no;
+  global $l_cat2_delete, $l_cat2_can_delete, $l_cat2_cant_delete;
+  global $l_back,$display;
+
+  $id = $contact["category2"];
+  $label = get_cat2_label($id);
+  $obm_q = run_query_cat2_links($id);
+
+  $nb_cat = $obm_q->num_rows();
+  if ($nb_cat > 0) {
+    $display["msg"] .= display_warn_msg($l_cat2_cant_delete);
+    $dis_link = "
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat2_link_contact ($nb_cat)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_title");
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a  href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_cat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+    $dis_link .="
+    </table>
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">
+	  <form name=\"form_back\" method=\"get\"
+	    action=\"" .url_prepare("contact_index.php") . "\">
+	  <input type=\"hidden\" name=\"action\" value=\"admin\" />
+	  <input type=\"submit\" value=\"$l_back\" />
+	  </form>
+	</p>
+      </div>";
+
+  } else {
+    $display["msg"] .= display_ok_msg($l_cat2_can_delete);
+
+    $dis_link = "
+    <table class=\"detail\">
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">
+        $label : $l_cat2_link_contact_no </td>
+    </tr>
+    </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">    
+      <form name=\"form_act_delete\"
+	method=post action=\"" . url_prepare("contact_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"cat2_delete\">
+      <input type=\"hidden\" name=\"sel_cat2\" value=\"$id\">
+      <input type=\"submit\" name=\"sub_act\" value=\"$l_cat2_delete\">
+      </form>
+      
+      <form name=\"form_back\" method=\"get\"
+	action=\"" .url_prepare("contact_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"admin\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </div>";
+
+  }
+
+  return $dis_link;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////

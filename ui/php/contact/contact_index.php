@@ -123,7 +123,9 @@ if ($action == "index" || $action == "") {
     }
     if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
       $display["detailInfo"] = display_record_info($con_q);
-      $display["detail"] = html_contact_consult($con_q);
+      $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
+      $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
+      $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
     } else {
       // this contact's page has "private" access
       $display["msg"] .= display_err_msg($l_error_visibility);
@@ -225,7 +227,81 @@ if ($action == "index" || $action == "") {
   require("contact_js.inc");
   $display["detail"] = dis_admin_index();
 
-} elseif ($action == "function_insert")  {
+} elseif ($action == "cat1_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat1_insert($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat1_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat1_update($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat1_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_cat1_links($contact);
+
+} elseif ($action == "cat1_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat1_delete($contact["category1"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat1_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat1_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat2_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat2_insert($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat2_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat2_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat2_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat2_update($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat2_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat2_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "cat2_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_cat2_links($contact);
+
+} elseif ($action == "cat2_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_cat2_delete($contact["category2"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_cat2_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_cat2_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+}elseif ($action == "function_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_function_insert($contact);
   if ($retour) {
@@ -365,6 +441,7 @@ function get_param_contact() {
   global $company_name, $company_new_name, $company_new_id;
   global $tf_func, $tf_label, $tf_lang, $tf_header;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
+  global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
@@ -385,6 +462,10 @@ function get_param_contact() {
     }
     $contact["doc_nb"] = $nb_d;
   }
+  if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
+  if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;
+  if (isset ($tf_cat1)) $contact["cat1_label"] = $tf_cat1;
+  if (isset ($tf_cat2)) $contact["cat2_label"] = $tf_cat2;
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
   if (isset ($sel_dsrc)) $contact["datasource"] = $sel_dsrc;
@@ -584,6 +665,62 @@ function get_contact_action() {
 // Kind Delete
   $actions["CONTACT"]["kind_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_delete",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Category Insert
+  $actions["DOCUMENT"]["cat1_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat1_insert",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Category Update
+  $actions["CONTACT"]["cat1_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat1_update",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Category Check Link
+  $actions["CONTACT"]["cat1_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat1_checklink",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Category Delete
+  $actions["CONTACT"]["cat1_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat1_delete",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Category Insert
+  $actions["CONTACT"]["cat2_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat2_insert",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Category Update
+  $actions["CONTACT"]["cat2_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat2_update",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Category Check Link
+  $actions["CONTACT"]["cat2_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat2_checklink",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Category Delete
+  $actions["CONTACT"]["cat2_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=cat2_delete",
     'Right'    => $contact_admin_write,
     'Condition'=> array ('None') 
                                      	       );

@@ -24,3 +24,48 @@ UPDATE CalendarEvent SET calendarevent_endrepeat = CONCAT(calendarevent_endrepea
 ALTER table CalendarEvent change column calendarevent_endrepeat calendarevent_endrepeat timestamp(14);
 ALTER table CalendarEvent change column calendarevent_length calendarevent_endrepeat INT(14);
 
+--
+-- Table structure for table 'ContactCategory1'
+--
+CREATE TABLE ContactCategory1 (
+  contactcategory1_id          int(8) NOT NULL auto_increment,
+  contactcategory1_timeupdate  timestamp(14),
+  contactcategory1_timecreate  timestamp(14),
+  contactcategory1_userupdate  int(8) default NULL,
+  contactcategory1_usercreate  int(8) default NULL,
+  contactcategory1_label       varchar(255) default NULL,
+  PRIMARY KEY (contactcategory1_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory2'
+--
+CREATE TABLE ContactCategory2 (
+  contactcategory2_id          int(8) NOT NULL auto_increment,
+  contactcategory2_timeupdate  timestamp(14) NOT NULL,
+  contactcategory2_timecreate  timestamp(14) NOT NULL,
+  contactcategory2_userupdate  int(8) default NULL,
+  contactcategory2_usercreate  int(8) default NULL,
+  contactcategory2_label       varchar(255) default NULL,
+  PRIMARY KEY (contactcategory2_id)
+);
+
+--
+-- Table structure for table 'ContactCategory1Link'
+--
+CREATE TABLE ContactCategory1Link (
+  contactcategory1link_category_id  int(8) NOT NULL default '0',
+  contactcategory1link_company_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_company_id)
+);
+
+--
+-- Table structure for table 'ContactCategory2Link'
+--
+CREATE TABLE ContactCategory2Link (
+  contactcategory2link_category_id  int(8) NOT NULL default '0',
+  contactcategory2link_company_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_company_id)
+);
+

@@ -9,6 +9,16 @@
 
 // Database fields
 $l_company = "Société";
+$l_cat1_manage = "Gestion des catégories 1";
+$l_cat1_exist = "Categories 1 existantes";
+$l_cat1_new = "Nouvelle categorie 1";
+$l_cat1_delete =  "Supprimer";
+$l_cat2_manage = "Gestion des catégories 2";
+$l_cat2_exist = "Categories 2 existantes";
+$l_cat2_new = "Nouvelle categorie 2";
+$l_cat2_delete =  "Supprimer";
+$l_category1 = "Categorie 1";
+$l_category2 = "Categorie 2";
 $l_lastname = "Nom";
 $l_firstname = "Prénom";
 $l_kind = "Genre";
@@ -47,6 +57,38 @@ $l_header = "En-tête";
 $l_contact = "Contact";
 
 // Actions
+$l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 
+$l_cat1_update = "Mettre à jour la catégorie 1"; 
+$l_cat1_insert = "Insérer une catégorie 1"; 
+$l_cat1_delete_ok = "La suppression de la categorie 1 a été correctement effectuée.";
+$l_cat1_delete_error = "La suppression de la categorie 1 a échoué !";
+$l_cat1_insert_ok = "L'insertion de la categorie 1 a été correctement effectuée.";
+$l_cat1_insert_error = "L'insertion de la categorie 1 a échoué !";
+$l_cat1_update_ok = "La modification de la categorie 1 a été correctement effectuée";
+$l_cat1_update_error = "La modification de la categorie 1 a &eacute;chou&eacute;e !";
+$l_cat1_link_document = "La catégorie 1 est référencée par ces documents";
+$l_cat1_link_document_no = "La catégorie 1 n'est référencée dans aucun documents";
+$l_cat1_can_delete = " La catégorie 1 peut être supprimée"; 
+$l_cat1_cant_delete = " La catégorie 1 ne peut pas etre supprimée";
+$l_cat2_link_document = "La catégorie 2 est référencée par ces documents";
+$l_cat2_link_document_no = "La catégorie 2 n'est référencée dans aucun documents";
+$l_cat2_can_delete = " La catégorie 2 peut etre supprimée"; 
+$l_cat2_cant_delete = " La catégorie 2 ne peut pas etre supprimée";
+$l_cat2_checkdelete = "Vérifier ou supprimer catégorie 2"; 
+$l_cat2_update = "Mettre à jour la catégorie 2"; 
+$l_cat2_insert = "Insérer une catégorie 2";
+$l_cat2_delete_ok = "La suppression de la categorie 2 a été correctement effectuée.";
+$l_cat2_delete_error = "La suppression de la categorie 2  a échoué !";
+$l_cat2_insert_ok = "L'insertion de la categorie 2 a été correctement effectuée.";
+$l_cat2_insert_error = "L'insertion de la categorie 2 a échoué !";
+$l_cat2_update_ok = "La modification de la categorie 2 a été correctement effectuée";
+$l_cat2_update_error = "La modification de la categorie 2 a &eacute;chou&eacute;e !";
+$l_j_cat1_create = "Vous devez renseigner le label de la categorie 1";
+$l_j_cat2_create = "Vous devez renseigner le label de la categorie 2";
+$l_j_cat1_update = "Vous devez renseigner le label de la categorie 1";
+$l_j_cat2_update = "Vous devez renseigner le label de la categorie 2";
+$l_j_cat1_delete = "Vous devez sélectionner une categorie 1";
+$l_j_cat2_delete = "Vous devez sélectionner une categorie 2";
 $l_insert = "Enregistrer le Contact";
 $l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";

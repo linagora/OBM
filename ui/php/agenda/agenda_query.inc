@@ -869,11 +869,11 @@ function run_query_insert_event_data($agenda) {
   $obm_db->query($query);
   $obm_db->next_record(); 
   $max_id = $obm_db->f("max_id")+1;
-  $query = "INSERT INTO CalendarEvent (calendarevent_id,calendarevent_timecreate,  calendarevent_userupdate, 
+  $query = "INSERT INTO CalendarEvent (calendarevent_id,calendarevent_timecreate,  
                          calendarevent_usercreate, calendarevent_title, calendarevent_description,
 			 calendarevent_category_id,calendarevent_priority,calendarevent_privacy, calendarevent_length,
 			 calendarevent_repeatkind,calendarevent_repeatdays,calendarevent_endrepeat)
-	         VALUES ($max_id,null,'".time()."',".$auth->auth["uid"].",'$title',
+	         VALUES ($max_id,'".time()."',".$auth->auth["uid"].",'$title',
 		         '$description',$category_id,$priority,$privacy,$length,
 			 '$repeat_kind','$repeat_days','".date("Y-m-d H:i",$repeat_end)."')";
 

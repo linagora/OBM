@@ -278,6 +278,15 @@ CREATE TABLE Contact (
 );
 
 
+---
+-- Table structure for table 'ContactCategory2Link'
+--
+CREATE TABLE ContactCategory2Link (
+  contactcategory2link_category_id  int(8) NOT NULL default '0',
+  contactcategory2link_company_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory2link_category_id,contact2categorylink_company_id)
+);
+
 --
 -- Table structure for table 'Kind'
 --
@@ -317,7 +326,6 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp(14),
   contactcategory1_userupdate  int(8) default '0',
   contactcategory1_usercreate  int(8) default '0',
-  contactcategory1_order       int(4) default '0',
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
@@ -342,7 +350,6 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_timecreate  timestamp(14),
   contactcategory2_userupdate  int(8) default '0',
   contactcategory2_usercreate  int(8) default '0',
-  contactcategory2_order       int(4) default '',
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );
@@ -504,7 +511,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_category_id  int(8) default NULL,
   calendarevent_priority     int(2) default NULL,
   calendarevent_privacy      int(2) default NULL,
-  calendarevent_length       int(14) NOT NULL default '',
+  calendarevent_length       int(4) NOT NULL default '',
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
   calendarevent_endrepeat    timestamp(14) NOT NULL '0',

@@ -147,11 +147,12 @@ function generate_menu($menu, $section) {
 " . $display["section"] ."
 <!-- Fin Onglets -->
 <!-- Menu -->
-<div>
+<div style=\"clear:both\" border=\"1\" bgcolor=green>
 " . $display["menu"] ."
 </div>
 <!-- Fin Menu -->
 </div>
+<p style=\"clear:both\">
 
 <!-- Fin Bandeau -->
 
