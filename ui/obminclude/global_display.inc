@@ -536,7 +536,7 @@ class OBM_DISPLAY {
 	  else {
 	    $couleur = $col_frs;
 	  }
-	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
+	  $name = "$amount";
 	}
 
 	//------------------------------
@@ -611,7 +611,7 @@ class OBM_DISPLAY {
 	  } else {
 	    $couleur = $col_frs;
 	  }
-	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
+	  $name = "$amount";
 	}
         else if ($fieldname == "invoice_date") {
 	  $name = $this->data_set->f("date");
@@ -806,9 +806,9 @@ class OBM_DISPLAY {
 
     $nb_page = floor(($nb_list-1) / $set_rows);
     $first_row = $page * $set_rows;
-    echo "<p class=\"messageInfo\">";
     // skip if display possible on a single page if nb_page==0
     if ($nb_page > 0) {
+    echo "<p class=\"messageInfo\">";
       // Table of content (pages)
       $i=0;
       while ($i <= ($nb_page)) {

@@ -168,7 +168,7 @@ if (($action == "index") || ($action == "")) {
       display_error_visibility();  
     } 	
   }
-
+  echo $www;
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_deal > 0) {
@@ -189,9 +189,9 @@ if (($action == "index") || ($action == "")) {
       if($deal["add_contract"]) {
         $param_deal = run_query_deal_id($deal);
 	echo "
-        <SCRIPT LANGUAGE=\"javascript\">
+        <script type=\"text/javascript\">
          window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_insert_ok)."'
-        </SCRIPT>
+        </script>
         ";
       }
     } else {
@@ -200,11 +200,11 @@ if (($action == "index") || ($action == "")) {
     dis_deal_index($deal);
   } else {
     require("deal_js.inc");
-    display_warn_msg($err_msg);
+    display_err_msg($err_msg);
     $usr_q = run_query_userobm();
     html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
   }
-
+  echo $www;
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
@@ -214,9 +214,9 @@ if (($action == "index") || ($action == "")) {
       if($deal["add_contract"]) {
         $param_deal = run_query_deal_id($deal);
 	echo "
-        <SCRIPT LANGUAGE=\"javascript\">
+        <script type=\"text/javascript\">
          window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_update_ok)."'
-        </SCRIPT>
+        </script>
         ";
       }
     } else {
@@ -244,7 +244,7 @@ if (($action == "index") || ($action == "")) {
       run_query_update_archive($param_deal,$param_parent);
     }
   }
-
+  echo $www;
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($param_deal);
@@ -254,6 +254,7 @@ if (($action == "index") || ($action == "")) {
     display_err_msg($l_delete_error);
   }
   dis_deal_index();
+  echo $www;
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -261,6 +262,7 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
+  echo $www;
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -269,6 +271,7 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
+  echo $www;
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,6 +280,7 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
+  echo $www;
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////

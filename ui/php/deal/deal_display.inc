@@ -349,7 +349,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
-  global $l_invoices_connected,$l_no_invoices_connected;
+  global $l_invoices_connected,$l_no_invoices_connected, $l_header_company;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $perms_user,$l_perms_user, $perms_admin,$l_contract_list;
@@ -387,10 +387,28 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
                  <td>$lvis</td>";
   }
 
+    // contact 1
+    while($con_q->next_record()) {
+      if ($con_q->f("contact_id") == $con1)
+        $dis_con1 .=  $con_q->f("contact_lastname") . " " .
+                      $con_q->f("contact_firstname") . " - " . $con_q->f("contact_phone");
+    }
+
+    // contact 2
+    if ($con_q->nf()>0) {  
+      $con_q->seek(0);
+    }
+
+    while($con_q->next_record()) {
+      if ($con_q->f("contact_id") == $con2) 
+        $dis_con2 .= $con_q->f("contact_lastname")."
+                     ". $con_q->f("contact_firstname") .  " - " . $con_q->f("contact_phone");
+    }
+
 
   $nb_invoices = $q_invoices->num_rows ();
-  echo "<center>
-    <table border=0 width=100%><tr><td valign=top width=130>";
+
+/*
 //////////////////
 //LIENS EXTERNES//
 //////////////////
@@ -420,17 +438,35 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     echo "<br><br><font color=\"#$col_link\">".
       $nb_arch_invoices." ".$l_archived_invoices_connected.
       "</font>";
-  }else { /* echo "et merde..."; */ }
+  }else { /* echo "et merde..."; */ //}
 //////////////////////
 //FIN LIENS EXTERNES//
 //////////////////////
 
-  echo "</td><td>
-    <table class=\"\"details\">
-     <tr><td>
+  echo "
       <table class=\"details\">
         <tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
+          <td colspan=\"2\" class=\"detailHead\">$l_header_company</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$comp&nbsp;&nbsp;          
+          <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+          <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
+          </td>
+          <td class=\"detailText\">$ad1<br/>$zip $town</td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_contacts 1&nbsp;&nbsp;
+          <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
+          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
+          <td class=\"detailText\">$dis_con1&nbsp;&nbsp;
+          </td>
+        </tr><tr>
+          <td class=\"detailLabel\">$l_contacts 2&nbsp;&nbsp;
+          <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
+          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
+          <td class=\"detailText\">$dis_con2
+          </td>
+        </tr><tr>
+          <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
         </tr><tr>
           <td class=\"detailLabel\">$l_label</td>
           <td class=\"detailText\">$label</td>
@@ -483,68 +519,14 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 	  <td colspan=\"2\" class=\"detailText\">$com</td>
         </tr>
         </table>
-
-        
-<!-- company and contacts panel -->
-      </td><td valign=top>
-        <table bgcolor=\"#$col_label\">
-        <tr>
-          <td bgcolor=\"#$col_table\" colspan=2>
-          <font color=\"#$col_textem\">$comp</font>&nbsp;&nbsp;&nbsp;&nbsp;
-          <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\"><img align=middle src=\"/images/$set_theme/$ico_company\"></a>
-          <br>$ad1
-          <br>$zip $town</td>
-        </tr><tr>
-          <td valign=center colspan=2>$l_contacts</td>
-        </tr><tr>";
-
-    // contact 1
-    while($con_q->next_record()) {
-      if ($con_q->f("contact_id") == $con1)
-        echo "<td>".$con_q->f("contact_lastname") . " " .
-        $con_q->f("contact_firstname") . " - " . $con_q->f("contact_phone") .
-        "</td>";
-    }
-    echo "<td><a href=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\"><img align=middle
-        src=\"/images/$set_theme/$ico_contact\"></a></td>
-        </tr><tr>";
-
-    // contact 2
-    if ($con_q->nf()>0) {  
-      $con_q->seek(0);
-    }
-
-    while($con_q->next_record()) {
-      if ($con_q->f("contact_id") == $con2) 
-        echo "<td>".$con_q->f("contact_lastname")." ". $con_q->f("contact_firstname") .  " - " . $con_q->f("contact_phone")."</td>";
-    }
-    echo "<td><a href=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\"><img align=middle
-          src=\"/images/$set_theme/$ico_contact\"></a></td>
-        </tr>
-        </table>";
-
-  echo "&nbsp;</td>
-        </tr>
-        </table>
-      </td>
-      </tr>
-      </table>
-    </td>
-    </tr>
-    </table>
-  </center>";
+      ";
 
   // we display invoices list
-  echo "<br><br><br>";
   if ($nb_invoices == 0) {
-    display_ok_msg ($l_no_invoices_connected);
+    display_info_msg ($l_no_invoices_connected);
   } else {
-    display_ok_msg ($nb_invoices." ".$l_invoices_connected);
+    display_info_msg ($nb_invoices." ".$l_invoices_connected);
 
-    echo "</CENTER>";
-    echo "<br><br>";
     
     $url = $sess->url("deal_index.php?".
 		      "action=detailconsult".
@@ -560,17 +542,19 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     $dis_invoice_list->data_url = $url;
 
     $dis_invoice_list->display();
-    echo "<br>";
     // and a button to allow displaying archived invoices :
     $url = $sess->url ("deal_index.php?action=detailconsult".
 		       "&amp;param_deal=".$id.
 		       "&amp;incl_arch=1");
     echo "
-      <center>
        <form method=\"post\" action=\"$url\">
-	<input type=\"submit\" value=\"$l_see_archived_invoices\">
+        <table class=\"details\">
+	 <tr><td class=\"detailHead\">
+	  <input type=\"submit\" value=\"$l_see_archived_invoices\" />
+         </td></tr>
+        </table>
        </form>
-      </center>";
+    ";
   }
 }
 
@@ -868,7 +852,14 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td class=\"detailLabel\">$l_state</td>
         <td>$sel_state</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_todo</td>
+        <td class Lundi
+Oct 21Mardi
+Oct 22Mercredi
+Oct 23Jeudi
+Oct 24Vendredi
+Oct 25Samedi
+Oct 26Dimanche
+Oct 27 08:00        09:00        10:00        11:00        12:00        13:00        14:00        15:00        16:00        17:00        18:00        19:00   =\"detailLabel\">$l_todo</td>
         <td><input type=\"text\" name=\"tf_todo\" size=\"60\" maxlength=\"128\" value=\"$todo\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_archive</td>
@@ -977,295 +968,278 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $sess;
 
   // Kind Select construction
-  $sel_kind = "<SELECT NAME=sel_kind SIZE=4>";
+  $sel_kind = "<select name=\"sel_kind\" size=\"4\">";
    while ($kind_q->next_record()) {
      $id = $kind_q->f("dealtype_id");
      $inout = $kind_q->f("dealtype_inout");
      $label = $kind_q->f("dealtype_label");
-     $sel_kind .= "<OPTION value=\"$id\">$inout $label</OPTION>\n";
+     $sel_kind .= "<option value=\"$id\">$inout $label</option>\n";
   }
-  $sel_kind .= "</SELECT>";
+  $sel_kind .= "</select>";
 
-  // Status Select construction
-  $sel_sta = "<SELECT NAME=sel_state SIZE=4>";
+  // status select construction
+  $sel_sta = "<select name=\"sel_state\" size=\"4\">";
    while ($status_q->next_record()) {
      $id = $status_q->f("dealstatus_id");
      $order = $status_q->f("dealstatus_order");
      $label = $status_q->f("dealstatus_label");
-     $sel_sta .= "<OPTION value=\"$id\">$order-$label</OPTION>\n";
+     $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
   }
-  $sel_sta .= "</SELECT>";
+  $sel_sta .= "</select>";
 
-  // Category Select construction
-  $sel_cat = "<SELECT NAME=sel_cat SIZE=4 >";
+  // category select construction
+  $sel_cat = "<select name=\"sel_cat\" size=\"4\" >";
    while ($cat_q->next_record()) {
      $id = $cat_q->f("tasktype_id");
      $mlabel = $cat_q->f("tasktype_label");
-     $sel_cat .= "<OPTION value=\"$id\">$mlabel</OPTION>\n";
+     $sel_cat .= "<option value=\"$id\">$mlabel</option>\n";
   }
-  $sel_cat .= "</SELECT>";
+  $sel_cat .= "</select>";
 
-  echo "<CENTER>
-    <FORM name=form_kind_delete
-      METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-    <TABLE WIDTH=90% border=1 bgcolor=\"#$col_a_table\">
-    <TR>
-      <TD colspan=5 BGCOLOR=\"#$col_a_tableh\">
-        <I><FONT COLOR=\"#$col_textem\">$l_kind_manage
-        </FONT></I></TD>
-    </TR>
-    <TR>
-      <TD>
+  echo "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_kind_manage</td>
+    </tr>
+    <tr>
+      <td>
 
-<!-- Kind Delete Section -->
+<!-- kind delete section -->
+       <table>
+        <tr>
+          <td class=\"adminLabel\">$l_kind_exist</td>
+          <td class=\"adminLabel\">$sel_kind</td>
+          <td>
+    <form name=\"form_kind_delete\"
+      method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+            <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
+              onclick=\"if (check_kind_checkdel(this.form)) return true;
+              else return false;\" />
+    </form>
+          </td>
+        </tr>
 
-      <TABLE border=0>
-      <TR>
-        <TD>$l_kind_exist</TD>
-        <TD>$sel_kind</TD>
-        <TD><INPUT TYPE=hidden name=action value=kind_checklink>
-        <INPUT TYPE=submit name=sub_type value=\"$l_kind_checkdelete\"
-          onClick=\"if (check_kind_checkdel(this.form)) return true; else return false;\">
-        </TD>
-      </TR>
-      </FORM>
+<!-- kind update section -->
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+    <form name=\"form_kind_update\"
+      method=\"get\" action=\"" . $sess->url("deal_index.php") . "\">
+       <table>
+         <tr>
+          <td>
+            <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
+            <input type=\"text\" name=\"tf_kind_upd\" />
+          </td>
+           <td rowspan=\"2\">
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
+              onclick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\" />
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus
+            <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
+          </td>
+        </tr>   
+       </table>
+     </form>
+      </td>
+      </tr>
+     </table>
 
-<!-- Kind Update Section -->
-
-      <FORM name=form_kind_update
-        METHOD=post action=\"" . $sess->url("deal_index.php") ."\">
-      <TR>
-        <TD colspan=2 align=center>
-          <INPUT TYPE=hidden name=sel_kind value=\"\">
-          <INPUT TYPE=hidden name=action value=kind_update>
-          <TABLE border=0>
-          <TR>
-            <TD><INPUT TYPE=text name=tf_kind></TD>
-          </TR><TR>
-            <TD align=center>
-              <INPUT type=radio name=rd_kind_inout value=- checked>$l_minus
-              <INPUT type=radio name=rd_kind_inout value=+>$l_plus
-            </TD>
-          </TR>
-          </TABLE>
-        </TD>
-        <TD>
-          <INPUT TYPE=submit name=sub_type value=\"$l_kind_update\"
-            onClick=\"if (check_kind_upd(this.form, document.form_kind_delete)) return true; else return false;\">
-        </TD>
-        <TD valign=center>
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-      <TD>
-      </FORM>
+<!-- new kind section -->
+      </td>
+      <td>
 
 <!-- New Kind Section -->
+    <form name=\"form_kind_new\"
+      method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_new\" /></td>
+        <td>
+          <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus<br />
+          <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
+        </td>
+      </tr><tr>
+        <td class=\"adminLabel\">
+          <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
+            onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
+        </td>
+      </tr>
+      </table>
+    </form>
+      </td>
+    </tr>
+    </table>
 
-      <FORM name=form_kind_new
-        METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-      <TABLE border=0>
-      <TR>
-        <TD align=right>$l_kind_new : <INPUT type=text name=tf_kind>
-        </TD>
-        <TD valign=center>
-          <INPUT type=radio name=rd_kind_inout value=- checked>$l_minus<br>
-          <INPUT type=radio name=rd_kind_inout value=+>$l_plus
-        </TD>
-      </TR>
-      <TR>
-        <TD align=center>
-          <INPUT TYPE=hidden name=action value=kind_insert>
-          <INPUT type=submit name=sub_type value=\"$l_kind_insert\"
-            onClick=\"if (check_kind_new(this.form)) return true; " .
-            "else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM>
-    </CENTER>
 
-<!-- --------------- STATUS SECTION --------------- -->
+<!-- status section -->
 
-    <br>
-    <CENTER>
-    <FORM name=form_status_delete
-      METHOD=post action=\"" . $sess->url("deal_index.php")."\">
-    <TABLE WIDTH=90% border=1 bgcolor=\"#$col_a_table\">
-    <TR>
-      <TD colspan=5 BGCOLOR=\"#$col_a_tableh\">
-        <I><FONT COLOR=\"#$col_textem\">$l_status_manage</FONT></I></TD>
-    </TR>
-    <TR>
-      <TD>
+    <hr />
 
-<!-- Status Delete Section -->
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_status_manage</td>
+    </tr>
+    <tr>
+      <td>
 
-      <TABLE border=0>
-      <TR>
-        <TD>$l_status_exist</TD>
-        <TD>$sel_sta</TD>
-        <TD><INPUT TYPE=hidden name=action value=status_checklink>
-          <INPUT TYPE=submit name=sub_status value=\"$l_status_checkdelete\"
-          onClick=\"if (check_status_checkdel(this.form)) return true; else return false;\">
-        </TD>
-      </TR>
-      </FORM>
+<!-- status delete section -->
 
-<!-- Status Update Section -->
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_status_exist</td>
+        <td class=\"adminLabel\">$sel_sta</td>
+        <td>
+          <form name=\"form_status_delete\"
+          method=\"post\" action=\"" . $sess->url("deal_index.php")."\">
+          <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
+          <input type=\"submit\" name=\"sub_status\" value=\"$l_status_checkdelete\"
+          onclick=\"if (check_status_checkdel(this.form)) return true; else return false;\" />
+         </form>
+        </td>
+      </tr>
 
-      <FORM name=form_status_update
-        METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-      <TR>
-        <TD colspan=2 align=center>
-          <INPUT TYPE=hidden name=sel_state value=\"\">
-          <INPUT TYPE=hidden name=action value=status_update>
-          <TABLE border=0>
-          <TR>
-            <TD align=right>$l_label : </TD>
-            <TD align=left><INPUT TYPE=text name=tf_status></TD>
-          </TR>
-            <TD align=right>$l_order : </TD>
-            <TD align=left>
-	      <INPUT TYPE=text name=tf_order size=3 maxlength=2>
-	    </TD>
-          </TR>
-          </TABLE>
-        </TD>
-        <TD>
-          <INPUT TYPE=submit name=sub_status value=\"$l_status_update\"
-            onClick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-      <TD>
-      </FORM>
+<!-- status update section -->
 
-<!-- New Status Section -->
+      <tr>
+        <td colspan=\"2\">
+      <form name=\"form_status_update\"
+        method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+          <input type=\"hidden\" name=\"sel_state\" value=\"\" />
+          <input type=\"hidden\" name=\"action\" value=\"status_update\" />
+          <table>
+          <tr>
+            <td class=\"adminLabel\">$l_label : </td>
+            <td><input type=\"text\" name=\"tf_status\" /></td>
+            <td rowspan=\"2\">
+              <input type=\"submit\" name=\"sub_status\" value=\"$l_status_update\"
+              onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
+            </td>
+          </tr>
+          <tr>
+            <td class=\"adminLabel\">$l_order : </td>
+            <td>
+	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	    </td>
+          </tr>
+          </table>
+      </form>
+        </td>
+      </tr>
+      </table>
+      </td>
+      <td>
 
-      <FORM name=form_status_new
-        METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-      <TABLE>
-      <TR>
-        <TD align=right>
-	<TABLE border=0>
-        <TR>
-          <TD align=center>$l_status_new : </TD>
-          <TD align=left><INPUT type=text name=tf_status></TD>
-        </TR>
-        <TR>
-          <TD align=right>$l_order : </TD>
-          <TD align=left>
-            <INPUT type=text name=tf_order size=3 maxlength=2>
-	  </TD>
-        </TR>
-        </TABLE>
-	</TD>
-      </TR>
-      <TR>
-        <TD align=center>
-          <INPUT TYPE=hidden name=action value=status_insert>
-          <INPUT type=submit name=sub_status value=\"$l_status_insert\"
-            onClick=\"if (check_status_new(this.form)) return true; " .
-            "else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM>
-    </CENTER>
+<!-- new status section -->
 
-<!-- --------------- CATEGORY SECTION --------------- -->
+      <form name=\"form_status_new\"
+        method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_status_new : </td>
+          <td><input type=\"text\" name=\"tf_status\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_order : </td>
+          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+          <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
+          <input type=\"submit\" name=\"sub_status\" value=\"$l_status_insert\"
+            onclick=\"if (check_status_new(this.form)) return true; " .
+            "else return false;\" />
+        </td>
+      </tr>
+     </table>
+    </form>
+    </td>
+    </tr>
+    </table>
 
-    <br>
-    <CENTER>
-    <FORM name=form_category_delete
-      METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-    <TABLE WIDTH=90% border=1 bgcolor=\"#$col_a_table\">
-    <TR>
-      <TD colspan=5 BGCOLOR=\"#$col_a_tableh\">
-        <I><FONT COLOR=\"#$col_textem\">$l_category_manage</FONT></I></TD>
-    </TR>
-    <TR>
-      <TD>
+<!--  category section  -->
 
-<!-- Category Delete Section -->
+    <hr />
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_category_manage</td>
+    </tr>
+    <tr>
+      <td>
 
-      <TABLE border=0>
-      <TR>
-        <TD>$l_category_exist</TD>
-        <TD>$sel_cat</TD>
-        <TD><INPUT TYPE=hidden name=action value=cat_checklink>
-          <INPUT TYPE=submit name=sub_cat value=\"$l_cat_checkdelete\"
-          onClick=\"if (check_cat_checkdel(this.form)) return true; else return false;\">
-        </TD>
-      </TR>
-      </FORM>
+<!-- category delete section -->
 
-<!-- Category Update Section -->
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_category_exist</td>
+        <td class=\"adminLabel\">$sel_cat</td>
+        <td>
+         <form name=\"form_category_delete\"
+          method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+          <input type=\"hidden\" name=\"action\" value=\"cat_checklink\" />
+          <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" 
+          onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />
+         </form>
+        </td>
+      </tr>
 
-      <FORM name=form_category_update
-        METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-      <TR>
-        <TD colspan=2 align=center>
-          <INPUT TYPE=hidden name=sel_cat value=\"\">
-          <INPUT TYPE=hidden name=action value=cat_update>
-	  <TABLE border=0>
-          <TR>
-            <TD align=right>$l_category_label : </TD>
-            <TD align=left>
-              <INPUT TYPE=text name=tf_cat>
-            </TD>
-          </TR>
-          </TABLE>
-        </TD>
-        <TD><INPUT TYPE=submit name=sub_category value=\"$l_cat_update\"
-          onClick=\"if (check_category_upd(this.form, document.form_category_delete)) return true; else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-      <TD>
-      </FORM>
+<!-- category update section -->
 
-<!-- New Category Section -->
+      <tr>
+        <td colspan=\"3\">
+          <form name=\"form_category_update\"
+          method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+          <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
+          <input type=\"hidden\" name=\"action\" value=\"cat_update\" />
+	  <table>
+          <tr>
+            <td class=\"adminLabel\">$l_category_label : </td>
+            <td>
+              <input type=\"text\" name=\"tf_cat\" />
+            </td>
+           <td>
+           <input type=\"submit\" name=\"sub_category\" value=\"$l_cat_update\"
+           onclick=\"if (check_category_upd(this.form, document.form_category_delete)) return true; else return false;\" />
+           </td>
+          </tr>
+         </table>
+         </form>
+        </td>
+       </tr>
+      </table>      
+      </td>
+      <td colspan=\"2\">
 
-      <FORM name=form_category_new
-        METHOD=post action=\"" . $sess->url("deal_index.php") . "\">
-      <TABLE>
-      <TR>
-        <TD align=right>
-        <TABLE border=0>
-        <TR>
-          <TD align=center>$l_category_new : </TD>
-          <TD align=left>
-	    <INPUT type=text name=tf_cat>
-          </TD>
-        </TR>
-        </TABLE>
-	</TD>
-      </TR>
-      <TR>
-        <TD align=center>
-          <INPUT TYPE=hidden name=action value=cat_insert>
-          <INPUT type=submit name=sub_category value=\"$l_cat_insert\"
-            onClick=\"if (check_category_new(this.form)) return true; " .
-            "else return false;\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM>
-    </CENTER>";
+<!-- new category section -->
+
+      <form name=\"form_category_new\"
+        method=\"post\" action=\"" . $sess->url("deal_index.php") . "\">
+      <table>
+        <tr>
+          <td class=\"adminLabel\">$l_category_new : </td>
+          <td>
+	    <input type=\"text\" name=\"tf_cat\" />
+          </td>
+        </tr>
+      <tr>
+        <td colspan=\"2\" class=\"adminLabel\">
+          <input type=\"hidden\" name=\"action\" value=\"cat_insert\" />
+          <input type=\"submit\" name=\"sub_category\" value=\"$l_cat_insert\"
+            onclick=\"if (check_category_new(this.form)) return true; " .
+            "else return false;\" />
+        </td>
+      </tr>
+     </table>
+    </form>
+     </td>
+      </tr>
+      </table>
+";
 }
 
 
@@ -1406,19 +1380,20 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
   $dis_pref->display_entity = "deal";
   $dis_pref->pref_title = $l_deal_display;
 
-  echo "<center>
-    <table><tr><td valign=top>";
+  echo "
+    <table class=\"details\"><tr><td>";
   $dis_pref->display();
-  echo "</td>";
+  echo "
+    </td>";
 
   $dis_pref->display_pref = $pref_parent_q;
   $dis_pref->display_module = "deal";
   $dis_pref->display_entity = "parentdeal";
   $dis_pref->pref_title = $l_parentdeal_display;
 
-  echo "<td valign=top>";
+  echo "<td>";
   $dis_pref->display();
-  echo "</td><td valign=\"top\">";
+  echo "</td><td>";
   $dis_pref->display_pref = $pref_invoice;
   $dis_pref->display_entity = "invoice";
   $dis_pref->pref_title = $l_invoice_display;
@@ -1427,7 +1402,6 @@ function dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice) {
   
   echo "</td></tr></table>";
   $dis_pref->dis_pref_help();
-  echo "</center>";
 
 }
 

@@ -985,25 +985,25 @@ function dis_kind_links($label) {
   $del_form = dis_kind_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
-    echo "$l_kind_link_company $label";
+    $dis_link = "<p>$l_kind_link_company $label";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      echo "<BR><A HREF=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</A>\n";
+      $dis_link .="<br /><a href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>\n";
     }
-    echo "<P>$label : $l_kind_cant_delete";
+    $dis_link .= "$label : $l_kind_cant_delete </p>";
   } else {
-    echo "$l_kind_link_company_no '$label' : $l_kind_can_delete
+    $dis_link = "$l_kind_link_company_no '$label' : $l_kind_can_delete
       <table>
       <tr>
         <td>
         $del_form
         </td>
         <td>
-        <form name=form_back method=get
+        <form name=\"form_back\" method=\"get\"
         action=\"" .$sess->url("company_index.php") . "\">
-        <input type=hidden name=action value=admin>
-        <input type=submit value=\"$l_back\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\">
         </form>
         </td>
       </tr>
