@@ -71,7 +71,7 @@ class OBM_User_Sql extends CT_Sql {
     $module_name = substr(strrchr($HTTP_SERVER_VARS['SCRIPT_NAME'],"/"),1);
     $module_name = substr($module_name,0,strlen($module_name)-10);
   //  $module_name = substr(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),0,strpos(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),"_"));
-    $now = date("YmdHis", time());
+    $now = date("Y-m-d H:i:s", time());
     $uquery = sprintf("update %s
                set activeuserobm_userobm_id='%d',
                  activeuserobm_timeupdate='%s', 

@@ -127,3 +127,22 @@ ALTER table Kind add column kind_lang char(2) after kind_label;
 
 -- Change column : contact_label to contact_header
 ALTER table Kind change column kind_label kind_header varchar(64);
+
+
+-------------------------------------------------------------------------------
+-- Update structure for table 'ActiveUserObm'
+-------------------------------------------------------------------------------
+-- Change column : activeuserobm_timeupdate to timestamp
+ALTER table ActiveUserObm change column activeuserobm_timeupdate activeuserobm_timeupdate timestamp(14);
+
+-- Change column : activeuserobm_timecreate to timestamp
+ALTER table ActiveUserObm change column activeuserobm_timecreate activeuserobm_timecreate timestamp(14);
+
+-------------------------------------------------------------------------------
+-- Update structure for table 'UserObm_SessionLog'
+-------------------------------------------------------------------------------
+-- Change column : userobm_sessionlog_timeupdate to timestamp
+ALTER table UserObm_SessionLog change column userobm_sessionlog_timeupdate userobm_sessionlog_timeupdate timestamp(14);
+
+-- Change column : userobm_sessionlog_timecreate to timestamp
+ALTER table UserObm_SessionLog change column userobm_sessionlog_timecreate userobm_sessionlog_timecreate timestamp(14);

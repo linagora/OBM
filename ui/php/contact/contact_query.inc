@@ -560,6 +560,7 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
   $query = "select distinct contact_id, contact_company_id, contact_lastname, contact_firstname, company_name 
       from Contact, Company
       where contact_company_id=company_id
+        $where_id
         and ((contact_lastname='$lname' and contact_firstname='$fname')
           or (contact_company_id='$comp_id' and contact_lastname='$lname'))";
 
@@ -582,13 +583,16 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_context($cid, $contact) {
 
-  $comp_id = $contact["company_id"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
+  $comp_new_id = $contact["comp_new_id"];
+  $comp_id = $contact["company_id"];
+  $comp = ($comp_new_id != "") ? $comp_new_id : $comp_id;
 
+  echo "comp=$comp, fi=$comp_id, ne=$comp_new_id";
   // return contacts with same lastname and firstname or
   // within the same company with same lname
-  $co_q = run_query_check_contact($cid, $comp_id, $lname, $fname);
+  $co_q = run_query_check_contact($cid, $comp, $lname, $fname);
 
   return $co_q;
 }

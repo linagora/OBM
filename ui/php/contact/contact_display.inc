@@ -801,10 +801,12 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
-  $cid = ($contact["comp_new_id"] ? $contact["comp_new_id"] : $contact["company_id"]);
+  $comp_id = ($contact["comp_new_id"] ? $contact["comp_new_id"] : $contact["company_id"]);
   $kind = $contact["kind"];
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
+  $dsrc = $contact["datasource"];
+  $mark = $contact["marketing_manager"];
   $ad1 = stripslashes($contact["ad1"]);
   $ad2 = stripslashes($contact["ad2"]);
   $ad3 = stripslashes($contact["ad3"]);
@@ -854,8 +856,10 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$cid\" />
+    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
     <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
@@ -882,8 +886,10 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$cid\" />
+    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
     <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
     <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />

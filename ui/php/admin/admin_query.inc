@@ -21,13 +21,15 @@
 function run_query_count_passive_sess($delay) {
   global $cdg_sql;
 
-  $time_pass = date("YmdHis",time() - $delay);
-  $query = "select count(*) as Num from ActiveUserObm Where ActiveUserObm.activeuserobm_timeupdate <= '$time_pass'";
+  $time_pass = date("Y-m-d H:i:s",time() - $delay);
+  $query = "select count(*) as num
+    from ActiveUserObm
+    where ActiveUserObm.activeuserobm_timeupdate <= '$time_pass'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  return $obm_q->f("Num");
+  return $obm_q->f("num");
 }
 
 
@@ -39,14 +41,14 @@ function run_query_count_passive_sess($delay) {
 function get_usersession_number() {
   global $cdg_sql;
 
-  $query = "select count(*) from ActiveUserObm";
+  $query = "select count(*) as num from ActiveUserObm";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
 
-  return $obm_q->f("count(*)");
+  return $obm_q->f("num");
 }
 
 
@@ -62,20 +64,25 @@ function run_query_active_user($delay) {
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
   if ($delay > 0)
-    $date_limit = date("YmdHis",time() - $delay);
+    $date_limit = date("Y-m-d H:i:s",time() - $delay);
   else
     $date_limit = 0;
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type, "activeuserobm_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "activeuserobm_timecreate", "timecreate");
+
   $query = "select UserObm.userobm_login,
-       UserObm.userobm_timelastaccess,
-       ActiveUserObm.*,
-       UNIX_TIMESTAMP(activeuserobm_timecreate) as timecreate,
-       UNIX_TIMESTAMP(activeuserobm_timeupdate) as timeupdate
+      UserObm.userobm_timelastaccess,
+      ActiveUserObm.*,
+      $timecreate,
+      $timeupdate
     from UserObm, ActiveUserObm
     where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
       and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
   display_debug_msg($query,$cdg_sql);
-  $obm_q = new DB_OBM;
   $obm_q->query($query);
   return $obm_q;
 }
@@ -91,7 +98,7 @@ function run_query_active_user($delay) {
 function run_query_passive_user($delay) {
   global $cdg_sql;
 
-  $date_limit = date("YmdHis",time() - $delay);
+  $date_limit = date("Y-m-d H:i:s",time() - $delay);
   $query = "select UserObm.userobm_login,
                    ActiveUserObm.*
             from UserObm, ActiveUserObm

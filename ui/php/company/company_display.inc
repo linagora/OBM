@@ -901,7 +901,9 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $archive = ($company["archive"] == 1 ? "1" : "0");
   $name = $company["name"];
   $kind = $company["kind"];
+  $dsrc = $company["datasource"];
   $act = $company["activity"];
+  $mark = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $ad3 = $company["ad3"];
@@ -942,7 +944,9 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
@@ -966,7 +970,9 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
     <input type=\"hidden\" name=\"sel_act\" value=\"$act\" />
+    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
     <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />

@@ -168,7 +168,7 @@ function dis_clear_sess($mode, $lifetime) {
   global $cdg_sql;
 
   if ($lifetime > 0) {
-    $date_limit = date("YmdHis",time() - $lifetime);
+    $date_limit = date("Y-m-d H:i:s",time() - $lifetime);
     $obm_q = run_query_passive_user($lifetime);
 
     while($obm_q->next_record()) {

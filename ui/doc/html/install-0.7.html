@@ -1,13 +1,13 @@
 <html>
 <head>
-<title>Basic steps to build and install OBM 0.7.0</title>
+<title>Basic steps to build and install OBM 0.7.x</title>
 </head>
 <!-- $Id$ -->
 <body bgcolor="#FFFFFF">
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2, 0.7.3, 0.7.4
+<p />These docs are valid for OBM 0.7.0, 0.7.1, 0.7.2, 0.7.3, 0.7.4, 0.7.5
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -19,7 +19,7 @@ We suppose apache, php and a database server (mysql) are correctly installed and
 <br>
 For pre-packaged distributions, check in your distribution docs.
 <br>
-In Debian, install php4, php4-cgi, php4-mysql, apache, apache-common
+In Debian, install php4, php4-cgi, php4-mysql or php4-pgsql, apache, apache-common
 
 <p />
 We suppose that as an example the obm root is /var/www/obm
@@ -58,8 +58,8 @@ chown -R apache:apache *  (on Redhat)
 
 <h2>2: PHP (module and command line configuration)</h2>
 
-Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).
-So the command line PHP must be configured : file php.ini for php-cgi (on Debian : /etc/php4/cgi/php.ini); /etc/php.ini on RedHat.
+PHP apache module config file : on Debian : /etc/php/apache/php.ini, on RedHat /etc/php.ini.
+<br />Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).) (on Debian : /etc/php4/cgi/php.ini)
 <p />
 The include_path directive must be set :
 
@@ -105,6 +105,19 @@ safe_mode = On
   </td>
 </tr>
 </table>
+
+<h3>2.1: Check that php support mysql or postgresql</h3>
+Depending on your database engine, one of these lines must be present in your php.ini :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+extension=mysql.so
+extension=pgsql.so
+</pre>
+  </td>
+</tr>
+</table>
+
 
 
 <h2>3: Apache and PHP configuration</h2>
@@ -267,9 +280,9 @@ require("obminclude/phplib/db_mysql.inc");       ## Mysql
   <td><pre>
 // var $type     = "PGSQL";   # for PostgreSQL
 var $type     = "MYSQL";   # for MySQL
-# user and password (web, web as example)
-var $User     = "web";
-var $Password = "web";
+# user and password (obm / obm as example)
+var $User     = "obm";
+var $Password = "obm";
 </pre>
   </td>
 </tr>
@@ -287,8 +300,8 @@ You can update some global preferences in this file too (eg: gp_mail_enabled)
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
-$obmdb_user = "web";
-$obmdb_password = "web";
+$obmdb_user = "obm";
+$obmdb_password = "obm";
 
 // is Mail enabled ? (agenda)
 $gp_mail_enabled = false;
@@ -299,20 +312,33 @@ $gp_mail_enabled = false;
 
 
 
-<h3>4.2: Database Configuration</h3>
+<h3>4.2: Database Configuration and Creation</h3>
 The scripts are in the scripts/0.7 directory.
 
 <h4>4.2.1: MySQL</h4>
-The script <i>install_obmdb_0.7.sh</i> handle all the database creation steps.
-<p />
-<b>Requisite :</b> you must know (or create) a valid mysql login/password
+
+Requisite :</b> you must know (or create) a valid mysql login/password
 
 <p />
-mysql user creation example (user web / web)
+mysql user creation example (user obm / obm)
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE ON obm.* TO web@localhost IDENTIFIED BY 'web';
+GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE, LOCK TABLES, INDEX ON obm.* TO obm@localhost IDENTIFIED BY 'obm';
+(or simpler GRANT ALL ON obm.* TO obm@localhost IDENTIFIED BY 'obm';)
+</pre>
+  </td>
+</tr>
+</table>
+<p />
+
+The script <i>install_obmdb_0.7.sh</i> handle all the database creation steps.
+Run the creation script
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd obm/scripts/0.7
+./install_obmdb_0.7.sh
 </pre>
   </td>
 </tr>
@@ -321,17 +347,28 @@ GRANT CREATE, DROP, SELECT, UPDATE, INSERT, DELETE ON obm.* TO web@localhost IDE
 
 <h4>4.2.2: PostgreSQL</h4>
 
-Scripts for postgres are not yet available but will come soon (we hope to have them for 0.7.5).
+Postgres support is back since 0.7.5.
 
+Create the obm user and create the obm database :
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+create user obm password 'obm';
+create database obm with owner = obm;
+</pre>
+  </td>
+</tr>
+</table>
+<p />
 
-<h3>4.3: - Database Creation</h4>
+The script <i>install_obmdb_0.7.pgsql.sh</i> handle all the database creation steps.
 
 Run the creation script
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
 cd obm/scripts/0.7
-./install_obmdb_0.7.sh
+./install_obmdb_0.7_pgsql.sh
 </pre>
   </td>
 </tr>
@@ -504,6 +541,35 @@ mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
 <tr>
   <td><pre>
 mysql -u web -pweb obm < scripts/0.7/update-0.7.3-0.7.4.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+
+
+<p/>
+<a name="upgrade-0.7.5"><h1>UPGRADE OBM DATABASE 0.7.4 to 0.7.5</h1></a>
+<p />
+# Database has evolved from 0.7.4 to 0.7.5
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/update-0.7.4-0.7.5.mysql.sql
 </pre>
   </td>
 </tr>
