@@ -93,8 +93,9 @@ display_bookmarks();
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q_type = run_query_companytype();
-  html_company_search_form($obm_q_type, $company);
+  $type_q = run_query_companytype();
+  $usr_q = run_query_userobm();
+  html_company_search_form($type_q, $usr_q, $company);
   if ($set_display == "yes") {
     dis_company_search_list($company);
   } else {
@@ -103,16 +104,18 @@ if ($action == "index") {
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q_type = run_query_companytype();
-  html_company_search_form($obm_q_type, $company);
+  $type_q = run_query_companytype();
+  $usr_q = run_query_userobm();
+  html_company_search_form($type_q, $usr_q, $company);
   dis_company_search_list($company);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
-    $obm_q_type = run_query_companytype();
+    $type_q = run_query_companytype();
+    $usr_q = run_query_userobm();
     require("company_js.inc");
-    html_company_form($action,"",$obm_q_type,$company);
+    html_company_form($action,"",$type_q, $usr_q, $company);
   } 
   else {
     display_error_permission();
@@ -135,10 +138,11 @@ if ($action == "index") {
   if ($param_company > 0) {
     $comp_q = run_query_detail($param_company);
     if ($comp_q->num_rows() == 1) {
-      $obm_q_type = run_query_companytype();
+      $type_q = run_query_companytype();
+      $usr_q = run_query_userobm();
       require("company_js.inc");
       display_record_info($comp_q->f("company_usercreate"),$comp_q->f("company_userupdate"),$comp_q->f("timecreate"),$comp_q->f("timeupdate"));
-      html_company_form($action, $comp_q, $obm_q_type, $company);
+      html_company_form($action, $comp_q, $type_q, $usr_q, $company);
     } else {
       display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -156,8 +160,9 @@ if ($action == "index") {
       } else {
         display_err_msg($l_insert_error);
       }
-      $obm_q_type = run_query_companytype();
-      html_company_search_form($obm_q_type, $company);
+      $type_q = run_query_companytype();
+      $usr_q = run_query_userobm();
+      html_company_search_form($type_q, $usr_q, $company);
 
     // If it is the first try, we warn the user if some companies seem similar
     } else {
@@ -171,16 +176,18 @@ if ($action == "index") {
         } else {
           display_err_msg($l_insert_error);
         }
-        $obm_q_type = run_query_companytype();
-        html_company_search_form($obm_q_type, $company);
+        $type_q = run_query_companytype();
+        $usr_q = run_query_userobm();
+        html_company_search_form($type_q, $usr_q, $company);
       }
     }
 
   // Form data are not valid
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $obm_q_type = run_query_companytype();
-    html_company_form($action, "", $obm_q_type, $company);
+    $type_q = run_query_companytype();
+    $usr_q = run_query_userobm();
+    html_company_form($action, "", $type_q, $usr_q, $company);
   }
 
 } elseif ($action == "update")  {
@@ -198,8 +205,9 @@ if ($action == "index") {
     html_company_consult($obm_q_soc, $obm_q_type);
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $obm_q_type = run_query_companytype();
-    html_company_form($action, "", $obm_q_type, $company);
+    $type_q = run_query_companytype();
+    $usr_q = run_query_userobm();
+    html_company_form($action, "", $type_q, $usr_q, $company);
   }
 
 } elseif ($action == "check_delete")  {
@@ -216,8 +224,9 @@ if ($action == "index") {
     display_err_msg($l_delete_error);
   }
 
-  $obm_q_type = run_query_companytype();
-  html_company_search_form($obm_q_type, $company);
+  $type_q = run_query_companytype();
+  $usr_q = run_query_userobm();
+  html_company_search_form($type_q, $usr_q, $company);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -307,7 +316,7 @@ if ($action == "index") {
 function get_param_company() {
   global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
-  global $sel_mailing, $ta_com, $param_company;
+  global $sel_market, $ta_com, $param_company;
   global $cdg_param;
 
   if (isset ($param_company)) $company["id"] = $param_company;
@@ -315,6 +324,7 @@ function get_param_company() {
   if (isset ($cb_state)) $company["state"] = $cb_state;
   if (isset ($tf_name)) $company["name"] = $tf_name;
   if (isset ($sel_kind)) $company["kind"] = $sel_kind;
+  if (isset ($sel_market)) $company["marketing_manager"] = $sel_market;
   if (isset ($tf_ad1)) $company["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $company["ad2"] = $tf_ad2;
   if (isset ($tf_zip)) $company["zip"] = $tf_zip;
@@ -325,7 +335,6 @@ function get_param_company() {
   if (isset ($tf_fax)) $company["fax"] = $tf_fax;
   if (isset ($tf_web)) $company["web"] = $tf_web;
   if (isset ($tf_email)) $company["email"] = $tf_email;
-  if (isset ($sel_mailing)) $company["mailing"] = $sel_mailing;
   if (isset ($ta_com)) $company["com"] = $ta_com;
 
   if (debug_level_isset($cdg_param)) {

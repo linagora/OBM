@@ -23,6 +23,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $name = $company["name"];
   $phone = $company["phone"];
   $kind = $company["kind"];
+  $market = $company["marketing_manager"];
   $zip = $company["zip"];
 
   $req = "select Company.*, company_id as Id, companytype_label
@@ -30,16 +31,19 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
           where company_type_id=companytype_id";
 
   if ($name != "") {
-     $req .= " and company_name like '" . $name . "%'";
+     $req .= " and company_name like '$name%'";
   }
   if (($kind != $c_all) && ($kind != "")) { 
-     $req .= " and company_type_id='" . $kind ."'";
+     $req .= " and company_type_id='$kind'";
+  }
+  if (($market != $c_all) && ($market != "")) { 
+     $req .= " and company_marketingmanager_id='$market'";
   }
   if ($phone != "") {
      $req .= " and company_phone like '$phone%'";
   }
   if ($zip != "") {
-     $req .= " and company_zipcode like '" . $zip. "%'";
+     $req .= " and company_zipcode like '$zip%'";
   }
   if ($state == 1) {
      $req .= " and company_state=1";
@@ -73,7 +77,7 @@ function run_query_detail($p_id) {
 
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
-    $query = "select *,DATE_FORMAT(company_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(company_timecreate,'$l_date_format') as timecreate from Company where company_id=".$p_id;
+    $query = "select *,DATE_FORMAT(company_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(company_timecreate,'$l_date_format') as timecreate from Company where company_id='$p_id'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select *,company_timeupdate as timeupdate, company_timecreate as timecreate from Company where company_id=".$p_id;
   }
@@ -100,6 +104,7 @@ function run_query_insert($company) {
   $state = ($company["state"] == 1 ? 1 : 0);
   $name = $company["name"];
   $kind = $company["kind"];
+  $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $zip = $company["zip"];
@@ -120,6 +125,7 @@ function run_query_insert($company) {
     company_state,
     company_name,
     company_type_id,
+    company_marketingmanager_id,
     company_address1,
     company_address2,
     company_zipcode,
@@ -139,6 +145,7 @@ function run_query_insert($company) {
     '$state',
     '$name',
     '$kind',
+    '$market',
     '$ad1',
     '$ad2',
     '$zip',
@@ -174,6 +181,7 @@ function run_query_update($cid, $company) {
   $state = ($company["state"] == 1 ? 1 : 0);
   $name = $company["name"];
   $kind = $company["kind"];
+  $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
   $zip = $company["zip"];
@@ -193,6 +201,7 @@ function run_query_update($cid, $company) {
     company_state='$state',
     company_name='$name',
     company_type_id='$kind',
+    company_marketingmanager_id='$market',
     company_address1='$ad1',
     company_address2='$ad2',
     company_zipcode='$zip',
@@ -337,6 +346,23 @@ function run_query_companytype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Userobm query execution                                                   //
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm() {
+  global $cdg_sql;
+
+  $query = "select * from UserObm order by userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Kind insertion query construction and execution                           //
 // Parameters:
 //   - $label : Kind label
@@ -443,6 +469,28 @@ function get_kind_id($label) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("companytype_id");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the name (lastname firstname) of the userobm from his Id              //
+// Parameters:
+//   - $id : userobm Id
+///////////////////////////////////////////////////////////////////////////////
+function get_userobm_name($id) {
+  global $cdg_sql;
+
+  $query = "select userobm_lastname, userobm_firstname
+            from UserObm
+            where userobm_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("userobm_lastname") ." ". $obm_q->f("userobm_firstname");
   return $retour;
 }
 

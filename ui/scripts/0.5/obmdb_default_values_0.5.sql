@@ -16,6 +16,7 @@ DELETE FROM GlobalPref;
 
 -- Session lifetime
 INSERT INTO GlobalPref VALUES ('lifetime', '14400');
+INSERT INTO GlobalPref VALUES ('session_cookie', '1');
 
 
 -------------------------------------------------------------------------------

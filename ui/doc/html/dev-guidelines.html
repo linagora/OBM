@@ -9,7 +9,7 @@
 <CENTER>
 <H1>OBM Development Guidelines</H1>
 <I>Coding standards now mandatory to harmonize the OBM code</I><BR>
-Version 0.5.3 - 2002-08-08<BR>
+Version 0.5.3 - 2002-08-12<BR>
 Pierre Baudracco
 </CENTER>
 <P>
@@ -23,7 +23,7 @@ This document describes what is now <b>mandatory</b> coding rules for OBM code.
 
 
 <h2>OBM Files</h2>
-<h3>File Size</h3>
+<h3>File Size and global presentation</h3>
 
 OBM is a web application and so is deployed on Internet/Intranet servers.
 These servers are often accessed from distant computers (via telnet, ssh,...)
@@ -56,6 +56,29 @@ Each truncated line should be so with this constraint in mind.
 <p>
 
 Of course some lines should not be truncated (function definitions, ...)
+
+<p>
+HTML should always be writen in lower caps letters (yes there is a big update
+here to do !)
+<br>
+HTML output should always be separated from process logic and should only contain simple vars. 
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  $sel_market = ...
+---------------------------------
+  echo "
+      < td>< font size=-2>$l_market< /font>< br>
+        $sel_market
+      < td>&nbsp;&nbsp;< /td>
+      < td align=center>< font size=-2>$l_internal< /font>< br>
+        < input type=\"checkbox\" name=\"cb_state\" value=\"1\" $cstate>< /td>
+</pre>
+</td></tr>
+</table>
+<p>
+
 
 <h3>File Header</h3>
 

@@ -19,6 +19,8 @@ CREATE TABLE GlobalPref (
 -- Dumping data for table `GlobalPref`
 --
 INSERT INTO GlobalPref VALUES ('lifetime', '14400');
+INSERT INTO GlobalPref VALUES ('session_cookie', '1');
+
 
 -------------------------------------------------------------------------------
 -- UserObm Update
@@ -31,6 +33,13 @@ ALTER table UserObm add column userobm_archive char(1) not null default '0' afte
 -- add lastname and firstname columns
 ALTER table UserObm add column userobm_lastname varchar(32) after userobm_archive;
 ALTER table UserObm add column userobm_firstname varchar(32) after userobm_lastname;
+
+
+-------------------------------------------------------------------------------
+-- Company Update
+-- add company_userobm_manager
+ALTER table Company add column company_marketingmanager_id int(8) after company_type_id;
+
 
 -------------------------------------------------------------------------------
 -- Get rid of old deprecated tables

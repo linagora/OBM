@@ -25,6 +25,7 @@ $l_user_pref = "Préférences des utilisateurs";
 $l_global_pref = "Préférences globales";
 $l_lifetime = "Durée d'une session utilisateur (en secondes)"; 
 $l_session_lifetime = "Durée de vie d'une session utilisateur (temps d'inactivité au dela duquel l'utilisateur sera déconnecté) en secondes"; 
+$l_session_cookie = "Cookie de session (cookie expire quand le client ferme son navigateur). Cela permet d'éviter les problèmes dus à la différence d'heure entre le serveur et le client. Recommandé.";
 
 // Titles
 $l_admin = "Admin";

@@ -56,7 +56,7 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_pref_index($mode, $actions);
+    dis_pref_index($mode);
     break;
   case "user_pref_update":
     dis_user_pref_update($mode);
@@ -68,10 +68,10 @@ switch ($action) {
         echo "$l_update_ok<p>\n";
       else
         echo "$l_update_error<p>\n";
-      dis_pref_index($mode, $pref);
+      dis_pref_index($mode);
     } else {
       echo "$l_invalid_data : ($err_msg)<p>\n";
-      dis_pref_index($mode, $pref);
+      dis_pref_index($mode);
     }
     break;
   default:
@@ -124,10 +124,11 @@ Usage: $argv[0] [Options]
 where Options:
 -h, --help help screen
 -a action  ($lactions)
--lifetime lifetime, -lf lifetime : session lifetime (seconds)
+-l lifetime, --lifetime lifetime : session lifetime (seconds)
+-s session_cookie, --session-cookie session_cookie : session_cookie (1=true |0)
 
 Ex: php4 admin_pref_index.php -a user_pref_update
-Ex: php4 admin_pref_index.php -a global_pref_update -lf 3600
+Ex: php4 admin_pref_index.php -a global_pref_update -l 3600 -s 1
 ";
 }
 
@@ -137,7 +138,7 @@ Ex: php4 admin_pref_index.php -a global_pref_update -lf 3600
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
   global $debug, $actions;
-  global $action, $tf_lifetime;
+  global $action, $tf_lifetime, $cb_session_cookie;
 
   // We skip the program name [0]
   next($argv);
@@ -159,10 +160,15 @@ function parse_arg($argv) {
 	return false;
       }
       break;
-    case '-lf' || 'lifetime':
+    case '-l' || '--lifetime':
       list($nb2, $val2) = each ($argv);
       $tf_lifetime = $val2;
       if ($debug > 0) { echo "-a -> \$tf_lifetime=$val2\n"; }
+      break;
+    case '-s' || '--session-cookie':
+      list($nb2, $val2) = each ($argv);
+      $cb_session_cookie = $val2;
+      if ($debug > 0) { echo "-a -> \$cb_session_cookie=$val2\n"; }
       break;
     }
   }
@@ -176,10 +182,11 @@ function parse_arg($argv) {
 // returns : $pref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_pref() {
-  global $tf_lifetime;
+  global $tf_lifetime, $cb_session_cookie;
   global $cdg_param;
 
   if (isset ($tf_lifetime)) $pref["lifetime"] = $tf_lifetime;
+  if (isset ($cb_session_cookie)) $pref["session_cookie"] = 1;
 
   if (debug_level_isset($cdg_param)) {
     if ( $pref ) {

@@ -392,7 +392,7 @@ function run_query_dealstatus() {
 function run_query_company_info($id) {
   global $cdg_sql;
 
-  $query = "select company_name, company_address1, company_zipcode, company_town from Company where company_id='$id'";
+  $query = "select company_name, company_marketingmanager_id, company_address1, company_zipcode, company_town from Company where company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

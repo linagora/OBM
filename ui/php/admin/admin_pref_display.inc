@@ -27,18 +27,19 @@ function dis_help($mode) {
 // Parameters:
 //   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
-function dis_pref_index($mode, $actions) {
+function dis_pref_index($mode) {
 
   // We get lifetime from the database and not from the session variable
   // in case it has been updated since (session value last during the session)
   $lifetime = get_global_pref_lifetime();
+  $session_cookie = get_global_pref_session_cookie();
 
   switch ($mode) {
   case "txt":
     echo "try -h to help\n";
     break;
   case "html":
-    html_pref_index($lifetime);
+    html_pref_index($lifetime, $session_cookie);
     break;
   default:
     echo "Invalid Mode ! (txt | html)";
@@ -50,13 +51,19 @@ function dis_pref_index($mode, $actions) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the HTML index screen for the pref admin module
 // Parameters:
-//   - $plifetime : $lifetime value (taken from database)
+//   - $plifetime       : $lifetime value (taken from database)
+//   - $psession_cookie : flag to do session_cookie : 1 or true = yes
 ///////////////////////////////////////////////////////////////////////////////
-function html_pref_index($plifetime) {
+function html_pref_index($plifetime, $psession_cookie) {
   global $sess;
   global $l_validate, $l_execute, $l_help, $l_user_pref, $l_global_pref;
-  global $l_session_lifetime;
+  global $l_session_lifetime, $l_session_cookie;
   global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
+
+  if ($psession_cookie)
+    $sc = "checked";
+  else
+    $sc = "";
 
   echo "
     <a href=\"" . $sess->url("admin_pref_index.php?action=help&amp;mode=html"). "\">$l_help</a>
@@ -89,6 +96,10 @@ function html_pref_index($plifetime) {
     <tr>
       <td>$l_session_lifetime</td>
       <td align=center><input name=tf_lifetime size=6 maxlength=6 value=\"$plifetime\"></td>
+    </tr>
+    <tr>
+      <td>$l_session_cookie</td>
+      <td align=center><input type=checkbox name=cb_session_cookie value=1 \"$sc\"></td>
     </tr>
     <tr>
       <td align=center colspan=2>

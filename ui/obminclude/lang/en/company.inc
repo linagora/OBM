@@ -12,6 +12,7 @@ $l_number = "Number";
 $l_name = "Name";
 $l_company_name = "Company Name";
 $l_kind = "Kind";
+$l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
 $l_address = "Address";
 $l_postcode = "Zip Code";

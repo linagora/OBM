@@ -57,9 +57,6 @@ echo "<html>
 ///////////////////////////////////////////////////////////////////////////////
 echo "<BODY TEXT=\"#$col_text\" BACKGROUND=\"/images/$set_theme/$img_bg\" BGCOLOR=\"#$col_bg\" LINK=\"#$col_link\" VLINK=\"#$col_link\" marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
 
-echo "lifetime auth=".$auth->lifetime."<br>
-".$auth->auth["exp"]. "<br>". time();
-
 generate_menu("");
 display_bookmarks(".");
 

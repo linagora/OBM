@@ -590,7 +590,3 @@ function dis_debug_param($deal) {
 }
 
 </SCRIPT>
-
-
-
-

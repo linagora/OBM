@@ -652,6 +652,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
       $ad1 = $comp_q->f("company_address1");
       $zip = $comp_q->f("company_zipcode");
       $town = $comp_q->f("company_town");
+      $market = $comp_q->f("company_marketingmanager_id");
     } else {
       $comp = stripslashes($deal["company_name"]);
       $ad1 = $deal["company_ad1"];
@@ -684,7 +685,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
   }
   $sel_cat .= "</SELECT>";
  
-
   // Marketing manager select construction
   $sel_market = "<SELECT name=sel_market>
     <OPTION value=\"0\">$l_sel_none</OPTION>";

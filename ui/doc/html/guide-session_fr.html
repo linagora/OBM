@@ -55,7 +55,7 @@ non présent dans le web
   <td>Cookie et fichier de session
       <ul>
         <li>Cookie : mécanisme de bas niveau représentant l'échange entre le client et le serveur d'une clé (ou cookie) afin de reconnaître (associer à une précédente connexion) le client. La durée de vie d'un cookie (temps maximal entre 2 connexions ?) est paramétrable.
-Dans OBM la durée donnée au cookie est définie par la préférence global <b>$lifetime</b>
+        <br>Dans OBM la durée donnée au cookie est définie par la préférence globale <b>$lifetime</b> (sauf si l'option <b>$session_cookie</b> "cookie de session" est activée; dans ce cas le cookie expirera à la fermeture du client web).
         <li>Fichier de session : zone de stockage gérée directement et de façon transparente par PHP pour stocker les données des sessions web. (Il est possible de définir un autre conteneur comme une base de données à la place du fichier)
       </ul>
      <br> <b>Note</b>: l'utilisation de sess->url() permet de passer le Session Id (sid) par l'url et donc théoriquement de faire fonctionner OBM sans les cookies activés</td>
@@ -77,9 +77,8 @@ Dans OBM la durée donnée au cookie est définie par la préférence global <b>$life
 <h2>Les sessions utilisateur : </h2>
 Les limites des sessions Web pour une application sont :
 <ul>
-<li> Non connaissance de l'utilisateur loggué à l'application
-<li> Possibilité de se connecter simultanément un nombre illimité de fois avec le même login.
-<li> Difficulté de consulter les données des sessions (lister les utilisateurs connectés,...). Il faudrait en effet ouvrir et récupérer chaque session.
+<li> leur structure est définie directement par le serveur d'application (PHP ici) et dépend du conteneur utilisé (fichier, base de données). Le chargement et déchargement des sessions est géré automatiquement par PHP. L'API ne permet que de travailler sur la session en cours. Il n'y a pas de méthodes externes d'accès aux sessions par l'application.
+<li> D'ou l'impossibilité d'obtenir des informations sur les sessions en cours. Ex: qui est connecté ? L'utilisateur qui se loggue n'est-il pas déjà connecté ? Lister les utilisateurs connectés avec la date de connexion...
 </ul>
 
 Les limites des anciennes sessions utilisées par OBM (via table Active Session)
@@ -87,6 +86,7 @@ Les limites des anciennes sessions utilisées par OBM (via table Active Session)
 <li> Non utilisation du format de session web natif (PHP)
 <li> Imposait le stockage dans une table (et non le choix table ou fichier)
 <li> Et donc lourdeur et pénalités au niveau performance.
+<li> Avait les mêmes contraintes que les sessions web natives.
 </ul>
 
 Afin de remédier à ces contraintes, un nouveau niveau de session (session
@@ -114,7 +114,8 @@ La destruction d'une session utilisateur n'a aucune influence sur sa session web
 <h2>Fonctionnement des sessions au travers du suivi de l'utilisation d'OBM</h2>
 
 Une session OBM est donc une session web + une session utilisateur.
-Si une des deux sessions est coupée, la session OBM tombe et l'utilisateur doitse reconnecter.
+Si une des deux sessions est coupée, la session OBM tombe et l'utilisateur doit
+se reconnecter.
 
 
 <H3>Scénario de déroulement de session OBM</h3>
@@ -142,7 +143,7 @@ positionnée à Auth->lifetime (seule utilisation) car la valeur globale
 $lifetime n'est pas encore chargée (page_open() avant session_load_global_prefs() car celui-ci se sert de $sess défini dans page_open()).
 Ceci dans Auth->start()
       <li> Les préférences globales sont chargées et mises en session (session_load_global_prefs()). A partir d'ici (pour toutes les autres pages) la durée de session est définie par le paramètre global $lifetime.
-Une date d'expiration (time() + $lifetime) est donnée au cookie.
+      <br>Une date d'expiration (time() + $lifetime) est donnée au cookie sauf si le paramètre global <b>$session_cookie</b> est vrai (1 ou true).
       <li> Les préférences de l'utilisateur sont chargées et mises en session (session_load_user_prefs()).
       <li> <b>La session OBM est ouverte</b>.
     </ul>
@@ -154,10 +155,10 @@ Une date d'expiration (time() + $lifetime) est donnée au cookie.
     La fonction page_open() est appelée (la session est chargée).
     <ul>
       <li> Si l'authentification n'a pas expiré, la date d'expiration est repoussée à (time() + $lifetime) dans Auth->start().
-      <li> La date d'expiration du cookie est repoussée à (time() + $lifetime).
+      <li> Si le paramètre global <b>$session_cookie</b> n'est pas mis (0 ou false) la date d'expiration du cookie est repoussée à (time() + $lifetime). Sinon le cookie n'expire qu'avec la fermeture du navigateur.
     </ul>
     <p>
-    Remarque: il existe la possibilité de faire revalider le login au bout d'uncertain temps (auth->auth["refresh"]). Cela n'est pas mis en oeuvre pour le moment (utilité pour applications avec attribution et désattribution fréquente de comptes).
+    Remarque: il existe la possibilité de faire revalider le login au bout d'un certain temps (auth->auth["refresh"]). Cela n'est pas mis en oeuvre pour le moment (utilité pour applications avec attribution et désattribution fréquente de comptes).
   </td>
 </tr><tr>
   <td> Logout d'OBM</td>
@@ -166,7 +167,7 @@ Une date d'expiration (time() + $lifetime) est donnée au cookie.
     <ul>
       <li>La session utilisateur est supprimée (ActiveUserObm) et logguée dans UserObm_SessionLog (run_query_logout()).
       <li>L'authentification (auth) est invalidée et supprimée de la session web.
-      <li>La session web est vidée (unregister() sur lesvariables).
+      <li>La session web est vidée (unregister() sur les variables).
       <li>La page de logout est affichée.
     </ul>
   </td>
@@ -178,7 +179,7 @@ Une date d'expiration (time() + $lifetime) est donnée au cookie.
       <li>Expiration du cookie dans le navigateur web du client.
 A la prochaine requète du client, sans le cookie, le serveur ne fait plus la liaison avec la session web.
 Fin de session.
-      <li>Expiration de l'authentification (classe Auth, teste par is_authenticated()). A la prochaine requête du client la fonction Auth->unauth() est appelée et détruit l'authentification.
+      <li>Expiration de l'authentification (classe Auth, testé par Auth->is_authenticated()). A la prochaine requête du client la fonction Auth->unauth() est appelée et détruit l'authentification.
     </ul>
     Dans les 2 derniers cas, la table des sessions utilisateurs actives n'est pas mise à jour automatiquement (même si cela était fait, cela ne couvrirait que les cas ou le client génère une nouvelle requête après l'expiration).
     <p>
@@ -207,12 +208,16 @@ Il faut donc veiller à ce que la configuration de PHP (dans php.ini: session.gc_
   <td>
     Afin de simplifier la configuration, dans OBM le paramètre global <b>$lifetime</b>, stocké dans la table des préférences globales et modifiable depuis l'outil d'administration des préférences, agit sur toutes les sessions :
     <ul>
-      <li> Les sessions web (coté client) : le cookie est illimité sur la page de login, puis prend la valeur de $lifetime.
+      <li> Les sessions web (coté client) : le cookie a une durée de session (est détruit à la fermeture du navigateur) sur la page de login, puis :
+        <ul>
+          <li> si les cookies de session sont activés (<b>$session_cookie = 1</b>) garde une durée de session
+          <li> sinon prend la valeur de $lifetime
+        </ul>
       <li> Les sessions utilisateurs (coté serveur) : l'authentification (classe Auth) prend sa durée de vie de $lifetime (à l'exception de la première page au login qui a une valeur fixe, voir Login dans OBM).
       <li> L'outil d'archivage "clear_sess" utilise $lifetime pour déterminer les sessions utilisateurs expirées.
     </ul>
 
-    Une valeur de <b>$lifetime = 0</b> supprime l'expiration des sessions (expiration à la date maximale). L'expiration s'effectuera, à la fermeture du navigateur pour le client (on ne peut garder le cookie ?), selon la configuration de PHP pour le serveur (sessions web).
+    Une valeur de <b>$lifetime = 0</b> supprime l'expiration des sessions (expiration à la date maximale). L'expiration s'effectuera, à la fermeture du navigateur pour le client, selon la configuration de PHP pour le serveur (sessions web).
     <br>
      Pour les sessions utilisateurs...
     <ul>
@@ -224,7 +229,8 @@ Il faut donc veiller à ce que la configuration de PHP (dans php.ini: session.gc_
     Remarques :
     <ul>
       <li>Problème potentiel : un cookie est crée au niveau du serveur (avec l'heure du serveur) et vérifié sur le client (avec l'heure du client).
-Si le client a un décalage d'horloge par rapport au serveur, la durée de vie du cookie sera diminuée ou augmentée de ce décalage. Pour des durées faibles celapeut être très génant et nécessiter de ne pas faire expirer les cookies.
+Si le client a un décalage d'horloge par rapport au serveur, la durée de vie du cookie sera diminuée ou augmentée de ce décalage. Pour des durées faibles cela peut être très génant et nécessiter de ne pas faire expirer les cookies.
+      <br> C'est l'utilité du paramètre <b>$session_cookie</b> qui fait expirer le cookie uniquement à la fermeture du client web (on appelle ca les cookies de session).
       <li>Lorsque on change la valeur de <b>$lifetime</b> cela n'affectera que les nouvelles sessions et non les sessions en cours (car la valeur est lue au login au chargement des préférences mais en suite stockée en variable de session pour ne pas effectuer la requête à chaque page) pour les expirations de cookie et d'authentification. Par contre l'effet est immédiat sur l'outil <i>clear_sess</i> via OBM ou en mode commande car celui-ci va chercher le paramètre en base.
       <br>
     </ul>

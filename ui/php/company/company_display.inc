@@ -12,55 +12,76 @@
 // Display Company search Form                                               //
 // Parameters:
 //   - $kind_q    : database object with kind list
+//   - $usr_q     : database object with userobm list
 //   - $company[] : default form values
-//     keys used  : state, name, kind, zip
+//     keys used  : state, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form ($kind_q, $company) {
+function html_company_search_form ($kind_q, $usr_q, $company) {
   global $l_company_name, $l_company_kind, $l_postcode, $l_internal, $l_phone;
-  global $l_all, $l_find; 
+  global $l_all, $l_find, $l_market; 
   global $c_all, $sess;
 
   $state = $company["state"];
   $name = stripslashes($company["name"]);
   $phone = stripslashes($company["phone"]);
   $kind = $company["kind"];
+  $mark = $company["marketing_manager"];
   $zip = stripslashes($company["zip"]);
 
-  echo "<CENTER>
-    <FORM METHOD=GET NAME=f_societe
-      ACTION=\"" . $sess->url("company_index.php") . "\">
-    <TABLE BORDER=0>
-    <TR>
-      <TD><FONT SIZE=-2>$l_company_name</FONT><BR>
-        <INPUT TYPE=text NAME=tf_name size=20 value=\"$name\">
-      <TD>&nbsp;&nbsp;</TD>
-      <TD><FONT SIZE=-2>$l_phone</FONT><BR>
-        <INPUT TYPE=text NAME=tf_phone size=14 value=\"$phone\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
-      <TD><FONT size=-2>$l_company_kind</FONT><BR>
-        <SELECT name=\"sel_kind\">\n<OPTION value=\"$c_all\">$l_all";
-  while ($kind_q->next_record()) {
-    $id = $kind_q->f("companytype_id");
-    echo "\n<OPTION value=\"$id\"";
-    if ($kind == $id) echo " selected";
-    echo ">". $kind_q->f("companytype_label");
+  // kind select
+  $sel_kind = "<select name=sel_kind>
+    <option value=\"$c_all\">$l_all";
+  while($kind_q->next_record()) {
+    $k_id = $kind_q->f("companytype_id");
+    $sel_kind .= "\n<option value=\"$k_id\"";
+    if ($k_id == $kind) { $sel_kind .= " selected"; }
+    $sel_kind .= ">". $kind_q->f("companytype_label") . "\n";
   }
-  echo "</SELECT>
-      </TD>
-      <TD><FONT SIZE=-2>$l_postcode</FONT><BR>
-        <INPUT TYPE=text NAME=tf_zip size=6 value=\"$zip\"></TD>
-      <TD>&nbsp;&nbsp;</TD>
-      <TD align=center><FONT size=-2>$l_internal</FONT><br>
-        <INPUT TYPE=\"checkbox\" NAME=\"cb_state\" value=\"1\" ";
-  if ($state == '1') echo " checked";
-  echo "></TD>
-      <TD align=center>&nbsp;&nbsp;&nbsp;&nbsp;
-        <INPUT NAME=\"action\" TYPE=\"hidden\" VALUE=\"search\">
-        <INPUT NAME=\"submit\" TYPE=\"submit\" VALUE=\"$l_find\">
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM><HR>";
+  $sel_kind .= "</select>";
+
+  // Marketing manager select
+  $sel_market = "<select name=sel_market>
+    <option value=\"$c_all\">$l_all";
+  while($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $mark) { $sel_market .= " selected"; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "\n";
+  }
+  $sel_market .= "</select>";
+
+  if ($state == '1') $cstate = " checked";
+
+  echo "<center>
+    <form method=get name=f_societe
+      action=\"" . $sess->url("company_index.php") . "\">
+    <table border=0>
+    <tr>
+      <td><font size=-2>$l_company_name</font><br>
+        <input type=text name=tf_name size=20 value=\"$name\">
+      <td>&nbsp;&nbsp;</td>
+      <td><font size=-2>$l_phone</font><br>
+        <input type=text name=tf_phone size=14 value=\"$phone\"></td>
+      <td>&nbsp;&nbsp;</td>
+      <td><font size=-2>$l_company_kind</font><br>
+        $sel_kind
+      </td>
+      <td>&nbsp;&nbsp;</td>
+      <td><font size=-2>$l_postcode</font><br>
+        <input type=text name=tf_zip size=6 value=\"$zip\"></td>
+      <td>&nbsp;&nbsp;</td>
+      <td><font size=-2>$l_market</font><br>
+        $sel_market
+      <td>&nbsp;&nbsp;</td>
+      <td align=center><font size=-2>$l_internal</font><br>
+        <input type=\"checkbox\" name=\"cb_state\" value=\"1\" $cstate></td>
+      <td align=center>&nbsp;&nbsp;&nbsp;&nbsp;
+        <input name=\"action\" type=\"hidden\" value=\"search\">
+        <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+      </td>
+    </tr>
+    </table>
+    </form><hr>";
 }
 
 
@@ -179,7 +200,7 @@ function html_company_consult($co_q, $kind_q) {
   global $ico_contact_list,$ico_contact_new,$ico_web,$ico_mail;
   // - Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
-  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number;
+  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
   global $l_insert,$l_update,$l_delete;
   global $perms_user,$l_perms_user;
   global $auth, $sess;
@@ -189,6 +210,7 @@ function html_company_consult($co_q, $kind_q) {
   $state = $co_q->f("company_state");
   $name = $co_q->f("company_name");
   $kind = $co_q->f("company_type_id");
+  $mark = $co_q->f("company_marketingmanager_id");
   $ad1 = $co_q->f("company_address1");
   $ad2 = $co_q->f("company_address2");
   $zip = $co_q->f("company_zipcode");
@@ -208,6 +230,11 @@ function html_company_consult($co_q, $kind_q) {
     if ($kind_q->f("companytype_id") == $kind)
       $lkind = $kind_q->f("companytype_label");
   }
+
+  if ($mark > 0)
+    $lmarket = get_userobm_name($mark);
+  else
+    $lmarket = "&nbsp;";
 
   // Email link
   if ($email != "") {
@@ -256,6 +283,11 @@ function html_company_consult($co_q, $kind_q) {
           <TD ALIGN=right><FONT COLOR=\"#$col_label\" SIZE=-2>$l_kind
           &nbsp;&nbsp;</FONT></TD>
           <TD>$lkind</TD>
+  <!-- Marketing manage -->
+        </tr><tr>
+          <td align=right><font color=\"#$col_label\" size=-2>$l_market
+          &nbsp;&nbsp;</font></td>
+          <td>$lmarket</td>
   <!-- EMPTY -->
       </TR><TR>
         <TD>&nbsp;</TD>
@@ -355,15 +387,16 @@ function html_company_consult($co_q, $kind_q) {
 //   - $action    : action called
 //   - $co_q      : company database result 
 //   - $kind_q    : kind database result 
+//   - $usr_q     : userobm database result 
 //   - $company[] : default values
 //     keys used  : id, num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, mailing (deprecated) ,com
+//                : phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $kind_q, $company) {
+function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   // -- Themes
   global $set_theme,$ico_web,$ico_mail;
   // -- Labels
-  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number;
+  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
   global $l_insert,$l_update,$l_checkdelete,$l_internal;
   global $sess;
 
@@ -374,6 +407,7 @@ function html_company_form($action, $co_q, $kind_q, $company) {
     $state = $co_q->f("company_state");
     $name = $co_q->f("company_name");
     $kind = $co_q->f("company_type_id");
+    $mark = $co_q->f("company_marketingmanager_id");
     $ad1 = $co_q->f("company_address1");
     $ad2 = $co_q->f("company_address2");
     $zip = $co_q->f("company_zipcode");
@@ -394,6 +428,7 @@ function html_company_form($action, $co_q, $kind_q, $company) {
     $state = $company["state"];
     $name = stripslashes($company["name"]);
     $kind = $company["kind"];
+    $mark = $company["marketing_manager"];
     $ad1 = stripslashes($company["ad1"]);
     $ad2 = stripslashes($company["ad2"]);
     $zip = stripslashes($company["zip"]);
@@ -408,14 +443,24 @@ function html_company_form($action, $co_q, $kind_q, $company) {
   }
 
   // kind select
-  $sel_kind = "<SELECT name=sel_kind>";
+  $sel_kind = "<select name=sel_kind>";
   while($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
-    $sel_kind .= "\n<OPTION value=\"$k_id\"";
+    $sel_kind .= "\n<option value=\"$k_id\"";
     if ($k_id == $kind) { $sel_kind .= " selected"; }
     $sel_kind .= ">". $kind_q->f("companytype_label") . "\n";
   }
-  $sel_kind .= "</SELECT>";
+  $sel_kind .= "</select>";
+
+  // Marketing manager select
+  $sel_market = "<select name=sel_market>";
+  while($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $mark) { $sel_market .= " selected"; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "\n";
+  }
+  $sel_market .= "</select>";
 
   // cb state state
   if ($state == 1) $lstate = " checked";
@@ -468,6 +513,10 @@ function html_company_form($action, $co_q, $kind_q, $company) {
         </TR><TR>
           <TD ALIGN=right><FONT SIZE=-2>$l_kind &nbsp;&nbsp;</FONT></TD>
           <TD>$sel_kind</TD>
+  <!-- Marketing Manager -->
+        </tr><tr>
+          <td align=right><font size=-2>$l_market &nbsp;&nbsp;</font></td>
+          <td>$sel_market</td>
   <!-- STATE -->
         </TR><TR>
           <TD><FONT SIZE=-2>$l_internal</FONT></TD>
@@ -651,7 +700,7 @@ function dis_check_links($p_id) {
 //   - $co_q      : company database result (at least 1 row)
 //   - $company[] : default values
 //     keys used  : num, state, name, kind, ad1, ad2, zip, town, cdx, ctry
-//                : phone, fax, web, email, mailing (deprecated), com
+//                : phone, fax, web, email, com
 /////////////////////////////////////////////////////////////////////////////
 function dis_company_warn_insert($cid, $co_q, $company) {
   global $l_check_samecompany, $l_confirm, $l_back;
@@ -701,7 +750,6 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <INPUT TYPE=hidden NAME=tf_fax VALUE=\"$fax\">
     <INPUT TYPE=hidden NAME=tf_web VALUE=\"$web\">
     <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
-    <INPUT TYPE=hidden NAME=sel_mailing VALUE=\"$mailing\">
     <INPUT TYPE=hidden NAME=ta_com VALUE=\"$com\">
     <INPUT TYPE=submit NAME=submit VALUE=\"$l_confirm\">
     </FORM>
@@ -723,7 +771,6 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <INPUT TYPE=hidden NAME=tf_fax VALUE=\"$fax\">
     <INPUT TYPE=hidden NAME=tf_web VALUE=\"$web\">
     <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
-    <INPUT TYPE=hidden NAME=sel_mailing VALUE=\"$mailing\">
     <INPUT TYPE=hidden NAME=ta_com VALUE=\"$com\">
     <INPUT TYPE=submit VALUE=\"$l_back\">
     </FORM>

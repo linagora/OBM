@@ -12,6 +12,7 @@ $l_number = "Numéro";
 $l_name = "Nom";
 $l_company_name = "Nom Société";
 $l_kind = "Type";
+$l_market = "Responsable du compte";
 $l_company_kind = "Type Société";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";

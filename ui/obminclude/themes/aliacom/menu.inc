@@ -61,8 +61,6 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     <font color=black size=-1>$l_header_admin</font></a>)";
   }
 
-echo "lifetime auth=".$auth->lifetime."<br>
-".$auth->auth["exp"]. "<br>". time();
   echo "
 <center>
 <br>

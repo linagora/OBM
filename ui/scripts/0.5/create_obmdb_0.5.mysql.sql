@@ -287,6 +287,7 @@ CREATE TABLE Company (
   company_state int(2) DEFAULT '0',
   company_name varchar(50) DEFAULT '' NOT NULL,
   company_type_id int(8),
+  company_marketingmanager_id int(8),
   company_address1 varchar(30),
   company_address2 varchar(30),
   company_zipcode varchar(14),
