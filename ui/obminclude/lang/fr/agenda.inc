@@ -57,6 +57,13 @@ $l_yearly = "annuelle";
 $l_from = "du";
 $l_to = "au";
 
+$l_insert_ok = "Insertion effectuée avec succès";
+$l_update_ok = "Mise a jour effectuée avec succès";
+$l_update_warning = "Attention des conflits ont été détectés";
+$l_insert_warning = "Attention des conflits ont été détectés";
+$l_update_error = "Des conflits ont été détectés, mise à jour annulée";
+$l_insert_error = "Des conflits ont été détectés, insertion annulée";
+
 
 // actions 
 $l_insert = "Enregistrer le rdv";

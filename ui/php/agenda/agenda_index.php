@@ -142,13 +142,16 @@ elseif ($action == "insert") {
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
+      display_ok_msg($l_insert_ok);
       dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
+      display_warning_msg($l_insert_warning);
       html_dis_conflict($agenda,$conflict,$event_id);
     }
     else{
+      display_error_msg($l_insert_error);
       html_dis_conflict($agenda,$conflict);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -172,6 +175,7 @@ elseif ($action == "insert_conflict") {
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   $user_obm = run_query_userobm();
+  display_ok_msg($l_insert_ok);
   dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
   
 
@@ -204,6 +208,7 @@ elseif ($action == "update") {
   if(check_data_form($agenda)){    
     $conflict = run_query_modify_event($agenda,$sel_user_id,$event_id);
     if(count($conflict) == 0) {
+      display_ok_msg($l_update_ok);  
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
@@ -212,9 +217,11 @@ elseif ($action == "update") {
     }
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
+      display_warning_msg($l_update_warning);      
       html_dis_conflict($agenda,$conflict,$event_id);
     }
     else{
+      display_error_msg($l_update_error); 
       html_dis_conflict($agenda,$conflict);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
@@ -240,7 +247,7 @@ elseif ($action == "update") {
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
   global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
-  global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
+  global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begiûXn;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
 
