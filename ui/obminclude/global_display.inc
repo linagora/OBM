@@ -344,6 +344,15 @@ class OBM_DISPLAY {
         //=====================================================================
 
 	//------------------------------
+	// For any field to be used as a date field
+    //  -> start with "date_" 
+	//   * used in timemanagement
+	//------------------------------
+	// For date:
+	if (substr($fieldname,0,5) == "date_") {
+	  $name =date_format($this->data_set->f($fieldname));
+	}
+	//------------------------------
 	// For lists 
 	//------------------------------
 	// For contacts urls (link):

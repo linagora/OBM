@@ -19,7 +19,7 @@ $l_task_int = "Internal Tasks";
 
 
 // Database fields
-$l_taskdate="Task date";
+$l_datetask="Task date";
 $l_tasklabel="Task label";
 $l_deallabel="Project/Deal";
 $l_task_del="Remove ?";

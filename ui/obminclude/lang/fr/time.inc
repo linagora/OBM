@@ -17,7 +17,7 @@ $l_task_fac = "Taches Facturées";
 $l_task_int = "Taches Internes";
 
 // Database fields
-$l_taskdate="Date tâche";
+$l_date_task="Date tâche";
 $l_tasktype = "Type tâche";
 $l_tasklabel="Label tâche";
 $l_deallabel="Projet/Affaire";
