@@ -6,7 +6,7 @@
 <style type="text/css">
 <!--
 body {
-	background-image: url(/images/images/accueil_fond.gif);
+	background-image: url(/images/images/accueil_obm.png);
 	background-repeat: no-repeat;
 	background-position: center top;
 }
@@ -44,29 +44,35 @@ tr.logintable {
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
 <p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
-<p align="center">&nbsp;</p>
 <p align="center"><font size="2" face="sans-serif, Verdana, Arial"><em>Please 
   identify yourself with a Login and a password :</em></font></p>
 <form name="login" method="post" action="<?echo $form_action;?>">
-  <table border="0" align="center" cellpadding="0" cellspacing="0">
-  <tr>
-    <td><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>LOGIN 
-          :&nbsp;</strong></font> </div></td>
-    <td><input name="login" type="text" size="10" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>"></td>
-  </tr>
-  <tr>
-    <td><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>PASSWORD 
-          :&nbsp;</strong></font></div></td>
-    <td><input name="password" type="password" size="10"></td>
-  </tr>
 
-</table>
-  <br>
+<table align="center">
+<tr>
+  <td>
+  <table border="0" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+      <td><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>LOGIN 
+            :&nbsp;</strong></font> </div></td>
+      <td><input name="login" type="text" size="10" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>"></td>
+    </tr>
+    <tr>
+      <td><div align="right"><font size="3" face="sans-serif, Verdana, Arial"><strong>PASSWORD 
+            :&nbsp;</strong></font></div></td>
+      <td><input name="password" type="password" size="10"></td>
+    </tr>
+  </table>
+
+  </td><td>
+
   <div align="center">
   <input name="imageField" type="image" src="/images/images/bouton_login.gif">
+  </div>
+  </td>
+</tr>
+</table>
 
-</div>
 <p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </font><font size="2" face="sans-serif, Verdana, Arial"><br>
   <em>Available login and pass for Demo :</em></font></p>
@@ -99,7 +105,7 @@ tr.logintable {
   - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   </font><br>
   <font size="2" face="sans-serif, Verdana, Arial"><a href="http://www.alaicom.fr" target="_blank">Aliacom</a></font> 
-  <font size="2" face="sans-serif, Verdana, Arial">- 2002</font></div>
+  <font size="2" face="sans-serif, Verdana, Arial">- 2003</font></div>
 
 
  <?php global $login; if ( isset($login) ): ?>

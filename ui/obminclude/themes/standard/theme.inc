@@ -51,7 +51,6 @@ $font_warn = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_wa
 $font_tableh = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_tableh_text\" size=2>";
 
 
-
 $col_a_text="000000";   // Admin Text color (black)
 $col_a_table="CCCCCC";  // Admin Table background color
 $col_a_tableh="666666"; // Admin Table header background color (bleu fonce)
@@ -76,7 +75,7 @@ $ico_change_company = "ico_change_company.gif";  // Contract Icon
 $ico_list           = "ico_list.gif";            // List Icon
 $ico_agenda         = "ico_agenda.gif";          // Agenda Icon
 
-$ico_contract       = "ico_contract.gif";
+$ico_contract       = "ico_phone.gif";
 $ico_incident       = "ico_incident.gif";
 
 $ico_account        = "ico_account.gif";
@@ -93,28 +92,28 @@ $ico_pref           = "ico_pref.gif";
 $ico_data           = "ico_data.gif";
 $ico_lang           = "ico_lang.gif";
 
-$ico_web		=	"ico_web.gif";                    // WWW Icon
-$ico_mail		=	"ico_mail.gif";                  // Mail Icon
-$ico_arrow_up		=	"arrow_up.gif";          // The up arrow
-$ico_arrow_down		=	"arrow_down.gif";      // The down arrow
-$ico_crow 		=	"crow-red.gif";
-$ico_ball 		= 	"ball-green.gif";
-$ico_back 		=	 "arrow_back.gif" ;
-$ico_forbidden 		=	 "forbidden.gif";
-$ico_warning 		=	 "warning.gif";
+$ico_web            = "ico_web.gif";        // WWW Icon
+$ico_mail           = "ico_mail.gif";       // Mail Icon
+$ico_arrow_up       = "arrow_up.gif";       // The up arrow
+$ico_arrow_down     = "arrow_down.gif";     // The down arrow
+$ico_crow           = "crow-red.gif";
+$ico_ball           = "ball-green.gif";
+$ico_back           = "arrow_back.gif" ;
+$ico_forbidden      = "forbidden.gif";
+$ico_warning        = "warning.gif";
 
 //Agenda Icons
-$ico_new_event		=	"new_event.gif";
-$ico_left_day 		=	"left_day.gif";
-$ico_right_day 		=	"right_day.gif";
-$ico_spacer 		=	"spacer.gif";
-$ico_calendar_user0   =	 "ico_calendar5.gif";
-$ico_calendar_user1   =	 "ico_calendar4.gif";
-$ico_calendar_user2   =	 "ico_calendar3.gif";
-$ico_calendar_user3   =	 "ico_calendar2.gif";
-$ico_calendar_user4   =	 "ico_calendar1.gif";
-$ico_calendar_user5   =	 "ico_calendar0.gif";
-$ico_calendar_nouser  =	 "ico_calendarno.gif";
+$ico_new_event      = "new_event.gif";
+$ico_left_day       = "left_day.gif";
+$ico_right_day      = "right_day.gif";
+$ico_spacer         = "spacer.gif";
+$ico_calendar_user0 = "ico_calendar0.gif";
+$ico_calendar_user1 = "ico_calendar1.gif";
+$ico_calendar_user2 = "ico_calendar2.gif";
+$ico_calendar_user3 = "ico_calendar3.gif";
+$ico_calendar_user4 = "ico_calendar4.gif";
+$ico_calendar_user5 = "ico_calendar5.gif";
+$ico_calendar_nouser= "ico_calendarno.gif";
 
 // Export icons
 $ico_html = "ico_netscape.png";
