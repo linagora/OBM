@@ -360,6 +360,10 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
       </td>
      </tr>
      <tr>
+         <td class=\"detailLabel\">$l_tax_rate</td>
+          <td class=\"detailForm\"><input name=\"tf_tax_rate\" type=\"text\" value=\"$default_tax\" size=\"8\" /></td>
+     </tr>
+     <tr>
       <td class=\"detailLabel\">$l_amount_TTC</td>
       <td class=\"detailForm\">
        <input name=\"tf_amount_TTC\" type=text size=15 value=\"$amount_TTC\">
