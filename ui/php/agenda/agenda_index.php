@@ -55,6 +55,7 @@ if(count($sel_user_id) != 0 ) {
 $sess->register("agenda_user_view");
 page_close();
 $sel_user_id = $agenda_user_view;
+if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
 $perm->check();
@@ -62,8 +63,19 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "") $action = "index";
 display_head($l_agenda);     // Head & Body
+
+if ($popup) {
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+  if ($action == "calendar") {
+    require("$obminclude/calendar.inc");
+  }
+  display_end();
+  exit();
+}
+
 generate_menu($menu,$section);      // Menu
 //////////////////////////////////////////////////////////////////////////////
 
@@ -93,13 +105,20 @@ elseif($action == "decision") {
 ///////////////////////////////////////////////////////////////////////////////
   $conflict = run_query_insert_decision($agenda);
   if (count($conflict) == 0) {
-    require("agenda_js.inc");
-    display_ok_msg($l_update_ok);  
-    $p_user_array = array($auth->auth["uid"]);
-    $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
-    $user_obm = run_query_userobm();
-    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    $obm_wait = run_query_waiting_events();
+    if($obm_wait->nf() != 0) {
+      display_warn_msg($l_waiting_events." : ".$obm_wait->nf());
+      html_waiting_events($obm_wait);
+    }
+    else {
+      require("agenda_js.inc");
+      display_ok_msg($l_update_ok);  
+      $p_user_array = array($auth->auth["uid"]);
+      $obm_q = run_query_week_event_list($agenda,$p_user_array);
+      $user_q = run_query_get_user_name($p_user_array);
+      $user_obm = run_query_userobm();
+      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    }
   }
   else {
     require("agenda_js.inc");
@@ -170,6 +189,7 @@ elseif ($action == "view_year") {
 elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
+  require("$obminclude/calendar.js");
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
   $p_user_array = array($auth->auth["uid"]);
@@ -202,6 +222,8 @@ elseif ($action == "insert") {
       dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);      
     }
     else{
+      require("agenda_js.inc");      
+      require("$obminclude/calendar.js");
       display_err_msg($l_insert_error);
       html_dis_conflict($agenda,$conflict,'',0);
       $user_obm = run_query_userobm();
@@ -210,6 +232,7 @@ elseif ($action == "insert") {
     }
   }
   else {
+    require("$obminclude/calendar.js");
     require("agenda_js.inc");
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm();
@@ -254,6 +277,7 @@ elseif ($action == "detailconsult") {
 elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 if ($param_event > 0) {  
+  require("$obminclude/calendar.js");  
   require("agenda_js.inc");
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
@@ -292,6 +316,7 @@ elseif ($action == "update") {
     }
     else{
       require("agenda_js.inc");
+      require("$obminclude/calendar.js");      
       display_error_msg($l_update_error); 
       html_dis_conflict($agenda,$conflict,'',0);
       $p_user_array =  array($auth->auth["uid"]);
@@ -303,6 +328,7 @@ elseif ($action == "update") {
   }
   else {
     require("agenda_js.inc");
+    require("$obminclude/calendar.js");    
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm();
     $cat_event = run_query_get_eventcategories();
@@ -325,7 +351,7 @@ elseif ($action == "update_decision") {
   else {
     require("agenda_js.inc");
     display_warn_msg($l_update_warning);      
-    html_dis_conflict($agenda,$conflict,$agenda["id"],1);
+    html_dis_conflict($agenda,$conflict,$agenda["id"],0);
   }
 }
 
@@ -366,7 +392,7 @@ function get_param_agenda() {
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
-  global $hd_date_begin, $hd_date_end,$rd_decision_event;
+  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end;
 
 	
   // Deal fields
@@ -417,6 +443,8 @@ function get_param_agenda() {
   else {
     $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime(date("Ymd"))));
   }
+  if (isset($param_date_begin)) $agenda["date_begin"] = $param_date_begin;
+  if (isset($param_date_end)) $agenda["date_end"] = $param_date_end;
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
     if (isset(${"cb_repeatday_".$i}))  {
@@ -478,7 +506,7 @@ function get_agenda_action() {
     'Condition'=> array ('index','detailconsult',
                   'view_month','view_week','view_day','view_year',
                   'insert','insert_conflict',
-		  'update_decision','decision','update') 
+		  'update_decision','decision','update','delete') 
                                     );
 
 //Insert

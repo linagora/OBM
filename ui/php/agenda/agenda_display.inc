@@ -210,7 +210,7 @@ echo "
 //   - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $set_weekstart_default,$l_daysofweek,$l_description,$ico_event;
 	
   $date = mktime(0,0,0,"$this_month","$this_day","$this_year");	
@@ -263,7 +263,9 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $dis_month_cal .= "<td $bgclass width=\"105\" height=\"105\">\n";
     $dis_month_cal .= "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
     $dis_month_cal .= "<tr>\n";
-    $dis_month_cal .= "<td colspan=\"$td_colspan\" class=\"agendaCell2\">\n";    
+    $dis_month_cal .= "<td colspan=\"$td_colspan\" class=\"agendaCell2\">\n";
+     $dis_month_cal .= "<a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink&amp;param_date_end=$daylink")."\" ><img align=\"left\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /></a>";
+  
     if (($check_month == $this_month)) {
       $dis_month_cal .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">";
     } else {
@@ -391,7 +393,7 @@ $hidden_div
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
+  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit,$ico_new_event;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -425,6 +427,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $week_day_list .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$this_date)."\"> ";
     $week_day_list .= "$this_date_l</a>\n";
     $week_day_list .= "</td>\n";
+   $under_week_day_list .= "<td colspan=\"$td_colspan\" width=\"70\"  class=\"agendaCell\"><a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$this_date&amp;param_date_end=$this_date")."\" > <img align=\"middle\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /></a></td>";
   }
 // Hour of the day
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
@@ -621,7 +624,15 @@ echo "
            </td>
            <td width=\"1\">
            </td>
-            $week_day_list
+	   $week_day_list
+	  </tr>
+	  <tr>
+	   <td class=\"agendaCell\" width=\"60\">
+            <img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" />
+           </td>
+           <td width=\"1\">
+           </td>
+	   $under_week_day_list
           </tr>
             $hour_day_list
          </table>
@@ -653,7 +664,7 @@ $hidden_div
 //    - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
   global $set_start_time, $set_stop_time,$set_time_unit,$l_description;
 
   $getdate = $agenda["date"];
@@ -848,6 +859,11 @@ echo "
           <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Tomorrow]\" />
          </a>
         </td>
+       </tr>
+       <tr>
+	<td colspan=\"3\" class=\"agendaHead\">
+	 <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$getdate&amp;param_date_end=$getdate")."\" > <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /> </a>
+	</td>
        </tr>
       </table>
      </td>
@@ -1225,7 +1241,7 @@ echo "
 //    -$groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
-  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
+  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit,$ico_mini_cal;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
@@ -1276,12 +1292,14 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $occupied_day = $agenda["occupied"];
     $repeat_kind = $agenda["kind"];
     $repeat_days =$agenda["repeat_days"]; 
-    if(isset($agenda["repeat_end"])) {
+    if(isset($agenda["repeat_end"]) && $agenda["repeat_end"]!= "") {
       ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$agenda["repeat_end"] , $day_array3);
       $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
     }
-    
+    $day_array[0] = $agenda["date_begin"];
+    $day_array2[0] = $agenda["date_end"];
     $force = $agenda["force"];
+    
   }
 
   
@@ -1293,7 +1311,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
       <input type=\"hidden\" name=\"hd_old_begin\" id=\"hd_old_begin\" value=\"".$day_array[0]."\" />
-      <input type=\"hidden\" name=\"hd_old_end\" id=\"hd_old_end\" value=\"".$day_array[0]."\" />
+      <input type=\"hidden\" name=\"hd_old_end\" id=\"hd_old_end\" value=\"".$day_array2[0]."\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -1476,7 +1494,12 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     </tr>   
     <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format</td>
-     <td><input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" /></td>
+     <td>
+      <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1');\">
+       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>
+     </td>
     </tr>
     <tr>
      <td class=\"detailLabel\">$l_timebegin</td>
@@ -1484,7 +1507,12 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     </tr>
     <tr>
      <td class=\"detailLabel\">$l_dateend $l_format</td>
-     <td><input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" /></td>       
+     <td>
+      <input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_end,'agenda_index.php?action=calendar&popup=1');\">
+       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>
+     </td>       
     </tr>
     <tr>    
      <td class=\"detailLabel\">$l_timeend</td>
@@ -1503,7 +1531,12 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     </tr>
     <tr>    
      <td class=\"detailLabel\">$l_use_endrepeat</td> 
-     <td><input type=\"text\" id=\"tf_repeat_end\" name=\"tf_repeat_end\" maxlength=\"10\" size=\"12\" value=\"$repeat_end\" /></td>
+     <td>
+      <input type=\"text\" id=\"tf_repeat_end\" name=\"tf_repeat_end\" maxlength=\"10\" size=\"12\" value=\"$repeat_end\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_repeat_end,'agenda_index.php?action=calendar&popup=1');\">
+       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+      </a>     
+     </td>
     </tr>
     <tr>  
      <td class=\"detailLabel\">$l_repeatdays</td>

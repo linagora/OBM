@@ -764,13 +764,15 @@ function run_query_insert_event_data($agenda) {
   $repeat_kind = $agenda["kind"];
   $repeat_days = $agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
-  if($repeat_end) {
-    $repeat_end = date("YmdHi",strtotime("+1 day",strtotime($repeat_end)));
+  if($repeat_end && $repeat_kind != "none") {
+    $repeat_end = date("YmdHi",strtotime($repeat_end));
   }
-  else {
-    $repeat_end = date("YmdHi",strtotime("+1 year +1 day", strtotime(date("Ymd"))));
+  elseif($repeat_kind != "none") {
+    $repeat_end = date("YmdHi",strtotime("+1 year", strtotime(date("Ymd"))));
   } 
-  
+  else{
+    $repeat_end = "";
+  }
   $obm_db = new DB_OBM;
   $obm_db->lock("CalendarEvent");
   $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
@@ -843,9 +845,8 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-  }
+  }var_dump($return_info);
   return $return_info;
-  
 }
 /////////////////////////////////////////////////////////////////////////////
 // Delete all event after the new begin date and update old end_repeat date
@@ -870,7 +871,7 @@ function  run_query_update_deprecated_events($agenda) {
     $query .= ">= '$old_date_begin')";
     $query2 = "UPDATE CalendarEvent Set calendarevent_endrepeat = $date_begin WHERE calendarevent_id = $old_event_id";
   }else{
-    $query .= "= '$old_date_begin' OR calendarsegment_date = '$old_date_begin')";
+    $query .= "= '$old_date_begin' OR calendarsegment_date = '$old_date_end')";
   }
  
   display_debug_msg($query, $cdg_sql);
@@ -878,7 +879,18 @@ function  run_query_update_deprecated_events($agenda) {
  
   display_debug_msg($query2, $cdg_sql);
   $obm_db->query($query2);
-  
+
+  $query = "SELECT COUNT(*) AS isDeprectated FROM CalendarSegment WHERE calendarsegment_eventid = $old_event_id 
+            AND calendarsegment_state != 'R'";
+  $obm_db->query($query);
+  $obm_db->next_record();    
+  if($obm_db->f("isDeprectated") == 0) {
+    $query = "DELETE FROM CalendarSegment WHERE calendarsegment_eventid = $old_event_id";
+    $obm_db->query($query);
+    $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $old_event_id";
+    $obm_db->query($query);
+  }
+
 }  
 /////////////////////////////////////////////////////////////////////////////
 // Delete all events of a evenements, and the event
@@ -1081,8 +1093,8 @@ function store_users($user_q) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
-  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_err_datebegin, $l_err_dateend,$err_msg ;
-  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat,$l_err_end_repeat2 ;
+  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_err_datebegin, $l_err_dateend,$err_msg,$l_err_weekly_repeat ;
+  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat,$l_err_end_repeat2,$l_err_end_repeat3,$l_err_days_repeat ;
   
   $title = $agenda["title"];
   $datebegin = substr($agenda["date_begin"],0,8);
@@ -1102,7 +1114,8 @@ function check_data_form($agenda) {
   $this_day_r = $day_array3[3]; 
   $this_month_r = $day_array3[2];
   $this_year_r = $day_array3[1];
-
+  $kind = $agenda["kind"];
+  $repeat_days = $agenda["repeat_days"];
 
   if (trim($title) == "") {
     $err_msg = $l_fill_title;
@@ -1127,24 +1140,44 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if (trim($repeat_end) != "") {
+  if (trim($repeat_end) != "" && $kind != "none") {
     if(!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
       $err_msg = $l_err_repeat;
       return false;
     }  
   }
 
-  if($dateend<$datebegin) {
+  if($dateend<$datebegin || ($dateend==$datebegin && $timeend<$timebegin)) {
     $err_msg =  $l_err_begin_end;
     return false;
   } 
   
-  if(trim($repeat_end) != "" && $dateend>$repeat_end) {
+  if(trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
     $err_msg =  $l_err_end_repeat;
     return false;
+  }
+  
+  if($kind == "weekly" && $repeat_days == "0000000") {
+    $err_msg =  $l_err_days_repeat;
+    return false;
   }  
-  if(trim($repeat_end) != "" && ($dateend+10000) < $repeat_end) {
+
+  if($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
+    $err_msg =  $l_err_weekly_repeat;
+    return false;
+  }  
+  
+  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "yearly") {
     $err_msg =  $l_err_end_repeat2;
+    return false;
+  }  
+
+  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
+    $err_msg =  $l_err_end_repeat3;
+    return false;
+  }  
+  if($kind != "" && $dateend > $datebegin) {
+    $err_msg =  $l_err_repeat;
     return false;
   }  
   
@@ -1189,14 +1222,13 @@ function get_event_repetition_dates($agenda) {
   
 
   if($repeat_end!="") {
-    $time_end_repeat = strtotime("+1 day",strtotime($repeat_end));
+    $time_end_repeat = strtotime($repeat_end);
   }
   else {
     $time_end_repeat = strtotime("+1 year +1 day", strtotime($this_year_b.$this_month_b.$this_day_b));
   }
   $time_b=strtotime("+$this_hour_b hours +$this_min_b minutes",strtotime($this_year_b.$this_month_b.$this_day_b));
   $time_e=strtotime("+$this_hour_e hours +$this_min_e minutes",strtotime($this_year_e.$this_month_e.$this_day_e));
-  
   if ($repeat_kind=="none") {
     $event_dates[] = array("date_begin" => date("YmdHi",$time_b),"date_end" => date("YmdHi",$time_e));
   }    
@@ -1224,38 +1256,47 @@ function get_event_repetition_dates($agenda) {
     }  
   }  
   else if ($repeat_kind=="monthlybydate") {
-    for($var_time_b=$time_b, $var_time_e=$time_e;
-    $var_time_b <= $time_end_repeat;
-    $var_time_b = strtotime("+1 month",$var_time_b), $var_time_e = strtotime("+1 month",$var_time_e)){
-      $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
+    $var_time_e = $time_e;
+    $i = 0;
+    while(($var_time_t = strtotime("+$i month",$time_b)) <= $time_end_repeat) {
+      if(date("d",$var_time_t) == $this_day_b) {
+	$event_dates[]= array("date_begin" => date("YmdHi",$var_time_t),"date_end" => date("YmdHi",(strtotime("+$i month",$var_time_e))));
+      }
+      $i++;
     }
   }
   else if ($repeat_kind=="monthlybyday") {
-    $var_time_b = $time_b;
-    $var_time_e = $time_e;
+    $start_of_month = strtotime($this_year_b.$this_month_b."01");
+    $time_rb = $time_b;
+    $time_re = $time_e;
     $start_week_day = date("w",strtotime($set_weekstart_default)); 
-    $day_beg = (date("w",$var_time_b) - $start_week_day)%7;
-    $day_end = (date("w",$var_time_e) - $start_week_day)%7;   
+    $day_beg = (date("w",$time_rb) - $start_week_day)%7;
+    $day_end = (date("w",$time_re) - $start_week_day)%7;  
     $tab_beg = array((($day_beg + 4)%7) => '+3',(($day_beg + 5)%7) => '+2',(($day_beg + 6)%7) => '+1',$day_beg => '+0',
                (($day_beg + 8)%7) => '-1',(($day_beg + 9)%7) => '-2',(($day_beg + 10)%7) => '-3');
     $tab_end = array((($day_end + 4)%7) => '+3',(($day_end + 5)%7) => '+2',(($day_end + 6)%7) => '+1',$day_end => '+0',
                (($day_end + 8)%7) => '-1',(($day_end + 9)%7) => '-2',(($day_end + 10)%7) => '-3'); 
+    $i = 1;
+    $var_time_b = $time_b;
     while($var_time_b <= $time_end_repeat){
-      $event_dates[]= array("date_begin" => date("YmdHi",$time_b),"date_end" => date("YmdHi",$time_e));     
-      $var_time_b = strtotime("+1 month",$var_time_b);
-      $var_time_e = strtotime("+1 month",$var_time_e);
-      $day_beg = ((date("w",$var_time_b) - $start_week_day)+7)%7;
-      $day_end = ((date("w",$var_time_e) - $start_week_day)+7)%7;
-      $time_b = strtotime($tab_beg[$day_beg]." days",$var_time_b);
-      $time_e = strtotime($tab_end[$day_end]." days",$var_time_e);
-
-
-      if(date("d",$time_b) < 1) {
-	$time_b = strtotime("+7 days",$time_b);
+      $event_dates[]= array("date_begin" => date("YmdHi",$time_rb),"date_end" => date("YmdHi",$time_re));     
+      $var_time_e = strtotime("+$i month",$time_e);
+      $var_time_b = strtotime("+$i month",$time_b);
+      $day_beg = (date("w",$var_time_b) - $start_week_day +7)%7;
+      $day_end = (date("w",$var_time_e) - $start_week_day +7)%7;
+      $time_rb = strtotime($tab_beg[$day_beg]." days",$var_time_b);
+      $time_re = strtotime($tab_end[$day_end]." days",$var_time_e);
+      if(date("m",$time_rb) != date("m",strtotime("+$i month",$start_of_month))) {
+       	if(date("d",$time_rb) < 7) {
+  	  $time_rb = strtotime("-7 days",$time_rb);
+	  $time_re = strtotime("-7 days",$time_re);
+      	}
+	elseif(date("d",$time_rb) > 21) {
+  	  $time_rb = strtotime("+7 days",$time_rb);
+	  $time_re = strtotime("+7 days",$time_re);
+	} 
       }
-      if(date("d",$time_e) < 1) {
-	$time_e = strtotime("+7 days",$time_e);
-      } 
+      $i ++;
     }
   } else if ($repeat_kind=="yearly") {  
     for($var_time_b=$time_b, $var_time_e=$time_e;

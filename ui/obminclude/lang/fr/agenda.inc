@@ -105,7 +105,9 @@ $l_err_repeat = "Format du champ [ $l_use_endrepeat ] incorrect";
 $l_err_begin_end = "La date de fin doit etre supérieure à la date de début";
 $l_err_end_repeat = "La fin de répétition doit etre supérieure à la date de fin";
 $l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
-
+$l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque la répétition est de type annuelle.";
+$l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
+$l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins etre de 7 jours supérieure à celle de fin d'événement.";
 $l_monday="Lundi";
 $l_tuesday="Mardi";
 $l_wednesday="Mercredi";

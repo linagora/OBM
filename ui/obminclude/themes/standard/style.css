@@ -721,38 +721,38 @@ td.agendaEventHead	{
 td.agendaEventBg5 	{ 
     background-color: 		#86c860; 
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
+    border : 			1px #336600 solid;        
+    }
 	
 td.agendaEventBg4 	{ 
     background-color: 		#d8f0b8; 
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
+    border : 			1px #669900 solid;        
+  }
 	
 td.agendaEventBg3 	{ 
     background-color:	 	#84a8d7;  
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
+    border : 			1px #333366 solid;        
+    }
 	
 td.agendaEventBg2 	{ 
     background-color: 		#cfe5f6;  
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
+    border : 			1px #336699 solid;        
+    }
 	
 td.agendaEventBg1 	{ 
     background-color: 		#f8d049;  
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
+    border : 			1px #cc3300 solid;          
+  }
 	
 td.agendaEventBg0 	{ 
     background-color: 		#fffba4;  
     vertical-align:		top;
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}	
+    border : 			1px #cc6600 solid;    
+}	
 
 td.agendaEventYear {
 	width:			8px;

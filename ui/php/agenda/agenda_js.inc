@@ -19,11 +19,11 @@ function check_calendar(form) {
   else if (check_date(form.tf_date_end, \"$l_err_dateend\") == false) {
     return false;
   }
-  else if ((trim(form.tf_repeat_end.value) != \"\") && (check_date(form.tf_repeat_end, \"$l_err_repeat\") == false)) {
+  else if ((trim(form.tf_repeat_end.value) != \"\") && (trim(form.sel_repeat_kind.value) != \"none\") && (check_date(form.tf_repeat_end, \"$l_err_repeat\") == false) ) {
     return false;
   }
 
-    return true;html_dis_conflict
+    return true;
   
 } 
 function check_all_force(form) {
@@ -158,7 +158,7 @@ function hide ( name ) {
     document.all[name].style.visibility = \"hidden\";
   }
 }
-
+-->
 </script>
 
 ";

@@ -129,6 +129,9 @@ $l_err_repeat = "[ $l_use_endrepeat ] format incorrect !";
 $l_err_begin_end = "End date must be after begin date !";
 $l_err_end_repeat = "Repetion end must be after end date";
 $l_err_end_repeat2 = "The max duration of a repetition is one year";
+$l_err_end_repeat3 = "The max duration of a repetition is ten years when the repeatition kind is yearly";
+$l_err_days_repeat = "You must check one or more repeatition day.";
+$l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
 
 
 $l_unknown="Inconnu";

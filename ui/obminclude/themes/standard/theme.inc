@@ -105,7 +105,7 @@ $ico_forbidden      = "forbidden.gif";
 $ico_warning        = "warning.gif";
 
 //Agenda Icons
-$ico_new_event      = "new_event.gif";
+$ico_new_event      = "ico_calendar_new.png";
 $ico_event          = "ico_calendar_evt.gif";
 $ico_left_day       = "left_day.gif";
 $ico_right_day      = "right_day.gif";
@@ -117,7 +117,11 @@ $ico_calendar_user3 = "ico_calendar3.gif";
 $ico_calendar_user4 = "ico_calendar4.gif";
 $ico_calendar_user5 = "ico_calendar5.gif";
 $ico_calendar_nouser= "ico_calendarno.gif";
-
+$ico_mini_larrow    = "arrows_l_still.gif";
+$ico_mini_larrow2   = "arrows_l_anim.gif";
+$ico_mini_rarrow    = "arrows_r_still.gif";
+$ico_mini_rarrow2   = "arrows_r_anim.gif";
+$ico_mini_cal       = "calendar.png";
 // Export icons
 $ico_html = "ico_netscape.png";
 $ico_excel = "ico_excel.png";
