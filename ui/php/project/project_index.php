@@ -95,16 +95,16 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_project > 0) {
-    dis_project_consult($param_project);
+  if ($project["id"] > 0) {
+    $display["detail"] = dis_project_consult($project["id"]);
   } else {
     $display["msg"] .= display_err_msg($l_query_error);
   }
   
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_project > 0) {
-    $project_q = run_query_detail($param_project);
+  if ($project["id"] > 0) {
+    $project_q = run_query_detail($project["id"]);
     $display["detailInfo"] = display_record_info($project_q);
     $display["detail"] = html_project_form($action, $project_q, $project);
   } else {
@@ -117,7 +117,7 @@ if ($action == "ext_get_id") {
     $project["id"] = run_query_insert($project);
     if ($project["id"]) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
-      dis_project_consult($project["id"]);
+      $display["detail"] = dis_project_consult($project["id"]);
     } else {
       $display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
     }
@@ -128,14 +128,14 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update") {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_project_form($param_project, $project)) {
-    $retour = run_query_update($param_project, $project);
+  if (check_project_form($project["id"], $project)) {
+    $retour = run_query_update($project["id"], $project);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
-      dis_project_consult($param_project);
+      $display["detail"] = dis_project_consult($project["id"]);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
-      dis_project_consult($param_project);
+      $display["detail"] = dis_project_consult($project["id"]);
     }
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
@@ -144,65 +144,65 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_check_links($param_project);
+  $display["detail"] = dis_check_links($project["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($param_project);
+  $retour = run_query_delete($project["id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
     $display["search"] = dis_project_search_form($project);
     $display["msg"] .= display_info_msg($l_no_display);
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
-    dis_project_consult($param_project);
+    $display["detail"] = dis_project_consult($project["id"]);
   }
 
 } elseif ($action == "task")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $project["name"] = run_query_projectname($param_project);
-  $tasks_q = run_query_tasks($param_project);
+  $project["name"] = run_query_projectname($project["id"]);
+  $tasks_q = run_query_tasks($project["id"]);
   $display["detail"]  = html_project_task_form($tasks_q, $project);
   $display["detail"] .= html_project_tasklist($tasks_q, $project);
 
 } elseif ($action == "task_add")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_task_form($param_project, $project)) {
+  if (check_task_form($project["id"], $project)) {
     $retour = run_query_task_insert($project);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_task_insert_ok);
     } else {
       $display["msg"] .= display_err_msg("$l_task_insert_error");
     }
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
     $display["detail"] = html_project_task_form($tasks_q, $project);
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   } else { 
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
     $display["detail"]  = html_project_task_form($tasks_q, $project);
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
 
 } elseif ($action == "task_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_task_form($param_project, $project)) {
+  if (check_task_form($project["id"], $project)) {
     $retour = run_query_task_update($project);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_task_update_ok);
     } else {
       $display["msg"] .= display_err_msg("$l_task_update_error");
     }
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
     $display["detail"] = html_project_task_form($tasks_q, $project);
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   } else { 
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
     $display["detail"]  = html_project_task_form($tasks_q, $project);
     $display["detail"] .= html_project_tasklist($tasks_q, $project);
   }
@@ -219,40 +219,40 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg("$l_no_task_del");
   }
-  $project["name"] = run_query_projectname($param_project);
-  $tasks_q = run_query_tasks($param_project);
+  $project["name"] = run_query_projectname($project["id"]);
+  $tasks_q = run_query_tasks($project["id"]);
   $display["detail"] = html_project_task_form($tasks_q, $project);
   $display["detail"] .= html_project_tasklist($tasks_q, $project);
       
 } elseif ($action == "member")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $project["name"] = run_query_projectname($param_project);
-  $tasks_q = run_query_tasks($param_project);
-  $members_q = run_query_members($param_project);
+  $project["name"] = run_query_projectname($project["id"]);
+  $tasks_q = run_query_tasks($project["id"]);
+  $members_q = run_query_members($project["id"]);
   $display["detail"] .= html_project_member_form($members_q, $project );
 
 } elseif ($action == "allocate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_project > 0) {
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
-    $members_q = run_query_members($param_project);
+  if ($project["id"] > 0) {
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
+    $members_q = run_query_members($project["id"]);
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
     } else {
-      $allo_q = run_query_allocation($param_project);
+      $allo_q = run_query_allocation($project["id"]);
       $display["detail"] = html_project_allocate_form($tasks_q, $members_q, $allo_q, $project); 
     }
   }
 
 } elseif ($action == "allocate_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-//  if (check_member_form($param_project, $project)) {
+//  if (check_member_form($project["id"], $project)) {
   $ins_err = run_query_allocate_update($project);
   // Create an entry in the ProjectStat log
-  $retour = run_query_statlog($param_project);
+  $retour = run_query_statlog($project["id"]);
   if (!($retour))
     $ins_err = 1;
   if (!($ins_err)) {
@@ -260,15 +260,15 @@ if ($action == "ext_get_id") {
   } else {
     $display["msg"] .= display_err_msg($l_allocate_update_error);
   }
-  dis_project_consult($param_project);
+  $display["detail"] = dis_project_consult($project["id"]);
 
 } elseif ($action == "progress")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_project > 0) {
-    $project["name"] = run_query_projectname($param_project);
-    $tasks_q = run_query_tasks($param_project);
-    $members_q = run_query_members($param_project);
-    $allo_q = run_query_allocation($param_project);
+  if ($project["id"] > 0) {
+    $project["name"] = run_query_projectname($project["id"]);
+    $tasks_q = run_query_tasks($project["id"]);
+    $members_q = run_query_members($project["id"]);
+    $allo_q = run_query_allocation($project["id"]);
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
@@ -285,7 +285,7 @@ if ($action == "ext_get_id") {
   if (check_advance_form($project)) {
     $ins_err = run_query_progress($project);
     // Create an entry in the ProjectStat log
-    $retour = run_query_statlog($param_project);
+    $retour = run_query_statlog($project["id"]);
     if (!($retour))
       $ins_err = 1;
     if (!($ins_err)) {
@@ -293,7 +293,7 @@ if ($action == "ext_get_id") {
     } else {
       $display["msg"] .= display_err_msg($l_progress_update_error);
     }
-    dis_project_consult($param_project);
+    $display["detail"] = dis_project_consult($project["id"]);
   }
 
 } elseif ($action == "member_add")  {
@@ -314,7 +314,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "member_del")  {
 ///////////////////////////////////////////////////////////////////////////////
   $pid = $project["id"];
-  $project["name"] = run_query_projectname($param_project);
+  $project["name"] = run_query_projectname($project["id"]);
   if ($project["mem_nb"] > 0) {
     $nb = run_query_memberlist_delete($project);
     $display["msg"] .= display_ok_msg("$nb $l_member_removed");
@@ -335,6 +335,16 @@ if ($action == "ext_get_id") {
   // gets updated infos
   $members_q = run_query_members($pid);
   $display["detail"] = html_project_member_form($members_q, $project);
+
+} elseif ($action == "document_add")  {
+///////////////////////////////////////////////////////////////////////////////
+  if ($project["doc_nb"] > 0) {
+    $nb = run_query_insert_documents($project, "project");
+    $display["msg"] .= display_ok_msg("$nb $l_document_added");
+  } else {
+    $display["msg"] .= display_err_msg($l_no_document_added);
+  }
+  $display["detail"] = dis_project_consult($project["id"]);
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -447,26 +457,35 @@ function get_param_project() {
   if (isset ($http_obm_vars)) {
     $nb_mem = 0;
     $nb_tsk = 0;
+    // Document
+    $nb_d = 0;
+    $nb_contact = 0;
 
     while ( list( $key ) = each( $http_obm_vars ) ) {
-
       // cb_u is likely to be called cb_user
-      if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
-	$nb_mem++;
-        $mem_num = substr($key, 4);
-
-        $project["mem$nb_mem"] = $mem_num;
-      } 
-
       if (strcmp(substr($key, 0, 7),"cb_task") == 0) {
 	$nb_tsk++;
         $tsk_num = substr($key, 7);
         $project["tsk$nb_tsk"] = $tsk_num;
+      }
+
+      else if (strcmp(substr($key, 0, 4),"cb_u") == 0) {
+	$nb_mem++;
+        $mem_num = substr($key, 4);
+        $project["mem$nb_mem"] = $mem_num;
       } 
+
+      else if (strcmp(substr($key, 0, 4),"cb_d") == 0) {
+	$nb_d++;
+	$d_num = substr($key, 4);
+	$project["doc$nb_d"] = $d_num;
+      }
+
     }
 
     $project["mem_nb"] = $nb_mem;
     $project["tsk_nb"] = $nb_tsk;
+    $project["doc_nb"] = $nb_d;
   }
 
   if (debug_level_isset($cdg_param)) {
@@ -686,6 +705,13 @@ function get_project_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
+
+// Document add
+  $actions["PROJECT"]["document_add"] = array (
+    'Url'      => "$path/project/project_index.php?action=document_add",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+  );     
 
 }
 

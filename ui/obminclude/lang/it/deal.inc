@@ -45,9 +45,6 @@ $l_deal_select_company = "Scegli l'azienda relativa al impegno";
 $l_deal_select_parentdeal = "Scegli il Sub-impegno al quale l'impegno deve essere collegato";
 $l_affect_deal= "Cambia Sub-Impegno ";
 // about invoice...
-$l_invoice_new = "Nuova Fattura";
-$l_invoice_active = "Attive Fatture";
-$l_invoice_total = "Fatture";
 $l_archived_invoices = "Fatture in archivio";
 $l_no_invoices = "Non sono presenti fatture collegate";
 $l_see_archived_invoices = "Vedi Elenco fatture in archivio";
@@ -63,8 +60,6 @@ $l_category_new = "Nuova Categoria";
 $l_category_label="Nome";
 $l_category_minilabel="Nome breve";
 $l_parentdeal_deals = "Impegni appartengono a questo impegno";
-$l_add_contrat = "Nuovo contratto";
-$l_contract_new = "Nuovo contratto";
 
 // Actions
 $l_insert = "Inserisci Impegno";

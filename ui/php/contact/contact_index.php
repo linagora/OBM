@@ -12,10 +12,10 @@
 // - new                -- $param_company -- show the new contact form
 // - detailconsult      -- $param_contact -- show the contact detail
 // - detailupdate       -- $param_contact -- show the contact detail form
-// - insert             -- form fields    -- insert the company
-// - update             -- form fields    -- update the company
+// - insert             -- form fields    -- insert the contact
+// - update             -- form fields    -- update the contact
 // - check_delete       -- $param_contact -- check links before delete
-// - delete             -- $param_contact -- delete the company
+// - delete             -- $param_contact -- delete the contact
 // - admin              --                -- admin index (kind)
 // - function_insert    -- form fields    -- insert the function
 // - function_update    -- form fields    -- update the function
@@ -372,7 +372,7 @@ if ($action == "ext_get_ids") {
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($contact["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($contact,"Contact");
+    $nb = run_query_insert_documents($contact, "contact");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
@@ -431,6 +431,7 @@ function get_param_contact() {
     }
     $contact["doc_nb"] = $nb_d;
   }
+
   if (isset ($view)) $contact["view"] = $view;
   if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
   if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;

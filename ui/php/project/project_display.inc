@@ -74,8 +74,7 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 //   - $pid : project id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_consult($pid) {
-  global $display, $uid;
-  global $l_query_error;
+  global $display, $l_query_error;
 
   $project_q = run_query_detail($pid);
   $tasks_q = run_query_tasks($pid);
@@ -83,11 +82,13 @@ function dis_project_consult($pid) {
   $times = run_query_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $project_q->query . " !");
+    $display["msg"] .= display_err_msg($l_query_error);
   }
 
   $display["detailInfo"] = display_record_info($project_q);
-  $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $times);
+  $block = html_project_consult($project_q, $tasks_q, $members_q, $times);
+
+  return $block;
 }
 
 
@@ -320,6 +321,74 @@ function html_project_search_list($proj_q, $pref_q, $nb_project, $project) {
   $display["msg"] .= display_info_msg($nb_project." ".$l_found);
   $block = $proj_d->display("dis_data_project");
   $block .= $display_popup_end;
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Project links menu
+// Parameters:
+//   - $p_q : project database result 
+// Returns:
+//   $r : string with XHTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_project_links($p_q) {
+  global $set_theme, $ico_document, $ico_document_new, $ico_invoice;
+  global $l_new, $l_header_invoice, $l_header_document;
+  global $l_document_add, $l_project;
+  global $path, $auth, $cgp_show, $popup_height, $popup_width;
+
+  $id = $p_q->f("project_id");
+  $name = $p_q->f("project_name");
+
+  $uname = urlencode($name);
+
+  // Document
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=project");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=project");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=$id&amp;ext_target=$l_project";
+    $nb_document = run_query_document_nb ($id, "project");
+    $block_doc = "
+  <div class=\"linkTitle\">:: $l_header_document</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+        <a href=\"$url_doc_new\">$l_new</a></li>
+    <li><a href=\"\" 
+	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	<a href=\"\" onclick=\"window.name='$l_project'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	 $l_document_add</a></li>
+  </ul>";
+  }
+
+  // Invoice
+  if ($cgp_show["module"]["invoice"]) {
+    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id&amp;cb_archive=1");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id");
+    $nb_inv_tot = run_query_linked_invoice_nb($id, "project", 1);
+    $nb_inv = run_query_linked_invoice_nb($id, "project");
+    $block_invoice = "
+  <div class=\"linkTitle\">:: $l_header_invoice</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
+    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        <a href=\"$url_inv_new\">$l_new</a></li>
+  </ul>";
+  }
+
+  // Links Template  
+  $block = "
+<div class=\"link\"> 
+  $block_doc
+  $block_invoice
+</div>";
 
   return $block;
 }
@@ -705,6 +774,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
   // --- HTML Template --------------------------------------------------------
 
+  $display["link"] = html_project_links($project_q);
   $display["title"] = "<div class=\"title\">$l_project : $name</div>";
 
   $block = "

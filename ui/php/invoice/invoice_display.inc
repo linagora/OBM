@@ -125,8 +125,10 @@ function html_invoice_search_form($sta_q, $invoice) {
   $date_before = $invoice["date_before"];
   $inout = $invoice["inout"];
   $deal = $invoice["deal"];
-  $deal_id = $invoice["param_deal"];
+  $deal_id = $invoice["deal_id"];
   $company = $invoice["company"];
+  $comp_id = $invoice["company_id"];
+  $proj_id = $invoice["project_id"];
   $archive = ($invoice["archive"]) ? "checked" : "" ;
 
   $url_form = url_prepare("invoice_index.php?action=search");
@@ -157,6 +159,8 @@ function html_invoice_search_form($sta_q, $invoice) {
         onSubmit=\"if (check_search_form(this) == false) return false;
         else return true;\" action=\"$url_form\">
       <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+      <input type=\"hidden\" name=\"param_project\" value=\"$proj_id\" />
 
     <div class=\"search\">
 
@@ -270,6 +274,9 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
   $deal = urlencode($invoice["deal"]);
   $company = urlencode($invoice["company"]);
   $archive = $invoice["archive"];
+  $deal_id = $invoice["deal_id"];
+  $comp_id = $invoice["company_id"];
+  $proj_id = $invoice["project_id"];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -279,6 +286,9 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
 		    "&amp;sel_status=$status".
 		    "&amp;tf_deal=$deal".
 		    "&amp;rd_inout=$inout".
+		    "&amp;param_company=$comp_id".
+		    "&amp;param_deal=$deal_id".
+		    "&amp;param_project=$proj_id".
 		    "&amp;cb_archive=$archive"); 
 
   $dis_invoice = new OBM_DISPLAY ("DATA", $pref_q, "invoice");
@@ -382,7 +392,7 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
 // XHTML Display invoice detail info part
 //////////////////////////////////////////////////////////////////////////////
 function dis_invoice_detail($inv_q) {
-  global $display;
+  global $display, $set_theme, $path, $ico_company, $ico_deal, $ico_project;
   global $l_company, $l_deal, $l_project,$l_amount_ht, $l_amount_ttc;
   global $l_date, $l_label, $l_number, $l_inout, $l_supplier, $l_client;
   global $l_status, $l_comment, $l_invoice;
@@ -396,27 +406,39 @@ function dis_invoice_detail($inv_q) {
   $ht = $inv_q->f("invoice_amount_ht");
   $ttc = $inv_q->f("invoice_amount_ttc");
   $comment = nl2br($inv_q->f("invoice_comment"));
+  $comp_id = $inv_q->f("company_id");
   $company = $inv_q->f("company_name");
+  $deal_id = $inv_q->f("invoice_deal_id");
   $deal = $inv_q->f("deal_label");
+  $project_id = $inv_q->f("invoice_project_id");
   $project = $inv_q->f("project_name");
 
   $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+
+  $url_comp = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id");
+  if ($deal_id > 0) {
+    $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
+    $deal_link = "<a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>";
+  }
+  if ($project_id > 0) {
+    $url_proj = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$project_id");
+    $proj_link = "<a href=\"$url_proj\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>";
+  }
 
   $block .= "
     <div class=\"detailHead\">$title</div>
 
     <table class=\"detail\">
     <tr>
-      <td class=\"detailLabel\">$l_company</td>
+      <td class=\"detailLabel\">$l_company <a href=\"$url_comp\"><img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a></td>
       <td class=\"detailText\">$company</td>
     </tr>
     <tr>
-      $dis_company
-      <td class=\"detailLabel\">$l_deal</td>
+      <td class=\"detailLabel\">$l_deal $deal_link</td>
       <td class=\"detailText\">$deal</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_project</td>
+      <td class=\"detailLabel\">$l_project $proj_link</td>
       <td class=\"detailText\">$project</td>
     </tr>
     </table>
@@ -690,6 +712,89 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   </form>";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays and check the invoice links (and delete form if ok)
+// Parameters:
+//   - $p_id : invoice id
+///////////////////////////////////////////////////////////////////////////////
+function dis_check_invoice_links($p_id) {
+  global $path, $display;
+  global $l_can_delete, $l_cant_delete, $l_back;
+  global $l_link_payment, $l_link_payment_no;
+
+  $delete_ok = true;
+
+  // Links from payments
+  $obm_q = run_query_invoice_payment_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_link_p = "<tr><td class=\"detailHead\">$l_link_payment</td></tr>";
+    while ($obm_q->next_record()) {
+      $pid = $obm_q->f("payment_id");
+      $plabel = $obm_q->f("payment_label");
+      $pamount = $obm_q->f("payment_amount");
+      $display_link_p .= "
+      <tr>
+        <td class=\"detailLabel\">
+          <a class=\"detailLabel\" href=\"".url_prepare("$path/payment/payment_index.php?action=detailconsult&amp;param_payment=$pid")."\">
+          $plabel ($pamount)</a>
+        </td>
+      </tr>";
+    }
+  } else {
+    $display_link_p = "<tr><td class=\"detailHead\">$l_link_payment_no</td></tr>";
+  }
+
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+     action=\"".url_prepare("invoice_index.php") ."\">
+     <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+     <input type=\"hidden\" name=\"param_invoice\" value=\"$p_id\" />
+     <input type=\"submit\" value=\"$l_back\" />
+     </form>";
+
+  $block .= "<table class=\"detail\">
+    $display_link_p
+    </table>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_invoice_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the delete form (button)                                         //
+// Parameters:
+//   - $p_id : invoice Id
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_delete_form($p_id) {
+  global $l_delete;
+
+  // --- HTML Template --------------------------------------------------------
+  return "
+    <form name=\"form_delete\" method=\"post\" action=\"" . url_prepare("invoice_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_invoice\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+  </form>";
 }
 
 

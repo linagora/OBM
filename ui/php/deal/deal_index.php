@@ -214,7 +214,7 @@ if ($action == "ext_get_id") {
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($deal["doc_nb"] > 0) {
-    $nb = run_query_insert_documents($deal,"Deal");
+    $nb = run_query_insert_documents($deal, "deal");
     $display["msg"] .= display_ok_msg("$nb $l_document_added");
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);

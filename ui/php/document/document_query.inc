@@ -40,8 +40,8 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   $where .= " and document_kind != '0'";
 
   if ($entity != "") {
-    $join_ent = "LEFT JOIN DocumentEntity on document_id = documententity_documentid";
-    $where .= " and documententity_entity = '$entity' and documententity_entityid = '$entity_id'";
+    $join_ent = "LEFT JOIN DocumentEntity on document_id = documententity_document_id";
+    $where .= " and documententity_entity = '$entity' and documententity_entity_id = '$entity_id'";
   }
 
   if ($title != "") {
@@ -290,8 +290,8 @@ function run_query_insert(&$document) {
     
     $query = "insert into DocumentEntity (
       documententity_entity,
-      documententity_entityid,
-      documententity_documentid
+      documententity_entity_id,
+      documententity_document_id
     ) values (    
       '$entity',
       '$entity_id',
@@ -565,7 +565,7 @@ function run_query_get_mimetype($path){
 function run_query_document_links($document_id) {
 
   $obm_q = new DB_OBM;
-  $query = "select * from DocumentEntity where documententity_documentid =
+  $query = "select * from DocumentEntity where documententity_document_id =
            '$document_id'";
   $obm_q->query($query);
   return $obm_q->nf();
@@ -581,7 +581,7 @@ function run_query_repository_links($document_id) {
   global $cdg_sql, $default_path;
 
   $obm_q = new DB_OBM;
-  $query = "select * from Document where document_id = $document_id";
+  $query = "select * from Document where document_id = '$document_id'";
   $obm_q->query($query);
   $obm_q->next_record();
   $doc_type = $obm_q->f("document_type");

@@ -62,12 +62,15 @@ DROP Table DealInvoice;
 -------------------------------------------------------------------------------
 -- Update Payment table
 -------------------------------------------------------------------------------
-ALTER TABLE Payment ADD COLUMN payment_invoice_id integer;
-ALTER TABLE Payment ALTER COLUMN payment_invoice_id SET DEFAULT 0;
-ALTER TABLE Payment ALTER COLUMN payment_invoice_id SET NOT NULL;
 ALTER TABLE Payment ADD COLUMN payment_company_id integer DEFAULT NULL;
 
-UPDATE Payment set payment_invoice_id=(select paymentinvoice_invoice_id from PaymentInvoice where paymentinvoice_payment_id=payment_id);
-UPDATE Payment set payment_company_id=(select invoice_company_id from Invoice where invoice_id=payment_invoice_id);
 
-DROP Table PaymentInvoice;
+-------------------------------------------------------------------------------
+-- Update DocumentEntity table for conformance and content
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentEntity RENAME COLUMN documententity_documentid TO documententity_document_id;
+ALTER TABLE DocumentEntity RENAME COLUMN documententity_entityid TO documententity_entity_id;
+
+UPDATE DocumentEntity set documententity_entity = 'company' where documententity_entity='Company';
+UPDATE DocumentEntity set documententity_entity = 'contact' where documententity_entity='Contact';
+UPDATE DocumentEntity set documententity_entity = 'deal' where documententity_entity='Deal';

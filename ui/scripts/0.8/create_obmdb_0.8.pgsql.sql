@@ -723,10 +723,10 @@ CREATE TABLE DocumentMimeType (
 -- Table structure for table 'DocumentEntity'
 --
 CREATE TABLE DocumentEntity (
-  documententity_documentid  integer NOT NULL,
-  documententity_entityid    integer NOT NULL,
-  documententity_entity      varchar(255) NOT NULL,
-  PRIMARY KEY (documententity_documentid,documententity_entityid,documententity_entity)
+  documententity_document_id  integer NOT NULL,
+  documententity_entity_id    integer NOT NULL,
+  documententity_entity       varchar(255) NOT NULL,
+  PRIMARY KEY (documententity_document_id, documententity_entity_id, documententity_entity)
 );
 
 
@@ -998,7 +998,6 @@ CREATE TABLE  Payment (
   payment_timecreate      timestamp,
   payment_userupdate      integer,
   payment_usercreate      integer,
-  payment_invoice_id      integer NOT NULL,
   payment_company_id      integer NOT NULL,
   payment_number          integer default null,
   payment_date            date,

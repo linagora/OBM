@@ -2,14 +2,30 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : invoice_index.inc
 //     - Desc : Invoice Main file
-// 2001-07-30 Nicolas Roman
+// 2001-07-30 Aliacom - Nicolas Roman
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+// Actions :
+// - index (default)    -- search fields  -- show the invoice search form
+// - search             -- search fields  -- show the result set of search
+// - new                -- $params        -- show the new invoice form
+// - detailconsult      -- $param_invoice -- show the invoice detail
+// - detailupdate       -- $param_invoice -- show the invoice detail form
+// - insert             -- form fields    -- insert the invoice
+// - update             -- form fields    -- update the invoice
+// - check_delete       -- $param_invoice -- check links before delete
+// - delete             -- $param_invoice -- delete the invoice
+// - display            --                -- display and set display parameters
+// - dispref_display    --                -- update one field display value
+// - dispref_level      --                -- update one field display position 
+// - duplicate
+// - updatearchive
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
 $section = "COMPTA";
-$menu="INVOICE";
+$menu = "INVOICE";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -79,7 +95,7 @@ if ($action == "index" || $action == "") {
   $display["search"] = dis_invoice_search_form($invoice); 
 
 } elseif ($action == "updatearchive")  {
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   reset ($HTTP_POST_VARS);
   $nb_invoices = 0;
 
@@ -95,8 +111,13 @@ if ($action == "index" || $action == "") {
   require ("invoice_js.inc");
   $display["search"] = dis_invoice_search_form($invoice); 
 
+} elseif ($action == "check_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("invoice_js.inc");
+  $display["detail"] = dis_check_invoice_links($invoice["id"]);
+
 } elseif ($action == "delete")  { // delete means delete an invoice 
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   // are there any payments (paid) connected to this invoice ?
   $payments_connected = run_query_invoice_payment($invoice["id"], -1);
   // if yes, we delete all associations
@@ -107,43 +128,35 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_err_msg ($l_delete_error."<br>".$l_payments_exist);
   }
   require ("invoice_js.inc");
-  $display["search"] = dis_invoice_search_form($invoice); 
+  $display["search"] = dis_invoice_search_form($invoice);
 
 } elseif ($action == "duplicate") {
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   // we give the user the traditionnal form to modify this invoice :
   require("invoice_js.inc"); 
   $display["detail"] = dis_invoice_form($action, $invoice);
   
 } elseif ($action == "display") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "invoice", 1);
   $display["detail"] = dis_invoice_display_pref ($pref_q);
   
 } else if($action == "dispref_display") {
-/////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update ($entity, $fieldname, $disstatus) ;
   $pref_q = run_query_display_pref ($uid, "invoice", 1);
   $display["detail"] = dis_invoice_display_pref ($pref_q);
   
 } else if($action == "dispref_level") {
-/////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update ($entity, $new_level, $fieldorder) ;
   $pref_q = run_query_display_pref($uid, "invoice", 1);
   $display["detail"] = dis_invoice_display_pref ($pref_q);
-
-} elseif ($action == "admin")  {
-//////////////////////h////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {  
-    $display["detail"] .= "Nothing here for now";
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }	
 }
   
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_invoice");
 $display["header"] = generate_menu($menu, $section);
@@ -292,20 +305,20 @@ function get_invoice_action() {
     'Condition'=> array ('None') 
                                         );
 
+// Check Delete
+  $actions["INVOICE"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/invoice/invoice_index.php?action=check_delete&amp;param_invoice=".$invoice["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update') 
+                                     	      );
+
 // Delete
   $actions["INVOICE"]["delete"] = array (
-    'Name'     => $l_header_delete,
     'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;param_invoice=".$invoice["id"],
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'detailupdate') 
+    'Condition'=> array ('None') 
                                      	);
-// Administration
-  $actions["INVOICE"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/invoice/invoice_index.php?action=admin",
-    'Right'    => $cright_read_admin,
-    'Condition'=> array ('all') 
-                                       );
 
 // Display
   $actions["INVOICE"]["display"] = array (

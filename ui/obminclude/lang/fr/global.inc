@@ -55,6 +55,9 @@ $l_public = "Public";
 $l_manager = "Responsable";
 $l_client = "Client";
 $l_supplier = "Fournisseur";
+$l_total = "Total";
+$l_active = "En cours";
+$l_new = "Créer";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
 

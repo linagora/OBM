@@ -425,14 +425,14 @@ function run_query_tasktype($tt_cat="") {
 // Parameters:
 //   - $id     : Id of entity
 //   - $entity : entity (deal, company)
-//   - $arch   : flag to tell if archive projects should be counted (if true)
+//   - $arch   : flag to tell if archived projects should be counted (if true)
 // Return:
-//   - Database Object : userobm list
+//   - $nb     : number of Project
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_linked_project_nb ($id, $entity, $arch="") {
   global $cdg_sql;
 
-  $query = "select count(*) as nb from Project
+  $query = "select count(project_id) as nb from Project
     where project_${entity}_id = '$id'";
 
   if (! $arch) {
@@ -454,13 +454,41 @@ function run_query_linked_project_nb ($id, $entity, $arch="") {
 //   - $id     : Id of entity
 //   - $entity : entity (deal, company)
 // Return:
-//   - Database Object : userobm list
+//   - $nb     : number of contract
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_linked_contract_nb ($id, $entity) {
   global $cdg_sql;
 
-  $query = "select count(*) as nb from Contract
+  $query = "select count(contract_id) as nb from Contract
     where contract_${entity}_id = '$id'";
+
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->next_record();
+
+  return $obm_q->f("nb");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : number of invoice linked to an entity
+// Parameters:
+//   - $id     : Id of entity
+//   - $entity : entity (deal, company, project)
+//   - $arch   : flag to tell if archived invoices should be counted (if true)
+// Return:
+//   - $nb     : number of invoice
+///////////////////////////////////////////////////////////////////////////////
+function run_query_linked_invoice_nb ($id, $entity, $arch="") {
+  global $cdg_sql;
+
+  $query = "select count(invoice_id) as nb from Invoice
+    where invoice_${entity}_id = '$id'";
+
+  if (! $arch) {
+    $query .= " and invoice_archive='0'";
+  }
 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -485,7 +513,7 @@ function run_query_document_nb ($id,$entity) {
   $query = "select count(*) as nb
     from DocumentEntity
     where documententity_entity = '$entity'
-      and documententity_entityid = '$id'"; 
+      and documententity_entity_id = '$id'"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -507,7 +535,7 @@ function run_query_delete_document($id,$entity) {
   global $cdg_sql;
 
   $query = "Delete from DocumentEntity where documententity_entity = '$entity'
-            and documententity_entityid = '$id'"; 
+            and documententity_entity_id = '$id'"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -515,14 +543,14 @@ function run_query_delete_document($id,$entity) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// query execution : Insert document linked with a entity      //
+// query execution : Insert document linked with a entity
 // Parameters:
 //   - $id  :  Id of entity
 //   - $entity  :  Type of entity (deal, company..)
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert_documents($ids,$entity) {
+function run_query_insert_documents($ids, $entity) {
   global $cdg_sql,$auth;
 
   $id = $ids["id"];
@@ -534,8 +562,8 @@ function run_query_insert_documents($ids,$entity) {
     
     $query = "select * from DocumentEntity
       where documententity_entity='$entity'
-      and documententity_entityid='$id'
-      and documententity_documentid = '$d_id'";
+      and documententity_entity_id='$id'
+      and documententity_document_id = '$d_id'";
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
     $retour = $test_q->query($query);
@@ -544,8 +572,8 @@ function run_query_insert_documents($ids,$entity) {
     if ($test_q->num_rows() == 0) {
       $query = "insert into DocumentEntity (
        	documententity_entity,
-	documententity_entityid,
-	documententity_documentid
+	documententity_entity_id,
+	documententity_document_id
       )
       values (    
 	'$entity',

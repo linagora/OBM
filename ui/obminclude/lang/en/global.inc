@@ -55,6 +55,9 @@ $l_public = "Public";
 $l_manager = "Manager";
 $l_client = "Customer";
 $l_supplier = "Supplier";
+$l_total = "Total";
+$l_active = "Active";
+$l_new = "New";
 
 // Entities
 $l_company = "Company";

@@ -43,11 +43,7 @@ $l_at = "at";
 $l_deal_select_company = "Select the company which whom the deal must be filled";
 $l_deal_select_parentdeal = "Select the parentdeal to which the deal must be affected";
 $l_affect_deal= "Change Parent Deal";
-$l_project_new = "New project";
 $l_no_invoice = "No invoice connected";
-$l_invoice_new = "New invoice";
-$l_invoice_active = "Actives Invoices";
-$l_invoice_total = "Total Invoices";
 $l_see_archived_invoices = "See archived invoices too";
 $l_kind_manage = "Deal Kind Management";
 $l_kind_exist = "Existing Kinds";
@@ -59,8 +55,6 @@ $l_cat_manage = "Category management";
 $l_cat_exist = "Existing Category";
 $l_cat_new = "New category";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
-$l_add_contrat = "Add a contract";
-$l_contract_new = "New contract";
 
 // Actions
 $l_select_deal = "Select a Deal";

@@ -94,6 +94,11 @@ $l_update_ok = "The invoice has been updated successfully.";
 $l_update_error = "The update of the invoice has failed !";
 $l_query_error = "Trouble executing the query...";
 
+$l_link_payment = "These payments are connected to this invoice";
+$l_link_payment_no = "The invoice hasn't any payment";
+$l_cant_delete = "The invoice can't be deleted !";
+$l_can_delete = "The invoice can be deleted.";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe invoice number is not valid!";
 $lj_check_money_ht = "\\nThe amount without charges is not valid!";

@@ -496,9 +496,10 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new, $ico_project, $ico_contract;
-  global $l_header_contact, $l_contact_new, $l_header_project, $l_project_new;
-  global $l_header_deal, $l_deal_new, $l_header_contract, $l_contract_new;
-  global $l_header_document, $l_document_new, $l_document_add;
+  global $ico_invoice;
+  global $l_new, $l_header_contact, $l_header_project, $l_header_deal;
+  global $l_header_contract, $l_header_invoice, $l_header_document;
+  global $l_document_add;
   global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
@@ -521,7 +522,7 @@ function html_company_links($co_q) {
     <li><a href=\"$url_con_list\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
         <a href=\"$url_con_list\">$l_header_contact ($con_num)</a></li>
     <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
-        <a href=\"$url_con_new\">$l_contact_new</a></li>
+        <a href=\"$url_con_new\">$l_new</a></li>
   </ul>";
   }
 
@@ -538,23 +539,23 @@ function html_company_links($co_q) {
         <a href=\"$url_deal_list\">$deal_num</a> /
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
-        <a href=\"$url_deal_new\">$l_deal_new</a></li>
+        <a href=\"$url_deal_new\">$l_new</a></li>
   </ul>";
   }
 
   // Document
   if ($cgp_show["module"]["document"]) {
-    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
-    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Company");
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=company");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=company");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
-    $nb_document = run_query_document_nb ($id,"Company");
+    $nb_document = run_query_document_nb ($id, "company");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
-        <a href=\"$url_doc_new\">$l_document_new</a></li>
+        <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
@@ -566,7 +567,8 @@ function html_company_links($co_q) {
   // Project
   if ($cgp_show["module"]["project"]) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
-    $nb_pro = run_query_linked_project_nb ($id, "company");
+    $url_pro_tot = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
+    $nb_pro = run_query_linked_project_nb($id, "company");
     $nb_pro_total = run_query_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_project = "
@@ -574,15 +576,15 @@ function html_company_links($co_q) {
   <ul class=\"linkList\">
     <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
         $l_header_project ( <a href=\"$url_pro\">$nb_pro</a> /
-        <a href=\"$url_pro\">$nb_pro_total</a> )</li>
+        <a href=\"$url_pro_tot\">$nb_pro_total</a> )</li>
     <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
-        <a href=\"$url_pro_new\">$l_project_new</a></li>
+        <a href=\"$url_pro_new\">$l_new</a></li>
   </ul>";
   }
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $nb_ctra = run_query_linked_contract_nb ($id,"company");
+    $nb_ctra = run_query_linked_contract_nb($id, "company");
     $url_ctra = url_prepare("$path/contract/contract_index.php?action=search&amp;param_company=$id");
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
 
@@ -592,7 +594,25 @@ function html_company_links($co_q) {
     <li><a href=\"$url_ctra\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
         <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
     <li><a href=\"$url_ctra_new\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
-        <a href=\"$url_ctra_new\">$l_contract_new</a></li>
+        <a href=\"$url_ctra_new\">$l_new</a></li>
+  </ul>";
+  }
+
+  // Invoice
+  if ($cgp_show["module"]["invoice"]) {
+    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id");
+    $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id");
+    $nb_inv_tot = run_query_linked_invoice_nb($id, "company", 1);
+    $nb_inv = run_query_linked_invoice_nb($id, "company");
+    $block_invoice = "
+  <div class=\"linkTitle\">:: $l_header_invoice</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
+    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
+        <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";
   }
 
@@ -604,6 +624,7 @@ function html_company_links($co_q) {
   $block_project
   $block_contract
   $block_doc
+  $block_invoice
 </div>";
 
   return $block;
@@ -616,9 +637,7 @@ function html_company_links($co_q) {
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q, $cat_q) {
-  // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  // - Labels
   global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;

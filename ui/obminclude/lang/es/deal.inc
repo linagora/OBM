@@ -40,10 +40,7 @@ $l_at = "a las";
 $l_deal_select_company = "Seleccione la compañía a quien el negocio debe ser asignado";
 $l_deal_select_parentdeal = "Seleccione el negocio original (Padre) a quien este negocio debe afectar.";
 $l_affect_deal= "Cambie Negocio Original(Padre)";
-$l_project_new = "Nuevo Proyecto";
-$l_invoice_new = "Nuevo factura";
 $l_no_invoice = "No hay facturas relacionadas";
-$l_archived_invoices = " Facturas Archivadas";
 $l_see_archived_invoices = "Ver facturas archivadas tambien";
 $l_kind_manage = "Manejo del Tipo de Negocio";
 $l_kind_exist = "Tipos Existentes";
@@ -62,8 +59,6 @@ $l_invoice_ht = "Montant HT";
 $l_invoice_ttc = "Montant TTC";
 $l_invoice_status = "Estado";
 $l_invoice_date = "Fecha";
-$l_add_contrat = "Adicionar un contrato";
-$l_contract_new = "Nuevo contrato";
 
 $l_parentdeal_deals = "Negocios pertenecientes a este Negocio Original(Padre)";
 

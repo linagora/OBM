@@ -511,20 +511,17 @@ function html_deal_search_list($deal_q, $pref_q, $nb_deal, $deal) {
 // Display: Deal links menu                                                  //
 // Parameters:
 //   - $deal_q : DBO : information about the deal
-//   - $inv_nb : invoices number
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_links($deal_q, $inv_nb) {
-  // -- Themes
+function html_deal_links($deal_q) {
   global $set_theme, $ico_pdeal, $ico_deal, $ico_contract;
   global $ico_contract_new, $ico_invoice, $ico_invoice_new, $ico_project;
-  // -- Labels
-  global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
-  global $l_project_new, $l_header_project;
-  global $l_header_document,$ico_document,$l_deal, $l_header_project;
-  global $l_header_invoice, $l_invoice_active, $l_invoice_total,$l_invoice_new;
-  global $l_document_new,$l_document_add,$ico_document_new;
+  global $l_new;
+  global $l_parentdeal, $l_affect_deal, $l_header_contract;
+  global $l_header_project, $l_header_invoice;
+  global $l_header_document,$ico_document, $l_deal, $l_header_project;
+  global $l_document_add, $ico_document_new;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $deal_q->f("deal_id");
@@ -563,7 +560,7 @@ function html_deal_links($deal_q, $inv_nb) {
       $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
       $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_pro_new\">$l_project_new</a></li>";
+            <a href=\"$url_pro_new\">$l_new</a></li>";
     }
     
     $block_project = "
@@ -575,7 +572,7 @@ function html_deal_links($deal_q, $inv_nb) {
 
   // Contract
   if ($cgp_show["module"]["contract"]) {
-    $contract_nb = run_query_contract_nb ($id);
+    $contract_nb = run_query_linked_contract_nb($id, "deal");
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
     $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
     $block_contract = "
@@ -584,7 +581,7 @@ function html_deal_links($deal_q, $inv_nb) {
     <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
     <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
-        <a href=\"$url_contract_new\">$l_contract_new</a></li>
+        <a href=\"$url_contract_new\">$l_new</a></li>
   </ul>";
   }
 
@@ -593,32 +590,32 @@ function html_deal_links($deal_q, $inv_nb) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
     $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
-    $nb_inv_arch = run_query_nb_total_invoices ($id);
+    $nb_inv_tot = run_query_linked_invoice_nb($id, "deal", 1);
+    $nb_inv = run_query_linked_invoice_nb($id, "deal");
     $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv\">$l_invoice_active ($inv_nb)</a></li>
-    <li><a href=\"$url_inv_tot\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv_tot\">$l_invoice_total ($nb_inv_arch)</a></li>
+        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
     <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        <a href=\"$url_inv_new\">$l_invoice_new</a></li>
+        <a href=\"$url_inv_new\">$l_new</a></li>
   </ul>";
   }
 
   // Document
   if ($cgp_show["module"]["document"]) {
-    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
-    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Deal");
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=deal");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=deal");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
-    $nb_document = run_query_document_nb($id,"Deal");
+    $nb_document = run_query_document_nb($id, "deal");
     $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
-        <a href=\"$url_doc_new\">$l_document_new</a></li>
+        <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
@@ -667,7 +664,7 @@ function dis_deal_consult($deal) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Consult                                                  //
+// XHTML Display: Deal Consult
 // Parameters :
 //   - $deal_q  : DBO : information about the deal
 ///////////////////////////////////////////////////////////////////////////////
@@ -715,7 +712,7 @@ function html_deal_consult($deal_q) {
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
-  $display["link"] = html_deal_links($deal_q, $inv_nb);
+  $display["link"] = html_deal_links($deal_q);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
    
   $show_cat = (! $cgp_hide["deal"]["category1"]);

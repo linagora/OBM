@@ -424,6 +424,28 @@ function run_query_delete($p_invoice_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return all the payments attached to the invoice
+// Parameters:
+//   - $p_id : invoice Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_invoice_payment_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select distinct payment_id, payment_label, payment_amount 
+    from Payment
+         left join PaymentInvoice on payment_id=paymentinvoice_payment_id
+    where paymentinvoice_invoice_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
 // get all details about a payment
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail_payment ($p_payment_id) {

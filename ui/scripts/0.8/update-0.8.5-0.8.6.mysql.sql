@@ -72,13 +72,15 @@ ALTER TABLE Payment CHANGE COLUMN payment_usercreate payment_usercreate int(8) a
 ALTER TABLE Payment CHANGE COLUMN payment_comment payment_comment text after payment_checked;
 
 -- New columns
-ALTER TABLE Payment ADD COLUMN payment_invoice_id int(8) NOT NULL after payment_usercreate;
-ALTER TABLE Payment ADD COLUMN payment_company_id int(8) NOT NULL after payment_invoice_id;
+ALTER TABLE Payment ADD COLUMN payment_company_id int(8) NOT NULL after payment_usercreate;
 
 
-UPDATE Payment left join PaymentInvoice on payment_id=paymentinvoice_payment_id
-               left join Invoice on paymentinvoice_invoice_id=invoice_id
-set payment_invoice_id = invoice_id,
-payment_company_id = invoice_company_id;
+-------------------------------------------------------------------------------
+-- Update DocumentEntity table for conformance and content
+-------------------------------------------------------------------------------
+ALTER TABLE DocumentEntity CHANGE documententity_documentid documententity_document_id int(8) DEFAULT '0' NOT NULL;
+ALTER TABLE DocumentEntity CHANGE documententity_entityid documententity_entity_id int(8) DEFAULT '0' NOT NULL;
 
-DROP Table IF EXISTS PaymentInvoice;
+UPDATE DocumentEntity set documententity_entity = 'company' where documententity_entity='Company';
+UPDATE DocumentEntity set documententity_entity = 'contact' where documententity_entity='Contact';
+UPDATE DocumentEntity set documententity_entity = 'deal' where documententity_entity='Deal';

@@ -84,6 +84,11 @@ $l_too_much_money = "The total amount of paiements is bigger than the invoice to
 $l_error_try_again = "There are errors !! Please restart from the beginning";
 $l_try_again = "Try Again !";
 
+$l_link_payment = "Ces paiments sont liés à cette facture";
+$l_link_payment_no = "La facture n'est liée à aucun paiment";
+$l_cant_delete = "La facture ne peut être supprimée !";
+$l_can_delete = "La facture peut être supprimée.";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";
 $l_check_money_ht = "\\n Le montant HT de la Facture est incorrect !";

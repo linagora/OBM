@@ -181,19 +181,16 @@ function run_query_detail($id) {
       Deal
       left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id
       left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id
+      left join Company on deal_company_id=company_id
       left join Contact c1 on deal_contact1_id=c1.contact_id
       left join Contact c2 on deal_contact2_id=c2.contact_id
       left join UserObm c on deal_usercreate=c.userobm_id
-      left join UserObm u on deal_userupdate=u.userobm_id,
-      DealType,
-      TaskType,
-      DealStatus,
-      Company
+      left join UserObm u on deal_userupdate=u.userobm_id
+      left join DealType on deal_type_id=dealtype_id
+      left join DealStatus on deal_status_id=dealstatus_id,
+      TaskType
     where deal_id='$id'
-      and dealtype_id=deal_type_id
-      and tasktype_id=deal_tasktype_id
-      and dealstatus_id=deal_status_id
-      and company_id=deal_company_id";
+      and tasktype_id=deal_tasktype_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -1813,49 +1810,6 @@ function get_parent_potential($p_id)  {
   $obm_q->next_record();
 
   return number_format($obm_q->f("res_balanced")) . " / " .$obm_q->f("res") ;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// returns the number of total (active + archived) invoices connected to a deal
-// Parameters:
-//   - $id : deal id
-// Returns:
-//   number of invoices connected to the deal
-//////////////////////////////////////////////////////////////////////////////
-function run_query_nb_total_invoices($id) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-
-  $query = "select invoice_id from Invoice
-    where invoice_deal_id = '$id'";
-
-  display_debug_msg($query, $cdg_sql, "run_query_nb_total_invoices()");
-  $obm_q->query($query);
-
-  return $obm_q->nf();
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// returns the number of contracts connected to a deal
-//////////////////////////////////////////////////////////////////////////////
-function run_query_contract_nb ($deal_id) {
-  global $cdg_sql;
-
-  if ($deal_id) {
-    $query = "select count(*) as Nb from Contract
-      Where contract_deal_id='$deal_id'";
-    display_debug_msg ("<b> run_query_contract_nb() : </b>".$query, $cdg_sql);
-
-    $obm_q = new DB_OBM;
-    $obm_q->query($query);
-    $obm_q->next_record();
-    return $obm_q->f("Nb");
-  }
-  else
-    return 0;
 }
 
 

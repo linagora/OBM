@@ -34,7 +34,7 @@ $fieldnames["documentmimetype_label"] = $l_mimetype;
 function dis_data_document(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
 
-  if ($fieldname == "document_title") {
+  if (($fieldname == "document_title") && $link_ok) {
     $res["url"] = "$path/document/document_index.php?action=detailconsult&amp;param_document=".$OD->data_set->f("document_id");
   }
 
