@@ -1769,7 +1769,7 @@ function display_popup_tree($tree,$indent) {
 	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
-	   <input type=\"checkbox\" name=\"$id\" /><span id=\"$id\">$code - $label</span>
+	   <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
 	 </tr>
 	</table>
@@ -1783,7 +1783,7 @@ function display_popup_tree($tree,$indent) {
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
-	     <input type=\"checkbox\" name=\"$id\" /><span id=\"$id\">$code - $label</span>
+	     <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
 	 </tr>
 	</table>";

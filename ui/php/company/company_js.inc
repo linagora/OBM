@@ -357,7 +357,7 @@ if (isset($ext_target)) {
 	   }
 	 }
 	 if(bool==false) {
-	    cat_name = document.getElementById(int_form.elements[i].name);
+	    cat_name = document.getElementById('data'+int_form.elements[i].name);
 	    cat_name = cat_name.innerHTML;
 	    window.opener.document.$ext_target.options[ext_size] = new Option(cat_name);
             window.opener.document.$ext_target.options[ext_size].value = int_form.elements[i].name;
