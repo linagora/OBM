@@ -203,13 +203,14 @@ elseif ($action == "new") {
   require("agenda_js.inc");
   require("$obminclude/calendar.js");
   $user_obm = run_query_userobm_writable();
+  $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
   if($p_user_meeting==1) {
     $p_user_array = $sel_user_id;
   }else {
     $p_user_array = array($auth->auth["uid"]);
   }
-  $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
+  $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $p_user_array);
 }
 
 elseif ($action == "insert") {
@@ -245,8 +246,9 @@ elseif ($action == "insert") {
       $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
       $user_obm = run_query_userobm_writable();
+      $grp_obm = run_query_group_writable();
       $cat_event = run_query_get_eventcategories();
-      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
     }
   }
   else {
@@ -254,8 +256,9 @@ elseif ($action == "insert") {
     require("agenda_js.inc");
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm_writable();
+    $grp_obm = run_query_group_writable();
     $cat_event = run_query_get_eventcategories();
-    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
 }
 
@@ -288,8 +291,9 @@ elseif ($action == "detailconsult") {
   if ($param_event > 0) {
     $eve_q = run_query_detail($param_event,$agenda["date"]);
     $cust_q = run_query_event_customers($param_event,$agenda["date"]);
+    $obm_q_grp = run_query_event_groups($param_event,$agenda["date"]);
     $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("timecreate"),$eve_q->f("timeupdate"));
-    $display["detail"] = html_calendar_consult($eve_q, $cust_q);
+    $display["detail"] = html_calendar_consult($eve_q, $cust_q,$obm_q_grp);
   }
 }
 
@@ -299,11 +303,12 @@ if ($param_event > 0) {
   require("$obminclude/calendar.js");  
   require("agenda_js.inc");
   $user_obm = run_query_userobm_writable();
+  $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
   $eve_q = run_query_detail($param_event,$agenda["date"]);  
   $p_user_array = run_query_event_customers_array($param_event,$agenda["date"]);
   $display["detailInfo"] = display_record_info($eve_q->f("calendarevent_usercreate"),$eve_q->f("calendarevent_userupdate"),$eve_q->f("calendarevent_timecreate"),$eve_q->f("calendarevent_timeupdate"));
-  $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm, $cat_event, $p_user_array);
+  $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm,$grp_obm, $cat_event, $p_user_array);
   }
 }
 
@@ -341,8 +346,9 @@ elseif ($action == "update") {
       $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
       $user_obm = run_query_userobm_writable();
+      $grp_obm = run_query_group_writable();
       $cat_event = run_query_get_eventcategories();
-      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
     }
   }
   else {
@@ -350,8 +356,9 @@ elseif ($action == "update") {
     require("$obminclude/calendar.js");    
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm_writable();
+    $grp_obm = run_query_group_writable();
     $cat_event = run_query_get_eventcategories();
-    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+    $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
 }
 
@@ -495,7 +502,7 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new;
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_grp_id;
 
   // Agenda fields
   if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
@@ -579,6 +586,8 @@ function get_param_agenda() {
   if (isset($hd_date_begin)) $agenda["date_begin"] = $hd_date_begin;
   if (isset($hd_date_end)) $agenda["date_end"] = $hd_date_end;
   if (isset($rd_decision_event)) $agenda["decision_event"] = $rd_decision_event;
+  if (is_array($sel_grp_id)) $agenda["group"] = $sel_grp_id;
+
 
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {

@@ -31,10 +31,18 @@ $l_path = "Path";
 $l_private = "Private";
 $l_title = "Title";
 $l_updatetime = "Update time";
-$l_company_display = "Display options for documents list";
+$l_document_display = "Display options for documents list";
 $l_size = "Size";
 $l_bytes = "bytes";
 $l_name = "Name";
+$l_header_new_repository = "New repository";
+$l_repository = "Repository";
+$l_add_repos = "Create repository";
+$l_new_file = "File to send";
+$l_link = "HTML Link";
+$l_existing_file = "File alreand sent";
+$l_kind = "Kind of document";
+$l_auto = "Default value";
 
 // Message
 $l_cat1_checkdelete = "Check or delete Category 1"; 
@@ -86,6 +94,7 @@ $l_no_display = "Fill the search fields and press < Find > to retrieve the docum
 $l_query_error = "Critical trouble during the execution of the query.";
 $l_update_ok = "The document has been updated successfully.";
 $l_update_error = "The update of the document has failed !";
+$l_header_tree = "Tree";
 
 // Actions
 $l_checkdelete = "Check or Delete the Document";
@@ -106,3 +115,8 @@ $l_j_mime_update = "You have to fill all the fields before submitting.";
 $l_j_mime_delete = "You have to select a mime-type";
 $l_j_cat1_delete = "You have to select a category1";
 $l_j_cat2_delete = "You have to select a category2";
+$l_fill_repository_name = "You have to fill the name of the repository";
+$l_invalid_repository_path = "Incorrect path for the repository";
+$l_invalid_file = "Incorrect file";
+$l_invalid_existing_file = "The path is not a valid file";
+

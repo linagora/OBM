@@ -200,10 +200,11 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
-  global $set_theme,$l_document;
-  global $l_title, $l_category1, $l_mimetype,$l_private;
-  global $l_find, $l_author, $l_category2,$l_path; 
-  global $l_file,$l_insert,$l_update,$l_checkdelete;
+  global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
+  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme;
+  global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width; 
+  global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto;
+
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -214,9 +215,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
-    $path = $doc_q->f("document_path");
+    $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
+    $kind = "file";
   }
-
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
   if (isset($document["title"])) { $title = $document["title"]; }
@@ -224,9 +225,11 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   if (isset($document["category1"])) { $cat1 = $document["category1"]; }
   if (isset($document["category2"])) { $cat2 = $document["category2"]; }
   if (isset($document["author"])) { $author = $document["author"]; }
-  if (isset($document["mimetype"])) { $mimetype = $document["mimetype"]; }
-  if (isset($document["path"])) { $path = $document["path"]; }
-  
+  if (isset($document["mime"])) { $mime = $document["mime"]; }
+  if (isset($document["path"])) { $fi_path = $document["path"]; }
+  if (isset($document["file"])) { $file = $document["file"]; } 
+  if (isset($document["kind"])) { $kind = $document["kind"]; }
+
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
   while($cat1_q->next_record()) {
@@ -250,6 +253,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
 
   // Mime-type select
   $sel_mime = "<select id=\"sel_mime\" name=\"sel_mime\">";
+  $sel_mime .= "<option value=\"$c_auto\">$l_auto</option>";
   while($mime_q->next_record()) {
     $type_id = $mime_q->f("documentmimetype_id");
     $sel_mime .= "\n<option value=\"$type_id\"";
@@ -272,15 +276,46 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <input type=\"submit\" value=\"$l_insert\" />
       ";
   }
+  
+   if($kind == "new_file" || $kind == "") { 
+     $checked = "checked=\"checked\"";
+     $dis_img2 = " style=\"display: none;\" ";
+   }
+   else 
+     $checked = "";
+   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"new_file\" $checked/> $l_new_file<br /> ";
+
+  if($kind == "file") {
+     $dis_field = " style=\"display: none;\" ";
+     $checked = "checked=\"checked\"";
+     $dis_img = " style=\"display: none;\" ";
+   }
+   else 
+     $checked = "";
+
+   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"file\" $checked/> $l_existing_file<br />";
+  
+
+  if($kind == "link") {
+     $dis_field = " style=\"display: none;\" ";
+     $dis_img = " style=\"display: none;\" ";
+     $checked = "checked=\"checked\"";
+     
+   }else 
+     $checked = "";
+
+   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"link\" $checked/> $l_link<br />";
 
   $display["title"] = "<div class=\"title\">$l_document : $title</div>";
+  $url1 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=false"; 
+  $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <form method=\"post\" name=\"f_mod_document\"
+    <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
       onsubmit=\"if (check_document(this)) return true; else return false;\"
-      action=\"".url_prepare("document_index.php")."\">
+      action=\"document_index.php\">
 
     <div class=\"detailHead\">$l_document</div>
 
@@ -290,7 +325,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"30\" value=\"$title\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_private</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td>
@@ -309,10 +344,25 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     <tr>
       <td class=\"detailLabel\">$l_mimetype</td>
       <td class=\"detailForm\">$sel_mime</td>
-    </tr><tr>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailForm\">$rd_kind</td>
+    </tr> 
+    <tr>
       <td class=\"detailLabel\">$l_path</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_path\" name=\"tf_path\" maxlength=\"30\" size=\"30\" value=\"$path\" /></td>
-    </tr>    
+      <td class=\"detailForm\">
+      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" maxlength=\"30\" size=\"30\" value=\"$fi_path\" />
+      <span id=\"browse_img\" $dis_img>
+      <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a></span>
+     <span id=\"browse_img_file\" $dis_img2>
+      <a href=\"javascript:return false;\" onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse_file\" alt=\"\" /></a></span>
+      </td>
+    </tr> 
+    <tr id=\"browse_field\" $dis_field>
+      <td class=\"detailLabel\">$l_file</td>
+      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" maxlength=\"30\" size=\"30\" value=\"$file\" /></td>
+    </tr> 
     </table>
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
@@ -323,6 +373,55 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display Repository Form                                                      //
+// Parameters:
+//   - $document[] : default values
+//     keys used  : uri, name
+///////////////////////////////////////////////////////////////////////////////
+function html_repository_form($action, $document) {
+  global $display,$popup_height,$popup_width;
+  global $set_theme,$l_document;
+  global $l_path, $l_name,$path,$ico_browse;
+  global $l_repository,$l_add_repos;
+  $name = $document["repository_name"];
+  $path = $document["repository_path"];
+  $dis_button = "
+  <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_repository\" />
+  <input type=\"submit\" value=\"$l_add_repos\" />
+  ";
+  $url = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].elements[1]&amp;ext_disp_file=false"; 
+
+  $block = "
+    <form method=\"get\" name=\"f_new_repository\"
+      onsubmit=\"if (check_repository(this)) return true; else return false;\"
+      action=\"".url_prepare("document_index.php")."\">
+
+    <div class=\"detailHead\">$l_repository</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_repository_name\" name=\"tf_repository_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_path</td>
+      <td class=\"detailForm\">
+     <input type=\"text\" id=\"tf_repository_path\" name=\"tf_repository_path\" value=\"$path\" size=\"50\"/>
+       <a href=\"javascript:return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a>
+      </td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>
+   ";
+
+  return $block;
+}
+
+   
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Document Consultation                                         //
 // Parameters:
@@ -976,4 +1075,126 @@ function dis_document_display_pref($display_pref_q) {
   $block = $dis_pref->display();
 
   return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_documents_tree($document,$display_file) {
+  global $document_path,$l_close;
+  $popup = $document["popup"];
+  $block = dis_repository_rec($document,$document_path,$display_file);
+  if($popup) {
+    $block.= "<a href=\"javascript:window.close();\">$l_close</a>";
+  }
+  return $block;
+  
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function dis_repository_rec($document,$repository,$display_file) {
+  global $document_path;
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  $root_handler = opendir($repository);
+  $relative_path = substr($repository,strlen($document_path)); 
+  $popup = $document["popup"];
+  
+  if($repository == $document_path) {
+    $name = "/";
+    $relative_path = $name;
+  }
+  else {
+    $name = substr($repository,strrpos($repository,'/')+1);
+  }
+  if($popup) {
+    if($display_file == "false") {
+      $js = "onclick=\"fill_ext_form('$relative_path');return false;\"";
+      $link_repo = "<a href=\"\" $js>";
+      $link_repo_end ="</a>";
+    }
+    $close = "<a href=\"javascript:window.close();\">$l_close</a>";
+  }
+
+  $files = array();
+  $repos = array();
+
+  while($file = readdir($root_handler)) {
+    $path = "$repository/$file";
+    if($file != ".." && $file != ".") {
+      if(is_dir($path)) {
+	$repos[] = $path;
+      }
+      elseif($display_file == "true") {
+	$files[] = $file;
+      }
+    }
+    
+  }
+  closedir($root_handler);
+  
+  if(count($repos) == 0 && (count($files) == 0 || $display_file == "false")) {
+     $img = "/images/$set_theme/$ico_directory";
+  }
+  else {
+     $img = "/images/$set_theme/$ico_directory_close";
+     $js_int = "<a href=\"\" onclick=\"show_hide_repo('$relative_path');return false;\"\">";
+     $js_int2 = " </a>";
+  }
+  
+  $block = "
+  <div class=\"documentRepository\">
+   $js_int <img id=\"img_$relative_path\" src=\"$img\" alt=\"\" />$js_int2 
+   $link_repo $ind $name $link_repo_end
+  </div>";
+  $block .= "<div id=\"$relative_path\" style=\"visibility:hidden;height:1px;\" class=\"documentBox\">";
+
+  foreach($repos as $path) {
+    $block .= dis_repository_rec($document,$path,$display_file);
+  }
+  
+  foreach($files as $file) {
+    if($popup) {
+      $js = "onclick=\"fill_ext_form('$relative_path/$file');return false;\"";
+    }
+
+    $block .= "<div class=\"documentFile\"><img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
+                <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>$file<br /></div>";
+  }
+  $block .= "</div>";
+  return $block;
+      
+  
+  
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Consult File
+/////////////////////////////////////////////////////////////////////////////
+
+function dis_file($document) {
+  global $document_path;
+  global $obm_version,$set_weekstart_default;
+  $path = $document["path"];
+  $name = $document["name"];
+  $final_path = $document_path.'/'.$path.'/'.$name;
+  if(!file_exists($final_path)) {
+    header("location: $path");
+    exit;
+  }
+  $doc_q = run_query_detail_by_path($path,$name);
+  if(!$doc_q) {
+    $mime = run_query_get_mimetype($path);
+  }
+  else {
+    $mime = $doc_q->f("documentmimetype_mime");  
+  }
+  header("Content-Type: $mime");
+  header("Content-Disposition: inline; filename=$name");
+  $handle = fopen ($final_path, "r");
+  echo  fread($handle, filesize ($final_path));
+  fclose ($handle); 
+  
 }

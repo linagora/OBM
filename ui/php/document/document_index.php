@@ -27,7 +27,6 @@ include("$obminclude/global_pref.inc");
 require("document_query.inc");
 require("document_display.inc");
 
-
 page_close();
 if ($action == "") $action = "index";
 $document = get_param_document();
@@ -41,6 +40,13 @@ $perm->check();
 if (! $document["popup"]) {
   $display["header"] = generate_menu($menu, $section); // Menu
 }
+if ($action == "ext_get_path") {
+  require("document_js.inc");
+  $display["detail"] = html_documents_tree($document,$ext_disp_file);
+} elseif ($action == "accessfile") {
+    dis_file($document);
+    exit();
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -49,7 +55,6 @@ if ($action == "index" || $action == "") {
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
   $mime_q = run_query_documentmime();
-  $usr_q = run_query_userobm();
   $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,  $document);
   if ($set_display == "yes") {
     $display["result"] = dis_document_search_list($document);
@@ -62,7 +67,6 @@ if ($action == "index" || $action == "") {
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
   $mime_q = run_query_documentmime();
-  $usr_q = run_query_userobm();
   $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q,  $document);
   $display["result"] = dis_document_search_list($document);
   
@@ -72,8 +76,17 @@ if ($action == "index" || $action == "") {
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
   $mime_q = run_query_documentmime();
-  $usr_q = run_query_userobm();
   $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q,  $document);
+  
+} elseif ($action == "new_repository")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("document_js.inc");
+  $display["detail"] = html_repository_form($action, $document);
+  
+} elseif ($action == "tree")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("document_js.inc");
+  $display["detail"] = html_documents_tree($document,"true");
   
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -95,7 +108,6 @@ if ($action == "index" || $action == "") {
       $cat1_q = run_query_documentcategory1();
       $cat2_q = run_query_documentcategory2();
       $mime_q = run_query_documentmime();
-      $usr_q = run_query_userobm();
       require("document_js.inc");
       $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate"));
       $display["detail"] = html_document_form($action,$doc_q,$cat1_q, $cat2_q,$mime_q,  $document);
@@ -103,22 +115,21 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $doc_q->query . " !");
     }
   }
-
-
-} elseif ($action == "insert")  {
+}
+elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
+  
   if (check_data_form("", $document)) {
     $retour = run_query_insert($document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
       $display["msg"] .= display_err_msg($l_insert_error);
-    }
+    }    
     $cat1_q = run_query_documentcategory1();
     $cat2_q = run_query_documentcategory2();
     $mime_q = run_query_documentmime();
-    $usr_q = run_query_userobm();
-    $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $usr_q, $document);
+    $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
     $display["result"] = dis_document_search_list($document);
   // Form data are not valid
   } else {
@@ -127,10 +138,25 @@ if ($action == "index" || $action == "") {
     $cat1_q = run_query_documentcategory1();
     $cat2_q = run_query_documentcategory2();
     $mime_q = run_query_documentmime();
-    $usr_q = run_query_userobm();
-    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $usr_q, $document);
+    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
   }
-
+} elseif ($action == "insert_repository")  {
+///////////////////////////////////////////////////////////////////////////////
+  if (check_repository_data_form($document)) {
+    $retour = run_query_create_repository($document);
+    if ($retour) {
+      $display["msg"] .= display_ok_msg($l_insert_ok);
+    } else {
+      $display["msg"] .= display_err_msg($l_insert_error);
+    }
+    require("document_js.inc");    
+    $display["detail"] = html_documents_tree($document,true);
+  // Form data are not valid
+  } else {
+    require("document_js.inc");
+    $display["msg"] = display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $display["detail"] = html_repository_form($action, $document);
+  }
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($param_document, $document)) {
@@ -149,8 +175,7 @@ if ($action == "index" || $action == "") {
     $cat1_q = run_query_documentcategory1();
     $cat2_q = run_query_documentcategory2();
     $mime_q = run_query_documentmime();
-    $usr_q = run_query_userobm();
-    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $usr_q, $document);
+    $display["detail"] = html_document_form($action,"",$cat1_q, $cat2_q,$mime_q, $document);
   }
 
 } elseif ($action == "admin")  {
@@ -299,20 +324,35 @@ display_page($display);
 // returns : $document hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_document() {
-  global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename;
-  global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype;
-  global $param_document;
-  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy;
-
+  global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_repository_path;
+  global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype,$tf_repository_name,$popup;
+  global $param_document,$fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
+  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$_FILES;
+  global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
+  
   if (isset ($param_document)) $document["id"] = $param_document;
+ 
+  if (isset ($tf_repository_name)) $document["repository_name"] = $tf_repository_name;
+  if (isset ($tf_repository_path)) $document["repository_path"] = $tf_repository_path;
   
   if (isset ($tf_title)) $document["title"] = $tf_title;
   if (isset ($tf_author)) $document["author"] = $tf_author;
   if (isset ($tf_path)) $document["path"] = $tf_path;
   if (isset ($tf_filename)) $document["filename"] = $tf_filename;
 
-  $document["size"] = 5000;
-  $document["name"] = "heu.nimp";
+  if (isset ($rd_kind)) $document["kind"] = $rd_kind;
+  if (isset ($fi_file_name)) $document["name"] = $fi_file_name;
+  if (isset ($fi_file_size)) $document["size"] = $fi_file_size;
+  if (isset ($fi_file_type)) $document["mime_file"] = $fi_file_type;
+  if (isset ($fi_file)) $document["file"] = $fi_file;
+
+    // External param
+  if (isset ($popup)) $document["popup"] = $popup;
+  if (isset ($ext_action)) $document["ext_action"] = $ext_action;
+  if (isset ($ext_title)) $document["ext_title"] = $ext_title;
+  if (isset ($ext_url)) $document["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $document["ext_id"] = $ext_id;
+  if (isset ($ext_target)) $document["ext_target"] = $ext_target;
 
   
   if (isset ($tf_cat1)) $document["cat1_label"] = $tf_cat1;
@@ -325,6 +365,13 @@ function get_param_document() {
   if (isset ($sel_cat2)) $document["category2"] = $sel_cat2;
   if (isset ($sel_mime)) $document["mime"] = $sel_mime;
 
+  if (isset ($popup)) $obm_user["popup"] = $popup;
+  if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
+  if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
+  if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
+  if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
+
   if (isset ($cb_privacy)) $document["privacy"] = $cb_privacy;
 
   if (debug_level_isset($cdg_param)) {
@@ -334,7 +381,6 @@ function get_param_document() {
       }
     }
   }
-
   return $document;
 }
 
@@ -344,11 +390,19 @@ function get_param_document() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_document_action() {
   global $document, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
-  global $l_header_consult, $l_header_display,$l_header_admin;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete,$l_header_tree;
+  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_repository;
   global $document_read, $document_write, $document_admin_read, $document_admin_write;
 
-// Index
+// Display Level
+  $actions["DOCUMENT"]["tree"]  = array (
+    'Name'     => $l_header_tree,
+    'Url'      => "$path/document/document_index.php?action=tree",
+    'Right'    => $document_read,
+    'Condition'=> array ('all') 
+                                     		 );
+
+// Index  
   $actions["DOCUMENT"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/document/document_index.php?action=index",
@@ -369,7 +423,17 @@ function get_document_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
     'Right'    => $document_write,
-    'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
+    'Condition'=> array ('search','index','detailconsult','new_repository','insert','insert_repository',
+                         'tree','update','admin','display') 
+                                     );
+
+// New Repository
+  $actions["DOCUMENT"]["new_repository"] = array (
+    'Name'     => $l_header_new_repository,
+    'Url'      => "$path/document/document_index.php?action=new_repository",
+    'Right'    => $document_write,
+    'Condition'=> array ('search','index','detailconsult','new','insert','insert_repository','update',
+                         'tree','admin','display') 
                                      );
 
 
@@ -399,6 +463,12 @@ function get_document_action() {
                                      	 );  
 
 
+// Repository Insert
+  $actions["DOCUMENT"]["insert_repository"] = array (
+    'Url'      => "$path/document/document_index.php?action=insert_repository",
+    'Right'    => $document_write,
+    'Condition'=> array ('None') 
+                                     	 );  
 // Admin
   $actions["DOCUMENT"]["admin"] = array (
     'Name'     => $l_header_admin,
@@ -512,5 +582,4 @@ function get_document_action() {
     'Condition'=> array ('None') 
                                      		 );
 }
-
 

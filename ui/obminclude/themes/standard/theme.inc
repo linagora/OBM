@@ -56,7 +56,9 @@ $ico_document       = "ico_document.gif";
 //$ico_time           = "ico_time.gif";
 //$ico_project        = "ico_project.png";
 $ico_user           = "ico_user.gif";
+$ico_add_user       = "ico_user_new.gif";
 $ico_group          = "ico_group.gif";
+$ico_add_group      = "ico_group_new.gif";
 $ico_setting        = "ico_setting.gif";
 
 $ico_admin          = "ico_admin.gif";
@@ -73,6 +75,13 @@ $ico_end            = "ico_end.gif";
 
 $ico_created        = "ico_created.gif";
 $ico_updated        = "ico_updated.gif";
+
+$ico_browse         = "ico_directory_browse.gif";
+$ico_browse_file    = "ico_file_browse.gif";
+$ico_directory_open = "ico_directory_opened.gif";
+$ico_directory_close= "ico_directory_closed.gif";
+$ico_directory      = "ico_directory.gif";
+$ico_file           = "ico_document.png";
 
 $ico_web            = "ico_web.gif";        // WWW Icon
 $ico_mail           = "ico_mail.gif";       // Mail Icon

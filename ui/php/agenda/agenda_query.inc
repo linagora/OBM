@@ -64,7 +64,26 @@ function run_query_event_customers($param_event,$getdate) {
             FROM UserObm, CalendarSegment
             WHERE  calendarsegment_eventid = $param_event
 	    AND calendarsegment_date LIKE '$getdate%'
-	    AND calendarsegment_customerid = userobm_id";
+	    AND calendarsegment_customerid = userobm_id
+	    AND calendarsegment_type = 'user'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return events users
+// Parameters: 
+//   - $param_event
+///////////////////////////////////////////////////////////////////////////////
+function run_query_event_groups($param_event,$getdate) {
+  $obm_db = new DB_OBM;
+  $query = "SELECT DISTINCT group_id, group_name,calendarsegment_state
+            FROM UGroup, CalendarSegment
+            WHERE  calendarsegment_eventid = $param_event
+	    AND calendarsegment_date LIKE '$getdate%'
+	    AND calendarsegment_customerid = group_id
+	    AND calendarsegment_type = 'group'";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -82,13 +101,35 @@ function run_query_event_customers_array($param_event,$getdate) {
             FROM UserObm, CalendarSegment
             WHERE  calendarsegment_eventid = $param_event
             AND calendarsegment_date LIKE '$getdate%'
-	    AND calendarsegment_customerid = userobm_id";
+	    AND calendarsegment_customerid = userobm_id
+	    AND calendarsegment_type = 'user'";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   while($obm_db->next_record()) {
     $p_arrayuserobm_id[] = $obm_db->f("userobm_id");
   }
   return $p_arrayuserobm_id;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return events groups array
+// Parameters: 
+//   - $param_event
+///////////////////////////////////////////////////////////////////////////////
+function run_query_event_groups_array($param_event,$getdate) {
+  $obm_db = new DB_OBM;
+  $query = "SELECT DISTINCT group_id
+            FROM UGroup, CalendarSegment
+            WHERE  calendarsegment_eventid = $param_event
+            AND calendarsegment_date LIKE '$getdate%'
+	    AND calendarsegment_customerid = group_id
+	    AND calendarsegment_type = 'group'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  while($obm_db->next_record()) {
+    $p_arraygroup_id[] = $obm_db->f("group_id");
+  }
+  return $p_arraygroup_id;
 }
 
 
@@ -338,21 +379,32 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_end"] , $day_array2);    
   $force = $agenda["force"];
   $mail  = $agenda["mail"];
+  $groups = $agenda["group"];
+  if(is_array($groups)) {
+    foreach($groups as $group_id) {
+      $user_group_array = array_merge($user_group_array,run_query_get_groupsusers($group_id));
+    }
+    $contacts_array = array_merge($contacts_array,$user_group_array);
+    $contacts_array = array_unique($contacts_array);
+  }
   $return_info = array();
   $event_repeat_dates = get_event_repetition_dates($agenda);
   foreach ($event_repeat_dates as $dates) {
     $conflicts = run_query_get_conflicts($dates["date_begin"],$dates["date_end"],$contacts_array);
     $return_info = array_merge($return_info, $conflicts);
   }
-  if ($force == 1 || count($return_info) == 0){    
+  if ($force == 1 || count($return_info) == 0){  
     $event_id = run_query_insert_event_data($agenda);   
     foreach($event_repeat_dates as $dates) {
+      foreach($groups as $group_id) {
+          run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+      }
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
-    	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
+    	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'A');	
 	}
 	else{
-	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
+	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'W');	
 	}
       }
     }
@@ -599,18 +651,18 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
 //    - $state :
 /////////////////////////////////////////////////////////////////////////////
 
-function run_query_insert_occurence($date_begin,$date_end,$user_id,$event_id,$state) {
+function run_query_insert_occurence($date_begin,$date_end,$user_id,$customer_type,$event_id,$state) {
   global $cdg_sql;
   $obm_db = new DB_OBM;
   $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
                                          calendarsegment_type, calendarsegment_state) 
-                                  VALUES ($event_id,$user_id,'$date_begin','begin','user','$state')";
+                                  VALUES ($event_id,$user_id,'$date_begin','begin','$customer_type','$state')";
   
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
                                          calendarsegment_type, calendarsegment_state) 
-                                  VALUES ($event_id,$user_id,'$date_end','end','user','$state')";
+                                  VALUES ($event_id,$user_id,'$date_end','end','$customer_type','$state')";
   
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -830,13 +882,18 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   $force = $agenda["force"];
   $repeat_update = $agenda["repeat_update"];
   $old_event_id = $agenda["id"];
+  $groups = $agenda["group"];
   $mail = $agenda["mail"];
   if($repeat_update != 1) {
     $agenda["kind"] ="none";
     $agenda["repeat_days"] ="0000000";
     $agenda["repeat_end"] = "";
   }
-  
+  foreach($groups as $group_id) {
+    $user_group_array = run_query_get_groupsusers($group_id);
+  }
+  $contacts_array .= $user_group_array;
+  $contacts_array = array_unique($contacts_array);
   $return_info = array();
   $event_repeat_dates = get_event_repetition_dates($agenda);
   foreach($event_repeat_dates as $dates) {
@@ -847,12 +904,15 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
     run_query_update_deprecated_events($agenda);
     $event_id = run_query_insert_event_data($agenda);   
     foreach($event_repeat_dates as $dates) {
+      foreach($groups as $group_id) {
+          run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$group_id,'group',$event_id,'R');
+      }
       foreach($contacts_array as $user_id) {
 	if($user_id == $auth->auth["uid"]) {
-      	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
+      	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'A');	
 	}
 	else{
-	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
+	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,'user',$event_id,'W');	
 	}
       }
     }
@@ -1015,6 +1075,100 @@ function run_query_userobm_writable() {
   $obm_db->query($query);
   return $obm_db;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list of writable agenda groups for the current user
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_writable() {
+  global $cdg_sql,$auth;
+
+  $uid = $auth->auth["uid"];
+
+  $query = "SELECT * from UGroup";
+  $obm_db = new DB_OBM;
+  display_debug_msg($query, $cdg_sql);	    
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a group user list                                                   //
+// Parameters:
+//   - $id : group id
+// Returns:
+//   - array of users groups ids
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_groupsusers($id) {
+
+   $groups[] = $id;
+   $groups = array_merge($groups,get_group_children($id));
+   $groups = array_unique($groups);
+   return run_query_get_group_users($groups);
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a group child list                                                   //
+// Parameters:
+//   - $id : group id
+// Returns:
+//   - array of parent groups ids
+///////////////////////////////////////////////////////////////////////////////
+function get_group_children($id) {
+  global $cdg_sql;
+
+  $query = "select groupgroup_childid
+    from GroupGroup where groupgroup_parentid='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+ 
+  $children = array();
+  while ($obm_q->next_record()) {
+    $g_id = $obm_q->f("groupgroup_childid");
+    array_push($children, $g_id);
+    $child_parents = get_group_children($g_id);
+    $children = array_merge($children, $child_parents);
+
+  }
+
+  return array_unique($children);
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get a group first level user list                                         //
+// Parameters:
+//   - $id : array ofgroup id
+// Returns:
+//   - array of users groups ids
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_group_users($groups) {
+  global $cdg_sql;
+
+  $query = "select userobmgroup_userobmid
+    from UserObmGroup where userobmgroup_groupid IN(";
+  $coma = "";
+  foreach($groups as $group_id) {
+	$query .= $coma.$group_id;
+	$coma = ",";
+  }
+  $query .= ")";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+ 
+  $users = array();
+  while($obm_q->next_record()) {
+    $users[] = $obm_q->f("userobmgroup_userobmid");
+  }
+  return array_unique($users);
+}
+
 
 
 /////////////////////////////////////////////////////////////////////////////

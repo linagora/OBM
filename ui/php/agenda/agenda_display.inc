@@ -1489,19 +1489,21 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 //   - $contacts_array : array of selected contacts 
 //   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $p_user_array) {
+function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_list, $p_user_array) {
   global $display;
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
+  global $ico_add_user, $ico_add_group;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
-  global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail;
+  global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
 
   $time_unit = 60 / $set_cal_interval;  
 
   if ($action == "detailupdate") {
+    $p_grp_array = run_query_event_groups_array($obm_q_event->f("calendarevent_id"),$agenda["date"]);
     $title = htmlspecialchars($obm_q_event->f("calendarevent_title"));
     $category_id = $obm_q_event->f("calendarevent_category_id");
     $priority = $obm_q_event->f("calendarevent_priority");
@@ -1527,6 +1529,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
 
   // If parameters have been given, they supercede the default action value
   if (isset($agenda["id"])) { $id = $agenda["id"]; }
+  if (is_array($agenda["group"])) { $p_grp_array = $agenda["group"];}
+  if (!is_array($p_grp_array)) {$p_grp_array = array();}
   if (isset($agenda["title"])) { $title = $agenda["title"]; }
   if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
@@ -1666,7 +1670,29 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
   } 
   $dis_sel_user .= "</select>";
-  
+ 
+  // group select
+  $dis_sel_grp = "<select name=\"sel_grp_id[]\" size=\"5\" multiple=\"multiple\">";
+  while ($grp_q->next_record()) {
+    $g_id = $grp_q->f("group_id");
+    $g_name = $grp_q->f("group_name");
+    $dis_sel_grp .= "\n<option value=\"$g_id\"";
+       
+    if (count($p_grp_array)>0) {
+      $tag_grp = "";
+      while ( (list($key, $grp_id) = each($p_grp_array) )
+              && ($tag_grp == "") ) {
+	if ($g_id == $grp_id ) {
+	  $tag_grp = " selected=\"selected\"";
+	}
+      }
+      reset($p_grp_array);
+    }
+    
+    $dis_sel_grp .= " $tag_grp>$g_name</option>";
+  } 
+  $dis_sel_grp .= "</select>";
+ 
   if ($force == 1){
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
   } else {
@@ -1724,7 +1750,9 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   }
   $dis_min_e .= "</select>";  
   $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
- 
+  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
+  $url2 = "$path/group/group_index.php?action=ext_get_group&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
+
       
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -1754,9 +1782,16 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
      <td class=\"detailForm\">$sel_cat</td>
     </tr>    
     <tr>
-     <td class=\"detailLabel\">$l_users</td>
+     <td class=\"detailLabel\">$l_users&nbsp;&nbsp; 
+     <a href=\"javascript: return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_add_user\"></a></td>
      <td class=\"detailForm\">$dis_sel_user</td>
     </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_groups&nbsp;&nbsp;
+     <a href=\"javascript: return false;\" onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_add_group\" /></a></td>
+</td>
+     <td class=\"detailForm\">$dis_sel_grp</td>
+    </tr>    
    </table>
    <div class=\"detailHead\">$l_carac</div>
    <table class=\"detail\">
@@ -1919,12 +1954,12 @@ function html_waiting_events($obm_wait) {
 // Display Calendar Consult                                                  //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_calendar_consult($obm_q_event,$obm_q_cust) {
+function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   global $display;
   global $set_theme,$set_weekstart_default;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state;
+  global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state,$l_groups;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
@@ -1987,6 +2022,10 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
     }
     $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."(".$obm_q_cust->f("calendarsegment_state").")<br />";
   }
+  while ($obm_q_grp->next_record()) {
+    $dis_grp_list .= $obm_q_grp->f("group_name")."<br />";
+  }
+
   $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
   // --- HTML Template --------------------------------------------------------
   $block = "
@@ -2008,6 +2047,10 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
     <tr>
      <td class=\"detailLabel\">$l_users</td>
      <td class=\"detailText\">$dis_user_list</td>
+    </tr>
+    <tr>
+     <td class=\"detailLabel\">$l_groups</td>
+     <td class=\"detailText\">$dis_grp_list</td>
     </tr>
    </table>
   <div class=\"detailHead\">$l_carac</div>

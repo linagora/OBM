@@ -36,6 +36,16 @@ function check_document(form) {
   return true;
 }
 
+function check_repository(form) {
+  // MANDATORY : Check that the Document title is not empty
+  if (trim(form.tf_repository_name.value) == \"\") {
+    alert (\"$l_fill_repository_name\");
+    return false;
+  }
+
+  return true;
+}
+
 function check_cat1_new(form)
 {
    if (form.tf_cat1.value != \"\")
@@ -149,6 +159,136 @@ function check_mime_checkdel(form)
    }
 }
 
+NS4 = (document.layers) ? 1 : 0;
+IE4 = (document.all) ? 1 : 0;
+W3C = (document.getElementById) ? 1 : 0;	
+
+function show_hide_repo(name)
+{
+  if (W3C) {
+    if(document.getElementById(name).style.visibility != \"hidden\") {
+      hide(name);
+     }
+     else{
+        show(name);
+     }
+  } else if (NS4) {
+    if(document.layers[name].visibility != \"hide\") {
+      hide(name);
+    }
+    else{
+      show(name);
+     }
+
+  } else {
+    if(document.all[name].style.visibility != \"hidden\") {
+       hide(name);
+    }
+    else{
+      show(name);
+    }
+  
+  }
+
+}
+
+function hide ( name ) {
+  if (W3C) {
+    document.getElementById(name).style.visibility = \"hidden\";
+    document.getElementById(name).style.height = \"0px\";
+    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_close\";    
+  } else if (NS4) {
+    document.layers[name].visibility = \"hide\";
+    document.layers[name].height = \"0px\";
+    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";    
+  } else {
+    document.all[name].style.visibility = \"hidden\";
+    document.all[name].style.height = \"0px\";
+    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";
+  }
+}
+
+function show ( name ) {
+  if (W3C) {
+    document.getElementById(name).style.visibility = \"\";
+    document.getElementById(name).style.height = \"auto\"; 
+    document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_open\";
+  } else if (NS4) {
+    document.layers[name].visibility = \"\";
+    document.layers[name].height = \"auto\";
+    document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+  } else {
+    document.all[name].style.visibility = \"\";
+    document.all[name].style.height = \"auto\";
+    document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
+  }
+}
+
+
+function show_hide_field()
+{ 
+  radios = document.f_mod_document.rd_kind;
+  if(radios[0].checked == true) {
+    basic_show('browse_img');
+    basic_hide('browse_img_file');
+    basic_show('browse_field');
+  }
+  else if(radios[1].checked == true) {
+    basic_hide('browse_img');
+    basic_show('browse_img_file');
+    basic_hide('browse_field');
+
+  }
+  else if(radios[2].checked == true) {
+    basic_hide('browse_img_file');
+    basic_hide('browse_img');
+    basic_hide('browse_field');
+
+  }
+}
+
+
+function basic_hide(name) {
+  if (W3C) {
+    document.getElementById(name).style.display = \"none\";
+   
+  } else if (NS4) {
+    document.layers[name].display = \"none\";
+  } else {
+    document.getElementById(name).style.display = \"none\";
+  }
+}
+
+
+function basic_show(name)
+{ 
+  if (W3C) {
+    document.getElementById(name).style.display = \"\";
+  } else if (NS4) {
+    document.layers[name].display = \"\";
+  } else {
+    document.all[name].style.display = \"\";
+
+  }
+}
+
+
+
+
+
+
+
+";
+if(isset($ext_target)) {
+  echo "
+   function fill_ext_form(repo_path) {
+     ext_field = window.opener.document.$ext_target;
+     ext_field.value = repo_path;
+     window.close();
+  }
+  ";
+}
+echo "
 </script>
 ";
 </SCRIPT>

@@ -80,6 +80,14 @@ if ($action == "ext_get_ids") {
   }
 }
 
+elseif ($action == "ext_get_group") {
+  $display["search"] = html_get_group_search_form($group);
+  if ($set_display == "yes") {
+    $display["result"] = dis_get_group_search_group($group, $popup);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+}
 
 elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,7 +104,11 @@ else if ($action == "search") {
   $display["search"] = html_group_search_form($group);
   $display["result"] = dis_group_search_group($group, $popup);
 }
-
+else if ($action == "getsearch") {
+///////////////////////////////////////////////////////////////////////////////
+  $display["search"] = html_get_group_search_form($group);
+  $display["result"] = dis_get_group_search_group($group, $popup);
+}
 else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {

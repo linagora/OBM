@@ -51,7 +51,6 @@ if ( ($param_user == $last_user) && (strcmp($action,"delete")==0) ) {
   run_query_set_user_pref($uid, "last_user", $param_user);
   $last_user_name = run_query_global_user_name($last_user);
 }
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -71,6 +70,16 @@ if ($action == "ext_get_ids") {
     $display["msg"] .= display_info_msg($l_no_display);
   }
 }
+elseif ($action == "ext_get_users") {
+  $display["search"] = html_get_user_search_form($obm_user);
+  if ($set_display == "yes") {
+  include("user_js.inc");
+    $display["result"] = dis_get_user_search_list($obm_user);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
+
+}
 
 elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -85,6 +94,12 @@ elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_user_search_form($obm_user);
   $display["result"] = dis_user_search_list($obm_user);
+
+}elseif ($action == "getsearch")  {
+///////////////////////////////////////////////////////////////////////////////
+  include("user_js.inc");
+  $display["search"] = html_get_user_search_form($obm_user);
+  $display["result"] = dis_get_user_search_list($obm_user);
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -296,11 +311,17 @@ function get_user_action() {
 
 // Search
   $actions["USER"]["search"] = array (
-    'Url'      => "$path/user/user_index.php?action=new",
+    'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $user_read,
     'Condition'=> array ('None') 
                                   );
-
+  
+// Get user id from external window (js)
+  $actions["USER"]["getsearch"] = array (
+    'Url'      => "$path/user/user_index.php?action=search",
+    'Right'    => $user_read,
+    'Condition'=> array ('None') 
+                                  );
 // Detail Consult
   $actions["USER"]["detailconsult"] = array (
     'Name'     => $l_header_consult,

@@ -19,7 +19,6 @@ $l_public  = "Public";
 $l_category = "Catégorie";
 $l_description = "Description";
 $l_state = "Etat";
-
 $l_high = "Haute";
 $l_low = "Basse";
 $l_medium = "Normale";

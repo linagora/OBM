@@ -802,7 +802,6 @@ function send_mail($subject, $message, $recipients, $force) {
     }
   }
   $headers .= "From: ".$send_q->f("userobm_email");
-
   if ($reci_list != "") {
     mail ($reci_list, $subject, $message, $headers);      
   }
@@ -824,14 +823,13 @@ function run_query_get_recipients($recipients, $force) {
       AND userobmpref_value = 'yes'";
     $join = ", UserObmPref";
   }  
-  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (".$recipients[0];
-
-  $limit = count($recipients);
-  for ($i=1; $i<$limit; $i++) {
-    $query.= ",".$recipients[$i];
+  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (";
+  $coma = "";
+  foreach($recipients as $recipient) {
+    $query.= $coma.$recipient;
+    $coma = ",";
   }
   $query.=") AND userobm_email != '' $mail_filter";
-
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

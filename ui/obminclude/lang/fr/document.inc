@@ -35,6 +35,11 @@ $l_document_display = "Options d'affichage des listes de documents";
 $l_size = "Taille";
 $l_bytes = "octets";
 $l_name = "Nom";
+$l_header_new_repository = "Nouveau répertoire";
+$l_repository = "Répertoire";
+$l_add_repos = "Créer le répertoire";
+$l_header_tree = "Arborescence";
+$l_auto = "Par défaut";
 
 // Message
 $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 
@@ -86,7 +91,10 @@ $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > p
 $l_query_error = "Une erreur est survenue durant l'éxécution de la requête.";
 $l_update_ok = "La modification du document a été correctement effectuée";
 $l_update_error = "La modification du document a échoué !";
-
+$l_new_file = "Fichier à envoyer";
+$l_link = "Lien HTML";
+$l_existing_file = "Fichier déjà envoyé";
+$l_kind = "Type de document";
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";
 $l_delete = "Supprimer le document";
@@ -106,4 +114,7 @@ $l_j_mime_update = "Vous devez renseigner tout les champ du type mime";
 $l_j_mime_delete = "Vous devez sélectionner un type mime";
 $l_j_cat1_delete = "Vous devez sélectionner une categorie 1";
 $l_j_cat2_delete = "Vous devez sélectionner une categorie 2";
-
+$l_fill_repository_name = "Vous devez donner un nom à vote répertoire";
+$l_invalid_repository_path = "Le chemin spécifié est invalide";
+$l_invalid_file = "Fichier incorrect";
+$l_invalid_existing_file = "Le chemin spécifié ne pointe pas vers un fichier valid";

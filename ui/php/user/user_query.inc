@@ -64,7 +64,66 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
   return $obm_db;
 }
+///////////////////////////////////////////////////////////////////////////////
+// User query search query execution                                         //
+// Parameters:
+//   - $user[] : user search criteria
+//     keys used  : name, perms
+//   - $p_new_order : infos for order clause
+//   - $p_order_dir : direction for order clause (asc, desc)
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_search($user, $p_new_order, $p_order_dir) {
+  global $c_all, $cdg_sql,$auth;
 
+  $login = $user["login"];
+  $lname = $user["lastname"];
+  $perms = $user["perms"];
+  $archive = $user["archive"];
+  $uid = $auth->auth["uid"];
+  $select = "select u.*,
+      userobm_id as Id,
+      UNIX_TIMESTAMP(userobm_timelastaccess) as userobm_timelastaccess
+    from UserObm  as u
+      LEFT OUTER JOIN CalendarRight as c 
+        ON u.userobm_id = c.calendarright_ownerid
+          AND c.calendarright_customerid = '$uid'
+    WHERE (c.calendarright_write = 1 OR u.userobm_id='$uid') AND";
+  $where = "";
+
+  // If a login indication has been specified, get it
+  if (trim($login) != "") {
+     $where .= " userobm_login like '$login%'";
+  }
+
+  // If a user perms indication has been specified, get it
+  if (($perms != $c_all) && ($perms != "")) {
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_perms='$perms'";
+  }
+
+  // If a name indication has been specified, get it
+  if (trim($lname) != "") {
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_lastname like '$lname%'";
+  }
+
+  if ($archive != "1") {
+    if (trim($where) != "") $where .= " and";
+    $where .= " userobm_archive = '0'";
+  }
+
+  $query = $select . $where;
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_login";
+  $query .= " order by $order $p_order_dir";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_db=new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // User detail query execution                                               //

@@ -83,6 +83,7 @@ $cdg_sql = 8;    // sql query display
 
 // Global Constants
 $c_all = "_ALL_";		// Used in Form select
+$c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
 
