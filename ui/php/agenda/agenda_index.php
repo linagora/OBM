@@ -29,7 +29,7 @@ page_close();
 
 include("agenda_functions.inc");
 
-
+get_agenda_action();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -1055,6 +1055,154 @@ if ($action == "index" || $action == "") {
   dis_planning_contacts($action,$monthstart,run_query_userobm(), run_query_get_usergroups(),$p_user_array,$p_group_array);
 }
  
+///////////////////////////////////////////////////////////////////////////////
+//  Agenda Action 
+///////////////////////////////////////////////////////////////////////////////
+
+function get_agenda_action() {
+  global $actions;
+  global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_day,$l_header_week,$l_header_admin;
+  global $l_header_month,$l_header_new_event,$param_event;
+
+
+//Index
+
+  $actions["AGENDA"]["index"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=index",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                      );
+
+//Approve
+
+  $actions["AGENDA"]["approve"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=approve",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//New   
+ 
+  $actions["AGENDA"]["new"] = array (
+    'Name'     => $l_header_new_event,
+    'Url'      => "$path/agenda/agenda_index.php?action=new",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('index','detailconsult','
+                         view_month','view_week','view_day') 
+                                    );
+
+
+//Insert
+
+  $actions["AGENDA"]["insert"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=insert",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Cancel Insert
+
+  $actions["AGENDA"]["cancel_insert"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=cancel_insert",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Confirm Insert
+
+  $actions["AGENDA"]["confirm_insert"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=confirm_insert",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//View Month
+
+  $actions["AGENDA"]["view_month"] = array (
+    'Name'     => $l_header_month,
+    'Url'      => "$path/agenda/agenda_index.php?action=view_month",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('all') 
+                                    	    );
+
+//View Week
+
+  $actions["AGENDA"]["view_week"] = array (
+    'Name'     => $l_header_week,
+    'Url'      => "$path/agenda/agenda_index.php?action=view_week",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('all') 
+                                    	  );
+
+//View Day
+
+  $actions["AGENDA"]["view_day"] = array (
+    'Name'     => $l_header_day,
+    'Url'      => "$path/agenda/agenda_index.php?action=view_day",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('all') 
+                                    	 );
+
+//Detail Consult
+
+  $actions["AGENDA"]["detail_consult"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=detail_consult",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Detail Update
+
+  $actions["AGENDA"]["detailupdate"] = array (
+    'Name'     => $l_header_modify,
+    'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('detailconsult') 
+                                     		 );
+
+//Update
+
+  $actions["AGENDA"]["update"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=update",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Cancel Update
+
+  $actions["AGENDA"]["cancel_update"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=cancel_update",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Confirm Update
+
+  $actions["AGENDA"]["confirm_update"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=confirm_update",
+    'Right'    => $agenda_read,
+    'Condition'=> array ('None') 
+                                         );
+
+//Delete
+
+  $actions["AGENDA"]["delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('detailconsult') 
+                                        );
+
+//Delete All
+
+  $actions["AGENDA"]["delete_all"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=delete_all",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('None') 
+                                        );
+
+}
   
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //

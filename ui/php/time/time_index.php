@@ -43,7 +43,7 @@ $uid = $auth->auth["uid"]; //current user uid
 page_close();
 
 require("time_js.inc");
-
+get_time_actions();
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = array( '6' , '7' , '8','23' ) ;
@@ -209,6 +209,63 @@ function get_param_time() {
   }
 
   return $task;
+}
+
+//////////////////////////////////////////////////////////////////////////////
+// Time actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_time_actions() {
+global $actions;
+//Index
+
+  $actions["TIME"]["index"] = array (
+    'Url'      => "$path/time/time_index.php?action=index",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+//Search
+
+  $actions["TIME"]["search"] = array (
+    'Url'      => "$path/time/time_index.php?action=search",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+//Validate
+
+  $actions["TIME"]["validate"] = array (
+    'Url'      => "$path/time/time_index.php?action=validate",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+//Validate Admin
+
+  $actions["TIME"]["validate_admin"] = array (
+    'Url'      => "$path/time/time_index.php?action=validate_admin",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+//Detail Update
+
+  $actions["TIME"]["detailupdate"] = array (
+    'Url'      => "$path/time/time_index.php?action=detailupdate",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+//Update
+
+  $actions["TIME"]["update"] = array (
+    'Url'      => "$path/time/time_index.php?action=update",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    );
+
+
 }
 
 </SCRIPT>

@@ -55,7 +55,8 @@ page_close();
 
 
 $incident=get_param_incident();
-
+get_incident_action();
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -108,7 +109,7 @@ if ($action == "index" || $action == "") {
   if ($param_incident > 0) {
     $inc_q = run_query_detail($param_incident);
     if ($inc_q->num_rows() == 1) {
-      $contr_q = run_query_incident_contract($param_contract);
+      $contr_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
       require("incident_js.inc");
       display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate")); 
       html_incident_form($action, $inc_q, $contr_q, run_query_userobm(), $incident);
@@ -171,12 +172,6 @@ if ($action == "index" || $action == "") {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
-///////////////////////////////////////////////////////////////////////////////
-display_end();
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Stores Contact parameters transmited in $incident hash
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
@@ -211,5 +206,115 @@ function get_param_incident() {
 
   return $incident;
 }
+
+//////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// Incident actions
+//////////////////////////////////////////////////////////////////////////////
+function get_incident_action() {
+  global $incident,$actions;
+  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_display;
+
+//Index
+
+  $actions["INCIDENT"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contract/incident_index.php?action=index",
+    'Right'    => $incident_read,
+    'Condition'=> array ('all') 
+                                	);
+
+//Search
+
+  $actions["INCIDENT"]["search"] = array (
+    'Url'      => "$path/contract/incident_index.php?action=search",
+    'Right'    => $incident_read,
+    'Condition'=> array ('None') 
+                                	);
+
+//New
+
+  $actions["INCIDENT"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/contract/incident_index.php?action=new",
+    'Right'    => $incident_write,
+    'Condition'=> array ('','search','index','detailconsult','display') 
+                    		       );
+
+//Detail Consult
+
+  $actions["INCIDENT"]["detailconsult"] = array (
+    'Url'      => "$path/contract/incident_index.php?action=consult",
+    'Right'    => $incident_read,
+    'Condition'=> array ('None') 
+                                	       );
+
+//Detail Update
+
+  $actions["INCIDENT"]["detailupdate"] = array (
+    'Name'     => $l_header_modify,
+    'Url'      => "$path/contract/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
+    'Right'    => $incident_write,
+    'Condition'=> array ('detailconsult') 
+                                     	        );
+
+//Insert
+
+  $actions["INCIDENT"]["insert"] = array (
+    'Url'      => "$path/contract/incident_index.php?action=insert",
+    'Right'    => $incident_write,
+    'Condition'=> array ('None') 
+                                     	 );
+
+//Update
+
+  $actions["INCIDENT"]["update"] = array (
+    'Url'      => "$path/contract/incident_index.php?action=update",
+    'Right'    => $incident_write,
+    'Condition'=> array ('None') 
+                                     	 );
+
+//Delete
+
+  $actions["INCIDENT"]["delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/contract/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
+    'Right'    => $incident_write,
+    'Condition'=> array ('detailconsult') 
+                                     	 );
+//Display
+
+  $actions["INCIDENT"]["display"] = array (
+     'Name'     => $l_header_display,
+     'Url'      => "$path/contract/incident_index.php?action=display",
+     'Right'    => $incident_admin_write,
+     'Condition'=> array ('all') 
+                                      	   );
+
+//Display Préférence
+
+  $actions["INCIDENT"]["dispref_display"] = array (
+     'Url'      => "$path/contract/incident_index.php?action=dispref_display",
+     'Right'    => $incident_admin_write,
+     'Condition'=> array ('None') 
+                                      	   );
+
+//Display level
+
+  $actions["INCIDENT"]["dispref_level"] = array (
+     'Url'      => "$path/contract/incident_index.php?action=dispref_level",
+     'Right'    => $incident_admin_write,
+     'Condition'=> array ('None') 
+                                      	   );
+
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display end of page                                                       //
+///////////////////////////////////////////////////////////////////////////////
+display_end();
+
+
+
 
 </SCRIPT>

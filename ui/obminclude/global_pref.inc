@@ -161,578 +161,68 @@ if($section == "PROD") {
 //////////////////////////////////////////////////////////////////////////////
 // AGENDA actions
 //////////////////////////////////////////////////////////////////////////////
-if($menu == "AGENDA") {
-
-  $actions["AGENDA"]["index"]		 = array ('Name'
-						  => '',
-            		          	          'Url'
-					 	  => "$path/agenda/agenda_index.php?action=index",
-                                                  'Right' 	  
-						  => $agenda_read,
-				                  'Condition'	  
-						  => array ('None') 
-                                    		  );
-
-  $actions["AGENDA"]["new"]   		= array ('Name' 	  
-						 => $l_header_new_event,
-            		          	         'Url'  	  
-						 => "$path/agenda/agenda_index.php?action=new",
-                                     	         'Right' 	  
-						 => $agenda_write,
-				            	 'Condition'      
-						 => array ('','index','detailconsult','view_month','view_week','view_day') 
-                                    		  );
-
-  $actions["AGENDA"]["view_month"]   	= array ('Name' 	  
-						 => $l_header_month,
-            		          	         'Url'  	  
-						 => "$path/agenda/agenda_index.php?action=view_month",
-                                     	         'Right' 	  
-						 => $agenda_write,
-				            	 'Condition'      
-						 => array ('all') 
-                                    		  );
-
-  $actions["AGENDA"]["view_week"]   	= array ('Name' 	  
-						 => $l_header_week,
-            		          	         'Url'  	  
-						 => "$path/agenda/agenda_index.php?action=view_week",
-                                     	         'Right' 	  
-						 => $agenda_write,
-				            	 'Condition'      
-						 => array ('all') 
-                                    		  );
-
-  $actions["AGENDA"]["view_day"]   	= array ('Name' 	  
-						 => $l_header_day,
-            		          	         'Url'  	  
-						 => "$path/agenda/agenda_index.php?action=view_day",
-                                     	         'Right' 	  
-						 => $agenda_write,
-				            	 'Condition'      
-						 => array ('all') 
-                                    		  );
-
-  $actions["AGENDA"]["detailupdate"]    = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."",
-                                      		 'Right' 	  
-						 => $agenda_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-  $actions["AGENDA"]["delete"]          = array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."",
-                                      		 'Right' 	  
-						 => $agenda_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-}
 //////////////////////////////////////////////////////////////////////////////
 // Contract actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "CONTRACT") {
-
-  $actions["CONTRACT"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/contract/contract_index.php?action=index",
-                                                  'Right' 	  
-						  => $contract_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["CONTRACT"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=".urlencode($l_select_company)."&amp;url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
-                                     	         'Right' 	  
-						 => $contract_write,
-                                      		 'Popup' 	 
-						 => 1,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','admin','display') 
-                                    		  );
-
-  $actions["CONTRACT"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$param_contract."",
-                                      		 'Right' 	  
-						 => $contract_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["CONTRACT"]["delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$param_contract."",
-                                      		 'Right' 	 
-						 => $contract_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["CONTRACT"]["admin"]		= array ('Name'	  	 
-						 => $l_header_admin,
-            		              		 'Url' 	 	 
-						 => "$path/contract/contract_index.php?action=admin",
-                                     		 'Right' 	
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-  $actions["CONTRACT"]["display"]	= array ('Name'	  	 
-						 => $l_header_display,
-            		              		 'Url' 	 	 
-						 => "$path/contract/contract_index.php?action=display",
-                                     		 'Right' 	 
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-}
 //////////////////////////////////////////////////////////////////////////////
 // Incident actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "INCIDENT") {
-
-  $actions["INCIDENT"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/contract/incident_index.php?action=index",
-                                                  'Right' 	  
-						  => $incident_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["INCIDENT"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/contract/incident_index.php?action=new",
-                                     	         'Right' 	  
-						 => $incident_write,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','display') 
-                                    		  );
-
-  $actions["INCIDENT"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/contract/incident_index.php?action=detailupdate&amp;param_incident=".$param_incident."",
-                                      		 'Right' 	  
-						 => $incident_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["INCIDENT"]["delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/contract/incident_index.php?action=delete&amp;param_incident=".$param_incident."",
-                                      		 'Right' 	 
-						 => $incident_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["INCIDENT"]["display"]	= array ('Name'	  	 
-						 => $l_header_display,
-            		              		 'Url' 	 	 
-						 => "$path/contract/incident_index.php?action=display",
-                                     		 'Right' 	 
-						 => $incident_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-}
-
 //////////////////////////////////////////////////////////////////////////////
 // Account actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "ACCOUNT") {
-
-  $actions["ACCOUNT"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/treso/account_index.php?action=index",
-                                                  'Right' 	  
-						  => $account_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["ACCOUNT"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/treso/account_index.php?action=new",
-                                     	         'Right' 	  
-						 => $account_write,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','display') 
-                                    		  );
-
-  $actions["ACCOUNT"]["compute_balance"]   = array ('Name'		  
-						 => $l_header_compute_balance,
-            		            		 'Url' 		  
-						 => "$path/treso/account_index.php?action=compute_balance&amp;param_account=".$param_account."",
-                                      		 'Right' 	  
-						 => $account_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-
-  $actions["ACCOUNT"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/treso/account_index.php?action=detailupdate&amp;param_account=".$param_account."",
-                                      		 'Right' 	  
-						 => $account_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["ACCOUNT"]["delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/treso/account_index.php?action=delete&amp;param_account=".$param_account."",
-                                      		 'Right' 	 
-						 => $incident_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["ACCOUNT"]["display"]	= array ('Name'	  	 
-						 => $l_header_display,
-            		              		 'Url' 	 	 
-						 => "$path/treso/account_index.php?action=display",
-                                     		 'Right' 	 
-						 => $incident_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-  $actions["ACCOUNT"]["admin"]		= array ('Name'	  	 
-						 => $l_header_admin,
-            		              		 'Url' 	 	 
-						 => "$path/treso/account_index.php?action=admin",
-                                     		 'Right' 	
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-
-}
 //////////////////////////////////////////////////////////////////////////////
 // Payment actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "PAYMENT") {
-
-  $actions["PAYMENT"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/treso/payment_index.php?action=index",
-                                                  'Right' 	  
-						  => $payment_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["PAYMENT"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/treso/payment_index.php?action=new",
-                                     	         'Right' 	  
-						 => $payment_write,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','display') 
-                                    		  );
-
-  $actions["PAYMENT"]["reconcile"]   	= array ('Name' 	  
-						 => $l_header_reconcile,
-            		          	         'Url'  	  
-				            	 => "$path/treso/payment_index.php?action=reconcile",
-                                     	         'Right' 	  
-						 => $payment_write,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','display') 
-                                    		  );
-
-  $actions["PAYMENT"]["duplicate"]   = array ('Name'		  
-						 => $l_header_dupplicate,
-            		            		 'Url' 		  
-						 => "$path/treso/payment_index.php?action=duplicate&amp;param_payment=".$param_payment."",
-                                      		 'Right' 	  
-						 => $payment_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-
-  $actions["PAYMENT"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/treso/payment_index.php?action=detailupdate&amp;param_payment=".$param_payment."",
-                                      		 'Right' 	  
-						 => $payment_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["PAYMENT"]["delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/treso/payment_index.php?action=delete&amp;param_payment=".$param_payment."",
-                                      		 'Right' 	 
-						 => $incident_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["PAYMENT"]["display"]	= array ('Name'	  	 
-						 => $l_header_display,
-            		              		 'Url' 	 	 
-						 => "$path/treso/payment_index.php?action=display",
-                                     		 'Right' 	 
-						 => $incident_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-  $actions["PAYMENT"]["admin"]		= array ('Name'	  	 
-						 => $l_header_admin,
-            		              		 'Url' 	 	 
-						 => "$path/treso/payment_index.php?action=admin",
-                                     		 'Right' 	
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-}
 //////////////////////////////////////////////////////////////////////////////
 // Invoice actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "INVOICE") {
-
-  $actions["INVOICE"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/treso/invoice_index.php?action=index",
-                                                  'Right' 	  
-						  => $invoice_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["INVOICE"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/treso/invoice_index.php?action=new",
-                                     	         'Right' 	  
-						 => $invoice_write,
-					  	 'Condition'      
-						 => array ('','search','index','detailconsult','display') 
-                                    		  );
-
-  $actions["INVOICE"]["duplicate"]   = array ('Name'		  
-						 => $l_header_dupplicate,
-            		            		 'Url' 		  
-						 => "$path/treso/invoice_index.php?action=duplicate&amp;param_invoice=".$param_invoice."",
-                                      		 'Right' 	  
-						 => $invoice_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-
-  $actions["INVOICE"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/treso/invoice_index.php?action=detailupdate&amp;param_invoice=".$param_invoice."",
-                                      		 'Right' 	  
-						 => $invoice_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["INVOICE"]["delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/treso/invoice_index.php?action=delete&amp;param_invoice=".$param_invoice."",
-                                      		 'Right' 	 
-						 => $incident_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["INVOICE"]["display"]	= array ('Name'	  	 
-						 => $l_header_display,
-            		              		 'Url' 	 	 
-						 => "$path/treso/invoice_index.php?action=display",
-                                     		 'Right' 	 
-						 => $incident_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-  $actions["INVOICE"]["admin"]		= array ('Name'	  	 
-						 => $l_header_admin,
-            		              		 'Url' 	 	 
-						 => "$path/treso/invoice_index.php?action=admin",
-                                     		 'Right' 	
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-
-}
 //////////////////////////////////////////////////////////////////////////////
-// Invoice actions
+// User actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "USER") {
-
-  $actions["USER"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/user/user_index.php?action=index",
-                                                  'Right' 	  
-						  => $user_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
-
-  $actions["USER"]["new"]   	= array ('Name' 	  
-						 => $l_header_new,
-            		          	         'Url'  	  
-				            	 => "$path/user/user_index.php?action=new",
-                                     	         'Right' 	  
-						 => $user_write,
-					  	 'Condition'      
-						 => array ('','search','index','admin','detailconsult','display') 
-                                    		  );
-
-  $actions["USER"]["reset"]   = array ('Name'		  
-						 => $l_header_reset,
-            		            		 'Url' 		  
-						 => "$path/user/user_index.php?action=reset&amp;param_user=".$param_user."",
-                                      		 'Right' 	  
-						 => $user_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-
-  $actions["USER"]["detailupdate"]   = array ('Name'		  
-						 => $l_header_modify,
-            		            		 'Url' 		  
-						 => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$param_user."",
-                                      		 'Right' 	  
-						 => $user_write,
-				      		 'Condition' 	  
-						 => array ('detailconsult') 
-                                     		 );
-
-  $actions["USER"]["check_delete"]   	= array ('Name'		  
-						 => $l_header_delete,
-            		            		 'Url' 		  
-						 => "$path/user/user_index.php?action=check_delete&amp;param_user=".$param_user."",
-                                      		 'Right' 	 
-						 => $incident_write,
-				      		 'Condition' 	 
-						 => array ('detailconsult') 
-                                     		 );
-
-
-  $actions["USER"]["admin"]		= array ('Name'	  	 
-						 => $l_header_admin,
-            		              		 'Url' 	 	 
-						 => "$path/user/user_index.php?action=admin",
-                                     		 'Right' 	
-						 => $contract_admin_write,
-				      		 'Condition'	 
-						 => array ('all') 
-                                      		 );
-
-
-}
 //////////////////////////////////////////////////////////////////////////////
 // Settings actions
 //////////////////////////////////////////////////////////////////////////////
-
-elseif($menu == "SETTINGS") {
-
-  $actions["SETTINGS"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/settings/settings_index.php?action=index",
-                                                  'Right' 	  
-						  => $settings_read,
-				                  'Condition'	  
-						  => array ('None') 
-                                    		  );
-}
+//////////////////////////////////////////////////////////////////////////////
+// Time actions
+//////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 // Time actions
 //////////////////////////////////////////////////////////////////////////////
 
-elseif($menu == "TIME") {
+if($menu == "ADMIN") {
 
-  $actions["TIME"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/time/time_index.php?action=index",
-                                                  'Right' 	  
-						  => $settings_read,
-				                  'Condition'	  
-						  => array ('None') 
-                                    		  );
-}
-//////////////////////////////////////////////////////////////////////////////
-// Time actions
-//////////////////////////////////////////////////////////////////////////////
+//Index 
 
-elseif($menu == "ADMIN") {
+  $actions["ADMIN"]["index"] = array (
+    'Name'    => $l_header_find,   'Url'     => "$path/admin/admin_index.php?action=index&amp;mode=html",
+    'Right'   => $admin_read,
+   'Condition'=> array ('all') 
+                                     );
 
-  $actions["ADMIN"]["index"]		 = array ('Name'
-						  => $l_header_find,
-            		          	          'Url'
-					 	  => "$path/admin/admin_index.php?action=index&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('None') 
-                                    		  );
+//data_show 
 
-  $actions["ADMIN"]["help"]		 = array ('Name'
-						  => $l_header_help,
-            		          	          'Url'
-					 	  => "$path/admin/admin_index.php?action=help&amp;mode=html",
-                                                  'Right' 	  
-						  => $admin_read,
-				                  'Condition'	  
-						  => array ('all') 
-                                    		  );
+  $actions["ADMIN"]["data_show"] = array (
+    'Url'     => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
+    'Right'   => $admin_read,
+    'Condition'=> array ('None') 
+                                     );
+
+//Data Update 
+
+  $actions["ADMIN"]["data_update"] = array (
+    'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
+    'Right'    => $admin_read,
+    'Condition'=> array ('None') 
+                                     );
+
+//Help
+
+  $actions["ADMIN"]["help"] = array (
+     'Name'     => $l_header_help,
+     'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
+     'Right'    => $admin_read,
+     'Condition'=> array ('all') 
+                                    );
 
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -748,7 +238,7 @@ elseif($menu == "ADMIN_LANG") {
                                                   'Right' 	  
 						  => $admin_lang_read,
 				                  'Condition'	  
-						  => array ('None') 
+						  => array ('all') 
                                     		  ); 
 
  $actions["ADMIN_LANG"]["help"]		 = array ('Name'
@@ -775,7 +265,7 @@ elseif($menu == "ADMIN_CODE") {
                                                   'Right' 	  
 						  => $admin_code_read,
 				                  'Condition'	  
-						  => array ('None') 
+						  => array ('all') 
                                     		  );
 
  $actions["ADMIN_CODE"]["help"]		 = array ('Name'
@@ -802,7 +292,7 @@ elseif($menu == "ADMIN_PREF") {
                                                   'Right' 	  
 						  => $admin_pref_read,
 				                  'Condition'	  
-						  => array ('None') 
+						  => array ('all') 
                                     		  );
 
  $actions["ADMIN_PREF"]["help"]		 = array ('Name'
@@ -829,7 +319,7 @@ elseif($menu == "ADMIN_DATA") {
                                                   'Right' 	  
 						  => $admin_data_read,
 				                  'Condition'	  
-						  => array ('None') 
+						  => array ('all') 
                                     		  );
 
  $actions["ADMIN_DATA"]["help"]		 = array ('Name'

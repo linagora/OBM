@@ -516,7 +516,6 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
     $dis_update = "<FORM METHOD=GET NAME=form_contract_update ACTION=\"".$sess->url("incident_index.php") . "\">
       <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
       <INPUT TYPE=hidden NAME=param_incident VALUE=\"$inc_id\">
-      <INPUT TYPE=hidden NAME=param_contract VALUE=\"$con_id\">
       <INPUT TYPE=submit value=\"$l_update\">
       </FORM>";
   }

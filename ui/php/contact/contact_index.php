@@ -60,7 +60,7 @@ if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
 
 page_close();
 
-
+if($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
 ///////////////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ if ($action == "ext_get_ids") {
     display_ok_msg($l_no_display);
   }
 }
-if($action == "") $action = "index";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ function get_param_contact() {
 ///////////////////////////////////////////////////////////////////////////////
 
 function get_contact_action() {
-  global $cocontact,$actions;
+  global $contact,$actions;
   global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
   global $l_header_display,$l_header_admin;
 

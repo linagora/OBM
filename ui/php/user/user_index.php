@@ -40,7 +40,8 @@ require("user_query.inc");
 
 //There is no page_close()
 $obm_user = get_param_user();  // $user is used by phplib
-
+get_user_action();
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -218,5 +219,111 @@ function get_param_user() {
   return $obm_user;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  User Action 
+///////////////////////////////////////////////////////////////////////////////
+
+function get_user_action() {
+  global $obm_user,$actions;
+  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_admin,$l_header_reset;
+
+
+
+//Index
+
+  $actions["USER"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/user/user_index.php?action=index",
+    'Right'    => $user_read,
+    'Condition'=> array ('all') 
+                                    );
+
+//New
+
+  $actions["USER"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/user/user_index.php?action=new",
+    'Right'    => $user_write,
+    'Condition'=> array ('search','index','admin','detailconsult','display') 
+                                  );
+
+//Search
+
+  $actions["USER"]["search"] = array (
+    'Url'      => "$path/user/user_index.php?action=new",
+    'Right'    => $user_write,
+    'Condition'=> array ('None') 
+                                  );
+
+//Detail Consult
+
+  $actions["USER"]["detailconsult"] = array (
+     'Url'      => "$path/user/user_index.php?action=detailconsult",
+    'Right'    => $user_write,
+    'Condition'=> array ('None') 
+                                  );
+
+//Reset
+
+  $actions["USER"]["reset"] = array (
+    'Name'     => $l_header_reset,
+    'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
+    'Right'    => $user_write,
+    'Condition'=> array ('detailconsult') 
+                                    );
+
+//Detail Uopate
+  $actions["USER"]["detailupdate"] = array (
+     'Name'     => $l_header_modify,
+     'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
+     'Right'    => $user_write,
+     'Condition'=> array ('detailconsult') 
+                                     	   );
+
+//Insert
+
+  $actions["USER"]["insert"] = array (
+    'Url'      => "$path/user/user_index.php?action=insert",
+    'Right'    => $user_write,
+    'Condition'=> array ('None') 
+                                     );
+
+//Update
+
+  $actions["USER"]["update"] = array (
+    'Url'      => "$path/user/user_index.php?action=update",
+    'Right'    => $user_write,
+    'Condition'=> array ('None') 
+                                     );
+
+//Check Delete
+
+  $actions["USER"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
+    'Right'    => $incident_write,
+    'Condition'=> array ('detailconsult') 
+                                     	   );
+
+//Delete
+
+  $actions["USER"]["delete"] = array (
+    'Url'      => "$path/user/user_index.php?action=delete",
+    'Right'    => $user_write,
+    'Condition'=> array ('None') 
+                                     );
+
+//Admin
+
+  $actions["USER"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/user/user_index.php?action=admin",
+    'Right'    => $contract_admin_write,
+    'Condition'=> array ('all') 
+                                    );
+
+
+}
 
 </SCRIPT>

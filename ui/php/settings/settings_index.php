@@ -62,7 +62,8 @@ require("settings_display.inc");
 if (($set_debug & $cdg_id) == $cdg_id) $dg_id = "checked";
 if (($set_debug & $cdg_param) == $cdg_param) $dg_param = "checked";
 if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
-
+if ($action == "") $action = "index";
+get_settings_actions();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -213,4 +214,16 @@ echo "></td>
   </body>
   </html>";
 
+//////////////////////////////////////////////////////////////////////////////
+// Settings actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_settings_actions() {
+  $actions["SETTINGS"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/settings/settings_index.php?action=index",
+    'Right'    => $settings_read,
+    'Condition'=> array ('None') 
+                                    	);
+}
 </SCRIPT>

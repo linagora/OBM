@@ -34,15 +34,14 @@ page_close();
 // $invoice is a hash table containing, for each form field set 
 // in the calling page, a couple var_name => var_value...
 $invoice = get_param_invoice();
-
-
+get_invoice_action();
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_payment);  // Head & Body
 generate_menu($menu,$section);      // Menu
 display_bookmarks();
-
 ///////////////////////////////////////////////////////////////////////////////
 // Programme principal                                                       //
 ///////////////////////////////////////////////////////////////////////////////
@@ -500,6 +499,173 @@ function get_param_invoice() {
   }
 
   return $invoice;
+}
+//////////////////////////////////////////////////////////////////////////////
+// Invoice actions
+//////////////////////////////////////////////////////////////////////////////
+
+function get_invoice_action() {
+  global $invoice,$actions;
+  global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_dupplicate,$l_header_admin;
+
+//Index 
+
+  $actions["INVOICE"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/treso/invoice_index.php?action=index",
+    'Right'    => $invoice_read,
+    'Condition'=> array ('all') 
+                                       );
+
+//Search
+
+  $actions["INVOICE"]["search"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=search",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+  
+                                   );
+
+//New
+
+  $actions["INVOICE"]["new"] = array (
+    'Name'     => $l_header_new_f,
+    'Url'      => "$path/treso/invoice_index.php?action=new",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('','search','index','detailconsult','display') 
+  
+                                   );
+
+//Insert
+
+  $actions["INVOICE"]["insert"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=insert",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+  
+                                   );
+
+//Detail Consult
+
+  $actions["INVOICE"]["detailconsult"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=detailconsult",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+  
+                                   );
+
+//Duplicate
+
+  $actions["INVOICE"]["duplicate"] = array (
+    'Name'     => $l_header_dupplicate,
+    'Url'      => "$path/treso/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["invoice"]."",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('detailconsult') 
+                                     	   );
+
+//Detail Update
+
+  $actions["INVOICE"]["detailupdate"] = array (
+    'Name'     => $l_header_modify,
+    'Url'      => "$path/treso/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["invoice"]."",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('detailconsult') 
+                                     	       );
+
+//Update
+
+  $actions["INVOICE"]["update"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=update",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+  
+                                        );
+
+//Update Archive
+
+  $actions["INVOICE"]["updatearchive"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=updatearchive",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Add Deal
+
+  $actions["INVOICE"]["add_deal"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=add_deal",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Search Deal
+
+  $actions["INVOICE"]["search_deal"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=search_deal",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Add Deal Chosen
+
+  $actions["INVOICE"]["add_deal_chosen"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=add_deal_chosen",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Delete Deal 
+
+  $actions["INVOICE"]["del_deal"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=del_deal",
+    'Right'    => $invoice_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Delete
+
+  $actions["INVOICE"]["delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/treso/invoice_index.php?action=delete&amp;param_invoice=".$invoice["invoice"]."",
+    'Right'    => $incident_write,
+    'Condition'=> array ('detailconsult') 
+                                     	);
+//Administration
+
+  $actions["INVOICE"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/treso/invoice_index.php?action=admin",
+    'Right'    => $contract_admin_write,
+    'Condition'=> array ('all') 
+                                       );
+
+//Display
+
+  $actions["INVOICE"]["display"] = array (
+    'Name'     => $l_header_display,
+    'Url'      => "$path/treso/invoice_index.php?action=display",
+    'Right'    => $incident_admin_write,
+    'Condition'=> array ('all') 
+                                        );
+
+//Display Préférences
+
+  $actions["INVOICE"]["dispref_display"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=dispref_display",
+    'Right'    => $incident_admin_write,
+    'Condition'=> array ('None') 
+                                        );
+
+//Display Préférences
+
+  $actions["INVOICE"]["dispref_level"] = array (
+    'Url'      => "$path/treso/invoice_index.php?action=dispref_level",
+    'Right'    => $incident_admin_write,
+    'Condition'=> array ('None') 
+                                        );
+
+
+
 }
 
 </SCRIPT>

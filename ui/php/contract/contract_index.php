@@ -59,6 +59,7 @@ page_close();
 
 
 $contract=get_param_contract();
+get_contract_action();
 display_head($l_contract);     // Head & Body
 
 if ($popup) {
@@ -80,7 +81,7 @@ if ($popup) {
   display_end();
   exit();
 }
-
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -307,6 +308,151 @@ function get_param_contract() {
   return $contract;
 }
 
+
+//////////////////////////////////////////////////////////////////////////////
+// Contract actions
+//////////////////////////////////////////////////////////////////////////////
+function get_contract_action() {
+  global $contract,$actions;
+  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_admin;
+
+
+//Search
+
+  $actions["CONTRACT"]["ext_get_id"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=ext_get_id",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+
+//Index
+
+  $actions["CONTRACT"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contract/contract_index.php?action=index",
+    'Right'    => $contract_read,
+    'Condition'=> array ('all') 
+                                    	);
+
+//Search
+
+  $actions["CONTRACT"]["search"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=search",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//New
+
+  $actions["CONTRACT"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=".urlencode($l_select_company)."&amp;url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
+    'Right'    => $contract_write,
+    'Popup'    => 1,
+    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+                                      );
+
+//Insert
+
+  $actions["CONTRACT"]["insert"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=insert",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//Detail Update
+  $actions["CONTRACT"]["detailupdate"] = array (
+    'Name'     => $l_header_modify,
+    'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."",
+    'Right'    => $contract_write,
+    'Condition'=> array ('detailconsult') 
+                                     	 );
+
+//Detail Consult
+
+  $actions["CONTRACT"]["detailconsult"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=detailconsult",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+
+//Update
+
+  $actions["CONTRACT"]["update"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=update",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//Delete
+
+  $actions["CONTRACT"]["delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$contract["id"]."",
+    'Right'    => $contract_write,
+    'Condition'=> array ('detailconsult') 
+                                     	 );
+//Admin
+
+  $actions["CONTRACT"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/contract/contract_index.php?action=admin",
+    'Right'    => $contract_admin_write,
+    'Condition'=> array ('all') 
+                                      	);
+
+//Admin Type Insert
+
+  $actions["CONTRACT"]["admintypeinsert"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=admintypeinsert",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//Admin Type Insert
+
+  $actions["CONTRACT"]["admintypedelete"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=admintypedelete",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//Admin Type Update
+
+  $actions["CONTRACT"]["admintypeupdate"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=admintypeupdate",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	);
+
+//Display
+  $actions["CONTRACT"]["display"] = array (
+    'Name'     => $l_header_display,
+    'Url'      => "$path/contract/contract_index.php?action=display",
+    'Right'    => $contract_admin_write,
+    'Condition'=> array ('all') 
+                                      	  );
+
+//Display Préférence
+
+  $actions["CONTRACT"]["dispref_display"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=dispref_display",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                        	  );
+
+//Display Level
+
+  $actions["CONTRACT"]["dispref_level"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=dispref_level",
+    'Right'    => $contract_read,
+    'Condition'=> array ('None') 
+                                    	       );
+
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
