@@ -137,7 +137,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
 //   - $id : deal id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($id) {
-  global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
+  global $cdg_sql, $db_type_mysql, $db_type_pgsql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -198,7 +198,7 @@ function run_query_detail($id) {
 //   - $deal[] : deal hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($deal) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql,$id,$obm_q;
 
   $id = $deal["id"];
   $pid = ($deal["parent"] ? "'".$deal["parent"]."'" : "null");
@@ -220,7 +220,10 @@ function run_query_insert($deal) {
   $status = $deal["state"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
+  $cat1 = $deal["category"];
+
   $add_comment = $deal["add_comment"];
+  
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
     $usercomment = $deal["usercomment"];
@@ -278,9 +281,23 @@ function run_query_insert($deal) {
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
-  $obm_q->query($query);
+  $retour = $obm_q->query($query);  
 
   $d_id = run_query_deal_id($deal);
+
+  if ($retour && is_array($cat1)) {
+    foreach($cat1 as $categoryid) {
+      $query = "insert into DealCategoryLink (
+	  dealcategorylink_deal_id,
+	  dealcategorylink_category_id)
+	values (
+          '$d_id',
+          '$categoryid')";
+      display_debug_msg($query, $cdg_sql);
+      $obm_q->query($query);
+    }
+  }
+
 
   // if the deal inserted is not archived, we increment the company deal number
   if (($d_id) && ($archive == '0')) {
@@ -294,8 +311,6 @@ function run_query_insert($deal) {
 
   return $d_id;
 }
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Deal Update query execution                                               //
 // Parameters:
@@ -326,6 +341,8 @@ function run_query_update($deal) {
   $todo = $deal["todo"];
   $comment = $deal["com"];
   $add_comment = $deal["add_comment"];
+  $cat_m = $deal["category"];
+
   if ($add_comment != "") {
     $datecomment = $deal["datecomment"];
     $usercomment = $deal["usercomment"];
@@ -362,6 +379,29 @@ function run_query_update($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
+  if($cat_m != "") { 
+    $query = "delete
+    from DealCategoryLink
+    where dealcategorylink_deal_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+   
+
+  if ($retour && is_array($cat_m)) {
+    foreach($cat_m as $categoryid) {
+      $query = "insert into DealCategoryLink (
+	  dealcategorylink_deal_id,
+	  dealcategorylink_category_id)
+	values (
+          '$id',
+          '$categoryid')";
+      display_debug_msg($query, $cdg_sql);
+      $obm_q->query($query);
+    }
+  }
+
+
   // If deal archive state has changed, update the company deal number
   if (($retour) && ($archive != $archive_old)) {
     if ($archive == '1') {
@@ -383,7 +423,7 @@ function run_query_update($deal) {
 //   deal Id if found else false
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_deal_id($deal) {
-  global $cdg_sql;
+  global $cdg_sql,$c_id;
 
   $num = $deal["num"];
   $label = $deal["label"];
@@ -485,6 +525,125 @@ function run_query_dealtype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Category 1 update query execution
+// Parameters:
+//   - $contact : contact hash info : keys used : act, act_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_update($deal) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $deal["category"];
+  $cat = $deal["cat_label"];
+  $cat_code = $deal["cat_code"];
+  
+  $query = "update DealCategory set
+      dealcategory_label='$cat',
+      dealcategory_code='$cat_code',
+      dealcategory_timeupdate='$timeupdate',
+      dealcategory_userupdate='$userupdate'
+    where
+      dealcategory_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of an Category from its id                                  //
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_cat_label($id) {
+  global $cdg_sql;
+
+  $query = "select dealcategory_label
+    from DealCategory
+    where dealcategory_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("dealcategory_label");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the categories attached to the contact
+// Parameters:
+//   - $c_id : contact Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_dealcategory($c_id) {
+    global $cdg_sql;
+
+  $query = "select dealcategory_id
+    from DealCategoryLink, DealCategory
+    where dealcategorylink_category_id = dealcategory_id
+      and dealcategorylink_deal_id = '$c_id'
+    order by dealcategory_id";     
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  while($obm_q->next_record()) {
+    $id = $obm_q->f("dealcategory_id");
+    $categories[] = $id;
+  }
+  return $categories;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Activity - Contact links query execution
+// Parameters:
+//   - $p_id : activity id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_links($p_id) {
+  global $cdg_sql;
+
+  $query = "select deal_title, deal_id, '$p_id' as deal_category
+    from Deal,DealCategoryLink
+    where deal_id = dealcategorylink_deal_id
+      and dealcategorylink_category_id = '$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category1 deletion query execution
+// Parameters:
+//   - $id : Category1 id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_delete($id) {
+  global $cdg_sql;
+
+  if ($id != '') {
+    $query = "delete from DealCategory where dealcategory_id='$id'";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+  }
+  else 
+  $retour = 1;
+  
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal Status list                                        //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_dealstatus() {
@@ -497,8 +656,99 @@ function run_query_dealstatus() {
   $obm_q->query($query);
   return $obm_q;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Contact detail query execution                                            //
+// Parameters:
+//   - $p_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_detail($p_id) {
+  global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
 
+  $timeupdate = sql_date_format($db_type, "deal_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "deal_timecreate", "timecreate");
+
+  $query = "select Deal.*,
+        $timeupdate,
+        $timecreate,
+        company_id, company_name, company_phone,
+        kind_lang,
+        kind_minilabel,
+        kind_header,
+        m.userobm_lastname as market_lname,
+        m.userobm_firstname as market_fname,
+      
+        c.userobm_login as usercreate,
+        u.userobm_login as userupdate
+      from
+        Deal
+        left join Company on deal_company_id=company_id
+        left join Kind on kind_id=deal_type_id
+        left join UserObm as m on deal_marketingmanager_id=m.userobm_id
+        left join UserObm as c on deal_usercreate=c.userobm_id
+        left join UserObm as u on deal_userupdate=u.userobm_id
+      where
+        deal_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Category  query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_dealcategory() {
+  global $cdg_sql, $cgp_hide;
+
+  if (! $cgp_hide["deal"]["category1"]) {
+    $query = "select * from DealCategory order by dealcategory_id"; 
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    display_debug_msg($query, $cdg_sql);
+  } else {
+    $obm_q = "";
+  }
+
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Category1 insertion query construction and execution
+// Parameters:
+//   - $contact : contact hash info : keys used : kind_label
+///////////////////////////////////////////////////////////////////////////////
+function run_query_cat_insert($deal) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $cat = $deal["cat_label"];
+  $cat_code = $deal["cat_code"];
+
+  $query = "insert into DealCategory (
+    dealcategory_timecreate,
+    dealcategory_usercreate,
+    dealcategory_label,
+    dealcategory_code)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$cat',
+    '$cat_code')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the contracts attached to the deal
 // Parameters:
@@ -517,7 +767,6 @@ function run_query_deal_contract_links($p_id) {
 
   return $obm_q;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the projects attached to the deal
@@ -538,7 +787,6 @@ function run_query_deal_project_links($p_id) {
   return $obm_q;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Company info                                            //
 // Parameters:
@@ -557,6 +805,25 @@ function run_query_company_info($id) {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Return all the categories attached to the contact
+// Parameters:
+//   - $c_id : contact Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_get_dealcategory_label($c_id) {
+    global $cdg_sql;
+
+  $query = "select dealcategory_label,dealcategory_code
+    from DealCategoryLink, DealCategory
+    where dealcategorylink_category_id = dealcategory_id
+      and dealcategorylink_deal_id = '$c_id'
+    order by dealcategory_id";     
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Contact list from the company :  Query execution                          //
@@ -594,7 +861,6 @@ function run_query_company_active_deal_inc($comp_id) {
   return $retour;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Company active deal number decrement                    //
 // Parameters:
@@ -612,7 +878,6 @@ function run_query_company_active_deal_dec($comp_id) {
   $retour = $obm_q->query($query);
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Company total deal number increment
@@ -632,7 +897,6 @@ function run_query_company_total_deal_inc($comp_id) {
   return $retour;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Company total deal number decrement                     //
 // Parameters:
@@ -650,7 +914,6 @@ function run_query_company_total_deal_dec($comp_id) {
   $retour = $obm_q->query($query);
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the deal archive state                                                //
@@ -672,7 +935,6 @@ function get_deal_archive($deal_id) {
   return $retour;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Get the deal company id                                                   //
 // Parameters:
@@ -692,7 +954,6 @@ function get_deal_company_id($deal_id) {
 
   return $retour;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Kind insert                                             //

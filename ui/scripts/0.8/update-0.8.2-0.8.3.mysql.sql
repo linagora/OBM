@@ -32,3 +32,25 @@ ALTER TABLE List ADD column list_mailing_ok int(1) after list_email;
 ALTER TABLE Contact ADD column contract_archive int(1) after contact_comment;
 
 ------------------------------------------------------------------------------
+-
+-- Table structure for table 'DealCategory'
+--
+CREATE TABLE DealCategory (
+  dealcategory_id          int(8) NOT NULL auto_increment,
+  dealcategory_timeupdate  timestamp(14),
+  dealcategory_timecreate  timestamp(14),
+  dealcategory_userupdate  int(8) default '0',
+  dealcategory_usercreate  int(8) default '0',
+  dealcategory_code        int(8) default '0',
+  dealcategory_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (dealcategory_id)
+);
+
+
+-- Table structure for table 'DealCategoryLink'
+--
+CREATE TABLE DealCategoryLink (
+  dealcategorylink_category_id  int(8) NOT NULL default '0',
+  dealcategorylink_deal_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
+);

@@ -134,6 +134,45 @@ function check_get_id_url(form, p_url) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if the Category update is possible
+///////////////////////////////////////////////////////////////////////////////
+
+function check_cat_upd(form,formd)
+{
+  cat_pos = formd.sel_cat.selectedIndex;
+  if ((cat_pos >= 0) && (form.tf_cat.value != \"\")) {
+    form.sel_cat.value=formd.sel_cat.options[cat_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_cat_update\");
+     return false;
+   }
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////
+// Check if the Category check or deletion is possible                       //
+///////////////////////////////////////////////////////////////////////////////
+
+function check_cat_checkdel(form)
+{
+   if (form.sel_cat.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_cat_delete\");
+      return false;
+   }
+}
+///////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Check if the obligatory fields are set while creating a new ParentDeal    //
 ///////////////////////////////////////////////////////////////////////////////
 function check_parentdeal(f_parent) {
@@ -224,6 +263,39 @@ function check_kind_new(form)
    }
 }
 
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Fill the Kind's header select.
+///////////////////////////////////////////////////////////////////////////////
+function get_elem(doc, name ) {
+    return doc.getElementById(name);
+  }  
+  function fill_ext_form2(int_form) {
+   size = int_form.length;
+   ext_field = get_elem(window.opener.document, '$ext_target' );
+   for(i=0; i <size; i++) {
+     if(int_form.elements[i].type == 'checkbox'){
+       if(int_form.elements[i].checked == true) {
+	 ext_size = ext_field.length;
+	 bool = false;
+	 for(j=0; j< ext_size  && bool == false; j++) {
+	   if(ext_field.options[j].value == int_form.elements[i].name) {
+	     ext_field.options[j].selected =true;
+	     bool = true;
+	   }
+	 }
+       }
+     }
+   }
+ }
+
+";
+
+
+$extra_js .= "
 
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the status creation is possible                                  //

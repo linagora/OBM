@@ -30,6 +30,7 @@ $l_comment = "Commentaire";
 $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";
 $l_todo = "A faire";
+$l_category = "Categorie";
 
 // Labels et textes
 $l_infos = "Informations";
@@ -71,11 +72,34 @@ $l_invoice_date = "Date";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
 $l_contract_new = "Nouveau contrat";
 
+$l_code = "Code";
+$l_label = "Label";
+$l_category = "Categorie";
+
+
+
 // Titres
 $l_deal = "Affaire";
 $l_parentdeal_deals = "Affaires appartenant a la SurAffaire";
 
+
+
 // Actions
+$l_cat_delete_ok = "La suppression de la categorie a été correctement effectuée.";
+$l_cat_delete_error = "La suppression de la categorie a échoué !";
+$l_cat_insert_ok = "L'insertion de la categorie a été correctement effectuée.";
+$l_cat_insert_error = "L'insertion de la categorie a échoué !";
+$l_cat_update_ok = "La modification de la categorie a été correctement effectuée";
+$l_cat_update_error = "La modification de la categorie a &eacute;chou&eacute;e !";
+$l_cat_link_contact = "La catégorie est référencée par ces contacts";
+$l_cat_link_contact_no = "La catégorie n'est référencée dans aucun contacts";
+$l_cat_can_delete = " La catégorie peut être supprimée"; 
+$l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
+$l_j_cat_create = "Vous devez renseigner le label de la categorie";
+$l_j_cat_update = "Vous devez renseigner le label de la categorie";
+$l_j_cat_delete = "Vous devez sélectionner une categorie";
+$l_add_cats = "Ajouter ces categories";
+
 $l_select_deal = "Sélectionner l'Affaire";
 $l_insert = "Enregistrer l'Affaire";
 $l_update = "Modifier l'Affaire";
@@ -97,7 +121,18 @@ $l_status_delete = "Supprimer l'état";
 $l_status_update = "Modifier l'état";
 $l_status_insert = "Créer l'état";
 
+
+
 // Messages
+
+$l_cat_manage = "Gestion des catégories";
+$l_cat_exist = "Categories existantes";
+$l_cat_new = "Nouvelle categorie";
+$l_cat_delete =  "Supprimer";
+$l_cat_checkdelete = "Vérifier ou supprimer la catégorie"; 
+$l_cat_update = "Mettre à jour la catégorie"; 
+$l_cat_insert = "Insérer une catégorie"; 
+
 $l_link_contract = "L'affaire est référencée par ces contrats";
 $l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
 $l_link_project = "L'affaire est référencée par ces projets";

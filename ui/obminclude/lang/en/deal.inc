@@ -30,6 +30,25 @@ $l_date_alarm = "Alarm Date";
 $l_add_comment = "Add a comment";
 $l_upd_comment = "Update comment";
 $l_todo = "To Do";
+$l_category = "Category";
+$l_code = "Code";
+$l_label = "Label";
+$l_category = "Category";
+$l_add_cats = "Add these categories";
+
+
+
+
+
+// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
+
+$l_j_cat_delete = "You have to select a category1";
+$l_j_cat_update = "You have to fill the label before submitting.";
+$l_j_cat_create = "You have to fill the label before submitting.";
+
+
+
+
 
 // Labels and texts
 $l_infos = "Informations";
@@ -144,6 +163,24 @@ $l_status_can_delete = "The Status can be deleted";
 $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";
 $l_status_link_deal_no = "The Status is not involved in any deals";
+
+$l_cat_manage = "Category management";
+$l_cat_exist = "Existing Category";
+$l_cat_new = "New category";
+$l_cat_delete = "Delete";
+$l_cat_checkdelete = "Check or delete Category"; 
+$l_cat_update = "Update category"; 
+$l_cat_insert = "Insert a category";
+$l_cat_insert_ok = "The category has been inserted successfully.";
+$l_cat_insert_error = "The insertion of the category has failed !";
+$l_cat_delete_ok = "The category has been deleted successfully.";
+$l_cat_delete_error = "The deletion of the category has failed !";
+$l_cat_update_ok = "The category has been updated successfully.";
+$l_cat_update_error = "The category has been updated has failed !";
+$l_cat_link_contact = "These category are referenced as";
+$l_cat_link_contact_no = "No contacts referenced as";
+$l_cat_cant_delete = "The category can't be deleted !";
+$l_cat_can_delete = "The category can be deleted.";     
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

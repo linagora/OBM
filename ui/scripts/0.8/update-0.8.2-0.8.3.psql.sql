@@ -31,6 +31,25 @@ ALTER TABLE List ADD column list_mailing_ok integer;
 -- Update Contract table
 -------------------------------------------------------------------------------
 -- Add column : contract_archive
-ALTER TABLE Contact ADD column contract_archive integer;
+ALTER TABLE Contact ADD column contract_archive integer; -------------------------------------------------------------------------------
+--
+-- Table structure for table 'DealCategory'
+--
+CREATE TABLE DealCategory (
+  dealcategory_id          serial,
+  dealcategory_timeupdate  timestamp,
+  dealcategory_timecreate  timestamp,
+  dealcategory_userupdate  integer default 0,
+  dealcategory_usercreate  integer default 0,
+  dealcategory_code        integer default 0,
+  dealcategory_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (dealcategory_id)
+);
 
--------------------------------------------------------------------------------
+-- Table structure for table 'DealCategoryLink'
+--
+CREATE TABLE DealCategoryLink (
+  dealcategorylink_category_id  integer NOT NULL default 0,
+  dealcategorylink_deal_id   integer NOT NULL default 0,
+  PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
+);
