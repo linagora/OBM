@@ -43,6 +43,7 @@ $l_auto = "Par défaut";
 $l_consult = "Consulter le document";
 $l_url = "Adresse";
 $l_add = "Ajouter les documents";
+
 // Message
 $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 
 $l_cat1_update = "Mettre à jour la catégorie 1"; 
@@ -74,7 +75,7 @@ $l_cat2_insert_ok = "L'insertion de la categorie 2 a été correctement effectuée.
 $l_cat2_insert_error = "L'insertion de la categorie 2 a échoué !";
 $l_cat2_update_ok = "La modification de la categorie 2 a été correctement effectuée";
 $l_cat2_update_error = "La modification de la categorie 2 a &eacute;chou&eacute;e !";
-$l_delete_ok = "La suppression de la société a été correctement effectuée.";
+$l_delete_ok = "La suppression du document a été correctement effectuée.";
 $l_delete_error = "La suppression de la société a échoué !";
 $l_found = "document(s) trouvé(s)";
 $l_insert_ok = "L'insertion ddu document a été correctement effectuée.";
@@ -93,13 +94,14 @@ $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > p
 $l_query_error = "Une erreur est survenue durant l'éxécution de la requête.";
 $l_update_ok = "La modification du document a été correctement effectuée";
 $l_update_error = "La modification du document a échoué !";
-$l_new_file = "Fichier à envoyer";
+$l_new_file = "Fichier à déposer";
 $l_link = "Lien HTTP";
 $l_links = "Lien HTTPS";
-$l_existing_file = "Fichier déjà envoyé";
 $l_kind = "Type de document";
 $l_invalid_link_file = "Impossible de creer un alias sur un lien";
 $l_invalid_url = "Adresse invalide";
+$l_noupdate_file = "Ne pas changer le fichier";
+$l_update_file = "Changer le fichier";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut etre supprimer";

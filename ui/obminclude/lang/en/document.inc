@@ -41,12 +41,16 @@ $l_add_repos = "Create repository";
 $l_new_file = "File to send";
 $l_link = "HTTP Link";
 $l_links = "HTTPS Link";
-$l_existing_file = "File alreand sent";
+$l_existing_file = "File already sent";
 $l_kind = "Kind of document";
 $l_auto = "Default value";
 $l_consult = "Consult document";
 $l_url = "URL";
 $l_add = "Add documents";
+$l_noupdate_file = "Do not update file";
+$l_update_file = "Update file";
+
+$l_have_link = "Ce document est lié à divers éléments d'obm";
 // Message
 $l_cat1_checkdelete = "Check or delete Category 1"; 
 $l_cat1_update = "Update category 1"; 

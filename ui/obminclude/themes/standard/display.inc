@@ -411,91 +411,91 @@ function display_last_visited($path="..") {
   if ($last_company_name != "") {
     $company_url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company);
     $company_name = substr($last_company_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$company_url\"><img src=\"/images/$set_theme/$ico_company\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$company_url\"><img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
         <a href=\"$company_url\">$company_name</a></li>";
   }
 
   if ($last_contact_name != "") {
     $contact_url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact);
     $contact_name = substr($last_contact_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$contact_url\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$contact_url\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"\" /></a>
         <a href=\"$contact_url\">$contact_name</a></li>";
   }
 
   if ($last_parentdeal_name != "") {
     $parentdeal_url = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$last_parentdeal);
     $parentdeal_name = substr($last_parentdeal_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/$ico_parentdeal\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/$ico_parentdeal\" alt=\"\" /></a>
         <a href=\"$parentdeal_url\">$parentdeal_name</a></li>";
   }
 
   if ($last_deal_name != "") {
     $deal_url = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal);
     $deal_name = substr($last_deal_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$deal_url\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$deal_url\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
         <a href=\"$deal_url\">$deal_name</a></li>";
   }
 
   if ($last_list_name != "") {
     $list_url = url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=".$last_list);
     $list_name = substr($last_list_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$list_url\"><img src=\"/images/$set_theme/$ico_list\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$list_url\"><img src=\"/images/$set_theme/$ico_list\" alt=\"\" /></a>
         <a href=\"$list_url\">$list_name</a></li>";
   }
 
   if ($last_account_name != "") {
     $account_url = url_prepare("$path/account/account_index.php?action=detailconsult&amp;param_account=".$last_account);
     $account_name = substr($last_account_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$account_url\"><img src=\"/images/$set_theme/$ico_account\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$account_url\"><img src=\"/images/$set_theme/$ico_account\" alt=\"\" /></a>
         <a href=\"$account_url\">$account_name</a></li>";
   }
 
   if ($last_invoice_name != "") {
     $invoice_url = url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice);
     $invoice_name = substr($last_invoice_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$invoice_url\"><img src=\"/images/$set_theme/$ico_invoice\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$invoice_url\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$invoice_url\">$invoice_name</a></li>";
   }
 
   if ($last_payment_name != "") {
     $payment_url = url_prepare("$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment);
     $payment_name = substr($last_payment_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$payment_url\"><img src=\"/images/$set_theme/$ico_payment\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$payment_url\"><img src=\"/images/$set_theme/$ico_payment\" alt=\"\" /></a>
         <a href=\"$payment_url\">$payment_name</a></li>";
   }
 
   if ($last_contract_name != "") {
     $contract_url = url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract);
     $contract_name = substr($last_contract_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$contract_url\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$contract_url\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$contract_url\">$contract_name</a></li>";
   }
 
   if ($last_project_name != "") {
     $project_url = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=".$last_project);
     $project_name = substr($last_project_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$project_url\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$project_url\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
         <a href=\"$project_url\">$project_name</a></li>";
   }
 
   if ($last_incident_name != "") {
     $incident_url = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident);
     $incident_name = substr($last_incident_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$incident_url\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$incident_url\"><img src=\"/images/$set_theme/$ico_incident\" alt=\"\" /></a>
         <a href=\"$incident_url\">$incident_name</a></li>";
   }
 
   if ($last_user_name != "") {
     $user_url = url_prepare("$path/user/user_index.php?action=detailconsult&amp;param_user=".$last_user);
     $user_name = substr($last_user_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$user_url\"><img src=\"/images/$set_theme/$ico_user\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$user_url\"><img src=\"/images/$set_theme/$ico_user\" alt=\"\" /></a>
         <a href=\"$user_url\">$user_name</a></li>";
   }
 
   if ($last_group_name != "") {
     $group_url = url_prepare("$path/group/group_index.php?action=detailconsult&amp;param_group=".$last_group);
     $group_name = substr($last_group_name,0,30);
-    $block .= "<li class=\"lastList\"><a href=\"$group_url\"><img src=\"/images/$set_theme/$ico_group\" /></a>
+    $block .= "<li class=\"lastList\"><a href=\"$group_url\"><img src=\"/images/$set_theme/$ico_group\" alt=\"\" /></a>
         <a href=\"$group_url\">$group_name</a></li>";
   }
 

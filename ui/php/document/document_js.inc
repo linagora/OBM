@@ -230,7 +230,6 @@ function show_hide_field()
   radios = document.f_mod_document.rd_kind;
   if(radios[0].checked == true) {
     basic_show('browse_img');
-    basic_hide('browse_img_file');
     basic_show('browse_field');
     basic_hide('url_field');";
     if(!isset($document["path"])) {
@@ -245,15 +244,6 @@ function show_hide_field()
     echo "
   }
   else if(radios[1].checked == true) {
-    basic_hide('browse_img');
-    basic_show('browse_img_file');
-    basic_hide('browse_field');
-    basic_hide('url_field');
-    document.f_mod_document.tf_path.value = '".$document["path"]."';
-    
-  }
-  else if(radios[2].checked == true) {
-    basic_hide('browse_img_file');
     basic_show('browse_img');
     basic_hide('browse_field');
     basic_show('url_field');";
@@ -269,8 +259,7 @@ function show_hide_field()
     echo "
     document.f_mod_document.preurl.value = \"http://\";
   }
-  else if(radios[3].checked == true) {
-    basic_hide('browse_img_file');
+  else if(radios[2].checked == true) {
     basic_show('browse_img');
     basic_hide('browse_field');
     basic_show('url_field');

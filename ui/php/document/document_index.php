@@ -18,6 +18,7 @@ $path = "..";
 $section = "PROD";
 $menu = "DOCUMENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+$extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
@@ -30,6 +31,9 @@ require("document_display.inc");
 page_close();
 if ($action == "") $action = "index";
 $document = get_param_document();
+get_document_action();
+$perm->check();
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -98,7 +102,6 @@ elseif ($action == "index" || $action == "") {
   if ($param_document > 0 || $name_document != "") {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
-      $document["id"] = $doc_q->f("document_id"); // Temporaire ???
       $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
       $display["detail"] = html_document_consult($doc_q);
     } else {
@@ -149,7 +152,7 @@ elseif ($action == "insert")  {
 } elseif ($action == "insert_repository")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_repository_data_form($document)) {
-    $retour = run_query_create_repository($document);
+    $retour = run_query_insert_repository($document);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_insert_ok);
     } else {
@@ -337,9 +340,6 @@ elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-// here to have the id filled (when queried by name and path)
-get_document_action();
-$perm->check();
 
 $display["head"] = display_head($l_document);
 if (! $document["popup"]) {
@@ -359,14 +359,14 @@ function get_param_document() {
   global $param_document,$fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
   global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url,$hd_document_id;
   global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target,$name_document;
-  global $param_entity, $entity; 
+  global $param_entity, $entity,$rd_file_update; 
   if (isset ($param_document)) $document["id"] = $param_document;
   if (isset ($name_document)) $document["name"] = $name_document;
 
   if (isset ($param_entity)) $document["entity_id"] = $param_entity;
   if (isset ($entity)) $document["entity"] = $entity;
 
-  
+  if (isset($rd_file_update)) $document["file_update"] = $rd_file_update;
   if (isset ($hd_document_id)) $document["id"] = $hd_document_id;
   
   if (isset ($tf_url)) $document["url"] = $tf_url;

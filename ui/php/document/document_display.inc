@@ -251,7 +251,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
-  global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
+  global $set_theme,$l_document,$l_new_file,$l_link,$path,$l_noupdate_file,$l_update_file;
   global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url,$l_links;
   global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto,$default_path;
@@ -277,8 +277,19 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       }
     } else {
       $kind = "file";
-      $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
+      $fi_path = $doc_q->f("document_path");
     }
+    $update_file = "
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">
+       <input checked=\"checked\" onclick=\"basic_hide('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"no\"/>$l_noupdate_file
+       <input onclick=\"basic_show('file_update')\" type=\"radio\" name=\"rd_file_update\" value=\"yes\"/>$l_update_file
+      </td>
+     </tr>
+    </table>
+    <div id=\"file_update\" style=\"display: none\">";
+    $update_file_end = "</div>";
   }
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
@@ -294,6 +305,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   if (isset($document["entity"])) { $entity = $document["entity"]; }
   if (isset($document["entity_id"])) { $entity_id = $document["entity_id"]; }
   if ($fi_path =="") $fi_path = $default_path;
+
+
+
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
   while($cat1_q->next_record()) {
@@ -340,27 +354,15 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <input type=\"submit\" value=\"$l_insert\" />
       ";
   }
-  
-   if($kind == "new_file" || $kind == "") { 
+   if($kind == "new_file" || $kind == "" || $kind =="file") { 
      $checked = "checked=\"checked\"";
      $dis_img2 = " style=\"display: none;\" ";
      $dis_url = " style=\"display: none;\" ";
    }
    else 
      $checked = "";
-   $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"new_file\" $checked/> $l_new_file<br /> ";
-
-  if($kind == "file") {
-     $dis_field = " style=\"display: none;\" ";
-     $checked = "checked=\"checked\"";
-     $dis_img = " style=\"display: none;\" ";
-     $dis_url = " style=\"display: none;\" ";
-   }
-   else 
-     $checked = "";
-
-   $rd_kind .= "<input onclick=\"show_hide_field()\"type=\"radio\" name=\"rd_kind\" value=\"file\" $checked/> $l_existing_file<br />";
   
+  $rd_kind .= "<input onclick=\"show_hide_field()\" type=\"radio\" name=\"rd_kind\" value=\"new_file\" $checked/> $l_new_file<br /> ";
 
   if($kind == "link" && $proto == "http") {
      $dis_field = " style=\"display: none;\" ";
@@ -401,9 +403,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </tr><tr>
       <td class=\"detailLabel\">$l_author</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_author\" name=\"tf_author\" value=\"$author\" size=\"50\"/ /></td>
-<!--    </tr><tr>
+    </tr><tr>
       <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> -->
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_privacy\" value=\"1\" $privacy /></td> 
     </tr><tr>
       <td class=\"detailLabel\">$l_category1</td>
       <td class=\"detailForm\">$sel_cat1</td>
@@ -414,7 +416,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </table>
 
     <div class=\"detailHead\">$l_file</div>
-
+    $update_file
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_mimetype</td>
@@ -430,8 +432,6 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
       <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a></span>
-     <span id=\"browse_img_file\" $dis_img2>
-      <a href=\"javascript:return false;\" onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse_file\" alt=\"\" /></a></span>
       </td>
     </tr> 
     <tr id=\"browse_field\" $dis_field>
@@ -443,6 +443,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       <td class=\"detailForm\"><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
+   $update_file_end
    <div class=\"detailButton\">
     <p class=\"detailButtons\">
     <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"30000\">
@@ -1255,96 +1256,135 @@ function dis_document_display_pref($display_pref_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_documents_tree($document,$display_file) {
   global $document_path,$l_close;
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
   $popup = $document["popup"];
-  $block = dis_repository_rec($document,$document_path,$display_file);
+  $obm_d = run_query_get_tree($display_file);
+  if($popup) {
+    $link = "<a class=\"documentRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link_end ="</a>";
+  }
+  $name = '/';
+  $kind = "0";
+  $realpath = $path.$name;
+  $block = "
+  <div class=\"documentTree\">
+  ";
+  if($popup) {
+    $fill = " onclick=\"fill_ext_form('$realpath');return false;\"";
+  }
+  
+  while($obm_d->next_record()) {
+    $path = $obm_d->f("document_path");
+    $begin_group ="";
+    if($kind === "0") {
+      if(substr($path,0,strlen($realpath)) == $realpath) {
+	$ico = $ico_directory_close;
+	$link_img = "<a href=\"\" onclick=\"show_hide_repo('$realpath');return false;\">";
+	$link_img_end = "</a>";
+	$begin_group = "<div id='$realpath' style=\"display:none;\" >";
+
+      }
+      else {
+	$ico = $ico_directory;
+      }
+      $class = "documentRepository";
+      if($popup) {
+	$link = "<a class=\"$class\" href=\"\" $fill>";
+ 	$link_end ="</a>";
+      }      
+      for($i=0;$i<$end_group;$i++) {
+	$block.= "</div>";
+      }     
+      $block.= "
+      <table class=\"document\">
+       <tr>
+	<td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 $link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
+	 $link$name$link_end
+	</td>
+	<td class=\"documentInfo\">&nbsp;$title</td>
+	<td class=\"documentInfo\">&nbsp;$author</td>
+       </tr>
+      </table>
+      $begin_group
+      ";
+    }
+    $indent_save = $indent;
+    $indent = substr_count($path,'/')*15;
+    $end_group = ($indent_save - $indent)/15;
+    $name = $obm_d->f("document_name");
+    $title = $obm_d->f("document_title");
+    $kind = $obm_d->f("document_kind");
+    $author = $obm_d->f("document_author");
+    $id = $obm_d->f("document_id");
+    $realpath = $path.$name;
+    $link = "";
+    $link_end = "";
+    $link_img = "";
+    $link_img_end = "";
+
+    if($popup) {
+      $fill = " onclick=\"fill_ext_form('$realpath');return false;\"";
+    }
+
+    if($kind !=0) {
+      $ico = $ico_file;
+      $class = "documentFile";
+      $link_file = "\"document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1\" target=\"_blank\" ";
+      $link = "<a class=\"$class\" href=$link_file $fill>";
+      $link_end ="</a>";
+      $link_img = "<a href=\"document_index.php?action=detailconsult&amp;param_document=$id\" $fill>";
+      $link_img_end = "</a>";
+      for($i=0;$i<$end_group;$i++) {
+	$block.= "</div>";
+      }
+     
+     $block.= "
+     <table class=\"document\">
+      <tr>
+       <td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
+	$link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
+	$link$name$link_end
+       </td>
+       <td class=\"documentInfo\">&nbsp;$title</td>
+       <td class=\"documentInfo\">&nbsp;$author</td>
+      </tr>
+     </table>
+     ";
+    } 
+  }
+  if($kind === "0") {
+      $ico = $ico_directory;
+      $class = "documentRepository";
+      if($popup) {
+	$link = "<a class=\"$class\" href=\"\" $fill>";
+ 	$link_end ="</a>";
+      }      
+      for($i=0;$i<$end_group;$i++) {
+	$block.= "</div>";
+      }     
+      $block.= "
+      <table class=\"document\">
+       <tr>
+	<td class=\"$class\" style=\"padding-left:".$indent."px;text-align:left;\">
+	 $link_img<img  id=\"img_$realpath\"  src=\"/images/$set_theme/$ico\" alt=\"\" />$link_img_end
+	 $link$name$link_end
+	</td>
+	<td class=\"documentInfo\">&nbsp;$title</td>
+	<td class=\"documentInfo\">&nbsp;$author</td>
+       </tr>
+      </table>
+      ";
+    }
+  $end_group = ($indent)/15;
+  for($i=0;$i<$end_group;$i++) {
+    $block.= "</div>";
+  }
+  $block .= "</div>";
   if($popup) {
     $block.= "<a href=\"javascript:window.close();\">$l_close</a>";
   }
   return $block;
-  
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display: Document Tree
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function dis_repository_rec($document,$repository,$display_file) {
-  global $document_path;
-  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-
-  $root_handler = opendir($repository);
-  $relative_path = substr($repository,strlen($document_path)); 
-  $popup = $document["popup"];
-  
-  if($repository == $document_path) {
-    $name = "/";
-    $relative_path = $name;
-  }
-  else {
-    $name = substr($repository,strrpos($repository,'/')+1);
-  }
-  if($popup) {
-   if($display_file == "false") {
-     $js = "onclick=\"fill_ext_form('$relative_path');return false;\"";
-     $link_repo = "<a href=\"\" $js>";
-     $link_repo_end ="</a>";
-   }
-   $close = "<a href=\"javascript:window.close();\">$l_close</a>";
-  }
-
-  $files = array();
-  $repos = array();
-
-  while($file = readdir($root_handler)) {
-    $path = "$repository/$file";
-    if($file != ".." && $file != ".") {
-      if(is_dir($path)) {
-	$repos[] = $path;
-      }
-      elseif($display_file == "true") {
-	$files[] = $file;
-      }
-    }
-    
-  }
-  closedir($root_handler);
-  
-  if(count($repos) == 0 && (count($files) == 0 || $display_file == "false")) {
-     $img = "/images/$set_theme/$ico_directory";
-  }
-  else {
-     $img = "/images/$set_theme/$ico_directory_close";
-     $js_int = "<a href=\"\" onclick=\"show_hide_repo('$relative_path');return false;\"\">";
-     $js_int2 = " </a>";
-  }
-  
-  $block = "
-  <div class=\"documentRepository\">
-   $js_int <img id=\"img_$relative_path\" src=\"$img\" alt=\"\" />$js_int2 
-   $link_repo $ind $name $link_repo_end
-  </div>";
-
-  $block .= "<div id=\"$relative_path\" style=\"display:none;\" class=\"documentBox\">";
-
-   foreach($repos as $path) {
-    $block .= dis_repository_rec($document,$path,$display_file);
-  }
-  
-  foreach($files as $file) {
-    if($popup) {
-      $js = "onclick=\"fill_ext_form('$relative_path/$file');return false;\"";
-    }
-    
-    $file = stripslashes($file);
-    $block .= "<div class=\"documentFile\">
-     <a href=\"document_index.php?action=detailconsult&amp;name_document=$file&amp;tf_path=$relative_path\" $js><img src=\"/images/$set_theme/$ico_file\" alt=\"\" /></a>
-     <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>
-      $file</a><br /></div>";
-  }
-  $block .= "</div>";
-  return $block;
-      
-  
   
 }
 
