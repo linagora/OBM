@@ -410,16 +410,22 @@ td.OBMDisplayLabel		{
 	color:			#ffff00;
 	text-align:		center;
 	background-color:	#93919c;
-
 }
 
 td.OBMDisplayText		{
 	font-family:		sans-serif;
 	font-size:		10px;
+	text-align:		left;
+	color:			#000000;
+	background-color:	#ffffff;
+}
+
+td.OBMDisplayTextCentered	{
+	font-family:		sans-serif;
+	font-size:		10px;
 	text-align:		center;
 	color:			#000000;
 	background-color:	#ffffff;
-	
 }
 
 a.OBMDisplayHead:link { color: #ffff00; background-color: transparent;}

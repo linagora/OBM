@@ -313,7 +313,7 @@ function display_head($l_module) {
   echo "
     $headers_e
     <head>
-     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/>
+     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\" />
      <title>$l_title - $l_module</title>
      <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
     </head>

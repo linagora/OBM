@@ -698,13 +698,18 @@ class OBM_DISPLAY {
         //===================
         // Final cell writing
         //===================
-        if ($special_col_table != "") {
-	 $td = "<td align=\"$align\" bgcolor=\"#$special_col_table\">";
-        }
-	else {
-	 $td = "<td align=\"$align\" bgcolor=\"#$col_table\">";
+        // if ($special_col_table != "") {
+	//   $td = "<td align=\"$align\" bgcolor=\"#$special_col_table\">";
+        // }
+	// else {
+	//   $td = "<td align=\"$align\" bgcolor=\"#$col_table\">";
+	// }
+
+	if ($align == "centrer") {
+	  $td = "<td class=\"OBMDisplayTextCentered\">";
+	} else {
+	  $td = "<td class=\"OBMDisplayText\">";
 	}
-         $td = "<td class=\"OBMDisplayText\">";
         $content = "";
 	
 	if($popup_display!="") { //make the popup link for timemanagement modification
