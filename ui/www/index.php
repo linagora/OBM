@@ -34,6 +34,7 @@
           <li> New field NAF code on Company, can be hidden
           <li> A project task can now be updated
           <li> Lists can now be private
+          <li> Reporting ans statistics on #companies (by categories, countries and managers)
           <li> Fixes on List (graphical construction), Deal, Document, Contact
           <li> Enhancements in Company, Project, CSV export, List, Calendar
           <li> Optimizations (hidden data no more fetched from DB)
