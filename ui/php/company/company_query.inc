@@ -115,10 +115,14 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   // ORDER construction
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "company_name";
 
+  // Order exceptions (order on calculated rows)
   // Contact list and new contact column haven't any meaning for sorting
   if ( (strcmp($p_new_order,"company_contacts")==0)
       || (strcmp($p_new_order,"company_new_contact") == 0) ) {
     $order = "company_name";
+  } else if (strcmp($p_new_order,"company_address")==0) {
+    $order = "company_address1";
+    $order_next = ", company_address2, company_address3, company_zipcode, company_town";
   }
 
   $req = "select
@@ -156,7 +160,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
          LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
          LEFT JOIN Country on company_country_id=country_id";
 
-  $query = "$req $whereq order by $order $p_order_dir";
+  $query = "$req $whereq order by $order $p_order_dir $order_next";
 
   if (! $fuzzy) {
     display_debug_msg("company_search(1) : $query", $cdg_sql);

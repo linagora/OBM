@@ -21,6 +21,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $login = $user["login"];
   $lname = $user["lastname"];
   $perms = $user["perms"];
+  $email = $user["email"];
   $archive = $user["archive"];
 
   $obm_q = new DB_OBM;
@@ -46,10 +47,16 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
      $where .= " userobm_perms='$perms'";
   }
 
-  // If a name indication has been specified, get it
+  // If a lastname indication has been specified, get it
   if (trim($lname) != "") {
      if (trim($where) != "") $where .= " and";
      $where .= " userobm_lastname $like '$lname%'";
+  }
+
+  // If an email indication has been specified, get it
+  if (trim($email) != "") {
+     if (trim($where) != "") $where .= " and";
+     $where .= " userobm_email like '%$email%'";
   }
 
   if ($archive != "1") {
@@ -57,7 +64,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
     $where .= " userobm_archive = '0'";
   }
 
-  if (trim($where) != "") $where = " where" .$where;
+  if (trim($where) != "") $where = " where" . $where;
   $query = $select . $where;
 
   // ORDER construction
@@ -153,8 +160,6 @@ function run_query_detail($p_id) {
   $timeupdate = sql_date_format($db_type, "UserObm.userobm_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
   $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
-
-  //      UNIX_TIMESTAMP(UserObm.userobm_timeupdate) as timeupdate,
 
   $query = "select UserObm.*,
       $timeupdate,
@@ -291,6 +296,80 @@ function run_query_delete($p_id) {
   $retour = $obm_q->query($query);
 
   return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User Groups query execution                                               //
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_user_group($p_id) {
+  global $cdg_sql;
+
+  $query = "select * from UGroup
+    left join UserObmGroup on group_id = userobmgroup_groupid
+    where userobmgroup_userobmid='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Groups query execution                                                    //
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group() {
+  global $cdg_sql;
+
+  $query = "select * from UGroup order by group_name";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : UserObmGroup global update                              //
+// Parameters:
+//   - $user[] : user hash info : keys used : id, group_nb, group_X
+// Return: number of usergroup inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_update_user_group($user) {
+  global $cdg_sql;
+
+  $uid = $user["id"];
+  $query = "delete from UserObmGroup where userobmgroup_userobmid = '$uid'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  $cpt = 0;
+  $cpt_ins = 0;
+  while ($cpt < $user["group_nb"]) {
+    $cpt++;
+    $g_id = $user["group_$cpt"];
+
+    $query = "insert into UserObmGroup (userobmgroup_groupid,
+        userobmgroup_userobmid) values ($g_id, $uid)";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+    if (! $retour) {
+      return -1;
+    }
+    $cpt_ins++;
+  }
+
+  return $cpt_ins;
 }
 
 
@@ -441,6 +520,14 @@ function run_query_delete_profil($param_user)  {
       deal_visibility='0'
     where deal_usercreate='$param_user'
       and deal_visibility != '0'"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  // Move all the user list from private to public
+  $query = "Update List set
+      list_visibility='0'
+    where list_usercreate='$param_user'
+      and list_visibility != '0'"; 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 }

@@ -13,15 +13,15 @@
 // Parameters :
 //   - $group[]      : list search criteria
 //     keys used     : name, user
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($group, $p_new_order, $p_order_dir) {
+function run_query_search($group) {
   global $cdg_sql;
   
   $name = $group["name"];
   $email = $group["email"];
   $user = $group["user"];
+  $new_order = $group["new_order"];
+  $order_dir = $group["order_dir"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -52,8 +52,8 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
       $where";
 
   // ORDER construction
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "group_name";
-  $query .= " order by $order $p_order_dir";
+  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
+  $query .= " order by $order $order_dir";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -66,16 +66,16 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
 // Parameters :
 //   - $group[]      : list search criteria
 //     keys used     : name, user
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_possible_children($group, $p_new_order, $p_order_dir) {
+function run_query_search_possible_children($group) {
   global $cdg_sql;
   
   $id = $group["ext_id"];
   $name = $group["name"];
   $email = $group["email"];
   $user = $group["user"];
+  $new_order = $group["new_order"];
+  $order_dir = $group["order_dir"];
 
   $parents = get_group_parents($id);
 
@@ -114,8 +114,8 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
 
   // ORDER construction
 
-  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "group_name";
-  $query .= " order by $order $p_order_dir";
+  $order = (strcmp($new_order,"") != 0) ? $new_order : "group_name";
+  $query .= " order by $order $order_dir";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -160,13 +160,14 @@ function run_query_detail($id) {
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($group) {
-  global $auth, $cdg_sql;
+  global $uid, $cdg_sql;
 
   $id = $group["id"];
+  $system = ($group["system"] == 1) ? 1 : 0;
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $system = ($group["system"] == 1) ? 1 : 0;
+  $now = date("Y-m-d H:i:s");
 
   $query = "insert into UGroup (group_timeupdate,
     group_timecreate,
@@ -177,9 +178,9 @@ function run_query_insert($group) {
     group_desc,
     group_email)
   values (null,
-    '" . date("Y-m-d H:i:s") ."',
+    '$now',
     null,
-    '" . $auth->auth["uid"] . "',
+    '$uid',
     '$system',
     '$name',
     '$desc',
@@ -199,16 +200,18 @@ function run_query_insert($group) {
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($group) {
-  global $auth, $cdg_sql;
+  global $uid, $cdg_sql;
 
   $id = $group["id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
   $system = ($group["system"] == 1) ? 1 : 0;
+  $now = date("Y-m-d H:i:s");
   
-  $query = "update UGroup set group_timeupdate='". date("Y-m-d H:i:s")."',
-    group_userupdate='".$auth->auth["uid"]."',
+  $query = "update UGroup set
+    group_timeupdate='$now',
+    group_userupdate='$uid',
     group_system='$system',
     group_name='$name',
     group_desc='$desc',
@@ -231,7 +234,7 @@ function run_query_update($group) {
 function run_query_delete($p_id) {
   global $cdg_sql;
 
-  // Delete all contacts registration to this group
+  // Delete all users registrations to this group
   $query = "delete from UserObmGroup where userobmgroup_groupid='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -402,14 +405,13 @@ function run_query_groupgroup_delete($group) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the users of the given group                        //
 // Parameters:
-//   - $group_id : Group id
-// -- Optionnals
-//   - $entity : dataset entity to order (to handle multiple Display in 1 p)
+//   - $group[] : Group parameters
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group($group, $entity="") {
+function run_query_user_group($group) {
   global $cdg_sql;
 
   $id = $group["id"];
+  $entity = $group["entity"];
   $new_order = $group["new_order"];
   $order_dir = $group["order_dir"];
 
@@ -444,14 +446,13 @@ function run_query_user_group($group, $entity="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the groups members of the given group               //
 // Parameters:
-//   - $group_id  : Group id
-// -- Optionnals
-//   - $entity    : dataset entity to order (to handle multiple Display in 1 p)
+//   - $group[] : Group parameters
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_group_group($group, $entity="") {
+function run_query_group_group($group) {
   global $cdg_sql;
 
   $id = $group["id"];
+  $entity = $group["entity"];
   $new_order = $group["new_order"];
   $order_dir = $group["order_dir"];
 
@@ -622,9 +623,9 @@ function check_group_context($id, $group) {
   $desc = $group["desc"];
 
   // return the groups with same name or desc
-  $q_q = run_query_check_group($id, $name, $desc);
+  $g_q = run_query_check_group($id, $name, $desc);
 
-  return $q_q;
+  return $g_q;
 }
 
 

@@ -140,31 +140,25 @@ function html_group_search_form ($group) {
 // Parameters:
 //   - $group[]   : group search criteria
 //     keys used  : name, description, email
-//   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function dis_group_search_group($group, $popup=false) {
-  global $l_no_found;
-  global $action, $display, $auth, $new_order, $order_dir;
+function dis_group_search_group($group) {
+  global $l_no_found, $display, $auth;
 
   $child_res = $group["children_restriction"];
   $widget = $group["ext_widget"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "group");
   if ($child_res) {
-    $obm_q = run_query_search_possible_children($group,$new_order, $order_dir);
+    $obm_q = run_query_search_possible_children($group);
   }  else {
-    $obm_q = run_query_search($group, $new_order, $order_dir);
+    $obm_q = run_query_search($group);
   }
 
   $nb_group = $obm_q->num_rows();
   if ($nb_group == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    if ($widget == "") {
-      $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
-    } else {
-      $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup);
-    }
+    $block = html_group_search_group($obm_q, $pref_q, $nb_group, $group);
   }
 
   return $block;
@@ -178,13 +172,13 @@ function dis_group_search_group($group, $popup=false) {
 //   - $pref_q    : the fields which have to be displayed
 //   - $nb_group  : nb groups returned by the search query 
 //   - $group[]   : group search criteria
-//     keys used  : name, user
-//   - $popup     : if true, doesn't display links and display checkbox
+//     keys used  : name, user, popup
 ///////////////////////////////////////////////////////////////////////////////
-function html_group_search_group($obm_q, $pref_q, $nb_group, $group, $popup) {
+function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
   global $display, $l_found, $l_add, $l_close;
 
   $child_res = $group["children_restriction"];
+  $popup = $group["popup"];
   $widget = $group["ext_widget"];
 
   if ($popup) {
@@ -315,6 +309,27 @@ function html_group_form($action, $group_q, $group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Group Consultation
+// Parameters:
+//   - $group[] : group parameters
+//   - $uid     : user id
+///////////////////////////////////////////////////////////////////////////////
+function dis_group_consult($group, $uid) {
+
+  $g_id = $group["id"];
+
+  $group_q = run_query_detail($g_id);
+  $pref_u_q = run_query_display_pref($uid, "group_user");
+  $u_q = run_query_user_group($group);
+  $pref_g_q = run_query_display_pref($uid, "group_group");
+  $g_q = run_query_group_group($group);
+  $block = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // HTML Display Group Consultation                                           //
 // Parameters:
 //   - $group_q  : group database result 
@@ -322,7 +337,6 @@ function html_group_form($action, $group_q, $group) {
 //   - $u_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
-  //-- Themes
   global $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
@@ -416,7 +430,6 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   if ($nb_u != 0) {
 
     $url = url_prepare("group_index.php?action=detailconsult&amp;param_group=$id");
-    
     $dis_infos = new OBM_DISPLAY("DATA", $pref_u_q);
     $dis_infos->data_set = $u_q;
     $dis_infos->display_entity = "group_user";
@@ -549,8 +562,7 @@ function dis_group_warn_insert($id, $g_q, $group) {
   $name = $group["name"];
   $desc = $group["desc"];
 
-  $display["msg"] .= display_warn_msg($l_check_samegroup)
-;
+  $display["msg"] .= display_warn_msg($l_check_samegroup);
   while ($g_q->next_record()) {
     $id = $g_q->f("group_id");
     $samename = $g_q->f("group_name");
@@ -591,4 +603,4 @@ function dis_group_warn_insert($id, $g_q, $group) {
 }
 
 
-</SCRIPT>
+</script>

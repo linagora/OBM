@@ -122,6 +122,7 @@ $l_header_incident = "Incidents";
 $l_header_deal = "Affari";
 $l_header_list = "Liste";
 $l_header_user = "Utenti";
+$l_header_group = "Gruppi";
 
 $l_header_admin = "Amministrazione";
 $l_header_admin_lang = "Lingua";
@@ -163,6 +164,7 @@ $l_header_display = "Visualizza";
 $l_header_add_contact = "Aggiungi Contatto";
 $l_header_add_user = "Aggiungi utente";
 $l_header_add_group = "Aggiungi gruppo";
+$l_header_upd_group = "Modifica gruppi";
 
 $l_header_new_child = "Nuovo Affare Collegato";
 $l_header_new_parent = "Nuovo Affare";

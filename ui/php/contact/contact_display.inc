@@ -424,7 +424,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
-  global $display, $l_no_found,$path;
+  global $display, $l_no_found, $path, $l_query_error;
   global $auth;
 
   $view = $contact["view"];
@@ -1458,17 +1458,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 
   // --- HTML Template --------------------------------------------------------
 
-  $block = "
-    <table class=\"detail\">
-    $disp_same_cont
-    </table>
-
-    <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
-    action=\"" .url_prepare("contact_index.php") . "\">
-    <input type=\"hidden\" name=\"action\" value=\"insert\" />
-    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+  $hidden = "
     <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
     <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
@@ -1493,7 +1483,20 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
+
+  $block = "
+    <table class=\"detail\">
+    $disp_same_cont
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
+    action=\"" .url_prepare("contact_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"insert\" />
+    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+    $hidden
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     </p>
@@ -1501,31 +1504,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <form id=\"form_back\" name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("contact_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
-    <input type=\"hidden\" name=\"sel_dsrc\" value=\"$dsrc\" />
-    <input type=\"hidden\" name=\"sel_market\" value=\"$mark\" />
-    <input type=\"hidden\" name=\"tf_lname\" value=\"$lname\" />
-    <input type=\"hidden\" name=\"tf_fname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"sel_func\" value=\"$func\" />
-    <input type=\"hidden\" name=\"tf_title\" value=\"$title\" />
-    <input type=\"hidden\" name=\"tf_service\" value=\"$service\" />
-    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
-    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
-    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
-    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
-    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
-    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
-    <input type=\"hidden\" name=\"sel_ctry\" value=\"$ctry\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_hphone\" value=\"$hphone\" />
-    <input type=\"hidden\" name=\"tf_mphone\" value=\"$mphone\" />
-    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"tf_email2\" value=\"$email2\" />
-    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
-    <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" 
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
+    $hidden
     <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>

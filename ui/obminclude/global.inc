@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.4pre1";
+$obm_version = "0.8.4pre2";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -494,23 +494,28 @@ function beautify_comment($com, $p_order="") {
 function display_record_info($obm_q) {
   global $set_theme, $ico_created, $ico_updated;
 
-  $usercreate = $obm_q->f("usercreate");
-  $userupdate = $obm_q->f("userupdate");
-  $timecreate = datetime_format($obm_q->f("timecreate"), 1);
-  $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
-  $datasource = $obm_q->f("datasource_name");
-
-  $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
-  $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
-
-  if ($datasource != "") {
-    $dis_dsrc = "<br />$datasource";
-  } else {
-    $dis_dsrc = "";
-  }
-
-  $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
+  if (is_object($obm_q)) {
+    $usercreate = $obm_q->f("usercreate");
+    $userupdate = $obm_q->f("userupdate");
+    $timecreate = datetime_format($obm_q->f("timecreate"), 1);
+    $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
+    $datasource = $obm_q->f("datasource_name");
+    
+    $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
+    $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" />$userupdate : $timeupdate";
+    
+    if ($datasource != "") {
+      $dis_dsrc = "<br />$datasource";
+    } else {
+      $dis_dsrc = "";
+    }
+    
+    $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
   </div>";
+  } else {
+    $block = "<div class=\"detailInfo\">$created<br />$updated $dis_dsrc
+  </div>";
+  }
 
   return $block;
 }

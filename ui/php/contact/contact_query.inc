@@ -109,7 +109,14 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   if (($order == "contact_lastname") || ($order == "contact_firstname")) {
     $order = sql_casei_sort($db_type, $order);
   }
-  $where .= " order by $order $p_order_dir";
+
+  // Order exceptions (order on calculated rows)
+  if (strcmp($p_new_order,"contact_address")==0) {
+    $order = "contact_address1";
+    $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town";
+  }
+
+  $where .= " order by $order $p_order_dir $order_next";
 
 
   $query = "select

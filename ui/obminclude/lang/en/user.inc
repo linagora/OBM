@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : user.inc                                                 //
@@ -20,13 +20,16 @@ $l_perms_admin = "Administrator";
 $l_check_usercreate = " entries owned by this user.";
 $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
+$l_group = "Group";
 
 // Titres
 $l_user = "User";
+$l_group_member = "Member of groups";
 
 // Actions
 $l_insert = "Insert the User";
 $l_update = "Update the User";
+$l_update_group = "Update the User groups";
 $l_checkdelete = "Check or Delete the User";
 $l_reset = "Reset user's preferences";
 $l_delete = "Delete the User";

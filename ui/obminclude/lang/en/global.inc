@@ -155,6 +155,7 @@ $l_header_delete = "Delete";
 $l_header_add_contact = "Add contact";
 $l_header_add_user = "Add user";
 $l_header_add_group = "Add group";
+$l_header_upd_group = "Update groups";
 $l_header_add_deal = "Add deal";
 $l_header_todo_list = "List";
 

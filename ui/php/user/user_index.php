@@ -17,11 +17,12 @@
 // - update          -- form fields    -- update the user
 // - check_delete    -- $param_user    -- check links before delete
 // - delete          -- $param_user    -- delete the user
+// - group_consult   -- $param_user    -- show the user groups form
+// - group_update    -- $param_user    -- update the user groups
+// External API ---------------------------------------------------------------
+// - ext_get_ids     --                -- select multiple users (return id) 
 ///////////////////////////////////////////////////////////////////////////////
 
-///////////////////////////////////////////////////////////////////////////////
-// Session, Auth, Perms Management                                           //
-///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "USER";
 $menu = "USER";
@@ -42,13 +43,6 @@ $uid = $auth->auth["uid"];
 
 update_last_visit("user", $param_user, $action);
 
-///////////////////////////////////////////////////////////////////////////////
-// Main Program                                                              //
-///////////////////////////////////////////////////////////////////////////////
-
-if (! $obm_user["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
@@ -98,12 +92,7 @@ elseif ($action == "index" || $action == "") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($obm_user["id"]);
-  if ($obm_q->num_rows() == 1) {
-    $display["detail"] = html_user_consult($obm_q);
-  } else {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
-  }
+  $display["detail"] = dis_user_consult($obm_user);
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -163,12 +152,7 @@ elseif ($action == "index" || $action == "") {
   run_query_default_preferences_insert($obm_user["id"]);
   session_load_user_prefs();
   $display["msg"] .= display_ok_msg($l_reset_ok);
-  $obm_q = run_query_detail($obm_user["id"]);
-  if ($obm_q->num_rows() == 1) {
-    $display["detail"] = html_user_consult($obm_q);
-  } else {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
-  }
+  $display["detail"] = dis_user_consult($obm_user);
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,7 +163,7 @@ elseif ($action == "index" || $action == "") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $display["search"] = html_user_search_form($obm_user);
+    $display["detail"] = dis_user_consult($obm_user);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
   }
@@ -200,9 +184,24 @@ elseif ($action == "index" || $action == "") {
   run_query_delete_profil($obm_user["id"]);
   $display["search"] = html_user_search_form($obm_user);
 
-} elseif ($action == "admin")  {
+} elseif ($action == "group_consult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = "<center>Nothing here</center><br />";
+  $obm_q = run_query_detail($obm_user["id"]);
+  if ($obm_q->num_rows() == 1) {
+    $display["detail"] = html_user_group_consult($obm_q);
+  } else {
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $query . " !");
+  }
+
+} elseif ($action == "group_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_update_user_group($obm_user);
+  if ($retour >= 0) {
+    $display["msg"] .= display_ok_msg($l_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_update_error);
+  }
+  $display["detail"] = dis_user_consult($obm_user);
 
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -227,6 +226,9 @@ elseif ($action == "index" || $action == "") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_user);
+if (! $obm_user["popup"]) {
+  $display["header"] = generate_menu($menu,$section);
+}
 $display["end"] = display_end();
 
 display_page($display);
@@ -241,6 +243,7 @@ function get_param_user() {
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
+  global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
@@ -255,7 +258,6 @@ function get_param_user() {
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
 
   // External param
-  if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($popup)) $obm_user["popup"] = $popup;
   if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
   if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
@@ -263,13 +265,31 @@ function get_param_user() {
   if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
   if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
 
+  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
+    $http_obm_vars = $HTTP_POST_VARS;
+  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
+    $http_obm_vars = $HTTP_GET_VARS;
+  }
+
+  if (isset ($http_obm_vars)) {
+    $nb_group = 0;
+    while ( list( $key ) = each( $http_obm_vars ) ) {
+      if (strcmp(substr($key, 0, 4),"cb_g") == 0) {
+	$nb_group++;
+        $group_num = substr($key, 4);
+        $obm_user["group_$nb_group"] = $group_num;
+      }
+    }
+    $obm_user["group_nb"] = $nb_group;
+  }
+
   if (debug_level_isset($cdg_param)) {
+    echo "<br />action = $action";
     if ( $obm_user ) {
       while ( list( $key, $val ) = each( $obm_user ) ) {
         echo "<br />user[$key]=$val";
       }
     }
-    echo "<br />action = $action";
   }
 
   return $obm_user;
@@ -283,6 +303,7 @@ function get_user_action() {
   global $obm_user, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_consult,$l_header_display,$l_header_admin,$l_header_reset;
+  global $l_header_upd_group;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
@@ -335,7 +356,7 @@ function get_user_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/user/user_index.php?action=detailconsult&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailupdate', 'group_consult') 
                                   );
 
 // Detail Update
@@ -343,16 +364,8 @@ function get_user_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'reset') 
+     'Condition'=> array ('detailconsult', 'reset', 'update', 'group_consult', 'group_update') 
                                      	   );
-
-// Reset
-  $actions["USER"]["reset"] = array (
-    'Name'     => $l_header_reset,
-    'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult') 
-                                    );
 
 // Insert
   $actions["USER"]["insert"] = array (
@@ -368,12 +381,35 @@ function get_user_action() {
     'Condition'=> array ('None') 
                                      );
 
+// Group Consult
+  $actions["USER"]["group_consult"] = array (
+    'Name'     => $l_header_upd_group,
+    'Url'      => "$path/user/user_index.php?action=group_consult&amp;param_user=".$obm_user["id"],
+    'Right'    => $cright_read,
+    'Condition'=> array ('detailconsult', 'reset', 'detailupdate', 'update', 'group_update') 
+                                     );
+
+// Group Update
+  $actions["USER"]["group_update"] = array (
+    'Url'      => "$path/user/user_index.php?action=group_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     );
+
+// Reset
+  $actions["USER"]["reset"] = array (
+    'Name'     => $l_header_reset,
+    'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('detailconsult', 'group_consult', 'group_update') 
+                                    );
+
 // Check Delete
   $actions["USER"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'reset') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'update', 'reset', 'group_consult', 'group_update') 
                                      	   );
 
 // Delete

@@ -158,6 +158,7 @@ $l_header_delete = "Supprimer";
 $l_header_add_contact = "Ajouter contact";
 $l_header_add_user = "Ajouter utilisateur";
 $l_header_add_group = "Ajouter groupe";
+$l_header_upd_group = "Modifier groupes";
 $l_header_add_deal = "Ajouter affaire";
 $l_header_todo_list = "Liste";
 

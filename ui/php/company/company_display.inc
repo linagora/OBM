@@ -448,7 +448,6 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 
   $comp_d = new OBM_DISPLAY("DATA", $pref_q, "company");
   if ($popup) {
-    echo "AAAAAAAAAAAAAAAAAAAAAAAAAa";
     $comp_d->display_link = false;
     $comp_d->data_specialfield = "ext_get_id";
     $display_popup_end = "

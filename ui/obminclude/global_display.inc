@@ -617,7 +617,7 @@ class OBM_DISPLAY {
 
       if (! $cgp_hide[$module][$fieldname]) {
 	$label = $fieldnames[$fieldname];
-	$order = ($order_dir == "ASC" ? "DESC" : "ASC");
+	$order = ($order_dir == "DESC" ? "ASC" : "DESC");
 
 	$block .= "
         <td class=\"resultHead\">";

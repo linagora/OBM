@@ -20,13 +20,16 @@ $l_perms_admin = "Administrateur";
 $l_check_usercreate = " entrées créées par cet utilisateur.";
 $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
+$l_group = "Groupe";
 
 // Titres
 $l_user = "Utilisateur";
+$l_group_member = "Membre des groupes";
 
 // Actions
 $l_insert = "Enregistrer l'utilisateur";
 $l_update = "Modifier l'utilisateur";
+$l_update_group = "Modifier les groupes de l'utilisateur";
 $l_checkdelete = "Vérifier ou Supprimer l'utilisateur";
 $l_reset = "Préférences par défaut";
 $l_delete = "Supprimer l'utilisateur";

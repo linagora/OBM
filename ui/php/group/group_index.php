@@ -24,8 +24,7 @@
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
 // External API ---------------------------------------------------------------
-// - ext_get_ids     --                -- select multiple groups (return id) 
-// - ext_get_ids_sel --                -- select multiple groups (fill select) 
+// - ext_get_ids     --                -- select multiple groups (url or sel) 
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -57,53 +56,29 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if (! $group["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// External calls (main menu not displayed)                                  //
-///////////////////////////////////////////////////////////////////////////////
-if (($action == "ext_get_ids") || ($action == "ext_get_ids_sel")) {
-  $display["search"] = html_group_search_form($group);
-  if ($set_display == "yes") {
-    $display["result"] = dis_group_search_group($group, $popup);
-  } else {
-    $display["msg"] .= display_info_msg($l_no_display);
-  }
-}
-
-elseif (($action == "index") || ($action == "")) {
+if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_group_search_form($group);
   if ($set_display == "yes") {
-    $display["msg"] .= dis_group_search_group("", $popup);
+    $display["msg"] .= dis_group_search_group("");
   } else {
     $display["msg"] .= display_info_msg($l_no_display);
   }
-}
 
-else if ($action == "search") {
+} else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["search"] = html_group_search_form($group);
-  $display["result"] = dis_group_search_group($group, $popup);
-}
+  $display["result"] = dis_group_search_group($group);
 
-else if ($action == "new") {
+} else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = html_group_form($action, "", $group);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $group_q = run_query_detail($group["id"]);
-  $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group, $entity);
-  $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group, $entity);
-  $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
-}
+  $display["detail"] = dis_group_consult($group, $uid);
 
-else if ($action == "detailupdate") {
+} else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($group["id"]);
   $display["detail"] = html_group_form($action, $obm_q, $group);
@@ -153,12 +128,7 @@ else if ($action == "detailupdate") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $group_q = run_query_detail($group["id"]);
-    $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($group);
-    $pref_g_q = run_query_display_pref($uid, "group_group");
-    $g_q = run_query_group_group($group);
-    $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+    $display["detail"] = dis_group_consult($group, $uid);
   } else {
     $display["msg"] .= display_err_msg($err_msg);
     $group_q = run_query_detail($group["id"]);
@@ -187,12 +157,7 @@ else if ($action == "detailupdate") {
   } else {
     $display["msg"] .= display_err_msg($l_no_user_added);
   }
-  $group_q = run_query_detail($group["id"]);
-  $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group);
-  $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group);
-  $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+  $display["detail"] = dis_group_consult($group, $uid);
 
 } elseif ($action == "user_del")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -202,12 +167,7 @@ else if ($action == "detailupdate") {
   } else {
     $display["msg"] .= display_err_msg($l_no_user_deleted);
   }
-  $group_q = run_query_detail($group["id"]);
-  $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group);
-  $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group);
-  $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+  $display["detail"] = dis_group_consult($group, $uid);
 
 } elseif ($action == "group_add")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -217,12 +177,7 @@ else if ($action == "detailupdate") {
   } else {
     $display["msg"] .= display_err_msg($l_no_group_added);
   }
-  $group_q = run_query_detail($group["id"]);
-  $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group);
-  $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group);
-  $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+  $display["detail"] = dis_group_consult($group, $uid);
 
 } elseif ($action == "group_del")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -232,34 +187,38 @@ else if ($action == "detailupdate") {
   } else {
     $display["msg"] .= display_err_msg($l_no_group_deleted);
   }
-  $group_q = run_query_detail($group["id"]);
-  $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($group);
-  $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($group);
-  $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
+  $display["detail"] = dis_group_consult($group, $uid);
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
-}
 
-else if ($action == "dispref_display") {
+} else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
-}
 
-else if($action == "dispref_level") {
+} else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
+
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+} else if ($action == "ext_get_ids") {
+  $display["search"] = html_group_search_form($group);
+  if ($set_display == "yes") {
+    $display["result"] = dis_group_search_group($group);
+  } else {
+    $display["msg"] .= display_info_msg($l_no_display);
+  }
 }
 
 
@@ -267,6 +226,9 @@ else if($action == "dispref_level") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_group);
+if (! $group["popup"]) {
+  $display["header"] = generate_menu($menu,$section);
+}
 $display["end"] = display_end();
 
 display_page($display);
@@ -298,12 +260,12 @@ function get_param_group() {
 
   // External param
   if (isset ($popup)) $group["popup"] = $popup;
-  if (isset ($ext_title)) $group["ext_title"] = $ext_title;
   if (isset ($ext_action)) $group["ext_action"] = $ext_action;
+  if (isset ($ext_title)) $group["ext_title"] = $ext_title;
+  if (isset ($ext_target)) $group["ext_target"] = $ext_target;
   if (isset ($ext_url)) $group["ext_url"] = $ext_url;
   if (isset ($ext_id)) $group["ext_id"] = $ext_id;
   if (isset ($ext_id)) $group["id"] = $ext_id;
-  if (isset ($ext_target)) $group["ext_target"] = $ext_target;
   if (isset ($ext_widget)) $group["ext_widget"] = $ext_widget;
 
   if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
@@ -422,12 +384,6 @@ function get_group_action() {
 
 // Ext get Ids : external Group selection
   $actions["GROUP"]["ext_get_ids"] = array (
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                    	  );
-
-// Ext get Ids in a select : external Group selection
-  $actions["GROUP"]["ext_get_ids_sel"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     	  );

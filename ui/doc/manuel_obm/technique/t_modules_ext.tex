@@ -1,0 +1,238 @@
+% Documentation technique d'OBM : Appels de modules externes (ext_)
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+%%\clearpage
+\subsection{Appels de modules externes, popups}
+
+L'appel de modules externes permet depuis un module d'interroger ou d'obtenir des informations d'un autre module.
+Exemple : pour ajouter un utilisateur à un groupe, le module groupe fait appel au module utilisateur.\\
+
+Afin de permettre une implémentation unique du module appelé qui sera utilisée par tous les modules le nécessitant, l'appel de modules externes est standardisé et répond aux objectifs suivants :\\
+\begin{itemize}
+\item Pas de dupplication de code inutile et lourde à maintenir
+\item Le module appelé propose une interface indépendante du module appelant
+\item Différents types d'informations peuvent être demandées (un Id, une liste d'Id)
+\item Le module appelant doit récupérer les informations (par appel à une url ou dans des widgets)
+\end{itemize}
+
+
+
+\subsubsection{Description des différents appels externes}
+
+Un appel externe est caractérisé par une action du module appelé.
+3 types d'appels sont actuellement définis.
+Pour chaque appel, divers paramètres sont à fournir.\\
+
+\begin{tabular}{|p{3cm}|p{9.5cm}|}
+\hline
+\textbf{Action} & \textbf{Commentaire} \\
+\hline
+ext\_get\_ids & Affiche sans bandeau, en popup, la recherche des entités du module, permet d'effectuer des recherches et de renvoyer les entités sélectionnées à une url \\
+\hline
+list & 0.8.2 \\
+\hline
+\end{tabular}
+
+\subsubsection{Spécifications de l'action ext\_get\_ids}
+
+L'exemple donné est l'ajout d'utilisateurs à un groupe.
+Le module appelant est groupe, le module appelé est utilisateur.
+Depuis un groupe, on sélection l'ajout d'utilisateurs. Une fenêtre externe popup de recherche d'utilisateurs s'ouvre.\\
+
+L'action ``Ajout d'utilisateurs'' doit donc être définie dans le module groupe comme un appel externe au module utilisateur.
+Des paramètres doivent être passés.\\
+
+\begin{tabular}{|p{2.5cm}|p{6cm}|p{4.5cm}|}
+\hline
+\textbf{Paramètre} & \textbf{Commentaire} & \textbf{Exemple} \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres de configuration du module appelé}}\\
+\hline
+action & ext\_get\_ids & \\
+\hline
+popup & (0 | 1) affichage en popup (sans menu) & 1 \\
+\hline
+ext\_title & Titre affiché dans la fenêtre externe & Ajouter des utilisateurs\\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres : retour par url + action}}\\
+\hline
+ext\_action & Action appelée par la fenêtre externe & user\_add\\
+\hline
+ext\_target & Fenêtre cible de retour (target) & Groupe \\
+\hline
+ext\_url & Url appelée par la fenêtre externe & ../group/group\_index.php \\
+\hline
+ext\_id & Id de l'entité réceptionnant la réponse & Id du groupe origine \\
+\hline
+\multicolumn{3}{|c|}{\textbf{Paramètres : retour par widget (select)}}\\
+\hline
+ext\_widget & Indique le widget (select) devant sélectionner les données \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Définition d'un appel à un module externe}
+
+Ce peut être une action d'un menu (ex: ajouter utilisateur à groupe) ou un lien direct (ajouter une catégorie à une société depuis le formulaire de mise à jour société).
+
+\paragraph{Appel par définition d'une action}
+Exemple : Ajouter un utilisateur au groupe courant.\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+// Sel user add : Users selection
+  $actions["GROUP"]["sel_user_add"] = array (
+    'Name'     => $l_header_add_user,
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1
+&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=user_add
+&amp;ext_url=".urlencode($path."/group/group_index.php")."
+&amp;ext_id=".$group["id"]."&amp;ext_target=$l_group",
+    'Right'    => $cright_write,
+    'Popup'    => 1,
+    'Target'   => $l_group,
+    'Condition'=> array ('detailconsult','user_add','user_del','group_add'...) 
+                                    	  )
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{Popup} : indique si l'action doit ouvrir une fenêtre externe (1) ou se dérouler dans la fenêtre courante (défaut ou 0).\\
+ \item \textbf{Target} : uniquement si Popup est positionné, indique le nom donné à la fenêtre source avant ouverture du Popup. Nécessaire dans le cas d'utilisation d'ext\_target pour identifier la fenêtre retour. Ces deux valeurs doivent être identiques.\\
+\end{itemize}
+
+\paragraph{Appel par lien direct}
+Exemple : Ajouter des groupes au rendez-vous courant.\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+  $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1
+&amp;ext_widget=forms[0].elements[6]
+&amp;ext_title=" . urlencode($l_agenda_select_group);
+  ...
+  $block = ``
+     <a href=\"javascript: return false;\" onclick=\"window.open('$url2',
+'','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+<img src=\"/images/$set_theme/$ico_add_group\" /></a></td>
+  ...``;
+\end{verbatim}
+\end{minipage}
+}
+
+
+\subsubsection{Modules implémentant des appels externes}
+
+\begin{tabular}{|p{5cm}|c|}
+\hline
+\textbf{Module} & \textbf{Depuis version OBM} \\
+\hline
+user & ext\_get\_ids \\
+\hline
+group & ext\_get\_ids \\
+\hline
+list & 0.8.2 \\
+\hline
+\end{tabular}
+
+
+\subsubsection{Implémentation dans un module}
+
+\paragraph{Définition des actions}
+Une action doit être déclarée pour être autorisée.
+Il faut donc déclarer les actions externes.
+Il n'y a pas besoin d'indiquer de titre, l'action ne disposant pas de menu (appel depuis un module externe).\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+// Ext get Ids : External User selection
+  $actions["USER"]["ext_get_ids"] = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('none')
+                                    );
+\end{verbatim}
+\end{minipage}
+}
+
+
+
+\paragraph{Affichage allégé (menu, liens)}
+L'affichage des fenêtres externes, en popup, possède quelques particularités afin d'améliorer l'ergonomie d'utilisation :\\
+\begin{itemize}
+\item Pas de bandeaux ou menus
+\item Pas de liens, données supplémentaires (formulaire de sélection,...)
+\end{itemize}
+\vspace{0.3cm}
+
+Le bandeau ou menu général ne sera affiché que si le paramètre popup n'est pas positionné (module\_index.php).\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+if (! $obm_user["popup"]) {
+  $display["header"] = generate_menu($menu, $section);
+}
+\end{verbatim}
+\end{minipage}
+}
+\vspace{0.3cm}
+
+Les fonctions d'affichage utilisées par les appels externes sont les mêmes que les fonctions d'affichage classiques du module (ex: affichage de la liste des utilisateurs après une recherche).\\
+
+Il faut donc que ces fonctions tiennent compte de ces contraintes. L'affichage sans liens est supporté par la classe d'affichage OBM\_DISPLAY.
+
+De même, le code de génération du formulaire de récupération des données (ex: sélection des utilisateurs) est à créer quand nécessaire.\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+  $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
+  if ($popup) {
+    $user_d->display_link = false;
+    $user_d->data_cb_text = "X";
+    $user_d->data_idfield = "userobm_id";
+    $user_d->data_cb_name = "cb_u";
+    $display_popup_head = "
+      <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
+    $display_popup_end = "
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"ext_id\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </p>
+      </form>
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+\end{verbatim}
+\end{minipage}
+}
+
+
+\paragraph{Transport des paramètres}
+
+Lorsque une navigation est possible dans une fenêtre externe (ex: cas de recherche puis liste de résultat) les paramètres externes doivent être transmis afin d'être conservés.\\
+
+\shadowbox{
+\begin{minipage}{14cm}
+\begin{verbatim}
+  if ($popup) {
+    $ext_action = $user["ext_action"];
+    $ext_target = $user["ext_target"];
+    $ext_url = $user["ext_url"];
+    $ext_id = $user["ext_id"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url
+&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+  }
+
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login
+&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
+\end{verbatim}
+\end{minipage}
+}

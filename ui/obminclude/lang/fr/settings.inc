@@ -27,11 +27,7 @@ $l_send_mail = "Accepter les e-mail";
 
 $l_update_ok = "Mise à jour de votre configuration correctement effectuée";
 
-$l_dg_id = "Id";
-$l_dg_param = "Paramètres";
-$l_dg_sess = "Session";
-$l_dg_sql = "SQL";
-
+// Dates format
 $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";
@@ -39,12 +35,22 @@ $l_da_txt = "dd mois yyyy";
 
 $l_deadline = "date limite";
 
+// Menus
 $l_me_txt = "texte";
 $l_me_ico = "icône";
 $l_me_both = "texte+icône";
 
+// Comment order
 $l_co_chro = "Chronologique";
 $l_co_rev = "Inverse";
 
+// CSV Separators
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";
+
+// Debug levels
+$l_dg_id = "Id";
+$l_dg_param = "Paramètres";
+$l_dg_sess = "Session";
+$l_dg_sql = "SQL";
+
