@@ -34,7 +34,12 @@ $l_header_admin_code = "Code";
 $l_header_account = "Comptes";
 $l_header_invoice = "Factures";
 $l_header_payment = "Paiements";
+
+//TIME
 $l_header_time = "Gestion des temps" ;
+$l_header_admin = "Administration";
+$l_header_stats = "Statistiques";
+$l_header_base = "Base";
 $l_header_agenda = "Agenda";
 
 $l_header_title_settings = "CONFIGURATION";

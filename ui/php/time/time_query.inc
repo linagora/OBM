@@ -8,22 +8,35 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task search query execution
-// Parametes:
+// Time search query execution                                            //
+// Parameters:
 //   - $time[]    :    time search criteria
-//     keys used       interval, date
+//     keys used       interval, date, contact_id
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_datetime_format, $l_date_text_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_datetime_format, $l_date_text_format, $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
+  //debug_array($time);
+  //reset($time);
   //  echo "date $date<br>";
-  if ($time['interval'] = "week") {
+  //  echo "interval $interval<br>";
+
+  if ($time["interval"] == "week") {
       $array_date = get_week_point($date);
-  } else
-    die ("interval != 'week' not fonctionnal"); 
+  }
+  else {
+    echo "week ". $time["interval"] ." !!<br>";
+	//    die ("interval != 'week' not fonctionnal"); 
+  }
+
+  // Query to get any time event for the given User
+  //  Optional parameters :
+  //   - $array_date with begin and end date
+  //   - $company : a company name (not used at this time)
+  //   - $company_id : a company id (not used at this time)
 
   // 0 = task_status renamed as test_status : if =0, check box visible
   //    if <> 0 (i.e. validated), checkbox not visible
@@ -33,7 +46,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
       DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
       DATE_FORMAT(task_timeupdate,'$l_datetime_format') as timeupdate,
       DATE_FORMAT(task_timecreate,'$l_datetime_format') as timecreate,
-      concat(task_length,concat('/',$fraction_jour)) as task_length,
+      concat(task_length,concat('/',$c_day_fraction)) as task_length,
       TaskType.*,
       deal_label as task_deal_label,
       company_name as task_company_name,
@@ -43,7 +56,6 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
       Deal,
       Company
     where task_tasktype_id = tasktype_id
-      and task_user_id='".$time["user_id"]."'
       and task_deal_id = deal_id
       and deal_company_id = company_id ";
 
@@ -54,11 +66,29 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
               "task_date  <'" . $array_date[1] . "'";
   }
 
+  // If a company indication has been specified, get it 
+  if ($company != "") {
+    $query .= " and company_name like '" . $company . "%'";
+  }
+
+  // If a company was sent as parameter, get it
+  if ($company_id != "") {
+    $query .= " and company_id =" . $company_id ;
+  }
+
+  // user_id : array -> size 1 or more 
+  if (sizeof($time["user_id"]) == 1)
+	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	$users_list = array_to_list($time["user_id"]);
+	$query .= " and task_user_id in $users_list";
+  }
+
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "Task.task_date";
   $query .= " order by $order $p_order_dir";
    
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql,"run_query_search");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   return $obm_db;
@@ -67,15 +97,17 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task grouped by day                                                       //
-// Parametes:
+// Task grouped by day and summed by task length                             //
+// Parameters:
 //   - $time[]    :    time search criteria
 //     keys used       week, user_id, date, date_end
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
+// Returns:
+//   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_by_day($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
   $user_id = $time["user_id"];
@@ -84,62 +116,127 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
 
   // task_valid 0 if checkbox not to be shown
   $query = "select
-      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
+      concat(sum(task_length),concat('/',$c_day_fraction)) as task_totallength,
       DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
-      (1=sum(task_length)/$fraction_jour and task_status<>2) as task_valid,
+      (1=sum(task_length)/$c_day_fraction and task_status<>2) as task_valid,
       task_status
     from Task
-    where task_user_id='$user_id'
-      and task_date>='$week_start'
-      and task_date<='$week_end'
-    group by task_date";
+    where task_date>='$week_start'
+      and task_date<='$week_end' ";
 
-  // order
-  $query .= " order by Task.task_date";
+  // user_id : array -> size 1 or more 
+  if (sizeof($time["user_id"]) == 1)
+	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	$users_list = array_to_list($time["user_id"]);
+	$query .= " and task_user_id in $users_list";
+  }
+
+  // group and order
+  $query .=   "  group by task_date order by Task.task_date";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_by_day");
+//  echo "$query <br>";
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   return $obm_db;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Task grouped by day                                                       //
-// Parametes:
+// Task grouped by deal                                                      //
+// Parameters:
 //   - $time[]       : time search criteria
 //     keys used       contac_id, date, date_end
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
+/* OLD
 function run_query_by_deal($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
+  global $auth, $l_date_text_format, $l_jour_format, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
-  $user_id = $time["user_id"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
+  //  $time["all_users"] = true;
 
-  $query = "select
-      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
-      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
-      deal_label as task_deal_label,
-      company_name as task_company_name
-    from Task,
-      Deal,
-      TaskType,
-      Company
-    where tasktype_id=task_tasktype_id
-      and task_deal_id = deal_id
-      and task_user_id='$user_id'
-      and task_date>='$week_start'
-      and task_date<='$week_end'
-      and deal_company_id = company_id
-    group by task_deal_id ";
+  $query="select 
+      FORMAT(sum(task_length)/ $c_day_fraction,3) as task_totallength,
+      deal_label as task_deal_label, 
+      tasktype_internal, tasktype_label,
+      if(tasktype_internal=1, 'interne', company_name) as task_company_name 
+    from Task, Deal, TaskType, Company 
+    where tasktype_id=task_tasktype_id 
+      and task_deal_id = deal_id 
+      and task_date>='$week_start' 
+      and task_date<='$week_end' 
+      and deal_company_id = company_id ";
+
+  //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
+  if (isset($time) && $time["all_users"])
+	$where_users = "";
+  else if (sizeof($time["user_id"]) == 1)
+	  $where_users = " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	$users_list = array_to_list($time["user_id"]);
+	$where_users = " and task_user_id in $users_list";
+  }
+  // order
+  $query .= $where_users. " group by task_deal_id order by tasktype_internal, tasktype_label";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_by_deal");
+
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db;
+}
+
+*/
+
+function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
+  global $auth, $l_date_text_format, $l_jour_format, $c_day_fraction, $cdg_sql;
+
+  $week = $time["week"];
+  $week_start = $time["date"];
+  $week_end = $time["date_end"];
+  //  $time["all_users"] = true;
+
+  $query="select 
+      FORMAT(sum(if (task_date < '$week_start', task_length, 0)) / $c_day_fraction,3) as task_totalbefore,
+      FORMAT(sum(if (task_date >= '$week_start' and task_date <= '$week_end', task_length, 0)) / $c_day_fraction,3) as task_totalperiod ,
+      FORMAT(sum(task_length) / $c_day_fraction,3) as task_totallength, 
+      deal_label as task_deal_label, 
+      tasktype_internal, tasktype_label,
+     if(tasktype_internal=1, 'interne', company_name) as task_company_name 
+    from Task, Deal, TaskType, Company 
+    where tasktype_id=task_tasktype_id 
+      and task_deal_id = deal_id 
+      and task_date<='$week_end' 
+      and deal_company_id = company_id ";
+
+  //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
+  if (isset($time) && $time["all_users"])
+	$where_users = "";
+  else if (sizeof($time["user_id"]) == 1)
+	  $where_users = " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	$users_list = array_to_list($time["user_id"]);
+	$where_users = " and task_user_id in $users_list";
+  }
+
+  // Do we display all tasks or those not empty for this period
+
+  if (isset($time) && $time["alltask"]) 
+	$having_task = ""; 
+  else 
+ 	$having_task = " having task_totalperiod <> 0";
 
   // order
-  $query .= " order by Task.task_date";
+  $query .= $where_users. $where_task ." group by task_deal_id $having_task 
+      order by tasktype_internal, task_totalperiod desc, tasktype_label";
   
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_by_deal 2");
+
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -154,14 +251,14 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
 //     keys used : user_id, date, date_end
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin($time) {
-  global $l_date_text_format,$fraction_jour, $cdg_sql;
+  global $l_date_text_format,$c_day_fraction, $cdg_sql;
 
-  $user_id = $time["user_id"];
+  $user_id = $time["user_id"][0];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
  
   $query = "select
-      concat(sum(task_length),concat('/',$fraction_jour)) as task_totallength,
+      FORMAT(concat(sum(task_length),concat('/',$c_day_fraction)),3) as task_totallength,
       DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
       task_status=2 as task_status
     from Task
@@ -174,26 +271,55 @@ function run_query_admin($time) {
    //order
    $query .= " order by Task.task_date";
 
+   display_debug_msg($query, $cdg_sql, "run_query_admin");
+
    $obm_db = new DB_OBM;
    $obm_db->query($query);
    return $obm_db;
 }
 ///////////////////////////////////////////////////////////////////////////////
-// return array with date where task have been validate
+// return array with date where task have been validate 
+//   in the given period of time
+// Parameters:
+//  - $time : array with defined variables
+//    keys used : - user_id
+//                - date
+//                - date_end
+// Returns:
+//  array of days corresponding to validated date, and task_status : 
+//   ("20010911" => 2, "20010912" => 1, "20010913" => 1)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_valid_search($time) {
 global $cdg_sql;
 
   $user_id = $time["user_id"];
-  $i=0; //for loop
+  //  echo "Run_query_valid_search<br>";
+  //  print_r($time);
+  $query = "select task_date, task_status 
+      from Task 
+      where task_status != 0 
+        and task_date >= '". $time["date"] ."' 
+        and task_date <= '". $time["date_end"] ."' ";
+
+  // user_id : array -> size 1 or more 
+  if (sizeof($time["user_id"]) == 1)
+	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+  else {
+	  $users_list = array_to_list($time["user_id"]);
+	  $query .= " and task_user_id in $users_list";
+  }
+
+  // Group
+  $query .= " group by task_date ";
   
-  $query = "select task_date from Task where task_status != 0 and task_user_id='$user_id' group by task_date";
-  
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_valid_search");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
+  
+
+  $i=0; //for loop
   while($obm_db->next_record()) {
-    $valid_array[$i++] = substr($obm_db->f("task_date"),0,8);
+    $valid_array[substr($obm_db->f("task_date"),0,8)]= $obm_db->f("task_status");
   }
    
   return $valid_array; 
@@ -211,6 +337,8 @@ function run_query_get_task($id) {
 
   $query = "select * from Task where task_id = '$id'";
   
+  display_debug_msg($query, $cdg_sql, "run_query_get_task");
+
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
@@ -233,9 +361,11 @@ function run_query_insert($task) {
   $project = $task["project"];
   $time = $task["time"];
   $label = $task["label"];
-  $user_id = $task["user_id"];
+  $user_id = $task["user_id"][0];
     
-  if ( $ttype != 0 ) //for navigators wich dosen't support HTML 4 => <option disabled>
+  if (debug_level_isset($cdg_param))
+	debug_array($time);
+  if ( $ttype != 0 ) //for navigators wich doesn't support HTML 4 => <option disabled>
   { 
      if(is_array($date)){
      foreach($date as $key => $value) {
@@ -262,7 +392,7 @@ function run_query_insert($task) {
        '$label',
        0)";
 
-       display_debug_msg($query, $cdg_sql);
+       display_debug_msg($query, $cdg_sql, "run_query_insert");
        $obm_q = new DB_OBM;
        $obm_q->query($query);  
      }
@@ -291,7 +421,7 @@ function run_query_insert($task) {
        '$label',
        0)";
 
-       display_debug_msg($query, $cdg_sql);
+       display_debug_msg($query, $cdg_sql, "run_query_insert");
        $obm_q = new DB_OBM;
        $obm_q->query($query);  
     }
@@ -316,7 +446,7 @@ function run_query_update($task) {
   $date = $task["sel_date"];
   
   $query = "update Task set task_date='$date',task_tasktype_id='$ttype',task_length='$time',task_label='$label',task_deal_id='$project' where task_id='$id'";
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_update");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 }
@@ -337,6 +467,8 @@ function run_query_delete($parms) {
     
       if($val == "on"){ 
         $query = "delete from Task where task_id = $id_task";
+
+		display_debug_msg($query, $cdg_sql, "run_query_delete");
         $delete_query = new DB_OBM;
         $delete_query->query($query);
       }    
@@ -356,12 +488,21 @@ function run_query_validate($parms,$time,$who) {
 
   global $l_date_text_format;
   global $uid;
-  global $cdg_sql;
+  global $cdg_sql, $cdg_param;
+
+  if (debug_level_isset($cdg_param))
+	debug_array($time);
+  
 
   if($who == 1) {
     $status = 2;
     ///////////////////////////////////////////
-    $zero = "update Task SET task_status=1 where task_status=2 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["user_id"] ."'";
+    $zero = "update Task SET task_status=1 where task_status=2 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' ";
+
+	// user_id : array -> size 1  
+	$zero .= " and task_user_id = ". $time["user_id"]["0"];
+
+	display_debug_msg($zero, $cdg_sql, "run_query_validate");
     $zero_query = new DB_OBM;                  
     $zero_query->query($zero);
     //////////////////////////////////////////
@@ -369,7 +510,10 @@ function run_query_validate($parms,$time,$who) {
   else { 
     $status = 1;
     ///////////////////////////////////////////
-    $zero = "update Task SET task_status=0 where task_status=1 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["user_id"] ."'";
+    $zero = "update Task SET task_status=0 where task_status=1 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["user_id"]["0"] ."'";
+	display_debug_msg($query, $cdg_sql, "run_query_validate");
+
+	display_debug_msg($zero, $cdg_sql, "run_query_validate");
     $zero_query = new DB_OBM;                  
     $zero_query->query($zero);
     //////////////////////////////////////////
@@ -381,9 +525,10 @@ function run_query_validate($parms,$time,$who) {
       $d_task = substr($d_task, 1);  
       if($val == "on"){ 
         $d_task = str_replace("_"," ",$d_task); 
-        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["user_id"]."'";
+        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["user_id"]["0"]."'";
+		display_debug_msg($query, $cdg_sql, "run_query_validate");
+
         $delete_query = new DB_OBM;
-        display_debug_msg($query, $cdg_sql);
         $delete_query->query($query);
       }	   
     }
@@ -399,7 +544,7 @@ function run_query_tasktype() {
 
   $query = "select * from TaskType order by tasktype_internal";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_tasktype");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -410,14 +555,15 @@ function run_query_tasktype() {
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: Project select query execution                              //
 //    only signed but not still realised...
+//    or payed (garantee, hosting...)
 // Returns : DB object result with project satisfying criteria
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_project() {
   global $cdg_sql;
 
-  $query = "select deal_id, deal_label, company_name from Deal, Company where company_id = deal_company_id and deal_status_id in ( 1 ,7 ,8 ) order by company_name";
+  $query = "select deal_id, deal_label, company_name from Deal, Company where company_id = deal_company_id and deal_status_id in ( 1 ,7 ,8,9 ) order by company_name";
 
-  display_debug_msg($query, $cdg_sql);
+  display_debug_msg($query, $cdg_sql, "run_query_project");
   $obm_q= new DB_OBM;
   $obm_q->query($query);
 
@@ -426,10 +572,59 @@ function run_query_project() {
 
 
 //////////////////////////////////////////////////////////////////////////
+// Get all the contacts of the companyusing obm
+//  -- THIS SHOULD CHANGE TO USE THE User TABLE --
+//////////////////////////////////////////////////////////////////////////
+function run_query_get_obmusers() {
+  global $cdg_sql;
+ 
+  $obm_db=new DB_OBM;
+  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm order by userobm_lastname";
+  display_debug_msg($query, $cdg_sql, "run_query_get_obmusers");
+
+  $obm_db->query($query);
+  return $obm_db;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+// return contact_id 
+// Param : $user_id
+//////////////////////////////////////////////////////////////////////////
+// function run_query_get_contact_id($user_id) {
+//   global $cdg_sql;
+
+//   $obm_db = new DB_OBM;
+//   $query="select userobm_contact_id from UserObm where $user_id  = userobm_id";
+//   display_debug_msg($query, $cdg_sql);
+//   $obm_db->query($query);
+//   $obm_db->next_record(); 
+//   return $obm_db->f("userobm_contact_id");
+// }
+
+//////////////////////////////////////////////////////////////////////////
+// return contact_id 
+// Param : $contact_id
+//////////////////////////////////////////////////////////////////////////
+// function run_query_get_names($contact) { 
+//   global $cdg_sql;
+
+//   $obm_db = new DB_OBM;
+//   $query = "select contact_lastname,contact_firstname from Contact where $contact=contact_id";
+//   display_debug_msg($query, $cdg_sql);
+
+//   $obm_db->query($query);
+//   return $obm_db;
+// }
+
+
+//////////////////////////////////////////////////////////////////////////
 // Get n day values for a given week, for displaying in the creating task
 //  form
-// Param: $date : a date starting on the 1st day of the week
-//        $num : the number of days choosen (5)
+// Paramaters: $date : a date starting on the 1st day of the week
+//        $num_days : the number of days choosen (5)
+// Returns:
+//  array with days of the week in "Mon 23 Apr" format
 //////////////////////////////////////////////////////////////////////////
 function get_this_week($date, $num_days) {
     global $cdg_sql;
@@ -582,6 +777,43 @@ function first_day_week(&$time) {
 }
 
 
+/////////////////////////////////////////////////////////////////////////////
+// Return the first day of the month in 20020825 format                    //
+//Parameters :
+// - $time : array with $time["date"] == current date 
+///////////////////////////////////////////////////////////////////////////
+function first_day_month(&$time) {
+  global $cdg_sql;
+
+  if ( isset($time["date"]) ) { 
+
+    $year=substr($time["date"],0,4);
+    $month=substr($time["date"],4,2);
+    $d_start_month=mktime(0,0,0,$month,1,$year);
+    // According to doc, 0th day of a month is the last of the previous one
+    $d_end_month=mktime(0,0,0,$month+1,0, $year);
+    
+  }
+  else {
+    $today = date("Ymd");
+    echo "first_day_month : today $today <br>";
+    $year=substr($today,0,4);
+    $month=substr($today,4,2);
+    $d_start_month=mktime(0,0,0,$month,1,$year);
+    // According to doc, 0th day of a month is the last of the previous one
+    $d_end_month=mktime(0,0,0,$month+1,0, $year);
+    //set $time["date"]
+    $time["date"] = date("Ymd",$d_start_month);  
+  }
+
+  // Set last day of the month
+  $time["date_end"] = date("Ymd", $d_end_month);
+  
+  return ($time["date"]); 
+
+}
+
+
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -616,4 +848,119 @@ function nb_days_in_month($sec,$direction) {
 }
 
 
+/////////////////////////////////////////////////////////////////////////////
+// Return a string list of the elements of the array                //
+//Parameters :
+// - $array = any array 
+///////////////////////////////////////////////////////////////////////////
+function array_to_list($array) {
+  global $cdg_param;
+
+  $i = 0;
+  while (sizeof($array) > 0) {
+	$elem = array_shift($array);
+	if ($i==0)
+	  $list = "($elem";
+	else
+	  $list .= ", $elem"; 
+	$i++;
+  }
+  $list .= ")";
+
+  if (debug_level_isset($cdg_param))
+	echo "liste : $list <br>";
+
+  return $list;
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Return number of "Open days" (jours ouvrables) in a month     //
+//   for a given date in this month
+// THIS SHOULD BE IMPROVED TO COPE WITH 5 or 6 (or 7) working days
+//  IN A MONTH (if we work on saturday or sunday) 
+//Parameters :
+// - $date = a date in 20020917 format 
+///////////////////////////////////////////////////////////////////////////
+function get_nb_working_days($date) {
+    global $c_days_in_a_week, $cdg_param;
+
+
+  $year=substr($date,0,4);
+  $month=substr($date,4,2);
+  $day=substr($date,6,2);
+
+
+  /*
+  if (debug_level_isset($cdg_param))
+	echo "jour $day mois $month an $year <br>";
+  */
+
+  // first day of the month in second
+  $first_day_sec = mktime(0,0,0,$month, $day, $year);
+  // Fist Weekday
+  $first_wday =date("w", $first_day_sec);
+
+  // Last day
+  $last_day_sec = mktime(23,0,0,$month+1, $day-1, $year);
+  $last_wday =date("w", $last_day_sec);
+
+  /*
+  if (debug_level_isset($cdg_param)) {
+	echo "dernier jour". date ("F j, Y H:m:s ", $last_day_sec).
+       "<br> 1er : $first_wday, dernier ".date("w",$last_day_sec) ."  <br>";
+  }
+  */
+
+  // Testing on where is Sunday in the month to calculate
+  // First sunday of the month is :
+  if ($first_wday ==0) {
+	$first_sunday = $first_day_sec; 
+    // Count of working day to first sunday
+    $workingdays = 0;
+  }
+  else {
+	// nb of days to sunday
+	$nb_to_sun = 7-$first_wday;
+	$first_sunday = mktime(0,0,0,$month, $day+$nb_to_sun, $year); 
+    // Count of working day to first sunday
+    $workingdays = $nb_to_sun -1;
+  }
+
+  /*
+  if (debug_level_isset($cdg_param))
+  	echo "dernier jour". date ("F j, Y -- w", $first_sunday).
+         "<br> working days $workingdays ; week in a day $c_days_in_a_week<br>";
+  */
+
+  // We calculate the number of completes weeks
+  // (sunday to sunday)
+  $week =0;
+  do {
+	  $week++;
+	  /*
+	    if (debug_level_isset($cdg_param))
+		  echo "<br>semaines incrémentées $week : ". 
+			  date ("F j Y -- w", mktime(0,0,0,$month, $day+$nb_to_sun+7*$week, $year));
+	  */
+  } while ($last_day_sec > mktime(0,0,0,$month, $day+$nb_to_sun+7*$week, $year));
+
+  $workingdays += $c_days_in_a_week *($week-1);
+
+  /*
+  if (debug_level_isset($cdg_param))
+  	echo "<br> working days $workingdays <br>";
+  */
+
+  // we now add the number of days to end of month
+  // What is the last in the month ?
+  // If last day is sunday (wday = 0), nothing to add
+  if ($last_wday !=0) {
+	// If wday > 5 (mean Saturday, one day to sub)
+    // Count of working day to last sunday
+    $workingdays += ($last_wday > 5 ? 5 : $last_wday);
+  }
+
+  return $workingdays;
+
+}
 </SCRIPT>

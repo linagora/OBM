@@ -31,6 +31,44 @@ function uncheck_days(data) {
  }
 
 }
+";
+
+////////////////////////
+// Deal Form checking //
+////////////////////////
+echo "
+function check_form(f_aff) {
+
+  if (! check_sel_tasktype(f_aff)) {
+    return false;
+  }
+  else if (! check_sel_project(f_aff)) {
+    return false;
+  }
+  else
+    return true;
+}
+";
+
+echo "
+function check_sel_tasktype(form) {
+  //  alert(\"value\" + form.sel_tasktype.selectedIndex);
+  if (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value == 0) {
+    alert (\"$l_j_select_tasktype\");
+    return false;
+  } else
+    return true;
+}
+
+function check_sel_project(form) {
+  //alert(\"value\" + form.sel_tasktype.selectedIndex);
+  if ((form.sel_project.options[form.sel_project.selectedIndex].value == 0) &&
+       (form.sel_tasktype.options[form.sel_tasktype.selectedIndex].value < 10)) {
+    alert (\"$l_j_select_project\");
+    return false;
+  } else
+    return true;
+}
 // -->
 </SCRIPT>
 ";

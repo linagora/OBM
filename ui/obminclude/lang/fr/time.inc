@@ -23,9 +23,13 @@ $l_company = "Société";
 $l_delete = "Supprimer les tâches";
 $l_length="Durée";
 $l_total_length="Durée cumulée";
+$l_total_before="Durée cumulée précédente";
+$l_total_period="Durée sur la période";
 $l_task_del="Suppr.";
 $l_week="Semaine";
+$l_month="Mois";
 $l_user="Utilisateur";
+$l_all="Tous ?";
 $l_see = "Voir";
 $l_validate = "Validée";
 $l_valid = "Valider";
@@ -62,6 +66,8 @@ $fieldnames["task_deal_label"] = $l_deallabel;
 $fieldnames["task_company_name"] = $l_company;
 $fieldnames["task_length"] = $l_length;
 $fieldnames["task_totallength"] = $l_total_length;
+$fieldnames["task_totalbefore"] = $l_total_before;
+$fieldnames["task_totalperiod"] = $l_total_period;
 $fieldnames["tasktype_label"] = $l_tasktype;
 $fieldnames["task_id"] = $l_update;
 $fieldnames["contact_function"] = $l_function;
@@ -78,8 +84,10 @@ $l_telother = "Autres tel";
 $l_private = "Privé";
 $l_public = "Publique";
 $l_contact_select_company = "Sélectionner la société du Contact.";
-$l_week_next = "Semaine Suivante";
+$l_week_next = "Semaine suivante";
 $l_week_prev = "Semaine précédente";
+$l_month_next = "Mois suivant";
+$l_month_prev = "Mois précédent";
 $l_date = "Date:";
 $l_project = "Projet:";
 $l_task = "Tache:";
@@ -88,6 +96,8 @@ $l_duration = "Durée:";
 
 // Titres
 $l_time = "Gestion des temps";
+$l_header_admin = "Administration";
+$l_header_stats = "Statistiques";
 
 // Actions
 $l_insert = "Enregistrer le Contact";
@@ -124,7 +134,16 @@ $l_update_ok = "La modification du contact a été correctement effectuée";
 $l_update_error = "La modification du contact a échoué !";
 $l_query_error = "Problème en executant la requete";
 
+// Type de tâches à rechercher
+$l_tasktype = "Type des tâches";
+$l_task_all = "Toutes";
+$l_task_uservalid = "Validées par l'admin ou l'utilisateur";
+$l_task_adminvalid= "Validées par l'admin uniquement";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_j_select_tasktype = "Vous devez sélectionner un type de tâche.";
+$l_j_select_project = "Vous devez sélectionner un project pour une tâche facturée.";
+
+
 $l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
 $l_fill_phone = "Vous devez renseigner le telephone avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de ces taches ?";

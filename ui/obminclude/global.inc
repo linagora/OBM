@@ -27,9 +27,21 @@ $last_payment_default=0;
 $last_contract_default=0;
 $last_incident_default=0;
 $set_weekstart_default="monday";
-//Timemanager module
+
+//Timemanager module CONSTANTS
 // In how many parts we can chop a day
-$fraction_jour = 8;
+$c_day_fraction = 8;
+// How many days we want to fill for each week:
+// 5 : Mon -> Fri; 6 : Mon -> Sat... (not tested for anything else than 5...
+//  and 5 could be hard coded at some places...
+$c_days_in_a_week= 5;
+// task_status flag
+// task not valided by the user : $c_task_notvalid
+// task valided by user : $c_task_uservalid
+// task valided by admin : $c_task_adminvalid
+$c_task_notvalid = 0;
+$c_task_uservalid = 1;
+$c_task_adminvalid = 2;
 
 // Perms
 $perms_user = "user" ;
@@ -84,11 +96,13 @@ if ($path == "") {
 //   - $msg         : message to display
 //   - $debug (opt) : debug flag required
 ///////////////////////////////////////////////////////////////////////////////
-function display_debug_msg($msg, $debug=0) {
+function display_debug_msg($msg, $debug=0, $function_name="") {
   global $set_debug;
 
+  if (! empty($function_name))
+	$function_name .= " : ";
   if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    echo $msg;
+    echo "<font color=\"#$col_green\">$function_name</font>$msg";
     echo "<HR>\n";
   }
 }  

@@ -357,6 +357,18 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
             <a class=header_green href=\"".$sess->url("payment_index.php?action=admin")."\">$l_header_admin</a> |
             <a class=header_green href=\"".$sess->url("payment_index.php?action=reconcile")."\">$l_header_reconcile</a> | "; 
     echo "<a class=header_green href=\"".$sess->url("payment_index.php?action=display")."\">$l_header_display</a>" ;
+  } 
+
+  /////////////////////////////////////////////////////////////////////////////
+  // TIME Submenu            
+  /////////////////////////////////////////////////////////////////////////////
+  else if ($menu=="TIME") {
+    // FIXME pas de permissions spéciales
+    if ($auth->auth["perm"] == $perms_admin) {
+     echo "<a class=header_green href=\"".$sess->url("time_index.php?action=index")."\"> $l_header_base</a>" ;
+     echo " | <a class=header_green href=\"".$sess->url("time_index.php?action=admin")."\"> $l_header_admin</a>" ;
+     echo " | <a class=header_green href=\"".$sess->url("time_index.php?action=stats")."\"> $l_header_stats</a>" ;
+    }   
   } else {
     echo "&nbsp;" ;
   }
