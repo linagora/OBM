@@ -41,7 +41,6 @@ require("agenda_display.inc");
 
 page_close();
 
-include("agenda_functions.inc");
 if ($action == "") $action = "index"; 
 $agenda = get_param_agenda();
 get_agenda_action();
@@ -103,13 +102,17 @@ elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if(check_data_form($agenda)){    
     $conflict = run_query_add_event($agenda,$sel_user_id);
+    $p_user_array = array($auth->auth["uid"],6);
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    dis_week_planning($agenda,$obm_q,$user_q);
   }
   else {
+    require("agenda_js.inc");
     display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm();
     $cat_event = run_query_get_eventcategories();
-    $p_user_array = array($auth->auth["uid"]);
-    dis_event_form($action, $agenda, $user_obm, $cat_event, $sel_user_id[]);
+    dis_event_form($action, $agenda, $user_obm, $cat_event, $sel_user_id);
   }
 }
 
@@ -120,14 +123,16 @@ elseif ($action == "insert") {
 
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
-  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$sel_repeat_kind;
-  global $cdg_param,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
+  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$tf_time_end,$tf_date_end,$sel_repeat_kind;
+  global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy;
 
 
   // Deal fields
-  if (isset ($param_date)) $agenda["date"] = $param_date; 
-  else $agenda["date"] = date("Ymd",time());
+  if (isset ($param_date)){
+    $agenda["date"] = $param_date;  echo "sdf,lksqdjsqlkdlk";}
+  else 
+    $agenda["date"] = date("Ymd",time());
   if (isset($param_event)) $agenda["id"] = $param_event;
   if (isset($tf_title)) $agenda["title"] = $tf_title;
   if (isset($sel_category_id)) $agenda["category"] = $sel_category_id;
@@ -136,21 +141,32 @@ function get_param_agenda() {
   if (isset($cb_force))  $agenda["force"] = $cb_force;
   if (isset($cb_privacy))  $agenda["privacy"] = $cb_privacy;
   if (isset($tf_repeat_end)) $agenda["repeat_end"] = $tf_repeat_end;  
+
   if (isset($tf_date_begin)) {
+    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_begin , $day_array2);
+    $agenda["date_begin"] .=  $day_array2[1].$day_array2[2].$day_array2[3];
     if (isset($tf_time_begin)) {
-      $agenda["date_begin"] = $tf_date_begin.substr($tf_time_begin,0,2).substr($tf_time_begin,3,2);
+      $agenda["date_begin"] = $agenda["date_begin"].substr($tf_time_begin,0,2).substr($tf_time_begin,3,2);
     }
     else {
-      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",$tf_date_begin));
+      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours", $agenda["date_begin"]));
     }
   }
+  else {
+    $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime(date("Ymd"))));
+  }
   if (isset($tf_date_end)) {
+    ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_end , $day_array);
+    $agenda["date_end"] .=  $day_array[1].$day_array[2].$day_array[3];
     if (isset($tf_time_end)) {
-      $agenda["date_end"] = $tf_date_begin.substr($tf_time_end,0,2).substr($tf_time_end,3,2);
+      $agenda["date_end"] =  $agenda["date_end"].substr($tf_time_end,0,2).substr($tf_time_end,3,2);
     }
     else {
-      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",$tf_date_end));
+      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",$agenda["date_end"]));
     }
+  }
+  else {
+    $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime(date("Ymd"))));
   }
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
@@ -204,7 +220,7 @@ function get_agenda_action() {
     'Url'      => "$path/agenda/agenda_index.php?action=new",
     'Right'    => $agenda_write,
     'Condition'=> array ('index','detailconsult','
-                         view_month','view_week','view_day','view_year','view_month') 
+                         view_month','view_week','view_day','view_year','view_month','insert') 
                                     );
 
 

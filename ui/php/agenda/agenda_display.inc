@@ -415,7 +415,9 @@ function dis_week_planning($agenda,$obm_q,$user_q) {
   $calendar_user = store_users($user_q);
   $td_width = 70/count($calendar_user);
   $td_colspan = count($calendar_user);
+  echo $start_week_time." - ".$end_week_time." ";
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
+  var_dump($current_events);
 // Week day listcount($contacts_array)
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {
     $this_date = date("Ymd", $i);
@@ -480,7 +482,7 @@ function dis_week_planning($agenda,$obm_q,$user_q) {
       $hour_day_list .=   "</tr>";
     }
   }
-							
+  
 echo "
 <table class=\"agendaMain\">
  <tr>
@@ -992,10 +994,17 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     $category_id = $agenda["category"];
     $priority = $agenda["priority"];
     $description = $agenda["description"];
-    $datebegin = substr($agenda["date_begin"],0,10);
-    $timebegin = substr($agenda["date_begin"],10,2).":".substr($agenda["date_begin"],12,2);
+    
+    $datebegin = substr($agenda["date_begin"],0,8);    
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array);
+    $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
+    $timebegin = substr($agenda["date_begin"],8,2).":".substr($agenda["date_begin"],10,2);
+    
     $dateend = substr($agenda["date_end"],0,10);
-    $timeend = substr($agenda["date_end"],10,2).":".substr($agenda["date_begin"],12,2);
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$dateend , $day_array2);
+    $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];
+    $timeend = substr($agenda["date_end"],8,2).":".substr($agenda["date_end"],10,2);
+    
     $privacy = $agenda["privacy"]; 
     $occupied_day = $agenda["occupied"];
     $repeat_kind = $agenda["kind"];
@@ -1035,7 +1044,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   }
 
   $$repeat_kind .= "selected=\"selected\" ";
-  $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"0\">aucune</option>";
+  $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"none\">aucune</option>";
   $dis_sel_kind .= "\n<option value=\"daily\" $daily>$l_daily</option>";
   $dis_sel_kind .= "\n<option value=\"weekly\" $weekly>$l_weekly</option>";
   $dis_sel_kind .= "\n<option value=\"monthly\" $monthly>$l_monthly</option> ";
@@ -1045,7 +1054,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   switch($priority) {
     case 1 : $tag_low="selected=\"selected\""; break;
     case 2 : $tag_medium="selected=\"selected\""; break;
-    case 3 : $tag_high="selected=\"selected\""; break; 
+    case 3: $tag_high="selected=\"selected\""; break; 
     default :
       $tag_low="";
       $tag_medium="selected=\"selected\"";
@@ -1054,9 +1063,9 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   }
   
   $dis_sel_prio .= "<select name=\"sel_priority\">";
-  $dis_sel_prio .= "<option value=0 ".$tag_low.">".$l_low."</option>";
-  $dis_sel_prio .= "<option value=1 ".$tag_medium.">".$l_medium."</option>";
-  $dis_sel_prio .= "<option value=2 ".$tag_high.">".$l_high."</option>";
+  $dis_sel_prio .= "<option value=1 ".$tag_low.">".$l_low."</option>";
+  $dis_sel_prio .= "<option value=2 ".$tag_medium.">".$l_medium."</option>";
+  $dis_sel_prio .= "<option value=3 ".$tag_high.">".$l_high."</option>";
   $dis_sel_prio .= "</select>";
 
   // eventcategory select
@@ -1088,7 +1097,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   }
 
   // userobm select
-  $dis_sel_user = "<select name=\"sel_user_id\" size=\"6\" multiple=\"multiple\">";
+  $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\">";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $u_lname = $usr_q->f("userobm_lastname");
@@ -1111,15 +1120,15 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   $dis_sel_user .= "</select>";
   
   if($force == 1){
-    $dis_force = "<input type=\"checkbox\" id=\"cb_force\" checked=\"checked\" name=\"cb_force\" />";
+    $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
   }else{
-    $dis_force = "<input type=\"checkbox\" id=\"cb_force\" name=\"cb_force\" />";
+    $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" name=\"cb_force\" />";
   }
   
   if($privacy == 1){
-    $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" checked=\"checked\" name=\"cb_privacy\" />";
+    $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" checked=\"checked\" name=\"cb_privacy\" />";
   }else{
-    $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" name=\"cb_privacy\" />";
+    $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";
   }
 
   

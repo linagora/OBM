@@ -81,29 +81,32 @@ function run_query_week_event_list($agenda,$contacts_array) {
   $start_week_time = date("YmdHi",strtotime("+ $set_start_time hours",$start_week_time));
   $end_week_time = date("YmdHi",$end_week_time);
   
-  
   $obm_db = new DB_OBM;
-  $query = "SELECT calendarevent_id,
+  $query = "SELECT DISTINCT calendarevent_id,
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
 		   calendarcategory_label,
 		   cs1.calendarsegment_customerid,
 		   cs1.calendarsegment_date,
-		   cs1.calendarsegment_flag
-		   FROM CalendarEvent,CalendarCategory, CalendarSegment cs1,CalendarSegment cs2
+		   cs1.calendarsegment_flag 
+	      FROM CalendarEvent,CalendarCategory, CalendarSegment cs1,CalendarSegment cs2,CalendarSegment cs3
 	      WHERE calendarevent_category_id = calendarcategory_id
-	      AND calendarevent_id = cs1.calendarsegment_eventid
+	      AND calendarevent_id = cs1.calendarsegment_eventid 
 	      AND cs1.calendarsegment_eventid = cs2.calendarsegment_eventid
 	      AND cs1.calendarsegment_customerid = cs2.calendarsegment_customerid
+	      AND cs1.calendarsegment_eventid = cs3.calendarsegment_eventid
+	      AND cs1.calendarsegment_customerid = cs3.calendarsegment_customerid	      
 	      AND cs1.calendarsegment_state = 'A'
 	      AND ((cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $end_week_time
-	            AND cs2.calendarsegment_flag = 'end' AND cs2.calendarsegment_date > $start_week_time)
-		OR (cs1.calendarsegment_flag = 'end' AND cs1.calendarsegment_date > $start_week_time
-	    	    AND cs2.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date < $end_week_time))
-	      ";
-
-  
+	            AND cs2.calendarsegment_flag = 'end' AND cs2.calendarsegment_date < $start_week_time
+		    AND cs2.calendarsegment_date < cs1.calendarsegment_date))";
+//    	        OR (cs1.calendarsegment_flag = 'end' AND cs1.calendarsegment_date > $start_week_time
+//		    AND cs3.calendarsegment_flag = 'end' AND cs3.calendarsegment_date < cs1.calendarsegment_date
+//		    AND cs2.calendarsegment_date > cs3.calendarsegment_date 
+//		    AND cs2.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date < $end_week_time))		      
+//	      ";
+	      
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
     $query .= "AND  cs1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
     for ($i=1;$i<count($contacts_array);$i++) {
@@ -111,10 +114,10 @@ function run_query_week_event_list($agenda,$contacts_array) {
     }
     $query.=")";
   }    
-        
   $query.=" ORDER BY cs1.calendarsegment_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
+  while($obm_db->next_record()){echo $obm_db->f("calendarevent_title")."-F".$obm_db->f("calendarsegment_flag")."-D".$obm_db->f("calendarsegment_date")."-I".$obm_db->f("calendarevent_id")."-P".$obm_db->f("calendarevent_priority")."-C".$obm_db->f("calendarsegment_customerid")."-L".$obm_db->f("calendarcategory_label")."<br>";}
   return $obm_db;
 }
 /////////////////////////////////////////////////////////////////////////////
@@ -153,8 +156,6 @@ function run_query_month_event_list($agenda,$contacts_array) {
 	      AND c2.calendarsegment_flag = 'begin'
 	      AND c2.calendarsegment_date LIKE '$month%'  
              ";
-
-
 
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
     $query .= "AND c1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
@@ -257,7 +258,8 @@ function run_query_get_user_name($contacts_array) {
 function run_query_add_event($agenda,$contacts_array) {
   global $auth;
   $return_info = array();
-  $event_repeat_dates = get_repeat_date();
+  $event_repeat_dates = get_event_repetition_dates($agenda);
+  var_dump($event_repeat_dates);
   foreach($event_repeat_dates as $dates) {
     $conflicts = run_query_get_conflicts($dates["date_begin"],$dates["date_end"],$contacts_array);
     $return_info = array_merge($return_info, $conflicts);
@@ -299,14 +301,14 @@ function run_query_insert_occurence($date_begin,$date_end,$user_id,$event_id,$st
                                   VALUES ($event_id,$user_id,'$date_begin','begin','user','$state')";
   
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+  $obm_db->query($query);
   $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
                                          calendarsegment_type, calendarsegment_state) 
                                   VALUES ($event_id,$user_id,'$date_end','end','user','$state')";
   
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  return $obm_q; 
+  $obm_db->query($query);
+  return $obm_db; 
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -327,7 +329,7 @@ function run_query_delete_occurence($occur,$user_id) {
 	    ( calendarsegment.date = '".$occur->f("date_begin")."' OR calendarsegment.date = '".$occur->f("date_end")."')";
     
     display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
+    $obm_db->query($query);
   }
 }
 
@@ -347,11 +349,11 @@ function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
             ,cs2.calendarsegment_date as date_end FROM CalendarSegment cs1, CalendarSegment cs2 
             WHERE cs1.calendarsegment_eventid = cs2.calendarsegment_eventid and cs1.calendarsegment_date < '$date_end'
 	    AND cs1.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date > 'date_begin' AND
-	    cs2.calendarsegment_flag = 'end' AND calendarsegment_customerid = $user_id AND calendarsegment_type = 'user'";
+	    cs2.calendarsegment_flag = 'end' AND cs1.calendarsegment_customerid = $user_id AND cs1.calendarsegment_type = 'user'";
   
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  return $obm_q;
+  $obm_db->query($query);
+  return $obm_db;
 }
 /////////////////////////////////////////////////////////////////////////////
 // search all conflict for a user in a laps of  time 
@@ -361,7 +363,7 @@ function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
 //    $date_begin
 //    $date_end
 //    $user_id :
-/////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
   global $cdg_sql;
@@ -370,17 +372,17 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
             ,cs2.calendarsegment_date as date_end FROM CalendarSegment cs1, CalendarSegment cs2 
             WHERE cs1.calendarsegment_eventid = cs2.calendarsegment_eventid and cs1.calendarsegment_date < '$date_end'
 	    AND cs1.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date > 'date_begin' AND
-	    cs2.calendarsegment_flag = 'end' AND calendarsegment_type = 'user'";
-  $query .= " AND calendarsegment_customerid IN ('".$contacts_array[0]."'";
+	    cs2.calendarsegment_flag = 'end' AND cs1.calendarsegment_type = 'user'";
+  $query .= " AND cs1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
   for ($i=1;$i<count($contacts_array);$i++) {
     $query.= ",'".$contacts_array[$i]."'";
   }
   $query.=")";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  while ($obm_q->next_record()) {
-    $conflict_array[] = array("event_id" => $obm_q->f("calendarsegment_eventid"), "user_id" => $obm_q->f("calendarsegment_customerid"));
+  $obm_db->query($query);
+  while ($obm_db->next_record()) {
+    $conflict_array[] = array("event_id" => $obm_db->f("calendarsegment_eventid"), "user_id" => $obm_db->f("calendarsegment_customerid"));
   }
   return $conflict_array;
 }
@@ -394,7 +396,7 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
 /////////////////////////////////////////////////////////////////////////////
 
 function run_query_insert_event_data($agenda) {
-  global $cdg_sql;
+  global $cdg_sql,$auth;
 
   $title = $agenda["title"];
   $category_id = $agenda["category"];
@@ -404,28 +406,30 @@ function run_query_insert_event_data($agenda) {
   $timebegin = substr($agenda["date_begin"],8,4);
   $dateend = substr($agenda["date_end"],0,8);
   $timeend = substr($agenda["date_begin"],8,6);
-  $privacy = $agenda["privacy"]; 
+  if($agenda["privacy"]!=1) $privacy = 0;else $privacy = 1; 
   $repeat_kind = $agenda["kind"];
   $repeat_days =$agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
 
   $obm_db = new DB_OBM;
   $obm_db->lock("CalendarEvent");
-  $query = "SELECT MAX(calendarevent_id) FROM CalendarEvent";
+  $query = "SELECT MAX(calendarevent_id) as max_id FROM CalendarEvent";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
-  $max_id = $obm_db->f("max(calendarevent_id)");
+  $obm_db->next_record(); 
+  $max_id = $obm_db->f("max_id")+1;
   $query = "INSERT INTO CalendarEvent (calendarevent_id,calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, 
                          calendarevent_usercreate, calendarevent_title, calendarevent_description,
 			 calendarevent_category_id,calendarevent_priority,calendarevent_privacy,
 			 calendarevent_repeatkind,calendarevent_repeatdays,calendarevent_endrepeat)
 	         VALUES ($max_id,null,'".date("YmdHis")."',null,".$auth->auth["uid"].",'$title',
 		         '$description',$category_id,$priority,$privacy,
-			 $repeat_interval,'$repeatdays','$endrepeat')";
+			 '$repeat_kind','$repeatdays','$endrepeat')";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-  $obm_db->unlock();
+  $obm_db->unlock();  
+  $obm_db->query($query);
+
   return $max_id;
 }
 
@@ -467,6 +471,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
   global  $set_start_time, $set_stop_time,$set_weekstart_default,$set_time_unit;
   $obm_q->next_record();
   $time_unit = 60 / $set_time_unit;
+  $s =0;
   $unix_time = mktime(substr($p_date_begin,8,2), substr($p_date_begin,10,2), "00", 
                       substr($p_date_begin,4,2), substr($p_date_begin,6,2), substr($p_date_begin,0,4));
   for($current_time=$p_date_begin;$current_time<$p_date_end;
@@ -575,18 +580,18 @@ function check_data_form($agenda) {
   $dateend = substr($agenda["date_end"],0,8);
   $timeend = substr($agenda["date_end"],8,6);
   $repeat_end = $agenda["repeat_end"];
-  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array2);
-  $this_day_b = $day_array2[3]; 
-  $this_month_b = $day_array2[2];
-  $this_year_b = $day_array2[1];
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$datebegin , $day_array);
+  $this_day_b = $day_array[3]; 
+  $this_month_b = $day_array[2];
+  $this_year_b = $day_array[1];
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$dateend , $day_array2);
   $this_day_e = $day_array2[3]; 
   $this_month_e = $day_array2[2];
   $this_year_e = $day_array2[1];
-  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$repeat_end , $day_array2);
-  $this_day_r = $day_array2[3]; 
-  $this_month_r = $day_array2[2];
-  $this_year_r = $day_array2[1];
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$repeat_end , $day_array3);
+  $this_day_r = $day_array3[3]; 
+  $this_month_r = $day_array3[2];
+  $this_year_r = $day_array3[1];
 
 
   if (trim($title) == "") {
@@ -620,5 +625,175 @@ function check_data_form($agenda) {
   }
   
   return true; 
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Agenda Form Data checking and formatting                                 //
+// Parameters:
+//   - $agenda[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+
+
+function get_event_repetition_dates($agenda) {
+  global $set_weekstart_default;
+
+  $repeat_kind = $agenda["kind"];
+  $repeat_days =$agenda["repeat_days"]; 
+  $repeat_end = $agenda["repeat_end"];
+  
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_begin"] , $day_array);
+  $this_min_b = $day_array[5]; 
+  $this_hour_b = $day_array[4]; 
+  $this_day_b = $day_array[3]; 
+  $this_month_b = $day_array[2];
+  $this_year_b = $day_array[1];
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$agenda["date_end"] , $day_array2);
+  $this_min_e = $day_array2[5]; 
+  $this_hour_e = $day_array2[4];   
+  $this_day_e = $day_array2[3]; 
+  $this_month_e = $day_array2[2];
+  $this_year_e = $day_array2[1];
+  ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$repeat_end , $day_array3);
+  $this_day_r = $day_array3[3]; 
+  $this_month_r = $day_array3[2];
+  $this_year_r = $day_array3[1];
+  
+
+  if($repeat_end) {
+    $time_end_repeat = strtotime("+1 day",strtotime($repeat_end));
+  }
+  else {
+    $time_end_repeat = strtotime("+1 year +1 day", strtotime(date("Ymd")));
+  }
+  $time_b=strtotime("+$this_hour_b hours +$this_min_b minutes",strtotime($this_year_b.$this_month_b.$this_day_b));
+  $time_e=strtotime("+$this_hour_e hours +$this_min_e minutes",strtotime($this_year_e.$this_month_e.$this_day_e));
+  
+  if ($repeat_kind=="none") {
+    $event_dates[] = array("date_begin" => date("YmdHi",$time_b),"date_end" => date("YmdHi",$time_e));
+  }    
+  elseif ($p_repeatkind=="daily") {
+    for($var_time_b=$time_b, $var_time_e=$time_e;
+    $var_time_b <= $time_end_repeat;
+    $var_time_b = strtotime("+1 day",$var_time_b), $var_time_e = strtotime("+1 day",$var_time_e)){
+      $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
+    }
+  }
+  elseif ($repeat_kind=="weekly") {
+    $start_week_day = strtotime($set_weekstart_default);
+    $first_day = (date("w",$time_b) - date("w",$start_week_day))%7;
+    for($var_time_b = strtotime("-$first_day days",$time_b), 
+        $var_time_e = strtotime("-$first_day days",$time_e);
+    $var_time_b <= $time_end_repeat;    
+    $var_time_b = strtotime("+1 week",$var_time_b), $var_time_e = strtotime("+1 week",$var_time_e)) {      
+      for ($i=0;($i<7) && (strtotime("+$i days",$var_time_b) <= $time_end_repeat ); $i++) { 
+	$day_char=substr($repeat_days,$i,1);
+	if (strcmp($day_char,"1")==0) {
+	  $event_dates[]=array("date_begin" => date("YmdHi",strtotime("+$i days",$var_time_b)),
+	                       "date_end" => date("YmdHi",strtotime("+$i days",$var_time_e)));
+	}
+      }
+    }  
+  }  
+  else if ($repeat_kind=="monthlybydate") {
+    for($var_time_b=$time_b, $var_time_e=$time_e;
+    $var_time_b <= $time_end_repeat;
+    $var_time_b = strtotime("+1 month",$var_time_b), $var_time_e = strtotime("+1 month",$var_time_e)){
+      $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
+    }
+  }
+  else if ($repeat_kind=="monthlybyday") {
+    $var_time_b = $time_b;
+    $var_time_e = $time_e;
+    $start_week_day = date("w",strtotime($set_weekstart_default));
+    $day_beg = (date("w",$time_b) - $start_week_day)%7;
+    $day_end = (date("w",$time_e) - $start_week_day)%7;
+    $tab_beg = array((($day_beg - 3)%7) => '+3',(($day_beg - 2)%7) => '+2',(($day_beg - 1)%7) => '+1',(($day_beg - 0)%7) => '+0',
+                (($day_beg - 1)%7) => '-1',(($day_beg - 2)%7) => '-2',(($day_beg - 3)%7) => '-3');
+    $tab_end = array((($day_end - 3)%7) => '+3',(($day_end - 2)%7) => '+2',(($day_end - 1)%7) => '+1',(($day_end - 0)%7) => '+0',
+                (($day_end - 1)%7) => '-1',(($day_end - 2)%7) => '-2',(($day_end - 3)%7) => '-3');
+    while($var_time_b <= $time_end_repeat){            
+      $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));     
+      $var_time_b = strtotime("+1 month",$var_time_b);
+      $var_time_e = strtotime("+1 month",$var_time_e);
+      $beg_day = date("w",$var_time_b);
+      $end_day = date("w",$var_time_e);
+      $var_time_b = strtotime("$beg_day days",$var_time_b);
+      if(date("d",$var_time_b) < 1) {
+	$var_time_b = strtotime("+7 days",$var_time_b);
+      }    
+    }
+  } else if ($repeat_kind=="yearly") {  
+    for($var_time_b=$time_b, $var_time_e=$time_e;
+    $var_time_b <= $time_end_repeat;
+    $var_time_b = strtotime("+1 year",$var_time_b), $var_time_e = strtotime("+1 year",$var_time_e)){  
+      $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
+    }
+  }
+  return $event_dates;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// localizeDate() - similar to strftime but uses a preset arrays of localized
+// months and week days and only supports %A, %a, %B, %b, %e, and %Y
+// more can be added as needed but trying to keep it small while we can
+//------------------------------------------------------------------------
+// Argument:
+// ---------
+// $format : format of the wished result
+// $timestamp : time to format
+///////////////////////////////////////////////////////////////////////////////
+function localizeDate($format, $timestamp) {
+ global $l_daysofweek, $l_daysofweekshort, $l_daysofweekreallyshort;
+ global $l_monthsofyear,  $l_monthsofyearshort;
+
+ $day = '%A %e %B';
+ $week = '%e %B';
+ $week_list = '%a %e %b';
+ $week_jump = '%e %b';
+ $month = '%B %Y';
+ $month_list = '%A %e %B';
+
+ $year = date("Y", $timestamp);
+ $months = date("n", $timestamp)-1;
+ $days = date("j", $timestamp);
+ $dayofweek = date("w", $timestamp);
+	
+ $date = str_replace('%Y', $year, ${$format});
+ $date = str_replace('%e', $days, $date);
+ $date = str_replace('%B', $l_monthsofyear[$months], $date);
+ $date = str_replace('%b', $l_monthsofyearshort[$months], $date);
+ $date = str_replace('%A', $l_daysofweek[$dayofweek], $date);
+ $date = str_replace('%a', $l_daysofweekshort[$dayofweek], $date);
+	
+ return $date;	
+	
+}
+///////////////////////////////////////////////////////////////////////////////
+// dateOfWeek() takes a date in Ymd and a day of week in 3 letters or more
+// and returns the date of that day. (ie: "sun" or "sunday" would be 
+// acceptable values of $day but not "su")
+//------------------------------------------------------------------------
+// Argument:
+// ---------
+// $Ymd 
+// $$day
+///////////////////////////////////////////////////////////////////////////////
+
+function dateOfWeek($Ymd, $day) {
+	global $set_weekstart_default;
+	if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
+	$timestamp = strtotime($Ymd);
+	$num = date('w', strtotime($set_weekstart_default));
+	$start_day_time = strtotime((date('w',$timestamp)==$num ? "$set_weekstart_default" : "last $set_weekstart_default"), $timestamp);
+	$ret_unixtime = strtotime($day,$start_day_time);
+	$ret_unixtime = strtotime('+12 hours', $ret_unixtime);
+	$ret = date('Ymd',$ret_unixtime);
+	return $ret;
+ 
 }
 
