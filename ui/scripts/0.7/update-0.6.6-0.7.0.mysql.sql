@@ -140,7 +140,7 @@ VALUES (0,'project_new','project_initlabel',1,2),
 --       (0,'time_projuser','total_before',3,1),
 --       (0,'time_projuser','total_after',4,1),
        (0,'time_ttuser','tasktype_label',1,2),
-       (0,'time_ttuser','total_spent',2,1),
+       (0,'time_ttuser','total_spent',2,1)
 --       (0,'time_ttuser','total_before',3,1),
 --       (0,'time_ttuser','total_after',4,1)
 ;

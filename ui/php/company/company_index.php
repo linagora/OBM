@@ -79,11 +79,16 @@ if ($action == "ext_get_id") {
   require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company["title"]);
+
 } elseif ($action == "ext_get_id_url") {
+///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
   $comp_q = run_query_active_company();
   $display["detail"] = html_select_company($comp_q, $company["title"], $company["url"]);
 
+///////////////////////////////////////////////////////////////////////////////
+// Normal calls
+///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();

@@ -9,7 +9,7 @@
 
 // Labels et textes
 $l_contract = "Contract";
-$l_contract_company = "Company";
+$l_company = "Company";
 $l_contract_contracttype = "Kind of contract";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Expiration date After";
@@ -20,7 +20,7 @@ $l_incident_list = "List of the Incidents";
 $l_incident_new = "Add a new Incident";
 
 $l_contract_select_deal = "Select the Deal.";
-$l_deal_label = "Deal";
+$l_deal = "Deal";
 $l_label = "Label";
 $l_label_libelle = "Key-word of the label";
 $l_kind = "Kind";
@@ -28,7 +28,6 @@ $l_marketing_manager = "Marketing Man.";
 $l_technical_manager = "Technical Man.";
 $l_client_manager = "Client Man.";
 $l_clause = "Clauses";
-$l_company = "Name of the company";
 $l_date_init = "Initial date";
 $l_dateexp = "Expiration date";
 $l_last_update = "Last update";
@@ -44,7 +43,6 @@ $l_delete = "Delete the contract";
 $l_select_company = "Select the company";
 
 // Messages
-$l_add_contract_deal = "Please fill the fields the of the contract which is linked to the Deal";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the contract";
 $l_found = "contracts found.";
 $l_no_found = "No contract found matching the query !";

@@ -24,6 +24,8 @@ $l_archive_first = "A";
 $l_invalid_data = "Ugyldig data";
 
 // OBM_DISPLAY
+$l_entries = "Entries";
+$l_page_res = "Result pages";
 $l_field = "Field";
 $l_displayed = "Displayed";
 $l_order = "Display order";
@@ -116,7 +118,9 @@ $l_header_title_agenda = "Word to define";
 $l_header_new_f = "Ny";
 $l_header_new = "Ny";
 $l_header_find = "Finn";
-$l_header_new_parent = "New ParentDeal";
+
+$l_header_new_child = "Ny linked Deal";
+$l_header_new_parent = "Ny ParentDeal";
 $l_header_find_parent = "Find ParentDeal";
 $l_header_delete =  "Word to define";
 

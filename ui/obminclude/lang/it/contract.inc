@@ -9,7 +9,7 @@
 
 // Labels et textes
 $l_contract = "Contratto";
-$l_contract_company = "Company";
+$l_company = "Company";
 $l_contract_contracttype = "Tipo di contratto";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Scadenza date Dopo";
@@ -20,7 +20,7 @@ $l_incident_list = "List di the Incidents";
 $l_incident_new = "Aggiungi a nuovo Incident";
 
 $l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
-$l_deal_label = "Impegno";
+$l_deal = "Impegno";
 $l_label = "Label";
 $l_label_libelle = "Key-word di the etichetta";
 $l_kind = "Tipo";
@@ -28,7 +28,6 @@ $l_marketing_manager = "Marketing Resp.";
 $l_technical_manager = "Tecnico Resp.";
 $l_client_manager = "Client Resp.";
 $l_clause = "Clauses";
-$l_company = "None dell'Azienda";
 $l_date_init = "Data inizio";
 $l_dateexp = "Data scadenza ";
 $l_last_update = "Ultimo aggiornamento";
@@ -36,7 +35,6 @@ $l_at = "a";
 $l_number = "Numero";
 
 $l_select_contract = "Scegli il contratto";
-$l_add_contract_deal = "Veuillez à présent remplir les champs du contrat lié à l'affaire";
 
 // Actions
 $l_insert = "Inserisci Contratto";

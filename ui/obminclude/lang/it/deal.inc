@@ -60,7 +60,6 @@ $l_deal_select_parentdeal = "Scegli il Sub-impegno al quale l'impegno deve esser
 $l_affect_deal= "Cambia Sub-Impegno ";
 // about invoice...
 $l_invoice_new = "Nuova Fattura";
-$l_invoices = "Fatture collegate";
 $l_archived_invoices = "Fatture in archivio";
 $l_no_invoices = "Non sono presenti fatture collegate";
 $l_see_archived_invoices = "Vedi Elenco fatture in archivio";
@@ -77,7 +76,6 @@ $l_category_label="Nome";
 $l_category_minilabel="Nome corto";
 $l_parentdeal_deals = "Impegni appartengono a questo Sub-impegno";
 $l_add_contrat = "Nuovo contratto";
-$l_contracts = "Contratti";
 $l_contract_new = "Nuovo contratto";
 
 // Titles
@@ -93,7 +91,6 @@ $l_insert_parent = "Inserisci Sub-Impegno";
 $l_update_parent = "Modifica Sub-Impegno";
 $l_delete_parent = "Elimina Sub-Impegno";
 $l_affect = "Affect";
-$l_parentdeal_deal_new = "Crea nuovo impegno";
 
 $l_link_contract = "The deal is involved in these contracts";
 $l_link_contract_no = "The deal isn't involved in any contracts";
@@ -105,6 +102,7 @@ $l_kind_delete = "Elimina Tipo";
 $l_kind_can_delete = "Tipo può essere eliminato!";
 $l_kind_cant_delete = "Tipo non può essere eliminato!";
 $l_kind_link_deal = "Tipo è richiesto in questi Impegni";
+$l_kind_link_deal_no = "Tipo no è richiesto in Impegni";
 $l_kind_update = "Modifica Tipo";
 $l_kind_insert = "Inserisci Tipo";
 $l_status_update = "Modifica State";
@@ -113,12 +111,14 @@ $l_status_delete = "Elimina Status";
 $l_status_can_delete = "Status può essere eliminato";
 $l_status_cant_delete = "Status non può essere eliminato";
 $l_status_link_deal = "Status necessario in questi Impegni";
+$l_status_link_deal_no = "Status no è richiesto in Impegni";
 $l_status_insert = "Inserisci Status";
 $l_cat_checkdelete = "Controlla o Elimina Categoria";
 $l_cat_delete = "Elimina Categoria";
 $l_cat_can_delete = "Categoria eliminabile";
 $l_cat_cant_delete = "Categoria NON può essere eliminata";
 $l_cat_link_deal = "Categoria richiesta per questi Impegni";
+$l_cat_link_deal_no = "Categoria no richiesta in Impegni";
 $l_cat_update = "Modifica Categoria";
 $l_cat_insert = "Inserisci Categoria";
 

@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.7.0pre1";
+$obm_version = "0.7.0pre2";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -550,12 +550,12 @@ function display_record_info($uc_id, $uu_id, $tc, $tu) {
   if ($uc_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
-    $created = "<img src=\"/images/$set_theme/$ico_created\"> ".$obm_q->f("userobm_login")." : ".datetime_format($p_timecreate);
+    $created = "<img src=\"/images/$set_theme/$ico_created\"> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
   }
   if ($uu_id != "") {
     $obm_q->query($query_updated);
     $obm_q->next_record();
-    $updated = "<img src=\"/images/$set_theme/$ico_updated\"> " . $obm_q->f("userobm_login") . " : ". datetime_format($p_timeupdate);
+    $updated = "<img src=\"/images/$set_theme/$ico_updated\"> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
   }
 
   $block = "<div class=\"detailInfo\">$created<br />$updated

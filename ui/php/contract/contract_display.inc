@@ -12,7 +12,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 $fieldnames["contract_label"] = $l_label;
-$fieldnames["contract_company_name"] = $l_contract_company;
+$fieldnames["contract_company_name"] = $l_company;
 $fieldnames["contract_number"] = $l_number;
 $fieldnames["contract_dateexp"] = $l_contract_exp ;
 $fieldnames["contracttype_label"] = $l_contract_contracttype;
@@ -109,59 +109,42 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
-    <form method=\"get\" name=\"form_contract\" 
-    onsubmit=\"if (check_search_form(this) == false) return false;
-    else return true;\" action=\"".url_prepare("contract_index.php")."\">
+  $block = "
+  <form method=\"get\" name=\"form_contract\" 
+  onsubmit=\"if (check_search_form(this) == false) return false;
+  else return true;\" action=\"".url_prepare("contract_index.php")."\">
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">$l_deal</td>
-      <td>&nbsp;&nbsp;&nbsp;</td>
+  <div class=\"search\">
+    <div class=\"searchLabel\">$l_number<br />
+      <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
+    </div>
+    <div class=\"searchLabel\">$l_company<br />
+      <input name=\"tf_company_name\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
+    </div>
+    <div class=\"searchLabel\">$l_after<br />
+      <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
+    </div>
+    <div class=\"searchLabel\">$l_before<br />
+      <input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$p_datebefore\" />
+    </div>
+    <div class=\"searchLabel\">$l_label_libelle<br />
+      <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$p_label\" />
+    </div>
+    <div class=\"searchLabel\">$l_kind<br />
+      $dis_cont_typ
+    </div>
+    <div class=\"searchLabel\">$l_technical_manager<br />
+      $dis_resp_tec
+    </div>
+    <div class=\"searchButton\">&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </div>
+    <div class=\"searchEnd\"></div>
+  </div>
+  </form>";
 
-      <td>
-      <table class=\"detail\">   
-      <tr>
-        <td class=\"textLabelForm\">$l_number<br />
-          <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
-        </td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_company<br />
-          <input name=\"tf_company_name\" size=\"20\" maxlength=\"20\"
-            value=\"$comp\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_after<br />
-          <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
-        </td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_before<br />
-          <input type=\"text\" name=\"tf_datebefore\" size=\"10\"
-            value=\"$p_datebefore\" /></td>
-      </tr>
-      </table>
-      <table class=\"detail\">
-      <tr>
-        <td class=\"textLabelForm\">$l_label_libelle<br />
-          <input type=\"text\" name=\"tf_label\" size=\"20\"
-            value=\"$p_label\" /></td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">&nbsp;&nbsp;$l_kind<br />
-          $dis_cont_typ</td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_technical_manager<br />
-          $dis_resp_tec</td>
-      </tr>
-      </table>
-
-      </td>
-      <td>
-        <input name=\"action\" type=\"hidden\" value=\"search\" />
-        <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-      </td>
-    </tr>
-    </table>
-    </form>
-    <hr />";
+  return $block;
 }
 
 
@@ -173,30 +156,32 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contract_search_list($contract) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $display, $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contract");
   $obm_q = run_query_search($contract, $new_order, $order_dir);
   $nb_contract = $obm_q->num_rows();
   if ($nb_contract == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    html_contract_search_list($obm_q,$pref_q,$nb_contract,$contract);
+    $block = html_contract_search_list($obm_q,$pref_q,$nb_contract,$contract);
   }
+
+  return $block;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Contract Search result                                   //
 // Parameters :
-//   - $contract_q  : contracts list
-//   - $pref_q      : fields to display in the contracts list
-//   - $nb_contract : nb contract found
-//   - $contract[]  : contract search criteria
-//     keys used    : label, type, dateafter, datebefore, company_name, market
+//   - $contract_q : contracts list
+//   - $pref_q     : fields to display in the contracts list
+//   - $nb_con     : nb contract found
+//   - $contract[] : contract search criteria
+//     keys used   : label, type, dateafter, datebefore, company_name, market
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($contract_q, $pref_q, $nb_contract,$contract) {
-  global $l_found;
+function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
+  global $display, $l_found;
 
   $num = urlencode($contract["number"]); 
   $label = urlencode($contract["label"]);
@@ -218,8 +203,49 @@ function html_contract_search_list($contract_q, $pref_q, $nb_contract,$contract)
 
   // --- html template --------------------------------------------------------
 
-  display_info_msg($nb_contract." ".$l_found);
-  $dis_contracts_list->display("dis_data_contract");
+  $display["msg"] .= display_info_msg($nb_con." ".$l_found);
+  $block = $dis_contracts_list->display("dis_data_contract");
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contract links menu                                              //
+// Parameters:
+//   - $id         : contract id
+//   - $deal_id    : deal id
+//   - $deal_label : deal label
+// Returns:
+//   $r : string with HTML code
+///////////////////////////////////////////////////////////////////////////////
+function html_contract_links($id, $deal_id, $deal_label) {
+  // -- Themes
+  global $set_theme, $ico_incident, $ico_deal;
+  // -- Labels
+  global $l_header_incident, $l_incident_list, $l_incident_new, $l_header_deal;
+  global $perms_user, $path, $auth;
+
+  $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
+  $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id");
+  $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
+
+  $block = "<div class=\"link\">
+  <div class=\"linkTitle\">:: $l_header_incident</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_inc\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+        <a href=\"$url_inc\">$l_incident_list</a></li>
+    <li><a href=\"$url_inc_new\"><img src=\"/images/$set_theme/$ico_incident_new\" /></a>
+        <a href=\"$url_inc_new\">$l_incident_new</a></li>
+  </ul>
+  <div class=\"linkTitle\">:: $l_header_deal</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+        <a href=\"$url_deal\">$deal_label</a></li>
+  </ul>
+</div>";
+
+  return $block;
 }
 
 
@@ -229,11 +255,11 @@ function html_contract_search_list($contract_q, $pref_q, $nb_contract,$contract)
 //   - $contract_q : information about the contract
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_consult($contract_q) {
-  global $path, $set_theme;
-  global $ico_company,$ico_contact,$ico_incident, $ico_deal;
+  global $path, $set_theme, $display;
+  global $ico_company,$ico_contact, $ico_deal;
   global $l_update,$l_delete,$l_insert;
   global $l_label,$l_date_init,$l_kind,$l_clause,$l_marketing_manager,$l_technical_manager,$l_last_update,$l_comment,$l_at,$l_number,$l_dateexp,$l_client_manager;
-  global $l_incident_list,$l_incident_new, $l_contract,$l_contract_company;
+  global $l_contract, $l_company, $l_deal;
 
   $id = $contract_q->f("contract_id");
   $label = $contract_q->f("contract_label");
@@ -272,93 +298,88 @@ function html_contract_consult($contract_q) {
 
 
   // --- HTML Template --------------------------------------------------------
-//////////////////
-//Liens Externes//
-//////////////////
-  echo "
+
+  $display["link"] = html_contract_links($id, $deal_id, $deal_label);
+
+  $block = "
+  <div class=\"detailHead\">$l_company</div>
+
     <table class=\"detail\">
     <tr>
-    <td rowspan=\"25\"> 
-      <a href=\"".url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id")."\">
-      <img border=\"0\"  src=\"/images/$set_theme/$ico_incident\"></a>
-      <font size=\"-1\">
-      <a href=\"" . url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id") . "\">
-      $l_incident_list</a></font>
-      <br />
-      <a href=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id") . "\">
-      <img border=\"0\" src=\"/images/$set_theme/$ico_incident\"></A>
-      <font size=\"-1\"><a href=\"" . url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&tf_lcontract=$label") . "\">
-      $l_incident_new</a></font>
-      <br />
-      <font size=\"-1\"><a href=\"" . url_prepare("$path/deal_index.php?action=detailconsult&param_deal=$deal_id") . "\">
-      <img border=0  src=\"/images/$set_theme/$ico_deal\"></a></font>
-      <font size=-1><a href=\"" . url_prepare("$path/deal/deal_index.php?action=detailconsult&param_deal=$deal_id") . "\">$deal_label</a></font>
+      <td class=\"detailLabel\">$comp_name
+        <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
       </td>
-    </tr>";
-//////////////////////
-//Fin Liens Externes//
-//////////////////////
-echo "
+      <td class=\"detailText\">$comp_address1
+        <br />$comp_zip $comp_town
+      </td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_client_manager 1
+        <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
+        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+      </td>
+      <td class=\"detailText\">$con1</td> 
+    </tr><tr>
+      <td class=\"detailLabel\">$l_client_manager 2
+        <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
+        <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+      </td>
+      <td class=\"detailText\">$con2</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_deal</td>
+      <td class=\"detailText\">
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+      </td>
+    </tr>
+    </table>
 
- <tr>
-   <td class=\"detailHead\" colspan=\"2\">$l_contract_company</td>
- </tr><tr>
-  <td class=\"detailLabel\">$comp_name
-   <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-   <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-  </td>
-  <td class=\"detailText\">$comp_address1
-    <br />$comp_zip $comp_town
-  </td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_client_manager 1</td>
-  <td class=\"detailText\">$con1
-     <a href=\"".
-      url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
-      <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
-   </td> 
- </tr><tr>
-  <td class=\"detailLabel\">$l_client_manager 2</td>
-  <td class=\"detailText\">$con2
-    <a href=\"".
-      url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
-    <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a></td>
- </tr><tr>
-   <td class=\"detailHead\" colspan=\"2\">$l_contract</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_label</td>
-  <td class=\"detailText\">$label</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_number</td>
-  <td class=\"detailText\">$number</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_date_init</td>
-  <td class=\"detailText\">$datebegin</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_dateexp</td>
-  <td class=\"detailText\">$dateexp</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_kind</td>
-  <td class=\"detailText\">$type</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_marketing_manager</td>
-  <td class=\"detailText\">$market</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_technical_manager</td>
-  <td class=\"detailText\">$tech</td>
- </tr><tr>
-  <td class=\"detailLabel\">$l_last_update</td>
-  <td class=\"detailText\">$dateu $l_at $timeu</td>
- </tr><tr>
-   <td class=\"detailHead\" colspan=\"2\"> $l_comment</td>
- </tr><tr>
-   <td class=\"detailText\" colspan=\"2\">$com</td>
- </tr><tr> 
-   <td class=\"detailHead\" colspan=\"2\">$l_clause</td>
- </tr><tr>
-   <td class=\"detailText\" colspan=\"2\">$clause</td>
- </tr>
-</table>";
+  <div class=\"detailHead\">$l_contract</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailText\">$label</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$number</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date_init</td>
+      <td class=\"detailText\">$datebegin</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_dateexp</td>
+      <td class=\"detailText\">$dateexp</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$type</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_marketing_manager</td>
+      <td class=\"detailText\">$market</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_technical_manager</td>
+      <td class=\"detailText\">$tech</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_last_update</td>
+      <td class=\"detailText\">$dateu $l_at $timeu</td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailText\" colspan=\"2\">$com</td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_clause</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailText\" colspan=\"2\">$clause</td>
+    </tr>
+    </table>";
+
+  return $block;
 }
 
 
@@ -382,7 +403,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
   global $l_label,$l_date_init,$l_kind,$l_marketing_manager;
   global $l_technical_manager,$l_last_update;
   global $popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp;
-  global $l_contract_select_deal,$l_client_manager,$l_deal_label,$l_contract,$l_contract_company;
+  global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -487,10 +508,9 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $dis_sel_con1.="</select>";
 
   if ($action == "detailupdate") {
-    $dis_sel_con1.="<a href=\"".
-    url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\">";
-    $dis_sel_con1.="<img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
-    }
+    $dis_con1 = "
+      <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+  }
 
   if ($contact_q->nf()>0) {
     $contact_q->seek(0);
@@ -507,113 +527,117 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
     $dis_sel_con2.="</select>";
 
   if ($action == "detailupdate") {
-    $dis_sel_con2.="<a href=\"".
-    url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\">";
-    $dis_sel_con2.="<img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
+    $dis_con2 = "
+      <a href=\"".url_prepare("$path/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
   }
 
+  $dis_sub = "
+    <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp_name\" />
+    <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
+    <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
+    <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
+";
+
   if (($action == "detailupdate") || ($action == "update")) {
-    $dis_sub = "
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    $dis_sub .= "
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp_name\" />
-      <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
-      <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
-      <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
       <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_update\" />
-     ";
+      <input type=\"submit\" value=\"$l_update\" />";
   } else {
-    $dis_sub = "
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-      <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp_name\" />
-      <input type=\"hidden\" name=\"hd_company_ad1\" value=\"$ad1\" />
-      <input type=\"hidden\" name=\"hd_company_zip\" value=\"$zip\" />
-      <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
+    $dis_sub .= "
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
 
   // --- html template --------------------------------------------------------
 
-  echo "  
+  $block = "
   <form method=\"post\" name=\"form_contract\"
     onsubmit=\"if (check_contract(this)) return true; else return false;\" 
     action=\"".url_prepare("contract_index.php")."\">
-  <table class=\"detail\">
-   <tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_contract_company</td>
-   </tr><tr>
-    <td class=\"detailLabel\">
-     $comp_name <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
-     <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-    </td>
-    <td class=\"detailText\">
-        $ad1
+
+  <div class=\"detailHead\">$l_company</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">
+        $comp_name <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id"). "\">
+        <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+      </td>
+      <td class=\"detailText\">$ad1
         <br />$zip $town
-    </td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_client_manager 1</td>
-    <td>$dis_sel_con1</td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_client_manager 2</td>
-    <td>$dis_sel_con2</td>
-   </tr><tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_contract</td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_label</td>
-    <td><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_number</td>
-    <td><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"40\" value=\"$number\" /></td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_date_init</td>
-    <td><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_dateexp</td>
-    <td><input name=\"tf_dateexp\" type=\"text\" size=\"10\" value=\"$dateexp\" /></td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_kind</td>
-    <td>$dis_sel_t</td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_marketing_manager</td>
-    <td>$dis_sel_respc</td>
-   </tr><tr>
-    <td class=\"detailLabel\">$l_technical_manager</td>
-    <td>$dis_sel_respt</td>    
-   </tr><tr>   
-    <td class=\"detailLabel\">
-      $l_deal_label 
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-      <input type=\"hidden\" name=\"deal_new_id\" value=\"$c_new_id\" />
-    </td>
-    <td>
-      <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
-      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"/images/$set_theme/$ico_deal\" alt=\"[Choose Deal]\" /></a>
-      <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-    </td>
-   </tr><tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
-   </tr><tr>
-    <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
-   </tr><tr>
-    <td colspan=\"2\" class=\"detailHead\">$l_clause</td>
-   </tr><tr>
-    <td colspan=\"2\"><textarea name=\"ta_clause\" rows=\"6\" cols=\"72\">$clause</textarea></td>
-   </tr><tr>
-    <td colspan=\"2\" class=\"detailHead\">$dis_sub</td>
-   </tr>
-  </table>
-  <table class=\"detail\">
-   <tr>
-    <td>
-     $dis_button
-    </td>
-   </tr>
-  </table>
+      </td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_client_manager 1 $dis_con1</td>
+      <td class=\"detailForm\">$dis_sel_con1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_client_manager 2 $dis_con2</td>
+      <td class=\"detailForm\">$dis_sel_con2</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_deal 
+        <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+        <input type=\"hidden\" name=\"deal_new_id\" value=\"$c_new_id\" />
+      </td>
+      <td class=\"detailForm\">
+        <a href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id")."\">$deal_label</a>
+        <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
+        <img src=\"/images/$set_theme/$ico_deal\" alt=\"[Choose Deal]\" /></a>
+        <input type=\"text\" name=\"deal_label\" value=\"$deal_label\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+      </td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_contract</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailForm\"><input name=\"tf_label\" type=\"text\" size=\"40\" value=\"$label\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"40\" value=\"$number\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date_init</td>
+      <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_dateexp</td>
+      <td class=\"detailForm\"><input name=\"tf_dateexp\" type=\"text\" size=\"10\" value=\"$dateexp\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailForm\">$dis_sel_t</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_marketing_manager</td>
+      <td class=\"detailForm\">$dis_sel_respc</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_technical_manager</td>
+      <td class=\"detailForm\">$dis_sel_respt</td>    
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailForm\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
+    </tr>
+    </table>
+
+  <div class=\"detailHead\">$l_clause</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailForm\"><textarea name=\"ta_clause\" rows=\"6\" cols=\"72\">$clause</textarea></td>
+    </tr>
+    </table>
+
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_sub</p>
+    </div>
   </form>
 ";
+
+  return $block;
 }
 
 
@@ -623,7 +647,7 @@ function html_contract_form($action,$contract_q,$type_q,$usr_q,$comp_q,$contact_
 //   - $p_id : contract id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
-  global $path, $l_can_delete, $l_cant_delete, $l_back;
+  global $display, $path, $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_incident, $l_link_incident_no;
 
   $delete_ok = true;
@@ -637,13 +661,21 @@ function dis_check_links($p_id) {
     while ($obm_q->next_record()) {
       $iid = $obm_q->f("incident_id");
       $ilabel = $obm_q->f("incident_label");
-      $display_linki .= "<tr><td class=\"detailText\"><a class=\"detail\" href=\"" . url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a></td>
+      $display_linki .= "
+      <tr>
+        <td class=\"detailLabel\"><a class=\"detail\" href=\"" . url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a></td>
       </tr>";
     }
   } else {
     $display_linki = "
-      <tr><td class=\"detailHead\">$l_link_incident_no</td></tr>";
+      <tr>
+        <td class=\"detailHead\">$l_link_incident_no</td>
+      </tr>";
   }
+
+  $block .= "<table class=\"detail\">
+   $display_linki
+   </table>";
 
   $dis_back = "<form name=\"form_back\" method=\"post\"
     action=\"".url_prepare("contract_index.php") ."\">
@@ -653,24 +685,21 @@ function dis_check_links($p_id) {
     </form>";
 
   if ($delete_ok == true) {
-    display_ok_msg($l_can_delete);
-    echo "<table class=\"detail\">
-          <tr><td>
-            <table>
-            <tr>
-              <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
-              <td class=\"detailHead\">$dis_back</td>
-            </tr>
-            </table>
-          </td></tr>";
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   } else {
-    display_warn_msg($l_cant_delete);
-    echo "<table class=\"detail\">
-          <tr><td class=\"detailHead\">$dis_back</td></tr>";
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
   }
-  echo "
-   $display_linki
-   </table>";
+
+  return $block;
 }
 
 
@@ -716,7 +745,7 @@ function html_contract_admin_form($type_q) {
 
   // --- html template --------------------------------------------------------
 
-  echo "
+  $block = "
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">$l_type_manage</td>
@@ -786,8 +815,9 @@ function html_contract_admin_form($type_q) {
    </td>
   </tr>
  </table>
-
 ";
+
+  return $block;
 }
 
 
@@ -799,18 +829,16 @@ function html_contract_admin_form($type_q) {
 function dis_type_links($id) {
   global $l_type_link_contract, $l_type_can_delete, $l_type_cant_delete;
   global $l_type_delete, $l_back;
+  global $display;
 
   $label = get_type_label($id);
   $obm_q = run_query_type_links($id);
 
   if ($obm_q->num_rows() > 0) {
+    $display["msg"] .= display_warn_msg("$label : $l_type_cant_delete");
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_type_cant_delete</td>
-    </tr><tr>
-      <td>&nbsp;</td>
-    </tr><tr>
       <td class=\"detailHead\">$label : $l_type_link_contract</td>
     </tr>";
 
@@ -819,36 +847,48 @@ function dis_type_links($id) {
       $clabel = $obm_q->f("contract_label");
       $dis_link .= "
     <tr>
-      <td class=\"detailText\">
+      <td class=\"detailLabel\">
         <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
       </td>
     </tr>";
     }
 
+    $dis_link .= "
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+        <form name=\"form_back\" method=\"post\"
+          action=\"" .url_prepare("contract_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+    </p>
+    </div>";
+
   } else {
+    $display["msg"] .= display_ok_msg("$label : $l_type_can_delete");
     $dis_link = "
-    <table class=\"detail\">
-    <tr>
-      <td colspan=\"2\" class=\"messageOk\">$label : $l_type_can_delete</td>
-    </tr><tr>
-      <td>
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">
         <form name=\"form_type_delete\".
           method=\"post\" action=\"" . url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"type_delete\" />
         <input type=\"hidden\" name=\"sel_type\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_type\" value=\"$l_type_delete\" />
         </form>
-      </td><td>
+    </p>
+    <p class=\"detailButtons\">
         <form name=\"form_back\" method=\"post\"
           action=\"" .url_prepare("contract_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
-      </td>
-    </tr>
-    </table>";
+    </p>
+    </div>";
   }
-  echo $dis_link;
+
+  return $dis_link;
 }
 
 
@@ -867,7 +907,9 @@ function dis_contract_display_pref($pref_q) {
 
   // --- html template --------------------------------------------------------
 
-  $dis_pref->display();
+  $block = $dis_pref->display();
+
+  return $block;
 }
 
 
@@ -899,25 +941,34 @@ function html_select_contract($con_q, $title, $url="") {
   }
    $display_cont.="</select>";
 
-  // --- html template --------------------------------------------------------
-  echo "
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+  <div class=\"detailHead\">$title</div>
+
+  <form method=\"get\" name=\"form_contr\"
+    onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
+
   <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">
-    <form method=\"get\" name=\"form_contr\"
-          onsubmit=\"if ($jsfunc) return true; else return false;\"
-          action=\"\">
-    $title<br />
-    $display_cont<br />
+  <tr>
+    <td class=\"detailLabel\">
+    $display_cont
+    </td>
+  </tr>
+  </table>
+
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"submit\" value=\"$l_select_contract\" />
-    </form>
-      </td>
-    </tr>
-  </table>
+    </p>
+  </div>
+  </form>
 
   <a href=\"\" onclick='window.close();'>$l_close</a>
 ";
+
+  return $block;
 }
  
 </script>

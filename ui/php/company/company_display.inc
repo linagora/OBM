@@ -1196,7 +1196,7 @@ function html_select_company($comp_q, $title, $url="") {
 
   // Company Select
   $sel_company = "
-    <select name=\"param_company\" size=\"20\" style=\"font-family:fixed\">";
+    <select name=\"param_company\" size=\"20\" style=\"font-family:fixed,courier\">";
   while($comp_q->next_record()) {
     $id = $comp_q->f("company_id");
     $name = $comp_q->f("company_name");
@@ -1209,20 +1209,26 @@ function html_select_company($comp_q, $title, $url="") {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
+  <div class=\"detailHead\">$title</div>
+
+  <form method=\"get\" name=\"form_comp\"
+    onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
+
   <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">
-        <form method=\"get\" name=\"form_comp\"
-          onsubmit=\"if ($jsfunc) return true; else return false;\"
-          action=\"\">
-         $title<p />
-         $sel_company<br />
-         <input type=\"hidden\" name=\"action\" value=\"new\" /><br />
-         <input type=\"submit\" value=\"$l_select_company\" />
-        </form>
-      </td>
-    </tr>
+  <tr>
+    <td class=\"detailLabel\">
+       $sel_company
+    </td>
+  </tr>
   </table>
+
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    <input type=\"hidden\" name=\"action\" value=\"new\" /><br />
+    <input type=\"submit\" value=\"$l_select_company\" />
+    </p>
+  </div>
+  </form>
 
   <a href=\"\" onclick='window.close();'>$l_close</a>
     ";

@@ -9,7 +9,7 @@
 
 // Labels et textes
 $l_contract = "Contrat";
-$l_contract_company = "Société";
+$l_company = "Société";
 $l_contract_contracttype = "Type";
 $l_contract_exp = "Expiration";
 $l_date_alarm_after = "Date Expiration Après";
@@ -20,7 +20,7 @@ $l_incident_list = "Liste des incidents";
 $l_incident_new = "Ajouter un incident";
 
 $l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
-$l_deal_label = "Affaire";
+$l_deal = "Affaire";
 $l_label = "Label";
 $l_label_libelle = "Mot-clef du libellé";
 $l_kind = "Type";
@@ -28,14 +28,11 @@ $l_marketing_manager = "Resp Commercial";
 $l_technical_manager = "Resp Technique";
 $l_client_manager = "Resp Client";
 $l_clause = "Clauses ";
-$l_company = "Nom Société";
 $l_date_init = "Date Debut";
 $l_dateexp = "Date Expiration";
 $l_last_update = "Dernière modification le";
 $l_at = "à";
 $l_number = "Numéro";
-
-$l_add_contract_deal = "Veuillez à présent remplir les champs du contrat lié à l'affaire";
 
 // Actions
 $l_insert = "Enregistrer le Contrat";

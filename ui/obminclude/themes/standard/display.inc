@@ -65,8 +65,6 @@ function display_page(&$display) {
 }
 
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Fonction which perform the menu
 // Parametres:
@@ -392,7 +390,7 @@ function display_last_visited($path="..") {
   }
 
   if ($last_parentdeal_name != "") {
-    $parentdeal_url = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_parentdeal=".$last_parentdeal);
+    $parentdeal_url = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$last_parentdeal);
     $parentdeal_name = substr($last_parentdeal_name,0,30);
     $block .= "<li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/$ico_parentdeal\" /></a>
         <a href=\"$parentdeal_url\">$parentdeal_name</a></li>";

@@ -25,6 +25,8 @@ $l_invalid_data = "Falsche Daten";
 $l_color = "Color";
 
 // OBM_DISPLAY
+$l_entries = "Entries";
+$l_page_res = "Result pages";
 $l_field = "Field";
 $l_displayed = "Displayed";
 $l_order = "Display order";
@@ -120,6 +122,7 @@ $l_header_new = "Neu";
 $l_header_find = "Suche";
 $l_header_delete =  "Word to define";
 
+$l_header_new_child = "Neuer linked Deal";
 $l_header_new_parent = "Neuer Hauptvertrag";
 $l_header_find_parent = "Suche Hauptvertrag";
 $l_header_reconcile =  "Word to define";

@@ -30,6 +30,7 @@ $l_error_visibility = "Le informazioni della pagina sono private - Non consultab
 $l_color = "Colore";
 
 // OBM_DISPLAY
+$l_entries = "Resultati";
 $l_page_res = "Pagine resultati";
 $l_export = "Esporta";
 $l_export_all = "Esporta tuto";
@@ -138,6 +139,7 @@ $l_header_update = "Modifica";
 $l_header_delete =  "Word to define";
 $l_header_display = "Visualizza";
 
+$l_header_new_child = "Nuovo linked Deal";
 $l_header_new_parent = "Nuovo ParentDeal";
 $l_header_find_parent = "Trova ParentDeal";
 

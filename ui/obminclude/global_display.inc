@@ -441,7 +441,7 @@ class OBM_DISPLAY {
   function dis_data_index($url) {
     global $path, $page, $new_order;
     global $set_theme, $set_rows, $set_rows_default;
-    global $l_page_res, $l_export, $l_export_all;
+    global $l_entries, $l_page_res, $l_export, $l_export_all;
     global $ico_export, $ico_export_all, $ico_begin, $ico_end;
 
     $nb_page_dis = 10;
@@ -472,7 +472,7 @@ class OBM_DISPLAY {
     $end_page = $start_page + $nb_page_dis - 1;
     $end_page = min ($end_page, $nb_page); 
 
-    $content = "<div class=\"resultIndex\">$l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
+    $content = "<div class=\"resultIndex\">$l_entries # $nb_rows &nbsp; &nbsp; &nbsp; $l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
 
     // Rewind to 1st page
     if ($page > 1) {

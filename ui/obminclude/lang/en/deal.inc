@@ -57,7 +57,6 @@ $l_at = "at";
 $l_deal_select_company = "Select the company which whom the deal must be filled";
 $l_deal_select_parentdeal = "Select the parentdeal to which the deal must be affected";
 $l_affect_deal= "Change Parent Deal";
-$l_invoices = "Invoice(s)";
 $l_no_invoice = "No invoice connected";
 $l_invoice_new = "New invoice";
 $l_archived_invoices = " Archived Invoices";
@@ -75,7 +74,6 @@ $l_category_label="Label";
 $l_category_minilabel="Mini Label";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_add_contrat = "Add a contract";
-$l_contracts = "Contracts";
 $l_contract_new = "New contract";
 
 // Titles
@@ -92,7 +90,6 @@ $l_insert_parent = "Insert the ParentDeal";
 $l_update_parent = "Update the ParentDeal";
 $l_delete_parent = "Delete the ParentDeal";
 $l_affect = "Affect";
-$l_parentdeal_deal_new = "Create a new deal";
 
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
@@ -149,6 +146,7 @@ $l_kind_delete_ok = "The kind has been deleted successfully.";
 $l_kind_can_delete = "The Kind can be deleted !";
 $l_kind_cant_delete = "The Kind can't be deleted !";
 $l_kind_link_deal = "The Kind is involved in these deals";
+$l_kind_link_deal_no = "The Kind is not involved in any deal";
 $l_status_insert_ok = "The state has been inserted successfully.";
 $l_status_insert_error = "The insertion of the state has failed !";
 $l_status_update_ok = "The State has been updated successfully.";
@@ -158,6 +156,7 @@ $l_status_delete_ok = "The state has been deleted successfully.";
 $l_status_can_delete = "The Status can be deleted";
 $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";
+$l_status_link_deal_no = "The Status is not involved in any deals";
 $l_cat_insert_ok = "The category has been inserted successfully.";
 $l_cat_insert_error = "The insertion of the category has failed !";
 $l_cat_update_ok = "The category has been updated successfully.";
@@ -167,6 +166,7 @@ $l_cat_delete_ok = "The category has been deleted successfully.";
 $l_cat_can_delete = "The Category can be deleted";
 $l_cat_cant_delete = "The Category can't be deleted";
 $l_cat_link_deal = "The Category is involved in these deals";
+$l_cat_link_deal_no = "The Category is not involved in any deals";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";

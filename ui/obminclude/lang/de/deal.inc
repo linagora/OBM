@@ -88,8 +88,6 @@ $l_insert_parent = "anlegen Hauptvertrag";
 $l_update_parent = "ändern Hauptvertrag";
 $l_delete_parent = "löschen Hauptvertrag";
 $l_affect = "zuordnen";
-$l_parentdeal_deal_new = "Vertrag anlegen";
-
 
 $l_type_delete = "Delete Kind";
 $l_type_update = "Update Kind";
@@ -102,10 +100,8 @@ $l_category_update = "Update Category";
 $l_category_insert = "Insert Category";
 
 
-
 // Messages
 
-$l_parentdeal_del_verif_error = " Verträge sind noch vorhanden: Haupvertrag kann nicht gelöscht werden";
 $l_updateaffect_ok = "Vertrag zugeordnet";
 $l_found = "Verträge gefunden";
 $l_no_found = "No Vertrag found matching the query !";

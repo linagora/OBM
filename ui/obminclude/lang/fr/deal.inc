@@ -57,7 +57,6 @@ $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
 $l_deal_select_parentdeal = "Sélectionner la surAffaire à laquelle l'affaire doit être affectée";
 $l_affect_deal = "Affecter à une surAffaire";
-$l_invoices = "Factures";
 $l_no_invoice = "Aucune Facture en cours associée";
 $l_invoice_new = "Nouvelle facture";
 $l_archived_invoices = "Factures archivées";
@@ -80,7 +79,6 @@ $l_invoice_TTC = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
-$l_contracts = "Contrats";
 $l_contract_new = "Nouveau contrat";
 
 // Titres
@@ -99,7 +97,6 @@ $l_affect = "Affecter";
 $l_insert_parent = "Enregistrer SurAffaire";
 $l_update_parent = "Modifier SurAffaire";
 $l_delete_parent = "Supprimer SurAffaire";
-$l_parentdeal_deal_new = "Créer nouvelle affaire";
 
 $l_kind_checkdelete = "Vérifier ou Supprimer le Type";
 $l_kind_delete = "Supprimer le Type";
@@ -153,6 +150,7 @@ $l_kind_delete_ok = "La suppression du type a été correctement effectuée.";
 $l_kind_can_delete = "Le type peut être supprimé";
 $l_kind_cant_delete = "Le type ne peut être supprimé";
 $l_kind_link_deal = "Le type est référencé par ces affaires";
+$l_kind_link_deal_no = "Le type n'est pas référencé dans les affaires";
 $l_status_insert_ok = "L'insertion de l'état a été correctement effectuée.";
 $l_status_insert_error = "L'insertion de l'état a échoué !";
 $l_status_update_ok = "La modification de l'état a été correctement effectuée";
@@ -162,6 +160,7 @@ $l_status_delete_ok = "La suppression de l'état a été correctement effectuée.";
 $l_status_can_delete = "L'état peut être supprimé";
 $l_status_cant_delete = "L'état ne peut être supprimé";
 $l_status_link_deal = "L'état est référencé par ces affaires";
+$l_status_link_deal_no = "L'état n'est pas référencé dans les affaires";
 $l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
 $l_cat_insert_error = "L'insertion de la catégorie a échoué !";
 $l_cat_update_ok = "La modification de la catégorie a été correctement effectuée";
@@ -171,6 +170,7 @@ $l_cat_delete_error = "La suppression de la catégorie a échoué !";
 $l_cat_can_delete = "La catégorie peut être supprimée";
 $l_cat_cant_delete = "La catégorie ne peut être supprimée";
 $l_cat_link_deal = "La catégorie est référencée par ces affaires";
+$l_cat_link_deal_no = "La catégorie n'est pas référencée dans les affaires";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";

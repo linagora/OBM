@@ -612,15 +612,15 @@ function html_priority_form($pri_q) {
 
   // Priority select construction
   $sel_pri = "<select name=\"sel_priority\" onChange=\"
-    text = this.options[this.selectedIndex].text;
-    pos = text.indexOf('(');
-    col = text.substr(pos+1);
+    mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf('(');
+    col = mytext.substr(pos+1);
     pos2 = col.indexOf(')');
     col = col.substr(0,pos2);
-    text = text.substr(0, pos);
-    pos = text.indexOf('-');
-    forms.form_pri_update.tf_pri.value=text.substr(pos+1);
-    forms.form_pri_update.tf_order.value=text.substr(0,pos);
+    mytext = mytext.substr(0, pos);
+    pos = mytext.indexOf('-');
+    forms.form_pri_update.tf_pri.value=mytext.substr(pos+1);
+    forms.form_pri_update.tf_order.value=mytext.substr(0,pos);
     forms.form_pri_update.tf_color.value=col;\"
     size=\"4\" >";
   while ($pri_q->next_record()) {
@@ -747,10 +747,10 @@ function html_status_form($sta_q) {
 
   // Status select construction
   $sel_sta = "<select name=\"sel_status\" onChange=\"
-    text = this.options[this.selectedIndex].text;
-    pos = text.indexOf('-');
-    forms.form_status_update.tf_status.value=text.substr(pos+1);
-    forms.form_status_update.tf_order.value=text.substr(0,pos);\"
+    mytext = this.options[this.selectedIndex].text;
+    pos = mytext.indexOf('-');
+    forms.form_status_update.tf_status.value=mytext.substr(pos+1);
+    forms.form_status_update.tf_order.value=mytext.substr(0,pos);\"
    size=\"4\">";
   while ($sta_q->next_record()) {
     $id = $sta_q->f("incidentstatus_id");

@@ -34,6 +34,7 @@ $l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
 $l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
 
 // OBM_DISPLAY
+$l_entries = "Entrées";
 $l_page_res = "Pages de résultat";
 $l_export = "Exporter";
 $l_export_all = "Tout exporter";
@@ -127,6 +128,7 @@ $l_header_update = "Modifier";
 $l_header_display = "Affichage";
 $l_header_delete = "Supprimer";
 
+$l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";
 
 $l_header_global_export = "Export";

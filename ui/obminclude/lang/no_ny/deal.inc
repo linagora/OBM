@@ -90,7 +90,6 @@ $l_insert_parent = "Insert the ParentDeal";
 $l_update_parent = "Update the ParentDeal";
 $l_delete_parent = "Delete the ParentDeal";
 $l_affect = "Affect";
-$l_parentdeal_deal_new = "Create a new deal";
 
 
 $l_type_delete = "Delete Kind";
@@ -104,7 +103,6 @@ $l_category_update = "Update Category";
 $l_category_insert = "Insert Category";
 
 // Messages
-$l_parentdeal_del_verif_error = " deal(s) are attached to this parentDeal : it can't be deleted";
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
 $l_error_visibility = "You can't consult this page : the information is private.";
 $l_no_display = "Skriv inn søkekriteria og trykk < Finn > for å finne avtalane";
