@@ -569,7 +569,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
   $inout = $invoice["inout"];
   $deal = urlencode($invoice["deal"]);
   $company = urlencode($invoice["company"]);
-
+  $archive=$invoice["archive"];
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -578,7 +578,8 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice,
 		    "&amp;tf_amount_TTC=$amount_TTC".
 		    "&amp;sel_status=$status".
 		    "&amp;tf_deal=$deal".
-		    "&amp;rd_inout=$inout"); 
+		    "&amp;rd_inout=$inout".
+		    "&amp;cb_archive=$archive"); 
 
   $dis_invoice = new OBM_DISPLAY ("DATA", $q_display_options, "invoice");
   $dis_invoice->data_set = $q_invoices;
