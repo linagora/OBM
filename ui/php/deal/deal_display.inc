@@ -291,6 +291,8 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   $obm_q_deals->seek($first_row);
   
+  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q);
   $dis_deals_list->data_set = $obm_q_deals;
   $dis_deals_list->data_url = $url;
@@ -300,7 +302,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   echo "<FONT color=\"#$col_textem\">$nb_deal $l_found</FONT><BR>";
 
-  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
   $dis_deals_list->display();
 
 }

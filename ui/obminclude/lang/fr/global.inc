@@ -153,4 +153,4 @@ $l_header_new_event = "Nouveau rdv";
 //TIME
 $l_header_time = "Gestion temps" ;
 $l_header_stats = "Statistiques";
-$l_header_base = "Base";
+$l_header_month = "Vue mensuelle";

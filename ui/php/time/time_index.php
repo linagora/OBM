@@ -93,7 +93,6 @@ if ($popup != 2) {
   get_time_actions();
 }
 
-require("time_js.inc");
 if ($action == "" ) $action = "index";
 get_time_actions();
 $perm->check("user");
@@ -422,16 +421,16 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 
 function get_time_actions() {
-  global $l_header_stats, $l_header_base;
+  global $l_header_stats, $l_header_month;
 global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
 //Index
 
   $actions["TIME"]["index"] = array (
-	'Name'     => "$l_header_base",
+	'Name'     => "$l_header_month",
     'Url'      => "$path/time/time_index.php?action=index",
     'Right'    => $time_read,
-    'Condition'=> array ('search', 'stats','admin') 
+    'Condition'=> array('all') 
                                     );
 
 //Search
