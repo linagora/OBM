@@ -1155,7 +1155,7 @@ function dis_repository_rec($document,$repository,$display_file) {
    $js_int <img id=\"img_$relative_path\" src=\"$img\" alt=\"\" />$js_int2 
    $link_repo $ind $name $link_repo_end
   </div>";
-  $block .= "<div id=\"$relative_path\" style=\"visibility:hidden;height:1px;\" class=\"documentBox\">";
+  $block .= "<div id=\"$relative_path\" style=\"display:none;\" class=\"documentBox\">";
 
   foreach($repos as $path) {
     $block .= dis_repository_rec($document,$path,$display_file);

@@ -166,7 +166,7 @@ function run_query_insert(&$document) {
     $mime = run_query_get_mime($document);
     $document["mime"] = $mime;
   }
-  if($name == "") {
+  if($name == "" && $kind != "link") {
     $name = substr($path,strrpos($path,'/')+1);
     $document["name"]=$name;
     $path = substr($path,0,strrpos($path,'/'));
@@ -508,7 +508,7 @@ function run_query_update($did, &$document) {
     $size=$file_info["size"];
     $document["size"] = $size ;
   }
-  if($name == "") {
+  if($name == "" && $kind != "link") {
     $name = substr($path,strrpos($path,'/')+1);
     $document["name"]=$name;
     $path = substr($path,0,strrpos($path,'/'));

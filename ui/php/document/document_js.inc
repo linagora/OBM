@@ -166,14 +166,14 @@ W3C = (document.getElementById) ? 1 : 0;
 function show_hide_repo(name)
 {
   if (W3C) {
-    if(document.getElementById(name).style.visibility != \"hidden\") {
+    if(document.getElementById(name).style.display != \"none\") {
       hide(name);
      }
      else{
         show(name);
      }
   } else if (NS4) {
-    if(document.layers[name].visibility != \"hide\") {
+    if(document.layers[name].display != \"none\") {
       hide(name);
     }
     else{
@@ -181,7 +181,7 @@ function show_hide_repo(name)
      }
 
   } else {
-    if(document.all[name].style.visibility != \"hidden\") {
+    if(document.all[name].style.display != \"none\") {
        hide(name);
     }
     else{
@@ -194,15 +194,15 @@ function show_hide_repo(name)
 
 function hide ( name ) {
   if (W3C) {
-    document.getElementById(name).style.visibility = \"hidden\";
+    document.getElementById(name).style.display = \"none\";
     document.getElementById(name).style.height = \"0px\";
     document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_close\";    
   } else if (NS4) {
-    document.layers[name].visibility = \"hide\";
+    document.layers[name].display = \"hide\";
     document.layers[name].height = \"0px\";
     document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";    
   } else {
-    document.all[name].style.visibility = \"hidden\";
+    document.all[name].style.display = \"none\";
     document.all[name].style.height = \"0px\";
     document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_close\";
   }
@@ -210,15 +210,15 @@ function hide ( name ) {
 
 function show ( name ) {
   if (W3C) {
-    document.getElementById(name).style.visibility = \"\";
+    document.getElementById(name).style.display = \"\";
     document.getElementById(name).style.height = \"auto\"; 
     document.getElementById('img_'+name).src = \"/images/$set_theme/$ico_directory_open\";
   } else if (NS4) {
-    document.layers[name].visibility = \"\";
+    document.layers[name].display = \"\";
     document.layers[name].height = \"auto\";
     document.layers['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
   } else {
-    document.all[name].style.visibility = \"\";
+    document.all[name].style.display = \"\";
     document.all[name].style.height = \"auto\";
     document.all['img_'+name].src = \"/images/$set_theme/$ico_directory_open\";
   }
@@ -289,6 +289,7 @@ if(isset($ext_target)) {
   ";
 }
 echo "
+-->
 </script>
 ";
 </SCRIPT>
