@@ -1,25 +1,24 @@
-<HTML>
-<HEAD>
-<TITLE> OBM Development Guidelines </TITLE>
-</HEAD>
-<BODY BGCOLOR="#FFFFFF">
+<html>
+<head>
+<title> OBM Development Guidelines </title>
+</head>
+<body bgcolor="#FFFFFF">
 
-<A HREF="index.html">back</A>
+<a href="index.html">back</a>
 
-<CENTER>
-<H1>OBM Development Guidelines</H1>
-<I>Coding standards now mandatory to harmonize the OBM code</I><BR>
-Version 0.5.3 - 2002-08-16<BR>
+<center>
+<h1>OBM Development Guidelines</h1>
+<i>Coding standards now mandatory to harmonize the OBM code</i><br>
+Version 0.6.0 - 2002-08-30<BR>
 Pierre Baudracco
-</CENTER>
-<P>
+</center>
+<p>
 
-<H2>Introduction</H2>
+<h2>Introduction</h2>
 As OBM is evolving towards a more ambitious and complex application, we need
 more rigorous coding standards.
-<P>
+<p>
 This document describes what is now <b>mandatory</b> coding rules for OBM code.
-
 
 
 <h2>OBM Files</h2>
@@ -28,7 +27,7 @@ This document describes what is now <b>mandatory</b> coding rules for OBM code.
 OBM is a web application and so is deployed on Internet/Intranet servers.
 These servers are often accessed from distant computers (via telnet, ssh,...)
 so OBM code has to be readable from a terminal in 80 col mode.
-<P>
+<p>
 OBM line separators (comments, headers,...) should always be <b>79 chars</b> long and never more.
 <p>
 Indentation should be <b>2 characters</b> steps.
@@ -101,7 +100,7 @@ Each OBM file should have an header as described below :
 
 
 <h2>Module Structure</h2>
-OBM is divided into application modules (and soon sections, a section beeing a set of modules).
+OBM is divided into application sections and modules. A section beeing a set of modules).
 <p>
 Each module must be divided into 4 files :
 <ul type=disc>
@@ -224,6 +223,7 @@ Here is a correct module_index.php variable definition :
 <tr><td>
 <pre>
 $path = "..";
+$section = "COM";
 $menu = "COMPANY";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -233,7 +233,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 <P>
 
 <h3>Included files : how to, order</h3>
-There is 3 global files which are included in all OBM module :
+There is 3 global files which must be included in all OBM module :
 <p>
 <ul type=disc>
          <li> <b>(1)</b> obmlib.inc
@@ -253,7 +253,7 @@ This order must be respected in all module.<br><br>
   </td>
 </tr><tr>
   <td>global.inc</td>
-  <td>This file define the global variables. In the settings module and in obm.php it must be included <i><u>before</u></i>
+  <td>This file define the global variables. It loads two other includes : <b>global_display.inc</b> and <b>global_query.inc</b>. In the settings module and in obm.php it must be included <i><u>before</u></i>
       the call of page_open(). In the other case it could be defined before or after page_open().
       For more homogenity we decided to include it before the call of page_open() in any case.
   </td>
@@ -486,7 +486,7 @@ function display_debug_msg($msg, $debug=0) {
 
 
 <!-- ---------------------------------------------------------------------- -->
-<H2>Date handling</H2>
+<h2>Date handling</h2>
 
 OBM allow different date representation depending on the user current language.
 <br>
@@ -566,8 +566,30 @@ Each language global.inc can hence define its version:
 
 <p>
 
+<!-- ---------------------------------------------------------------------- -->
+<h2>Expressions régulières</h2>
 
-<H2>Variables Names</H2>
+PHP propose 2 types d'expressions régulières :
+<p>
+<table border=1>
+<tr>
+  <th>Type</th>
+  <th>Préfixe des fonctions</th>
+</tr><tr>
+  <td>PCRE (Perl compatible regular expression)</td>
+  <td>preg_</td>
+</tr><tr>
+  <td>Regexps (Posix extended)</td>
+  <td>ereg_ ou eregi_</td>
+</tr>
+</table>
+<p>
+Dans OBM, les expressions régulières utilisées doivent être de type <b>PCRE</b>
+pour des raisons de fonctionnalités et performances.
+
+
+<!-- ---------------------------------------------------------------------- -->
+<h2>Variables Names</h2>
 Variables names must be explicit without beeing exhaustive.
 <BR>
 Ex: $param_theme. No $a, $i, $tp neither $parameter_theme_for_settings_screen.
