@@ -22,6 +22,10 @@ $last_payment_default = 0;
 $last_contract_default = 0;
 $last_incident_default = 0;
 
+
+// Document constants 
+$link_to = "Link : "; // Name of the prefix of a link document
+
 // Agenda constants
 $set_weekstart_default = "monday"; //First day of the week, in english
 $set_start_time = '8'; // first hour of the day

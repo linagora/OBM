@@ -159,25 +159,42 @@ function run_query_insert(&$document) {
   $path = $document["path"];
   $size = $document["size"];
   $kind = $document["kind"];
+  $url = $document["url"];
+  $kind = $document["kind"];  
 
+  if($kind == "link") {
+    $name = $url;
+    $document["name"]=$name;
+  }
   
   if($size == "") $size = 0;
+  
   if($mime == $c_auto) {
     $mime = run_query_get_mime($document);
     $document["mime"] = $mime;
   }
-  if($name == "" && $kind != "link") {
+
+  if($kind == "file") {
     $name = substr($path,strrpos($path,'/')+1);
     $document["name"]=$name;
     $path = substr($path,0,strrpos($path,'/'));
     $document["path"]=$path;
-  }    
+    $file_info = stat($document_path.'/'.$path);
+    $size=$file_info["size"];
+    $document["size"] = $size ;
+  }
+
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
-  $kind = $document["kind"];  
+
   if($kind == "new_file") {
     if(!run_query_create_file($document)) 
       return false;
   }
+  elseif($kind == "link") {
+    if(!run_query_create_link($document)) 
+      return false;
+  }
+
   $query = "insert into Document (
     document_timeupdate,
     document_timecreate,
@@ -234,13 +251,14 @@ function run_query_get_mime($document){
       return $return;
     }
   }
-  if(strrpos($path,'/') == (strlen($path) -1) && $kind == "link") {
+  if(strrpos($file,'/') == (strlen($file) -1) && $kind == "link") {
     $return = run_query_get_type_by_ext("html");
     if($return) {
       return $return;
     }
   }
-  if($kind != "new_file") {
+  
+  if($kind == "file") {
     $ext = substr($path,strrpos($path,'/'));
     $ext = substr(strrchr($path,'.'),1);
     $return = run_query_get_type_by_ext($ext);
@@ -248,7 +266,15 @@ function run_query_get_mime($document){
       return $return;
     }
   }
-  
+  else{
+    $ext = substr($name,strrpos($name,'/'));
+    $ext = substr(strrchr($name,'.'),1);
+    $return = run_query_get_type_by_ext($ext);
+    if($return) {
+      return $return;
+    }
+  }
+
   $return = run_query_get_type_by_ext("html");
   return $return ;
 }
@@ -373,6 +399,53 @@ function run_query_create_file($document) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// Insertion query execution                                                 //
+// Parameters:
+//   - $document[] : Entry's values
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+
+function run_query_create_link($document) {
+  global $document_path,$link_to;
+  $path = $document["path"];
+  $title = $document["title"];
+  $name  = $document["name"];
+
+  
+  if(strpos($path,'/') === 0) {
+    $final_path = $document_path.$path;
+  }
+  else {
+    $final_path = $document_path.'/'.$path;
+  }
+  
+  if(!is_dir($final_path)) {
+    return false;
+  }
+
+  if(strrpos($finalpath,'/') == (strlen($finalpath) -1)) {
+    $directory = $final_path.$title;
+  }
+  else {
+    $directory = $final_path.'/'.$link_to.$title;
+  }
+  $handler = fopen($directory,"w+");
+  if($handler == false) 
+  return false;
+  $success = fwrite($handler,$name); 
+  if(!$success) {
+    fclose($handler);
+    return false;
+  }
+  $success = fclose($handler);
+  if(!$success)
+  return false;
+  return true;
+  
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Document Form Data checking and formatting                                 //
 // Parameters:
 //   - $cid   : document id
@@ -401,8 +474,13 @@ function check_data_form($cid, $document) {
     $final_path = $document_path.'/'.$path;
   }
    
-  
   if($kind == "new_file" && !is_dir($final_path)) {
+    $err_msg = $l_invalid_repository_path;
+    return false;
+  }
+  
+  $realpath = realpath($final_path);
+  if(substr($realpath,0,strlen($document_path)) != $document_path) {
     $err_msg = $l_invalid_repository_path;
     return false;
   }
@@ -420,7 +498,6 @@ function check_data_form($cid, $document) {
     }
   }
 
-   
   // MANDATORY: Document Title 
   if (trim($title) == "") {
     $err_msg = $l_fill_title;
@@ -432,8 +509,6 @@ function check_data_form($cid, $document) {
     $err_msg = $l_fill_author;
     return false;
   }
-
-
 
   return true; 
 }
@@ -516,24 +591,43 @@ function run_query_update($did, &$document) {
   $size = $document["size"];
   $name = $document["name"];
   $kind = $document["kind"];
+  $url = $document["url"];
 
+  
   $privacy = (isset($document["privacy"]) ? $document["privacy"] : '0');
+
+
+  if($size == "") $size = 0;
+  
+  if($kind == "link") {
+    $name = $url;
+    $document["name"]=$name;
+  }
+
   if($mime == $c_auto) {
     $mime = run_query_get_mime($document);
     $document["mime"] = $mime;
   }
+
   if($kind == "file") {
     $file_info = stat($document_path.'/'.$path);
     $size=$file_info["size"];
     $document["size"] = $size ;
-  }
-  if($name == "" && $kind != "link") {
     $name = substr($path,strrpos($path,'/')+1);
     $document["name"]=$name;
     $path = substr($path,0,strrpos($path,'/'));
     $document["path"]=$path;
   }
-  
+
+
+  if($kind == "new_file") {
+    if(!run_query_create_file($document)) 
+      return false;
+  }
+  elseif($kind == "link") {
+    if(!run_query_create_link($document)) 
+      return false;
+  }
 
   $query = "update Document set
     document_timeupdate='". date("Y-m-d H:i:s") ."',
@@ -958,6 +1052,13 @@ function check_repository_data_form($document) {
     return false;
   }
 
+  $realpath = realpath($final_path);
+  if(substr($realpath,0,strlen($document_path)) != $document_path) {
+    $err_msg = $l_invalid_repository_path;
+    return false;
+  }
+
+
   // MANDATORY: Document Title 
   if (!opendir($document_path.$path)) {
     $err_msg = $l_invalid_repository_path;
@@ -966,4 +1067,16 @@ function check_repository_data_form($document) {
   return true;
 
 }
+///////////////////////////////////////////////////////////////////////////////
+// Tell if the file is a link or not.
+// return true if it is false else
+///////////////////////////////////////////////////////////////////////////////
 
+function islink($filename) {
+  if(substr_count($filename,"http://") != 0) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}

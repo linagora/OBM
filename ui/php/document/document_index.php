@@ -327,10 +327,12 @@ function get_param_document() {
   global $tf_title, $tf_author, $tf_path,$tf_mime,$tf_filename,$tf_repository_path;
   global $tf_cat1,$tf_cat2,$tf_extension,$tf_mimetype,$tf_repository_name,$popup;
   global $param_document,$fi_file_name,$fi_file_size,$fi_file_type,$fi_file;
-  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$_FILES;
+  global $sel_cat1, $sel_cat2,$sel_mime,$cb_privacy,$rd_kind,$tf_url;
   global $param_ext, $ext_action, $ext_title, $ext_url, $ext_id, $ext_target;
   
   if (isset ($param_document)) $document["id"] = $param_document;
+  
+  if (isset ($tf_url)) $document["url"] = $tf_url;
  
   if (isset ($tf_repository_name)) $document["repository_name"] = $tf_repository_name;
   if (isset ($tf_repository_path)) $document["repository_path"] = $tf_repository_path;

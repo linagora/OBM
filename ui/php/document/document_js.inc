@@ -232,18 +232,22 @@ function show_hide_field()
     basic_show('browse_img');
     basic_hide('browse_img_file');
     basic_show('browse_field');
+    basic_hide('url_field');
+    document.f_mod_document.fi_file.value = false;
+    document.f_mod_document.tf_url.value = \"\";
   }
   else if(radios[1].checked == true) {
     basic_hide('browse_img');
     basic_show('browse_img_file');
     basic_hide('browse_field');
-
+    basic_hide('url_field');
+    document.f_mod_document.tf_url.value = \"\";
+    
   }
   else if(radios[2].checked == true) {
     basic_hide('browse_img_file');
-    basic_hide('browse_img');
     basic_hide('browse_field');
-
+    basic_show('url_field');
   }
 }
 

@@ -146,7 +146,7 @@ function dis_document_search_list($document) {
   $obm_q = run_query_search($document, $new_order, $order_dir);
   $nb_document = $obm_q->num_rows();
   if ($nb_document == 0) {
-    $display["msg"] = display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
     $block = html_document_search_list($obm_q,$pref_q,$nb_document,$document);
   }
@@ -182,7 +182,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
   $doc_d->data_set = $doc_q;
   $doc_d->data_url = $url;
   $doc_d->data_header = "both";
-  $display["msg"] = display_info_msg("$nb_document $l_found");
+  $display["msg"] .= display_info_msg("$nb_document $l_found");
   $block = $doc_d->display("dis_data_document");
 
   return $block;
@@ -201,7 +201,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
   global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
-  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme;
+  global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme,$l_url;
   global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto;
 
@@ -215,9 +215,13 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
-        if($doc_q->f("document_name") == "") {
+    if(islink($doc_q->f("docment_name"))) {
       $kind = "link";
-      $fi_path = $doc_q->f("document_path").'/';
+      $fi_path = $doc_q->f("document_path");
+      $url = $doc_q->f("docment_name");
+      if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
+	$fi_path = $doc_q->f("document_path").'/';
+      }
     }
     else {
       $kind = "file";
@@ -286,6 +290,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
    if($kind == "new_file" || $kind == "") { 
      $checked = "checked=\"checked\"";
      $dis_img2 = " style=\"display: none;\" ";
+     $dis_url = " style=\"display: none;\" ";
    }
    else 
      $checked = "";
@@ -295,6 +300,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
      $dis_field = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
      $dis_img = " style=\"display: none;\" ";
+     $dis_url = " style=\"display: none;\" ";
    }
    else 
      $checked = "";
@@ -304,7 +310,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
 
   if($kind == "link") {
      $dis_field = " style=\"display: none;\" ";
-     $dis_img = " style=\"display: none;\" ";
+     $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
      
    }else 
@@ -357,7 +363,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     <tr>
       <td class=\"detailLabel\">$l_path</td>
       <td class=\"detailForm\">
-      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" maxlength=\"30\" size=\"30\" value=\"$fi_path\" />
+      <input type=\"text\" id=\"tf_path\" name=\"tf_path\" size=\"30\" value=\"$fi_path\" />
       <span id=\"browse_img\" $dis_img>
       <a href=\"javascript:return false;\" onclick=\"window.open('$url1','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_browse\" alt=\"\" /></a></span>
      <span id=\"browse_img_file\" $dis_img2>
@@ -367,6 +373,10 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     <tr id=\"browse_field\" $dis_field>
       <td class=\"detailLabel\">$l_file</td>
       <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
+    </tr>
+    <tr id=\"url_field\" $dis_url>
+      <td class=\"detailLabel\">$l_url</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
     <div class=\"detailButton\">
@@ -1172,7 +1182,8 @@ function dis_repository_rec($document,$repository,$display_file) {
     }
 
     $block .= "<div class=\"documentFile\"><img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
-     <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>$file</a><br /></div>";
+     <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>
+      ".stripslashes($file)."</a><br /></div>";
   }
   $block .= "</div>";
   return $block;
@@ -1186,15 +1197,18 @@ function dis_repository_rec($document,$repository,$display_file) {
 /////////////////////////////////////////////////////////////////////////////
 
 function dis_file($document) {
-  global $document_path;
+  global $document_path,$link_to;
   global $obm_version,$set_weekstart_default;
   $path = $document["path"];
   $name = $document["name"];
-  $final_path = $document_path.'/'.$path.'/'.$name;
-  if(!file_exists($final_path)) {
-    header("location: $path");
+  if(substr($name,0,strlen($link_to)) == $link_to) {
+    $final_path = $document_path.'/'.$path.'/'.str_replace(" ","\ ",$name); 
+    $handle = fopen ($final_path, "r");
+    $link = fread($handle,filesize ($final_path));
+    header("location: $link");
     exit;
   }
+
   $doc_q = run_query_detail_by_path($path,$name);
   if(!$doc_q) {
     $mime = run_query_get_mimetype($name);
@@ -1202,9 +1216,10 @@ function dis_file($document) {
   else {
     $mime = $doc_q->f("documentmimetype_mime");  
   }
+  $final_path = $document_path.'/'.$path.'/'.$name; 
+  $handle = fopen ($final_path, "r");
   header("Content-Type: $mime");
   header("Content-Disposition: inline; filename=$name");
-  $handle = fopen ($final_path, "r");
   echo  fread($handle, filesize ($final_path));
   fclose ($handle); 
   

@@ -165,3 +165,9 @@ INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documen
 VALUES (4,'Image JPG','JPG','image/jpg');
 INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES (5,'Fichier PDF','pdf','application/pdf');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (6,'Fichier Excel','xls','application/vnd.ms-excel');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (7,'Fichier Texte','txt','text/plain');
+INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
+VALUES (8,'Fichier Word','doc','application/msword');

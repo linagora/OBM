@@ -128,6 +128,10 @@ CREATE TABLE Document (
 -- DocumentCategory1 
 -------------------------------------------------------------------------------
 CREATE TABLE DocumentCategory1 (
+  documentcategory1_timeupdate timestamp(14) NOT NULL,
+  documentcategory1_timecreate timestamp(14) NOT NULL,
+  documentcategory1_userupdate int(8) default NULL,
+  documentcategory1_usercreate int(8) default NULL,
   documentcategory1_id int(8) NOT NULL auto_increment,
   documentcategory1_label varchar(255) default NULL,
   PRIMARY KEY (documentcategory1_id)
@@ -137,6 +141,10 @@ CREATE TABLE DocumentCategory1 (
 -- DocumentCategory2 
 -------------------------------------------------------------------------------
 CREATE TABLE DocumentCategory2 (
+  documentcategory2_timeupdate timestamp(14) NOT NULL,
+  documentcategory2_timecreate timestamp(14) NOT NULL,
+  documentcategory2_userupdate int(8) default NULL,
+  documentcategory2_usercreate int(8) default NULL,
   documentcategory2_id int(8) NOT NULL auto_increment,
   documentcategory2_label varchar(255) default NULL,
   PRIMARY KEY (documentcategory2_id)
@@ -147,6 +155,10 @@ CREATE TABLE DocumentCategory2 (
 -- DocumentMimeType 
 -------------------------------------------------------------------------------
 CREATE TABLE DocumentMimeType (
+  documentmimetype_timeupdate timestamp(14) NOT NULL,
+  documentmimetype_timecreate timestamp(14) NOT NULL,
+  documentmimetype_userupdate int(8) default NULL,
+  documentmimetype_usercreate int(8) default NULL,
   documentmimetype_id int(8) NOT NULL auto_increment,
   documentmimetype_label varchar(255) default NULL,
   documentmimetype_extension varchar(10) default NULL,
