@@ -216,8 +216,9 @@ td.agendaVide		{
 	color:			#000000;
 	text-align:		center;
 	background-color:	#ffffff;
+        border: 		1px solid #a1a4a8;
         border-top: 		1px dashed #a1a4a8;
-        border-right: 		1px solid #a1a4a8;
+        border-bottom: 		1px dashed #a1a4a8;	
 }
 td.agendaNoEvent	{
 	font-family:		sans-serif;
@@ -226,7 +227,8 @@ td.agendaNoEvent	{
 	color:			#000000;
 	text-align:		center;
 	background-color:	#ffffff;
-        border-top: 		1px dashed #a1a4a8;
+	border-top: 		1px dashed #a1a4a8;
+        border-bottom: 		1px dashed #a1a4a8;	
 }
 
 td.agendaHour		{

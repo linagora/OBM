@@ -69,9 +69,8 @@ table.agendaCalWeek		{
 	background-color: 	#ffffff;
 	border: 		1px solid #a1a5a9; 
 	width:			554px;
-	border-collapse:	separate;	
-	border-spacing:		0;!important;
 	border-collapse:	collapse;	
+	border-spacing:		0;
 	
 }
 
@@ -218,10 +217,11 @@ td.agendaVide		{
 	color:			#000000;
 	text-align:		center;
 	background-color:	#ffffff;
+        border: 		1px solid #a1a4a8;
         border-top: 		1px dashed #a1a4a8;
-        border-right: 		1px solid #a1a4a8;
-        border-left: 		0px solid #a1a4a8;
+        border-bottom: 		1px dashed #a1a4a8;	
 }
+
 td.agendaNoEvent	{
 	font-family:		sans-serif;
 	font-size:		14px;
@@ -229,9 +229,9 @@ td.agendaNoEvent	{
 	color:			#000000;
 	text-align:		center;
 	background-color:	#ffffff;
+        border: 		1px solid #a1a4a8;
         border-top: 		1px dashed #a1a4a8;
-        border-right: 		0px solid #a1a4a8;
-        border-left: 		0px solid #a1a4a8;
+        border-bottom: 		1px dashed #a1a4a8;
 }
 
 td.agendaHour		{
