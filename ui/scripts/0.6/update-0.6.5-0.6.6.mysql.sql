@@ -15,4 +15,4 @@ ALTER table Contact add column contact_mailing_ok char(1) AFTER contact_email;
 -- Company
 -------------------------------------------------------------------------------
 -- Change column : contact_state -> company_archive
-ALTER table Company change column company_state company_archive char(1) default '0';
+ALTER table Company change column company_state company_archive char(1) NOT NULL default '0';

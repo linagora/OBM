@@ -146,7 +146,7 @@ function run_query_insert($company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $archive = $company["archive"];
+  $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];
@@ -226,7 +226,7 @@ function run_query_update($cid, $company) {
   global $auth, $cdg_sql;
 
   $num = $company["num"];
-  $archive = $company["archive"];
+  $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $kind = $company["kind"];
   $act = $company["activity"];

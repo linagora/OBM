@@ -10,17 +10,33 @@
 -- Add new column : incidentpriority_color
 ALTER table IncidentPriority add column incidentpriority_color char(6) AFTER incidentpriority_order;
 
+
+-------------------------------------------------------------------------------
+-- Company
+-------------------------------------------------------------------------------
+-- Update company_archive to '0' where = ''
+Update Company set company_archive='0' where company_archive='';
+
+
 -------------------------------------------------------------------------------
 -- Deal
 -------------------------------------------------------------------------------
 -- Add new column : deal_soldtime
-ALTER TABLE Deal ADD deal_soldtime int(8) DEFAULT NULL;
+ALTER TABLE Deal ADD deal_soldtime int(8) DEFAULT NULL AFTER deal_datealarm;
 
--- Add new column : deal_state
-ALTER TABLE Deal ADD deal_state int(1) DEFAULT 0;
+-- Add new column : deal_project_status
+ALTER TABLE Deal ADD deal_project_status int(1) DEFAULT 0 AFTER deal_soldtime;
+
 
 -------------------------------------------------------------------------------
--- Projectstat
+-- List
+-------------------------------------------------------------------------------
+-- Add query field
+ALTER table List ADD list_query text AFTER list_email;
+
+
+-------------------------------------------------------------------------------
+-- ProjectStat
 -------------------------------------------------------------------------------
 CREATE TABLE ProjectStat (
   projectstat_deal_id int(8) NOT NULL,
@@ -34,8 +50,9 @@ CREATE TABLE ProjectStat (
   PRIMARY KEY (projectstat_deal_id, projectstat_date)
 );
 
+
 -------------------------------------------------------------------------------
--- Projectuser
+-- ProjectUser
 -------------------------------------------------------------------------------
 CREATE TABLE ProjectUser (
   projectuser_deal_id int(8) NOT NULL,
