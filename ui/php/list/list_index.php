@@ -103,18 +103,28 @@ else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_list_form($action, "", $list);
 }
+
 else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
-  $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($list, $entity);
-  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+  if (is_entity_visible("list", $list_q, $uid)) {
+    $pref_con_q = run_query_display_pref($uid, "list_contact");
+    $con_q = run_query_contacts_list($list, $entity);
+    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
+  } else {
+    $display["msg"] .= display_warn_msg($l_error_visibility);
+  }
 }
 
 else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($list["id"]);
-  $display["detail"] = dis_list_form($action, $obm_q, $list);
+  $list_q = run_query_detail($list["id"]);
+  if (is_entity_visible("list", $list_q, $uid)) {
+    $display["detail"] = dis_list_form($action, $list_q, $list);
+  } else {
+    // this deal's page has "private" access
+    $display["msg"] .= display_err_msg($l_error_visibility);
+  } 	
 }
 
 else if ($action == "insert") {
@@ -275,9 +285,8 @@ exit(0);
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
-  global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
-  global $new_order, $order_dir,$popup,$row_index;
-  
+  global $action, $cb_vis, $ext_action, $ext_url, $ext_id, $ext_target, $title;
+  global $new_order, $order_dir, $popup, $row_index;
   global $tf_company_name,$tf_company_zipcode,$tf_company_town;
   global $tf_company_timeafter,$tf_company_timebefore;
   global $sel_company_country_id,$sel_company_marketingmanager_id;
@@ -306,6 +315,7 @@ function get_param_list() {
   if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
   if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
+  $list["vis"] = ($cb_vis == 1 ? 1 : 0);
   if (isset ($row_index)) $list["row_index"] = $row_index;
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;

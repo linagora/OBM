@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : document.inc                                             //
@@ -30,7 +30,6 @@ $l_mime_new = "Nouveau Type MIME";
 $l_mimetype = "Type MIME";
 $l_mime_delete =  "Supprimer";
 $l_path = "Chemin";
-$l_private = "Privé";
 $l_title = "Titre";
 $l_updatetime = "Dernière modification";
 $l_document_display = "Options d'affichage des listes de documents";

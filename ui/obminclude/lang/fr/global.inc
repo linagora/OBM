@@ -43,6 +43,9 @@ $l_after = "Après";
 $l_before = "Avant";
 $l_fuzzy = "Avancée";
 $l_cat = "Catégorie";
+$l_visibility = "Accès";
+$l_private = "Privé";
+$l_public = "Public";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
 

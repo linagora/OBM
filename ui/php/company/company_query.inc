@@ -229,11 +229,13 @@ function run_query_insert($company) {
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
-  $aka = $company["aka"];
+  $aka = trim($company["aka"]);
   // If aka is empty we auto fill it
-  if (trim($aka) == "") {
+  if ($aka == "") {
     $auto_aka = reduce_name($name);
-    $aka = $auto_aka;
+    if ($auto_aka != $name) {
+      $aka = $auto_aka;
+    }
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
@@ -366,11 +368,13 @@ function run_query_update($cid, $company) {
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
-  $aka = $company["aka"];
+  $aka = trim($company["aka"]);
   // If aka is empty we auto fill it
-  if (trim($aka) == "") {
+  if ($aka == "") {
     $auto_aka = reduce_name($name);
-    $aka = $auto_aka;
+    if ($auto_aka != $name) {
+      $aka = $auto_aka;
+    }
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];

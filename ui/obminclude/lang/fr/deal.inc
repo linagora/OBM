@@ -30,11 +30,8 @@ $l_comment = "Commentaire";
 $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";
 $l_todo = "A faire";
-$l_visibility = "Accès";
 
 // Labels et textes
-$l_private = "Privé";
-$l_public = "Publique";
 $l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";

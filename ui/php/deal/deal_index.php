@@ -132,8 +132,7 @@ elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   if ($deal["id"] > 0) {
     $deal_q = run_query_detail($deal["id"]);
-    if ( ($deal_q->f("deal_visibility")==0) ||
-         ($deal_q->f("deal_usercreate")==$uid) ) {
+    if (is_entity_visible("deal", $deal_q, $uid)) {
       $display["detailInfo"] = display_record_info($deal_q);
       $cid = $deal_q->f("deal_company_id");
       // we retrieve invoices data :
@@ -151,12 +150,17 @@ elseif (($action == "index") || ($action == "")) {
   if ($deal["id"] > 0) {
     require("deal_js.inc");
     $deal_q = run_query_detail($deal["id"]);
-    $display["detailInfo"] = display_record_info($deal_q);
-    $param_company = $deal_q->f("deal_company_id");
-    $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
-    $usrc_q = run_query_all_users_from_group($cg_com, $users);
-    $usrp_q = run_query_all_users_from_group($cg_prod, $users);
-    $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    if (is_entity_visible("deal", $deal_q, $uid)) {
+      $display["detailInfo"] = display_record_info($deal_q);
+      $param_company = $deal_q->f("deal_company_id");
+      $users = array($deal_q->f("deal_marketingmanager_id"), $deal_q->f("deal_technicalmanager_id"));
+      $usrc_q = run_query_all_users_from_group($cg_com, $users);
+      $usrp_q = run_query_all_users_from_group($cg_prod, $users);
+      $display["detail"] = html_deal_form($action, $deal_q, run_query_dealtype(), run_query_tasktype($ctt_sales), $usrc_q, $usrp_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, $deal);
+    } else {
+      // this deal's page has "private" access
+      $display["msg"] .= display_err_msg($l_error_visibility);
+    } 	
   }
   
 } elseif ($action == "insert")  {
@@ -466,8 +470,7 @@ elseif (($action == "index") || ($action == "")) {
 
     // then we display the deal
     $deal_q = run_query_detail($deal["id"]);
-    if ( ($deal_q->f("deal_visibility")==0) ||
-         ($deal_q->f("deal_usercreate")==$uid) ) {
+    if (is_entity_visible("deal", $deal_q, $uid)) {
       $display["detailInfo"] = display_record_info($deal_q);
       $cid = $deal_q->f("deal_company_id");
       $q_invoices = run_query_search_connected_invoices ($deal["id"], $incl_arch);

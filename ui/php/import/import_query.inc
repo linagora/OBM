@@ -437,12 +437,13 @@ function get_import_row_mapping($row, $map) {
 // Check if an import row is valid
 // Parameters:
 //   - $fields : row fields content
+//   - $map    : import fields mapping
 // Returns:
 //   true if valid
 ///////////////////////////////////////////////////////////////////////////////
-function is_row_valid($fields) {
+function is_row_valid($fields, $map) {
 
-  if ($fields["comp_name"] == "") {
+  if ( ($fields["comp_name"] == "") && ($map["default"]["comp_name"] == "") ) {
     return false;
   } else {
     return true;
@@ -459,7 +460,8 @@ function is_row_valid($fields) {
 ///////////////////////////////////////////////////////////////////////////////
 function row_has_contact($fields) {
 
-  if ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") ) {
+  if ( ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") )
+     || ( (isset($fields["con_fn"])) && ($fields["con_fn"] != "") ) ) {
     return true;
   } else {
     return false;
@@ -471,8 +473,9 @@ function row_has_contact($fields) {
 // Return the existing companies similar to the one given
 // Parameters:
 //   - $fields : company Id not to return
+//   - $map    : import mapping fields (to get default entries)
 ///////////////////////////////////////////////////////////////////////////////
-function get_similar_company($fields) {
+function get_similar_company($fields, $map) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -480,6 +483,9 @@ function get_similar_company($fields) {
   $like = sql_casei_like($db_type);
 
   $name = $fields["comp_name"];
+  if ($name == "") {
+    $name = $map["default"]["comp_name"];
+  }
   $zip = $fields["comp_zip"];
 
   $query = "select distinct company_id, company_name, company_zipcode 
@@ -954,7 +960,7 @@ function run_query_import_contact_update(&$import_q, $fields, $defaults, &$count
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return the country hash : countries["name"] = id
+// Return the country hash : countries["iso"] = id
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_country_hash() {
   global $cdg_sql;
@@ -964,7 +970,8 @@ function get_import_country_hash() {
   while ($ctry_q->next_record()) {
     $id = $ctry_q->f("country_id");
     $name = $ctry_q->f("country_name");
-    $countries[$name] = $id;
+    $iso = $ctry_q->f("country_iso3166");
+    $countries[$iso] = $id;
   }
 
   return $countries;

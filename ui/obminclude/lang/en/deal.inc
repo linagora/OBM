@@ -30,11 +30,8 @@ $l_date_alarm = "Alarm Date";
 $l_add_comment = "Add a comment";
 $l_upd_comment = "Update comment";
 $l_todo = "To Do";
-$l_visibility = "Access";
 
 // Labels and texts
-$l_private = "Private";
-$l_public = "Public";
 $l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";

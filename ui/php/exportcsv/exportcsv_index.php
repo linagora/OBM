@@ -72,7 +72,7 @@ if (($action == "index") || ($action == "")) {
 
   $export_d = new OBM_DISPLAY("DATA", $pref_q);
   $export_d->data_set = $obm_q;
-  header("Content-Type: text/plain");
+  header("Content-Type: text/comma-separated-values");
   header("Content-Disposition: attachment; filename=\"$module.csv\"");
   $export_d->dis_data_file($first_row, $nb_rows, $sep, $params["function"]);
 }
@@ -105,4 +105,4 @@ function get_param_export() {
   return $params;
 }
 
-</SCRIPT>
+</script>

@@ -29,6 +29,9 @@ $l_invalid_data = "Ugyldig data";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_cat = "Kategori";
+$l_visibility = "Access";
+$l_private = "Private";
+$l_public = "Public";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

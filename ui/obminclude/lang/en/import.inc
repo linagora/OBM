@@ -73,6 +73,8 @@ $l_no_found = "No imports found matching the query";
 $l_fill_name = "The Import Name must be filled !";
 $l_similar_company = "Similar company";
 $l_similar_contact = "Similar contact";
+$l_company_defaultname = "Company with no Name";
+$l_contact_defaultname = "Contact with no Lastname";
 
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";

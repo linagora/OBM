@@ -27,9 +27,6 @@ $l_address = "Adresse";
 $l_postcode = "PLZ";
 $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
-$l_private = "Privat";
-$l_public = "Öffentlich";
-$l_visibility ="Access";
 
 $l_contact_select_company = "Firmenauswahl für den Kontakt";
 

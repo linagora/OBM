@@ -266,6 +266,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query;
+  global $l_visibility, $l_public, $l_private;
   global $display, $perm, $menu, $action, $cright_write;
   global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_invalid_query;
@@ -276,6 +277,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $userupdate = $list_q->f("list_userupdate");
   $timecreate = $list_q->f("timecreate");
   $timeupdate = $list_q->f("timeupdate");
+  $lvis = ($list_q->f("list_visibility") == 0 ? $l_public : $l_private);
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
@@ -289,7 +291,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   } else {
     $query_nb = $l_invalid_query;
   }
-  if($crit_q == "") {
+  if ($crit_q == "") {
     $disp_query = "<tr>
       <td class=\"detailLabel\">$l_query</td>
       <td class=\"detailText\">$query</td>
@@ -304,6 +306,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailText\">$name</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_visibility</td>
+      <td class=\"detailText\">$lvis</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_subject</td>
       <td class=\"detailText\">$subject</td>
@@ -439,9 +444,10 @@ function dis_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email, $l_query,$l_list,$display;
-  global $l_expert_mode,$l_normal_mode;
-  
+  global $l_name, $l_subject, $l_email, $l_query, $l_list, $l_private;
+  global $l_expert_mode, $l_normal_mode;
+  global $action, $display, $uid;  
+
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $list_q->f("list_id");
@@ -451,17 +457,31 @@ function html_list_form($action, $list_q, $list) {
     $email = $list_q->f("list_email");
     $crit_q = $list_q->f("list_structure");
     $query = $list_q->f("list_query");
+    $vis = ($list_q->f("list_visibility") == 0 ? "0" : "1");
   }
   
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
+  if (isset($list["vis"])) { $vis = $list["vis"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
+
+  if ( ($action == "new") || ($action == "insert") ||
+       ( (($action == "detailupdate") || ($action == "update")) && 
+         ($usercreate == $uid) ) ) {
+    $dis_vis = "
+      <td class=\"detailLabel\">$l_private</td>
+      <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
+    if ($vis == 1) $dis_vis .= "checked = \"checked\"";
+    $dis_vis .= " /></td>
+  </tr><tr>";
+  }
+
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
-  if($crit_q =="" && $query != "") {
+  if ($crit_q =="" && $query != "") {
     $query_checked = " checked=\"checked\" ";
     $dis_query = "";
   }
@@ -478,6 +498,7 @@ function html_list_form($action, $list_q, $list) {
       <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
   </tr>
   <tr>
+  $dis_vis
     <td class=\"detailLabel\">$l_subject</td>
     <td class=\"detailForm\">
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>

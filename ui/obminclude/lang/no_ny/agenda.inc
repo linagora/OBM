@@ -10,8 +10,6 @@
 $l_users = "Contacts";
 $l_groups = "Groupes";
 $l_title = "Titre";
-$l_private = "Priv&eacute;";
-$l_public  = "Public";
 $l_description = "Description";
 $l_state = "Etat";
 $l_none = "aucune";

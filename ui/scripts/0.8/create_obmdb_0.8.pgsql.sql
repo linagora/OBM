@@ -484,6 +484,7 @@ CREATE TABLE List (
   list_timecreate  TIMESTAMP,
   list_userupdate  integer,
   list_usercreate  integer,
+  list_visibility  integer DEFAULT '0',
   list_name        varchar(32) NOT NULL,
   list_subject     varchar(70),
   list_email       varchar(128),

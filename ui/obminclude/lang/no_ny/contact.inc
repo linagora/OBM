@@ -31,10 +31,6 @@ $l_comment = "Kommentar";
 
 $l_contact_select_company = "Velg firma for kontakten.";
 
-$l_private="Private";
-$l_public = "Public";
-$l_visibility ="Access";
-
 // Titles
 $l_contact = "Kontakt";
 $l_contact_detail = "Kontaktdetalj";

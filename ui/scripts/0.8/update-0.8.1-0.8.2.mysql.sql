@@ -26,8 +26,14 @@ CREATE TABLE CompanyNafCode (
 
 
 -------------------------------------------------------------------------------
+-- Update List table
+-------------------------------------------------------------------------------
+-- Add column : list_private
+ALTER TABLE List ADD column list_visibility int(2) DEFAULT '0' after list_usercreate;
+
+
+-------------------------------------------------------------------------------
 -- Update Country table
 -------------------------------------------------------------------------------
 -- Change column : country_phone -> varchar(5) (bug#339)
- 
 ALTER TABLE Country CHANGE column country_phone country_phone VARCHAR(5);

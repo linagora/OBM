@@ -676,13 +676,6 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $dis_con2 = $deal_q->f("lnamec2") . " " . $deal_q->f("fnamec2");
   $phone_con2 = ($deal_q->f("phonec2") ? $deal_q->f("phonec2") : $comp_phone);
 
-  if ($usercreate == $auth->auth["uid"]) {   
-   $visibility = "
-    </tr><tr>
-      <td class=\"detailLabel\">$l_visibility</td>
-      <td class=\"detailText\">$lvis</td>";
-  }
-
   $inv_nb = $q_invoices->num_rows ();
   $display["link"] = html_deal_links($deal_q, $inv_nb);
   $display["title"] = "<div class=\"title\">$l_deal : $label</div>";
@@ -700,7 +693,9 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
       <tr>
         <td class=\"detailLabel\">$l_label</td>
         <td class=\"detailText\">$label</td>
-        $visibility
+      </tr><tr>
+        <td class=\"detailLabel\">$l_visibility</td>
+        <td class=\"detailText\">$lvis</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_number</td>
         <td class=\"detailText\">$num</td>
@@ -1069,7 +1064,7 @@ function auto_set_hitrate(select, targetField, pos) {
     ";
   }
 
-  if ( ($action == "new") ||
+  if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
     $dis_visibility = "

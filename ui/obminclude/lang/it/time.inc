@@ -43,13 +43,9 @@ $l_postcode = "CP";
 $l_expresspostal = "Cedex";
 $l_town = "Città";
 $l_country = "Stato";
-$l_visibility ="Accesso";
 
 $l_week_sel = "Settimana di ricerca";
 $l_from_company = "&nbsp;&nbsp;Azienda";
-$l_telother = "Altri tel";
-$l_private = "Privato";
-$l_public = "Pubblico";
 $l_contact_select_company = "Seleziona la società del contatto.";
 $l_week_prev = "Settimana precedente";
 $l_week_next = "Prossima settimana";

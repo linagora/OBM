@@ -355,6 +355,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact search result                                            //
 // Parameters:
@@ -696,6 +697,7 @@ function html_contact_header($co_q) {
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Contact links menu
 // Parameters:
@@ -708,7 +710,7 @@ function html_contact_links($id) {
   global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
   global $l_header_document,$l_contact;
   global $l_document_new,$l_document_add,$l_add_document;
-  global $l_subscription_new,$l_subscription;  
+  global $l_subscription_new, $l_subscription, $l_subscription_list;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   // Document  
@@ -741,7 +743,7 @@ function html_contact_links($id) {
   <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
-        <a href=\"$url_subscription\">$l_subscription ($nb_subscription)</a></li>
+        <a href=\"$url_subscription\">$l_subscription_list ($nb_subscription)</a></li>
     <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
   </ul>";
@@ -818,6 +820,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $c_name = $co_q->f("company_name");
     $id = $co_q->f("contact_id");
     $usercreate = $co_q->f("contact_usercreate");
+    $dsrc = $co_q->f("contact_datasource_id");
     $kind = $co_q->f("contact_kind_id");
     $mark = $co_q->f("contact_marketingmanager_id");
     $lname = $co_q->f("contact_lastname");

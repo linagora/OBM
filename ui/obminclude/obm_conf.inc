@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // is Mail enabled ? (agenda)
 $cgp_mail_enabled = false;
@@ -53,8 +53,8 @@ $cgp_show["module"]["statistic"] = true;
 //$cgp_hide["company"]["number"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
-$cgp_hide["company"]["companynafcode_code"] = true;
-$cgp_hide["company"]["category"] = true;
+//$cgp_hide["company"]["companynafcode_code"] = true;
+//$cgp_hide["company"]["category"] = true;
 //$cgp_hide["company"]["address3"] = true;
 
 // Contact module

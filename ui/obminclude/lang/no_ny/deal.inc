@@ -47,8 +47,6 @@ $l_at = "at";
 
 $l_deal_select_company = "Velg firma det skal inngås avtale med.";
 $l_number_deal="Number";
-$l_private="Private";
-$l_public = "Public";
 $l_type_manage = "Deal Kind Management";
 $l_type_exist = "Existing Kinds";
 $l_type_new = "New Kind";
@@ -60,7 +58,6 @@ $l_category_exist = "Existing Categories";
 $l_category_new = "New Category";
 $l_category_label="Label";
 $l_category_minilabel="Mini Label";
-$l_visibility ="Access";
 $l_affect_deal= "Affect to a parentdeal";
 $l_deal_select_parentdeal = "Select the parentdeal whom the deal must be affected";
 $l_parentdeal="ParentDeal";

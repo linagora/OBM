@@ -40,6 +40,9 @@ $l_town = "Ort";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_cat = "Kategorie";
+$l_visibility = "Zugriff";
+$l_private = "Privat";
+$l_public = "Öffentlich";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

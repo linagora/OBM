@@ -12,7 +12,7 @@
     
 <center>
 <h1>O.B.M. ChangeLog</h1>
-version 0.8.1 - 2004-04-22
+version 0.8.2 - 2004-06-11
 <p>
 </center>
 
@@ -25,16 +25,21 @@ To do<br>
 <LI> decouper : get_module_param() avant switch action, update_module_param() apres pour mise a jour url affectees
 <li> Suppress all direct access to param in index : force to use module hash
 <li> Regressions tests (siege ?)
+<li> harmonize all visibility tests (partially done) consult, update, delete...
 </UL>
 
 
-2004-06-04 : version 0.8.2<br>
+2004-06-11 : version 0.8.2<br>
 
 <ul>
+<li> CSV export : better csv recognition
+<li> List : lists can now be private (+ enhancements on visibility handling)
 <li> Company : new field : Naf Code (can be hidden, hidden by default)
 <li> Site specific optimization : hidden data no more fetched from database
 <li> List : many bug fixes in graphical query construct
 <li> Page management : new icon previous and next page
+<li> BUG#341 : Document with & in the name can be accessed
+<li> BUG#340 : Contact : Datasource now correct on update form
 <li> BUG#339 : Phone code size now consistent (width 5) in country table
 <li> BUG#337 : user lastname now propagated when browsing user result lists
 <li> BUG#335 : Dupplicate of 332 !

@@ -1,8 +1,10 @@
-<SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                   //
 //     - File     : document.inc                                             //
-// 2003-08-21 Rande Mehdi                                             //
+// 2003-08-21 Rande Mehdi
+//////////////////////////////////////////////////////////////////////////////
+// $Id$
 //////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
@@ -28,7 +30,6 @@ $l_mime_new = "New Mime type";
 $l_mimetype = "Mime-Type";
 $l_mime_delete =  "Delete";
 $l_path = "Path";
-$l_private = "Private";
 $l_title = "Title";
 $l_updatetime = "Update time";
 $l_document_display = "Display options for documents list";
@@ -135,4 +136,3 @@ $l_fill_repository_name = "You have to fill the name of the directory";
 $l_invalid_repository_path = "Incorrect path for the directory";
 $l_invalid_file = "Incorrect file";
 $l_invalid_existing_file = "The path is not a valid file";
-

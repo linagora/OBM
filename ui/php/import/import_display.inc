@@ -425,8 +425,9 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 function html_import_file_import($import_q, $import) {
   global $l_test_file, $l_import_file;
   global $l_company, $l_contact, $l_info, $l_result;
-  global $l_similar_company, $l_similar_contact, $l_invalid_row;
-  global $l_invalid_rows, $l_conflict_rows;
+  global $l_similar_company, $l_similar_contact, $l_contact_defaultname;
+  global $l_company_defaultname;
+  global $l_invalid_row, $l_invalid_rows, $l_conflict_rows;
   global $l_import_end,$l_file_error, $l_lines_processed, $l_conflict_detected;
   global $l_header_company, $l_header_contact, $l_nb_insert, $l_nb_update;
   global $display;
@@ -512,7 +513,8 @@ function html_import_file_import($import_q, $import) {
       }
 
       // test for contact
-      if (row_has_contact($fields)) {
+      if ( (row_has_contact($fields)) &&
+	   ( ($fields["con_ln"] != "") || ($map["default"]["con_ln"] != ""))) {
 	
 	// Test if similar contact exist --------------------------------------
 	$conts = get_similar_contact($fields, $company_id);
@@ -533,6 +535,9 @@ function html_import_file_import($import_q, $import) {
 	  }
 	} else {
 	  // No similar contacts exists ---------------------------------------
+	  if ($fields["con_ln"] == "") {
+	    $log["res"] .= $l_contact_defaultname;
+	  }
 	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
 	  $nb_con_ins++;
 	}
@@ -540,7 +545,7 @@ function html_import_file_import($import_q, $import) {
       } else {
 	// Row has no contact : End row Conflict
       }
-      
+
       // Update the existing contact
     } else if ($conflict_action == "contact_update") {
       list($num_line, $line) = each($r);
@@ -572,14 +577,18 @@ function html_import_file_import($import_q, $import) {
     $fields = get_import_row_mapping($row, $map);
 
     // Test if company is valid
-    if (is_row_valid($fields)) {
+    if (is_row_valid($fields, $map)) {
+
+      if ($fields["comp_name"] == "") {
+	$log["res"] = $l_company_defaultname;
+      }
 
       // Test if similar companies exist --------------------------------------
-      $comps = get_similar_company($fields);
+      $comps = get_similar_company($fields, $map);
       if (is_array($comps)) {
 	$nb_line_conf++;
 	$log["display"] = true;
-	$log["res"] = $l_similar_company;
+	$log["res"] .= $l_similar_company;
 
 	// Automatic mode
 	if ($run_mode == "auto") {
@@ -606,10 +615,19 @@ function html_import_file_import($import_q, $import) {
 	  // Insert the company
 	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
 	  $nb_comp_ins++;
+	  // If row has a contact
 	  if (row_has_contact($fields)) {
-	    echo "insert contact :" . $fields["con_ln"] . " " . $fields["con_fn"];
-	    run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
-	    $nb_con_ins++;
+	    // We insert If lastname filled, or if lastname empty but default
+	    if ($fields["con_ln"] != "") {
+	      run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	      $nb_con_ins++;
+	    } else if ($fields["con_ln"] == "") {
+	      if ($map["default"]["con_ln"] != "") {
+		$log["res"] .= $l_contact_defaultname;
+		run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+		$nb_con_ins++;
+	      }
+	    }
 	  }
 	}
       }

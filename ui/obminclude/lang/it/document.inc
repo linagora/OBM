@@ -4,6 +4,8 @@
 //     - File     : document.inc                                             //
 // 2004-01-10 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_document = "Gestione lettera";
@@ -36,8 +38,6 @@ $l_recupsoc_doc = "Err.35v86 nel recupero  des donnees dell'azienda in base...";
 $l_generer = "Genere";
 
 // Messages
-
-
 $l_no_display = "Riempi i campi di ricerca e premi < TROVA > per la lista degli affari ";
 $l_no_found = "Alcuni affari non corrispondono ai criteri";
 $l_delete_ok = "Eliminazione dei criteri eseguita";

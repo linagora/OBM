@@ -43,6 +43,9 @@ $l_after = "After";
 $l_before = "Before";
 $l_fuzzy = "Advanced";
 $l_cat = "Category";
+$l_visibility = "Access";
+$l_private = "Private";
+$l_public = "Public";
 
 // Global display
 $l_last_visit = "Bookmarks";

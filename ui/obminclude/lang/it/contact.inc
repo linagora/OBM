@@ -23,14 +23,11 @@ $l_mailing_ok = "Email abilitata";
 $l_fax = "Fax";
 $l_expresspostal = "CAP";
 $l_country = "Nazione";
-$l_visibility ="Accesso";
 
 // Labels and texts
 $l_contact_name = "Nome Contatto";
 $l_from_company = "Azienda";
 $l_telother = "Altro Tel";
-$l_private = "Privato";
-$l_public = "Pubblico";
 $l_contact_select_company = "Scegli l'azienda per il contatto.";
 
 // Titles

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Español                                                  //
 //     - File     : global.inc                                               //
@@ -39,6 +39,9 @@ $l_postcode = "Código Postal";
 $l_town = "Ciudad";
 $l_datasource = "Fuente de Datos";
 $l_cat = "Categoría";
+$l_visibility = "Acceso";
+$l_private = "Privado";
+$l_public = "Publico";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
 

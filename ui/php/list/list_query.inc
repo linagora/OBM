@@ -18,7 +18,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($list, $p_new_order, $p_order_dir) {
-  global $c_all, $cdg_sql;
+  global $c_all, $cdg_sql, $uid;
   
   $name = $list["name"];
   $email = $list["email"];
@@ -52,7 +52,8 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
-  where list_name $like '$name%'
+  where (list_visibility=0 || list_usercreate='$uid')
+    and list_name $like '$name%'
     $where";
 
 
@@ -104,18 +105,20 @@ function run_query_detail($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($list) {
   global $auth, $cdg_sql;
-  $id = $list["id"];
+
+  $vis = $list["vis"];
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
-  if(isset($list["criteria"])) {
+  if (isset($list["criteria"])) {
     $list_critery = serialize($list["criteria"]);
   }
   $query = "insert into List (list_timeupdate,
     list_timecreate,
     list_userupdate,
     list_usercreate,
+    list_visibility,
     list_name,
     list_subject,
     list_email,
@@ -125,11 +128,12 @@ function run_query_insert($list) {
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
+    '$vis',
     '$name',
     '$subject',
     '$email',
     '$list_query',
-     '$list_critery')";
+    '$list_critery')";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -147,15 +151,17 @@ function run_query_update($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
+  $vis = $list["vis"];
   $name = $list["name"];
   $subject = $list["subject"];
   $email = $list["email"];
   $list_query = $list["query"];
-  if(isset($list["criteria"])) {
+  if (isset($list["criteria"])) {
     $list_critery = serialize($list["criteria"]);
   }
   $query = "update List set list_timeupdate='". date("Y-m-d H:i:s")."',
     list_userupdate='".$auth->auth["uid"]."',
+    list_visibility='$vis',
     list_name='$name',
     list_subject='$subject',
     list_email='$email',
@@ -927,13 +933,13 @@ function make_query($list) {
 	
   $join = " Contact left join Company on contact_company_id=company_id ";  
 	     
-  if(is_array($criteria)) {
+  if (is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
-      if(is_array($module_criteria)) {
+      if (is_array($module_criteria)) {
         foreach($module_criteria as $field => $criterion) {
-          if(is_array($criterion)) {
+          if (is_array($criterion)) {
             foreach($criterion as $line => $value) {
-              if($value != "") {
+              if ($value != "") {
 		$field_fill = 1;
 		$module_fill = 1;
 		$operation = $operateurs[$field];
@@ -946,7 +952,7 @@ function make_query($list) {
 		$condition[$line] .= "";
 	      }
             }
-	    if($field_fill == 1) { 
+	    if ($field_fill == 1) { 
 	      $join .= $add_join[$field];
     	      $select .= $add_select[$field];
     	      $group .= $add_group[$field];	      
@@ -954,7 +960,7 @@ function make_query($list) {
 	    }
           }  
         } 
-       	if($module_fill == 1) { 
+       	if ($module_fill == 1) { 
       	  $join .= $add_join[$module];
 	  $select .= $add_select[$module];
 	  $group .= $add_group[$module];
@@ -963,7 +969,7 @@ function make_query($list) {
       }
     }
     foreach($condition as $line=>$value) {
-      if($line == 0) {
+      if ($line == 0) {
 	$logical_criterion[$line] = "";
       }
       $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
@@ -974,12 +980,13 @@ function make_query($list) {
 
   
   
-  if($where != "") {
+  if ($where != "") {
     $where = " WHERE $where";
   }
   $query = "SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname";
   return trim(addslashes($query));
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 //  Make a query with the dynamic and static contact.
@@ -1038,5 +1045,7 @@ function make_final_query($query,$con_q) {
   $final_query .= " ) ) GROUP BY contact_lastname";
   return $final_query; 
 }
+
+
 </script>
 

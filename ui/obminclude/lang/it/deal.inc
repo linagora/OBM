@@ -7,7 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
 //for list
 $l_task_fac = "Impegni comuni";
 $l_task_int = "Impegni interni";
@@ -28,13 +27,10 @@ $l_hitrate = "Hit Rate";
 $l_state = "Stato";
 $l_date_alarm = "Data avviso";
 $l_todo = "Da fare";
-$l_visibility = "Accesso";
 $l_add_comment = "Nuovo commento";
 $l_upd_comment = "Modifica commento";
 
 // Labels and texts
-$l_private = "Privato";
-$l_public = "Pubblico";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordine";

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.2pre5";
+$obm_version = "0.8.2pre6";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -181,8 +181,8 @@ $js_regexp_phone="/^[0-9+ \(\)-\.]+$/"; // digits + SPACE ( ) - in phone number
 $php_regexp_phone="^[0-9+ \(\)-\.]+$";  // digits + SPACE ( ) - in phone number
 $js_regexp_fax="/^[0-9+ \(\)-\.]+$/";   // digits + SPACE ( ) - in fax number
 $php_regexp_fax="^[0-9+ \(\)-\.]+$";    // digits + SPACE ( ) - in fax number
-$js_regexp_zip="/^[0-9A-Z]{2,8}$/";     // 2-8 digits or letters
-$php_regexp_zip="^[0-9A-Z]{2,8}$";      // 2-8 digits or letters
+$js_regexp_zip="/^[0-9A-Z ]{2,8}$/";     // 2-8 digits or letters
+$php_regexp_zip="^[0-9A-Z ]{2,8}$";      // 2-8 digits or letters
 $js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
 $php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
 $php_regexp_email_name="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*$/"; // Email name
@@ -406,7 +406,7 @@ function get_hour($timestamp="") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Dispaly an entity dates and users creation / update infos
+// Display an entity dates and users creation / update infos
 // Parameters:
 //   - $obm_q : DBO object : used fields
 //              usercreate userupdate timecreate timeupdate datasource_name
@@ -433,6 +433,34 @@ function display_record_info($obm_q) {
   </div>";
 
   return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if an entity is visible by the user
+// Parameters:
+//   - $entity : Entity (to get database fieldname)
+//   - $q      : DBO object with entity to check
+//   - $uid    : user id to check visibility
+// Returns true if entity is visible, else false
+///////////////////////////////////////////////////////////////////////////////
+function is_entity_visible($entity, $q, $uid="") {
+  global $auth;
+
+  if ($uid == "") {
+    $uid = $auth->auth["uid"];
+  }
+
+  $field_vis = "${entity}_visibility";
+  $field_uc = "${entity}_usercreate";
+
+  if ( ($q->f("$field_vis") == 0)
+    || ($q->f("$field_uc") == $uid) ){
+    return true;
+  } else {
+    return false;
+  }
+
 }
 
 
@@ -475,7 +503,6 @@ function phonetic_key($name) {
 
 //functions used by many modules
 function month_name ($num_month) {
- 
   global $l_monthsofyear;
 
   return $l_monthsofyear[$num_month-1];
@@ -484,7 +511,6 @@ function month_name ($num_month) {
 
 
 function month_short_name ($num_month) {
- 
   global $l_monthsofyearshort;
 
   return $l_monthsofyearshor[$num_month-1];
