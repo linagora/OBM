@@ -14,6 +14,7 @@ $l_company_name = "Company Name";
 $l_kind = "Kind";
 $l_category = "Categories";
 $l_activity = "Activity";
+$l_nafcode = "Code";
 $l_market = "Marketing manager";
 $l_company_kind = "Company Kind";
 $l_expresspostal = "Express postal";
@@ -41,11 +42,17 @@ $l_cat_code = "Code";
 $l_act_manage = "Company Activity Management";
 $l_act_exist = "Existing Activities";
 $l_act_new = "New Activity";
-$l_add = "Add";
+$l_naf_manage = "Code Management";
+$l_naf_exist = "Existing codes";
+$l_naf_new = "New Code";
+$l_naf_label = "Label";
+$l_naf_code = "Code";
+
 // Titres
 $l_company = "Company";
 
 // Actions
+$l_add = "Add";
 $l_insert = "Insert the Company";
 $l_update = "Update the Company";
 $l_checkdelete = "Check or Delete the Company";
@@ -64,6 +71,12 @@ $l_act_update = "Update Activity";
 $l_act_checkdelete = "Check or Delete Activity";
 $l_act_delete = "Delete Activity";
 $l_act_insert = "Insert Activity";
+
+$l_naf_update = "Update Code";
+$l_naf_checkdelete = "Check or Delete Code";
+$l_naf_delete = "Delete Code";
+$l_naf_insert = "Insert Code";
+
 $l_select_company = "Select the Company";
 
 // Messages
@@ -122,6 +135,18 @@ $l_act_link_company = "These companies are referenced as";
 $l_act_link_company_no = "No company from activity";
 $l_act_cant_delete = "Activity can't be deleted !";
 $l_act_can_delete = "Activity can be deleted.";
+
+$l_naf_no = "No Code defined";
+$l_naf_delete_ok = "Code has been deleted successfully.";
+$l_naf_delete_error = "Code deletion has failed !";
+$l_naf_insert_ok = "Code has been inserted successfully.";
+$l_naf_insert_error = "Code insertion has failed !";
+$l_naf_update_ok = "Code has been updated successfully.";
+$l_naf_update_error = "Code update has failed !";
+$l_naf_link_company = "These companies are referenced as";
+$l_naf_link_company_no = "No company from Code";
+$l_naf_cant_delete = "Code can't be deleted !";
+$l_naf_can_delete = "Code can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_delete_confirm = "Really delete the company ?";

@@ -52,7 +52,7 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
     LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
     LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
-  where (list_visibility=0 || list_usercreate='$uid')
+  where (list_visibility=0 or list_usercreate='$uid')
     and list_name $like '$name%'
     $where";
 

@@ -625,6 +625,7 @@ function run_query_task_update($project) {
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
 
+
   echo "task=$task, ptask=$ptask, label=$tasklabel";
   // If a parent task has been given, check that there are no links from
   // User to the parent task (a parent task can't be assigned to users)
@@ -1389,12 +1390,31 @@ function check_project_form($pid, $project) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_task_form($pid, $project) {
-  global $err_msg, $l_fill_tasklabel, $l_ptask_has_user;
+  global $err_msg, $l_ptask_same_task, $l_fill_tasklabel, $l_ptask_has_user;
+  global $l_ptask_and_parent;
 
   $pid = $project["id"];
   $task = $project["task"];
   $ptask = $project["ptask"];
   $tasklabel = $project["tasklabel"];
+
+  // If parent task same has task
+  if ($ptask == $task) {
+    $err_msg = $l_ptask_same_task;
+    return false;
+  }
+
+  // If parent task and task is already parent
+  if (is_task_parent($task)) {
+    $task_is_parent = true;
+  } else {
+    $task_is_parent = false;
+  }
+
+  if ( $task_is_parent && ($ptask > 0)) {
+    $err_msg = $l_ptask_and_parent;
+    return false;
+  }
 
   echo "task=$task, ptask=$ptask, label=$tasklabel";
   // If a parent task has been given, check that there are no links from
@@ -1420,6 +1440,33 @@ function check_task_form($pid, $project) {
   }
 
   return true; 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if a task is a parent task
+// Parameters:
+//   - $tid : task id
+// Returns:
+//   - (true | false) : true if task is parent, else false 
+///////////////////////////////////////////////////////////////////////////////
+function is_task_parent($tid) {
+  global $cdg_sql;
+
+  $query = "select projecttask_id
+    from ProjectTask
+    where projecttask_parenttask_id = '$tid'
+    ";
+
+  display_debug_msg($query, $cdg_sql, "check_task_is_parent");
+  $t_q = new DB_OBM;
+  $t_q->query($query);
+
+  if ($t_q->num_rows() > 0) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
 

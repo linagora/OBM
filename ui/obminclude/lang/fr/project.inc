@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : projet.inc                                               //
@@ -72,19 +72,26 @@ $l_update_ok = "La modification du projet a été correctement effectuée";
 $l_update_error = "La modification du projet a échoué !";
 $l_delete_ok = "La suppression du projet a été correctement effectuée";
 $l_delete_error = "La suppression du projet a échoué !";
+$l_link_timetask = "Le projet est renseigné dans la gestion du temps";
+$l_link_timetask_no = "Le projet n'est pas renseigné dans la gestion du temps";
+$l_cant_delete = "Le projet ne peut être supprimé !";
+$l_can_delete = "Le projet peut être supprimé.";
 $l_task_insert_ok = "La création de la tâche a été correctement effectuée.";
 $l_task_insert_error = "Impossible de créer cette tâche; La tâche parente est déjà assignée à des utilisateurs";
 $l_task_update_ok = "La modification de la tâche a été correctement effectuée.";
 $l_task_update_error = "Impossible de modifier cette tâche";
 $l_task_delete_ok = "La suppression des tâches a été correctement effectuée.";
 $l_task_delete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affecté (ou à ses filles), ou la tâche est référencée en gestion du temps";
+$l_no_task_del = "Aucune tâche à effacer";
+$l_ptask_same_task = "La tâche parente ne peut être la tâche elle-même !";
+$l_ptask_and_parent = "La tâche est parente et ne peut donc avoir une tâche parente !";
+
 $l_member_delete_error = "Impossible d'enlever ce participant ; Il est affecté à une tâche du projet ou a déjà passé du temps sur le projet.";
 $l_allocate_update_ok = "La mise à jour des affectations a été correctement effectuée";
 $l_allocate_update_error = "La mise à jour des affectations a échoué !";
 $l_progress_update_ok = "La mise à jour des avancements a été correctement effectuée";
 $l_progress_update_error = "La mise à jour des avancements a échoué !";
 $l_query_error = "Problème en executant la requete";
-$l_no_task_del = "Aucune tâche à effacer";
 $l_del_member_sel = "Enlever ces participants";
 $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";
@@ -92,10 +99,6 @@ $l_no_member_add = "Aucun participant à ajouter";
 $l_no_member_del = "Aucun participant à effacer";
 $l_add_member = "Ajouter des participants au projet";
 
-$l_link_timetask = "Le projet est renseigné dans la gestion du temps";
-$l_link_timetask_no = "Le projet n'est pas renseigné dans la gestion du temps";
-$l_cant_delete = "Le projet ne peut être supprimé !";
-$l_can_delete = "Le projet peut être supprimé.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";

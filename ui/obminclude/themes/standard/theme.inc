@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Theme : Standard                                                    //
 //     - File  : theme.inc                                                   //

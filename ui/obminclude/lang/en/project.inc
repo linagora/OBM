@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : projet.inc                                               //
@@ -72,30 +72,32 @@ $l_update_ok = "The project has been updated successfully.";
 $l_update_error = "The update of the project has failed !";
 $l_delete_ok = "The project has been deleted successfully";
 $l_delete_error = "The deletion of the project has failed !";
+$l_link_timetask = "The project is used in time management";
+$l_link_timetask_no = "The project is not used in time management";
+$l_cant_delete = "The project can't be deleted !";
+$l_can_delete = "The project can be deleted.";
 $l_task_insert_ok = "Task inserted successfully";
 $l_task_insert_error = "The task insertion has failed ! The parent task is already assigned to users";
 $l_task_update_ok = "Task updated successfully";
 $l_task_update_error = "The task update has failed !";
 $l_task_delete_ok = "The task has been deleted successfully.";
 $l_task_delete_error = "The tasks deletion has failed ! Someone is assigned to the task (or its children)";
+$l_no_task_del = "No task to remove";
+$l_ptask_same_task = "The parent task can't be the same as the task !";
+$l_ptask_and_parent = "A parent task can't have a parent !";
+
 $l_member_delete_error = "The deletion of the member has failed ! He should be assigned to some tasks or has spent some time on the project.";
 $l_allocate_update_ok = "The project allocation update has been updated successfully.";
 $l_allocate_update_error = "The update of the project allocation has failed !";
 $l_progress_update_ok = "The project progress has been updated successfully.";
 $l_progress_update_error = "The update of the project progress has failed !";
 $l_query_error = "Problem executing the query";
-$l_no_task_del = "No task to remove";
 $l_del_member_sel = "remove these members";
 $l_member_added = "member(s) added";
 $l_member_removed = "member(s) removed";
 $l_no_member_add = "No member to add";
 $l_no_member_del = "No member to remove";
 $l_add_member = "Add members to the project";
-
-$l_link_timetask = "The project is used in time management";
-$l_link_timetask_no = "The project is not used in time management";
-$l_cant_delete = "The project can't be deleted !";
-$l_can_delete = "The project can be deleted.";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "You have to fill the name before submitting.";

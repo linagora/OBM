@@ -193,11 +193,25 @@ Ce menu permet la suppression d'un projet.
 
 \subsubsection{Le sous-menu : Tâches}
 
-Ce menu permet de visualiser la liste des tâches déjà ratachées au projet et d'en saisir de nouvelles ou d'en supprimer.
+Ce menu permet de :\\
+\begin{itemize}
+\item Visualiser la liste des tâches ratachées au projet
+\item Saisir de nouvelles tâches
+\item Supprimer des tâches
+\item Modifier des tâches existantes.
+\end{itemize}
 
 \paragraph{L'ajout d'une tâche} ne peut s'effectuer si la tâche référence une tâche parente possédant des affectations. Car les tâches de groupe (ou parentes) ne peuvent pas être affectées à des utilisateurs.
 
 \paragraph{La suppression d'une tâche} ne peut s'effectuer si la tâche (ou une tâche fille de la tâche si elle est parente) est affectée à un utilisateur ou est référencée dans la gestion des temps.
+
+\paragraph{La modification d'une tâche} ne peut s'effectuer si :
+\begin{itemize}
+\item Une tâche parente est indiquée, identique à la tâche elle-même
+\item Une tâche parente est indiquée et que la tâche est elle-même parente
+\item Une tâche parente est indiquée mais possède des affectations (possible uniquement si affectations créés en même temps)
+\item La tâche est transformée en parent (Il n'y a pas de tâche parente indiquée) et la tâche comporte des allocations (ou saisies)
+\end{itemize}
 
 
 \subsubsection{Le sous-menu : Participants}
