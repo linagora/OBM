@@ -246,7 +246,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contact() {
   global $action;
-  global $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_ad1, $tf_ad2;
+  global $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $tf_ctry, $tf_func, $tf_phone, $tf_hphone;
   global $tf_mphone, $tf_fax, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
@@ -265,6 +265,7 @@ function get_param_contact() {
   if (isset ($company_new_id)) $contact["comp_new_id"] = $company_new_id;
   if (isset ($tf_ad1)) $contact["ad1"] = $tf_ad1;
   if (isset ($tf_ad2)) $contact["ad2"] = $tf_ad2;
+  if (isset ($tf_ad3)) $contact["ad3"] = $tf_ad3;
   if (isset ($tf_zip)) $contact["zip"] = $tf_zip;
   if (isset ($tf_town)) $contact["town"] = $tf_town;
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;

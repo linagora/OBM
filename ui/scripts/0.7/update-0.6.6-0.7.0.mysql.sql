@@ -24,6 +24,11 @@ Update Company set company_archive='0' where company_archive='';
 -- Add new column : company_address3
 ALTER TABLE Company ADD company_address3 varchar(64) AFTER company_address2;
 
+-------------------------------------------------------------------------------
+-- Contact
+-------------------------------------------------------------------------------
+-- Add new column : contact_address3
+ALTER TABLE Contact ADD contact_address3 varchar(50) AFTER contact_address2;
 
 -------------------------------------------------------------------------------
 -- Deal
@@ -67,8 +72,10 @@ alter table Task rename to TimeTask;
 CREATE TABLE ProjectStat (
   projectstat_deal_id int(8) NOT NULL,
   projectstat_date timestamp(14) NOT NULL,
-  projectstat_timecreate timestamp(14) NOT NULL,
-  projectstat_usercreate int(8) default NULL,
+  projectstat_timeupdate timestamp(14),
+  projectstat_timecreate timestamp(14),
+  projectstat_userupdate int(8),
+  projectstat_usercreate int(8),
   projectstat_useddays int(8) default NULL,
   projectstat_remainingdays int(8) default NULL,
   PRIMARY KEY (projectstat_deal_id, projectstat_date)

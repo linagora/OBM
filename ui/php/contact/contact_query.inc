@@ -174,7 +174,7 @@ function run_query_detail($p_id) {
 // Contact Insertion query execution                                         //
 // Parameters:
 //   - $contact[] : Entry's values
-//     keys used  : company_id, kind, lname, fname ad1, ad2, zip, town, cdx
+//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
 //                : ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($contact) {
@@ -190,6 +190,7 @@ function run_query_insert($contact) {
   $fname = $contact["fname"];
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
+  $ad3 = $contact["ad3"];
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -215,6 +216,7 @@ function run_query_insert($contact) {
     contact_firstname,
     contact_address1,
     contact_address2,
+    contact_address3,
     contact_zipcode,
     contact_town,
     contact_expresspostal,
@@ -239,6 +241,7 @@ function run_query_insert($contact) {
     '$fname',
     '$ad1',
     '$ad2',
+    '$ad3',
     '$zip',
     '$town',
     '$cdx',
@@ -270,8 +273,8 @@ function run_query_insert($contact) {
 // Contact update query execution                                            //
 // Parameters:
 //   - $contact[] : Entry's values
-//     keys used  : id, company_id, kind, lname, fname ad1, ad2, zip, town, cdx
-//                : ctry, func, phone, hphone, mphone, fax, email, com, vis
+//     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town,
+//                :  cdx, ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($contact) {
   global $auth, $cdg_sql;
@@ -289,6 +292,7 @@ function run_query_update($contact) {
   $fname = $contact["fname"];
   $ad1 = $contact["ad1"];
   $ad2 = $contact["ad2"];
+  $ad3 = $contact["ad3"];
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
@@ -313,6 +317,7 @@ function run_query_update($contact) {
     contact_firstname='$fname',
     contact_address1='$ad1',
     contact_address2='$ad2',
+    contact_address3='$ad3',
     contact_zipcode='$zip',
     contact_town='$town',
     contact_expresspostal='$cdx',

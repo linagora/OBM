@@ -193,6 +193,7 @@ CREATE TABLE Contact (
   contact_firstname varchar(24),
   contact_address1 varchar(50),
   contact_address2 varchar(50),
+  contact_address3 varchar(50),
   contact_zipcode varchar(14),
   contact_town varchar(24),
   contact_expresspostal varchar(8),
@@ -396,8 +397,10 @@ CREATE TABLE DocumentEntity (
 CREATE TABLE ProjectStat (
   projectstat_deal_id int(8) NOT NULL,
   projectstat_date timestamp(14) NOT NULL,
-  projectstat_timecreate timestamp(14) NOT NULL,
-  projectstat_usercreate int(8) default NULL,
+  projectstat_timeupdate timestamp(14),
+  projectstat_timecreate timestamp(14),
+  projectstat_userupdate int(8),
+  projectstat_usercreate int(8),
   projectstat_useddays int(8) default NULL,
   projectstat_remainingdays int(8) default NULL,
   PRIMARY KEY (projectstat_deal_id, projectstat_date)

@@ -252,6 +252,7 @@ function html_contact_consult($co_q) {
   $fname = $co_q->f("contact_firstname");
   $ad1 = $co_q->f("contact_address1");
   $ad2 = $co_q->f("contact_address2");
+  $ad3 = $co_q->f("contact_address3");
   $zip = $co_q->f("contact_zipcode");
   $town = $co_q->f("contact_town");
   $cdx = $co_q->f("contact_expresspostal");
@@ -340,6 +341,9 @@ function html_contact_consult($co_q) {
       <td class=\"detailLabel\">$l_address 2</td>
       <td class=\"detailText\">$ad2</td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailText\">$ad3</td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
       <td class=\"detailText\">$zip</td>
     </tr><tr>
@@ -381,7 +385,7 @@ function html_contact_consult($co_q) {
 //   - $co_q      : contact database result 
 //   - $kind_q    : contact kind database result 
 //   - $contact[] : default values
-//     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
+//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx, ctry, func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $kind_q, $contact) {
@@ -405,6 +409,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     $fname = $co_q->f("contact_firstname");
     $ad1 = $co_q->f("contact_address1");
     $ad2 = $co_q->f("contact_address2");
+    $ad3 = $co_q->f("contact_address3");
     $zip = $co_q->f("contact_zipcode");
     $town = $co_q->f("contact_town");
     $cdx = $co_q->f("contact_expresspostal");
@@ -445,6 +450,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
   if (isset($contact["ad2"])) { $ad2 = stripslashes($contact["ad2"]); }
+  if (isset($contact["ad3"])) { $ad2 = stripslashes($contact["ad3"]); }
   if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
   if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
   if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
@@ -561,6 +567,9 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     <td class=\"detailLabel\">$l_address 2</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"30\" value=\"$ad2\" /></td>
     </tr><tr>
+    <td class=\"detailLabel\">$l_address 3</td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad3\" size=\"30\" value=\"$ad3\" /></td>
+    </tr><tr>
     <td class=\"detailLabel\">$l_postcode</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
     </tr><tr>
@@ -606,7 +615,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 //   - $cid       : contact id
 //   - $co_q      : contact database result (at least 1 row)
 //   - $contact[] : values for insertion/update (if confirmation)
-//     keys used  : company_id, kind, lname, fname ad1, ad2, zip, town, cdx
+//     keys used  : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
 //                : ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
@@ -619,6 +628,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $fname = stripslashes($contact["fname"]);
   $ad1 = stripslashes($contact["ad1"]);
   $ad2 = stripslashes($contact["ad2"]);
+  $ad3 = stripslashes($contact["ad3"]);
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $cdx = stripslashes($contact["cdx"]);
@@ -671,6 +681,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_func\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
@@ -697,6 +708,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     <input type=\"hidden\" name=\"tf_func\" value=\"$func\" />
     <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
     <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_ad3\" value=\"$ad3\" />
     <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
     <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
     <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
