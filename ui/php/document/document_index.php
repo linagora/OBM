@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : document_index.php                                            //
-//     - Desc : Document Index File                                           //
+// OBM - File : document_index.php                                           //
+//     - Desc : Document Index File                                          //
 // 2003-08-21 Rande Mehdi                                              //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -30,22 +30,17 @@ require("document_display.inc");
 page_close();
 if ($action == "") $action = "index";
 $document = get_param_document();
-get_document_action();
-$perm->check();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if (! $document["popup"]) {
-  $display["header"] = generate_menu($menu, $section); // Menu
-}
 if ($action == "ext_get_path") {
   require("document_js.inc");
   $display["detail"] = html_documents_tree($document,$ext_disp_file);
 } elseif ($action == "accessfile") {
-    dis_file($document);
-    exit();
+  dis_file($document);
+  exit();
 } elseif ($action == "ext_get_ids") {
   $cat1_q = run_query_documentcategory1();
   $cat2_q = run_query_documentcategory2();
@@ -103,6 +98,7 @@ elseif ($action == "index" || $action == "") {
   if ($param_document > 0 || $name_document != "") {
     $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
+      $document["id"] = $doc_q->f("document_id"); // Temporaire ???
       $display["detailInfo"] = display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
       $display["detail"] = html_document_consult($doc_q);
     } else {
@@ -337,10 +333,18 @@ elseif ($action == "insert")  {
   $pref_q = run_query_display_pref($auth->auth["uid"], "document", 1);
   $display["detail"] = dis_document_display_pref($pref_q);
 }
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
+// here to have the id filled (when queried by name and path)
+get_document_action();
+$perm->check();
+
 $display["head"] = display_head($l_document);
+if (! $document["popup"]) {
+  $display["header"] = generate_menu($menu, $section);
+}
 $display["end"] = display_end();
 display_page($display);
 
@@ -452,7 +456,6 @@ function get_document_action() {
     'Right'    => $document_read,
     'Condition'=> array ('None') 
                                     	 );
-
 
 // New
   $actions["DOCUMENT"]["new"] = array (

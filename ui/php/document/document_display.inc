@@ -1,8 +1,8 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : document_display.inc                                          //
-//     - Desc : Document Display File                                         //
-//  2003-08-21 Mehdi Rande                                               //
+// OBM - File : document_display.inc                                         //
+//     - Desc : Document Display File                                        //
+//  2003-08-21 Mehdi Rande                                                   //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ $fieldnames["documentcategory2_label"] = $l_category2;
 $fieldnames["documentmimetype_label"] = $l_mimetype;
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document specific dataset fields                                   //
+// Display Document specific dataset fields                                  //
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -509,7 +509,7 @@ function html_repository_form($action, $document) {
 
    
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Document Consultation                                         //
+// HTML Display Document Consultation                                        //
 // Parameters:
 //   - $co_q   : document database result 
 ///////////////////////////////////////////////////////////////////////////////
