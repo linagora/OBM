@@ -108,8 +108,8 @@ elseif ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_document > 0) {
-    $doc_q = run_query_detail($param_document);
+if ($param_document > 0) {
+    $doc_q = run_query_detail($document);
     if ($doc_q->num_rows() == 1) {
       $cat1_q = run_query_documentcategory1();
       $cat2_q = run_query_documentcategory2();
@@ -172,7 +172,7 @@ elseif ($action == "insert")  {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $doc_q = run_query_detail($param_document);
+    $doc_q = run_query_detail($document);
     $display["detailInfo"] .= display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
     $display["detail"] = html_document_consult($doc_q);
   } else {
