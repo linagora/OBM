@@ -30,7 +30,7 @@ $l_see = "Voir";
 $l_validate = "Validée";
 $l_valid = "Valider";
 $l_add = "Ajouter";
-$l_modify = "Modifier";
+$l_update = "Modifier";
 
 
 $l_lastname = "Nom";
@@ -63,7 +63,7 @@ $fieldnames["task_company_name"] = $l_company;
 $fieldnames["task_length"] = $l_length;
 $fieldnames["task_totallength"] = $l_total_length;
 $fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["task_id"] = $l_modify;
+$fieldnames["task_id"] = $l_update;
 $fieldnames["contact_function"] = $l_function;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
@@ -91,7 +91,6 @@ $l_time = "Gestion des temps";
 
 // Actions
 $l_insert = "Enregistrer le Contact";
-$l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
 $l_select_company = "Sélectionner la société";
 $l_confirm= "Confirmer l'action";
@@ -114,7 +113,7 @@ $l_found = "Taches trouvées.";
 $l_no_found = "Aucune Taches pour cet utilisateur!";
 $l_addtask_start = "Saisissez les tâches réalisées pour la semaine en cours. La durée s'entend en fraction de journée (entre 1/";
 $l_addtask_end = " et 1).";
-$l_modtask = "Vous pouvez modifier votre tache ci dessous:";
+$l_update_task = "Vous pouvez modifier votre tache ci dessous:";
 $l_total_day = "Récapitulatif des tâches par jour.Si une journée a été intégralement saisie,<BR> vous devez confirmer ci-dessous en sélectionnant les journées à valider et en validant le formulaire.";
 $l_total_deal = "Récapitulatif par taches:";
 $l_delete_ok = "La suppression du contact a été correctement effectuée.";

@@ -36,7 +36,6 @@ function debug_array($a) {
 function html_time_links (&$time, $type="all") {
   global $sess, $l_week, $hum_date,$l_week_prev,$l_week_next;
 
-
   //get the current start and end of week
   $d_start_week = first_day_week($time);
   if ( ! isset($time["date_end"]) ) 
@@ -75,21 +74,20 @@ function html_time_links (&$time, $type="all") {
          <TABLE BORDER=1>
             <TR><TD>
                <A HREF=\"" .
-               $sess->url("time_index.php?action=index&amp;param_begin=".date("Ymd",$d_start_prev)."&amp;param_end=".date("Ymd",$d_end_prev))."&amp;user_id=".$time["contact_id"]."\">
+               $sess->url("time_index.php?action=index&amp;param_begin=".date("Ymd",$d_start_prev)."&amp;param_end=".date("Ymd",$d_end_prev))."&amp;user_id=".$time["user_id"]."\">
                ".$l_week_prev."
                </A>
             </TD>  
             <TD>
                <A HREF=\"" .
-               $sess->url("time_index.php?action=index&amp;param_begin=".date("Ymd",$d_start_next)."&amp;param_end=".date("Ymd",$d_end_next))."&amp;user_id=".$time["contact_id"]."\">
+               $sess->url("time_index.php?action=index&amp;param_begin=".date("Ymd",$d_start_next)."&amp;param_end=".date("Ymd",$d_end_next))."&amp;user_id=".$time["user_id"]."\">
                ".$l_week_next."
                </A>
             </TD></TR>
          </TABLE>    
-      </FONT> </CENTER>    
+      </FONT> </center>    
         ";     
 }
-
 
  
 ///////////////////////////////////////////////////////////////////////////////
@@ -97,80 +95,77 @@ function html_time_links (&$time, $type="all") {
 // Parameters:
 //   - $time[] : default form values
 //     keys used  : week
+//   - $usr_q  : DBO : UserObm list
+//   - $uid    : current user id
 ///////////////////////////////////////////////////////////////////////////////
-function html_time_search_form ($time, $obm_q_contact_list, $contacts_array) {
-  global $l_contact_name, $l_from_company, $l_see, $l_week, $l_from_user, $project_managers;
+function html_time_search_form ($time, $usr_q, $uid) {
+  global $l_see, $l_week, $l_from_user, $project_managers;
   global $l_user;
-  global $sess , $uid;
+  global $sess, $uid;
 
   $hum_date_start = dis_human_date($time["date"]);
   $hum_date_end = dis_human_date($time["date_end"]);
 
   if (in_array($uid, $project_managers)) {
-    $sel_contact_id = $time["contact_id"];
+    $sel_user_id = $time["user_id"];
   
-    echo "<BR><CENTER>
-       <FORM METHOD=POST NAME=f_time ACTION=\"" .
-       $sess->url("time_index.php") . "\">
-	  <TABLE BORDER=1><TR>
-         <TD><FONT SIZE=-2>$l_week</FONT></TD>
-         <TD><FONT SIZE=-1>Du $hum_date_start au $hum_date_end </FONT></TD>
-         </TR>
-         <TR>
-         <TD>&nbsp;&nbsp;</TD>
-         <TD align=left><FONT SIZE=-2> $l_user </FONT><BR>";
-
-    // Available Contacts 
-    echo "\n<CENTER><SELECT name=\"sel_contact_id\" size=6>";
-    while ($obm_q_contact_list->next_record()) {
-      echo "\n<OPTION value=".$obm_q_contact_list->f("contact_id");
+    // UserObm Select
+    $sel_user = "<select name=\"sel_user_id\" size=6>";
+    $selected = false;
+    while ($usr_q->next_record()) {
+      $u_id = $usr_q->f("userobm_id");
+      $lname = $usr_q->f("userobm_lastname");
+      $fname = $usr_q->f("userobm_firstname");
+      $sel_user .= "\n<option value=\"$u_id\"";
  
-      // Get parameter from Form 
-      if (! is_null($sel_contact_id)) {
-         $tag_contact="";
-	   if ($obm_q_contact_list->f("contact_id") == $sel_contact_id ) {
-	     $tag_contact=" selected";
-	   }
+      // decide whic user to select:
+      // if one has been selected (sel_user_id) select it,
+      // else select the current user
+      if ( (! $selected)
+           && ( (($sel_user_id == $u_id) && (! is_null($sel_user_id)))
+                || ( ($u_id == $uid) && (is_null($sel_user_id)) ) ) ) {
+        $selected = "1";  
+        $sel_user .= "selected";
       }
-      // Or Get it from user id.
-      elseif (count($contacts_array)>0) {
-         $tag_contact="";
-         while ( (list($key, $contact_id) = each($contacts_array) ) && (strcmp($tag_contact,"")==0)) {
-	   if ($obm_q_contact_list->f("contact_id") == $contact_id ) {
-	     $tag_contact=" selected";
-	   }
-         }
-         reset($contacts_array);
-      }    
-  
-      echo " ".$tag_contact.">".$obm_q_contact_list->f("contact_lastname")." ".$obm_q_contact_list->f("contact_firstname")." </OPTION>";
+
+      $sel_user .= ">$lname $fname</option>";
     }
-    echo "</SELECT></CENTER>";
+    $sel_user .= "</select>";
 
-
-    echo "
-       </TD>
-       <TD VALIGN=bottom>&nbsp;&nbsp;
-         <INPUT TYPE=hidden name=param_begin value=\"".$time["date"]."\">
-         <INPUT TYPE=hidden name=param_end value=\"".$time["date_end"]."\">
-         <INPUT NAME=\"action\" TYPE=hidden VALUE=\"search\">
-         <INPUT NAME=\"submit\" TYPE=submit VALUE=\"$l_see\">&nbsp;
-       </TD>
-     </TR>
-     </TABLE>
-     </FORM><HR>
-   </CENTER>";
+    echo "<br>
+      <center>
+      <form method=post name=f_time action=\"" .
+      $sess->url("time_index.php") . "\">
+      <table border=1>
+      <tr>
+        <td><font size=-2>$l_week</font></td>
+        <td><font size=-1>Du $hum_date_start au $hum_date_end</font></td>
+      </tr><tr>
+        <td><font size=-2> $l_user </font></td>
+        <td align=left>
+        $sel_user
+        </td>
+        <td valign=bottom>&nbsp;&nbsp;
+          <input type=hidden name=param_begin value=\"".$time["date"]."\">
+          <input type=hidden name=param_end value=\"".$time["date_end"]."\">
+          <input name=\"action\" type=hidden value=\"search\">
+          <input name=\"submit\" type=submit value=\"$l_see\">&nbsp;
+        </td>
+      </tr>
+      </table>
+      </form><hr>
+      </center>";
   }
   else
-    echo "<BR>Semaine du $hum_date_start au $hum_date_end<BR><BR>";
+    echo "<br>$l_week du $hum_date_start au $hum_date_end<br><br>";
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contact search result                                         //
+// Display the Task search result                                            //
 // Parameters:
-//   - $contact[] : contact search criteria
-//     keys used  : company_id, name, company
+//   - $time[]   : time search criteria
+//     keys used : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list($time) {
   global $l_no_found, $l_addtask, $set_debug;
@@ -205,10 +200,6 @@ function dis_time_list($time) {
   if ($nb_task == 0) {
     display_warn_msg("<BR>".$l_no_found);
   } else {
-      $names = run_query_get_names($time["contact_id"]);
-      $names->next_record();
-      
-   
     html_time_list($obm_q,$pref_q,$nb_task,$time);
   }
   
@@ -233,25 +224,25 @@ function dis_time_list($time) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Time Task  result                                        //
 // Parameters : 
-//   - $obm_q      : list of the contacts to display 
-//   - $pref_q     : the fields which have to be displayed
-//   - $nb_task : nb contacts returned by the search query 
-//   - $time[]  : time search criteria
-//     keys used   : week
+//   - $obm_q    : list of tasks to be displayed
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//   - $time[]   : time search criteria
+//     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
 function html_time_list($obm_q,$pref_q,$nb_task,$time) {
   //-- Themes
   global $sess, $set_theme,$col_tableh,$col_textem,$col_table,$ico_mail;
   //-- Labels
-  global $l_found, $_task_del, $l_delete, $l_modify, $l_task_del, $l_found_task;
+  global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
 
   dis_table_title($l_found_task) ;
   echo "<font color=\"#$col_textem\">$nb_task $l_found</font><br>";
 
-  $url = $sess->url("time_index.php?action=index&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"]."&amp;user_id=".$time["contact_id"]."&amp;tf_week=".urlencode($week));
+  $url = $sess->url("time_index.php?action=index&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"]."&amp;user_id=".$time["user_id"]."&amp;tf_week=".urlencode($week));
  
   echo "
-    <form METHOD=POST NAME=f_task_del ACTION=\"".$sess->url("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >";
+    <form method=post NAME=f_task_del ACTION=\"".$sess->url("time_index.php")."\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
   $dis_task_list->data_set = $obm_q;
@@ -268,7 +259,7 @@ function html_time_list($obm_q,$pref_q,$nb_task,$time) {
 
   echo "
     <BR>
-    <INPUT TYPE=hidden name=user_id value=\"".$time["contact_id"]."\">
+    <INPUT TYPE=hidden name=user_id value=\"".$time["user_id"]."\">
     <INPUT TYPE=hidden name=param_begin value=\"".$time["date"]."\">
     <INPUT TYPE=hidden name=param_end value=\"".$time["date_end"]."\">
     <input NAME=\"action\" TYPE=hidden VALUE=\"delete\">
@@ -278,13 +269,13 @@ function html_time_list($obm_q,$pref_q,$nb_task,$time) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Day  result                                        //
+// HTML Display the Time Day result                                        //
 // Parameters : 
-//   - $obm_q      : list of the contacts to display 
-//   - $pref_q     : the fields which have to be displayed
-//   - $nb_task : nb contacts returned by the search query 
-//   - $time[]  : time search criteria
-//     keys used   : week
+//   - $obm_q    : list of tasks to display 
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//   - $time[]   : time search criteria
+//     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
 function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   //-- Themes
@@ -294,11 +285,6 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
   global $l_total_day, $l_projects_manager, $l_validate, $l_valid;
   //session
   global $uid, $project_managers;
-
-
-  $lname = stripslashes($contact["lname"]);
-  $company = stripslashes($contact["company"]);
-  $company_id = $contact["company_id"];
 
   echo "<FONT color=\"#$col_textem\">";
   echo "</FONT><BR>";
@@ -331,11 +317,11 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
 
   echo "
     <BR>
-    <INPUT TYPE=hidden name=user_id value=\"".$time["contact_id"]."\">
+    <INPUT TYPE=hidden name=user_id value=\"".$time["user_id"]."\">
     <INPUT TYPE=hidden name=param_begin value=\"".$time["date"]."\">
     <INPUT TYPE=hidden name=param_end value=\"".$time["date_end"]."\">
     <INPUT NAME=\"action\" TYPE=hidden VALUE=\"validate\">
-    <INPUT NAME=\"submit\" TYPE=submit VALUE=\"".$l_valid."\" >
+    <INPUT NAME=\"submit\" TYPE=submit VALUE=\"$l_valid\" >
     </form>
        ";
 
@@ -368,7 +354,7 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
 
    echo "
      <BR>
-     <INPUT TYPE=hidden name=user_id value=\"".$time["contact_id"]."\">
+     <INPUT TYPE=hidden name=user_id value=\"".$time["user_id"]."\">
      <INPUT TYPE=hidden name=param_begin value=\"".$time["date"]."\">
      <INPUT TYPE=hidden name=param_end value=\"".$time["date_end"]."\">
      <INPUT NAME=\"action\" TYPE=hidden VALUE=\"validate_admin\">
@@ -382,10 +368,10 @@ function html_time_day_list($obm_dq,$pref_dq,$nb_task,$time) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Time Deal  result                                        //
 // Parameters : 
-//   - $obm_q      : list of the contacts to display 
-//   - $pref_q     : the fields which have to be displayed
-//   - $nb_task : nb contacts returned by the search query 
-//     keys used   : week
+//   - $obm_q    : tasks list to display 
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
 function html_time_deal_list($obm_dq,$pref_dq,$nb_task) {
   //-- Themes
@@ -433,18 +419,20 @@ function dis_table_title($message) {
 //   - $message : message to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$time) {
-   global $sess, $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
-   global $col_table, $col_tableh, $col_textem, $l_add, $task_list;
-   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_modify, $l_modtask, $l_close;
-   //for list classement of task
-   global $l_task_fac,$l_task_int;
-   $task_list  = array($l_task_fac, $l_task_int);
+  global $sess, $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour;
+  global $col_table, $col_tableh, $col_textem, $l_add, $task_list;
+  global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_modtask, $l_close;
+  //for list classement of task
+  global $l_task_fac,$l_task_int;
 
+  $task_list  = array($l_task_fac, $l_task_int);
+  
   $validate_day = run_query_valid_search($time);
 
   //get different attribute for task to be modify
-  if ( $action == "modify") {
-    $task_to_be_modify = run_query_get_task($task_id_modify);
+  if ($action == "detailupdate") {
+    $task_id = $time["task_id"];
+    $task_to_be_modify = run_query_get_task($task_id);
     $is_day = substr($task_to_be_modify->f("task_date"),0,8);
     $is_tt = $task_to_be_modify->f("task_tasktype_id");
     $is_proj = $task_to_be_modify->f("task_deal_id");
@@ -463,17 +451,17 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   $sel_day .= "</SELECT>";
 
   // Day check construction
-  if( $action != "modify") {
+  if( $action != "detailupdate") {
    for ($day=0;$day< sizeof($day_q);  $day++) {
      if(sizeof($validate_day)>0 && in_array($day_q[$day][1],$validate_day) != FALSE) continue;
      $dlabel = $day_q[$day][0];
-     $ch_day .= "<INPUT type=\"checkbox\" name=\"cb_day[".$day_q[$day][1]."]\"";
+     $ch_day .= "<input type=\"checkbox\" name=\"cb_day[".$day_q[$day][1]."]\"";
      $ch_day .= ">$dlabel\n";
    }
   }
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<SELECT name=sel_tasktype>";
+  $sel_tt = "<select name=sel_tasktype>";
   while($taskt_q->next_record()) {
     //put menu titles
     if (($task_i = $taskt_q->f("tasktype_internal")) != $type_prec) {
@@ -482,11 +470,11 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
     }
     $tt_id = $taskt_q->f("tasktype_id");
     $tt_label = $taskt_q->f("tasktype_label");
-    $sel_tt .= "\n<OPTION value=\"$tt_id\"";
+    $sel_tt .= "\n<option value=\"$tt_id\"";
     if ($is_tt == $tt_id) $sel_tt .= " selected"; 
-    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</OPTION>\n";
+    $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
   }
-  $sel_tt .= "</SELECT>";
+  $sel_tt .= "</select>";
 
   // Project select construction
   $sel_proj = "<SELECT name=sel_project>";
@@ -500,7 +488,7 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
   $sel_proj .= "</SELECT>";
 
   // Project Label
-  if ($action == "modify")
+  if ($action == "detailupdate")
     $tf_label ="<INPUT TYPE=\"text\" NAME=\"tf_label\" SIZE=30 VALUE=\"".$task_to_be_modify->f("task_label")."\">";
   else
     $tf_label ="<INPUT TYPE=\"text\" NAME=\"tf_label\" SIZE=30>";
@@ -518,22 +506,22 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
 
 // FORM
   echo "<p>&nbsp;</p>";
-  if($action == "insert") {
+  if ($action == "insert") {
     dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
     echo "
-<FORM METHOD=POST NAME=form_add_task 
-        ACTION=\"".$sess->url("time_index.php")."\">
-      <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"$action\">
-      <INPUT TYPE=\"hidden\" NAME=\"popup\" VALUE=0>
+      <form method=get name=form_add_task 
+        action=\"".$sess->url("time_index.php")."\">
+      <input type=\"hidden\" name=\"action\" value=\"$action\">
+      <input type=\"hidden\" name=\"popup\" value=0>
   ";
   }
   else {
-    dis_table_title($l_modtask);
+    dis_table_title($l_update_task);
     echo "
-<FORM METHOD=POST  NAME=form_add_task 
-        ACTION=\"".$sess->url("time_index.php")."\">
-      <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"$action\">
-      <INPUT TYPE=\"hidden\" NAME=\"popup\" VALUE=0>
+      <form method=get  name=form_add_task 
+        action=\"".$sess->url("time_index.php")."\">
+      <input type=\"hidden\" name=\"action\" value=\"update\">
+      <input type=\"hidden\" name=\"popup\" value=0>
   ";
   }
  echo " 
@@ -547,22 +535,23 @@ function dis_form_addtask($action, $project_q, $taskt_q, $day_q, $fraction_t,$ti
      <td colspan=2>".col_table($col_textem, $l_project)."<br>$sel_proj</td>
      <td>".col_table($col_textem, $l_label)."<br>$tf_label</td>
     </tr>
-</table>";
+</table>
+  <center>";
 
-   if ($action == "insert") {
-      echo "<BR><INPUT TYPE=hidden name=user_id value=\"".$time["contact_id"]."\">
-            <CENTER> <INPUT TYPE=submit value=\"$l_add\"> </CENTER>
-           ";
-   }
-   else {
-      echo "<BR><INPUT TYPE=hidden name=user_id value=\"".$time["contact_id"]."\">
-            <CENTER> <INPUT TYPE=submit value=\"$l_modify\"> </CENTER>
-           ";
-      echo "
-            <BR><CENTER> <INPUT TYPE=submit value=\"$l_close\" onclick=\"window.close()\"> </CENTER>
-           ";
-   }     
- echo "</FORM> <p>&nbsp;</p>";
+ if ($action == "insert") {
+   echo "<br><input type=submit value=\"$l_add\">";
+ } else {
+   echo "<br><input type=hidden name=task_id value=\"$task_id\">
+         <input TYPE=submit value=\"$l_update\">";
+ }     
+ 
+ echo "<br>
+     <input type=submit value=\"$l_close\" onclick=\"window.close();\">
+  </center>
+    <input type=hidden name=user_id value=\"".$time["user_id"]."\">
+    <input type=hidden name=param_begin value=\"".$time["date"]."\">
+    <input type=hidden name=param_end value=\"".$time["date_end"]."\">
+</FORM> <p>&nbsp;</p>";
 
 }
 
@@ -571,25 +560,4 @@ function col_table($col, $data) {
 } 
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Display the Time search form with params                                 //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : company_id, name, company
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_search($time) {
-  global $l_no_found;
-  global $auth, $new_order, $order_dir;
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "time");
-  $obm_q = run_query_search($time, $new_order, $order_dir);
-  $nb_contact = $obm_q->num_rows();
-  if ($nb_contact == 0) {
-    display_warn_msg($l_no_found);
-  } else {
-    html_contact_search_list($obm_q,$pref_q,$nb_contact,$contact);
-  }
-}
-
- 
 </SCRIPT>

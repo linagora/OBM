@@ -30,7 +30,7 @@ $l_see = "See";
 $l_validate = "Validate";
 $l_valid = "Validation";
 $l_add = "Add";
-$l_modify = "Modify";
+$l_update = "Update";
 
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
@@ -62,7 +62,7 @@ $fieldnames["task_company_name"] = $l_company;
 $fieldnames["task_length"] = $l_length;
 $fieldnames["task_totallength"] = $l_total_length;
 $fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["task_id"] = $l_modify;
+$fieldnames["task_id"] = $l_update;
 $fieldnames["contact_function"] = $l_function;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
@@ -90,7 +90,6 @@ $l_time = "Time management";
 
 // Actions
 $l_insert = "Enregistrer le Contact";
-$l_update = "Modifier le Contact";
 $l_checkdelete = "Vérifier ou Supprimer le Contact";
 $l_select_company = "Sélectionner la société";
 $l_confirm= "Confirmer l'action";
@@ -113,7 +112,7 @@ $l_found = "found tasks.";
 $l_no_found = "No task for this user";
 $l_addtask_start = "Put information for the current week. Duration is fraction of day (between 1/";
 $l_addtask_end = " and 1).";
-$l_modtask = "Here is the form where you can modify your task:";
+$l_update_task = "Here is the form where you can update your task:";
 $l_total_day = "Summary by day. If a day is complete,<BR> Confirm it by selecting complet days and validate form.";
 $l_total_deal = "Summary by task:";
 $l_delete_ok = "La suppression du contact a été correctement effectuée.";

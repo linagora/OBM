@@ -1,8 +1,10 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : contact_js.inc                                              //
-//     - Desc  : Contact javascript functions File                           //
-// 2000-01-13 Pierre Baudracco : Last Update 2000-01-13                      //
+// OBM - File : time_js.inc                                                  //
+//     - Desc : Time javascript functions File                               //
+// 2000-01-13 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "

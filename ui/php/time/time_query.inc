@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact search query execution                                            //
+// Task search query execution
 // Parametes:
 //   - $time[]    :    time search criteria
 //     keys used       interval, date
@@ -43,7 +43,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
       Deal,
       Company
     where task_tasktype_id = tasktype_id
-      and task_user_id='".$time["contact_id"]."'
+      and task_user_id='".$time["user_id"]."'
       and task_deal_id = deal_id
       and deal_company_id = company_id ";
 
@@ -52,18 +52,6 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
   if (is_array($array_date)) {
     $query .= "and task_date  >='" . $array_date[0] . "' and " .
               "task_date  <'" . $array_date[1] . "'";
-  }
-  // If a contact indication has been specified, get it 
-  if ($lname != "") {
-    $query .= " contact_lastname like '" . $lname . "%' and";
-  }
-  // If a company indication has been specified, get it 
-  if ($company != "") {
-    $query .= " company_name like '" . $company . "%' and";
-  }
-  // If a company was sent as parameter, get it
-  if ($company_id != "") {
-    $query .= " company_id =" . $company_id . " and";
   }
 
   // order
@@ -82,7 +70,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 // Task grouped by day                                                       //
 // Parametes:
 //   - $time[]    :    time search criteria
-//     keys used       week,contact_id, date, date_end
+//     keys used       week, user_id, date, date_end
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +78,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
   global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
-  $contact_id = $time["contact_id"];
+  $user_id = $time["user_id"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
 
@@ -101,7 +89,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
       (1=sum(task_length)/$fraction_jour and task_status<>2) as task_valid,
       task_status
     from Task
-    where task_user_id='$contact_id'
+    where task_user_id='$user_id'
       and task_date>='$week_start'
       and task_date<='$week_end'
     group by task_date";
@@ -127,7 +115,7 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
   global $auth, $l_date_text_format, $fraction_jour, $cdg_sql;
 
   $week = $time["week"];
-  $contact_id = $time["contact_id"];
+  $user_id = $time["user_id"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
 
@@ -142,7 +130,7 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
       Company
     where tasktype_id=task_tasktype_id
       and task_deal_id = deal_id
-      and task_user_id='$contact_id'
+      and task_user_id='$user_id'
       and task_date>='$week_start'
       and task_date<='$week_end'
       and deal_company_id = company_id
@@ -162,13 +150,13 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir) {
 ///////////////////////////////////////////////////////////////////////////////
 // Task to validate                                                         //
 // Parametes:
-//   - $time[]    : contact search criteria 
-//     keys used       contac_id, date, date_end
+//   - $time[]   : task search criteria 
+//     keys used : user_id, date, date_end
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin($time) {
   global $l_date_text_format,$fraction_jour, $cdg_sql;
 
-  $contact_id = $time["contact_id"];
+  $user_id = $time["user_id"];
   $week_start = $time["date"];
   $week_end = $time["date_end"];
  
@@ -177,7 +165,7 @@ function run_query_admin($time) {
       DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
       task_status=2 as task_status
     from Task
-    where task_user_id='$contact_id'
+    where task_user_id='$user_id'
       and task_date>='$week_start'
       and task_date<='$week_end'
       and task_status!=0
@@ -196,10 +184,10 @@ function run_query_admin($time) {
 function run_query_valid_search($time) {
 global $cdg_sql;
 
-  $uid = $time["contact_id"];
+  $user_id = $time["user_id"];
   $i=0; //for loop
   
-  $query = "select task_date from Task where task_status != 0 and task_user_id='$uid' group by task_date";
+  $query = "select task_date from Task where task_status != 0 and task_user_id='$user_id' group by task_date";
   
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
@@ -233,7 +221,6 @@ function run_query_get_task($id) {
 // Task Insertion query execution                                         //
 // Parameters:
 //   - $task[] : Entry's values
-//   -$date : date of creation
 //     keys used  : tasktype, project, time, label, date
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($task) {
@@ -246,7 +233,7 @@ function run_query_insert($task) {
   $project = $task["project"];
   $time = $task["time"];
   $label = $task["label"];
-  $user = $task["contact_id"];
+  $user_id = $task["user_id"];
     
   if ( $ttype != 0 ) //for navigators wich dosen't support HTML 4 => <option disabled>
   { 
@@ -267,7 +254,7 @@ function run_query_insert($task) {
        '" . date("Y-m-d H:i:s") . "',
        null,
        '" . $auth->auth["uid"] . "',
-       $user,
+       '$user_id',
        '$key',
        '$project',
        '$time',
@@ -296,7 +283,7 @@ function run_query_insert($task) {
        '" . date("Y-m-d H:i:s") . "',
        null,
        '" . $auth->auth["uid"] . "',
-       $user,
+       '$user_id',
        '$date',
        '$project',
        '$time',
@@ -316,10 +303,9 @@ function run_query_insert($task) {
 // Task modification query execution                                         //
 // Parameters:
 //   - $task[] : Entry's values
-//   -$date : date of creation
 //     keys used  : tasktype, project, time, label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_modify($task,$date) {
+function run_query_update($task) {
   global $cdg_sql;
 
   $id = $task["task_id"];
@@ -327,9 +313,10 @@ function run_query_modify($task,$date) {
   $project = $task["project"];
   $time = $task["time"];
   $label = $task["label"];
+  $date = $task["sel_date"];
   
-  display_debug_msg($query, $cdg_sql);
   $query = "update Task set task_date='$date',task_tasktype_id='$ttype',task_length='$time',task_label='$label',task_deal_id='$project' where task_id='$id'";
+  display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 }
@@ -361,9 +348,9 @@ function run_query_delete($parms) {
 ///////////////////////////////////////////////////////////////////////////////
 // Task Validation                                                          //
 // Parameters:
-//     - $time[]    : time search criteria  
-//     -$parms      : correponding to page parameters
-//     -$who        : user who make the validation : 1=admin or other=user
+//   - $time[] : time search criteria  
+//   - $parms  : correponding to page parameters
+//   - $who    : user who make the validation : 1=admin or other=user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_validate($parms,$time,$who) {
 
@@ -374,7 +361,7 @@ function run_query_validate($parms,$time,$who) {
   if($who == 1) {
     $status = 2;
     ///////////////////////////////////////////
-    $zero = "update Task SET task_status=1 where task_status=2 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["contact_id"] ."'";
+    $zero = "update Task SET task_status=1 where task_status=2 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["user_id"] ."'";
     $zero_query = new DB_OBM;                  
     $zero_query->query($zero);
     //////////////////////////////////////////
@@ -382,7 +369,7 @@ function run_query_validate($parms,$time,$who) {
   else { 
     $status = 1;
     ///////////////////////////////////////////
-    $zero = "update Task SET task_status=0 where task_status=1 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["contact_id"] ."'";
+    $zero = "update Task SET task_status=0 where task_status=1 and task_date>='".$time["date"]."' and task_date<='".$time["date_end"]."' and task_user_id='". $time["user_id"] ."'";
     $zero_query = new DB_OBM;                  
     $zero_query->query($zero);
     //////////////////////////////////////////
@@ -394,7 +381,7 @@ function run_query_validate($parms,$time,$who) {
       $d_task = substr($d_task, 1);  
       if($val == "on"){ 
         $d_task = str_replace("_"," ",$d_task); 
-        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["contact_id"]."'";
+        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["user_id"]."'";
         $delete_query = new DB_OBM;
         display_debug_msg($query, $cdg_sql);
         $delete_query->query($query);
@@ -435,52 +422,6 @@ function run_query_project() {
   $obm_q->query($query);
 
   return $obm_q;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// Get all the contacts of the companyusing obm
-//////////////////////////////////////////////////////////////////////////
-function run_query_get_mycontacts() {
-  global $cdg_sql;
- 
-  $obm_db=new DB_OBM;
-  $query="select contact_id,contact_lastname,contact_firstname from Contact,Company where contact_company_id=company_id and company_state=1 order by contact_lastname";
-  display_debug_msg($query, $cdg_sql);
-
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
-// return contact_id 
-// Param : $usr_id
-//////////////////////////////////////////////////////////////////////////
-function run_query_get_contact_id ($usr_id) {
-  global $cdg_sql;
-
-  $obm_db = new DB_OBM;
-  $query = "select userobm_contact_id from UserObm where userobm_id='$usr_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  $obm_db->next_record(); 
-  return $obm_db->f("userobm_contact_id");
-}
-
-//////////////////////////////////////////////////////////////////////////
-// return contact_id 
-// Param : $contact_id
-//////////////////////////////////////////////////////////////////////////
-function run_query_get_names($contact) { 
-  global $cdg_sql;
-
-  $obm_db = new DB_OBM;
-  $query = "select contact_lastname,contact_firstname from Contact where $contact=contact_id";
-  display_debug_msg($query, $cdg_sql);
-
-  $obm_db->query($query);
-  return $obm_db;
 }
 
 
@@ -531,35 +472,35 @@ function get_week_point($sel_date) {
 
 
     // week planning
-	if (is_null($sel_date))
-		$p_date=date("YmdHis");
-    else
-		$p_date=$sel_date;
+  if (is_null($sel_date))
+    $p_date=date("YmdHis");
+  else
+    $p_date=$sel_date;
 
-    $p_contact_array=array(run_query_contactid_user($auth->auth["uid"]));
-    $p_year=substr($p_date,0,4);
-    $p_month=substr($p_date,4,2);
-    $p_day=substr($p_date,6,2);
-     // day of week (0=sunday)
-    $dow=date("w",mktime(0,0,0,$p_month,$p_day,$p_year));       
-    // Weekstart :
-    if ($dow == 0) {
-      $weekstart=mktime(0,0,0,$p_month,$p_day - 6,$p_year);
-    } elseif ( $dow == 1 ) {
-      $weekstart=mktime(0,0,0,$p_month,$p_day,$p_year); 
-    } else {
-      $weekstart=mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
-    }
-    $weekend=date("YmdHis",$weekstart + 7 * 86400);
-    $weekstart=date("YmdHis",$weekstart);  
+  $p_year=substr($p_date,0,4);
+  $p_month=substr($p_date,4,2);
+  $p_day=substr($p_date,6,2);
+  // day of week (0=sunday)
+  $dow=date("w",mktime(0,0,0,$p_month,$p_day,$p_year));       
+  // Weekstart :
+  if ($dow == 0) {
+    $weekstart=mktime(0,0,0,$p_month,$p_day - 6,$p_year);
+  } elseif ( $dow == 1 ) {
+    $weekstart=mktime(0,0,0,$p_month,$p_day,$p_year); 
+  } else {
+    $weekstart=mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
+  }
+  $weekend=date("YmdHis",$weekstart + 7 * 86400);
+  $weekstart=date("YmdHis",$weekstart);  
     
-	// Date Couple in an array
-    if ($debug > 0)
-		echo "dates debut $weekstart fin $weekend<br>";
-
-	return array($weekstart, $weekend);
+  // Date Couple in an array
+  if ($debug > 0)
+    echo "dates debut $weekstart fin $weekend<br>";
+  
+  return array($weekstart, $weekend);
 	
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Show a date in human format

@@ -708,7 +708,7 @@ class OBM_DISPLAY {
         // For the time management
         //------------------------------
         else if ($fieldname == "task_id" && $this->data_set->f("task_status")==0) { //make the popup timemanagement modification variable
-	   $popup_display = "time_index.php?action=modify&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+	   $popup_display = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$this->data_set->f("task_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
 	   $name = "<img border=0 src=\"/images/$set_theme/modify.png\">";
            $url="./time_index.php?action=index&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
 	}
