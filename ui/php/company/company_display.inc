@@ -810,7 +810,6 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   }
 
   $cat_a = get_ordered_category($cat_q); 
-  
   // Cat select field
   if ($show_cat) {
     $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
@@ -956,9 +955,8 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $js_ctry
 
     <form method=\"post\" name=\"form_company\"
-      onsubmit=\"if (check_company(this)) return true; else return false;\"
+    onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
-
     <div class=\"detailHead\">$l_company</div>
 
     <table class=\"detail\">
@@ -1212,7 +1210,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $web = $company["web"];
   $email = $company["email"];
   $com = $company["com"];
-
+  $compcat = $company["cat"]; 
   $display["msg"] .= display_warn_msg($l_check_samecompany);
 
   while ($co_q->next_record()) {
@@ -1225,7 +1223,9 @@ function dis_company_warn_insert($cid, $co_q, $company) {
           $samename ($samezip)</a>
       </td></tr>";
   }
-
+  foreach($compcat as $cat) {
+    $dis_cat .= "<input type=\"hidden\" name=\"sel_cat[]\" value=\"$cat\" />";
+  }
   $block = "
   <table class=\"detail\">
     $dis_same_comp
@@ -1254,6 +1254,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    $dis_cat
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
@@ -1280,6 +1281,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
     <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
     <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    $dis_cat
     <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
@@ -2065,14 +2067,14 @@ function display_popup_tree($tree,$indent) {
       "<table class=\"category\">
 	 <tr>
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
+	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\"> 
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	   </a>
-	   <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
+	  <input type=\"checkbox\" id=\"pouic\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
 	  </td>
 	 </tr>
 	</table>
-	<div id='$code' style=\"display:none;\" >
+	<div id='div_$code' style=\"display:none;\" >
 	 $content
 	</div>";
     }

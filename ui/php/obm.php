@@ -46,8 +46,14 @@ $display["title"] = "
 <div class=\"title\">
 <b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s") . "
 </div>";
-$block .= dis_calendar_portal();
-$block .= dis_time_portal();
+if ($cgp_show["module"]["agenda"]) { 
+  $block .= dis_calendar_portal();
+}
+
+if ($cgp_show["module"]["time"]) { 
+  $block .= dis_time_portal();
+}
+
 $display["detail"] = "
 <div class=\"detail\">
  <div class=\"portal\">

@@ -291,20 +291,29 @@ function run_query_insert($company) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
+  if($kind != 0) {
+    $kind_sql = "and company_type_id='$kind'";
+  }
+  if($market != 0) {
+    $marquet_sql = "and company_marketingmanager_id='$market'";
+  }
+  if($act != 0) {
+    $act_sql = "and company_activity_id='$act'";
+  }
 
-  $query = "select company_id as Id
+  $query = "select company_id as id
     from Company
     where company_name = '$name'
-      and company_type_id='$kind'
-      and company_activity_id='$act'
-      and company_marketingmanager_id='$market'
+      $kind_sql
+      $marquet_sql
+      $act_sql
       and company_phone = '$phone'
       and company_zipcode = '$zip'";
-
+  
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   $obm_q->next_record();
-  $id = $obm_q->f("Id");
+  $id = $obm_q->f("id");
 
   if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {

@@ -102,7 +102,15 @@ if ($action == "ext_get_id") {
   $publication["lang"] = run_query_get_contact_lang($publication["contact_id"]);
   require("publication_js.inc");
   $display["detail"] =html_subscription_form($action,$sub_q, $renew_q, $recept_q, $publication);
-
+} elseif ($action == "new_auto")  {
+///////////////////////////////////////////////////////////////////////////////
+  $renew_q = run_query_subscriptionrenewal();
+  $recept_q = run_query_subscriptionreception();
+  $pub_q = run_query_detail($param_publication);
+  if($pub_q->nf() == 1) {
+    require("publication_js.inc");
+    $display["detail"] = html_auto_subscription_form($action,$pub_q,$renew_q, $recept_q, $publication);
+  }
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_publication > 0) {
@@ -198,6 +206,19 @@ if ($action == "ext_get_id") {
     require("publication_js.inc");
     $display["detail"] =html_subscription_form($action,$cont_q, $renew_q, $recept_q, $publication);        
   }
+
+} elseif ($action == "insert_auto")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_auto_insert($publication);
+  if ($retour != 0) {
+    $display["msg"] .= display_ok_msg($l_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_insert_error);
+  } 
+  $pub_q = run_query_detail($param_publication);
+  $display["detailInfo"] .= display_record_info($pub_q);
+  $display["detail"] = html_publication_consult($pub_q, $cat_q);
+  
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($param_publication, $publication)) {
@@ -421,6 +442,7 @@ display_page($display);
 function get_param_publication() {
   global $tf_title, $tf_year, $tf_lang;
   global $sel_type,$ta_desc, $param_publication,$tf_type,$param_contact;
+  global $param_publication_orig;
   global $sel_renew,$tf_renew,$sel_recept,$tf_recept,$tf_quantity;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;    
   global $cdg_param;
@@ -436,6 +458,7 @@ function get_param_publication() {
   
   if (isset ($param_contact)) $publication["contact_id"] = $param_contact;
   if (isset ($param_publication)) $publication["id"] = $param_publication;
+  if (isset ($param_publication_orig)) $publication["id_orig"] = $param_publication_orig;
   if (isset ($tf_title)) $publication["title"] = $tf_title;
   if (isset ($sel_type)) $publication["type"] = $sel_type;
   if (isset ($sel_renew)) $publication["renew"] = $sel_renew;
@@ -467,7 +490,7 @@ function get_param_publication() {
 function get_publication_action() {
   global $publication, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_consult, $l_header_display,$l_header_admin;
+  global $l_header_consult, $l_header_display,$l_header_admin,$l_header_new_auto;;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
@@ -498,6 +521,13 @@ function get_publication_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
                                      );
+// New
+  $actions["PUBLICATION"]["new_auto"] = array (
+    'Name'     => $l_header_new_auto,
+    'Url'      => "$path/publication/publication_index.php?action=new_auto&amp;param_publication=".$publication["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult', 'update','insert_auto')
+                                     );
 
 // Detail Consult
   $actions["PUBLICATION"]["detailconsult"]  = array (
@@ -512,7 +542,7 @@ function get_publication_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update') 
+    'Condition'=> array ('detailconsult', 'update','insert_auto') 
                                      	      );
 // Subscription Update
   $actions["PUBLICATION"]["detailupdate_subscription"] = array (
@@ -526,6 +556,12 @@ function get_publication_action() {
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
+// Insert
+  $actions["PUBLICATION"]["insert_auto"] = array (
+    'Url'      => "$path/publication/publication_index.php?action=insert_auto",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None')
+                                         );
 
 // Update
   $actions["PUBLICATION"]["update"] = array (

@@ -651,13 +651,10 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
 
   return $block;
 }
-
-///////////////////////////////////////////////////////////////////////////////
 // Display Subscription Form                                                      //
 // Parameters:
 //   - $action    : action called
 //   - $pub_q      : publication database result 
-//   - $dsrc_q    : datasource database result 
 //   - $type_q    : type database result 
 //   - $usr_q     : userobm database result 
 //   - $ctry_q    : country database result 
@@ -665,17 +662,15 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
 //     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_auto_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication) {
-  global $display;
-  global $set_theme,$popup_height,$popup_width;
-  global $l_subscription,$l_quantity, $l_renew, $l_recept;
+function html_auto_subscription_form($action,$pub_q,$renew_q,$recept_q, $publication) {
+  global $display,$ico_publication_new;
+  global $set_theme,$popup_height,$popup_width,$l_auto_renew,$l_insert;
+  global $l_publication,$l_quantity, $l_renew, $l_recept,$l_year;
 
   $popup = $publication["popup"];
 
-   $pub_id = $sub_q->f("subscription_publication_id"); 
-   $title = $sub_q->f("publication_title"); 
-   $renew = $sub_q->f("subscription_renewal_id"); 
-   $recept = $sub_q->f("subscription_reception_id"); 
+   $pub_id = $pub_q->f("publication_id"); 
+   $title = $pub_q->f("publication_title"); 
   
   // renewal mode select
   $sel_renew = "<select name=\"sel_renew\" id=\"sel_renew\">";
@@ -696,11 +691,22 @@ function html_auto_subscription_form($action,$sub_q, $renew_q,$recept_q, $public
     $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
   }
   $sel_recept .= "</select>";
-  
-  $block_publi = "$title<input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />";
+  $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang";   
+ $block_publi_dest = "      
+    <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+     <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+    </a>
+    <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"\" />
+    <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"\" />
+    ";       
+  $block_publi_orig = "$title<input type=\"hidden\" name=\"param_publication_orig\" id=\"param_publication_orig\" value=\"$pub_id\" />";
+   $dis_button = "
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_auto\" />
+      <input type=\"submit\" value=\"$l_insert\" />
+      ";
      	
 
-  $display["title"] = "<div class=\"title\">$l_subscription  $title</div>";
+  $display["title"] = "<div class=\"title\">$l_auto_renew : $title</div>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -708,26 +714,34 @@ function html_auto_subscription_form($action,$sub_q, $renew_q,$recept_q, $public
     $js_ctry
 
     <form method=\"get\" name=\"form_auto_subscription\"
-      onsubmit=\"if (check_subscription(this)) return true; else return false;\"
-      action=\"".url_prepare("publication_index.php")."\">
+            action=\"".url_prepare("publication_index.php")."\">
 
     <div class=\"detailHead\">$l_subscription</div>
 
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-      $l_publication 
+      $l_publication_orig 
       </td>
       <td class=\"detailForm\">
-	$block_publi
+	$block_publi_orig
       </td>
-    </tr><tr>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">
+      $l_publication_dest 
+      </td>
+      <td class=\"detailForm\">
+      $block_publi_dest
+      </td>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_renew</td>
       <td class=\"detailForm\">$sel_renew</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_recept</td>
       <td class=\"detailForm\">$sel_recept</td>
-    </tr>
+    </tr><tr>
     </table>
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
@@ -736,7 +750,6 @@ function html_auto_subscription_form($action,$sub_q, $renew_q,$recept_q, $public
 
   return $block;
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Display and check the publication links (and delete form if ok)

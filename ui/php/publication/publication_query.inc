@@ -154,6 +154,64 @@ function run_query_insert($publication) {
   $retour = $obm_q->query($query);
   return $retour;
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Insertion query execution                                                 //
+// Parameters:
+//   - $publication[] : Entry's values
+//     keys used  : num, archive, title, type, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email, com
+///////////////////////////////////////////////////////////////////////////////
+function run_query_auto_insert($publication) {
+  global $auth, $cdg_sql;
+  $id = $publication["id"];
+  $id_orig = $publication["id_orig"];
+
+  $retour = run_query_renew_subscription($id_orig,$id,$publication["renew"],$publication["recept"]);
+  display_debug_msg($query, $cdg_sql);
+  return $retour;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Subscription Insertion query execution                                                 //
+// Parameters:
+//   - $publication[] : Entry's values
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_renew_subscription($old_id,$p_id,$renew,$recept) {
+  global $auth, $cdg_sql;
+
+ 
+  $query = "insert into Subscription (
+    subscription_timeupdate,
+    subscription_timecreate,
+    subscription_usercreate,
+    subscription_contact_id,
+    subscription_publication_id,
+    subscription_renewal_id,
+    subscription_reception_id,
+    subscription_quantity)
+    select
+    null,
+    '" . date("Y-m-d H:i:s") . "',
+    " . $auth->auth["uid"] . ",
+    subscription_contact_id,
+    '$p_id',
+    '$renew',
+    '$recept',
+    subscription_quantity  
+    from 
+    Subscription
+    where 
+    subscription_publication_id = '$old_id' and
+    subscription_renewal_id = '$renew'
+    and subscription_reception_id = '$recept'
+  ";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Subscription Insertion query execution                                                 //
 // Parameters:
