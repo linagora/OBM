@@ -97,7 +97,7 @@ p			{
 	background-color: #fff;
 	height: 80px;
 	font-size: 0.7em;
-	margin-bottom: 10px;
+	margin-bottom: 0;
 }
 
 .header #logo	{
@@ -139,9 +139,6 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header .section	{
-	/*position:		relative;
-	top: 			9px;
-	left: 			178px;*/
 	text-align: 		center;
 	font-family: 		arial,sans-serif;
 	font-weight: 		bold;
@@ -150,7 +147,7 @@ p			{
 }
 
 .header .section p	{
-	height: 		27px;
+	height: 		22px;
 	margin: 		0px 4px 0px 0px;
 	float:			left;
 	display:		inline;
@@ -176,13 +173,17 @@ p			{
 /* ------------------------------------------------------------------------- */
 
 .header .menu	{
-  	position: 		relative;
-	top:			-22px;
-	left:			172px;
+  	clear:			left;
 	padding:		0px;
-	float:			left;
 	font-family: 		arial,sans-serif;
-	
+	/* IE Put a margin between section and menu... don't know why..
+	if anyone have an issue mail me at mehdi.rande@aliacom.fr
+	So here we use the special css dirty hack pattern no to let IE
+	read the rest of this css tag...*/
+	voice-family: 		"\"}\"";
+  	voice-family:		inherit;
+	margin-top:		0px;
+		
 }
 
 .header .menu li {

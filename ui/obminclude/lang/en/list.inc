@@ -35,7 +35,6 @@ $l_firstname = "Fisrtname";
 $l_function = "Function";
 $l_company = "Company";
 $l_hphone = "Home phone";
-$l_town = "Town";
 $l_contact = "Contact";
 $l_country = "Country";
 $l_zipcode = "Zip code";

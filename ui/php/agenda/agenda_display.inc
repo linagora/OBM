@@ -2513,7 +2513,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
     $hour_day_list .= 	"<td width=\"1\" height=\"15\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
     for($j=0; $j<7;$j++)  {
       $current_time = strtotime("+$j days $i hours",$start_week_day);
-      $current_date = date("Ymd",$current_time);
+      $current_date = date("YmdHi",$current_time);
       $end_time =  date("YmdHi", strtotime("+$j days $i hours $real_duration minutes",$start_week_day));
       $goto = "agenda_index.php?action=new&param_date_begin=$current_date&param_date_end=$end_time&p_user_meeting=1";
       switch($meeting[$current_time]) {
@@ -2538,7 +2538,7 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
       $hour_day_list .= "<tr><td height=\"15\" width=\"1\"><img src=\"/images/$set_theme/$ico_spacer\" alt=\"\" /></td>";
        for($j=0; $j<7;$j++) {	 
 	 $current_time = strtotime("+$j days $i hours".($k*$time_unit)." minutes",$start_week_day);
-   	 $current_date = date("Ymd",$current_time);
+   	 $current_date = date("YmdHi",$current_time);
       	 $end_time =  date("YmdHi", strtotime("+$j days $i hours ".(($k*$time_unit)+$real_duration)." minutes",$start_week_day));
 	$goto = "agenda_index.php?action=new&param_date_begin=$current_date&param_date_end=$end_time&p_user_meeting=1";
 	switch($meeting[$current_time]) {

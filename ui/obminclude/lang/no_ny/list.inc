@@ -88,5 +88,4 @@ $l_function = "Function";
 $l_company = "Company";
 $l_tel = "Phone";
 $l_telp = "Phone perso";
-$l_town = "Town";
 $l_email = "E-Mail";

@@ -17,7 +17,7 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // Use specific site includes
-//$cgp_site_include = true;
+$cgp_site_include = true;
 
 // is Mail enabled ? (agenda)
 $cgp_mail_enabled = false;
