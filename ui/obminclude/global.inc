@@ -91,6 +91,7 @@ $cgp_show["module"]["deal"] = true;
 $cgp_show["module"]["list"] = true;
 $cgp_show["module"]["agenda"] = true;
 $cgp_show["module"]["todo"] = true;
+$cgp_show["module"]["publication"] = true;
 $cgp_show["module"]["time"] = true;
 $cgp_show["module"]["project"] = true;
 $cgp_show["module"]["contract"] = true;

@@ -70,3 +70,40 @@ ALTER TABLE ContactCategory1 CHANGE COLUMN contactcategory1_order contactcategor
 --
 ALTER TABLE ContactCategory2 CHANGE COLUMN contactcategory2_order contactcategory2_code int(4) default '0';
 
+-------------------------------------------------------------------------------
+-- Publication module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Publication'
+--
+CREATE TABLE Publication (
+  publication_id             int(8) DEFAULT '0' NOT NULL auto_increment,
+  publication_timeupdate     timestamp(14),
+  publication_timecreate     timestamp(14),
+  publication_userupdate     int(8),
+  publication_usercreate     int(8),
+  publication_title          varchar(64) NOT NULL,
+  publication_type_id        int(8),
+  publication_year           int(4),
+  publication_lang           char(2),
+  publication_desc           text,
+  PRIMARY KEY (publication_id)
+);
+
+--
+-- Table structure for table 'PublicationType'
+--
+CREATE TABLE PublicationType (
+  publicationtype_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  publicationtype_timeupdate  timestamp(14),
+  publicationtype_timecreate  timestamp(14),
+  publicationtype_userupdate  int(8),
+  publicationtype_usercreate  int(8),
+  publicationtype_label       char(12),
+  PRIMARY KEY (publicationtype_id)
+);
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'publication', 'publication_title', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'publication', 'publicationtype_label', 2, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'publication', 'publication_year', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'publication', 'publication_lang', 4, 1);

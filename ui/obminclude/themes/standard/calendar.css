@@ -17,15 +17,12 @@ a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
 
 
 
-
-
 div.agendaBar {
 	width:			170px;
 	margin-bottom:		20px;
 }
 
 div.agendaHidden {
-	position:		fixed;
 	z-index: 		20;
 	visibility: 		hidden;
 	top: 			0px;

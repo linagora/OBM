@@ -14,7 +14,7 @@ $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
 //$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
-$obmdb_password = "20cel28";
+$obmdb_password = "obm";
 
 // Use specific site includes
 //$cgp_site_include = true;

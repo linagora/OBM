@@ -776,6 +776,8 @@ $block = "
         </td>
        </tr>
       </table>
+     </tr>
+    </table>      
    </div>
 $hidden_div
 ";

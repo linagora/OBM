@@ -41,40 +41,38 @@ p			{
 	margin-right:		auto;
 }	
 
-
+	
 .leftpanel {
-	position: absolute;
-	left: 2px;
-	width: 180px;
-/*	border: 1px solid #000000;*/
+	position:absolute;
+	width:180px;
+	left:2px;
 	margin-top: 10px;
-/*	padding: 2px;*/
 }
 
 .rightpanel {
-	float: right;
-	width: 180px;
-/*	border: 1px solid #000000;*/
-/*	padding: 2px;*/
+	position:absolute;
+	width:180px;
+	right:2px;
+	z-index:1;
+	margin-top: 10px;
 }
 
 .middlepanel {
-	width: auto;
-/*	border: 1px solid #000000;*/
-	margin-right: 196px;
-/*	background-color: #0000FF;*/
+	position:relative; 
+	width:auto;
+	min-width:120px;
+	margin:0px 196px 20px 196px;
+	padding:10px;
+	z-index:3; 
 }
 
 .detailpanel {
-	position: absolute;
-	left: 196px;
-/*	right: 0px;*/
-	width: auto;
-/*	border: 1px solid #000000;*/
-	padding: 0px;
-	margin-top: 10px;
-	margin-right: 10px;
-/*	background-color: #00FF00;*/
+	position:relative; 
+	width:auto;
+	min-width:120px;
+	margin:0px 0px 20px 196px;
+	padding:10px;
+	z-index:3; 
 }
 
 .detailpanelalone {

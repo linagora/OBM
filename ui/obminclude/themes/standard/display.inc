@@ -44,7 +44,7 @@ function display_page(&$display) {
     </div>
     <!-- left panel end -->
 
-  <div class=\"detailpanel\">";
+  ";
  
   if ($right_panel) {
     echo "
@@ -57,9 +57,12 @@ function display_page(&$display) {
     <!-- right panel end -->
 
     <!-- center zone -->
-    <div class=\"middlepanel\">";
+    <div class=\"middlepanel\">
+    ";
   }
-
+  else {
+    echo "<div class=\"detailpanel\">";
+  }
   echo
     $display["msg"] .
     $display["title"] .

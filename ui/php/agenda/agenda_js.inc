@@ -101,7 +101,6 @@ function show ( evt, name ) {
     docHeight = document.height;
     layerWidth = ele.style.width;
     layerHeight = ele.style.height;
-
   } else if ( NS4 ) {
     ele = document.layers[name];
     currentX = evt.pageX,
@@ -127,7 +126,9 @@ function show ( evt, name ) {
   else {
     x = currentX;
   }
+   x = x - 196;
   y = currentY + 20;
+  y = y - 150;
   if ( IE4 ) {
     x += document.body.scrollLeft;
     y += document.body.scrollTop;
@@ -141,6 +142,7 @@ function show ( evt, name ) {
     ele.top = parseInt ( y );
     ele.visibility = \"show\";
   } else {  // IE4 & W3C
+    ele.style.position = 'absolute'
     ele.style.left = x+'px';
     ele.style.top = y+'px';
     ele.style.visibility = \"visible\";

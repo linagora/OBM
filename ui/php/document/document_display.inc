@@ -1435,7 +1435,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\" 
+	 <a href=\"\" onclick=\"show_hide_repo('$current_directory');return false;\"> 
 	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
 	 </a>
 	 <a class=\"documentRepository\" href=\"\"  onclick=\"fill_ext_form('$current_directory');return false;\">
