@@ -166,15 +166,24 @@ function run_query_country_insert($ctry) {
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
   $name = $ctry["name"];
+  $iso = $ctry["iso"];
+  $lang = $ctry["lang"];
+  $phone = $ctry["phone"];
 
   $query = "insert into Country (
       country_timecreate,
       country_usercreate,
-      country_name)
+      country_iso3166,
+      country_name,
+      country_lang,
+      country_phone)
     values (
       '$timecreate',
       '$usercreate',
-      '$name')";
+      '$iso',
+      '$name',
+      '$lang',
+      '$phone')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -196,9 +205,15 @@ function run_query_country_update($ctry) {
   $userupdate = $auth->auth["uid"];
   $id = $ctry["country"];
   $name = $ctry["name"];
+  $iso = $ctry["iso"];
+  $lang = $ctry["lang"];
+  $phone = $ctry["phone"];
 
   $query = "update Country set
+      country_iso3166='$iso',
       country_name='$name',
+      country_lang='$lang',
+      country_phone='$phone',
       country_timeupdate='$timeupdate',
       country_userupdate='$userupdate'
     where

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_display.php                                             //
 //     - Desc : Deal Display File                                            //
@@ -1816,7 +1816,7 @@ function dis_status_links($id) {
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_status_can_delete);
     $dis_del = "<form name=\"form_kind_delete\".
-        method=\"post\# action=\"" . url_prepare("deal_index.php") . "\">
+        method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
       <input type=\"hidden\" name=\"sel_state\" value=\"$id\" />
       <input type=\"submit\" name=\"sub_status\" value=\"$l_status_delete\" />

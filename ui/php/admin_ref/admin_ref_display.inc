@@ -265,7 +265,32 @@ function html_country_form($ctry_q) {
 
     // Country select construction
     $sel_ctry = "<select name=\"sel_ctry\" onChange=\"
-      forms.form_ctry_update.tf_name.value=this.options[this.selectedIndex].text;\" size=\"20\">";
+      mytext = this.options[this.selectedIndex].text;
+
+      // Get Iso
+      pos = mytext.indexOf('-');
+      iso = mytext.substr(0, pos);
+
+      // Get Lang
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf('-');
+      lang = mytext.substr(0,pos);
+
+      // Get name
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf('(');
+      myname = mytext.substr(0,pos);
+
+      // Get phone
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf(')');
+      phone = mytext.substr(0,pos);
+
+      forms.form_ctry_update.tf_name.value=myname;
+      forms.form_ctry_update.tf_iso.value=iso;
+      forms.form_ctry_update.tf_lang.value=lang;
+      forms.form_ctry_update.tf_phone.value=phone;\"
+      size=\"20\">";
     while ($ctry_q->next_record()) {
       $id = $ctry_q->f("country_id");
       $iso = $ctry_q->f("country_iso3166");
@@ -303,7 +328,7 @@ function html_country_form($ctry_q) {
 <!-- Country Update Section -->
 
     <tr>
-      <td colspan=\"2\" class=\"adminLabel\">
+      <td colspan=\"2\">
         <form name=\"form_ctry_update\" method=\"get\"
           action=\"" . url_prepare("admin_ref_index.php") . "\">
         <input type=\"hidden\" name=\"sel_ctry\" value=\"\" />
@@ -313,7 +338,7 @@ function html_country_form($ctry_q) {
         <tr>
           <td class=\"adminLabel\">$l_name : </td>
           <td><input type=\"text\" name=\"tf_name\" /></td>
-          <td rowspan=\"3\">
+          <td rowspan=\"4\">
           <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_update\"
             onclick=\"if (check_ctry_upd(this.form,document.form_ctry_delete.sel_ctry)) return true; else return false;\" />
           </td>
@@ -353,10 +378,9 @@ function html_country_form($ctry_q) {
   $block = "
     <table class=\"admin\">
     <tr>
-      <td colspan=\"5\" class=\"adminHead\">
-        $l_ctry_manage
-      </td>
-    </tr><tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_ctry_manage</td>
+    </tr>
+    <tr>
       <td>
       $dis_update_delete
 
@@ -371,7 +395,20 @@ function html_country_form($ctry_q) {
         <tr>
           <td class=\"adminLabel\">$l_ctry_new :
             <input name=\"tf_name\" /></td>
-        </tr><tr>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_iso_3166 : </td>
+          <td><input type=\"text\" name=\"tf_iso\" size=\"2\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_lang : </td>
+          <td><input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_phone : </td>
+          <td><input type=\"text\" name=\"tf_phone\" size=\"2\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
           <td class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"country_insert\" />
             <input type=\"submit\" name=\"sub_ctry\" value=\"$l_ctry_insert\"

@@ -61,7 +61,7 @@ if ($action == "index")  {
     $display["msg"] .= display_err_msg($l_country_insert_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_country_index();
 
 } elseif ($action == "country_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -72,13 +72,13 @@ if ($action == "index")  {
     $display["msg"] .= display_err_msg($l_country_update_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_country_index();
 
 } elseif ($action == "country_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_country_links($ref);
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_country_index();
 
 } elseif ($action == "country_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -89,7 +89,7 @@ if ($action == "index")  {
     $display["msg"] .= display_err_msg($l_country_delete_error);
   }
   require("admin_ref_js.inc");
-  $display["detail"] .= dis_admin_index();
+  $display["detail"] .= dis_country_index();
 
 } elseif ($action == "datasource")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -151,14 +151,21 @@ display_page($display);
 // returns : $ref hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_ref() {
-  global $tf_name, $sel_dsrc;
+  global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
   global $cdg_param;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
+  // Admin - generic fields
   if (isset ($tf_name)) $ref["name"] = $tf_name;
 
   // Admin - Data Source fields
   if (isset ($sel_dsrc)) $ref["datasource"] = $sel_dsrc;
+
+  // Admin - Country fields
+  if (isset ($sel_ctry)) $ref["country"] = $sel_ctry;
+  if (isset ($tf_iso)) $ref["iso"] = $tf_iso;
+  if (isset ($tf_lang)) $ref["lang"] = $tf_lang;
+  if (isset ($tf_phone)) $ref["phone"] = $tf_phone;
 
 
   if (debug_level_isset($cdg_param)) {

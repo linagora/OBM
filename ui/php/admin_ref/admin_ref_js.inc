@@ -65,6 +65,54 @@ function check_dsrc_new(form)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the country check or deletion is possible                        //
+///////////////////////////////////////////////////////////////////////////////
+function check_ctry_checkdel(sel)
+{
+   if (sel.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_ctry_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the country update is possible                                   //
+///////////////////////////////////////////////////////////////////////////////
+function check_ctry_upd(form, sel_del_ctry)
+{
+  ctry_pos = sel_del_ctry.selectedIndex;
+  if ((ctry_pos >= 0) && (form.tf_name.value != \"\")) {
+    form.sel_ctry.value=sel_del_ctry.options[ctry_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_ctry_update\");
+     return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the country creation is possible                                 //
+///////////////////////////////////////////////////////////////////////////////
+function check_ctry_new(form)
+{
+   if (form.tf_name.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_ctry_create\");
+      return false;
+   }
+}
+
+
 // -->
 </script>
 ";
