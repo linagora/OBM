@@ -34,13 +34,16 @@ function run_query_id_user($login, $passwd) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Userobm query execution                                                   //
+// Parameters:
+//   - $id (optionnal) : UserObm Id 
 // Return:
 //   - Database Object : userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm() {
+function run_query_userobm($id="") {
   global $cdg_sql;
 
-  $query = "select * from UserObm order by userobm_lastname"; 
+  if ($id) $where = "where userobm_id='$id'";
+  $query = "select * from UserObm $where order by userobm_lastname"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg("run_query_userobm() : $query", $cdg_sql);

@@ -64,20 +64,14 @@ if ($action == "index") {
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   include("user_js.inc");
-  html_user_form(1,"",$obm_user,run_query_mycontacts());
+  html_user_form(1,"",$obm_user);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($param_user);
   if ($obm_q->num_rows() == 1) {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    // We get the contact infos associated to the user separatedly because it
-    // would require a left join which Postgres only support from 7.1.x
-    // We will left join in future version to avoid this second query
-    if ($obm_q->f("userobm_contact_id")>0) {
-      $obm_q_con=run_query_contact_name($obm_q->f("userobm_contact_id"));
-    }
-    html_user_consult($obm_q, $obm_q_con);
+    html_user_consult($obm_q);
   } else {
     display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -88,7 +82,7 @@ if ($action == "index") {
   if ($obm_q->num_rows() == 1) {
     include("user_js.inc");
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    html_user_form(1, $obm_q, $obm_user, run_query_mycontacts());
+    html_user_form(1, $obm_q, $obm_user);
   } else {
     display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -132,7 +126,7 @@ if ($action == "index") {
   // Form data are not valid
   } else {
     display_warn_msg($l_invalid_data . " : " . $err_msg);
-    html_user_form(0, "", $obm_user, run_query_mycontacts());
+    html_user_form(0, "", $obm_user);
   }
 
 } elseif ($action == "reset")  {
@@ -143,10 +137,7 @@ if ($action == "index") {
   $obm_q = run_query_detail($param_user);
   if ($obm_q->num_rows() == 1) {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
-    if ($obm_q->f("userobm_contact_id")>0) {
-      $obm_q_con=run_query_contact_name($obm_q->f("userobm_contact_id"));
-    }
-    html_user_consult($obm_q, $obm_q_con);
+    html_user_consult($obm_q);
   } else {
     display_err_msg($l_query_error . " - " . $query . " !");
   }
@@ -202,7 +193,7 @@ display_end();
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
   global $cdg_param;
-  global $param_user, $tf_login, $tf_passwd, $sel_perms,$tf_email,$sel_contact;
+  global $param_user, $tf_login, $tf_passwd, $sel_perms,$tf_email;
   global $tf_lastname, $tf_firstname, $cb_archive;
 
   if (isset ($param_user)) $obm_user["id"] = $param_user;
@@ -214,7 +205,6 @@ function get_param_user() {
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
-  if (isset ($sel_contact)) $obm_user["contact"] = $sel_contact;
 
   if (debug_level_isset($cdg_param)) {
     if ( $obm_user ) {

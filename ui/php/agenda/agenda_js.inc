@@ -132,7 +132,7 @@ function check_insert_event(form) {
     alert (\"$mj_invalid_day\");
     return false;
   } else if (year_end < year_begin) {
-    alert (\"$mj_date_incompatibility\");
+    alert (year_begin,\"$mj_date_incompatibility\");
     return false;       
   } else if ((year_end == year_begin) && (month_end < month_begin)) {
     alert (\"$mj_date_incompatibility\");

@@ -44,7 +44,7 @@ $uid = $auth->auth["uid"];
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
   
-  $obm_q_waiting_events=run_query_get_waiting_events($uid);
+  $obm_q_waiting_events = run_query_get_waiting_events($uid);
   if ($obm_q_waiting_events->nf()>0) {
     // display events to confirm
     dis_waiting_events_list($obm_q_waiting_events);
@@ -141,13 +141,13 @@ if ($action == "index") {
   if (($nb_contact_chosen<=0) && ($nb_group_chosen<=0)) {
     // no contacts to assign to the event 
     echo "<FONT color=#$col_error>".$l_select_contacts."</FONT><BR>";
-    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
+    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_userobm(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
   
 
   } else if ((strcmp($repeat_days,"0000000")==0) && (strcmp($sel_repeat_kind,"weekly")==0))  {
     // no day is selected     
     echo "<FONT color=#$col_error>".$l_select_repeat_day."</FONT><BR>";
-    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_get_mycontacts(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
+    dis_event_form("new",new DB_OBM,new DB_OBM,new DB_OBM,'',run_query_userobm(), run_query_get_usergroups(), run_query_get_eventcategories(),$tf_event_title,$sel_user_id,$sel_group_id,$sel_category_id,$sel_priority,$cb_private_event,$begindate,$enddate,$ta_event_description,$cb_occupied_day,$sel_repeat_kind,$tf_repeat_interval,$repeat_days,$enddate_repeat);
 
 
 
@@ -187,7 +187,7 @@ if ($action == "index") {
     for ( $i = 0; $i <  $nb_contact_chosen; $i++ ) {
       $obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($sel_user_id[$i]),''); 
       if ($obm_q_conflict_events->nf() > 0) {  
-	$contact_id_conflict_array[$max_event_id+1][]=run_query_contact($sel_user_id[$i]);
+	$contact_id_conflict_array[$max_event_id+1][]=run_query_userobm($sel_user_id[$i]);
       }
     }
     // for each group chosen : assignement of the event to the group 
@@ -200,7 +200,7 @@ if ($action == "index") {
       while ($obm_q_members->next_record()) {
 	$obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($obm_q_members->f("ContactList_contactid")),'');
 	if ($obm_q_conflict_events->nf() > 0) {  
-	  $contact_id_conflict_array[$max_event_id+1][]=run_query_contact($obm_q_members->f("ContactList_contactid"));
+	  $contact_id_conflict_array[$max_event_id+1][]=run_query_userobm($obm_q_members->f("ContactList_contactid")); // Group here later XXXXXXXX
 	}
       }
     }
@@ -215,7 +215,7 @@ if ($action == "index") {
 	for ( $i = 0; $i <  $nb_contact_chosen; $i++ ) { 
 	  $obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($sel_user_id[$i]),'');
 	  if ($obm_q_conflict_events->nf() > 0) {  
-	    $contact_id_conflict_array[$max_repeated_id_array[$cpt_events]+1][]=run_query_contact($sel_user_id[$i]);
+	    $contact_id_conflict_array[$max_repeated_id_array[$cpt_events]+1][]=run_query_userobm($sel_user_id[$i]);
 	  }
 	} 
 	// for each group chosen : assignement of the event to the group 
@@ -228,7 +228,7 @@ if ($action == "index") {
 	  while ($obm_q_members->next_record()) {
 	    $obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($obm_q_members->f("ContactList_contactid")),'');
 	    if ($obm_q_conflict_events->nf() > 0) {  
-	      $contact_id_conflict_array[$max_repeated_id_array[$cpt_events]+1][]=run_query_contact($obm_q_members->f("ContactList_contactid"));
+	      $contact_id_conflict_array[$max_repeated_id_array[$cpt_events]+1][]=run_query_userobm($obm_q_members->f("ContactList_contactid"));  // Group here XXXXXXX
 	    }
 	  } 
 	}
@@ -279,40 +279,36 @@ if ($action == "index") {
       display_ok_msg($l_event_insert_ok);
       
       // Display week planning
-      $p_date=date("YmdHis");
-      $p_contact_array = array($uid);
-      $p_year=substr($p_date,0,4);
-      $p_month=substr($p_date,4,2);
-      $p_day=substr($p_date,6,2);
-      $dow=date("w",mktime(0,0,0,$p_month,$p_day,$p_year));
+      $p_date = date("YmdHis");
+      $p_user_array = array($uid);
+      $p_year = substr($p_date,0,4);
+      $p_month = substr($p_date,4,2);
+      $p_day = substr($p_date,6,2);
+      $dow = date("w",mktime(0,0,0,$p_month,$p_day,$p_year));
       // Weekstart :
       if ($dow == 0) {
-	$weekstart=mktime(0,0,0,$p_month,$p_day - 6,$p_year);
+	$weekstart = mktime(0,0,0,$p_month,$p_day - 6,$p_year);
       } elseif ( $dow == 1 ) {
-	$weekstart=mktime(0,0,0,$p_month,$p_day,$p_year); 
+	$weekstart = mktime(0,0,0,$p_month,$p_day,$p_year); 
       } else {
-	$weekstart=mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
+	$weekstart = mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
       }
-      $weekend=date("YmdHis",$weekstart + 7 * 86400);
-      $weekstart=date("YmdHis",$weekstart);
-      $action="view_week";
-      dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array), $uid, $p_contact_array,$p_group_array,$col_attend,$col_not_attend);
-      dis_planning_contacts($action,$weekstart,run_query_get_mycontacts(), run_query_get_usergroups(),$p_contact_array,$p_group_array);  
-  
+      $weekend = date("YmdHis",$weekstart + 7 * 86400);
+      $weekstart = date("YmdHis",$weekstart);
+      $action = "view_week";
+      dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_user_array, $p_group_array), $uid, $p_user_array,$p_group_array,$col_attend,$col_not_attend);
+      dis_planning_contacts($action,$weekstart,run_query_userobm(), run_query_get_usergroups(),$p_user_array,$p_group_array);  
   
     }  else {
       // CONFLICT 
       echo "<FONT color=#$col_error>".$l_conflict_events."</FONT><BR>";
       dis_conflict_events_form($action,$max_event_id+1,$events_array,$contact_id_conflict_array,$group_id_conflict_array,$sel_user_id,$sel_group_id);   
     }
-
   }
-    
-
 
 
 } else if ($action == "cancel_insert") {
-  ////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
   if ($param_event>0) {
     run_query_event_delete($param_event,1);
@@ -320,7 +316,7 @@ if ($action == "index") {
 
     // Display week planning
     $p_date=date("YmdHis");
-    $p_contact_array = array($uid);
+    $p_user_array = array($uid);
     $p_year=substr($p_date,0,4);
     $p_month=substr($p_date,4,2);
     $p_day=substr($p_date,6,2);
@@ -336,16 +332,14 @@ if ($action == "index") {
     $weekend=date("YmdHis",$weekstart + 7 * 86400);
     $weekstart=date("YmdHis",$weekstart);
     $action="view_week";
-    dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_contact_array,$p_group_array), $uid, $p_user_array,$p_group_array,$col_attend,$col_not_attend);
+    dis_week_planning($weekstart, run_query_event_list($weekstart,$weekend,$p_user_array,$p_group_array), $uid, $p_user_array,$p_group_array,$col_attend,$col_not_attend);
     dis_planning_contacts($action,$weekstart,run_query_userobm(), run_query_get_usergroups(),$p_user_array,$p_group_array);  
       
   }
 
 
-
-
 } else if ($action == "confirm_insert") {
-  ////////////////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   
   if ($param_event>0) {
  
@@ -520,7 +514,7 @@ if ($action == "index") {
 	// insert the association contact / event if it isn't already exist
 	$obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($sel_user_id[$i]),'',$param_event); 
 	if ($obm_q_conflict_events->nf() > 0) { 
-	  $contact_id_conflict_array[$max_event_id+1][]=run_query_contact($sel_user_id[$i]);
+	  $contact_id_conflict_array[$max_event_id+1][]=run_query_userobm($sel_user_id[$i]);
 	}
       }
       // each group
@@ -533,7 +527,7 @@ if ($action == "index") {
 	while ($obm_q_members->next_record()) {
 	  $obm_q_conflict_events=run_query_event_list($begindate,$enddate,array($obm_q_members->f("ContactList_contactid")),'',$param_event); 
 	  if ($obm_q_conflict_events->nf() > 0) {  
-	    $contact_id_conflict_array[$max_event_id+1][]=run_query_contact($obm_q_members->f("ContactList_contactid"));
+	    $contact_id_conflict_array[$max_event_id+1][]=run_query_userobm($obm_q_members->f("ContactList_contactid"));  // Group here XXXXXX
 	  }
 	}
       }
@@ -566,7 +560,7 @@ if ($action == "index") {
 	}
 	
 	// determinate which contacts have been removed and delete them 
-	$obm_q_event_contacts=run_query_get_eventcontacts($param_event);
+	$obm_q_event_contacts = run_query_get_eventuser($param_event);
 	while ($obm_q_event_contacts->next_record()) {
 	  $chosen=0;
 	  for ( $i = 0; ($i < $nb_contact_chosen) && !$chosen; $i++ ) { 
@@ -748,7 +742,7 @@ if ($action == "index") {
       }
       
       // determinate which contacts have been removed and delete them 
-      $obm_q_event_contacts=run_query_get_eventcontacts($param_event);
+      $obm_q_event_contacts=run_query_get_eventuser($param_event);
       while ($obm_q_event_contacts->next_record()) {
 	$chosen=0;
 	for ( $i = 0; ($i < $nb_contact_chosen) && !$chosen; $i++ ) { 

@@ -610,20 +610,6 @@ function run_query_get_usergroups() {
 
 
 //////////////////////////////////////////////////////////////////////////
-// Get all the contacts of the company using obm
-//////////////////////////////////////////////////////////////////////////
-function run_query_get_mycontacts() {
-  global $cdg_sql;
-
-  $query = "select contact_id,contact_lastname,contact_firstname from Contact,Company where contact_company_id=company_id and company_state=1 order by contact_lastname";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-
-//////////////////////////////////////////////////////////////////////////
 // Return the id of all member of the specified group (list)
 //////////////////////////////////////////////////////////////////////////
 // Args :
@@ -677,25 +663,6 @@ function run_query_is_attendee($p_event_id,$p_contact_id) {
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   return $obm_db->nf()>0;
-}
-
-
-////////////////////////////////////////////////////////////////////////
-// Get infos about one contact identified buy it's id
-////////////////////////////////////////////////////////////////////////
-// Args : 
-// ------
-//    $p_contact_id : contact's id
-///////////////////////////////////////////////////////////////////////
-function run_query_contact($p_contact_id) {
-  global $cdg_sql;
-
-  $query = "select * from Contact where contact_id='$p_contact_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  
-  return $obm_db;
 }
 
 

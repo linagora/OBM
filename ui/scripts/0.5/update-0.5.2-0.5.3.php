@@ -50,19 +50,19 @@ while (list ($cid, $uid) = each ($users)) {
 }
 
 // fill userobm names
-//update_userobm_names();
+update_userobm_names();
 // Update deal managers
-//update_deal_managers();
+update_deal_managers();
 // Update Parentdeal managers
-//update_parentdeal_managers();
+update_parentdeal_managers();
 // Update contract managers
-//update_contract_managers();
+update_contract_managers();
 // Update contract managers
-//update_incident_managers();
+update_incident_managers();
 // Update Time management contcts
 update_task_contact();
 // Update Eventuser
-//update_eventuser_contact();
+update_eventuser_contact();
 // No need to update CalendarLayer : empty
 
 ///////////////////////////////////////////////////////////////////////////////

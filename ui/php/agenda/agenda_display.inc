@@ -43,12 +43,10 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
 
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$col_a_table;
-  
   // - Labels 
   global $l_users, $l_groups, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin,$l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat,$l_periodicity,$l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_occupied_day,$l_none,$l_daily,$l_weekly,$l_monthlybyday,$l_monthlybydate,$l_yearly;
   // - Javascript Messages 
   global $mj_fill_title_event,$mj_fill_time_begin,$mj_fill_time_end,$mj_select_contacts,$mj_delete_confirm; 
-  
   // - Variables 
   global $sess;
   
@@ -143,7 +141,6 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   $sel_cat .= "</select>";
 
 
-
   // current, last and next years
   $current_year=date("Y");
   $last_year=date("Y",mktime(0,0,0,1,1,$current_year-1));
@@ -229,7 +226,7 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   
   // Privacy 
   echo "<TABLE border=2><TR><TD>".
-  "<FONT COLOR=\"#$col_label\">".$l_private."</FONT><INPUT type=checkbox name=\"cb_private_event\" value=1";
+  "<FONT COLOR=\"#$col_label\">$l_private</FONT><INPUT type=checkbox name=\"cb_private_event\" value=1";
   if ($privacy==1) {
      echo " checked";
   }
@@ -247,33 +244,31 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
  
   // Date begin
   echo "<TR><TD>"; 
-  echo "<FONT COLOR=\"#$col_label\">".$l_datebegin."</FONT>";
+  echo "<FONT COLOR=\"#$col_label\">$l_datebegin</FONT>";
   echo "</TD><TD>";
   echo "<SELECT name=\"sel_day_begin\" OnChange=\"SynchronizeDay(this.form)\">";
   for ($num_day=1 ; $num_day<32 ; $num_day++) {
-    echo "\n<OPTION value=";
     if ($num_day<10) {
       $num_day_value="0".$num_day;
     } else {
       $num_day_value=$num_day;
     }
-    echo $num_day_value;
+    echo "\n<OPTION value=\"$num_day_value\"";
     if ($daybegin==$num_day_value) {
       echo " selected";
     }
-    echo ">".$num_day."</OPTION>";
+    echo ">$num_day</option>";
   }
   echo "</SELECT>";
   echo "</TD><TD>";
   echo "<SELECT name=\"sel_month_begin\" OnChange=\"SynchronizeMonth(this.form)\">";
   for ($num_month=1 ; $num_month<13 ; $num_month++) {
-    echo "\n<OPTION value=";
     if ($num_month<10) {
       $num_month_value="0".$num_month;
     } else {
       $num_month_value=$num_month;
     }
-    echo $num_month_value;
+    echo "\n<OPTION value=\"$num_month_value\"";
     if ($monthbegin==$num_month_value) {
       echo " selected";
     }
@@ -286,11 +281,11 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
      case $current_year : $tag_current = "selected"; break;
      case $next_year : $tag_next = "selected"; break;
   }
-  echo "<SELECT name=\"sel_year_begin\" OnChange=\"SynchronizeYear(this.form)\">
-  \n<OPTION value=".$current_year." ".$tag_current.">".$current_year."</OPTION>
-  \n<OPTION value=".$last_year." ".$tag_last.">".$last_year."</OPTION>
-  \n<OPTION value=".$next_year." ".$tag_next.">".$next_year."</OPTION>
-  </SELECT>"; 
+  echo "<select name=\"sel_year_begin\" OnChange=\"SynchronizeYear(this.form)\">
+    <option value=\"$current_year\" $tag_current>$current_year</option>
+    <option value=\"$last_year\" $tag_last>$last_year</option>
+    <option value=\"$next_year\" $tag_next>$next_year</option>
+  </select>"; 
   echo "</TD></TR>";
      
   // Time begin
@@ -307,33 +302,31 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   echo "</TD><TD>";
   echo "<SELECT name=\"sel_day_end\">";
   for ($num_day=1 ; $num_day<32 ; $num_day++) {
-    echo "\n<OPTION value=";
     if ($num_day<10) {
       $num_day_value="0".$num_day;
     } else {
       $num_day_value=$num_day;
     }
-    echo $num_day_value;
+    echo "\n<OPTION value=\"$num_day_value\"";
     if ($dayend==$num_day_value) {
       echo " selected";
     }
-    echo ">".$num_day."</OPTION>";
+    echo ">$num_day</option>";
   }
   echo "</SELECT>";
   echo "</TD><TD>";
   echo "<SELECT name=\"sel_month_end\">";
   for ($num_month=1 ; $num_month<13 ; $num_month++) {
-    echo "\n<OPTION value=";
     if ($num_month<10) {
       $num_month_value="0".$num_month;
     } else {
       $num_month_value=$num_month;
     }
-    echo $num_month_value;
+    echo "\n<OPTION value=\"$num_month_value\"";
     if ($monthend==$num_month_value) {
       echo " selected";
     }
-    echo ">".month_short_name($num_month)."</OPTION>";
+    echo ">".month_short_name($num_month)."</option>";
   }
   echo "</SELECT>";
   echo "</TD><TD>";
@@ -345,16 +338,16 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     case $current_year : $tag_current = "selected"; break;
     case $next_year : $tag_next = "selected"; break;
   }
-  echo "<SELECT name=\"sel_year_end\">
-  \n<OPTION value=".$current_year." ".$tag_current.">".$current_year."</OPTION>
-  \n<OPTION value=".$last_year." ".$tag_last.">".$last_year."</OPTION>
-  \n<OPTION value=".$next_year." ".$tag_next.">".$next_year."</OPTION>
-  </SELECT>"; 
+  echo "<select name=\"sel_year_end\">
+    <option value=\"$current_year\" $tag_current>$current_year</option>
+    <option value=\"$last_year\" $tag_last>$last_year</option>
+    <option value=\"$next_year\" $tag_next>$next_year</option>
+  </select>"; 
   echo "</TD></TR>";
 
   // Time end
   echo "<TR><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_timeend."</FONT>";
+  echo "<font color=\"#$col_label\">$l_timeend</font>";
   echo "</TD><TD colspan=3>";
   echo "<INPUT type=text name=\"tf_hour_end\" size=3 maxlength=2 value=\"".$hour_end."\">&nbsp; <b>:</b> &nbsp;";
   echo "<INPUT type=text name=\"tf_minute_end\" size=3 maxlength=2 value=\"".$minute_end."\">";

@@ -117,5 +117,4 @@ $mj_event_delete_confirm = "Confirmer la suppression du rdv ?";
 $mj_event_delete_all_confirm = "Confirmer la suppression du rdv et de toutes ses repetitions ?"; 
 
 
-
 ?>

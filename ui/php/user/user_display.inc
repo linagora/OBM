@@ -115,11 +115,10 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
 //   - $usr_q     : user database result
 //   - $user      : default values or updated values (if error)
 //     kes used   : id, name, passwd, perms, email
-//   - $mycon_q   : db object, list of all "internal" contacts 
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_form($first_try, $usr_q, $user, $mycon_q) {
+function html_user_form($first_try, $usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_email, $l_archive, $l_insert,$l_update,$l_checkdelete,$l_reset,$l_associated_contact,$l_none;
+  global $l_email, $l_archive, $l_insert,$l_update,$l_checkdelete,$l_reset,$l_none;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action, $sess;
 
@@ -132,7 +131,6 @@ function html_user_form($first_try, $usr_q, $user, $mycon_q) {
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
-    $contact = $usr_q->f("userobm_contact_id");
   } else {
     $id = $user["id"];
     $login = $user["login"];
@@ -142,22 +140,12 @@ function html_user_form($first_try, $usr_q, $user, $mycon_q) {
     $fname = $user["firstname"];
     $email = $user["email"];
     $archive = ($user["archive"] == "1" ? "checked" : "");
-    $contact = $user["contact"];
   }
 
   // perms selectconstruction
   if ($perms == $perms_user) $perms_user_s = " selected";
   if ($perms == $perms_editor) $perms_editor_s = " selected";
   if ($perms == $perms_admin) $perms_admin_s = " selected";
-
-  // contact select construction
-  $sel_con = "";
-  while ($mycon_q->next_record()) {
-    $sel_con .= "<OPTION value=" . $mycon_q->f("contact_id");
-    if ($contact == $mycon_q->f("contact_id")) { $sel_con .= " selected"; }
-    $sel_con .= ">" . $mycon_q->f("contact_lastname") . " " .
-               $mycon_q->f("contact_firstname") . "</OPTION>";
-  }
 
   echo "<table>
     <form method=post name=form_user
@@ -192,13 +180,6 @@ function html_user_form($first_try, $usr_q, $user, $mycon_q) {
     </tr><tr>
       <td>$l_email </td>
       <td><input name=tf_email size=32 maxlength=64 value=\"$email\"></td>
-    </tr><tr>
-      <td>$l_associated_contact</td>
-      <td><select name=sel_contact>
-        <option value='0'>$l_none</option>
-        $sel_con
-        </select>
-      </td>
     </tr>
     </table>
 
@@ -238,9 +219,8 @@ function html_user_form($first_try, $usr_q, $user, $mycon_q) {
 // HTML Display User Consultation                                            //
 // Parameters:
 //   - $obm_q     : user database result
-//   - $obm_q_con : contact infosdatabase result
 ///////////////////////////////////////////////////////////////////////////////
-function html_user_consult($obm_q, $obm_q_con) {
+function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_email, $l_lastaccess, $l_archive;
   global $l_insert,$l_update,$l_delete;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
@@ -260,11 +240,6 @@ function html_user_consult($obm_q, $obm_q_con) {
   if ($perms == $perms_editor) $l_perms = $l_perms_editor;
   if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
-  if ($obm_q->f("userobm_contact_id") > 0) {
-    $contact = "(" . $obm_q_con->f("contact_lastname") . " " .
-              $obm_q_con->f("contact_firstname") . ")";
-  } 
-
   echo "<table>
     <tr><td>
 
@@ -274,7 +249,7 @@ function html_user_consult($obm_q, $obm_q_con) {
         <td>$archive</td>
       </tr><tr>
         <td><font color=\"#$col_label\">$l_login</font></td>
-        <td>$login $contact</td>
+        <td>$login</td>
       </tr><tr>
         <td><font color=\"#$col_label\">$l_password</font></td>
         <td>$passwd</td>
@@ -329,7 +304,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $fname = $user["firstname"];
   $email = $user["email"];
   $archive = $user["archive"];
-  $contact = $user["contact"];
 
   echo $l_check_sameuser;
   while ($usr_q->next_record()) {
@@ -351,7 +325,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <INPUT TYPE=hidden NAME=tf_firstname VALUE=\"$fname\">
     <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
     <input type=hidden name=cb_archive value=\"$archive\">
-    <INPUT TYPE=hidden NAME=sel_contact VALUE=\"$contact\">
     <INPUT TYPE=submit NAME=submit VALUE=\"$l_confirm\">
     </FORM>
     </TD><TD>
@@ -365,7 +338,6 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <INPUT TYPE=hidden NAME=tf_firstname VALUE=\"$fname\">
     <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
     <input type=hidden name=cb_archive value=\"$archive\">
-    <INPUT TYPE=hidden NAME=sel_contact VALUE=\"$contact\">
     <INPUT TYPE=submit VALUE=\"$l_back\">
     </FORM>
     </TD></TR>

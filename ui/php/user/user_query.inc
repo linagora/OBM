@@ -90,7 +90,7 @@ function run_query_detail($p_id) {
 // User insert query execution                                               //
 // Parameters:
 //   - $user[]   : entry values
-//     keys used : login, passwd, perms, archive, *name, email, contact
+//     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($user) {
   global $auth, $cdg_sql;
@@ -102,7 +102,6 @@ function run_query_insert($user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $email = $user["email"];
-  $contact = $user["contact"];
 
   $query = "insert into UserObm (userobm_timeupdate,
     userobm_timecreate,
@@ -115,8 +114,7 @@ function run_query_insert($user) {
     userobm_lastname,
     userobm_firstname,
     userobm_email,
-    userobm_timelastaccess,
-    userobm_contact_id)
+    userobm_timelastaccess)
   values (
     null,
     '" . date("Y-m-d H:i:s") . "',
@@ -129,8 +127,7 @@ function run_query_insert($user) {
     '$lname',
     '$fname',
     '$email',
-    null,
-    '$contact')";
+    null)";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -145,7 +142,7 @@ function run_query_insert($user) {
 // Parameters:
 //   - $p_id     : user id
 //   - $user[]   : entry values
-//     keys used : login, passwd, perms, archive, *name, email, contact
+//     keys used : login, passwd, perms, archive, *name, email
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($p_id, $user) {
   global $auth, $cdg_sql;
@@ -157,7 +154,6 @@ function run_query_update($p_id, $user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $email = $user["email"];
-  $contact = $user["contact"];
 
   $query = "update UserObm set
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
@@ -168,8 +164,7 @@ function run_query_update($p_id, $user) {
     userobm_archive='$archive',
     userobm_lastname='$lname',
     userobm_firstname='$fname',
-    userobm_email='$email',
-    userobm_contact_id='$contact'
+    userobm_email='$email'
   where userobm_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -177,28 +172,6 @@ function run_query_update($p_id, $user) {
   $retour = $obm_q->query($query);
 
   return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return the lastname and firstname of the contact linked to the user       //
-// Used because of lack of left join in postgres < 7.1.x
-// Parameters:
-//   - $p_id : contact id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contact_name($p_id) {
-  global $cdg_sql;
-
-  $query = "select contact_lastname, contact_firstname
-            from Contact
-            where contact_id='$p_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_db=new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-
-  return $obm_db;
 }
 
 
@@ -236,7 +209,6 @@ function check_user_context($p_id, $user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $email = $user["email"];
-  $contact = $user["contact"];
 
   // if a user with same name exists, return false
   $co_q = run_query_check_user($p_id, $login);
@@ -274,7 +246,7 @@ function run_query_check_user($p_id, $login) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($p_id, $user) {
   global $l_exist_error, $l_login_error, $l_password_error, $l_email_error;
-  global $l_err_user_contact, $php_regexp_email;
+  global $l_lname_error, $php_regexp_email;
   global $err_msg, $action, $cdg_sql;
 
   $id = $user["id"];
@@ -284,7 +256,6 @@ function check_data_form($p_id, $user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $email = $user["email"];
-  $contact = $user["contact"];
 
   // MANDATORY: Login
   if (trim($login) == "") {
@@ -294,6 +265,11 @@ function check_data_form($p_id, $user) {
   // MANDATORY: User password
   if (trim($passwd) == "") {
     $err_msg = $l_password_error." : ". $passwd;
+    return false;
+  }
+  // MANDATORY: Lastname
+  if (trim($lname) == "") {
+    $err_msg = $l_lname_error." : ". $lname;
     return false;
   }
   // User email
@@ -317,49 +293,7 @@ function check_data_form($p_id, $user) {
     return false;
   }
 
-  /////////////////////////////////////////////////////////////////////////////
-  // if the contact is already assigned to a user return false               //
-  /////////////////////////////////////////////////////////////////////////////
-  $query = "select * from UserObm where userobm_contact_id='$contact'
-                                  and userobm_contact_id!=''";
-  if ($p_id > 0) {
-    $query .= " and userobm_id!='$p_id'";
-  }
-  $obm_q=new DB_OBM;
-  $obm_q->query($query);
-  if ($obm_q->num_rows() > 0) {
-    while ($obm_q->next_record()) {
-      $login = $obm_q->f("userobm_login");
-      $id = $obm_q->f("userobm_id");
-      $list .= "<A HREF=\"user_index.php?action=detailconsult&amp;param_user=$id\">$login<BR>";
-    }
-    $err_msg = $l_err_user_contact . "<P>" . $list;
-    return false;
-  }
-
   return true;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return the list of all internal contacts                                  //
-// (the contacts who belong to MyCompany : for now those marked as internal) //
-// Should be in global XXX
-///////////////////////////////////////////////////////////////////////////////
-function run_query_mycontacts () {
-  global $cdg_sql;
-
-  $query = "select contact_id,contact_lastname,contact_firstname
-            from Contact,Company
-            where contact_company_id=company_id
-              and company_state=1
-            order by contact_lastname";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_db=new DB_OBM;
-  $obm_db->query($query);
-
-  return $obm_db;
 }
 
 

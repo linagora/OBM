@@ -14,7 +14,6 @@ $l_user_perms = "Authorization";
 $l_password = "Password";
 $l_lastaccess = "Last access";
 $l_email = "@M";
-$l_associated_contact = "Associated Contact";
 $l_perms_user = "User";
 $l_perms_editor = "Editor";
 $l_perms_admin = "Administrator";
@@ -60,7 +59,7 @@ $l_query_error = "Error while executing the query";
 $l_login_error = "Invalid login !";
 $l_password_error = "Invalid password !";
 $l_email_error = "Invalid email";
-$l_err_user_contact = "This contact is already asigned to these users";
+$l_lname_error = "Invalid Name !";
 $l_exist_error = "already exists";
 $l_check_sameuser = "These users seem similar to this new entry !";
 

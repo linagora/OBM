@@ -14,7 +14,6 @@ $l_user_perms = "Permissions";
 $l_password = "Password";
 $l_lastaccess = "Dernier accès";
 $l_email = "@M";
-$l_associated_contact = "Contact associé";
 $l_perms_user = "Utilisateur";
 $l_perms_editor = "Editeur";
 $l_perms_admin = "Administrateur";
@@ -62,7 +61,7 @@ $l_password_error = "Le mot de passe doit être renseigné !";
 $l_email_error = "L'adresse E-mail saisie n'est pas valide !";
 $l_check_sameuser = "Ces utilisateurs semblent similaires à cette nouvelle entrée !";
 $l_exist_error = "Ce login est déjà utilisé !";
-$l_err_user_contact = "Ce contact est déjà associé à ces utilisateurs";
+$l_lname_error = "Le nom doit être correctement renseigné !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_login = "Vous devez renseigner le login avant de valider.";
