@@ -2553,17 +2553,17 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	      }
 	    } else {
 	      if ($user_indice == 1) {
-		$week_cal .= "<td width=\"$td_width\" style=\"border-left:1px solid #a1a4a8;\" class=\"agendaNoEvent\">&nbsp;</td>";
+		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" style=\"border-width:1px 0 1px 1px\">&nbsp;</td>";
 	      }	      
-	      elseif ($user_indice != $nb_user) {
-		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\">&nbsp;</td>";
+	      elseif ($user_indice == $nb_user) {
+		$week_cal .= "<td width=\"$td_width\" class=\"agendaNoEvent\" style=\"border-width:1px 1px 1px 0\">&nbsp;</td>";
 	      }	else {
-		$week_cal .= "<td width=\"$td_width\" class=\"agendaVide\">&nbsp;</td>";
+		$week_cal .= "<td width=\"$td_width\" class=\"agendaVide\" style=\"border-width:1px 0 1px 0\">&nbsp;</td>";
 	      }	      
 	    }
 	  }
 	} else {
-          $week_cal .=  "<td class=\"agendaVide\"  style=\"border-left:1px solid #a1a4a8;\" colspan=\"$nb_user\">&nbsp;</td>";
+          $week_cal .=  "<td class=\"agendaVide\" colspan=\"$nb_user\">&nbsp;</td>";
         }
       }
       $week_cal .=  "</tr>";
