@@ -25,9 +25,7 @@ $l_coord = "Coordonnées";
 
 // Labels et textes
 $l_comment = "Commentaire";
-$l_contact_list = "Liste Contacts";
 $l_contact_new = "Nouveau Contact";
-$l_deal_list = "Liste Affaires";
 $l_deal_new = "Nouvelle Affaire";
 $l_kind_manage = "Gestion des Types de Société";
 $l_kind_exist = "Types existants";

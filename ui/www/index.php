@@ -24,8 +24,10 @@
     <ul class="detailList">
 
       <li>
-        <div align="left"><b>2003-09-26</b> : version <b>0.7.1</b> released (fixes and enhancement)
+        <div align="left"><b>2003-09-29</b> : version <b>0.7.1</b> released (fixes and enhancement)
         <ol>
+          <li> New module : todo
+          <li> New theme : grey (finally we have more than 1 real theme)
           <li> CVS Export enhancement (delimiter in user preference, default to save with module.csv filename, export all pages...)
 	  <li> Document tree now viewed directly from database
 	  <li> Time optimizations and enhancement (project list refresh)

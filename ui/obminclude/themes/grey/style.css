@@ -255,8 +255,6 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	border-right: 3px solid #BDC3CE;
 	border-bottom: 3px solid #BDC3CE;
 	border-left: 3px solid #394D5A;
-
-
 }
 
 .detailHead {
@@ -303,16 +301,16 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	font-size: 10px;
 	text-align: left;
 	color: #7B9EAD;
-	margin-top: 0px;
-	margin-bottom: 0px;
 	background-color: #FFFFFF;
-	margin-right: 10px;
+	margin-top: 0px;
+	margin-bottom: 20px;
+	margin-left: 0px;
+	margin-right: 0px;
 	border-top: 2px solid #394D5A;
 	border-right: 2px solid #BDC3CE;
 	border-bottom: 2px solid #BDC3CE;
 	border-left: 2px solid #394D5A;
 	clear: left;
-	margin-left: 0px;
 }
 
 .detailButton {
@@ -334,6 +332,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 /* ------------------------------------------------------------------------- */
 
 .link {
+	clear: right;
 	width: 180px;
 	margin-top: 0px;
 	margin-right: 0px;
@@ -365,6 +364,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 }
 
 .linkList {
+	list-style-type: none;
 	padding-top: 0px;
 	padding-right: 0px;
 	padding-bottom: 0px;
@@ -382,9 +382,9 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	border-top-color: #CED3D6;
 }
 
- .link a {	border: 0px;	font-weight: bold;	text-decoration: none;} 
- .link a:link { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
- .link a:active { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
+.link a {border: 0px; font-weight: bold; text-decoration: none;} 
+.link a:link {color: #FFFFFF; border: 0px; font-weight: bold; text-decoration: none;} 
+.link a:active { color: #FFFFFF; border: 0px; font-weight: bold; text-decoration: none;} 
  .link a:visited { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
 
 /* ------------------------------------------------------------------------- */

@@ -42,7 +42,6 @@ function display_page(&$display) {
     <!-- zone Action -->
     ". $display["action"] ."
     <!-- Fin zone Action -->
-    ".  $display["link"] ."
     <!-- zone Last -->
     ". $display["last"] ."
     <!-- Fin zone Last -->
@@ -62,6 +61,7 @@ function display_page(&$display) {
     <div class=\"rightpanel\">
      ". $display["detailInfo"] . "<p /> 
      ". $display["features"] ."
+    ".  $display["link"] ."
     </div>
     <!-- right panel end --> 
 

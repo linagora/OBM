@@ -4,7 +4,7 @@
 //     - Desc : Todo Display File                                            //
 // 2003-09-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id:
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
  
 
@@ -136,16 +136,16 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_todotitle</td>
-      <td class=\"detailForm\" colspan=\"3\">
+      <td class=\"detailForm\">
        <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" />
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailForm\" colspan=\"3\">$sel_user</td>
+      <td class=\"detailForm\">$sel_user</td>
      </tr><tr>
       <td class=\"detailLabel\">$l_priority</td>
       <td class=\"detailForm\">$sel_priority</td>
-
+     </tr><tr>
       <td class=\"detailLabel\">$l_deadline</td>
       <td class=\"detailForm\">
        <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
@@ -155,7 +155,7 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_content</td>
-      <td class=\"detailForm\" colspan=\"3\">
+      <td class=\"detailForm\">
        <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
       </td>
      </tr>
@@ -167,7 +167,8 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
      </p>
     </div>
 
-    </form>";
+    </form>
+    <p /> <br />";
 
   return $block;
 }

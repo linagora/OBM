@@ -10,7 +10,7 @@
 # Mysql User and Password var definition
 U=root
 P=""
-
+DB="obm"
 
 # We search for the PHP interpreter (different name on Debian, RedHat)
 PHP=`which php4 2> /dev/null`
@@ -30,15 +30,15 @@ mysql -u $U -p$P < create_obmdb_0.7.mysql.sql
 
 # Dictionnary data insertion
 echo "Dictionnary data insertion"
-mysql -u $U -p$P obm < create_obmdb_0.7_fr.mysql.sql
+mysql -u $U -p$P $DB < create_obmdb_0.7_fr.mysql.sql
 
 # Test data insertion
 echo "Test data insertion"
-mysql -u $U -p$P obm < obmdb_test_values_0.7.sql
+mysql -u $U -p$P $DB < obmdb_test_values_0.7.sql
 
 # Default preferences data insertion
 echo "Default preferences data insertion"
-mysql -u $U -p$P obm < obmdb_default_values_0.7.sql
+mysql -u $U -p$P $DB < obmdb_default_values_0.7.sql
 
 # Default preferences propagation on created users
 echo "Default preferences propagation on created users"

@@ -502,7 +502,7 @@ function html_deal_links($deal_q, $inv_nb) {
   // -- Labels
   global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
   global $l_create_project, $l_create_short_project, $l_view_project;
-  global $l_header_document,$ico_document,$l_deal, $l_project;
+  global $l_header_document,$ico_document,$l_deal, $l_header_project;
   global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
   global $l_document_new,$l_document_add,$ico_document_new;
   global $perms_user, $path, $auth,$popup_height,$popup_width;
@@ -528,7 +528,7 @@ function html_deal_links($deal_q, $inv_nb) {
   }
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid&amp;param_deal=$id");
 
-  // project
+  // Project
   if ($project or ($hitrate == "100")) {
     if ($project) {
       $url_project = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$id");
@@ -547,23 +547,24 @@ function html_deal_links($deal_q, $inv_nb) {
             <a href=\"$url_project\">$l_create_short_project</a></li>";
     }
     
-    $dis_project_link ="
-     <div class=\"linkTitle\">:: $l_project</div>
+    $dis_project_link = "
+     <div class=\"linkTitle\">:: $l_header_project</div>
      <ul class=\"linkList\">
        $dis_ico_project
      </ul>";
   }
 
-  // contract
+  // Contract
   $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
   $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
 
-  // invoice
+  // Invoice
   $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
   $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
   $nb_inv_arch = run_query_nb_archived_invoices ($id);
   $contract_nb = run_query_contract_nb ($id);
 
+  // Document
   $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
   $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Deal");
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";

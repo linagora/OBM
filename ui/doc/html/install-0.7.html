@@ -400,6 +400,48 @@ mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
 <h3>Update stored values that are not calculated</h3>
 # In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the company module (which update these values)
 
+
+<p/>
+<a name="upgrade-0.7.1"><h1>UPGRADE OBM DATABASE 0.7.0 to 0.7.1</h1></a>
+<p />
+# Database has evolved from 0.7.0 to 0.7.1
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/update-0.7.0-0.7.1.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# As a consequence of the new db model, some data need an update too (Document).
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+cd scripts/0.7
+php4 update-0.7.0-0.7.1.php  (on Debian)
+php update-0.7.0-0.7.1.php  (on Redhat)
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.7/obmdb_default_values_0.7.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+
 <br /><br />
 <a href="javascript:back();">back</a>
 

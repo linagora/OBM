@@ -284,12 +284,12 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_links($p_id, $name, $con_num, $deal_num) {
-  // -- Themes
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new;
-  // -- Labels
-  global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new,$popup_height,$popup_width; 
-  global $perms_user,$l_company, $path, $auth,$l_document_new,$l_header_document,$l_document_add;
+  global $l_header_contact, $l_contact_new; 
+  global $l_header_deal, $l_deal_new; 
+  global $l_header_document, $l_document_new, $l_document_add; 
+  global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
 
   $uname = urlencode($name);
   $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id&amp;tf_company=$uname");
@@ -303,20 +303,21 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 
   
   $block = "<div class=\"link\"> 
-  <div class=\"linkTitle\">:: Contacts associes</div>
+  <div class=\"linkTitle\">:: $l_header_contact</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_con_list\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
-        <a href=\"$url_con_list\">$l_contact_list ($con_num)</a></li>
+        <a href=\"$url_con_list\">$l_header_contact ($con_num)</a></li>
     <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
         <a href=\"$url_con_new\">$l_contact_new</a></li>
   </ul>
-  <div class=\"linkTitle\">:: Affaires associees</div>
+  <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
-        <a href=\"$url_deal_list\">$l_deal_list ($deal_num)</a></li>
+        <a href=\"$url_deal_list\">$l_header_deal ($deal_num)</a></li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>
    </ul>
+  <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
@@ -343,7 +344,6 @@ function html_company_consult($co_q) {
   // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
-  global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
   global $l_name,$l_number,$l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;

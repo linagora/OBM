@@ -3,7 +3,7 @@
 //     - Desc : CSS style file (grey theme) for Calendar module              //
 // 2003-09-01 Mehdi Rande                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 */
 
@@ -14,9 +14,6 @@
 a.agendaHead:link 	{ color: #ffff00; background-color: transparent;}
 a.agendaHead:active 	{ color: #ffff00; background-color: transparent;}
 a.agendaHead:visited 	{ color: #ffff00; background-color: transparent;}
-
-
-
 
 
 div.agendaBar {
@@ -100,7 +97,7 @@ table.agendaCal		{
 	width: 			100%;
 	margin-top: 		0px;
 /*	margin-right: 		0px;*/
-	margin-bottom: 		20px;
+	margin-bottom: 		0px;
 /*	margin-left: 		0px;*/
 	padding: 		0px;
 	border-right-width: 	2px;

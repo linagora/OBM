@@ -13,17 +13,13 @@
       <td class="detailLabel">$l_archive</td>
       <td class="detailText">$archive</td>
     </tr>
-    <tr> 
+    <tr>
       <td class="detailLabel">$l_kind</td>
       <td class="detailText">$kind</td>
     </tr>
     <tr> 
       <td class="detailLabel">$l_activity</td>
       <td class="detailText">$act</td>
-    </tr>
-    <tr> 
-      <td class="detailLabel">$l_contact_list</td>
-      <td class="detailText">$con_num</td>
     </tr>
     <tr>
       <td class="detailLabel">$l_market</td>

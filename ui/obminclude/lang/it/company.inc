@@ -22,9 +22,7 @@ $l_web = "Web";
 $l_email = "E-Mail";
 
 // Labels and texts
-$l_contact_list = "Lista Contatti";
 $l_contact_new = "Nuovo Contatto";
-$l_deal_list = "Lista Impegni";
 $l_deal_new = "New Deal";
 $l_kind_manage = "Azienda Tipo Management";
 $l_kind_exist = "Tipi esistente";
