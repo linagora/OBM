@@ -599,13 +599,13 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
           <td align=right>
             <font size=-2>$l_address &nbsp;<br>1 &nbsp;</font>
           </td>
-          <td><input name=tf_ad1 size=30 maxlength=50 value=\"$ad1\"></td>
+          <td><input name=tf_ad1 size=30 maxlength=64 value=\"$ad1\"></td>
   <!-- ADDRESSE 2 -->
         </tr><tr>
           <td align=right>
             <font SIZE=-2>$l_address &nbsp;<br>2 &nbsp;</font>
           </td>
-          <td><input name=tf_ad2 size=30 maxlength=50 value=\"$ad2\"></td>
+          <td><input name=tf_ad2 size=30 maxlength=64 value=\"$ad2\"></td>
   <!-- ZIP CODE + CEDEX -->
         </tr><tr>
           <td align=right><font size=-2>$l_postcode &nbsp;&nbsp;</font></td>
@@ -617,7 +617,7 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   <!-- TOWN -->
         </tr><tr>
           <td align=right><font size=-2>$l_town &nbsp;&nbsp;</font></td>
-          <td><input name=tf_town size=24 maxlength=24 value=\"$town\"></td>
+          <td><input name=tf_town size=30 maxlength=64 value=\"$town\"></td>
   <!-- COUNTRY -->
         </tr><tr>
           <td align=right><font size=-2>$l_country &nbsp;&nbsp;</font></td>
@@ -632,12 +632,12 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
       <tr>
   <!-- EMAIL + LINK -->
         <td align=right><font size=-2>$l_email &nbsp;&nbsp;</font></td>
-        <td><input name=tf_email size=45 maxlength=128 value=\"$email\"></td>
+        <td><input name=tf_email size=45 maxlength=64 value=\"$email\"></td>
         <td align=center>$link_email</td>
       </tr><tr>
   <! -- WEB + LINK -->
         <td align=right><font size=-2>$l_web &nbsp;&nbsp;</font></td>
-        <td><input name=tf_web size=45 maxlength=52 value=\"$web\"></td>
+        <td><input name=tf_web size=45 maxlength=64 value=\"$web\"></td>
         <td align=center>$link_web</td>
       </tr>
       </table>

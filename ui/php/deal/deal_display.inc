@@ -1505,7 +1505,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
 
-  echo "<FONT color=\"#$col_textem\">$nb_parentdeals  $l_found_parent</font>";
+  echo "<FONT color=\"#$col_textem\">$nb_parentdeals $l_found_parent</font>";
 
   $url = $sess->url("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
@@ -1643,17 +1643,17 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Parent Deal Detail                                                //
 // Parameters :
-//   - $parent_q      : DBO : information about the parent deal
-//   - $deal_q        : DBO : parentdeal deal list
-//   - deal[]         : default or transmitted values
-//     keys used      : forwarded to html_deal_search_form
-//   - $pref_q  : display preferences for the deal list
-//   - $nbdeals       : number of deals in the list
+//   - $parent_q : DBO : information about the parent deal
+//   - $deal_q   : DBO : parentdeal deal list
+//   - deal[]    : default or transmitted values
+//     keys used : forwarded to html_deal_search_form and $url for OBM_DISPLAY
+//   - $pref_q   : display preferences for the deal list
+//   - $nbdeals  : number of deals in the list
 //     //---> used by the deal search form :
-//   - $kind_q        : list of deal types available
-//   - $cat_q         : list of deal categpries available
-//   - $state_q       : list of deal status available 
-//   - $usr_q         : DBO : list of userobm
+//   - $kind_q   : list of deal types available
+//   - $cat_q    : list of deal categories available
+//   - $state_q  : list of deal status available 
+//   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
   global $col_textem,$col_label,$col_ok; 
@@ -1769,6 +1769,16 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   }
 
   echo "<font color=\"#$col_textem\">$nb_deals $l_found</font>";
+
+  $label = urlencode(stripslashes($deal["label"]));
+  $name = urlencode(stripslashes($deal["company_name"]));
+  $archive = $deal["archive"];
+  $kind = $deal["kind"];
+  $cat = $deal["cat"];
+  $state = $deal["state"];
+  $manager = $deal["manager"];
+  $dateafter = stripslashes($deal["dateafter"]);
+  $datebefore = stripslashes($deal["datebefore"]);
 
   $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
