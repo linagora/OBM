@@ -59,7 +59,7 @@ function dis_project_consult($pid) {
   $project_q = run_query_detail($pid);
   $tasks_q = run_query_tasks($pid);
   $members_q = run_query_members($pid);
-  $allo_q = run_query_allocation($pid);
+  $allo_q = run_query_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $project_q->query . " !");
@@ -444,16 +444,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
       $cpt_t++; 
     }
   
-    if ($allo_q->nf() == 0) $action = "consultnoadv";
-
     // list the members of the project
     while ($allo_q->next_record()) {
       
       $m_id = $allo_q->f("userobm_id");
-      $m_task = $allo_q->f("projectuser_projecttask_id");
-      $m_proj = $allo_q->f("projected_time");
-      $m_miss = $allo_q->f("missing_time");
-      $m_used = $allo_q->f("used_time");
+      $m_task = ($allo_q->f("projecttask_id") ? $allo_q->f("projecttask_id") : 0);
+      $m_proj = ($allo_q->f("projected_time") ? $allo_q->f("projected_time") : 0);
+      $m_miss = ($allo_q->f("missing_time") ? $allo_q->f("missing_time") : 0);
+      $m_used = ($allo_q->f("used_time") ? $allo_q->f("used_time") : 0);
 
       // time (used/missing/projected) for each (task/member) couple
       $array_time["proj"][$m_task][$m_id] = $m_proj;
@@ -516,7 +514,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
         $t_label</td>\n";
       }
 
-      //write a line (corresponding to a task)
+      // write a line (corresponding to a task)
       for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
 
 	$m_id = $array_mem[$cpt_e]["id"];
@@ -524,10 +522,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 	$tm_miss = $array_time["miss"][$t_id][$m_id];
 	$tm_used = $array_time["used"][$t_id][$m_id];
 
-	if ($tm_proj != 0)
-	  $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
-	else
-	  $tm_label = "";
+	$tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
 
 	if ($t_haschild) {
 	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
@@ -539,7 +534,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
       }
 
       if ($t_parent) {
-	//write the total for a parent task
+	// write the total for a parent task
 	$tm_proj = $array_partot["proj"][$t_id];
 	$tm_miss = $array_partot["miss"][$t_id];
 	$tm_used = $array_partot["used"][$t_id];
@@ -556,6 +551,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 
 	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
+
       } else {
 	$dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
       }

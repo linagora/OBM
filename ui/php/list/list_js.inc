@@ -15,8 +15,8 @@ require("$obminclude//javascript/check_js.inc");
 echo "
 
 function check_name_list(form) {
-  name_list = form.tf_name_list.value ;
-  subject_list = form.tf_subject_list.value ;
+  name_list = form.tf_name.value ;
+  subject_list = form.tf_subject.value ;
 
 
   if (trim(name_list) == \"\") {

@@ -13,6 +13,7 @@ echo "
 <!--
 ";
 
+require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 
 echo "
@@ -26,7 +27,7 @@ function confirm_del() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind check or deletion is possible                           //
+// Check if the kind form values are correct                                 //
 ///////////////////////////////////////////////////////////////////////////////
 function check_project(form) {
 
@@ -60,8 +61,19 @@ function check_project(form) {
     return false;
   }
 
-  else
-    return true;
+  // If datebegin filled, check it is correct 
+  if ( (form.tf_datebegin.value != \"\")
+       && (check_date(form.tf_datebegin, \"$l_datebegin\") == false)) {
+    return false;
+  }
+
+  // If dateend filled, check it is correct 
+  if ( (form.tf_dateend.value != \"\")
+       && (check_date(form.tf_dateend, \"$l_dateend\") == false)) {
+    return false;
+  }
+
+  return true;
 } 
 
 
@@ -146,7 +158,7 @@ function check_allo_valid(form, nb_mem)
   //    if (i_nb[idx] != 1) {
   //      error += 2;
   //    }
-  }
+  //  }
 
   if (error == 1) {
     alert (\"$l_fill_projnumber\");

@@ -42,6 +42,9 @@ function confirm_del() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the deal form values are correct                                 //
+///////////////////////////////////////////////////////////////////////////////
 function check_form(f_aff) {
   if (trim(f_aff.tf_label.value) == \"\") {
     alert (\"$l_fill_label\");
@@ -51,30 +54,9 @@ function check_form(f_aff) {
   if (trim(f_aff.tf_datealarm.value) == \"\") {
     alert (\"$l_fill_datealarm\");
     return false;
-  }
-
-  if (trim(f_aff.tf_datebegin.value) == \"\") {
-    alert (\"$l_fill_datebegin\");
+  } else if (check_date(f_aff.tf_datealarm, \"$l_date_alarm\") == false) {
     return false;
-  }
-
-  //else if (trim(f_aff.tf_num.value) == \"\") {
-  //  alert (\"$l_fill_number\")
-  //  return false;
-  //}
-
-  else if (check_date(f_aff.tf_datebegin, \"$l_date_init\") == false) {
-    return false;
-  }
-  else if (check_date(f_aff.tf_datealarm, \"$l_date_alarm\") == false) {
-    return false;
-  }
-  else if ((f_aff.tf_dateprop.value != \"\") &&
-          (check_date(f_aff.tf_dateprop, \"$l_proposition\") == false)) {
-    return false;
-  }
-  else
-  {
+  } else {
     // Check if date alarm is in the past
     today = new Date();
     dalarm = f_aff.tf_datealarm.value;
@@ -93,6 +75,18 @@ function check_form(f_aff) {
       }
     }
     return true;
+  }
+
+  if (trim(f_aff.tf_datebegin.value) == \"\") {
+    alert (\"$l_fill_datebegin\");
+    return false;
+  } else if (check_date(f_aff.tf_datebegin, \"$l_date_init\") == false) {
+    return false;
+  }
+  
+  if ((f_aff.tf_dateprop.value != \"\") &&
+          (check_date(f_aff.tf_dateprop, \"$l_proposition\") == false)) {
+    return false;
   }
 }
 

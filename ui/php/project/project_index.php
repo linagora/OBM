@@ -211,7 +211,6 @@ if ($action == "index" || $action == "") {
     $tasks_q = run_query_tasks($param_project);
     $members_q = run_query_members($param_project);
     $allo_q = run_query_allocation($param_project);
-
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
       $display["msg"] = display_warn_msg($l_no_allocation);
 
@@ -363,11 +362,12 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
 // Update right for projectmanagers and admins
 ///////////////////////////////////////////////////////////////////////////////
-$consult_actions = Array('detailconsult', 'consultnoproj', 'consultnoadv',
-                         'update', 'progress_update', 'allocate_update');
 
-if (in_array($action, $consult_actions))
-     $action = (manager_rights($uid, $project, $project_q)) ? $action : "consultnoright";
+// To be reviewed !!!
+//$consult_actions = Array('detailconsult',
+//                         'update', 'progress_update', 'allocate_update');
+//if (in_array($action, $consult_actions))
+//     $action = (manager_rights($uid, $project, $project_q)) ? $action : "consultnoright";
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -523,7 +523,7 @@ function get_project_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'update', 'insert', 'progress_update', 'allocate_update') 
+    'Condition'=> array ('detailconsult', 'update', 'insert', 'progress_update', 'allocate_update') 
     );
 
 // Insert
@@ -560,7 +560,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'update', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
     );
 
 // Add a task
@@ -582,7 +582,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_del', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_del', 'allocate', 'progress') 
                                      );
 
 // Select members : Lists selection
@@ -621,7 +621,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'consultnoadv', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_del') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'progress', 'member', 'member_add', 'member_del', 'member_update','task', 'task_add', 'task_del') 
                                      );
 
 // Time allocation Update

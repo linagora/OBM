@@ -936,7 +936,9 @@ function run_query_tasks($pid) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Project members query
+// What the goal of this query without project id given ????XXXXX
 // Parameters :
+//   - $p_id : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_members($p_id = 0) {
   global $cdg_sql;
@@ -977,63 +979,49 @@ function run_query_members($p_id = 0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Members time informations query
+// Project Participants query (current members + time management filling) 
 // Parameters :
-//   - $p_id      : project id
+//   - $p_id : project id
+// Returns:
+//   array of project particpants id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_allocation($p_id) {
-  global $cdg_sql, $c_day_fraction;
-
-  $frac = $c_day_fraction;
-
+function get_project_participants($p_id = 0) {
+  global $cdg_sql;
+  
   $query = "
     select
-      userobm_id,
-      projectuser_projecttask_id,
-      sum((timetask_length)/$frac) as used_time,
-      projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time
-    from UserObm, ProjectUser, ProjectTask
-    left join TimeTask
-      on  timetask_projecttask_id = projecttask_id
-      and timetask_user_id = userobm_id
-    where projecttask_project_id = '$p_id'
-      and projecttask_id = projectuser_projecttask_id
-      and projectuser_user_id = userobm_id
-      and projectuser_projectedtime != '0'
-    group by userobm_id, projecttask_id
-    ";
-
-  $query = "
-    select
-      userobm_id,
-      projecttask_id,
-      sum((timetask_length)/$frac) as used_time,
-      projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time
-    from UserObm, ProjectTask
-      left join TimeTask
-        on timetask_projecttask_id = projecttask_id
-          and timetask_user_id = userobm_id
-      left join ProjectUser
-        on projecttask_id = projectuser_projecttask_id
-          and projectuser_user_id = userobm_id
-    where projecttask_project_id = '$p_id'
-      and (userobm_id=6 or userobm_id=19)
-    group by userobm_id, projecttask_id
-    ";
-
-  // Ideee qui manque : comment avoir le temps passe meme si une affectation n'existe plus !
-  // XXX Supprimer les users en dur !! :)
-  // Decouper sans doute en 2 requets
-  // - timetask
-  // - projectUser
-
-  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+      projectuser_user_id
+    from ProjectUser
+      where projectuser_project_id = '$p_id'
+      "; 
+  display_debug_msg($query, $cdg_sql, "run_query_participants(1)");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  return $obm_q;
+  $users_arr = array();
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("projectuser_user_id");
+    array_push($users_arr, $u_id);
+  }
+
+ $query = "
+    select
+      timetask_user_id
+    from TimeTask, ProjectTask
+      where timetask_projecttask_id = projecttask_id
+        and projecttask_project_id = '$p_id'
+      "; 
+  display_debug_msg($query, $cdg_sql, "run_query_participants(2)");
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $u_id = $obm_q->f("timetask_user_id");
+    array_push($users_arr, $u_id);
+  }
+
+  $users = array_unique ($users_arr);
+
+  return $users;
 }
 
 
@@ -1063,6 +1051,99 @@ function run_query_managers($p_id = 0) {
   $obm_q->query($query);
   return $obm_q;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Project tasks user allocation
+// Parameters:
+//   - $p_id : project id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_allocation($p_id) {
+  global $cdg_sql, $c_day_fraction;
+
+  $frac = $c_day_fraction;
+
+  $query = "
+    select
+      userobm_id,
+      projectuser_projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time
+    from UserObm, ProjectUser, ProjectTask
+    left join TimeTask
+      on  timetask_projecttask_id = projecttask_id
+      and timetask_user_id = userobm_id
+    where projecttask_project_id = '$p_id'
+      and projecttask_id = projectuser_projecttask_id
+      and projectuser_user_id = userobm_id
+      and projectuser_projectedtime != '0'
+    group by userobm_id, projecttask_id
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Project tasks user allocation and time spend (in time management)
+// Different from run_query_allocation as a project member who has already
+// spent some time on the project (filled in the time management) but is not
+// anymore assigned to some tasks, must appear in the detailed progress table 
+// Parameters:
+//   - $p_id : project id
+// Optimiser en separant en 2 requetes Projectuser et TimeTask ????XXXXX
+///////////////////////////////////////////////////////////////////////////////
+function run_query_allocation_and_time($p_id) {
+  global $cdg_sql, $c_day_fraction;
+
+  $frac = $c_day_fraction;
+
+  $users = get_project_participants($p_id);
+
+  $nb = count($users);
+  $cpt = 0;
+  $user_where = "and (";
+  while (list($key, $u_id) = each ($users)) {
+    $cpt ++;
+    if ($cpt == 1) {
+      $user_where .= "userobm_id='$u_id'";
+    } else {
+      $user_where .= " or userobm_id='$u_id'";
+    }
+  }
+  $user_where .= ")";
+
+  $query = "
+    select
+      userobm_id,
+      projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time
+    from UserObm, ProjectTask
+      left join TimeTask
+        on timetask_projecttask_id = projecttask_id
+          and timetask_user_id = userobm_id
+      left join ProjectUser
+        on projecttask_id = projectuser_projecttask_id
+          and projectuser_user_id = userobm_id
+    where projecttask_project_id = '$p_id'
+      $user_where
+    group by userobm_id, projecttask_id
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Get all the contacts of the companyusing obm
