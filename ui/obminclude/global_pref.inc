@@ -120,7 +120,7 @@ $menus["COMPTA"] = array('Name' => $l_header_compta,
                          'Url'  => "$path/account/account_index.php",
                          'Right'=> $compta_read);
 $menus["USERS"]  = array('Name' => $l_header_users,
-                         'Url'  => "$path/time/time_index.php",
+                         'Url'  => "$path/user/user_index.php",
                          'Right'=> $users_read);
 $menus["ADMINS"] = array('Name' => $l_header_admins,
                          'Url'  => "$path/admin/admin_index.php?mode=html",
@@ -154,6 +154,10 @@ if ($section == "COM") {
 
 } elseif ($section == "PROD") {
 
+  $menus["PROD"]["TIME"]     = array('Name'=> $l_header_time,
+                                      'Ico' => "$ico_time",
+			              'Url' => "$path/time/time_index.php",
+			              'Right'=> $time_read);
   $menus["PROD"]["CONTRACT"] = array('Name' => $l_header_contract,
 			           'Ico' => "$ico_contract",
   			           'Url' => "$path/contract/contract_index.php",
@@ -203,10 +207,6 @@ if ($section == "COM") {
 
 } elseif ($section == "USERS") {
 
-  $menus["USERS"]["TIME"]     = array('Name'=> $l_header_time,
-                                      'Ico' => "$ico_time",
-			              'Url' => "$path/time/time_index.php",
-			              'Right'=> $time_read);
   $menus["USERS"]["USER"]     = array('Name'=> $l_header_user,
                                       'Ico' => "$ico_user",
 			              'Url' => "$path/user/user_index.php",

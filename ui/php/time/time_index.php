@@ -25,7 +25,7 @@
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "USERS";
+$section = "PROD";
 $menu = "TIME";
 
 // Deal we display in project list

@@ -166,6 +166,13 @@ $prod_write 		= 32;
 $prod_admin_read	= 64;
 $prod_admin_write	= 128;
 			////////////
+			//TIME    //
+			////////////
+$time_read		= $prod_read;
+$time_write	 	= $prod_read + $prod_write;
+$time_admin_read 	= $prod_admin_read;
+$time_admin_write	= $prod_admin_read + $prod_admin_write;
+			////////////
 			//CONTRACT//
 			////////////
 $contract_read		= $prod_read;
@@ -223,13 +230,7 @@ $user_read		= $users_admin_read;
 $user_write	 	= $users_admin_read + $users_admin_write;
 $user_admin_read 	= $users_admin_read;
 $user_admin_write	= $users_admin_read + $users_admin_write;
-			////////////
-			//TIME    //
-			////////////
-$time_read		= $users_read;
-$time_write	 	= $users_read + $users_write;
-$time_admin_read 	= $users_admin_read;
-$time_admin_write	= $users_admin_read + $users_admin_write;
+
 			////////////
 			//SETTINGS//
 			////////////
