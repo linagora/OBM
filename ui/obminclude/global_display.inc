@@ -291,6 +291,10 @@ class OBM_DISPLAY {
 
     $link_ok = $this->display_link;
     $module = $this->display_module;
+    $entity = $this->display_entity;
+    if ($entity == "") {
+      $entity = $module;
+    }
 
     $block .= "<div class=\"result\">";
 
@@ -355,7 +359,7 @@ class OBM_DISPLAY {
 	// Default values
 	$fieldname = $this->display_pref->f("display_fieldname");
 
-	if (! $cgp_hide[$module][$fieldname]) {
+	if (! $cgp_hide[$entity][$fieldname]) {
 
 	  $name = $this->data_set->f($fieldname);
 	  $url = "";
@@ -599,7 +603,9 @@ class OBM_DISPLAY {
 
     $module = $this->display_module;
     $entity = $this->display_entity;
-
+    if ($entity == "") {
+      $entity = $module;
+    }
     $this->display_pref->seek(0);
     $block = "
     <tr>";
@@ -618,7 +624,7 @@ class OBM_DISPLAY {
     while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
 
-      if (! $cgp_hide[$module][$fieldname]) {
+      if (! $cgp_hide[$entity][$fieldname]) {
 	$label = $fieldnames[$fieldname];
 	$order = ($order_dir == "DESC" ? "ASC" : "DESC");
 

@@ -528,6 +528,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
+  $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
 
   // Function field
   if ($show_func) {
@@ -548,19 +549,25 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   // Service field
   if ($show_service) {
     $block_service = "
-    <tr>
+    </tr><tr>
       <td class=\"detailLabel\">$l_service</td>
-      <td class=\"detailText\">$service</td>
-    </tr>";
+      <td class=\"detailText\">$service</td>";
   }
 
   // Address3 field
   if ($show_ad3) {
     $block_ad3 = "
-    <tr>
+    </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$ad3</td>
-    </tr>";
+      <td class=\"detailText\">$ad3</td>";
+  }
+
+  // Cedex field
+  if ($show_cdx) {
+    $block_cdx = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailText\">$cdx</td>";
   }
 
   if ($usercreate == $auth->auth["uid"]) {
@@ -710,9 +717,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
       <td class=\"detailText\">$town</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$cdx</td>
+    $block_cdx
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td class=\"detailText\">$ctry_name</td>
@@ -1032,6 +1037,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   $show_cat2 = (! $cgp_hide["contact"]["category2"]);
   $show_service = (! $cgp_hide["contact"]["contact_service"]);
   $show_ad3 = (! $cgp_hide["contact"]["contact_address3"]);
+  $show_cdx = (! $cgp_hide["contact"]["contact_expresspostal"]);
 
   // some constants
   $csize_add = "48";
@@ -1241,6 +1247,14 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       </td>";
   }
 
+  // Cedex field
+  if ($show_cdx) {
+    $block_cdx = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>";
+  }
+
   // User comment select construction
   if ($usr_q->nf()>0) {
     $usr_q->seek(0);
@@ -1374,9 +1388,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     </tr><tr>
     <td class=\"detailLabel\">$l_town</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_expresspostal</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
+    $block_cdx
     </tr><tr>
     <td class=\"detailLabel\">$l_country</td>
     <td class=\"detailForm\">$sel_ctry</td>

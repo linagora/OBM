@@ -1087,7 +1087,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $projtask_id = $projecttask_q->f("projecttask_id");
     
       $projtask_name = addslashes($projecttask_q->f("projecttask_label"));
-      $projtask_name = (strlen($projtask_name) > 35) ? substr($projtask_name,0,35)."..." : $projtask_name;
+      $projtask_name = (strlen($projtask_name) > 64) ? substr($projtask_name,0,64)."..." : $projtask_name;
 
       $projtask_label = "\"". $projtask_name ."\"";
 

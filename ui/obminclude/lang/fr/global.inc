@@ -70,6 +70,7 @@ $l_deal = "Affaire";
 $l_list = "Liste";
 $l_publication = "Publication";
 $l_todo = "A faire";
+$l_time = "Gestion du temps";
 $l_project = "Projet";
 $l_contract = "Contrat";
 $l_incident = "Incident";

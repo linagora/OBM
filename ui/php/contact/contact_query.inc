@@ -58,7 +58,8 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
   // If an email indication has been specified, get it 
   if ($email != "") {
-    $where .= " and contact_email $like '$email%'";
+    $where .= " and (contact_email $like '$email%' or
+                     contact_email2 $like '$email%')";
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {

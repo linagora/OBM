@@ -61,6 +61,26 @@ function sql_casei_like($db_type) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Transform and Return a searched string (allow global processing)
+// Parameters:
+//   - $text : Text o parse or transform
+// Returns:
+//   - updated text
+///////////////////////////////////////////////////////////////////////////////
+function sql_search_text_parse($text) {
+  global $cgp_sql_star;
+
+  $mytext = $text;
+
+  if ($cgp_sql_star) {
+    $mytext = preg_replace("/\*/", "%", $text);
+  }
+
+  return $mytext;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the sql order clause handling case insensitive sorting
 // Parameters:
 //   - $db_type : DB type

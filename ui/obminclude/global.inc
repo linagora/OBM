@@ -78,6 +78,9 @@ $cg_prod = 3;
 // Use Database sessions
 $cgp_sess_db = false;
 
+// Allow * in search field
+$ctu_sql_star = false;
+
 // Tuning constants
 $ctu_sql_limit = false;
 
@@ -130,6 +133,24 @@ if (! $cgp_show["module"]["contact"]) {
   $cgp_hide["company"]["company_contact_number"] = true;
   $cgp_hide["company"]["company_new_contact"] = true;
 }
+
+if ($cgp_hide["company"]["company_address3"]) {
+  $cgp_hide["contact"]["contact_address3"] = true;
+  $cgp_hide["list_contact"]["address3"] = true;
+  $cgp_hide["list_contact_2"]["address3"] = true;
+}
+
+if ($cgp_hide["company"]["company_expresspostal"]) {
+  $cgp_hide["contact"]["contact_expresspostal"] = true;
+  $cgp_hide["list_contact"]["expresspostal"] = true;
+  $cgp_hide["list_contact_2"]["expresspostal"] = true;
+}
+
+if ($cgp_hide["contact"]["contact_function"]) {
+  $cgp_hide["list_contact"]["function_label"] = true;
+  $cgp_hide["list_contact_2"]["function_label"] = true;
+}
+
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 

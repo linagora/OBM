@@ -665,10 +665,10 @@ at least as much in the file system.
 		document_path,
 		document_kind,
 		document_size,
-		document_category1,
-		document_category2,
+		document_category1_id,
+		document_category2_id,
 		document_mimetype,
-		document_private
+		document_privacy
 	      )
 	      values (
 		null,
@@ -709,15 +709,15 @@ at least as much in the file system.
 	 $update
 	 </tr>";
       }
-      elseif($kind==2) {
+      elseif ($kind==2) {
 	$bool_bd = $d_q->next_record();
-      }else{
+      } else {
 	$bool_fs = next($f_q);
 	$bool_bd = $d_q->next_record();
       }
     } 
   }
-  if($mode == "txt") {
+  if ($mode == "txt") {
     $bool_bd = $d_q->next_record();
     $bool_fs = true;
     while ($bool_bd || $bool_fs) {
@@ -781,10 +781,10 @@ at least as much in the file system.
 	      document_path,
 	      document_kind,
 	      document_size,
-	      document_category1,
-	      document_category2,
+	      document_category1_id,
+	      document_category2_id,
 	      document_mimetype,
-	      document_private
+	      document_privacy
 	    )
 	    values (
 	      null,

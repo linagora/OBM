@@ -41,10 +41,7 @@
       <td class="detailLabel">$l_town</td>
       <td class="detailText">$town</td>
     </tr>
-    <tr>
-      <td class="detailLabel">$l_expresspostal</td>
-      <td class="detailText">$cdx</td>
-    </tr>
+    $block_cdx
     <tr>
       <td class="detailLabel">$l_country</td>
       <td class="detailText">$ctry_name</td>

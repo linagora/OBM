@@ -68,6 +68,7 @@ $l_deal = "Deal";
 $l_list = "List";
 $l_publication = "Publication";
 $l_todo = "To Do";
+$l_time = "Time management";
 $l_project = "Project";
 $l_contract = "Contract";
 $l_incident = "Incident";

@@ -89,7 +89,7 @@ Afin de permettre des utilisations d'\obm d'orientations diverses, certains modu
 
 A partir de la version 0.8 d'\obm, les modules \company, \contact et \deal ont des champs paramétrables.\\
 
-Le tableau \$cgp\_hide[``module''] définit pour les modules cibles les champs devant être cachés.
+Le tableau \$cgp\_hide[``entity''] définit pour les modules cibles les champs devant être cachés.
 Par défaut tous les champs sont affichés et il faut donc préciser explicitement les champs non souhaités.
 
 Pour ne pas afficher un champ il faut insérer dans le fichier de configuration la ligne :
@@ -117,6 +117,7 @@ $cgp_hide["company"]["companyactivity_label"] = true;  // secteur d'activité
 $cgp_hide["company"]["companynafcode_code"] = true;    // code NAF
 $cgp_hide["company"]["category"] = true;               // catégorie
 $cgp_hide["company"]["company_address3"] = true;       // ligne adresse 3
+$cgp_hide["company"]["company_expresspostal"] = true;  // Cedex
 \end{verbatim}  
 
 
@@ -131,7 +132,8 @@ $cgp_hide["contact"]["contact_title"] = true;     // titre
 $cgp_hide["contact"]["category1"] = true;         // catégorie 1
 $cgp_hide["contact"]["category2"] = true;         // catégorie 2
 $cgp_hide["contact"]["contact_service"] = true;   // ligne service
-$cgp_hide["contact"]["contact_address3"] = true;  // ligne adresse 3
+$cgp_hide["contact"]["contact_address3"] = [AUTO] // ligne adresse 3
+$cgp_hide["contact"]["contact_expresspostal"] = [AUTO];  // Cedex
 \end{verbatim}  
 
 
@@ -143,3 +145,33 @@ Liste des champs paramétrables (masquables) du module \deal :
 // Company module
 $cgp_hide["deal"]["category1"] = true;                 // catégorie
 \end{verbatim}  
+
+
+\subsubsection{Les dépendances entre modules}
+
+Certains champs apparaissent dans différent modules.
+Par exemple le champ \variable{contact\_function} apparait dans les modules \contact et \List, et ce champ, défini dans le module \contact peut être masqué.
+Pour les champs dépendants, \obm calcule donc automatiquement la visibilité en fonction des dépendances.
+Liste des champs dépendants :\\
+
+\begin{tabular}{|p{2.5cm}|p{3.5cm}|p{2.5cm}|p{3.5cm}|}
+\hline
+\textbf{Entité source} & \textbf{Champ source} & \textbf{Entité dépendante} & \textbf{Dépendance} \\
+\hline
+\multirow{3}{2cm}{company} & \multirow{3}{2cm}{company\_address3} & contact & contact\_address3 \\ 
+\cline{3-4}
+& & list\_contact & address3 \\ 
+\cline{3-4}
+& & list\_contact\_2 & address3 \\ 
+\hline
+\multirow{3}{2cm}{company} & \multirow{3}{2cm}{company\_expresspostal} & contact & contact\_expresspostal \\ 
+\cline{3-4}
+& & list\_contact & expresspostal \\ 
+\cline{3-4}
+& & list\_contact\_2 & expresspostal \\ 
+\hline
+\multirow{2}{2cm}{contact} & \multirow{2}{2cm}{contact\_function} & list\_contact & function\_label \\ 
+\cline{3-4}
+& & list\_contact\_2 & function\_label \\ 
+\hline
+\end{tabular}

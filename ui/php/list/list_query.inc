@@ -475,7 +475,7 @@ function run_query_contacts_list($list, $entity="") {
          contact_country_iso3166,
          country_name,
          contact_function_id,
-         function_label as contact_function,
+         function_label,
          contact_title,
          contact_phone,
          contact_homephone,

@@ -11,7 +11,7 @@
 // Database infos
 $obmdb_host = "localhost";
 $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
-$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
+//$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
@@ -38,6 +38,9 @@ $cgp_mailing_default = true;
 $cg_adm = 1;
 $cg_com = 2;
 $cg_prod = 3;
+
+// Allow * in search field
+$cgp_sql_star = true;
 
 // Tuning constants
 //$ctu_sql_limit = true;
@@ -76,15 +79,15 @@ $cgp_hide["company"]["company_vat"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["companynafcode_code"] = true;
 //$cgp_hide["company"]["category"] = true;
-$cgp_hide["company"]["company_address3"] = true;
+//$cgp_hide["company"]["company_address3"] = true;
+//$cgp_hide["company"]["company_expresspostal"] = true;
 
 // Contact module
-//$cgp_hide["contact"]["contact_function"] = true;
+$cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["category1"] = true;
 //$cgp_hide["contact"]["category2"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
-//$cgp_hide["contact"]["contact_address3"] = true;
 
 // Deal module
 

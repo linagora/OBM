@@ -702,6 +702,7 @@ function html_company_consult($co_q, $cat_q) {
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
+  $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
   // Number field
   if ($show_number) {
@@ -754,6 +755,15 @@ function html_company_consult($co_q, $cat_q) {
     <tr>
       <td class=\"detailLabel\">$l_address 3</td>
       <td class=\"detailText\">$ad3</td>
+    </tr>";
+  }
+
+  // Cedex field
+  if ($show_cdx) {
+    $block_cdx = "
+    <tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailText\">$cdx</td>
     </tr>";
   }
 
@@ -925,6 +935,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
   $show_cat = (! $cgp_hide["company"]["category"]);
   $show_ad3 = (! $cgp_hide["company"]["company_address3"]);
+  $show_cdx = (! $cgp_hide["company"]["company_expresspostal"]);
 
   // some constants
   $csize_add = "48";
@@ -1062,6 +1073,14 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     </tr><tr>
       <td class=\"detailLabel\">$l_address 3</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"$cmax_add\" size=\"$csize_add\" value=\"$ad3\" /></td>";
+  }
+
+  // Cedex field
+  if ($show_cdx) {
+    $block_cdx = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>";
   }
 
   // Country select
@@ -1204,9 +1223,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>
+    $block_cdx
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td class=\"detailForm\">$sel_ctry</td>

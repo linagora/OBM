@@ -365,11 +365,10 @@ elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 // except export in file
 if ($popup != 2) {
-  $display["head"] = display_head($l_contact);
+  $display["head"] = display_head($l_time);
   $display["end"] = display_end();
-  
   display_page($display);
-};
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores time parameters transmited in $task hash

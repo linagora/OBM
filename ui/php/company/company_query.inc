@@ -21,9 +21,9 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 
   $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
-  $name = $company["name"];
-  $phone = $company["phone"];
-  $town = $company["town"];
+  $name = sql_search_text_parse($company["name"]);
+  $phone = sql_search_text_parse($company["phone"]);
+  $town = sql_search_text_parse($company["town"]);
   $ctry = $company["country"];
   $kind = $company["kind"];
   $cat = $company["cat"];
@@ -31,7 +31,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $naf = $company["nafcode"];
   $market = $company["marketing_manager"];
   $dsrc = $company["datasource"];
-  $zip = $company["zip"];
+  $zip = sql_search_text_parse($company["zip"]);
   $dateafter = $company["dateafter"];
   $datebefore = $company["datebefore"];
   $lang = get_lang();
