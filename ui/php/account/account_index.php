@@ -46,7 +46,6 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head("$l_account");
 $display["header"] = generate_menu($menu, $section);
-echo $display["head"] . $display["header"];
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -56,34 +55,34 @@ echo $display["head"] . $display["header"];
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  html_account_search_form ($action, $account);
+  $display["search"] = html_account_search_form ($action, $account);
   if ($set_display == "yes") {
-    dis_account_search_list($account);
+    $display["result"] = dis_account_search_list($account);
   } else {
-    display_ok_msg($l_no_display);
+    $display["msg"] = display_ok_msg($l_no_display);
   }
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
-  html_account_search_form($action, $account);
-  dis_account_search_list($account);
+  $display["search"] = html_account_search_form($action, $account);
+  $display["result"] = dis_account_search_list($account);
   
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
     require("account_js.inc");
-    html_account_form($obm_q_accounts, $action);
+    $display["detail"] = html_account_form($obm_q_accounts, $action);
   } else {
-    display_err_msg($l_error_permission);
+    $display["msg"] = display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_insert($account);
-  display_ok_msg($l_insert_ok);
+  $display["msg"] = display_ok_msg($l_insert_ok);
   require("account_js.inc");
-  html_account_search_form($action, $account);
+  $display["search"] = html_account_search_form($action, $account);
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -92,7 +91,7 @@ if ($action == "index" || $action == "") {
     $obm_q_account=run_query_detail($account["account"]);
     $obm_q_account->next_record();
     display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
-    html_account_consult($obm_q_account, $action);
+    $display["detail"] = html_account_consult($obm_q_account, $action);
   }
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -102,28 +101,28 @@ if ($action == "index" || $action == "") {
     $obm_q_account->next_record();    
     require("account_js.inc");
     display_record_info($obm_q_account->f("account_usercreate"),$obm_q_account->f("account_userupdate"),$obm_q_account->f("timecreate"),$obm_q_account->f("timeupdate"));
-    html_account_form($obm_q_account,$action);
+    $display["detail"] = html_account_form($obm_q_account,$action);
   }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update($account);
-  display_ok_msg($l_update_ok);
+  $display["msg"] = display_ok_msg($l_update_ok);
   require("account_js.inc");
-  html_account_search_form($action, $account);
+  $display["search"] = html_account_search_form($action, $account);
   
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   // checking that no payment is linked to this account
   $q_related_payments = run_query_search_payments ($account["account"]);
   if ($q_related_payments->nf() != 0){
-    html_impossible_deletion ($account["account"], $q_related_payments);
+    $display["detail"] = html_impossible_deletion ($account["account"], $q_related_payments);
     // maybe a confirmation from the user would be enough...
   } else {
     run_query_delete($account["account"]);
-    display_ok_msg($l_delete_ok);
+    $display["msg"] = display_ok_msg($l_delete_ok);
     require("account_js.inc");
-    html_account_search_form($action,'');
+    $display["search"] = html_account_search_form($action,'');
   }
 
 } elseif ($action == "compute_balance") {
@@ -147,16 +146,16 @@ if ($action == "index" || $action == "") {
   if (true) {
     // account_js.inc needed to check date input by user...
     require ("account_js.inc");
-    display_ok_msg ("FIXME PERMISSIONS");
+    $display["msg"] = display_ok_msg ("FIXME PERMISSIONS");
     //$q_account = run_query_detail ($account["account"]);
     //$q_account->next_record();
     //    $payments_options = run_query_display_options ($auth->auth["uid"],"payment");
     $payments_prefs = run_query_display_pref ($auth->auth["uid"], "payment");
 
-    html_compute_balance ($account["account"], $payments_prefs, $tf_balance_date);
+    $display["detail"] = html_compute_balance ($account["account"], $payments_prefs, $tf_balance_date);
 
   } else {
-    display_err_msg($l_error_permission);
+    $display["msg"] = display_err_msg($l_error_permission);
   } 
   /*  
 $q_account = run_query_detail ($account["account"]);
@@ -173,30 +172,30 @@ $q_account = run_query_detail ($account["account"]);
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {  
-    echo "<center>Nothing here for now</center><br />";
+    $display["msg"] = "<center>Nothing here for now</center><br />";
   } else {
-    display_err_msg($l_error_permission);
+    $display["msg"] = display_err_msg($l_error_permission);
   }	
     
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $account_options=run_query_display_pref($auth->auth["uid"], "account",1);
   $payment_options=run_query_display_pref ($auth->auth["uid"], "payment",1);
-  dis_account_display_pref ($account_options, $payment_options); 
+  $display["detail"] = dis_account_display_pref ($account_options, $payment_options); 
 
 } else if($action =="dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_account_q = run_query_display_pref($uid,"account",1);
   $pref_payment_q = run_query_display_pref($uid,"payment",1);
-  dis_account_display_pref($pref_account_q, $pref_payment_q);
+  $display["detail"] = dis_account_display_pref($pref_account_q, $pref_payment_q);
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_account_q = run_query_display_pref($uid,"account",1);
   $pref_payment_q = run_query_display_pref($uid,"payment",1);
-  dis_account_display_pref($pref_account_q, $pref_payment_q);
+  $display["detail"] = dis_account_display_pref($pref_account_q, $pref_payment_q);
 }
 
 
@@ -204,7 +203,7 @@ $q_account = run_query_detail ($account["account"]);
 // Display end of page
 ///////////////////////////////////////////////////////////////////////////////
 $display["end"] = display_end();
-echo $display["end"];
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -89,7 +89,7 @@ function html_account_search_form ($p_action, $account) {
 
   $url = url_prepare("account_index.php");
 
-  echo "
+  $block .= "
   <form method=\"get\" name=\"form_account\"
     onSubmit=\"if (check_form(this) == false) return false; else return true;\"
     action=\"$url\">
@@ -114,6 +114,7 @@ function html_account_search_form ($p_action, $account) {
   </table>
   </form>
   <hr />";
+  return $block;
 }  
 
 
@@ -125,15 +126,15 @@ function html_account_search_form ($p_action, $account) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_account_search_list($account) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $auth, $new_order, $order_dir,$display;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "account");
   $obm_q = run_query_search($account, $new_order, $order_dir);
   $nb_account = $obm_q->num_rows();
   if ($nb_account == 0) {
-    display_info_msg($l_no_found);
+    $display["msg"] = display_info_msg($l_no_found);
   } else {
-    html_account_search_list($obm_q, $pref_q, $nb_account, $account);
+    return html_account_search_list($obm_q, $pref_q, $nb_account, $account);
   }
 }
 
@@ -148,7 +149,7 @@ function dis_account_search_list($account) {
 //     keys used   : label, bank, number
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
-  global $l_label, $l_bank, $l_number, $l_found;
+  global $l_label, $l_bank, $l_number, $l_found,$display;
 
   $label = urlencode($account["label"]);
   $bank = urlencode($account["bank"]);
@@ -160,8 +161,8 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
   $dis_account->data_set = $acc_q;
   $dis_account->data_url = $url;
 
-  display_info_msg("$nb_account $l_found");
-  $dis_account->display("dis_data_account");
+  $display["msg"] = display_info_msg("$nb_account $l_found");
+  return $dis_account->display("dis_data_account");
 }
 
 
@@ -191,7 +192,7 @@ function html_account_consult($obm_q_account, $p_action){
 
   
   // number and label
-  echo "
+  $block .= "
   <center>
   <table border=$border cellspacing=$cellspacing>
   <tr>
@@ -229,14 +230,14 @@ function html_account_consult($obm_q_account, $p_action){
 
   // we display buttons only if we need them :
   if ($p_action == "detailconsult") {
-    echo "<br /><br /><br />
+    $block .= "<br /><br /><br />
     <tr><td>";  
     // update/ compute balance of the account
-    echo "
+    $block .= "
      <table border=$border cellspacing=$cellspacing width=\"100%\">
       <tr><td align=\"center\" valign=\"top\">";
     // if ($auth->auth["perm"] != $perms_user) {
-    echo "
+    $block .= "
        <form method=\"post\" action=\"\">";
     $url_upd = url_prepare("account_index.php?action=detailupdate".
 			   "&amp;param_account=".
@@ -245,7 +246,7 @@ function html_account_consult($obm_q_account, $p_action){
 			   "&amp;param_account=".
 			   $obm_q_account->f("account_id"));
     
-    echo " 
+    $block .= " 
         <input type=\"button\" value=\"$l_update\" ".
       "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
 
@@ -253,7 +254,7 @@ function html_account_consult($obm_q_account, $p_action){
     // useless ?
 //        <input type=hidden name=hd_balance value=\"".
 //      $obm_q_account->f("account_balance")."\">
-    echo "
+    $block .= "
       </td><td align=\"center\" valign=\"top\">
         <input type=\"button\" value=\"$l_compute_balance\" ".
       "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
@@ -261,12 +262,14 @@ function html_account_consult($obm_q_account, $p_action){
       </td></tr>
      </table>";
     //}
-    echo "
+    $block .= "
     </td></tr>";
   }
-  echo "
+  $block .= "
    </table>
   </center>";
+  return $block;
+
 }
 
 
@@ -311,7 +314,7 @@ function html_account_form($obm_q_account, $action) {
   if (isset($account["comment"])) { $comment = stripslashes($account["comment"]); }
 
 
-  echo "
+  $block .= "
   <center>
   <form method=\"post\" onSubmit=\"if (check_cpte(this)) return true; else return false;\" action=\"\">
     <table border=$border cellspacing=$cellspacing>
@@ -361,24 +364,24 @@ function html_account_form($obm_q_account, $action) {
   if ($action=="detailupdate"){//modifier/supprimer
     $url_delete = url_prepare("account_index.php?action=delete&amp;param_account=$id");
     $url_update = url_prepare("account_index.php?action=update&amp;param_account=$id");
-    echo "
+    $block .= "
             <table border=\"$border\" cellspacing=\"$cell_spacing\"><tr><td>
              <input type=\"button\" value=\"$l_update\" ".
       "onClick=\"if (check_cpte (this.form)) {".
       "this.form.action='$url_update'; this.form.submit ();".
       "}\">
             </td><td>";
-    //    echo "
+    //    $block .= "
     //            <form method=post name=form_account_delete onSubmit=\"if(valider_suppression()) return true; else return false;\" action=\"$url_delete\">";
     // deletion is impossible if there are payments connected to
     // this account :
     if (($action == "detailupdate") && ($q_payments->nf() != 0)) {
-      echo "
+      $block .= "
              <input type=\"button\" value=\"$l_delete\" disabled>
              </td></tr>
             </table>"; 
     } else {
-      echo "
+      $block .= "
              <input type=\"button\" value=\"$l_delete\" ".
 	"onClick=\" if (valider_suppression ()) { ".
 	" this.form.action='$url_delete'; this.form.submit () ; ".
@@ -388,19 +391,21 @@ function html_account_form($obm_q_account, $action) {
     }
   } else{ // inserer : 
     $url_insert = url_prepare("account_index.php?action=insert");
-    echo "
+    $block .= "
           <input type=\"button\" value=\"$l_insert\" ".
       " onClick=\"if (check_cpte (this.form)) {".
       "this.form.action='$url_insert';this.form.submit();".
       "}\">";
   }  
-  echo "
+  $block .= "
          </center>
          </td>
         </tr>
           </td>
        </tr>
-</table></form></center>";
+    </table></form></center>";
+    return $block;
+
 }
 
 
@@ -416,10 +421,10 @@ function dis_account_display_pref ($account_options, $payment_options) {
    global $l_account_options, $l_payment_options;
   // Image
   global $set_theme ;
-  echo "<center>\n";
+  $block .= "<center>\n";
  
- echo "<table><tr valign=\"top\">";
-   echo "<td>";
+ $block .= "<table><tr valign=\"top\">";
+   $block .= "<td>";
  
   $dis_pref = new OBM_DISPLAY("PREFERENCES",$account_options) ;
   $dis_pref->display_entity = "account" ; // not used but must be set
@@ -427,18 +432,19 @@ function dis_account_display_pref ($account_options, $payment_options) {
   $dis_pref->pref_dis_help = 0 ;
   $dis_pref->display() ;
 
-  echo "</td><td>" ;
+  $block .= "</td><td>" ;
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $payment_options);
   $dis_pref->display_entity = "payment";
   $dis_pref->pref_title = $l_payment_options;
   $dis_pref->pref_dis_help = 0;
-  $dis_pref->display ();
+  $block .= $dis_pref->display ();
 
-  echo  "</td></tr></table>";
+  $block .=  "</td></tr></table>";
   $dis_pref->dis_pref_help ();
 
-  echo  "</center>" ;
+  $block .=  "</center>" ;
+ return $block;
 }
 
 
@@ -449,20 +455,23 @@ function dis_account_display_pref ($account_options, $payment_options) {
 function html_impossible_deletion ($p_account_id, $q_related_payments) {
   global $l_impossible_deletion, $l_cancel;
 
-  echo "
+  $block .= "
    <center>
     <font color=\"#$FF00FF\">".$q_related_payments->nf()." ".$l_impossible_deletion." : </font><br>";
   while ($q_related_payments->next_record()) {
-    echo "
+    $block .= "
      <a href=\"payment_index.php?action=detailconsult&amp;param_payment=".$q_related_payments->f("payment_id")."\">".$q_related_payments->f("payment_label") . "</a><br>\n";
   }
   
-  echo "
+  $block .= "
      <br><br>
      <form name=form_cancel_delete method=post action=\"".url_prepare("account_index.php?action=index")."\">
       <input type=submit name=\"sub_cancel_del\" value=\"$l_cancel\">
      </form>
-   <center>";
+     <center>";
+  
+  return $block;
+
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -477,7 +486,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   global $l_old_balance, $l_in_total, $l_out_total, $l_total;
   global $l_compute_balance, $l_choose_balance_date;
   global $l_nb_expected_used, $l_used_payments, $l_used_expected_payments;
-  global $l_expected_payments, $l_payments, $l_totals;
+  global $l_expected_payments, $l_payments, $l_totals,$display;
 
   // if $p_date == "", we use today :
   $p_date = ($p_date =="") ? date("Y-m-d") : $p_date;
@@ -499,9 +508,9 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   html_account_consult ($q_account, "compute_balance");
 
   // the form allowing a date input :
-  echo "<br><br>";
+  $block .= "<br><br>";
   $url = url_prepare("account_index.php?action=compute_balance&amp;param_account=".$p_account["account"]);
-  echo "
+  $block .= "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
   <form method=\"post\" action=\"$url\"
@@ -518,19 +527,19 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
  <br><br><hr>";
      
   // we display the result :
-  echo "
+  $block .= "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\" cellpadding=\"5\">
   <tr><td>
    &nbsp;";
-  echo "
+  $block .= "
   </td><td>
    <font color=\"#$col_label\">$l_in_total</font>
   </td><td>
    <font color=\"#$col_label\">$l_out_total</font>
   </td></tr>";
   // first line : expected payments :
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_expected_payments</font>
   </td><td align=\"right\">
@@ -538,7 +547,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   </td><td align=\"right\">
    <font color=\"#$col_balance_neg\">".$data["out_expected"]."</font>";
   // the payments already paid :
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_payments</font>
   </td><td align=\"right\">
@@ -549,7 +558,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   // total :
   $total_in = $data["in_real"]+$data["in_expected"];
   $total_out = $data["out_real"]+$data["out_expected"];
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_totals</font>
   </td><td align=\"right\">
@@ -558,7 +567,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
    <font color=\"#$col_balance_neg\">".$total_out."</font>
   </td></tr>";
   // balance :
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_total</font>
   </td><td colspan=\"2\" align=\"center\">
@@ -567,7 +576,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
  </table>
 </center><br><br>";
 
-  /*  echo "
+  /*  $block .= "
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\" cellpadding=\"5\">
   <tr><td colspan=2>
@@ -576,28 +585,28 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
     $l_nb_expected_used ."</font><br>  
   </td></tr>";  
   // today balance 
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_old_balance</font>
   </td><td>
    <font color=\"#$col_today\">".$data["today"]."</font>
   </td></tr>";
   // total amount of incoming on the compute period
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_in_total</font>
   </td><td> 
    <font color=\"#$col_balance_pos\">".$data["in"]."</font>
   </td></tr>";
   // total amount of outgoing on the compute period
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_out_total</font>
   </td><td>
    <font color=\"#$col_balance_neg\">".$data["out"]."</font>
   </td></tr>";
   // the final balance we all are waiting for :
-  echo "
+  $block .= "
   <tr><td>
    <font color=\"#$col_label\">$l_total</font>
   </td><td>
@@ -619,8 +628,8 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
     $dis_expect->data_url = $url_expect;
     $dis_expect->data_order = false;
 
-    display_ok_msg ($l_used_expected_payments);
-    $dis_expect->display ();
+    $display["msg"] = display_ok_msg ($l_used_expected_payments);
+    $block .= $dis_expect->display ();
   }
   // operations  detail display
   if ($q_payments->nf() != 0) { 
@@ -634,9 +643,11 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
     $dis_done->data_url = $url_done;
     $dis_done->data_order = false;
 
-    display_ok_msg ("<br>".$l_used_payments);
-    $dis_done->display (); 
+    $display["msg"] = display_ok_msg ("<br>".$l_used_payments);
+    $block .= $dis_done->display (); 
   }
+  return $block;
+
 }
 
 </SCRIPT>
