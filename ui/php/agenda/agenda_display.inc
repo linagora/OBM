@@ -303,7 +303,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	     else {
 	       $titleEvent = $l_private;
 	       $descEvent = $l_private_description;
-	       $linkEvent = "javascript:";
+	       $linkEvent = "javascript:return false;";
 	       $typeEvent = $l_private;
 	     }   
 	     $dis_month_cal .= "
@@ -521,7 +521,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    else {
 		      $titleEvent = $l_private;
 		      $descEvent = $l_private_description;
-		      $linkEvent = "javascript:";
+		      $linkEvent = "javascript:return false;";
 		      $typeEvent = $l_private;
 		    }  
 		    $event_head_display .= "
@@ -567,7 +567,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    else {
 		      $titleEvent = $l_private;
 		      $descEvent = $l_private_description;
-		      $linkEvent = "javascript:";
+		      $linkEvent = "javascript:return false;";
 		      $typeEvent = $l_private;
 		    }  
 		    $event_head_display .= "
@@ -665,7 +665,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      else {
 			$titleEvent = $l_private;
 			$descEvent = $l_private_description;
-			$linkEvent = "javascript:";
+			$linkEvent = "javascript: return false;";
 			$typeEvent = $l_private;
 		      }  
 		      $event_head_display .= "
@@ -709,7 +709,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		      else {
 			$titleEvent = $l_private;
 			$descEvent = $l_private_description;
-			$linkEvent = "javascript:";
+			$linkEvent = "javascript: return false;";
 			$typeEvent = $l_private;
 		      }  
 		      $event_head_display .= "
@@ -910,7 +910,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  else {
 		    $titleEvent = $l_private;
 		    $descEvent = $l_private_description;
-		    $linkEvent = "javascript:";
+		    $linkEvent = "javascript: return false;";
 		    $typeEvent = $l_private;
 		  }  
 		  $event_head_display .= "
@@ -954,7 +954,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  else {
 		    $titleEvent = $l_private;
 		    $descEvent = $l_private_description;
-		    $linkEvent = "javascript:";
+		    $linkEvent = "javascript: return false";
 		    $typeEvent = $l_private;
 		  }  
 		  $event_head_display .= "
@@ -1044,7 +1044,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    else {
 		      $titleEvent = $l_private;
 		      $descEvent = $l_private_description;
-		      $linkEvent = "javascript:";
+		      $linkEvent = "javascript:return false;";
 		      $typeEvent = $l_private;
 		    }  
 		    $event_head_display .= "
@@ -1089,7 +1089,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    else {
 		      $titleEvent = $l_private;
 		      $descEvent = $l_private_description;
-		      $linkEvent = "javascript:";
+		      $linkEvent = "javascript:return false;";
 		      $typeEvent = $l_private;
 		    }  
 		    $event_head_display .= "
@@ -1620,6 +1620,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     ereg ("([0-9]{4})([0-9]{2})([0-9]{2})([0-9]{2})([0-9]{2})",$obm_q_event->f("calendarevent_endrepeat") , $day_array3);
     $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
     $id = $obm_q_event->f("calendarevent_id");
+    $old_begin = $day_array[0];
+    $old_end = $day_array2[0];
     
   } else {
     if (isset($agenda["id"])) { $id = $agenda["id"]; }
@@ -1650,6 +1652,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $day_array[0] = $agenda["date_begin"];
     $day_array2[0] = $agenda["date_end"];
     $force = $agenda["force"];
+    $old_begin = $agenda["old_begin"];
+    $old_end = $agenda["old_end"];
     
   }
 
@@ -1664,12 +1668,11 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     }	
     $dis_repeat_update = "<tr><td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>";
     $dis_repeat_update .= "<td><input type=\"checkbox\" name=\"cb_repeat_update\" $check_activate value=\"1\"</td> </tr> "; 
-
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_event\" id=\"param_event\" value=\"$id\" />
-      <input type=\"hidden\" name=\"hd_old_begin\" id=\"hd_old_begin\" value=\"".$day_array[0]."\" />
-      <input type=\"hidden\" name=\"hd_old_end\" id=\"hd_old_end\" value=\"".$day_array2[0]."\" />
+      <input type=\"hidden\" name=\"hd_old_begin\" id=\"hd_old_begin\" value=\"$old_begin\" />
+      <input type=\"hidden\" name=\"hd_old_end\" id=\"hd_old_end\" value=\"$old_end\" />
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
@@ -2789,7 +2792,7 @@ function dis_category_delete_form($agenda) {
 function dis_category_links($agenda) {
   global $l_category_link_agenda, $l_category_link_agenda_no;
   global $l_category_can_delete, $l_category_cant_delete;
-  global $l_back;
+  global $l_back,$l_link_events;
 
   $label = get_category_label($agenda["category_id"]);
   $obm_q = run_query_category_links($agenda["category_id"]);
@@ -2799,7 +2802,7 @@ function dis_category_links($agenda) {
     $dis_link = "
     <table class=\"details\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_category_cant_delete</td>
+      <td class=\"messageWarning\">$label : $l_category_cant_delete ".$obm_q->f("numlink")." $l_link_events</td>
     </tr><tr>
       <td>&nbsp;</td>
     </tr>

@@ -43,6 +43,7 @@ $l_use_endrepeat = "Date de fin de répétition";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'evenement";
 
+$l_link_events = " évenements liés à cette catégorie.";
 $l_waiting_events = "Rendez-vous en attente";
 $l_free = "Libre mais restreint";
 $l_possible = "Libre";

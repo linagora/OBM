@@ -40,6 +40,7 @@ $l_too_much_user = "No more than six users";
 $l_waiting_events = "Waiting events";
 $l_user_calendar = "Multi-user view";
 
+$l_link_events = "linked events with this category.";
 $l_accepted = "Accept";
 $l_rejected = "Reject";
 $l_waiting  = "Waiting for confirmation";
