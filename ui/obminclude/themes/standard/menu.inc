@@ -32,24 +32,10 @@ function generate_menu($menu, $section) {
   echo "
 <table cellpadding=\"0\" cellspacing=\"0\" class=\"global\">
 <tr>
-<!-- Taleau du logo et identification société -->
+<!-- Logo OBM -->
   <td class=\"globalLogo\">
-    <table cellpadding=\"0\" cellspacing=\"0\" class=\"logo\">
-    <tr>
-      <td colspan=\"4\"><img src=\"/images/$set_theme/logo_obm.gif\" alt=\"\" /></td>
-    </tr><tr>
-      <td><img src=\"/images/$set_theme/logo_g.gif\" alt=\"\" /></td>
-      <td class=\"logoInside\"><img src=\"/images/$set_theme/logo_obm2.gif\" alt=\"\" /></td>
-      <td class=\"logoVersion\">v.$obm_version</td>
-      <td><img src=\"/images/$set_theme/logo_d.gif\" alt=\"\" /></td>
-    </tr><tr>
-      <td class=\"logoBottom\"><img src=\"/images/$set_theme/logo_bg.gif\" alt=\"\" /></td>  
-      <td colspan=\"2\"><img src=\"/images/$set_theme/logo_bm.gif\" alt=\"\" /></td>
-      <td class=\"logoBottom\"><img src=\"/images/$set_theme/logo_bd.gif\" alt=\"\" /></td>
-    </tr>
-    </table>
+    <img src=\"/images/$set_theme/logo_obm.png\" alt=\"\" />
   </td>
-<!-- fin du tableau du logo et identification société -->
 
 <!-- Tableau partie droite du bandeau (Login, Onglets, menus) -->
 
@@ -66,7 +52,7 @@ function generate_menu($menu, $section) {
         <img class=\"header\" src=\"/images/$set_theme/logout.gif\" alt=\"\" />
         <a class=\"header\" href=\"$path/obm.php?action=logout\">Logout</a>
       </td>
-      <td>
+      <td class=\"headerRight\">OBM v. $obm_version &nbsp;
         Société Aliacom
       </td>
       <td>&nbsp;</td>
