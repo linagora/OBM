@@ -41,7 +41,6 @@ $section = "COM";
 $menu = "COMPANY";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
@@ -222,6 +221,7 @@ if ($action == "ext_get_id") {
     $display["detail"] = html_company_consult($comp_q, $cat_q);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $comp_q = run_query_detail($param_company);
     $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
@@ -229,7 +229,7 @@ if ($action == "ext_get_id") {
     $usr_q = run_query_userobm_active($users);
     $cat_q = run_query_companycat();
     $ctry_q = run_query_country();
-    $display["detail"] = html_company_form($action, "", $dsrc_q, $type_q, $act_q, $usr_q,$cat_q,"", $ctry_q, $company);
+    $display["detail"] = html_company_form($action, $comp_q, $dsrc_q, $type_q, $act_q, $usr_q, $cat_q, "", $ctry_q, $company);
   }
 
 } elseif ($action == "check_delete")  {

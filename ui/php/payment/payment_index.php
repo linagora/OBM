@@ -1,4 +1,4 @@
-<?php
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : payment_index.php 
 //     - Desc : payment Index File
@@ -15,7 +15,6 @@ $section = "COMPTA";
 $menu = "PAYMENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
@@ -826,4 +825,4 @@ function get_payment_action() {
 
 }
 
-?>
+</script>

@@ -119,9 +119,9 @@ function check_func_new(form)
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the kind check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_checkdel(form)
+function check_kind_checkdel(sel)
 {
-  if (form.sel_kind.selectedIndex >= 0)
+  if (sel.selectedIndex >= 0)
   {
     return true;
   }
@@ -134,13 +134,13 @@ function check_kind_checkdel(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind update is possible                                    //
+// Check if the kind update is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_kind_upd(form,formd)
+function check_kind_upd(form, sel_del)
 {
-  kind_pos = formd.sel_kind.selectedIndex;
-  if ((kind_pos >= 0) && (form.tf_kind.value != \"\")) {
-    form.sel_kind.value=formd.sel_kind.options[kind_pos].value;
+  kind_pos = sel_del.selectedIndex;
+  if ((kind_pos >= 0) && (form.tf_label.value != \"\")) {
+    form.sel_kind.value=sel_del.options[kind_pos].value;
     return true;
   } else {
     alert(\"$l_j_kind_update\");
@@ -148,6 +148,21 @@ function check_kind_upd(form,formd)
   }
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the kind creation is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_kind_new(form)
+{
+   if ( (trim(form.tf_lang.value) == \"\")
+        || (trim(form.tf_label.value) == \"\")
+        || (trim(form.tf_header.value) == \"\") ) {
+      alert(\"$l_j_kind_create\");
+      return false;
+   } else {
+      return true;
+   }
+}
 
 // -->
 </script>

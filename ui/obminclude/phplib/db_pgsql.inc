@@ -1,4 +1,9 @@
 <?php
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : db_pgsql.inc                                                 //
+//     - Desc : PostGreSQL Database PHPLIB class (updated for OBM)           //
+// 2003-12-13 ALIACOM                                                        //
+///////////////////////////////////////////////////////////////////////////////
 /*
  * Session Management for PHP3
  *
@@ -29,6 +34,9 @@ class DB_Sql {
   var $Auto_Free = 0; # Set this to 1 for automatic pg_freeresult on 
                       # last record.
 
+  /* public: last query string : added PB Aliacom */
+  var $obm_query;
+
   function ifadd($add, $me) {
           if("" != $add) return " ".$me.$add;
   }
@@ -39,17 +47,17 @@ class DB_Sql {
   }
 
   function connect() {
-          if ( 0 == $this->Link_ID ) {
-                  $cstr = "dbname=".$this->Database.
-                  $this->ifadd($this->Host, "host=").
-                  $this->ifadd($this->Port, "port=").
-                  $this->ifadd($this->User, "user=").
-                  $this->ifadd($this->Password, "password=");
-                  $this->Link_ID=pg_pconnect($cstr);
-                  if (!$this->Link_ID) {
-                          $this->halt("Link-ID == false, pconnect failed");
-                  }
-          }
+    if ( 0 == $this->Link_ID ) {
+      $cstr = "dbname=".$this->Database.
+	$this->ifadd($this->Host, "host=").
+	$this->ifadd($this->Port, "port=").
+	$this->ifadd($this->User, "user=").
+	$this->ifadd($this->Password, "password=");
+      $this->Link_ID=pg_pconnect($cstr);
+      if (!$this->Link_ID) {
+	$this->halt("Link-ID == false, pconnect failed");
+      }
+    }
   }
 
   function query($Query_String) {
@@ -62,8 +70,11 @@ class DB_Sql {
       return 0;
 
     $this->connect();
+
+    // Store the query string - PB Aliacom
+    $this->obm_query = $Query_String;
     
-    if ($this->Debug) 
+    if ($this->Debug)
       printf("<br>Debug: query = %s<br>\n", $Query_String);
 
     $this->Query_ID = pg_Exec($this->Link_ID, $Query_String);

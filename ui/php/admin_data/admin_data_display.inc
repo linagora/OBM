@@ -59,7 +59,7 @@ function html_data_index($actions, $modules) {
   global $l_execute, $l_help;
 
   // modules SELECT
-  $sel_module = "<select name=module>";
+  $sel_module = "<select name=\"module\">";
   while (list ($key, $val) = each ($modules)) {
     $sel_module .= "<option value=\"$val\">$val";
   }
@@ -203,6 +203,8 @@ function dis_data_company($action, $mode) {
     $new_con_num = get_company_contact_number($id);
     $new_deal_num = get_company_active_deal_number($id);
     $new_deal_total = get_company_total_deal_number($id);
+    //$new_deal_num = "0";
+    //$new_deal_total = "0";
 
     if ( ($con_num != $new_con_num) || ($deal_num != $new_deal_num)
          || ($deal_total != $new_deal_total) ) {

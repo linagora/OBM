@@ -124,7 +124,7 @@ $l_j_func_create = "You have to enter a new function label to create it !";
 // JavaScript messages - Kind
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
-$l_j_kind_create = "You have to enter a new kind to create it !";
+$l_j_kind_create = "You have to fill all kind informations kind to create it !";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen

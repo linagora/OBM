@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : contact.inc                                              //
@@ -122,7 +122,7 @@ $l_j_func_create = "Vous devez saisir un label de fonction pour la créer !";
 // JavaScript Messages - Kind
 $l_j_kind_delete = "Sélectionnez un genre pour le vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un genre et entrer une modification avant de valider !";
-$l_j_kind_create = "Vous devez saisir un genre pour le créer !";
+$l_j_kind_create = "Vous devez saisir toutes les informations d'un genre pour le créer !";
 
 // For the display preferences modification screen 
 $l_contact_display = "Options d'affichage des listes de contacts";

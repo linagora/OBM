@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : obmlib.inc                                                   //
 //     - Desc : Local PHPLIB file for OBM                                    //
@@ -7,20 +7,26 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+$db_type_mysql = "MYSQL";
+$db_type_pgsql = "PGSQL";
+
 ///////////////////////////////////////////////////////////////////////////////
 // Required packages                                                         //
 ///////////////////////////////////////////////////////////////////////////////
-//require("$obminclude/phplib/db_pgsql.inc");       //Postgres
-require("$obminclude/phplib/db_mysql.inc");     //Mysql
+// Package for the selected DB backend
+if ($obmdb_dbtype == $db_type_pgsql) {
+  require_once("$obminclude/phplib/db_pgsql.inc");
+} elseif ($obmdb_dbtype == $db_type_mysql) {
+  require_once("$obminclude/phplib/db_mysql.inc");
+} else {
+  require_once("$obminclude/phplib/db_mysql.inc");
+}
 require("$obminclude/phplib/ct_sql.inc");
 require("$obminclude/phplib/session4.inc");
 require("$obminclude/phplib/auth.inc");
 require("$obminclude/phplib/perm.inc");
 require("$obminclude/phplib/page4.inc");
 
-$db_type_mysql="MYSQL";
-
-//$db_type_pgsql="PGSQL";
 ///////////////////////////////////////////////////////////////////////////////
 // OBM Classes                                                               //
 ///////////////////////////////////////////////////////////////////////////////
@@ -237,4 +243,4 @@ class OBM_Perm extends Perm {
 }
 
 
-</SCRIPT>
+</script>

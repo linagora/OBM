@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : incident_index.php                                           //
 //     - Desc : Incident Index File                                          //
@@ -29,7 +29,6 @@ $menu = "INCIDENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
-require("$obminclude/phplib/obmlib.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 

@@ -7,6 +7,7 @@
 --/////////////////////////////////////////////////////////////////////////////
 
 
+\encoding latin1
 --
 -- Dumping data for table 'CompanyType'
 --
@@ -27,9 +28,9 @@ INSERT INTO CompanyActivity (companyactivity_timeupdate, companyactivity_timecre
 --
 -- Dumping data for table 'Kind'
 --
-INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'M.','Monsieur');
-INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'Mme','Madame');
-INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_minilabel, kind_label) VALUES (null,null,2,null,'Mlle','Mademoiselle');
+INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (null,null,2,null,'FR','M.','Monsieur');
+INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (null,null,2,null,'FR','Mme','Madame');
+INSERT INTO Kind (kind_timeupdate, kind_timecreate, kind_userupdate, kind_usercreate, kind_lang, kind_minilabel, kind_header) VALUES (null,null,2,null,'FR','Mlle','Mademoiselle');
 
 
 --
@@ -186,4 +187,3 @@ INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documen
 VALUES (10,'Fichier PowerPoint','ppt','application/vnd.ms-powerpoint');
 INSERT INTO DocumentMimeType (documentmimetype_id,documentmimetype_label,documentmimetype_extension,documentmimetype_mime) 
 VALUES (11,'Fichier CSV','csv','text/x-csv');
-

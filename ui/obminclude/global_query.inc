@@ -9,6 +9,36 @@
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Format a Date field query according to Database backend
+// Parameters:
+//   - $db_type : DB type
+//   - $field   : date field name
+//   - $as      : (Optionnal) alias fieldname to return
+// Returns:
+//   - Field query string
+///////////////////////////////////////////////////////////////////////////////
+function sql_date_format($db_type, $field, $as="") {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_mysql) {
+    $ret = "UNIX_TIMESTAMP($field)";
+    if ($as != "") {
+      $ret .= " as $as";
+    }
+  } elseif ($db_type == $db_type_pgsql) {
+    $ret = "EXTRACT (EPOCH from $field)";
+    if ($as != "") {
+      $ret .= " as $as";
+    }
+  } else {
+    $ret = $field;
+  }
+
+  return $ret;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query Execution : get the Id of one User from its login / pass
 // Parameters:
 //   - $login  : login
@@ -100,8 +130,10 @@ function run_query_linked_project_nb ($id, $entity) {
 function run_query_document_nb ($id,$entity) {
   global $cdg_sql;
 
-  $query = "select count(*) as nb from DocumentEntity where documententity_entity = '$entity'
-            and documententity_entityid = '$id'"; 
+  $query = "select count(*) as nb
+    from DocumentEntity
+    where documententity_entity = '$entity'
+      and documententity_entityid = '$id'"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
@@ -217,7 +249,9 @@ function run_query_userobm_active($ids="") {
     $where_add = "";
     $nb_add = count($ids);
     for ($i=0; $i<$nb_add; $i++) {
-      $where_add .= " or userobm_id = '$ids[$i]'";
+      if ($ids[$i] != "") {
+        $where_add .= " or userobm_id = '$ids[$i]'";
+      }
     }
   }
 
@@ -875,7 +909,7 @@ function run_query_global_group_name($id) {
 function get_company_contact_number($id) {
   global $cdg_sql;
 
-  $query = "select count(contact_id) from Contact
+  $query = "select count(contact_id) as nb from Contact
             where contact_company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -883,7 +917,7 @@ function get_company_contact_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("count(contact_id)");
+  $retour = $obm_q->f("nb");
   return $retour;
 }
 
@@ -896,7 +930,7 @@ function get_company_contact_number($id) {
 function get_company_active_deal_number($id) {
   global $cdg_sql;
 
-  $query = "select count(deal_id) from Deal
+  $query = "select count(deal_id) as nb from Deal
             where deal_company_id='$id' and deal_archive='0'";
 
   display_debug_msg($query, $cdg_sql);
@@ -904,7 +938,7 @@ function get_company_active_deal_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("count(deal_id)");
+  $retour = $obm_q->f("nb");
   return $retour;
 }
 
@@ -917,7 +951,7 @@ function get_company_active_deal_number($id) {
 function get_company_total_deal_number($id) {
   global $cdg_sql;
 
-  $query = "select count(deal_id) from Deal
+  $query = "select count(deal_id) as nb from Deal
             where deal_company_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -925,7 +959,7 @@ function get_company_total_deal_number($id) {
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("count(deal_id)");
+  $retour = $obm_q->f("nb");
   return $retour;
 }
 

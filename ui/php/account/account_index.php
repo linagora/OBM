@@ -1,4 +1,4 @@
-<SCRIPT language=php>
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : account_query.inc                                            //
 //     - Desc : account query File                                           //
@@ -15,7 +15,6 @@ $section = "COMPTA";
 $menu = "ACCOUNT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");

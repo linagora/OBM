@@ -169,7 +169,7 @@ function check_cat_new(form)
 {
    var reg=new RegExp(\"[ .;]+\", \"g\");
    var tableau=form.tf_cat_code.value.split(reg);
-   if(tableau.length > 2) {
+   if(tableau.length > 3) {
       alert(\"$l_j_cat_deep\");
       return false;
    }

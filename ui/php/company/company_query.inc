@@ -64,7 +64,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $and = "";
   if ($name != "") {
     $where .= " (company_name like '$name%'
-                 or company_aka like '%auto_aka%'
+                 or company_aka like '%$auto_aka%'
                  or company_sound = '$sound')";
     $and = "and";
   }
@@ -126,26 +126,27 @@ function run_query_detail($p_id) {
   global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(company_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(company_timecreate) as timecreate,
-        m.userobm_lastname as market_lname,
-        m.userobm_firstname as market_fname,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate
-      from Company
-           LEFT JOIN CompanyType on company_type_id=companytype_id
-           LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
-           LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
-           LEFT JOIN Country on company_country_id=country_id
-           LEFT JOIN DataSource on company_datasource_id=datasource_id
-           LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
-           LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
-      where company_id='$p_id'";
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select *,company_timeupdate as timeupdate, company_timecreate as timecreate from Company where company_id=".$p_id;
-  }
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type, "company_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "company_timecreate", "timecreate");
+
+  $query = "select *,
+      $timeupdate,
+      $timecreate,
+      m.userobm_lastname as market_lname,
+      m.userobm_firstname as market_fname,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+    from Company
+         LEFT JOIN CompanyType on company_type_id=companytype_id
+         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+         LEFT JOIN UserObm as m on company_marketingmanager_id=m.userobm_id
+         LEFT JOIN Country on company_country_id=country_id
+         LEFT JOIN DataSource on company_datasource_id=datasource_id
+         LEFT JOIN UserObm as c on company_usercreate=c.userobm_id
+         LEFT JOIN UserObm as u on company_userupdate=u.userobm_id
+    where company_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -250,9 +251,13 @@ function run_query_insert($company) {
 
 
   $query = "select company_id as Id
-  from Company where 
-  company_name = '$name' and company_type_id='$kind' and company_activity_id='$act' and company_marketingmanager_id='$market'
-  and company_phone = '$phone' and company_zipcode = '$zip'";
+    from Company
+    where company_name = '$name'
+      and company_type_id='$kind'
+      and company_activity_id='$act'
+      and company_marketingmanager_id='$market'
+      and company_phone = '$phone'
+      and company_zipcode = '$zip'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -262,10 +267,11 @@ function run_query_insert($company) {
   if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
-	companycategorylink_companyid,
-	companycategorylink_categoryid)
-	values
-	('$id','$categoryid')";
+	  companycategorylink_companyid,
+	  companycategorylink_categoryid)
+	values (
+          '$id',
+          '$categoryid')";
       display_debug_msg($query, $cdg_sql);
       $obm_q->query($query);
     }
@@ -347,7 +353,7 @@ function run_query_update($cid, $company) {
   $query = "delete from CompanyCategoryLink where companycategorylink_companyid='$cid'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
-  var_dump($compcat);
+
   if($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
@@ -475,11 +481,15 @@ function run_query_company_contract_links($p_id) {
 function run_query_check_company($p_id, $name, $zip) {
   global $cdg_sql;
 
+  $where_id = "";
+  if ($p_id != "") {
+    $where_id = "and company_id!='$p_id'";
+  }
   $obm_q = new DB_OBM;
   $query = "select distinct company_id, company_name, company_zipcode 
             from Company
-            where company_id!='$p_id'
-              and company_name like '$name%'";
+            where company_name like '$name%'
+              $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_pref_index.php                                         //
 //     - Desc : Update User Preferences (Display,...)                        //
@@ -20,7 +20,6 @@ $menu = "ADMIN_PREF";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc"); 
 require("admin_pref_display.inc");
 require("admin_pref_query.inc");
@@ -278,5 +277,5 @@ function get_admin_pref_action() {
 
 }
 
-</SCRIPT>
+</script>
 

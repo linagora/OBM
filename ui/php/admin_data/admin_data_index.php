@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_data_index.php                                         //
 //     - Desc : Update static database data (company contact number,...)     //
@@ -22,7 +22,6 @@ $menu = "ADMIN_DATA";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc"); 
 require("admin_data_display.inc");
 require("admin_data_query.inc");
@@ -46,7 +45,6 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-
    include("$obminclude/global_pref.inc"); 
    $retour = parse_arg($argv);
    if (! $retour) { end; }
@@ -215,4 +213,4 @@ function get_admin_data_action() {
 
 }
 
-</SCRIPT>
+</script>

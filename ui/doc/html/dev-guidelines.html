@@ -9,7 +9,7 @@
 <center>
 <h1>OBM Development Guidelines</h1>
 <i>Coding standards now mandatory to harmonize the OBM code</i><br>
-Version 0.7.5 - 2003-12-07<br>
+Version 0.7.5 - 2003-12-14<br>
 Pierre Baudracco
 </center>
 <p>
@@ -244,12 +244,11 @@ if ($obminclude == "") $obminclude = "obminclude";
 <P>
 
 <h3>Included files : how to, order</h3>
-There is 3 global files which must be included in all OBM module :
+There is 2 global files which must be included in all OBM module :
 <p>
 <ul type=disc>
-         <li> <b>(1)</b> obmlib.inc
-         <li> <b>(2)</b> global.inc
-         <li> <b>(3)</b> global_pref.inc
+         <li> <b>(1)</b> global.inc (which included obmlib.inc since 0.7.5)
+         <li> <b>(2)</b> global_pref.inc
 </ul>
 <p>
 This order must be respected in all module.<br><br>
@@ -259,7 +258,7 @@ This order must be respected in all module.<br><br>
   <th>Description</th>
 </tr><tr>
   <td>obmlib.inc</td>
-  <td>This file define the library objects like OBM_Sess, or OBM_DB. It must be included <i><u>before</u></i>
+  <td><b>Now automatically included by global.inc</b>. This file define the library objects like OBM_Sess, or OBM_DB. It must be included <i><u>before</u></i>
       the call of page_open() in any case.
   </td>
 </tr><tr>
@@ -286,7 +285,6 @@ $path = "..";
 $menu = "COMPANY";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");

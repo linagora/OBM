@@ -283,6 +283,8 @@ function html_contact_consult($co_q) {
   $c_phone = $co_q->f("company_phone");
   $id = $co_q->f("contact_id");
   $kind = $co_q->f("kind_minilabel");
+  $kind_header = $co_q->f("kind_header");
+  if ($kind_header != $kind) $kind .= " ($kind_header)";
   $function = $co_q->f("function_label");
   $title = $co_q->f("contact_title");
   $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
@@ -478,7 +480,9 @@ function dis_contact_form($action, $co_q, $contact) {
   $dsrc_q = run_query_datasource();
   $kind_q = run_query_kind();
   $func_q = run_query_function();
-  $users = array($contact["marketing_manager"]);
+  if ($contact["marketing_manager"]) {
+    $users = array($contact["marketing_manager"]);
+  }
   $usr_q = run_query_userobm_active($users);
   $ctry_q = run_query_country();
   $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact);
@@ -602,9 +606,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $sel_kind = "<select name=\"sel_kind\">";
   while ($kind_q->next_record()) {
     $k_id = $kind_q->f("kind_id");
+    $k_lang = $kind_q->f("kind_lang");
+    $k_label = $kind_q->f("kind_minilabel");
+    $k_header = $kind_q->f("kind_header");
     $sel_kind .= "\n<option value=\"$k_id\"";
     if ($k_id == $kind) { $sel_kind .= "selected = \"selected\""; }
-    $sel_kind .= ">". $kind_q->f("kind_minilabel") . "</option>\n";
+    $sel_kind .= ">$k_lang-$k_label-$k_header</option>";
   }
   $sel_kind .= "</select>";
 
@@ -631,11 +638,12 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $sel_func .= "</select>";
 
   // Country select
-  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
+  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
+    <option value=\"0\">$l_none</option>";
   while ($ctry_q->next_record()) {
-    $c_id = $ctry_q->f("country_id");
-    $sel_ctry .= "\n<option value=\"$c_id\"";
-    if ($c_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $ctry_id = $ctry_q->f("country_id");
+    $sel_ctry .= "\n<option value=\"$ctry_id\"";
+    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";
@@ -1039,6 +1047,7 @@ function dis_admin_index() {
   $func_q = run_query_function();
   $kind_q = run_query_kind();
   $block = html_contact_kind_form($kind_q);
+  $block .= "<p></p>";
   $block .= html_contact_function_form($func_q);
 
   return $block;
@@ -1252,14 +1261,12 @@ function html_contact_kind_form($kind_q) {
       label = mytext.substr(0,pos);
 
       // Get header
-      mytext = mytext.substr(pos+1);
-      pos = mytext.indexOf('-');
-      header = mytext.substr(0,pos);
+      header = mytext.substr(pos+1);
 
       forms.form_kind_update.tf_lang.value=lang;
       forms.form_kind_update.tf_label.value=label;
       forms.form_kind_update.tf_header.value=header;\"
-      size=\"12\">";
+      size=\"8\">";
     while ($kind_q->next_record()) {
       $id = $kind_q->f("kind_id");
       $lang = $kind_q->f("kind_lang");
@@ -1276,10 +1283,12 @@ function html_contact_kind_form($kind_q) {
     <tr>
       <td colspan=\"3\">
       <form name=\"form_kind_delete\" method=\"post\"
-        action=\"" . url_prepare("admin_ref_index.php") . "\">
+        action=\"" . url_prepare("contact_index.php") . "\">
       <table>
       <tr>
         <td class=\"adminLabel\">$l_kind_exist</td>
+      </tr>
+      <tr>
         <td class=\"adminLabel\">$sel_kind</td>
         <td>
           <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
@@ -1298,7 +1307,7 @@ function html_contact_kind_form($kind_q) {
     <tr>
       <td colspan=\"2\">
         <form name=\"form_kind_update\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
+          action=\"" . url_prepare("contact_index.php") . "\">
         <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
         <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
 
@@ -1352,7 +1361,7 @@ function html_contact_kind_form($kind_q) {
 <!-- New Kind Section -->
 
         <form name=\"form_kind_new\" method=\"get\"
-          action=\"" . url_prepare("admin_ref_index.php") . "\">
+          action=\"" . url_prepare("contact_index.php") . "\">
         <table>
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">$l_kind_new</td>
@@ -1398,37 +1407,10 @@ function dis_kind_links($ref) {
 
   $delete_ok = true;
   $id = $ref["kind"];
-  $name = get_kind_name($id);
-
-  // Company Links
-  $obm_q = run_query_kind_company_links($id);
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$name : $l_kind_link_company</td>
-    </tr>";
-
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("company_id");
-      $cname = $obm_q->f("company_name");
-      $dis_link_comp .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
-      </td>
-    </tr>";
-    }
-
-  } else {
-    $dis_link_comp = "
-    <tr>
-      <td class=\"detailHead\">$l_kind_link_company_no</td>
-    </tr>";
-  }
+  $name = get_kind_label($id);
 
   // Contacts Links
-  $obm_q = run_query_kind_contact_links($id);
+  $obm_q = run_query_kind_links($id);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
     $dis_link_cont = "
@@ -1450,25 +1432,24 @@ function dis_kind_links($ref) {
   } else {
     $dis_link_cont = "
     <tr>
-      <td class=\"detailHead\">$l_kind_link_contact_no</td>
+      <td class=\"detailHead\">$name : $l_kind_link_contact_no</td>
     </tr>";
   }
 
   $block .= "<table class=\"detail\">
-    $dis_link_comp
     $dis_link_cont
     </table>";
 
   $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("admin_ref_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"kind\" />
+          action=\"" .url_prepare("contact_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_kind_can_delete);
     $dis_del = "<form name=\"form_act_delete\".
-          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
+          method=\"post\" action=\"" . url_prepare("contact_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
         <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />

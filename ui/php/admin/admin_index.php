@@ -19,7 +19,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 
 $acts = array ('help', 'index', 'data_show', 'data_update', 'clear_sess');
 
-require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 require("admin_display.inc");
 require("admin_query.inc");

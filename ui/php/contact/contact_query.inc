@@ -47,8 +47,8 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       company_phone,
       function_label as contact_function
     from Contact
-        left join Function on contact_function_id=function_id,
-      Company
+        left join Company on contact_company_id=company_id 
+        left join Function on contact_function_id=function_id
     where";
 
   // If a contact indication has been specified, get it 
@@ -89,8 +89,8 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   // only the one which are allowed (ie. publics )
   $query .= " (contact_visibility='0' or contact_usercreate='".$auth->auth["uid"]."') and ";
   
-  // join
-  $query .= " contact_company_id=company_id";
+  // join ! A supprimer (modifier les "and")
+  $query .= " 1=1";
 
   // order
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contact_lastname";
@@ -179,6 +179,7 @@ function run_query_detail($p_id) {
         UNIX_TIMESTAMP(contact_timecreate) as timecreate,
         company_id, company_name, company_phone,
         kind_minilabel,
+        kind_header,
         m.userobm_lastname as market_lname,
         m.userobm_firstname as market_fname,
         function_label,
@@ -257,8 +258,8 @@ function run_query_insert($contact) {
   $email = $contact["email"];
   $mailok = $contact["mailok"];
   $com = $contact["com"];
-  $arch = $contact["archive"];
-  $vis = $contact["vis"];
+  $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
+  $vis = (isset($contact["vis"]) ? $contact["vis"] : '0');
 
   $query = "insert into Contact (contact_timeupdate,
     contact_timecreate,
@@ -368,8 +369,8 @@ function run_query_update($contact) {
   $email = $contact["email"];
   $mailok = $contact["mailok"];
   $com = $contact["com"];
-  $arch = $contact["archive"];
-  $vis = $contact["vis"];
+  $arch = (isset($contact["archive"]) ? $contact["archive"] : '0');
+  $vis = (isset($contact["vis"]) ? $contact["vis"] : '0');
 
   $query = "update Contact set
     contact_timeupdate='".date("Y-m-d H:i:s")."',
@@ -552,10 +553,13 @@ function run_query_company_contact_dec($comp_id) {
 function run_query_check_contact($cid, $comp_id, $lname, $fname) {
   global $cdg_sql;
 
+  $where_id = "";
+  if ($cid != "") {
+    $where_id = "and contact_id!='$cid'";
+  }
   $query = "select distinct contact_id, contact_company_id, contact_lastname, contact_firstname, company_name 
       from Contact, Company
       where contact_company_id=company_id
-        and contact_id!='$cid'
         and ((contact_lastname='$lname' and contact_firstname='$fname')
           or (contact_company_id='$comp_id' and contact_lastname='$lname'))";
 
@@ -797,6 +801,138 @@ function get_function_label($id) {
   $obm_q->next_record();
   
   $retour = $obm_q->f("function_label");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Kind insertion query construction and execution
+// Parameters:
+//   - $contact : contact hash info
+//                keys used : kind_label, kind_lang, kind_header
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind_insert($contact) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $label = $contact["kind_label"];
+  $lang = $contact["kind_lang"];
+  $header = $contact["kind_header"];
+
+  $query = "insert into Kind (
+    kind_timecreate,
+    kind_usercreate,
+    kind_minilabel,
+    kind_header,
+    kind_lang)
+  values (
+    '$timecreate',
+    '$usercreate',
+    '$label',
+    '$header',
+    '$lang')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Kind update query execution
+// Parameters:
+//   - $contact : contact hash info
+//                keys used : kind_label, kind_lang, kind_header
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind_update($contact) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $contact["kind"];
+  $label = $contact["kind_label"];
+  $lang = $contact["kind_lang"];
+  $header = $contact["kind_header"];
+
+  $query = "update Kind set
+      kind_timeupdate='$timeupdate',
+      kind_userupdate='$userupdate',
+      kind_minilabel='$label',
+      kind_header='$header',
+      kind_lang='$lang'
+    where
+      kind_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Kind deletion query execution
+// Parameters:
+//   - $id : Kind id to delete
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind_delete($id) {
+  global $cdg_sql;
+
+  $query = "delete from Kind where kind_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Kind - Contact links query execution
+// Parameters:
+//   - $id : kind id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind_links($id) {
+  global $cdg_sql;
+
+  $query = "select contact_lastname,
+      contact_firstname,
+      contact_id,
+      contact_kind_id
+    from Contact where contact_kind_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a kind from its id
+// Parameters:
+//   - $id : kind id
+///////////////////////////////////////////////////////////////////////////////
+function get_kind_label($id) {
+  global $cdg_sql;
+
+  $query = "select kind_lang, kind_minilabel, kind_header
+    from Kind
+    where kind_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("kind_lang") . " " . $obm_q->f("kind_minilabel") . " " .
+            $obm_q->f("kind_header");
   return $retour;
 }
 

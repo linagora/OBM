@@ -112,7 +112,7 @@ ALTER table Contact add column contact_country_id int(8) after contact_expresspo
 -- Add new column : contact_marketingmanager_id
 ALTER table Contact add column contact_marketingmanager_id int(8) after contact_kind_id;
 
--- Change column : contact_function to contact_titel
+-- Change column : contact_function to contact_title
 ALTER table Contact change column contact_function contact_title varchar(64);
 
 -- Add new column : contact_function_id

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : global.inc                                                   //
 //     - Desc : Global common OBM include file                               //
@@ -9,8 +9,9 @@
 
 
 require_once("$obminclude/obm_conf.inc");
+require_once("$obminclude/phplib/obmlib.inc");
 
-$obm_version = "0.7.5pre2";
+$obm_version = "0.7.5pre3";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
@@ -480,19 +481,29 @@ function isodate_format($timestamp="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Format a date-time according to user preference                           //
 // Parameters:
-//   - $timestamp : Unix timestamp
+//   - $timestamp  : Unix timestamp
+//   - $empty_null : tell if null should returns empty (true) or today ("")
 // Returns:
 //   datetime formated as user settings
 ///////////////////////////////////////////////////////////////////////////////
-function datetime_format($timestamp="") {
+function datetime_format($timestamp="", $null_empty="") {
   global $set_date_default, $set_date;
 
   $format = $set_date;
   if (trim($format) == "") $format = $set_date_default;
-  if ($timestamp != "")
-    $date = date("$format H:i:s", $timestamp);
-  else
-    $date = date("$format H:i:s");
+  if ($timestamp != "") {
+    if ($timestamp == "0") {
+      $date = "";
+    } else {
+      $date = date("$format H:i:s", $timestamp);
+    }
+  } else {
+    if ($null_empty != "") {
+      $date = "";
+    } else {
+      $date = date("$format H:i:s");
+    }
+  }
 
   return $date;
 }
@@ -527,8 +538,8 @@ function display_record_info($obm_q) {
 
   $usercreate = $obm_q->f("usercreate");
   $userupdate = $obm_q->f("userupdate");
-  $timecreate = datetime_format($obm_q->f("timecreate"));
-  $timeupdate = datetime_format($obm_q->f("timeupdate"));
+  $timecreate = datetime_format($obm_q->f("timecreate"), 1);
+  $timeupdate = datetime_format($obm_q->f("timeupdate"), 1);
   $datasource = $obm_q->f("datasource_name");
 
   $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" />$usercreate : $timecreate";
@@ -633,4 +644,4 @@ function month_short_name ($num_month) {
 }
 
 
-</SCRIPT>
+</script>
