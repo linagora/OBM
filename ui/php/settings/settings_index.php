@@ -142,18 +142,18 @@ echo "<P>$l_new_settings<P><CENTER>
 // display en entry                                                          //
 ///////////////////////////////////////////////////////////////////////////////
 $lang_dir = dir("$path/../$obminclude/lang");
-echo "<TABLE BORDER=0>";
+echo "<table border=0>";
 while($entry=$lang_dir->read()) {
   if (strcmp($entry, ".") && strcmp($entry,"..") && strcmp($entry,"CVS")
       && is_dir($lang_dir->path."/".$entry)) {
-    echo "<TR><TD><A HREF=\"".
+    echo "<tr><td><a href=\"".
       $sess->url("settings_index.php?param_lang=$entry") . "\">" .
-      "<IMG BORDER=0 ALIGN=MIDDLE SRC=\"/images/images/flag-" . 
+      "<img border=0 align=middle src=\"/images/images/flag-" . 
       $entry . ".gif\"></A>
-      </TD></TR>";
+      </td></tr>";
   }
 }
-echo "</TABLE>";
+echo "</table>";
 $lang_dir->close();
  
 

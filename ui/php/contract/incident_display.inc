@@ -14,10 +14,11 @@
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_form ($obm_q_contacts_obm,$incident) {
+function html_incident_search_form ($usr_q, $incident) {
   global $l_incident_label,$l_contract_label,$l_incident_priority,$l_incident_status, $l_find,$l_incident_owner;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$sess,$c_all,$l_all;
   global $l_date_after,$l_date_before,$l_archive;
+
   $lincident = stripslashes($incident["lincident"]);
   $lcontract = stripslashes($incident["lcontract"]);
   $priority = $incident["priority"];
@@ -27,28 +28,36 @@ function html_incident_search_form ($obm_q_contacts_obm,$incident) {
   $datebefore = $incident["date_before"];
   $archive = ($incident["archive"] == "1" ? "checked" : "");
 
-  $dis_sel_owner="<SELECT name=\"sel_owner\">\n<OPTION value=\"$c_all\">$l_all</OPTION>";
-  while($obm_q_contacts_obm->next_record()) {
-   $dis_sel_owner.="\n<OPTION value=".$obm_q_contacts_obm->f("contact_id");
-   if ($obm_q_contacts_obm->f("contact_id") == $owner) 
+  $dis_sel_owner="<select name=\"sel_owner\">
+    <option value=\"$c_all\">$l_all</option>";
+  while($usr_q->next_record()) {
+    $id = $usr_q->f("userobm_id");
+   $dis_sel_owner.="\n<option value=\"$id\"";
+   if ($id == $owner) 
      $dis_sel_owner.=" selected";
-   $dis_sel_owner.=">". $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</OPTION>";
+   $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_owner.="\n</SELECT>";
+  $dis_sel_owner.="</select>";
 
-  $dis_sel_prio="<SELECT name=\"sel_priority\">\n<OPTION value=\"$c_all\">$l_all</OPTION>\n<OPTION value=\"REDHOT\"";
+  $dis_sel_prio="<select name=\"sel_priority\">
+    <option value=\"$c_all\">$l_all</option>
+    <option value=\"REDHOT\"";
   if ($priority == "REDHOT") 
-   $dis_sel_prio.= " selected";
-  $dis_sel_prio.=">$l_redhot</OPTION>\n<OPTION value=\"HOT\"";
+    $dis_sel_prio.= " selected";
+  $dis_sel_prio.=">$l_redhot</option>
+    <option value=\"HOT\"";
   if ($priority == "HOT") 
-   $dis_sel_prio.=" selected";
-  $dis_sel_prio.=">$l_hot</OPTION>\n<OPTION value=\"NORMAL\"";
+    $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_hot</option>
+    <option value=\"NORMAL\"";
   if ($priority == "NORMAL") 
-   $dis_sel_prio.=" selected";
-  $dis_sel_prio.= ">$l_normal</OPTION>\n<OPTION value=\"LOW\"";
+    $dis_sel_prio.=" selected";
+  $dis_sel_prio.= ">$l_normal</option>
+    <option value=\"LOW\"";
   if ($priority == "LOW") 
-   $dis_sel_prio.=" selected";
-  $dis_sel_prio.=">$l_low</OPTION>\n</SELECT>";
+    $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_low</option>
+  </select>";
 
   $dis_sel_stat="<SELECT name=\"sel_status\">\n<OPTION value=\"$c_all\">$l_all</OPTION>\n<OPTION value=\"OPEN\"";
   if ($status == "OPEN") 
@@ -190,6 +199,7 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
 function html_new_incident_contract($contr_q) {
   global $l_incident_select_contract,$l_select_contract;
   global $sess;
+
   $dis_param_contract =" <SELECT name=\"param_contract\" size=10>";
     while($contr_q->next_record()) {
     $id = $contr_q->f("contract_id");
@@ -218,13 +228,13 @@ function html_new_incident_contract($contr_q) {
 // Display Incident Form                                                     //
 // Parameters:
 //   - $action    : action called
-//   - $co_q      : contact database result 
+//   - $usr_q     : userobm database result 
 //   - $comp_q    : company database result 
 //   - $incident[]: default values
 //     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 //                : phone, hpone, mphone, fax, email ,com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $contr_q, $co_q, $incident) {
+function html_incident_form($action, $contr_q, $usr_q, $incident) {
   global $col_table, $col_label, $col_textem;
   global $l_incident_label,$l_contract_label,$l_incident_prority,$l_incident_status, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
@@ -246,7 +256,6 @@ function html_incident_form($action, $contr_q, $co_q, $incident) {
     $date =  $incident->f("incident_date");
     $archive = ($incident->f("incident_archive") == "1" ? "checked" : "");
     $param_incident = $incident->f("incident_id");
-    $contr_q->next_record();
     $c_name = $contr_q->f("contract_label");
     $c_id = $param_contract;
   } else {
@@ -262,25 +271,25 @@ function html_incident_form($action, $contr_q, $co_q, $incident) {
     $archive = ($incident["archive"] == "1" ? "checked" : "");
   }
 
-  $dis_sel_owner="<SELECT name=\"sel_owner\">\n";
-  while($co_q->next_record()) {
-   $dis_sel_owner.="\n<OPTION value=".$co_q->f("contact_id");
-   if ($co_q->f("contact_id") == $owner) 
-     $dis_sel_owner.=" selected";
-   $dis_sel_owner.=">". $co_q->f("contact_lastname") . " " . $co_q->f("contact_firstname")."</OPTION>";
+  $dis_sel_owner="<select name=\"sel_owner\">";
+  while($usr_q->next_record()) {
+    $dis_sel_owner.="\n<option value=".$usr_q->f("userobm_id");
+    if ($usr_q->f("userobm_id") == $owner) 
+      $dis_sel_owner.=" selected";
+    $dis_sel_owner.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_owner.="\n</SELECT>";
+  $dis_sel_owner.="</select>";
 
-  $co_q->seek();
+  $usr_q->seek();
 
-  $dis_sel_logger="<SELECT name=\"sel_logger\">\n";
-  while($co_q->next_record()) {
-   $dis_sel_logger.="\n<OPTION value=".$co_q->f("contact_id");
-   if ($co_q->f("contact_id") == $logger) 
-     $dis_sel_logger.=" selected";
-   $dis_sel_logger.=">". $co_q->f("contact_lastname") . " " . $co_q->f("contact_firstname")."</OPTION>";
+  $dis_sel_logger="<select name=\"sel_logger\">";
+  while($usr_q->next_record()) {
+    $dis_sel_logger.="\n<option value=".$usr_q->f("userobm_id");
+    if ($usr_q->f("userobm_id") == $logger) 
+      $dis_sel_logger.=" selected";
+    $dis_sel_logger.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_owner.="\n</SELECT>";
+  $dis_sel_owner.="</select>";
 
   $dis_sel_prio="<SELECT name=\"sel_priority\" >\n<OPTION value=\"REDHOT\"";
   if ($priority == "REDHOT") 
@@ -346,17 +355,14 @@ function html_incident_form($action, $contr_q, $co_q, $incident) {
     <TD><FONT SIZE=-2>$l_incident_label</FONT></TD>
     <TD><INPUT NAME=tf_lincident size=30 value=\"$lincident\"></TD>
     </TR>
+    <tr>
+    <td><font size=-2>$l_incident_logger</font></td>
+    <td>$dis_sel_logger</td>
+    </tr><tr>
+    <td><font size=-2>$l_incident_owner</font></td>
+    <td>$dis_sel_owner</td>
+    </tr>
     <TR>
-    <TD><FONT SIZE=-2>$l_incident_logger</FONT> </TD>
-    <TD>
-    ".$dis_sel_logger."
-    </TD>
-    </TR><TR>
-    <TD><FONT SIZE=-2>$l_incident_owner</FONT> </TD>
-    <TD>
-    ".$dis_sel_owner."
-    </TD>
-    </TR><TR>
      <TD><FONT SIZE=-2>$l_archive_new</FONT></TD>
      <TD><INPUT NAME=cb_archive type=\"checkbox\"size=30 value=\"1\" $archive ></TD>
     </TR>
@@ -446,12 +452,12 @@ echo "
 // ------------
 //      $obm_q_contract : information about the contract
 //      $obm_q_type : list deal's types
-//      $obm_q_contacts_obm : list of contacts from internal companies 
+//      $usr_q : list of contacts from internal companies 
 //      $obm_q_company : list of companies
 //      $obm_q_contact : list of contact from the company 
 //      $p_company_id  : id of the company concerned by the contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id) {
+function html_incident_consult($inc_q,$con_q,$obm_q_type,$usr_q,$obm_q_company,$obm_q_contacts,$p_company_id) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // - Labels
@@ -472,52 +478,41 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
   $con_id = $con_q->f("contract_id");
   $con_label = $con_q->f("contract_label");
   $con_num = $con_q->f("contract_numero");
-  $con_debut = $con_q->f("contract_debut");
-  $con_exp = $con_q->f("contract_expiration");
-  $con_tech = $con_q->f("contract_responsable_tech_id");
-  $con_com = $con_q->f("contract_responsable_com_id");
-  $con_cli = $con_q->f("contract_responsable_client_id");
-  $con_cli2 = $con_q->f("contract_responsable_client2_id");
+  $con_debut = $con_q->f("contract_datebegin");
+  $con_exp = $con_q->f("contract_dateexp");
+  $con_tech = $con_q->f("contract_techmanager_id");
+  $con_com = $con_q->f("contract_marketmanager_id");
+  $con_cli = $con_q->f("contract_contact1_id");
+  $con_cli2 = $con_q->f("contract_contact2_id");
   $obm_q_company->next_record();
   $comp_name = $obm_q_company->f("company_name");
   $comp_ad1 = $obm_q_company->f("company_address1");
   $comp_zip = $obm_q_company->f("company_zipcode");
   $comp_town = $obm_q_company->f("company_town");
 
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_owner")) 
-      $dis_lab_owner = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
-  }
-
-  if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0); 
-  }
-
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_logger")) 
-      $dis_lab_logger = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
-  }
+  $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
+  $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="</TD></TR><TR><TD>$l_archive_consult";
   }
 
-  if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0); 
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0); 
   }
 
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $con_tech) 
-      $dis_lab_tec = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+  while($usr_q->next_record()) {
+    if ($usr_q->f("userobm_id") == $con_tech) 
+      $dis_lab_tec = "<td> ".$usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</td>";
   }
 
-  if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0); 
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0); 
   }
 
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $con_com) 
-      $dis_lab_com = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+  while($usr_q->next_record()) {
+    if ($usr_q->f("userobm_id") == $con_com) 
+      $dis_lab_com = "<td> ".$usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</td>";
   }
 
   while($obm_q_contacts->next_record()) {
@@ -571,11 +566,11 @@ function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q
               </table>
               <table border=0>
               <tr>
-                <td><font COLOR=\"#$col_label\">$l_incident_owner</font></td>
-                <td>$dis_lab_owner</td>
-              </tr><tr>
                 <td><font COLOR=\"#$col_label\">$l_incident_logger</font></td>
-                <td>$dis_lab_logger $dis_lab_archive</td>
+                <td>$logger $dis_lab_archive</td>
+              </tr><tr>
+                <td><font COLOR=\"#$col_label\">$l_incident_owner</font></td>
+                <td>$owner</td>
               </tr>
               </table>
 <!--  Pave Contract -->

@@ -114,46 +114,46 @@ function run_query_detail($id) {
   $obm_q = new DB_OBM;
   if ($obm_q->type == $db_type_mysql) {
     $query = "select Deal.*,
-         dealtype_label,
-         tasktype_label,
-         dealstatus_label,
-         company_name, company_address1, company_zipcode, company_town,
-         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-         DATE_FORMAT(deal_timeupdate,'$l_date_format') as datemodif,
-         DATE_FORMAT(deal_timeupdate,'$l_date_format') as timeupdate,
-         DATE_FORMAT(deal_timecreate,'$l_date_format') as timecreate
-       from
-         (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
-               left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
-          DealType, TaskType, DealStatus, Company
-       where deal_id='$id'
-         and dealtype_id=deal_type_id
-         and tasktype_id=deal_tasktype_id
-         and dealstatus_id=deal_status_id
-         and company_id=deal_company_id";
+        dealtype_label,
+        tasktype_label,
+        dealstatus_label,
+        company_name, company_address1, company_zipcode, company_town,
+        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+        DATE_FORMAT(deal_timeupdate,'$l_date_format') as datemodif,
+        DATE_FORMAT(deal_timeupdate,'$l_date_format') as timeupdate,
+        DATE_FORMAT(deal_timecreate,'$l_date_format') as timecreate
+      from
+        (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
+              left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
+         DealType, TaskType, DealStatus, Company
+      where deal_id='$id'
+        and dealtype_id=deal_type_id
+        and tasktype_id=deal_tasktype_id
+        and dealstatus_id=deal_status_id
+        and company_id=deal_company_id";
 
   } else if ($obm_q->type == $db_type_pgsql) {
     // require at list Postgresql 7.1 (left join)
     $query = "select Deal.*,
-         dealtype_label,
-         tasktype_label,
-         dealstatus_label,
-         company_name, company_address1, company_zipcode, company_town,
-         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-         deal_timeupdate as datemodif,
-         deal_timeupdate as timeupdate,
-         deal_timecreate as timecreate
-       from
-         (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
-               left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
-          DealType TaskType, DealStatus, Company
-       where deal_id='$id'
-         and dealtype_id=deal_type_id
-         and tasktype_id=deal_tasktype_id
-         and dealstatus_id=deal_status_id
-         and company_id=deal_company_id";
+        dealtype_label,
+        tasktype_label,
+        dealstatus_label,
+        company_name, company_address1, company_zipcode, company_town,
+        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+        deal_timeupdate as datemodif,
+        deal_timeupdate as timeupdate,
+        deal_timecreate as timecreate
+      from
+        (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
+              left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
+         DealType TaskType, DealStatus, Company
+      where deal_id='$id'
+        and dealtype_id=deal_type_id
+        and tasktype_id=deal_tasktype_id
+        and dealstatus_id=deal_status_id
+        and company_id=deal_company_id";
   }
 
   display_debug_msg($query, $cdg_sql);

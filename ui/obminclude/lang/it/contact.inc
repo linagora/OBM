@@ -1,0 +1,108 @@
+<SCRIPT language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                  //
+//     - File     : contact.inc                                              //
+// 1999-01-24 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id //
+///////////////////////////////////////////////////////////////////////////////
+
+// Database fields
+$l_company = "Azienda";
+$l_lastname = "Cognome";
+$l_firstname = "Nome";
+$l_kind = "Tipo";
+$l_function = "Funzione";
+$l_phone = "Tel.";
+$l_hphone = "Tel. Casa";
+$l_minihphone = "(casa)";
+$l_mphone = "Cell.";
+$l_minimphone = "(minitel)";
+$l_email = "E-Mail";
+$l_fax = "Fax";
+$l_address = "Indirizzo";
+$l_postcode = "ZIP";
+$l_expresspostal = "CAP";
+$l_town = "Città";
+$l_country = "Nazione";
+$l_comment = "Commento";
+$l_visibility ="Accesso";
+
+// Labels and texts
+$l_last_contact = "Ultimo contatto";
+$l_last_company = "Ultima azienda";
+$l_last_deal="Ultimo  deal";
+$l_contact_name = "Nome Contatto";
+$l_from_company = "Azienda";
+$l_find = "Trova";
+$l_telother = "Altro Tel";
+$l_private = "Privato";
+$l_public = "Pubblico";
+$l_contact_select_company = "Scegli l'azienda per il contatto.";
+$l_invalid_data = "Valore errato";
+
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["contact_lastname"] = $l_lastname;
+$fieldnames["contact_firstname"] = $l_firstname;
+$fieldnames["contact_function"] = $l_function;
+$fieldnames["contact_phone"] = $l_phone;
+$fieldnames["contact_homephone"] = $l_hphone;
+$fieldnames["contact_mobilephone"] = $l_mphone;
+$fieldnames["contact_email"] = $l_email;
+// Calculated fields
+$fieldnames["contact_company_name"] = $l_company;
+
+// Titles
+$l_contact = "Contatto";
+
+// Actions
+$l_insert = "Inserisci Contatto ";
+$l_update = "Modifica Contatto";
+$l_checkdelete = "Controlla o elimina il Contatto";
+$l_delete = "Elimina il ";
+$l_back = "Indietro";
+$l_confirm= "Conferma azione";
+$l_add = "Aggiungi i contatti";
+
+// Messages
+$l_check_samecontact = "Quasti contatti sembrano simili al nuovo  !";
+$l_link_deal = "Qusto contatto ha deals in corso";
+$l_link_deal_no = "Il contatto non ha ";
+$l_link_list = "Il contatto è registrato in queste liste";
+$l_link_list_no = "Il Contatto non è registrato in nessuna lista";
+$l_cant_delete = "Il contatto non può essere eliminato!";
+$l_can_delete = "Il contatto può essere eliminato.";
+$l_error_permission = "Non hai accesso alla pagina";
+$l_error_visibility = "Pagina riservata.";
+$l_no_display = "Riempi i campi e click <TROVA> per eseguire la ricerca";
+$l_found = "contatti trovati.";
+$l_no_found = "Non sono stato trovati contatti !";
+$l_delete_ok = "Contatto eliminato.";
+$l_delete_error = "Eliminazione contatto fallita!";
+$l_insert_ok = "Contatto inserito .";
+$l_insert_error = "Inserimento contatto fallito!";
+$l_update_ok = "Contatto modificato .";
+$l_update_error = "Modifica contatto fallita !";
+$l_query_error = "Errore durate la ricerca";
+
+// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
+$l_fill_lastname = "Inserisci prima il Cognome.";
+$l_fill_company = "Scegli prima una Azienda.";
+$l_fill_phone = "Scrivi prima il telefono.";
+$l_delete_confirm = "Confermi eliminazione contatto ?";
+$l_j_select_company =  "Seleziona una azienda!";
+$l_j_check_phone = "Numero telefono non valido.";
+$l_j_check_hphone = "Numero telefono privato non valido.";
+$l_j_check_mphone = "Numero cellulare non valido.";
+$l_j_check_fax = "Numero fax non valido.";
+$l_j_check_email = "Indirizzo email non valido.";
+
+// Specifics fields
+// MySQL Date and time format for display in the deal detail screen
+$l_date_format = "%Y-%m-%d %H:%i:%s";
+
+// For the display parameters modification screen
+$l_contact_display = "Opzioni visualizzazine della lista contatti";

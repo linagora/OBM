@@ -1,11 +1,11 @@
 <SCRIPT LANGUAGE="PHP">
-///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                   //
-//     - File     : incident.inc                                             //
-// 2001-08-20  Mehdi RANDE                                                   //
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                  //
+//     - File     : incident.inc                                            //
+// 2001-08-20  Mehdi RANDE                                                  //
+//////////////////////////////////////////////////////////////////////////////
 //   $Id   //
-///////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 
 //Fields Label
 $l_incident_label = "Label";
@@ -44,6 +44,7 @@ $l_call = "Call";
 $l_waitcall = "Wait Call";
 $l_paused = "Paused";
 $l_closed = "Closed";
+$l_all = "All";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -61,7 +62,8 @@ $fieldnames["incident_company_name"] = $l_incident_company;
 
 // Action
 
-$l_select_contract = "Select the Contract";
+$l_find = "Find";
+$l_select_contract = "Selct the Contract";
 $l_insert = "Record the Incident";
 $l_update = "Modify the Incident";
 $l_checkdelete = "Delete the Incident";
@@ -82,9 +84,12 @@ $l_incident_display = "Display options for Incidents";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_label = "You have to fill the Label before submitting.";
 $l_length_label = "The Label is too long";
-$l_fill_contract = "You have to assigned a Contract before submitting.";
 $l_fill_date = "You have to fill the Date before submitting.";
 $l_invalid_date = "Invalid date format (DD/MM/YYYY or YYYY-MM-DD).";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm="Really delete the Incident ?";
 $l_date_after_js ="Date After";
+
+$l_time_format = "%Y-%d-%m %H:%i:%s";
+$l_date_format = "%Y-%d-%m %H:%i:%s";
+

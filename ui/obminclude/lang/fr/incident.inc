@@ -77,6 +77,7 @@ $l_incident_display = "Options d'affichage des Incidents";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_label = "Vous devez renseigner le label avant de valider.";
 $l_length_label = "Le champ Label est trop long";
+$l_fill_contract = "Vous devez sélectionner un contrat avant de valider.";
 $l_fill_date = "La date doit être renseignee.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_j_select_contract = "Vous devez sélectionner un Contrat!";
