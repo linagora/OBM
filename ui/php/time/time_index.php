@@ -361,14 +361,13 @@ elseif ($action == "detailupdate") {
     $user_id = $time["user_id"];
     
     $display["detail"] .= "
-    <Script language=\"javascript\">
+    <script language=\"javascript\">
      window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
-
+     window.close();
     </script>
     ";
   }
 }  
-//      window.close();
 
 elseif ($action == "admin") {
 //////////////////////////////////////////////////////////////////////////////

@@ -560,6 +560,8 @@ function run_query_projectupdate($project) {
     while ( list($m_id, $proj) = each($projtab) ) {
       if ($proj != "") {
 
+// 	echo "--rtq--$t_id--$m_id--<br>";
+
  	$query = "	
           insert into ProjectUser 
             (projectuser_user_id,
@@ -577,11 +579,11 @@ function run_query_projectupdate($project) {
             )";
 	
 	
-	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
-	$retour = $obm_q->query($query);
+// 	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
+// 	$retour = $obm_q->query($query);
 	
-	if (!($retour))
-	  $ins_err = 1;
+// 	if (!($retour))
+// 	  $ins_err = 1;
       }
     }
   }

@@ -30,11 +30,6 @@ $l_usedsold = "Utilisation du temps vendu";
 $l_progress = "Avancement du projet";
 $l_progeval = "Evaluation de l'avance retard";
 
-// for list
-$l_task_fac = "Taches Facturées";
-$l_task_div = "Taches Diverses";
-$l_task_int = "Tâches R&D";
-
 // Labels et textes
 $l_list = "Liste";
 $l_taskname = "Nom";

@@ -129,10 +129,10 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $sel_member .= "</select>";
 
   $checked = ($new) ? "checked" : "";
-  $cb_new = "<input type=\"checkbox\" name=\"cb_new\" $checked/>";
+  $cb_new = "<input type=\"checkbox\" name=\"cb_new\" $checked />";
 
   $checked = ($archive) ? "checked" : "";
-  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" $checked/>";
+  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" $checked />";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -239,13 +239,13 @@ function html_project_form($action, $project_q, $tt_q, $project) {
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\"/></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_name\" size=\"40\" value=\"$name\" /></td>
      </tr><tr>
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailForm\">$sel_tt</td>
      </tr><tr>
       <td class=\"detailLabel\">$l_projtime</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
     </tr>
    </table>
 
@@ -325,7 +325,7 @@ function html_project_init_form($action, $project_q, $project) {
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_soldtime</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\"/></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
      </tr>
     </table>
 
@@ -355,7 +355,7 @@ function html_project_taskadd_form($ptask_q, $project) {
 
   $tf_taskname = "<tr>
                    <td class=\"detailLabel\">$l_taskname</td>
-                   <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\"/></td>
+                   <td class=\"detailForm\"><input type=\"text\" name=\"tf_tasklabel\" size=\"30\" /></td>
                   </tr>";
 
   if (($ptask_q != 0) && ($ptask_q->num_rows() != 0)) {
@@ -783,7 +783,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 	else
 	  $class = "projectPtime";
 
-	$tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+	$tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 	$dis_member .= "<td class=\"$class\">$tm_label</td>\n";
       } else {
 	$dis_member .= "<td class=\"projectCtime\">&nbsp;</td>";
@@ -801,7 +801,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
       $tm_proj = $array_memtot["proj"][$m_id];
       $tm_miss = $array_memtot["miss"][$m_id];
       $tm_used = $array_memtot["used"][$m_id];
-      $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+      $tm_label = number_format($tm_used, 1) ."/". number_format($tm_miss) ."/". number_format($tm_proj);
 
       $dis_member .= "<td class=\"projectPtime\">$tm_label</td>\n";
     }
@@ -973,7 +973,7 @@ function html_project_tasklist($tasks_q, $project) {
 	$dis_task .= "
          <tr>
           <td align=\"right\" width=\"5%\">
-	   <input type=\"checkbox\" name=\"cb_task$t_id\"/>
+	   <input type=\"checkbox\" name=\"cb_task$t_id\" />
 	  </td>
 	  <td class=\"detailText\" colspan=\"2\">$t_label</td>
          </tr>";
@@ -981,7 +981,7 @@ function html_project_tasklist($tasks_q, $project) {
 	$dis_task .= "
          <tr>
           <td align=\"right\">
-           <input type=\"checkbox\" name=\"cb_task$t_id\"/>
+           <input type=\"checkbox\" name=\"cb_task$t_id\" />
           </td>
 	  <td class=\"detailText\" colspan=\"2\">|----- $t_label</td>
          </tr>";
@@ -1053,8 +1053,8 @@ function html_project_member_form($members_q, $project) {
     }
 
     $dis_button  = "
-      <input type=\"hidden\" name=\"param_project\" value=$pid>
-      <input type=\"hidden\" name=\"action\" value=\"member_del\">
+      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+      <input type=\"hidden\" name=\"action\" value=\"member_del\" />
       <input type=\"submit\" value=\"$l_del_member_sel\"
              onclick=\"submit_memberdel(this.form)\" />";
 
@@ -1104,7 +1104,7 @@ function html_project_member_form($members_q, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project) {
   global $display;
-  global $l_memberstimeinfos, $l_del_member_sel, $l_valid_member, $l_member_add;
+  global $l_memberstimeinfos, $l_del_member_sel, $l_validate, $l_member_add;
   global $l_no_members, $l_project;
 
   $cpt_t=0;
@@ -1165,11 +1165,11 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 	$tm_proj = $array_time[$t_id][$m_id];
 
 	if ($t_parent) {
- 	  $dis_member .= "<td class=\"detailText\">&nbsp;</td>\n";
+ 	  $dis_member .= "<td class=\"detailLabel\">&nbsp;</td>\n";
 	} else {
 	  $dis_member .= "
             <td class=\"detailLabel\">
-             <input type=\"text\" name=\"tf_projected[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\"/>
+             <input type=\"text\" name=\"tf_projected[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
 	    </td>";
 	}
       }
@@ -1177,7 +1177,7 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
     }
     
      $dis_button .= "
-       <input type=\"submit\" value=\"$l_valid_member\"
+       <input type=\"submit\" value=\"$l_validate\"
           onclick=\"if(check_membertimevalid(this.form, $cpt_m)) return true; else return false;\" />";
     
     $span = $cpt_m*2 + 1;
@@ -1210,7 +1210,7 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
        $dis_memhead
        $dis_member
       </table>
-       <input type=\"hidden\" name=\"param_project\" value=$pid>
+       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
 
      <div class=\"detailButton\">
       <p class=\"detailButtons\">$dis_button</p>
@@ -1297,7 +1297,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
       if ($tm_proj != 0) {
 	$dis_member .= "
           <td>
-	   <input type=\"text\" name=\"tf_missing[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_miss\"/>
+	   <input type=\"text\" name=\"tf_missing[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_miss\" />
 	  </td>\n";
       } else {
 	$dis_member .= "<td class=\"detailText\">&nbsp;</td>\n";
@@ -1309,7 +1309,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
     
   $dis_button = "
     <input type=\"hidden\" name=\"action\" value=\"a_update\" />
-    <input type=\"hidden\" name=\"param_project\" value=$pid />
+    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
     <input type=\"submit\" value=\"$l_adv_update\" />
     ";
     

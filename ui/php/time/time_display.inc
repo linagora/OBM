@@ -143,7 +143,7 @@ function dis_time_links ($time, $type="all") {
 
   if ($type == "week") {
 
-    $tot_width = 550;
+    $tot_width = 500;
 
     //get the current start and end of week
     $d_start_week = first_day_week($time);
@@ -330,7 +330,7 @@ function dis_time_search_form ($time, $usr_q, $uid) {
 
     $block = "<br>
       <center>
-      <form method=post name=f_time action=\"" .
+      <form method=post name=\"f_time\" action=\"" .
            url_prepare("time_index.php") . "\">
        <table cellpadding=\"0\" cellspacing=\"0\" class=\"timeUser\">
         <tr>
@@ -339,17 +339,17 @@ function dis_time_search_form ($time, $usr_q, $uid) {
          <td class=\"timeUserback\">$sel_user</td>
         </tr><tr>
          <td class=\"timeUserback\">
-          <input type=hidden name=\"wbegin\" value=\"".$time["date"]."\">
-          <input type=hidden name=\"action\" value=\"$act\">
-          <input type=submit name=\"submit\" value=\"$l_see\">&nbsp;
+          <input type=hidden name=\"wbegin\" value=\"".$time["date"]."\" />
+          <input type=hidden name=\"action\" value=\"$act\" />
+          <input type=submit name=\"submit\" value=\"$l_see\" />
          </td>
         </tr>
        </table>
-      </form><hr>
+      </form>
       </center>";
   }
-  else
-    $block = "<br>$l_week du $hum_date_start au $hum_date_end<br><br>";
+//   else
+//     $block = "<br>$l_week du $hum_date_start au $hum_date_end<br><br>";
 
   return $block;
 }
@@ -604,7 +604,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
  
   $block .= "
-     <form method=post name=f_task_del action=\"".url_prepare("time_index.php").
+     <form method=post name=\"f_task_del\" action=\"".url_prepare("time_index.php").
       "\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >
      ";
 
@@ -624,10 +624,10 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   $block .= $dis_task_list->display("dis_data_time");
 
   $dis_button = "
-    <input type=\"hidden\" name=\"user_id\" value=\"".$time["user_id"][0]."\">
-    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\">
-    <input type=\"hidden\" name=\"action\" value=\"delete\">
-    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" >";
+    <input type=\"hidden\" name=\"user_id\" value=\"".$time["user_id"][0]."\" />
+    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
 
   $block .= "
      <p class=\"detailButton\">
@@ -1025,7 +1025,7 @@ function display_weekview($time, $result, $total, $title) {
   global $l_fill, $l_daysofweekshort;
   global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
-  $tot_width = 550;
+  $tot_width = 500;
   $col_width = $tot_width / $c_days_in_a_week;
 
   $curr_day = first_day_week($time);
@@ -1149,7 +1149,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   global $l_fill_addtask;
   //for list classement of task
-  global $l_task_fac,$l_task_div,$l_task_int, $l_intern, $l_cat;
+  global $l_task_fac,$l_task_div,$l_task_int, $l_intern, $l_cat, $l_comment;
   global $c_days_in_a_week; // number of days to be displayed in a week
 
   // If length of $validate_days = length of week ($days_in_a_week) :
@@ -1190,9 +1190,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"".$day_q[$day][1]."\"";
       
       if ($day_q[$day][1] == $is_day)
-	$rd_day .= "checked";
+	$rd_day .= " checked";
       
-      $rd_day .= ">$dlabel\n";
+      $rd_day .= " />$dlabel\n";
     }
   }
   
@@ -1204,9 +1204,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $ch_day .= "<input type=\"checkbox\" name=\"cb_day[".$day_q[$day][1]."]\"";
       
       if ($day_q[$day][1] == date("Ymd"))
-	$ch_day .= "checked";
+	$ch_day .= " checked";
       
-      $ch_day .= ">$dlabel\n";
+      $ch_day .= " />$dlabel\n";
     }
   }
 
@@ -1334,20 +1334,20 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     //bcontins faudra les virer
 //    dis_table_title($l_addtask_start.$fraction_jour.$l_addtask_end) ;
     $block .= "
-      <form method=post name=form_add_task
+      <form method=post name=\"f_add_task\"
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
         action=\"".url_prepare("time_index.php")."\">\n
-      <input type=\"hidden\" name=\"action\" value=\"$action\">\n
-      <input type=\"hidden\" name=\"popup\" value=0>\n";
+      <input type=\"hidden\" name=\"action\" value=\"$action\" />\n
+      <input type=\"hidden\" name=\"popup\" value=\"0\" />\n";
   }
   else {
     //dis_table_title($l_update_task);
     $block .= "
-      <form method=post  name=form_add_task 
+      <form method=post  name=\"f_add_task\" 
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\"
         action=\"".url_prepare("time_index.php")."\">
-      <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
-      <input type=\"hidden\" name=\"popup\" value=0>";
+      <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
+      <input type=\"hidden\" name=\"popup\" value=\"0\" />";
   }
 
   if ($action != "detailupdate")
@@ -1370,31 +1370,32 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
      <td class=\"timeForm\" colspan=\"3\">$sel_tt</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_project</td>
+     <td class=\"timeForm\">$l_project :</td>
      <td class=\"timeForm\" colspan=\"3\">$sel_proj</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_task</td>
+     <td class=\"timeForm\">$l_task :</td>
      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_label</td>
+     <td class=\"timeForm\">$l_label :</td>
      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
     </tr>
    </table>
    </center>";
 
   if ($action == "insert") {
-    $block .= "<br><input type=submit value=\"$l_add\">";
+    $block .= "<br><input type=\"submit\" value=\"$l_add\" />";
   } 
   else {
-    $block .= "<br><input type=hidden name=task_id value=\"$task_id\">
-         <input TYPE=submit value=\"$l_update\">
-     <input type=submit value=\"$l_close\" onclick=\"window.close();\">";
+    $block .= "<br>
+     <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
+     <input type=\"submit\" value=\"$l_update\" />
+     <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
   }     
   
   $block .= "
-    <input type=hidden name=wbegin value=\"".$time["date"]."\">\n";
+    <input type=hidden name=wbegin value=\"".$time["date"]."\" />\n";
   
   if ($action == "detailupdate"){
     $block .= "

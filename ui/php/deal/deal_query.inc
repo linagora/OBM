@@ -481,10 +481,13 @@ function run_query_dealtype() {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal TaskType list                                      //
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_tasktype() {
+function run_query_deal_tasktype($filter = "") {
   global $cdg_sql;
 
-  $query = "select * from TaskType where tasktype_internal!='1' order by tasktype_internal";
+  if ($filter != "all")
+    $where = "where tasktype_internal ='0'";
+
+  $query = "select * from TaskType $where order by tasktype_internal, tasktype_label";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -881,6 +884,7 @@ function run_query_cat_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["cat_label"];
+  $intern = $deal["cat_internal"];
 
   $query = "insert into TaskType (tasktype_timeupdate,
     tasktype_timecreate,
@@ -890,7 +894,7 @@ function run_query_cat_insert($deal) {
   values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
-    '0',
+    '$intern',
     '$label')";
 
   display_debug_msg($query, $cdg_sql);
@@ -948,10 +952,15 @@ function run_query_cat_delete($id) {
 // Parameters:
 //   - $c_id : category id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_links($c_id) {
+function run_query_cat_links($c_id, $intern) {
   global $cdg_sql;
 
-  $query = "select deal_id, deal_label from Deal where deal_tasktype_id='$c_id'";
+  if ($intern == 0)
+    $query = "select deal_id, deal_label from Deal where deal_tasktype_id='$c_id'";
+  else if ($intern == 1)
+    $query = "select deal_id, deal_label from Deal where deal_tasktype_id='$c_id'";
+  else
+    $query = "select timetask_id from TimeTask where timetask_tasktype_id='$c_id'";
 
   display_debug_msg($query, $cdg_sql);
   $cat_q = new DB_OBM;
@@ -1341,17 +1350,19 @@ function get_status_label($id) {
 // Parameters:
 //   - $id : category id
 ///////////////////////////////////////////////////////////////////////////////
-function get_cat_label($id) {
+function get_cat_infos($id) {
   global $cdg_sql;
 
-  $query="select tasktype_label from TaskType where tasktype_id='$id'";
+  $query="select tasktype_label, tasktype_internal from TaskType where tasktype_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
   
-  $retour = $obm_q->f("tasktype_label");
+  $retour["label"] = $obm_q->f("tasktype_label");
+  $retour["intern"] = $obm_q->f("tasktype_internal");
+
   return $retour;
 }
 

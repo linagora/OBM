@@ -1153,12 +1153,12 @@ table.timeDetail		{
 
 td.timeForm			{
  	font-family: 		sans-serif;
-	font-size:		12px;
-	font-weight: 		600;
+	font-size:		10px;
+	font-weight: 		300;
 	text-align:		left;
-	color:			#a5bace;
+	color:			#4f7091;
 	background-color:	#e7ebef;
-	padding:		4;
+	padding:		3;
 	}
 
 td.timeWeekhead			{

@@ -7,11 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-// for list
-$l_task_fac = "Taches Facturées";
-$l_task_div = "Taches Diverses";
-$l_task_int = "Tâches Internes";
-
 // Database fields
 $l_date_task="Date";
 $l_tasktype = "Type tâche";
@@ -24,9 +19,9 @@ $l_length="Durée";
 $l_total = "Total";
 
 $l_total_period="Durée sur la période";
-$l_total_spent="Temps utilisé";
-$l_total_before="Cumul précédente";
-$l_total_after="Cumul suivante";
+$l_total_spent="Temps période";
+$l_total_before="Total précédent";
+$l_total_after="Total actuel";
 $l_day="Jour";
 $l_period="Période";
 
@@ -39,7 +34,7 @@ $l_month2="Mois de";
 $l_user="Utilisateur";
 $l_all_users="Tous ?";
 $l_see = "Voir";
-$l_validate_task = "Validée";
+$l_validate_task = "Valider";
 $l_valid = "Valider";
 $l_unvalid = "Annuler";
 $l_add = "Ajouter";
@@ -58,7 +53,7 @@ $l_task = "Tache";
 $l_label = "Label";
 $l_duration = "Durée";
 
-$show_events="Voir le Détail";
+//$show_events="Voir le Détail";
 $total_menu="Récapitulatifs";
 $total_tasks="Total par taches";
 $total_companies="Total par société";
@@ -101,10 +96,10 @@ $l_ttmonth_stats = "Répartition du temps de travail par type de tâche ce mois-ci
 $l_no_ttmonth_stats = "Aucun renseignement n'a été saisi pour la gestion des temps ce mois-ci";
 
 // Type de tâches à rechercher
-$l_tasktype = "Type des tâches";
-$l_task_all = "Toutes";
-$l_task_uservalid = "Validées par l'admin ou l'utilisateur";
-$l_task_adminvalid= "Validées par l'admin uniquement";
+//$l_tasktype = "Type des tâches";
+//$l_task_all = "Toutes";
+//$l_task_uservalid = "Validées par l'admin ou l'utilisateur";
+//$l_task_adminvalid= "Validées par l'admin uniquement";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_day = "Vous devez sélectionner un jour.";

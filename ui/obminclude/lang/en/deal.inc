@@ -9,8 +9,8 @@
 
 
 //for list
-$l_task_fac = "Factured Tasks";
-$l_task_int = "Internal Tasks";
+//$l_task_fac = "Factured Tasks";
+//$l_task_int = "Internal Tasks";
 
 // Database fields
 $l_number = "Number";

@@ -269,9 +269,9 @@ function run_query_get_task($id) {
     select
        TimeTask.*,
        projecttask_deal_id as timetask_project_id  
-     from TimeTask, ProjectTask
-     where timetask_id = '$id'
-       and timetask_projecttask_id = projecttask_id";
+     from TimeTask
+     left join ProjectTask on timetask_projecttask_id = projecttask_id
+     where timetask_id = $id";
   
   display_debug_msg($query, $cdg_sql, "run_query_get_task");
 

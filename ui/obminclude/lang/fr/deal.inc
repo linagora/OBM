@@ -8,8 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 //for list
-$l_task_fac = "Taches Facturées";
-$l_task_int = "Taches Internes";
+//$l_task_fac = "Taches Facturées";
+//$l_task_int = "Taches Internes";
 
 // Database fields
 $l_number = "Numéro";
@@ -171,6 +171,10 @@ $l_cat_can_delete = "La catégorie peut être supprimée";
 $l_cat_cant_delete = "La catégorie ne peut être supprimée";
 $l_cat_link_deal = "La catégorie est référencée par ces affaires";
 $l_cat_link_deal_no = "La catégorie n'est pas référencée dans les affaires";
+$l_cat_link_project = "La catégorie est référencée par ces projets";
+$l_cat_link_project_no = "La catégorie n'est pas référencée dans les projets";
+$l_cat_link_timetask = "La catégorie est utilisée dans la gestion des temps";
+$l_cat_link_timetask_no = "La catégorie n'est pas utilisée dans la gestion des temps";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";

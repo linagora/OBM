@@ -59,6 +59,11 @@ $l_fill_date = "La date doit être renseignée.";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 
 //used by many modules
+//tasktype groups
+$l_task_fac = "Taches Facturées";
+$l_task_int = "Projets Internes";
+$l_task_div = "Tâches Non Facturées";
+
 // days and months
 $l_january="Janvier";
 $l_february="Février";
@@ -107,6 +112,7 @@ $l_header_time = "Gestion des temps";
 $l_header_project = "Projets";
 $l_header_contract = "Contrats";
 $l_header_incident = "Incidents";
+$l_header_document = "Documents";
 
 $l_header_account = "Comptes";
 $l_header_invoice = "Factures";
@@ -121,20 +127,16 @@ $l_header_admin_lang = "Langue";
 $l_header_admin_data = "Données";
 $l_header_admin_pref = "Préférences";
 $l_header_admin_code = "Code";
-$l_header_account = "Comptes";
-$l_header_invoice = "Factures";
-$l_header_payment = "Paiements";
-$l_header_time = "Gestion des temps";
-$l_header_project = "Projets";
-$l_header_agenda = "Agenda";
-$l_header_document = "Documents";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
 $l_header_find = "Chercher";
-$l_header_consult = "Consulter";
-$l_header_update = "Modifier";
+$l_header_global_export = "Export";
+$l_header_export = "Exporter";
 $l_header_display = "Affichage";
+$l_header_consult = "Consulter";
+
+$l_header_update = "Modifier";
 $l_header_delete = "Supprimer";
 $l_header_add_contact = "Ajouter contact";
 $l_header_add_user = "Ajouter utilisateur";
@@ -143,19 +145,20 @@ $l_header_add_group = "Ajouter groupe";
 $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";
 
-$l_header_global_export = "Export";
-$l_header_export = "Exporter";
 $l_header_reconcile = "Rapprocher";
 $l_header_dupplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
 
+$l_header_add_contact = "Ajouter contact";
+
+$l_header_reset = "Préférence par défaut";
+
+// Project headers
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";
 $l_header_man_advance = "Avancement";
 $l_header_man_affect = "Affectation";
 $l_header_add_member = "Ajouter participant";
-
-$l_header_reset = "Préférence par défaut";
 
 // Admin headers
 $l_header_index = "Accueil";
@@ -171,13 +174,10 @@ $l_header_month = "Mois";
 $l_header_year = "Année";
 $l_header_new_event = "Nouveau rdv";
 
-$l_header_admin = "Administration";
+//time headers
 $l_header_stats = "Statistiques";
 $l_header_statsmonth = "Statistiques mensuelles";
 $l_header_statsuser = "Statistiques utilisateur";
-
-//time headers
 $l_header_weeklyview = "Semaine";
 $l_header_monthlyview = "Mois";
 $l_header_globalview = "Validation";
-$l_header_stats = "Statistiques";

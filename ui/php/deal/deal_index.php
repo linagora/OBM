@@ -270,7 +270,7 @@ elseif (($action == "index") || ($action == "")) {
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
   
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -281,7 +281,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_kind_insert_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
   
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -292,7 +292,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_kind_update_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
   
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_kind_delete_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -319,7 +319,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_status_insert_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -330,7 +330,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_status_update_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -357,7 +357,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_cat_insert_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 } elseif ($action == "cat_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -368,7 +368,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_cat_update_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 } elseif ($action == "cat_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -384,7 +384,7 @@ elseif (($action == "index") || ($action == "")) {
     $display["msg"] .= display_err_msg($l_cat_delete_error);
   }
   require("deal_js.inc");
-  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  $display["detail"] = html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype("all"),run_query_dealstatus());
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -535,6 +535,7 @@ function get_param_deal() {
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_cat, $tf_hitrate;
+  global $rd_cat_internal;
 
   // Deal fields
   if (isset ($param_deal)) $deal["id"] = $param_deal;
@@ -605,6 +606,7 @@ function get_param_deal() {
   // Admin - Category fields
   // $sel_cat -> "cat" is already set
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
+  if (isset ($rd_cat_internal)) $deal["cat_internal"] = $rd_cat_internal;
 
   dis_debug_param($deal);
   return $deal;

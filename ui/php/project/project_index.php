@@ -178,7 +178,8 @@ if ($action == "index" || $action == "") {
 //  if (check_member_form($param_project, $project)) {
 
    //smlp renvoie le tableau des missings
-   $project["missing"] = run_query_memberlist_delete($project, 1);
+  //vire, modifie projectupdate
+//    $project["missing"] = run_query_memberlist_delete($project, 1);
    $ins_err = run_query_projectupdate($project);
 
    // Create an entry in the ProjectStat log
@@ -572,11 +573,6 @@ function get_param_project() {
   if (isset ($tf_missing)) $project["missing"] = $tf_missing;
   if (isset ($tf_projected)) $project["projected"] = $tf_projected;
   if (isset ($hd_status)) $project["status"] = $hd_status;
-//   if (isset ($cb_archive)) {
-//     $project["archive"] = $cb_archive;
-//   } else {
-//     $project["archive"] = "0";
-//   }
 
   // Search fields
   if (isset ($tf_name)) $project["name"] = $tf_name;

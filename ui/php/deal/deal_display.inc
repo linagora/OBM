@@ -1290,7 +1290,9 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert;
-  global $l_hitrate;
+  global $l_hitrate, $l_task_fac, $l_task_int, $l_task_div;
+
+  $task_list = array($l_task_fac, $l_task_int, $l_task_div);
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind\" onChange=\"
@@ -1337,9 +1339,14 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
     forms.form_cat_update.tf_cat.value=this.options[this.selectedIndex].text;\"
     size=\"4\" >";
   while ($cat_q->next_record()) {
+    //put menu titles
+    if (($cat_i = $cat_q->f("tasktype_internal")) != $type_prec) {
+      $sel_cat .= "<option disabled=\"disabled\">".$task_list[$cat_i]." </option>";
+      $type_prec = $cat_i;
+    }
     $id = $cat_q->f("tasktype_id");
     $mlabel = $cat_q->f("tasktype_label");
-    $sel_cat .= "<option value=\"$id\">$mlabel</option>\n";
+    $sel_cat .= "<option value=\"$id\">&nbsp;&nbsp;$mlabel</option>\n";
   }
   $sel_cat .= "</select>";
 
@@ -1605,6 +1612,13 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
           </td>
         </tr>
       <tr>
+        <td colspan=\"2\">
+          <input type=\"radio\" name=\"rd_cat_internal\" value=\"0\" checked=\"checked\" />$l_task_fac<br />
+          <input type=\"radio\" name=\"rd_cat_internal\" value=\"1\" />$l_task_int<br />
+          <input type=\"radio\" name=\"rd_cat_internal\" value=\"2\" />$l_task_div
+        </td>
+      </tr>
+      <tr>
         <td colspan=\"2\" class=\"adminLabel\">
           <input type=\"hidden\" name=\"action\" value=\"cat_insert\" />
           <input type=\"submit\" name=\"sub_category\" value=\"$l_cat_insert\"
@@ -1617,7 +1631,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
     </td>
   </tr>
   </table>
-";
+  ";
 
   return $block;
 }
@@ -1777,35 +1791,87 @@ function dis_status_links($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_links($id) {
   global $display, $l_cat_link_deal, $l_cat_link_deal_no, $l_back;
+  global $l_cat_link_project, $l_cat_link_project_no;
+  global $l_cat_link_timetask, $l_cat_link_timetask_no;
   global $l_cat_can_delete, $l_cat_cant_delete, $l_cat_delete;
 
   $delete_ok = true;
-  $label = get_cat_label($id);
-  $obm_q = run_query_cat_links($id);
+  $cat_infos = get_cat_infos($id);
+  $label = $cat_infos["label"];
+  $intern = $cat_infos["intern"];
 
-  if ($obm_q->num_rows() > 0) {
-    $delete_ok = false;
-    $dis_link = "
+  $obm_q = run_query_cat_links($id, $intern);
+
+  if ($intern == 0) {
+
+    if ($obm_q->num_rows() > 0) {
+      $delete_ok = false;
+      $dis_link = "
     <tr>
       <td class=\"detailHead\">$label : $l_cat_link_deal</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
-      $cid = $obm_q->f("deal_id");
-      $clabel = $obm_q->f("deal_label");
-      $dis_link .= "
+      while ($obm_q->next_record()) {
+	$cid = $obm_q->f("deal_id");
+	$clabel = $obm_q->f("deal_label");
+	$dis_link .= "
     <tr>
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$cid") . "\">$clabel</a>
       </td>
     </tr>";
-    }
+      }
 
-  } else {
-    $dis_link = "
+    } else {
+      $dis_link = "
     <tr>
       <td class=\"detailHead\">$l_cat_link_deal_no</td>
     </tr>";
+    }
+
+  } else if ($intern == 1) {
+
+    if ($obm_q->num_rows() > 0) {
+      $delete_ok = false;
+      $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat_link_project</td>
+    </tr>";
+
+      while ($obm_q->next_record()) {
+	$pid = $obm_q->f("deal_id");
+	$plabel = $obm_q->f("deal_label");
+	$dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("../project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$plabel</a>
+      </td>
+    </tr>";
+      }
+
+    } else {
+      $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$l_cat_link_project_no</td>
+    </tr>";
+    }
+
+  } else {
+
+    if ($obm_q->num_rows() > 0) {
+      $delete_ok = false;
+      $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_cat_link_timetask</td>
+    </tr>";
+      
+    } else {
+      $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$l_cat_link_timetask_no</td>
+    </tr>";
+    }
+
   }
 
   $block .= "<table class=\"detail\">
