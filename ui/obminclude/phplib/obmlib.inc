@@ -204,9 +204,13 @@ class CAS_Auth extends Auth {
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
-    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
-    phpCAS::authenticateIfNeeded();
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
+    require_once("obmCAS.inc");
+    if(!$lock) {
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+      $lock = true;
+    }
+    obmCAS::authenticateIfNeeded();
   }
 
   function is_authenticated() {
@@ -241,16 +245,17 @@ class CAS_Auth extends Auth {
   }
 
   function auth_validatelogin () {
-    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
-    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+    global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
+    require_once("obmCAS.inc");
+    if(!$lock) {
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+      $lock = "true";
+    }
     //valider le login CAS
-    if (!phpCAS::isAuthenticated()) {
-      echo "non authentifié";
+    if (!obmCAS::isAuthenticated()) {
       return false;
     }
-
-    $login = phpCAS::getUser();
-
+    $login = obmCAS::getUser();
     $this->db->query(sprintf("select userobm_id,
         userobm_perms
       from %s
@@ -269,15 +274,20 @@ class CAS_Auth extends Auth {
   }
    
    function logout($nobody = "") {
-    global $sess;
+    global $sess,$lock;
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri;
     
+    require_once("obmCAS.inc");
     $sess->unregister("auth");
     unset($this->auth["uname"]);
     $this->unauth($nobody == "" ? $this->nobody : $nobody);
+    
+    if(!$lock) {
+      obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
+      $lock = "true";
+    }
 
-    phpCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
-    phpCAS::logout();
+    obmCAS::logout();
   }
   
 ##
@@ -361,7 +371,6 @@ class CAS_Auth extends Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
@@ -371,13 +380,11 @@ class CAS_Auth extends Auth {
             $this->auth["uid"] = "form";
             $this->auth["exp"] = 0x7fffffff;
             $this->auth["refresh"] = 0x7fffffff;
-            $sess->freeze();
             exit;
             break;
           default:
             # This should never happen. Complain.
             echo "Error in auth handling: no valid mode specified.\n";
-            $sess->freeze();
             exit;
         }
         break;
@@ -403,7 +410,6 @@ class CAS_Auth extends Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
@@ -418,14 +424,12 @@ class CAS_Auth extends Auth {
               $this->auth["uid"] = "form";
               $this->auth["exp"] = 0x7fffffff;
               $this->auth["refresh"] = 0x7fffffff;
-              $sess->freeze();
               exit;
             }
             break;
           default:
             # This should never happen. Complain.
             echo "Error in auth handling: no valid mode specified.\n";
-            $sess->freeze();
             exit;
             break;
         }
@@ -433,7 +437,6 @@ class CAS_Auth extends Auth {
       default:
         # This should never happen. Complain.
         echo "Error in auth handling: invalid state reached.\n";
-        $sess->freeze();
         exit;
         break;
     }

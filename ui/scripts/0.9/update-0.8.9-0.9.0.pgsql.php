@@ -7,26 +7,22 @@ include("$obminclude/global.inc");
   $db_type = $obm_db->type;    
   $calendarsegment_date = sql_date_format($db_type, "calendarsegment_date","calendarsegment_date"); 
   
-  $query = "DROP TABLE IF EXISTS CalendarEventData";
-  $obm_db->query($query);
-  display_debug_msg($query, $cdg_sql);
-
   $query = "
   CREATE TABLE CalendarEventData (
-    calendareventdata_id 	   serial,
+    calendareventdata_id           serial,
     calendareventdata_timeupdate   timestamp,
     calendareventdata_timecreate   timestamp,
     calendareventdata_userupdate   integer,
     calendareventdata_usercreate   integer,
-    calendarevent_owner	           integer default NULL,    
+    calendareventdata_owner	           integer default NULL,    
     calendareventdata_title        varchar(255) default NULL,
     calendareventdata_description  text,
     calendareventdata_category_id  integer,
     calendareventdata_priority     integer,
     calendareventdata_privacy      integer,
     calendareventdata_date       timestamp NOT NULL,
-    calendareventdata_duration     integer NOT NULL default '',
-    calendareventdata_allday	     integer NOT NULL default '0',
+    calendareventdata_duration     integer NOT NULL default 0,
+    calendareventdata_allday	     integer NOT NULL default 0,
     calendareventdata_repeatkind   varchar(20) default NULL,
     calendareventdata_repeatfrequence  integer default NULL,
     calendareventdata_repeatdays   varchar(7) default NULL,
@@ -56,8 +52,8 @@ include("$obminclude/global.inc");
     calendarexception_timecreate   timestamp,
     calendarexception_userupdate   integer default NULL,
     calendarexception_usercreate   integer default NULL,
-    calendarexception_event_id     integer    NOT NULL auto_increment,
-    calendarexception_date         timestampeger NOT NULL,
+    calendarexception_event_id     serial,
+    calendarexception_date         timestamp NOT NULL,
     PRIMARY KEY (calendarexception_event_id,calendarexception_date)
   )";
   display_debug_msg($query, $cdg_sql);
@@ -76,8 +72,10 @@ include("$obminclude/global.inc");
     $id = $obm_db->f("calendarevent_id");
     $timeupdate = $obm_db->f("calendarevent_timeupdate");
     $timecreate = $obm_db->f("calendarevent_timecreate");   
+    if(!$timeupdate) $timeupdate = $timecreate;
     $userupdate = $obm_db->f("calendarevent_userupdate");  
     $usercreate = $obm_db->f("calendarevent_usercreate"); 
+    if(!$userupdate) $userupdate = $usercreate;
     $title = $obm_db->f("calendarevent_title");     
     $description = $obm_db->f("calendarevent_description");  
     $category_id = $obm_db->f("calendarevent_category_id"); 
@@ -104,6 +102,7 @@ include("$obminclude/global.inc");
     
     $query = "SELECT calendarsegment_customerid, calendarsegment_state, calendarsegment_date
               FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
+	      AND calendarsegment_type = 'user'
 	      GROUP BY calendarsegment_customerid, calendarsegment_state, calendarsegment_date 
 	      HAVING calendarsegment_date = MIN(calendarsegment_date)
 	      ORDER BY calendarsegment_date";
@@ -112,10 +111,9 @@ include("$obminclude/global.inc");
     $obm_sub_db->query($query);
     $obm_sub_db->next_record();
     $date_begin =  $obm_sub_db->f("calendarsegment_date");
-   
     $query = "INSERT INTO CalendarEventData VALUES('".addslashes($id)."', '".addslashes($timeupdate)."',
              '".addslashes($timecreate)."','".addslashes($userupdate)."', '".addslashes($usercreate)."',
-	     '".addslashes($usercreate)."',".addslashes($title)."', '".addslashes($description)."', '".addslashes($category_id)."',
+	     '".addslashes($usercreate)."','".addslashes($title)."', '".addslashes($description)."', '".addslashes($category_id)."',
              '".addslashes($priority)."','".addslashes($privacy)."','".addslashes($date_begin)."',
 	     '".addslashes($length)."','".addslashes($allday)."','".addslashes($repeatkind)."',
 	     '".addslashes($repeatfrequence)."','".addslashes($repeatdays)."','".addslashes($endrepeat)."')";
@@ -124,6 +122,7 @@ include("$obminclude/global.inc");
         
     $query = "SELECT calendarsegment_customerid, calendarsegment_state 
               FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
+	      AND calendarsegment_type = 'user'
               GROUP BY calendarsegment_customerid, calendarsegment_state";
 	      
     display_debug_msg($query, $cdg_sql);
@@ -139,10 +138,9 @@ include("$obminclude/global.inc");
 	}
 	elseif($rec_state != "A" && $state == "W" ) {
 	  $rec_state = $state;
-	}elseif($rec_state != "W" && $state == "R" ) {
+	}elseif($rec_state != "A" && $rec_state != "W" && $state == "R" ) {
 	  $rec_state = $state;
 	}
-	  
       }
       else {
         $query = "INSERT INTO CalendarUser VALUES('".addslashes($timeupdate)."', '".addslashes($timecreate)."',
@@ -150,7 +148,7 @@ include("$obminclude/global.inc");
 						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
         display_debug_msg($query, $cdg_sql);
         $obm_ins_db->query($query);
-	$rec_state = "";
+	$rec_state = "$state";
       }
       $old_u = $user_id ;
     }
@@ -167,7 +165,10 @@ include("$obminclude/global.inc");
   $query = "DROP TABLE CalendarEvent";
   $obm_db->query($query);
   display_debug_msg($query, $cdg_sql);
-
+  $query = "DROP TABLE CalendarSegment";
+  $obm_db->query($query);
+  display_debug_msg($query, $cdg_sql);
+      
   $query = "
   CREATE TABLE CalendarEvent (
   calendarevent_id 	     serial,
@@ -180,10 +181,10 @@ include("$obminclude/global.inc");
   calendarevent_description  text,
   calendarevent_category_id  integer default NULL,
   calendarevent_priority     integer default NULL,
-  calendarevent_privacy      integer NOT NULL default '0',
+  calendarevent_privacy      integer NOT NULL default 0,
   calendarevent_date         timestamp NOT NULL,
-  calendarevent_duration     integer NOT NULL default '',
-  calendarevent_allday	     integer NOT NULL default '0',
+  calendarevent_duration     integer NOT NULL default 0,
+  calendarevent_allday	     integer NOT NULL default 0,
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatfrequence  integer default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,

@@ -177,10 +177,6 @@ if ($cgp_hide["contact"]["contact_function"]) {
 //---------------------------------------------------------------------------//
 if ($auth_kind == "CAS") {
   $auth_class_name = "CAS_Auth";
-  include_once("$obminclude/CAS/CAS.php");
-  // adjust value according to phpCAS lib you use
-  $cas_version = CAS_VERSION_2_0; 
-  phpCAS::setDebug();
 } elseif($auth_kind == "standalone") {
   $auth_class_name = "OBM_Challenge_Auth";
 } else {

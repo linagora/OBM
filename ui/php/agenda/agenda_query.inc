@@ -380,12 +380,7 @@ function run_query_insert_event_data($agenda) {
   
   if($stamp_repeat && $repeat_kind != "none") {
     $stamp_repeat = $stamp_repeat;
-  }
-  elseif($repeat_kind != "none") {
-    $stamp_repeat = strtotime("+1 year",date("Ymd"));
-    
-  } 
-  else{
+  } else{
     $stamp_repeat = "";
   } 
   
@@ -1212,7 +1207,8 @@ function run_query_repeat_events($start,$end,$contacts_array) {
 	      AND calendaruser_state = 'A'
 	      AND calendarevent_repeatkind != 'none'
 	      AND $calendarevent_date <= $end  - calendarevent_duration
-	      AND $calendarevent_endrepeat >= $start
+	      AND ($calendarevent_endrepeat >= $start
+	           OR $calendarevent_endrepeat = '0')
             ";		  
   if(is_array($contacts_array) && (count($contacts_array)>0) ) {
     $query .= " AND calendaruser_user_id IN (";
@@ -1279,6 +1275,9 @@ function events_model($start_time, $end_time,$calendar_user) {
     $duration = $obm_repeat->f("calendarevent_duration");
     $repeatkind = $obm_repeat->f("calendarevent_repeatkind");
     $endrepeat = $obm_repeat->f("calendarevent_endrepeat");
+    if(!$endrepeat) {
+      $endrepeat = $end_time;
+    }
     $repeatfrequence = $obm_repeat->f("calendarevent_repeatfrequence");
     $repeatdays = $obm_repeat->f("calendarevent_repeatdays");
     $user_id = $obm_repeat->f("calendaruser_user_id");    
@@ -1443,14 +1442,11 @@ function events_model($start_time, $end_time,$calendar_user) {
 class Event {
   
   var $id;
-  var $start;
-  var $end;
   var $duration;
   var $title;
   var $category;
   var $privacy;
   var $description;
-  var $day;
 
   function Event($id,$duration,$title,$category,$privacy,$description) {
     $this->id = $id;
@@ -1471,7 +1467,6 @@ class Day {
 
   var $day;
   var $events;
-  var $index;
 
   function Day($day) {
     $this->day = $day;

@@ -327,7 +327,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays");
-    if($repeat_kind != "none") {
+    if($repeat_end) {
       $repeat_end = date("Y-m-d",$obm_q_event->f("calendarevent_endrepeat"));
     }
     $id = $obm_q_event->f("calendarevent_id");
@@ -364,6 +364,9 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   if (isset($agenda["repeat_end"]) && $agenda["repeat_end"] != "") {
     preg_match("/^(\d{4})(\d{2})(\d{2})/", $agenda["repeat_end"], $day_array3);
     $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
+  }elseif(!isset($agenda["repeat_end"]) && $action != "detailupdate") {
+    $repeat_end = date("Y-m-d",strtotime("+1 year"));
+
   }
   if (isset($agenda["force"])) { $force = $agenda["force"]; }
   if($repeat_kind != "weekly") {

@@ -1,0 +1,323 @@
+% Manuel d'utilisation d'OBM : module Agenda
+% ALIACOM Mehdi Rande
+% $Id$
+
+\clearpage
+\section{Le module \agenda}
+
+\subsection{Présentation du module \agenda}
+
+Ce module permet de gérer son calendrier, ainsi que de consulter le planning des
+autres utilisateurs. \\
+
+Les principales entités du module \agenda sont décrites ci-dessous :
+
+\subsection{Description d'un évenement}
+
+Composantes d'une société :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Titre & Titre de votre évenement.\\ 
+\hline
+Privé & Visibilité de l'événement qui peut être publique ou privée. Un 
+évenementprivé n'est visible que par ses participants.\\
+\hline
+Catégorie & Catégories de l'événement.Les catégories de tâches sont gérées dans
+la section administration du module \agenda.\\
+\hline
+Utilisateurs & Liste des participants de l'événement. La valeur entre
+paranthèses (A,W ou R) représente l'etat du rendez-vous: A pour accepter, W 
+pour
+en attente de réponse, R pour refuser.\\
+\hline
+Date de début & Date et heure de début de l'événement. Dans le cas d'un
+événement répétitif, il s'agit de la date de début de la première occurence de
+l'événement.\\
+\hline
+Date de fin & Date et heure de fin de l'événement. Dans le cas d'un
+événement répétitif, il s'agit de la date de fin de la première occurence de
+l'événement.\\
+\hline
+Priorité & Décrit le niveau d'importance d'un événement (Basse, Normale,
+Haute).\\
+\hline
+Type de répétition & Voir la description des types de répétition.\\
+\hline
+Date de fin de répétition & Dans le cas d'un événement répétitif, date jusqu'a
+laquelle l'événement se répétera.\\
+\hline
+Jours de répétition  & Voir la description des types de répétition : type
+hebdomadaire.\\
+\hline
+Description & Description de l'événement.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+
+\subsubsection{Type de répétition}
+
+Un événement peut être répétitif, c'est à dire qu'il va se répéter suivant un
+fréquence définit lors de sa création. 
+ Les differentes valeurs sont :
+\begin{description}
+\item[---] Pour indiquer l'absence de répétition.
+\item[quotidienne] Pour indiquer une répétion qui aurait lieu toute les 
+jours.
+\item[hebdomadaire] Pour indiquer une répétion qui aurait lieu toute les 
+semaines. Le champs Jours de répétition détermine les jours de la semaine
+auxquels aura lieu l'évenement. Par exemple les Lundi et Mardi de chaque 
+semaine.
+\item[mensuelle(date)] Pour une répétition qui aurait lieu tout les mois a une 
+date donnée (le 4 de chaque mois par exemple).
+\item[mensuelle(jour)] Pour une répétition qui aurait lieu tout les mois à un 
+jour
+donné (exemple tout les seconds lundi du mois).
+\item[annuelle] Pour une répétition qui aura lieu tout les ans à la même date.
+\end{description}
+
+\subsubsection{Les liens d'un événement}
+
+Actuellement le module \agenda est uniquement lié aux utilisateurs.
+Cependant ce module est prévut pour pouvoir se lier à d'autres modules.
+
+\subsection{Les sous-menus du module \agenda}
+
+Le module \agenda comporte 12 sous-menus (accessibles selon les droits d'accès)
+:\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Nouveau rdv & Créer un nouvel événement \\
+\hline
+Consulter & Consulter les informations d'un évenement.\\
+\hline
+Modifier & Modifier les informations d'un évenement.\\
+\hline
+Supprimer & Permet de supprimer un événement (uniquement pour les 
+administrateurs).\\
+\hline
+Année & Affichage de la vue annuelle de l'agenda.\\
+\hline
+Mois & Affichage de la vue mensuelle de l'agenda.\\
+\hline
+Semaine & Affichage de la vue hebdomadaire de l'agenda.\\
+\hline
+Jour & Affichage de la vue quotidienne de l'agenda.\\
+\hline
+Nouvelle réunion & Plannifier une nouvelle réunion.\\
+\hline
+Gestion des droits & Gérer les permissions de son agenda.\\
+\hline
+Administrer & Administration des informations annexes (catégories).\\
+\hline
+Exporter & Exporter l'agenda au format iCalendar.\\
+\hline       	
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Nouveau rdv}
+
+Ce menu permet de créer un évenement.
+
+Pour insérer l'événement saisie, il faut cliquer sur le bouton ``Enregistrer la
+société''.\\
+
+A noter :
+\begin{description}
+\item[Conflits] : L'agenda ne previent plus lorsque l'événement insérer entre
+en conflit avec un autre événement.
+\item[Forcer la notification par mail] : Si cette case est cochée tout les
+utilisateurs participants à l'événements recevront une notification par mail, y
+compris ceux qui par ont spécifié dans leurs préférences de ne pas en recevoir.
+\item[Groupes] : Selectionner un (ou plusieurs) dans cette liste aura pour
+effet de rajouter les membres de ce(s) groupe(s) aux participants de
+l'évenement.
+\end{description}
+
+\subsubsection{Le sous-menu : Consulter}
+
+Cette fonctionnalité permet de consulter les details d'un événement. Si vous
+participez à cet événement vous pouvez également modifiez votre participation
+depuis cet ecran grâce au trois boutons radio en bas de la page.
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations de l'événement dans un
+formulaire.
+Toutes les informations sont modifiables.\\
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton 
+``valider les modifications''.
+
+\subsubsection{Le sous-menu : Supprimer}
+
+Permet de supprimer un événement. Cette fonctionnalité est uniquement
+disponible pour l'administrateur.\\
+A noter : Lors de la confirmation de la suppression de l'événement, la
+fonctionnalité Confirmer+forcer l'envoi de mail permet de notifier par mail
+tout les participants, y compris ceux qui par ont spécifié dans leurs 
+préférences de ne pas en recevoir.
+
+\subsubsection{Le sous-menu : Année}
+
+Cette fonctionnalité permet d'avoir une vue annuelle de votre agenda.
+Les jours qui contiennent un carré de couleur sont les jours où vous avez un où
+plusieurs évenements programmés.\\
+En cliquant sur l'intitulé d'un mois vous passerez automatiquement
+dans la vue mensuelle de ce mois.\\
+En cliquant sur la case représentant un jour vous passerez automatiquement
+dans la vue quotidienne de ce jour.
+
+\subsubsection{Le sous-menu : Mois}
+
+Cette fonctionnalité permet d'avoir une vue mensuelle de votre agenda.
+Pour chaque événement est indiqué l'heure de début et l'heure de fin.
+Lorsque la souris survol un événement des informations supplémentaires 
+sont indiquées (Type de rendez-vous, Titre...).\\
+Les numéros sur la colonne de gauche represente le numéros de la semaine
+qui se trouve sur la ligne. \\
+En cliquant sur ce numéros vous passerez automatiquement dans la vue 
+hebdomadaire de cette semaine.\\
+En cliquant sur la date d'une case représentant un jour vous passerez
+automatiquement dans la vue quotidienne de ce jour.\\
+En cliquant sur le + d'une case représentant un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de début et de fin 
+pré-remplit pour ce jour.
+
+\subsubsection{Le sous-menu : Semaine}
+
+Cette fonctionnalité permet d'avoir une vue hebdomadaire de votre agenda.
+Pour chaque événement est indiqué le titre de l'événement.\\
+Lorsque la souris survol un événement des informations supplémentaires 
+sont indiquées (Type de rendez-vous, Titre, Heure...).\\
+Le numéros en haut à gauche de la vue représente le numéros de la semaine en
+cours.
+Si deux événements se superposent, ils seront fusionnés dans la vue
+hebdomadaire.\\
+En cliquant sur l'intitulé d'un jour vous passerez automatiquement dans la vue
+quotidienne de ce jour.\\
+En cliquant sur le + à coté de l'intitulé d'un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de début et de fin 
+pré-remplit pour ce jour.
+
+\subsubsection{Le sous-menu : Jour}
+
+Cette fonctionnalité permet d'avoir une vue quotidienne de votre agenda.
+Pour chaque événement est indiqué le titre de l'événement ainsi que sont
+heure de début et de fin..\\
+Lorsque la souris survol un événement des informations supplémentaires 
+sont indiquées (Type de rendez-vous, Titre, Heure...).\\
+Le numéros en haut à gauche de la vue représente le numéros de la semaine en
+cours.
+Si deux événements se superposent, ils seront fusionnés dans la vue
+hebdomadaire.\\
+En cliquant sur le numéros de la semaine en cours passerez automatiquement dans
+la vue hebdomadaire de cette semaine.\\
+En cliquant sur le + en dessous de l'intitulé d'un jour vous accederez au 
+formulaire de prise de rendez vous avec la date de début et de fin 
+pré-remplit pour ce jour.
+
+\subsubsection{Le sous-menu : Nouvelle réunion}
+
+Cet outil est idéal pour plannifier des réunions entre plusieurs utilisateurs
+d'\obm. Lorsque vous cliquez sur cet élémenet du menu, vous accedez à un
+formulaire vous proposant de choisir les participants de la réunion parmis les
+utilisateurs d'\obm, ainsi que la durée et la date approximative à laquelle vous
+voulez poser la réunion.\\
+Une fois validé le formulaire vous renverra vers une vue hebdomadaire de la date
+choisie. Les différentes cases de la vue sont alors représentées de trois
+couleurs différentes dont la légende se trouve sur la gauche de l'ecran:
+\begin{description}
+\item[Libre] Indique que si vous décidez de débuter votre réunion sur une case
+de cette couleur, alors vous etes assuré que tout les participants pourront
+assister jusqu'à la fin.
+\item[Libre mais restreint] Indique que si vous décidez de débuter votre
+réunion sur une case de cette couleur, alors un ou plusieurs particiapants ne
+pourront pas assister à la réunion jusqu'au bout
+\item[Non disponible] Indique que un ou plusieurs particiapants ont un
+rendez-vous à cette heure là.
+\end{description}
+
+\subsubsection{Le sous-menu : Gestion des droits}
+
+Ce formulaire vous permettra de gérer les droits de votre agenda.
+\begin{description}
+\item[Gestion des permissions de lecture de votre agenda] Cette liste présente
+les personnes ayant le droit de consulter votre agenda. Cependant ils ne
+pourront pas voir le détail de vos rendez-vous de type privé.
+\item[Gestion des permissions d'écriture sur votre agenda] Cette liste présente
+les personnes ayant le droit de gérer votre agenda. Une personne ayant les
+droits d'ecriture sur votre agenda pour accepter ou refuser des rendez-vous pour
+vous, et définir qui à le droit de lecture de votre agenda, de plus les
+rendez-vous pris par une personne qui à les droits d'ecriture sur votre agenda
+seront automatiquement acceptés.
+\end{description}
+
+A noter que tout le monde à le droit de vous proposer un rendez-vous, cette
+fonctionnalité ne nécessite aucun droit, libre à vous par la suite d'accepter ou
+refuser les rendez-vous que l'on vous propose.
+\\
+Pour gérer les droits de l'agenda d'une autre personne (disponible uniquement si
+vous avez les autorisations nécessaires), il vous suffit de selectionner la
+personne dont vous voulez gérer les droits dans le portlet \textbf{Gérer les droits
+de} et de sélectionner la personne en question.
+
+\subsubsection{Le sous-menu : Administrer}
+
+Ce menu permet l'administration des informations annexes des rendez-vous.\\
+
+\subsection{La planningBar de l'\agenda}
+
+La planningBar est une serie de portlet qui se place sur la gauche de \obm
+lorsque vous etes dans le module \agenda. \\
+La planningBar est constituée de quatre portlets dont voici la description.
+
+\subsubsection{Le portlet : Utilisateurs}
+
+Le premier portlet \textbf{Utilisateurs} indique la liste des utilisateurs dont
+vous consulté actuellement l'agenda.\\
+Pour chaque utilisateur sont indiqués le nom, le prénom ainsi qu'une couleur.\\
+Tout les événéments de l'utilisateur seront indiqués sur l'agenda de la couleur
+qui lui correspond.
+
+\subsubsection{Le portlet : Utilisateurs}
+
+Le second portlet \textbf{Utilisateurs} permet de sélectionner les utilisateurs
+dont vous voulez voir l'agenda. La liste ne contient que les personnes dont vous
+pouvez consulter l'agenda. De plus pour des raisons de lisibilité vous ne pouvez
+consulter au maximum que l'agenda de six personnes simultanément.\\
+Lorsque vous consulter l'agenda de personne autre que vous même un lien
+\textbf{Revenir à votre vue} vous permet de revenir à la consultation de votre
+agenda.
+
+\subsubsection{Le portlet : Mois en cours}
+
+Ce portlet présente une vue simplifié du mois en cours, il vous propose de plus
+un lien vous permetant d'accéder rapidement à n'importe quel jour du mois . La
+date du jour est surlignée.
+
+\subsubsection{Le portlet : Aller à}
+
+Ce portlet vous permet d'accéder rapidement à :
+\begin{itemize}
+\item[N'importe quelle année dans un intervalle de plus ou moins trois ans par
+rapport à l'année en cours.]
+\item[N'importe quel mois de l'année en cours]
+\item[N'importe quelle semaine de l'année en cours]
+\end{itemize}
+
+
+
+
+
+\begin{itemize}
+\item Catégories
+\end{itemize}
+
+

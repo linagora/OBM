@@ -34,7 +34,9 @@ if (! check_privacy($module, "Document", $action, $document["id"], $uid)) {
   update_last_visit("document", $document["id"], $action);
 }
 page_close();
-
+if(isset($document_path)) {
+  $document_path = realpath($document_path);
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////

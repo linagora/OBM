@@ -6,7 +6,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
 ///////////////////////////////////////////////////////////////////////////////
 // Document search query execution                                           //
 // Parametes:
@@ -328,7 +327,7 @@ function format_path($p_path) {
 // Parameters:
 //   - $p_path : path parameter
 ///////////////////////////////////////////////////////////////////////////////
-function get_final_path($p_path) {
+function get_final_path($path) {
   global $document_path;
   // Ensure a / separate the document_path from the path
   if (strpos($path,'/') === 0) {
@@ -349,13 +348,12 @@ function get_final_path($p_path) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_create_file($document) {
   global $document_path;
-
   $path = $document["path"];
   $name = $document["name"];
   $file = $document["file"];
   $path = format_path($path);
   $final_path = get_final_path($path);
-
+  
   // Ensure that the final path is a directory
   if (! is_dir($final_path)) {
     return false;

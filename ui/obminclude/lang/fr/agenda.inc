@@ -32,7 +32,7 @@ $l_repeatkind = "Type de répétition";
 $l_repeatdays = "Jours de répétition (type hebdomadaire)";
 $l_repeatdays2 = "Jours de répétition";
 $l_user_right = "Gérer les droits de";
-$l_use_endrepeat = "Date de fin de répétition";
+$l_use_endrepeat = "Fin de répétition (blanc si infinie)";
 $l_carac = "Propriétés";
 $l_force = "Forcer l'insertion de l'événement";
 

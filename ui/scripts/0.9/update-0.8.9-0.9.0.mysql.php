@@ -119,6 +119,7 @@ include("$obminclude/global.inc");
         
     $query = "SELECT calendarsegment_customerid, calendarsegment_state 
               FROM CalendarSegment WHERE calendarsegment_eventid = '$id' AND calendarsegment_flag = 'begin'
+             AND calendarsegment_type = 'user'	     
               GROUP BY calendarsegment_customerid, calendarsegment_state";
 	      
     display_debug_msg($query, $cdg_sql);
@@ -145,7 +146,7 @@ include("$obminclude/global.inc");
 						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
         display_debug_msg($query, $cdg_sql);
         $obm_ins_db->query($query);
-	$rec_state = "";
+	$rec_state = "$state";
       }
       $old_u = $user_id ;
     }
@@ -162,7 +163,10 @@ include("$obminclude/global.inc");
   $query = "DROP TABLE CalendarEvent";
   $obm_db->query($query);
   display_debug_msg($query, $cdg_sql);
-
+  $query = "DROP TABLE CalendarSegment";
+  $obm_db->query($query);
+  display_debug_msg($query, $cdg_sql);
+    
   $query = "
   CREATE TABLE CalendarEvent (
   calendarevent_id int(8)    NOT NULL auto_increment,

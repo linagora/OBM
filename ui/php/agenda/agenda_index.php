@@ -23,7 +23,6 @@
 // - rights_admin    -- access rights screen
 // - rights_update   -- Update agenda access rights
 ///////////////////////////////////////////////////////////////////////////////
-$time = (time() + microtime());
 $www = "   <p class=\"messageInfo\">
     	<a href=\"http://validator.w3.org/check/referer\"><img
         src=\"http://www.w3.org/Icons/valid-xhtml10\"
@@ -394,8 +393,6 @@ $display["header"] = generate_menu($module,$section);
 $display["end"] = display_end();
 
 display_page($display);
-$time = (time() + microtime()) - $time;
-echo $time;
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set

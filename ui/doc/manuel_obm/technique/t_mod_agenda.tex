@@ -1,0 +1,292 @@
+% Documentation technique d'OBM : module Agenda
+% ALIACOM Mehdi Rande
+% $Id$
+
+
+
+
+\clearpage
+
+\section{\agenda}
+
+Le \agenda \obm  est un agenda partagé permettant d'inserer, modifier, 
+consulter ou supprimer des évenements pour un ou plusieurs utilisateurs 
+simultanés.
+
+\subsection{Organisation de la base de données}
+
+Le \calendar utilise quatre tables :
+\begin{itemize}
+ \item CalendarCategory
+ \item CalendarEvent
+ \item CalendarUser
+ \item CalendarRight
+\end{itemize}
+
+\subsubsection{CalendarCategory}
+Cette table est utilisée pour sotcker les catégories des événements.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant & Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & \\
+\hline
+\_usercreate & int 8 & Id du créateur & \\
+\hline
+\_label & varchar 128 &  Label de la catégorie & \\
+\hline
+\end{tabular}
+
+\subsubsection{CalendarEvent}
+Cette table stocke toute la description d'un évenement ainsi que ces caractéristiques.
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_id & int 8 & Identifiant &  Clé primaire \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur &  Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
+\hline
+\_owner & int 8 & Id du propriétaire & Clé etrangère\\
+\hline
+\_title & varchar 255 & Titre  & \\
+\hline
+\_description & text & Description & \\
+\hline
+\_category\_id & int 8 & Id de la catégorie & Clé etrangère\\
+\hline
+\_priority & int 2 & Priorité : <1> Basse <2> Normal <3> Haute & \\
+\hline 
+\_privacy & int 2 & Privé : <0> Non <1> Oui & \\
+\hline
+\_date & timestamp & Date de début de la première occurence de l'événement & \\
+\hline
+\_duration & int 8 & Durée de l'événement en secondes & \\
+\hline
+\_allday & int 1 & Evénement sur toute la journée <0> Non <1> Oui & \\
+\hline
+\_repeatkind & varchar 20 & Type de répétition & \\
+\hline
+\_repeatfrequence & int 3 & Fréquence de répétition & \\
+\hline
+\_repeatdays & varchar 7 & Jours de répétion pour les répétition de type
+hebdomadaire & \\
+\hline
+\_endrepeat & timestamp & Date de fin de répétition & \\
+\hline
+\end{tabular}
+
+\subsubsection{CalendarUser}
+
+Cette table stocke toutes les relations entre les utilisateurs et les
+événements
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_timeupdate & timestamp 14 & Date de mise à jour & \\
+\hline
+\_timecreate & timestamp 14 & Date de création & \\
+\hline
+\_userupdate & int 8 & Id du modificateur & Clé etrangère\\
+\hline
+\_usercreate & int 8 & Id du créateur & Clé etrangère\\
+\hline
+\_user\_id & int 8 & Id de l'utilisateur & Clé etrangère - Clé primaire \\
+\hline
+\_event\_id & int 8 & Id de l'événement & Clé etrangère - Clé primaire \\
+\hline
+\_state & char 1 & Etat de l'événément : <R> Refusé, <W> En attente, et <A> 
+Accepté  & \\
+\hline 
+\_required & int 1 & Détermine si l'utilisateur est nécessaire pour l'événement
+: <0> Non <1> Oui & \\
+\hline
+\end{tabular}
+
+\subsubsection{CalendarRight}
+
+\begin{tabular}{|p{3cm}|c|p{5.4cm}|p{2.6cm}|}
+\hline
+\textbf{Champs} & \textbf{Type} & \textbf{Description} & \textbf{Commentaire} \\
+\hline
+\_ownerid & int 8 & Id du propriétaire de l'agenda & Clé etrangère - Clé primaire\\
+\hline
+\_customerid & int 8 & Id de l'utilisateur concerné par ces droits & Clé etrangère - Clé primaire\\
+\hline
+\_write & int 1 & Droit d'ecriture <0> Non <1> Oui & \\
+\hline 
+\_read & int 1 & Droit de lecture <0> Non <1> Oui  & \\
+\hline
+\end{tabular}
+
+
+\subsection{Actions et droits}
+
+Voici la liste des actions du module \agenda, avec le droit d'accès requis 
+ainsi qu'une description sommaire de chacune d'entre elles.\\
+
+\begin{tabular}{|l|c|p{9.5cm}|}
+ \hline
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
+ \hline
+  index & read & Accueil \\ 
+ \hline
+  decision & write & Définit l'état d'une liste d'événements \\
+ \hline
+  view\_year & read & Vue annuelle \\
+ \hline
+  view\_month & read & Vue mensuelle \\
+ \hline
+  view\_week & read & Vue hebdomadaire \\
+ \hline
+  view\_day & read & Vue quotidienne \\
+ \hline
+  new & write & Formulaire de nouvel événement \\
+ \hline
+  insert & write & Insertion de l'événement \\
+ \hline
+  detail\_consult & read & Consultation d'un événement \\
+ \hline
+  check\_delete & admin & Confirmation de suppression d'événement \\
+ \hline
+  delete & write & Suppression d'un événement \\
+ \hline
+  detailupdate & write & Formulaire de mise à jour d'un événement \\
+ \hline
+  update & write & Mise à jour d'un événement \\
+ \hline
+  update\_decision & write & Mise à jour de l'état d'un événements \\
+ \hline
+  rights\_admin & write & Formulaire de mise à jour des droits \\
+ \hline
+  rights\_update &  write & Mise à jour des droits \\
+ \hline
+  new\_meeting & write & Formulaire de nouvelle réunion \\
+ \hline
+  perform\_meeting & write & Vue réunion \\
+ \hline
+\end{tabular}
+
+\subsubsection{Remarques}
+  Par défaut l'action \textbf{index} affiche la vue mensuelle de la semaine
+  courante. Cependant si l'utilisateur courant ou bien un utilisateur qui lui à 
+  céder les droits d'ecriture sur son agenda à des événements en attente cette
+  action affichera la liste des événements en attente.
+
+\subsection{Fonctionnement}
+ Dans cette partie seront abordées le fonctionnement général du module \agenda.
+ Seul le point de vue technique sera ici abordé et non utilisateur. Il va donc 
+ plus etre sujet du fonctionnement que de l'utilité et de l'utilisation du module.
+ De plus seules les parties complexes de l'agenda seront abordés à savoir
+ principalement la construction d'une vue de l'agenda.
+ 
+\subsubsection{Principe de fonctionnement}
+ Les etapes de construction de la vue sont :
+ \begin{itemize}
+  \item{Récupération des informations en base de données}
+  \item{Traitement des données et construction du modèle}
+  \item{Traitement du modèle et construction de la vue}
+  \item{Affichage de la vue}
+ \end{itemize}
+
+\subsubsection{Structure du modèle}
+ Le modèle de donnée est un des rare éléments à utiliser objets au sein d'un
+ module. Ceci vient du fait que l'approche objet est particulierement adapté aux
+ traitement à effectuer.
+
+ Voici les différents éléments de ce modèle :
+\paragraph{L'objet Event}
+ L'objet Event représente un événement au sens abstrait.
+ C'est à dire que quelque soit le nombre d'occurence d'un événement (dans le cas
+ d'un événement répétitif) il n'y aura qu'un seul objet Event.
+
+ \begin{tabular}{|l|p{9.5cm}|}
+  \hline
+   \textbf{Attribut} & \textbf{Description} \\
+  \hline
+   id & Identifiant \\
+  \hline
+   duration & Durée en secondes \\
+  \hline
+   title & Titre \\
+  \hline
+   category & Label de la catégorie \\
+  \hline
+   privacy & Si événement privé \\
+  \hline
+   description & Description de l'événement \\
+  \hline
+ \end{tabular}
+
+\paragraph{L'objet Day}
+ L'objet Day represente un jour. Il stockera toutes les informations relatives à
+ ce jour : date, événements, ... 
+ \\
+ \begin{tabular}{|l|p{9.5cm}|}
+  \hline
+   \textbf{Attribut} & \textbf{Description} \\
+  \hline
+   day & Date du jour \\
+  \hline
+   events & Tableau d'objet Events lié avec des id utilisateurs et une heure de
+   début \\
+  \hline
+   title & Titre \\
+  \hline
+ \end{tabular}
+ \\
+ \\
+ \\
+ \begin{tabular}{|l|c|p{9.5cm}|}
+  \hline
+   \textbf{Fonction} & \textbf{Paramètres} & \textbf{Description} \\
+  \hline
+   is\_same\_day & date & Return true si la date passée en parametre est la meme
+   que celle de l'objet\\
+  \hline
+   add\_even & event - begin\_date - uid & Ajoute un événement au tableau
+   \textbf{events}, le lie avec l'heure de début et l'uid passé en paramètre. Si
+   l'événement été déjà stocké, l'événement est juste lié à l'uid.\\
+  \hline
+   get\_events & uid & Retourne tout les événement du tableau \textbf{events} 
+   de l'utilisateurs dont l'uid est passé en paramètre.\\
+  \hline
+  \hline
+   have\_events\_between & start - end & Retourne tout les événement du tableau \textbf{events} 
+   qui se débute entre l'heure \textbf{start} et l'heure \textbf{end} \\
+  \hline
+   get\_events\_between & start - end - uid & Retourne tout les événement du tableau \textbf{events} 
+   qui se débute entre l'heure \textbf{start} et l'heure \textbf{end} pour
+   l'utilisateur \textbf{uid} \\
+  \hline
+ \end{tabular}
+  \textbf{Remarques :} \\
+  Les fonctions \textbf{have\_events\_between} et \textbf{get\_events\_between}
+  retourn \textbf{NULL} si aucun événements ne débute durant l'interval de
+  temps et que aucun événements ne se déroule durant l'interval de
+  temps, \textbf{-1} si aucun événements ne débute durant l'interval de
+  temps mais que des événements sont déjà en cours.
+  
+ \subsubsection{Affichage de la vue}
+   La fonction qui doit construire est afficher la vue reçoit donc un tableau
+   d'objets \textbf{Day} qui correspondent aux jours à afficher.
+   Pour construire la vue, la fonction interroge juste les objets \textbf{Day}
+   du tableau pour savoir si un jour donné contient des informations à afficher,
+   et si oui quelles sont ces information.
+

@@ -40,6 +40,8 @@ ALTER TABLE UserObm ADD COLUMN userobm_fax varchar(32);
 ALTER TABLE UserObm ADD COLUMN userobm_fax2 varchar(32);
 ALTER TABLE UserObm ADD COLUMN userobm_description varchar(255);
 
+-- Add column _calendar_version
+ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp;
 
 -------------------------------------------------------------------------------
 -- Update Contract tables
