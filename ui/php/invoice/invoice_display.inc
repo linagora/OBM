@@ -120,11 +120,11 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   $sel_status = "<select name=\"sel_status\">
      <option value=\"_TOUT_\">$l_all_f</option>";
   while ($q_status->next_record()) {
-    $id = $q_status->f("invoicestatus_id");
-    $label = $q_status->f("invoicestatus_label");
-    $sel_status .= "<option value=\"$id\"";
-    if ($status == $id) $sel_status .= " selected = \"selected\"";
-    $sel_status .= ">$label</option>";
+    $s_id = $q_status->f("invoicestatus_id");
+    $s_label = $q_status->f("invoicestatus_label");
+    $sel_status .= "<option value=\"$s_id\"";
+    if ($status == $s_id) $sel_status .= " selected = \"selected\"";
+    $sel_status .= ">$s_label</option>";
   }
   $sel_status .= "</select>";
 
@@ -608,7 +608,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   // deals data 
   if ($q_deal->nf() == 0) {
     // no deals :
-    $display["msg"] .= display_ok_msg ($l_no_deal);
+    $block .= display_info_msg ($l_no_deal);
     // form to add some :
     $block .= "
 <table cellspacing=\"0\" border=\"0\">
@@ -619,7 +619,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
  </td></tr>
 </table>";
   } else {
-    $display["msg"] .= display_ok_msg(($action == ("del_deal")? $l_deals_todel : $l_list_deal));
+    $block .= display_info_msg(($action == ("del_deal")? $l_deals_todel : $l_list_deal));
 
     if ($action == "del_deal") {
       $url = url_prepare("invoice_index.php?action=del_deal&amp;param_invoice=".$q_invoice->f('invoice_id'));
@@ -653,7 +653,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
       } else {
 	// we display the button to add some deals or remove some...
 	$block .= "
-<br>
+<p>
 <table cellspacing=\"$cellspacing\" border=\"$border\">
  <tr><td valign=\"top\">
   <form method=\"post\" action=\"\">
@@ -671,9 +671,9 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   //  payments data :
   if ($q_payment->nf() == 0) {
     // no payment
-    $display["msg"] .= display_ok_msg ($l_no_payment);
+    $block .= display_info_msg ($l_no_payment);
   } else {
-    $display["msg"] .= display_ok_msg ($l_list_payment);
+    $block .= display_info_msg ($l_list_payment);
 
     $url = url_prepare("invoice_index.php?action=detailconsult".
 		      "&amp;param_invoice=".$q_invoice->f("invoice_id"));

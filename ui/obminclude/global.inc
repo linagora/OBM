@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.7.0pre3";
+$obm_version = "0.7.0pre4";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -22,11 +22,10 @@ $last_payment_default = 0;
 $last_contract_default = 0;
 $last_incident_default = 0;
 
-
 // Document constants 
 $link_to = "Link : "; // Name of the prefix of a link document
 $default_mime = "text/html"; //Default Mime Type
-$default_path = "/X-Files"; //Default repository
+$default_path = "/Default"; //Default repository
 
 // Agenda constants
 $set_weekstart_default = "monday"; //First day of the week, in english

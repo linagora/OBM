@@ -240,7 +240,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Document Form                                                      //
+// Display Document Form                                                     //
 // Parameters:
 //   - $action    : action called
 //   - $doc_q      : document database result 
@@ -248,7 +248,7 @@ function html_document_search_list($doc_q, $pref_q, $nb_document,$document) {
 //   - $document[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
-//////////////////////////////popup/////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document) {
   global $display;
   global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
@@ -266,7 +266,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
-    if(islink($doc_q->f("document_name"))) {
+    if (islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
       $proto = substr($doc_q->f("document_name"),0,strrpos($doc_q->f("document_name"),'/')+1);
@@ -274,12 +274,12 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
       if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
       }
-    }
-    else {
+    } else {
       $kind = "file";
       $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
     }
   }
+  echo "proto=$proto";
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
   if (isset($document["title"])) { $title = stripslashes($document["title"]); }
@@ -1271,6 +1271,7 @@ function html_documents_tree($document,$display_file) {
 function dis_repository_rec($document,$repository,$display_file) {
   global $document_path;
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+
   $root_handler = opendir($repository);
   $relative_path = substr($repository,strlen($document_path)); 
   $popup = $document["popup"];
