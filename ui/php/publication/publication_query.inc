@@ -21,9 +21,9 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
 
   $archive = $publication["archive"];
   $title = sql_search_text_parse($publication["title"]);
-  $lang = sql_search_text_parse$publication["lang"]);
+  $lang = sql_search_text_parse($publication["lang"]);
   $type = $publication["type"];
-  $year = sql_search_text_parse$publication["year"]);
+  $year = sql_search_text_parse($publication["year"]);
   $market = $publication[""];
   $zip = $publication["zip"];
 

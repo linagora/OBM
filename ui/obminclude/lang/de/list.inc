@@ -26,7 +26,6 @@ $l_no_list = "Keine Mailliste gefunden" ;
 $l_no_contact_found = "Kein Kontakt gefunden" ;
 $l_list_found = "Maillisten gefunden";
 
-$l_nb_contact = "Kontakt-Nummer" ;
 $l_date_creation = "Erstellungsdatum" ;
 $l_creator = "Ersteller" ;
 $l_add_contact = "Kontakt einfügen" ;

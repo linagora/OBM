@@ -18,7 +18,6 @@ $l_date_last_update = "Ultima Modifica";
 $l_static = "Static";
 
 // Labels and texts
-$l_nb_contact = "N° di contatti";
 $l_list_contact = "con contatto : ";
 $l_list_display = "Opzioni visualizzazione dell'elenco liste";
 $l_contact_display = "Opzioni visualizzazione dell'elenco contatti";

@@ -18,7 +18,6 @@ $l_date_last_update = "Mise à jour" ;
 $l_static = "Statique";
 
 // Labels et textes
-$l_nb_contact = "# Contacts";
 $l_list_contact = "Ayant comme contact";
 $l_list_display = "Options d'affichage des listes de listes";
 $l_contact_display = "Options d'affichage des listes de contacts";

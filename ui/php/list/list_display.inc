@@ -455,7 +455,7 @@ function dis_list_consult($list) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display List Consultation                                            //
+// HTML Display List Consultation
 // Parameters:
 //   - $list_q     : list database result 
 //   - $pref_con_q : contact display preferences database result 
@@ -465,8 +465,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query, $l_static;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
   global $display, $perm, $menu, $cright_write, $ctu_sql_limit, $cdg_sql;
-  global $l_nb_contact, $l_no_static_contact, $l_static_con_found;
-  global $l_no_dyn_contact, $l_dyn_con_found, $l_invalid_query;
+  global $l_contact, $l_no_static_contact, $l_static_con_found;
+  global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added,$l_mailing, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
@@ -538,10 +538,10 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       <td class=\"detailText\">$email</td>
     </tr>
     <tr>
-      <td class=\"detailLabel\">$l_nb_contact : $l_static / $l_query</td>
+      <td class=\"detailLabel\"># $l_contact : $l_static / $l_query</td>
       <td class=\"detailText\">$static_nb / $query_nb</td>
     </tr>
-      <td class=\"detailLabel\">$l_nb_company : $l_static / $l_query</td>
+      <td class=\"detailLabel\"># $l_company : $l_static / $l_query</td>
       <td class=\"detailText\">$comp_static_nb / $comp_query_nb</td>
     </tr>
     $dis_query
