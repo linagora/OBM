@@ -27,10 +27,14 @@ DROP TABLE RepeatKind;
 -- Update User and Group tables
 -------------------------------------------------------------------------------
 -- Add column _local
-ALTER TABLE UserObm ADD COLUMN userobm_local integer DEFAULT 1;
-ALTER TABLE UGroup ADD COLUMN group_local integer DEFAULT 1;
+ALTER TABLE UserObm ADD COLUMN userobm_local integer;
+ALTER TABLE UserObm ALTER COLUMN userobm_local SET DEFAULT 1;
+ALTER TABLE UGroup ADD COLUMN group_local integer;
+ALTER TABLE UGroup ALTER COLUMN group_local SET DEFAULT 1;
 ALTER TABLE UGroup ADD COLUMN group_privacy integer;
 ALTER TABLE UGroup ALTER COLUMN group_privacy SET DEFAULT 0;
+UPDATE UGroup SET group_privacy=0;
+ALTER TABLE UGroup DROP CONSTRAINT ugroup_group_name_key;
 
 -- Add column _ext_id
 ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16);
@@ -50,17 +54,25 @@ ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp;
 -------------------------------------------------------------------------------
 -- Update Contract table
 
-ALTER TABLE Contract ADD COLUMN contract_datesignature date DEFAULT NULL; 
-ALTER TABLE Contract ADD COLUMN contract_daterenew date DEFAULT NULL;
-ALTER TABLE Contract ADD COLUMN contract_datecancel date DEFAULT NULL;
-ALTER TABLE Contract ADD COLUMN contract_priority_id integer DEFAULT 0 NOT NULL;
-ALTER TABLE Contract ADD COLUMN contract_status_id integer DEFAULT 0 NOT NULL;
-ALTER TABLE Contract ADD COLUMN contract_kind integer DEFAULT 0 NULL;
-ALTER TABLE Contract ADD COLUMN contract_format integer DEFAULT 0 NULL;
-ALTER TABLE Contract ADD COLUMN contract_ticketnumber integer DEFAULT 0 NULL;
-ALTER TABLE Contract ADD COLUMN contract_duration float DEFAULT 0 NULL;
-ALTER TABLE Contract ADD COLUMN contract_autorenewal integer DEFAULT 0 NULL;
-ALTER TABLE Contract ADD COLUMN contract_privacy integer DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_datesignature date;
+ALTER TABLE Contract ADD COLUMN contract_daterenew date;
+ALTER TABLE Contract ADD COLUMN contract_datecancel date;
+ALTER TABLE Contract ADD COLUMN contract_priority_id integer NOT NULL;
+ALTER TABLE Contract ALTER COLUMN contract_priority_id SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_status_id integer NOT NULL;
+ALTER TABLE Contract ALTER COLUMN contract_status_id SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_kind integer;
+ALTER TABLE Contract ALTER COLUMN contract_kind SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_format integer;
+ALTER TABLE Contract ALTER COLUMN contract_format SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_ticketnumber integer;
+ALTER TABLE Contract ALTER COLUMN contract_ticketnumber SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_duration float;
+ALTER TABLE Contract ALTER COLUMN contract_duration SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_autorenewal integer;
+ALTER TABLE Contract ALTER COLUMN contract_autorenewal SET DEFAULT 0;
+ALTER TABLE Contract ADD COLUMN contract_privacy integer;
+ALTER TABLE Contract ALTER COLUMN contract_privacy SET DEFAULT 0;
 
 
 --
@@ -111,7 +123,7 @@ INSERT INTO ContractStatus (contractstatus_order, contractstatus_label) VALUES (
 -- Update Incident tables
 -------------------------------------------------------------------------------
 
-ALTER TABLE Incident ADD COLUMN incident_cat1_id integer DEFAULT NULL;
+ALTER TABLE Incident ADD COLUMN incident_cat1_id integer;
 
 ALTER TABLE Incident ADD COLUMN incident_comment text;
 ALTER TABLE Incident ALTER COLUMN incident_comment SET DEFAULT NULL;

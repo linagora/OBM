@@ -1269,8 +1269,7 @@ CREATE TABLE UGroup (
   group_name        varchar(32) NOT NULL,
   group_desc        varchar(128),
   group_email       varchar(128),
-  PRIMARY KEY (group_id),
-  UNIQUE group_name (group_name)
+  PRIMARY KEY (group_id)
 );
 
 

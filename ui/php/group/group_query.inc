@@ -210,7 +210,49 @@ function run_query_insert($group) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  return $retour;
+  $g_id = run_query_group_id($group);
+
+  return $g_id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Group ID : Get the id of the group inserted
+// Parameters:
+//   - $group[] : group hash info : keys used : all
+// Returns:
+//   group Id if found else false
+///////////////////////////////////////////////////////////////////////////////
+function run_query_group_id($group) {
+  global $cdg_sql;
+
+  $system = ($group["system"] == 1) ? 1 : 0;
+  $name = $group["name"];
+  $desc = $group["desc"];
+  $email = $group["email"];
+  $priv = (isset($group["priv"]) ? $group["priv"] : '0');
+
+  $query = "SELECT group_id
+    FROM UGroup
+    WHERE
+      group_system='$system'
+      and group_name='$name'
+      and group_privacy='$priv'
+      and group_desc='$desc'
+      and group_email='$email'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $id = $obm_q->f("group_id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
 }
 
 
@@ -226,19 +268,18 @@ function run_query_update($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
-  $system = ($group["system"] == 1) ? 1 : 0;
   $priv = (isset($group["priv"]) ? $group["priv"] : '0');
   $now = date("Y-m-d H:i:s");
   
   $query = "update UGroup set
     group_timeupdate='$now',
     group_userupdate='$uid',
-    group_system='$system',
     group_privacy='$priv',
     group_name='$name',
     group_desc='$desc',
     group_email='$email'
   where group_id='$id'";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -551,8 +592,10 @@ function get_group_info($id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+  $g["usercreate"] = $obm_q->f("group_usercreate");
   $g["name"] = $obm_q->f("group_name");
   $g["system"] = $obm_q->f("group_system");
+  $g["privacy"] = $obm_q->f("group_privacy");
 
   return $g;
 }
@@ -567,15 +610,17 @@ function get_group_info($id) {
 //   - true (if a group exists) or false
 ///////////////////////////////////////////////////////////////////////////////
 function get_group_name_exists($name, $id="") {
-  global $cdg_sql;
+  global $cdg_sql, $uid;
 
   if ($id != "") {
-    $where_id = "group_id!='$id' and";
+    $where_id = "and group_id!='$id'";
   }
 
-  $query = "select group_id, group_name
-    from UGroup
-    where $where_id group_name='$name'";
+  $query = "SELECT group_id, group_name
+    FROM UGroup
+    WHERE group_name='$name'
+      and (group_privacy=0 OR group_usercreate='$uid')
+      $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -598,14 +643,14 @@ function get_group_name_exists($name, $id="") {
 //   - $desc : group desc
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_check_group($id, $name, $desc) {
-  global $cdg_sql;
+  global $cdg_sql, $uid;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
   if ($id != "") {
-    $where_id = "group_id!='$id' and";
+    $where_id = "and group_id!='$id'";
   }
 
   // If name is short, we test equality, else similarity
@@ -625,10 +670,12 @@ function run_query_check_group($id, $name, $desc) {
   }
   if ($wdesc != "") $wdesc = "or $wdesc";
 
-  $query = "select distinct group_id, group_name, group_desc
-     from UGroup
-     where $where_id
-       ($wname $wdesc)";
+  $query = "SELECT distinct group_id, group_name, group_desc
+     FROM UGroup
+     WHERE
+       (group_privacy=0 OR group_usercreate='$uid')
+       and ($wname $wdesc)
+       $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -667,12 +714,16 @@ function check_group_context($id, $group) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($group) {
   global $php_regexp_email_name, $l_fill_name, $l_group_exists, $l_email_exist;
-  global $err_msg, $l_j_check_email;
+  global $uid, $err_msg, $l_j_check_email, $l_system_no_priv, $l_only_owner_priv;
 
   $id = $group["id"];
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
+  $priv = $group["priv"];
+  $lgroup = get_group_info($id);
+  $usercreate = $lgroup["usercreate"];
+  $system = $lgroup["system"];
 
   // MANDATORY: Group name not empty
   if (trim($name) == "") {
@@ -704,12 +755,25 @@ function check_data_form($group) {
     }
   }
 
+  // A public group can only be private if user = owner
+  if ($priv && ($usercreate > 0) && ($usercreate != $uid)) {
+    $err_msg = "$l_only_owner_priv";
+    return false;
+  }
+
+  // A system group can't be private
+  if ($system && $priv) {
+    $err_msg = "$l_system_no_priv";
+    return false;
+  }
+
+
   return true;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get a group parent list                                                   //
+// Get a group parent list
 // Parameters:
 //   - $id : group id
 // Returns:

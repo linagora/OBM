@@ -213,9 +213,9 @@ INSERT INTO PaymentKind VALUES (7,'LC','Lettre de change');
 
 
 -- Add system Groups
+INSERT INTO UGroup (group_system, group_privacy, group_name, group_desc, group_email) VALUES
+(1, 0, 'Admin', 'Administration system group', 'admin');
 INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
-(1, 'Admin', 'Administration system group', 'admin');
+(1, 0, 'Commercial', 'Commercial system group', '');
 INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
-(1, 'Commercial', 'Commercial system group', '');
-INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
-(1, 'Production', 'Production system group', '');
+(1, 0, 'Production', 'Production system group', '');

@@ -397,10 +397,10 @@ function dis_group_consult($group, $uid) {
 //   - $u_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
-  global $auth; 
-  global $c_yes, $c_no, $ico_mail;
+  global $auth;
+  global $l_yes, $l_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_visibility, $l_no_user, $l_no_group_group;
-  global $l_private, $l_public;
+  global $l_visibility, $l_private, $l_public;
   global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $display, $perm, $module, $action, $cright_write;
@@ -410,8 +410,8 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   $userupdate = $group_q->f("group_userupdate");
   $timecreate = $group_q->f("timecreate");
   $timeupdate = $group_q->f("timeupdate");
-  $system = ($group_q->f("group_system") == 1 ? $c_yes : $c_no);
-  $local = ($group_q->f("group_local") == 1 ? $c_yes : $c_no);
+  $system = ($group_q->f("group_system") == 1 ? $l_yes : $l_no);
+  $local = ($group_q->f("group_local") == 1 ? $l_yes : $l_no);
   $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
@@ -425,15 +425,14 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   $display["title"] = "<div class=\"title\">$l_group : $name</div>";
 
   // Privacy
-  if ($usercreate == $auth->auth["uid"]) {
-    if ($priv == 1)
-      $l_priv = $l_private;
-    else
-      $l_priv = $l_public;
-    $l_priv = "</tr><tr>
+  if ($priv == "1") {
+    $l_priv = $l_private;
+  } else {
+    $l_priv = $l_public;
+  }
+  $dis_priv = "</tr><tr>
       <td class=\"detailLabel\">$l_visibility</td>
       <td class=\"detailText\">$l_priv</td>";
-  }
 
   $block = "
     <div class=\"detailHead\">$l_group</div>
@@ -445,6 +444,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_system</td>
       <td class=\"detailText\">$system</td>
+    $dis_priv
     </tr><tr>
       <td class=\"detailLabel\">$l_local</td>
       <td class=\"detailText\">$local</td>
@@ -458,7 +458,6 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email@</td>
     </tr>
-    $l_priv
     </table>";
 
 
@@ -594,10 +593,14 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($id) {
   global $display, $l_warn_delete, $l_delete, $l_back, $l_cant_delete_system;
+  global $uid, $l_cant_delete_public;
 
   $lgroup = get_group_info($id);
   if ($lgroup["system"] != "0") {
     $display["msg"] .= display_warn_msg($l_cant_delete_system);
+    $dis_delete = "";
+  } else if (($lgroup["privacy"] == "0") && ($lgroup["usercreate"] != "$uid")) {
+    $display["msg"] .= display_warn_msg($l_cant_delete_public);
     $dis_delete = "";
   } else {
     $nb_u = get_group_nb_user($id);

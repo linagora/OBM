@@ -30,6 +30,8 @@ DROP TABLE IF EXISTS RepeatKind;
 ALTER TABLE UserObm ADD COLUMN userobm_local int(1) DEFAULT 1 after userobm_usercreate;
 ALTER TABLE UGroup ADD COLUMN group_local int(1) DEFAULT 1 after group_usercreate;
 ALTER TABLE UGroup ADD COLUMN group_privacy int(2) NULL DEFAULT 0 after group_system;
+UPDATE UGroup SET group_privacy=0;
+ALTER TABLE UGroup DROP INDEX group_name;
 
 -- Add column _ext_id
 ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16) after userobm_local;
