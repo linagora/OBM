@@ -81,15 +81,28 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 //   - $contact[] : default form values
 //     keys used  : name, company
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact) {
+function html_contact_search_form ($contact, $usr_q) {
   global $l_contact_name, $l_phone, $l_from_company, $l_email, $l_archive;
-  global $l_find, $popup, $display;
+  global $l_market, $l_find, $popup, $display, $c_all, $l_all;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
   $company = stripslashes($contact["company"]);
   $email = stripslashes($contact["email"]);
+  $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
+
+  // Marketing manager select
+  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+  }
+  $sel_market .= "</select>";
+
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -120,6 +133,9 @@ function html_contact_search_form ($contact) {
     </div>
     <div class=\"searchLabel\">$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </div>
+    <div class=\"searchLabel\">$l_market<br />
+      $sel_market
     </div>
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
@@ -237,10 +253,10 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 function html_contact_consult($co_q) {
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
+  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_public,$l_private,$l_archive,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
-  global $c_yes, $c_no, $set_theme,  $ico_mail;
+  global $c_yes, $c_no, $set_theme, $ico_mail;
   global $display, $path, $action, $auth;
   global $perms_user, $l_perms_user;
 
@@ -250,6 +266,7 @@ function html_contact_consult($co_q) {
   $c_phone = $co_q->f("company_phone");
   $id = $co_q->f("contact_id");
   $kind = $co_q->f("kind_minilabel");
+  $market = $co_q->f("market_lname") . " " . $co_q->f("market_fname");
   $lname = $co_q->f("contact_lastname");
   $fname = $co_q->f("contact_firstname");
   $ad1 = $co_q->f("contact_address1");
@@ -272,7 +289,7 @@ function html_contact_consult($co_q) {
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
-  $display["link"] = html_deal_links($id);
+  $display["link"] = html_contact_links($id);
   if ($usercreate == $auth->auth["uid"]) {
     if ($vis == 1) 
       $l_priv = $l_private;
@@ -318,6 +335,9 @@ function html_contact_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
       <td class=\"detailText\">$func</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$market</td>
     </tr>
     </table>
 
@@ -374,20 +394,21 @@ function html_contact_consult($co_q) {
       $com
       </td>
     </tr>
-    </table>
-";
+    </table>";
+
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Deal links menu                                                  //
+// Display: Contact links menu
 // Parameters:
 //   - $deal_q : DBO : information about the deal
 //   - $inv_nb : invoices number
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_links($id) {
+function html_contact_links($id) {
   // -- Themes
   global $set_theme,$ico_document,$ico_document_new;
   // -- Labels
@@ -426,18 +447,42 @@ function html_deal_links($id) {
 // Parameters:
 //   - $action    : action called
 //   - $co_q      : contact database result 
+//   - $contact[] : default values
+//     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
+//                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_form($action, $co_q, $contact) {
+  global $display;
+
+  $dsrc_q = run_query_datasource();
+  $kind_q = run_query_kind();
+  $users = array($contact["marketing_manager"]);
+  $usr_q = run_query_userobm_active($users);
+  $ctry_q = run_query_country();
+  $block = html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Contact Form
+// Parameters:
+//   - $action    : action called
+//   - $co_q      : contact database result 
 //   - $dsrc_q    : datasource database result 
 //   - $kind_q    : contact kind database result 
+//   - $usr_q     : active userobm database result 
 //   - $ctry_q    : country database result 
 //   - $contact[] : default values
 //     keys used  : kind, lname, fname, ad1, ad2, ad3, zip, town, cdx,ctry,func
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) {
+function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $usr_q, $ctry_q, $contact) {
   global $set_dsrc, $set_theme, $ico_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
-  global $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
+  global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
   global $l_datasource, $l_archive, $l_private,$l_coord, $l_contact, $l_none;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
@@ -450,6 +495,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
     $id = $co_q->f("contact_id");
     $usercreate = $co_q->f("contact_usercreate");
     $kind = $co_q->f("contact_kind_id");
+    $mark = $co_q->f("contact_marketingmanager_id");
     $lname = $co_q->f("contact_lastname");
     $fname = $co_q->f("contact_firstname");
     $ad1 = $co_q->f("contact_address1");
@@ -473,6 +519,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
   // New form and first time
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
+    $mark = $auth->auth["uid"];
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one
@@ -481,6 +528,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
       $c_name = $co_q->f("company_name");
       $c_new_id = $c_id;
       $c_new_name = $c_name;
+      $mark = $contact["marketing_manager"];
     }
   }
 
@@ -493,6 +541,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
   if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
+  if (isset($contact["market"])) { $mark = $contact["market"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
@@ -533,6 +582,16 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
     $sel_kind .= ">". $kind_q->f("kind_minilabel") . "</option>\n";
   }
   $sel_kind .= "</select>";
+
+  // Marketing manager select
+  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+  }
+  $sel_market .= "</select>";
 
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
@@ -612,6 +671,9 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $ctry_q, $contact) 
     </tr><tr>
       <td class=\"detailLabel\">$l_function</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
+    </tr><tr>    
+      <td class=\"detailLabel\">$l_market</td> 
+      <td class=\"detailForm\">$sel_market</td>
     </tr>
     </table>
 

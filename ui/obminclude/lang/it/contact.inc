@@ -12,6 +12,7 @@ $l_company = "Azienda";
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_kind = "Tipo";
+$l_market = "Person in charge";
 $l_function = "Funzione";
 $l_hphone = "Tel. Casa";
 $l_minihphone = "(casa)";

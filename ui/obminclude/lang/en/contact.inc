@@ -12,6 +12,7 @@ $l_company = "Company";
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";
 $l_kind = "Kind";
+$l_market = "Person in charge";
 $l_function = "Function";
 $l_hphone = "Home Phone";
 $l_minihphone = "(Home)";

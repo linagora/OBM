@@ -141,7 +141,7 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
   // kind select
   $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
     <option value=\"$c_all\">$l_all</option>";
-  while($kind_q->next_record()) {
+  while ($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
     if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
@@ -276,14 +276,11 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Company links menu                                               //
 // Parameters:
-//   - $p_id     : company id
-//   - $name     : company name
-//   - $con_num  : contact number
-//   - $deal_num : deal number
+//   - $co_q : company database result 
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_links($p_id, $name, $con_num, $deal_num) {
+function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new, $ico_project;
   global $l_header_contact, $l_contact_new;
@@ -292,18 +289,24 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   global $l_header_project, $l_project_new;
   global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
 
+  $id = $co_q->f("company_id");
+  $name = $co_q->f("company_name");
+  $market = $co_q->f("company_marketingmanager_id");
+  $con_num = $co_q->f("company_contact_number");
+  $deal_num = $co_q->f("company_deal_number");
+
   $uname = urlencode($name);
-  $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$p_id&amp;tf_company=$uname");
-  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$p_id");
-  $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$p_id&amp;tf_company_name=$uname");
-  $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$p_id");
-  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$p_id&amp;entity=Company");
-  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$p_id&amp;entity=Company");
-  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$p_id&amp;ext_target=$l_company";
-  $nb_document = run_query_document_nb ($p_id,"Company");
-  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$p_id");
-  $nb_pro = run_query_linked_project_nb ($p_id,"company");
-  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$p_id&amp;tf_company_name=$uname");
+  $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
+  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market");
+  $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
+  $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
+  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
+  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Company");
+  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
+  $nb_document = run_query_document_nb ($id,"Company");
+  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
+  $nb_pro = run_query_linked_project_nb ($id,"company");
+  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
   
   $block = "<div class=\"link\"> 
   <div class=\"linkTitle\">:: $l_header_contact</div>
@@ -351,7 +354,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Company Consultation                                         //
 // Parameters:
-//   - $co_q   : company database result 
+//   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q,$cat_q) {
   // - Themes
@@ -443,7 +446,7 @@ function html_company_consult($co_q,$cat_q) {
   }
 
   $lcom = nl2br($com);
-  $display["link"] = html_company_links($id, $name, $con_num, $deal_num);
+  $display["link"] = html_company_links($co_q);
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
 
@@ -544,7 +547,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
 
   // kind select
   $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">";
-  while($kind_q->next_record()) {
+  while ($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
     if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
@@ -574,7 +577,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   // activity select
   $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
     <option value=\"0\">$l_none</option>";
-  while($act_q->next_record()) {
+  while ($act_q->next_record()) {
     $a_id = $act_q->f("companyactivity_id");
     $sel_act .= "\n<option value=\"$a_id\"";
     if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
@@ -584,7 +587,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">";
-  while($usr_q->next_record()) {
+  while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }

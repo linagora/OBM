@@ -11,6 +11,7 @@ $l_contact_name = "Kontaktnamn";
 $l_from_company = "Frå firma";
 $l_lastname = "Etternamn";
 $l_firstname = "Fornamn";
+$l_market = "Person in charge";
 $l_function = "Funksjon";
 $l_company = "Firma";
 $l_tel = "Direktetelefon";

@@ -12,6 +12,7 @@ $l_number = "Numero";
 $l_aka = "Altri nome";
 $l_company_name = "Nome Azienda";
 $l_kind = "Tipo";
+$l_market = "Person in charge";
 $l_activity = "Activita";
 $l_company_kind = "Tipo Azienda";
 $l_expresspostal = "CAP 2";

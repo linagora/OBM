@@ -217,6 +217,7 @@ CREATE TABLE Contact (
   contact_datasource_id int(8),
   contact_company_id int(8),
   contact_kind_id int(8),
+  contact_marketingmanager_id int(8),
   contact_lastname varchar(24) DEFAULT '' NOT NULL,
   contact_firstname varchar(24),
   contact_address1 varchar(50),

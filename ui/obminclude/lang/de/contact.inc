@@ -13,6 +13,7 @@ $l_contact_name = "Name des Kontakts";
 $l_from_company = "Firma";
 $l_lastname = "Nachname";
 $l_firstname = "Vorname";
+$l_market = "Person in charge";
 $l_tel = "Telefon";
 $l_telp = "Telefon privat";
 $l_telm = "Telefon mobil";

@@ -91,3 +91,6 @@ ALTER table Contact drop column contact_country;
 
 -- Add new column : contact_country_id
 ALTER table Contact add column contact_country_id int(8) after contact_expresspostal;
+
+-- Add new column : contact_marketingmanager_id
+ALTER table Contact add column contact_marketingmanager_id int(8) after contact_kind_id;

@@ -97,7 +97,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
   if ($set_display == "yes") {
     $display["result"] = dis_company_search_list($company);
@@ -109,7 +109,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
   $display["result"] = dis_company_search_list($company);
 
@@ -172,7 +172,7 @@ if ($action == "ext_get_id") {
       }
       $type_q = run_query_companytype();
       $act_q = run_query_companyactivity();
-      $usr_q = run_query_userobm();
+      $usr_q = run_query_userobm_active();
       $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
     // If it is the first try, we warn the user if some companies seem similar
     } else {
@@ -188,7 +188,7 @@ if ($action == "ext_get_id") {
         }
         $type_q = run_query_companytype();
 	$act_q = run_query_companyactivity();
-        $usr_q = run_query_userobm();
+        $usr_q = run_query_userobm_active();
         $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
       }
     }
@@ -245,7 +245,7 @@ if ($action == "ext_get_id") {
   }
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
-  $usr_q = run_query_userobm();
+  $usr_q = run_query_userobm_active();
   $display["search"] = html_company_search_form($type_q, $act_q, $usr_q, $company);
 
 } elseif ($action == "admin")  {

@@ -16,13 +16,14 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($contact, $p_new_order, $p_order_dir) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $c_all;
 
   $company_id = $contact["company_id"];
   $lname = $contact["lname"];
   $phone = stripslashes($contact["phone"]);
   $email = $contact["email"];
   $company = $contact["company"];
+  $market = $contact["marketing_manager"];
   $archive = $contact["archive"];
 
   $query = "select
@@ -31,6 +32,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       contact_usercreate,
       contact_company_id,
       contact_kind_id,
+      contact_marketingmanager_id,
       contact_lastname,
       contact_firstname,
       contact_function,
@@ -65,6 +67,10 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   // If a company was sent as parameter, get it
   if ($company_id != "") {
     $query .= " company_id='$company_id' and";
+  }
+  // If a person in charge has been set
+  if (($market != $c_all) && ($market != "")) { 
+    $query .= " $and contact_marketingmanager_id='$market' and";
   }
   // Get only not archived by default
   if ($archive != "1") {
@@ -140,6 +146,8 @@ function run_query_detail($p_id) {
         UNIX_TIMESTAMP(contact_timecreate) as timecreate,
         company_id, company_name, company_phone,
         kind_minilabel,
+        m.userobm_lastname as market_lname,
+        m.userobm_firstname as market_fname,
         country_name,
         datasource_name,
         c.userobm_login as usercreate,
@@ -148,6 +156,7 @@ function run_query_detail($p_id) {
         Contact
         left join Company on contact_company_id=company_id
         left join Kind on kind_id=contact_kind_id
+        left join UserObm as m on contact_marketingmanager_id=m.userobm_id
         left join Country on contact_country_id=country_id
         left join DataSource on contact_datasource_id=datasource_id
         left join UserObm as c on contact_usercreate=c.userobm_id
@@ -194,6 +203,7 @@ function run_query_insert($contact) {
 
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
+  $market = $contact["marketing_manager"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $ad1 = $contact["ad1"];
@@ -221,6 +231,7 @@ function run_query_insert($contact) {
     contact_datasource_id,
     contact_company_id,
     contact_kind_id,
+    contact_marketingmanager_id,
     contact_lastname,
     contact_firstname,
     contact_address1,
@@ -247,6 +258,7 @@ function run_query_insert($contact) {
     '$dsrc',
     '$comp_id',
     '$kind',
+    '$market',
     '$lname',
     '$fname',
     '$ad1',
@@ -299,6 +311,7 @@ function run_query_update($contact) {
   }
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
+  $market = $contact["marketing_manager"];
   $lname = $contact["lname"];
   $fname = $contact["fname"];
   $ad1 = $contact["ad1"];
@@ -325,6 +338,7 @@ function run_query_update($contact) {
     contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
     contact_kind_id='$kind',
+    contact_marketingmanager_id='$market',
     contact_lastname='$lname',
     contact_firstname='$fname',
     contact_address1='$ad1',
