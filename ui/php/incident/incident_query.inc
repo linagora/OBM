@@ -217,7 +217,7 @@ function run_query_incident_contract($cid) {
 //                 : status, date, hour, duration, archive, contract_id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($incident) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sql, $cgp_host, $l_mail_incident_new_subject;
 
   $lincident = $incident["lincident"];
   $owner = $incident["owner"];
@@ -229,11 +229,11 @@ function run_query_insert($incident) {
   $date = $incident["date"];
   $hour = $incident["hour"];
   $duration = $incident["duration"];
-  $archive = $incident["archive"];
+  $archive = ($incident["archive"] ? $incident["archive"] : "0");
   $contract_id = $incident["contract_id"];
   $call_date = "$date $hour:0:0";
 
-  $connect_db=new DB_OBM;
+  $obm_q = new DB_OBM;
 
   $query = "insert into Incident (incident_timeupdate,
     incident_timecreate,
@@ -267,7 +267,65 @@ function run_query_insert($incident) {
     '$solu')";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
+  $obm_q->query($query);
+
+  $i_id = run_query_incident_id($incident);
+
+  $subject = "$l_mail_incident_new_subject : $lincident";
+  $message = "$cgp_host/incident/incident_index.php?action=detailconsult&amp;param_incident=$i_id";
+
+  send_mail($subject, $message, array($logger, $owner), "pierre.baudracco@aliacom.fr", 1);
+
+  return $i_id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Incident ID : Get the id of the incident given as parameter
+// Parameters:
+//   - $incident[] : incident hash info : keys used : all
+// Returns:
+//   incident Id if found else false
+///////////////////////////////////////////////////////////////////////////////
+function run_query_incident_id($incident) {
+  global $cdg_sql, $c_id;
+
+  $contract_id = $incident["contract_id"];
+  $lincident = $incident["lincident"];
+  $owner = ($incident["owner"] ? "='".$incident["owner"]."'" : " is null");
+  $logger = ($incident["logger"] ? "='".$incident["logger"]."'" : " is null");
+  $date = ($incident["date"] ? "='".$incident["date"]."'" : "is null");
+  $pri = ($incident["priority"] ? "='".$incident["priority"]."'" : " is null");
+  $status = ($incident["status"] ? "='".$incident["status"]."'" : " is null");
+  $hour = $incident["hour"];
+  $date = $incident["date"];
+  $call_date = "$date $hour:0:0";
+  $duration = $incident["duration"];
+  $archive = ($incident["archive"] ? $incident["archive"] : "0");
+
+  $query = "select incident_id from Incident
+    where incident_contract_id='$contract_id'
+      and incident_label='$lincident'
+      and incident_owner $owner
+      and incident_logger $logger
+      and incident_date='$call_date'
+      and incident_priority_id $pri
+      and incident_status_id $status
+      and incident_duration='$duration'
+      and incident_archive='$archive'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    $obm_q->next_record();
+    $id = $obm_q->f("incident_id");
+  } else {
+    $id = false;
+  }
+
+  return $id;
 }
 
 

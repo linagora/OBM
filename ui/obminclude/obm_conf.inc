@@ -16,6 +16,9 @@ $obmdb_db = "obm";
 $obmdb_user = "obm";
 $obmdb_password = "obm";
 
+// OBM host (for mail links)
+$cgp_host = "http://obminta/";
+
 // Use specific site includes
 //$cgp_site_include = true;
 
@@ -23,7 +26,7 @@ $obmdb_password = "obm";
 //$cgp_sess_db = true;
 
 // is Mail enabled ? (agenda)
-$cgp_mail_enabled = false;
+$cgp_mail_enabled = true;
 
 // is mailing enabled by default for a new user
 $cgp_mailing_default = true;

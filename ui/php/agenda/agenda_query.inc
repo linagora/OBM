@@ -376,8 +376,8 @@ function run_query_get_user_name($contacts_array) {
   for ($i=1;$i<count($contacts_array);$i++) {
     $query.= ",'".$contacts_array[$i]."'";
   }
-  $query.=")";        
-  $query.=" ORDER BY userobm_id"; 
+  $query.= ")";        
+  $query.= " ORDER BY userobm_id"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -399,7 +399,7 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   $force = $agenda["force"];
   $mail  = $agenda["mail"];
   $groups = $agenda["group"];
-  if(is_array($groups)) {
+  if (is_array($groups)) {
     foreach($groups as $group_id) {
       $user_group_array = array_merge($user_group_array, get_all_users_from_group($group_id));
     }
@@ -429,11 +429,11 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-    $message = $l_add_event_mail_head.$agenda["title"]."\n".$l_event_mail_body.$l_from." "
-	       .$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
-	       .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5];      
+    $message = $l_add_event_mail_head.$agenda["title"]."\n"
+      .$l_event_mail_body.$l_from." ".$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
+      .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5];      
     $subject = "$l_add_event_mail_subject" . $agenda["title"];
-    send_mail($subject, $message, $contacts_array,$mail);
+    send_mail($subject, $message, $contacts_array,"",$mail);
   }
 
   return $return_info;
@@ -992,7 +992,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
                  .$day_array3[1]."-".$day_array3[2]."-".$day_array3[3]." @ ".$day_array3[4].":".$day_array3[5]." "
 		 .$l_to." ".$day_array4[1]."-".$day_array4[2]."-".$day_array4[3]." @ ".$day_array4[4].":".$day_array4[5];         
       $subject = "$l_update_event_mail_subject" . $agenda["title"];
-      send_mail($subject, $message, $contacts_array, $mail);
+      send_mail($subject, $message, $contacts_array, "",$mail);
     }
   }
   return $return_info;
@@ -1076,7 +1076,7 @@ function run_query_delete($agenda) {
   $obm_db->query($query);
   $message = $l_delete_event_mail_head.$title;   
   $subject = "$l_delete_event_mail_subject" . $title;
-  send_mail($subject, $message, $contacts, $mail);
+  send_mail($subject, $message, $contacts, "", $mail);
 } 
 
 

@@ -1627,10 +1627,12 @@ function get_email_used($id="", $gid="", $lid="") {
 //  - $subject    : mail subject
 //  - $message    : mail content
 //  - $recipients : Id Recipients array
+//  - $r_addr     : adresses array to add to recipients
 //  - $force      : Mail should be forced (all user even with no set_mail)
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject, $message, $recipients, $force) {
+function send_mail($subject, $message, $recipients, $r_addr, $force) {
   global $cgp_mail_enabled;
+
   $message = stripslashes($message);
   if (! $cgp_mail_enabled) {
     return 0;
@@ -1639,6 +1641,7 @@ function send_mail($subject, $message, $recipients, $force) {
   $send_q = run_query_get_sender();
   $reci_q = run_query_get_recipients($recipients, $force);
 
+  // Construct recipient list
   while ($reci_q->next_record()) {
     $reci = $reci_q->f("userobm_email");
     if ($reci_list == "") {
@@ -1647,6 +1650,18 @@ function send_mail($subject, $message, $recipients, $force) {
       $reci_list .= " , $reci";
     }
   }
+
+  // Add addresses given to recipient list
+  if (is_array($r_addr)) {
+    foreach($r_addr as $reci) {
+      if ($reci_list == "") {
+	$reci_list = $reci;
+      } else {
+	$reci_list .= " , $reci";
+      }
+    }
+  }
+
   $headers .= "From: ".$send_q->f("userobm_email");
   if ($reci_list != "") {
     mail ($reci_list, $subject, $message, $headers);      

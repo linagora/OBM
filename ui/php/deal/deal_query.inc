@@ -476,8 +476,8 @@ function run_query_deal_id($deal) {
   $kind = $deal["kind"]; 
   $tt = $deal["tasktype"];
   $comp = $deal["company"];
-  $market = ($deal["market"] ? $deal["market"] : "null");
-  $tech = ($deal["tech"] ? $deal["tech"] : "null");
+  $market = ($deal["market"] ? "='".$deal["market"]."'" : "is null");
+  $tech = ($deal["tech"] ? "='".$deal["tech"]."'" : "is null");
   $dateprop = ($deal["dateprop"] ? "='".$deal["dateprop"]."'" : "is null");
   $amount = ($deal["amount"] ? "='".$deal["amount"]."'" : "is null");
   $hitrate = ($deal["hitrate"] ? "='".$deal["hitrate"]."'" : "is null");
@@ -498,8 +498,8 @@ function run_query_deal_id($deal) {
     deal_company_id='$comp' and
     deal_contact1_id='$con1' and
     deal_contact2_id='$con2' and
-    deal_marketingmanager_id='$market' and
-    deal_technicalmanager_id='$tech' and
+    deal_marketingmanager_id $market and
+    deal_technicalmanager_id $tech and
     deal_dateproposal $dateprop and
     deal_amount $amount and
     deal_hitrate $hitrate and

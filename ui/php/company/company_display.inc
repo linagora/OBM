@@ -1430,8 +1430,10 @@ function dis_company_warn_insert($cid, $co_q, $company) {
           $samename ($samezip)</a>
       </td></tr>";
   }
-  foreach($compcat as $cat) {
+  if (is_array($compcat)) {
+    foreach ($compcat as $cat) {
     $dis_cat .= "<input type=\"hidden\" name=\"sel_cat[]\" value=\"$cat\" />";
+    }
   }
   $block = "
   <table class=\"detail\">

@@ -103,10 +103,14 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_incident_form($incident)) {
-    run_query_insert($incident);
-    $display["msg"] = display_ok_msg($l_insert_ok);
-    require("incident_js.inc");
-    $display["search"] = html_incident_search_form(run_query_userobm(), run_query_priority(), run_query_status(),$incident);
+    $incident["id"] = run_query_insert($incident);
+    if ($incident["id"] > 0) {
+      $display["msg"] = display_ok_msg($l_insert_ok);
+      $inc_q = run_query_detail($incident["id"]);
+      $con_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
+      $display["detailInfo"] = display_record_info($inc_q);
+      $display["detail"] = html_incident_consult($inc_q, $con_q);
+    }
   } else {
     require("incident_js.inc");
     $display["msg"] = display_warn_msg($err_msg);

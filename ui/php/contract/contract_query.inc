@@ -185,6 +185,8 @@ function run_query_insert($contract) {
   global $cdg_sql;
   global $auth;
 
+  $uid = $auth->auth["uid"];
+
   $p_label = $contract["label"];
   $comp_id = $contract["company_id"];
   $p_num = $contract["number"];
@@ -223,8 +225,8 @@ function run_query_insert($contract) {
     values (
       null,
       '". date("Y-m-d H:i:s") ."',
-      '".$auth->auth["uid"]."',
-      '".$auth->auth["uid"]."',
+      '$uid',
+      '$uid',
       '$p_label',
       '$deal_id',
       '$comp_id',

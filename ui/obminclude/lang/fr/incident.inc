@@ -58,6 +58,9 @@ $l_sta_checkdelete = "Vérifier ou supprimer l'état";
 $l_sta_delete = "Supprimer l'état";
 $l_sta_insert = "Insérer l'état";
 
+// Mail
+$l_mail_incident_new_subject = "OBM : Nouvel incident";
+
 // Message
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
 $l_found = "incident(s) trouvé(s).";

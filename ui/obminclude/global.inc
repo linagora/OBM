@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.6pl1";
+$obm_version = "0.8.6pl2";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -54,6 +54,9 @@ $c_focsys = 3;
 // OBM Default configurable Constants : Default values
 // To change site values => change these in obm_conf.inc 
 //---------------------------------------------------------------------------//
+
+// OBM host (for mail links)
+$cgp_host = "http://obm/";
 
 // Query limits (for user queries)
 $cql_max_row = 50000;    // Maximum rows to be returned

@@ -58,6 +58,9 @@ $l_sta_checkdelete = "Check or Delete Status";
 $l_sta_delete = "Delete Status";
 $l_sta_insert = "Insert Status";
 
+// Mail
+$l_mail_incident_new_subject = "OBM : New incident";
+
 // Message
 $l_no_display = "Fill the search fields and press < Find > to retrieve the incidents";
 $l_found = "incidents found";
