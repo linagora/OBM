@@ -13,7 +13,7 @@ echo "
 <!--
 ";
 
-$obminclude = getenv("OBM_INCLUDE_VAR");
+
 require("$obminclude/lang/$set_lang/check_date_js.inc");
 require("$obminclude/javascript/check_js.inc");
 

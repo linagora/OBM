@@ -9,7 +9,7 @@ echo "
 <SCRIPT LANGUAGE=\"JavaScript\">" ;
 
 
-$obminclude = getenv("OBM_INCLUDE_VAR");
+
 require("$obminclude//javascript/check_js.inc");
 
 echo "
