@@ -864,56 +864,62 @@ function html_status_form($sta_q) {
 function dis_priority_links($id) {
   global $l_pri_link_incident, $l_pri_link_incident_no;
   global $l_pri_delete, $l_pri_can_delete, $l_pri_cant_delete;
-  global $l_back;
+  global $l_back,$display;
 
   $label = get_priority_label($id);
   $obm_q = run_query_priority_links($id);
-
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+        action=\"" .url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+	
   if ($obm_q->num_rows() > 0) {
+    $display["msg"] = display_warn_msg($l_pri_cant_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_pri_cant_delete</td>
-    </tr><tr>
-      <td>&nbsp;</td>
-    </tr><tr>
-      <td class=\"detailHead\">$l_pri_link_incident $label</td>
+      <td class=\"detailHead\"> $label : $l_pri_link_incident</td>
     </tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("incident_id");
       $cname = $obm_q->f("incident_label");
       $dis_link .="
     <tr>
-      <td class=\"detailText\">
+      <td class=\"detailLabel\">
         <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$cid") . "\">$cname</a>
       </td>
     </tr>";
     }
+    $dis_link .="
+    </table>
+    <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
 
   } else {
+    $display["msg"] = display_ok_msg($l_pri_can_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"messageOk\">
-      $l_pri_link_incident_no '$label' : $l_pri_can_delete</td>
+      <td colspan=\"2\" class=\"detailHead\">
+      $l_pri_link_incident_no $label</td>
     </tr><tr>
       <td>
+      </td>
+    </table>
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">
         <form name=\"form_pri_delete\"
           method=post action=\"" . url_prepare("incident_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"priority_delete\">
         <input type=\"hidden\" name=\"sel_priority\" value=\"$id\">
         <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_delete\">
         </form>
-      </td>
-      <td>
-        <form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("incident_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </td>
-    </tr>
-    </table>";
+        $dis_back
+     </p>
+    </div>";
+
   }
   return $dis_link;
 }
@@ -925,20 +931,22 @@ function dis_priority_links($id) {
 //   - $id : status id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_status_links($id) {
-  global $l_sta_link_incident, $l_sta_can_delete, $l_sta_cant_delete;
-  global $l_sta_delete, $l_back;
+  global $l_sta_link_incident,$l_sta_link_incident_no, $l_sta_can_delete, $l_sta_cant_delete;
+  global $l_sta_delete, $l_back,$display;
 
   $label = get_status_label($id);
   $obm_q = run_query_status_links($id);
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+        action=\"" .url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
 
   if ($obm_q->num_rows() > 0) {
+    $display["msg"] = display_warn_msg($l_sta_cant_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"messageWarning\">$label : $l_sta_cant_delete</td>
-    </tr><tr>
-      <td>&nbsp;</td>
-    </tr><tr>
       <td class=\"detailHead\">$label : $l_sta_link_incident</td>
     </tr>";
 
@@ -947,34 +955,42 @@ function dis_status_links($id) {
       $ilabel = $obm_q->f("incident_label");
       $dis_link.= "
     <tr>
-      <td class=\"detailText\">
+      <td class=\"detailLabel\">
         <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a>
       </td>
     </tr>";
     }
+    $dis_link .="
+    </table>
+    <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
 
   } else {
+    $display["msg"] = display_ok_msg($l_sta_can_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td colspan=\"2\" class=\"messageOk\">$label : $l_sta_can_delete</td>
-    </tr><tr>
-      <td>
+      <td colspan=\"2\" class=\"detailHead\">$label : $l_sta_link_incident_no</td>
+    </tr>
+    </table>
+    <div class=\"detailButton\">
+        <p class=\"detailButtons\">
         <form name=\"form_kind_delete\".
           method=post action=\"" . url_prepare("incident_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
         <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
         <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_delete\" />
         </form>
-      </td><td>
         <form name=\"form_back\" method=\"post\"
           action=\"" .url_prepare("incident_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
-      </td>
-    </tr>
-    </table>";
+	
+	</p>
+    </div>";
+
   }
   return $dis_link;
 }

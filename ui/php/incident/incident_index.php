@@ -185,8 +185,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "priority_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_priority_links($incident["priority"]);
-  require("incident_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "priority_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,8 +222,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_status_links($incident["status"]);
-  require("incident_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
