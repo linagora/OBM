@@ -1121,7 +1121,7 @@ CREATE TABLE Publication (
   publication_title          varchar(64) NOT NULL,
   publication_type_id        integer,
   publication_year           integer,
-  publication_lang           char(2),
+  publication_lang           varchar(20),
   publication_desc           text,
   PRIMARY KEY (publication_id)
 );

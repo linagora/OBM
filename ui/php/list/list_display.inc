@@ -397,7 +397,7 @@ function dis_list_form($action, $list_q, $list) {
   $block = "<form method=\"get\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
 
-  $block = html_list_form($action, $list_q, $list);
+  $block .= html_list_form($action, $list_q, $list);
   if($action == "insert" || $action == "new" || $list["criteria"] != "" ||  $crit_q !="") {
      $block .= html_list_graphical_form($action, $list_q, $list);
   }
@@ -453,8 +453,6 @@ function html_list_form($action, $list_q, $list) {
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   $block = "
-  <form method=\"get\" name=\"f_new\" action=\"$url\"
-    onSubmit=\"if (check_name_list(this)) return true; else return false;\">
   <div class=\"detailHead\">$l_list</div>
   <table class=\"detail\">
   <tr>
@@ -529,7 +527,6 @@ function html_list_graphical_form($action, $list_q, $list) {
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];
   }
-
 
 
   // If parameters have been given, they supercede the default action value
@@ -644,7 +641,8 @@ function html_list_graphical_form($action, $list_q, $list) {
 	  $labels[$line] .= "<td>".$fields_label[$field]."</td>";
         }
         else {
-	  $hid_cell[$line] .= "<input type=\"hidden\" name=\"tf_".$field."[]\" value=\"\" />";
+	  $structure[$line] .= "";
+	  $hid_cell[$line] .= "<input type=\"hidden\" name=\"".$field_kind[$field]."_".$field."[]\" value=\"\" />";
         }
       }
     }

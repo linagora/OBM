@@ -896,7 +896,10 @@ function make_query($list) {
 		$operation = str_replace('%v',$value,$operation);
 		$condition[$line] .= $and[$line]." ". $operation;
 		$and[$line] = " AND";
-	      }		
+	      }	
+	      else {
+		$condition[$line] .= "";
+	      }
             }
           }        
         } 

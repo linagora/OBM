@@ -121,7 +121,7 @@ function html_publication_search_form ($type_q,$publication) {
     </div>
     $dis_year
     <div class=\"searchLabel\">$l_lang<br />
-      <input type=\"text\" name=\"tf_lang\" id=\"tf_lang\" size=\"4\" 
+      <input type=\"text\" name=\"tf_lang\" id=\"tf_lang\" size=\"15\" 
       value=\"$lang\" />
     </div>
     $dis_button
@@ -490,7 +490,7 @@ function html_publication_form($action, $pub_q,$type_q, $publication) {
       <td class=\"detailForm\">$sel_type</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_lang</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_lang\" name=\"tf_lang\" maxlength=\"2\" size=\"2\" value=\"$lang\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_lang\" name=\"tf_lang\" maxlength=\"20\" size=\"20\" value=\"$lang\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_year</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_year\" name=\"tf_year\" maxlength=\"4\" size=\"4\" value=\"$year\" /></td>

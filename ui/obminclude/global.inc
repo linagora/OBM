@@ -12,12 +12,16 @@ $obm_version = "0.8.1pre1";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
-$link_to = "Link : "; // Name of the prefix of a link document
+$link_to = "Link : "; // Deprecated but necessary for update from older version
+                     //Name of the prefix of a link document
 $default_mime = "application/octet-stream"; // Default Mime Type
 $default_path = "/Default"; // Default repository
 
 // Agenda constants
-$set_weekstart_default = "monday + 2 hours"; // First day of the week, english
+$set_weekstart_default = "monday + 2 hours"; // First day of the week, 
+                                             //english The +2 hours is a quick fix
+					     //for a bug php 
+					     //(see dst bug in bugzilla.aliacom.fr)
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 

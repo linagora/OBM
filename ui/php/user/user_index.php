@@ -312,7 +312,7 @@ function get_user_action() {
   $actions["USER"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display') 
                                   );
 
@@ -341,7 +341,7 @@ function get_user_action() {
   $actions["USER"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
-     'Right'    => $cright_write,
+     'Right'    => $cright_write_admin,
      'Condition'=> array ('detailconsult', 'reset') 
                                      	   );
 
@@ -349,21 +349,21 @@ function get_user_action() {
   $actions["USER"]["reset"] = array (
     'Name'     => $l_header_reset,
     'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                     );
 
 // Insert
   $actions["USER"]["insert"] = array (
     'Url'      => "$path/user/user_index.php?action=insert",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Update
   $actions["USER"]["update"] = array (
     'Url'      => "$path/user/user_index.php?action=update",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
@@ -371,14 +371,14 @@ function get_user_action() {
   $actions["USER"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult', 'detailupdate', 'reset') 
                                      	   );
 
 // Delete
   $actions["USER"]["delete"] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
-    'Right'    => $cright_write,
+    'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
@@ -398,6 +398,20 @@ function get_user_action() {
     'Condition'=> array ('all') 
                                       	 );
 
+// Dispay
+  $actions["USER"]["dispref_display"] = array (
+    'Url'      => "$path/user/user_index.php?action=dispref_display",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                      	 );
+// Dispay
+  $actions["USER"]["dispref_level"] = array (
+    'Url'      => "$path/user/user_index.php?action=dispref_level",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                      	 );
+
 }
+
 
 </script>

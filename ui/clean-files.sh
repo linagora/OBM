@@ -7,3 +7,6 @@ rm `find . -name '*~'`
 
 # files starting with .#
 rm `find . -name '.#*'`
+
+
+rm `find . -name '.*.s*'`

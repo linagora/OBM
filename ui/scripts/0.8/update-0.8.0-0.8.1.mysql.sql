@@ -13,7 +13,11 @@
 ALTER TABLE Contact CHANGE column contact_address1 contact_address1 VARCHAR(64);
 ALTER TABLE Contact CHANGE column contact_address2 contact_address2 VARCHAR(64);
 ALTER TABLE Contact CHANGE column contact_address2 contact_address2 VARCHAR(64);
-
+-------------------------------------------------------------------------------
+-- Update Publication tables
+-------------------------------------------------------------------------------
+-- Change column : publication_lang varchar(20)
+ALTER TABLE Publication CHANGE column publication_lang publication_lang VARCHAR(30);
 -------------------------------------------------------------------------------
 -- Update UserObmPref table
 -------------------------------------------------------------------------------

@@ -59,7 +59,7 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   }
   
   if ($lang != "") {
-    $where .= " $and publication_lang $like '$lang%'";
+    $where .= " $and publication_lang $like '%$lang%'";
     $and = "and";
   }
 

@@ -353,7 +353,6 @@ function get_param_list() {
   if (isset ($tf_publication_title)) $list["criteria"]["modules"]["publication"]["publication_title"] = $tf_publication_title;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
   if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
-
   if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;
   if (isset ($sel_log_and)) $list["criteria"]["logical"]["AND"] = $sel_log_and;
 
