@@ -20,8 +20,7 @@ include("$obminclude/global.inc");
 require("$obminclude/phplib/obmlib.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
-
-
+echo "Il est passé par là,$action";
 if ($action == "logout") {
   include("$obminclude/global_pref.inc");
   run_query_logout();

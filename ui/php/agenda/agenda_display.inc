@@ -227,7 +227,7 @@ function dis_month_planning($agenda,$obm_q,$user_q) {
   $this_month = $day_array2[2];
   $this_year = $day_array2[1];
   $first_of_month = $this_year.$this_month."01";
-  $stop_of_month = $this_year.($this_month +1)."01";
+  $stop_of_month = $this_year.(substr("0".($this_month +1),-2))."01";
   $start_month_day = dateOfWeek($first_of_month,$set_weekstart_default);  
   $next_month = date( "Ymd", strtotime("+1 month",  $unix_time));
   $prev_month = date( "Ymd", strtotime("-1 month",  $unix_time));
@@ -240,7 +240,6 @@ function dis_month_planning($agenda,$obm_q,$user_q) {
   $td_heigth = 90/count($calendar_user);
   $td_colspan = count($calendar_user);
   store_daily_events($obm_q, $current_events, $event_data,$first_of_month,$stop_of_month);
-
   //Display the day of a week
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_day);
@@ -415,9 +414,7 @@ function dis_week_planning($agenda,$obm_q,$user_q) {
   $calendar_user = store_users($user_q);
   $td_width = 70/count($calendar_user);
   $td_colspan = count($calendar_user);
-  echo $start_week_time." - ".$end_week_time." ";
   store_events($obm_q, $current_events, $event_data,date("YmdHi",$start_week_time),date("YmdHi",$end_week_time));
-  var_dump($current_events);
 // Week day listcount($contacts_array)
   for($i = $start_week_time; $i < ($start_week_time + 7*(25 * 60 * 60)); $i += (25 * 60 * 60) ) {
     $this_date = date("Ymd", $i);
@@ -971,7 +968,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_delete,$l_delete_all,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly;
-  global $l_monthly,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_checkdelete,$l_insert,$l_force;
   
   if($action == "detailupdate") {
@@ -1047,10 +1044,10 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   $dis_sel_kind .= "<select name=\"sel_repeat_kind\">\n<option value=\"none\">aucune</option>";
   $dis_sel_kind .= "\n<option value=\"daily\" $daily>$l_daily</option>";
   $dis_sel_kind .= "\n<option value=\"weekly\" $weekly>$l_weekly</option>";
-  $dis_sel_kind .= "\n<option value=\"monthly\" $monthly>$l_monthly</option> ";
+  $dis_sel_kind .= "\n<option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option> ";
+  $dis_sel_kind .= "\n<option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option> ";
   $dis_sel_kind .= "\n<option value=\"yearly\" $yearly>$l_yearly</option> ";
   $dis_sel_kind .= "\n</select>";
-
   switch($priority) {
     case 1 : $tag_low="selected=\"selected\""; break;
     case 2 : $tag_medium="selected=\"selected\""; break;

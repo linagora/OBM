@@ -56,35 +56,35 @@ if($action == "") $action = "index";
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],6);
+  $p_user_array = array($auth->auth["uid"],30);
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   dis_week_planning($agenda,$obm_q,$user_q);
 }
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],6);
+  $p_user_array = array($auth->auth["uid"],30);
   $obm_q = run_query_day_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   dis_day_planning($agenda,$obm_q,$user_q);
 }
 elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],6);
+  $p_user_array = array($auth->auth["uid"],30);
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   dis_week_planning($agenda,$obm_q,$user_q);
 }
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],6);
+  $p_user_array = array($auth->auth["uid"],30);
   $obm_q = run_query_month_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   dis_month_planning($agenda,$obm_q,$user_q);
 }
 elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],6);
+  $p_user_array = array($auth->auth["uid"],30);
   $obm_q = run_query_year_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
   dis_year_planning($agenda,$obm_q,$user_q);
@@ -129,8 +129,8 @@ function get_param_agenda() {
 
 
   // Deal fields
-  if (isset ($param_date)){
-    $agenda["date"] = $param_date;  echo "sdf,lksqdjsqlkdlk";}
+  if (isset ($param_date))
+    $agenda["date"] = $param_date; 
   else 
     $agenda["date"] = date("Ymd",time());
   if (isset($param_event)) $agenda["id"] = $param_event;

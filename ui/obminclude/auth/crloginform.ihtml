@@ -68,7 +68,7 @@ tr.logintable {
   <div align="center">
   <input name="imageField" type="image" src="/images/images/bouton_login.gif" width="143" height="32" border="0">
 
-</div></form>
+</div>
 <p align="center"> <font color="#CCCCCC" size="3" face="sans-serif, Verdana, Arial"> 
   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - </font><font size="2" face="sans-serif, Verdana, Arial"><br>
   <em>Available login and pass for Demo :</em></font></p>
