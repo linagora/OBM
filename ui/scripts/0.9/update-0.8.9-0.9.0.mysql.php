@@ -7,10 +7,6 @@ include("$obminclude/global.inc");
   $db_type = $obm_db->type;    
   $calendarsegment_date = sql_date_format($db_type, "calendarsegment_date","calendarsegment_date"); 
   
-  $query = "DROP TABLE IF EXISTS CalendarEventData";
-  $obm_db->query($query);
-  display_debug_msg($query, $cdg_sql);
-
   $query = "
   CREATE TABLE CalendarEventData (
     calendareventdata_id int(8)    NOT NULL auto_increment,
@@ -144,7 +140,7 @@ include("$obminclude/global.inc");
 	  $rec_state = $state;
         $query = "INSERT INTO CalendarUser VALUES('".addslashes($timeupdate)."', '".addslashes($timecreate)."',
                                                 '".addslashes($userupdate)."', '".addslashes($usercreate)."',
-						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."')";	
+						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
         display_debug_msg($query, $cdg_sql);
         $obm_ins_db->query($query);
 	$rec_state = "";
