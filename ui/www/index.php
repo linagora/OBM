@@ -25,7 +25,7 @@
 
       <li>
         <div align="left"><b>2004-08-16</b> : version <b>0.8.5</b> released (fixes, functionality and architecture enhancements)
-        <br />As Postgres, Privacy handling and Search queries (with limit flag) have been dealt with, on the architectural side it remains only one point to do (allow data from one module to be displayed in an other module) before 0.9 starts. 
+        <br />As Postgres, Privacy handling and Search queries (with limit flag) have been dealt with, it remains only one point to do (allow data from one module to be displayed in an other module) on the architectural side before 0.9 starts. 
         <ol>
           <li> Many Postgres improvement (Document, Invoice, incident, Project,...), near on par with mysql support now
           <li> New functionalities in Deal (quick update), Contact (Vcard export), List, Time (user entry date)

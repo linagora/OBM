@@ -30,7 +30,7 @@ $cgp_mailing_default = true;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 1;
+$cg_com = 2;
 $cg_prod = 3;
 
 // Tuning constants
