@@ -6,6 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
+
 $path = "..";
 $section = "COMPTA";
 $menu="INVOICE";
@@ -23,9 +24,9 @@ require("invoice_query.inc");
 if ( ($param_invoice == $last_invoice) && (strcmp($action,"delete")==0) ) {
   $last_invoice=$last_invoice_default;
 } elseif  ( ($param_invoice > 0) && ($last_invoice != $param_invoice) ) {
-    $last_invoice=$param_invoice;
-    run_query_set_user_pref($auth->auth["uid"],"last_invoice",$param_invoice);
-    $last_invoice_name = run_query_global_invoice_label($last_invoice);
+  $last_invoice=$param_invoice;
+  run_query_set_user_pref($auth->auth["uid"],"last_invoice",$param_invoice);
+  $last_invoice_name = run_query_global_invoice_label($last_invoice);
 }
 
 page_close();
@@ -39,8 +40,11 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_payment);  // Head & Body
-generate_menu($menu,$section);      // Menu
+//display_head($l_payment);  // Head & Body
+
+$display["head"] = display_head("$l_invoice");
+$display["header"] = generate_menu($menu, $section);
+echo $display["head"] . $display["header"];
 
 ///////////////////////////////////////////////////////////////////////////////
 // Programme principal                                                       //
@@ -50,18 +54,18 @@ if ($action == "index" || $action == "") {
   require("invoice_js.inc");
   html_invoice_search_form ($action,run_query_invoicestatus(), $invoice); 
   if ($set_display == "yes") { 
-
+    
     $obm_q = run_query_search($invoice, $new_order, $order_dir); 
     $nb_invoices = $obm_q->num_rows(); 
     if ($nb_invoices == 0) { 
       display_warn_msg($l_no_found);
-   } else { 
-     $obm_q_options_display_invoices=run_query_display_pref($auth->auth["uid"],"invoice");
+    } else { 
+      $obm_q_options_display_invoices=run_query_display_pref($auth->auth["uid"],"invoice");
 
-     html_invoice_search_list($obm_q, $obm_q_options_display_invoices, $nb_invoices, $invoice); 
-   } 
-     
-  }else { 
+      html_invoice_search_list($obm_q, $obm_q_options_display_invoices, $nb_invoices, $invoice); 
+    } 
+    
+  } else { 
     display_ok_msg($l_no_display); 
   } 
 
@@ -459,7 +463,9 @@ elseif ($action == "delete")  { // delete means delete an invoice
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["end"] = display_end();
+echo $display["end"];
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Invoice parameters transmitted in $invoice hash
@@ -503,9 +509,9 @@ function get_param_invoice() {
 }
 
 
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 // Invoice actions
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function get_invoice_action() {
   global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;

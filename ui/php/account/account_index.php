@@ -37,15 +37,17 @@ page_close();
 
 // $account is a hash table containing, for each form field set 
 // in the calling page, a couple var_name, var_value...
-if($action == "") $action = "index";
+if ($action == "") $action = "index";
 $account = get_param_account();
 get_account_action();
 $perm->check();
+
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_account);  // Head & Body
-generate_menu($menu,$section);      // Menu
+$display["head"] = display_head("$l_account");
+$display["header"] = generate_menu($menu, $section);
+echo $display["head"] . $display["header"];
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -196,12 +198,14 @@ $q_account = run_query_detail ($account["account"]);
   $pref_account_q = run_query_display_pref($uid,"account",1);
   $pref_payment_q = run_query_display_pref($uid,"payment",1);
   dis_account_display_pref($pref_account_q, $pref_payment_q);
-
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["end"] = display_end();
+echo $display["end"];
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -234,6 +238,10 @@ function get_param_account() {
   return $account;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Account actions
+///////////////////////////////////////////////////////////////////////////////
 function get_account_action() {
   global $account, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;

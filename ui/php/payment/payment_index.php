@@ -19,9 +19,9 @@ require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
-
 require("payment_display.inc");
 require("payment_query.inc");
+require("payment_js.inc");
 
 // bookmarks 
 if ( ($param_payment == $last_payment) && (strcmp($action,"delete")==0) ) {
@@ -43,9 +43,9 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head ($l_treso);
-require("payment_js.inc");
-generate_menu ($menu,$section);
+$display["head"] = display_head("$l_treso");
+$display["header"] = generate_menu($menu, $section);
+echo $display["head"] . $display["header"];
 
 ///////////////////////////////////////////////////////////////////////////////
 // ACTIONS :
@@ -546,7 +546,8 @@ elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display end of page                                                       //
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["end"] = display_end();
+echo $display["end"];
 
 
 ///////////////////////////////////////////////////////////////////////////////
