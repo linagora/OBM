@@ -355,12 +355,10 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-    if($mail == 1) {
-      $message = $l_add_event_mail_head.$agenda["title"]."\n".$l_event_mail_body.$l_from." "
-                 .$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
-                 .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5];      
-      send_mail($l_add_event_mail_subject,$message,$contacts_array);
-    }
+    $message = $l_add_event_mail_head.$agenda["title"]."\n".$l_event_mail_body.$l_from." "
+	       .$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
+	       .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5];      
+    send_mail($l_add_event_mail_subject,$message,$contacts_array,$mail);
   }
 
   return $return_info;
@@ -857,14 +855,14 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-    if($mail == 1 && ($agenda["old_begin"] != $agenda["date_begin"] || $agenda["old_end"] != $agenda["date_end"])) {
+    if(($agenda["old_begin"] != $agenda["date_begin"] || $agenda["old_end"] != $agenda["date_end"])) {
       $message = $l_update_event_mail_head.$agenda["title"]."\n".$l_event_mail_body.$l_from." "
                  .$day_array[1]."-".$day_array[2]."-".$day_array[3]." @ ".$day_array[4].":".$day_array[5]." "
 		 .$l_to." ".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]." @ ".$day_array2[4].":".$day_array2[5]." ".
 		 $l_update_event_mail_body.$l_from." "
                  .$day_array3[1]."-".$day_array3[2]."-".$day_array3[3]." @ ".$day_array3[4].":".$day_array3[5]." "
 		 .$l_to." ".$day_array4[1]."-".$day_array4[2]."-".$day_array4[3]." @ ".$day_array4[4].":".$day_array4[5];         
-      send_mail($l_update_event_mail_subject,$message,$contacts_array);
+      send_mail($l_update_event_mail_subject,$message,$contacts_array,$mail);
     }
   }
   return $return_info;
@@ -941,10 +939,8 @@ function run_query_delete($agenda) {
   $obm_db->query($query);
   $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
   $obm_db->query($query);
-  if($mail == 1) {
-    $message = $l_delete_event_mail_head.$titre;          
-    send_mail($l_delete_event_mail_subject,$message,$contacts);
-  }  
+  $message = $l_delete_event_mail_head.$titre;   
+  send_mail($l_delete_event_mail_subject,$message,$contacts,$mail);
 } 
 
 /////////////////////////////////////////////////////////////////////////////

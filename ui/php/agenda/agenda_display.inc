@@ -1686,7 +1686,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     </tr> 
     <tr>
      <td class=\"detailLabel\">$l_sendamail</td>
-     <td><input type=\"checkbox\" id=\"cb_mail\" value=\"1\" name=\"cb_mail\" checked=\"checked\" /></td>
+     <td><input type=\"checkbox\" id=\"cb_mail\" value=\"1\" name=\"cb_mail\" /></td>
     </tr>       
     <tr>
      <td class=\"detailLabel\">$l_force</td>

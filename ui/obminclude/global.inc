@@ -89,7 +89,7 @@ $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
 
 // Mail.
-$activate_mail = 0;
+$activate_mail = 1;
 
 // Display size
 $popup_width = 620;

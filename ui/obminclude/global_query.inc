@@ -681,25 +681,20 @@ function get_modules_array() {
 //  - $message : content of the mail
 //  - $receivers : Ids of the receivers.
 ///////////////////////////////////////////////////////////////////////////////
-function send_mail($subject,$message,$receivers) {
+function send_mail($subject,$message,$receivers,$force) {
   global $path,$activate_mail;
   if($activate_mail == 0) {
     return 0;
   }
   
   $obm_q_send = run_query_get_sender();
-  $obm_q_rece = run_query_get_receiver($receivers);
+  $obm_q_rece = run_query_get_receiver($receivers,$force);
   while($obm_q_rece->next_record()) {
-    if($obm_q_rece->f("userobm_email") != "") {
-      if($rece_list == "") {
-	$rece_list = $obm_q_rece->f("userobm_email");
-      }
-      else{
-	$rece_list .= " , ".$obm_q_rece->f("userobm_email");
-      }
+    if($rece_list == "") {
+      $rece_list = $obm_q_rece->f("userobm_email");
     }
     else{
-      //send private message via obm
+      $rece_list .= " , ".$obm_q_rece->f("userobm_email");
     }
   }
   $headers .= "From: ".$obm_q_send->f("userobm_email");
@@ -712,14 +707,17 @@ function send_mail($subject,$message,$receivers) {
 // Parameters:
 //  - $receivers : Ids of the receivers.
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_receiver($receivers) {
+function run_query_get_receiver($receivers,$force) {
   global $cdg_sql;
-
-  $query = "SELECT userobm_email FROM UserObm WHERE userobm_id IN (".$receivers[0];
+  if($force != 1) {
+    $mail_filter ="AND userobm_id = userobmpref_user_id AND userobmpref_option = 'set_mail' AND userobmpref_value = 'yes'";
+    $join = ",UserObmPref";
+  }  
+  $query = "SELECT userobm_email FROM UserObm $join WHERE userobm_id IN (".$receivers[0];
   for ($i=1;$i<count($receivers);$i++) {
     $query.= ",".$receivers[$i];
   }
-  $query.=")";
+  $query.=") AND userobm_email != '' $mail_filter";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);

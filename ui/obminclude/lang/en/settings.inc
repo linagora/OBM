@@ -21,6 +21,7 @@ $l_set_cal_interval = "Calendar interval";
 $l_set_rows = "# Rows displayed per page";
 $l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";
+$l_send_mail = "Accept e-mails";
 
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";

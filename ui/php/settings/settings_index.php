@@ -54,6 +54,15 @@ if ($form_user_pref) {
     run_query_set_user_pref($uid, "set_rows", $set_rows, 1);
   }
 
+  if ($param_mail == "yes") {
+    $set_mail = "yes";
+  } else {
+    $set_mail = "no";
+  }
+  $sess->register("set_mail");
+  run_query_set_user_pref($uid, "set_mail", $set_mail, 1);
+
+
   if ($param_date != "") {
     $set_date = $param_date;
     $sess->register("set_date");
@@ -180,12 +189,18 @@ echo "
     <td class=\"adminLabel\">$l_auto_display</td>
     <td class=\"adminText\">
       <input type=\"checkbox\" name=\"param_display\" value=\"yes\" ";
-if ($set_display == "yes") echo "checked";
+if ($set_display == "yes") echo "checked = \"checked\"";
 echo " /></td>
   </tr><tr>
     <td class=\"adminLabel\">$l_set_rows</td>
     <td class=\"adminText\">
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
+  </tr><tr>
+    <td class=\"adminLabel\">$l_send_mail</td>
+    <td class=\"adminText\">
+      <input type=\"checkbox\" name=\"param_mail\" value=\"yes\" ";
+if ($set_mail == "yes") echo "checked";
+echo " /></td>
   </tr><tr>
     <td class=\"adminLabel\">$l_set_date</td>
     <td class=\"adminText\">

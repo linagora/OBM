@@ -106,3 +106,5 @@ ALTER table Incident drop column incident_state;
 
 -- Update Display preferences for Incident Status
 UPDATE DisplayPref set display_fieldname='incident_status' where display_fieldname='incident_state';
+-- Mail preferences
+INSERT INTO UserObmPref VALUES (0, 'set_mail', 'yes');

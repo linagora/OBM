@@ -124,7 +124,7 @@ $l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
 			      'aug','sep','oct','nov','dec');
 
 // Messages
-$l_sendamail = "Notify customers by mail.";
+$l_sendamail = "Force the notification by mail.";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
 $l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
