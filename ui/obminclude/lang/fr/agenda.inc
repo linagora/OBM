@@ -64,14 +64,14 @@ $l_to = "au";
 $l_conflicts = "Conflit(s) rencontré(s)";
 $l_date = "Date";
 $l_user = "Utilisateur";
-$l_back_mono = "Vue utilisateur courant";
+$l_back_mono = "Revenir à votre vue";
 // actions 
 $l_insert = "Enregistrer le rdv";
 $l_update = "Modifier le rdv";
 $l_accept = "Accepter";
 $l_reject = "Refuser";
 $l_select = "Sélectionner";
-$l_repeat_update ="Mettre à jour les répétitions";
+$l_repeat_update ="Mettre à jour toutes les répétitions à venir";
 $l_go_to = "Aller à";
 $l_refuse = "Refuser";
 $l_change_state = "Votre participation à l'évenement";

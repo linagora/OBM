@@ -121,7 +121,7 @@ function show ( evt, name ) {
     x = ( currentX - layerWidth );
   }
   else {
-    x = currentX - 250;
+    x = currentX;
   }
   if ( ( currentY + layerHeight ) >= docHeight ) {
      y = ( currentY - layerHeight - 20 );
@@ -138,7 +138,7 @@ function show ( evt, name ) {
   }
 
   if ( NS4 ) {
-    ele.left = parseInt ( x );
+    ele.right = parseInt ( x );
     ele.top = parseInt ( y );
     ele.visibility = \"show\";
   } else {  // IE4 & W3C

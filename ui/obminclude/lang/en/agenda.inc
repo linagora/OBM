@@ -17,7 +17,7 @@ $l_public  = "Public";
 $l_category = "Catégory";
 $l_description = "Description";
 $l_state = "Status";
-$l_back_mono = "Current user view";
+$l_back_mono = "Back to your own view";
 
 $l_high = "High";
 $l_low = "Low";
@@ -66,7 +66,7 @@ $l_update = "Update the event";
 $l_accept = "Accept";
 $l_reject = "Refuse";
 $l_select = "Select";
-$l_repeat_update = "Update repetitions";
+$l_repeat_update = "Update all occurrences of this appointment";
 $l_go_to = "Go to";
 $l_refuse = "Refuse";
 $l_change_state = "Your event participation";

@@ -112,8 +112,9 @@ elseif($action == "decision") {
     }
     else {
       require("agenda_js.inc");
-      display_ok_msg($l_update_ok);  
-      $p_user_array = array($auth->auth["uid"]);
+      display_ok_msg($l_update_ok); 
+      $sel_user_id = array($auth->auth["uid"]);
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -215,7 +216,8 @@ elseif ($action == "insert") {
       display_warn_msg($l_insert_warning);
       html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
-      $p_user_array = array($auth->auth["uid"]);
+      $sel_user_id = array($auth->auth["uid"]);
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -297,7 +299,8 @@ elseif ($action == "update") {
     if(count($conflict) == 0) {
       require("agenda_js.inc");
       display_ok_msg($l_update_ok);
-      $p_user_array =  array($auth->auth["uid"]);
+      $sel_user_id = array($auth->auth["uid"]);
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -308,7 +311,8 @@ elseif ($action == "update") {
       display_warn_msg($l_update_warning);      
       html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
-      $p_user_array = array($auth->auth["uid"]);
+      $sel_user_id = array($auth->auth["uid"]);
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -319,7 +323,8 @@ elseif ($action == "update") {
       require("$obminclude/calendar.js");      
       display_error_msg($l_update_error); 
       html_dis_conflict($agenda,$conflict,'',0);
-      $p_user_array =  array($auth->auth["uid"]);
+      $sel_user_id = array($auth->auth["uid"]);
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
       $user_obm = run_query_userobm();
@@ -341,8 +346,9 @@ elseif ($action == "update_decision") {
   $conflict = run_query_change_decision($agenda);
   if(count($conflict) == 0) {
     require("agenda_js.inc");
-    display_ok_msg($l_update_ok);  
-    $p_user_array =  array($auth->auth["uid"]);
+    display_ok_msg($l_update_ok);
+    $sel_user_id = array($auth->auth["uid"]);
+    $p_user_array = $sel_user_id ;
     $obm_q = run_query_week_event_list($agenda,$p_user_array);
     $user_q = run_query_get_user_name($p_user_array);
     $user_obm = run_query_userobm();

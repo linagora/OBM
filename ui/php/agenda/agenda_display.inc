@@ -283,7 +283,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	     $dis_month_cal .= "<tr>";  
 	     $dis_month_cal .= "<td class=\"".$data["class"]."\">";
 	     $dis_month_cal .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$event_id."&param_date=$daylink\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$daylink-$event_id'); return true;\" onMouseOut=\"hide('$daylink-$event_id'); return true;\">";
-	      $hidden_div .= "<div id=\"$daylink-$event_id\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"30%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$event_id]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$event_id]["type"]." ".$event_data[$event_id]["begin"]."-".$event_data[$event_id]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$event_id]["description"]."</td></tr></table></td></tr></table></div>";	
+	      $hidden_div .= "<div id=\"$daylink-$event_id\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$event_id]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$event_id]["type"]." ".$event_data[$event_id]["begin"]."-".$event_data[$event_id]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$event_id]["description"]."</td></tr></table></td></tr></table></div>";	
 	       if($nb_user == 1) {
 		 $dis_month_cal .= $event_data[$event_id]["begin"]."-";
 		 $dis_month_cal .= $event_data[$event_id]["end"];
@@ -458,7 +458,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $is_title = TRUE;
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($indice_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($indice_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
-		    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
+		    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
 		    if($nb_user == 1) {	      
      		      $event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 		    }else {
@@ -471,7 +471,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  elseif(!in_array($idOfEvent,$temp_array)) {	
 		    $event_head_display .= "<br />";
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($indice_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($current_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
-                    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
+                    $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		     
 		    if($nb_user == 1) {
      		      $event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 
@@ -534,7 +534,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  	      $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		      $is_title = TRUE;
 		      $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($current_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($current_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
-		      $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		       
+		      $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";		       
 		      if($nb_user == 1) {
 		       	$event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 		      }else {
@@ -547,7 +547,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		    elseif(!in_array($idOfEvent,$temp_array)) {	
 		      $event_head_display .= "<br />";
 		      $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=".substr($current_time,0,8)."\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'".substr($current_time,0,8)."-$idOfEvent'); return true;\" onMouseOut=\"hide('".substr($current_time,0,8)."-$idOfEvent'); return true;\">";
-	              $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>"; 
+	              $hidden_div .= "<div id=\"".substr($current_time,0,8)."-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>"; 
 		       if($nb_user == 1) {
 			 $event_head_display .= "&#8226;".$event_data[$idOfEvent]["title"];
 		       }else {
@@ -711,7 +711,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		  $is_title = TRUE;
 		  $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\" onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
-		   $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
+		   $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
 		  $event_head_display .= "&#8226;";
 		  if($nb_user == 1) {
 		    $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
@@ -724,7 +724,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		elseif(!in_array($idOfEvent,$temp_array)){
 		  $event_head_display .= "<br />";
 		  $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\" onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
-		  $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
+		  $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
 		  $event_head_display .= "&#8226;";
 		  if($nb_user == 1) {
 		    $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
@@ -783,7 +783,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  if($is_title == FALSE) {
 		    $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\" onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
-		    $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"1\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
+		    $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"1\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
 		    $event_head_display .= "&#8226;";
 		    if($nb_user == 1) {
 		      $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
@@ -797,7 +797,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  elseif(!in_array($idOfEvent,$temp_array)){
 		    $event_head_display .=" <br />";
 		    $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\" onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
-		     $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"30%\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
+		     $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
  		    $event_head_display .= "&#8226;";
 		    if($nb_user == 1) {
 		      $event_head_display .= $event_data[$idOfEvent]["begin"]."-";
@@ -1001,7 +1001,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
     $new_action = $action;
   }
   if(count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
-    $dis_back_monoview = "<tr><td colspan=\"3\" class=\"agendaCell\"><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a></td></tr>";
+    $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action&sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
   }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"12\" multiple=\"multiple\" style=\"font-size:10px\">";
   while ($usr_q->next_record()) {
@@ -1146,17 +1146,16 @@ echo "
        <tr>
         <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
        </tr>
-       	$dis_back_monoview
        <tr>
 	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
         <td colspan=\"2\" class=\"agendaVide\" align=\"left\">
 	 <form action=\"agenda_index.php\" method=\"get\" onsubmit=\"if (check_count_user(this)) return true; else return false;\">
 	  $dis_sel_user
-	  <input type=\"hidden\" name=\"action\" value=\"$action\" />
-	  <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />	  
+	  <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />
+	  $dis_back_monoview
 	 </form>
         </td>
-       </tr>
+       </tr>              
       </table>
      </td>
     </tr>
@@ -1306,8 +1305,15 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
 
   
   if (($action == "detailupdate") || ($action == "update")) {
-    $dis_repeat_update = "<tr><td class=\"detailLabel\">$l_repeat_update</td>";
-    $dis_repeat_update .= "<td><input type=\"checkbox\" name=\"cb_repeat_update\" value=\"1\"</td> </tr> "; 
+    if($repeat_kind == "none") {
+      $check_activate = "disabled=\"disabled\"";
+      $check_case_style = "style=\"color:#cccccc; bacgound-color: #999999\"";      
+    }
+    else {
+      $check_case_style = "style=\"color:red;\"";      
+    }	
+    $dis_repeat_update = "<tr><td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>";
+    $dis_repeat_update .= "<td><input type=\"checkbox\" name=\"cb_repeat_update\" $check_activate value=\"1\"</td> </tr> "; 
 
     $dis_button = "
       <!-- Update button -->

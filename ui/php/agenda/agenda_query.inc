@@ -845,7 +845,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 	}
       }
     }
-  }var_dump($return_info);
+  }
   return $return_info;
 }
 /////////////////////////////////////////////////////////////////////////////
