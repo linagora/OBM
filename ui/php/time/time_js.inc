@@ -23,12 +23,14 @@ function confirm_del() {
     return false;
 }
 
-function uncheck_days(data) {
- longueur=data.length;
- for(i=3;i<longueur;i++){
-  data.elements[i].checked = 0;
- }
+function select_all(form) {
+  data = form.elements[0];
 
+  longueur=data.length;
+  for(i=0;i<longueur;i++){
+    data.options[i].selected = 1;
+  }
+  return false;
 }
 ";
 

@@ -7,6 +7,15 @@
 ///////////////////////////////////////////////////////////////////////////////
 */
 
+.timeCenter			{
+	text-align:		center;
+	}
+
+table.timeLinks			{
+	border-spacing:		1;
+	margin:			auto;
+	}
+
 td.timePeriod			{
  	text-align: 		center; 
  	font-family: 		sans-serif;
@@ -22,6 +31,7 @@ table.timeDetail		{
 	text-align:		left;
 	background-color:	#a5bace;
 	border-spacing:		1;
+	margin:			auto;
 	}
 
 td.timeForm			{

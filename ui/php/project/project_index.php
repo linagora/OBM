@@ -342,11 +342,6 @@ if ($action == "index" || $action == "") {
       $display["detail"] .= html_project_member_form($members_q, $project );
 
       $action = "member_fill";
-//     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
-
-//       $display["msg"] = display_warn_msg($l_no_members);
-//       $display["detail"]  = html_project_memberadd_form($project);
-//       $display["detail"] .= html_project_member_form($members_q, $project );
 
     } else if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
 
@@ -354,17 +349,8 @@ if ($action == "index" || $action == "") {
       $display["detail"] = html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project); 
 
     } else {
-  
-      //smlp remettre le privacy check au début
-//       if (($project_q->f("project_visibility")==0) ||
-// 	  ($project_q->f("usercreate")==$uid) ) {
-// 	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
-      
+   
       $display["detail"] = html_project_advance($members_q, $membertime_q, $tasks_q, $project);
-//       } else {
-// 	// this project's page has "private" access
-// 	$display["msg"] .= display_err_msg($l_error_visibility);
-//       } 	
     }
   }
   

@@ -28,9 +28,6 @@ $section = "PROD";
 $menu = "TIME";
 $extra_css = "time.css";
 
-// Deal we display in project list
-//  added proposal for 'avantvente';
-
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -49,48 +46,79 @@ if (debug_level_isset($cdg_param)) {
   echo "login : $uid <br>";
 }
 
+// user select ---------------------------------------------
+
+// a user was selected
 if (! empty($time["user_id"])) {
+
+  // we come back from stats : we retrieve the user
+  if (is_array($time["user_id"]) and ($action != "stats")) {
+    $time["user_id"] = $uid;
+  } else if (!(is_array($time["user_id"])) and ($action == "stats")) {
+    $time["user_id"] = array($time["user_id"]);
+  }
+
+  if ($action == "stats")
+    $time["user_id"] = array_unique($time["user_id"]);
+
   $s_users = $time["user_id"];
   $sess->register("s_users");
+
+  // debug ------------------------------------------------
   if (debug_level_isset($cdg_param)) {
-	echo "\$time[user_id] not empty : $s_users <br>";
+    echo "\$time[user_id] not empty : $s_users <br>";
     if (is_array($s_users)) {
-	  echo "\$s_users is an array ---";
+      echo "\$s_users is an array ---";
       print_r($s_users);
-	  echo " ---<br>";
-	}
+      echo " ---<br>";
+    }
     else if (is_string($s_users))
-	  echo "\$s_users is a string : ". $s_users ." -- <br>";
+      echo "\$s_users is a string : ". $s_users ." -- <br>";
   }
 }
-else if (isset($s_users)) {
-  // $s_users is a session variable
 
-  //  if (count($s_users) == 1)
-  //$time["user_id"] = $s_users[0];
-    //else
+// we use the session variable
+else if (isset($s_users)) {
+
+  // we come back fro stats : we retrieve the user
+  if ($action == "") {
+    $s_users = $uid;
+    $sess->register("s_users");
+  } else if (is_array($s_users) and ($action != "stats")) {
+    $s_users = $uid;
+    $sess->register("s_users");
+  } else if (!(is_array($s_users)) and ($action == "stats")) {
+    $s_users = array($s_users);
+    $sess->register("s_users");
+  }
+
   $time["user_id"] = $s_users;
 
+  // debug ------------------------------------------------
   if (debug_level_isset($cdg_param)) {
-	echo "variable de session \$s_users is set : ". $s_users ." <br>";
+    echo "session variable \$s_users is set : ". $s_users ." <br>";
     if (is_array($s_users)) {
-	  echo "\$s_users is an array ---";
+      echo "\$s_users is an array ---";
       print_r($s_users);
-	  echo " ---<br>";
-	}
+      echo " ---<br>";
+    }
     else if (is_string($s_users))
-	  echo "\$s_users is a string : ". $s_users ." -- <br>";
+      echo "\$s_users is a string : ". $s_users ." -- <br>";
   }
 }
 
+// we arrive in the time module
 else {
   $s_users = $uid;
   $time["user_id"] = $s_users;
   $sess->register("s_users");
+
+  // debug ------------------------------------------------
   if (debug_level_isset($cdg_param)) {
-	echo "tout est vide, on définit user_id sur $uid <br>";
+     echo "everything empty, we define user_id with $uid <br>";
   }
 }
+
 page_close();
 
 // $popup = 2 => writing into a file
@@ -157,20 +185,6 @@ if ($action == "index" || $action == "") {
   $time["interval"] = "week";
   $time["action"] = "index";
 
-  // bcontins pour l'instant on n'a jamais plusieurs utilisateurs à la fois
-  // (ça servait pour les stats multi-utilisateur)
-  // USERS : only one for index (and others, except stats)
-  //   if (! in_array($u_id, $project_managers))
-  //     $time["user_id"] == array($u_id);
-  //   else if (sizeof($time["user_id"]) > 1) {
-  //     $tt = $time["user_id"];
-  //     $time["user_id"] == $tt[0];
-  //   }
-  //   else if (sizeof($time["user_id"]) == 0) {
-  //     echo "error \$time[user_id] empty !!! <br>";
-  //     $time["user_id"] == array($u_id);
-  //   }
-
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"week");
 
@@ -191,18 +205,6 @@ elseif ($action == "viewmonth") {
 //////////////////////////////////////////////////////////////////////////////
 
   $time["interval"] = "month";
-
-  // USERS : only one for index (and others, except stats)
-  if (! in_array($u_id, $project_managers))
-	$time["user_id"] == array($u_id);
-  else if (sizeof($time["user_id"]) > 1) {
-	$tt = $time["user_id"];
-	$time["user_id"] == array($tt[0]);
-  }
-  else if (sizeof($time["user_id"]) == 0) {
-    echo "error \$time[user_id] empty !!! <br>";
-	$time["user_id"] == array($u_id);
-  }
 
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"month");
@@ -271,32 +273,21 @@ elseif ($action == "unvalidate") {
   $display["detail"] .= dis_time_index($time);
 }
 
-elseif ($action == "statsuser") {
+elseif ($action == "stats") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time["interval"] = "month";
 
-  $statproj_q = run_query_stat_project_by_user($time);
-  $stattt_q = run_query_stat_tasktype_by_user($time);
-
-  $display["features"] .= dis_time_search_form($time, 
-      run_query_get_obmusers(),
-      $uid);
-
-  $display["detail"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
-}
-
-elseif ($action == "statsmonth") {
-//////////////////////////////////////////////////////////////////////////////
-  // interval is week -- see if we may need to use others intervals
-  $time["interval"] = "month";
-
-  $statproj_q = run_query_stat_project_by_month($time);
-  $stattt_q = run_query_stat_tasktype_by_month($time);
+  $statproj_q = run_query_stat_project($time);
+  $stattt_q = run_query_stat_tasktype($time);
 
   $display["detail"] = dis_time_links($time,$time["interval"]);
+  $display["features"] .= dis_time_search_form($time, 
+					       run_query_get_obmusers(),
+					       $uid, 1);
 
-  $display["detail"] .= dis_time_statsmonth($statproj_q, $stattt_q, $time);
+
+  $display["detail"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
 }
 
 elseif ($action == "export_stats") {
@@ -334,7 +325,7 @@ elseif ($action == "detailupdate") {
   if ( $popup == 1 ) {
     // Get elements for insertion of new task
     // TaskType
-    $obm_tasktype_q = run_query_tasktype($time["user"]);
+    $obm_tasktype_q = run_query_tasktype($time["user_id"]);
     // Project
     $obm_project_q = run_query_project($time);
     // ProjectTask
@@ -444,8 +435,7 @@ function get_param_time() {
 function get_time_actions() {
   global $time, $path;
   global $l_header_weeklyview, $l_header_monthlyview, $l_header_globalview;
-  global $l_header_statsuser, $l_header_statsmonth;
-  global $l_header_admin, $l_header_display;
+  global $l_header_stats, $l_header_admin, $l_header_display;
   global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
 // Index
@@ -489,20 +479,20 @@ function get_time_actions() {
                                     );
 
 // Stats by Users
-  $actions["TIME"]["statsuser"] = array (
-    'Name'     => "$l_header_statsuser",
-    'Url'      => "$path/time/time_index.php?action=statsuser",
+  $actions["TIME"]["stats"] = array (
+    'Name'     => "$l_header_stats",
+    'Url'      => "$path/time/time_index.php?action=stats",
     'Right'    => $time_admin_read,
     'Condition'=> array ('all') //, 'display') 
                                      );
 
 // Stats by Month
-  $actions["TIME"]["statsmonth"] = array (
-    'Name'     => "$l_header_statsmonth",
-    'Url'      => "$path/time/time_index.php?action=statsmonth",
-    'Right'    => $time_admin_read,
-    'Condition'=> array ('all') 
-                                    );
+//   $actions["TIME"]["statsmonth"] = array (
+//     'Name'     => "$l_header_statsmonth",
+//     'Url'      => "$path/time/time_index.php?action=statsmonth",
+//     'Right'    => $time_admin_read,
+//     'Condition'=> array ('all') 
+//                                     );
 
 // Insert 
   $actions["TIME"]["insert"] = array (

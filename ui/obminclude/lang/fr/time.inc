@@ -73,7 +73,6 @@ $l_daysofweekshort = array (	'Dim',
 // Titres
 $l_time = "Gestion des temps";
 
-
 // Messages
 $l_projects_manager = "Confirmation de la validation des taches par l'administrateur:";
 $l_found_task = "Voici les tâches réalisées et saisies pour la semaine en cours:";
@@ -86,14 +85,10 @@ $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
 $l_admin_valid = "Ecran de validation administrateur";
 $l_admin_empty = "Il n'y a pas de renseignements pour ce mois";
 
-$l_projuser_stats = "Participation de cette personne aux projets en cours";
-$l_no_projuser_stats = "Cette personne ne participe à aucun projet";
-$l_ttuser_stats = "Répartition du temps de travail par type de tâche";
-$l_no_ttuser_stats = "Cette personne n'utilise pas la gestion des temps";
-$l_projmonth_stats = "Participation aux projets ce mois-ci";
-$l_no_projmonth_stats = "Aucun renseignement sur la participation aux projets ce mois-ci";
-$l_ttmonth_stats = "Répartition du temps de travail par type de tâche ce mois-ci";
-$l_no_ttmonth_stats = "Aucun renseignement n'a été saisi pour la gestion des temps ce mois-ci";
+$l_proj_stats = "Participation aux projets en cours";
+$l_no_proj_stats = "Cette(Ces) personne(s) ne participe(nt) à aucun projet";
+$l_tt_stats = "Répartition du temps de travail par type de tâche";
+$l_no_tt_stats = "Cette(Ces) personne(s) n'utilise(nt) pas la gestion des temps";
 
 // Type de tâches à rechercher
 //$l_tasktype = "Type des tâches";

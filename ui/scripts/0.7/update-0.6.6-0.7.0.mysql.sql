@@ -180,26 +180,15 @@ VALUES (0,'project','project_label',1,2),
        (0,'time','tasktype_label',5,1),
        (0,'time','timetask_length',6,2),
        (0,'time','timetask_id',7,2),
-       (0,'time_projmonth','deal_label',1,2),
-       (0,'time_projmonth','company_name',2,2),
-       (0,'time_projmonth','total_length',3,1),
-       (0,'time_projmonth','total_before',4,1),
-       (0,'time_projmonth','total_after',5,1),
-       (0,'time_ttmonth','tasktype_label',1,2),
-       (0,'time_ttmonth','total_length',2,1),
-       (0,'time_ttmonth','total_before',3,1),
-       (0,'time_ttmonth','total_after',4,1),
-       (0,'time_projuser','deal_label',1,2),
-       (0,'time_projuser','company_name',2,2),
-       (0,'time_projuser','total_spent',3,1),
---       (0,'time_projuser','total_before',3,1),
---       (0,'time_projuser','total_after',4,1),
-       (0,'time_ttuser','tasktype_label',1,2),
-       (0,'time_ttuser','total_spent',2,1)
---       (0,'time_ttuser','total_before',3,1),
---       (0,'time_ttuser','total_after',4,1)
-;
-
+       (0,'time_proj','deal_label',1,2),
+       (0,'time_proj','company_name',2,2),
+       (0,'time_proj','total_length',3,1),
+       (0,'time_proj','total_before',4,1),
+       (0,'time_proj','total_after',5,1),
+       (0,'time_tt','tasktype_label',1,2),
+       (0,'time_tt','total_length',2,1),
+       (0,'time_tt','total_before',3,1),
+       (0,'time_tt','total_after',4,1);
 
 -------------------------------------------------------------------------------
 -- Group module tables

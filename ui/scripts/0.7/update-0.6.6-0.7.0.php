@@ -294,20 +294,15 @@ function fill_preferences() {
         ($id,'time','tasktype_label',5,1),
         ($id,'time','timetask_length',6,2),
         ($id,'time','timetask_id',7,2),
-        ($id,'time_projmonth','deal_label',1,2),
-        ($id,'time_projmonth','company_name',2,2),
-        ($id,'time_projmonth','total_length',3,1),
-        ($id,'time_projmonth','total_before',4,1),
-        ($id,'time_projmonth','total_after',5,1),
-        ($id,'time_ttmonth','tasktype_label',1,2),
-        ($id,'time_ttmonth','total_length',2,1),
-        ($id,'time_ttmonth','total_before',3,1),
-        ($id,'time_ttmonth','total_after',4,1),
-        ($id,'time_projuser','deal_label',1,2),
-        ($id,'time_projuser','company_name',2,2),
-        ($id,'time_projuser','total_spent',3,1),
-        ($id,'time_ttuser','tasktype_label',1,2),
-        ($id,'time_ttuser','total_spent',2,1)
+        ($id,'time_proj','deal_label',1,2),
+        ($id,'time_proj','company_name',2,2),
+        ($id,'time_proj','total_length',3,1),
+        ($id,'time_proj','total_before',4,1),
+        ($id,'time_proj','total_after',5,1),
+        ($id,'time_tt','tasktype_label',1,2),
+        ($id,'time_tt','total_length',2,1),
+        ($id,'time_tt','total_before',3,1),
+        ($id,'time_tt','total_after',4,1)
     ";
 
     // echo "$query \n ---------------------------------------------\n";

@@ -62,15 +62,6 @@ $l_update = "Modifier le Projet";
 $l_adv_update = "Mettre à jour les avancements";
 $l_checkdelete = "Vérifier ou Supprimer la Société";
 $l_delete = "suppr";
-$l_kind_update = "Modifier le Type";
-$l_kind_checkdelete = "Vérifier ou Supprimer le Type";
-$l_kind_delete = "Supprimer le Type";
-$l_kind_insert = "Créer le Type";
-$l_act_update = "Modifier le secteur d'activité";
-$l_act_checkdelete = "Vérifier ou Supprimer le secteur d'activité";
-$l_act_delete = "Supprimer le secteur d'activité";
-$l_act_insert = "Créer le secteur d'activité";
-$l_select_company = "Sélectionner la société";
 
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
@@ -81,7 +72,8 @@ $l_no_tasks = "Il n'y a pas encore de tâches définies";
 $l_no_members = "Il n'y a pas de renseignements sur les participants au projet";
 $l_no_membertime = "Les personnes qui participent à ce projet n'ont pas encore été affecté à une tâche";
 $l_no_projected = "Les personnes suivantes participent à ce projet mais n'ont pas encore été affecté à une tâche";
-$l_delete_ok = "La suppression de la société a été correctement effectuée.";
+$l_delete_ok = "----";
+$l_delete_error = "----";
 $l_status_error = "Ce n'est pas un projet valide";
 $l_insert_ok = "La création du projet a été correctement effectuée.";
 $l_insert_error = "Impossible de créer cette tâche ; La tâche principale est utilisée par la gestion de temps";
@@ -105,13 +97,11 @@ $l_task_added = "une tâche ajoutée";
 $l_task_removed = "tâche(s) enlevé(s)";
 $l_no_task_add = "Aucune tâche à ajouter";
 $l_no_task_del = "Aucune tâche à effacer";
-$l_valid_task = "Confirmer";
 $l_del_member_sel = "Enlever ces participants";
 $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";
 $l_no_member_add = "Aucun participant à ajouter";
 $l_no_member_del = "Aucun participant à effacer";
-$l_valid_member = "Confirmer";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
@@ -124,7 +114,7 @@ $l_fill_projected = "Chaque participant avant doit être affecté à au moins une t
 $l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
 $l_fill_missing = "Le temps manquant doit être indiqué pour tous les membres du projet";
 $l_fill_missnumber = "Le temps manquant doit être un nombre entier de jours.";
-$l_delete_confirm = "Confirmer la suppression de la Société ?";
+$l_delete_confirm = "----";
 
 // For the display preferences modification screen 
 $l_searchproject_display = "Options d'affichage des listes de projets";

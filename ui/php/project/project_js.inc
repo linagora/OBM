@@ -97,14 +97,6 @@ function check_taskadd(form)
   }
 }
 
-//bcontins verif un selectionner
-//function check_taskdel(form)
-// {
-//   form.action = \"project_index.php?action=task_del\"
-//   form.submit();
-// }
-
-
 function submit_memberdel(form)
 {
   form.action = \"project_index.php?action=member_del\"

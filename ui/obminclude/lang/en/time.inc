@@ -25,6 +25,7 @@ $l_total_after="Total after period";
 $l_day="Day";
 $l_period="Period";
 
+
 $l_task_del="Remove.";
 $l_from = "from";
 $l_to = "to";
@@ -46,12 +47,12 @@ $l_week_prev = "Previous week";
 $l_week_next = "Next week";
 $l_month_next = "Next month";
 $l_month_prev = "Previous month";
-$l_date = "Date:";
-$l_project = "Project:";
+$l_date = "Date";
+$l_project = "Project";
 $l_cat = "Catégory";
-$l_task = "Task:";
-$l_label = "Label:";
-$l_duration = "Duration:";
+$l_task = "Task";
+$l_label = "Label";
+$l_duration = "Duration";
 
 //$show_events="See details";
 $total_menu="Summary";
@@ -85,14 +86,10 @@ $l_update_task = "You can uodate the following task :";
 $l_admin_valid = "Admin validation screen";
 $l_admin_empty = "No informations are available for this month";
 
-$l_projuser_stats = "Taking part in actual projects";
-$l_no_projuser_stats = "This person is currently not taking part in projects";
-$l_ttuser_stats = "Distribution of the time spent on different task types";
-$l_no_ttuser_stats = "This person is not using the time management";
-$l_projmonth_stats = "Taking part in projects for this month";
-$l_no_projmonth_stats = "No informations concerning the participation in project this month";
-$l_ttmonth_stats = "Distribution of the time spent on different task types for this month";
-$l_no_ttmonth_stats = "No informations available for this month";
+$l_proj_stats = "Taking part in actual projects";
+$l_no_proj_stats = "This person(s) is/are currently not taking part in projects";
+$l_tt_stats = "Distribution of the time spent on different task types";
+$l_no_tt_stats = "This person(s) is/are not using the time management";
 
 // Type de tâches à rechercher
 //$l_tasktype = "Task type";

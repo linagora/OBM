@@ -104,6 +104,7 @@ function run_query_detail($p_id) {
       deal_id as project_id,
       deal_label as project_label,
       deal_project_status as project_status,
+      deal_archive as project_archive,
       deal_visibility as project_visibility,
       company_name as project_company_name,
       tasktype_id as project_tasktype_id,
@@ -117,24 +118,6 @@ function run_query_detail($p_id) {
       left join Company on deal_company_id=company_id
     where deal_id=$p_id
       and tasktype_id=deal_tasktype_id";
-
-//   $query = "select
-//       deal_id as project_id,
-//       deal_label as project_label,
-//       deal_project_status as project_status,
-//       deal_visibility as project_visibility,
-//       company_name as project_company_name,
-//       tasktype_id as project_tasktype_id,
-//       tasktype_label as project_tasktype_label,
-//       deal_soldtime as project_soldtime,
-//       deal_userupdate as userupdate,
-//       deal_usercreate as usercreate,
-//       UNIX_TIMESTAMP(deal_timeupdate) as timeupdate,
-//       UNIX_TIMESTAMP(deal_timecreate) as timecreate
-//     from Deal, TaskType
-//       left join Company on deal_company_id=company_id
-//     where deal_id=$p_id
-//       and tasktype_id=deal_tasktype_id";
 
   $obm_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_detail");
@@ -241,11 +224,17 @@ function run_query_update($pid, $project) {
   $soldtime = $project["soldtime"];
   $name = $project["name"];
   $tt = $project["tt"];
+  $archive = $project["archive"];
 
   $query = "update Deal set
       deal_timeupdate='". date("Y-m-d H:i:s") ."',
       deal_userupdate='". $auth->auth["uid"] ."',
       deal_soldtime=$soldtime";
+
+  if ($archive)
+    $query .= ", deal_archive = 1";
+  else
+    $query .= ", deal_archive = 0";
 
   if ($state == 2)
     $query .= ", deal_label='$name'
@@ -384,7 +373,7 @@ function run_query_tasklist_delete($project) {
     $query = "
       select projectuser_user_id
       from ProjectUser
-      where projectuser_projecttask_id = 1638
+      where projectuser_projecttask_id = $tsk_id
         and projectuser_projectedtime != 0
       ";
     
@@ -573,84 +562,87 @@ function run_query_memberlist_delete($project, $all = 0) {
 function run_query_projectupdate($project) {
   global $auth, $cdg_sql;
 
-   $p_id = $project["id"];
-   $new = $project["projected"];
+  $p_id = $project["id"];
+  $new = $project["projected"];
   
-
-$query = "
-  select
-    projectuser_user_id as mt_user,
-    projectuser_projecttask_id as mt_task,
-    projectuser_projectedtime as mt_proj
+  $query = "
+    select
+      projectuser_user_id as mt_user,
+      projectuser_projecttask_id as mt_task,
+      projectuser_projectedtime as mt_proj,
+      projectuser_missingtime as mt_miss
   from ProjectUser, ProjectTask
   where projecttask_deal_id = $p_id
     and projecttask_id = projectuser_projecttask_id
   order by mt_user, mt_task";
 
-$old_q = new DB_OBM;
-display_debug_msg($query, $cdg_sql, "run_query_projectupdate(old)");
-$old_q->query($query);
+  $old_q = new DB_OBM;
+  display_debug_msg($query, $cdg_sql, "run_query_projectupdate(old)");
+  $old_q->query($query);
+
+  while ($old_q->next_record()) {
+    $old_user = $old_q->f("mt_user");
+    $old_task = $old_q->f("mt_task");
+    $old_proj = $old_q->f("mt_proj");
+    $old_miss = $old_q->f("mt_miss");
+    
+    $old[$old_user][$old_task] = $old_proj;
+    $miss_tab[$old_user][$old_task] = $old_miss;
+  }
   
-
-   while ($old_q->next_record()) {
-     $old_user = $old_q->f("mt_user");
-     $old_task = $old_q->f("mt_task");
-     $old_proj = $old_q->f("mt_proj");
-
-     $old[$old_user][$old_task] = $old_proj;
-   }
-
-   $obm_q = new DB_OBM;
-
-while ( list($m_id, $ttime) = each($new) ) {
-  while ( list($t_id, $proj) = each($ttime) ) {
+  $obm_q = new DB_OBM;
+  
+  while ( list($m_id, $ttime) = each($new) ) {
+    while ( list($t_id, $proj) = each($ttime) ) {
 
     $tnew = ($new[$m_id][$t_id] != "")  ? 1 : 0;
     $told = (isset ($old[$m_id][$t_id])) ? 1 : 0;
     
     if (!($tnew) and ($told)) {
 
-	$query = "
-delete from ProjectUser
-where projectuser_user_id = $m_id
-  and projectuser_projecttask_id = $t_id";
+      $query = "
+        delete from ProjectUser
+        where projectuser_user_id = $m_id
+          and projectuser_projecttask_id = $t_id";
 
  	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
 	$obm_q->query($query);
 
     } else if (($tnew) and ($told)) {
-//       $mb_exists = 1;
 
- 	$query = "
-update ProjectUser
-set projectuser_timeupdate = '".date("Y-m-d H:i:s")."',
-    projectuser_userupdate = ". $auth->auth["uid"] .",
-    projectuser_projectedtime = $proj
-where projectuser_user_id = $m_id
-  and projectuser_projecttask_id = $t_id";
+      $set_miss_time = (isset($miss_tab[$m_id][$t_id])) ? "" : ", projectuser_missingtime = $proj";
 
- 	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
-	$obm_q->query($query);
+      $query = "
+         update ProjectUser
+         set projectuser_timeupdate = '".date("Y-m-d H:i:s")."',
+             projectuser_userupdate = ". $auth->auth["uid"] .",
+             projectuser_projectedtime = $proj
+             $set_miss_time
+         where projectuser_user_id = $m_id
+           and projectuser_projecttask_id = $t_id";
+
+      display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
+      $obm_q->query($query);
 
     } else if (($tnew) and !($told)){
 
-  	$query = "	
-           insert into ProjectUser 
-             (projectuser_user_id,
-              projectuser_projecttask_id,
-              projectuser_timecreate,
-              projectuser_usercreate,
-              projectuser_projectedtime,
-              projectuser_missingtime
-             )
-           values
-             ($m_id,
-              $t_id,
-              '".date("Y-m-d H:i:s")."',
-              ". $auth->auth["uid"] .",
-              $proj,
-              $proj
-             )";
+      $query = "	
+        insert into ProjectUser 
+          (projectuser_user_id,
+           projectuser_projecttask_id,
+           projectuser_timecreate,
+           projectuser_usercreate,
+           projectuser_projectedtime,
+           projectuser_missingtime
+          )
+        values
+          ($m_id,
+           $t_id,
+           '".date("Y-m-d H:i:s")."',
+           ". $auth->auth["uid"] .",
+           $proj,
+           $proj
+          )";
 
  	display_debug_msg($query, $cdg_sql, "run_query_projectupdate");
 	$obm_q->query($query);
@@ -764,7 +756,7 @@ function run_query_statlog($p_id) {
   return $retour;
 }
 
-// bcontins : pour les projets internes ?
+// bcontins : pour les projets internes : non géré sur la 0.7?
 ///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution                                                  //
 // Parameters:

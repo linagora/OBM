@@ -11,6 +11,7 @@
 $l_find = "Find";
 $l_back = "Back";
 $l_cancel = "Cancel";
+$l_validate = "Validate";
 $l_close = "Close the window";
 $l_validate = "Validate";
 $l_execute = "Execute action";
@@ -94,6 +95,7 @@ $l_invalid_perm = "Invalid permissions.";
 ////////////////////////////////////////////////////////
 ////// Theme headers lang files ////////////////////////
 ////////////////////////////////////////////////////////
+
 $l_header_com    = "COMMERCIAL";
 $l_header_prod   = "PRODUCTION";
 $l_header_compta = "ACCOUTANCY";

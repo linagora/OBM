@@ -14,23 +14,23 @@
 	position: absolute;
 	left: 2px;
 	width: 180px;
-#	border: 1px solid #000000;
+//	border: 1px solid #000000;
 	margin-top: 10px;
-#	padding: 2px;
+//	padding: 2px;
 }
 
 .rightpanel {
 	float: right;
 	width: 180px;
-#	border: 1px solid #000000;
-#	padding: 2px;
+//	border: 1px solid #000000;
+//	padding: 2px;
 }
 
 .middlepanel {
 	width: auto;
-#	border: 1px solid #000000;
+//	border: 1px solid #000000;
 	margin-right: 196px;
-#	background-color: #0000FF;
+//	background-color: #0000FF;
 }
 
 .detailpanel {
@@ -38,11 +38,11 @@
 	left: 196px;
 	right: 0px;
 	width: auto;
-#	border: 1px solid #000000;
+//	border: 1px solid #000000;
 	padding: 0px;
 	margin-top: 10px;
 	margin-right: 2px;
-#	background-color: #00FF00;
+//	background-color: #00FF00;
 }
 
 .detailpanelalone {
@@ -50,10 +50,10 @@
 	left: 2px;
 	right: 2px;
 	width: auto;
-#	border: 1px solid #000000;
+//	border: 1px solid #000000;
 	padding: 0px;
 	margin-top: 10px;
-#	background-color: #00FF00;
+//	background-color: #00FF00;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -95,7 +95,7 @@
 }
 
 .lastList {
-#	display: block;
+//	display: block;
 	list-style-type: none;
 	margin-top: 0px;
 	text-indent: -3em;
@@ -142,25 +142,25 @@ select {
 	border: 1px solid #009EC6;
 	height: 100%;
 	width: auto;
-#	margin-top: 10px;
+//	margin-top: 10px;
 	margin-bottom: 20px;
 	font-style: italic;
 	color: #7B9EAD;
-#	background-color: #FFFFFF;
+//	background-color: #FFFFFF;
 }
 
 .searchLabel {
 	float: left;
 	margin: 0px;
 	padding: 3px;
-#	background-color: #FF0000;
+//	background-color: #FF0000;
 }
 
 .searchButton {
 	float: left;
 	margin: 0px;
 	padding: 3px;
-#	background-color: #FF0000;
+//	background-color: #FF0000;
 }
 
 .searchEnd {
@@ -226,7 +226,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 .detailButton {
 	position: relative;
 	top: 16px;
-#	border: 3px solid #FF9EC6;
+//	border: 3px solid #FF9EC6;
 	text-align: center;
 	background-color: #FF;
 }
@@ -383,7 +383,7 @@ a.resultText:visited { color: #0ba589; background-color: transparent;}
 /* ////////////////////////////////////////// */
 body 			{
 	background-color: #EFF3F7;
-#	background-color: 	#d7dfe7;
+//	background-color: 	#d7dfe7;
 	color:			#000000;
         border:                 0px;
         margin:                 0px;

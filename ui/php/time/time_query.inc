@@ -54,8 +54,6 @@ function run_query_search($time) {
   return $obm_db;
 }
 
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Task grouped by month and summed by task project                          //
 // Parameters:
@@ -64,8 +62,20 @@ function run_query_search($time) {
 // Returns:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_project_by_month($time) {
+function run_query_stat_project($time) {
   global $auth, $c_day_fraction, $cdg_sql;
+
+  $tail = 0;
+  $user = $time["user_id"];
+  $uid_tab = "(";
+
+  while($key = each($time["user_id"])) {
+    $uid = $key["value"];
+    $uid_tab .= ($tail) ? ", $uid" : "$uid";
+    $tail = 1;
+  }
+
+  $uid_tab .= ")";
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
@@ -88,6 +98,7 @@ function run_query_stat_project_by_month($time) {
     where timetask_date <= '$month_end'
       and timetask_projecttask_id = projecttask_id
       and projecttask_deal_id = deal_id
+      and timetask_user_id in $uid_tab
     group by deal_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
     ";
@@ -107,8 +118,20 @@ function run_query_stat_project_by_month($time) {
 // Returns:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_tasktype_by_month($time) {
+function run_query_stat_tasktype($time) {
   global $auth, $c_day_fraction, $cdg_sql;
+
+  $tail = 0;
+  $user = $time["user_id"];
+  $uid_tab = "(";
+
+  while($key = each($time["user_id"])) {
+    $uid = $key["value"];
+    $uid_tab .= ($tail) ? ", $uid" : "$uid";
+    $tail = 1;
+  }
+
+  $uid_tab .= ")";
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
@@ -128,73 +151,9 @@ function run_query_stat_tasktype_by_month($time) {
     from TimeTask, TaskType
     where timetask_date <= '$month_end'
       and timetask_tasktype_id = tasktype_id
+      and timetask_user_id in $uid_tab
     group by tasktype_id
     having (sum(if (timetask_date >= '$month_begin' and timetask_date <= '$month_end', timetask_length, 0))) != 0
-    ";
-
-  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
-
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Task grouped by user and summed by project                                //
-// Parameters:
-//   - $time[]    :    time search criteria
-//     keys used       user_id
-// Returns:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_project_by_user($time) {
-  global $auth, $c_day_fraction, $cdg_sql;
-
-  $user_id = $time["user_id"];
-
-  $query = "
-    select
-      deal_label,
-      company_name,
-      FORMAT(sum(timetask_length / $c_day_fraction),3) as total_spent
-    from TimeTask, ProjectTask, Deal
-    left join Company on deal_company_id = company_id
-    where timetask_user_id = $user_id
-      and timetask_projecttask_id = projecttask_id
-      and projecttask_deal_id = deal_id
-      and deal_archive = 0
-      and deal_project_status in (1,2)
-    group by deal_id
-    ";
-
-  display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
-
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  return $obm_db;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Task grouped by user and summed by tasktype                               //
-// Parameters:
-//   - $time[]    :    time search criteria
-//     keys used       user_id
-// Returns:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_stat_tasktype_by_user($time) {
-  global $auth, $c_day_fraction, $cdg_sql;
-
-  $user_id = $time["user_id"];
-
-  $query = "
-    select
-      tasktype_label,
-      FORMAT(sum(timetask_length / $c_day_fraction),3) as total_spent
-    from TimeTask, TaskType
-    where timetask_user_id = $user_id
-      and timetask_tasktype_id = tasktype_id
-    group by tasktype_id 
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_stat_project_by_month");
@@ -713,7 +672,9 @@ function run_query_tasktype($uid = 0) {
       from TaskType
         left join Deal on (tasktype_id = deal_tasktype_id and deal_archive = 0 and deal_project_status != 0)
         left join ProjectTask on (deal_id = projecttask_deal_id)
-        left join ProjectUser on (projecttask_id=projectuser_projecttask_id and projectuser_user_id=$uid)
+        left join ProjectUser on (projecttask_id=projectuser_projecttask_id
+                                  and projectuser_user_id=$uid
+                                  and projectuser_projectedtime != 0)
       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
         or tasktype_internal=2
       order by tasktype_internal, tasktype_label";
@@ -743,7 +704,10 @@ function run_query_project($time) {
 
   $query = "
     select distinct
-      deal_id, deal_label, company_name, deal_tasktype_id
+      deal_id,
+      deal_label,
+      company_name,
+      deal_tasktype_id
     from Deal, ProjectTask, ProjectUser
       left join Company on company_id = deal_company_id
     where deal_project_status in (1,2)
@@ -751,6 +715,7 @@ function run_query_project($time) {
       and projectuser_projecttask_id = projecttask_id
       and projecttask_deal_id = deal_id
       and projectuser_user_id = $uid
+      and projectuser_projectedtime != 0
       order by deal_tasktype_id, company_name, deal_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_project");
@@ -775,6 +740,7 @@ function run_query_projecttask($time) {
     from ProjectTask, ProjectUser
     where projectuser_projecttask_id = projecttask_id
       and projectuser_user_id = $uid
+      and projectuser_projectedtime != 0
       order by projecttask_deal_id, projecttask_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_projecttask");
