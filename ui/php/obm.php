@@ -107,7 +107,7 @@ function dis_logout_detail() {
 function dis_calendar_portal() {
   global $ico_agenda_portal,$set_theme;
   global $l_module_agenda,$l_daysofweekfirst,$l_your_agenda,$l_waiting_events;
-  global $auth,$set_weekstart_default;
+  global $auth, $cagenda_weekstart;
 
   $num = run_query_waiting_events() ;
 
@@ -115,14 +115,14 @@ function dis_calendar_portal() {
  
   $first_of_month = date("Ym01",$unix_time);
   $next_month = date( "Ym01", strtotime("+1 month",  $unix_time));
-  $start_month_day = dateOfWeek($first_of_month,$set_weekstart_default);  
+  $start_month_day = dateOfWeek($first_of_month, $cagenda_weekstart);  
   $start_time = strtotime($start_month_day);
   $end_time = strtotime($next_month);
   $calendar_user = array ($auth->auth["uid"] => "dummy"); 
   $events_list = events_model($start_time,$end_time,$calendar_user);
   $minical_month = date("m");
   $minical_year = date("Y");
-  $start_day = strtotime(dateOfWeek($first_of_month, $set_weekstart_default));
+  $start_day = strtotime(dateOfWeek($first_of_month, $cagenda_weekstart));
   $whole_month = TRUE;
   $num_of_events = 0;
   $i = 0;

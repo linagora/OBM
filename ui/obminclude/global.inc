@@ -11,14 +11,6 @@
 $obm_version = "0.9.0pre16";
 $l_obm_title = "O.B.M.";
 
-// Agenda constants
-$set_weekstart_default = "monday + 2 hours"; // First day of the week, 
-//english The +2 hours is a quick fix
-//for a bug php (see dst bug in bugzilla.aliacom.fr)
-
-$set_start_time = '8'; // first hour of the day
-$set_stop_time = '20'; // last hour of the day
-
 // Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
 
@@ -90,35 +82,48 @@ $password_encryption = "md5";
 
 // Modules specific parameters ----------------------------------------------//
 
-// Generic E-mail for Incident module
-$cmail_incident = "";
+// Company : Auto format fields
+$caf_company_name = false;
+$caf_town = false;
 
-// is mailing enabled by default for a new contact
+// Contact : is mailing enabled by default for a new contact
 $cgp_mailing_default = true;
 
-// is a new contact private by default
+// Contact : is a new contact private by default
 $ccontact_private_default = false;
 
-// Document constants 
+// Calendar : show public groups
+$cagenda_public_groups = true;
+
+// Calendar : First day of the week (+2h to fix a DST php bug)
+$cagenda_weekstart = "monday + 2 hours";
+
+// Calendar first and last hour display
+$cagenda_first_hour = 8;
+$cagenda_last_hour = 20;
+
+// Time : In how many parts we split up a day (Time management)
+$c_day_fraction = 8;
+
+// Time : Worked days in a week (start at sunday)
+$c_working_days = array(0,1,1,1,1,1,0);
+
+// Time : Day beginning a week (0=Sunday, 1=Monday,...)
+$c_week_first_day = 1;
+
+// Incident : Generic E-mail for Incident module
+$cmail_incident = "";
+
+// Document : constants
 $document_path = "/var/www/docs";            // Root of the document repository
 $default_path = "/Default";                  // Default directory
 $default_mime = "application/octet-stream";  // Default Mime Type
 
-// Auto format fields
-$caf_company_name = false;
-$caf_town = false;
+// Group : is a new group private by default
+$cgroup_private_default = true;
 
-// Import constants
+// Import : temporary path
 $tmp_path = "/tmp";
-
-// In how many parts we split up a day (Time management)
-$c_day_fraction = 8;
-
-// Worked days in a week (start at sunday)
-$c_working_days = array(0,1,1,1,1,1,0);
-
-// Day beginning a week (0=Sunday, 1=Monday,...)
-$c_week_first_day = 1;
 
 // DST (Daily Saving Time) correction to avoid dates problems (2h)
 $c_dst_err = 7200;

@@ -1,10 +1,10 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : obm_conf.inc                                                 //
-//     - Desc : OBM specific site configuration file                         //
-// 2003-10-17 Pierre Baudracco                                               //
+// OBM - File : obm_conf.inc.sample                                          //
+//     - Desc : OBM specific site configuration Sample file                  //
+// 2005-04-04 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id$
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -30,14 +30,14 @@ $cgp_todo_nb = 5;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 1;
-$cg_prod = 2;
+$cg_com = 2;
+$cg_prod = 3;
 
 // Allow * in search field
 $cgp_sql_star = true;
 
 // Tuning constants
-$ctu_sql_limit = true;
+//$ctu_sql_limit = true;
 
 // MySQL (only 4.1+) charset used (for database and files !)
 //$cmy_character_set = "_latin1";
@@ -117,38 +117,35 @@ $profiles["editor"] = array (
 // sections -- Default is true
 //$cgp_show["section"] = ""; // Needed if module order to change
 //$cgp_show["section"]["com"]["url"] = "$path/agenda/agenda_index.php";
-$cgp_show["section"]["aliamin"]["url"] = "http://aliamin-panthere.aliacom.local/aliamin.php";
 
-$cgp_show["section"]["aliamin"] = false; 
 // modules -- false to hide, otherwise section
 //$cgp_show["module"] = ""; // Needed if module order to change
 //$cgp_show["module"]["company"] = "com";
 
 // Company module
-$cgp_hide["company"]["company_number"] = true;
-$cgp_hide["company"]["company_vat"] = true;
+//$cgp_hide["company"]["company_number"] = true;
+//$cgp_hide["company"]["company_vat"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
-$cgp_hide["company"]["companynafcode_code"] = true;
+//$cgp_hide["company"]["companynafcode_code"] = true;
 //$cgp_hide["company"]["category"] = true;
 //$cgp_hide["company"]["company_address3"] = true;
 //$cgp_hide["company"]["company_expresspostal"] = true;
 
 // Contact module
-$cgp_hide["contact"]["contact_function"] = true;
+//$cgp_hide["contact"]["contact_function"] = true;
 //$cgp_hide["contact"]["contact_title"] = true;
-$cgp_hide["contact"]["responsible"] = true;
+//$cgp_hide["contact"]["responsible"] = true;
 //$cgp_hide["contact"]["category1"] = true;
-$cgp_hide["contact"]["category2"] = true;
+//$cgp_hide["contact"]["category2"] = true;
 //$cgp_hide["contact"]["contact_service"] = true;
 
 // Deal module
-$cgp_hide["deal"]["category1"] = true;
+//$cgp_hide["deal"]["category1"] = true;
 
-//Set if there is a link for Aliamin, Blogs and Aliacms
+// AliaSuite : Set if there is a link for Aliamin, Blogs and Aliacms
 //$aliamin_link = "http://aliamin.aliacom.local/";
 //$aliacms_link = "http://cms.aliacom.local/";
 //$blogs_link = "http://blogs.aliacom.local/";
-
 
 </script>

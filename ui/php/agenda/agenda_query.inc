@@ -1231,11 +1231,12 @@ function localizeDate($format, $timestamp) {
 //     - $day
 ///////////////////////////////////////////////////////////////////////////////
 function dateOfWeek($Ymd, $day) {
-  global $set_weekstart_default;
-  if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
+  global $cagenda_weekstart;
+
+  if (!isset($cagenda_weekstart)) $cagenda_weekstart = 'Sunday';
   $timestamp = strtotime($Ymd);
-  $num = date('w', strtotime($set_weekstart_default));
-  $start_day_time = strtotime((date('w',$timestamp)==$num ? "$set_weekstart_default" : "last $set_weekstart_default"), $timestamp);
+  $num = date('w', strtotime($cagenda_weekstart));
+  $start_day_time = strtotime((date('w',$timestamp)==$num ? "$cagenda_weekstart" : "last $cagenda_weekstart"), $timestamp);
   $ret_unixtime = strtotime($day,$start_day_time);
   $ret_unixtime = strtotime('+12 hours', $ret_unixtime);
   $ret = date('Ymd',$ret_unixtime);
@@ -1283,8 +1284,9 @@ function format_to_iso($db_type,$date) {
 //     - $date
 ///////////////////////////////////////////////////////////////////////////////
 function get_week_num($date) {
-  global $set_weekstart_default;
-  $num = date('w', strtotime($set_weekstart_default));
+  global $cagenda_weekstart;
+
+  $num = date('w', strtotime($cagenda_weekstart));
   $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$data));
   $week_num = date("W",strtotime("$delta_thursday days",$date));
   return $week_num;
@@ -1397,7 +1399,7 @@ function run_query_conflict_events($start,$end,$contacts_array,$event_id) {
 //   - $groups_array   : group id array, the event is assigned to 
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_repeat_events($start,$end,$contacts_array) {
-  global $cdg_sql, $set_start_time, $set_stop_time,$set_weekstart_default,$auth;
+  global $cdg_sql, $auth;
   
   $obm_db = new DB_OBM;
   $db_type = $obm_db->type;
@@ -1450,9 +1452,8 @@ function run_query_repeat_events($start,$end,$contacts_array) {
 // -----------
 /////////////////////////////////////////////////////////////////////////////
 function events_model($start_time, $end_time,$calendar_user) {
-  global $set_start_time, $set_stop_time,$set_weekstart_default;
-
   global $day_duration;
+
   $day_duration = 86400;
   $obm_no_repeat = run_query_no_repeat_events($start_time,$end_time,$calendar_user);
   while($obm_no_repeat->next_record()) {
@@ -1557,13 +1558,14 @@ function daily_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_ev
     $temp_date = strtotime("+$repeatfrequence days",$temp_date);
   }
 }
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 //  Perform the weekly repeatition of an event 
 //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
-  global $day_duration,$set_weekstart_default;
-  $temp_date = strtotime(dateOfWeek(date("Ymd",$date), $set_weekstart_default));
+  global $day_duration,$cagenda_weekstart;
+
+  $temp_date = strtotime(dateOfWeek(date("Ymd",$date), $cagenda_weekstart));
   $temp_date = strtotime("+".date("H",$date)." hours +".date("i",$date)." minutes",$temp_date);
   if($temp_date < $start_time) {
     $temp_date = ceil(($start_time - $temp_date) / $day_duration);
@@ -1573,7 +1575,7 @@ function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequ
     if($temp_date == "") $temp_date = 0;
     $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
   }
-  $num = (date('w', $temp_date) - date('w', strtotime($set_weekstart_default)) +7)%7;
+  $num = (date('w', $temp_date) - date('w', strtotime($cagenda_weekstart)) +7)%7;
   for($i=$num; $i<strlen($repeatdays);$i++) {
     $repeat_days[$i - $num]=substr($repeatdays, $i, 1);
   }	
@@ -1594,19 +1596,21 @@ function weekly_repeatition($date,$start_time,$end_date,$repeatdays,$repeatfrequ
     $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
   }	
 }
-/////////////////////////////////////////////////////////////////////////////
+
+
+///////////////////////////////////////////////////////////////////////////////
 //  Perform the monthly by date repeatition of an event 
 //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function monthlybyday_repeatition($date,$start_time,$end_date,$repeatfrequence,&$day_events,&$event,$user_id,$all_day) {
-  
-  global $day_duration,$set_weekstart_default;
+  global $day_duration,$cagenda_weekstart;
+
   $temp_date = $date;  
-  $start_week = date('w', strtotime($set_weekstart_default));
+  $start_week = date('w', strtotime($cagenda_weekstart));
   $num = (date('w', $date) - $start_week +7)%7;	
   $monthlybyday = ceil( date('d',$date) / 7 ) ;
   $event_end = $date + $event->duration;
-  if($event_end  < $start_time) {
+  if ($event_end  < $start_time) {
     $month_diff = (date("Y",$start_time) - date("Y",$temp_date)) * 12;	
     $month_diff += date("m",$start_time) - date("m",$temp_date);
     $hour_diff = date("H",$date) - date("H",$start_time);

@@ -14,7 +14,7 @@
 //   - $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q) {
-  global $set_theme, $set_weekstart_default, $set_cal_interval, $ico_spacer;
+  global $set_theme, $cagenda_weekstart, $set_cal_interval, $ico_spacer;
   global $l_go_to, $l_calendar_visible, $l_calendar_displayed, $l_back_mono;
   global $l_free,$l_possible,$l_go,$l_occupied, $l_private, $l_public;
   global $l_daysofweekfirst,$l_validate,$l_meeting_legend;
@@ -35,22 +35,19 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
   $this_group = $agenda["agenda_group"];
 
   $check_week = strtotime($getdate);
-  $start_week_time = strtotime(dateOfWeek(date("Ymd", strtotime("$this_year-01-01")), $set_weekstart_default));
+  $start_week_time = strtotime(dateOfWeek(date("Ymd", strtotime("$this_year-01-01")), $cagenda_weekstart));
   $end_week_time = $start_week_time + (6 * 25 * 60 * 60);
 
   $month_time = strtotime("$this_year-01-01");
-
   $year_time = strtotime(($this_year-3)."-01-01");
-  
   $dis_month = localizeDate ("month", $unix_time);
-
-  $start_week_day = strtotime($set_weekstart_default);
+  $start_week_day = strtotime($cagenda_weekstart);
 
   $minical_time = strtotime($this_year.'-'.$this_month.'-15');
   $minical_month = date("m", $minical_time);
   $minical_year = date("Y", $minical_time);
   $first_of_month = $minical_year.$minical_month."01";
-  $start_day = strtotime(dateOfWeek($first_of_month, $set_weekstart_default));
+  $start_day = strtotime(dateOfWeek($first_of_month, $cagenda_weekstart));
 
   $whole_month = TRUE;
   $num_of_events = 0;
@@ -316,10 +313,9 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
        </tr>
       </table>
      </div>
-      
 ";
 
-    return $block;
+  return $block;
 }
 
 
@@ -332,10 +328,10 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
 //   - $force: 
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_conflict($agenda,$conflict) {
-  global $set_theme,$set_weekstart_default,$auth;
-  // -- Labels
+  global $set_theme,$auth;
   global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user;
   global $l_force_insert,$l_refuse_insert,$l_cancel_insert,$l_validate;
+
   $user_id = $agenda["user_id"];
   while ($conflict->next_record()) {
     $id = $conflict->f("calendarevent_id"); 
@@ -384,6 +380,8 @@ function html_dis_conflict($agenda,$conflict) {
   ";
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Conflicts
 // Parameters:
@@ -421,15 +419,15 @@ function html_conflict_form($agenda) {
 //   - $contacts_array : array of selected contacts 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category_list, $p_user_array) {
-  global $display;
-  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
-  global $ico_add_user, $ico_add_group,$ico_delete;
+  global $path, $display, $set_theme,$cagenda_weekstart, $set_cal_interval;
+  global $ico_mini_cal, $ico_add_user, $ico_add_group,$ico_delete;
+  global $cagenda_first_hour, $cagenda_last_hour;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
-  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort,$l_update;
-  global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
+  global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort;
+  global $l_none,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
   global $l_agenda_select_group, $l_hour,$l_all_day;
 
   $time_unit = 60 / $set_cal_interval;  
@@ -554,7 +552,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
   $sel_cat .= "</select>";
 
  // Repetition days
-  $start_week_day = strtotime($set_weekstart_default);
+  $start_week_day = strtotime($cagenda_weekstart);
 
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
@@ -647,7 +645,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
 
   
   $dis_hour_b = "<select name=\"sel_time_begin\">";
-  for ($i=$set_start_time;$i<$set_stop_time;$i++) {
+  for ($i=$cagenda_first_hour; $i<$cagenda_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $hourbegin) {
       $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
@@ -658,7 +656,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
   $dis_hour_b .= "</select>";  
  
   $dis_hour_e = "<select name=\"sel_time_end\">";
-  for ($i=$set_start_time;$i<=$set_stop_time;$i++) {
+  for ($i=$cagenda_first_hour; $i<$cagenda_last_hour; $i++) {
     $current_hour = substr("0$i",-2,2); 
     if ($current_hour == $hourend) {
       $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
@@ -803,7 +801,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $grp_q, $category
 function html_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate,$l_from;
-  global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
+  global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$cagenda_weekstart,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
    
   while ($obm_wait->next_record()) {
@@ -857,7 +855,7 @@ function html_waiting_events($obm_wait) {
 	break;
     }
 	
-    $start_week_day = strtotime($set_weekstart_default);
+    $start_week_day = strtotime($cagenda_weekstart);
     $dis_repeat_days = "";
     for ($i=0; $i<7; $i++) {
       $day_num = date("w", $start_week_day);
@@ -895,7 +893,7 @@ function html_waiting_events($obm_wait) {
      </td>
     </tr>";
   }
-  if($is_repeat) {
+  if ($is_repeat) {
     $dis_kind = $l_repeatkind;
     $dis_day = $l_repeatdays2;
     $dis_end = $l_use_endrepeat;
@@ -928,19 +926,18 @@ function html_waiting_events($obm_wait) {
  
  
 ///////////////////////////////////////////////////////////////////////////////
-// Display Calendar Consult                                                  //
+// Display Calendar Consult
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
-  global $display;
-  global $set_theme,$set_weekstart_default;
+  global $display, $set_theme,$cagenda_weekstart;
   // -- Labels
   global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc,$l_high;
   global $l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $auth,$l_change_state,$l_groups,$l_all_day;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
-  global $set_weekstart_default,$l_wait,$l_none;
+  global $l_wait,$l_none;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda;
   global $l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
@@ -977,7 +974,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
       break;
   }
     
-  $start_week_day = strtotime($set_weekstart_default);
+  $start_week_day = strtotime($cagenda_weekstart);
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);
     $day = $l_daysofweekshort[$day_num];
@@ -1117,9 +1114,10 @@ function html_dis_delete($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_right_admin($agenda) {
   global $display,$auth;
-  if(isset($agenda["user_id"])) {
+
+  if (isset($agenda["user_id"])) {
     $user_id = $agenda["user_id"];
-  }else {
+  } else {
     $user_id = $auth->auth["uid"];
   }
   $writable_user = run_query_userobm_label_writable(); 
@@ -1136,6 +1134,7 @@ function dis_right_admin($agenda) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_userwritable_bar($writable_user,$user_id) {
   global $l_user_right,$l_validate;
+
 // User Selection
   if (count($writable_user) > 0) {  
     $dis_sel_user .= "<select name=\"param_user\">";
@@ -1175,8 +1174,6 @@ function html_userwritable_bar($writable_user,$user_id) {
   }
   return $block;
 } 
-
-
 
   
 ///////////////////////////////////////////////////////////////////////////////
@@ -1280,9 +1277,9 @@ function html_dis_right_admin($user_q,$user_id) {
 //    -$groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_meeting_form($agenda, $usr_q, $p_user_array) {
-  global $display, $path,$ico_delete;
-  global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
-  global $ico_add_user,$popup_height,$popup_width;
+  global $display, $path,$ico_delete, $ico_mini_cal, $ico_add_user;
+  global $set_theme, $set_cal_interval;
+  global $popup_height,$popup_width;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
   global $l_groups;
@@ -1404,8 +1401,8 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
    </div>    
   </form>
    ";
-   return $block;
- }
+  return $block;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1418,9 +1415,9 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_free_interval($agenda,$calendar_user,$usr_q){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
+  global $set_cal_interval,$ico_new_event;
+  global $cagenda_weekstart, $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_private_description,$display;              
-
 
   $user_meeting = $agenda["user_meeting"]; 
   $group_meeting = $agenda["group_meeting"]; 
@@ -1441,9 +1438,9 @@ function dis_free_interval($agenda,$calendar_user,$usr_q){
     $param_group .= "&amp;sel_group_meeting_id[]=$group";
   }
   
-  $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
-  $end_week_time = $start_week_day + ((6 * 24 + $set_stop_time) * 3600);
-  $start_week_time = strtotime("+ $set_start_time hours",$start_week_day);
+  $start_week_day = strtotime(dateOfWeek($getdate, $cagenda_weekstart));
+  $end_week_time = $start_week_day + ((6 * 24 + $cagenda_last_hour) * 3600);
+  $start_week_time = strtotime("+ $cagenda_first_hour hours",$start_week_day);
   
   $start_week = localizeDate("week", $start_week_time);
   $end_week =  localizeDate("week", $end_week_time);
@@ -1455,16 +1452,16 @@ function dis_free_interval($agenda,$calendar_user,$usr_q){
   for($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date = date("Ymd", $i);
     $this_date_l = localizeDate("week_list", $i);
-    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($this_date)));
-    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($this_date)));
+    $daylink_begin = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($this_date)));
+    $daylink_end = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($this_date)));
     $week_day_list .= "
      <td class=\"agendaCell\" colspan=\"$nb_user\" style=\"width:72px\">
       $this_date_l 
      </td>";
   } 
   /* Events of the week */
-  for($j = $set_start_time; $j < $set_stop_time; $j++) {
-    $delta = $j - $set_start_time;
+  for ($j = $cagenda_first_hour; $j < $cagenda_last_hour; $j++) {
+    $delta = $j - $cagenda_first_hour;
     for ($k=0;$k<$set_cal_interval;$k++) {
       if($k==0) {
 	$week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\" >".($j).":00</td>";
@@ -1537,20 +1534,20 @@ function dis_free_interval($agenda,$calendar_user,$usr_q){
 }
 
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Free meeting performing and display
@@ -1562,7 +1559,8 @@ function dis_free_interval($agenda,$calendar_user,$usr_q){
 ///////////////////////////////////////////////////////////////////////////////
 function dis_free_ressource($agenda,$calendar_user,$usr_q ){
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
+  global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
+  global $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_private_description,$display;              
 
   $user_meeting = $agenda["user_meeting"]; 
@@ -1580,9 +1578,9 @@ function dis_free_ressource($agenda,$calendar_user,$usr_q ){
     $param_user .= "&amp;sel_user_meeting_id[]=$user";
   }
   
-  $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
-  $end_week_time = $start_week_day + ((6 * 24 + $set_stop_time) * 3600);
-  $start_week_time = strtotime("+ $set_start_time hours",$start_week_day);
+  $start_week_day = strtotime(dateOfWeek($getdate, $cagenda_weekstart));
+  $end_week_time = $start_week_day + ((6 * 24 + $cagenda_last_hour) * 3600);
+  $start_week_time = strtotime("+ $cagenda_first_hour hours",$start_week_day);
   
   $start_week = localizeDate("week", $start_week_time);
   $end_week =  localizeDate("week", $end_week_time);
@@ -1591,42 +1589,42 @@ function dis_free_ressource($agenda,$calendar_user,$usr_q ){
   $day_duration = 86400; 
 
   /* Week Days headers */
-  for($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
+  for ($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date = date("Ymd", $i);
     $this_date_l = localizeDate("week_list", $i);
-    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($this_date)));
-    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($this_date)));
+    $daylink_begin = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($this_date)));
+    $daylink_end = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($this_date)));
     $week_day_list .= "
      <td class=\"agendaCell\" colspan=\"$nb_user\" style=\"width:72px\">
       $this_date_l 
      </td>";
   } 
   /* Events of the week */
-  for($j = $set_start_time; $j < $set_stop_time; $j++) {
-    $delta = $j - $set_start_time;
+  for ($j = $cagenda_first_hour; $j < $cagenda_last_hour; $j++) {
+    $delta = $j - $cagenda_first_hour;
     for ($k=0;$k<$set_cal_interval;$k++) {
-      if($k==0) {
+      if ($k==0) {
 	$week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\" >".($j).":00</td>";
       }
       else {	
 	$week_cal .= "\n<tr>";
       }
       $delta2 = $k * $time_unit;
-      for($i = 0; $i <7; $i ++) {
+      for ($i = 0; $i <7; $i ++) {
 	$current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);	
         $dayLink = date("Ymd",$current_time);
         $end_time = $current_time + $duration;	
-	if(isset($events[$dayLink])) {
+	if (isset($events[$dayLink])) {
 	  $restricted = array();
 	  $free = array();
 	  $day = $events[$dayLink];
 	  $begin_date = date("YmdHis",$current_time);
 	  $end_date = date("YmdHis",$end_time);
-	  foreach($calendar_user as $id => $data ) {  
+	  foreach ($calendar_user as $id => $data ) {  
 	    $have_event = $day->user_have_events_between($current_time, $current_time + $time_unit_sec,$id);
             $will_have_event = $day->user_have_events_between($current_time, $end_time,$id);
-	    if(!$have_event) {
-	      if($will_have_event) {
+	    if (!$have_event) {
+	      if ($will_have_event) {
 		$restricted[] = $data;
 	      } else {
 		$free[] = $data;
@@ -1634,7 +1632,7 @@ function dis_free_ressource($agenda,$calendar_user,$usr_q ){
 	    }
 	  } 	  
 	  $goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1";	  
-	  if(count($free) != 0) {
+	  if (count($free) != 0) {
 	    $week_cal .=  "<td class=\"agendaPossible\" onclick=\"window.location='$goto&amp;sel_user_meeting_id[]=".$free[0]["id"]."'\"
 	     onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer';show(event,'$current_time')\";
 	     onmouseout=\"this.className='agendaPossible';hide('$current_time');\">&nbsp;</td>\n";
@@ -1644,7 +1642,7 @@ function dis_free_ressource($agenda,$calendar_user,$usr_q ){
 	     onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer';show(event,'$current_time')\"
 	     onmouseout=\"this.className ='agendaFree';hide('$current_time');\">&nbsp;</td>\n";
 	     $hidden_div .= ressources_free_display($free,$restricted,$current_time);
-	  }else {
+	  } else {
 	    $week_cal .=  "<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
 	  }
 	} else {
@@ -1719,15 +1717,15 @@ function ressources_free_display($free, $restrected, $current_time) {
   return $hidden_div;
 }
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the agenda administration index
@@ -1916,12 +1914,12 @@ function dis_category_links($agenda) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Perform the export to the vCalendar format                                //
+// Perform the export to the vCalendar format
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
 function dis_export_handle($agenda) {
-  global $obm_version,$set_weekstart_default,$auth;
+  global $obm_version,$cagenda_weekstart,$auth;
 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);  
@@ -2026,7 +2024,7 @@ END:VEVENT";
     }
     elseif($kind == "weekly") {
       $l_day_repeat = array("SU","MO","TU","WE","TH","FR","SA");
-      $start_week_day = strtotime($set_weekstart_default);
+      $start_week_day = strtotime($cagenda_weekstart);
       for ($i=0; $i<7; $i++) {
       	$day_num = date("w", $start_week_day);
       	$day = $l_day_repeat[$day_num];
@@ -2083,7 +2081,7 @@ END:VCALENDAR";
 function dis_year_planning($agenda,$calendar_user,$usr_q) {
 
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
+  global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
   global $l_private;
 
@@ -2096,7 +2094,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
   $this_year = date("Y",$unix_time);
 
   $display_date = localizeDate("month", $unix_time);  
-  $start_week_day = strtotime($set_weekstart_default);
+  $start_week_day = strtotime($cagenda_weekstart);
   $start_time = strtotime($first_of_year);
   $end_time = strtotime($next_year);
   $num_of_events = 0;
@@ -2107,7 +2105,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
   
   $events = events_model($start_time,$end_time,$calendar_user);
 
-  $start_day = strtotime($set_weekstart_default);
+  $start_day = strtotime($cagenda_weekstart);
   
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
@@ -2125,7 +2123,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
     $minical_year = date("Y",$start_time);
     $first_of_month = $minical_year.$minical_month."01";
 
-    $start_day = strtotime(dateOfWeek($first_of_month, $set_weekstart_default));
+    $start_day = strtotime(dateOfWeek($first_of_month, $cagenda_weekstart));
     
     $i = 0;
     $whole_month = TRUE;
@@ -2264,7 +2262,8 @@ return $block;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_month_planning($agenda,$calendar_user,$usr_q) { 
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
+  global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
+  global $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_daysofweek;
 
   $getdate = $agenda["date"];
@@ -2273,11 +2272,11 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
   $first_of_month = date("Ym01",$unix_time);
   $next_month = date( "Ym01", strtotime("+1 month",  $unix_time));
   $prev_month = date( "Ym01", strtotime("-1 month",  $unix_time));
-  $start_month_day = dateOfWeek($first_of_month,$set_weekstart_default);  
+  $start_month_day = dateOfWeek($first_of_month,$cagenda_weekstart);  
   $this_month =  date("m",$unix_time);
 
   $display_date = localizeDate("month", $unix_time);  
-  $start_week_day = strtotime($set_weekstart_default);
+  $start_week_day = strtotime($cagenda_weekstart);
   $start_time = strtotime($start_month_day);
   $end_time = strtotime($next_month);
   $whole_month = TRUE;
@@ -2319,8 +2318,8 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
       </a>
       </td>";
     }
-    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($current_day)));
-    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($current_day)));
+    $daylink_begin = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($current_day)));
+    $daylink_end = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($current_day)));
 
     $dis_month_cal .= "
       <td $bgclass style=\"width:105px;height:105px\">
@@ -2464,7 +2463,8 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
-  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
+  global $cagenda_weekstart, $set_cal_interval,$ico_new_event;
+  global $cagenda_first_hour, $cagenda_last_hour;
   global $l_private,$l_all_day, $ico_agenda;
 
   $getdate = $agenda["date"];
@@ -2475,9 +2475,9 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
   
-  $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
-  $end_week_time = $start_week_day + ((6 * 24 + $set_stop_time) * 3600);
-  $start_week_time = strtotime("+ $set_start_time hours",$start_week_day);
+  $start_week_day = strtotime(dateOfWeek($getdate, $cagenda_weekstart));
+  $end_week_time = $start_week_day + ((6 * 24 + $cagenda_last_hour) * 3600);
+  $start_week_time = strtotime("+ $cagenda_first_hour hours",$start_week_day);
   
   $start_week = localizeDate("week", $start_week_time);
   $end_week =  localizeDate("week", $end_week_time);
@@ -2493,8 +2493,8 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
   for($i = $start_week_time; $i < $end_week_time; $i += $day_duration ) {
     $this_date = date("Ymd", $i);
     $this_date_l = localizeDate("week_list", $i);
-    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($this_date)));
-    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($this_date)));
+    $daylink_begin = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($this_date)));
+    $daylink_end = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($this_date)));
     $week_day_list .= "
      <td class=\"agendaCell\" colspan=\"$nb_user\" style=\"width:72px\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=$this_date")."\">$this_date_l</a>
@@ -2531,8 +2531,8 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
     $week_cal .= "</tr>";
   }
   /* Events of the week */
-  for($j = $set_start_time; $j < $set_stop_time; $j++) {
-    $delta = $j - $set_start_time;
+  for ($j = $cagenda_first_hour; $j < $cagenda_last_hour; $j++) {
+    $delta = $j - $cagenda_first_hour;
     for ($k=0;$k<$set_cal_interval;$k++) {
       if($k==0) {
 	$week_cal .= "\n<tr><td rowspan=\"$set_cal_interval\" class=\"agendaHour\" >".($j).":00</td>";
@@ -2548,7 +2548,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	  $user_indice = 0;
 	  foreach($calendar_user as $id => $properties) {
 	    $user_indice ++;
-	    if($j == $set_start_time && $delta2 == 0) 
+	    if ($j == $cagenda_first_hour && $delta2 == 0) 
 	      $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
 	    else 
 	      $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);
@@ -2664,7 +2664,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
-  global $set_start_time, $set_stop_time,$set_cal_interval,$set_weekstart_default;
+  global $cagenda_first_hour, $cagenda_last_hour,$set_cal_interval;
   global $l_private,$auth,$l_all_day,$ico_agenda;
 
   $getdate = $agenda["date"];
@@ -2679,9 +2679,8 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
  
-
-  $start_time = strtotime("+$set_start_time hours",strtotime($getdate));
-  $end_time =  strtotime("+$set_stop_time hours",strtotime($getdate));
+  $start_time = strtotime("+$cagenda_first_hour hours",strtotime($getdate));
+  $end_time =  strtotime("+$cagenda_last_hour hours",strtotime($getdate));
   
   $display_date = localizeDate("day", $unix_time);
    
@@ -2713,29 +2712,30 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
     $hour_day_list .= "</tr>";
   }
 
-  for($i = $set_start_time; $i < $set_stop_time; $i++) {
-    for ($k=0;$k<$set_cal_interval;$k++) {
-      if($k==0) {
+  for ($i = $cagenda_first_hour; $i < $cagenda_last_hour; $i++) {
+    for ($k=0; $k<$set_cal_interval; $k++) {
+      if ($k==0) {
 	$hour_day_list .= "\n<tr><td class=\"agendaHour\" rowspan=\"$set_cal_interval\" >$i:00</td>"; 
       } else {
 	$hour_day_list .= "\n<tr>"; 
       }
       $delta2 = $k * $time_unit;
       $current_time = strtotime("+$i hours +$delta2 minutes",strtotime($getdate));   
-      if(is_object($day)) {
+      if (is_object($day)) {
 	$user_indice = 0;
-	foreach($calendar_user as $id => $properties) {
+	foreach ($calendar_user as $id => $properties) {
 	  $user_indice ++;
-	  if($i == $set_start_time && $delta2 == 0) 
+	  if ($i == $cagenda_first_hour && $delta2 == 0) {
 	    $events_data = $day->get_events_before($current_time + $time_unit_sec, $id, $current_time);
-	  else 
+	  } else {
 	    $events_data = $day->get_events_between($current_time, $current_time + $time_unit_sec, $id);	  
-	  if($events_data != null)  {
-	    if(is_array($events_data)) {
+	  }
+	  if ($events_data != null) {
+	    if (is_array($events_data)) {
 	      $duration = $events_data["duration"];
 	      $list_events = $events_data["events"];
 	      $hour_day_list .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\" rowspan=\"".ceil($duration/($time_unit_sec))."\" >";
-	      foreach($list_events as $event) {
+	      foreach ($list_events as $event) {
 		day_event_display(&$hour_day_list,&$hidden_div,$event,$nb_user,$properties);	
 	      }
 	      $hour_day_list .=  "</td>";
@@ -2751,8 +2751,8 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
     }
   }
 
-  $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($getdate)));
-  $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($getdate)));  
+  $daylink_begin = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($getdate)));
+  $daylink_end = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($getdate)));  
   $block = "
 
 <div class=\"agendaMain\">

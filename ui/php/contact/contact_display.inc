@@ -2973,7 +2973,6 @@ function dis_vcard_export($contact) {
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
 function export_vcard($co_q,$com_q) {
-  global $obm_version,$set_weekstart_default;
 
   $id = $co_q->f("contact_id");
   $kind_header = $co_q->f("kind_header");

@@ -424,7 +424,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_agenda() {
   global $param_date,$param_event,$param_group,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
-  global $set_start_time, $set_stop_time,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
+  global $cagenda_first_hour, $cagenda_last_hour,$tf_date_begin,$sel_time_begin,$sel_min_begin,$sel_time_end,$sel_min_end;
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action,$param_user;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
@@ -484,11 +484,11 @@ function get_param_agenda() {
       $agenda["date_begin"] = $agenda["date_begin"].$sel_time_begin.$sel_min_begin;
     }
     else {
-      $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime($agenda["date_begin"])));
+      $agenda["date_begin"] = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime($agenda["date_begin"])));
     }
   }
   else {
-    $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime(date("Ymd"))));
+    $agenda["date_begin"] = date("YmdHi",strtotime("+$cagenda_first_hour hours",strtotime(date("Ymd"))));
   }
   if (isset($tf_date_end)) {
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_end , $day_array);
@@ -497,11 +497,11 @@ function get_param_agenda() {
       $agenda["date_end"] =  $agenda["date_end"].$sel_time_end.$sel_min_end;
     }
     else {
-      $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($agenda["date_end"])));
+      $agenda["date_end"] = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime($agenda["date_end"])));
     }
   }
   else {
-    $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime(date("Ymd"))));
+    $agenda["date_end"] = date("YmdHi",strtotime("+$cagenda_last_hour hours",strtotime(date("Ymd"))));
   }
   if (isset($param_date_begin)) { 
     $agenda["date_begin"] = $param_date_begin;

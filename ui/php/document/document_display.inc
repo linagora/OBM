@@ -1551,7 +1551,7 @@ function display_popup_tree($tree,$current_directory,$name,$indent) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_file($doc_q) {
   global $document_path;
-  global $obm_version,$set_weekstart_default;
+
   $path = $doc_q->f("document_path");
   $name = $doc_q->f("document_name");  
   if(islink($name)) {

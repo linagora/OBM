@@ -1176,7 +1176,6 @@ function dis_contract_export($param_contract) {
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
 function export_contract($co_q) {
-  global $obm_version,$set_weekstart_default;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier;
