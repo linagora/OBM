@@ -127,9 +127,9 @@ function html_contact_search_form ($contact) {
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-      $ext&nbsp;
+      $ext &nbsp;
     </div>
-    <div style=\"clear: both;\"></div>
+    <div class=\"searchEnd\"></div>
   </div>
   </form>";
 
@@ -201,15 +201,13 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
-      <table class=\"detail\">
-      <tr>
-        <td>
-      <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
-        </td>
-      </tr>
-      </table>
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
+        <input type=\"submit\" value=\"$l_add\" />
+        <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
+        <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </p>
+      </p>
       </form>
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>

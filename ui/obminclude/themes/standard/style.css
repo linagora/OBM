@@ -270,7 +270,6 @@ table.detail {
 /* ------------------------------------------------------------------------- */
 
 .result {
-	clear: both;
 	float: left;
 	font-size: 10px;
 	background-color: #FF0000;
@@ -279,6 +278,7 @@ table.detail {
 	margin-top: 0px;
 	font-style: italic;
 	color: #7B9EAD;
+	clear: both;
 }
 
 table.resultTable	 {

@@ -101,35 +101,31 @@ function html_list_search_form ($list) {
 
   // --- HTML Page display ----------------------------------------------------
 
-  echo "
-    <form method=\"get\" name=\"f_list\"
-      action=\"".url_prepare("list_index.php")."\">
-      <table class=\"detail\">
-      <tr>
-        <td class=\"textLabelForm\">$l_name
-          <br />
-          <input type=\"text\" name=\"tf_name\" size=\"16\" value=\"$name\" />
-        </td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_list_contact
-          <br />
-          <input type=\"text\" name=\"tf_contact\" size=\"16\"
-            value=\"$contact\" />
-        </td>
-        <td>&nbsp;&nbsp;</td>
-        <td class=\"textLabelForm\">$l_email
-          <br />
-          <input type=\"text\" name=\"tf_email\" size=\"20\" value=\"$email\" />
-        </td>
-        <td class=\"textLabelForm\">&nbsp;&nbsp;
-          <input name=\"action\" type=\"hidden\" value=\"search\" />
-          <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
-          <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
-          $ext
-        </td>
-      </tr>
-      </table>
-    </form><hr />";
+  $block = "
+  <form method=\"get\" name=\"f_list\"
+    action=\"".url_prepare("list_index.php")."\">
+
+  <div class=\"search\">
+    <div class=\"searchLabel\">$l_name<br />
+      <input type=\"text\" name=\"tf_name\" size=\"16\" value=\"$name\" />
+    </div>
+    <div class=\"searchLabel\">$l_list_contact<br />
+      <input type=\"text\" name=\"tf_contact\" size=\"16\" value=\"$contact\" />
+    </div>
+    <div class=\"searchLabel\">$l_email<br />
+      <input type=\"text\" name=\"tf_email\" size=\"20\" value=\"$email\" />
+    </div>
+    <div class=\"searchLabel\">&nbsp;<br />
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+      $ext
+    </div>
+    <div class=\"searchEnd\"></div>
+  </div>
+  </form>";
+
+  return $block;
  }
 
 
@@ -142,16 +138,18 @@ function html_list_search_form ($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_search_list($list, $popup=false) {
   global $l_no_found;
-  global $auth, $new_order, $order_dir;
+  global $display, $auth, $new_order, $order_dir;
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "list");
   $obm_q = run_query_search($list, $new_order, $order_dir);
   $nb_list = $obm_q->num_rows();
   if ($nb_list == 0) {
-    display_warn_msg($l_no_found);
+    $display["msg"] .= display_warn_msg($l_no_found);
   } else {
-    html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup);
+    $block = html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup);
   }
+
+  return $block;
 }
 
 
@@ -166,7 +164,7 @@ function dis_list_search_list($list, $popup=false) {
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
-  global $l_found, $l_add, $l_close;
+  global $display, $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $list["ext_action"];
@@ -179,7 +177,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
   $name = urlencode(stripslashes($list["name"]));
   $contact = urlencode(stripslashes($list["contact"]));
 
-  display_info_msg("$nb_list $l_found");
+  $display["msg"] .= display_info_msg("$nb_list $l_found");
 
   $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
   
@@ -189,21 +187,28 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     $dis_list->data_cb_text = "X";
     $dis_list->data_idfield = "list_id";
     $dis_list->data_cb_name = "cb_list";
-    echo "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
+    $block .= "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
   }
   $dis_list->data_set = $obm_q;
   $dis_list->data_header = "both";
   $dis_list->data_url = $url;
-  $dis_list->display("dis_data_list");
+  $block .= $dis_list->display("dis_data_list");
 
   if ($popup) {
-    echo "<input type=\"submit\" value=\"$l_add\" /> 
+    $block .= "
+    <p class=\"detailButton\">
+    <p class=\"detailButtons\">
+      <input type=\"submit\" value=\"$l_add\" /> 
       <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" /> 
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" /> 
-      </form>
-      <p align=right>
-      <a href=\"\" onclick='window.close();'>$l_close</a>";
+    </p>
+    </p>
+    </form>
+    <p align=\"right\">
+    <a href=\"\" onclick='window.close();'>$l_close</a>";
   }
+
+  return $block;
 }
 
 
@@ -217,7 +222,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   //-- Label
   global $l_name, $l_subject, $l_email;
   global $l_query, $l_no_contact;
-  global $perm, $action;
+  global $display, $perm, $action;
   global $l_del_contact_sel, $l_con_found, $nb_contact_added, $nb_contact_deleted;
 
   $id = $list_q->f("list_id");
@@ -230,9 +235,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $email = $list_q->f("list_email");
   $query = nl2br($list_q->f("list_query"));
 
-  display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
+  $display["detailInfo"] = display_record_info($usercreate, $userupdate, $timecreate, $timeupdate);
 
-  echo "
+  $block = "
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_name</td>
@@ -256,11 +261,11 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $message = "$nb_con $l_con_found";
   }
 
-  display_info_msg($message);
+  $block .= display_info_msg($message);
 
   if ($nb_con != 0) {
 
-    $url= url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
+    $url=url_prepare("list_index.php?action=detailconsult&amp;param_list=$id");
     
     $dis_infos = new OBM_DISPLAY("DATA", $pref_con_q, "list");
     $dis_infos->data_set = $con_q;
@@ -272,25 +277,25 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       $dis_infos->data_idfield = "list_contact_id";
       $dis_infos->data_cb_name = "cb_con";
       $dis_infos->data_cb_field = "";
-      echo "<form method=\"get\" action=\"list_index.php\">";
+      $block .= "<form method=\"get\" action=\"list_index.php\">";
     }
 
-    $dis_infos->display("dis_data_list");
+    $block .= $dis_infos->display("dis_data_list");
 
     if ($perm->have_perm("editor")) {
-      echo "
-      <table class=\"detail\">
-      <tr>
-        <td>
+      $block .= "
+      <p class=\"detailButton\">
+        <p class=\"detailButtons\">
         <input type=\"submit\" value=\"$l_del_contact_sel\" />
         <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
-        </td>
-      </tr>
-      </table>
+        </p>
+      </p>
       </form>";
     }
   }
+
+  return $block;
 }
 
 
@@ -324,9 +329,10 @@ function html_list_form($action, $list_q, $list) {
 
   $url = url_prepare("list_index.php");
 
-  echo "
+  $block = "
   <form method=\"get\" name=\"f_new action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
+
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_name</td>
@@ -339,7 +345,7 @@ function html_list_form($action, $list_q, $list) {
       <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
   </tr>
   <tr>
-    <td class=\"detailLabel\">$l_email>
+    <td class=\"detailLabel\">$l_email</td>
     <td class=\"detailText\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
   </tr>
@@ -348,35 +354,33 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailText\">
       <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
   </tr>
-  <tr>
-    <td class=\"detailHead\" colspan=\"2\">
-          <br />";
+  </table>";
 
   if (($action == "detailupdate") || ($action == "update")) {
-     echo "<table><tr><td>
+     $dis_but .= "
       <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
       <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />
-      </form>
-      </td><td>
- 
-      <form method=\"get\" name=\"f_back\"
+      <input type=\"submit\" value=\"$l_update\" />";
+
+       $dis_back = "<form method=\"get\" name=\"f_back\"
         action=\"".url_prepare("list_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
       <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
-      </form>
-      </td></tr></table>";
-   } else {
-    echo "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />
       </form>";
+   } else {
+    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />";
   }
 
-  echo "
-    </td>
-  </tr>
-  </table>";
+  $block .= "<div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_but
+    </p>
+    </div>
+    </form>";
+
+  return $block;
 }
 
 
@@ -394,22 +398,22 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
   $dis_pref->pref_title = $l_list_display;
   $dis_pref->pref_dis_help = 0;
 
-  echo "<center>
-    <table><tr><td>";
-  $dis_pref->display();
+  $block = "<center><table><tr><td>";
+  $block .= $dis_pref->display();
 
   $dis_pref->display_pref = $pref_contact_q;
   $dis_pref->display_module = "list";
   $dis_pref->display_entity = "list_contact";
   $dis_pref->pref_title = $l_contact_display;
 
-  echo "</td><td>
-    ";
-  $dis_pref->display();
+  $block .= "</td><td>";
+  $block .= $dis_pref->display();
 
-  echo "</td></tr></table>";
-  $dis_pref->dis_pref_help();
-  echo "</center>";
+  $block .= "</td></tr></table>";
+  $block .= $dis_pref->dis_pref_help();
+  $block .= "</center>";
+
+  return $block;
 }
 
 
@@ -420,30 +424,33 @@ function dis_list_display_pref($pref_list_q, $pref_contact_q) {
 //   - $id : list id
 /////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($id) {
-  global $l_warn_delete, $l_delete, $l_back;
+  global $display, $l_warn_delete, $l_delete, $l_back;
 
   $nb_con = get_list_nb_contact($id);
-  echo "<p align=\"center\" />$nb_con $l_warn_delete</p>
 
-    <table class=\"detail\">
-    <tr>
-      <td class=\"detailHead\">
+  $display["msg"] .= display_warn_msg("$nb_con $l_warn_delete");
+
+  $block .= "
+    <div class=\"detailButton\">
+      <p class=\"detailButtons\">
         <form method=\"get\" name=\"form_delete\"
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
         <input type=\"hidden\" name=\"hd_list_id\" value=\"$id\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
         </form>
-      </td><td class=\"detailHead\">
+      </p>
+      <p class=\"detailButtons\">
         <form name=\"form_back\" method=\"get\"
           action=\"" .url_prepare("list_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
         <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
         <input type=\"submit\" VALUE=\"$l_back\" />
         </form>
-      </td>
-    </tr>
-    </table>";
+      </p>
+    </div>";
+
+  return $block;
 }
 
 
@@ -457,49 +464,50 @@ function dis_warn_delete($id) {
 /////////////////////////////////////////////////////////////////////////////
 function dis_list_warn_insert($list_q, $list) {
   global $l_check_samelist, $l_confirm, $l_back;
-  global $c_yes, $c_no;
+  global $display, $c_yes, $c_no;
 
   $name = $list["name"];
   $subject = $list["subject"];
 
-  display_warn_msg($l_check_samelist);
+  $display["msg"] .= display_warn_msg($l_check_samelist);
   while ($list_q->next_record()) {
     $id = $list_q->f("list_id");
     $samename = $list_q->f("list_name");
     $samesubject = $list_q->f("list_subject");
     $dis_same_list .= "
-      <tr><td colspan =\"2\" class=\"detailText\">
+      <tr><td class=\"detailLabel\">
         <a class=\"detail\" href=\"" .url_prepare("list_index.php?action=detailconsult&amp;param_list=$id") . "\">$samename ($samesubject)</a>
       </td></tr>";
   }
 
-  echo "<p />
-    <table class=\"detail\">
-    $dis_same_list
-    <tr>
-      <td>&nbsp;</td>
-    </tr>
-    <tr>
-      <td>
-        <form method=\"post\" name=\"form_insert\"
-          action=\"" .url_prepare("list_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"insert\" />
-        <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-        <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-        <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
-        </form>
-      </td><td>
-        <form name=\"form_back method=\"post\"
-          action=\"" .url_prepare("list_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"new\" />
-        <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
-        <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>
-      </td>
-    </tr>
-    </table>";
+  $block = "<p />
+  <table class=\"detail\">
+  $dis_same_list
+  </table>
+
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    <form method=\"post\" name=\"form_insert\"
+      action=\"" .url_prepare("list_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+    </form>
+    </p>
+    <p class=\"detailButtons\">
+    <form name=\"form_back method=\"post\"
+      action=\"" .url_prepare("list_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"new\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_subject\" value=\"$subject\" />
+      <input type=\"submit\" value=\"$l_back\" />
+    </form>
+    </p>
+  </div>";
+
+  return $block;
 }
 
 
@@ -512,9 +520,9 @@ function dis_list_warn_insert($list_q, $list) {
 function dis_export_form($list) {
   global $c_export_format, $l_no_found, $l_list_set, $l_export_format;
   global $l_export_intro, $l_name, $l_desc, $l_help;
-  global $set_theme, $ses_list;
+  global $display, $set_theme, $ses_list;
 
-  display_info_msg($l_export_intro);
+  $display["msg"] .= display_info_msg($l_export_intro);
 
   $nb_list = $list["list_nb"];
   $cpt = 1;
@@ -568,7 +576,7 @@ function dis_export_form($list) {
   }
   $d_format .= "</table>";
 
-  echo "<table class=\"detail\">
+  $block = "<table class=\"detail\">
     <tr>
       <td>$d_list
       </td>
@@ -577,6 +585,7 @@ function dis_export_form($list) {
     </tr>
     </table>";
 
+  return $block;
 }
 
 

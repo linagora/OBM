@@ -19,6 +19,8 @@ function display_page(&$display) {
   if ($display["header"] == "") {
     echo $display["head"] . "
       <div class=\"detailpanelalone\">" .
+      $display["search"] .
+      $display["result"] .
       $display["detail"] . "
       </div>" .
       $display["end"];

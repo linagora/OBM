@@ -217,13 +217,13 @@ if ($action == "index" || $action == "") {
   $pref_q = run_query_display_pref($uid, "contact", 1);
   $display["detail"] = dis_contact_display_pref($pref_q); 
   
-} else if($action == "dispref_display") {
+} else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   $display["detail"] = dis_contact_display_pref($pref_q);
   
-} else if($action == "dispref_level") {
+} else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);

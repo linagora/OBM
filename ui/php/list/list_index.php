@@ -80,39 +80,35 @@ page_close();
 require("list_js.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-display_head($l_list);  // Head & Body
-if (! $popup) {
-  generate_menu($menu,$section);   // Menu
-}
-
-///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
+if (! $popup) {
+  $display["header"] = generate_menu($menu, $section); // Menu
+}
+
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  html_list_search_form($list);
+  $display["search"] = html_list_search_form($list);
   if ($set_display == "yes") {
-    dis_list_search_list("", $popup);
+    $display["result"] = dis_list_search_list("", $popup);
   } else {
-    display_ok_msg($l_no_display);
+    $display["msg"] .= display_info_msg($l_no_display);
   }
 }
 
 else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  html_list_search_form($list);
-  dis_list_search_list($list, $popup);
+  $display["search"] = html_list_search_form($list);
+  $display["result"] = dis_list_search_list($list, $popup);
 }
 
 else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    html_list_form($action, "", $list);
+    $display["detail"] = html_list_form($action, "", $list);
   } else {
-    echo $l_error_permission;
+    $display["msg"] .= display_err_msg($l_error_permission);
   }
 }
 
@@ -121,13 +117,13 @@ else if ($action == "detailconsult") {
   $list_q = run_query_detail($list["id"]);
   $pref_con_q = run_query_display_pref($uid, "list_contact");
   $con_q = run_query_contacts_list($list["id"], $new_order, $order_dir);
-  html_list_consult($list_q, $pref_con_q, $con_q);
+  $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
 }
 
 else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($list["id"]);
-  html_list_form($action, $obm_q, $list);
+  $display["detail"] = html_list_form($action, $obm_q, $list);
 }
 
 else if ($action == "insert") {
@@ -138,32 +134,32 @@ else if ($action == "insert") {
     if ($hd_confirm == $c_yes) {
       $retour = run_query_insert($list);
       if ($retour) {
-        display_ok_msg($l_insert_ok);
+        $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
-        display_err_msg($l_insert_error);
+        $display["msg"] .= display_err_msg($l_insert_error);
       }
-      html_list_search_form($list);
+      $display["search"] = html_list_search_form($list);
 
     // If it is the first try, we warn the user if some lists seem similar
     } else {
       $obm_q = check_list_context("", $list);
       if ($obm_q->num_rows() > 0) {
-        dis_list_warn_insert($obm_q, $list);
+        $display["detail"] = dis_list_warn_insert($obm_q, $list);
       } else {
         $retour = run_query_insert($list);
         if ($retour) {
-          display_ok_msg($l_insert_ok);
+          $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
-          display_err_msg($l_insert_error);
+          $display["msg"] .= display_err_msg($l_insert_error);
         }
-        html_list_search_form($list);
+        $display["search"] = html_list_search_form($list);
       }
     }
 
   // Form data are not valid
   } else {
-    display_warn_msg($err_msg);
-    html_list_form($action, "", $list);
+    $display["msg"] .= display_warn_msg($err_msg);
+    $display["detail"] = html_list_form($action, "", $list);
   }
 
 } elseif ($action == "update")  {
@@ -171,36 +167,36 @@ else if ($action == "insert") {
   if (check_data_form($list["id"], $list)) {
     $retour = run_query_update($list);
     if ($retour) {
-      display_ok_msg($l_update_ok);
+      $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg($l_update_error);
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
     $con_q = run_query_contacts_list($list["id"]);
-    html_list_consult($list_q, $pref_con_q, $con_q);
+    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
-    display_warn_msg($err_msg);
+    $display["msg"] .= display_warn_msg($err_msg);
     $list_q = run_query_detail($list["id"]);
-    html_list_form($action, $list_q, $list);
+    $display["detail"] = html_list_form($action, $list_q, $list);
   }
 
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_warn_delete($hd_list_id);
+  $display["detail"] = dis_warn_delete($hd_list_id);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
     $retour = run_query_delete($hd_list_id);
     if ($retour) {
-      display_ok_msg($l_delete_ok);
+      $display["msg"] .= display_ok_msg($l_delete_ok);
     } else {
-      display_err_msg($l_delete_error);
+      $display["msg"] .= display_err_msg($l_delete_error);
     }
-    html_list_search_form("");
+    $display["search"] = html_list_search_form("");
   } else {
-   display_err_msg($l_error_permission);
+   $display["msg"] .= display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "contact_add")  {
@@ -208,16 +204,16 @@ else if ($action == "insert") {
   if ($perm->have_perm("editor")) {
     if ($list["con_nb"] > 0) {
       $nb = run_query_contactlist_insert($list);
-      display_ok_msg("$nb $l_contact_added");
+      $display["msg"] .= display_ok_msg("$nb $l_contact_added");
     } else {
-      display_err_msg("no contact to add");
+      $display["msg"] .= display_err_msg("no contact to add");
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
     $con_q = run_query_contacts_list($list["id"]);
-    html_list_consult($list_q, $pref_con_q, $con_q);
+    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
-    display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "contact_del")  {
@@ -225,23 +221,23 @@ else if ($action == "insert") {
   if ($perm->have_perm("editor")) {
     if ($list["con_nb"] > 0) {
       $nb = run_query_contactlist_delete($list);
-      display_ok_msg("$nb $l_contact_removed");
+      $display["msg"] .= display_ok_msg("$nb $l_contact_removed");
     } else {
-      display_err_msg("no contact to delete");
+      $display["msg"] .= display_err_msg("no contact to delete");
     }
     $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
     $con_q = run_query_contacts_list($list["id"]);
-    html_list_consult($list_q, $pref_con_q, $con_q);
+    $display["detail"] = html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
-    display_err_msg($l_error_permission);
+    $display["msg"] .= display_err_msg($l_error_permission);
   }
 
 } else if ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  dis_list_display_pref($pref_q, $pref_con_q);
+  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
 }
 
 else if($action == "dispref_display") {
@@ -249,7 +245,7 @@ else if($action == "dispref_display") {
   run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  dis_list_display_pref($pref_q, $pref_con_q);
+  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
 }
 
 else if($action == "dispref_level") {
@@ -257,31 +253,34 @@ else if($action == "dispref_level") {
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "list", 1);
   $pref_con_q = run_query_display_pref($uid, "list_contact", 1);
-  dis_list_display_pref($pref_q, $pref_con_q);
+  $display["detail"] = dis_list_display_pref($pref_q, $pref_con_q);
 }
 
 else if($action == "export_add") {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_export_form($list);
+  $display["detail"] = dis_export_form($list);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  html_list_search_form($list);
+  $display["search"] = html_list_search_form($list);
   if ($set_display == "yes") {
-    dis_list_search_list($list, $popup);
+    $display["detail"] = dis_list_search_list($list, $popup);
   } else {
-    display_ok_msg($l_no_display);
+    $display["msg"] .= display_ok_msg($l_no_display);
   }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
-display_end();
+$display["head"] = display_head($l_list);
+$display["end"] = display_end();
+
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////

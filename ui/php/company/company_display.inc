@@ -184,26 +184,26 @@ function html_company_search_form ($kind_q, $act_q, $usr_q, $company) {
       <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
       value=\"$phone\" />
     </div>
-    <p class=\"searchLabel\">$l_company_kind<br />
+    <div class=\"searchLabel\">$l_company_kind<br />
       $sel_kind
-    </p>
-    <p class=\"searchLabel\">$l_activity<br />
+    </div>
+    <div class=\"searchLabel\">$l_activity<br />
       $sel_act
-    </p>
-    <p class=\"searchLabel\">$l_postcode<br />
+    </div>
+    <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
-    </p>
-    <p class=\"searchLabel\">$l_market<br />
+    </div>
+    <div class=\"searchLabel\">$l_market<br />
       $sel_market
-    </p>
-    <p class=\"searchLabel\">$l_archive<br />
+    </div>
+    <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
-    </p>
-    <p class=\"searchLabel\">&nbsp;<br />
+    </div>
+    <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-    </p>
+    </div>
     <div class=\"searchEnd\"></div>
   </div>
   </form>";
