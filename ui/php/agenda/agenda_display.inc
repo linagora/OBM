@@ -159,7 +159,7 @@ function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   echo " 
 <table class=\"agendaMain\">
  <tr>
-  <td>
+  <td style=\"vertical-align: top;\">
    <table width=\"676\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td>
@@ -312,7 +312,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   echo "
 <table class=\"agendaMain\">
  <tr>
-  <td>
+  <td style=\"vertical-align: top;\">
    <table width=\"735\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td>
@@ -535,7 +535,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 echo "
 <table class=\"agendaMain\">
  <tr>
-  <td>
+  <td style=\"valign: top;\">
    <table width=\"540\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td>
@@ -725,7 +725,7 @@ echo "
 
 <table class=\"agendaMain\">
  <tr>
-  <td width=\"520\">
+  <td width=\"520\" style=\"valign: top;\">
    <table width=\"520\" border=\"0\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
      <td align=\"center\">
@@ -1647,12 +1647,12 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   ";
 }
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Consult                                                  //
+// Display Conflict                                                          //
 // Parameters:
-//   - $inc_q : DBO : incident result
-//   - $con_q : DBO : contract result
-//   - $obm_q_company : list of companies
-//   - $contact_q : list of contact from the company 
+//   - $agenda:
+//   - $conflict:
+//   - $event_id: 
+//   - $force: 
 ///////////////////////////////////////////////////////////////////////////////
 function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   global $set_theme,$set_weekstart_default,$auth;
@@ -1712,5 +1712,38 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
    $dis_form_button
   </table>
   $dis_form_end
+  ";
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display Delete Options                                                          //
+// Parameters:
+//   - $agenda:
+///////////////////////////////////////////////////////////////////////////////
+function html_dis_delete($agenda) {
+  global $set_theme;
+  // -- Labels
+  global $ico_validate, $ico_cancel;
+  global $l_confirm_delete,$l_confirm,$l_cancel;
+  
+  $event_id = $agenda["id"];
+  $getdate = $agenda["date"];
+  echo "
+  <table class=\"details\">
+   <tr>
+    <td colspan=\"8\" class=\"detailHead\">$l_confirm_delete</td>
+    <tr>
+    <td colspan=\"3\" style=\"text-align: right;width: 40%\">
+     <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"/images/$set_theme/$ico_validate\" alt=\"[Validate]\" /></a></a>
+    <td colspan=\"1\" class=\"detailHead\" style=\"text-align: left\">
+     $l_confirm
+    </td>
+    <td colspan=\"1\" style=\"text-align: right\">
+     <a href=\"agenda_index.php?action=detailconsult&param_event=$event_id&param_date=$getdate\"><img src=\"/images/$set_theme/$ico_cancel\" alt=\"[Cancel]\" /></a>
+    </td>
+    <td colspan=\"3\" class=\"detailHead\" style=\"text-align: left;width: 40%\"> 
+     $l_cancel
+    </td>
+   </tr>
+  </table>
   ";
 } 

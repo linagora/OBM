@@ -92,7 +92,9 @@ $l_insert_error = "Des conflits ont été détectés, insertion annulée";
 // Messages 
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez sélectionner le ou les jours de répétition";
-
+$l_confirm_delete = "Cette opération supprimer toutes les occurences de cet évenement pour tout les utilisateur, êtes-vous sûre de vouloit poursuivre ?";
+$l_confirm = "Confirmer";
+$l_cancel = "Annuler";
 $l_conflict_events = "Le ou les créneaux horaires choisis sont occupés pour ";
 $l_fill_title = "Veuillez remplir le champ [ $l_title ]";
 $l_fill_dateend = "Veuillez remplir le champ [ $l_dateend ]";

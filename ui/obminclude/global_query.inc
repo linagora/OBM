@@ -674,4 +674,32 @@ function get_modules_array() {
   return $modules;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Send a Mail to an user                                                       //
+// Return : $modules : array of modules
+///////////////////////////////////////////////////////////////////////////////
+function send_mail($subject,$message,$sender,$receiver) {
+  global $path;
+
+  $obm_q_send = run_query_get_sender();
+  $obm_q_rece = run_query_get_receiver();
+  while($obm_q_rece->suivant()) {
+    if($obm_q_rece->f("userobm_email") != "") {
+      if($rece_list == "") {
+	$rece_list = $obm_q_rece->f("userobm_email");
+      }
+      else{
+	$rece_list .= " ; ".$obm_q_rece->f("userobm_email");
+      }
+    }
+    else{
+      //send private message via obm
+    }
+  }
+  $headers .= "From: ".$obm_q_send->f("userobm_email")."\r\n";
+  if($rece_list != "") {
+    mail($rece_list,$subject,$message,$headers);
+  
+  }
+}
 ?>

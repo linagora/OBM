@@ -419,6 +419,7 @@ function run_query_get_latent_conflicts($event_id, $user_id) {
   while( $obm_db->next_record() ) {
     $conflicts = run_query_get_conflicts($obm_db->f("datebegin"),$obm_db->f("dateend"),array($user_id));
     $return_info = array_merge($return_info, $conflicts);
+    var_dump($return_info);
   }
   return $return_info;  
 }
@@ -896,7 +897,24 @@ function  run_query_update_deprecated_events($agenda) {
   $obm_db->query($query2);
   
 }  
+/////////////////////////////////////////////////////////////////////////////
+// Delete all events of a evenements, and the event
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    - $agenda
+/////////////////////////////////////////////////////////////////////////////
 
+function run_query_delete($agenda) {
+  global $cdg_sql;
+  $obm_db = new DB_OBM;
+  $event_id = $agenda["id"];
+  
+  $query = "DELETE FROM CalendarSegment WHERE calendarsegment_eventid = $event_id";
+  $obm_db->query($query);
+  $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
+  $obm_db->query($query);
+}  
 /////////////////////////////////////////////////////////////////////////////
 // Return if the event is valid or not. It permit to keep only valid event in
 // a table.

@@ -303,6 +303,31 @@ elseif ($action == "update_decision") {
   }
 }
 
+elseif ($action == "check_delete") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($param_event > 0) {
+    html_dis_delete($agenda);
+  }
+
+}
+elseif ($action == "delete") {
+///////////////////////////////////////////////////////////////////////////////
+  if ($param_event > 0) {
+     run_query_delete($agenda);
+  }
+  if (count($sel_user_id) != 0) {
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
+  $obm_q = run_query_week_event_list($agenda,$p_user_array);
+  $user_q = run_query_get_user_name($p_user_array);
+  $user_obm = run_query_userobm();  
+  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);     
+
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
@@ -398,7 +423,7 @@ function get_param_agenda() {
 function get_agenda_action() {
   global $actions, $path;
   global $l_header_update;
-  global $l_header_day,$l_header_week,$l_header_year;
+  global $l_header_day,$l_header_week,$l_header_year,$l_header_delete;
   global $l_header_month,$l_header_new_event,$param_event,$param_date;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
@@ -506,6 +531,23 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
+//Check Delete
+
+  $actions["AGENDA"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('detailconsult') 
+                                     		 );
+
+//Delete
+  $actions["AGENDA"]["delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
+    'Right'    => $agenda_admin_write,
+    'Condition'=> array ('None') 
+                                     		 );
+						 
 //Detail Update
 
   $actions["AGENDA"]["detailupdate"] = array (

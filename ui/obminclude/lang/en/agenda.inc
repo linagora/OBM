@@ -80,6 +80,10 @@ $l_replace_event = "Replace";
 $l_force = "Force the event insertion";
 $l_carac = "Caracteristics";
 
+
+$l_confirm_delete ="This operation will remove all the events of this évenement for all the users, are you sure to want to continue?";
+$l_confirm = "Confirm";
+$l_cancel = "Cancel";
 $l_insert_ok = "Insertion successful";
 $l_update_ok = "Update successful";
 $l_update_warning = "Warning : some conflicts have been detected";
