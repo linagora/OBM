@@ -155,9 +155,6 @@ function dis_cat_stats($comp_q,$tot) {
   }
   ksort($cat);
   $block .= "
-  <div class=\"title\">
-  x = $l_compcat /  y = $l_header_country
-  </div>
   <div class=\"classic\">
   <table class=\"classic\">
   <tr>
@@ -193,6 +190,11 @@ function dis_cat_stats($comp_q,$tot) {
   <tr><th>%</th>$cat_percent<td></td><td>100</td></tr>
    </table>
    </div>
+   <br />
+  <div class=\"detail\">
+  <div class=\"detailText\"> x = $l_compcat </div>
+  <div class=\"detailText\"> y = $l_header_country</div>
+  </div>
   ";
   return $block;
 }

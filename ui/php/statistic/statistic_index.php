@@ -51,6 +51,7 @@ elseif ($action == "responsible") {
 ///////////////////////////////////////////////////////////////////////////////
   $cont_q = run_query_contact_per_resp();
   $comp_q = run_query_company_per_resp();
+  $display["title"] = display_title($l_header_resp_stats);
   $display["detail"] = dis_resp_stats($cont_q,$comp_q);
   $display["features"] = dis_menu_stats(); 
 
@@ -59,6 +60,7 @@ elseif ($action == "company") {
 ///////////////////////////////////////////////////////////////////////////////
   $cat_q = run_query_company_per_country_per_cat();
   $nb_comp = run_query_nb_company();
+  $display["title"] = display_title($l_header_comp_stats);
   $display["detail"] = dis_cat_stats($cat_q,$nb_comp);
   $display["features"] = dis_menu_stats(); 
 
