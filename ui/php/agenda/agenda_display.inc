@@ -1150,8 +1150,10 @@ echo "
        <tr>
 	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
         <td colspan=\"2\" class=\"agendaVide\" align=\"left\">
-	 <form action=\"\" method=\"get\" onsubmit=\"if (check_count_user(this)) return true; else return false;\">
+	 <form action=\"agenda_index.php\" method=\"get\" onsubmit=\"if (check_count_user(this)) return true; else return false;\">
 	  $dis_sel_user
+	  <input type=\"hidden\" name=\"action\" value=\"$action\" />
+	  <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />	  
 	 </form>
         </td>
        </tr>
