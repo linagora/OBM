@@ -120,18 +120,18 @@ else if ($action == "new") {
 
 else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $group_q = run_query_detail($param_group);
+  $group_q = run_query_detail($group["id"]);
   $pref_u_q = run_query_display_pref($uid, "group_user");
-  $u_q = run_query_user_group($param_group, $new_order, $order_dir, $entity);
+  $u_q = run_query_user_group($group, $entity);
   $pref_g_q = run_query_display_pref($uid, "group_group");
-  $g_q = run_query_group_group($param_group, $new_order, $order_dir, $entity);
+  $g_q = run_query_group_group($group["id"], $new_order, $order_dir, $entity);
   $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
 }
 
 else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    $obm_q = run_query_detail($param_group);
+    $obm_q = run_query_detail($group["id"]);
     $display["detail"] = html_group_form($action, $obm_q, $group);
   } else {
     $display["msg"] .= display_error_permission();
@@ -141,7 +141,7 @@ else if ($action == "detailupdate") {
 else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    if (check_data_form("", $group)) {
+    if (check_data_form($group)) {
 
       // If the context (same group) was confirmed ok, we proceed
       if ($hd_confirm == $c_yes) {
@@ -181,22 +181,22 @@ else if ($action == "insert") {
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    if (check_data_form($param_group, $group)) {
+    if (check_data_form($group)) {
       $retour = run_query_update($group);
       if ($retour) {
 	$display["msg"] .= display_ok_msg($l_update_ok);
       } else {
 	$display["msg"] .= display_err_msg($l_update_error);
       }
-      $group_q = run_query_detail($param_group);
+      $group_q = run_query_detail($group["id"]);
       $pref_u_q = run_query_display_pref($uid, "group_user");
-      $u_q = run_query_user_group($param_group);
+      $u_q = run_query_user_group($group);
       $pref_g_q = run_query_display_pref($uid, "group_group");
-      $g_q = run_query_group_group($param_group);
+      $g_q = run_query_group_group($group["id"]);
       $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
     } else {
       $display["msg"] .= display_err_msg($err_msg);
-      $group_q = run_query_detail($param_group);
+      $group_q = run_query_detail($group["id"]);
       $display["detail"] = html_group_form($action, $group_q, $group);
     }
   } else {
@@ -206,7 +206,7 @@ else if ($action == "insert") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    $dislpay["detail"] = dis_warn_delete($param_group);
+    $dislpay["detail"] = dis_warn_delete($group["id"]);
   } else {
     $display["msg"] .= display_error_permission();
   }
@@ -236,7 +236,7 @@ else if ($action == "insert") {
     }
     $group_q = run_query_detail($group["id"]);
     $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($group["id"]);
+    $u_q = run_query_user_group($group);
     $pref_g_q = run_query_display_pref($uid, "group_group");
     $g_q = run_query_group_group($group["id"]);
     $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
@@ -253,11 +253,11 @@ else if ($action == "insert") {
     } else {
       $display["msg"] .= display_err_msg($l_no_user_deleted);
     }
-    $group_q = run_query_detail($param_group);
+    $group_q = run_query_detail($group["id"]);
     $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($param_group);
+    $u_q = run_query_user_group($group);
     $pref_g_q = run_query_display_pref($uid, "group_group");
-    $g_q = run_query_group_group($param_group);
+    $g_q = run_query_group_group($group["id"]);
     $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
   } else {
     $display["msg"] .= display_error_permission();
@@ -272,11 +272,11 @@ else if ($action == "insert") {
     } else {
       $display["msg"] .= display_err_msg($l_no_group_added);
     }
-    $group_q = run_query_detail($param_group);
+    $group_q = run_query_detail($group["id"]);
     $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($param_group);
+    $u_q = run_query_user_group($group);
     $pref_g_q = run_query_display_pref($uid, "group_group");
-    $g_q = run_query_group_group($param_group);
+    $g_q = run_query_group_group($group["id"]);
     $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
   } else {
     $display["msg"] .= display_error_permission();
@@ -291,11 +291,11 @@ else if ($action == "insert") {
     } else {
       $display["msg"] .= display_err_msg($l_no_group_deleted);
     }
-    $group_q = run_query_detail($param_group);
+    $group_q = run_query_detail($group["id"]);
     $pref_u_q = run_query_display_pref($uid, "group_user");
-    $u_q = run_query_user_group($param_group);
+    $u_q = run_query_user_group($group);
     $pref_g_q = run_query_display_pref($uid, "group_group");
-    $g_q = run_query_group_group($param_group);
+    $g_q = run_query_group_group($group["id"]);
     $display["detail"] = html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q);
   } else {
     $display["msg"] .= display_error_permission();
@@ -340,7 +340,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_group() {
   global $tf_name, $tf_desc, $tf_user, $tf_email, $cb_vis;
-  global $param_group, $cdg_param, $popup;
+  global $param_group, $cdg_param, $popup, $new_order, $order_dir, $entity;
   global $action, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $HTTP_POST_VARS, $HTTP_GET_VARS;
 
@@ -350,6 +350,9 @@ function get_param_group() {
   if (isset ($tf_desc)) $group["desc"] = trim($tf_desc);
   if (isset ($tf_email)) $group["email"] = $tf_email;
   if (isset ($tf_user)) $group["user"] = trim($tf_user);
+
+  if (isset ($new_order)) $group["new_order"] = $new_order;
+  if (isset ($order_dir)) $group["order_dir"] = $order_dir;
 
   // External param
   if (isset ($popup)) $group["popup"] = $popup;

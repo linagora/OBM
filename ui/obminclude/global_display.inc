@@ -553,6 +553,8 @@ class OBM_DISPLAY {
       $url .= "&amp;popup=1";
     }
 
+    $entity = $this->display_entity;
+
     $this->display_pref->seek(0);
     $block = "
     <tr>";
@@ -578,7 +580,7 @@ class OBM_DISPLAY {
       if ($this->data_order) {
         $block .= "<a class=\"resultHead\" href=\"".$url.
           (($url != "") ? "&amp;page=$page" : "" ) .
-          "&amp;new_order=$fieldname&amp;order_dir=$order\">";
+          "&amp;new_order=$fieldname&amp;order_dir=$order&amp;entity=$entity\">";
       }
       $block .= $label;
       if ($this->data_order) {

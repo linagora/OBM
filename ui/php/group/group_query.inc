@@ -369,14 +369,16 @@ function run_query_groupgroup_delete($group) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution : Get the users of the given group                        //
 // Parameters:
-//   - $group_id  : Group id
+//   - $group_id : Group id
 // -- Optionnals
-//   - $new_order : field for the older clause
-//   - $order_dir : direction for the older clause
-//   - $entity    : dataset entity to order (to handle multiple Display in 1 p)
+//   - $entity   : dataset entity to order (to handle multiple Display in 1 p)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_user_group($group_id, $new_order="", $order_dir="", $entity="") {
+function run_query_user_group($group, $entity="") {
   global $cdg_sql;
+
+  $id = $group["id"];
+  $new_order = $group["new_order"];
+  $order_dir = $group["order_dir"];
 
   if (($entity == "group_user") && (trim($new_order) != "")) {
     $order = "order by $new_order $order_dir";
@@ -395,7 +397,7 @@ function run_query_user_group($group_id, $new_order="", $order_dir="", $entity="
          userobm_phone as group_user_phone,
          userobm_email as group_user_email
       from UserObmGroup LEFT JOIN UserObm ON userobmgroup_userobmid=userobm_id
-      where userobmgroup_groupid='$group_id'
+      where userobmgroup_groupid='$id'
          $order";
 
   $obm_q = new DB_OBM; 
@@ -465,6 +467,33 @@ function get_group_nb_user($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if a group (except with id given) with the name given already exists
+// Parameters:
+//   - $name : name to search for
+//   - $id   : group id to exclude
+// Returns:
+//   - true (if a group exists) or false
+///////////////////////////////////////////////////////////////////////////////
+function get_group_name_exists($name, $id="") {
+  global $cdg_sql;
+
+  $query = "select group_id, group_name
+    from UGroup
+    where group_id!='$id' and group_name='$name'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  if ($obm_q->num_rows() > 0) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the groups which matches the name or the desc
 // except the one given (update mode)
 // Parameters:
@@ -530,11 +559,10 @@ function check_group_context($id, $group) {
 ///////////////////////////////////////////////////////////////////////////////
 // Group Form Data checking and formatting
 // Parameters:
-//   - $id       : group id  (empty on insertion)
 //   - $group[]  : values checked
 //     keys used : name, desc, email
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($id, $group) {
+function check_data_form($group) {
   global $php_regexp_email_name, $l_fill_name, $l_group_exists, $l_email_exist;
   global $err_msg, $l_j_check_email;
 
@@ -550,7 +578,7 @@ function check_data_form($id, $group) {
   }
 
   // MANDATORY: List name unique
-  if (get_list_name_exists($name, $id)) {
+  if (get_group_name_exists($name, $id)) {
     $err_msg = "$l_group_exists ($name)";
     return false;
   }

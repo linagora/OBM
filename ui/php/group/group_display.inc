@@ -488,7 +488,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     
     $dis_infos = new OBM_DISPLAY("DATA", $pref_g_q);
     $dis_infos->data_set = $g_q;
-    $dis_infos->entity = "group_group";
+    $dis_infos->display_entity = "group_group";
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "top";
 
@@ -516,7 +516,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   }
 
 
-  // Affichage des utilisateurs membres 
+  // registered Users display
   $nb_u = $u_q->num_rows();
   if ($nb_u == 0) {
     $message = $l_no_user;
@@ -532,7 +532,7 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     
     $dis_infos = new OBM_DISPLAY("DATA", $pref_u_q);
     $dis_infos->data_set = $u_q;
-    $dis_infos->entity = "group_user";
+    $dis_infos->display_entity = "group_user";
     $dis_infos->data_url = $url;
     $dis_infos->data_header = "both";
 
