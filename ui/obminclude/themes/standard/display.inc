@@ -213,7 +213,6 @@ function display_menu_bar($section, $menu) {
 
    if (is_array($actions[$menu])) {
      foreach ($actions[$menu] as $key => $value){
-       echo ";a=".$value["Name"];
        if (in_array("all",$value["Condition"])
            || in_array($action,$value["Condition"])) {
          if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
