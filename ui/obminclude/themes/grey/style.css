@@ -932,24 +932,25 @@ td.textLabelForm	{
 table.admin		{
         margin-left:		auto;
 	margin-right:		auto;
-	border:			3px outset blue;
-	background-color:	#cccccc;
+	border:			3px outset #000000;
+	background-color:	#ffffff;
 }
 
 td.adminHead		{
 	font-family:		sans-serif;
 	font-style:		italic;
 	font-size:		12px;
-	color:			#37ff00;
 	text-align:		center;
-	background-color:	#666666;
+	color:			#ffcf00;
+	background-color:	#394d5a;
+	background-image: 	url(fond_bandeau02.png);
 }
 
 td.adminLabel		{
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
-	color:			#59519e;
+	color:			#84929c;
 	text-align:		center;
 	background-color:	transparent;
 }
@@ -959,16 +960,7 @@ td.adminText		{
 	font-size:		12px;
 	vertical-align:		top;
 	text-align:		center;
-	color:			#000000;
-	background-color:	transparent;
-}
-
-td.adminText		{
-	font-family:		sans-serif;
-	font-size:		12px;
-	vertical-align:		top;
-	text-align:		center;
-	color:			#000000;
+	color:			#666666;
 	background-color:	transparent;
 }
 
@@ -977,7 +969,7 @@ td.adminTextLeft	{
 	font-size:		12px;
 	vertical-align:		top;
 	text-align:		left;
-	color:			#000000;
+	color:			#666666;
 	background-color:	transparent;
 }
 
@@ -986,7 +978,7 @@ td.adminTextRight	{
 	font-size:		12px;
 	vertical-align:		top;
 	text-align:		right;
-	color:			#000000;
+	color:			#666666;
 	background-color:	transparent;
 }
 

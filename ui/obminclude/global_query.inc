@@ -782,7 +782,7 @@ function run_query_global_todo_title($id) {
   $obm_db = new DB_OBM;
   $obm_db->query($query);
   $obm_db->next_record();
-  return $obm_db->f("todo_name");
+  return $obm_db->f("todo_title");
 }
 
 ///////////////////////////////////////////////////////////////////////////////

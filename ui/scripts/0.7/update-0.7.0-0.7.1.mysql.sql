@@ -41,6 +41,11 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -------------------------------------------------------------------------------
 -- ProjectStat
 -------------------------------------------------------------------------------
+ALTER TABLE Contact ADD contact_address3 varchar(50) AFTER contact_address2;
+
+-------------------------------------------------------------------------------
+-- ProjectStat
+-------------------------------------------------------------------------------
 -- add missing lines (only from update-0.6.6-0.7.0 and not create)
 ALTER TABLE ProjectStat ADD projectstat_timeupdate timestamp(14) AFTER projectstat_date;
 ALTER TABLE ProjectStat ADD projectstat_userupdate int(8) AFTER projectstat_usercreate;

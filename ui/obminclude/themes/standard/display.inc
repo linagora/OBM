@@ -569,6 +569,9 @@ function display_todo_toplist($path="..") {
      </ul>
     </div>";
 
+  if (!($todo_1_id))
+    $block = "";
+
   return $block;
 }
 

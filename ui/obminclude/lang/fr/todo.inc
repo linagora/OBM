@@ -21,6 +21,10 @@ $l_delete = "Supprimer";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 
+$l_sortorder = "Ordre de tri des tâches urgentes";
+$l_sortpriority = "par priorité";
+$l_sortdeadline = "par date limite";
+
 $l_no_found = "Rien à faire";
 $l_no_deadline = "Non spécifiée";
 $l_delete_ok = "La suppression du post-it a été correctement effectuée.";
@@ -28,7 +32,9 @@ $l_delete_error = "La suppression du post-it a échoué !";
 
 $l_delete_confirm = "Confirmer la suppression de ces entrées";
 $l_j_fill_title = "Remplissez le titre";
+$l_j_fill_deadline = "Remplissez la date limite avec une date valide";
 
 $l_todo_display = "Options d'affichage des listes de tâches à faire";
+$l_todo_prefs = "Options d'affichage des listes de tâches urgentes";
 
 </script>

@@ -4,7 +4,7 @@
 //     - Desc : Todo Display File                                            //
 // 2003-09-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id:
 ///////////////////////////////////////////////////////////////////////////////
  
 
@@ -58,50 +58,38 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\" alt=\"\" />";
   }
 
-//   else if ($fieldname == "company_archive") {
-//     $res["align"] = "center";
-//     if ($OD->data_set->f($fieldname)) $res["name"] = "X";
-//     else $res["name"] = "&nbsp;";
-//   }
-
-//   else if ($fieldname == "company_email") {
-//     $email = $OD->data_set->f("company_email");
-//     if (strcmp($email,"") != 0) {
-//       $res["url"] = "mailto:$email";
-//       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
-//     }
-//   } 
-
   return $res;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company specific dataset fields                                   //
+// Display Todo Form                                                         //
 // Parameters:
-//   - $OD        : OBM_DISPLAY object (passed by reference)
-//   - $fieldname : field to display
-//   - $link_ok   : true if links must be displayed
-// Returns:
-//   - $res : hash with 'name', 'url', 'align' values
+//   - $user_q    : userobm database result 
+//   - $todo_q    : default values
+//   - $todo[]    : default values
+//     keys used  : id, uid
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $user_q, $todo_q = 0) {
+  global $set_theme, $set_date, $ico_mini_cal;
   global $l_add, $l_update, $l_close;
   global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_content;
 
   $max_priority = 5;
+  $action = $todo["action"];
   $popup = $todo["popup"];
 
-  if ($popup) {
+  if ($action == "update") {
     $t_id = $todo["id"];
 
     $uid = $todo_q->f("todo_user");
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
-    $deadline = ($todo_q->f("date_deadline")) ? $todo_q->f("todo_deadline") : "";
+    $deadline = ($todo_q->f("date_deadline")) ? date_format($todo_q->f("todo_deadline")) : "";
   } else {
     $uid = $todo["uid"];
     $priority = intval(($max_priority+1)/2);
+    $deadline = date("$set_date");
   }
   // User select
   $sel_user = "<select id=\"sel_user\" name=\"sel_user\">";
@@ -123,13 +111,12 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
   }
   $sel_priority .= "</select>";
 
-  if ($popup) {
+  if ($action == "update") {
     $dis_button = "
       <input type=\"hidden\" id=\"param_todo\" name=\"param_todo\" value=\"$t_id\" />
-      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update\" />
-      <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"0\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"detailupdate\" />
+      <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />
       <input type=\"submit\" value=\"$l_update\" />
-      <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
     ";
   } else {
     $dis_button = "
@@ -137,6 +124,9 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
       <input type=\"submit\" value=\"$l_add\" />
     ";
   }
+
+  if ($popup)
+    $dis_button .=  "<input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
 
   $block = "
     <form method=\"post\" name=\"f_add_todo\"
@@ -159,6 +149,9 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
       <td class=\"detailLabel\">$l_deadline</td>
       <td class=\"detailForm\">
        <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
+       <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_add_todo.tf_deadline,'../agenda/agenda_index.php?action=calendar&popup=1') ;\">
+        <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+       </a>
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_content</td>
@@ -180,16 +173,14 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company specific dataset fields                                   //
+// Display Todo Full list                                                    //
 // Parameters:
-//   - $OD        : OBM_DISPLAY object (passed by reference)
-//   - $fieldname : field to display
-//   - $link_ok   : true if links must be displayed
-// Returns:
-//   - $res : hash with 'name', 'url', 'align' values
+//   - $todo_q    : todo list
+//   - $todo[]    : default values
+//     keys used  : uid
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_list($todo, $todo_q) {
-  global $l_del, $l_delete;
+  global $auth, $l_del, $l_delete;
 
   $uid = $todo["uid"];
 
@@ -234,17 +225,15 @@ function dis_todo_list($todo, $todo_q) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company specific dataset fields                                   //
+// Display Todo Detail (all informations)                                    //
 // Parameters:
-//   - $OD        : OBM_DISPLAY object (passed by reference)
-//   - $fieldname : field to display
-//   - $link_ok   : true if links must be displayed
-// Returns:
-//   - $res : hash with 'name', 'url', 'align' values
+//   - $todo_q    : todo list
+//   - $todo[]    : default values
+//     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_detail($todo, $todo_q) {
   global $display;
-  global $l_todo, $l_title, $l_user, $l_author, $l_priority, $l_date;
+  global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date;
   global $l_deadline, $l_content, $l_no_deadline;
 
   $title = $todo_q->f("todo_title");
@@ -263,7 +252,7 @@ function dis_todo_detail($todo, $todo_q) {
   $block = "
     <table class=\"detail\">
      <tr>
-      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailLabel\">$l_todotitle</td>
       <td class=\"detailText\">$title</td>
      </tr><tr>
       <td class=\"detailLabel\">$l_user</td>
@@ -291,7 +280,45 @@ function dis_todo_detail($todo, $todo_q) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Time Display preference screen                             //
+// Display the Todo Display preference screen                                //
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function dis_admin_todo() {
+  global $todo_order;
+  global $l_todo_prefs, $l_sortorder, $l_sortpriority, $l_sortdeadline;
+
+  $sel_priority = ($todo_order == "todo_priority") ? "selected=\"selected\"" : "";
+  $sel_deadline = ($todo_order == "todo_deadline") ? "selected=\"selected\"" : "";
+
+  $block = "
+    <table class=\"admin\">
+     <tr>
+      <td colspan=\"2\" class=\"adminHead\">
+        $l_todo_prefs
+      </td>
+     </tr><tr>
+      <td class=\"adminLabel\">
+       $l_sortorder
+      </td>
+      <td class=\"adminText\">
+       <form name=\"f_order_change\" method=\"post\"
+             action=\"" . url_prepare("todo_index.php") . "\">
+        <select name=\"sel_order\" onChange=\"forms.f_order_change.submit();\">
+         <option value=\"todo_priority\" $sel_priority>$l_sortpriority</option>
+         <option value=\"todo_deadline\" $sel_deadline>$l_sortdeadline</option>
+        </select>
+        <input type=\"hidden\" name=\"action\" value=\"adminupdate\" />
+       </form>
+      </td>
+     </tr>
+    </table>
+    ";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Todo display preference screen                                //
 // Parameters:
 //   - $display_newpref_q    : DBO : Field list to display
 //   - $display_searchpref_q : DBO : Field list to display

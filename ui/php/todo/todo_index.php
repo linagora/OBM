@@ -4,7 +4,7 @@
 //     - Desc : Company Index File                                           //
 // 2003-09-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id:
 ///////////////////////////////////////////////////////////////////////////////
 // Actions              -- Parameter
 // - index (default)    -- search fields  -- show the company search form
@@ -30,7 +30,7 @@ include("$obminclude/global_pref.inc");
 require("todo_query.inc");
 require("todo_display.inc");
 
-if (($action != "update") || ($popup))
+if (!(($action == "detailupdate") && ($popup)))
   require("todo_js.inc");
 
 page_close();
@@ -57,6 +57,9 @@ if ($action == "index" || $action == "") {
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $todo_q = run_query_detail($todo);
+
+  $display["detailInfo"] = display_record_info($todo_q->f("usercreate"),$todo_q->f("userupdate"),
+					       $todo_q->f("timecreate"),$todo_q->f("timeupdate"));
 
   $display["result"] .= dis_todo_detail($todo, $todo_q);
 
@@ -105,23 +108,55 @@ if ($action == "index" || $action == "") {
     $display["msg"] .= display_info_msg($l_no_found);
 
 } else if ($action == "update") {
-  ///////////////////////////////////////////////////////////////////////////////
-  if ($popup) {
+///////////////////////////////////////////////////////////////////////////////
     $user_q = run_query_userobm();
     $todo_q = run_query_detail($todo);
 
     $display["result"] = dis_todo_form($todo, $user_q, $todo_q);
 
-  } else {
-    $retour = run_query_update($todo);
-
+} else if ($action == "detailupdate") {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_update($todo);
+    
+  if ($popup) {
     $display["result"] .= "
     <script language=\"javascript\">
      window.opener.location.href=\"$path/todo/todo_index.php?action=index\";
      window.close();
     </script>
     ";
+
+  } else if ($uid == $todo["sel_user"]) {
+    $todo_q = run_query_detail($todo);
+
+    $display["detailInfo"] = display_record_info($todo_q->f("usercreate"),$todo_q->f("userupdate"),
+						 $todo_q->f("timecreate"),$todo_q->f("timeupdate"));
+    
+    $display["result"] .= dis_todo_detail($todo, $todo_q);
+
+  } else {
+    $action = "index";
+    $user_q = run_query_userobm();
+    $todo_q = run_query_todolist($todo, "", "");
+    
+    $display["result"] = dis_todo_form($todo, $user_q);
+
+    if ($todo_q->nf() != 0)
+      $display["result"] .= dis_todo_list($todo, $todo_q);
+    else
+      $display["msg"] .= display_info_msg($l_no_found);
   }
+
+}  elseif ($action == "admin") {
+/////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_admin_todo();
+
+}  elseif ($action == "adminupdate") {
+/////////////////////////////////////////////////////////////////////////
+  $retour = run_query_admin_update($todo);
+  run_query_set_user_todo($uid);
+
+  $display["detail"] .= dis_admin_todo();
 
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
@@ -146,21 +181,29 @@ if ($action == "index" || $action == "") {
   $display["detail"] = dis_todo_display_pref($pref_search_q);
 }
 
-// Todo top list
-if (in_array($action, array("add", "update", "delete", "delete_unique")))
-     run_query_set_user_todo($uid);
-     
+///////////////////////////////////////////////////////////////////////////////
+// Todo top list (same as the bookmarks : id and titles are registered)
+///////////////////////////////////////////////////////////////////////////////
+// if a todo was modified for an other user, we update his prefs
+if ((in_array($action, array("add", "detailupdate")))
+    && ($sel_user != $uid))
+  run_query_set_user_todo($sel_user);;
+
+//we update the current user prefs
+if (in_array($action, array("add", "detailupdate", "delete", "delete_unique")))
+  run_query_set_user_todo($uid);
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 
-if (!($popup))
-     $display["header"] = generate_menu($menu, $section);
+if (($action != "update") or (!($popup)))
+  $display["header"] = generate_menu($menu, $section);
      
-     $display["head"] = display_head($l_todo);
-     $display["end"] = display_end();
+$display["head"] = display_head($l_todo);
+$display["end"] = display_end();
      
-     display_page($display);
+display_page($display);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -170,6 +213,7 @@ if (!($popup))
 function get_param_todo() {
   global $uid, $param_todo, $action, $popup;
   global $tf_title, $sel_user, $sel_priority, $tf_deadline, $ta_content;
+  global $sel_order;
   global $cdg_param;
 
   if (isset ($uid)) $todo["uid"] = $uid;
@@ -177,11 +221,15 @@ function get_param_todo() {
   if (isset ($popup)) $todo["popup"] = $popup;
   if (isset ($param_todo)) $todo["id"] = $param_todo;
 
+  // Todo form
   if (isset ($tf_title)) $todo["title"] = $tf_title;
   if (isset ($tf_deadline)) $todo["deadline"] = $tf_deadline;
   if (isset ($sel_user)) $todo["sel_user"] = $sel_user;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
+
+  // Admin form
+  if (isset ($sel_order)) $todo["sel_order"] = $sel_order;
 
   return $todo;
 }
@@ -194,7 +242,7 @@ function get_todo_action() {
   global $todo, $actions, $path;
   global $todo_read, $todo_write, $todo_admin_read, $todo_admin_write;
   global $l_header_todo_list, $l_header_delete, $l_header_update;
-  global $l_header_display;
+  global $l_header_admin, $l_header_display;
 
 // Index
   $actions["TODO"]["index"] = array (
@@ -228,7 +276,14 @@ function get_todo_action() {
 // Update
   $actions["TODO"]["update"]  = array (
     'Name'     => $l_header_update,
-    'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"] ."&amp;popup=1",
+    'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"],
+    'Right'    => $todo_write,
+    'Condition'=> array ('detailconsult', 'detailupdate') 
+                                      );
+
+// Update
+  $actions["TODO"]["detailupdate"]  = array (
+    'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;param_todo=". $todo["id"],
     'Right'    => $todo_write,
     'Condition'=> array ('None') 
                                       );
@@ -239,7 +294,23 @@ function get_todo_action() {
     'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;param_todo=". $todo["id"],
     'Right'    => $todo_write,
     'Condition'=> array ('detailconsult') 
+
                                      );
+// Admin
+  $actions["TODO"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/todo/todo_index.php?action=admin",
+    'Right'    => $todo_admin_read,
+    'Condition'=> array ('all') 
+                                       );
+
+// Admin
+  $actions["TODO"]["adminupdate"] = array (
+    'Url'      => "$path/todo/todo_index.php?action=adminupdate",
+    'Right'    => $todo_admin_read,
+    'Condition'=> array ('None') 
+                                       );
+
 // Display
    $actions["TODO"]["display"] = array (
      'Name'     => $l_header_display,

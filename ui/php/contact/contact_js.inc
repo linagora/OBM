@@ -32,10 +32,7 @@ function check_contact(form) {
 
   // MANDATORY : Check the phone number
   lphone = form.tf_phone.value;
-//  if (lphone == \"\") {
-//    alert (\"$l_fill_phone\");
-//    return false;
-//  }
+
   if ((lphone != \"\") && (check_phone(lphone) == null)) {
     alert (\"$l_j_check_phone\");
     return false;

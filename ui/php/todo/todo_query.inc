@@ -4,7 +4,7 @@
 //     - Desc : todo query File                                              //
 // 2003-15-09 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id:
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -12,7 +12,7 @@
 // Todo search query execution                                               //
 // Parametes:
 //   - $todo[]       : company search criteria
-//     keys used       
+//     keys used       uid
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
@@ -43,12 +43,10 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo search query execution                                               //
+// Todo add query execution                                                  //
 // Parametes:
 //   - $todo[]       : company search criteria
-//     keys used       
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
+//     keys used       uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_add($todo) {
   $uid = $todo["uid"];
@@ -90,12 +88,10 @@ function run_query_add($todo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Todo search query execution                                               //
+// Todo update query execution                                               //
 // Parametes:
 //   - $todo[]       : company search criteria
-//     keys used       
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
+//     keys used       id, uid, title, sel_user, priority, deadline, content
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($todo) {
   $t_id = $todo["id"];
@@ -126,9 +122,10 @@ function run_query_update($todo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete task pass in $params                                              //
+// Todo detail query execution                                               //
 // Parameters:
-//     -$parms = correponding to page parameters
+//   - $todo[]       : company search criteria
+//     keys used       id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($todo) {
 
@@ -137,6 +134,10 @@ function run_query_detail($todo) {
   $query = "
   select
     Todo.*,
+    todo_userupdate as userupdate,
+    todo_usercreate as usercreate,
+    UNIX_TIMESTAMP(todo_timeupdate) as timeupdate,
+    UNIX_TIMESTAMP(todo_timecreate) as timecreate,
     UNIX_TIMESTAMP(todo_date) as date_todo,
     UNIX_TIMESTAMP(todo_deadline) as date_deadline,
     User.userobm_lastname as user_firstname,
@@ -158,7 +159,7 @@ function run_query_detail($todo) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete task pass in $params                                              //
+// Delete todo pass in $params                                               //
 // Parameters:
 //     -$parms = correponding to page parameters
 ///////////////////////////////////////////////////////////////////////////////
@@ -183,9 +184,9 @@ function run_query_delete($parms) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete task pass in $params                                              //
+// Delete one todo                                                           //
 // Parameters:
-//     -$parms = correponding to page parameters
+//     -$t_id = todo id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_unique($t_id) {
   global $cdg_sql;
@@ -198,19 +199,38 @@ function run_query_delete_unique($t_id) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Update an user preference
+// Delete task pass in $params                                              //
+// Parameters:
+//     -$parms = correponding to page parameters
+///////////////////////////////////////////////////////////////////////////////
+function run_query_admin_update($todo) {
+  global $cdg_sql, $todo_order;
+
+  $uid = $todo["uid"];
+  $todo_order = $todo["sel_order"];
+
+  $query = "
+    update UserObmPref
+    set userobmpref_value = '$todo_order'
+    where userobmpref_option = 'todo_order'
+    and userobmpref_user_id = $uid
+    ";
+  
+  display_debug_msg($query, $cdg_sql, "run_query_admin_update");
+  $obm_q = new DB_OBM;
+  return $obm_q->query($query);
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Update the user top priority list
 // Parameters:
 //   - $user_id  : user Id
-//   - $option   : preference name
-//   - $value    : new preference value
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_set_user_todo($user_id) {
   global $cdg_sql, $todo_order;
   global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
   global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
   global $todo_5_id, $todo_5_title;
-
-  $rank = 1;
 
   // create the todo list
   $query = "
@@ -223,14 +243,24 @@ function run_query_set_user_todo($user_id) {
   ";
 
   display_debug_msg($query, $cdg_sql);
-  $todolist_q = new DB_OBM ;
+  $todolist_q = new DB_OBM;
   $todolist_q->query($query);
 
-  while ($todolist_q->next_record()) {
+  $nb_todo = $todolist_q->nf();
+
+  for ($rank = 1; $rank <= 5; $rank++) {
 
     $option = "todo_". $rank ."_id";
-    $value = $todolist_q->f("todo_id");
-    $title = $todolist_q->f("todo_title");
+
+    if ($rank <= $nb_todo) {
+      $todolist_q->next_record();
+
+      $value = $todolist_q->f("todo_id");
+      $title = $todolist_q->f("todo_title");
+    } else {
+      $value = 0;
+      $title = 0;
+    }
 
     if ($rank == 1) {
       $todo_1_id = $value;
@@ -257,17 +287,6 @@ function run_query_set_user_todo($user_id) {
     display_debug_msg($query, $cdg_sql);
     $obm_q = new DB_OBM ;
     $ret = $obm_q->query($query);
-
-    // If nothing updated, we insert
-    if ($obm_q->affected_rows() == 0) {
-      $query = "insert into UserObmPref
-              (userobmpref_user_id, userobmpref_option, userobmpref_value)
-              values ('$user_id', '$option', '$value')";
-      display_debug_msg($query, $cdg_sql);
-      $ret = $obm_q->query($query);
-    }
-
-    $rank++;
   }
 
   return $ret;
