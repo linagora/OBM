@@ -409,9 +409,13 @@ CREATE TABLE Project (
   project_company_id int(8),
   project_deal_id int(8),
   project_soldtime int(8) DEFAULT NULL,
+  project_datebegin date,
+  project_dateend date,
   project_archive char(1) DEFAULT '0',
   project_comment text,
-  PRIMARY KEY (project_id)
+  PRIMARY KEY (project_id),
+  INDEX project_idx_comp (project_company_id),
+  INDEX project_idx_deal (project_deal_id)
 );
 
 
@@ -428,7 +432,8 @@ CREATE TABLE ProjectTask (
   projecttask_label varchar(128) default NULL,
   projecttask_parenttask_id int(8) default 0,
   projecttask_rank int(8) default NULL,
-  PRIMARY KEY (projecttask_id)
+  PRIMARY KEY (projecttask_id),
+  INDEX pt_idx_pro (projecttask_project_id),
 );
 
 
@@ -449,7 +454,9 @@ CREATE TABLE ProjectUser (
   projectuser_validity timestamp(14) default NULL,
   projectuser_soldprice int(8) default NULL,
   projectuser_manager int(1) default NULL,
-  PRIMARY KEY (projectuser_id)
+  PRIMARY KEY (projectuser_id),
+  INDEX pu_idx_pro (projectuser_project_id),
+  INDEX pu_idx_user (projectuser_user_id)
 );
 
 

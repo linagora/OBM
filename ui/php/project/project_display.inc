@@ -16,6 +16,8 @@ $fieldnames["project_name"] = $l_name;
 $fieldnames["project_company"] = $l_company;
 $fieldnames["project_tasktype"] = $l_tasktype;
 $fieldnames["project_soldtime"] = $l_soldtime;
+$fieldnames["project_datebegin"] = $l_datebegin;
+$fieldnames["project_dateend"] = $l_dateend;
 $fieldnames["project_archive"] = $l_archive_first;
 
 
@@ -103,7 +105,7 @@ function dis_project_search_form($project) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
-  global $l_name, $l_company, $l_tasktype, $l_manager, $l_member;
+  global $l_name, $l_company, $l_tasktype, $l_manager, $l_member, $l_date;
   global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
   global $c_all;
 
@@ -113,6 +115,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $manager = $project["manager"];
   $member = $project["member"];
   $archive = $project["archive"];
+  $date = $project["datebegin"];
 
   $task_list = array($l_task_fac, $l_task_int, $l_task_div);
 
@@ -120,7 +123,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $type_prec = -1;
   $sel_tt = "<select name=\"sel_tt\">";
   $sel_tt .= "<option value=\"$c_all\">$l_all</option>";
-  while($tt_q->next_record()) {
+  while ($tt_q->next_record()) {
     //put menu titles
     if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
       $sel_tt .= "<option disabled=\"disabled\">".$task_list[$task_i]." </option>";
@@ -148,7 +151,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   // member select
   $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
     <option value=\"$c_all\">$l_all</option>\n";
-  while($member_q->next_record()) {
+  while ($member_q->next_record()) {
     $mb_id = $member_q->f("member_id");
     $sel_member .= "<option value=\"$mb_id\"";
     if ($mb_id == $member) { $sel_member .= " selected=\"selected\""; }
@@ -179,6 +182,10 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">$l_member<br />
         $sel_member
+      </div>
+      <div class=\"searchLabel\">$l_date<br />
+        <input name=\"tf_datebegin\" size=\"10\" maxlength=\"10\"
+          value=\"$date\" />
       </div>
       <div class=\"searchLabel\">$l_archive<br />
         $cb_archive
@@ -265,7 +272,7 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
   global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
-  global $l_name, $l_tasktype, $l_company, $l_total;
+  global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
   global $l_deal, $l_project, $l_progress, $l_progressinfos;
   global $l_projected, $l_used, $l_missing, $l_sold;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
@@ -286,6 +293,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
   $deal_label = $project_q->f("deal_label");
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
+  $datebegin = (($project_q->f("datebegin") != "0") ? date_format($project_q->f("datebegin")) : "");
+  $dateend = (($project_q->f("dateend") != "0") ? date_format($project_q->f("dateend")) : "");
 
   // Labels are different for sales and R&D projects
   if ($company != "") {
@@ -645,23 +654,27 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
     <div class=\"detailHead\">$l_project</div>
 
     <table class=\"detail\">
-     <tr>
+    <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailText\">$name</td>
-     </tr>
-     <tr>
-      $dis_company
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailText\">$tt</td>
-     </tr>
-     <tr>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_datebegin</td>
+      <td class=\"detailText\">$datebegin</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_dateend</td>
+      <td class=\"detailText\">$dateend</td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_resume</td>
       <td class=\"detailText\"># $l_tasks : $nb_tsk / # $l_members : $cpt_m</td>
-     </tr>
-     <tr>
+    </tr>
+    <tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailText\">$arc_status</td>
-     </tr>
+    </tr>
     </table>
  	
     <div class=\"detailHead\">$l_progress</div>
@@ -697,7 +710,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_task, $l_projtime, $l_none, $l_archive;
-  global $ctt_sales, $ctt_research;
+  global $l_datebegin, $l_dateend;
+  global $ctt_sales, $ctt_research, $c_php_isodate_format;
 
   if ($action == "detailupdate") {
     $pid = $project_q->f("project_id");
@@ -709,6 +723,8 @@ function html_project_form($action, $project_q, $project) {
     $arc_val = ($project_q->f("project_archive")) ? "checked" : "";
     $company_name = $project_q->f("company_name");
     $deal_label = $project_q->f("deal_label");
+    $datebegin = (($project_q->f("datebegin") != "0") ? date_format($project_q->f("datebegin")) : "");
+    $dateend = (($project_q->f("dateend") != "0") ? date_format($project_q->f("dateend")) : "");
   } else {
     $pid = $project["id"];
     $name = $project["name"];
@@ -719,9 +735,14 @@ function html_project_form($action, $project_q, $project) {
     $company_name = $project["company_name"];
     $deal_label = $project["deal_label"];
     $task = $project["tasklabel"];
+    $datebegin = $project["datebegin"];
+    $dateend = $project["dateend"];
+    $arc_val = $project["archive"] ? "checked" : "";
 
     if ($action == "new") {
       $name = $deal_label;
+      // We pre-fill datebegin and datealarm with current date
+      $datebegin = date($c_php_isodate_format); 
 
       // member select
       $mb_q = run_query_get_obmusers();
@@ -838,8 +859,16 @@ function html_project_form($action, $project_q, $project) {
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
    $dis_task
    $dis_member
+   </tr><tr>
+     <td class=\"detailLabel\">$l_datebegin</td>
+     <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
+   </tr><tr>
+     <td class=\"detailLabel\">$l_dateend</td>
+     <td class=\"detailForm\"><input name=\"tf_dateend\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateend\" /></td>
+   </tr><tr>
+      <td class=\"detailLabel\">$l_archive</td>
+      <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" $arc_val /></td>
    </tr>
-    $dis_archive
    </table>
 
    <div class=\"detailButton\">

@@ -25,6 +25,7 @@ $l_none = "---";
 $l_comment = "Comment";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
+$l_date = "Date";
 $l_invalid_data = "Invalid Data";
 $l_error_permission = "You are not allowed to execute this action";
 $l_error_visibility = "You can't access this information, it is private.";

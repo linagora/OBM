@@ -13,6 +13,8 @@ $l_company = "Société";
 $l_tasktype = "Catégorie";
 $l_task = "Tâche";
 $l_soldtime = "Temps vendu";
+$l_datebegin = "Date de début";
+$l_dateend = "Date de fin";
 
 $l_sold = "Vendu";
 $l_allotted = "Attribué";

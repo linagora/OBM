@@ -26,6 +26,7 @@ $l_none = "---";
 $l_comment = "Kommentar";
 $l_archive = "Archiv";
 $l_archive_first = "A";
+$l_date = "Date";
 $l_invalid_data = "Falsche Daten";
 $l_error_permission = "keine Berechtigung";
 $l_error_visibility = "private Information";

@@ -21,6 +21,7 @@ $l_none = "---";
 $l_comment = "Kommentar";
 $l_archive = "Arkiv";
 $l_archive_first = "A";
+$l_date = "Date";
 $l_invalid_data = "Ugyldig data";
 
 // OBM_DISPLAY

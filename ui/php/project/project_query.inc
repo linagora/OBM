@@ -26,6 +26,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $manager = $project["manager"];
   $member = $project["member"];
   $archive = $project["archive"];
+  $date = $project["datebegin"];
 
   $query = "select distinct
       project_id,
@@ -33,6 +34,8 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
       project_soldtime,
       company_name as project_company,
       tasktype_label as project_tasktype,
+      project_datebegin,
+      project_dateend,
       project_archive
     from Project
          left join Company on project_company_id=company_id
@@ -85,6 +88,11 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
                 and Member.projectuser_user_id = '$member'";
   }
 
+  if ($date != "") {
+    $query .= " and project_datebegin < '$date'
+                  and (project_dateend < '$date' or project_dateend is null)";
+  }
+
   // Order by clause
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "project_name";
   $query .= " order by $order $p_order_dir";
@@ -119,7 +127,9 @@ function run_query_detail($p_id) {
       project_userupdate as userupdate,
       project_usercreate as usercreate,
       UNIX_TIMESTAMP(project_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(project_timecreate) as timecreate
+      UNIX_TIMESTAMP(project_timecreate) as timecreate,
+      UNIX_TIMESTAMP(project_datebegin) as datebegin,
+      UNIX_TIMESTAMP(project_dateend) as dateend
     from Project
          left join Company on project_company_id=company_id
          left join Deal on project_deal_id=deal_id
@@ -156,6 +166,8 @@ function run_query_insert($project) {
   $com = $project["comment"];
   $task = $project["tasklabel"];
   $member = $project["member"];
+  $datebegin = ($project["datebegin"] ? $project["datebegin"] : "null");
+  $dateend = ($project["dateend"] ? $project["dateend"] : "null");
   
 
   $query = "insert into Project
@@ -168,6 +180,8 @@ function run_query_insert($project) {
     project_company_id,
     project_deal_id,
     project_soldtime,
+    project_datebegin,
+    project_dateend,
     project_archive,
     project_comment)
   values (null,
@@ -179,6 +193,8 @@ function run_query_insert($project) {
     '$comp',
     '$deal',
     '$soldtime',
+    '$datebegin',
+    '$dateend',
     '0',
     '$com')";
 
@@ -291,6 +307,8 @@ function run_query_update($pid, $project) {
   $name = $project["name"];
   $soldtime = $project["soldtime"];
   $tt = $project["tt"];
+  $datebegin = ($project["datebegin"] ? $project["datebegin"] : "null");
+  $dateend = ($project["dateend"] ? $project["dateend"] : "null");
   $archive = $project["archive"];
   if ($archive) {
     $arch = "1";
@@ -304,6 +322,8 @@ function run_query_update($pid, $project) {
       project_name='$name',
       project_tasktype_id='$tt',
       project_soldtime='$soldtime',
+      project_datebegin='$datebegin',
+      project_dateend='$dateend',
       project_archive='$arch'
     where project_id='$pid'";
 
