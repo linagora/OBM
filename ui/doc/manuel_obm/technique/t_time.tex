@@ -169,13 +169,89 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
 \end{tabular}
 
 \subsection{Fonctionalité}
- Dans cette partie seront abordées les fonctionnalités du module \timemanager. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus être sujet du fonctionnement que de l'utilité et de l'utilisation du module.
+ Dans cette partie seront abordées les fonctionnalités du module \project. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus etre sujet du fonctionnement que de l'utilité et de l'utilisation du module.
 
-\subsubsection{Affichage}
- Nous passerons assez rapidement sur l'affichage des details d'un évenement qui est une fonctionnalité assez basique(recherche des éléments en base, puis affichage de ces derniers de manière structuré).
- Nous nous interresseront plus au differentes vues du planning.
+\subsubsection{Vue Hebdomadaire}
 
  Nous alons dans un premier temps traiter les vues quotidiennes et hebdomadaire.
 
-\subsubsection{Insertion}
+ Les etapes de la production de cet affichage sont les suivantes : 
+ \begin{itemize}
+  \item{Récupération des informations en base de données}
+  \item{}
+  \item{Affichage de la vue}
+ \end{itemize}
 
+ Donc pour la récupération des données sur les tâches en base, trois fonctions sont utilisées à savoir :
+ \begin{description}
+  \item{\fonction{run\_query\_task\_one\_week}} : Cette fonction permet de récupérer l'état de remplissage des différents jours de la semaine. 
+  \item{\fonction{run\_query\_search}} : Cette fonction récupére en base de données la liste des tâches déjà saisies pour la semaine.
+  \item{\fonction{run\_query\_valid\_search}} : Cette fonction récupére l'état de validation des différents jours de la semaine. 
+ \end{description}
+
+ Donc pour la récupération des données sur les tâches que l'utilisateur est susceptible de réaliser, trois fonctions sont utilisées à savoir :
+ \begin{description}
+  \item{\fonction{run\_query\_tasktype}} : Cette fonction permet de récupérer la liste des types de tâches que l'utilisateur est susceptible d'effectuer (c'est à dire les tâches non facturées et celles qui sont ratachées à un projet auquel l'utilisateur prend part)
+  \item{\fonction{run\_query\_project}} : Cette fonction récupére en base de données la liste de tous les projets auquels participe l'utilisateur.
+  \item{\fonction{run\_query\_projecttask}} : Cette fonction récupére de la liste des sous-tâches qui composent les projets qui ont été récupérés par la fonction précédente.
+ \end{description}
+
+ A partir des informations générées, on appelle les fonctions :
+ \begin{description}
+  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les semaines précédentes et suivantes.
+  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthétique de la semaine : cet affichage met en évidence l'état de remplissage des différents jours et permet de faire ressortir de façon visible celles qui restent à compléter.
+  \item{\fonction{dis\_form\_addtask}} : qui affiche le formumlaire de saisie si il reste des journées à remplir (cf formulaire de saisie des tâches)
+  \item{\fonction{dis\_time\_list\_result}} : qui affiche la liste des tâches déjà saisies pour la semaine. Il s'agit d'une instance de la classe OBM_DISPLAY ; l'affichage de cette liste est donc paramétrable depuis l'écran affichage.
+  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sélection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
+ \end{description}
+
+\subsubsection{Vue mensuelle}
+
+ Donc pour la récupération des données sur les tâches qui ont déjà été saisies pour le mois en cours :
+ \begin{description}
+  \item{\fonction{run\_query\_task\_one\_month}} : Cette fonction permet de récupérer les informations sur le remplissage de la gestion des temps pour le mois en cours.
+ \end{description}
+
+ A partir des informations récupérées, on appelle les fonctions :
+ \begin{description}
+  \item{\fonction{dis\_time\_links}} : qui affiche les liens vers les mois précédents et suivants.
+  \item{\fonction{dis\_time\_index}} : qui affiche une vue synthétique du mois : cet affichage met en évidence l'état de remplissage des différents jours et permet de faire ressortir de façon visible celles qui restent à compléter. Depuis cet écran, on peut accéder aux vues hebdomadaires des différentes semains du mois.
+  \item{\fonction{dis\_time\_search\_form}} : qui affiche, pour l'administrateur seulement, une boite de sélection des utilisateurs. Cela lui permet d'intervenir a la place de n'importe quel utilisateur.
+ \end{description}
+
+\subsubsection{Formulaire de saisie des tâches}
+
+Afin de faciliter la saisie, l'action sur les listes catégorie ou projet modifie le contenu de ces mêmes listes et de la liste de sous-tâches.
+Deux éléments sont nécessaires pour permettre ce comportement :
+\begin{itemize}
+\item{l'envoi d'informations sur les projets dans la page web}
+\item{la modification du formulair à l'aide de scrips JavaScript}
+\end{itemize}
+
+On va donc commencer par génerer deux tableaux de donnés qui seront inclus dans la source de la page html : un pour les projets qui pourront apparaitre dans la liste déroulantes, un pour les sous-tâches qui composent ces mêmes projets.
+
+Ces deux tableaux seront exploités par les scripts qui seront appelés quand l'utilisateur agira sur la liste des catégories ou sur celle des projets :
+\begin{itemize}
+\item{fill\_tasktype} : met à jour la valeur sélectionnée pour la rendre cohérente avec le projet sélectionnée.
+\item{fill\_projectall} : remplit la liste des projets avec tous les projets auquels l'utilisateur prend part.
+\item{fill\_project} : remplit cette même liste mais avec seulement les projets qui correspondent au type de tâche sélectionné.
+\item{fill\_projecttask} : remplit la liste des sous-tâches en fonction du projet sélectionné.
+\item{select\_default} : sélectionne les valeurs adéquates lors du chargement de l'écran permettant la modification d'un tâche.
+\end{itemize}
+
+\subsubsection{Insertion/modification d'une tâche}
+
+La modification des informations dans la base de données se fait en deux étapes
+\begin{itemize}
+\item{mise à jour de la base de données} : \fonction{run\_query\_insert} ajoute cette tâche dans la base de données ou \fonction{run\_query\_update} mets à jour la tâche modifiée.
+\item{validation des journées} : \fonction{run\_query\_validate} marque comme complets les jours que cette modification a fini de remplire ou, au contraire, détecte si une modification a remis en cause le fait qu'une journée soit validée.
+\end{itemize}
+
+\subsubsection{Validation d'un mois}
+
+Cette fonctionnalité n'est disponible que pour l'administrateur. Il peut :
+\begin{itemize}
+\item{compléter un mois incomplet}
+\item{valider un mois} : \fonction{run\_query\_adminvalidate} marque comme validé un mois. Il ne sera alors plus possible de modifier les tâches qui ont été validées.
+\item{annuler la validation} : \fonction{run\_query\_adminunvalidate} annule cette validation. C'est la seule solution pour pouvoir corriger à nouveau des tâches précedemment vérouillées.
+\end{itemize}

@@ -394,7 +394,6 @@ function dis_time_list($time) {
   return $block;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the full TimeManager result page for Index Page                       //
 // Parameters:

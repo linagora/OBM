@@ -672,6 +672,7 @@ function run_query_tasktype($uid = 0) {
       from TaskType, Deal, ProjectUser
       where tasktype_id = deal_tasktype_id
         and deal_id = projectuser_deal_id
+        and deal_archive = 0
         and projectuser_user_id = $uid
       order by tasktype_internal, tasktype_label";
 

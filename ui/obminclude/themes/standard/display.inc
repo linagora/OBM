@@ -391,7 +391,7 @@ function display_inactive_tab($tab) {
 function display_last_visited($path="..") {
   global $set_theme, $ico_project;
   global $ico_company, $ico_contact, $ico_parentdeal, $ico_deal, $ico_list;
-  global $ico_contract, $ico_incident, $ico_account, $ico_invlice,$ico_payment;
+  global $ico_contract, $ico_incident, $ico_account, $ico_invoice,$ico_payment;
   global $ico_user, $ico_group;
   global $last_company,$last_contact,$last_deal,$last_parentdeal,$last_list;
   global $last_contract, $last_incident, $last_project;
