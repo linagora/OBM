@@ -123,6 +123,7 @@ $l_err_end_repeat = "La fin de répétition doit être supérieure à la date de fin"
 $l_err_end_repeat2 = "La durée maximum d'une répétition est de 1 an";
 $l_err_end_repeat3 = "La durée maximum d'une répétition est de 10 ans lorsque la répétition est de type annuelle.";
 $l_err_days_repeat = "Vous devez spécifier des jours de répétitions.";
+$l_err_days_repeat_not_weekly = "Vous ne pouvez préciser des jours de répétition qu'en mode de répétition hebdomadaire.";
 $l_err_weekly_repeat = "Lors d'une répétition hebdomadaire la date de fin de répétition doit au moins être de 7 jours supérieure à celle de fin d'événement.";
 $l_monday = "Lundi";
 $l_tuesday = "Mardi";

@@ -1074,7 +1074,7 @@ function run_query_delete($agenda) {
   $obm_db->query($query);
   $message = $l_delete_event_mail_head.$title;   
   $subject = "$l_delete_event_mail_subject" . $title;
-  send_mail($l_delete_event_mail_subject,$message,$contacts,$mail);
+  send_mail($subject, $message, $contacts, $mail);
 } 
 
 
@@ -1866,7 +1866,8 @@ function store_meeting_cell($current_events,$duration,$calendar_user,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
   global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_err_datebegin, $l_err_dateend,$err_msg,$l_err_weekly_repeat ;
-  global $l_err_begin_end ,$l_err_end_repeat, $l_err_repeat,$l_err_end_repeat2,$l_err_end_repeat3,$l_err_days_repeat ;
+  global $l_err_begin_end, $l_err_end_repeat, $l_err_repeat,$l_err_end_repeat2;
+  global $l_err_end_repeat3, $l_err_days_repeat, $l_err_days_repeat_not_weekly;
   
   $title = $agenda["title"];
   $datebegin = substr($agenda["date_begin"],0,8);
@@ -1920,7 +1921,7 @@ function check_data_form($agenda) {
   }
 
   if ($dateend<$datebegin || ($dateend==$datebegin && $timeend<=$timebegin)) {
-    $err_msg =  $l_err_begin_end;
+    $err_msg = $l_err_begin_end;
     return false;
   } 
   
@@ -1929,29 +1930,35 @@ function check_data_form($agenda) {
     return false;
   }
   
+  // If repeat kind is weekly, repeat days must be set
   if ($kind == "weekly" && $repeat_days == "0000000") {
-    $err_msg =  $l_err_days_repeat;
+    $err_msg = $l_err_days_repeat;
+    return false;
+  }  
+
+  // If repeat days are set, repeat kind must be weekly
+  if ($kind != "weekly" && $repeat_days != "0000000") {
+    $err_msg = $l_err_days_repeat_not_weekly;
     return false;
   }  
 
   if ($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
-    $err_msg =  $l_err_weekly_repeat;
+    $err_msg = $l_err_weekly_repeat;
     return false;
   }  
   
   if (trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
-    $err_msg =  $l_err_end_repeat3;
+    $err_msg = $l_err_end_repeat3;
     return false;
   }  
   
   if (trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
-    $err_msg =  $l_err_end_repeat2;
+    $err_msg = $l_err_end_repeat2;
     return false;
   }  
-
   
   if ($kind != "none" && $dateend > $datebegin) {
-    $err_msg =  $l_err_repeat;
+    $err_msg = $l_err_repeat;
     return false;
   }  
   
