@@ -102,8 +102,13 @@ $l_header_computer = "Computers";
 $l_header_account = "Accounts";
 $l_header_invoice = "Invoices";
 $l_header_payment = "Payments";
-$l_header_time = "Time management" ;
 $l_header_agenda = "Calendar";
+
+//TIME
+$l_header_time = "Time management" ;
+$l_header_stats = "Statistics";
+$l_header_month = "Monthly view";
+
 
 $l_header_title_computer = "COMPUTER" ;
 $l_header_title_settings = "SETTINGS";

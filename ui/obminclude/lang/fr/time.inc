@@ -27,6 +27,7 @@ $l_total_before="Durée cumulée précédente";
 $l_total_period="Durée sur la période";
 $l_total="Total";
 $l_day="Jour";
+$l_period="Période";
 
 $l_task_del="Suppr.";
 $l_week="Semaine";
@@ -39,8 +40,6 @@ $l_valid = "Valider";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 
-
-$l_visibility ="Accès";
 
 //------------------------------------//
 // Fields that appear in result lists //
@@ -61,12 +60,7 @@ $fieldnames["day_in_month"] = $l_day;
 // Calculated fields
 $fieldnames["contact_company_name"] = $l_company;
 
-$l_week_sel = "Semaine recherchée";
-$l_from_company = "&nbsp;&nbsp;Société";
-$l_telother = "Autres tel";
-$l_private = "Privé";
-$l_public = "Publique";
-$l_contact_select_company = "Sélectionner la société du Contact.";
+
 $l_week_next = "Semaine suivante";
 $l_week_prev = "Semaine précédente";
 $l_month_next = "Mois suivant";
@@ -79,21 +73,10 @@ $l_duration = "Durée:";
 
 // Titres
 $l_time = "Gestion des temps";
-$l_header_admin = "Administration";
-$l_header_stats = "Statistiques";
 
-// Actions
-$l_insert = "Enregistrer le Contact";
-$l_checkdelete = "Vérifier ou Supprimer le Contact";
-$l_select_company = "Sélectionner la société";
-$l_confirm= "Confirmer l'action";
-// Defined in global
-// $l_close = "Fermer";
 
 // Messages
 $l_projects_manager = "Confirmation de la validation des taches par l'administrateur:";
-$l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";
-$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contacts correspondants.";
 $l_found_task = "Voici les tâches réalisées et saisies pour la semaine en cours:";
 $l_found = "Taches trouvées.";
 $l_no_found = "Aucune Taches pour cet utilisateur!";
@@ -103,27 +86,15 @@ $l_update_task = "Vous pouvez modifier votre tache ci dessous:";
 $l_total_day = "Récapitulatif des tâches par jour.Si une journée a été intégralement saisie,<BR> vous devez confirmer ci-dessous en sélectionnant les journées à valider et en validant le formulaire.";
 $l_total_deal = "Récapitulatif par taches :";
 $l_total_month = "Récapitulatif mensuel :";
-$l_query_error = "Problème en executant la requete";
 
 // Type de tâches à rechercher
 $l_tasktype = "Type des tâches";
 $l_task_all = "Toutes";
 $l_task_uservalid = "Validées par l'admin ou l'utilisateur";
 $l_task_adminvalid= "Validées par l'admin uniquement";
+
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_tasktype = "Vous devez sélectionner un type de tâche.";
 $l_j_select_project = "Vous devez sélectionner un project pour une tâche facturée.";
-
-
-$l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
-$l_fill_phone = "Vous devez renseigner le telephone avant de valider.";
 $l_delete_confirm = "Confirmer la suppression de ces taches ?";
-$l_j_select_company = "Vous devez sélectionner une société !";
 
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_jour_format = "%a %M %d";
-
-
-// For the display preferences modification screen 
-$l_contact_display = "Options d'affichage des listes de contacts";
