@@ -77,7 +77,7 @@ switch ($action) {
     dis_data($action, $mode, $module);
     break;
   case "sound_aka_update":
-    dis_sound_aka_update($action, $mode);
+    dis_sound_aka_update($mode);
     break;
   default:
     echo "No action specified !";

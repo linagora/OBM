@@ -267,8 +267,8 @@ function run_query_insert($company) {
   if ($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
-	  companycategorylink_companyid,
-	  companycategorylink_categoryid)
+	  companycategorylink_company_id,
+	  companycategorylink_category_id)
 	values (
           '$id',
           '$categoryid')";
@@ -350,15 +350,17 @@ function run_query_update($cid, $company) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $query = "delete from CompanyCategoryLink where companycategorylink_companyid='$cid'";
+  $query = "delete
+    from CompanyCategoryLink
+    where companycategorylink_company_id='$cid'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   if($retour && is_array($compcat)) {
     foreach($compcat as $categoryid) {
       $query = "insert into CompanyCategoryLink (
-	companycategorylink_companyid,
-	companycategorylink_categoryid)
+	companycategorylink_company_id,
+	companycategorylink_category_id)
 	values
 	('$cid','$categoryid')";
       display_debug_msg($query, $cdg_sql);
@@ -385,7 +387,8 @@ function run_query_delete($p_id) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
   run_query_delete_document($p_id,"Company");
-  $query = "delete from CompanyCategoryLink where companycategorylink_companyid='$p_id'";
+  $query = "delete from CompanyCategoryLink
+    where companycategorylink_company_id='$p_id'";
   $obm_q->query($query);
 
   return $retour;
@@ -655,8 +658,8 @@ function run_query_get_companycat($id) {
 
   $query = "select *
     from CompanyCategoryLink, CompanyCategory
-    where companycategorylink_companyid = '$id' 
-      and companycategorylink_categoryid = companycategory_id
+    where companycategorylink_company_id = '$id' 
+      and companycategorylink_category_id = companycategory_id
     order by  companycategory_code"; 
 
   $obm_q = new DB_OBM;
@@ -664,7 +667,7 @@ function run_query_get_companycat($id) {
   display_debug_msg($query, $cdg_sql);
   $i=0;
   while ($obm_q->next_record()) {
-    $links[$i++] = $obm_q->f("companycategorylink_categoryid");
+    $links[$i++] = $obm_q->f("companycategorylink_category_id");
   }
   return $links;
 }
@@ -680,8 +683,8 @@ function run_query_get_companycat_name($id) {
   $query = "select *
     from CompanyCategoryLink,
       CompanyCategory
-    where companycategorylink_companyid = '$id' 
-      and companycategorylink_categoryid = companycategory_id
+    where companycategorylink_company_id = '$id' 
+      and companycategorylink_category_id = companycategory_id
     order by  companycategory_code"; 
 
   $obm_q = new DB_OBM;
@@ -779,8 +782,13 @@ function run_query_cat_delete($id) {
 function run_query_cat_links($p_id) {
   global $cdg_sql;
 
-  $query = "select company_name, company_id, '$p_id' as company_category_id from Company,CompanyCategoryLink where 
-  company_id= companycategorylink_companyid and companycategorylink_categoryid = '$p_id'";
+  $query = "select company_name,
+      company_id,
+      '$p_id' as company_category_id
+    from Company,
+      CompanyCategoryLink
+    where company_id=companycategorylink_company_id
+      and companycategorylink_category_id = '$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

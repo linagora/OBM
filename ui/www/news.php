@@ -21,7 +21,7 @@
       <li>
         <div align="left"><b>2003-12-24</b> : version <b>0.7.5</b> released (enhancement)
         <ol>
-          <li> PostreSQL support up to date
+          <li> PostreSQL support is back (db scripts, modules Company, Contact,Deal and User for now)
           <li> Company enhancements (Phonetics and approximate searches, Categories, datasource...)
           <li> Contact enhancements (Categories, marketing manager, kind, functions, datasource,...)
           <li> New module : Admin Referential to handle global entities

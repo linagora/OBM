@@ -232,9 +232,9 @@ CREATE TABLE CompanyCategory (
 -- Table structure for table 'CompanyCategoryLink'
 --
 CREATE TABLE CompanyCategoryLink (
-  companycategorylink_categoryid  int(8) NOT NULL default '0',
-  companycategorylink_companyid   int(8) NOT NULL default '0',
-  PRIMARY KEY (companycategorylink_categoryid,companycategorylink_companyid)
+  companycategorylink_category_id  int(8) NOT NULL default '0',
+  companycategorylink_company_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
 );
 
 
@@ -254,8 +254,6 @@ CREATE TABLE Contact (
   contact_company_id           int(8),
   contact_kind_id              int(8),
   contact_marketingmanager_id  int(8),
-  contact_category1_id	       int(4),
-  contact_category2_id	       int(4),  
   contact_lastname             varchar(24) DEFAULT '' NOT NULL,
   contact_firstname            varchar(24),
   contact_address1             varchar(50),
@@ -315,28 +313,51 @@ CREATE TABLE Function (
 --
 CREATE TABLE ContactCategory1 (
   contactcategory1_id          int(8) NOT NULL auto_increment,
-  contactcategory1_timeupdate  timestamp(14) NOT NULL,
-  contactcategory1_timecreate  timestamp(14) NOT NULL,
-  contactcategory1_userupdate  int(8) NOT NULL default '0',
-  contactcategory1_usercreate  int(8) NOT NULL default '0',
-  contactcategory1_order        int(4) NOT NULL default '',
+  contactcategory1_timeupdate  timestamp(14),
+  contactcategory1_timecreate  timestamp(14),
+  contactcategory1_userupdate  int(8) default '0',
+  contactcategory1_usercreate  int(8) default '0',
+  contactcategory1_order       int(4) default '0',
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
+
+
+--
+-- Table structure for table 'ContactCategory1Link'
+--
+CREATE TABLE ContactCategory1Link (
+  contactcategory1link_category_id  int(8) NOT NULL default '0',
+  contactcategory1link_contact_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
+);
+
 
 --
 -- Table structure for table 'ContactCategory2'
 --
 CREATE TABLE ContactCategory2 (
   contactcategory2_id          int(8) NOT NULL auto_increment,
-  contactcategory2_timeupdate  timestamp(14) NOT NULL,
-  contactcategory2_timecreate  timestamp(14) NOT NULL,
-  contactcategory2_userupdate  int(8) NOT NULL default '0',
-  contactcategory2_usercreate  int(8) NOT NULL default '0',
-  contactcategory2_order        int(4) NOT NULL default '',
+  contactcategory2_timeupdate  timestamp(14),
+  contactcategory2_timecreate  timestamp(14),
+  contactcategory2_userupdate  int(8) default '0',
+  contactcategory2_usercreate  int(8) default '0',
+  contactcategory2_order       int(4) default '',
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );
+
+
+--
+-- Table structure for table 'ContactCategory2Link'
+--
+CREATE TABLE ContactCategory2Link (
+  contactcategory2link_category_id  int(8) NOT NULL default '0',
+  contactcategory2link_contact_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Deal module tables
 -------------------------------------------------------------------------------
@@ -386,11 +407,10 @@ CREATE TABLE Deal (
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
   deal_visibility           int(2) DEFAULT '0',
-  deal_soldtime             int(8) DEFAULT NULL,
-  deal_project_status       int(1) DEFAULT 0,
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );
+
 
 --
 -- Table structure for table 'DealStatus'

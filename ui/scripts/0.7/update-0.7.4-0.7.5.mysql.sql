@@ -72,9 +72,9 @@ CREATE TABLE CompanyCategory (
 -- Table structure for table 'CompanyCategoryLink'
 --
 CREATE TABLE CompanyCategoryLink (
-  companycategorylink_categoryid int(8) NOT NULL default '0',
-  companycategorylink_companyid int(8) NOT NULL default '0',
-  PRIMARY KEY  (companycategorylink_categoryid,companycategorylink_companyid)
+  companycategorylink_category_id int(8) NOT NULL default '0',
+  companycategorylink_company_id int(8) NOT NULL default '0',
+  PRIMARY KEY  (companycategorylink_category_id,companycategorylink_company_id)
 );
 
 --
@@ -86,10 +86,21 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp(14) NOT NULL,
   contactcategory1_userupdate  int(8) NOT NULL default '0',
   contactcategory1_usercreate  int(8) NOT NULL default '0',
-  contactcategory1_order        int(4) NOT NULL default '',
+  contactcategory1_order       int(4) NOT NULL default '',
   contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
+
+
+--
+-- Table structure for table 'ContactCategory1Link'
+--
+CREATE TABLE ContactCategory1Link (
+  contactcategory1link_category_id  int(8) NOT NULL default '0',
+  contactcategory1link_contact_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
+);
+
 
 --
 -- Table structure for table 'ContactCategory2'
@@ -104,6 +115,18 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );
+
+
+--
+-- Table structure for table 'ContactCategory2Link'
+--
+CREATE TABLE ContactCategory2Link (
+  contactcategory2link_category_id  int(8) NOT NULL default '0',
+  contactcategory2link_contact_id   int(8) NOT NULL default '0',
+  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Update structure for table 'Company'
 -------------------------------------------------------------------------------
@@ -144,12 +167,6 @@ ALTER table Contact change column contact_function contact_title varchar(64);
 -- Add new column : contact_function_id
 ALTER table Contact add column contact_function_id int(8) after contact_country_id;
 
--- Add new column : contact_function_id
-ALTER table Contact add column contact_category1_id int(8) after contact_marketingmanager_id;
-
--- Add new column : contact_function_id
-ALTER table Contact add column contact_category2_id int(8) after contact_category1_id;
-
 
 -------------------------------------------------------------------------------
 -- Update structure for table 'Kind'
@@ -166,6 +183,12 @@ ALTER table Kind change column kind_label kind_header varchar(64);
 -------------------------------------------------------------------------------
 -- Change column : deal_hitrate to int(3)
 ALTER table Deal change column deal_hitrate deal_hitrate int(3) default 0;
+
+-- Drop column : deal_soldtime
+ALTER table Deal drop column deal_soldtime;
+
+-- Drop column : deal_project_status
+ALTER table Deal drop column deal_project_status;
 
 
 -------------------------------------------------------------------------------

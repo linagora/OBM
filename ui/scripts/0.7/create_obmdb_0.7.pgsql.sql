@@ -247,9 +247,9 @@ CREATE TABLE CompanyCategory (
 -- Table structure for table 'CompanyCategoryLink'
 --
 CREATE TABLE CompanyCategoryLink (
-  companycategorylink_categoryid  integer NOT NULL default '0',
-  companycategorylink_companyid   integer NOT NULL default '0',
-  PRIMARY KEY (companycategorylink_categoryid,companycategorylink_companyid)
+  companycategorylink_category_id  integer NOT NULL default '0',
+  companycategorylink_company_id   integer NOT NULL default '0',
+  PRIMARY KEY (companycategorylink_category_id,companycategorylink_company_id)
 );
 
 
@@ -323,6 +323,56 @@ CREATE TABLE Function (
 );
 
 
+--
+-- Table structure for table 'ContactCategory1'
+--
+CREATE TABLE ContactCategory1 (
+  contactcategory1_id          serial,
+  contactcategory1_timeupdate  timestamp,
+  contactcategory1_timecreate  timestamp,
+  contactcategory1_userupdate  integer default 0,
+  contactcategory1_usercreate  integer default 0,
+  contactcategory1_order       integer default 0,
+  contactcategory1_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory1_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory1Link'
+--
+CREATE TABLE ContactCategory1Link (
+  contactcategory1link_category_id  integer NOT NULL default 0,
+  contactcategory1link_contact_id   integer NOT NULL default 0,
+  PRIMARY KEY (contactcategory1link_category_id,contactcategory1link_contact_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory2'
+--
+CREATE TABLE ContactCategory2 (
+  contactcategory2_id          serial,
+  contactcategory2_timeupdate  timestamp,
+  contactcategory2_timecreate  timestamp,
+  contactcategory2_userupdate  integer default 0,
+  contactcategory2_usercreate  integer default 0,
+  contactcategory2_order       integer default 0,
+  contactcategory2_label       varchar(100) NOT NULL default '',
+  PRIMARY KEY (contactcategory2_id)
+);
+
+
+--
+-- Table structure for table 'ContactCategory2Link'
+--
+CREATE TABLE ContactCategory2Link (
+  contactcategory2link_category_id  integer NOT NULL default 0,
+  contactcategory2link_contact_id   integer NOT NULL default 0,
+  PRIMARY KEY (contactcategory2link_category_id,contactcategory2link_contact_id)
+);
+
+
 -------------------------------------------------------------------------------
 -- Deal module tables
 -------------------------------------------------------------------------------
@@ -372,8 +422,6 @@ CREATE TABLE Deal (
   deal_archive              char(1) DEFAULT '0',
   deal_todo                 varchar(128),
   deal_visibility           integer DEFAULT '0',
-  deal_soldtime             integer DEFAULT NULL,
-  deal_project_status       integer DEFAULT 0,
   deal_comment              text,
   PRIMARY KEY (deal_id)
 );

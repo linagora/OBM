@@ -11,7 +11,7 @@
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
-$obm_version = "0.7.5pre5";
+$obm_version = "0.7.5";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
