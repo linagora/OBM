@@ -19,6 +19,7 @@
 function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;
+
   $getdate = $agenda["date"];
   ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $getdate, $day_array2);
   $this_day = $day_array2[3]; 

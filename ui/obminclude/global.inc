@@ -85,10 +85,13 @@ $ctu_sql_limit = false;
 $c_day_fraction = 8;
 
 // Worked days in a week (start at sunday)
-$c_working_days = array(1,1,1,1,1,1,0);
+$c_working_days = array(0,1,1,1,1,1,0);
 
 // Day beginning a week (0=Sunday, 1=Monday,...)
 $c_week_first_day = 1;
+
+// DST (Daily Saving Time) correction to avoid dates problems (2h)
+$c_dst_err = 7200;
 
 // task_status flag
 $c_task_notvalid = 0;    // task not valiated

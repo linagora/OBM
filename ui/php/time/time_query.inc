@@ -15,10 +15,11 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($time) {
+function run_query_task_list($time) {
   global $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
+  $user_id = $time["user_id"];
 
   if ($time["interval"] == "week") {
     $array_date = get_week_point($date);
@@ -61,7 +62,7 @@ function run_query_search($time) {
     where timetask_tasktype_id = tasktype_id
       and timetask_date >='". $array_date[0] ."' 
       and timetask_date <'". $array_date[1] ."'
-      and timetask_user_id = ". $time["user_id"] ."
+      and timetask_user_id = '$user_id'
     order by timetask_date
     ";
    
@@ -84,10 +85,9 @@ function run_query_stat_project($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
-  $user = $time["user_id"];
   $uid_tab = "(";
 
-  while ($key = each($time["user_id"])) {
+  while ($key = each($time["user_ids"])) {
     $uid = $key["value"];
     $uid_tab .= ($tail) ? ", $uid" : "$uid";
     $tail = 1;
@@ -141,10 +141,9 @@ function run_query_stat_tasktype($time) {
   global $c_day_fraction, $cdg_sql;
 
   $tail = 0;
-  $user = $time["user_id"];
   $uid_tab = "(";
 
-  while ($key = each($time["user_id"])) {
+  while ($key = each($time["user_ids"])) {
     $uid = $key["value"];
     $uid_tab .= ($tail) ? ", $uid" : "$uid";
     $tail = 1;
@@ -184,13 +183,9 @@ function run_query_stat_tasktype($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// return array with date where task have been validate 
-//   in the given period of time
+// return array with filled days and status in the week containing time[date]
 // Parameters:
 //  - $time : array with defined variables
-//    keys used : - user_id
-//                - date
-//                - date_end
 // Returns:
 //  array of days corresponding to validated date, and task_status : 
 //   ("20010911" => 2, "20010912" => 1, "20010913" => 1)
@@ -200,34 +195,35 @@ function run_query_valid_search($time) {
 
   $week_span = get_week_point($time["date"]);
 
-  $user_id = $time["user_id"];
-  //  echo "Run_query_valid_search<br>";
-  //  print_r($time);
-  $query = "select timetask_date, timetask_status
-      from TimeTask 
-      where timetask_status != 0 
-        and timetask_date >= '". $week_span[0] ."' 
-        and timetask_date <= '". $week_span[1]. "'";
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datetask = sql_date_format($db_type, "timetask_date", "date_task");
+
+  $query = "select 
+      $datetask,
+      timetask_status
+    from TimeTask 
+    where timetask_status != 0 
+      and timetask_date >= '". $week_span[0] ."' 
+      and timetask_date <= '". $week_span[1]. "'";
 
   // user_id : array -> size 1 or more 
-  if (sizeof($time["user_id"]) == 1)
-	  $query .= " and timetask_user_id = ". $time["user_id"];
-  else {
-	  $users_list = array_to_list($time["user_id"]);
-	  $query .= " and timetask_user_id in $users_list";
+  if (sizeof($time["user_ids"]) == 1) {
+    $query .= " and timetask_user_id = '". $time["user_id"] . "'";
+  } else {
+    $users_list = array_to_list($time["user_ids"]);
+    $query .= " and timetask_user_id in $users_list";
   }
 
   // Group
   $query .= " group by timetask_date, timetask_status ";
   
   display_debug_msg($query, $cdg_sql, "run_query_valid_search");
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
   
-
-  $i=0; //for loop
-  while ($obm_db->next_record()) {
-    $valid_array[substr($obm_db->f("timetask_date"),0,8)]= $obm_db->f("timetask_status");
+  while ($obm_q->next_record()) {
+    $date_Ymd = date("Ymd",$obm_q->f("date_task"));
+    $valid_array[$date_Ymd] = $obm_q->f("timetask_status");
   }
    
   return $valid_array; 
@@ -242,20 +238,23 @@ function run_query_valid_search($time) {
 function run_query_get_task($id) {
   global $cdg_sql;
 
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $datetask = sql_date_format($db_type, "timetask_date", "date_task");
+
   $query = "
     select
-       TimeTask.*,
-       projecttask_project_id as timetask_project_id  
-     from TimeTask
-     left join ProjectTask on timetask_projecttask_id = projecttask_id
-     where timetask_id = $id";
+      TimeTask.*,
+      $datetask,
+      projecttask_project_id as timetask_project_id  
+    from TimeTask
+      left join ProjectTask on timetask_projecttask_id = projecttask_id
+    where timetask_id = '$id'";
   
   display_debug_msg($query, $cdg_sql, "run_query_get_task");
-
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q;
 }
 
 
@@ -266,8 +265,7 @@ function run_query_get_task($id) {
 //     keys used  : tasktype, project, time, label, date
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_insert($task) {
-  global $auth;
-  global $cdg_sql;
+  global $uid, $cdg_sql;
 
   $valid_date = run_query_valid_search($task);
   $date = $task["sel_date"];
@@ -276,13 +274,12 @@ function run_query_insert($task) {
   $time = $task["time"];
   $label = $task["label"];
   $user_id = $task["user_id"];
-    
 
-  if ( $ttype != 0 ) //for navigators wich doesn't support HTML 4 => <option disabled>
-  { 
-     if(is_array($date)){
-     foreach($date as $key => $value) {
-       $query = "
+  if ( $ttype != 0 ) {
+    // for navigators wich doesn't support HTML 4 => <option disabled>
+    if (is_array($date)) {
+      foreach ($date as $key => $value) {
+	$query = "
        insert into TimeTask (
          timetask_timeupdate,
          timetask_timecreate,
@@ -298,7 +295,7 @@ function run_query_insert($task) {
        values(null,
          '" . date("Y-m-d H:i:s") . "',
          null,
-         '" . $auth->auth["uid"] . "',
+         '$uid',
          '$user_id',
          '$key',
          $projecttask,
@@ -307,13 +304,12 @@ function run_query_insert($task) {
          '$label',
          0)";
 
-       display_debug_msg($query, $cdg_sql, "run_query_insert");
-       $obm_q = new DB_OBM;
-       $obm_q->query($query);  
-     }
-    }
-    else {
-       $query = "
+	display_debug_msg($query, $cdg_sql, "run_query_insert");
+	$obm_q = new DB_OBM;
+	$obm_q->query($query);  
+      }
+    } else {
+      $query = "
        insert into TimeTask (
          timetask_timeupdate,
          timetask_timecreate,
@@ -329,7 +325,7 @@ function run_query_insert($task) {
        values(null,
          '" . date("Y-m-d H:i:s") . "',
          null,
-         '" . $auth->auth["uid"] . "',
+         '$uid',
          '$user_id',
          '$date',
          $projecttask,
@@ -376,26 +372,25 @@ function run_query_update($task) {
   $obm_db->query($query);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Delete task pass in $params                                              //
+// Delete task given in $params
 // Parameters:
-//     -$parms = correponding to page parameters
+//   - $parms : parameters hash
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete($parms) {
-
   global $cdg_sql;
 
   foreach($parms as $key => $val) {
     $id_task = strstr($key,"_"); 
-    if( $id_task != "" ) {//if we have a id task
+    if ( $id_task != "" ) {  // if we have an id task
       $id_task = substr($id_task, 1);  
     
-      if($val == "on"){ 
-        $query = "delete from TimeTask where timetask_id = $id_task";
-
+      if ($val == "on") { 
+        $query = "delete from TimeTask where timetask_id = '$id_task'";
 	display_debug_msg($query, $cdg_sql, "run_query_delete");
-        $delete_query = new DB_OBM;
-        $delete_query->query($query);
+        $obm_q = new DB_OBM;
+        $obm_q->query($query);
       }    
     }
   }
@@ -409,8 +404,7 @@ function run_query_delete($parms) {
 //     keys used
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_validate($who) {
-  
-  global $c_day_fraction;
+  global $cdg_sql, $c_day_fraction;
 
   // to see if a day is full
   $cdf = $c_day_fraction;
@@ -420,10 +414,10 @@ function run_query_validate($who) {
   // should use subselect (mysql 4.1 and further)
   $query = "select timetask_date
             from TimeTask
-            where timetask_user_id=$who
-            and timetask_status=0
+            where timetask_user_id = '$who'
+            and timetask_status = 0
             group by timetask_date
-            having sum(timetask_length) = $cdf";
+            having sum(timetask_length) = '$cdf'";
   
   display_debug_msg($query, $cdg_sql, "run_query_validate(1)");
   $search_valid_query = new DB_OBM;
@@ -433,11 +427,11 @@ function run_query_validate($who) {
     
     $search_valid_query->next_record();
     $date = $search_valid_query->f("timetask_date");
-    $date_list = "($date";
+    $date_list = "('$date'";
 
     while($search_valid_query->next_record()) {
       $date = $search_valid_query->f("timetask_date");
-      $date_list .= ", $date";
+      $date_list .= ", '$date'";
     }
 
     $date_list .= ")";
@@ -457,10 +451,10 @@ function run_query_validate($who) {
   // ie. if a task has been updated...
   $query = "select timetask_date
             from TimeTask
-            where timetask_user_id=$who
+            where timetask_user_id = '$who'
             and timetask_status != 2
             group by timetask_date
-            having sum(timetask_length) != $cdf";
+            having sum(timetask_length) != '$cdf'";
   
   display_debug_msg($query, $cdg_sql, "run_query_validate(3)");
   $search_unvalid_query = new DB_OBM;
@@ -470,19 +464,19 @@ function run_query_validate($who) {
     
     $search_unvalid_query->next_record();
     $date = $search_unvalid_query->f("timetask_date");
-    $date_list = "($date";
+    $date_list = "('$date'";
 
     while($search_unvalid_query->next_record()) {
       $date = $search_unvalid_query->f("timetask_date");
-      $date_list .= ", $date";
+      $date_list .= ", '$date'";
     }
 
     $date_list .= ")";
 
     // validate dates that are fully filled
     $query = "update TimeTask
-              set timetask_status=0
-              where timetask_user_id=$who
+              set timetask_status = 0
+              where timetask_user_id = '$who'
               and timetask_date in $date_list";
     
     display_debug_msg($query, $cdg_sql, "run_query_validate(4)");
@@ -515,7 +509,7 @@ function run_query_adminvalidate($time) {
   $query = "
     update TimeTask
     set timetask_status = 2
-    where timetask_user_id = $user_id
+    where timetask_user_id = '$user_id'
       and timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end' 
     ";
@@ -549,7 +543,7 @@ function run_query_adminunvalidate($time) {
   $query = "
     update TimeTask
     set timetask_status = 1
-    where timetask_user_id = $user_id
+    where timetask_user_id = '$user_id'
       and timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end' 
     ";
@@ -570,9 +564,9 @@ function run_query_adminunvalidate($time) {
 function run_query_short_month($time) {
   global $cdg_sql, $cdg_param;
 
-  $year=substr($time["date"],0,4);
-  $month=substr($time["date"],4,2);
-  $day=1;
+  $year = substr($time["date"],0,4);
+  $month = substr($time["date"],4,2);
+  $day = 1;
 
   // First and last days of month
   $month_begin = date("Ymd", mktime(0,0,0,$month, 1, $year));
@@ -584,16 +578,18 @@ function run_query_short_month($time) {
       userobm_firstname,
       sum(timetask_length) as total_length,
       timetask_user_id as userid,
-      timetask_status
+      min(timetask_status) as status
     from TimeTask, UserObm
     where timetask_date >= '$month_begin' 
       and timetask_date <= '$month_end'
       and timetask_user_id = userobm_id
-    group by timetask_user_id
+    group by userobm_lastname,
+             userobm_firstname,
+             timetask_user_id
     order by userobm_lastname, userobm_firstname
     ";
   
-  display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
+  display_debug_msg($query, $cdg_sql, "run_query_short_month");
   $obm_db = new DB_OBM;
   $obm_db->query($query);
 
@@ -876,7 +872,7 @@ function run_query_get_obmusers() {
 ///////////////////////////////////////////////////////////////////////////////
 // Get an array of working days date for the week begining at the date given
 // Paramaters:
-//   - $date : a date starting on the 1st day of the week
+//   - $date : a date (timestamp) starting on the 1st day of the week
 // Returns:
 //  array with for each days of the week : 0->"Mon 23 Apr" 1->20040413
 ///////////////////////////////////////////////////////////////////////////////
@@ -884,7 +880,7 @@ function get_week_working_days_dates($date) {
   global $c_week_first_day, $l_daysofweekshort, $l_monthsofyearshort;
   
   $cpt_end = $c_week_first_day + 7;
-  for ($i=$c_week_first_day ; $i < $cpt_end; $i++) {
+  for ($i=$c_week_first_day; $i < $cpt_end; $i++) {
     if (is_working_day($date)) {
       $date_link = date("Ymd", $date);
       $month = date("m", $date);
@@ -897,7 +893,6 @@ function get_week_working_days_dates($date) {
 
     $date += 86400;
   }
-  
   return $array_date;
 }
 

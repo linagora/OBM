@@ -7,22 +7,29 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
-// - index (default) -- search fields  -- show the task week list and the task 
-//					  insert form.
+// - index (default) -- search fields  -- dislay task list and new task form.
 // - viewmonth       --                -- display month
 // - globalview      --                -- display validation pannel
 // - insert          -- form fields    -- insert the task
+// - detailupdate    -- $task_id       -- show the update task form in a popup
+// - update          -- form fields    -- update the task
+// - delete          -- $params        -- delete the tasks
 // - validate        --                -- validate a month for a user
 // - unvalidate      --                -- cancel admin validation
 // - stats           --                -- show stats screen
-// - delete          -- $params        -- delete the tasks
-// - detailupdate    -- $task_id       -- show the update task form in a popup
-// -                 -- form fields    -- update the task
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
 // - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
+// Todo
+// - handle project_managers
+// - review actions : stats
+// - probleme de date !! stockage different Mysql et postgres (timetask_date)
+//   mysql : 20041116..., postgres 2004-11-16...
+//   d'ou toutes les fonctions substr... pour recup mois, jour depuis bd ko !! avec pg (attention pas depuis time[date]
+// - point sur timetask_status ! dans globalview : incoherent
+//   => d'ou sur validate, unvalidate et valid auto
 
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
@@ -47,157 +54,85 @@ $time = get_param_time();
 get_time_actions();
 $perm->check_permissions($menu, $action);
 
-// user select ---------------------------------------------
-
-// a user was selected
-if (! empty($time["user_id"])) {
-
-  // we come back from stats : we retrieve the user
-  if (is_array($time["user_id"]) and ($action != "stats")) {
-    $time["user_id"] = $uid;
-  } else if (!(is_array($time["user_id"])) and ($action == "stats")) {
-    $time["user_id"] = array($time["user_id"]);
-  }
-
-  if ($action == "stats")
-    $time["user_id"] = array_unique($time["user_id"]);
-
-  $s_users = $time["user_id"];
-  $sess->register("s_users");
-
-// we use the session variable
-} else if (isset($s_users)) {
-
-  // we come back fro stats : we retrieve the user
-  if ($action == "index") {
-    $s_users = $uid;
-    $sess->register("s_users");
-  } else if (is_array($s_users) and ($action != "stats")) {
-    $s_users = $uid;
-    $sess->register("s_users");
-  } else if (!(is_array($s_users)) and ($action == "stats")) {
-    $s_users = array($s_users);
-    $sess->register("s_users");
-  }
-
-  $time["user_id"] = $s_users;
-
-// we arrive in the time module
-} else {
-  $s_users = $uid;
-  $time["user_id"] = $s_users;
-  $sess->register("s_users");
-
-  // debug ------------------------------------------------
-  if (debug_level_isset($cdg_param)) {
-     echo "everything empty, we define user_id with $uid <br>";
-  }
-}
-
-// debug ------------------------------------------------
-if (debug_level_isset($cdg_param)) {
-  echo "session variable \$s_users is set : ". $s_users ." <br>";
-  if (is_array($s_users)) {
-    echo "\$s_users is an array ---";
-    print_r($s_users);
-    echo " ---<br>";
-  }
-  else if (is_string($s_users))
-    echo "\$s_users is a string : ". $s_users ." -- <br>";
-}
-
 page_close();
 
-// $popup = 2 => writing into a file
-if ($popup != 2) {
-  require("time_js.inc");
-}
+require("time_js.inc");
 
-///////////////////////////////////////////////////////////////////////////////
-//Initialisation                                                             //
-///////////////////////////////////////////////////////////////////////////////
-//set user_id if not set
-if (!(isset($time["user_id"]))) {
-  $time["user_id"] = $uid;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
 $project_managers = run_query_managers();
 $stats_users = $project_managers;
-///////////////////////////////////////////////////////////////////////////////
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-if (! $popup) {
-  $display["header"] = generate_menu($menu,$section);         // Menu
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
 if ($action == "index") {
-//////////////////////////////////////////////////////////////////////////////
-  $time["interval"] = "week";
-  $display["result"] = dis_time_nav_date($time);
-  $display["result"] .= dis_time_planning($time);
-
-  // display addtask form if necessary and full task list
-  $display["result"] .= dis_time_list($time);
-
-  // display user Search Form
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
+///////////////////////////////////////////////////////////////////////////////
+  dis_time_index($time);
 
 } elseif ($action == "viewmonth") {
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_planning($time);
-  // display user Search Form
   $display["features"] .= dis_user_select($time, run_query_get_obmusers());
  
+} elseif ($action == "insert") {
+//////////////////////////////////////////////////////////////////////////////
+  $time["interval"] = "week";
+  run_query_insert($time);
+  run_query_validate($time["user_id"]);
+  dis_time_index($time);
+
+} elseif ($action == "detailupdate") {
+///////////////////////////////////////////////////////////////////////////////
+  $d_start_week = first_day_week($time["date"]);
+  $val_days = run_query_valid_search($time);
+  $display["result"] .= dis_form_addtask($time, $val_days);
+
+} elseif ($action == "update") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_update($time);
+  run_query_validate($time["user_id"]);
+  // close the popup
+  $display["result"] .= "
+    <script language=\"javascript\">
+     window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
+     window.close();
+    </script>
+  ";
+
+} elseif ($action == "delete") {
+//////////////////////////////////////////////////////////////////////////////
+  // interval is week -- see if we may need to use others intervals
+  $time["interval"] = "week";
+  run_query_delete($HTTP_POST_VARS);
+  run_query_validate($time["user_id"]);
+  dis_time_index($time);
+  
 } if ($action == "globalview") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
   $display["result"] = dis_time_nav_date($time);
-  // display validation panel ! XXX fonction differente !!
-  $display["result"] .= dis_time_planning($time);
-
-} elseif ($action == "insert") {
-//////////////////////////////////////////////////////////////////////////////
-  // interval is week -- see if we may need to use others intervals
-  $time["action"]="index";
-  $time["interval"] = "week";
-  $display["result"] = dis_time_nav_date($time);
-  run_query_insert($time);
-  run_query_validate($time["user_id"]);
-  $display["result"] .= dis_time_planning($time);
-  $display["result"] .= dis_time_list($time);
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
+  $display["result"] .= dis_time_month_users_total($time);
 
 } elseif ($action == "validate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
   run_query_adminvalidate($time);
   $display["result"] = dis_time_nav_date($time);
-  // display validation panel
-  $display["result"] .= dis_time_planning($time);
+  $display["result"] .= dis_time_month_users_total($time);
 
 } elseif ($action == "unvalidate") {
 //////////////////////////////////////////////////////////////////////////////
   $time["interval"] = "month";
-
   run_query_adminunvalidate($time);
   $display["result"] = dis_time_nav_date($time);
+  $display["result"] .= dis_time_month_users_total($time);
 
-  // display validation panel
-  $display["result"] .= dis_time_planning($time);
-}
-
-elseif ($action == "stats") {
+} elseif ($action == "stats") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time["interval"] = "month";
@@ -205,62 +140,9 @@ elseif ($action == "stats") {
   $stattt_q = run_query_stat_tasktype($time);
   $display["result"] = dis_time_nav_date($time);
   $display["features"] .= dis_user_select($time, run_query_get_obmusers(), 1);
-
   $display["result"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
-}
 
-// bcontins : pas utilise pour le moment
-// elseif ($action == "export_stats") {
-// //////////////////////////////////////////////////////////////////////////////
-//   // interval is week -- see if we may need to use others intervals
-//   $time["interval"] = "month";
-
-//   //  echo "export stats<br>";
-//   $display["result"] = dis_time_export_stats($time);
-// }
-
-elseif ($action == "delete") {
-//////////////////////////////////////////////////////////////////////////////
-
-  // interval is week -- see if we may need to use others intervals
-  $time["action"] = "index";
-  $time["interval"] = "week";
-  $display["result"] = dis_time_nav_date($time);
-
-  run_query_delete($HTTP_POST_VARS);
-  run_query_validate($time["user_id"]);
-
-  $display["result"] .= dis_time_planning($time);
-  $display["result"] .= dis_time_list($time);
-  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
-}
-
-elseif ($action == "detailupdate") {
-//////////////////////////////////////////////////////////////////////////////
-  
-  // open the popup
-  // interval is week -- see if we may need to use others intervals
-  if ( $popup == 1 ) {
-    $d_start_week = first_day_week($time["date"]);
-    // Creating the dates for the selected (or current) date
-    $day_q = get_week_working_days_dates($d_start_week);
-    $display["result"] .= dis_form_addtask($time, $day_q, null);
-  }
-
-  // close the popup
-  else {
-    run_query_update($time);
-    run_query_validate($time["user_id"]);
-    $user_id = $time["user_id"];
-    $display["result"] .= "
-      <script language=\"javascript\">
-       window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
-       window.close();
-      </script>
-    ";
-  }
-  
-}  elseif ($action == "display") {
+} elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "time", 1);
   $display["detail"] = dis_time_display_pref($pref_search_q);
@@ -278,26 +160,27 @@ elseif ($action == "detailupdate") {
   $display["detail"] = dis_time_display_pref($pref_search_q);
 }  
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display
 ///////////////////////////////////////////////////////////////////////////////
-// except export in file
-if ($popup != 2) {
-  $display["head"] = display_head($l_time);
-  $display["end"] = display_end();
-  display_page($display);
+$display["head"] = display_head($l_time);
+$display["end"] = display_end();
+if (! $popup) {
+  $display["header"] = generate_menu($menu, $section);
 }
+display_page($display);
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Stores time parameters transmited in $task hash
 // returns : $task hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_time() {
-  global $set_debug, $cdg_param, $action, $wbegin;
+  global $uid, $sess, $sess_users, $set_debug, $cdg_param, $action, $wbegin;
   global $sel_date, $sel_tasktype, $sel_time, $tf_label, $task_id;
   global $sel_project, $sel_projecttask, $wbegin, $user_id;
-  global $tf_lweek, $f_time, $sel_user_id, $cb_day, $rd_day, $cb_allusers;
-  //global $st_detail;
+  global $tf_lweek, $f_time, $sel_user_id, $cb_day, $rd_day;
 
   if (isset ($action)) $time["action"] = $action;
   if (isset ($sel_tasktype)) $time["tasktype"] = $sel_tasktype;
@@ -306,9 +189,6 @@ function get_param_time() {
   if (isset ($sel_time)) $time["time"] = $sel_time;
   if (isset ($tf_label)) $time["label"] = $tf_label;
   if (isset ($f_time)) $time["f_time"] = $f_time;
-  if (isset ($user_id)) $time["user_id"] = $user_id;
-  if (isset ($sel_user_id)) $time["user_id"] = $sel_user_id;
-  if (isset ($cb_allusers)) $time["allusers"] = $cb_allusers;
   if (isset ($submit)) $time["submit"] = $submit;
   if (isset ($wbegin)) $time["date"] = $wbegin;
   if ($time["date"] == "") { $time["date"] = date("Ymd"); }
@@ -317,10 +197,40 @@ function get_param_time() {
   if (is_array($cb_day)) $time["sel_date"] = $cb_day;
   elseif (isset ($rd_day)) $time["sel_date"] = $rd_day;
 
+  if (isset ($user_id)) $time["user_id"] = $user_id;
+  if (isset ($sel_user_id)) $time["user_id"] = $sel_user_id;
+
+  // We retrieve the selected users if any, else we get them from sessiom
+  if (isset ($sel_user_id)) {
+    if (is_array($sel_user_id)) {
+      $time["user_id"] = $uid;
+      $time["user_ids"] = $sel_user_id;
+    } else {
+      $time["user_id"] = $sel_user_id;
+      $time["user_ids"] = array($sel_user_id);
+    }
+    $sess_users = $sel_user_id;
+    $sess->register("sess_users");
+  } elseif (isset($sess_users)) {
+    if (is_array($sess_users)) {
+      $time["user_id"] = $uid;
+      $time["user_ids"] = $sess_users;
+    } else {
+      $time["user_id"] = $sess_users;
+      $time["user_ids"] = array($sess_users);
+    }
+  } else {
+    $sess_users = $uid;
+    $time["user_id"] = $uid;
+    $time["user_ids"] = array($uid);
+    $sess->register("sess_users");
+  }
+
   display_debug_param($time);
 
   return $time;
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 // Time actions
@@ -357,6 +267,34 @@ function get_time_actions() {
     'Condition'=> array ('all')
                                     );
 
+// Detail Update
+  $actions["TIME"]["detailupdate"] = array (
+    'Url'      => "$path/time/time_index.php?action=detailupdate",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                    );
+
+// Insert 
+  $actions["TIME"]["insert"] = array (
+    'Url'      => "$path/time/time_index.php?action=insert",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                    );
+
+// Update
+  $actions["TIME"]["update"] = array (
+    'Url'      => "$path/time/time_index.php?action=update",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                    );
+
+// Delete 
+  $actions["TIME"]["delete"] = array (
+    'Url'      => "$path/time/time_index.php?action=delete",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                    );
+
 // Validate
   $actions["TIME"]["validate"] = array (
     'Url'      => "$path/time/time_index.php?action=validate",
@@ -379,27 +317,6 @@ function get_time_actions() {
     'Condition'=> array ('all')
                                      );
 
-// Insert 
-  $actions["TIME"]["insert"] = array (
-    'Url'      => "$path/time/time_index.php?action=insert",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                    );
-
-// Delete 
-  $actions["TIME"]["delete"] = array (
-    'Url'      => "$path/time/time_index.php?action=delete",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                    );
-
-// Detail Update
-  $actions["TIME"]["detailupdate"] = array (
-    'Url'      => "$path/time/time_index.php?action=detailupdate",
-    'Right'    => $cright_write,
-    'Condition'=> array ('None') 
-                                    );
-
 // Display
    $actions["TIME"]["display"] = array (
      'Name'     => $l_header_display,
@@ -408,7 +325,7 @@ function get_time_actions() {
      'Condition'=> array ('all') 
                                        	 );
 
-// Display Préférences
+// Display Preferences
   $actions["TIME"]["dispref_display"] = array (
     'Url'      => "$path/time/time_index.php?action=dispref_display",
     'Right'    => $cright_read,

@@ -79,27 +79,45 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display the TimeManager index page
+// Parameters:
+//   - $time[] : time search criteria
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_index($time) {
+  global $uid, $display;
+
+  $time["interval"] = "week";
+  $display["result"] = dis_time_nav_date($time);
+  $display["result"] .= dis_time_planning($time);
+
+  // dis_form_addtask does not display anything if days are full and validated
+  $val_days = run_query_valid_search($time);
+  $display["result"] .= dis_form_addtask($time, $val_days); 
+
+  $display["result"] .= dis_time_task_list($time);
+  $display["features"] .= dis_user_select($time, run_query_get_obmusers());
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Time navigation by date
 // Parameters:
 //   - $time : parameter hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_nav_date($time) {
-  global $cdg_param, $auth, $set_theme, $l_monthsofyear;
+  global $cdg_param, $auth, $set_theme, $c_dst_err, $l_monthsofyear;
 
   $action = $time["action"];
   $interval = $time["interval"];
 
-  if (($action=="globalview") or ($action=="validate") or ($action=="unvalidate")) {
-    $user_id = $auth->auth["uid"];
-    $time["user_id"] = $user_id;
+  $no_user = array("stats","globalview","validate","unvalidate");
+  if (in_array($action, $no_user)) {
+    $link_action = $action;
   } else {
     $user_id = $time["user_id"];
-  }
-
-  $u = get_user_info($user_id);
-  $no_name = array("stats","globalview","validate","unvalidate");
-  if (!(in_array($action, $no_name))) {
-    $user = $u["firstname"]. " " . $u["lastname"];
+    $u = get_user_info($user_id);
+    $user = $u["firstname"]. " " . $u["lastname"] . " :";
+    $link_action = "index";
   }
 
   if ($interval == "week") {
@@ -111,26 +129,26 @@ function dis_time_nav_date($time) {
     $d_end_week = $d_start_week+6*86400;
     $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
     $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
-    $title = "$user : $hum_date_start - $hum_date_end";
+    $title = "$user $hum_date_start - $hum_date_end";
 
     // get the previous and next beginning of week
     $d_prev = date("Ymd",$d_start_week-7*86400);
-    $d_next = date("Ymd",$d_start_week+7*86400+3*3600); // +3h prevent DST bug
-    $url_prev = url_prepare("time_index.php?action=$action&amp;wbegin=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$action&amp;wbegin=$d_next");
+    $d_next = date("Ymd",$d_start_week+7*86400+$c_dst_err); // prevent DST bug
+    $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
 
   } else if ($interval == "month") {
 
-    $tot_width = (in_array($action, $no_name)) ? 200 : 400;
+    $tot_width = (in_array($action, $no_user)) ? 200 : 400;
 
     // This should work for january also (month 0 = december) 
     $month = substr($time["date"],4,2);
     $year = substr($time["date"],0,4);
     $d_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
     $d_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
-    $url_prev = url_prepare("time_index.php?action=$action&amp;wbegin=$d_prev");
-    $url_next = url_prepare("time_index.php?action=$action&amp;wbegin=$d_next");
-    $title = "$user : ". $l_monthsofyear[$month-1] . " $year";;
+    $url_prev = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_prev");
+    $url_next = url_prepare("time_index.php?action=$link_action&amp;wbegin=$d_next");
+    $title = "$user ". $l_monthsofyear[$month-1] . " $year";;
   }
 
   $block = "
@@ -172,21 +190,11 @@ function dis_time_planning($time) {
     $block = dis_time_planning_week($task_q, $time);
 
   } else if ($time["interval"] == "month") {
-
-    // If $action=globalview, show all users
-    if (($time["action"] == "globalview") or
-        ($time["action"] == "validate") or
-        ($time["action"] == "unvalidate")) {
-      $obm_short_q = run_query_short_month($time);
-      $block = dis_short_month($obm_short_q, $time);
-
-    } else {
-      $task_q = run_query_task_one_month($time);
-      $block = dis_time_planning_month($task_q, $time);
-    }
+    $task_q = run_query_task_one_month($time);
+    $block = dis_time_planning_month($task_q, $time);
   }
 
-  return "AAAA" . $block. "BBB";
+  return $block;
 }
 
 
@@ -197,7 +205,7 @@ function dis_time_planning($time) {
 //   - $time[] : time hash
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_planning_week($obm_q, $time) {
-  global $c_working_days, $c_day_fraction,$l_daysofweekshort;
+  global $c_working_days, $c_day_fraction, $c_dst_err, $l_daysofweekshort;
 
   while ($obm_q->next_record())  {
     $date = $obm_q->f("date");
@@ -210,7 +218,7 @@ function dis_time_planning_week($obm_q, $time) {
   $col_width = $tot_width / $nb_worked_days;
 
   $first_day = first_day_week($time["date"]);
-  $curr_day = $first_day;
+  $curr_day = $first_day + $c_dst_err;
   $last_day = $first_day + 7*86400;
 
   // we loop through days
@@ -262,7 +270,6 @@ function dis_time_planning_week($obm_q, $time) {
 function dis_time_planning_month($obm_q, $time) {
   global $c_working_days, $c_week_first_day, $c_day_fraction, $l_fill;
 
-  $uid = $time["user_id"];
   $col_width = 20;
   $time_length = 0;
   $time_worked = 0;
@@ -322,7 +329,7 @@ function dis_time_planning_month($obm_q, $time) {
         <td $class>".$val["length"]."/$c_day_fraction</td>";
     }
 
-    // handle the 3rd line (fill) XXXX not generic with working day here
+    // handle the 3rd line
     if ($val["obm_dow"] == 0) {
       $time_length = 0;
       $time_worked = 0;
@@ -382,7 +389,7 @@ function dis_user_select($time, $usr_q, $multi=false) {
   global $uid;
 
   if (in_array($uid, $project_managers)) {
-    $sel_user_id = $time["user_id"];
+    $sel_user_ids = $time["user_ids"];
 
     if ($multi) {
       $size = 12;
@@ -404,18 +411,14 @@ function dis_user_select($time, $usr_q, $multi=false) {
       $fname = $usr_q->f("userobm_firstname");
       $sel_user .= "\n<option value=\"$u_id\" ";
 
-      if ($multi) {
-	if (in_array($u_id,$sel_user_id))
-	  $sel_user .= "selected=\"selected\"";
-      } else {
-	if ($sel_user_id == $u_id)
-	  $sel_user .= "selected=\"selected\"";
+      if (in_array($u_id, $sel_user_ids)) {
+	$sel_user .= "selected=\"selected\"";
       }
 
       $sel_user .= " >$lname $fname</option>";
     }
     $sel_user .= "</select>";
-
+    
     // Define the action to follow
     if ($time["action"] == "stats")
       $act = "stats";
@@ -459,21 +462,14 @@ function dis_user_select($time, $usr_q, $multi=false) {
 //   - $time[] : time search criteria
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_list($time) {
+function dis_time_task_list($time) {
   global $uid, $display;
 
-  $task_q = run_query_search($time);
+  $task_q = run_query_task_list($time);
   $nb_task = $task_q->num_rows();
 
-  $pref_q = run_query_display_pref($uid, "time");
-
-  // array of validated days
-  $val_days = run_query_valid_search($time);
-
-  // dis_form_addtask does not display anything if days are full and validated
-  $block .= dis_form_addtask($time, $val_days); 
- 
   if ($nb_task != 0) {
+    $pref_q = run_query_display_pref($uid, "time");
     $block .= dis_time_list_result($task_q, $pref_q, $time);
   }
 
@@ -482,82 +478,26 @@ function dis_time_list($time) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Stats TimeManager result page                                 //
-// Parameters:
-//   - $time[] : time search criteria
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_time_statsuser($statproj_q, $stattt_q, $time) {
-  global $cdg_param, $auth, $new_order, $order_dir;
-  global $l_proj_stats, $l_no_proj_stats;
-  global $l_tt_stats, $l_no_tt_stats;
-
-  if ($statproj_q->num_rows() != 0) {
-    $pref_pq = run_query_display_pref($auth->auth["uid"], "time_proj");
-
-    $dis_projuser_list = new OBM_DISPLAY("DATA",$pref_pq);
-    $dis_projuser_list->data_set = $statproj_q;
-    $dis_projuser_list->data_order = false;
-    $dis_projuser_list->data_page = false;
-    $dis_projuser_list->data_header = "top";
-
-    $block .= "<div class=\"detailHead\">$l_proj_stats</div>";
-    $block .= $dis_projuser_list->display("dis_data_time");
-  } else {
-    $block .= display_warn_msg($l_no_proj_stats);
-  }
-
-  if ($stattt_q->num_rows() != 0) {
-    $pref_tq = run_query_display_pref($auth->auth["uid"], "time_tt");
-
-    $dis_ttuser_list = new OBM_DISPLAY("DATA",$pref_tq);
-    $dis_ttuser_list->data_set = $stattt_q;
-    $dis_ttuser_list->data_order = false;
-    $dis_ttuser_list->data_page = false;
-    $dis_projuser_list->data_header = "top";
-
-    $block .= "<div class=\"detailHead\">$l_tt_stats</div>";
-    $block .= $dis_ttuser_list->display("dis_data_time");
-  }else {
-    $block .= display_warn_msg($l_no_tt_stats);
-  }
-  
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Time Task  result                                        //
 // Parameters : 
-//   - $obm_q    : list of tasks to be displayed
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_task  : nb tasks returned by the search query 
-//   - $time[]   : time search criteria
-//     keys used : week
+//   - $task_q : list of tasks to be displayed
+//   - $pref_q : the fields which have to be displayed
+//   - $time[] : time search criteria
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_list_result($task_q,$pref_q,$time) {
-  //-- Themes
-  global $set_date,$ico_mail;
-  //-- Labels
-  global $l_date_task, $l_company;
-  global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
-  global $l_update, $l_length, $l_task_list;
+  global $set_date;
+  global $l_delete, $l_task_del, $l_task_list;
 
-  //  dis_table_title($l_found_task) ;
-
-  //oldstart
-  //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
+  $url = url_prepare("time_index.php");
  
   $block .= "
-     <form method=\"post\" name=\"f_task_del\" action=\"".url_prepare("time_index.php").
-    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
-     ";
+     <form method=\"post\" name=\"f_task_del\" action=\"$url\"
+       onsubmit=\"if (confirm_del()) return true; else return false\" >";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
   $dis_task_list->data_set = $task_q;
   $dis_task_list->data_header = "top";
   $dis_task_list->data_page = false;
-  //  $dis_task_list->data_url = $url; 
   $dis_task_list->data_cb_text = $l_task_del;
   $dis_task_list->data_idfield = "timetask_id"; 
   $dis_task_list->data_order = false; 
@@ -569,10 +509,10 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   $block .= $dis_task_list->display("dis_data_time");
 
   $dis_button = "
-    <input type=\"hidden\" name=\"user_id\" value=\"".$time["user_id"]."\" />
+    <input type=\"hidden\" name=\"sel_user_id\" value=\"".$time["user_id"]."\" />
     <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
+    <input name=\"submit\" type=\"submit\" value=\"$l_delete\" />";
 
   $block .= "
      <p class=\"detailButton\">
@@ -581,128 +521,6 @@ function dis_time_list_result($task_q,$pref_q,$time) {
 
      </form>
      ";
-
-  return $block;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// HTML Display the Short View for one user :                               //
-//  | 01 | 02 | 03 | 04
-//    OK   OK        5/8
-// Parameters : 
-//   - $array_res : an associative array build by XXXXX 
-//      $array_res[$day_in_month][string]
-//     where
-//        $day_in_month : [1-31]
-//        string : length = total filled for this day [1-$c_day_fraction]
-//                 wday   = number of the day in the week
-//   - $total : the amount of task filled for the month
-//////////////////////////////////////////////////////////////////////////////
-function dis_short_month($month_q, $time) {
-  //-- Themes
-  global $display;
-  //-- Labels
-  global $l_admin_empty;
-
-  $cpt=0;
-  
-  if ($month_q->nf()==0)
-    $block .= display_warn_msg($l_admin_empty);
-  else {
-
-    while ($month_q->next_record())  {
-      $f_name = $month_q->f("userobm_firstname");
-      $l_name = $month_q->f("userobm_lastname");
-      $array_res[$cpt]["id"] = $month_q->f("userid");
-      $array_res[$cpt]["name"] = $f_name . " " . $l_name;
-      $array_res[$cpt]["status"] = $month_q->f("timetask_status");
-      $array_res[$cpt]["length"] = $month_q->f("total_length");
-
-      $cpt++;
-    }
-
-    $block .= display_shortview($time, $array_res);//, $array_order);
-  }
-        
-  return $block;
-}
-
-//////////////////////////////////////////////////////////////////////////////
-// HTML Display the Short View for one user :                               //
-//  | 01 | 02 | 03 | 04
-//    OK   OK        5/8
-// Parameters : 
-//   - $array_res : an associative array build by XXXXX 
-//      $array_res[$day_in_month][string]
-//     where
-//        $day_in_month : [1-31]
-//        string : length = total filled for this day [1-$c_day_fraction]
-//                 wday   = number of the day in the week
-//   - $total : the amount of task filled for the month
-//////////////////////////////////////////////////////////////////////////////
-function display_shortview($time, $array_res) { //, $order) {
-  global $set_theme, $c_working_days;
-  global $c_day_fraction;
-  global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
-
-  $date = $time["date"];
-  $tot_workingdays = get_nb_working_days($date);
-
-  while (list($key) = each($array_res)) {	
-    $uid = $array_res[$key]["id"];
-    $user_title = $array_res[$key]["name"];
-    $user_status = $array_res[$key]["status"];
-    $user_total = $array_res[$key]["length"];
-
-    // we display a recap for this user
-    $fract = $user_total/$c_day_fraction;
-
-    if ($user_status == 2) {
-      $class= "timeValok";
-      $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
-      $link_act = "$l_see";
-    } else if ($fract != $tot_workingdays) {
-      $class= "timeValunfilled";
-      $dis_validlink = "&nbsp;";
-      $link_act = "$l_fill";
-    } else {
-      $class= "timeValfilled";
-      $dis_validlink = "
-       <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
-      $link_act = "$l_see";
-    }
-
-    $fract = ($fract != number_format($fract, 0)) ? number_format($fract, 1) : $fract;
-    $dis_tot= ($fract != $tot_workingdays) ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
-
-    $dis_months .= "
-     <tr>
-      <td><b>&nbsp;$user_title</b></td>
-      <td>&nbsp;&nbsp;</td>
-      <td class=\"$class\">$dis_tot</td>
-      <td>&nbsp;&nbsp;</td>
-      <td>
-       <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;wbegin=$date&amp;user_id=$uid") ."\">
-       <img border=0 src=\"/images/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
-      </td>
-      <td>$dis_validlink</td>
-     </tr>
-     ";
-  }
-
-  $block = "
-   <div class=\"detailHead\">$l_admin_valid</div>
-
-   <div class=\"timeCenter\">
-    <table class=\"timeValid\">
-      $dis_months
-    </table>
-   <div>
-   ";
 
   return $block;
 }
@@ -728,80 +546,81 @@ function dis_form_addtask($time, $validate_days) {
   $projecttask_q = run_query_projecttask($time);
   $tasktype_q = run_query_used_tasktype($time["user_id"]);
   $nb_worked_days = array_sum($c_working_days);
-
   $d_start_week = first_day_week($time["date"]);  
-  $day_q = get_week_working_days_dates($d_start_week);
+  $work_day_dates = get_week_working_days_dates($d_start_week);
 
-  // If length of $validate_days = length of week ($days_in_a_week) :
-  //   => form not to be shown
-  if (debug_level_isset($cdg_param)) {
-    echo "<br />day_q <br />";
-    print_r($day_q);
-    echo "<br />validate_days  <br />";
-    print_r($validate_days);
-    if (is_array($validate_days))
-      echo "<br />sum validate_days " .array_sum($validate_days)."<br />";
-  }
-
+  echo "<p>size validate=".sizeof($validate_days). " nb_worked=$nb_worked_days";
   if (sizeof($validate_days) == $nb_worked_days) {
     $block .= "<p></p>";
     return;
   }
   
   $task_list  = array($l_task_fac, $l_task_int, $l_task_div);
+  $cpt_end = $c_week_first_day + 7;
   
   // get different attribute for task to be modify
   if ($action == "detailupdate") {
+    $obm_action = "update";
     $task_id = $time["task_id"];
     $task_q = run_query_get_task($task_id);
-    $is_day = substr($task_q->f("timetask_date"),0,8);
+    //    $is_day = substr($task_q->f("timetask_date"),0,8);
+    $is_day = date("Ymd", $task_q->f("date_task"));
     $is_tt = $task_q->f("timetask_tasktype_id");
     $is_proj = $task_q->f("timetask_project_id");
     $is_projtask = $task_q->f("timetask_projecttask_id");
     $is_time = $task_q->f("timetask_length");
-  }
+    $time_label = $task_q->f("timetask_label");
 
-  $cpt_end = $c_week_first_day + sizeof($day_q);
-
-  // Day radio select (for update)
-  if ($action == "detailupdate") {
+    // Day radio select (for update)
     for ($day = $c_week_first_day; $day < $cpt_end; $day++) {
-      $dlabel = $day_q[$day][0];
-      $rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"".$day_q[$day][1]."\"";
-      if ($day_q[$day][1] == $is_day)
-	$rd_day .= " checked=\"checked\"";
-      
-      $rd_day .= " />$dlabel\n";
+      if (isset($work_day_dates[$day])) {
+	$dlabel = $work_day_dates[$day][0];
+	$dvalue = $work_day_dates[$day][1]; 
+	$rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"$dvalue\"";
+	if ($work_day_dates[$day][1] == $is_day) {
+	  $rd_day .= " checked=\"checked\"";
+	}
+	$rd_day .= " />$dlabel\n";
+      }
     }
-  }
-  
-  // Day check construction
-  else {
+
+  } else {
+    $obm_action = "insert";
+    $time_label = "";
+
+    // Day checkboxes construction
+    // Precheck current day
     $day_checked = -1;
+    $today = date("Ymd");
     for ($day=$c_week_first_day; $day < $cpt_end; $day++) {
-      if ($day_q[$day][1] == date("Ymd"))
+      if ($work_day_dates[$day][1] == $today) {
 	$day_checked = $day;
+      }
     }
 
     for ($day=$c_week_first_day; $day < $cpt_end; $day++) {
-      if (sizeof($validate_days)>0 && isset($validate_days[$day_q[$day][1]]))
-	$disabled = 1;
-      else
-	$disabled = 0;
-   
-      // $d_label=$l_daysofweekshort[$day];
-      $dlabel = $day_q[$day][0];
-      $ch_day .= "<input type=\"checkbox\" name=\"cb_day[".$day_q[$day][1]."]\"";
-      
-      if ($disabled)
-	$ch_day .= " disabled";
-      else if ($day_checked == -1) {
-	$ch_day .= " checked=\"checked\"";
-	$day_checked = $day;
-      } else if ($day == $day_checked) {
-	$ch_day .= " checked=\"checked\"";
+      // If it is a working day
+      if (isset($work_day_dates[$day])) {
+	$dlabel = $work_day_dates[$day][0];
+	$ddate = $work_day_dates[$day][1]; 
+
+	// If day is already filled
+	$dis_attr = "";
+	if (isset($validate_days[$ddate])) {
+	  $dis_attr = "disabled";
+
+	  // not this week, we pre check the first day
+	} else if ($day_checked == -1) {
+	  $dis_attr = " checked=\"checked\"";
+	  $day_checked = $day;
+
+	  // we pre check today if current week
+	} else if ($day == $day_checked) {
+	  $dis_attr = " checked=\"checked\"";
+	}
+
+	$ch_day .= "<input type=\"checkbox\" name=\"cb_day[$ddate]\" $dis_attr />$dlabel\n";
       }
-      $ch_day .= " />$dlabel\n";
     }
   }
 
@@ -864,15 +683,15 @@ function dis_form_addtask($time, $validate_days) {
   }
 
   $script = "
-    <script type=\"text/javascript\">
-      project = new Array (
-        $proj_data
-      )
+<script type=\"text/javascript\">
+  project = new Array (
+    $proj_data
+  )
 
-      projecttask = new Array (
-        $projtask_data
-      )
-    </script>\n";
+  projecttask = new Array (
+    $projtask_data
+  )
+</script>\n";
 
 
   // TaskType select construction
@@ -881,10 +700,8 @@ function dis_form_addtask($time, $validate_days) {
     <select name=\"sel_tasktype\"
       onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,this.form.sel_projecttask, -1) \">
       <option value=\"0\">$l_none</option>";
-
   for ($i=0; $i<2; $i++) {
     $tt_q = $tasktype_q[$i];
-
     while($tt_q->next_record()) {
       //put menu titles
       if (($task_i = $tt_q->f("tasktype_internal")) != $type_prec) {
@@ -898,7 +715,6 @@ function dis_form_addtask($time, $validate_days) {
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
   }
-
   $sel_tt .= "</select>";
 
   // Project select construction
@@ -915,12 +731,6 @@ function dis_form_addtask($time, $validate_days) {
     <option value=\"0\">$l_none</option>
     </select>";
 
-  // Project Label
-  if ($action == "detailupdate")
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=\"30\" value=\"".$task_q->f("timetask_label")."\" />";
-  else
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=\"30\" />";
-
   // Project time length
   $sel_time="<select name=\"sel_time\">";
   for ($t=1; $t<=$c_day_fraction; $t++) {
@@ -932,10 +742,8 @@ function dis_form_addtask($time, $validate_days) {
   $sel_time .= "</select>";
 
 
-  // FORM
-  $block = "$script";
-  $block .= "$script2";
-  $block .= "<p></p>";
+  $block = "$script
+<p></p>";
 
   // Update timetask ----------------------------------------------------------
   if ($action == "detailupdate") {
@@ -982,9 +790,9 @@ function dis_form_addtask($time, $validate_days) {
   $url = url_prepare("time_index.php");
 
   $block .= "
-  <form method=\"post\"  name=\"f_add_task\" action=\"$url\"
+  <form method=\"post\" name=\"f_add_task\" action=\"$url\"
     onsubmit=\"if (check_addtaskform(this)) return true; else return false;\">
-    <input type=\"hidden\" name=\"action\" value=\"$action\" />
+    <input type=\"hidden\" name=\"action\" value=\"$obm_action\" />
     <input type=\"hidden\" name=\"popup\" value=\"0\" />
 
   <div class=\"detailHead\">$l_fill_addtask</div>
@@ -1007,7 +815,9 @@ function dis_form_addtask($time, $validate_days) {
     </tr>
     <tr>
       <td class=\"timeForm\">$l_comment :</td>
-      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
+      <td class=\"timeForm\" colspan=\"3\">
+        <input type=\"text\" name=\"tf_label\" size=\"30\" value=\"$time_label\" />
+      </td>
       $dis_button
     </tr>
     </table>
@@ -1016,6 +826,160 @@ function dis_form_addtask($time, $validate_days) {
   $dis_script
   </form>";
 
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the month total page (with all users)
+// Parameters : 
+//   - $time : parameter hash
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_month_users_total($time) {
+  global $display, $l_admin_empty;
+
+  $month_q = run_query_short_month($time);
+
+  if ($month_q->nf()==0) {
+    $block .= display_warn_msg($l_admin_empty);
+  } else {
+    $cpt = 0;
+    while ($month_q->next_record())  {
+      $f_name = $month_q->f("userobm_firstname");
+      $l_name = $month_q->f("userobm_lastname");
+      $array_res[$cpt]["id"] = $month_q->f("userid");
+      $array_res[$cpt]["name"] = $f_name . " " . $l_name;
+      $array_res[$cpt]["status"] = $month_q->f("status");
+      $array_res[$cpt]["length"] = $month_q->f("total_length");
+      $cpt++;
+    }
+
+    $block .= html_time_month_users_total($time, $array_res);
+  }
+        
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the month total page (with all users)
+// Parameters : 
+//   - $time : parameter hash
+//   - 
+///////////////////////////////////////////////////////////////////////////////
+function html_time_month_users_total($time, $array_res) {
+  global $set_theme, $c_working_days, $c_day_fraction;
+  global $l_see, $l_fill, $l_valid, $l_unvalid, $l_admin_valid;
+
+  $date = $time["date"];
+  $tot_workingdays = get_nb_working_days($date);
+
+  while (list($key) = each($array_res)) {	
+    $uid = $array_res[$key]["id"];
+    $user_title = $array_res[$key]["name"];
+    // XXXX status can be different from different ttasks ? should not global validatio  or unvalidation !
+    $user_status = $array_res[$key]["status"];
+    $user_total = $array_res[$key]["length"];
+
+    // we display a recap for this user
+    $fract = $user_total/$c_day_fraction;
+
+    if ($user_status == 2) {
+      $class = "timeValok";
+      $dis_validlink = "
+       <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_unvalid</a>";
+      $link_act = "$l_see";
+    } else if ($fract != $tot_workingdays) {
+      $class = "timeValunfilled";
+      $dis_validlink = "&nbsp;";
+      $link_act = "$l_fill";
+    } else {
+      $class = "timeValfilled";
+      $dis_validlink = "
+       <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"16\" width=\"16\" alt=\"\" /> $l_valid</a>";
+      $link_act = "$l_see";
+    }
+
+    $fract = ($fract != number_format($fract, 0)) ? number_format($fract, 1) : $fract;
+    $dis_tot= ($fract != $tot_workingdays) ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
+
+    $dis_months .= "
+     <tr>
+      <td><b>&nbsp;$user_title</b></td>
+      <td>&nbsp;&nbsp;</td>
+      <td class=\"$class\">$dis_tot</td>
+      <td>&nbsp;&nbsp;</td>
+      <td>
+       <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;wbegin=$date&amp;sel_user_id=$uid") ."\">
+       <img border=0 src=\"/images/$set_theme/modify.png\" alt=\"\" /> $link_act</a>
+      </td>
+      <td>$dis_validlink</td>
+     </tr>
+     ";
+  }
+
+  $block = "
+   <div class=\"detailHead\">$l_admin_valid</div>
+
+   <div class=\"timeCenter\">
+    <table class=\"timeValid\">
+      $dis_months
+    </table>
+   <div>
+   ";
+
+  return $block;
+}
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Stats TimeManager result page                                 //
+// Parameters:
+//   - $time[] : time search criteria
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_statsuser($statproj_q, $stattt_q, $time) {
+  global $cdg_param, $auth, $new_order, $order_dir;
+  global $l_proj_stats, $l_no_proj_stats;
+  global $l_tt_stats, $l_no_tt_stats;
+
+  if ($statproj_q->num_rows() != 0) {
+    $pref_pq = run_query_display_pref($auth->auth["uid"], "time_proj");
+
+    $dis_projuser_list = new OBM_DISPLAY("DATA",$pref_pq);
+    $dis_projuser_list->data_set = $statproj_q;
+    $dis_projuser_list->data_order = false;
+    $dis_projuser_list->data_page = false;
+    $dis_projuser_list->data_header = "top";
+
+    $block .= "<div class=\"detailHead\">$l_proj_stats</div>";
+    $block .= $dis_projuser_list->display("dis_data_time");
+  } else {
+    $block .= display_warn_msg($l_no_proj_stats);
+  }
+  
+  if ($stattt_q->num_rows() != 0) {
+    $pref_tq = run_query_display_pref($auth->auth["uid"], "time_tt");
+
+    $dis_ttuser_list = new OBM_DISPLAY("DATA",$pref_tq);
+    $dis_ttuser_list->data_set = $stattt_q;
+    $dis_ttuser_list->data_order = false;
+    $dis_ttuser_list->data_page = false;
+    $dis_projuser_list->data_header = "top";
+
+    $block .= "<div class=\"detailHead\">$l_tt_stats</div>";
+    $block .= $dis_ttuser_list->display("dis_data_time");
+  } else {
+    $block .= display_warn_msg($l_no_tt_stats);
+  }
+  
   return $block;
 }
 

@@ -190,7 +190,7 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
   global $l_all, $l_all_f, $l_find, $c_all, $l_category;
-  global $display, $l_select_deal;
+  global $display, $cgp_hide, $l_select_deal;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -237,18 +237,20 @@ function html_deal_search_form($deal, $kind_q, $tt_q, $cat_q, $stat_q, $manager_
   $sel_tt .= "</select>";
 
   // Category select construction
-  $sel_cat = "<select name=\"sel_cat\">
-              <option value=\"$c_all\">$l_all</option>";
-  while ($cat_q->next_record()) {
-    //put menu titles
-    $id = $cat_q->f("dealcategory_id");
-    $cat_code = $cat_q->f("dealcategory_code");
-    $cat_label = $cat_q->f("dealcategory_label");
-    $sel_cat .= "\n<option value=\"$id\"";
-    if ($cat == $id) $sel_cat .= "selected =\"selected\"";
-    $sel_cat .= ">$cat_code - $cat_label</option>\n";
+  if ($show_cat) {
+    $sel_cat = "<select name=\"sel_cat\">
+                <option value=\"$c_all\">$l_all</option>";
+    while ($cat_q->next_record()) {
+      //put menu titles
+      $id = $cat_q->f("dealcategory_id");
+      $cat_code = $cat_q->f("dealcategory_code");
+      $cat_label = $cat_q->f("dealcategory_label");
+      $sel_cat .= "\n<option value=\"$id\"";
+      if ($cat == $id) $sel_cat .= "selected =\"selected\"";
+      $sel_cat .= ">$cat_code - $cat_label</option>\n";
+    }
+    $sel_cat .= "</select>";
   }
-  $sel_cat .= "</select>";
 
   // State select construction
   $sel_state = "<select name=\"sel_state\">
