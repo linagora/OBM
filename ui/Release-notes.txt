@@ -1,7 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Vers : 0.6.2                                                        //
+// OBM - Vers : 0.7.0                                                        //
 //     - File : Release-notes.txt                                            //
-//     - Desc : First file to read. Basic infos on OBM release 0.6.2         //
+//     - Desc : First file to read.                                          //
 // 2002-02-04 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -9,35 +9,6 @@
 
 All the OBM docs are in the doc folder.
 
-This version of OBM is a developper only release as it should be difficult to
-install and the data and the database model are subject to change.
-
 Licence
 -------
 OBM is protected by the GNU General Public License (See file COPYING).
-
-
-Version 0.6.2
--------------
-Minor release
-
-- Major Calendar work
-- Deal, contact and minor fixes
-- Debug flag to display session content
-
-
-Version 0.6.0
--------------
-Major release
-
-- New design and theme (with real design now !)
-- XHTML / CSS compliance
-- modules are grouped in sections (tabs in the default theme)
-- New (cleaner, better, nicer) shared calendar (complete rewrite by Mehdi)
-- Better genericity (themes, menus, actions,...)
-- New access right model not code intrusive,
-- New actions model (theme don't need now some hardcoded info)
-- Code quality improvment : Rules defined and applied everywhere for date, url,...
-- Lots, lots of clean up, fixes, polishment
-- Lots of minor functionalities added
-- New web site, documentation, install scripts,...
