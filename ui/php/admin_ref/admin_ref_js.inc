@@ -113,6 +113,54 @@ function check_ctry_new(form)
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the task type check or deletion is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_tt_checkdel(sel)
+{
+   if (sel.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_tt_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the task type update is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_tt_upd(form, sel_del_tt)
+{
+  tt_pos = sel_del_tt.selectedIndex;
+  if ((tt_pos >= 0) && (form.tf_label.value != \"\")) {
+    form.sel_tt.value=sel_del_tt.options[tt_pos].value;
+    return true;
+   } else {
+     alert(\"$l_j_tt_update\");
+     return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the tasktype creation is possible
+///////////////////////////////////////////////////////////////////////////////
+function check_tt_new(form)
+{
+   if (form.tf_label.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_tt_create\");
+      return false;
+   }
+}
+
+
 // -->
 </script>
 ";

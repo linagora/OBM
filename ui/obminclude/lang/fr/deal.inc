@@ -68,11 +68,6 @@ $l_kind_new = "Nouveau Type";
 $l_status_manage = "Gestion des Etats d'Affaires";
 $l_status_exist = "Etats existants";
 $l_status_new = "Nouvel Etat";
-$l_category_manage = "Gestion des Catégories d'Affaires";
-$l_category_exist = "Catégories existantes";
-$l_category_new = "Nouvelle Catégorie";
-$l_category_label = "Label";
-$l_category_minilabel = "Mini Label";
 $l_invoice_number = "Numéro";
 $l_invoice_label = "Label";
 $l_invoice_HT = "Montant HT";
@@ -107,10 +102,6 @@ $l_status_checkdelete = "Vérifier ou Supprimer l'état";
 $l_status_delete = "Supprimer l'état";
 $l_status_update = "Modifier l'état";
 $l_status_insert = "Créer l'état";
-$l_cat_checkdelete = "Vérifier ou Supprimer la catégorie";
-$l_cat_delete = "Supprimer la catégorie";
-$l_cat_update = "Modifier la catégorie";
-$l_cat_insert = "Créer la catégorie";
 
 // Messages
 $l_link_contract = "L'affaire est référencée par ces contrats";
@@ -164,20 +155,6 @@ $l_status_can_delete = "L'état peut être supprimé";
 $l_status_cant_delete = "L'état ne peut être supprimé";
 $l_status_link_deal = "L'état est référencé par ces affaires";
 $l_status_link_deal_no = "L'état n'est pas référencé dans les affaires";
-$l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
-$l_cat_insert_error = "L'insertion de la catégorie a échoué !";
-$l_cat_update_ok = "La modification de la catégorie a été correctement effectuée";
-$l_cat_update_error = "La modification de la catégorie a échoué !";
-$l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée !";
-$l_cat_delete_error = "La suppression de la catégorie a échoué !";
-$l_cat_can_delete = "La catégorie peut être supprimée";
-$l_cat_cant_delete = "La catégorie ne peut être supprimée";
-$l_cat_link_deal = "La catégorie est référencée par ces affaires";
-$l_cat_link_deal_no = "La catégorie n'est pas référencée dans les affaires";
-$l_cat_link_project = "La catégorie est référencée par ces projets";
-$l_cat_link_project_no = "La catégorie n'est pas référencée dans les projets";
-$l_cat_link_timetask = "La catégorie est utilisée dans la gestion des temps";
-$l_cat_link_timetask_no = "La catégorie n'est pas utilisée dans la gestion des temps";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";
@@ -192,14 +169,10 @@ $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
 
 $l_j_kind_delete = "Vous devez sélectionner un type pour vérifier ou supprimer !";
 $l_j_status_delete = "Vous devez sélectionner un état pour le vérifier ou supprimer !";
-$l_j_category_delete = "Vous devez sélectionner une catégorie pour la vérifier ou supprimer !";
 $l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
 $l_j_status_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
-$l_j_category_update = "Vous devez sélectionner une catégorie et entrer une modification avant de valider !";
 $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
 $l_j_status_create = "Vous devez saisir un nom d'état pour le créer !";
-$l_j_category_create = "Vous devez saisir un nom de catégorie pour le créer !";
-
 
 // For the display preferences modification screen 
 $l_deal_display = "Options d'affichage des listes d'affaires";

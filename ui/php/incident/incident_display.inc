@@ -866,20 +866,25 @@ function dis_priority_links($id) {
 
   $label = get_priority_label($id);
   $obm_q = run_query_priority_links($id);
+
   $dis_back = "<form name=\"form_back\" method=\"post\"
         action=\"" .url_prepare("incident_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 	
-  if ($obm_q->num_rows() > 0) {
+  $nb_pri = $obm_q->num_rows();
+  if ($nb_pri > 0) {
     $display["msg"] = display_warn_msg($l_pri_cant_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\"> $label : $l_pri_link_incident</td>
+      <td class=\"detailHead\"> $label : $l_pri_link_incident ($nb_pri)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("incident_id");
       $cname = $obm_q->f("incident_label");
       $dis_link .="
@@ -889,6 +894,13 @@ function dis_priority_links($id) {
       </td>
     </tr>";
     }
+    if ($cpt < $nb_pri) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
     $dis_link .="
     </table>
     <div class=\"detailButton\">
@@ -940,15 +952,18 @@ function dis_status_links($id) {
         <input type=\"submit\" value=\"$l_back\" />
         </form>";
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_stat = $obm_q->num_rows();
+  if ($nb_stat > 0) {
     $display["msg"] = display_warn_msg($l_sta_cant_delete); 
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_sta_link_incident</td>
+      <td class=\"detailHead\">$label : $l_sta_link_incident ($nb_stat)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $iid = $obm_q->f("incident_id");
       $ilabel = $obm_q->f("incident_label");
       $dis_link.= "
@@ -958,6 +973,13 @@ function dis_status_links($id) {
       </td>
     </tr>";
     }
+    if ($cpt < $nb_stat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
     $dis_link .="
     </table>
     <div class=\"detailButton\">

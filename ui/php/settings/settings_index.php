@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : settings_index.php                                           //
 //     - Desc : Settings (Language, themes,...) management index file        //
@@ -56,6 +56,12 @@ if ($form_user_pref) {
     $set_rows = $param_rows;
     $sess->register("set_rows");
     run_query_set_user_pref($uid, "set_rows", $set_rows);
+  }
+
+  if ($param_todo != "") {
+    $set_todo = $param_todo;
+    $sess->register("set_todo");
+    run_query_set_user_pref($uid, "set_todo", $set_todo);
   }
 
   if ($param_dsrc != "") {
@@ -135,6 +141,13 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 $display["header"] = generate_menu($menu, $section);
 
+// Todo Order select
+if ($set_todo == $cts_pri) { $todo_pri = "selected=\"selected\" "; }
+if ($set_todo == $cts_dead) { $todo_dead = "selected=\"selected\" "; }
+$sel_todo = "<select name=\"param_todo\" id=\"param_todo\">
+  <option value=\"$cts_pri\" $todo_pri>$l_priority</option>
+  <option value=\"$cts_dead\" $todo_dead>$l_deadline</option>
+</select>";
 
 // Data source select
 $dsrc_q = run_query_datasource();
@@ -241,6 +254,12 @@ $display["detail"] .= " /></td>
     <td class=\"adminLabel\">$l_set_rows</td>
     <td class=\"adminText\">
       <input size=\"3\" name=\"param_rows\" value=\"$set_rows\" /></td>
+  </tr>
+
+<!-- Todo Order config ------------------------------------------------------->
+  <tr>
+    <td class=\"adminLabel\">$l_set_todo</td>
+    <td class=\"adminText\">$sel_todo</td>
   </tr>
 
 <!-- Data Source config ------------------------------------------------------>
@@ -355,4 +374,5 @@ function get_settings_actions() {
     'Condition'=> array ('None') 
                                     	);
 }
-</SCRIPT>
+
+</script>

@@ -1,10 +1,10 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : todo_query.inc                                               //
 //     - Desc : todo query File                                              //
 // 2003-15-09 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id:
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -20,14 +20,19 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
   $cgd_sql;
 
   $uid = $todo["uid"];
-
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "todo_priority";
   $p_order_dir = (strcmp($p_order_dir,"") != 0) ? $p_order_dir : "desc";
 
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $date = sql_date_format($type, "todo_date", "date_todo");
+  $deadline = sql_date_format($type, "todo_deadline", "date_deadline");
+
   $query = "select
     todo_id,
-    UNIX_TIMESTAMP(todo_date) as date_todo,
-    UNIX_TIMESTAMP(todo_deadline) as date_deadline,
+    $date,
+    $deadline,
     todo_priority,
     todo_title
   from Todo
@@ -36,11 +41,58 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
   ";
 
   display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
+  $obm_q->query($query);
   
-  return $obm_db;
+  return $obm_q;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Todo detail query execution                                               //
+// Parameters:
+//   - $todo[]       : company search criteria
+//     keys used       id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($todo) {
+
+  $t_id = $todo["id"];
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type, "todo_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "todo_timecreate", "timecreate");
+  $date = sql_date_format($type, "todo_date", "date_todo");
+  $deadline = sql_date_format($type, "todo_deadline", "date_deadline");
+
+  $query = "
+  select
+    Todo.*,
+    uu.userobm_login as userupdate,
+    uc.userobm_login as usercreate,
+    $timeupdate,
+    $timecreate,
+    $date,
+    $deadline,
+    u.userobm_lastname as user_firstname,
+    u.userobm_firstname as user_lastname,
+    Author.userobm_lastname as author_firstname,
+    Author.userobm_firstname as author_lastname
+  from Todo
+       left join UserObm as uc on todo_usercreate = uc.userobm_id
+       left join UserObm as uu on todo_userupdate = uu.userobm_id
+       left join UserObm as u on todo_user = u.userobm_id,
+     UserObm as Author
+  where todo_id = $t_id
+    and Author.userobm_id = todo_usercreate
+  ";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Todo add query execution                                                  //
@@ -87,6 +139,7 @@ function run_query_add($todo) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Todo update query execution                                               //
 // Parametes:
@@ -121,42 +174,6 @@ function run_query_update($todo) {
   return $retour;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Todo detail query execution                                               //
-// Parameters:
-//   - $todo[]       : company search criteria
-//     keys used       id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($todo) {
-
-  $t_id = $todo["id"];
-
-  $query = "
-  select
-    Todo.*,
-    todo_userupdate as userupdate,
-    todo_usercreate as usercreate,
-    UNIX_TIMESTAMP(todo_timeupdate) as timeupdate,
-    UNIX_TIMESTAMP(todo_timecreate) as timecreate,
-    UNIX_TIMESTAMP(todo_date) as date_todo,
-    UNIX_TIMESTAMP(todo_deadline) as date_deadline,
-    User.userobm_lastname as user_firstname,
-    User.userobm_firstname as user_lastname,
-    Author.userobm_lastname as author_firstname,
-    Author.userobm_firstname as author_lastname
-  from Todo, UserObm User, UserObm Author
-  where todo_id = $t_id
-    and User.userobm_id = todo_user
-    and Author.userobm_id = todo_usercreate
-  ";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-
-  return $obm_q;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Delete todo pass in $params                                               //
@@ -198,36 +215,14 @@ function run_query_delete_unique($t_id) {
   return $delete_query->query($query);
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Delete task pass in $params                                              //
+// Query execution : Update the user todo display list
 // Parameters:
-//     -$parms = correponding to page parameters
-///////////////////////////////////////////////////////////////////////////////
-function run_query_admin_update($todo) {
-  global $cdg_sql, $todo_order;
-
-  $uid = $todo["uid"];
-  $todo_order = $todo["sel_order"];
-
-  $query = "
-    update UserObmPref
-    set userobmpref_value = '$todo_order'
-    where userobmpref_option = 'todo_order'
-    and userobmpref_user_id = $uid
-    ";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_admin_update");
-  $obm_q = new DB_OBM;
-  return $obm_q->query($query);
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Update the user top priority list
-// Parameters:
-//   - $user_id  : user Id
+//   - $user_id : user Id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_set_user_todo($user_id) {
-  global $cdg_sql, $todo_order;
+  global $cdg_sql, $set_todo;
   global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
   global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
   global $todo_5_id, $todo_5_title;
@@ -239,7 +234,7 @@ function run_query_set_user_todo($user_id) {
       todo_title
     from Todo
     where todo_user = $user_id
-    order by $todo_order desc
+    order by $set_todo desc
   ";
 
   display_debug_msg($query, $cdg_sql);

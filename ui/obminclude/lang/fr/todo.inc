@@ -1,10 +1,10 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : todo.inc                                                 //
 // 2003-09-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_todo = "A faire";
@@ -12,7 +12,6 @@ $l_user = "Utilisateur";
 $l_author = "Auteur";
 $l_date = "Date de saisie";
 $l_deadline = "Date limite";
-$l_priority = "Priorité";
 $l_todotitle = "Titre";
 $l_content = "Description";
 
@@ -20,10 +19,6 @@ $l_del = "Suppr.";
 $l_delete = "Supprimer";
 $l_add = "Ajouter";
 $l_update = "Modifier";
-
-$l_sortorder = "Ordre de tri des tâches urgentes";
-$l_sortpriority = "par priorité";
-$l_sortdeadline = "par date limite";
 
 $l_no_found = "Rien à faire";
 $l_no_deadline = "Non spécifiée";

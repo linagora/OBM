@@ -4,14 +4,12 @@
 //     - File     : agenda.inc                                               //
 // 2001-06-28 by Francois Bloque                                             //
 ///////////////////////////////////////////////////////////////////////////////
-// Last Update 2001-07-19                                                   //
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
-
 
 $l_users = "Contacts";
 $l_groups = "Groupes";
 $l_title = "Titre";
-$l_priority = "Priorit&eacute;";
 $l_private = "Priv&eacute;";
 $l_public  = "Public";
 $l_category = "Cat&eacute;gorie";

@@ -1025,14 +1025,19 @@ function dis_cat1_links($document) {
   $id = $document["category1"];
   $label = get_cat1_label($id);
   $obm_q = run_query_cat1_links($id);
-  if ($obm_q->num_rows() > 0) {
-    $display["msg"] .= display_warn_msg($l_cat1_cant_delete."aaé");
+
+  $nb_cat = $obm_q->num_rows();
+  if ($nb_cat > 0) {
+    $display["msg"] .= display_warn_msg($l_cat1_cant_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_cat1_link_document</td>
+      <td class=\"detailHead\">$label : $l_cat1_link_document ($nb_cat)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("document_id");
       $cname = $obm_q->f("document_title");
       $dis_link .= "
@@ -1040,10 +1045,17 @@ function dis_cat1_links($document) {
       <td class=\"detailLabel\">
         <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
       </td>
-    </tr>
-    </table>";
+    </tr>";
     }
+    if ($cpt < $nb_cat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
     $dis_link .="
+    </table>
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
 	  <form name=\"form_back\" method=\"get\"
@@ -1100,14 +1112,19 @@ function dis_cat2_links($document) {
   $id = $document["category2"];
   $label = get_cat2_label($id);
   $obm_q = run_query_cat2_links($id);
-  if ($obm_q->num_rows() > 0) {
-    $display["msg"] .= display_warn_msg($l_cat2_cant_delete."aaé");
+
+  $nb_cat = $obm_q->num_rows();
+  if ($nb_cat > 0) {
+    $display["msg"] .= display_warn_msg($l_cat2_cant_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_cat2_link_document</td>
+      <td class=\"detailHead\">$label : $l_cat2_link_document ($nb_cat)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("document_id");
       $cname = $obm_q->f("document_title");
       $dis_link .= "
@@ -1115,10 +1132,17 @@ function dis_cat2_links($document) {
       <td class=\"detailLabel\">
         <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
       </td>
-    </tr>
-    </table>";
+    </tr>";
     }
+    if ($cpt < $nb_cat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
     $dis_link .="
+    </table>
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
 	  <form name=\"form_back\" method=\"get\"
@@ -1175,14 +1199,19 @@ function dis_mime_links($document) {
   $id = $document["mime"];
   $label = get_mime_label($id);
   $obm_q = run_query_mime_links($id);
-  if ($obm_q->num_rows() > 0) {
-    $display["msg"] .= display_warn_msg($l_mime_cant_delete."aaé");
+
+  $nb_mime = $obm_q->num_rows();
+  if ($nb_mime > 0) {
+    $display["msg"] .= display_warn_msg($l_mime_cant_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_mime_link_document</td>
+      <td class=\"detailHead\">$label : $l_mime_link_document ($nb_mime)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("document_id");
       $cname = $obm_q->f("document_title");
       $dis_link .= "
@@ -1190,10 +1219,17 @@ function dis_mime_links($document) {
       <td class=\"detailLabel\">
         <a  href=\"" .url_prepare("document_index.php?action=detailconsult&amp;param_document=$cid") . "\">$cname</a>
       </td>
-    </tr>
-    </table>";
+    </tr>";
     }
+    if ($cpt < $nb_mime) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
     $dis_link .="
+    </table>
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
 	  <form name=\"form_back\" method=\"get\"

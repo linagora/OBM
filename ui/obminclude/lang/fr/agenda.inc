@@ -7,12 +7,10 @@
 // $Id$ //
 //////////////////////////////////////////////////////////////////////////////
 
-
 $l_agenda = "Calendrier";
 $l_users = "Utilisateurs";
 $l_groups = "Groupes";
 $l_title = "Titre";
-$l_priority = "Priorité";
 $l_private = "Privé";
 $l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
 $l_public  = "Public";

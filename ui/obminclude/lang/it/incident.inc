@@ -1,4 +1,4 @@
-<SCRIPT LANGUAGE="PHP">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italian                                                  //
 //     - File     : incident.inc                                             //
@@ -9,7 +9,6 @@
 
 // Fields Label
 $l_label = "Label";
-$l_priority = "Priority";
 $l_status = "Status";
 $l_date = "Date";
 $l_owner = "Owner";

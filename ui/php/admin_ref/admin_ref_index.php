@@ -13,11 +13,16 @@
 // - datasource_update    -- form fields    -- update the Data Source
 // - datasource_checklink --                -- check if Data Source is used
 // - datasource_delete    -- $sel_kind      -- delete the Data Source
-// - country              --                -- Data Source index
+// - country              --                -- Country index
 // - country_insert       -- form fields    -- insert the Country
 // - country_update       -- form fields    -- update the Country
 // - country_checklink    --                -- check if Country is used
 // - country_delete       --                -- delete the Country
+// - tasktype             --                -- TaskType index
+// - tasktype_insert      -- form fields    -- insert the Tasktype
+// - tasktype_update      -- form fields    -- update the Tasktype
+// - tasktype_checklink   --                -- check if Tasktype is used
+// - tasktype_delete      --                -- delete the Tasktype
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -132,6 +137,49 @@ if ($action == "index")  {
   }
   require("admin_ref_js.inc");
   $display["detail"] .= dis_datasource_index();
+
+} elseif ($action == "tasktype")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("admin_ref_js.inc");
+  $display["detail"] = dis_tasktype_index();
+
+} elseif ($action == "tasktype_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_tasktype_insert($ref);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_tt_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_tt_insert_error);
+  }
+  require("admin_ref_js.inc");
+  $display["detail"] .= dis_tasktype_index();
+
+} elseif ($action == "tasktype_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_tasktype_update($ref);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_tt_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_tt_update_error);
+  }
+  require("admin_ref_js.inc");
+  $display["detail"] .= dis_tasktype_index();
+
+} elseif ($action == "tasktype_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("admin_ref_js.inc");
+  $display["detail"] .= dis_tasktype_links($ref);
+
+} elseif ($action == "tasktype_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_tasktype_delete($ref);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_tt_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_tt_delete_error);
+  }
+  require("admin_ref_js.inc");
+  $display["detail"] .= dis_tasktype_index();
 }
 
 
@@ -151,6 +199,7 @@ display_page($display);
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_ref() {
   global $tf_name, $sel_dsrc, $sel_ctry, $tf_iso, $tf_lang, $tf_phone;
+  global $sel_tt, $tf_label, $rd_tt_internal;
   global $cdg_param;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
@@ -166,6 +215,10 @@ function get_param_ref() {
   if (isset ($tf_lang)) $ref["lang"] = $tf_lang;
   if (isset ($tf_phone)) $ref["phone"] = $tf_phone;
 
+  // Admin - Task Type fields
+  if (isset ($sel_tt)) $ref["tasktype"] = $sel_tt;
+  if (isset ($tf_label)) $ref["label"] = $tf_label;
+  if (isset ($rd_tt_internal)) $ref["internal"] = $rd_tt_internal;
 
   if (debug_level_isset($cdg_param)) {
     if ( $ref ) {
@@ -184,7 +237,7 @@ function get_param_ref() {
 //////////////////////////////////////////////////////////////////////////////
 function get_admin_ref_action() {
   global $actions, $path;
-  global $l_header_datasource, $l_header_country;
+  global $l_header_datasource, $l_header_country, $l_header_tasktype;
   global $admin_ref_read, $admin_ref_write;
 
   // Country index
@@ -255,6 +308,42 @@ function get_admin_ref_action() {
 // DataSource Delete
   $actions["ADMIN_REF"]["datasource_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+  // Tasktype index
+  $actions["ADMIN_REF"]["tasktype"] = array (
+     'Name'     => $l_header_tasktype,
+     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype&amp;mode=html",
+     'Right'    => $admin_ref_read,
+     'Condition'=> array ('all')
+                                    	  );
+
+// Tasktype Insert
+  $actions["ADMIN_REF"]["tasktype_insert"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_insert",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Tasktype Update
+  $actions["ADMIN_REF"]["tasktype_update"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_update",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Tasktype Check Link
+  $actions["ADMIN_REF"]["tasktype_checklink"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_checklink",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Tasktype Delete
+  $actions["ADMIN_REF"]["tasktype_delete"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_delete",
     'Right'    => $admin_ref_write,
     'Condition'=> array ('None') 
                                      	       );

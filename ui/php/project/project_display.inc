@@ -87,7 +87,7 @@ function dis_project_consult($pid) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_form($project) {
 
-  $tt_q = run_query_tasktype();
+  $tt_q = run_query_tasktype("project");
   $manager_q = run_query_managers();
   $member_q = run_query_members();
 

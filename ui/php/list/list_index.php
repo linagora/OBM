@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_index.php                                               //
 //     - Desc : List Index File                                              //
-// 1999-03-19 Vincent MARGUERIT                                              //
+// 1999-03-19 - Aliacom - Vincent MARGUERIT                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -437,7 +437,7 @@ function get_list_action() {
     'Right'    => $list_write,
     'Popup'    => 1,
     'Target'   => $l_list,
-    'Condition'=> array ('detailconsult','contact_add','contact_del') 
+    'Condition'=> array ('detailconsult','update','contact_add','contact_del') 
                                     	  );
 
 // Contact ADD

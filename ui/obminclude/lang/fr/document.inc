@@ -50,14 +50,14 @@ $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1";
 $l_cat1_update = "Mettre à jour la catégorie 1"; 
 $l_cat1_insert = "Insérer une catégorie 1"; 
 $l_cat1_delete_ok = "La suppression de la categorie 1 a été correctement effectuée.";
-$l_cat1_delete_error = "La suppression de la categorie 1  a échoué !";
+$l_cat1_delete_error = "La suppression de la categorie 1 a échoué !";
 $l_cat1_insert_ok = "L'insertion de la categorie 1 a été correctement effectuée.";
 $l_cat1_insert_error = "L'insertion de la categorie 1 a échoué !";
 $l_cat1_update_ok = "La modification de la categorie 1 a été correctement effectuée";
 $l_cat1_update_error = "La modification de la categorie 1 a &eacute;chou&eacute;e !";
 $l_cat1_link_document = "La catégorie 1 est référencée par ces documents";
 $l_cat1_link_document_no = "La catégorie 1 n'est référencée dans aucun documents";
-$l_cat1_can_delete = " La catégorie 1 peut etre supprimée"; 
+$l_cat1_can_delete = " La catégorie 1 peut être supprimée"; 
 $l_cat1_cant_delete = " La catégorie 1 ne peut pas etre supprimée";
 $l_cat2_link_document = "La catégorie 2 est référencée par ces documents";
 $l_cat2_link_document_no = "La catégorie 2 n'est référencée dans aucun documents";
@@ -107,7 +107,7 @@ $l_already_exist_error = "Ce fichier existe déjà";
 $l_creation_error = "Une erreur est survenue pendant la création du fichier";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
-$l_have_no_link = "Ce document n'est lié à aucun éléments et peut etre supprimer";
+$l_have_no_link = "Ce document n'est lié à aucun éléments et peut être supprimé";
 $l_no_document = "Document introuvable";
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";

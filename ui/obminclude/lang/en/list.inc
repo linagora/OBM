@@ -64,7 +64,7 @@ $l_no_static_contact = "No static contact registered";
 $l_dyn_con_found = "dynamic registered contacts";
 $l_no_dyn_contact = "No dynamic contact registered";
 
-$l_add_contact = "Add contacts" ;
+$l_add_contact = "Add contacts to the list" ;
 $l_del_contact_sel = "Remove these contacts";
 $l_contact_added = "added Contact(s)";
 $l_contact_removed = "removed Contact(s)";

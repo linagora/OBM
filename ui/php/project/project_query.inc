@@ -1209,37 +1209,6 @@ function run_query_get_obmusers() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Project TaskType list query
-// Parameters :
-//   - $tt_cat : tasktype category (if not given -> all except others)
-///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype($tt_cat="") {
-  global $cdg_sql, $ctt_sales, $ctt_research;
-
-  $query = "
-    select
-      tasktype_id,
-      tasktype_label, 
-      tasktype_internal
-    from TaskType ";
-
-  if ($tt_cat != "") {
-    $query .= "where tasktype_internal = '$tt_cat'";
-  } else {
-    $query .= "where (tasktype_internal = '$ctt_sales'
-                      or tasktype_internal = '$ctt_research')";
-  }
-
-  $query .= " order by tasktype_internal";
-
-  display_debug_msg($query, $cdg_sql, "run_query_tasktype");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // New Project Form Data checking and formatting                             //
 // Parameters:
 //   - $pid   : project id

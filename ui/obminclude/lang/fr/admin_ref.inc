@@ -65,3 +65,37 @@ $l_j_ctry_create = "Vous devez saisir un nom de pays pour le créer !";
 
 $l_iso_3166 = "Code Iso 3166";
 $l_lang = "Langue";
+
+// Task Type
+$l_tt_manage = "Gestion des types de tâche";
+$l_tt_exist = "Types de tâche existants";
+$l_tt_new = "Nouveau type de tâche";
+$l_tt_no = "Pas de type de tâche définis";
+$l_tt_update = "Modifier le type de tâche";
+$l_tt_checkdelete = "Vérifier ou Supprimer le type de tâche";
+$l_tt_delete = "Supprimer le type de tâche";
+$l_tt_insert = "Créer le type de tâche";
+
+$l_tt_delete_ok = "La suppression du type de tâche a été correctement effectuée.";
+$l_tt_delete_error = "La suppression du type de tâche a échoué !";
+$l_tt_insert_ok = "L'insertion du type de tâche a été correctement effectuée.";
+$l_tt_insert_error = "L'insertion du type de tâche a échoué !";
+$l_tt_update_ok = "La modification du type de tâche a été correctement effectuée";
+$l_tt_update_error = "La modification du type de tâche a échoué !";
+
+$l_tt_link_deal = "Ces affaires sont du type de tâche";
+$l_tt_link_deal_no = "Pas d'affaire du type de tâche";
+$l_tt_link_project = "Ces projets sont du type de tâche";
+$l_tt_link_project_no = "Pas de projet du type de tâche";
+$l_tt_link_time = "Le type de tâche est référencé dans la gestion du temps";
+$l_tt_link_time_no = "Le type de tâche n'est pas référencé dans la gestion du temps";
+$l_tt_cant_delete = "Le type de tâche ne peut être supprimé !";
+$l_tt_can_delete = "Le type de tâche peut être supprimé.";
+
+$l_j_tt_delete = "Sélectionnez un type de tâche pour le vérifier ou supprimer !";
+$l_j_tt_update = "Vous devez sélectionner un type de tâche et entrer une modification avant de valider !";
+$l_j_tt_create = "Vous devez saisir un nom de type de tâche pour le créer !";
+
+$l_tt_sales = "Tâche facturée";
+$l_tt_research = "Projet interne";
+$l_tt_others = "Tâche non facturée";

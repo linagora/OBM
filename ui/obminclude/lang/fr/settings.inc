@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : settings.inc                                             //
@@ -17,6 +17,7 @@ $l_set_lang = "Choisissez votre langue";
 $l_set_theme = "Choisissez votre theme";
 $l_set_menu = "Affichage des menus";
 $l_set_rows = "# lignes affichées par page";
+$l_set_todo = "Ordre d'affichage des tâches";
 $l_set_date = "Format de date";
 $l_set_commentorder = "Affichage des commentaires";
 $l_set_cal_interval = "Intervalle du calendrier";
@@ -35,6 +36,8 @@ $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";
 $l_da_txt = "dd mois yyyy";
+
+$l_deadline = "date limite";
 
 $l_me_txt = "texte";
 $l_me_ico = "icône";

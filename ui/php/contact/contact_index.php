@@ -46,7 +46,6 @@ include("$obminclude/global_pref.inc");
 require("contact_display.inc");
 require("contact_query.inc");
 
-
 $uid = $auth->auth["uid"];
 
 // updating the contact bookmark : 

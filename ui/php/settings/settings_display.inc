@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : settings_display.php                                         //
 //     - Desc : Settings Display File                                        //

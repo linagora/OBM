@@ -61,6 +61,113 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
   return $res;
 }
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Todo Full list                                                    //
+// Parameters:
+//   - $todo_q    : todo list
+//   - $todo[]    : default values
+//     keys used  : uid
+///////////////////////////////////////////////////////////////////////////////
+function dis_todo_list($todo, $todo_q) {
+  global $auth, $l_del, $l_delete;
+
+  $uid = $todo["uid"];
+  $title = $todo["title"];
+  $user = $todo["sel_user"];
+  $priority = $todo["priority"];
+  $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
+
+  $todo_q->seek($first_row);
+
+  $block .= "
+     <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
+     ";
+  $pref_q = run_query_display_pref($auth->auth["uid"], "todo");
+
+  $todo_d = new OBM_DISPLAY("DATA", $pref_q);
+  $todo_d->data_set = $todo_q;
+  $todo_d->data_url = $url;
+  $todo_d->data_idfield = "todo_id";
+  $todo_d->data_cb_text = "$l_del";
+  $todo_d->data_cb_side = "left";
+  $todo_d->data_cb_name = "delete_";
+  $todo_d->data_cb_show = 1;
+  $todo_d->data_header = "both";
+
+  $block .= $todo_d->display("dis_data_todo");
+
+  $block .= "
+    <p class=\"detailButton\">
+     <p class=\"detailButtons\">
+      <input type=\"hidden\" name=\"action\" value=\"delete\" />
+      <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
+     </p>
+    </p>
+    </form>
+    ";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Todo Detail (all informations)                                    //
+// Parameters:
+//   - $todo_q    : todo list
+//   - $todo[]    : default values
+//     keys used  : 
+///////////////////////////////////////////////////////////////////////////////
+function dis_todo_detail($todo, $todo_q) {
+  global $display;
+  global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date;
+  global $l_deadline, $l_content, $l_no_deadline;
+
+  $title = $todo_q->f("todo_title");
+  $user = $todo_q->f("user_firstname") ." ". $todo_q->f("user_lastname");
+  $author = $todo_q->f("author_firstname") ." ". $todo_q->f("author_lastname");
+  $priority = $todo_q->f("todo_priority");
+
+  $date = date_format($todo_q->f("date_todo"));
+  $deadline = $todo_q->f("date_deadline");
+  $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
+
+  $content = $todo_q->f("todo_content");
+
+  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
+
+  $block = "
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_todotitle</td>
+      <td class=\"detailText\">$title</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_user</td>
+      <td class=\"detailText\">$user</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_author</td>
+      <td class=\"detailText\">$author</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_priority</td>
+      <td class=\"detailText\">$priority</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_deadline</td>
+      <td class=\"detailText\">$deadline</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_content</td>
+      <td class=\"detailText\">$content</td>
+     </tr>
+    </table>
+    ";
+  
+  return $block;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Todo Form                                                         //
 // Parameters:
@@ -80,13 +187,12 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
  
   if ($action == "update") {
     $t_id = $todo["id"];
-
     $uid = $todo_q->f("todo_user");
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
     $deadline = $todo_q->f("date_deadline");
-    $deadline = ($deadline != 0) ?$deadline : $l_no_deadline;
+    $deadline = ($deadline != 0) ? date_format($deadline, 1) : $l_no_deadline;
   } else {
     $uid = $todo["uid"];
     $priority = intval(($max_priority+1)/2);
@@ -175,150 +281,6 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
   return $block;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Display Todo Full list                                                    //
-// Parameters:
-//   - $todo_q    : todo list
-//   - $todo[]    : default values
-//     keys used  : uid
-///////////////////////////////////////////////////////////////////////////////
-function dis_todo_list($todo, $todo_q) {
-  global $auth, $l_del, $l_delete;
-
-  $uid = $todo["uid"];
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "todo");
-
-  $title = $todo["title"];
-  $user = $todo["sel_user"];
-  $priority = $todo["priority"];
-  
-  $url = url_prepare("todo_index.php?action=index&amp;tf_title=$title&amp;tf_user=$user&amp;sel_priority=$priority");
-
-  $todo_q->seek($first_row);
-
-  $block .= "
-     <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
-    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
-     ";
-
-  $todo_d = new OBM_DISPLAY("DATA", $pref_q);
-  $todo_d->data_set = $todo_q;
-  $todo_d->data_url = $url;
-  $todo_d->data_idfield = "todo_id";
-  $todo_d->data_cb_text = "$l_del";
-  $todo_d->data_cb_side = "left";
-  $todo_d->data_cb_name = "delete_";
-  $todo_d->data_cb_show = 1;
-  $todo_d->data_header = "both";
-
-  $block .= $todo_d->display("dis_data_todo");
-
-  $block .= "
-    <p class=\"detailButton\">
-     <p class=\"detailButtons\">
-      <input type=\"hidden\" name=\"action\" value=\"delete\" />
-      <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
-     </p>
-    </p>
-    </form>
-    ";
-
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Todo Detail (all informations)                                    //
-// Parameters:
-//   - $todo_q    : todo list
-//   - $todo[]    : default values
-//     keys used  : 
-///////////////////////////////////////////////////////////////////////////////
-function dis_todo_detail($todo, $todo_q) {
-  global $display;
-  global $l_todo, $l_todotitle, $l_user, $l_author, $l_priority, $l_date;
-  global $l_deadline, $l_content, $l_no_deadline;
-
-  $title = $todo_q->f("todo_title");
-  $user = $todo_q->f("user_firstname") ." ". $todo_q->f("user_lastname");
-  $author = $todo_q->f("author_firstname") ." ". $todo_q->f("author_lastname");
-  $priority = $todo_q->f("todo_priority");
-
-  $date = date_format($todo_q->f("date_todo"));
-  $deadline = $todo_q->f("date_deadline");
-  $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
-
-  $content = $todo_q->f("todo_content");
-
-  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
-
-  $block = "
-    <table class=\"detail\">
-     <tr>
-      <td class=\"detailLabel\">$l_todotitle</td>
-      <td class=\"detailText\">$title</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailText\">$user</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_author</td>
-      <td class=\"detailText\">$author</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_priority</td>
-      <td class=\"detailText\">$priority</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_deadline</td>
-      <td class=\"detailText\">$deadline</td>
-     </tr><tr>
-      <td class=\"detailLabel\">$l_content</td>
-      <td class=\"detailText\">$content</td>
-     </tr>
-    </table>
-    ";
-  
-  return $block;
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// Display the Todo Display preference screen                                //
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function dis_admin_todo() {
-  global $todo_order;
-  global $l_todo_prefs, $l_sortorder, $l_sortpriority, $l_sortdeadline;
-
-  $sel_priority = ($todo_order == "todo_priority") ? "selected=\"selected\"" : "";
-  $sel_deadline = ($todo_order == "todo_deadline") ? "selected=\"selected\"" : "";
-
-  $block = "
-    <table class=\"admin\">
-     <tr>
-      <td colspan=\"2\" class=\"adminHead\">
-        $l_todo_prefs
-      </td>
-     </tr><tr>
-      <td class=\"adminLabel\">
-       $l_sortorder
-      </td>
-      <td class=\"adminText\">
-       <form name=\"f_order_change\" method=\"post\"
-             action=\"" . url_prepare("todo_index.php") . "\">
-        <select name=\"sel_order\" onChange=\"forms.f_order_change.submit();\">
-         <option value=\"todo_priority\" $sel_priority>$l_sortpriority</option>
-         <option value=\"todo_deadline\" $sel_deadline>$l_sortdeadline</option>
-        </select>
-        <input type=\"hidden\" name=\"action\" value=\"adminupdate\" />
-       </form>
-      </td>
-     </tr>
-    </table>
-    ";
-
-  return $block;
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Todo display preference screen                                //

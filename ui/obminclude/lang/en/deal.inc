@@ -68,11 +68,6 @@ $l_kind_new = "New Kind";
 $l_status_manage = "Deal Status Management";
 $l_status_exist = "Existing States";
 $l_status_new = "New State";
-$l_category_manage = "Deal Category Management";
-$l_category_exist = "Existing Categories";
-$l_category_new = "New Category";
-$l_category_label="Label";
-$l_category_minilabel="Mini Label";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_add_contrat = "Add a contract";
 $l_contract_new = "New contract";
@@ -100,10 +95,6 @@ $l_status_update = "Update State";
 $l_status_checkdelete = "Check or Delete State";
 $l_status_delete = "Delete State";
 $l_status_insert = "Insert State";
-$l_cat_checkdelete = "Check or Delete Category";
-$l_cat_delete = "Delete Category";
-$l_cat_update = "Update Category";
-$l_cat_insert = "Insert Category";
 
 // Messages
 $l_link_contract = "The deal is involved in these contracts";
@@ -159,20 +150,6 @@ $l_status_can_delete = "The Status can be deleted";
 $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";
 $l_status_link_deal_no = "The Status is not involved in any deals";
-$l_cat_insert_ok = "The category has been inserted successfully.";
-$l_cat_insert_error = "The insertion of the category has failed !";
-$l_cat_update_ok = "The category has been updated successfully.";
-$l_cat_update_error = "The category update has failed !";
-$l_cat_delete_error = "The deletion of the category has failed !";
-$l_cat_delete_ok = "The category has been deleted successfully.";
-$l_cat_can_delete = "The Category can be deleted";
-$l_cat_cant_delete = "The Category can't be deleted";
-$l_cat_link_deal = "The Category is involved in these deals";
-$l_cat_link_deal_no = "The Category is not involved in any deals";
-$l_cat_link_project = "The Category is involved in these projects";
-$l_cat_link_project_no = "The Category is not involved in any projects";
-$l_cat_link_timetask = "The Category is used in time management";
-$l_cat_link_timetask_no = "The Category is not used in time management";
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)
 $l_fill_parentdeal = "You have to select a parentdeal before submitting.";
@@ -186,13 +163,10 @@ $l_invalid_date = "Invalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ).";
 $l_delete_confirm = "Confirm the deal deletion ?";
 $l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_status_delete = "You have to select a state to check or delete it !";
-$l_j_category_delete = "You have to select a category to check or delete it !";
 $l_j_kind_update = "You have to select a kind and enter a new name to update it !";
 $l_j_status_update = "You have to select a state and enter a new name to update it !";
-$l_j_category_update = "You have to select a category and enter a new name to update it !";
 $l_j_kind_create = "You have to enter a new kind name to create it !";
 $l_j_status_create = "You have to enter a new state name to create it !";
-$l_j_category_create = "You have to enter a new category name to create it !";
 
 // For the display parameters modification screen
 $l_deal_display = "Display options for deals list";

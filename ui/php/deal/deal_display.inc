@@ -131,11 +131,11 @@ function dis_data_deal(&$OD, $fieldname, $link_ok) {
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_index($deal="") {
-  global $display;
+  global $display, $ctt_sales;
 
   $usr_q = run_query_userobm();
   $block .= html_parentdeal_search_form($deal, $usr_q);
-  $block .= html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
+  $block .= html_deal_search_form($deal, run_query_dealtype(), run_query_tasktype($ctt_sales), run_query_dealstatus(), $usr_q);
 
   return $block;
 }
@@ -1356,22 +1356,17 @@ function html_deal_affect($parent_q, $p_deal_id) {
 // Deal Administration Forms
 // Parametres:
 //   - $kind_q   : DBO : Deal kind list
-//   - $cat_q    : DBO : Deal TaskType list
 //   - $status_q : DBO : Deal Status list
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_admin_form($kind_q, $cat_q, $status_q) {
+function html_deal_admin_form($kind_q, $status_q) {
    // Labels : 
   global $l_kind_manage,$l_kind_new,$l_kind_exist;
   global $l_status_manage,$l_status_exist,$l_status_new;
-  global $l_category_manage,$l_category_exist,$l_category_new;
-  global $l_category_label,$l_category_minilabel,$l_label,$l_minus,$l_plus,$l_order;
+  global $l_label,$l_minus,$l_plus,$l_order;
   // Actions : 
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
-  global $l_cat_checkdelete,$l_cat_update,$l_cat_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert;
-  global $l_hitrate, $l_task_fac, $l_task_int, $l_task_div;
-
-  $task_list = array($l_task_fac, $l_task_int, $l_task_div);
+  global $l_hitrate;
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind\" onChange=\"
@@ -1413,21 +1408,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   }
   $sel_sta .= "</select>";
 
-  // category select construction
-  $sel_cat = "<select name=\"sel_cat\" onChange=\"
-    forms.form_cat_update.tf_cat.value=this.options[this.selectedIndex].text;\"
-    size=\"4\" >";
-  while ($cat_q->next_record()) {
-    //put menu titles
-    if (($cat_i = $cat_q->f("tasktype_internal")) != $type_prec) {
-      $sel_cat .= "<option disabled=\"disabled\">".$task_list[$cat_i]." </option>";
-      $type_prec = $cat_i;
-    }
-    $id = $cat_q->f("tasktype_id");
-    $mlabel = $cat_q->f("tasktype_label");
-    $sel_cat .= "<option value=\"$id\">&nbsp;&nbsp;$mlabel</option>\n";
-  }
-  $sel_cat .= "</select>";
 
   $block = "
     <table class=\"admin\">
@@ -1619,94 +1599,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
     </tr>
     </table>
 
-<!--  category section  -->
-
-    <hr />
-    <table class=\"admin\">
-    <tr>
-      <td colspan=\"5\" class=\"adminHead\">$l_category_manage</td>
-    </tr>
-    <tr>
-      <td>
-
-<!-- category delete section -->
-
-      <table>
-        <tr>
-         <td colspan=\"3\">
-         <form name=\"form_category_delete\"
-          method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-       <table>
-      <tr>
-        <td class=\"adminLabel\">$l_category_exist</td>
-        <td class=\"adminLabel\">$sel_cat</td>
-        <td>
-          <input type=\"hidden\" name=\"action\" value=\"cat_checklink\" />
-          <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_checkdelete\" 
-          onclick=\"if (check_cat_checkdel(this.form)) return true; else return false;\" />
-          </td>
-        </tr>
-        </table>
-         </form>
-        </td>
-      </tr>
-
-<!-- category update section -->
-
-      <tr>
-        <td colspan=\"3\">
-          <form name=\"form_cat_update\"
-          method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-          <input type=\"hidden\" name=\"sel_cat\" value=\"\" />
-          <input type=\"hidden\" name=\"action\" value=\"cat_update\" />
-	  <table>
-          <tr>
-            <td class=\"adminLabel\">$l_category_label : </td>
-            <td>
-              <input type=\"text\" name=\"tf_cat\" />
-            </td>
-           <td>
-           <input type=\"submit\" name=\"sub_category\" value=\"$l_cat_update\"
-           onclick=\"if (check_category_upd(this.form, document.form_category_delete)) return true; else return false;\" />
-           </td>
-          </tr>
-         </table>
-         </form>
-        </td>
-          <td>&nbsp;</td>
-       </tr>
-      </table>      
-      </td>
-      <td colspan=\"2\">
-
-<!-- new category section -->
-
-      <form name=\"form_category_new\"
-        method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-      <table>
-        <tr>
-          <td class=\"adminLabel\">$l_category_new : </td>
-          <td>
-	    <input type=\"text\" name=\"tf_cat\" />
-          </td>
-        </tr>
-      <tr>
-        <td colspan=\"2\">
-          <input type=\"radio\" name=\"rd_cat_internal\" value=\"0\" checked=\"checked\" />$l_task_fac<br />
-          <input type=\"radio\" name=\"rd_cat_internal\" value=\"1\" />$l_task_int<br />
-          <input type=\"radio\" name=\"rd_cat_internal\" value=\"2\" />$l_task_div
-        </td>
-      </tr>
-      <tr>
-        <td colspan=\"2\" class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"cat_insert\" />
-          <input type=\"submit\" name=\"sub_category\" value=\"$l_cat_insert\"
-            onclick=\"if (check_category_new(this.form)) return true; " .
-            "else return false;\" />
-        </td>
-      </tr>
-      </table>
-      </form>
     </td>
   </tr>
   </table>
@@ -1729,14 +1621,17 @@ function dis_kind_links($id) {
   $label = get_kind_label($id);
   $obm_q = run_query_kind_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_kind = $obm_q->num_rows();
+  if ($nb_kind > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_kind_link_deal</td>
+      <td class=\"detailHead\">$label : $l_kind_link_deal ($nb_kind)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $dis_link .= "
@@ -1744,6 +1639,12 @@ function dis_kind_links($id) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_kind) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 
@@ -1802,14 +1703,17 @@ function dis_status_links($id) {
   $label = get_status_label($id);
   $obm_q = run_query_status_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_stat = $obm_q->num_rows();
+  if ($nb_stat > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_status_link_deal</td>
+      <td class=\"detailHead\">$label : $l_status_link_deal ($nb_stat)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
       $dis_link.= "
@@ -1817,6 +1721,12 @@ function dis_status_links($id) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_stat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 
@@ -1853,132 +1763,6 @@ function dis_status_links($id) {
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_status_cant_delete);
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  }
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Displays the category links                                               //
-// Parameters:
-//   - $id : category id
-///////////////////////////////////////////////////////////////////////////////
-function dis_cat_links($id) {
-  global $display, $l_cat_link_deal, $l_cat_link_deal_no, $l_back;
-  global $l_cat_link_project, $l_cat_link_project_no;
-  global $l_cat_link_timetask, $l_cat_link_timetask_no;
-  global $l_cat_can_delete, $l_cat_cant_delete, $l_cat_delete;
-
-  $delete_ok = true;
-  $cat_infos = get_cat_infos($id);
-  $label = $cat_infos["label"];
-  $intern = $cat_infos["intern"];
-
-  $obm_q = run_query_cat_links($id, $intern);
-
-  if ($intern == 0) {
-
-    if ($obm_q->num_rows() > 0) {
-      $delete_ok = false;
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_deal</td>
-    </tr>";
-
-      while ($obm_q->next_record()) {
-	$cid = $obm_q->f("deal_id");
-	$clabel = $obm_q->f("deal_label");
-	$dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$cid") . "\">$clabel</a>
-      </td>
-    </tr>";
-      }
-
-    } else {
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$l_cat_link_deal_no</td>
-    </tr>";
-    }
-
-  } else if ($intern == 1) {
-
-    if ($obm_q->num_rows() > 0) {
-      $delete_ok = false;
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_project</td>
-    </tr>";
-
-      while ($obm_q->next_record()) {
-	$pid = $obm_q->f("deal_id");
-	$plabel = $obm_q->f("deal_label");
-	$dis_link .= "
-    <tr>
-      <td class=\"detailLabel\">
-        <a href=\"" .url_prepare("../project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$plabel</a>
-      </td>
-    </tr>";
-      }
-
-    } else {
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$l_cat_link_project_no</td>
-    </tr>";
-    }
-
-  } else {
-
-    if ($obm_q->num_rows() > 0) {
-      $delete_ok = false;
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_timetask</td>
-    </tr>";
-      
-    } else {
-      $dis_link = "
-    <tr>
-      <td class=\"detailHead\">$l_cat_link_timetask_no</td>
-    </tr>";
-    }
-
-  }
-
-  $block .= "<table class=\"detail\">
-   $dis_link
-   </table>";
-
-  $dis_back = "<form name=\"form_back\" method=\"get\"
-          action=\"" .url_prepare("deal_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\" />
-        </form>";
-
-  if ($delete_ok == true) {
-    $display["msg"] .= display_ok_msg($l_cat_can_delete);
-    $dis_del = "<form name=\"form_cat_delete\".
-          method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"cat_delete\" />
-        <input type=\"hidden\" name=\"sel_cat\" value=\"$id\" />
-        <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_delete\" />
-        </form>";
-
-    $block .= "
-      <div class=\"detailButton\">
-        <p class=\"detailButtons\">$dis_del</p>
-        <p class=\"detailButtons\">$dis_back</p>
-      </div>";
-  } else {
-    $display["msg"] .= display_warn_msg($l_cat_cant_delete);
     $block .= "
       <div class=\"detailButton\">
         <p class=\"detailButtons\">$dis_back</p>
@@ -2380,4 +2164,4 @@ function html_select_deal($deal_q, $title, $url="") {
 }
  
 
-</SCRIPT>
+</script>

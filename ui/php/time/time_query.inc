@@ -54,6 +54,7 @@ function run_query_search($time) {
   return $obm_db;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Task grouped by month and summed by task project                          //
 // Parameters:
@@ -109,6 +110,7 @@ function run_query_stat_project($time) {
   $obm_db->query($query);
   return $obm_db;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Task grouped by month and summed by tasktype                              //
@@ -215,9 +217,8 @@ function run_query_valid_search($time) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// get all for task with $id id                                         //
+// get all for task with $id id
 // Parametes:
 //   - $id : id for task
 ///////////////////////////////////////////////////////////////////////////////
@@ -478,6 +479,7 @@ function run_query_validate($who) {
  
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Task Validation by the Admin (once each month)                            //
 // Parameters:
@@ -663,8 +665,8 @@ global $cdg_sql, $cdg_param;
 // Timemanager: TaskType select query execution                              //
 // Returns : DB object result with all type of task
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_tasktype($uid = 0) {
-  global $cdg_sql;
+function run_query_used_tasktype($uid = 0) {
+  global $cdg_sql, $ctt_sales, $ctt_research, $ctt_others;
 
   if ($uid) {
     $query = "
@@ -676,17 +678,17 @@ function run_query_tasktype($uid = 0) {
         and projectuser_user_id = '$uid'
       order by tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm1_q= new DB_OBM;
     $obm1_q->query($query);
 
     $query = "
       select TaskType.*
       from TaskType
-      where tasktype_internal='2'
+      where tasktype_internal='$ctt_others'
       order by tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm2_q= new DB_OBM;
     $obm2_q->query($query);
 
@@ -698,7 +700,7 @@ function run_query_tasktype($uid = 0) {
       from TaskType
       order by tasktype_internal, tasktype_label";
 
-    display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+    display_debug_msg($query, $cdg_sql, "run_query_used_tasktype");
     $obm_q= new DB_OBM;
     $obm_q->query($query);
   }
@@ -715,7 +717,7 @@ function run_query_tasktype($uid = 0) {
 //         left join ProjectUser on (deal_id=projectuser_project_id
 //                                   and projectuser_projectedtime != 0)
 //       where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
-//         or tasktype_internal=2
+//         or tasktype_internal='$ctt_others'
 //       order by tasktype_internal, tasktype_label";
 
 ///////////////////////////////////////////////////////////////////////////////

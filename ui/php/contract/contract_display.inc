@@ -831,15 +831,18 @@ function dis_type_links($id) {
   $label = get_type_label($id);
   $obm_q = run_query_type_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_type = $obm_q->num_rows();
+  if ($nb_type > 0) {
     $display["msg"] .= display_warn_msg("$label : $l_type_cant_delete");
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_type_link_contract</td>
+      <td class=\"detailHead\">$label : $l_type_link_contract ($nb_type)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("contract_id");
       $clabel = $obm_q->f("contract_label");
       $dis_link .= "
@@ -847,6 +850,12 @@ function dis_type_links($id) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_type) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 

@@ -126,6 +126,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q) {
     $ext_target = $contact["ext_target"];
     $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
             <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
             <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
             <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
     $display["title"] = "<div class=\"title\">$ext_title</div>";
@@ -1180,13 +1181,17 @@ function dis_function_links($contact) {
   $label = get_function_label($id);
   $obm_q = run_query_function_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_func = $obm_q->num_rows();
+  if ($nb_func > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_func_link_contact</td>
+      <td class=\"detailHead\">$label : $l_func_link_contact ($nb_func)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
       $dis_link .="
@@ -1194,6 +1199,12 @@ function dis_function_links($contact) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_func) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 
@@ -1417,14 +1428,17 @@ function dis_kind_links($ref) {
 
   // Contacts Links
   $obm_q = run_query_kind_links($id);
-  if ($obm_q->num_rows() > 0) {
+  $nb_kind = $obm_q->num_rows();
+  if ($nb_kind > 0) {
     $delete_ok = false;
     $dis_link_cont = "
     <tr>
-      <td class=\"detailHead\">$name : $l_kind_link_contact</td>
+      <td class=\"detailHead\">$name : $l_kind_link_contact ($nb_kind)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
       $dis_link_cont .= "
@@ -1432,6 +1446,12 @@ function dis_kind_links($ref) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_kind) {
+      $dis_link_cont .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 

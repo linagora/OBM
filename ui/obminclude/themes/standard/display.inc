@@ -39,7 +39,7 @@ function display_page(&$display) {
 
     <!-- left panel -->
     <div class=\"leftpanel\">" .
-      $display["last"] .
+      $display["last"] . "<p />" .
       $display["todo"] . "
     </div>
     <!-- left panel end -->
@@ -281,7 +281,7 @@ function display_sections($section) {
     }
   }
   $ret .= "</div>";
-                                                                                                                                                           
+
   return $ret;
 }
 

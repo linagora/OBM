@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_display.php                                             //
 //     - Desc : Time Display File                                            //
@@ -372,7 +372,7 @@ function dis_time_list($time) {
 
   // Get elements for insertion of new task
   // TaskType
-  $obm_tasktype_q = run_query_tasktype($time["user_id"]);
+  $obm_tasktype_q = run_query_used_tasktype($time["user_id"]);
   // Project
   $obm_project_q = run_query_project($time);
   // ProjectTask
@@ -445,7 +445,7 @@ function dis_time_index($time) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_statsuser($statproj_q, $stattt_q, $time) {
   global $l_no_found, $cdg_param;
-  global $auth, $new_order, $order_dir, $new_order2;
+  global $auth, $new_order, $order_dir;
   global $l_proj_stats, $l_no_proj_stats;
   global $l_tt_stats, $l_no_tt_stats;
 
@@ -1418,9 +1418,9 @@ function dis_human_date($p_date) {
 function dis_mysql_date($p_date) {
   global $cdg_sql;
     
-  $p_year=substr($p_date,0,4);
-  $p_month=substr($p_date,4,2);
-  $p_day=substr($p_date,6,2);
+  $p_year = substr($p_date,0,4);
+  $p_month = substr($p_date,4,2);
+  $p_day = substr($p_date,6,2);
 
   return "'$p_year-$mois-$p_day'";
 

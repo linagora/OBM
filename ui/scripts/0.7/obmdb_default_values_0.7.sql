@@ -107,7 +107,7 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
 
--- Day the week start 
+-- Todo sort order
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_order','todo_priority');
 
 -- Todo top list

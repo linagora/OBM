@@ -44,7 +44,7 @@ function display_page(&$display) {
     ". $display["action"] ."
     <!-- Fin zone Action -->
     <!-- zone Last -->
-    ". $display["last"] ."
+    ". $display["last"] . "
     <!-- Fin zone Last -->
     <!-- zone Todo -->
     ". $display["todo"] . "

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French for global                                        //
 //     - File     : global.inc                                               //
@@ -37,6 +37,7 @@ $l_phone = "Tel.";
 $l_address = "Adresse";
 $l_postcode = "Code Postal";
 $l_town = "Ville";
+$l_priority = "Priorité";
 $l_datasource = "Source de données";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
@@ -166,7 +167,6 @@ $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";
 
-
 // Project headers
 $l_header_man_task = "Tâches";
 $l_header_man_member = "Participants";
@@ -184,6 +184,7 @@ $l_header_pref_update = "Réinitialiser les préférences utilisateur";
 $l_header_reset = "Préférence par défaut";
 $l_header_country = "Pays";
 $l_header_datasource = "Source de données";
+$l_header_tasktype = "Type de tâche";
 
 $l_header_day = "Jour";
 $l_header_week = "Semaine";

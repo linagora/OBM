@@ -44,7 +44,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
 require("company_query.inc");
 require("company_display.inc");
 
@@ -697,7 +696,6 @@ function get_company_action() {
     'Right'    => $company_read,
     'Condition'=> array ('None') 
                                      		 );
-					       }
 					       
 // Document add
   $actions["DEAL"]["document_add"] = array (
@@ -705,4 +703,7 @@ function get_company_action() {
     'Right'    => $company_write,
     'Condition'=> array ('None')
   );     
-</SCRIPT>
+
+}
+
+</script>

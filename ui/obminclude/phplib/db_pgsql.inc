@@ -219,7 +219,7 @@ class DB_Sql {
     printf("<b>PostgreSQL Error</b>: %s (%s)<br>\n",
       $this->Errno,
       $this->Error);
-    die("Session halted.");
+    // die("Session halted.");
   }
 
   function table_names() {

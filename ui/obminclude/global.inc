@@ -11,7 +11,7 @@
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
-$obm_version = "0.7.5";
+$obm_version = "0.8.0pre1";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
@@ -59,7 +59,7 @@ $c_task_adminvalid = 2;
 // OBM internal Constants : Do not change 
 //---------------------------------------------------------------------------//
 
-// TaskType caterogies (used by Project and time management)
+// TaskType caterogies (used by Project and time management) (field : internal)
 $ctt_sales = '0';    // Sales Activity tasks
 $ctt_research = '1'; // Internal R&D tasks
 $ctt_others = '2';   // Tasks not related to production
@@ -68,6 +68,10 @@ $ctt_others = '2';   // Tasks not related to production
 $cme_txt = "text";  // text
 $cme_ico = "icon";  // icon
 $cme_both = "both"; // both
+
+// Todo sort order options constants
+$cts_pri = "todo_priority";  // Priority
+$cts_dead = "todo_deadline"; // Deadline
 
 // Date constants
 $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
@@ -111,7 +115,7 @@ $c_no = "No";
 
 // Display size
 $popup_width = 620;
-$popup_height = 400;
+$popup_height = 480;
 $popup_contact_height = 600;
 
 // JavaScript and PHP Fields masks (regexp)

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_query.inc                                               //
 //     - Desc : list query File                                              //
@@ -25,44 +25,31 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   $contact = $list["contact"];
 
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
 
-  if ($obm_q->type == $db_type_mysql) {
-    if ($contact != '') {
-      $where .= " and contact_lastname like '$contact%'";
-    }
-    if ($email != '') {
-      $where .= " and list_email like '%$email%'";
-    }
+  $timeupdate = sql_date_format($type, "list_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "list_timecreate", "timecreate");
 
-    $query = "select distinct List.*, list_id as Id,
-      UNIX_TIMESTAMP(List.list_timecreate) as timecreate,
-      UNIX_TIMESTAMP(List.list_timeupdate) as timeupdate,
-      A.userobm_login as usercreate,
-      B.userobm_login as userupdate
-    from 
-      (List LEFT JOIN ContactList ON list_id=ContactList_listid)
-      LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
-      LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
-      LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
-    where list_name like '$name%'
-      $where";
+  if ($contact != '') {
+    $where .= " and contact_lastname like '$contact%'";
+  }
+  if ($email != '') {
+    $where .= " and list_email like '%$email%'";
   }
 
-  // Postgres doesn't support Left join until 7.1 !
-  else if ($obm_q->type == $db_type_pgsql) {
-    if ($email != '') {
-      $where .= " and list_email like '%$email%'";
-    }
-    $query = "select distinct List.*, list_id as Id,
-                List.list_timecreate as timecreate,
-                List.list_timeupdate as timeupdate
-              from List, ContactList, Contact
-              where list_name like '$name%' $where";
+  $query = "select distinct List.*, list_id as Id,
+    $timecreate,
+    $timeupdate,
+    A.userobm_login as usercreate,
+    B.userobm_login as userupdate
+  from 
+    (List LEFT JOIN ContactList ON list_id=ContactList_listid)
+    LEFT JOIN Contact ON ContactList.ContactList_contactid=Contact.contact_id
+    LEFT JOIN UserObm as A ON List.list_usercreate=A.userobm_id
+    LEFT JOIN UserObm as B ON List.list_userupdate=B.userobm_id
+  where list_name like '$name%'
+    $where";
 
-    if ($contact != "") {
-      $query .= " or (contact_lastname like '$contact%' and ContactList_contactid in (select contact_id from Contact where contact_lastname like '$contact%') and List.list_id = ContactList_listid)";
-    }
-  }
 
   // ORDER construction
 
@@ -84,19 +71,21 @@ function run_query_detail($id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select *,
-        UNIX_TIMESTAMP(List.list_timecreate) as timecreate,
-        UNIX_TIMESTAMP(List.list_timeupdate) as timeupdate,
-        c.userobm_login as usercreate,
-        u.userobm_login as userupdate
-    from List
-         LEFT JOIN UserObm as c on list_usercreate=c.userobm_id
-         LEFT JOIN UserObm as u on list_userupdate=u.userobm_id
-    where list_id = '$id'";
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select List.* from List where list_id = '$id'";
-  }
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type, "list_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "list_timecreate", "timecreate");
+
+  $query = "select *,
+      $timecreate,
+      $timeupdate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate
+  from List
+       LEFT JOIN UserObm as c on list_usercreate=c.userobm_id
+       LEFT JOIN UserObm as u on list_userupdate=u.userobm_id
+  where list_id = '$id'";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;
   $obm_q->next_record();
@@ -206,6 +195,16 @@ function run_query_contactlist_insert($list) {
   global $auth, $cdg_sql;
 
   $id = $list["id"];
+
+  // We check the list still exist (in case popup windows here for long...)
+  $query = "select list_id from List where list_id = '$id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  if ($obm_q->num_rows() != 1) {
+    return -1;
+  }
+
   $cpt = 0;
   $cpt_ins = 0;
   while ($cpt < $list["con_nb"]) {
@@ -299,8 +298,10 @@ function run_query_contacts_list($list, $entity="") {
          contact_zipcode,
          contact_town,
          contact_expresspostal,
-         contact_country,
-         contact_function,
+         contact_country_id,
+         country_name as contact_country,
+         contact_function_id,
+         function_label as contact_function,
          contact_phone,
          contact_homephone,
          contact_mobilephone,
@@ -315,8 +316,11 @@ function run_query_contacts_list($list, $entity="") {
          company_zipcode,
          company_town,
          company_expresspostal
-      from (ContactList LEFT JOIN Contact ON ContactList_contactid=contact_id)
-         LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+      from ContactList
+           LEFT JOIN Contact ON ContactList_contactid=contact_id
+           LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
+           LEFT JOIN Country ON Contact.contact_country_id = country_id
+           LEFT JOIN Function ON Contact.contact_function_id = function_id
       where ContactList_listid='$id'
          $order";
 
@@ -357,9 +361,14 @@ function get_list_nb_contact($id) {
 function get_list_name_exists($name, $id="") {
   global $cdg_sql;
 
+  if ($id != "") {
+    $where_id = "and list_id != '$id'";
+  }
+
   $query = "select list_id, list_name
     from List
-    where list_id!='$id' and list_name='$name'";
+    where list_name='$name'
+      $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -384,6 +393,10 @@ function get_list_name_exists($name, $id="") {
 function run_query_check_list($id, $name, $subject) {
   global $cdg_sql;
 
+  if ($id != "") {
+    $where_id = "and list_id != '$id'";
+  }
+
   // We search for a similar name (as same name is already excluded)
   $wname = "list_name like '%$name%'";
 
@@ -396,8 +409,8 @@ function run_query_check_list($id, $name, $subject) {
 
   $query = "select distinct list_id, list_name, list_subject
      from List
-     where list_id!='$id'
-       and ($wname or $wsubject)";
+     where $where_id
+       ($wname or $wsubject)";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -416,6 +429,12 @@ function run_query_check_list($id, $name, $subject) {
 function run_query_update_num_rows($id, $nb) {
   global $cdg_sql;
 
+  if ($id == "") {
+    return 0;
+  }
+  if ($nb == "") {
+    $nb = "0";
+  }
   $query = "update List set list_query_nb='$nb' where list_id='$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -533,14 +552,18 @@ function get_list_name($id) {
 // Parameters:
 //   - $query : query to run
 ///////////////////////////////////////////////////////////////////////////////
-function get_query_num_rows($query) {
+function get_query_num_rows($query="") {
   global $cdg_sql;
 
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $ret = $obm_q->num_rows();
-  
+  if (trim($query) != "") {
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $ret = $obm_q->num_rows();
+  } else {
+    $ret = 0;
+  }  
+
   return $ret;
 }
 
@@ -562,37 +585,43 @@ function run_query_contacts_for_letter($list_ids) {
   $connect_db = new DB_OBM;
   if($list_ids != "") {
     $query = "select DISTINCT contact_id as list_contact_id,
-                 contact_timeupdate as list_contact_timeupdate,
-                 contact_timecreate as list_contact_timecreate,
-                 contact_userupdate as list_contact_userupdate,
-                 contact_usercreate as list_contact_usercreate,
-                 contact_company_id as list_contact_company_id,
-                 contact_lastname as list_contact_lastname,
-                 contact_firstname as list_contact_firstname,
-                 contact_address1 as list_contact_address1,
-                 contact_address2 as list_contact_address2,
-                 contact_zipcode as list_contact_zipcode,
-                 contact_town as list_contact_town,
-                 contact_expresspostal as list_contact_expresspostal,
-                 contact_country as list_contact_country,
-                 contact_function as list_contact_function,
-                 contact_phone as list_contact_phone,
-                 contact_homephone as list_contact_homephone,
-                 contact_mobilephone as list_contact_mobilephone,
-                 contact_fax as list_contact_fax,
-                 contact_email as list_contact_email,
-                 contact_comment as list_contact_comment,
-                 contact_visibility as list_contact_visibility,
-                 company_name as contact_company_name,
-                 company_address1 as contact_company_address1,
-                 company_address2 as contact_company_address2,
-                 company_zipcode as contact_company_zipcode,
-                 company_town as contact_company_town,
-                 company_expresspostal as contact_company_expresspostal,
-                 company_country as contact_company_country,
-                 kind_label as list_contact_kind
-              from Contact, Company, ContactList, Kind
-              where contactlist_listid in (";
+        contact_timeupdate as list_contact_timeupdate,
+        contact_timecreate as list_contact_timecreate,
+        contact_userupdate as list_contact_userupdate,
+        contact_usercreate as list_contact_usercreate,
+        contact_company_id as list_contact_company_id,
+        contact_lastname as list_contact_lastname,
+        contact_firstname as list_contact_firstname,
+        contact_address1 as list_contact_address1,
+        contact_address2 as list_contact_address2,
+        contact_zipcode as list_contact_zipcode,
+        contact_town as list_contact_town,
+        contact_expresspostal as list_contact_expresspostal,
+        c1.country_name as list_contact_country,
+        function_label as list_contact_function,
+        contact_phone as list_contact_phone,
+        contact_homephone as list_contact_homephone,
+        contact_mobilephone as list_contact_mobilephone,
+        contact_fax as list_contact_fax,
+        contact_email as list_contact_email,
+        contact_comment as list_contact_comment,
+        contact_visibility as list_contact_visibility,
+        company_name as contact_company_name,
+        company_address1 as contact_company_address1,
+        company_address2 as contact_company_address2,
+        company_zipcode as contact_company_zipcode,
+        company_town as contact_company_town,
+        company_expresspostal as contact_company_expresspostal,
+        c2.country_name as contact_company_country,
+        kind_minilabel as list_contact_kind
+      from Contact
+             left join Company on contact_company_id=company_id
+             left join Kind on contact_kind_id=kind_id
+             left join Function on contact_function_id=function_id
+             left join Country as c1 on contact_country_id=c1.country_id
+             left join Country as c2 on company_country_id=c2.country_id,
+           ContactList
+      where contactlist_listid in (";
     $query .= $list_ids;
     $query .= ") and contactlist_contactid = contact_id and company_id = contact_company_id and contact_kind_id = kind_id";
     $query .= " order by ";

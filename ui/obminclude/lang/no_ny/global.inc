@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Norwegian                                                //
 //     - File     : global.inc                                               //
@@ -26,6 +26,7 @@ $l_name = "Namn";
 $l_label = "Namn";
 $l_phone = "Telefon";
 $l_invalid_data = "Ugyldig data";
+$l_priority = "Priority";
 $l_datasource = "Data source";
 
 // OBM_DISPLAY

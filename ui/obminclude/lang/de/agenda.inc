@@ -7,11 +7,9 @@
 // $Id$ //
 //////////////////////////////////////////////////////////////////////////////
 
-
 $l_users = "Users";
 $l_groups = "Groups";
 $l_title = "Title";
-$l_priority = "Priority";
 $l_private = "Private;";
 $l_public  = "Public";
 $l_category = "Category";

@@ -97,6 +97,42 @@ function run_query_country() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// TaskType list query
+// Parameters :
+//   - $tt_cat : tasktype category
+//               "all" or ""  return all tasktype
+//               "project" "  return tasktype from $ctt_sales and $ctt_research
+//               one category return the category
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype($tt_cat="") {
+  global $cdg_sql, $ctt_sales, $ctt_research;
+
+  $query = "
+    select
+      tasktype_id,
+      tasktype_label, 
+      tasktype_internal
+    from TaskType ";
+
+  if (($tt_cat == "") || ($tt_cat == "all")) {
+    $query .= "";
+  } elseif ($tt_cat == "project") {
+    $query .= "where (tasktype_internal = '$ctt_sales'
+                      or tasktype_internal = '$ctt_research')";
+  } else {
+    $query .= "where tasktype_internal = '$tt_cat'";
+  }
+
+  $query .= " order by tasktype_internal, tasktype_label";
+
+  display_debug_msg($query, $cdg_sql, "run_query_tasktype");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : number of projects linked to an entity
 // Parameters:
 //   - $id     : Id of entity
@@ -869,7 +905,7 @@ function run_query_global_user_name($id) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the contract label from the contract Id
+// Get the Todo label from the contract Id
 // Parameters:
 //   - $id : user id 
 ///////////////////////////////////////////////////////////////////////////////
@@ -883,6 +919,7 @@ function run_query_global_todo_title($id) {
   $obm_db->next_record();
   return $obm_db->f("todo_title");
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Group name from the group Id

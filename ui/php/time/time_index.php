@@ -326,7 +326,7 @@ elseif ($action == "detailupdate") {
   if ( $popup == 1 ) {
     // Get elements for insertion of new task
     // TaskType
-    $obm_tasktype_q = run_query_tasktype($time["user_id"]);
+    $obm_tasktype_q = run_query_used_tasktype($time["user_id"]);
     // Project
     $obm_project_q = run_query_project($time);
     // ProjectTask
@@ -404,7 +404,6 @@ function get_param_time() {
   // Forms parameters
   global $sel_date, $sel_tasktype, $sel_time, $tf_label, $task_id;
   global $sel_project, $sel_projecttask, $wbegin, $user_id;
-
   global $tf_lweek, $f_time, $sel_user_id, $cb_day, $rd_day, $cb_allusers;
   //global $st_detail;
 

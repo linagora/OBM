@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italian for global                                       //
 //     - File     : global.inc                                               //
@@ -36,6 +36,7 @@ $l_phone = "Telefono";
 $l_address = "Indirizzo";
 $l_postcode = "CAP";
 $l_town = "Citta";
+$l_priority = "Priorita";
 $l_datasource = "Data source";
 
 // OBM_DISPLAY
@@ -166,8 +167,6 @@ $l_header_export = "Esporta";
 $l_header_global_export = "Esporta";
 
 
-$l_header_reset = "Word to define";
-
 // Admin headers
 $l_header_index = "Index";
 $l_header_help 	= "Ayuto";
@@ -175,6 +174,10 @@ $l_header_amp = "Word to define";
 $l_header_func_unused = "Functions";
 $l_header_clear_sess = "Word to define";
 $l_header_pref_update = "Ripristini le preferenze degli utenti";
+$l_header_reset = "Word to define";
+$l_header_country = "Country";
+$l_header_datasource = "Data Source";
+$l_header_tasktype = "Task Type";
 
 $l_header_day = "Giorno";
 $l_header_week = "Settimana";

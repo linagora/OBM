@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : deal_query.inc                                               //
 //     - Desc : Deal query File                                              //
@@ -485,24 +485,6 @@ function run_query_dealtype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Deal TaskType list                                      //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal_tasktype($filter = "") {
-  global $cdg_sql;
-
-  if ($filter != "all")
-    $where = "where tasktype_internal ='0'";
-
-  $query = "select * from TaskType $where order by tasktype_internal, tasktype_label";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query execution : Deal Status list                                        //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_dealstatus() {
@@ -902,101 +884,6 @@ function run_query_status_links($s_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : Category insert                                         //
-// Parameters:
-//   - $deal[] : deal hash info : keys used : cat_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_insert($deal) {
-  global $auth, $cdg_sql;
-	
-  $label = $deal["cat_label"];
-  $intern = $deal["cat_internal"];
-
-  $query = "insert into TaskType (tasktype_timeupdate,
-    tasktype_timecreate,
-    tasktype_usercreate,
-    tasktype_internal,
-    tasktype_label)
-  values (null,
-    '".date("Y-m-d H:i:s")."',
-    ".$auth->auth["uid"].",
-    '$intern',
-    '$label')";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Category update                                         //
-// Parameters:
-//   - $deal[] : deal hash info : keys used : cat, cat_label
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_update($deal) {
-  global $auth, $cdg_sql;
-
-  $cat = $deal["cat"];
-  $label = $deal["cat_label"];
-
-  $query = "update TaskType set tasktype_label='$label',
-      tasktype_timeupdate='".date("Y-m-d H:i:s")."',
-      tasktype_userupdate='".$auth->auth["uid"]."'
-    where tasktype_id='$cat'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Category deletion                                       //
-// Parameters:
-//   - $id : Category id to delete
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_delete($id) {
-  global $cdg_sql;
-
-  $query = "delete from TaskType where tasktype_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $cat_q = new DB_OBM;
-  $retour = $cat_q->query($query);
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution : Links to the Category given                             //
-// Parameters:
-//   - $c_id : category id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_links($c_id, $intern) {
-  global $cdg_sql;
-
-  if ($intern == 0)
-    $query = "select deal_id, deal_label from Deal where deal_tasktype_id='$c_id'";
-  else if ($intern == 1)
-    $query = "select deal_id, deal_label from Deal where deal_tasktype_id='$c_id'";
-  else
-    $query = "select timetask_id from TimeTask where timetask_tasktype_id='$c_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $cat_q = new DB_OBM;
-  $cat_q->query($query);
-
-  return $cat_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Deal Form Data checking and formatting
 // Parameters:
 //   - $did    : deal id : (empty on insertion)
@@ -1377,28 +1264,6 @@ function get_status_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category                                               //
-// Parameters:
-//   - $id : category id
-///////////////////////////////////////////////////////////////////////////////
-function get_cat_infos($id) {
-  global $cdg_sql;
-
-  $query="select tasktype_label, tasktype_internal from TaskType where tasktype_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  $obm_q->next_record();
-  
-  $retour["label"] = $obm_q->f("tasktype_label");
-  $retour["intern"] = $obm_q->f("tasktype_internal");
-
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Return the label of the specified ParentDeal
 // Parameters:
 //   - $p_id : parent deal id
@@ -1675,4 +1540,4 @@ function run_query_deal($comp_id = "0") {
 }
 
 
-</SCRIPT>
+</script>

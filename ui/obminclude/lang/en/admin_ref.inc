@@ -35,7 +35,6 @@ $l_j_dsrc_delete = "You have to select a data source to check or delete it !";
 $l_j_dsrc_update = "You have to select a data source and enter a new name to update it !";
 $l_j_dsrc_create = "You have to enter a new data source name to create it !";
 
-
 // Country
 $l_ctry_manage = "Countries management";
 $l_ctry_exist = "Existing Countries";
@@ -66,3 +65,37 @@ $l_j_ctry_create = "You have to enter a new country name to create it !";
 
 $l_iso_3166 = "Iso Code 3166";
 $l_lang = "Lang";
+
+// Task Type
+$l_tt_manage = "Countries management";
+$l_tt_exist = "Existing Countries";
+$l_tt_new = "New Task Type";
+$l_tt_no = "No Task Type defined";
+$l_tt_update = "Update Task Type";
+$l_tt_checkdelete = "Check or Delete Task Type";
+$l_tt_delete = "Delete Task Type";
+$l_tt_insert = "Insert Task Type";
+
+$l_tt_delete_ok = "The Task Type has been deleted successfully.";
+$l_tt_delete_error = "The deletion of the Task Type has failed !";
+$l_tt_insert_ok = "The Task Type has been inserted successfully.";
+$l_tt_insert_error = "The insertion of the Task Type has failed !";
+$l_tt_update_ok = "The Task Type has been updated successfully";
+$l_tt_update_error = "The update of the Task Type has failed !";
+
+$l_tt_link_deal = "These deals reference this Task Type";
+$l_tt_link_deal_no = "No deal referenced by this Task Type";
+$l_tt_link_project = "These projects reference this Task Type";
+$l_tt_link_project_no = "No project referenced by this Task Type";
+$l_tt_link_time = "The Task Type is used in time management";
+$l_tt_link_time_no = "The Task Type is not used in time management";
+$l_tt_cant_delete = "The Task Type can't be deleted !";
+$l_tt_can_delete = "The Task Type can be deleted.";
+
+$l_j_tt_delete = "You have to select a task type to check or delete it !";
+$l_j_tt_update = "You have to select a task type and enter a new name to update it !";
+$l_j_tt_create = "You have to enter a new task type name to create it !";
+
+$l_tt_sales = "Client Task";
+$l_tt_research = "Internal Project";
+$l_tt_others = "Other task";

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English for global                                       //
 //     - File     : global.inc                                               //
@@ -37,6 +37,7 @@ $l_phone = "Phone";
 $l_address = "Address";
 $l_postcode = "Zip Code";
 $l_town = "Town";
+$l_priority = "Priority";
 $l_datasource = "Data source";
 
 // OBM_DISPLAY
@@ -184,6 +185,7 @@ $l_header_pref_update = "Reset users preferences";
 $l_header_reset = "Défault Préferences";
 $l_header_country = "Country";
 $l_header_datasource = "Data Source";
+$l_header_tasktype = "Task Type";
 
 $l_header_year = "Year";
 $l_header_day = "Day";

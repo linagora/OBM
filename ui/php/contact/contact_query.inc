@@ -589,7 +589,6 @@ function check_contact_context($cid, $contact) {
   $comp_id = $contact["company_id"];
   $comp = ($comp_new_id != "") ? $comp_new_id : $comp_id;
 
-  echo "comp=$comp, fi=$comp_id, ne=$comp_new_id";
   // return contacts with same lastname and firstname or
   // within the same company with same lname
   $co_q = run_query_check_contact($cid, $comp, $lname, $fname);

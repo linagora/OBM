@@ -11,7 +11,6 @@ $l_agenda = "Calendario";
 $l_users = "Contatti";
 $l_groups = "Gruppi";
 $l_title = "Titolo";
-$l_priority = "Priorita";
 $l_private = "Privato";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_public  = "Pubblico";

@@ -506,7 +506,7 @@ function dis_datasource_links($ref) {
 
   if ($delete_ok == true) {
     $display["msg"] .= display_ok_msg($l_dsrc_can_delete);
-    $dis_del = "<form name=\"form_act_delete\".
+    $dis_del = "<form name=\"form_dsrc_delete\".
           method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"datasource_delete\" />
         <input type=\"hidden\" name=\"sel_dsrc\" value=\"$id\" />
@@ -527,5 +527,300 @@ function dis_datasource_links($ref) {
 
   return $block;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Task Type index screen
+///////////////////////////////////////////////////////////////////////////////
+function dis_tasktype_index() {
+
+  $tt_q = run_query_tasktype();
+  $block = html_tasktype_form($tt_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Task Type section
+// Parameters:
+//   - $tt_q : Task Type list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_tasktype_form($tt_q) {
+  global $l_tt_manage, $l_tt_exist, $l_tt_no;
+  global $l_tt_checkdelete, $l_tt_update, $l_tt_new, $l_tt_insert;
+  global $l_tt_sales, $l_tt_research, $l_tt_others;
+
+  $tt_list = array($l_tt_sales, $l_tt_research, $l_tt_others);
+
+  if ($tt_q->num_rows() > 0) {
+    $sel_tt = "<select name=\"sel_tt\" onChange=\"
+      forms.form_tt_update.tf_label.value=this.options[this.selectedIndex].text;\" size=\"8\">";
+    while ($tt_q->next_record()) {
+      $id = $tt_q->f("tasktype_id");
+      $label = $tt_q->f("tasktype_label");
+      $int = $tt_q->f("tasktype_internal");
+      //put menu titles
+      if ($int != $cur_type) {
+	$sel_tt .= "<option disabled=\"disabled\">".$tt_list[$int]."</option>";
+	$cur_type = $int;
+      }
+      $sel_tt .= "\n<option value=\"$id\">&nbsp;&nbsp;$label</option>";
+    }
+    $sel_tt .= "</select>";
+
+    $dis_update_delete = "
+<!-- Task Type Check Delete Section -->
+
+    <table>
+    <tr>
+      <td colspan=\"3\">
+      <form name=\"form_tt_delete\" method=\"post\"
+        action=\"" . url_prepare("admin_ref_index.php") . "\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_tt_exist</td>
+        <td class=\"adminLabel\">$sel_tt</td>
+        <td>
+          <input type=\"hidden\" name=\"action\" value=\"tasktype_checklink\" />
+          <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_checkdelete\"
+            onclick=\"if (check_tt_checkdel(this.form.sel_tt)) return true;
+            else return false;\" />
+        </td>
+      </tr>
+      </table>
+      </form>
+      </td>
+    </tr>
+
+<!-- Task Type Update Section -->
+
+    <tr>
+      <td colspan=\"2\" class=\"adminLabel\">
+        <form name=\"form_tt_update\" method=\"get\"
+          action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"sel_tt\" value=\"\" />
+        <input type=\"hidden\" name=\"action\" value=\"tasktype_update\" />
+        <input type=\"text\" name=\"tf_label\" />
+        <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_update\"
+          onclick=\"if (check_tt_upd(this.form,document.form_tt_delete.sel_tt)) return true; else return false;\" />
+        </form>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+    </table>";
+    
+  } else {
+    $dis_update_delete = $l_tt_no;
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_tt_manage
+      </td>
+    </tr><tr>
+      <td>
+      $dis_update_delete
+
+      </td>
+      <td>
+
+<!-- New Task Type Section -->
+
+        <form name=\"form_tt_new\" method=\"get\"
+          action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_tt_new :
+            <input name=\"tf_label\" /></td>
+        </tr>
+        <tr>
+          <td colspan=\"2\">
+            <input type=\"radio\" name=\"rd_tt_internal\" value=\"0\" checked=\"checked\" />$l_tt_sales<br />
+            <input type=\"radio\" name=\"rd_tt_internal\" value=\"1\" />$l_tt_research<br />
+            <input type=\"radio\" name=\"rd_tt_internal\" value=\"2\" />$l_tt_others
+          </td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"tasktype_insert\" />
+            <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_insert\"
+              onclick=\"if (check_tt_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Task Type links
+// Parameters:
+//   - $ref : tasktype hash info : keys used : id, name
+///////////////////////////////////////////////////////////////////////////////
+function dis_tasktype_links($ref) {
+  global $path, $display, $l_back, $l_tt_link_deal, $l_tt_link_deal_no;
+  global $l_tt_link_project, $l_tt_link_project_no, $l_tt_link_time, $l_tt_link_time_no;
+  global $l_tt_delete, $l_tt_can_delete, $l_tt_cant_delete;
+
+  $delete_ok = true;
+  $id = $ref["tasktype"];
+  $label = get_tasktype_label($id);
+
+  // Deal Links
+  $obm_q = run_query_tasktype_deal_links($ref);
+  $nb_deal = $obm_q->num_rows();
+  if ($nb_deal > 0) {
+    $delete_ok = false;
+    $dis_link_deal = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_deal ($nb_deal)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $did = $obm_q->f("deal_id");
+      $dlabel = $obm_q->f("deal_label");
+      $dis_link_deal .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_deal) {
+      $dis_link_deal .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_deal = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_deal_no</td>
+    </tr>";
+  }
+
+  // Projects Links
+  $obm_q = run_query_tasktype_project_links($ref);
+  $nb_proj = $obm_q->num_rows();
+  if ($nb_proj > 0) {
+    $delete_ok = false;
+    $dis_link_proj = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_project ($nb_proj)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $pid = $obm_q->f("project_id");
+      $pname = $obm_q->f("project_name");
+      $dis_link_proj .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$pid") . "\">$pname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_proj) {
+      $dis_link_proj .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_proj = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_project_no</td>
+    </tr>";
+  }
+
+  // Time Task Links
+  $obm_q = run_query_tasktype_timetask_links($ref);
+  $nb_time = $obm_q->num_rows();
+  if ($nb_time > 0) {
+    $delete_ok = false;
+    $dis_link_time = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_time ($nb_time)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $tid = $obm_q->f("timetask_user_id");
+      $tname = $obm_q->f("lastname") . " " . $obm_q->f("firstname");
+      $tdate = date_format($obm_q->f("date"), 1);
+      $dis_link_time .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("$path/time/time_index.php?action=index&amp;sel_user_id=$tid&amp;wbegin=$tdate") . "\">$tname ($tdate)</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_time) {
+      $dis_link_time .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_time = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_tt_link_time_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link_deal
+    $dis_link_proj
+    $dis_link_time
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"tasktype\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_tt_can_delete);
+    $dis_del = "<form name=\"form_act_delete\".
+          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"tasktype_delete\" />
+        <input type=\"hidden\" name=\"sel_tt\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_tt\" value=\"$l_tt_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_tt_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  return $block;
+}
+
+
 
 

@@ -311,3 +311,184 @@ function get_datasource_name($id) {
   $retour = $obm_q->f("datasource_name");
   return $retour;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type insertion query construction and execution
+// Parameters:
+//   - $tt : task type hash info : keys used : label, internal
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_insert($tt) {
+  global $auth, $cdg_sql;
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
+  $label = $tt["label"];
+  $int = $tt["internal"];
+
+  $query = "insert into TaskType (
+      tasktype_timecreate,
+      tasktype_usercreate,
+      tasktype_label,
+      tasktype_internal)
+    values (
+      '$timecreate',
+      '$usercreate',
+      '$label',
+      '$int')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type update query execution
+// Parameters:
+//   - $tt : task type hash info : keys used : tasktype, label, int
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_update($tt) {
+  global $auth, $cdg_sql;
+
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
+  $id = $tt["tasktype"];
+  $label = $tt["label"];
+  $int = $tt["internal"];
+
+  $query = "update TaskType set
+      tasktype_label='$label',
+      tasktype_timeupdate='$timeupdate',
+      tasktype_userupdate='$userupdate'
+    where
+      tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type deletion query execution
+// Parameters:
+//   - $tt : task type hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_delete($tt) {
+  global $cdg_sql;
+
+  $id = $tt["tasktype"];
+
+  $query = "delete from TaskType where tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type - Deal links query execution
+// Parameters:
+//   - $tt : task type hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_deal_links($tt) {
+  global $cdg_sql;
+
+  $id = $tt["tasktype"];
+
+  $query = "select deal_id,
+      deal_label,
+      deal_tasktype_id
+    from Deal
+    where deal_tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type - Project links query execution
+// Parameters:
+//   - $tt : task type hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_project_links($tt) {
+  global $cdg_sql;
+
+  $id = $tt["tasktype"];
+
+  $query = "select project_id,
+      project_name,
+      project_tasktype_id
+    from Project where project_tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Task Type - TimeTask links query execution
+// Parameters:
+//   - $tt : task type hash info : keys used : id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasktype_timetask_links($tt) {
+  global $cdg_sql;
+
+  $id = $tt["tasktype"];
+
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+  $timedate = sql_date_format($type, "timetask_date", "date");
+
+  $query = "select timetask_id,
+      timetask_user_id,
+      $timedate,
+      userobm_lastname as lastname,
+      userobm_firstname as firstname,
+      timetask_tasktype_id
+    from TimeTask
+         left join UserObm on timetask_user_id=userobm_id
+    where timetask_tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the label of a Task Type from its id
+// Parameters:
+//   - $id : id
+///////////////////////////////////////////////////////////////////////////////
+function get_tasktype_label($id) {
+  global $cdg_sql;
+
+  $query = "select tasktype_label
+    from TaskType
+    where tasktype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("tasktype_label");
+  return $retour;
+}

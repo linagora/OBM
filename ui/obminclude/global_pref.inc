@@ -87,12 +87,38 @@ if (file_exists("$path/../".$lang_file)) {
   include("$lang_file");
 }
 
-if ($menu != "") {
-  $lang_file = "$obminclude/lang/$set_lang/".strtolower($menu).".inc";
+// Specific site global lang file
+if ($gp_site_include) {
+  $lang_file = "$obminclude/site/lang/$set_lang/global.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
-  } else {//if (file_exists("$path/../$obminclude/lang/$set_lang_default/".strtolower($menu).".inc")) {
-    include("$obminclude/lang/$set_lang_default/".strtolower($menu).".inc");
+  }
+}
+
+// Module lang file
+if ($menu != "") {
+  $lc_menu = strtolower($menu);
+  $lang_file = "$obminclude/lang/$set_lang/$lc_menu.inc";
+  if (file_exists("$path/../".$lang_file)) {
+    include("$lang_file");
+  } else {
+    $lang_file = "$obminclude/lang/$set_lang_default/$lc_menu.inc";
+    if (file_exists("$path/../".$lang_file)) {
+      include("$lang_file");
+    }
+  }
+
+  // Specific site module lang file
+  if ($gp_site_include) {
+    $lang_file = "$obminclude/site/lang/$set_lang/$lc_menu.inc";
+    if (file_exists("$path/../".$lang_file)) {
+      include("$lang_file");
+    } else {
+      $lang_file = "$obminclude/site/lang/$set_lang_default/$lc_menu.inc";
+      if (file_exists("$path/../".$lang_file)) {
+	include("$lang_file");
+      }
+    }
   }
 }
 

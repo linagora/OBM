@@ -1291,13 +1291,17 @@ function dis_kind_links($company) {
   $label = get_kind_label($id);
   $obm_q = run_query_kind_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_kind = $obm_q->num_rows();
+  if ($nb_kind > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_kind_link_company</td>
+      <td class=\"detailHead\">$label : $l_kind_link_company ($nb_kind)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .="
@@ -1305,6 +1309,12 @@ function dis_kind_links($company) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_kind) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 
@@ -1365,13 +1375,17 @@ function dis_cat_links($company) {
   $label = get_cat_label($id);
   $obm_q = run_query_cat_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_cat = $obm_q->num_rows();
+  if ($nb_cat > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_company</td>
+      <td class=\"detailHead\">$label : $l_cat_link_company ($nb_cat)</td>
     </tr>";
-    while ($obm_q->next_record()) {
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .="
@@ -1379,6 +1393,12 @@ function dis_cat_links($company) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_cat) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 
@@ -1533,14 +1553,17 @@ function dis_activity_links($company) {
   $label = get_activity_label($id);
   $obm_q = run_query_activity_links($id);
 
-  if ($obm_q->num_rows() > 0) {
+  $nb_act = $obm_q->num_rows();
+  if ($nb_act > 0) {
     $delete_ok = false;
     $dis_link = "
     <tr>
-      <td class=\"detailHead\">$label : $l_act_link_company</td>
+      <td class=\"detailHead\">$label : $l_act_link_company ($nb_act)</td>
     </tr>";
 
-    while ($obm_q->next_record()) {
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
       $dis_link .= "
@@ -1548,6 +1571,12 @@ function dis_activity_links($company) {
       <td class=\"detailLabel\">
         <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
       </td>
+    </tr>";
+    }
+    if ($cpt < $nb_act) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
     </tr>";
     }
 

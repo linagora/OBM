@@ -4,7 +4,7 @@
 //     - Desc : Company Index File                                           //
 // 2003-09-15 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id:
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // Actions              -- Parameter
 // - index (default)    -- search fields  -- show the company search form
@@ -25,7 +25,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
-
 require("todo_query.inc");
 require("todo_display.inc");
 
@@ -44,10 +43,8 @@ $perm->check();
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $user_q = run_query_userobm();
-  $todo_q = run_query_todolist($todo, "", "");
-
+  $todo_q = run_query_todolist($todo, $new_order, $order_dir);
   $display["result"] = dis_todo_form($todo, $user_q);
-
   if ($todo_q->nf() != 0)
     $display["result"] .= dis_todo_list($todo, $todo_q);
   else
@@ -56,10 +53,7 @@ if ($action == "index" || $action == "") {
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $todo_q = run_query_detail($todo);
-
-  $display["detailInfo"] = display_record_info($todo_q->f("usercreate"),$todo_q->f("userupdate"),
-					       $todo_q->f("timecreate"),$todo_q->f("timeupdate"));
-
+  $display["detailInfo"] = display_record_info($todo_q);
   $display["result"] .= dis_todo_detail($todo, $todo_q);
 
 } else if ($action == "add") {
@@ -93,7 +87,6 @@ if ($action == "index" || $action == "") {
   $retour = run_query_delete_unique($param_todo);
   $user_q = run_query_userobm();
   $todo_q = run_query_todolist($todo, "", "");
-
   $display["result"] = dis_todo_form($todo, $user_q);
 
   if ($retour)
@@ -127,17 +120,13 @@ if ($action == "index" || $action == "") {
 
   } else if ($uid == $todo["sel_user"]) {
     $todo_q = run_query_detail($todo);
-
-    $display["detailInfo"] = display_record_info($todo_q->f("usercreate"),$todo_q->f("userupdate"),
-						 $todo_q->f("timecreate"),$todo_q->f("timeupdate"));
-    
+    $display["detailInfo"] = display_record_info($todo_q);
     $display["result"] .= dis_todo_detail($todo, $todo_q);
 
   } else {
     $action = "index";
     $user_q = run_query_userobm();
     $todo_q = run_query_todolist($todo, "", "");
-    
     $display["result"] = dis_todo_form($todo, $user_q);
 
     if ($todo_q->nf() != 0)
@@ -145,17 +134,6 @@ if ($action == "index" || $action == "") {
     else
       $display["msg"] .= display_info_msg($l_no_found);
   }
-
-}  elseif ($action == "admin") {
-/////////////////////////////////////////////////////////////////////////
-  $display["detail"] .= dis_admin_todo();
-
-}  elseif ($action == "adminupdate") {
-/////////////////////////////////////////////////////////////////////////
-  $retour = run_query_admin_update($todo);
-  run_query_set_user_todo($uid);
-
-  $display["detail"] .= dis_admin_todo();
 
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
@@ -212,7 +190,6 @@ display_page($display);
 function get_param_todo() {
   global $uid, $param_todo, $action, $popup;
   global $tf_title, $sel_user, $sel_priority, $tf_deadline, $ta_content;
-  global $sel_order;
   global $cdg_param;
 
   if (isset ($uid)) $todo["uid"] = $uid;
@@ -226,9 +203,6 @@ function get_param_todo() {
   if (isset ($sel_user)) $todo["sel_user"] = $sel_user;
   if (isset ($sel_priority)) $todo["priority"] = $sel_priority;
   if (isset ($ta_content)) $todo["content"] = $ta_content;
-
-  // Admin form
-  if (isset ($sel_order)) $todo["sel_order"] = $sel_order;
 
   return $todo;
 }
@@ -295,20 +269,6 @@ function get_todo_action() {
     'Condition'=> array ('detailconsult') 
 
                                      );
-// Admin
-  $actions["TODO"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/todo/todo_index.php?action=admin",
-    'Right'    => $todo_admin_read,
-    'Condition'=> array ('all') 
-                                       );
-
-// Admin
-  $actions["TODO"]["adminupdate"] = array (
-    'Url'      => "$path/todo/todo_index.php?action=adminupdate",
-    'Right'    => $todo_admin_read,
-    'Condition'=> array ('None') 
-                                       );
 
 // Display
    $actions["TODO"]["display"] = array (
@@ -333,4 +293,5 @@ function get_todo_action() {
                                      		 );
 
 }
+
 </script>
