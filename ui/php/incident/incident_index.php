@@ -193,6 +193,45 @@ if ($action == "index" || $action == "") {
   require("incident_js.inc");
   dis_admin_index();
 
+} elseif ($action == "status_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_status_insert($incident);
+  if ($retour) {
+    display_ok_msg($l_sta_insert_ok);
+  } else {
+    display_err_msg($l_sta_insert_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "status_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_status_update($incident);
+  if ($retour) {
+    display_ok_msg($l_sta_update_ok);
+  } else {
+    display_err_msg($l_sta_update_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "status_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_status_links($incident["status"]);
+  require("incident_js.inc");
+  dis_admin_index();
+
+} elseif ($action == "status_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_status_delete($incident["status"]);
+  if ($retour) {
+    display_ok_msg($l_sta_delete_ok);
+  } else {
+    display_err_msg($l_sta_delete_error);
+  }
+  require("incident_js.inc");
+  dis_admin_index();
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "incident", 1);
@@ -223,11 +262,11 @@ display_end();
 // returns : $incident hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_incident() {
-  global $tf_lcontract, $tf_lincident, $sel_status, $sel_priority;
+  global $tf_lcontract, $tf_lincident, $sel_stiatus, $sel_priority;
   global $sel_hour, $sel_dur, $sel_logger, $sel_owner, $cb_archive;
   global $tf_date, $ta_desc, $ta_solu,$param_contract,$param_incident;
   global $tf_dateafter,$tf_datebefore, $contract_new_id;
-  global $tf_pri, $tf_order;
+  global $tf_pri, $tf_order, $tf_status;
   global $set_debug, $cdg_param;
 
   if (isset ($tf_dateafter)) $incident["date_after"] = $tf_dateafter;
@@ -252,6 +291,11 @@ function get_param_incident() {
   // $sel_priority -> "priority" is already set
   if (isset ($tf_pri)) $incident["pri_label"] = $tf_pri;
   $incident["pri_order"] = (isset($tf_order) ? $tf_order : "0");
+
+  // Admin - Status fields
+  // $sel_status -> "status" is already set
+  if (isset ($tf_status)) $incident["sta_label"] = $tf_status;
+  $incident["sta_order"] = (isset($tf_order) ? $tf_order : "0");
 
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
     if ( $incident ) {

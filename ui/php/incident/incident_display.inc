@@ -559,8 +559,7 @@ function dis_admin_index() {
 
   $pri_q = run_query_priority();
   $sta_q = run_query_status();
-  html_incident_priority_form($pri_q);
-  //  html_incident_status_form($sta_q);
+  echo html_priority_form($pri_q) . "<hr />" . html_status_form($sta_q);
 }
 
 
@@ -569,7 +568,7 @@ function dis_admin_index() {
 // Parameters:
 //   - $pri_q : Priority list database object
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_priority_form($pri_q) {
+function html_priority_form($pri_q) {
   global $l_pri_manage,$l_pri_exist, $l_label, $l_order;
   global $l_pri_checkdelete, $l_pri_update, $l_pri_new, $l_pri_insert;
 
@@ -585,7 +584,7 @@ function html_incident_priority_form($pri_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "
+  $r = "
     <table class=\"admin\">
     <tr>
       <td colspan=\"5\" class=\"adminHead\">
@@ -607,7 +606,7 @@ function html_incident_priority_form($pri_q) {
               <td class=\"adminLabel\">$sel_pri</td>
               <td>
               <input type=\"hidden\" name=\"action\" value=\"priority_checklink\" />
-              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_pri_checkdel(this.form)) return true; else return false;\" />
+              <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_checkdelete\" onclick=\"if (check_priority_checkdel(this.form)) return true; else return false;\" />
               </td>
             </tr>
             </table>
@@ -618,7 +617,7 @@ function html_incident_priority_form($pri_q) {
 <!-- Priority Update Section -->
 
         <tr>
-          <td colspan=\"2\" class=\"adminLabel\">
+          <td colspan=\"2\">
             <form name=\"form_admin_pri_update\" method=\"get\"
               action=\"" . url_prepare("incident_index.php") . "\">
             <input type=\"hidden\" name=\"sel_priority\" value=\"\" />
@@ -662,7 +661,7 @@ function html_incident_priority_form($pri_q) {
           <td colspan=\"2\" class=\"adminLabel\">
             <input type=\"hidden\" name=\"action\" value=\"priority_insert\" />
             <input type=\"submit\" name=\"sub_pri\" value=\"$l_pri_insert\"
-              onclick=\"if (check_pri_new(this.form)) return true; else return false;\" />
+              onclick=\"if (check_priority_new(this.form)) return true; else return false;\" />
           </td>
 
         </tr>
@@ -672,6 +671,126 @@ function html_incident_priority_form($pri_q) {
     </tr>
     </table>
 ";
+
+  return $r;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Incident Status section                                                   //
+// Parameters:
+//   - $sta_q : Status list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_status_form($sta_q) {
+  global $l_label, $l_order;
+  global $l_sta_manage,$l_sta_exist,$l_sta_new;
+  global $l_sta_checkdelete, $l_sta_update, $l_sta_insert;
+
+  // Status select construction
+  $sel_sta = "<select name=\"sel_status\" size=\"4\">";
+   while ($sta_q->next_record()) {
+     $id = $sta_q->f("incidentstatus_id");
+     $order = $sta_q->f("incidentstatus_order");
+     $label = $sta_q->f("incidentstatus_label");
+     $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
+  }
+  $sel_sta .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $r = "
+<!-- Status section -->
+
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_sta_manage</td>
+    </tr>
+    <tr>
+      <td>
+
+<!-- status delete section -->
+
+        <table>
+        <tr>
+         <td colspan=\"3\">
+          <form name=\"form_status_delete\"
+          method=\"post\" action=\"" . url_prepare("incident_index.php")."\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_sta_exist</td>
+        <td class=\"adminLabel\">$sel_sta</td>
+        <td>
+          <input type=\"hidden\" name=\"action\" value=\"status_checklink\" />
+          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_checkdelete\"
+          onclick=\"if (check_status_checkdel(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+         </form>
+        </td>
+      </tr>
+
+<!-- status update section -->
+
+      <tr>
+        <td colspan=\"2\">
+          <form name=\"form_status_update\" method=\"get\"
+            action=\"" . url_prepare("incident_index.php") . "\">
+          <input type=\"hidden\" name=\"sel_status\" value=\"\" />
+          <input type=\"hidden\" name=\"action\" value=\"status_update\" />
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_label : </td>
+          <td><input type=\"text\" name=\"tf_status\" /></td>
+          <td rowspan=\"2\">
+            <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_update\"
+            onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
+          </td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_order : </td>
+          <td>
+	    <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	  </td>
+        </tr>
+        </table>
+        </form>
+        </td>
+        <td>&nbsp;</td>
+      </tr>
+      </table>
+      </td>
+      <td>
+
+<!-- new status section -->
+
+      <form name=\"form_status_new\"
+        method=\"post\" action=\"" . url_prepare("incident_index.php") . "\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_sta_new : </td>
+          <td><input type=\"text\" name=\"tf_status\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_order : </td>
+          <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+          <input type=\"hidden\" name=\"action\" value=\"status_insert\" />
+          <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_insert\"
+            onclick=\"if (check_status_new(this.form)) return true; " .
+            "else return false;\" />
+        </td>
+      </tr>
+     </table>
+    </form>
+    </td>
+    </tr>
+    </table>
+";
+
+  return $r;
 }
 
 
@@ -735,6 +854,67 @@ function dis_priority_links($id) {
     </table>";
   }
   echo "$dis_link";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the stabtus links                                                //
+// Parameters:
+//   - $id : status id
+///////////////////////////////////////////////////////////////////////////////
+function dis_status_links($id) {
+  global $l_sta_link_incident, $l_sta_can_delete, $l_sta_cant_delete;
+  global $l_sta_delete, $l_back;
+
+  $label = get_status_label($id);
+  $obm_q = run_query_status_links($id);
+
+  if ($obm_q->num_rows() > 0) {
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_sta_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$label : $l_sta_link_incident</td>
+    </tr>";
+
+    while ($obm_q->next_record()) {
+      $iid = $obm_q->f("incident_id");
+      $ilabel = $obm_q->f("incident_label");
+      $dis_link.= "
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("incident_index.php?action=detailconsult&amp;param_incident=$iid") . "\">$ilabel</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">$label : $l_sta_can_delete</td>
+    </tr><tr>
+      <td>
+        <form name=\"form_kind_delete\".
+          method=post action=\"" . url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
+        <input type=\"hidden\" name=\"sel_status\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_status\" value=\"$l_sta_delete\" />
+        </form>
+      </td><td>
+        <form name=\"form_back\" method=\"post\"
+          action=\"" .url_prepare("incident_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+      </td>
+    </tr>
+    </table>";
+  }
+  echo $dis_link;
 }
 
 

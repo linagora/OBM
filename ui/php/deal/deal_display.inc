@@ -1124,13 +1124,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert;
-  // Messages : 
-  global $l_kind_insert_ok, $l_kind_insert_error, $l_kind_update_ok;
-  global $l_kind_update_error, $l_kind_delete_error, $l_kind_delete_ok;
-  global $l_status_insert_ok, $l_status_insert_error, $l_status_update_ok;
-  global $l_status_update_error, $l_status_delete_error, $l_status_delete_ok;
-  global $l_cat_insert_ok, $l_cat_insert_error, $l_cat_update_ok;
-  global $l_cat_update_error, $l_cat_delete_error;
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind\" size=\"4\">";

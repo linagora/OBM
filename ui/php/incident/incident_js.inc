@@ -101,12 +101,54 @@ function check_priority_new(form)
 }
 
 
-function auto_archive(form) {
-  if (form.sel_status.value == 'CLOSED')
-    form.cb_archive.checked = 1;
-  else
-    form.cb_archive.checked = 0;
-} 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the Deal Status deletion is possible                            //
+///////////////////////////////////////////////////////////////////////////////
+function check_status_checkdel(form)
+{  
+   if (form.sel_status.selectedIndex >= 0)
+   { 
+     return true;
+   }
+   else
+   {
+     alert(\"$l_j_sta_delete\");
+     return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the status update is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_status_upd(form,formd)
+{
+  status_pos = formd.sel_status.selectedIndex;
+  if ((status_pos >= 0) && (form.tf_status.value != \"\")) {
+    form.sel_status.value=formd.sel_status.options[status_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_sta_update\");
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the status creation is possible                                  //
+///////////////////////////////////////////////////////////////////////////////
+function check_status_new(form)
+{
+   if (form.tf_status.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_sta_create\");
+      return false;
+   }
+}
+
+
 -->
 </script>
 ";

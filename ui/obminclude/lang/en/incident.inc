@@ -35,6 +35,9 @@ $l_incident = "Incident";
 $l_pri_manage = "Incident Priority Management";
 $l_pri_exist = "Existing Priorities";
 $l_pri_new = "New Priority";
+$l_sta_manage = "Incident Status Management";
+$l_sta_exist = "Existing Status";
+$l_sta_new = "New Status";
 
 // Title 
 $l_redhot = "Redhot";
@@ -67,7 +70,6 @@ $l_no_found = "No incident found matching the query !";
 $l_insert_ok = "The incident has been inserted successfully.";
 $l_delete_ok = "The incident has been deleted successfully.";
 $l_no_display = "Fill the search fields and press &lt; Find &gt; to retrieve the Incidents";
-$l_select_contract = "Select the contract of the Incident";
 
 $l_pri_insert_ok = "The priority has been inserted successfully.";
 $l_pri_insert_error = "The insertion of the priority has failed !";
@@ -97,4 +99,9 @@ $l_fill_contract = "You have to assigned a Contract before submitting.";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm = "Really delete the Incident ?";
 $l_date_after_js = "Date After";
-$l_j_pri_update = "You have to select a priority and enter a new name and order update it !";
+$l_j_pri_create = "You have to enter a priority to create it !";
+$l_j_pri_update = "You have to select a priority and enter a new name and order to update it !";
+$l_j_pri_delete = "You have to select a priority to delete it !";
+$l_j_sta_create = "You have to enter a status to create it !";
+$l_j_sta_update = "You have to select a status and enter a new name and order to update it !";
+$l_j_sta_delete = "You have to select a status to delete it !";

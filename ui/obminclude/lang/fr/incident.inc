@@ -31,6 +31,13 @@ $l_archive_consult = "Archivé";
 $l_company = "Société";
 $l_incident = "Incident";
 
+$l_pri_manage = "Gestion des priorités d'incident";
+$l_pri_exist = "Priorités existantes";
+$l_pri_new = "Nouvelle";
+$l_sta_manage = "Gestion des états d'incident";
+$l_sta_exist = "Etats existants";
+$l_sta_new = "Nouveau";
+
 // Title 
 $l_redhot = "Très Urgent";
 $l_hot = "Urgent";
@@ -48,7 +55,14 @@ $l_select_contract = "Sélectionner le contrat";
 $l_insert = "Enregistrer l'incident";
 $l_update = "Modifier l'incident";
 $l_checkdelete = "Supprimer l'incident";
-$l_select_contract = "Selectionner le contrat lié à cet incident";
+$l_pri_update = "Modifier la priorité";
+$l_pri_checkdelete = "Vérifier ou supprimer la priorité";
+$l_pri_delete = "Supprimer la priorité";
+$l_pri_insert = "Insérer la priorité";
+$l_sta_update = "Modifier l'état";
+$l_sta_checkdelete = "Vérifier ou supprimer l'état";
+$l_sta_delete = "Supprimer l'état";
+$l_sta_insert = "Insérer l'état";
 
 //Message
 $l_found = "incident(s) trouvé(s).";
@@ -56,6 +70,25 @@ $l_no_found = "Aucun Incident ne correspond à ces critères !";
 $l_insert_ok = "L'insertion de l'incident a été correctement effectuée.";
 $l_delete_ok = "La suppression de l'incident a été correctement effectuée.";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des incidents correspondants.";
+$l_pri_insert_ok = "La priorité a été insérée avec succès.";
+$l_pri_insert_error = "L'insertion de la priorité a échoué !";
+$l_pri_update_ok = "La modification de la priorité a été correctement effectuée.";
+$l_pri_update_error = "La modification de la priorité a échoué !";
+$l_pri_delete_ok = "La suppression de la priorité a été correctement effectuée !.";
+$l_pri_delete_error = "La suppression de la priorité a échoué !";
+$l_pri_can_delete = "La priorité peut être supprimée !";
+$l_pri_cant_delete = "La priorité ne peut être supprimée !";
+$l_pri_link_incident = "La priorité est référencée par ces incidents";
+
+$l_sta_insert_ok = "L'état a été inséré avec succès.";
+$l_sta_insert_error = "L'insertion de l'état a échoué !";
+$l_sta_update_ok = "La modification de l'état a été correctement effectuée.";
+$l_sta_update_error = "La modification de l'état a échoué !";
+$l_sta_delete_ok = "La suppression de l'état a été correctement effectuée !.";
+$l_sta_delete_error = "La suppression de l'état a échoué !";
+$l_sta_can_delete = "L'état peut être supprimé !";
+$l_sta_cant_delete = "L'état ne peut être supprimé !";
+$l_sta_link_incident = "L'état est référencé par ces incidents";
 
 // For the display preferences modification screen 
 $l_incident_display = "Options d'affichage des Incidents";
@@ -64,5 +97,11 @@ $l_incident_display = "Options d'affichage des Incidents";
 $l_length_label = "Le champ Label est trop long";
 $l_fill_contract = "Vous devez sélectionner un contrat avant de valider.";
 $l_j_select_contract = "Vous devez sélectionner un Contrat!";
-$l_delete_confirm="Confirmer la suppression de l'Incident ?";
-$l_date_after_js ="Date Après";
+$l_delete_confirm = "Confirmer la suppression de l'Incident ?";
+$l_date_after_js = "Date Après";
+$l_j_pri_create = "Vous devez saisir une priorité pour la créer !";
+$l_j_pri_update = "Vous devez sélectionner une priorité et entrer une modification avant de valider !";
+$l_j_pri_delete = "Vous devez sélectionner une priorité pour l'effacer !";
+$l_j_sta_create = "Vous devez saisir un état pour le créer !";
+$l_j_sta_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
+$l_j_sta_delete = "Vous devez sélectionner un état pour l'effacer !";
