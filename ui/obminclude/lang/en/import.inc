@@ -30,6 +30,8 @@ $l_result = "Result";
 $l_info = "Information";
 $l_sample_file = "Sample file to check";
 $l_conflict = "Conflict";
+$l_nb_insert = "inserts";
+$l_nb_update = "updates";
 
 // Actions
 $l_insert = "Insert the import";
@@ -38,9 +40,12 @@ $l_delete = "Delete the import";
 $l_check_file = "Check this file";
 $l_test_file = "Test this file";
 $l_import_file = "Import this file";
-$l_comp_nothing = "Leave as is";
+$l_comp_nothing = "Keep the actual company";
 $l_comp_insert = "Insert this company";
 $l_comp_update = "Update the existing company";
+$l_con_nothing = "Keep the existing contact";
+$l_con_insert = "Insert this contact";
+$l_con_update = "Update the existing contact";
 
 // Messages
 $l_insert_ok = "The import has been inserted successfully.";

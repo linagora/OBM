@@ -237,7 +237,7 @@ display_page($display);
 // returns : $obm_user hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
-  global $cdg_param, $popup;
+  global $action, $cdg_param, $popup;
   global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_lastname, $tf_firstname, $tf_phone, $cb_archive;
   global $param_ext, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
@@ -269,6 +269,7 @@ function get_param_user() {
         echo "<br />user[$key]=$val";
       }
     }
+    echo "<br />action = $action";
   }
 
   return $obm_user;

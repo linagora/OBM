@@ -417,7 +417,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Import File Core
+// HTML Display Import File Core (Test and Import)
 // Parameters:
 //   - $import_q : Import database result 
 //   - $import[] : import hash values
@@ -428,6 +428,7 @@ function html_import_file_import($import_q, $import) {
   global $l_similar_company, $l_similar_contact, $l_invalid_row;
   global $l_invalid_rows, $l_conflict_rows;
   global $l_import_end,$l_file_error, $l_lines_processed, $l_conflict_detected;
+  global $l_header_company, $l_header_contact, $l_nb_insert, $l_nb_update;
   global $display;
 
   $file = $import["file_saved"];
@@ -442,6 +443,7 @@ function html_import_file_import($import_q, $import) {
   $row_start = ($import["row_start"] ? $import["row_start"] : 0);
   $conflict_action = $import["conflict_action"];
   $company_id = $import["company_id"];
+  $contact_id = $import["contact_id"];
 
   if ($run_mode == "test") {
     $title = "$l_test_file : $file_name";
@@ -459,6 +461,10 @@ function html_import_file_import($import_q, $import) {
   $nb_line = 0;
   $nb_line_err = 0;
   $nb_line_conf = 0;
+  $nb_comp_ins = 0;
+  $nb_comp_upd = 0;
+  $nb_con_ins = 0;
+  $nb_con_upd = 0;
   if (! file_exists($file)) {
     $display["msg"] .= display_err_msg("$file : $l_file_error");
     return;
@@ -471,44 +477,48 @@ function html_import_file_import($import_q, $import) {
     next($r);
   }
 
-  // Company Conflict Management ----------------------------------------------
+  // Company & Contact Conflict Management ------------------------------------
   if ($conflict_action != "") {
+    $log = "";
+    $log["num_line"] = $row_start;
     $nb_line++;
 
-    // Skip this row, go to next one
-    if ($conflict_action == "nothing") {
-      next($r);
-
-      // XXX test for contact ?
-
-      // Insert the new company
-    } else if ($conflict_action == "company_insert") {
+    // Test user decision
+    // Insert the new company
+    if ($conflict_action == "company_insert") {
       list($num_line, $line) = each($r);
       $row = get_file_row_fields($line, $csv_sep, $enclosed);
       $fields = get_import_row_mapping($row, $map);
       $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
+      $nb_comp_ins++;
 
       // If contact, insert
       if (row_has_contact($fields)) {
-	echo "insert contact :" . $fields["con_ln"] . " " . $fields["con_fn"];
 	run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	$nb_con_ins++;
       }
 
-      // Update the existing company
-    } else if ($conflict_action == "company_update") {
+      // Others company choices (update or keep) need then contact choice
+    } else if (($conflict_action == "company_nothing")
+              || ($conflict_action == "company_update")) {
+
       list($num_line, $line) = each($r);
       $row = get_file_row_fields($line, $csv_sep, $enclosed);
       $fields = get_import_row_mapping($row, $map);
-      run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats, $company_id);
+
+      if ($conflict_action == "company_update") {
+	run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats, $company_id);
+	$nb_comp_upd++;
+      }
 
       // test for contact
       if (row_has_contact($fields)) {
-
+	
 	// Test if similar contact exist --------------------------------------
 	$conts = get_similar_contact($fields, $company_id);
 	if (is_array($conts)) {
+	  $log["display"] = true;
 	  $log["res"] = $l_similar_contact;
-	  echo "conflict contact :".$fields["con_ln"] ." ". $fields["con_fn"];
 	  // Automatic mode
 	  if ($run_mode == "auto") {
 	    // XXXX action auto
@@ -518,20 +528,39 @@ function html_import_file_import($import_q, $import) {
 	    // Normal mode (Interactive)
 	  } else {
 	    $stop = true;
-	    $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps);
+	    $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps, $conts);
 	    $display["msg"] .= display_warn_msg($l_conflict_detected);
 	  }
-	}  
-	
-	// No similar contacts exists -----------------------------------------
-	run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
-      }
+	} else {
+	  // No similar contacts exists ---------------------------------------
+	  run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
+	  $nb_con_ins++;
+	}
 
+      } else {
+	// Row has no contact : End row Conflict
+      }
+      
       // Update the existing contact
     } else if ($conflict_action == "contact_update") {
-      // XXX
+      list($num_line, $line) = each($r);
+      $row = get_file_row_fields($line, $csv_sep, $enclosed);
+      $fields = get_import_row_mapping($row, $map);
+      run_query_import_contact_update($import_q, $fields, $map["default"], $countries, $contact_id);
+      $nb_con_upd++;
+
+    } else if ($conflict_action == "contact_insert") {
+      list($num_line, $line) = each($r);
+      $row = get_file_row_fields($line, $csv_sep, $enclosed);
+      $fields = get_import_row_mapping($row, $map);
+      run_query_import_contact_insert($import_q, $company_id, $fields, $map["default"], $countries);
+      $nb_con_ins++;
+
+    } else if ($conflict_action == "contact_nothing") {
+      next($r);
     }
   }
+
 
   // Loop through the file ----------------------------------------------------
   while ((list($num_line, $line) = each($r)) && ($stop == false)) {
@@ -554,6 +583,7 @@ function html_import_file_import($import_q, $import) {
 
 	// Automatic mode
 	if ($run_mode == "auto") {
+	  // XXXX action auto
 
 	  // Test mode (no database updates) Do nothing : only log
 	} else if ($run_mode == "test") {
@@ -575,9 +605,11 @@ function html_import_file_import($import_q, $import) {
 	} else {
 	  // Insert the company
 	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
+	  $nb_comp_ins++;
 	  if (row_has_contact($fields)) {
 	    echo "insert contact :" . $fields["con_ln"] . " " . $fields["con_fn"];
 	    run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	    $nb_con_ins++;
 	  }
 	}
       }
@@ -598,6 +630,8 @@ function html_import_file_import($import_q, $import) {
   if (! $stop) {
     $msg .= ". $l_import_end";
   }
+  $msg .= "<br />$l_header_company : $nb_comp_ins $l_nb_insert, $nb_comp_upd $l_nb_update";
+  $msg .= "<br />$l_header_contact : $nb_con_ins $l_nb_insert, $nb_con_upd $l_nb_update";
 
   $display["msg"] .= display_ok_msg("$msg");
   if (($nb_line_err > 0) || ($nb_line_conf > 0)) {
@@ -636,14 +670,18 @@ function html_import_file_import($import_q, $import) {
 //   - $log_head : log line header
 //   - $fields   : company row info array
 //   - $comps    : similar company info array
+//   - $cons     : similar contact info array
 ///////////////////////////////////////////////////////////////////////////////
-function display_import_conflict_block($import, $log, &$log_head, $fields, $comps) {
-  global $path, $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update, $l_validate;
+function display_import_conflict_block($import, $log, &$log_head, $fields, $comps, $cons="") {
+  global $path, $l_validate;
+  global $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update;
+  global $l_conflict, $l_con_nothing, $l_con_insert, $l_con_update;
 
   $id = $import["id"];
   $file = $import["file"];
   $file_name = $import["file_name"];
   $file_saved = $import["file_saved"];
+  $comp_id = $import["company_id"];
 
   $num_line = $log["num_line"];
 
@@ -662,13 +700,36 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
 
   if (is_array($comps)) {
     while ( list($num, $comp) = each($comps) ) {
-      $cid = $comp["comp_id"];
-      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid");
+      $comp_id = $comp["comp_id"];
+      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id");
       $line_log .= "<br />";
       $line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
     }
     $line_log .= "</td>
       </tr>";
+    $lab_nothing = $l_comp_nothing;
+    $lab_insert = $l_comp_insert;
+    $lab_update = $l_comp_update;
+    $act_nothing = "company_nothing";
+    $act_insert = "company_insert";
+    $act_update = "company_update";
+  }
+
+  if (is_array($cons)) {
+    while ( list($num, $con) = each($cons) ) {
+      $con_id = $con["con_id"];
+      $url = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_id");
+      $line_log .= "<br />";
+      $line_log .= "<a target=\"New\" href=\"$url\">".$con["con_lname"] . " ".$con["con_fname"] ."</a>";
+    }
+    $line_log .= "</td>
+      </tr>";
+    $lab_nothing = $l_con_nothing;
+    $lab_insert = $l_con_insert;
+    $lab_update = $l_con_update;
+    $act_nothing = "contact_nothing";
+    $act_insert = "contact_insert";
+    $act_update = "contact_update";
   }
 
   $url = url_prepare("import_index.php");
@@ -687,9 +748,9 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
     <table class=\"detail\">
     <tr>    
       <td class=\"detailLabel\">
-        <input type=\"radio\" name=\"rd_conflict\" value=\"nothing\" checked />$l_comp_nothing
-        <input type=\"radio\" name=\"rd_conflict\" value=\"company_insert\" />$l_comp_insert
-        <input type=\"radio\" name=\"rd_conflict\" value=\"company_update\" />$l_comp_update
+        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_nothing\" checked />$lab_nothing
+        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_insert\" />$lab_insert
+        <input type=\"radio\" name=\"rd_conflict\" value=\"$act_update\" />$lab_update
       </td>
     </tr>
     <tr colspan=\"3\">
@@ -699,7 +760,8 @@ function display_import_conflict_block($import, $log, &$log_head, $fields, $comp
         <input type=\"hidden\" name=\"file_saved\" value=\"$file_saved\" />
         <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
         <input type=\"hidden\" name=\"row_start\" value=\"$num_line\" />
-        <input type=\"hidden\" name=\"company_id\" value=\"$cid\" />
+        <input type=\"hidden\" name=\"company_id\" value=\"$comp_id\" />
+        <input type=\"hidden\" name=\"contact_id\" value=\"$con_id\" />
         <input type=\"hidden\" name=\"action\" value=\"file_import\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
       </td> 

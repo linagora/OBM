@@ -30,6 +30,8 @@ $l_result = "Résultat";
 $l_info = "Information";
 $l_sample_file = "Vérifier avec fichier exemple";
 $l_conflict = "Conflit";
+$l_nb_insert = "insertions";
+$l_nb_update = "mises à jour";
 
 // Actions
 $l_insert = "Enregistrer l'import";
@@ -41,6 +43,9 @@ $l_import_file = "Importer ce fichier";
 $l_comp_nothing = "Ne pas modifier";
 $l_comp_insert = "Insérer la société";
 $l_comp_update = "Modifier la société existante";
+$l_con_nothing = "Garder le contact actuel";
+$l_con_insert = "Insérer le contact";
+$l_con_update = "Modifier le contact existant";
 
 // Messages
 $l_insert_ok = "L'insertion de l'import a été correctement effectuée.";

@@ -180,7 +180,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
-  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
 
   $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
   if ($popup) {
@@ -331,6 +331,8 @@ function html_get_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 
   $ext_target = $user["ext_target"];
 
+  $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive$url_ext");
+
   $user_d = new OBM_DISPLAY("DATA", $pref_q, "user");
   if ($popup) {
     $user_d->display_link = false;
@@ -358,7 +360,7 @@ function html_get_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   $user_d->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  $dislay["msg"] .= display_info_msg("$nb_user $l_found");
+  $display["msg"] .= display_info_msg("$nb_user $l_found");
   $block = $display_popup_head;
   $block .= $user_d->display("dis_data_user");
   $block .= $display_popup_end;

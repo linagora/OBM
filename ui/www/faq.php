@@ -53,6 +53,11 @@ memory_limit = 16M
 upload_max_filesize = 16M
 </pre>
 
+On some distrib (eg: Redhat) check the php configuration for apache (conf.d/php.conf)
+
+<pre>
+LimitRequestBody 16000000
+</pre>
 
 <a name="user_pref">
 <h2>OBM seems to work but each search lead to a mysql error</h2>
