@@ -224,7 +224,7 @@ function html_contract_links($id, $con_label, $deal_id, $deal_label) {
   global $set_theme, $ico_incident, $ico_deal;
   // -- Labels
   global $l_header_incident, $l_incident_list, $l_incident_new, $l_header_deal;
-  global $perms_user, $path, $auth;
+  global $path, $auth;
 
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;tf_lcontract=$con_label");
@@ -396,7 +396,6 @@ function html_contract_consult($contract_q) {
 function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp_q,$contact_q, $contract){
   // - Themes
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
-  // -- Labels
   global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_date_init,$l_kind,$l_marketing_manager;
   global $l_technical_manager,$l_last_update;
@@ -494,16 +493,19 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $contact_q->seek(0);
   }
    
-  $dis_sel_con1="<select name=\"sel_con1\">";
-  while($contact_q->next_record()) {
-    $dis_sel_con1.="\n<option value=\"".$contact_q->f("contact_id")."\"";
-    if ($contact_q->f("contact_id") == $con1_id) 
+  $dis_sel_con1 = "<select name=\"sel_con1\">
+    <option value=\"0\">$l_none</option>";
+  while ($contact_q->next_record()) {
+    $lc_id = $contact_q->f("contact_id");
+    $lc_text = $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone");
+    $dis_sel_con1.="\n<option value=\"$lc_id\"";
+    if ($lc_id == $con1_id) {
       $dis_sel_con1.=" selected=\"selected\"";
-    $dis_sel_con1.=">". $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") .
-    " - " . $contact_q->f("contact_phone")."</option>";
     }
-    $dis_sel_con1.="</select>";
-
+    $dis_sel_con1 .= ">$lc_text</option>";
+  }
+  $dis_sel_con1.="</select>";
+  
   if ($action == "detailupdate") {
     $dis_con1 = "
       <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\"><img src=\"/images/$set_theme/$ico_contact\" alt=\"[contact\" /></a>";    
@@ -513,15 +515,18 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $contact_q->seek(0);
   }
    
-  $dis_sel_con2="<select name=\"sel_con2\">";
-  while($contact_q->next_record()) {
-    $dis_sel_con2.="\n<option value=\"".$contact_q->f("contact_id")."\"";
-    if ($contact_q->f("contact_id") == $con2_id) 
+  $dis_sel_con2="<select name=\"sel_con2\">
+    <option value=\"0\">$l_none</option>";
+  while ($contact_q->next_record()) {
+    $lc_id = $contact_q->f("contact_id");
+    $lc_text = $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") . " - " . $contact_q->f("contact_phone");
+    $dis_sel_con2 .= "\n<option value=\"$lc_id\"";
+    if ($lc_id == $con2_id) {
       $dis_sel_con2.=" selected=\"selected\"";
-    $dis_sel_con2.=">". $contact_q->f("contact_lastname")." ". $contact_q->f("contact_firstname") .
-    " - " . $contact_q->f("contact_phone")."</option>";
     }
-    $dis_sel_con2.="</select>";
+    $dis_sel_con2 .= ">$lc_text</option>";
+  }
+  $dis_sel_con2.="</select>";
 
   if ($action == "detailupdate") {
     $dis_con2 = "

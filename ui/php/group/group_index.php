@@ -47,14 +47,7 @@ $perm->check_permissions($menu, $action);
 
 $uid = $auth->auth["uid"];
 
-// updating the group bookmark : 
-if ( ($param_group == $last_group) && (strcmp($action,"delete")==0) ) {
-  $last_group = $last_group_default;
-} else if ( ($param_group > 0) && ($last_group != $param_group) ) {
-  $last_group = $param_group;
-  run_query_set_user_pref($uid, "last_group", $param_group);
-  $last_group_name = run_query_global_group_name($last_group);
-}
+update_last_visit("group", $param_group, $action);
 
 page_close();
 

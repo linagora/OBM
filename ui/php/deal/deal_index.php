@@ -59,22 +59,19 @@ require("deal_display.inc");
 
 $uid = $auth->auth["uid"];
 
-// Updating the "last deal" bookmark 
-if ( ($param_deal == $last_deal) && (strcmp($action,"delete")==0) ) {
-  $last_deal = $last_deal_default;
-} elseif ( ($param_deal > 0) && ($last_deal != $param_deal) ) {
-  $last_deal = $param_deal;
-  run_query_set_user_pref($uid,"last_deal",$param_deal);
-  $last_deal_name = run_query_global_deal_label($last_deal);
-}
+update_last_visit("deal", $param_deal, $action);
+update_last_visit("parentdeal", $param_parent, $action);
+
 
 // Updating the "last parentdeal" bookmark 
+if (false) {
 if ( ($param_parent == $last_parentdeal) && (strcmp($action,"parent_delete")==0) ) {
   $last_parentdeal = $last_parentdeal_default;
 } elseif ( ($param_parent > 0) && ($last_parentdeal != $param_parent) ) {
   $last_parentdeal = $param_parent;
   run_query_set_user_pref($uid, "last_parentdeal", $param_parent);
   $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
+}
 }
 
 page_close();
@@ -688,8 +685,8 @@ function get_deal_action() {
     'Name'     => $l_header_new_parent,
     'Url'      => "$path/deal/deal_index.php?action=parent_new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','parent_search','index',
-                         'detailconsult','parent_detailconsult',
+    'Condition'=> array ('','search','parent_search','index','detailconsult',
+                         'parent_detailconsult','parent_insert',
                          'admin','display') 
                                          );
 
@@ -759,6 +756,20 @@ function get_deal_action() {
     'Url'      => "$path/deal/deal_index.php?action=parent_delete&amp;param_parent=".$deal["parent"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('parent_detailconsult') 
+                                     	     );
+
+  // Affect
+  $actions["DEAL"]["affect"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=affect&amp;param_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult') 
+                                     	     );
+
+  // Affect Update
+  $actions["DEAL"]["affect_update"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=affect_update&amp;sel_parent=".$deal["parent"]."&amp;param_deal=".$deal["id"],
+    'Right'    => $cright_write,
+    'Condition'=> array ('detailconsult') 
                                      	     );
 
   // Admin  

@@ -18,14 +18,7 @@ include("$obminclude/global_pref.inc");
 require("invoice_display.inc");
 require("invoice_query.inc");
 
-// bookmark 
-if ( ($param_invoice == $last_invoice) && (strcmp($action,"delete")==0) ) {
-  $last_invoice=$last_invoice_default;
-} elseif  ( ($param_invoice > 0) && ($last_invoice != $param_invoice) ) {
-  $last_invoice=$param_invoice;
-  run_query_set_user_pref($auth->auth["uid"],"last_invoice",$param_invoice);
-  $last_invoice_name = run_query_global_invoice_label($last_invoice);
-}
+update_last_visit("invoice", $param_invoice, $action);
 
 page_close();
 

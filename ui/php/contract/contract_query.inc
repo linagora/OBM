@@ -50,10 +50,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
       $dateexp
-    from (((Contract
-      left join UserObm u1 on contract_techmanager_id=u1.userobm_id)
-      left join UserObm u2 on contract_marketmanager_id=u2.userobm_id)
-      left join ContractType on contract_type_id=contracttype_id),
+    from Contract
+         left join UserObm u1 on contract_techmanager_id=u1.userobm_id
+         left join UserObm u2 on contract_marketmanager_id=u2.userobm_id
+         left join ContractType on contract_type_id=contracttype_id,
       Company
     where contract_company_id=company_id";
 
@@ -97,7 +97,14 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 function run_query_detail($p_contract_id) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
-  $connect_db = new DB_OBM;
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+
+  $datebegin = sql_date_format($db_type, "contract_datebegin", "datebegin");
+  $dateexp = sql_date_format($db_type, "contract_dateexp", "dateexp");
+  $timeupdate = sql_date_format($db_type, "contract_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "contract_timecreate", "timecreate");
+
   $query = "select Contract.*,
       deal_id,
       deal_label,
@@ -111,10 +118,10 @@ function run_query_detail($p_contract_id) {
       c1.contact_lastname as clname1, c1.contact_firstname as cfname1,
       c2.contact_lastname as clname2, c2.contact_firstname as cfname2,
       c1.contact_phone as cphone1, c2.contact_phone as cphone2,
-      UNIX_TIMESTAMP(contract_datebegin) as datebegin,
-      UNIX_TIMESTAMP(contract_dateexp) as dateexp,
-      UNIX_TIMESTAMP(contract_timeupdate) as timeupdate,
-      UNIX_TIMESTAMP(contract_timecreate) as timecreate,
+      $datebegin,
+      $dateexp,
+      $timeupdate,
+      $timecreate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     from Contract
@@ -130,9 +137,10 @@ function run_query_detail($p_contract_id) {
     where contract_id='$p_contract_id'";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  $connect_db->next_record();
-  return $connect_db;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q;
 }
 
 
@@ -151,11 +159,11 @@ function run_query_insert($contract) {
   $p_dateexp = $contract["dateexp"];
   $sel_type = $contract["type"];
   $ta_com = $contract["comment"];
-  $sel_con1 = $contract["contact1"];
-  $sel_con2 =  $contract["contact2"];
+  $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
+  $con2 = ($contract["contact2"] ? $contract["contact2"] : "0");
   $sel_tech  = $contract["tech"];
   $sel_market = $contract["market"];
-  $deal_id = $contract["deal_id"];
+  $deal_id = ($contract["deal_id"] ? $contract["deal_id"] : "0");
   $connect_db = new DB_OBM;
 
   $query = "insert into Contract
@@ -176,8 +184,8 @@ function run_query_insert($contract) {
       contract_marketmanager_id,
       contract_clause,
       contract_comment)
-    values ('".
-      date("Y-m-d H:i:s") ."',
+    values (
+      null,
       '". date("Y-m-d H:i:s") ."',
       '".$auth->auth["uid"]."',
       '".$auth->auth["uid"]."',
@@ -188,8 +196,8 @@ function run_query_insert($contract) {
       '$p_datebegin',
       '$p_dateexp',
       '$sel_type',
-      '$sel_con1',
-      '$sel_con2',
+      '$con1',
+      '$con2',
       '$sel_tech',
       '$sel_market',
       '$ta_clause',
@@ -221,7 +229,7 @@ function run_query_update($contract) {
   $sel_market = $contract["market"];
   $p_comment = $contract["comment"];
   $p_clause = $contract["clause"];
-  $deal_id = $contract["deal_id"];
+  $deal_id = ($contract["deal_id"] ? $contract["deal_id"] : "0");
  
   $connect_db=new DB_OBM;
   
@@ -375,7 +383,7 @@ function run_query_type_insert($contract) {
     contracttype_timecreate,
     contracttype_usercreate,
     contracttype_label)
-  values ('null',
+  values (null,
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$label')";

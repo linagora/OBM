@@ -41,6 +41,7 @@ $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_after = "After";
 $l_before = "Before";
+$l_fuzzy = "Advanced";
 
 // OBM_DISPLAY
 $l_entries = "Entries";
@@ -167,7 +168,7 @@ $l_header_amp = "Show amp";
 $l_header_func_unused = "Functions";
 $l_header_clear_sess = "Clear sessions";
 $l_header_pref_update = "Reset users preferences";
-$l_header_reset = "Défault Préferences";
+$l_header_reset = "Default Preferences";
 $l_header_country = "Country";
 $l_header_datasource = "Data Source";
 $l_header_tasktype = "Task Type";

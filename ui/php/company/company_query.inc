@@ -19,6 +19,7 @@
 function run_query_search($company, $p_new_order, $p_order_dir) {
   global $c_all, $cdg_sql;  
 
+  $fuzzy = $company["fuzzy"];
   $archive = $company["archive"];
   $name = $company["name"];
   $phone = $company["phone"];
@@ -129,18 +130,25 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "company_name";
 
   // Contact list and new contact column haven't any meaning for sorting
-  if ( (strcmp($p_new_order,"company_contacts")==0) || (strcmp($p_new_order,"company_new_contact") == 0) ) {
+  if ( (strcmp($p_new_order,"company_contacts")==0)
+      || (strcmp($p_new_order,"company_new_contact") == 0) ) {
     $order = "company_name";
   }
 
   $query = "$req $whereq order by $order $p_order_dir";
 
-  display_debug_msg("company_search(1) : $query", $cdg_sql);
-  $obm_q->query($query);
+  if (! $fuzzy) {
+    display_debug_msg("company_search(1) : $query", $cdg_sql);
+    $obm_q->query($query);
+  }
 
-  if ( ($obm_q->num_rows() == 0) && ($name != "") ) {
-    $where_name = " (company_aka $like '%$auto_aka%'
+  // If fuzzy or unsuccessful search
+  if ( ($fuzzy)
+       || ( ($obm_q->num_rows() == 0) && ($name != "") ) ) {
+	 if ($name != "") {
+	   $where_name .= " or (company_aka $like '%$auto_aka%'
                  or company_sound = '$sound')";
+	 }
     $whereq = " where $where_name $where";
     $query = "$req $whereq order by $order $p_order_dir";
     display_debug_msg("company_search(2) : $query", $cdg_sql);
@@ -205,15 +213,15 @@ function run_query_insert($company) {
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = $company["aka"];
-  // If reduced version of name not in aka (and not same as name), we add it
-  $auto_aka = reduce_name($name);
-  if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
-    $aka .= " $auto_aka";
+  // If aka is empty we auto fill it
+  if (trim($aka) == "") {
+    $auto_aka = reduce_name($name);
+    $aka = $auto_aka;
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
-  $kind = $company["kind"];
-  $act = $company["activity"];
+  $kind = ($company["kind"] != "" ? $company["kind"] : "0");
+  $act = ($company["activity"] != "" ? $company["activity"] : "0");
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -324,21 +332,23 @@ function run_query_insert($company) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($cid, $company) {
-  global $auth, $cdg_sql;
+  global $auth, $cdg_sq, $cgp_hide;
 
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = $company["aka"];
-  // If reduced version of name not in aka (and not same as name), we add it
-  $auto_aka = reduce_name($name);
-  if ( ($auto_aka != $name) && (strpos($aka, $auto_aka) === false) ) {
-    $aka .= " $auto_aka";
+  // If aka is empty we auto fill it
+  if (trim($aka) == "") {
+    $auto_aka = reduce_name($name);
+    $aka = $auto_aka;
   }
   $sound = phonetic_key($name);
   $dsrc = $company["datasource"];
-  $kind = $company["kind"];
+  $kind = $company["kind"]; 
+  if ($kind != "") $upd_kind = "company_type_id='$kind',";
   $act = $company["activity"];
+  if ($act != "") $upd_act = "company_activity_id='$act',";
   $market = $company["marketing_manager"];
   $ad1 = $company["ad1"];
   $ad2 = $company["ad2"];
@@ -363,8 +373,8 @@ function run_query_update($cid, $company) {
     company_name='$name',
     company_aka='$aka',
     company_sound='$sound',
-    company_type_id='$kind',
-    company_activity_id='$act',
+    $upd_kind
+    $upd_act
     company_marketingmanager_id='$market',
     company_address1='$ad1',
     company_address2='$ad2',

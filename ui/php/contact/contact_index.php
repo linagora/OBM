@@ -48,15 +48,7 @@ require("contact_query.inc");
 
 $uid = $auth->auth["uid"];
 
-// updating the contact bookmark : 
-if ( ($param_contact == $last_contact) && (strcmp($action,"delete")==0) ) {
-  $last_contact = $last_contact_default;
-} else if ( ($param_contact > 0) && ($last_contact != $param_contact) ) {
-  $last_contact = $param_contact;
-  run_query_set_user_pref($auth->auth["uid"],"last_contact",$param_contact);
-  $last_contact_name = run_query_global_contact_name($last_contact);
-  //$sess->register("last_contact");  
-}
+update_last_visit("contact", $param_contact, $action);
 
 page_close();
 
@@ -110,14 +102,14 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_contact > 0) {
+  if ($contact["id"] > 0) {
     $display["detail"] = dis_contact_consult($contact);
   }
   
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_contact > 0) {
-    $con_q = run_query_contact_detail($param_contact);
+  if ($contact["id"] > 0) {
+    $con_q = run_query_contact_detail($contact["id"]);
     if ($con_q->num_rows() == 1) {
       require("contact_js.inc");
       $display["detailInfo"] = display_record_info($con_q);
@@ -173,7 +165,7 @@ if ($action == "index" || $action == "") {
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    if ($param_contact > 0) {
+    if ($contact["id"] > 0) {
       $display["detail"] = dis_contact_consult($contact);
     }    
   } else {
@@ -185,11 +177,11 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("contact_js.inc");
-  $display["detail"] = dis_check_links($param_contact);
+  $display["detail"] = dis_check_contact_links($contact["id"]);
   
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_contact_delete($param_contact);
+  $retour = run_query_contact_delete($contact["id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -379,7 +371,7 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  if ($param_contact > 0) {
+  if ($contact["id"] > 0) {
       $display["detail"] = dis_contact_consult($contact);
   }    
 }
@@ -507,6 +499,12 @@ function get_contact_action() {
   global $l_header_consult, $l_header_display, $l_header_admin;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
+// ext_get_ids
+  $actions["CONTACT"]["ext_get_ids"] = array (
+    'Right'    => $cright_read,
+    'Condition'=> array ('all') 
+                                        );
+
 // Index
   $actions["CONTACT"]["index"] = array (
     'Name'     => $l_header_find,
@@ -535,7 +533,7 @@ function get_contact_action() {
     'Name'     => $l_header_consult,
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailconsult','detailupdate') 
                                     		 );
 
 // Detail Update
@@ -704,14 +702,14 @@ function get_contact_action() {
                                       	 );
 
 // Dispay Preferences
-  $actions["CONTACT"]["displref_level"]	= array (
+  $actions["CONTACT"]["dispref_display"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	        );
 
 // Dispay Level
-  $actions["CONTACT"]["displref_level"]= array (
+  $actions["CONTACT"]["dispref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

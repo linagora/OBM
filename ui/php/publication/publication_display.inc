@@ -143,6 +143,8 @@ function dis_publication_search_list($publication) {
   global $display, $l_no_found;
   global $auth, $new_order, $order_dir;
 
+  $popup = $publication["popup"];
+
   $pref_q = run_query_display_pref($auth->auth["uid"], "publication");
   $obm_q = run_query_search($publication, $new_order, $order_dir);
   $nb_publication = $obm_q->num_rows();
@@ -168,6 +170,14 @@ function dis_publication_search_list($publication) {
 function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publication,$popup) {
   global $display, $l_found,$l_close;
 
+  if ($popup) {
+    $ext_action = $publication["ext_action"];
+    $ext_url = $publication["ext_url"];
+    $ext_id = $publication["ext_id"];
+    $ext_target = $publication["ext_target"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
+  }
+
   // we urlencode to avoid breakage for space char
   $archive = $publication["archive"];
   $title = urlencode(stripslashes($publication["name"]));
@@ -176,26 +186,26 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
   $act = $publication["activity"];
   $zip = urlencode(stripslashes($publication["zip"]));
   $market = $publication["marketing_manager"];
-  $popup = $publication["popup"]; 
   
   $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
 
   $comp_q->seek($first_row);
 
-  $comp_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
+  $pub_d = new OBM_DISPLAY("DATA", $pref_q, "publication");
   if ($popup) {
-    $comp_d->data_specialfield = "ext_get_id";
+    $pub_d->display_link = false;
+    $pub_d->data_specialfield = "ext_get_id"; // ???????? XXXX
     $display_popup_end = "
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>
       </p>";
   }
   
-  $comp_d->data_set = $comp_q;
-  $comp_d->data_url = $url;
-  $comp_d->data_header = "both";
+  $pub_d->data_set = $comp_q;
+  $pub_d->data_url = $url;
+  $pub_d->data_header = "both";
   $display["msg"] = display_info_msg("$nb_publication $l_found");
-  $block = $comp_d->display("dis_data_publication");
+  $block = $pub_d->display("dis_data_publication");
   $block .= $display_popup_end;  
 
   return $block;
@@ -259,7 +269,7 @@ function html_publication_links($pub_q) {
   global $l_header_contact, $l_contact_new, $l_header_project, $l_project_new;
   global $l_header_deal, $l_deal_new, $l_header_contract, $l_contract_new;
   global $l_header_document, $l_document_new, $l_document_add;
-  global $perms_user,$l_publication, $path, $auth,$popup_height,$popup_width;
+  global $l_publication, $path, $auth,$popup_height,$popup_width;
 
   $id = $pub_q->f("publication_id");
   $title = $pub_q->f("publication_title");
@@ -635,6 +645,91 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
     </tr>    
     </table>
    -->
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Subscription Form                                                      //
+// Parameters:
+//   - $action    : action called
+//   - $pub_q      : publication database result 
+//   - $dsrc_q    : datasource database result 
+//   - $type_q    : type database result 
+//   - $usr_q     : userobm database result 
+//   - $ctry_q    : country database result 
+//   - $publication[] : default values
+//     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email ,com
+///////////////////////////////////////////////////////////////////////////////
+function html_auto_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication) {
+  global $display;
+  global $set_theme,$popup_height,$popup_width;
+  global $l_subscription,$l_quantity, $l_renew, $l_recept;
+
+  $popup = $publication["popup"];
+
+   $pub_id = $sub_q->f("subscription_publication_id"); 
+   $title = $sub_q->f("publication_title"); 
+   $renew = $sub_q->f("subscription_renewal_id"); 
+   $recept = $sub_q->f("subscription_reception_id"); 
+  
+  // renewal mode select
+  $sel_renew = "<select name=\"sel_renew\" id=\"sel_renew\">";
+  while ($renew_q->next_record()) {
+    $n_id = $renew_q->f("subscriptionrenewal_id");
+    $sel_renew .= "\n<option value=\"$n_id\"";
+    if ($n_id == $renew) { $sel_renew .= " selected=\"selected\""; }
+    $sel_renew .= ">". $renew_q->f("subscriptionrenewal_label") . "</option>\n";
+  }
+  $sel_type .= "</select>";
+
+  // reception mode select
+  $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
+  while ($recept_q->next_record()) {
+    $k_id = $recept_q->f("subscriptionreception_id");
+    $sel_recept .= "\n<option value=\"$k_id\"";
+    if ($k_id == $recept) { $sel_recept .= " selected=\"selected\""; }
+    $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
+  }
+  $sel_recept .= "</select>";
+  
+  $block_publi = "$title<input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$pub_id\" />";
+     	
+
+  $display["title"] = "<div class=\"title\">$l_subscription  $title</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    $js_ctry
+
+    <form method=\"get\" name=\"form_auto_subscription\"
+      onsubmit=\"if (check_subscription(this)) return true; else return false;\"
+      action=\"".url_prepare("publication_index.php")."\">
+
+    <div class=\"detailHead\">$l_subscription</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">
+      $l_publication 
+      </td>
+      <td class=\"detailForm\">
+	$block_publi
+      </td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_renew</td>
+      <td class=\"detailForm\">$sel_renew</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_recept</td>
+      <td class=\"detailForm\">$sel_recept</td>
+    </tr>
+    </table>
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
@@ -1479,7 +1574,7 @@ function dis_subscription_external_list($hash_table) {
 function html_subscription_list_result($sub_q,$nb_subscription) {
   global $set_theme,$ico_update;
   global $l_timecreate, $l_timeupdate,$l_publication_title;
-  global $l_year, $l_renewal,$l_recept,$l_quantity;
+  global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
   global  $path, $auth,$popup_height,$popup_width;
 
   $block = " 
@@ -1487,6 +1582,7 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
    <tr>
     <td class=\"resultHead\">$l_publication_title</td>
     <td class=\"resultHead\">$l_year</td>
+    <td class=\"resultHead\">$l_lang</td>
     <td class=\"resultHead\">$l_renewal</td>
     <td class=\"resultHead\">$l_recept</td>
     <td class=\"resultHead\">$l_quantity</td>
@@ -1511,6 +1607,7 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
     </a>
     </td>
     <td class=\"resultText\">".$sub_q->f("publication_year")."</td>
+    <td class=\"resultText\">".$sub_q->f("publication_lang")."</td>
     <td class=\"resultText\">".$sub_q->f("subscriptionrenewal_label")."</td>
     <td class=\"resultText\">".$sub_q->f("subscriptionreception_label")."</td>
     <td class=\"resultText\">".$sub_q->f("subscription_quantity")."</td>

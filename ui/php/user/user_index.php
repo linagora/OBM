@@ -40,14 +40,7 @@ get_user_action();
 $perm->check_permissions($menu, $action);
 $uid = $auth->auth["uid"];
 
-// updating the user bookmark : 
-if ( ($param_user == $last_user) && (strcmp($action,"delete")==0) ) {
-  $last_user = $last_user_default;
-} else if ( ($param_user > 0) && ($last_user != $param_user) ) {
-  $last_user = $param_user;
-  run_query_set_user_pref($uid, "last_user", $param_user);
-  $last_user_name = run_query_global_user_name($last_user);
-}
+update_last_visit("user", $param_user, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -133,7 +126,7 @@ elseif ($action == "index" || $action == "") {
       if ($retour) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
         // insertion of his default preferences : 
-        $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
+        $user_id = run_query_id_user($obm_user["login"]);
         run_query_default_preferences_insert($user_id);
       } else {
       $display["msg"] .= display_err_msg($l_insert_error);
@@ -148,8 +141,8 @@ elseif ($action == "index" || $action == "") {
       } else {
         $retour = run_query_insert($obm_user);
         if ($retour) {
-          // insertion of his default preferences : 
-          $user_id = run_query_id_user($obm_user["login"], $obm_user["passwd"]);
+          // insertion of his default preferences :
+          $user_id = run_query_id_user($obm_user["login"]);
           run_query_default_preferences_insert($user_id);
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
@@ -320,7 +313,7 @@ function get_user_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','admin','detailconsult','reset','display') 
+    'Condition'=> array ('search','index','insert','update','admin','detailconsult','reset','display') 
                                   );
 
 // Search

@@ -141,7 +141,7 @@ class OBM_User_Sql extends CT_Sql {
 
 class OBM_Session extends Session {
   var $cookie_name     	= "OBM_Session";
-  var $cookie_domain  	= "aliacom.local";
+//  var $cookie_domain  	= "aliacom.local";
   var $mode           	= "cookie";     // We propagate session ID with cookies
   var $lifetime_default = 0x7fffffff;   // session cookie if global lifetime=0
   var $allowcache	= "" ;

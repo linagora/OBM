@@ -15,7 +15,7 @@
 // - insert             -- form fields    -- insert the company
 // - update             -- form fields    -- update the company
 // - check_delete       -- $param_company -- check links before delete
-// - delete             -- $hd_company_id -- delete the company
+// - delete             -- $param_company -- delete the company
 // - admin              --                -- admin index (kind)
 // - kind_insert        -- form fields    -- insert the kind
 // - kind_update        -- form fields    -- update the kind
@@ -47,15 +47,7 @@ include("$obminclude/global_pref.inc");
 require("company_query.inc");
 require("company_display.inc");
 
-
-// updating the company bookmark : 
-if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
-  $last_company = $last_company_default;
-} else if ( ($param_company > 0 ) && ($last_company != $param_company) ) {
-  $last_company = $param_company;
-  run_query_set_user_pref($auth->auth["uid"],"last_company", $param_company);
-  $last_company_name = run_query_global_company_name($last_company);
-}
+update_last_visit("company", $param_company, $action);
 
 page_close();
 if ($action == "") $action = "index";
@@ -129,9 +121,9 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_company > 0) {
-    $comp_q = run_query_detail($param_company);
-    $cat_q = run_query_get_companycat_name($param_company);
+  if ($company["id"] > 0) {
+    $comp_q = run_query_detail($company["id"]);
+    $cat_q = run_query_get_companycat_name($company["id"]);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
       $display["detail"] = html_company_consult($comp_q, $cat_q);
@@ -142,8 +134,8 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($param_company > 0) {
-    $comp_q = run_query_detail($param_company);
+  if ($company["id"] > 0) {
+    $comp_q = run_query_detail($company["id"]);
     if ($comp_q->num_rows() == 1) {
       $dsrc_q = run_query_datasource();
       $type_q = run_query_companytype();
@@ -151,7 +143,7 @@ if ($action == "ext_get_id") {
       $users = array($comp_q->f("company_marketingmanager_id"));
       $usr_q = run_query_all_users_from_group($cg_com, $users);
       $cat_q = run_query_companycat();
-      $compcat = run_query_get_companycat($param_company);
+      $compcat = run_query_get_companycat($company["id"]);
       $ctry_q = run_query_country();
       require("company_js.inc");
       $display["detailInfo"] = display_record_info($comp_q);
@@ -205,20 +197,20 @@ if ($action == "ext_get_id") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($param_company, $company)) {
-    $retour = run_query_update($param_company, $company);
+  if (check_data_form($company["id"], $company)) {
+    $retour = run_query_update($company["id"], $company);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $comp_q = run_query_detail($param_company);
-    $cat_q = run_query_get_companycat_name($param_company);
+    $comp_q = run_query_detail($company["id"]);
+    $cat_q = run_query_get_companycat_name($company["id"]);
     $display["detailInfo"] .= display_record_info($comp_q);
     $display["detail"] = html_company_consult($comp_q, $cat_q);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
-    $comp_q = run_query_detail($param_company);
+    $comp_q = run_query_detail($company["id"]);
     $dsrc_q = run_query_datasource();
     $type_q = run_query_companytype();
     $act_q = run_query_companyactivity();
@@ -232,11 +224,11 @@ if ($action == "ext_get_id") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("company_js.inc");
-  $display["detail"] = dis_check_links($param_company);
+  $display["detail"] = dis_check_links($company["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($hd_company_id);
+  $retour = run_query_delete($company["id"]);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -426,7 +418,7 @@ function get_param_company() {
   global $tf_num, $cb_archive, $tf_name, $tf_aka, $tf_ad1, $tf_ad2, $tf_ad3;
   global $tf_zip, $tf_town, $tf_cdx, $sel_ctry, $tf_phone, $tf_fax, $tf_web;
   global $tf_email, $sel_act, $sel_kind,$sel_cat, $sel_market, $ta_com;
-  global $tf_dateafter, $tf_datebefore;
+  global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
   global $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
@@ -485,6 +477,7 @@ function get_param_company() {
   // Search fields
   if (isset ($tf_dateafter)) $company["dateafter"] = $tf_dateafter;
   if (isset ($tf_datebefore)) $company["datebefore"] = $tf_datebefore;
+  if (isset ($cb_fuzzy)) $company["fuzzy"] = ($cb_fuzzy == 1 ? 1 : 0);
 
   // Admin - Kind fields
   // $sel_kind -> "kind" is already set
@@ -539,7 +532,7 @@ function get_company_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('search','index','detailconsult','insert','update','admin','display') 
+    'Condition'=> array ('search','index','detailconsult','insert','update','delete','admin','display') 
                                      );
 
 // Detail Consult
@@ -734,6 +727,7 @@ function get_company_action() {
     'Condition'=> array ('None')
   );     
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Company Actions URL updates (after processing, before displaying menu)

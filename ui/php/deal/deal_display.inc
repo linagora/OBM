@@ -376,7 +376,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Labels
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
-  global $display, $perms_user,$l_perms_user;
+  global $display;
 
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
@@ -505,7 +505,7 @@ function html_deal_links($deal_q, $inv_nb) {
   global $l_header_document,$ico_document,$l_deal, $l_header_project;
   global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
   global $l_document_new,$l_document_add,$ico_document_new;
-  global $perms_user, $path, $auth,$popup_height,$popup_width;
+  global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -519,7 +519,6 @@ function html_deal_links($deal_q, $inv_nb) {
   $project = $deal_q->f("deal_project_status");
   $market = $deal_q->f("deal_marketingmanager_id");
   $tech = $deal_q->f("deal_technicalmanager_id");
-  $nb_pro = run_query_linked_project_nb ($id, "deal");
 
   // parent deal
   if ($pid > 0) {
@@ -532,56 +531,49 @@ function html_deal_links($deal_q, $inv_nb) {
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid&amp;param_deal=$id");
 
   // Project
-  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
-  $dis_ico_project = "
+  if ($cgp_show["module"]["project"]) {
+    $nb_pro = run_query_linked_project_nb ($id, "deal");
+    $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
+    $dis_ico_project = "
         <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>";
 
-  // New project allowed only if hitrate = 100
-  if ($hitrate == "100") {
-    $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
-    $dis_ico_project .= "
+    // New project allowed only if hitrate = 100
+    if ($hitrate == "100") {
+      $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_deal=$id&amp;deal_label=$label&amp;param_company=$cid&amp;tf_company_name=$cname&amp;sel_tt=$tt_id");
+      $dis_ico_project .= "
         <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
             <a href=\"$url_pro_new\">$l_project_new</a></li>";
-  }
+    }
     
-  $dis_project_link = "
+    $block_project = "
      <div class=\"linkTitle\">:: $l_header_project</div>
      <ul class=\"linkList\">
        $dis_ico_project
      </ul>";
+  }
 
   // Contract
-  $contract_nb = run_query_contract_nb ($id);
-  $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
-  $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
-
-  // Invoice
-  $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
-  $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
-  $nb_inv_arch = run_query_nb_archived_invoices ($id);
-
-  // Document
-  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
-  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Deal");
-  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
-  $nb_document = run_query_document_nb ($id,"Deal");
-
-  $block = "<div class=\"link\">
-  <div class=\"linkTitle\">:: $l_parentdeal</div>
-  <ul class=\"linkList\">
-    $dis_pdeal
-    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
-        <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
-  </ul>
-  $dis_project_link
+  if ($cgp_show["module"]["contract"]) {
+    $contract_nb = run_query_contract_nb ($id);
+    $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
+    $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
+    $block_contract = "
   <div class=\"linkTitle\">:: $l_header_contract</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
     <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_contract_new</a></li>
-  </ul>
+  </ul>";
+  }
+
+  // Invoice
+  if ($cgp_show["module"]["invoice"]) {
+    $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
+    $nb_inv_arch = run_query_nb_archived_invoices ($id);
+    $block_invoice = "
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
@@ -590,7 +582,16 @@ function html_deal_links($deal_q, $inv_nb) {
         <a href=\"$url_inv\">$l_archived_invoices ($nb_inv_arch)</a></li>
     <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_invoice_new</a></li>
-  </ul>
+  </ul>";
+  }
+
+  // Document
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Deal");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Deal");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
+    $nb_document = run_query_document_nb($id,"Deal");
+    $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
@@ -602,7 +603,21 @@ function html_deal_links($deal_q, $inv_nb) {
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
+  </ul>";
+  }
+
+  // Links Template  
+  $block = "<div class=\"link\">
+  <div class=\"linkTitle\">:: $l_parentdeal</div>
+  <ul class=\"linkList\">
+    $dis_pdeal
+    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
+        <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
+  $block_project
+  $block_contract
+  $block_invoice
+  $block_doc
        
  </div>
 ";
@@ -628,7 +643,6 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoice, $l_no_invoice, $l_see_archived_invoices, $incl_arch;
   global $display, $path, $auth, $c_yes, $c_no;
-  global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
   $pid = $deal_q->f("deal_parentdeal_id");
@@ -1987,7 +2001,7 @@ function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
-  global $display, $path, $perms_user;
+  global $display, $path;
   global $l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
   global $l_infos;

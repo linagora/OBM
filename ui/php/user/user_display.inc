@@ -625,6 +625,7 @@ function dis_check_links($p_id) {
 
   $obm_q = new DB_OBM;
   $tables = $obm_q->table_names();
+  echo "AAAAAAAAAAA";
 
   $i = 0;
   while ($tables[$i]["table_name"]) {
@@ -633,7 +634,9 @@ function dis_check_links($p_id) {
     $userupdate = $table . "_userupdate";
 
     $obm_qm = new DB_OBM;
+  echo "BBBBBBBBBB";
     $fields = $obm_qm->metadata($table, false);
+  echo "CCCCCCCCCC";
     $fieldexist_uc = false;
     $fieldexist_uu = false;
     $j = 0;

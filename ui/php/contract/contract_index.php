@@ -43,16 +43,7 @@ include("$obminclude/global_pref.inc");
 require("contract_query.inc");
 require("contract_display.inc");
 
-
-// Updating the "last contract" bookmark 
-if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
-  $last_contract=$last_contract_default;
-} elseif  ( ($param_contract > 0) && ($last_contract != $param_contract) ) {
-  $last_contract=$param_contract;
-  run_query_set_user_pref($auth->auth["uid"],"last_contract",$param_contract);
-  $last_contract_name = run_query_global_contract_label($last_contract);
-  //$sess->register("last_contract");
-}
+update_last_visit("contract", $param_contract, $action);
 
 page_close();
 
@@ -362,7 +353,7 @@ function get_contract_action() {
     'Url'      => "$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
     'Popup'    => 1,
-    'Condition'=> array ('','search','index','detailconsult','admin','display')
+    'Condition'=> array ('','search','index','detailconsult','admin','type_insert','type_update','type_delete','display')
                                       );
 
 // Insert
@@ -395,13 +386,21 @@ function get_contract_action() {
     'Condition'=> array ('None') 
                                     	);
 
-// Delete
+// Check Delete
   $actions["CONTRACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
+
+// Delete
+  $actions["CONTRACT"]["delete"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$contract["id"]."",
+    'Right'    => $cright_write,
+    'Condition'=> array ('None') 
+                                     	 );
+
 // Admin
   $actions["CONTRACT"]["admin"] = array (
     'Name'     => $l_header_admin,
@@ -417,16 +416,22 @@ function get_contract_action() {
     'Condition'=> array ('None') 
                                     	);
 
-// Admin Type Insert
-  $actions["CONTRACT"]["type_delete"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=type_delete",
+// Admin Type Update
+  $actions["CONTRACT"]["type_update"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=type_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
-// Admin Type Update
-  $actions["CONTRACT"]["type_update"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=type_update",
+// Admin Type check link
+  $actions["CONTRACT"]["type_checklink"] = array (
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                    	);
+
+// Admin Type Delete
+  $actions["CONTRACT"]["type_delete"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=type_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);

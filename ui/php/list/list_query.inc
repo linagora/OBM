@@ -846,8 +846,8 @@ function make_query($list) {
              left join Company on contact_company_id=company_id
 	     left join CompanyCategoryLink on company_id = companycategorylink_company_id 
 	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
-	     left join ContactCategory1link on contact_id = contactcategory1link_contact_id
-	     left join ContactCategory2link on contact_id = contactcategory2link_contact_id
+	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id
+	     left join ContactCategory2Link on contact_id = contactcategory2link_contact_id
 	     left join Subscription on subscription_contact_id = contact_id
 	     left join Publication on publication_id = subscription_publication_id";  
   
@@ -898,11 +898,12 @@ function make_query($list) {
         } 
       }
     }
-  }
-
   foreach($condition as $line=>$value) {
     $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
+  }    
   }
+
+
 
 
 

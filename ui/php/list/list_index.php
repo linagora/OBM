@@ -51,14 +51,7 @@ require("$obminclude/global_pref.inc");
 include("list_display.inc");
 include("list_query.inc");
 
-// updating the list bookmark : 
-if ( ($param_list == $last_list) && (strcmp($action,"delete")==0) ) {
-  $last_list = $last_list_default;
-} else if ( ($param_list > 0 ) && ($last_list != $param_list) ) {
-  $last_list = $param_list;
-  run_query_set_user_pref($auth->auth["uid"],"last_list", $param_list);
-  $last_list_name = run_query_global_list_name($last_list);
-}
+update_last_visit("list", $param_list, $action);
 
 if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
@@ -127,7 +120,7 @@ else if ($action == "detailupdate") {
 
 else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
-  if(isset($list["criteria"])) {
+  if($list["criteria"] != "") {
     $list["query"] = make_query($list);
   }
   if (check_data_form("", $list)) {
@@ -166,7 +159,7 @@ else if ($action == "insert") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if(isset($list["criteria"])) {
+  if($list["criteria"]!="") {
     $list["query"] = make_query($list);
   }
   if (check_data_form($list["id"], $list)) {

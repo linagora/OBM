@@ -373,8 +373,8 @@ function check_data_form($p_id, $user) {
     $err_msg = $l_login_error." : ". $login;
     return false;
   }
-  // MANDATORY: User password
-  if (trim($passwd) == "") {
+  // MANDATORY: User password on insert
+  if (($action == "insert") && (trim($passwd) == "")) {
     $err_msg = $l_password_error." : ". $passwd;
     return false;
   }

@@ -192,7 +192,6 @@ function run_query_detail($id) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : deal insertion                                          //
 // Parameters:

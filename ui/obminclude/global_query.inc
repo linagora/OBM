@@ -61,19 +61,18 @@ function sql_casei_like($db_type) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution : get the Id of one User from its login / pass
+// Query Execution : get the Id of one User from its login
 // Parameters:
 //   - $login  : login
-//   - $passwd : password
 // Returns:
 //   - user's Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_id_user($login, $passwd) {
+function run_query_id_user($login) {
   global $cdg_sql;
 
   $connect_db = new DB_OBM ;
-  if (isset($login) && isset($passwd)) {
-    $query = "select userobm_id from UserObm where userobm_login='$login' and userobm_password='$passwd' " ;
+  if (isset($login)) {
+    $query = "select userobm_id from UserObm where userobm_login='$login'" ;
     display_debug_msg($query, $cdg_sql);
     $connect_db->query($query) ;
     $connect_db->next_record() ;
@@ -704,11 +703,7 @@ function session_load_global_prefs() {
 // This must be called in an open session (between page_open and page_close )
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
-  global $sess, $auth;
-  global $last_company_name,$last_contact_name,$last_deal_name,$last_list_name;
-  global $last_parentdeal_name, $last_contract_name, $last_incident_name;
-  global $last_account_name, $last_invoice_name, $last_payment_name;
-  global $last_user_name, $last_group_name, $last_project_name;
+  global $sess, $auth, $last_v;
   global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
   global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
   global $todo_5_id, $todo_5_title;
@@ -721,32 +716,37 @@ function session_load_user_prefs() {
     $$tab[0]=$tab[1];
     $sess->register("$tab[0]");
   }
-  $last_company_name = run_query_global_company_name($last_company);
-  $sess->register("last_company_name");
-  $last_contact_name = run_query_global_contact_name($last_contact);
-  $sess->register("last_contact_name");
-  $last_deal_name = run_query_global_deal_label($last_deal);
-  $sess->register("last_deal_name");
-  $last_parentdeal_name = run_query_global_parentdeal_label($last_parentdeal);
-  $sess->register("last_parentdeal_name");
-  $last_list_name = run_query_global_list_name ($last_list); 
-  $sess->register("last_list_name");
-  $last_account_name = run_query_global_account_label($last_account);
-  $sess->register("last_account_name");
-  $last_invoice_name = run_query_global_invoice_label ($last_invoice);
-  $sess->register("last_invoice_name");
-  $last_payment_name = run_query_global_payment_label ($last_payment);
-  $sess->register("last_payment_name");
-  $last_contract_name = run_query_global_contract_label ($last_contract); 
-  $sess->register("last_contract_name");
-  $last_project_name = run_query_global_project_name($last_project);
-  $sess->register("last_project_name");
-  $last_incident_name = run_query_global_incident_label ($last_incident); 
-  $sess->register("last_incident_name");
-  $last_user_name = run_query_global_user_name ($last_user); 
-  $sess->register("last_user_name");
-  $last_group_name = run_query_global_group_name ($last_group); 
-  $sess->register("last_group_name");
+
+  $last_v["company"]["id"] = $last_company;
+  $last_v["company"]["text"] = get_last_company_text($last_company);
+  $last_v["contact"]["id"] = $last_contact;
+  $last_v["contact"]["text"] = get_last_contact_text($last_contact);
+  $last_v["deal"]["id"] = $last_deal;
+  $last_v["deal"]["text"] = get_last_deal_text($last_deal);
+  $last_v["parentdeal"]["id"] = $last_parentdeal;
+  $last_v["parentdeal"]["text"] = get_last_parentdeal_text($last_parentdeal);
+  $last_v["list"]["id"] = $last_list;
+  $last_v["list"]["text"] = get_last_list_text($last_list);
+  $last_v["publication"]["id"] = $last_publication;
+  $last_v["publication"]["text"] = get_last_publication_text($last_publication);
+  $last_v["project"]["id"] = $last_project;
+  $last_v["project"]["text"] = get_last_project_text($last_project);
+  $last_v["contract"]["id"] = $last_contract;
+  $last_v["contract"]["text"] = get_last_contract_text($last_contract);
+  $last_v["incident"]["id"] = $last_incident;
+  $last_v["incident"]["text"] = get_last_incident_text($last_incident);
+  $last_v["account"]["id"] = $last_account;
+  $last_v["account"]["text"] = get_last_account_text($last_account);
+  $last_v["invoice"]["id"] = $last_invoice;
+  $last_v["invoice"]["text"] = get_last_invoice_text($last_invoice);
+  $last_v["payment"]["id"] = $last_payment;
+  $last_v["payment"]["text"] = get_last_payment_text($last_payment);
+  $last_v["user"]["id"] = $last_user;
+  $last_v["user"]["text"] = get_last_user_text($last_user);
+  $last_v["group"]["id"] = $last_group;
+  $last_v["group"]["text"] = get_last_group_text($last_group);
+
+  $sess->register("last_v");
 
   $todo_1_title = run_query_global_todo_title($todo_1_id);
   $sess->register("todo_1_title");
@@ -842,36 +842,67 @@ function run_query_log_session($obm_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Function that Update a Last visited entry if needed
+// Parameters:
+//   - $entity : entity
+//   - $id     : entity id
+//   - $action : action called 
+///////////////////////////////////////////////////////////////////////////////
+function update_last_visit($entity, $id, $action) {
+  global $auth, $last_v;
+
+  if ( ($id == $last_v[$entity]["id"]) && (strcmp($action,"delete")==0) ) {
+    $last_v[$entity]["id"] = 0;
+    $last_v[$entity]["text"] = 0;
+  } else if ( ($id > 0 ) && ($last_v[$entity]["id"] != $id) ) {
+    $last_v[$entity]["id"] = $id;
+    run_query_set_user_pref($auth->auth["uid"], "last_$entity", $id);
+    $function_get_last_text = "get_last_${entity}_text";
+    $last_v[$entity]["text"] = $function_get_last_text($id);
+  }
+  
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Get the company name from the company Id
 // Parameters:
-//   - $c_id : company id 
+//   - $id : company id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_company_name($c_id) {
+function get_last_company_text($id) {
   global $cdg_sql;
-  
-  $query = "select company_name from Company where company_id='$c_id'";
-  $obm_db = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("company_name");
+
+  if ($id > 0) {
+    $query = "select company_name from Company where company_id='$id'";
+    $obm_q = new DB_OBM;
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("company_name");
+  }
+
+  return;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the contact name from the contact Id
 // Parameters:
-//   - $c_id : contact id 
+//   - $id : contact id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_contact_name($c_id) {
+function get_last_contact_text($id) {
   global $cdg_sql;
   
-  $query = "select contact_lastname from Contact where contact_id='$c_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("contact_lastname");
+  if ($id > 0) {
+    $query = "select contact_lastname from Contact where contact_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("contact_lastname");
+  }
+
+  return;
 }
 
 
@@ -880,34 +911,41 @@ function run_query_global_contact_name($c_id) {
 // Parameters:
 //   - $d_id : deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_deal_label($d_id) {
+function get_last_deal_text($id) {
   global $cdg_sql;
 
-  $query = "select deal_label from Deal where deal_id='$d_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("deal_label");
+  if ($id > 0) {
+    $query = "select deal_label from Deal where deal_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("deal_label");
+  }
+
+  return;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Parent deal label from the parent deal Id
 // Parameters:
-//   - $p_id : parent deal id 
+//   - $id : parent deal id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_parentdeal_label($p_id) {
+function get_last_parentdeal_text($id) {
   global $cdg_sql;
 
-  $query = "select parentdeal_label
+  if ($id > 0) {
+    $query = "select parentdeal_label
     from ParentDeal
-    where parentdeal_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("parentdeal_label");
+    where parentdeal_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("parentdeal_label");
+  }
+  return;
 }
 
 
@@ -916,118 +954,159 @@ function run_query_global_parentdeal_label($p_id) {
 // Parameters:
 //   - $id : list id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_list_name($id) {
+function get_last_list_text($id) {
   global $cdg_sql;
   
-  $query = "select list_name from List where list_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("list_name");
+  if ($id > 0) {
+    $query = "select list_name from List where list_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("list_name");
+  }
+  return;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the contract label from the contract Id
+// Get the publication name from the publication Id
 // Parameters:
-//   - $c_id : contract id 
+//   - $id : publication id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_contract_label($c_id) {
+function get_last_publication_text($id) {
   global $cdg_sql;
   
-  $query = "select contract_label from Contract where contract_id='$c_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("contract_label");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the incident label from the incident Id
-// Parameters:
-//   - $i_id : incident id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_incident_label($i_id) {
-  global $cdg_sql;
-  
-  $query = "select incident_label from Incident where incident_id='$i_id'";
-  // Problem because called before include global.inc in setting module
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("incident_label");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the account label from the account Id
-// Parameters:
-//   - $a_id : account id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_account_label($a_id) {
-  global $cdg_sql;
-
-  $query = "select account_label from Account where account_id='$a_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("account_label");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the invoice label from the invoice Id
-// Parameters:
-//   - $a_id : invoice id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_invoice_label($i_id) {
-  global $cdg_sql;
-  
-  $query = "select invoice_label from Invoice where invoice_id='$i_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("invoice_label");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the payment label from the payment Id
-// Parameters:
-//   - $p_id : payment id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_payment_label($p_id) {
-  global $cdg_sql;
-  
-  $query = "select payment_label from Payment where payment_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("payment_label");
+  if ($id > 0) {
+    $query = "select publication_title from Publication
+     where publication_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("publication_title");
+  }
+  return;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the deal project from the project Id
 // Parameters:
-//   - $p_id : project id 
+//   - $id : project id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_project_name($p_id) {
+function get_last_project_text($id) {
   global $cdg_sql;
 
-  $query = "select project_name from Project where project_id='$p_id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("project_name");
+  if ($id > 0) {
+    $query = "select project_name from Project where project_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("project_name");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the contract label from the contract Id
+// Parameters:
+//   - $id : contract id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_contract_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $query = "select contract_label from Contract where contract_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("contract_label");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the incident label from the incident Id
+// Parameters:
+//   - $id : incident id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_incident_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $query = "select incident_label from Incident where incident_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("incident_label");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the account label from the account Id
+// Parameters:
+//   - $id : account id
+///////////////////////////////////////////////////////////////////////////////
+function get_last_account_text($id) {
+  global $cdg_sql;
+
+  if ($id > 0) {
+    $query = "select account_label from Account where account_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("account_label");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the invoice label from the invoice Id
+// Parameters:
+//   - $id : invoice id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_invoice_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $query = "select invoice_label from Invoice where invoice_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("invoice_label");
+  }
+  return;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the payment label from the payment Id
+// Parameters:
+//   - $id : payment id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_payment_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $query = "select payment_label from Payment where payment_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("payment_label");
+  }
+  return;
 }
 
 
@@ -1036,16 +1115,40 @@ function run_query_global_project_name($p_id) {
 // Parameters:
 //   - $id : user id 
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_global_user_name($id) {
+function get_last_user_text($id) {
   global $cdg_sql;
   
-  $query = "select userobm_login from UserObm where userobm_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("userobm_login");
+  if ($id > 0) {
+    $query = "select userobm_login from UserObm where userobm_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("userobm_login");
+  }
+  return;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the Group name from the group Id
+// Parameters:
+//   - $id : group id 
+///////////////////////////////////////////////////////////////////////////////
+function get_last_group_text($id) {
+  global $cdg_sql;
+  
+  if ($id > 0) {
+    $query = "select group_name from UGroup where group_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("group_name");
+  }
+  return;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Todo label from the contract Id
@@ -1055,29 +1158,15 @@ function run_query_global_user_name($id) {
 function run_query_global_todo_title($id) {
   global $cdg_sql;
   
-  $query = "select todo_title from Todo where todo_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("todo_title");
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Get the Group name from the group Id
-// Parameters:
-//   - $id : group id 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_global_group_name($id) {
-  global $cdg_sql;
-  
-  $query = "select group_name from UGroup where group_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-  $obm_db->next_record();
-  return $obm_db->f("group_name");
+  if ($id > 0) {
+    $query = "select todo_title from Todo where todo_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_db = new DB_OBM;
+    $obm_db->query($query);
+    $obm_db->next_record();
+    return $obm_db->f("todo_title");
+  }
+  return;
 }
 
 

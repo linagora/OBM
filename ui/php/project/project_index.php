@@ -54,14 +54,7 @@ require("project_js.inc");
 $uid = $auth->auth["uid"];
 $perms = $auth->auth["perm"];
 
-// updating the project bookmark : 
-if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
-  $last_project = $last_project_default;
-} else if ( ($param_project > 0 ) && ($last_project != $param_project) ) {
-  $last_project = $param_project;
-  run_query_set_user_pref($uid,"last_project",$param_project);
-  $last_project_name = run_query_global_project_name($last_project);
-}
+update_last_visit("project", $param_project, $action);
 
 page_close();
 if ($action == "") $action = "index";
@@ -547,7 +540,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_del', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'task', 'task_add', 'task_del', 'allocate', 'progress') 
                                      );
 
 // Select members : Lists selection

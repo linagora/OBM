@@ -47,6 +47,7 @@ include("$obminclude/global_pref.inc");
 require("publication_query.inc");
 require("publication_display.inc");
 
+update_last_visit("publication", $param_publication, $action);
 
 page_close();
 if ($action == "") $action = "index";

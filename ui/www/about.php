@@ -51,29 +51,28 @@
       </tr>
       <tr> 
         <td bgcolor="#E2F1F3">Linux</td>
-        <td bgcolor="#E2F1F3">2.0.31 - 2.4.22 </td>
+        <td bgcolor="#E2F1F3">2.0.31 - 2.4.25 </td>
         <td bgcolor="#E2F1F3">OBM shouldn't be related to kernel and OS
           version directly (should run on every UNIX)</td>
       </tr>
       <tr bgcolor="#F1F9FA"> 
         <td>Apache</td>
         <td>1.3.3 - 1.3.27; 2.0.40 - </td>
-        <td>Not tested on 1.2 but should work with</td>
+        <td></td>
       </tr>
       <tr bgcolor="#E2F1F3"> 
         <td>PHP</td>
         <td>OBM <b>0.3, 0.4</b> : 3.0.5 - 3.0.16; 4.0.1 pl2 - 4.1.x
-          <br />OBM <b>0.5.x</b> : 4.0.x - 4.3.x (PHP3 no more supported)
-          <br />OBM <b>0.6.x</b> : 4.0.x - 4.3.x
+          <br />OBM <b>0.5.x, 0.6.x</b> : 4.0.x - 4.3.x
           <br />OBM <b>0.7.x</b> : 4.1.x - 4.3.x
+          <br />OBM <b>0.8.x</b> : 4.2.x - 4.3.x
         </td>
-        <td>One or two &quot;;&quot; to delete with 4.0.x (for OBM 0.3)
-          but that's all </td>
+        <td>pg_query() need PHP >= 4.2.0</td>
       </tr>
       <tr bgcolor="#F1F9FA"> 
         <td>PHPlib</td>
-        <td>7 - 7.2</td>
-        <td>Parts used are included (but modified) in OBM
+        <td>Customized version</td>
+        <td>included (but modified) in OBM
           </td>
       </tr>
       <tr bgcolor="#E2F1F3"> 
@@ -86,7 +85,7 @@
         <td>7.1.x, 7.2.x, 7.3.x</td>
         <td>Was supported in 0.3.0
           <br>
-          Postgres support back since 0.7.5</td>
+          Postgres support back since 0.8.0</td>
       </tr>
     </table>
     <p>&nbsp; </p>
@@ -113,12 +112,10 @@
 
     <div align="center"></div>
     <p /><br>
-      All OBM versions support MySQL, and PostgreSQL is supported since 0.3.0. 
-      Multidatabase support is done throught Phplib, and all database interactions are done in specific files (module_query.inc) so it should be easy 
-      now to add support for other databases. </p>
-     <p />Phplib dependance will be removed in the future when the enhanced
-     session and authentification layers are completed and a new database
-     abstraction layer has been chosen.
+      All OBM versions support MySQL, and PostgreSQL is supported since 0.8.0.
+      Support for other databases should be not too hard.
+    </p>
+
   <ul>
     <li> 
       <div align="left"> Apache : <a href="http://www.apache.org" target="_blank">www.apache.org</a> 

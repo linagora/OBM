@@ -374,7 +374,6 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
   global $display, $path, $action, $auth, $cgp_hide;
-  global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
   $c_id = $co_q->f("contact_company_id");
@@ -624,7 +623,6 @@ function html_contact_header($co_q) {
   global $l_update,$l_delete,$l_insert,$l_contact;
   global $c_yes, $c_no, $set_theme;
   global $display, $path, $action, $auth;
-  global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
   $c_id = $co_q->f("contact_company_id");
@@ -676,24 +674,19 @@ function html_contact_header($co_q) {
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
-  // -- Themes
   global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
-  // -- Labels
   global $l_header_document,$l_contact;
   global $l_document_new,$l_document_add,$l_add_document;
   global $l_subscription_new,$l_subscription;  
-  global $perms_user, $path, $auth,$popup_height,$popup_width;
+  global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
-  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
-  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contact");
-  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
-  $nb_document = run_query_document_nb ($id,"Contact");
-  $nb_subscription = run_query_subscription_nb ($id);
-  $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
-  $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1");
-
-  
-  $block = "<div class=\"link\">
+  // Document  
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contact");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
+    $nb_document = run_query_document_nb ($id,"Contact");
+    $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
@@ -705,15 +698,30 @@ function html_contact_links($id) {
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>
+  </ul>";
+  }
+
+  // Publication  
+  if ($cgp_show["module"]["publication"]) {
+    $nb_subscription = run_query_subscription_nb($id);
+    $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
+    $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1");
+    $block_publi = "
   <div class=\"linkTitle\">:: $l_subscription</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription ($nb_subscription)</a></li>
     <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
 	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
-  </ul>
- </div>
+  </ul>";
+  }
+  
+  // Links Template  
+  $block = "
+<div class=\"link\">
+  $block_doc
+  $block_publi
+</div>
  ";
 
   return $block;
@@ -762,7 +770,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, vis, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $set_theme, $ico_company, $l_company;
+  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_phone,$l_letter;
   global $l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_comment;
@@ -807,6 +815,9 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   } elseif ($action == "new") {
     $dsrc = $set_dsrc;
     $mark = $auth->auth["uid"];
+    if ($cgp_mailing_default) {
+      $mailok = " checked";
+    }
     // if company given
     if (is_object($co_q)) {
       // fill the phone with company one

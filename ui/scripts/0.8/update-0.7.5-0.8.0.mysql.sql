@@ -11,6 +11,9 @@
 -- Update preference : todo_order
 UPDATE UserObmPref set userobmpref_option='set_todo', userobmpref_value='priority' where userobmpref_option='todo_order';
 
+-- Drop deprecated last visit preferences : last_*
+delete from UserObmPref where userobmpref_user_id='0' and userobmpref_option like 'last_%';
+
 
 -------------------------------------------------------------------------------
 -- Update Calendar tables
@@ -55,12 +58,16 @@ CREATE TABLE Import (
   UNIQUE (import_name)
 );
 
+
 -- module 'import'
 
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_name', 1, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'import', 'import_datasource', 2, 2);
 
--- module 'Contact'
+
+-------------------------------------------------------------------------------
+-- Update Contact tables
+-------------------------------------------------------------------------------
 --
 -- Table structure for table 'ContactCategory1'
 --
@@ -69,6 +76,7 @@ ALTER TABLE ContactCategory1 CHANGE COLUMN contactcategory1_order contactcategor
 -- Table structure for table 'ContactCategory2'
 --
 ALTER TABLE ContactCategory2 CHANGE COLUMN contactcategory2_order contactcategory2_code int(4) default '0';
+
 
 -------------------------------------------------------------------------------
 -- Publication module tables

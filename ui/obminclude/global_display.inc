@@ -585,7 +585,6 @@ class OBM_DISPLAY {
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
       $block .= "<td class=\"resultHead\">Id</td>";
     }
-    echo "entity=$module";
 
     // Display the checkbox title if needed (exists and left side)
     if (($this->data_cb_side == "left")

@@ -442,7 +442,7 @@ function html_list_form($action, $list_q, $list) {
     <td class=\"detailForm\">
       <input name=\"tf_email\" size=\"30\" value=\"$email\" /></td>
   </tr>";
-  if($action == "insert" || $action == "new" || ($list["criteria"] == "" &&  $crit_q =="")) {
+  if($action == "insert" || $action == "new" || ($list["criteria"]["modules"] == "" &&  unserialize($crit_q) =="")) {
   $block .=  "
     <tr>
       <td class=\"detailLabel\">$l_query<br /> <a id=\"query_show\" href=\"javascript:void(0);\" onclick=\"show_query_field()\">$l_show_query</a></td>
@@ -451,6 +451,15 @@ function html_list_form($action, $list_q, $list) {
     </tr>
     ";
   }
+  else {
+ $block .=  "
+    <tr>
+      <td id=\"query_show\" class=\"detailLabel\"></td>
+      <td id=\"ta_query\" class=\"detailForm\"></td>
+    </tr>
+    ";
+  }    
+
   $block .= " </table>";
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
@@ -475,7 +484,15 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_contact_cat2,$l_function,$l_category;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete;
+  $cty_q = run_query_country();
+  $dsr_q = run_query_datasource();
+  $cat1_q = run_query_contactcategory1();
+  $usr_q = run_query_userobm_active();  
+  $cat2_q = run_query_contactcategory2();
+  $fct_q = run_query_function();
+  $cat_q = run_query_companycategory();
 
+  
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $list_q->f("list_id");
@@ -488,7 +505,20 @@ function html_list_graphical_form($action, $list_q, $list) {
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"];
   }
-  
+
+  $field_label = array(
+      "company_country_id" => $cty_q,
+      "company_marketingmanager_id" => $cty_q,
+      "company_datasource_id" => $dsr_q,
+      "companycategory_code" => $cat_q,
+      "contact_country_id" => $cty_q,
+      "contact_marketingmanager_id" => $usr_q,
+      "contact_datasource_id" => $dsr_q,
+      "contactcategory1link_category_id" => $cat1_q,
+      "contactcategory2link_category_id" => $cat2_q,
+      "contact_function_id" => $fct_q,
+  );
+
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
   if (isset($list["name"])) { $name = stripslashes($list["name"]); }

@@ -166,7 +166,8 @@ $sel_dsrc .= "</select>";
 ///////////////////////////////////////////////////////////////////////////////
 // Debug block (admin only)
 ///////////////////////////////////////////////////////////////////////////////
-if ($auth->auth["perm"] == $perms_admin) {
+// Conditionne a Admin !
+//if ($perm->check_right($menu, $cright_write_admin)) {
   $dis_debug = "
   <tr>
     <td class=\"adminLabel\">$l_set_debug ($set_debug)</td>
@@ -178,7 +179,7 @@ if ($auth->auth["perm"] == $perms_admin) {
       <input type=\"checkbox\" name=\"param_debug_sql\" value=\"$cdg_sql\" $dg_sql />$l_dg_sql
     </td>
   </tr>";
-}
+//}
 
 ///////////////////////////////////////////////////////////////////////////////
 // For each LANGUAGE directory in the lang direcory (but ., .., CVS)         //

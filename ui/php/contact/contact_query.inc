@@ -229,13 +229,17 @@ function run_query_contactcategory2() {
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_detail($p_id) {
-  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  if ($obm_q->type == $db_type_mysql) {
-    $query = "select Contact.*,
-        UNIX_TIMESTAMP(contact_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(contact_timecreate) as timecreate,
+  $db_type = $obm_q->type;
+
+  $timeupdate = sql_date_format($db_type, "contact_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
+
+  $query = "select Contact.*,
+        $timeupdate,
+        $timecreate,
         company_id, company_name, company_phone,
         kind_minilabel,
         kind_header,
@@ -258,20 +262,6 @@ function run_query_contact_detail($p_id) {
         left join UserObm as u on contact_userupdate=u.userobm_id
       where
         contact_id='$p_id'";
-
-  } else if ($obm_q->type == $db_type_pgsql) {
-    $query = "select Contact.*,
-                contact_timeupdate as timeupdate,
-                contact_timecreate as timecreate,
-                company_id, company_name, company_phone,
-                kind_minilabel
-              from
-                Contact left join Kind on kind_id=contact_kind_id,
-                Company
-              where
-                contact_id='$p_id'
-                and company_id=contact_company_id";
-  }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);

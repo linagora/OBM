@@ -36,15 +36,7 @@ require("incident_display.inc");
 
 $uid = $auth->auth["uid"];
 
-// Updating the "last incident" bookmark 
-if ( ($param_incident == $last_incident) && (strcmp($action,"delete")==0) ) {
-  $last_incident=$last_incident_default;
-} elseif  ( ($param_incident > 0) && ($last_incident != $param_incident) ) {
-  $last_incident=$param_incident;
-  run_query_set_user_pref($auth->auth["uid"],"last_incident",$param_incident);
-  $last_incident_name = run_query_global_incident_label($last_incident);
-  //$sess->register("last_incident");
-}
+update_last_visit("incident", $param_incident, $action);
 
 page_close();
 

@@ -180,5 +180,5 @@ $l_year = "Year";
 $l_renewal = "Renewal mode";
 $l_recept = "Reception mode";
 $l_quantity = "Quantity";
-$l_no_found_subscription = "No subscription found matching this contact !";
+$l_no_found_subscription = "No subscription found for this contact !";
 

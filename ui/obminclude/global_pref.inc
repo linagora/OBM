@@ -55,17 +55,6 @@ if ($set_commentorder == "") $set_commentorder = $set_commentorder_default;
 if ($set_debug == "") $set_debug = $set_debug_default;
 if ($set_cal_interval == "") $set_cal_interval = $set_cal_interval_default;
 
-if ($last_company == "") $last_company=$last_company_default;
-if ($last_deal == "") $last_deal=$last_deal_default;
-if ($last_contact == "") $last_contact=$last_contact_default;
-if ($last_account == "") $last_account=$last_account_default;
-if ($last_invoice == "") $last_invoice=$last_invoice_default;
-if ($last_payment == "") $last_payment=$last_payment_default;
-if ($last_project == "") $last_project=$last_project_default;
-if ($last_contract == "") $last_contract=$last_contract_default;
-if ($last_incident == "") $last_incident=$last_incident_default;
-if ($last_user == "") $last_user = $last_user_default;
-if ($last_group == "") $last_group = $last_group_default;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Inclusion of the correct Theme.                                           //
@@ -124,7 +113,7 @@ if ($menu != "") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Inclusion of the correct Display file (global display functrions)         //
+// Inclusion of the correct Display file (global display functions)          //
 ///////////////////////////////////////////////////////////////////////////////
 $display_include_file = "$obminclude/themes/$set_theme/display.inc";
 include("$display_include_file");

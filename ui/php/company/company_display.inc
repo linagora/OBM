@@ -65,7 +65,10 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "company_web") {
     $web = $OD->data_set->f("company_web");
     if (strcmp($web,"") != 0) {
-      if (strcmp(substr($web,0,5), "http:") != 0) {
+      if ( (strcmp(substr($web,0,7), "http://") == 0)
+           || (strcmp(substr($web,0,8), "https://") == 0) ) {
+	$res["url"] = "";
+      } else {
 	$res["url"] = "http://";
       }
       $res["url"] .= $web;
@@ -161,7 +164,7 @@ function dis_company_search_form($company="") {
 function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find;
+  global $l_all, $l_find, $l_fuzzy;
   global $c_all, $cgp_hide;
 
   $popup = $company["popup"];
@@ -176,6 +179,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   $zip = stripslashes($company["zip"]);
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
+  $fuzzy = ($company["fuzzy"] == "1" ? "checked = \"checked\"" : "");
 
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
@@ -294,6 +298,9 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
     <div class=\"searchLabel\">$l_archive<br />
       <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive />
     </div>
+    <div class=\"searchLabel\">$l_fuzzy<br />
+      <input type=\"checkbox\" name=\"cb_fuzzy\" value=\"1\" $fuzzy />
+    </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
       <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
@@ -388,8 +395,8 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 }
 
 
-/////////////////////////////////////////////////////////////////////////////////
-//Display: Company links menu                                               //
+///////////////////////////////////////////////////////////////////////////////
+// Display: Company links menu
 // Parameters:
 //   - $co_q : company database result 
 // Returns:
@@ -401,7 +408,7 @@ function html_company_links($co_q) {
   global $l_header_contact, $l_contact_new, $l_header_project, $l_project_new;
   global $l_header_deal, $l_deal_new, $l_header_contract, $l_contract_new;
   global $l_header_document, $l_document_new, $l_document_add;
-  global $perms_user,$l_company, $path, $auth,$popup_height,$popup_width;
+  global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
 
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
@@ -412,30 +419,27 @@ function html_company_links($co_q) {
   $deal_total = $co_q->f("company_deal_total");
 
   $uname = urlencode($name);
-  $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
-  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
-  $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
-  $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
-  $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
-  $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
-  $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Company");
-  $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
-  $nb_document = run_query_document_nb ($id,"Company");
-  $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
-  $nb_pro = run_query_linked_project_nb ($id,"company");
-  $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
-  $nb_ctra = run_query_linked_contract_nb ($id,"company");
-  $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
-  
-  $block = "<div class=\"link\"> 
+
+  // Contact
+  if ($cgp_show["module"]["contact"]) {
+    $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
+    $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
+    $block_contact = "
   <div class=\"linkTitle\">:: $l_header_contact</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_con_list\"><img src=\"/images/$set_theme/$ico_contact\" /></a>
         <a href=\"$url_con_list\">$l_header_contact ($con_num)</a></li>
     <li><a href=\"$url_con_new\"><img src=\"/images/$set_theme/$ico_contact_new\" /></a>
         <a href=\"$url_con_new\">$l_contact_new</a></li>
-  </ul>
+  </ul>";
+  }
 
+  // Deal
+  if ($cgp_show["module"]["deal"]) {
+    $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
+    $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
+    $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
+    $block_deal = "
   <div class=\"linkTitle\">:: $l_header_deal</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_deal_list\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
@@ -444,24 +448,16 @@ function html_company_links($co_q) {
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
     <li><a href=\"$url_deal_new\"><img src=\"/images/$set_theme/$ico_deal_new\" /></a>
         <a href=\"$url_deal_new\">$l_deal_new</a></li>
-  </ul>
+  </ul>";
+  }
 
-  <div class=\"linkTitle\">:: $l_header_project</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
-        <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>
-    <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
-        <a href=\"$url_pro_new\">$l_project_new</a></li>
-  </ul>
-
-  <div class=\"linkTitle\">:: $l_header_contract</div>
-  <ul class=\"linkList\">
-    <li><a href=\"$url_ctra\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
-        <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
-    <li><a href=\"$url_ctra_new\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
-        <a href=\"$url_ctra_new\">$l_contract_new</a></li>
-  </ul>
-
+  // Document
+  if ($cgp_show["module"]["document"]) {
+    $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
+    $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Company");
+    $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
+    $nb_document = run_query_document_nb ($id,"Company");
+    $block_doc = "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
@@ -473,7 +469,47 @@ function html_company_links($co_q) {
 	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_company'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
-  </ul>       
+  </ul>";
+  }
+
+  // Project
+  if ($cgp_show["module"]["project"]) {
+    $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_company=$id");
+    $nb_pro = run_query_linked_project_nb ($id,"company");
+    $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+    $block_project = "
+  <div class=\"linkTitle\">:: $l_header_project</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_pro\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+        <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>
+    <li><a href=\"$url_pro_new\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+        <a href=\"$url_pro_new\">$l_project_new</a></li>
+  </ul>";
+  }
+
+  // Contract
+  if ($cgp_show["module"]["contract"]) {
+    $nb_ctra = run_query_linked_contract_nb ($id,"company");
+    $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
+
+     $block_contract = "
+  <div class=\"linkTitle\">:: $l_header_contract</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_ctra\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+        <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
+    <li><a href=\"$url_ctra_new\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+        <a href=\"$url_ctra_new\">$l_contract_new</a></li>
+  </ul>";
+  }
+
+  // Links Template  
+  $block = "
+<div class=\"link\"> 
+  $block_contact
+  $block_deal
+  $block_project
+  $block_contract
+  $block_doc
 </div>";
 
   return $block;
@@ -492,7 +528,7 @@ function html_company_consult($co_q, $cat_q) {
   global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_archive;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
-  global $l_insert,$l_update,$l_delete, $l_company, $l_coord,$l_category;
+  global $l_insert,$l_update, $l_company, $l_coord,$l_category;
   global $display, $c_yes, $c_no, $cgp_hide;
 
   $id = $co_q->f("company_id");
@@ -618,7 +654,12 @@ function html_company_consult($co_q, $cat_q) {
   // Web link
   if ($web != "") {
     $link_web = "<a target=\"_blank\" href=\"";
-    if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
+    if ( (strcmp(substr($web,0,7), "http://") == 0)
+       || (strcmp(substr($web,0,8), "https://") == 0) ){
+      $link_web .= "";
+    } else {
+      $link_web .= "http://";
+    }
     $link_web .= "$web\">
       <img border=\"0\" src=\"/images/$set_theme/$ico_web\"
       alt=\"$web\" /></a>";
@@ -660,7 +701,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
-  global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
+  global $l_insert, $l_update, $l_internal, $l_company;
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -786,7 +827,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     }
     $sel_cat .= "</select>";
 
-    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
+    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
     $block_cat = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category</td>
@@ -875,9 +916,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   // Web link
   if (($action=="detailupdate") || ($action=="update")) {
     if ($web != "") {
-      $link_web = "<a target=\"_blank\" href=\"";
-      if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
-      $link_web .= $web . "\">
+      $link_web = "<a target=\"_blank\" href=\"$web\">
         <img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
@@ -1253,7 +1292,7 @@ function dis_delete_form($p_id) {
   $ret = "<form name=\"form_delete\" method=\"post\"
       action=\"" . url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input type=\"hidden\" name=\"hd_company_id\" value=\"$p_id\" />
+    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
     onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
     </form>";

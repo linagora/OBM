@@ -243,7 +243,7 @@ function dis_project_search_list($project) {
 //     keys used    : name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
-  global $display, $perms_user, $l_found;
+  global $display, $l_found;
 
   $name = $project["name"];
   $company_name = $project["company_name"];

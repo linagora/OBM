@@ -17,23 +17,30 @@ $obmdb_user = "obm";
 $obmdb_password = "obm";
 
 // Use specific site includes
-$cgp_site_include = true;
+//$cgp_site_include = true;
 
 // is Mail enabled ? (agenda)
 $cgp_mail_enabled = false;
+
+// is mailing enabled by default for a new user
+$cgp_mailing_default = true;
 
 //-----------------//
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
+//$cgp_show["section"]["prod"] = false;
 $cgp_show["section"]["compta"] = false;
-$cgp_show["section"]["aliamin"] = false;
+//$cgp_show["section"]["aliamin"] = false;
 
 // modules -- Default is true
-//$cgp_show["module"]["contact"] = false;
-//$cgp_show["module"]["user"] = false;
-//$cgp_show["module"]["group"] = false;
-//$cgp_show["module"]["publication"] = false;
+$cgp_show["module"]["deal"] = false;
+$cgp_show["module"]["project"] = false;
+$cgp_show["module"]["contract"] = false;
+$cgp_show["module"]["document"] = false;
+$cgp_show["module"]["account"] = false;
+$cgp_show["module"]["invoice"] = false;
+$cgp_show["module"]["payment"] = false;
 
 // Company module
 //$cgp_hide["company"]["number"] = true;

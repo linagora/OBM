@@ -8,20 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.0pre7";
+$obm_version = "0.8.0pre8";
 $l_obm_title = "O.B.M.";
-
-// Bookmarks default
-$last_deal_default = 0;
-$last_parentdeal_default = 0;
-$last_company_default = 0;
-$last_contact_default = 0;
-$last_contract_default = 0;
-$last_invoice_default = 0;
-$last_account_default = 0;
-$last_payment_default = 0;
-$last_contract_default = 0;
-$last_incident_default = 0;
 
 // Document constants 
 $link_to = "Link : "; // Name of the prefix of a link document
@@ -60,7 +48,7 @@ $c_task_adminvalid = 2;
 
 // Query limits (for user queries)
 $cql_max_row = 50000;  // Maximum rows to be returned
-$cql_max_cost = 1000;  // Maximum query cost (Postgres)
+$cql_max_cost = 10000;  // Maximum query cost (Postgres)
 
 // Popup Display size
 $popup_width = 620;
@@ -150,10 +138,10 @@ $l_cal_1 = "1";    // 1 h
 $ccsvd_sc = ";";    // Semi-colon
 $ccsvd_tab = "tab"; // Tab
 
-// Perms
-$perms_user = "user" ;
-$perms_editor = "editor" ;
-$perms_admin = "admin" ;
+// Perms XXXXX Deprecated : to be removed
+$perms_user = "user";
+$perms_editor = "editor";
+$perms_admin = "admin";
 
 // Debug Constants
 $cdg_id = 1;     // id display
@@ -177,8 +165,8 @@ $php_regexp_zip="^[0-9A-Z]{2,8}$";      // 2-8 digits or letters
 $js_regexp_email="/^\w([\.\w-_]+)?@([\w\-]+\.)+[A-Za-z]{2,3}$/";  // Email
 $php_regexp_email="^[a-z0-9_-]+(\.[a-z0-9_-]+)*@([a-z0-9-]+\.)+[a-z]{2,3}$"; // Email
 $php_regexp_email_name="/^[a-z0-9_-]+(\.[a-z0-9_-]+)*$/"; // Email name
-$js_regexp_web="/^[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}$/";  // Web
-$php_regexp_web="^[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}$"; // Web
+$js_regexp_web="/^(http:\/\/)?(https:\/\/)?[A-Za-z0-9\-]+(\.[A-Za-z0-9\-]+)*\.[A-Za-z]{2,3}([\-\/A-Za-z0-9])*$/";  // Web
+$php_regexp_web="^(http:\/\/)?(https:\/\/)?[a-z0-9-]+(\.[a-z0-9-]+)*\.[a-z]{2,3}([\-\/A-Za-z0-9]*)$"; // Web
 $php_regexp_isodate = "^[0-9]{4}-[01][0-9]-[0123][0-9]$";
 $js_regexp_list_name = "/^[0-9A-Za-z_- ]+$/";  // List name
 $js_regexp_import_name = "/^[0-9A-Za-z_- ]+$/";  // Import name
@@ -188,11 +176,8 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 $php_regexp_lifetime = "^[0-9]{1,6}$";
 
 
-// Perms and Profil
 //---------------------------------------------------------------------------//
-// Profile Definitions
-//---------------------------------------------------------------------------//
-// Default bits meanings
+// Default access rights bits meanings
 // 0 - read  : data
 // 1 - own   : owner data
 // 2 - write : data
@@ -203,18 +188,6 @@ $cright_own = 2;
 $cright_write = 4;
 $cright_read_admin = 8;
 $cright_write_admin = 16;
-//---------------------------------------------------------------------------//
-// Standards profiles
-// Values are in hexa : 1 byte : 2 chars
-$char_by_module = 2;
-// reader : 01 (bit 0) : can see data
-// user   : 03 (bits 0+1) : can see data + can insert or update his own data
-// editor : 05 (bits 0+2) : can see data + can write data
-// admin  : 1D (bits 0+2+3+4) : can do everything
-$perm_reader = "01";
-$perm_user = "03";
-$perm_editor = "05";
-$perm_admin = "1D";
 
 
 // Path to the OBM php root (if not set)
@@ -458,7 +431,7 @@ function reduce_name($name) {
   $res = preg_replace("/[פצ]/i", "o", $res);
   $res = preg_replace("/[ûüש]/i", "u", $res);
   $res = preg_replace("/[ח]/i", "c", $res);
-  $res = preg_replace("/[\.\-\']/", "", $res);
+  $res = preg_replace("/[\.\-\'\\\]/", "", $res);
 
   return $res;
 }

@@ -65,50 +65,11 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Mail enabled
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_mail','yes');
 
--- Company bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_company','0');
-
--- Contact bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_contact','0');
-
--- Parent Deal bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_parentdeal','0');
-
--- Deal bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_deal','0');
-
--- Project bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_project','0');
-
--- List bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_list','0');
-
--- Contract bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_contract','0');
-
--- Incident bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_incident','0');
-
--- Account bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_account','0');
-
--- Invoice bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_invoice','0');
-
--- Payment bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_payment','0');
-
--- User bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_user','0');
-
--- Group bookmark
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_group','0');
-
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
 
 -- Todo sort order
-insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_todo','priority');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_todo','todo_priority');
 
 -- Todo top list
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_1_id','0');

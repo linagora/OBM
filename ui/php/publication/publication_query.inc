@@ -907,7 +907,7 @@ function run_query_subscription_external_search($hash_table) {
     $query = "
         SELECT
 	      $timeupdate,$timecreate,subscription_contact_id,subscription_publication_id,
-	      publication_title,publication_year, subscriptionrenewal_label,
+	      publication_title,publication_year, publication_lang,subscriptionrenewal_label,
 	      subscriptionreception_label, subscription_quantity 
         FROM Subscription 
 	LEFT JOIN Publication ON publication_id = subscription_publication_id
