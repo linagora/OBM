@@ -1,0 +1,575 @@
+<HTML>
+<!-- $Id$ -->
+<HEAD>
+<TITLE>OBM-DISPLAY-HOWTO</TITLE>
+</HEAD>
+
+<BODY BGCOLOR="#FFFFFF">
+
+<CENTER>
+
+<H1>OBM-DISPLAY-LIST-HOWTO</H1>
+<I>Comment utiliser un affichage générique pour les tableaux de résutats</I><BR>
+Version 0.5.2 - 2002-07-09<BR>
+</CENTER>
+
+<hr>
+<h2><a href="#api">Référence de la classe OBM_DISPLAY et API</a></h2>
+<h2><a href="#util">Utilisation de la classe OBM_DISPLAY</a></h2>
+<ul>
+<li><a href="#crea">Création d'un objet OBM_DISPLAY</a>
+<li><a href="#ex1">Affichage : Exemple simple</a>
+<li><a href="#nom_col">Spécifier le titre des colonnes</a>
+<li><a href="#tri">Tri de la liste selon les colonnes</a>
+<li><a href="#cb">Association d'une action (checkbox) aux éléments de la liste</a><br>
+<li><a href="#page">Gestion de la pagination</a><br>
+<li><a href="#pref">Affichage et gestion des préférences</a>
+</ul>
+<h2><a href="#spec">Spécifications techniques</a></h2>
+<ul>
+<li><a href="#arbo">Arborescence et fichiers utilisés</a>
+<li><a href="#displaypref">DisplayPref : table de stockage</a>
+<li><a href="#defaut">Préférences d'affichage par défaut</a>
+<li><a href="#action">Actions à implémenter</a>
+<li><a href="#inserer_lien">Insérer des liens ou des images dans la liste</a><br>
+<li><a href="#mod_ent">Modules gérant plusieurs entités</a><br>
+</ul>
+
+<h2><a href="#recapitule">Récapitulatif pour l'ajout d'un module</a></h2>
+
+<h2><a href="#compa">Différences avec l'ancienne implémentation</a></h2>
+
+<hr>
+<br>
+<a name="api"><h2>Référence de la classe OBM_DISPLAY et API</h2></a>
+
+<table border=1>
+<tr><th colspan=3 align=center>Classe OBM_DISPLAY</th></tr>
+<tr bgcolor=\"#AAAAAA\">
+  <td>Attributs</td>
+  <td>Values</td>
+  <td>Description</td>
+</tr>
+<tr>
+  <td><b>display_type</b></td>
+  <td>(DATA | PREFERENCES)</td>
+  <td>Type de représentation :
+    <ul>
+      <li>DATA pour tableau de données
+      <li>PREFERENCES pour écran de préférences
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><b>display_entity</b></td>
+  <td>string</td>
+  <td>Entité à afficher (contact, deal, parentdeal,...)</td>
+</tr>
+<tr>
+  <td><b>display_module</b></td>
+  <td>string</td>
+  <td>Module gérant l'entité (ex: deal pour parentdeal)</td>
+</tr>
+<tr>
+  <td><b>display_pref</b></td>
+  <td>DB_OBM</td>
+  <td>Résultat de requete de récupération des préférences d'affichage de l'utilisateur</td>
+</tr>
+<tr>
+  <td><b>display_link</b></td>
+  <td>(<b>true</b> | false) or (<b>1</b> | 0)</td>
+  <td>Indique si les liens doivent être affichés (ex: non dans le cas d'affichaege en popup)</td>
+</tr>
+<tr>
+  <td><b>data_set</b></td>
+  <td>DB_OBM</td>
+  <td>Ensemble de données à afficher</td>
+</tr>
+<tr>
+  <td><b>data_header</b></td>
+  <td>(<b>top</b> | both)</td>
+  <td>Affichage de la ligne de titre des colonnes
+    <ul>
+      <li>top : en haut du tableau
+      <li>both : en haut et bas du tableau
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><b>data_page</b></td>
+  <td>(<b>true</b> | false)</td>
+  <td>Gestion de la pagination active ou non
+    <ul>
+      <li>true : gestion de la pagination
+      <li>false : pas de pagination 
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><b>data_url</b></td>
+  <td>string</td>
+  <td>Base de URL de recherche (pagination et ordre)<br>
+      ex: contact_index.php?action=search&amp;tf_lname=baud</td>
+</tr>
+<tr>
+  <td><b>data_order</b></td>
+  <td>(<b>true</b> | false)</td>
+  <td>Indique si l'ordre de tri est modifiable</b>
+</tr>
+<tr>
+  <td><b>data_cb_text</b></td>
+  <td>string</td>
+  <td>Label de la colonne des checkbox</td>
+</tr>
+<tr>
+  <td><b>data_cb_show</b></td>
+  <td>(<b>1</b> | string)</td>
+  <td>Indicateur d'affichage des checkbox pour chaque ligne
+    <ul>
+      <li>1 : checkbox sur chaque ligne
+      <li>nom_col : nom de colonne définissant si la checkbox doit être affichée ou non, par ligne
+        <ul>
+          <li>colonne à vrai : checkbox affichée sur la ligne
+          <li>colonne à faux : checkbox non affichée
+        </ul>
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td><b>data_cb_side</b></td>
+  <td>(<b>left</b> | right)</td>
+  <td>Position de la colonne des checkbox</td>
+</tr>
+<tr>
+  <td><b>data_cb_name</b></td>
+  <td>string</td>
+  <td>Prefixe du nom des checkbox. Est complété avec l'id de la ligne</td>
+</tr>
+<tr>
+  <td><b>data_cb_field</b></td>
+  <td>string (nom de champ valide)</td>
+  <td>Champ source servant à pré-remplir les checkbox. Si vrai alors checked</td>
+</tr>
+<tr>
+  <td><b>data_idfield</b></td>
+  <td>string</td>
+  <td>Nom du champ avec role d'index pour la ligne</td>
+</tr>
+
+<tr bgcolor=\"#AAAAAA\">
+  <td colspan=2>Méthodes publiques (API)</td>
+  <td>Description</td>
+</tr>
+<tr>
+  <td colspan=2><b>OBM_DISPLAY($type, $pref)</b></td>
+  <td>Constructeur
+    <ul>
+      <li>$type : type de représentation (display_type)
+      <li>$pref : préférences utilisateur (display_pref)
+    </ul>
+  </td>
+</tr>
+<tr>
+  <td colspan=2><b>display()</b></td>
+  <td>Affiche les données</td>
+</tr>
+<tr>
+  <td colspan=2><b>dis_pref_help()</b></td>
+  <td>Affiche l'aide pour le panel de préférences</td>
+</tr>
+
+<tr bgcolor=\"#AAAAAA\">
+  <td colspan=2>Méthodes privées (internes)</td>
+  <td>Description</td>
+</tr>
+<tr>
+  <td colspan=2><b>check_data_vars()</b></td>
+  <td>Vérifie les données de l'object (avant affichage mode data)</td>
+</tr>
+<tr>
+  <td colspan=2><b>check_preferences_vars()</b></td>
+  <td>Vérifie les données de l'object (avant affichage mode preferences)</td>
+</tr>
+<tr>
+  <td colspan=2><b>dis_data()</b></td>
+  <td>Affichage du tableau des données (mode data)</td>
+</tr>
+<tr>
+  <td colspan=2><b>dis_data_header()</b></td>
+  <td>Affichage d'une ligne de titre du tableau (mode data)</td>
+</tr>
+<tr>
+  <td colspan=2><b>dis_preferences()</b></td>
+  <td>Affichage du panel de préférences (mode préférences)</td>
+</tr>
+
+</table>
+
+<br>
+<hr>
+<br>
+
+
+<a name="util"><h2>Utilisation de la classe OBM_DISPLAY</h2>
+<P>
+La classe OBM_DISPLAY permet de générer rapidement des affichages d'ensembles de données (ou dataset) provenant de requêtes de base de données, sous forme de tableaux paramétrables.<br>
+L'affichage du résultat peut être découpé en pages (de nombre de lignes paramétrable), avec navigation style "curseur".<br>
+La liste de lignes ainsi générée peut être triée selon une ou deux de ses colonnes (les noms des colonnes sont des liens).<br>
+On peut aussi associer une <i>checkbox</i> à chaque ligne afin d'intégrer la liste dans un formulaire (exemple : archiver des affaires, supprimer des contacts, etc.).<p>
+<br>
+
+<a name="crea"><h3>Création d'un objet OBM_DISPLAY</h3>
+
+<b><u>Spécification du constructeur de la classe OBM_DISPLAY : </u></b><br><br>
+<i>function OBM_DISPLAY($display_type, $display_pref)</i><br>
+<ul>
+<li>$display_type : type d'affichage. Il y a trois valeurs possibles 
+<ul>
+<li><i>"DATA"</i> indique au constructeur de la classe que l'objet servira à afficher une liste
+<li><i>"PREFERENCES"</i> indique que l'objet servira a générer l'écran de préférences d'affichage
+<li><i>"INFORMATIONS"</i><b>DEPRECATED</b> indique que l'on veut generer la fiche detaillee d'un element (contact, societe, affaire .... ). Il s'agit d'une relique de la première version d'OBM_DISPLAY à ne pas utiliser. Elle sera supprimée dès que sortie des modules List (quasi fait) et Computer.
+</ul>
+<li>$display_pref : liste des noms de champs à afficher avec l'ordre.<br>
+C'est le résultat de la requête de récuperation des paramètres d'affichage de l'utilisateur. Elle doit contenir <b>le nom, dans l'ordre, de tous les champs à afficher </b>. <i>(voir plus loin ...)</i>. Il peut s'agir indifféremment de champs déterminés ou calculés.
+</ul>
+
+<hr>
+<br>
+
+<a name="ex1"><h3>Affichage : Exemple simple</h3>
+
+Quelques attributs permettent de paramétrer plus finement l'affichage comme dans l'exemple ci dessous : 
+
+<p><b><u>Exemple : liste des affaires</u></b><br>
+<i>
+include("obminclude/global_display.inc");<br>
+<br>
+$dis_deals_list=new OBM_DISPLAY("DATA",$obm_q_display_options);<br>
+$dis_deals_list->data_set = $obm_q_deals ;<br>
+$dis_deals_list->data_header = "both";<br>
+$dis_deals_list->elem_order_for = "" ;<br>
+</i>
+<p>
+
+<UL>
+<LI>l'attribut <i>data_set</i> doit recevoir <b>l'ensemble de données à afficher</b> (résultat de la requête de recherche). La requête peut très bien retourner des champs calculés.
+
+<LI><i>si l'attribut </i>data_header</i> vaut 'both' les titres des colonnes seront affichés à la fois en haut et en bas du tableau.
+Sinon ils ne seront affichés qu'en haut.
+
+<LI>l'attribut <i>elem_order_for</i> n'est utilise que par le module "List" et n'est donc conserve que par souci de compatibilite. Il sert à specifier le champ par defaut selon lequel on trie la liste : la clause "order by" de la requete de recherche et l'utilisation des variables de tri des colonnes <i>(voir plus loin : "Tri des colonnes")</i> le rendent obsolete. 
+</UL>
+<br>
+
+<a name="nom_col"><h3>Spécifier le titre des colonnes</h3>
+<p>Pour déterminer le titre des colonnes de la liste correspondant aux champs à afficher, les méthodes <i>dis_preferences(), dis_data_header()</i> utilisent le tableau global $fieldnames[], qui doit être défini dans les fichiers de langues du module et qui à un nom de champ à afficher fait correspondre un titre.
+<br><u>Note</u>: Exit la pénible fontion <i>dis_name_fieldname($fieldname)</i> nécessitant de connaître l'ensemble des champs de tous les modules.
+<p>
+Les clés du haschage $fieldnames[] doivent être le nom des colonnes du dataset (donc correspondre à la requête de récupération des données). Si des alias ou
+champs calculés sont retournés, il faut les positionner dans $fieldnames[].
+<p>
+<i><pre>
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["contact_lastname"] = $l_lastname;
+$fieldnames["contact_firstname"] = $l_firstname;
+// Calculated fields
+$fieldnames["contact_company_name"] = $l_company;
+</pre></i>
+<p>
+
+<br>
+
+<a name="tri"><h3>Tri des listes selon les colonnes</h3>
+Par défaut il est possible de modifier le critère de tri du résultat en cliquant sur le titre de la colonne selon laquelle le résultat doit être trié.
+<br>En cliquant sur la colonne de tri, on inverse l'ordre de tri (ascendant, descendant).
+<p>
+Il est possible de désactiver cette fonctionnalité en donnant la valeur "false" à l'attribut <b>data_order</b>.
+<p>
+<u>Exemple</u> :
+<i><pre>
+$url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_company=".urlencode($company)."&amp;param_company=".$company_id);
+
+$dis_contacts_list = new OBM_DISPLAY("DATA",$pref_q);
+$dis_contacts_list->data_set = $obm_q_contacts;
+$dis_contacts_list->data_order = false;
+$dis_contacts_list->data_header = "top";
+$dis_contacts_list->data_url = $url;
+$dis_contacts_list->display();
+</pre></i>
+
+<p>La requête de sélection des données doit accepter 2 paramètres de tris :
+<b>$new_order</b> et <b>$order_dir</b>.
+
+<p><b>Remarque :</b> la classe OBM_DISPLAY gère ces 2 paramètres et les renseigne automatiquement dans les titres des tableaux de résultat.
+<p>
+ 
+<br>
+
+<a name="cb"><H3>Association d'une action aux éléments de la liste</H3>
+<p>A chaque tuple de la liste peut aussi être associé une "case a cocher" (ou "checkbox"), qui permettra d'effectuer une ou plusieurs actions sur les éléments de cette liste.<p>
+<p><i>
+$dis_deals_list->data_cb_text = $l_archive_first;<br>
+$dis_deals_list->data_cb_show = "1";<br>
+$dis_deals_list->data_idfield = "deal_id";<br>
+$dis_deals_list->data_cb_side = "left";<br>
+$dis_deals_list->data_cb_name = "archive_";<br>
+$dis_deals_list->data_cb_field = "deal_archive";<br>
+</i>
+<p>
+
+<UL>
+<LI><i>data_cb_text</i> est le <b>titre de la colonne</b> qui contiendra les checkbox.<br>
+<LI><i>data_cb_show</i> indique si la checkbox doit être affichée sur la ligne en cours. <b>"1"</b> (par défaut) indique checkbox affichées sur toutes les lignes. Sinon <b>titre de la colonne</b> qui déterminera si la checkbox doit être affichée sur la ligne (colonne à vrai Oui sinon Non).<br>
+<LI><i>data_idfield</i> est le nom du champ qui joue le role d'<b>identifiant</b>.<br>
+<LI><i>data_cb_side</i> peut prendre 2 valeurs "left" ou "right" et détermine la position des checkbox dans la liste. (à gauche ou à droite du tableau).<br>
+<LI><i>data_cb_name</i> détermine la base du nom des checkbox : il sera constitué de <i>data_cb_name</i> et de l'identifiant de l'objet. Dans l'exemple ci dessus elles auront pour nom "archive_1", "archive_367", ou 1 et 367 sont des identifiants d'affaires.<br>
+<LI><i>data_cb_field</i> détermine le champ utilisé pour pré-renseigner les checkbox. Si ce champ est vrai (!=0 ou true) la checkbox sera sélectionnée.<br>
+</UL>
+
+<b>Remarque : </b>ni le code de creation du formulaire contenant les checkbox, ni le code de creation des boutons submit, ne sont generes par OBM_DISPLAY.
+C'est donc au developpeur de l'ecrire. <br><br><br>
+
+<p>L'affichage des données se fait par un simple appel a la methode <i>display()</i> de la classe. C'est elle qui va generer le tableau.<br>
+<i>$dis_deals_list->display();</i><p>
+
+
+<a name="page"><h3>Gestion de la pagination</h3>
+La pagination (simulation de curseur) est maintenant intégrée à OBM_DISPLAY.
+<p>
+L'activation de la pagination est controlée par l'attribut <b>data_page</b> qui peut prendre les valeurs (true | false). Par défaut la pagination est activée (true).
+<p>
+Pour obtenir l'affichage de l'index des pages de résultat, il est nécessaire de renseigner l'attribut <b>data_url</b> avec la base de l'url correspondant à la recherche.
+<p>
+Si l'url n'est pas renseignée ou le nombre d'enregistrements à afficher est inférieur au nombre d'enregistrements par page pour l'utilisateur, l'index n'est pas affiché.
+<p>
+<u>Exemple :</u>
+<br>
+<i><pre>
+$url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_company=".urlencode($company)."&amp;param_company=".$company_id);
+
+$dis_contacts_list = new OBM_DISPLAY("DATA",$pref_q);
+$dis_contacts_list->data_set = $obm_q_contacts;
+$dis_contacts_list->data_header = "top";
+$dis_contacts_list->data_url = $url;
+$dis_contacts_list->display();
+</pre></i>
+
+<p>
+<a name="pref"><h3>Affichage et gestion des préferences d'affichage</h3>
+
+La classe OBM_DISPLAY fournit une interface pour gérer les préférences d'affichage.<p>
+ 
+<i><pre>
+include("obminclude/global_display.inc");
+&nbsp;
+$dis_pref = new OBM_DISPLAY("PREFERENCES",$display_pref_q) ;
+$dis_pref->display_entity = "deal"; 
+$dis_pref->pref_title = "Display options for the lists of deals"; 
+$dis_pref->pref_dis_help = 1 ;
+$dis_pref->display() ;
+</pre></i>
+<br>
+
+<UL>
+<LI><i>$display_pref_q</i> est la liste de tous les noms des champs qui sont affichés ou pas dans la liste, avec l'ordre d'affichage.
+<LI><i>display_entity</i> est l'entité gérée par l'objet OBM_DISPLAY.
+<LI><i>pref_title</i> est le titre du panel d'affichage des préférences.
+<LI><i>pref_dis_help</i> est l'indicateur d'affichage de l'aide (0 ou 1).
+<LI><i>display()</i> est la méthode qui affiche l'interface.
+</UL>
+<hr>
+<br>
+
+
+<a name="spec"><h2>Spécifications techniques</h2>
+<p><br>
+
+<a name="arbo"><h3>Arborescence et fichiers</h3>
+<p>
+La classe OBM_DISPLAY est définie dans le fichier <b>obminclude/global_display.inc</b>
+<p>
+Le fichier <b>obminclude/global_query.inc</b> propose 3 fonctions utilitaires
+de manipulation de la table des préférences.
+
+<ul>
+<li><b>run_query_display_pref($u_id, $all=0)</b>, qui retourne les préférences de l'utilisateur (à fournir comme second argument au contructeur OBM_DISPLAY)
+<li><b>run_query_display_pref_update($entity, $fieldname, $display)</b>, qui modifie la propriété d'affichage (affiché oui | non) d'un champ
+<li><b>run_query_display_pref_level_update($entity, $new_level, $fieldorder)</b>, qui modifie la position d'affichage d'un champ
+</ul>
+
+
+<a name="displaypref"><h3>DisplayPref : table de stockage</h3>
+<p>
+Les préférences d'affichages sont stockées dans la table <b>DisplayPref</b> de structure :
+<p>
+<table border=1>
+<tr>
+ <td><b>champ</b></td>
+ <td><b>type</b></td>
+ <td><b>role</b></td>
+</tr>
+<tr>
+ <td>display_user_id</td>
+ <td><i>int(8)</i></td>
+ <td>identifiant de l'utilisateur</td>
+</tr>
+<tr>
+ <td>display_entity</td>
+ <td><i>varchar(32)</i></td>
+ <td>entité cible (contact, deal, parentdeal,...)</td>
+</tr>
+<tr>
+ <td>display_fieldname</td>
+ <td><i>varchar(20)</i></td>
+ <td>nom du champ</td>
+</tr>
+<tr>
+ <td>display_fieldorder</td>
+ <td><i>tinyint(3)</i></td>
+ <td>ordre d'affichage</td>
+<tr>
+ <td>display_display</td>
+ <td><i>tinyint(1)</i></td>
+ <td>état de l'affichage : <br>0 (pas affiché), <br>1 (affiché), <br>2 (obligatoire)</td>
+</tr>
+</table>
+<br>
+
+<p>Les champs dont les noms sont stockes dans ces tables sont ceux retournes par la requete de selection des elements de la liste. Ce peut etre aussi bien des champs fixes de la table que des champs calcules. Remarque : si un alias a ete mis sur un champ, alors c'est cet alias qui doit etre stocke dans la table Display. <p>
+
+
+<a name="defaut"><h3>Préférences d'affichage par défaut</h3>
+Les valeurs d'affichage par défaut sont les entrées de la table <b>DisplayPref</b> avec la valeur '0' au champ display_user_id.
+<p>
+A la création d'un nouvel utilisateur, on lui associe les préférences d'affichage par défaut. On copie les lignes de display_user_id à '0' en mettant la valeur du nouvel utilisateur.
+<p>
+A la suppression d'un utilisateur, les entrées de la table DisplayPref de cet utilisateur sont supprimées.
+
+
+<a name="action"><h3>Actions à implémenter</h3>
+
+<p>Les noms des "actions" qu'il faut utiliser dans le fichier index sont "display" (affichage des préférences), "dispref_display" (pour le changement d'état d'affichage d'un champ) et "dispref_level" (pour le changement de position d'affichage d'un champ).
+<p>
+<i><pre>
+}  elseif ($action == "display") {
+/////////////////////////////////////////////////////////////////////////
+  $pref_q = run_query_display_pref($auth->auth["uid"],1);
+  dis_company_display_pref($pref_q);
+
+} else if ($action == "dispref_display") {
+/////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_update($entity, $fieldname, $display);
+  $pref_q = run_query_display_pref($auth->auth["uid"],1);
+  dis_company_display_pref($pref_q);
+
+} else if ($action == "dispref_level") {
+/////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
+  $pref_q = run_query_display_pref($auth->auth["uid"],1);
+  dis_company_display_pref($pref_q);
+}
+</pre></i>
+
+<br>
+
+<a name="inserer_lien"><h3>Insérer des liens ou des images dans la liste</h3>
+<p>Par défaut, pour chaque tuple, la fonction <i>dis_data()</i> définie dans la classe OBM_DISPLAY (et appelée en interne par la méthode publique <i>display()</i>) prend chaque champ à afficher dans la liste des champs (passée en paramètre au constructeur), et pour chacun d'eux, affiche la valeur telle que retournée par la requête de sélection. 
+Or dans le cas du label d'une affaire par exemple, on veut que ce soit un lien vers la fiche de l'affaire en question.<br>
+Pour cela on dispose de deux variables <i>$name</i> et <i>$url</i>, qui seront affichées si elles sont valorisées : <p>
+
+<UL>
+<LI><i>$name</i> contient le code html à afficher à la place de la valeur du champ. Cela peut être une image "IMG SRC=..." ou le label correspondant à un identifiant.
+<LI><i>$url</i> est utilisée dans le cas d'un lien et contient l'url de ce lien. A noter que si <i>$url</i> est valorisée, alors <i>$name</i> sera automatiquement encadré par des balises "A HREF=..." et "/A".
+</UL>
+
+<p><i><u>Exemple</u> :
+<pre>
+$fieldname = $this->display_pref->f("display_fieldname");
+if ($fieldname == "company_name") {
+     $url = "./company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
+}
+else if ($fieldname == "company_email") {
+     $url = "mailto:".$this->data_set->f("company_email");
+     $name = "IMG BORDER=0 SRC=\"../obminclude/themes/$set_theme/$ico_mail\" ALT=\"".$this->data_set->f("company_email")."\">";
+} 
+</pre></i>
+<p>
+
+<br>
+
+
+<a name="mod_ent"><h3>Modules gérant plusieurs entités</h3>
+<p>
+Un module complexe gère souvent plusieurs entités:
+<br>
+<u>Ex:</u> le module deal gère les entités deal et parentdeal.
+<p>
+Lorsqu'une entité de nom différent de son module est gérée par OBM_DISPLAY, il faut préciser le module contenant l'entité. 
+
+<i><pre>
+include("obminclude/global_display.inc");
+&nbsp;
+$dis_pref = new OBM_DISPLAY("PREFERENCES",$display_pref_q) ;
+$dis_pref->display_entity = "parentdeal"; 
+$dis_pref->display_module = "deal"; 
+$dis_pref->pref_title = "Display options for ParentDeal"; 
+$dis_pref->pref_dis_help = 1 ;
+$dis_pref->display() ;
+</pre></i>
+
+
+<hr>
+<br>
+<a name="recapitule"><h2>Récapitulatif pour l'ajout d'un module</h2>
+
+<OL>
+<b><LI></b>Ecrire la requête de récupération du dataset. Elle doit avoir au moins 2 paramètres qui seront les critères de tri de la liste, c'est à dire les valeurs de la clause "order by".
+<br><br>
+
+<b><LI></b>Ecrire la fonction qui retourne le code html de la page : c'est a l'interieur de cette fonction qu'est créé et utilisé l'objet de type OBM_DISPLAY.
+Cette fonction aura comme paramètres le résultat de la requête de sélection, et le résultat de la requête de récuperation des paramètres d'affichage.<br><br>
+
+<b><LI></b>Peupler la table <i>DisplayPref</i> avec les valeurs par défaut (utilisateur 0).
+<br><br>
+
+<b><LI></b>Renseigner dans les fichiers de langues du module le haschage <b>$fieldnames[]</b>. A chaque champ affichable, il faut associer un label.
+<br><br>
+
+<b><LI></b>
+Modifier la fonction dis_data() dans la classe OBM_DISPLAY pour intégrer les spécificités de la liste (liens, des images, etc). (Ce point est sujet à améliorations afin d'éliminer toute nécessité d'insertion de code hors du module concerné). <br><br>
+
+<b><LI></b>
+Implémenter les actions display, dispref_display et dispref_level dans le module_index.php.
+<br><br>
+
+<b><LI></b>S'assurer de la bonne propagation des variables $new_order et $order_dir entre les formulaires et le fichier index.
+</OL>
+<br>
+
+
+<hr>
+
+<a name="compa"><h2>Différences avec l'ancienne implémentation</a></h2>
+
+L'idée générale est une implémentation plus propre et plus générique à laquelle il est beaucoup plus facile de rajouter des modules.
+
+<ul>
+<li> Réécriture : meilleur découpage du code, néttoyage, modification de l'API
+<li> Centralisation des paramètres d'affichage dans une table unique DisplayPref
+remplaçant les diverses tables ModuleDisplay (ContactDisplay, CompanyDisplay,...).
+Une colonne indique l'entité cible pour chaque préférence.
+Ceci a permis de supprimer l'attribut elem_which et les contournements nécessaires pour gérer des modules avec plusieurs entités.
+Ainsi que tous les tests et cas particuliers engendrés par cet état.
+<li> Suppression des tests suivant les champs dans la fonction d'affichage des préférences (if (table_name == ....))
+<li> Suppression de la fonction dis_name_fieldname() qui devait connaître et tester tous les noms de champs
+<li> fonction de requête des préférences d'affichage globale et non plus spécifique à chaque module
+<li> Pas de code à rajouter dans les fonctions d'insertion et de suppression d'un utilisateur
+<li> Paramètres par défaut stockés dans la table DisplayPref (utilisateur 0) d'ou facilité d'initialiser ou de reinitialiser les préférences d'un utilisateur.
+<li> Intégration de la gestion de la pagination.
+</ul>
+</BODY>
+
+</HTML>

@@ -1,0 +1,255 @@
+<HTML>
+<HEAD>
+<TITLE> OBM History, Status and Roadmap </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<A HREF="index.html">back</A>
+
+<CENTER>
+<H1>OBM History and Roadmap</H1>
+<I>Why OBM and where does it go </I><BR>
+Version 0.5.2 - 2002-07-15<BR>
+Pierre Baudracco
+</CENTER>
+<P>
+
+<H2>Events</H2>
+
+2002-07-15 : version <B>0.5.2</B> released (feature enhancement and fixes)<BR>
+2002-06-01 : version <B>0.5.1</B> released (feature enhancement and fixes)<BR>
+2002-02-01 : version <B>0.5.0</B> released (major rewrite)<BR>
+2002-02-01 : OBM <b>bugzilla</b> is open at bugzilla.aliacom.fr <BR>
+2001-07-29 : OBM <b>mailing list</b> is open <BR>
+2001-07-28 : version <B>0.4.1</B> released <BR>
+2001-06-13 : version <B>0.4.0</B> released <BR>
+2001-02-15 : version <B>0.3.3</B> released. including the list module. (minor bug fixes release)<BR>
+2000-10-10 : version <B>0.3.2</B> released.<BR>
+2000-07-24 : version <B>0.3.1</B> released.<BR>
+2000-01-31 : version <B>0.3.0</B> released. Thanks the O.E.A. ! See the history.<BR>
+2000-01-09 : version <B>0.2.4</B> released.<BR>
+1999-11-14 : version <B>0.2.3b</B> released. (Bug fixes release)<BR>
+1999-11-01 : version <B>0.2.3a</B> released. (Bug fixes release)<BR>
+1999-10-30 : version <B>0.2.3</B> released. (Bug fixes release)<BR>
+1999-09-07 : version <B>0.2.2</B> released.<BR>
+1999-05-22 : version <B>0.2.1</B> released.<BR>
+1999-04-04 : version <B>0.2.0</B> released. Initial public release.<BR>
+
+<H2>History</H2>
+
+OBM started as an internal project at Aliacom (the company I work for) which
+goal was to manage our contact and customer database.
+We hadn't any tool to deal with our business, so we implemented a basic
+contract management to serve our needs. Then many ideas came to our minds to
+upgrade this tool.
+<P>
+As we are deeply in free software (we are a Linux solutions provider) we
+thought that this thing could become a good candidate for an open source
+development.
+We then continued development with a GPL release in mind (translation of the
+code in english language, more structured sections,...).
+We added advanced global capabilities that should be added first to avoid too
+much work later as International support, Theme support, Session support,...
+Session support means that 2 different people can use OBM with different
+language or theme in the same time.
+<P>
+We worked on the global architecture to make OBM easily expandable.
+For example, you don't have to dive in the source code to add an other
+language, or an other theme.
+You just have to translate messages that are in a separated text file
+and OBM will automatically integrate it.
+<BR>This around may 1999.
+<P>
+Through 2nd half of 1999 we updated OBM to correct bugs or integrate new
+features but with little time and focus on it. This period ended with 2000,
+0.2.4 coming out and a great thing.
+We have signed a contract with "<B>l'Observatoire Europeen de l'Audiovisuel
+(O.E.A.)</B>" to develop a web contact database which will be based on OBM and
+remain under the GPL licence (so we can use OBM code).
+We then agree with them to first implement the features needed in OBM and then
+fork the project to deal with the specific data of the O.E.A. 
+<P>
+This brought out version 0.3.x with new features (user management,
+authentication, multidatabase support, new design).
+
+
+<H3>Versions 0.4.x</H3>
+Versions 0.4.x saw many developments but without a leading goal.
+Different people worked on it but the project was lacking a clear and global objective.
+<br>The needed list module had been created,
+<br>a computer module has been created but anyone may ask how does it fit within the OBM project,
+<br>a new class with great ideas has been created (OBM_DISPLAY) but with severe design flaws.
+<br> a needed shared calendar was designed.
+<br> The deal module was improved with the parentdeal entity which allow to group individuals deals.
+<P>
+OBM 0.4 was out with code and functionnality enhancements.
+The development guidlines had been slightly update to improve code maintenance.
+The database model had been update too, the list and computer module were
+definitively integrated. Hence the Mailing functionality in the company module
+was deprecated, better handled by the list module (generic, no more single
+mailing limitation, infos can come from other tables, Contact and Company, and
+better suited for mailshots or mailings).
+The deal module had integrated the parentdeal entity to improve scalability.
+<P>
+But, some global polishment was needed and code had moved in too many directions.
+Lang files were becoming unmaintenable. So a major rewrite to harmonize and correct all these points was needed.
+<BR>
+"A background feeling that is getting stronger is that we must work on the
+design (from user perspective) to reach high quality and usability.
+We must start thinking of well defined directions and goals.
+For example, today what is the logical behind the computer module in OBM ? 
+"
+<P>
+It took a long time but was vital to the project and led to 0.5.0.
+
+<H2>Status - Current situation - 0.5.x</H2>
+0.5.0 has been released on 2002-02-01 and was a major rewrite with many enhancements.
+Current release is 0.5.2.
+<P>
+A mailing list and the bugzilla bugs and features tracking have been set up.
+The base modules (Company, Contact, Deal, List, User,) have been completly rewritten.
+A new module (time manager) to help track time spent on each tasks, and some enhancements.
+New tools have been set up in the admin module (Prefs, Data, Lang) which help
+code and maintain the code and data (translations, Preferences,...).
+<br> 
+OBM_DISPLAY class has been greatly improved and simplified.
+Code is now cleaner and more constant in the global project.
+<br>
+The calendar module is now integrated for testing purpose, its code hasn't been reviewed.
+<br>The accounting module has been integrated for testing only.
+<P>
+0.5.1 brings many bug fixes, a new module (time manager) to help track time spent on each tasks, and some enhancements.
+<p>
+The strategy is now clearer for OBM.
+
+
+<H2>Towards 0.6</H2>
+
+The main goal for the 0.6 version is to have the new section grouping with new UI and the 5 modules for the "sale force" (force de vente) section completly finished and usable.
+For now :
+<table border=1>
+<tr>
+<th>Module</th><th>state</th>
+</tr><tr>
+<td colspan=2 bgcolor=\"#CCCCCC\">Core modules</td>
+</tr><tr>
+  <td>User</td><td>Production</td>
+</tr><tr>
+  <td>Lang (Admin)</td><td>Production</td>
+</tr><tr>
+  <td>Company</td><td>Production</td>
+</tr><tr>
+  <td>Contact</td><td>Production</td>
+</tr><tr>
+  <td>Deal</td><td>Production</td>
+</tr><tr>
+  <td>List</td><td>Production</td>
+</tr><tr>
+  <td>Calendar</td><td>beta : seems to be working</td>
+</tr><tr>
+  <td colspan=2 bgcolor=\"#CCCCCC\">modules in testing mode</td>
+</tr><tr>
+  <td>Computer</td><td>Deprecated : to be removed or redesigned</td>
+</tr><tr>
+  <td>Support : Contracts</td><td>beta</td>
+</tr><tr>
+  <td>Support : Incidents</td><td>beta</td>
+</tr><tr>
+  <td>Accounting : Account</td><td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>Accounting : Invoice</td><td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>Accounting : Payments</td><td>alpha : to be reviewed</td>
+</tr><tr>
+  <td>Time manager</td><td>beta</td>
+</tr>
+</table>
+<P>
+
+<H2>Future developments</H2>
+
+We will add the section stage.
+A section will be for exemple : <b>sales forces</b> wich will included the modules Company, Contact, Deal, List and Calendar. 
+
+<P>
+Work has just started on two new modules. An accounting module and an support
+module.
+<P>
+
+Then we are planning a new module : The Document Module, designed to
+store all the documents a company can produce (letter, bill, ...).
+One intersting feature of this module would be the capability to automaticaly
+generate a document with data from the database and from a form depending on
+the document type.
+<BR>
+The Document would be generated by specific modules (LaTex, Word, any capable
+Linux office tool) which could be added later. We are currently working on the
+LaTex module.
+<P>
+Then maybe a very strong concept of modules where you can choose modules you
+want to use, and where OBM knows what to offer depending on the presence of
+modules. You could add a module,...
+
+
+<H2>RoadMap</H2>
+
+For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzilla for OBM</a> tool.
+<P>
+
+<TABLE border=1>
+<TR><TH>Version</TH><TH>Date</TH><TH>Planned features or changes</TH></TR>
+<TR>
+<TD>0.4.x</TD>
+<TD>2001-xx-xx</TD>
+<TD>
+<UL>
+<LI> better graphic design (better look, better screen positionning to save space). Hello contributors (themes, lang...)
+<LI> we may put a theme and lang manager to simplify contribs (already very simple though)
+<LI> better design logic (ex: after a company creation, display this company detail screen)
+<LI> help with english and others translations
+<LI> Extend the testing before inserting, updating, deleting things
+<LI> Mailing from Company is deprecated.
+</UL>
+</TD>
+</TR>
+<TR>
+<TD><b>0.5.x</b></TD>
+<TD>2002-07-xx - ?</TD>
+<TD>
+<UL>
+<LI> (done - 0.5.2) complete the List rewrite
+<LI> complete the shared Calendar module
+<LI> start section grouping
+<LI> improve access rights
+<LI> (done - 0.5.2) complete OBM_DISPLAY
+<LI> (done - 0.5.2) extend debug infos and level
+<LI> (done - 0.5.2) move to native PHP4 session (through PHPLIB)
+</UL>
+</TD>
+</TR><TR>
+  <TD>0.6</TD>
+  <TD>2002-09-xx</TD>
+  <TD>
+    <UL>
+    <LI> New default theme with cleaner displays
+    <LI> Section grouping of modules
+    </UL>
+  </TD>
+</TR><TR>
+  <TD>Future</TD>
+  <TD>200x-xx-xx</TD>
+  <TD>
+    <UL>
+    <LI> Document module with latex connection (other word processors ?)
+    <LI> Bill module
+    </UL>
+  </TD>
+</TR>
+
+</TABLE>
+<P>
+
+<A HREF="index.html">back</A>
+
+</BODY>
+</HTML>

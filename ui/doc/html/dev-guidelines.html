@@ -1,0 +1,417 @@
+<HTML>
+<HEAD>
+<TITLE> OBM Development Guidelines </TITLE>
+</HEAD>
+<BODY BGCOLOR="#FFFFFF">
+
+<A HREF="index.html">back</A>
+
+<CENTER>
+<H1>OBM Development Guidelines</H1>
+<I>Coding standards now mandatory to harmonize the OBM code</I><BR>
+Version 0.5.2 - 2002-07-15<BR>
+Pierre Baudracco
+</CENTER>
+<P>
+
+<H2>Introduction</H2>
+As OBM is evolving towards a more ambitious and complex application, we need
+more rigorous coding standards.
+<P>
+This document describes what is now <b>mandatory</b> coding rules for OBM code.
+
+
+
+<h2>OBM Files</h2>
+<h3>File Size</h3>
+
+OBM is a web application and so is deployed on Internet/Intranet servers.
+These servers are often accessed from distant computers (via telnet, ssh,...)
+so OBM code has to be readable from a terminal in 80 col mode.
+<P>
+OBM line separators (comments, headers,...) should always be <b>79 chars</b> long and never more.
+<p>
+Indentation should be <b>2 characters</b> steps.
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+</pre>
+</td></tr>
+</table>
+<p>
+
+Each truncated line should be so with this constraint in mind.
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  $req = "select Company.*, company_id as Id, companytype_label
+          from Company, CompanyType 
+          where company_type_id=companytype_id";
+</pre>
+</td></tr>
+</table>
+<p>
+
+Of course some lines should not be truncated (function definitions, ...)
+
+<h3>File Header</h3>
+
+Each OBM file should have an header as described below :
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File : company_index.php                                            //
+//     - Desc : Company Index File                                           //
+// 1999-03-19 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+</pre>
+</td></tr>
+</table>
+<P>
+
+
+<h2>Module Structure</h2>
+OBM is divided into application modules (and soon sections, a section beeing a set of modules).
+<p>
+Each module must be divided into 4 files :
+<ul type=disc>
+         <li> <b>(1)</b> module_index.php
+         <li> <b>(2)</b> module_display.inc
+         <li> <b>(3)</b> module_query.inc
+         <li> <b>(4)</b> module_js.inc<br><br>
+</ul>
+
+<table border=1>
+<tr>
+  <th>Module file</th>
+  <th>Description</th>
+</tr><tr>
+  <td>module_index.php</td>
+  <td>Main module file, is the module skeleton which calls and coordinates the functions contained in all the other files.<br>
+The <i>$action</i> variable dictates the module execution.
+  </td>
+</tr><tr>
+  <td>module_display.php</td>
+  <td>Display module file which contains display functions
+  </td>
+</tr><tr>
+  <td>module_display.php</td>
+  <td>Query module file which contains query functions (database access)
+  </td>
+</tr><tr>
+  <td>module_display.php</td>
+  <td>Javascript module file which contains javascript functions.
+  </td>
+</tr>
+</table>
+
+<H3>The module index file : module_index.php</H3>
+
+Each module index file must have an header, referencing all actions implemented, as described below :
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : company_index.php                                           //
+//     - Desc  : Company Index File                                          //
+// 1999-03-19 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+// Actions           -- Parameter
+// - index (default) -- search fields  -- show the company search form
+// - search          -- search fields  -- show the result set of search
+// - new             --                -- show the new company form
+// - detailconsult   -- $param_company -- show the company detail
+// - detailupdate    -- $param_company -- show the company detail form
+// - insert          -- form fields    -- insert the company
+// - update          -- form fields    -- update the company
+// - check_delete    -- $param_company -- check links before delete
+// - delete          -- $hd_company_id -- delete the company
+// - admin           --                -- admin index (kind)
+// - kind_insert     -- form fields    -- insert the kind
+// - kind_update     -- form fields    -- update the kind
+// - kind_checklink  --                -- check if kind is used
+// - kind_delete     -- $sel_kind      -- delete the kind
+// - display         --                -- display and set display parameters
+// - dispref_display --                -- update one field display value
+// - dispref_level   --                -- update one field display position 
+// External API ---------------------------------------------------------------
+// - ext_get_id      -- $title         -- select a company (return id) 
+// - ext_get_id_url  -- $url, $title   -- select a company (id), load URL 
+///////////////////////////////////////////////////////////////////////////////
+</pre>
+</td></tr>
+</table>
+<P>
+
+Names of <i>$action</i> variable should be coherent.
+Default actions names should be used :
+<ul>
+<li>index 
+<li>search 
+<li>detailconsult 
+<li>detailupdate 
+<li>new 
+<li>insert 
+<li>update 
+<li>check_delete 
+<li>delete 
+<li>display
+<li>dispref_display
+<li>dispref_level
+</ul>
+and others, specific to the module.
+
+
+<h2>Functions</h2>
+
+Each function must have an header, referencing all parameters and the return value (if any).
+<br>
+Parameters must be described after the line
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+// Parameters:
+</pre>
+</td></tr>
+</table>
+<P>
+
+Returned value must be described after the line
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+// Returns:
+</pre>
+</td></tr>
+</table>
+<P>
+
+Here is a correct function header :
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// Company Form Data checking and formatting                                 //
+// Parameters:
+//   - $cid       : company id
+//   - $company[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+</pre>
+</td></tr>
+</table>
+<P>
+
+
+<ul>
+<li><b>Display functions:</b>
+<ul>
+<li>All variables needed by the display function (other than labels, colors, or session variables) must be transmitted as arguments.
+<li>The name of the function is like "dis_module_$$$" (ex. <i> dis_deal_search_form() </I> ).
+<li>The file has to be called in the <i>_index.php</i> file with an "include" and not a "require".
+</ul>
+<br>
+<li><b>Query functions:</b><br>
+<ul>
+<li>The name of the function must be like "run_query_$$$" where "$$$" represent the action performed. 
+<li>All variables needed by the query (like label or id) have to be transmitted as arguments.
+<li>The OBM_DB object which execute the query is local to the function.
+<li>The function return the result of the query.
+<li>The file has to be called in the <i>_index.php</i> file with an "include" and not a "require".
+</ul>  
+</ul>
+
+
+<H2>Debug Infos</H2>
+Each user in OBM can set individually its debug level.
+The user debug level is stored in the session variable $set_debug.
+The debug level is a combination of different debug flags or switches.
+
+<h3>Debug flags defined</h3>
+For 0.5.2, OBM defines 3 independant debug switches.
+
+<P>
+<TABLE border=1>
+<TR>
+  <TH>Debug switch (value)</TH>
+  <TH>Debug infos to display</TH>
+  <TH>Developper Requirements</TH>
+</TR><TR>
+  <TD><I>$cdg_id (1)</I></TD>
+  <TD>Records ID</TD>
+  <TD>In the main search query (run_query_search() usually) get the entity_id column as Id (example below)</TD>
+</TR><TR>
+  <TD><I>$cdg_param (2)</I></TD>
+  <TD>Global and session variables</TD>
+  <TD>Call display_debug_msg on parameters in main get_param function</TD>
+</TR><TR>
+  <TD><I>$cdg_sql (4)</I></TD>
+  <TD>SQL queries</TD>
+  <TD>Call display_debug_msg() on each query (example below)</TD>
+</TR>
+</TABLE>
+<p>
+
+<h3>Developper Requirements</h3>
+<h4>$cdg_id</h4>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  $req = "select Company.*, <b>company_id as Id</b>, companytype_label
+          from Company, CompanyType 
+          where company_type_id=companytype_id";
+</pre>
+</td></tr>
+</table>
+
+<h4>$cdg_sql</h4>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+  $obm_q = new DB_OBM;
+  $query = "select distinct contact_id, contact_lastname, contact_firstname 
+            from Contact
+            where contact_company_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+</pre>
+</td></tr>
+</table>
+<P>
+
+<h3>Debug functions API</h3>
+The $set_debug session variable contains the user current debug level which should be tested against the various switches to display debug information.
+<p>
+OBM defines these functions (in global.inc) to help test and display debug info.
+<h4>debug_level_isset()</h4>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// Test if the debug flag is set
+// Parameters:
+//   - $debug : debug flag
+// Returns:
+//   - true || false : true is flag set
+///////////////////////////////////////////////////////////////////////////////
+function debug_level_isset($debug) {
+  global $set_debug;
+
+  if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
+    return true;
+  } else {
+    return false;
+  }
+}
+</pre>
+</td></tr>
+</table>
+<P>
+
+debug_level_isset($debug_flag) returns true if the flag is set for the user;
+<p><u>Example of use</u>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+if (debug_level_isset($cdg_param)) {
+</pre>
+</td></tr>
+</table>
+
+<h4>display_debug_mesg()</h4>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+///////////////////////////////////////////////////////////////////////////////
+// Display a debug message
+// Parameters:
+//   - $msg         : message to display
+//   - $debug (opt) : debug flag required
+///////////////////////////////////////////////////////////////////////////////
+function display_debug_msg($msg, $debug=0) {
+  global $set_debug;
+
+  if (($debug > 0) && (($set_debug & $debug) == $debug)) {
+    echo $msg;
+    echo "<HR>\n";
+  }
+}
+</pre>
+</td></tr>
+</table>
+<P>
+
+
+
+<H2>Variables Names</H2>
+Variables names must be explicit without beeing exhaustive.
+<BR>
+Ex: $param_theme. No $a, $i, $tp neither $parameter_theme_for_settings_screen.
+<P>
+
+If more than one word is to be used in a variable name the separator "_" should be used.
+<P>
+
+Most variables names should contains a prefix which indicates the variable nature. Here is a list of prefixes used.
+<P>
+
+<TABLE border=0>
+<TR><TD valign=top align=left>
+
+<TABLE border=1>
+<TR><TH colspan=2>HTML Form variables</TH></TR>
+<TR><TH>Variable Prefix</TH><TH>Variable Nature</TH></TR>
+<TR><TD><I>$tf_</I></TD><TD>Text Field</TD></TR>
+<TR><TD><I>$hd_</I></TD><TD>Hidden Field</TD></TR>
+<TR><TD><I>$sel_</I></TD><TD>Select</TD></TR>
+<TR><TD><I>$sb_</I></TD><TD>Submit Button</TD></TR>
+<TR><TD><I>$cb_</I></TD><TD>Checkbox</TD></TR>
+<TR><TD><I>$rd_</I></TD><TD>Radio button</TD></TR>
+<TR><TD><I>$fl_</I></TD><TD>File</TD></TR>
+<TR><TD><I>$ta_</I></TD><TD>Text Area</TD></TR>
+<TR><TD><I>$pw_</I></TD><TD>Password</TD></TR>
+<TR><TD><I>$form_</I></TD><TD>Form</TD></TR>
+</TABLE>
+
+</TD><TD valign=top align=right>
+
+<TABLE border=1 valign=top>
+<TR><TH colspan=2>Php variables</TH></TR>
+<TR><TH>Variable Prefix</TH><TH>Variable Nature</TH></TR>
+<TR><TD><I>$l_</I></TD><TD>label</TD></TR>
+<TR><TD><I>$param_</I></TD><TD>parameter</TD></TR>
+
+<TR><TD><I>$col_</I></TD><TD>Color</TD></TR>
+<TR><TD><I>$regexp_</I></TD><TD>Regular expression</TD></TR>
+<TR><TD><I>$set_</I></TD><TD>Setting</TD></TR>
+<TR><TD><I>$img_</I></TD><TD>Image</TD></TR>
+</TABLE>
+
+</TD></TR>
+</TABLE>
+
+
+
+<br><br>
+
+
+<A HREF="index.html">back</A>
+
+</BODY>
+</HTML>
+

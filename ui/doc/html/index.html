@@ -1,0 +1,200 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<HTML>
+  
+<HEAD>
+  <TITLE>O.B.M.</TITLE>
+</HEAD>
+  
+<BODY BGCOLOR="#FFFFFF">
+    
+<CENTER>
+<IMG SRC="/images/obm.gif" ALT="OBM">
+<P>
+OBM est un projet de gestion d'affaires Libre.
+<P>
+New : 2002-07-20 : version <B>0.5.2</B>
+<P>
+
+</CENTER>
+La version courante stable est la 0.5.2 du 20/07/2002
+<p>
+O.B.M. est utilisable en version démo (mais complète sauf les fonctions d'envoi de mails qui sont désactivées) sur ce site, il n'y a donc pas de section screenshots.
+<P>
+<UL>
+<LI> <A HREF="#news">What's new</A>
+<LI> <A HREF="#about">About OBM</A>
+<LI> <A HREF="demo/obm.php">Online demonstration (Démo OBM - mailing disabled)</A>
+<LI> <A HREF="#doc">Documentation</A>
+<LI> <A HREF="#mailing">Mailing list</A>
+<LI> <A HREF="#bugzilla">Bugzilla : bugs and requested features</A>
+<LI> <A HREF="#download">Download section</A>
+<LI> <A HREF="changelog.html">Change Log</A>
+<LI> <A HREF="hist-roadmap.html">History, Status and RoadMap</A>
+<LI>  Contact the authors : pierre.baudracco-NOSPAM@NOSPAM-aliacom.fr (remove -NOSPAM-)
+</UL>
+
+<P>
+<H2><A NAME="news">What's new</A></H2>
+2002-07-20 : version <B>0.5.2</B> released (coding standards more stricts)<BR>
+2002-06-10 : version <B>0.5.1</B> released <BR>
+2002-02-01 : version <B>0.5.0</B> released <BR>
+2002-02-01 : OBM bugzilla is open at bugzilla.aliacom.fr <BR>
+2001-07-29 : OBM mailing list is open <BR>
+2001-07-28 : version <B>0.4.1</B> released <BR>
+2001-06-13 : version <B>0.4.0</B> released <BR>
+2001-02-15 : version <B>0.3.3</B> released. including the list module. (minor bug fixes release)<BR>
+2000-10-10 : version <B>0.3.2</B> released.<BR>
+
+<H2><A NAME="about">About OBM</A></H2>
+
+<H3>OBM</H3>
+O.B.M. stands for Open Business Management.
+<P>
+
+OBM is an Intranet application which goal is to help manage a company, but can be used as a contact database. It is written by an evolving group of developpers and lead by Pierre Baudracco, with contributions by other people (see the changelog) and released under the terms of the GPL.
+
+<P>
+This version of OBM is a developper only release as it should be difficult to
+install and the datas and the database model are subject to change.
+
+<h3>Licence</h3>
+OBM is protected by the GNU General Public License v2 (See file COPYING).
+
+
+<h3>Requirements</h3>
+
+OBM is developped under Linux, Apache, PHP, PHPlib, MySQL or PostgreSQL.
+<P>
+<CENTER>
+OBM has been tested on these versions :
+<P>
+<TABLE border=1>
+<TR bgcolor=#00C0C0>
+  <TH>Software</TH>
+  <TH>Version</TH>
+  <TH>Comment</TH>
+</TR>
+<TR>
+  <TD>Linux</TD>
+  <TD>2.0.31 - 2.4.18</TD>
+  <TD>OBM shouldn't be related to kernel version directly</TD>
+</TR>
+<TR>
+  <TD>Apache</TD>
+  <TD>1.3.3 - 1.3.24</TD>
+  <TD>Not tested on 1.2 but should work with</TD>
+</TR>
+<TR>
+  <TD>PHP</TD>
+  <TD><b>OBM 0.3, 0.4</b> : 3.0.5 - 3.0.16; 4.0.1 pl2 - 4.1.x<BR>
+  <b>OBM 0.5.x</b> : 4.0.x - 4.2.x (<b>PHP3 no more supported</b>)</TD>
+  <TD>One or two ";" to delete with 4.0.x (for OBM 0.3) but that's all</TD>
+</TR>
+<TR>
+  <TD>PHPlib</TD>
+  <TD>7 - 7.2</TD>
+  <TD>Is included in OBM</TD>
+</TR>
+<TR>
+  <TD>MySQL</TD>
+  <TD>3.22.8 - 3.22.32; 3.23.x</TD>
+  <TD>&nbsp</TD>
+</TR>
+<TR>
+  <TD>Postgres</TD>
+  <TD>6.5.3; 7.0.x, 7.1.x, 7.2.x</TD>
+  <TD>Is supported since 0.3.0
+    <br>(<b>Version prior to 7.1 will not be supported anymore due to lack of "Left Join" feature</b>)
+    <br>(Postgres creation scripts are lacking for now)
+  </TD>
+</TR>
+</TABLE>
+
+<P>
+There are reports of OBM running on :
+<P>
+<TABLE border=1>
+<TR bgcolor=#00C0C0>
+  <TH>Platform</TH>
+  <TH>Reporter</TH>
+  <TH>Comment</TH>
+</TR> 
+<TR>
+  <TD>NT with Apache</TD>
+  <TD>Raymond Gardner</TD>
+  <TD>&nbsp;</TD>
+</TR>
+<TR>
+  <TD>FreeBSD 4.1, Apache 1.3.12, Mysql 3.23, PHP 3.0.16.</TD>
+  <TD>Ryan Fox</TD>
+  <TD>OBM 0.4</TD>
+</TR> 
+</TABLE>
+</CENTER>
+<P>
+
+All OBM versions support MySQL, and PostgreSQL is supported since 0.3.0.
+Multidatabase support is done throught Phplib, so it should be easy now to
+add support for other databases.
+<P>
+Phplib (PHP Base Library) is used in OBM. Only parts needed by OBM are
+present in this distribution, but Phplib can be obtain at phplib.netuse.de
+<P>
+<UL>
+<LI>Apache : <A HREF="http://www.apache.org">www.apache.org</A>
+<LI>PHP    : <A HREF="http://www.php.net">www.php.net</A>
+<LI>MySQL  : <A HREF="http://www.mysql.org">www.mysql.org</A>
+<LI>PostgreSQL : <A HREF="http://www.postgresql.org">www.postgresql.org</A>
+<LI>Phplib : <A HREF="http://phplib.netuse.de">phplib.netuse.de</A>
+</UL>
+
+
+<H2><A NAME="doc">Documentation</A></H2>
+<UL>
+<li>
+<a href="install-0.5.html#upgrade-0.5.2">
+ upgrade 0.5.1 to 0.5.2</a><br>
+<a href="install-0.5.html#upgrade-0.5.1">
+ upgrade 0.5.0 to 0.5.1</a><br>
+<a href="install-0.5.html#upgrade-0.5.0">
+ upgrade 0.4.1 to 0.5.0</a><br>
+<a href="install-0.4.html#upgrade-0.4.0">
+ upgrade 0.3.3 to 0.4.0</a><br>
+<a href="install-0.3.html#upgrade-0.3.3">
+ upgrade 0.3.2 to 0.3.3</a><br>
+<LI> Installation guide : 
+<A HREF="install-0.5.html">0.5.x</A> - <A HREF="install-0.4.html">0.4.x</A> - <A HREF="install-0.3.html">0.3.x</A> - <A HREF="install-0.2.html">0.2.x</A> 
+<LI> <A HREF="dev-guidelines.html">OBM Development Guide Lines</A>
+<LI> <A HREF="OBM-LANG-HOWTO.html">OBM LANG HOWTO</A>
+<LI> <A HREF="OBM-THEME-HOWTO.html">OBM THEME HOWTO</A>
+<LI> <A HREF="OBM-PREFERENCES-HOWTO.html">OBM PREFERENCES HOWTO (french)</A>
+<LI> <A HREF="OBM-DISPLAY-HOWTO.html">OBM DISPLAY HOWTO (french)</A>
+<LI> Known Bugs and Requested Features are deprecated since the use of bugzilla</A>
+</UL>
+
+<H2><A NAME="mailing">Mailing list</A></H2>
+
+You can <A HREF="http://www.list.aliacom.fr/obm/"> view the archive </A> of the
+OBM mailing list.
+<BR>
+To suscribe, or get more info on the list
+<A HREF="http://www.list.aliacom.fr/mailman/listinfo/obm/">
+visit the list info </A>.
+
+
+<H2><A NAME="bugzilla">Bugzilla tool</A></H2>
+
+You can access the <A HREF="http://bugzilla.aliacom.fr/"> bugzilla tool </A> to view the currents bugs and requested or planned features.
+
+
+<H2><A NAME="download">Download</A></H2>
+<UL>
+<LI> <A HREF="obm-0.2.4.tar.gz"> 0.2.4 sources : obm-0.2.4.tar.gz</A>
+<LI> <A HREF="obm-0.3.3.tar.gz"> 0.3.3 sources : obm-0.3.3.tar.gz</A>
+<LI> <A HREF="obm-0.4.1.tar.gz"> 0.4.1 sources : obm-0.4.1.tar.gz</A>
+<LI> <A HREF="obm-0.5.1.tar.gz"> 0.5.1 sources : obm-0.5.1.tar.gz</A>
+</UL>
+
+</BODY>
+</HTML>

@@ -1,0 +1,353 @@
+<SCRIPT language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : user_query.inc                                              //
+//     - Desc  : User query & db File                                        //
+// 2000-01-13 Florent Goalabre : Last Update 2001-07-27 Francois Bloque      //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// User query search query execution                                         //
+// Parameters:
+//   - $user[] : user search criteria
+//     keys used  : name, perms
+//   - $p_new_order : infos for order clause
+//   - $p_order_dir : direction for order clause (asc, desc)
+///////////////////////////////////////////////////////////////////////////////
+function run_query_search($user, $p_new_order, $p_order_dir) {
+  global $c_all, $cdg_sql;
+
+  $name = $user["name"];
+  $perms = $user["perms"];
+
+  $select = "select UserObm.*, userobm_id as Id from UserObm";
+  $where="";
+
+  // If a user indication has been specified, get it
+  if (trim($name) != "") {
+     $where .= " userobm_username like '" . $name . "%' ";
+  }
+
+  // If a user perms  indication has been specified, get it
+  if (($perms != $c_all) && ($perms != "")) {
+     if (trim($where) != "") $where = " and" ;
+     $where .= " userobm_perms='" . $perms . "'" ;
+  }
+  if (trim($where) != "") $where = " where" .$where;
+  $query = $select . $where;
+
+  // ORDER construction
+  $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "userobm_username";
+  $query .= " order by $order $p_order_dir";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_db=new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User detail query execution                                               //
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_detail($p_id) {
+  global $l_date_format,$db_type_mysql,$db_type_pgsql, $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  if ($obm_q->type == $db_type_mysql) {
+    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_date_format') as timecreate from UserObm where userobm_id='$p_id'";
+  } else if ($obm_q->type == $db_type_pgsql) {
+    $query = "select UserObm.*,DATE_FORMAT(userobm_timeupdate,'$l_date_format') as timeupdate, DATE_FORMAT(userobm_timecreate,'$l_date_format') as timecreate from UserObm where userobm_id='$p_id'";
+  } 
+
+  $obm_q->query($query);
+  $obm_q->next_record();
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User insert query execution                                               //
+// Parameters:
+//   - $user[]   : entry values
+//     keys used : name, passwd, perms, email, contact
+///////////////////////////////////////////////////////////////////////////////
+function run_query_insert($user) {
+  global $auth, $cdg_sql;
+
+  $name = $user["name"];
+  $passwd = $user["passwd"];
+  $perms = $user["perms"];
+  $email = $user["email"];
+  $contact = $user["contact"];
+
+  $query = "insert into UserObm (userobm_timeupdate,
+    userobm_timecreate,
+    userobm_userupdate,
+    userobm_usercreate,
+    userobm_username,
+    userobm_password,
+    userobm_perms,
+    userobm_timelastaccess,
+    userobm_contact_id,
+    userobm_email)
+  values (
+    null,
+    '" . date("Y-m-d H:i:s") . "',
+    null,
+    ". $auth->auth["uid"] . ",
+    '$name',
+    '$passwd',
+    '$perms',
+    null,
+    '$contact',
+    '$email')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User update query execution                                               //
+// Parameters:
+//   - $p_id     : user id
+//   - $user[]   : entry values
+//     keys used : name, passwd, perms, email, contact
+///////////////////////////////////////////////////////////////////////////////
+function run_query_update($p_id, $user) {
+  global $auth, $cdg_sql;
+
+  $name = $user["name"];
+  $passwd = $user["passwd"];
+  $perms = $user["perms"];
+  $email = $user["email"];
+  $contact = $user["contact"];
+
+  $query = "update UserObm set
+    userobm_timeupdate='". date("Y-m-d H:i:s")."',
+    userobm_userupdate=". $auth->auth["uid"] .",
+    userobm_username='$name',
+    userobm_password='$passwd',
+    userobm_perms='$perms',
+    userobm_contact_id='$contact',
+    userobm_email='$email'
+  where userobm_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the lastname and firstname of the contact linked to the user       //
+// Used because of lack of left join in postgres < 7.1.x
+// Parameters:
+//   - $p_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contact_name($p_id) {
+  global $cdg_sql;
+
+  $query = "select contact_lastname, contact_firstname
+            from Contact
+            where contact_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_db=new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+
+  return $obm_db;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User delete query execution                                               //
+// Parameters:
+//   - $p_id : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete($p_id) {
+  global $cdg_sql;
+
+  $query = "delete from UserObm where userobm_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// User environment checking (same user exists ?)                            //
+// Parameters:
+//   - $p_id   : user id
+//   - $user[] : user's values
+// Returns:
+//   - User Database object with list of similar users
+///////////////////////////////////////////////////////////////////////////////
+function check_user_context($p_id, $user) {
+
+  $name = $user["name"];
+  $passwd = $user["passwd"];
+  $perms = $user["perms"];
+  $email = $user["email"];
+  $contact = $user["contact"];
+
+  // if a user with same name exists, return false
+  $co_q = run_query_check_user($p_id, $name);
+  return $co_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the user with similar names
+// Parameters:
+//   - $p_id    : user id
+//   - $name    : username
+///////////////////////////////////////////////////////////////////////////////
+function run_query_check_user($p_id, $name) {
+  global $cdg_sql;
+
+  $query = "select distinct userobm_id, userobm_username
+            from UserObm
+            where userobm_id!='$p_id' and userobm_username like '$name%'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Data checking and formatting                                              //
+// Parameters:
+//   - $p_id     : user id
+//   - $user[]   : values checked
+//     keys used : name, passwd, email
+///////////////////////////////////////////////////////////////////////////////
+function check_data_form($p_id, $user) {
+  global $l_exist_error,$l_username_error,$l_password_error,$l_email_error;
+  global $l_err_user_contact, $php_regexp_email;
+  global $err_msg, $action, $cdg_sql;
+
+  $id = $user["id"];
+  $name = $user["name"];
+  $passwd = $user["passwd"];
+  $perms = $user["perms"];
+  $email = $user["email"];
+  $contact = $user["contact"];
+
+  // MANDATORY: User name
+  if (trim($name) == "") {
+    $err_msg = $l_username_error." : ". $name;
+    return false;
+  }
+  // MANDATORY: User password
+  if (trim($passwd) == "") {
+    $err_msg = $l_password_error." : ". $passwd;
+    return false;
+  }
+  // User email
+  if (($email != "") && (eregi($php_regexp_email, $email) == false)) {
+    $err_msg = $l_email_error." : ". $email;
+    return false;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // if a user with the same name already exists  return false               //
+  /////////////////////////////////////////////////////////////////////////////
+  $query = "select * from UserObm where userobm_username='$name'";
+  if ($p_id > 0) {
+    $query .= " and userobm_id!='$p_id'";
+  }
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  if ($obm_q->num_rows() > 0) {
+    $err_msg = $name . " : " . $l_exist_error;
+    return false;
+  }
+
+  /////////////////////////////////////////////////////////////////////////////
+  // if the contact is already assigned to a user return false               //
+  /////////////////////////////////////////////////////////////////////////////
+  $query = "select * from UserObm where userobm_contact_id='$contact'
+                                  and userobm_contact_id!=''";
+  if ($p_id > 0) {
+    $query .= " and userobm_id!='$p_id'";
+  }
+  $obm_q=new DB_OBM;
+  $obm_q->query($query);
+  if ($obm_q->num_rows() > 0) {
+    while ($obm_q->next_record()) {
+      $username = $obm_q->f("userobm_username");
+      $id = $obm_q->f("userobm_id");
+      $list .= "<A HREF=\"user_index.php?action=detailconsult&amp;param_user=$id\">$username<BR>";
+    }
+    $err_msg = $l_err_user_contact . "<P>" . $list;
+    return false;
+  }
+
+  return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the list of all internal contacts                                  //
+// (the contacts who belong to MyCompany : for now those marked as internal) //
+// Should be in global XXX
+///////////////////////////////////////////////////////////////////////////////
+function run_query_mycontacts () {
+  global $cdg_sql;
+
+  $query = "select contact_id,contact_lastname,contact_firstname
+            from Contact,Company
+            where contact_company_id=company_id
+              and company_state=1
+            order by contact_lastname";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_db=new DB_OBM;
+  $obm_db->query($query);
+
+  return $obm_db;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Executions - Delete all references to one (UserObmPref, DisplayPref)
+// Parameters:
+//   - $param_user : user id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete_profil($param_user)  {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+
+  $query = "Delete from UserObmPref where userobmpref_user_id='$param_user'"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  $query = "Delete from DisplayPref where display_user_id='$param_user'"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+}
+
+
+</SCRIPT>

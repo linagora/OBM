@@ -1,0 +1,133 @@
+<SCRIPT language="php">
+//////////////////////////////////////////////////////////////////////////////
+// OBM - Language : English                                                 //
+//     - File     : company.inc                                             //
+// 1999-01-25 Pierre Baudracco                                              //
+//////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+//////////////////////////////////////////////////////////////////////////////
+
+// Database fields
+$l_number = "Number";
+$l_name = "Name";
+$l_company_name = "Company Name";
+$l_kind = "Kind";
+$l_company_kind = "Company Kind";
+$l_address = "Address";
+$l_postcode = "Zip Code";
+$l_postcode_first = "ZIP";
+$l_town = "Town";
+$l_expresspostal = "Express postal";
+$l_country = "Country";
+$l_phone = "Phone";
+$l_fax = "Fax";
+$l_web = "Web";
+$l_email = "E-Mail";
+
+// Labels and texts
+$l_back = "Back";
+$l_last_company = "Last company";
+$l_last_contact = "Last contact";
+$l_last_deal = "Last deal";
+$l_all = "All";
+$l_find = "Find";
+$l_mailing_first = "M";
+$l_listdoc_first = "D";
+$l_newdoc_first = "ND";
+$l_comment = "Comment";
+$l_contact_list = "Contact List";
+$l_contact_new = "New Contact";
+$l_deal_list = "Deal List";
+$l_deal_new = "New Deal";
+$l_kind_manage = "Company Kind Management";
+$l_kind_exist = "Existing Kinds";
+$l_kind_new = "New Kind";
+$l_invalid_data = "Invalid Data";
+$l_internal = "Internal";
+
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["company_name"] = $l_name;
+$fieldnames["company_address1"] = $l_address;
+$fieldnames["company_address2"] = $l_address;
+$fieldnames["company_phone"] = $l_phone;
+$fieldnames["company_fax"] = $l_fax;
+$fieldnames["company_email"] = $l_email;
+$fieldnames["company_web"] = $l_web;
+// Calculated or indirect fields
+$fieldnames["companytype_label"] = $l_kind;
+$fieldnames["company_contact_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_list\" ALT=C>";
+$fieldnames["company_new_contact"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\" ALT=NC>";
+$fieldnames["company_deal_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_deal_list\" ALT=D>";
+
+// Titres
+$l_company = "Company";
+
+// Actions
+$l_insert = "Insert the Company";
+$l_update = "Update the Company";
+$l_checkdelete = "Check or Delete the Company";
+$l_delete = "Delete the Company";
+$l_mailing_update = "Update Mailing";
+$l_mailing_reset = "Reset Mailing";
+$l_kind_update = "Update Kind";
+$l_kind_checkdelete = "Check or Delete Kind";
+$l_kind_delete = "Delete Kind";
+$l_kind_insert = "Insert Kind";
+$l_confirm = "Confirm the action";
+$l_select_company = "Select the Company";
+
+// Messages
+$l_error_permission = "You doesn't have the rights to access this page";
+$l_no_display = "Fill the search fields and press < Find > to retrieve the companies";
+$l_found = "companies found.";
+$l_no_found = "No company found matching the query !";
+$l_delete_ok = "The company has been deleted successfully.";
+$l_delete_error = "The deletion of the company has failed !";
+$l_insert_ok = "The company has been inserted successfully.";
+$l_insert_error = "The insertion of the company has failed !";
+$l_check_samecompany = "These companies seem similar to this new entry !";
+$l_update_ok = "The company has been updated successfully.";
+$l_update_error = "The update of the company has failed !";
+$l_query_error = "Critical trouble during the execution of the query.";
+$l_mailing_ok = "The mailing has been updated successfully.";
+$l_mailing_nb = "companies registered in the mailing.";
+$l_mailing_reset_ok = "The reset of the mailing has been completed successfully.";
+$l_link_deal = "The company is involved in these deals";
+$l_link_deal_no = "The company isn't involved in any deal";
+$l_link_contact = "These contacts are from this company";
+$l_link_contact_no = "The company hasn't any contacts";
+$l_cant_delete = "The company can't be deleted !";
+$l_can_delete = "The company can be deleted.";
+$l_kind_insert_ok = "The kind has been inserted successfully.";
+$l_kind_insert_error = "The insertion of the kind has failed !";
+$l_kind_delete_ok = "The kind has been deleted successfully.";
+$l_kind_delete_error = "The deletion of the kind has failed !";
+$l_kind_update_ok = "The kind has been updated successfully.";
+$l_kind_update_error = "The update of the kind has failed !";
+$l_kind_link_company = "These companies are referenced as";
+$l_kind_link_company_no = "No company referenced as";
+$l_kind_cant_delete = "The Kind can't be deleted !";
+$l_kind_can_delete = "The Kind can be deleted.";
+
+// JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_delete_confirm = "Really delete the company ?";
+$l_fill_name = "You have to fill the Name before submitting.";
+$l_j_check_zip = "The zip code is not valid.";
+$l_j_check_phone = "The phone number is not valid.";
+$l_j_check_fax = "The fax number is not valid.";
+$l_j_check_email = "The email adress is not valid.";
+$l_j_check_web = "The web adress is not valid.";
+$l_j_kind_delete = "You have to select a kind to check or delete it !";
+$l_j_kind_update = "You have to select a kind and enter a new name to update it !";
+$l_j_kind_create = "You have to enter a new kind name to create it !";
+$l_j_select_company = "You have to select a company !";
+
+// Specifics fields
+// MySQL Date and time format for display in the deal detail screen
+$l_date_format = "%Y-%m-%d %H:%i:%s";
+
+// For the display parameters modification screen
+$l_company_display = "Display options for companies list"; 

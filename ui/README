@@ -1,0 +1,39 @@
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Vers  : 0.3.0                                                       //
+//     - File  : README                                                      //
+//     - Desc  : First file to read. Basic infos on OBM.                     //
+// 2000-01-09 Pierre Baudracco - Last Updated : 2000-01-31                   //
+///////////////////////////////////////////////////////////////////////////////
+
+
+This file is not valid anymore. Visit the doc/html folder for current information.
+
+All the OBM docs are in the doc folder.
+
+This version of OBM is a developper only release as it should be difficult to
+install and the datas and the database model are subject to change.
+
+
+Licence
+-------
+OBM is protected by the GNU General Public License (See file COPYING).
+
+
+Requirements
+------------
+OBM is developped under Linux (Kernel 2.0.36, glibc), Apache 1.3.3, PHP 3.0.5
+and MySQL 3.22.8.
+It should run whith any Apache 1.3.X (maybe with 1.2.X too), PHP 3.X and
+MySQL 3.21.X or above. It has only been tested on Linux but it may run on
+others UNIX where Apache, PHP and MySQL are available.
+
+OBM currently only supports MySQL and PostgreSQL but others databases
+support is planned.
+
+Phplib (PHP Base Library) is used in OBM. Only parts needed by OBM are
+present in this distribution, but Phplib can be obtain at phplib.shonline.de
+
+Apache : www.apache.org
+PHP    : www.php.net
+MySQL  : www.mysql.org
+Phplib : phplib.shonline.de

@@ -1,0 +1,289 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<HTML>
+  
+<HEAD>
+  <TITLE>O.B.M.</TITLE>
+</HEAD>
+  
+<BODY BGCOLOR="#FFFFFF">
+
+<A HREF="index.html">back</A>
+    
+<CENTER>
+O.B.M. ChangeLog
+<P>
+</CENTER>
+
+To do<BR>
+<UL>
+<LI> When deleting a user, move all his contacts from private to public
+<LI> Move run_query_mycontacts (in user) to global
+<LI> Remove all $sess->self_url(), replace with $sess->url() (pb with action)
+<LI> theme.inc was included twice (in menu.inc and global.inc) => optimisation : inclusion only in global.inc and parameter $theme passed to the generate_menu function(). So all themes vars in the $theme array
+<LI> Look at the bookmark implementation.
+<LI> Improve OBM_DISPLAY and its way to implement special field case. If possible no update of the dis_data() function should be needed when adding a module.
+<LI> how to detect doublons ?
+<LI> Pour les listes : listes dynamiques ? supprimer les listes dans export ? trier requete exports ?
+</UL>
+
+
+2002-07-xx : version 0.5.2<BR>
+<UL>
+<LI> BUG#18 : Update install documentation for security
+<LI> Security : obminclude not in the web tree anymore
+<LI> BUG#7 : obminclude now defined in variable to allow several OBM instances
+<LI> Minors contact modules fixes (visibility on insert form, tel not needed)
+<LI> New tool (admin module code) to detect '&' misuse in URL
+<LI> BUG#6 : Changed all '&' in URL to $amp;
+<LI> BUG#39 : List of connected users now displayed in the admin module.
+<LI> BUG#46 : Use of native PHP sessions instead of PHPLIB ones.
+<LI> BUG#26 : List module review / rewrite finished !
+<LI> BUG#60 : Administration counters now corrects (was shifted by one)
+<LI> BUG#59 : Company Deal list no longer display deals from similar companies
+<LI> BUG#57 : Debug level can now be set to 0 again
+<LI> Development Guidlines updates
+<LI> BUG#10 : Debug level is now a set of switches (Id, param, sql)
+<LI> BUG#45 : New debug level which displays Id
+<LI> OBM_DISPLAY clean up (set_new_order, pref_element_id removed,...)
+<LI> The INFORMATIONS display_type has been removed from OBM_DISPLAY
+<LI> BUG#49 : page management in OBM_DISPLAY can now be disabled.
+<LI> BUG#56 : User last access time now refreshed on login instead of logout !
+<LI> BUG#52 : Time management : main window is not refreshed anymore on editing
+<LI> BUG#40 : Calendar: own User selected by default (preferences problem)
+<LI> BUG#25 : User module now use the OBM_DISPLAY class.
+<LI> New tool (admin module) : Update users preferences (all in one shot)
+<LI> BUG#36 : (time management) Project label can now handle ' correctly.
+<LI> New tool (admin module) : Data inconsistency checking
+<LI> BUG#47 (feature) : contact and active deal number displayed for companies
+<LI> BUG#55 : On deal creation, select fields are not pre-filled anymore
+<LI> BUG#51 : Contact now found when searched just after insertion
+<LI> Removed table DealCategory and merged with TaskType
+</UL>
+
+2002-06-10 : version 0.5.1 <BR>
+<UL>
+<LI> New module : Time manager.
+<LI> Allow contact sorting in List module (even by company)
+<LI> Popup size in variable
+<LI> BUG#23 : select extern entity from new popup window (return id or call url)
+<LI> BUG#44 : An existing contact could have its company changed
+<LI> BUG#12 : Company list (extern entity from contact or deal) displays town
+<LI> Database creation scripts reorganized. Main script creates tables, secondary script which populates language specific fields.
+<LI> BUG#9 : default new contact phone number from company phone
+<LI> BUG#35 : mailto field in the contact detail page
+<LI> BUG#41 : added search by phone in Contact and Company module
+<LI> BUG#42 : warning removed
+<LI> BUG#36 : Escaping is now done and undone correctly (company, contact, deal, list)
+<LI> BUG#27 : Checkboxes are now set in deal list view. Added data_cb_field to OBM_DISPLAY
+<LI> Added missing Invoice.invoice_archive, Payment.payment_checked in database create files (already present in update file) with updated declaration, new update-0.5.0-0.5.1.mysql.sql script to correct that with doc (see install-0.5 file)
+<LI> Missing temporary tables (for module accounting) in create or update scripts.
+<LI> BUG#3 : company and contact emails updated to varchar(128)
+<LI> BUG#37 : Successive deal searches within a parentdeal were losing parentdeal info
+</UL>
+
+
+2002-02-01 : version 0.5.0 (Major rewrite)<BR>
+<UL>
+<LI> Note: New tools for OBM : bugzilla (bugzilla.aliacom.fr) and mailing list
+<LI> Major rewrite : better processing and display separation, form fields captured in only one place (get_param_module()) (no more form fields in function parameters or global variables), better code presentation
+<LI> Deal module rewrite : adapt to coding standards, deal and parentdeal search grouping, display optimization, fixes (Pierre Baudracco)
+<LI> User module rewrite : adapt to coding standards, new actions: check links, reset preferences, minor fixes (Pierre Baudracco)
+<LI> Contact module rewrite : adapt to coding standards, new action check links, minor fixes (Pierre Baudracco)
+<LI> Company module rewrite : adapt to coding standards, new action check links, minor fixes (Pierre Baudracco)
+<LI> Check if similar companies exists before inserting a new one (Pierre Baudracco)
+<LI> Check if company has any contact before deleting it (Pierre Baudracco)
+<LI> Removed deprecated mailing functionnality (and field) in company module (Pierre Baudracco)
+<LI> Move all .php3 files to .php (for the new CVS) (Pierre Baudracco)
+<LI> fix a bug in ct_sql.inc (in PHPLIB) which displays an error message (Database error: Invalid SQL: insert into ActiveSessions ( sid, name, val, changed )...) when the screen is asked to be refresh more than once a second (Mehdi)
+<LI> New tool "admin lang" to manage lang and ease translations. Works in Web or command line mode (Pierre Baudracco)
+<LI> Resync and update lang 'en' and 'fr'.
+<LI> Updated Administration module (Pierre Baudracco)
+<LI> Contact kind now back in contact module (jlb)
+<LI> Phone numbers now accept "." (Maxime)
+<LI> OBM_DISPLAY complete rewrite, API changed (Pierre Baudracco) main changes:
+  <UL>
+    <LI> Database storage of parameters in DisplayPref (only one table now)
+    <LI> Remove cumbersome dis_name_fieldname(), replaced by $fieldnames[] hash
+    <LI> Remove the need to update base functions when adding new module
+    <LI> Page management moved into OBM_DISPLAY (with jlb)
+    <LI> Lang vars in a specific file (lang/fr/global.inc)
+    <LI> OBM-DISPLAY-HOWTO Rewrite
+  </UL>
+<LI> Better modules sub-menus : display preferences always in submenus under "display" (Pierre Baudracco)
+<LI> Account section (3 modules) integrated for testing purpose (Nicolas Roman)
+</UL>
+
+
+2001-07-28 : version 0.4.1<BR>
+<UL>
+<LI> More SQL compliance (correct PostgreSQL problems) : single quotes replace ", null instead of "" (Martin Fink)
+<LI> Updated german translation (Martin Fink)
+<LI> Contrib to handle same string in multiple lang files (Martin Fink)
+<LI> Fix some session problems in computer and list modules (François Bloque)
+<LI> Doesn't display bookmark if the entity has been deleted ! (François Bloque)
+<LI> Some typos (Martin Fink, Francois Bloque, Pierre Baudracco)
+</UL>
+
+
+2001-06-13 : version 0.4 (database model has changed) - Francois Bloque alias PSG version (hence the bugs :) ) <br>
+<UL>
+  <li> Adding a new part of the deal module : the ParentDeal manager
+    <ul>
+      <li> you can group deals under a parentdeal 
+      <li> you can create parentdeals
+      <li> you can search for parentdeals
+      <li> from a deal's page, you can affect the deal to a parentdeal
+      <li> from a deal's page, you can consult information about its parentdeal
+      <li> if all the deals of a parentdeal are archived, then the parentdeal is archived.
+      <li> from a parentdeal's page, you can create a deal which will be automatically attached to the parentdeal, and whose default managers will be the ones of the parentdeal.
+      <li>Only an editor or an admin can affect deals to a parentdeal
+      <li>The status of a parentdeal is the less advanced status among all its deals.
+      <li>The amounts of a parentdeal are the sums of the proposal amounts of its deals (determined by a balance "plus" or "minus" see below).
+    </ul> 
+
+<li>The Computer module can be accessed from all themes now
+<li>Deal_proposal, Deal_origin_id and Deal_manager_id are not used anymore.
+<li>The Zipcode is now  14 characters
+<li>The Deal label is now 128 characters
+<li>Deal Status have an order now.
+<li>Deal Types have a balance : plus or minus. 
+<li>Deal types, status and categories are all customizable (Deal submenu "Administration").
+<li>New fields : deal_number and company_number which can be used as registration numbers (they can be blank), and the character string "deal_todo" which is the next thing to do with the deal. 
+<li>Save and  restore of the user's preferences (lang, theme, etc. ) when he quits or logs in obm.
+<li>Default preferences profile inserted for a new user
+<li>Deletion of all preferences of a user when he is removed from obm 
+<li>A company has a state : "internal" or "external" ("internal" means it's the company of the user, it's "my company"). It replaces the company of id 1. Then the "internal" contacts are the ones who belong to an internal company. 
+<li>Possibility to protect your own data from the other users by specifying deal or contact as "private". Only the creator of the deal or the contact (the one who inserted data) can see these items in the lists, access their detailled page and set them to public or private.
+<li>Direct access (link) to the last visited deal, the last visited contact, and the last visited company.
+<li>All list displays (contacts, companies, deals, parentdeals) are managed by the OBM_DISPLAY class, which allow to order a list by one or two columns and to customize all display options.
+<li>The contacts, parentdeals, or companies deletion are checked : we can't delete companies or contacts linked to deals, or parentdeals which contain deals. 
+<li>Better security : a not allowed user can't access a forbidden section by using the url anymore. 
+<li>Documentation : OBM-PREFERENCES-HOWTO and OBM-DISPLAY-LISTS-HOWTO  
+<li>Documentation : New developement guidelines for query functions and html display functions 
+(only in the Deal section for the moment -  see dev-guidelines.html for more details)
+<li>Sql and Perl scripts to update Obm database from 0.3.3 to 0.4 format
+</UL>
+<br>
+
+<!--     old     -->
+
+ 2001-02-16 : version 0.3.3 <BR>
+<UL>
+  <li> Adding a new module, the list module. (Vincent Marguerit)
+    <ul>
+      <li> This module manage some list of contacts. (Vincent Marguerit)
+       <li> You can send a mail to the lists (sendmail must be installed to send mails) (Vincent Marguerit)
+      <li> You can authorize/forbid users to send mail to list. (Vincent Marguerit)
+   </ul>
+<LI> minor bugs with PHP4 (Michael Peters)
+<LI> bug with strpos which do not work the same with PHP4 (Michael Peters, Pierre Carlier)
+<LI> 'require' does not work the same in PHP3 and PHP4: using 'include("global.inc")' in all files (P. Carlier)
+<LI> cross links loose sessions when disabling cookies: using $session PHPLib object (P. Carlier)
+</UL>
+
+2000-10-10 : version 0.3.2<BR>
+<UL>
+<LI> Menu representation is now themable (Frodo)
+<LI> New theme : linux-mandrake (Philippe Vivien)
+<LI> All settings variable now prefixed with $set_ (Pierre Baudracco)
+<LI> Norvegian translation (nynorsk, dir lang/no_ny) (Magni Onsøien)
+<LI> Added some header code to deal with caching problems (Magni Onsøien)
+<LI> Valid zip codes are now 4 to 8 alphanumeric chars in form validation. The database change will go in OBM 0.4 (Magni Onsøien, Pierre Baudracco)
+<LI> Company, Contact and Deal comments fields now displayed with nl2br (Magni Onsøien)
+<LI> Cursor simulation : Number of rows in a result page is now configurable via the settings screen, total rows number is now displayed (Florent Goalabre, Pierre Baudracco)
+<LI> Documentation fixes and updates (Install guide,...) (Tom Musgrove, Pierre Brua)
+<LI> B0024 : Allow "-" in the username part of an email (Pierre Baudracco)
+<LI> B0023 : Login screen displays the correct obm version (Pierre Baudracco)
+<LI> B0022 : Fixe and update with the contact phones display (Magni Onsøien, Pierre Baudracco)
+<LI> B0021 : Fixes problems when inserting or updating deals (Pierre Baudracco)
+<LI> B0020 : Update the postgres database creation scripts (Pierre Baudracco)
+</UL>
+
+2000-07-24 : version 0.3.1<BR>
+<UL>
+<LI> An export script to export OBM databases from 0.2 to 0.3 format - scripts/obmdb_export_0.2-0.3.pl (Pierre Baudracco)
+<LI> The debug variable can now be changed in the settings screen (only by an admin user) (Pierre Baudracco)
+<LI> B0019 : User search now works correctly when automatic display is set (Pierre Baudracco)
+<LI> B0018 : The marketing manager was displayed in place of the technical manager in the deal detail screen (Pierre Baudracco)
+<LI> B0017 : Deal and contact titles in the browser window are now correct (Pierre Baudracco)
+<LI> B0015 : PostgreSQL password for default user uadmin set to padmin instead of admin (Pierre Baudracco)
+<LI> B0014 : Deal search now works again when automatic display is set (Pierre Baudracco)
+</UL>
+
+2000-01-30 : version 0.3.0 (database model changed)<BR>
+<UL>
+<LI> Major code rewrite to follow the model of one application page per entity (Florent Goalabre).
+<LI> Default consultation is read only and doesn't allow updates anymore. You have to click the update button to go to update mode (Florent Goalabre)
+<LI> German language translation added (Martin Fink)
+<LI> Documentation updated (database model,...) (Pierre Baudracco)
+<LI> Each record store its creator and the username of the user which last updates the record (Florent Goalabre)
+<LI> User and profile management (user -read only-,editor -read/write-,admin -full access-) and authentication (Florent Goalabre)
+<LI> Session database merged with the obm database (Florent Goalabre)
+<LI> F0012 : Database updates : Contact address, contact home and mobile phones (Pierre Baudracco)
+<LI> F0006 : Database fieldnames in english (Michael de Beer and Pierre Baudracco)
+<LI> F0009 : Added creation and update dates in all tables (Florent Goalabre and Pierre Baudracco)
+<LI> F0004 : PostgreSQL support (database creation script) (Florent Goalabre and Martin Fink)
+<LI> Switch to PHPlib 0.7.2 and Multi-database architecture (Florent Goalabre and Martin Fink)
+</UL>
+
+2000-01-09 : version 0.2.4<BR>
+<UL>
+<LI> F0008 : Phone, fax numbers, e-mail, web and zip code data checking against configurable regexp on client and server side (Pierre Baudracco)
+<LI> F0007 : Secure insert and update scripts by checking parameters on the client and server side to prevent misuse by manually editing the URL (Pierre Baudracco)
+<LI> Company, contact and deal names automatically converted to uppercase. Firstname converted to capital (Pierre Baudracco)
+<LI> B0013 : Blank Names (with spaces) for company, contact and deal names can't be inserted or updated anymore (Pierre Baudracco)
+<LI> F0003 : Debug flag to control the display of infos (queries,...) (Pierre Baudracco)
+<LI> F0002 : Phone number of the contact in the deal detail screen (Pierre Baudracco)
+<LI> Display the version number (Pierre Baudracco)
+<LI> Link to the company from the deal index screen (Pierre Baudracco)
+<LI> Company select fields replaced by text fields to allow more companies and better search in contact screens. (Pierre Baudracco)
+<LI> Parameters names standardized (param_company,...) (Pierre Baudracco)
+</UL>
+
+14/11/1999 : version 0.2.3b (bug fixes release)<BR>
+<UL>
+<LI> New deal fixes. (Pierre Baudracco)
+</UL>
+
+01/11/1999 : version 0.2.3a (bug fixes release)<BR>
+<UL>
+<LI> JavaScript fixes to prevent browser messages. (Pierre Baudracco)
+<LI> New archive (0.2.3 was not complete, the doc and script folders were missing)
+</UL>
+
+30/10/1999 : version 0.2.3 (bug fixes release)<BR>
+<UL>
+<LI> Many bugfixes. Each reported bug has been corrected. (Pierre Baudracco)
+<LI> See the known bugs page.
+</UL>
+
+24/08/1999 : version 0.2.2<BR>
+<UL>
+<LI> Company Administration Menu implemented (Pierre Baudracco)
+<LI> Documentation : 2 words in the developper GuideLines (Pierre Baudracco)
+<LI> Documentation : THEME-HOWTO and LANG-HOWTO (Pierre Baudracco)
+<LI> Documentation : Known Bugs and Requested Features (Pierre Baudracco)
+<LI> Documentation : History and RoadMap (Pierre Baudracco)
+<LI> BugFix : Deal List from company detail now works (Pierre Baudracco)
+<LI> Contact List from company detail displays those contacts directly (Pierre Baudracco) even if automatic listing display is not set.
+</UL>
+
+22/05/1999 : version 0.2.1<BR>
+<UL>
+<LI> New options for Company Details screen (Pierre Carlier)
+<LI> Beautifying The code source (Patrice Bridoux)
+<LI> GUI improvments (Patrice Bridoux)
+<LI> New configuration (automatic listing selection) (Pierre Baudracco)
+<LI> New Menu for Company (Pierre Baudracco)
+<LI> Theme Improvment (Patrice Bridoux)
+<LI> New themes (Patrice Bridoux & Pierre Baudracco)
+</UL>
+
+04/04/1999 : Version 0.2 : first public release
+<P>
+
+<A HREF="index.html">back</A>
+
+</BODY>
+</HTML>

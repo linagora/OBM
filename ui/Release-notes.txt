@@ -1,0 +1,39 @@
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Vers : 0.5.2                                                        //
+//     - File : Release-notes.txt                                            //
+//     - Desc : First file to read. Basic infos on OBM release 0.5.2         //
+// 2002-02-04 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+All the OBM docs are in the doc folder.
+
+This version of OBM is a developper only release as it should be difficult to
+install and the data and the database model are subject to change.
+
+Licence
+-------
+OBM is protected by the GNU General Public License (See file COPYING).
+
+
+Version 0.5.2
+-------------
+Many fixes and enhancements to 0.5.1
+
+*** Highligths of this version
+- The list modules is now finished ! (Exports are now working.)
+- Debug level now support separated flags (Id, sql, param)
+- Session enhancement : move to PHP4 sessions, user session info (who is connected,...)
+- new admin tools
+- clean up
+
+*** State
+- Company, Contact, Deal, List, User, Setting and Admin modules in production.
+
+- The calendar, Support (Contract and Incident) are in beta mode (bug fixing)
+- The time manager is in beta mode.
+
+- Account/Invoice/Payment in alpha stage.
+
+- Computer : need rewrite and design

@@ -1,0 +1,668 @@
+<SCRIPT language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : incident_display.php                                        //
+//     - Desc  : Incident File                  		             //   
+// 2002-03-14  : Mehdi Rande                                                 //
+///////////////////////////////////////////////////////////////////////////////
+//      $Id$
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Company search Form                                               //
+// Parameters:
+//   - $incident[] : default form values
+//     keys used  : status, label incident, priority, label contract
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_search_form ($obm_q_contacts_obm,$incident) {
+  global $l_incident_label,$l_contract_label,$l_incident_priority,$l_incident_status, $l_find,$l_incident_owner;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$sess,$c_all,$l_all;
+  global $l_date_after,$l_date_before,$l_archive;
+  $lincident = stripslashes($incident["lincident"]);
+  $lcontract = stripslashes($incident["lcontract"]);
+  $priority = $incident["priority"];
+  $status = $incident["status"];
+  $owner = $incident["owner"];
+  $dateafter = $incident["date_after"];
+  $datebefore = $incident["date_before"];
+  $archive = ($incident["archive"] == "1" ? "checked" : "");
+
+  $dis_sel_owner="<SELECT name=\"sel_owner\">\n<OPTION value=\"$c_all\">$l_all</OPTION>";
+  while($obm_q_contacts_obm->next_record()) {
+   $dis_sel_owner.="\n<OPTION value=".$obm_q_contacts_obm->f("contact_id");
+   if ($obm_q_contacts_obm->f("contact_id") == $owner) 
+     $dis_sel_owner.=" selected";
+   $dis_sel_owner.=">". $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</OPTION>";
+  }
+  $dis_sel_owner.="\n</SELECT>";
+
+  $dis_sel_prio="<SELECT name=\"sel_priority\">\n<OPTION value=\"$c_all\">$l_all</OPTION>\n<OPTION value=\"REDHOT\"";
+  if ($priority == "REDHOT") 
+   $dis_sel_prio.= " selected";
+  $dis_sel_prio.=">$l_redhot</OPTION>\n<OPTION value=\"HOT\"";
+  if ($priority == "HOT") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_hot</OPTION>\n<OPTION value=\"NORMAL\"";
+  if ($priority == "NORMAL") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.= ">$l_normal</OPTION>\n<OPTION value=\"LOW\"";
+  if ($priority == "LOW") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_low</OPTION>\n</SELECT>";
+
+  $dis_sel_stat="<SELECT name=\"sel_status\">\n<OPTION value=\"$c_all\">$l_all</OPTION>\n<OPTION value=\"OPEN\"";
+  if ($status == "OPEN") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.= ">$l_open</OPTION>\n<OPTION value=\"CALL\"";
+  if ($status == "CALL") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.= ">$l_call</OPTION>\n<OPTION value=\"WAITCALL\"";
+  if ($status == "WAITCALL") 
+   $dis_sel_stat.= " selected";
+  $dis_sel_stat.=">$l_waitcall</OPTION>\n<OPTION value=\"PAUSED\"";
+  if ($status == "PAUSED") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.=">$l_paused</OPTION>\n<OPTION value=\"CLOSED\"";
+  if ($status == "CLOSED") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.=">$l_closed</OPTION>\n</SELECT>";
+ 
+  echo "<CENTER>
+     <FORM METHOD=POST NAME=f_incident ACTION=\"" .
+     $sess->url("incident_index.php") . " \" onSubmit=\"if (verifier_inc(this)) return true; else return false;\">
+     <TABLE BORDER=0><TR><TD>
+      <TABLE BORDER=0><TR>
+       <TD><FONT SIZE=-2>$l_incident_label</FONT><BR>
+         <INPUT TYPE=text NAME=tf_lincident size=20 value=\"$lincident\"></TD>
+       <TD>&nbsp;&nbsp;</TD>
+       <TD align=left><FONT SIZE=-2> $l_contract_label</FONT><BR>
+         <INPUT TYPE=text NAME=tf_lcontract size=20 value=\"$lcontract\"></TD>
+       <TD align=\"center\"><FONT  SIZE=-2>$l_archive</FONT><BR>
+  	<INPUT NAME=cb_archive TYPE=checkbox size=10 value=\"1\" ".$archive." >
+       </TD>
+       <TD><FONT  SIZE=-2>$l_date_after</FONT><BR>
+  	<INPUT NAME=tf_dateafter TYPE=text size=10 value=\"$dateafter\">
+       </TD> 
+       <TD><FONT  SIZE=-2>$l_date_before</FONT><BR>
+  	<INPUT NAME=tf_datebefore TYPE=text size=10 value=\"$datebefore\">
+       </TD>
+       </TR>
+      </TABLE>
+       </TD></TR><TR><TD align = center>
+      <TABLE BORDER=0>     	
+       <TR>
+       <TD ><FONT SIZE=-2>$l_incident_priority</FONT><BR>
+       ".$dis_sel_prio."
+       </TD>
+       <TD>&nbsp;&nbsp;</TD>
+       <TD align=left><FONT SIZE=-2> $l_incident_status </FONT><BR>
+       ".$dis_sel_stat."
+       </TD>
+       <TD>
+       <FONT  SIZE=-2>$l_incident_owner</FONT><BR>
+       ".$dis_sel_owner."
+       </TD>
+      </TR>
+      </TABLE>
+	</TD>      
+	<TD VALIGN=bottom COLSPAN=\"3\" ALIGN=\"center\">&nbsp;&nbsp;
+         <INPUT NAME=\"action\" TYPE=hidden VALUE=\"search\">
+         <INPUT NAME=\"submit\" TYPE=submit VALUE=\"$l_find\">&nbsp;
+       </TD>
+     </TR>
+     </TABLE>
+     </FORM><HR>
+   </CENTER>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Incident search result                                        //
+// Parameters:
+//   - $incident[] : incident search criteria
+//     keys used  : status, label incident, priority, label contract
+///////////////////////////////////////////////////////////////////////////////
+function dis_incident_search_list($incident) {
+  global $l_no_found;
+  global $auth, $new_order, $order_dir, $new_order2;
+
+  $pref_q = run_query_display_pref($auth->auth["uid"], "incident");
+  $obm_q = run_query_search($incident, $new_order, $order_dir, $new_order2);
+  $nb_incident = $obm_q->num_rows();
+  if ($nb_incident == 0) {
+    display_warn_msg($l_no_found);
+  } else {
+    html_incident_search_list($obm_q,$pref_q,$nb_incident,$incident);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Search result                                                //
+// Parameters : 
+//   - $obm_q_comp    : list of incidents
+//   - $obm_q_display : the fields which have to be displayed
+//   - $nb_incident    : nb incidents to return by the query search
+//   - $company[]     : incidents search criteria
+//     keys used      : status, label incident, priority, label contract
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$incident) {
+  //-- Themes
+  global $set_theme,$col_textem,$col_table,$col_tableh;
+  //-- Labels
+  global $l_found, $l_no_found;
+  //-- Authentication
+  global $perms_user,$l_perms_user, $auth, $sess;
+
+  $lincident = $incident["lincident"];
+  $lcontract = $incident["lcontract"];
+  $priority = $incident["priority"];
+  $status = $incident["status"];
+  $param_contract = $incident["contract_id"];
+  $owner = $incident["owner"];
+  $archive = $incident["archive"];
+  $dateafter = $incident["date_after"];
+  $datebefore = $incident["date_before"];
+
+  echo "<FONT color=\"#$col_textem\">";
+  echo "$nb_incident $l_found";
+  echo "</FONT><BR>";
+
+  $url = $sess->url("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
+
+  $obm_q_comp->seek($first_row);
+
+  $dis_incidents_list=new OBM_DISPLAY("DATA",$obm_q_display);
+  $dis_incidents_list->data_set = $obm_q_comp;
+  $dis_incidents_list->data_url = $url;
+  $dis_incidents_list->data_header = "both";
+
+  $dis_incidents_list->display();
+ 
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display new incident : Contract Form                                       //
+// Parameters:
+//   - $contr_q : contract database result
+///////////////////////////////////////////////////////////////////////////////
+function html_new_incident_contract($contr_q) {
+  global $l_incident_select_contract,$l_select_contract;
+  global $sess;
+  $dis_param_contract =" <SELECT name=\"param_contract\" size=10>";
+    while($contr_q->next_record()) {
+    $id = $contr_q->f("contract_id");
+    $label = $contr_q->f("contract_label");
+    $dis_param_contract .= "\n<OPTION value=\"$id\">$label";
+  }
+  $dis_param_contract .= " \n</SELECT>";
+
+  echo "<CENTER>
+    <FORM METHOD=POST NAME=form_contr
+          onSubmit=\"if (verifie(this)) return true; else return false;\"
+          ACTION=\"".$sess->self_url()."\">";
+
+  echo $l_incident_select_contract;
+  echo "<P>
+  ". $dis_param_contract ."
+    <P>
+    <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
+    <INPUT TYPE=submit value=\"$l_select_contract\">
+    </FORM>
+    </CENTER>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Incident Form                                                     //
+// Parameters:
+//   - $action    : action called
+//   - $co_q      : contact database result 
+//   - $comp_q    : company database result 
+//   - $incident[]: default values
+//     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
+//                : phone, hpone, mphone, fax, email ,com, vis, id, usercreate
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_form($action, $contr_q, $co_q, $incident) {
+  global $col_table, $col_label, $col_textem;
+  global $l_incident_label,$l_contract_label,$l_incident_prority,$l_incident_status, $l_find;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
+  global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status;
+  global $l_contract_label, $l_contract_num, $l_update, $l_checkdelete, $l_insert, $l_contract_date_init;
+  global $l_contract_date_expir,$l_incident_description,$l_incident_solution,$l_incident_date, $l_archive_new;
+  global $sess, $auth,$popup_height,$popup_width, $set_theme, $ico_mail, $l_incident_select_contract,$l_contract_label ;
+
+  // if update mode and first time values are taken from database
+  if ($action == "detailupdate") {
+    $param_contract = $incident->f("incident_contract_id");
+    $lincident = $incident->f("incident_label");
+    $owner =  $incident->f("incident_owner");
+    $logger =  $incident->f("incident_logger");
+    $desc =  $incident->f("incident_description");
+    $solu =  $incident->f("incident_resolution");
+    $priority =  $incident->f("incident_priority");
+    $status =  $incident->f("incident_etat");
+    $date =  $incident->f("incident_date");
+    $archive = ($incident->f("incident_archive") == "1" ? "checked" : "");
+    $param_incident = $incident->f("incident_id");
+    $contr_q->next_record();
+    $c_name = $contr_q->f("contract_label");
+    $c_id = $param_contract;
+  } else {
+    $param_contract = $incident["contract_id"];
+    $lincident = $incident["lincident"];
+    $owner =  $incident["owner"];
+    $logger =  $incident["logger"];
+    $desc =  $incident["description"];
+    $solu =  $incident["solution"];
+    $priority =  $incident["priority"];
+    $status =  $incident["status"];
+    $date =  $incident["date"];
+    $archive = ($incident["archive"] == "1" ? "checked" : "");
+  }
+
+  $dis_sel_owner="<SELECT name=\"sel_owner\">\n";
+  while($co_q->next_record()) {
+   $dis_sel_owner.="\n<OPTION value=".$co_q->f("contact_id");
+   if ($co_q->f("contact_id") == $owner) 
+     $dis_sel_owner.=" selected";
+   $dis_sel_owner.=">". $co_q->f("contact_lastname") . " " . $co_q->f("contact_firstname")."</OPTION>";
+  }
+  $dis_sel_owner.="\n</SELECT>";
+
+  $co_q->seek();
+
+  $dis_sel_logger="<SELECT name=\"sel_logger\">\n";
+  while($co_q->next_record()) {
+   $dis_sel_logger.="\n<OPTION value=".$co_q->f("contact_id");
+   if ($co_q->f("contact_id") == $logger) 
+     $dis_sel_logger.=" selected";
+   $dis_sel_logger.=">". $co_q->f("contact_lastname") . " " . $co_q->f("contact_firstname")."</OPTION>";
+  }
+  $dis_sel_owner.="\n</SELECT>";
+
+  $dis_sel_prio="<SELECT name=\"sel_priority\" >\n<OPTION value=\"REDHOT\"";
+  if ($priority == "REDHOT") 
+   $dis_sel_prio.= " selected";
+  $dis_sel_prio.=">$l_redhot</OPTION>\n<OPTION value=\"HOT\"";
+  if ($priority == "HOT") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_hot</OPTION>\n<OPTION value=\"NORMAL\"";
+  if ($priority == "NORMAL") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.= ">$l_normal</OPTION>\n<OPTION value=\"LOW\"";
+  if ($priority == "LOW") 
+   $dis_sel_prio.=" selected";
+  $dis_sel_prio.=">$l_low</OPTION>\n</SELECT>";
+
+  $dis_sel_stat="<SELECT name=\"sel_status\" OnChange=\"auto_archive(this.form)\">\n<OPTION value=\"OPEN\"";
+  if ($status == "OPEN") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.= ">$l_open</OPTION>\n<OPTION value=\"CALL\"";
+  if ($status == "CALL") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.= ">$l_call</OPTION>\n<OPTION value=\"WAITCALL\"";
+  if ($status == "WAITCALL") 
+   $dis_sel_stat.= " selected";
+  $dis_sel_stat.=">$l_waitcall</OPTION>\n<OPTION value=\"PAUSED\"";
+  if ($status == "PAUSED") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.=">$l_paused</OPTION>\n<OPTION value=\"CLOSED\"";
+  if ($status == "CLOSED") 
+   $dis_sel_stat.=" selected";
+  $dis_sel_stat.=">$l_closed</OPTION>\n</SELECT>";
+
+  // UPDATE 
+  if (($action=="detailupdate") || ($action=="update")) {
+    $dis_submit = "<INPUT TYPE=hidden NAME=action VALUE=update>\n";
+    $dis_submit .=   "<INPUT TYPE=hidden NAME=param_incident VALUE=\"$param_incident\">\n";
+    $dis_submit .=   "<INPUT TYPE=submit value=\"$l_update\">\n";
+    $dis_submit .=   "</FORM></TD>\n";
+
+  // CHECK DELETE
+    $dis_submit .=     "<TD valign=top>\n";
+    $dis_submit .=     "<FORM METHOD=POST NAME=f_del_con onSubmit=\"if (confirm_del()) return true; else return false;\" ";
+    $dis_submit .=     "ACTION=\"" . $sess->url("incident_index.php") . "\">\n";
+    $dis_submit .=     "<INPUT TYPE=hidden NAME=action VALUE=delete>\n";
+    $dis_submit .=     "<INPUT TYPE=hidden NAME=param_incident VALUE=\"$param_incident\">\n";
+    $dis_submit .=     "<INPUT TYPE=submit value=\"$l_checkdelete\">\n";
+
+  // INSERT
+  } elseif (($action=="new") || ($action=="insert")) {
+    $dis_submit .="<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"insert\">\n";
+    $dis_submit .="<INPUT TYPE=submit value=\"$l_insert\">\n";
+  }
+
+  echo "<CENTER>
+    <TABLE BORDER=0>
+    <FORM METHOD=GET NAME=form_mod_incident onSubmit=\"if (check_incident(this)) return true; else return false;\" ACTION=\"".$sess->url("incident_index.php")."\">
+    <TR><TD>
+
+  <TABLE BORDER=0>
+  <TR><TD>
+    <TABLE BORDER=0>
+    <TR>
+    <TD><FONT SIZE=-2>$l_incident_label</FONT></TD>
+    <TD><INPUT NAME=tf_lincident size=30 value=\"$lincident\"></TD>
+    </TR>
+    <TR>
+    <TD><FONT SIZE=-2>$l_incident_logger</FONT> </TD>
+    <TD>
+    ".$dis_sel_logger."
+    </TD>
+    </TR><TR>
+    <TD><FONT SIZE=-2>$l_incident_owner</FONT> </TD>
+    <TD>
+    ".$dis_sel_owner."
+    </TD>
+    </TR><TR>
+     <TD><FONT SIZE=-2>$l_archive_new</FONT></TD>
+     <TD><INPUT NAME=cb_archive type=\"checkbox\"size=30 value=\"1\" $archive ></TD>
+    </TR>
+   </TABLE>
+  </TD>
+  <TD>&nbsp;&nbsp;</TD>
+  <TD valign=top>
+";
+/*
+$contr_q->next_record();
+echo "
+  <TABLE bgcolor=\"#$col_label\">
+    <TR>
+    <TD bgcolor=\"#$col_table\">$l_contract_label&nbsp;&nbsp;:&nbsp;&nbsp;</TD>
+    <TD><FONT color=\"#$col_textem\">".$contr_q->f("contract_label")."</FONT></TD>
+    </TR><TR>
+    <TD bgcolor=\"#$col_table\">$l_contract_num &nbsp;&nbsp;:&nbsp;&nbsp;</TD>
+    <TD><FONT color=\"#$col_textem\">".$contr_q->f("contract_numero")."</FONT></TD>
+    </TR><TR>
+    <TD bgcolor=\"#$col_table\">$l_contract_date_init &nbsp;&nbsp;:&nbsp;&nbsp;</TD>
+    <TD><FONT color=\"#$col_textem\">".$contr_q->f("contract_debut")."</FONT></TD>
+    </TR><TR>
+    <TD bgcolor=\"#$col_table\">$l_contract_date_expir &nbsp;&nbsp;:&nbsp;&nbsp;</TD>
+    <TD><FONT color=\"#$col_textem\">".$contr_q->f("contract_expiration")."</FONT></TD>
+    </TR>
+  </TABLE>
+*/
+
+echo "
+    <TABLE BORDER=0>
+    <TR>
+    <TD><FONT SIZE=-2>$l_contract_label&nbsp;&nbsp;&nbsp;&nbsp; </FONT></TD>
+    <TD>
+<A HREF=\"".
+      $sess->url("../contract/contract_index.php?action=detailconsult_contract&amp;param_contract=$c_id") . "\">$c_name";
+  echo "</A><INPUT TYPE=hidden NAME=param_contract value=\"$param_contract\">
+      <INPUT TYPE=hidden NAME=contract_new_id value=\"$c_new_id\">
+      <a href=\"\" onclick=\"window.open('../contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_incident_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
+      <img src=\"/images/$set_theme/$ico_mail\"></a>
+      <INPUT TYPE=text NAME=contract_name value=\"$c_new_name\" style=\"border:none\" READONLY onfocus=\"this.blur();\">
+    </TD></TR>
+    </TABLE>
+</TD></TR>
+<TR><TD colspan=3 align=\"center\">
+  <TABLE BORDER=0>
+   <TR>
+    <TD><FONT SIZE=-2>$l_incident_priority</FONT> </TD>
+    <TD>
+    ".$dis_sel_prio."
+    </TD>
+    <TD><FONT SIZE=-2>$l_incident_status</FONT> </TD>
+    <TD>
+    ".$dis_sel_stat."
+   </TD>
+   <TD><FONT SIZE=-2>$l_incident_date&nbsp;&nbsp;&nbsp;</FONT></TD>
+   <TD><INPUT NAME=tf_date size=12 value=\"$date\"></TD>
+  </TABLE>
+  <TABLE BORDER=0>
+  <TR>
+  <TD><FONT SIZE=-2>$l_incident_description</FONT><BR>
+   <TEXTAREA NAME=ta_desc ROWS=6 COLS=60>$desc</TEXTAREA></TD>
+  </TR>
+  <TR>
+  <TD><FONT SIZE=-2>$l_incident_solution</FONT><BR>
+   <TEXTAREA NAME=ta_solu ROWS=6 COLS=60>$solu</TEXTAREA></TD>
+  </TR>
+  </TABLE>
+  </TD></TR>
+  <TR><TD align=middle colspan=3>";
+  echo "<CENTER><TABLE BORDER=0>
+  <TR><TD valign=top align=\"center\">
+   ".$dis_submit."
+    </TD></TR>
+    </TABLE>
+    </CENTER>
+    </FORM>
+    </TD></TR></TABLE>
+    </CENTER>";
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Incident Consult                                                  //
+///////////////////////////////////////////////////////////////////////////////
+// Parameters :
+// ------------
+//      $obm_q_contract : information about the contract
+//      $obm_q_type : list deal's types
+//      $obm_q_contacts_obm : list of contacts from internal companies 
+//      $obm_q_company : list of companies
+//      $obm_q_contact : list of contact from the company 
+//      $p_company_id  : id of the company concerned by the contract
+///////////////////////////////////////////////////////////////////////////////
+function html_incident_consult($inc_q,$con_q,$obm_q_type_deal,$obm_q_type,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id) {
+
+  // -- Themes
+  global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
+  // - Labels
+  global $l_incident_label,$l_incident_prority,$l_incident_status;
+  global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status;
+  global $l_update,$l_incident_description,$l_incident_solution,$l_incident_date,$l_contract_num;
+  global $l_to, $l_from,$l_manager,$l_client_manager,$l_update,$l_archive_consult;
+
+  global $perms_user,$l_perms_user;
+  global $auth, $sess;
+
+   
+  while($obm_q_contacts_obm->next_record()) {
+    if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_owner")) 
+	$dis_lab_owner = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
+  }
+
+  if ($obm_q_contacts_obm->nf()>0) {
+    $obm_q_contacts_obm->seek(0); 
+  }
+
+  while($obm_q_contacts_obm->next_record()) {
+    if ($obm_q_contacts_obm->f("contact_id") == $inc_q->f("incident_logger")) 
+        $dis_lab_logger = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
+  }
+
+  if ($inc_q->f("incident_archive") == 1) {
+    $dis_lab_archive ="</TD></TR><TR><TD>$l_archive_consult";
+  }
+
+  if ($obm_q_contacts_obm->nf()>0) {
+    $obm_q_contacts_obm->seek(0); 
+  }
+
+  while($obm_q_contacts_obm->next_record()) {
+    if ($obm_q_contacts_obm->f("contact_id") ==$con_q->f("contract_responsable_tech_id")) 
+        $dis_lab_tec = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+  }
+
+  if ($obm_q_contacts_obm->nf()>0) {
+    $obm_q_contacts_obm->seek(0); 
+  }
+
+  while($obm_q_contacts_obm->next_record()) {
+    if ($obm_q_contacts_obm->f("contact_id") == $con_q->f("contract_responsable_com_id")) 
+        $dis_lab_com = "<TD> ".$obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</TD>";
+  }
+
+  while($obm_q_contacts->next_record()) {
+    if ($obm_q_contacts->f("contact_id") == $con_q->f("contract_responsable_client_id")) 
+        $dis_lab_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+    }
+
+ if ($obm_q_contacts->nf()>0) {
+   $obm_q_contacts->seek(0);
+ }
+ 
+ while($obm_q_contacts->next_record()) {
+   if ($obm_q_contacts->f("contact_id") == $con_q->f("contract_responsable_client2_id")) 
+    $dis_lab_cli2 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+    }
+
+
+  if ($auth->auth["perm"] != $perms_user) {
+    $dis_update = "<FORM METHOD=POST NAME=form_contract_update ACTION=\"".$sess->self_url()."\">\n";
+    $dis_update .= "<INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">\n";
+    $dis_update .= "<INPUT TYPE=hidden NAME=param_incident VALUE=\"".$inc_q->f("incident_id")."\">\n";
+    $dis_update .= "<INPUT TYPE=hidden NAME=param_contract VALUE=\"".$con_q->f("contract_id")."\">\n";
+    $dis_update .= "<INPUT TYPE=submit value=\"$l_update\">\n";
+    $dis_update .= "</FORM>\n";
+
+}
+
+  echo "
+<CENTER>
+
+<TABLE border=0><TR><TD valign=top>
+</TD><TD>
+<TABLE border=0><TR><TD>";
+
+echo "
+<TABLE border=0><TR><TD valign=top align=left>";
+echo "<TABLE>
+<TR>
+   <TD><FONT COLOR=\"#$col_label\">$l_incident_label</FONT></TD><TD>";
+echo $inc_q->f("incident_label");
+echo "</TD>
+      </TR><TR>
+  <TD><FONT COLOR=\"#$col_label\">$l_incident_priority</FONT></TD><TD>";
+echo $inc_q->f("incident_priority");
+echo "</TD>
+</TR>
+<TR>
+  <TD><FONT COLOR=\"#$col_label\">$l_incident_status</FONT></TD><TD>";
+echo $inc_q->f("incident_etat");
+echo "</TD>
+</TR>
+<TR>
+  <TD><FONT COLOR=\"#$col_label\">$l_incident_date</FONT></TD><TD>";
+echo $inc_q->f("incident_date");
+echo "</TD>
+</TR>
+</TABLE>
+
+<TABLE border=0>
+<TR>
+  <TD><FONT COLOR=\"#$col_label\">$l_incident_owner</FONT></TD><TD>
+  ".$dis_lab_owner."
+  </TD></TR><TR><TD><FONT COLOR=\"#$col_label\">$l_incident_logger</FONT></TD><TD>
+  ".$dis_lab_logger .
+  $dis_lab_archive ."
+  </TD>
+</TR>
+</TABLE>";
+
+  // Pave Contract
+  echo " </TD><TD valign=top>
+  <TABLE bgcolor=\"#$col_label\">
+    <TR>
+    <TD bgcolor=\"#$col_table\" colspan=2>";
+    echo "<A HREF=\"".
+      $sess->url("contract_index.php?action=detailconsult_contract&amp;param_contract=".$con_q->f("contract_id"))."\">";
+    echo "<FONT color=\"#$col_textem\">".$con_q->f("contract_label")."</FONT></A>
+    <BR>".$l_contract_num." : ".$con_q->f("contract_numero") ."
+    <BR>".$l_from." ".$con_q->f("contract_debut")." ".$l_to." ".$con_q->f("contract_expiration")."
+    </TD>
+    </TR><TR>
+    <TD valign=center colspan=2>$l_manager</TD>";
+    echo "</TR><TR>
+    ".$dis_lab_tec."
+    <TD><A HREF=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_tech_id"))."\">";
+    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
+    echo "</TR><TR>
+    ".$dis_lab_com."
+    <TD><A HREF=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_com_id"))."\">";
+    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
+    echo "</TR>
+
+  </TABLE>
+
+";
+  // Pave Societe, contact
+  $obm_q_company->next_record();
+  echo " </TD><TD valign=top>
+  <TABLE bgcolor=\"#$col_label\">
+    <TR>
+    <TD bgcolor=\"#$col_table\" colspan=2>
+    <FONT color=\"#$col_textem\">".$obm_q_company->f("company_name")."</FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    echo "<A HREF=\"".
+      $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">";
+    echo "<IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
+    <BR>".$obm_q_company->f("company_address1") ."
+    <BR>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
+    </TD>
+    </TR><TR>
+    <TD valign=center colspan=2>$l_client_manager</TD>";
+    echo "</TR><TR>
+    ".$dis_lab_cli1."
+    <TD><A HREF=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_client_id"))."\">";
+    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
+    echo "</TR><TR>
+    ".$dis_lab_cli2."
+    <TD><A HREF=\"".
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con_q->f("contract_responsable_client2_id"))."\">";
+    echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
+    echo "</TR>
+
+  </TABLE>
+</TD>
+</TR>
+</TABLE>
+
+</TD></TR>
+<TR><TD>
+
+<TABLE width=100% border=0>
+<TR>";
+echo "<TD valign=top><FONT COLOR=\"#$col_label\">".$l_incident_description."</FONT><BR>";
+echo nl2br($inc_q->f("incident_description")); 
+echo "<BR><BR><TD valign=top><FONT COLOR=\"#$col_label\">".$l_incident_solution."</FONT><BR>";
+echo nl2br($inc_q->f("incident_resolution")); 
+echo "</TD></TR><TR>
+<TD align=center colspan=2><BR>
+". $dis_update."
+&nbsp;</TD></TR></TABLE>
+</TD></TR></TABLE>
+</TD></TR></TABLE>";
+echo "</CENTER>";
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Incidnet Display preference screen                            //
+// Parameters:
+//   - $display_pref_q : DBO : Field list to display
+///////////////////////////////////////////////////////////////////////////////
+function dis_incident_display_pref($display_pref_q) {
+  global $l_incident_display;
+ 
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_pref_q);
+  $dis_pref->display_entity = "incident";
+  $dis_pref->pref_title = $l_incident_display;
+  $dis_pref->pref_dis_help = 1;
+
+  echo "<center>";
+  $dis_pref->display();
+  echo "<br></center>";
+}
+
+

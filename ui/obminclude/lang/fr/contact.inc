@@ -1,0 +1,109 @@
+<SCRIPT language="php">
+//////////////////////////////////////////////////////////////////////////////
+// OBM - Language : French                                                  //
+//     - File     : contact.inc                                             //
+// 1999-01-24 Pierre Baudracco                                              //
+//////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+//////////////////////////////////////////////////////////////////////////////
+
+// Database fields
+$l_company = "Société";
+$l_lastname = "Nom";
+$l_firstname = "Prénom";
+$l_kind = "Genre";
+$l_function = "Fonction";
+$l_phone = "Tel";
+$l_hphone = "Tel personnel";
+$l_minihphone = "(Perso)";
+$l_mphone = "Tel mobile";
+$l_minimphone = "(Mobile)";
+$l_email = "@M";
+$l_fax = "Fax";
+$l_address = "Adresse";
+$l_postcode = "CP";
+$l_expresspostal = "Cedex";
+$l_town = "Ville";
+$l_country = "Pays";
+$l_comment = "Commentaire";
+$l_visibility ="Accès";
+
+//------------------------------------//
+// Fields that appear in result lists //
+//------------------------------------//
+// Direct fields
+$fieldnames["contact_lastname"] = $l_lastname;
+$fieldnames["contact_firstname"] = $l_firstname;
+$fieldnames["contact_function"] = $l_function;
+$fieldnames["contact_phone"] = $l_phone;
+$fieldnames["contact_homephone"] = $l_hphone;
+$fieldnames["contact_mobilephone"] = $l_mphone;
+$fieldnames["contact_email"] = $l_email;
+// Calculated fields
+$fieldnames["contact_company_name"] = $l_company;
+
+
+$l_last_contact = "Dernier contact";
+$l_last_company = "Derniere societe";
+$l_last_deal = "Derniere affaire";
+$l_contact_name = "Nom Contact";
+$l_from_company = "&nbsp;&nbsp;Société";
+$l_find = "Chercher";
+$l_telother = "Autres tel";
+$l_private = "Privé";
+$l_public = "Publique";
+$l_contact_select_company = "Sélectionner la société du Contact.";
+$l_invalid_data = "Données invalides";
+
+// Titres
+$l_contact = "Contact";
+
+// Actions
+$l_insert = "Enregistrer le Contact";
+$l_update = "Modifier le Contact";
+$l_checkdelete = "Vérifier ou Supprimer le Contact";
+$l_delete = "Supprimer le Contact";
+$l_back = "Retour";
+$l_confirm= "Confirmer l'action";
+$l_add = "Ajouter ces contacts";
+
+// Messages
+$l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";
+$l_link_deal = "Le contact est référencé par ces affaires";
+$l_link_deal_no = "Le contact n'est pas référencé dans les affaires";
+$l_link_list = "Le contact est enregistré dans ces listes";
+$l_link_list_no = "Le contact n'est pas référencé dans les listes";
+$l_cant_delete = "Le contact ne peut être supprimé !";
+$l_can_delete = "Le contact peut être supprimé.";
+$l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
+$l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas les consulter";
+$l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des contacts correspondants.";
+$l_found = "contacts trouvés.";
+$l_no_found = "Aucun contact ne correspond &agrave; ces critères !";
+$l_delete_ok = "La suppression du contact a été correctement effectuée.";
+$l_delete_error = "La suppression du contact a échoué !";
+$l_insert_ok = "L'insertion du contact a été correctement effectuée.";
+$l_insert_error = "L'insertion du contact a échoué !";
+$l_update_ok = "La modification du contact a été correctement effectuée";
+$l_update_error = "La modification du contact a échoué !";
+$l_query_error = "Problème en executant la requete";
+
+// JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_fill_lastname = "Vous devez renseigner le Nom avant de valider.";
+$l_fill_company = "Vous devez sélectionner une société avant de valider.";
+$l_fill_phone = "Vous devez renseigner le telephone avant de valider.";
+$l_delete_confirm = "Confirmer la suppression du contact ?";
+$l_j_select_company = "Vous devez sélectionner une société !";
+$l_j_check_phone = "Le numéro de téléphone n'est pas correct.";
+$l_j_check_hphone = "Le numéro de téléphone personnel n'est pas correct.";
+$l_j_check_mphone = "Le numéro de téléphone mobile n'est pas correct.";
+$l_j_check_fax = "Le numéro de fax n'est pas correct.";
+$l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
+
+// champs specifiques
+// format de date et heure pour MySQL pour affichage dans ecran detail affaire
+$l_date_format = "%Y-%d-%m %H:%i:%s";
+
+
+// For the display preferences modification screen 
+$l_contact_display = "Options d'affichage des listes de contacts";

@@ -1,0 +1,35 @@
+#//////////////////////////////////////////////////////////////////////////////
+#// OBM - File  : obmexport_0.2-0.3.txt                                      //
+#//     - Desc  : Database Export README from OBM 0.2.X towards OBM 0.3.X    //
+#// 2000-07-24 - Pierre Baudracco - Last Update : 2000-07-24                 //
+#//////////////////////////////////////////////////////////////////////////////
+
+The obmdb_export_0.3-0.4.pl is a perl script that export and convert and OBM
+0.3.x database into an OBM 0.4.x database.
+
+* Licence : GPL
+
+
+* Requirements :
+
+- Perl, Perl-DBI and Mysql or PostgreSQL DBD drivers
+
+
+* How to use it:
+
+- First adjust the parameters found in the "specific parameters" section to fit
+to your install. Example :
+
+my $driver = "mysql";        # DBD database driver
+my $host_new = "localhost";  # host where the 0.3 OBM database to modify is located
+my $port = "3306";           # port listened by the database server
+my $db_new = "obm";          # name of database to modify
+my $user = "toto";           # user to connect to the databases
+my $password = "totop";      # password to connect to the databases
+
+
+- Then, if necessary, adjust the default values for the preferences language, theme, etc. 
+
+
+- Run it
+./obmdb_export_0.3-0.4.pl

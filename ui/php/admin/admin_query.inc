@@ -1,0 +1,158 @@
+<SCRIPT language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : admin_query.inc                                             //
+//     - Desc  : Admin Query File                                            //
+// 2001-12-27 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : Return the number of entries in ActiveSessions Table    //
+///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the passive session number                                            //
+// Parameters:
+//   - $delay : session older than this delay (in sec) are considered passive
+// Returns:
+//   - number of passive session
+///////////////////////////////////////////////////////////////////////////////
+function run_query_count_passive_sess($delay) {
+  global $cdg_sql;
+
+  $time_pass = date("YmdHis",time() - $delay);
+  $query = "select count(*) as Num from ActiveUserObm Where ActiveUserObm.activeuserobm_timeupdate <= '$time_pass'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q->f("Num");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of Web session (rows in ActiveSessions)                    //
+// Returns:
+//   - number of Web session
+///////////////////////////////////////////////////////////////////////////////
+function get_session_number() {
+  global $cdg_sql;
+
+  $query = "select count(*) from ActiveSessions";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q->f("count(*)");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the number of User session (rows in ActiveUserObm)                    //
+// Returns:
+//   - number of user session
+///////////////////////////////////////////////////////////////////////////////
+function get_usersession_number() {
+  global $cdg_sql;
+
+  $query = "select count(*) from ActiveUserObm";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+
+  return $obm_q->f("count(*)");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - List of Active User session (not older than delay)      //
+// Parameters:
+//   - $delay : session older than this delay (in sec) are considered passive
+// Returns:
+//   - DBO : list of active user session
+///////////////////////////////////////////////////////////////////////////////
+function run_query_active_user($delay) {
+  global $cdg_sql;
+
+  $date_limit = date("YmdHis",time() - $delay);
+  $query = "select UserObm.userobm_username,
+                   UserObm.userobm_timelastaccess,
+                   ActiveUserObm.*
+            from UserObm, ActiveUserObm
+            where ActiveUserObm.activeuserobm_user_obm_id = UserObm.userobm_id
+              and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
+  display_debug_msg($query,$cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - List of Passive User session (older than delay)         //
+// Parameters:
+//   - $delay : session older than this delay (in sec) are considered passive
+// Returns:
+//   - DBO : list of passive user session
+///////////////////////////////////////////////////////////////////////////////
+function run_query_passive_user($delay) {
+  global $cdg_sql;
+
+  $date_limit = date("YmdHis",time() - $delay);
+  $query = "select UserObm.userobm_username,
+                   UserObm.userobm_timelastaccess,
+                   ActiveUserObm.*
+            from UserObm, ActiveUserObm
+            where ActiveUserObm.activeuserobm_user_obm_id = UserObm.userobm_id
+              and ActiveUserObm.activeuserobm_timeupdate < '$date_limit'";
+  display_debug_msg($query,$cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Delete an ActiveUserObm entry                           //
+// Parameters:
+//   - $sid : session id
+// Returns:
+//   - DBO : list of passive user session
+///////////////////////////////////////////////////////////////////////////////
+function run_query_activeuserobm_delete($sid) {
+  global $cdg_sql;
+
+  $query = "delete from ActiveUserObm where activeuserobm_sid = '$sid'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the module list                                                       //
+// Return : $modules : array of modules
+///////////////////////////////////////////////////////////////////////////////
+function get_modules_array() {
+  global $cdg_sql;
+
+  // Module dirs to exclude
+  $exclude = array('.', '..', 'CVS', 'obminclude', 'images');
+  $modules = array();
+
+  $mod_dir = dir("..");
+  while($entry=$mod_dir->read()) {
+    if (! in_array ($entry, $exclude) && is_dir($mod_dir->path."/".$entry)) {
+      array_push($modules, $entry);
+    }
+  }
+  $mod_dir->close();
+
+  return $modules;
+}
+
+

@@ -1,0 +1,153 @@
+<!--
+///////////////////////////////////////////////////////////////////////////////
+// OBM - File  : crloginform.ihtml                                           //
+//     - Desc  : OBM Login Page                                              //
+// 1999-03-19 Pierre Baudracco                                               //
+///////////////////////////////////////////////////////////////////////////////
+
+  This loginform uses a challenge/response mechanism to
+  authenticate the user. The password does not travel over the
+  network if the client browser has JavaScript enabled.
+
+  $auth->auth_loginform() creates a challenge value which is incorporated
+  into this form. When the user tries to submit the form,
+  md5("username:password:challenge") is calculated and filled
+  into the reply field. The password field is erased. The server
+  can calculate the exspected reply and compare it to the actual
+  reply value. If they match, the user is authenticated.
+
+  If the reply field is empty and password is set, the server
+  knows that the client cannot do JS. The user can still be
+  authenticated, but the password is visible on the network.
+
+  $Id$
+-->
+
+<html>
+<head>
+  <TITLE>Login - O.B.M.</TITLE>
+
+  <style type="text/css">
+  <!--
+    body { font-family: Arial, Helvetica, sans-serif }
+    td   { font-family: Arial, Helvetica, sans-serif }
+  -->
+  </style>
+<? 
+$obminclude = getenv("OBM_INCLUDE_VAR");
+include("$obminclude/auth/md5.js"); ?>
+<script language="javascript">
+<!--
+  function doChallengeResponse() {
+    str = document.login.username.value + ":" +
+          document.login.password.value + ":" +
+          document.login.challenge.value;
+
+    document.login.response.value = MD5(str);
+    document.login.password.value = "";
+    document.login.submit();
+  }
+// -->
+</script>
+</head>
+
+<?php require("$obminclude/global.inc"); ?>
+
+<BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCCC" VLINK="#00CCCC">
+<CENTER><TABLE Width=100% BORDER=0><TR>
+<TD WIDTH="24%"><A HREF="http://www.aliacom.fr/"><IMG align=middle border=0 SRC="/images/standard/standard.jpg"></A><?php print $obm_version ?></TD>
+
+<TD WIDTH="18%" align=center>&nbsp;</TD>
+<TD WIDTH="40%" align=center><H1>DEMO</H1></TD>
+<TD WIDTH="18%" align=center>&nbsp;</TD>
+<TD WIDTH="18%" align=right>
+<TABLE BORDER=0><TR><TD ALIGN=center><A HREF="../obm.php" TARGET="_top"><IMG BORDER=0 SRC="/images/standard/obm.jpg"></A></TD>
+</TR>
+<TR>
+<TD ALIGN=center>&nbsp;</TD></TR>
+<TR><TD ALIGN=center>&nbsp;</TD><TR>
+</TABLE></FONT></TD></TR>
+<TR><TD COLSPAN=4><HR></TD></TR></TABLE>
+
+
+Please identify yourself with a username and a password:<br>
+
+<form name="login" action="<?php print $this->url() ?>" method=post>
+<table border=0 bgcolor="#000000" align="center" cellspacing=0 cellpadding=4>
+ <tr valign=top align=left>
+  <td>Username:</td>
+  <td><input type="text" name="username" value="<?php print (isset($this->auth["uname"]) ? $this->auth["uname"] : "" ) ?>" size=32 maxlength=32></td>
+ </tr>
+
+ <tr valign=top align=left>
+  <td>Password:</td>
+  <td><input type="password" name="password" size=32 maxlength=32></td>
+ </tr>
+
+ <tr>
+  <td>&nbsp;</td>
+  <td align=right><input onClick="doChallengeResponse(); return false;" type="submit" name="submitbtn" value="Login now"></td>
+ </tr>
+</table>
+
+<br>
+Available login and pass for Demo
+<br>
+<br>
+<table border =1>
+  <tr>
+    <th>Username</th>
+    <th>Password</th>
+    <th>Authorization</th>
+  </tr>
+  <tr>
+    <td>uuser</td>
+    <td>puser</td>
+    <td>user</td>
+  </tr>
+  <tr>
+    <td>ueditor</td>
+    <td>peditor</td>
+    <td>editor</td>
+  </tr>
+  <tr>
+    <td>uadmin</td>
+    <td>padmin</td>
+    <td>admin</td>
+  </tr>
+</table>
+
+ <?php global $username; if ( isset($username) ): ?>
+ <!-- failed login code -->
+
+ <p>
+ <table>
+  <tr>
+   <td colspan=2><font color=red><b>Either your username or your password
+       are invalid.<br>
+       Please try again!</b></font></td>
+  </tr>
+ </table>
+
+ <?php endif ?>
+
+</table>
+<input type="hidden" name="action" value="login">
+<!-- Set up the form with the challenge value and an empty reply value -->
+<input type="hidden" name="challenge" value="<?php print $challenge ?>">
+<input type="hidden" name="response"  value="">
+</form>
+</body>
+<script language="JavaScript">
+<!--
+  // Activate the appropriate input form field.
+  if (document.login.username.value == '') {
+    document.login.username.focus();
+  } else {
+    document.login.password.focus();
+  }
+// -->
+</script>
+</html>
+
+
