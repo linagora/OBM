@@ -299,7 +299,7 @@ CREATE TABLE Kind (
   kind_timecreate  timestamp(14),
   kind_userupdate  int(8),
   kind_usercreate  int(8),
-  kind_minilabel   char(5),
+  kind_minilabel   varchar(64),
   kind_header      varchar(64),
   kind_lang        char(2),
   PRIMARY KEY (kind_id)
@@ -1136,7 +1136,7 @@ CREATE TABLE PublicationType (
   publicationtype_timecreate  timestamp(14),
   publicationtype_userupdate  int(8),
   publicationtype_usercreate  int(8),
-  publicationtype_label       char(12),
+  publicationtype_label       varchar(64),
   PRIMARY KEY (publicationtype_id)
 );
         

@@ -388,7 +388,8 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
 }
 
 
-///////////////////////////////////////////////////////////////////////////////// Display: Company links menu                                               //
+/////////////////////////////////////////////////////////////////////////////////
+//Display: Company links menu                                               //
 // Parameters:
 //   - $co_q : company database result 
 // Returns:
@@ -568,15 +569,7 @@ function html_company_consult($co_q, $cat_q) {
     </tr>";
   }
 
-  // Category field
-  if ($show_cat) {
-    $block_cat = "
-<div class=\"detailHead\">$l_category</div>
-  
-  <table class=\"detail\">
-    $cat_disp
-  </table>";
-  }
+
   
   // Address3 field
   if ($show_ad3) {
@@ -597,7 +590,7 @@ function html_company_consult($co_q, $cat_q) {
   }
   $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
   if($cat_q->nf() >0) {
-    $cat_a = run_query_ordered_category($cat_q);
+    $cat_a = get_ordered_category($cat_q);
     $i = 0;
     foreach($cat_a as $cat_info) {
       if ($i==0) {
@@ -613,7 +606,15 @@ function html_company_consult($co_q, $cat_q) {
       }    
     }
   }
-
+  // Category field
+  if ($show_cat) {
+    $block_cat = "
+<div class=\"detailHead\">$l_category</div>
+  
+  <table class=\"detail\">
+    $cat_disp
+  </table>";
+  }  
   // Web link
   if ($web != "") {
     $link_web = "<a target=\"_blank\" href=\"";
@@ -758,7 +759,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <td class=\"detailForm\">$sel_kind</td>";
   }
 
-  $cat_a = run_query_ordered_category($cat_q); 
+  $cat_a = get_ordered_category($cat_q); 
   
   // Cat select field
   if ($show_cat) {
@@ -785,6 +786,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     }
     $sel_cat .= "</select>";
 
+    $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
     $block_cat = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category</td>
@@ -897,7 +899,6 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <input type=\"submit\" value=\"$l_insert\" />
       ";
   }
-  $url = "company_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
   $display["title"] = "<div class=\"title\">$l_company : $name</div>";
 
@@ -1400,7 +1401,7 @@ function html_company_cat_form($cat_q) {
     forms.form_cat_update.tf_cat_code.value=ext;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
   if($cat_q->nf()>0) {
-    $cat_a = run_query_ordered_category($cat_q);
+    $cat_a = get_ordered_category($cat_q);
     foreach($cat_a as $cat_info) {
       $id = $cat_info["id"];
       $code = $cat_info["code"];
@@ -1949,7 +1950,7 @@ function html_category_tree($category) {
   <div class=\"categoryTree\">
    <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
    ";
-   $cat_a = run_query_ordered_category($obm_d);
+   $cat_a = get_ordered_category($obm_d);
    if(is_array($cat_a)) {
      foreach($cat_a as $cat_info) {
        $hash_code = explode(".",$cat_info["code"]);
@@ -2034,6 +2035,116 @@ function display_popup_tree($tree,$indent) {
 	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
 	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
 	     <input type=\"checkbox\" name=\"$id\" /><span id=\"data$id\">$code - $label</span>
+	  </td>
+	 </tr>
+	</table>";
+    }
+  }
+  else {
+    $block = $content;
+  }
+    
+  return $block;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Display: category Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function html_category_code_tree($category) {
+  global $l_close,$l_add,$l_cat_no;
+  $popup = $category["popup"];
+  $obm_d = run_query_get_tree();
+  if($popup) {
+    $link = "<a class=\"categoryRepository\" href=\"\" onclick=\"fill_ext_form('/');return false;\">";
+    $link_end ="</a>";
+  }
+  $name = '/';
+  $kind = "0";
+  $realpath = $path.$name;
+  
+  $block.= "
+  <div class=\"categoryTree\">
+   ";
+   $cat_a = get_ordered_category($obm_d);
+   if(is_array($cat_a)) {
+     foreach($cat_a as $cat_info) {
+       $hash_code = explode(".",$cat_info["code"]);
+       $deep = count($hash_code);
+       switch ($deep) {
+	 case 1:
+	   $tree[$hash_code[0]] = $cat_info;
+	   break;
+	 case 2:
+	   $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
+	   break;
+	 case 3:
+	   $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
+	   break;
+	 }
+    }
+    foreach($tree as $level => $info) { 
+      $block .= @display_popup_code_tree($info,0);
+    }
+  }
+  else {
+    $block.= "$l_cat_no";
+  }
+  $block.= "
+  </div>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Document Tree
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function display_popup_code_tree($tree,$indent) {
+  global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
+  global $popup;
+  $code = $tree["code"];
+  $label = $tree["label"];
+  $id = $tree["id"]; 
+  if($code != "") {
+    $is_valid = true;
+    $indent_file = $indent + 15;
+  }
+  else {
+    $is_valid = false;
+  }
+    
+  foreach($tree as $level => $info) {
+    if("$level" != "code" && "$level" != "label" && "$level" != "id") {    
+       $content.= display_popup_code_tree($info,$indent_file);
+      $bool = true;
+    }
+  }
+ 
+  if($is_valid) {
+    if($bool == true) {
+      $block= 
+      "<table class=\"category\">
+	 <tr>
+	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	   <a href=\"\" onclick=\"show_hide_repo('$code');return false;\" 
+	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory_close\" alt=\"\"/>
+	   </a>
+	   <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form($code);return false;\"><span id=\"data$id\">$code - $label</span></a>
+	  </td>
+	 </tr>
+	</table>
+	<div id='$code' style=\"display:none;\" >
+	 $content
+	</div>";
+    }
+    else {
+      $block= 
+      "<table class=\"category\">
+	 <tr>
+	  <td class=\"categoryRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
+	    <img id=\"img_$code\"  src=\"/images/$set_theme/$ico_directory\" alt=\"\"/>
+	     <a href=\"javascript: void(0);\" onclick=\"fill_ext_code_form($code);return false;\"><span id=\"data$id\">$code - $label</span></a>
 	  </td>
 	 </tr>
 	</table>";

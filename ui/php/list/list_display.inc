@@ -400,6 +400,7 @@ function dis_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_list,$display;
+  global $l_show_query;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -444,9 +445,9 @@ function html_list_form($action, $list_q, $list) {
   if($action == "insert" || $action == "new" || ($list["criteria"] == "" &&  $crit_q =="")) {
   $block .=  "
     <tr>
-      <td class=\"detailLabel\">$l_query</td>
+      <td class=\"detailLabel\">$l_query<br /> <a id=\"query_show\" href=\"javascript:void(0);\" onclick=\"show_query_field()\">$l_show_query</a></td>
       <td class=\"detailForm\">
-      <textarea name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
+      <textarea id=\"ta_query\" name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea></td>
     </tr>
     ";
   }
@@ -470,6 +471,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
+  global $l_timeupdate,$l_timecreate,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
+  global $l_contact_cat2,$l_function,$l_category;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete;
 
@@ -483,8 +486,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $criteria = unserialize($list_q->f("list_structure"));
     $bollean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
-    $criteria = $criteria["modules"]; 
-
+    $criteria = $criteria["modules"];
   }
   
   // If parameters have been given, they supercede the default action value
@@ -501,16 +503,53 @@ function html_list_graphical_form($action, $list_q, $list) {
     $logical_criterion = $criteria["logical"]["AND"];      
     $criteria = $criteria["modules"]; 
   }
-
+    $field_kind = array(
+      "company_name" => "tf",
+      "company_country_id" => "sel",
+      "company_timeupdate"  =>  "tf",
+      "company_zipcode"  =>  "tf",
+      "company_marketingmanager_id" => "sel",
+      "company_timecreate" =>  "tf",
+      "company_town"  =>  "tf",
+      "company_datasource_id" => "sel",
+      "companycategory_code" => "sel",
+      "contact_firstname"  =>  "tf",
+      "contact_country_id" => "sel",
+      "contact_timeupdate"  =>  "tf",
+      "contact_lastname"  =>  "tf",
+      "contact_marketingmanager_id" => "sel",
+      "contact_timecreate"  => "tf",
+      "contact_datasource_id" => "sel",
+      "contact_town"  => "tf",
+      "contact_zipcode"  => "tf",
+      "contactcategory1link_category_id" => "sel",
+      "contactcategory2link_category_id" => "sel",
+      "contact_function_id" => "sel",
+      "publication_title"  => "tf",
+      "publication_lang"  => "tf",
+      "publication_year"  => "tf"
+  );
   $fields_label["company_name"] = $l_company; 
   $fields_label["company_country"] = "$l_company: $l_country"; 
   $fields_label["company_zipcode"] = "$l_company: $l_postcode"; 
   $fields_label["company_town"] = "$l_company: $l_town"; 
+  $fields_label["company_timeupdate"] = "$l_company: $l_timeupdate"; 
+  $fields_label["company_timecreate"] = "$l_company: $l_timecreate"; 
+  $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
+  $fields_label["companycategory_code"] = "$l_company: $l_category";   
+  $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
   $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
   $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
   $fields_label["contact_country"]= "$l_contact: $l_country";  
   $fields_label["contact_zipcode"] = "$l_contact: $l_postcode";  
-  $fields_label["contact_town"] = "$l_contact: $l_town";  
+  $fields_label["contact_town"] = "$l_contact: $l_town"; 
+  $fields_label["contact_timeupdate"] = "$l_contact: $l_timeupdate"; 
+  $fields_label["contact_timecreate"] = "$l_contact: $l_timecreate"; 
+  $fields_label["contact_marketingmanager_id"] = "$l_contact: $l_marketingmanager_id"; 
+  $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
+  $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
+  $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
+  $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
   $fields_label["publication_title"] = "$l_publication: $l_title"; 
   $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
   $fields_label["publication_year"] = "$l_publication: $l_year"; 
@@ -519,13 +558,13 @@ function html_list_graphical_form($action, $list_q, $list) {
     foreach($criteria as $module)
     foreach($module as $field => $criterion) {
       foreach($criterion as $line => $value) {
-        if($field == "c1.country_name") {
-	  $field= "company_country";
-        }elseif($field == "c2.country_name") {
-          $field= "contact_country";
-        }
         if($value != "") {
-          $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
+	  if($field_kind[$field] == "tf") {
+	    $input = "<input type=\"text\" name=\"tf_".$field."[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"$value\" />";
+	  }
+	  else {
+	    $input = "<select name=\"sel_".$field."[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"$value\"></option></select>";
+	  }
 	  $structure[$line] .= "<td>$input</td>";
 	  $labels[$line] .= "<td>".$fields_label[$field]."</td>";
         }
@@ -539,6 +578,7 @@ function html_list_graphical_form($action, $list_q, $list) {
  
     $upd_cell = "<td><a href=\"javascript:void(0);\" onclick=\"open_window(this.parentNode.parentNode);return false;\">
     <img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a></td>"; 
+    if(is_array($structure))
     foreach($structure as $key=>$line) {
       if($bollean_criterion[$key] == "NOT") {
 	$not = "selected =\"true\"";
@@ -594,9 +634,19 @@ function dis_add_criterion_form($list) {
   global $l_list_display, $l_contact_display,$l_add_criterion;
   $popup = $list["popup"];
   if(isset($list["row_index"]))$row_index = $list["row_index"];else $row_index =-1;
+//  $ds_q =;
+//  $cat_q =;
+  $cty_q = run_query_country();
+  $usr_q = run_query_userobm_active();
+  $dsr_q = run_query_datasource();
+  $cat1_q = run_query_contactcategory1();
+  $cat2_q = run_query_contactcategory2();
+  $fct_q = run_query_function();
+  $cat_q = run_query_companycategory();
+
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
-  $block .= html_company_criterion();
-  $block .= html_contact_criterion();
+  $block .= html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
+  $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q);
   $block .= html_publication_criterion();
   $block .= "
   <div class=\"detailButton\">
@@ -621,23 +671,74 @@ function dis_add_criterion_form($list) {
 // Display the Company Criterion Form //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_criterion(){
-  global $l_company,$l_country,$l_postcode,$l_town;
+function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
+  global $l_company,$l_country,$l_postcode,$l_town,$l_timecreate,$l_timeupdate;
+  global $l_all,$l_market,$l_datasource,$l_category;
+  global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
+  $sel_cty .= "\n<option value=\"\">$l_all</option>";
+  while($cty_q->next_record()) {
+    $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
+  }
+  $sel_usr .= "\n<option value=\"\">$l_all</option>";
+  while($usr_q->next_record()) {
+    $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
+  }
+  $sel_dsr .= "\n<option value=\"\">$l_all</option>";
+  while($dsr_q->next_record()) {
+    $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
+  }  
+  $sel_cat .= "\n<option value=\"\">$l_all</option>";
+  while($cat_q->next_record()) {
+    $sel_cat .= "\n<option value=\"".$cat_q->f("companycategory_code")."\">".substr($cat_q->f("companycategory_label"),0,30)."</option>";
+  }  
+  
   $block .= "
   <div class=\"detailHead\">$l_company</div>    
   <table class=\"search\">
   <tr>
     <td class=\"detailLabel\">$l_company</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailLabel\">$l_town</td>
+    <td class=\"detailLabel\">$l_timeupdate</td>  
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_name\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_country\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td>
+    <td class=\"detailForm\"><select name=\"sel_company_country_id\">$sel_cty</select></td>
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timeupdate\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timeupdate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+    </td>    
   </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_postcode</td>
+    <td class=\"detailLabel\">$l_market</td>
+    <td class=\"detailLabel\">$l_timecreate</td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_zipcode\" value=\"\" /></td>
+    <td class=\"detailForm\"><select name=\"sel_company_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_company_timecreate\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_company_timecreate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+     </a>
+    </td> 
+  </tr>
+  <tr>   
+    <td class=\"detailLabel\">$l_town</td>
+    <td class=\"detailLabel\">$l_category</td>    
+    <td class=\"detailLabel\">$l_datasource</td>
+  </tr>
+  <tr>    
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_company_town\" value=\"\" /></td> 
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+    <select  readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\" name=\"sel_companycategory_code\">$sel_cat</select>
+     <a href=\"javascript: void(0);\" onclick=\"window.open('../company/company_index.php?action=ext_get_cat_code&amp;popup=1&amp;ext_target=f_new_criterion.sel_companycategory_code','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+     <img src=\"/images/$set_theme/$ico_add\" border=\"0\" />
+
+    </td>     
+    <td class=\"detailForm\"><select name=\"sel_company_datasource_id\">$sel_dsr</select></td>        
+  </tr>  
   </table>
   ";
   return $block;
@@ -647,25 +748,87 @@ function html_company_criterion(){
 // Display the Contact Criterion Form //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_criterion(){
+function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
+  global $l_all,$l_timecreate,$l_timeupdate,$l_market,$l_datasource;  
+  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_language;
+  global $set_theme,$ico_mini_cal;  
+  $sel_cty .= "\n<option value=\"\">$l_all</option>";
+  while($cty_q->next_record()) {
+    $sel_cty .= "\n<option value=\"".$cty_q->f("country_id")."\">".$cty_q->f("country_name")."</option>";
+  } 
+  $sel_usr .= "\n<option value=\"\">$l_all</option>";
+  while($usr_q->next_record()) {
+    $sel_usr .= "\n<option value=\"".$usr_q->f("userobm_id")."\">".$usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname")."</option>";
+  }
+  $sel_dsr .= "\n<option value=\"\">$l_all</option>";
+  while($dsr_q->next_record()) {
+    $sel_dsr .= "\n<option value=\"".$dsr_q->f("datasource_id")."\">".$dsr_q->f("datasource_name")."</option>";
+  }  
+  $sel_cat1 .= "\n<option value=\"\">$l_all</option>";
+  while($cat1_q->next_record()) {
+    $sel_cat1 .= "\n<option value=\"".$cat1_q->f("contactcategory1_id")."\">".$cat1_q->f("contactcategory1_label")."</option>";
+  }  
+  $sel_cat2 .= "\n<option value=\"\">$l_all</option>";
+  while($cat2_q->next_record()) {
+    $sel_cat2 .= "\n<option value=\"".$cat2_q->f("contactcategory2_id")."\">".$cat2_q->f("contactcategory2_label")."</option>";
+  }   
+  $sel_fct .= "\n<option value=\"\">$l_all</option>";
+  while($fct_q->next_record()) {
+    $sel_fct .= "\n<option value=\"".$fct_q->f("function_id")."\">".$fct_q->f("function_label")."</option>";
+  }   
+  
   $block = "
   <div class=\"detailHead\">$l_contact</div>    
   <table class=\"search\">
   <tr>
     <td class=\"detailLabel\">$l_lastname</td>
-    <td class=\"detailLabel\">$l_firstname</td>
     <td class=\"detailLabel\">$l_country</td>
-    <td class=\"detailLabel\">$l_postcode</td>
-    <td class=\"detailLabel\">$l_town</td>    
+    <td class=\"detailLabel\">$l_timeupdate</td>
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_lname\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_fname\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_country\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_zipcode\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
+    <td class=\"detailForm\"><select name=\"sel_contact_country_id\">$sel_cty</select></td>    
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timeupdate\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timeupdate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+     <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+    </td>    
+  <tr>  
+    <td class=\"detailLabel\">$l_firstname</td>
+    <td class=\"detailLabel\">$l_market</td>
+    <td class=\"detailLabel\">$l_timecreate</td>    
   </tr>
+  <tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_fname\" value=\"\" /></td>
+    <td class=\"detailForm\"><select name=\"sel_contact_marketingmanager_id\">$sel_usr</select></td>    
+    <td class=\"detailForm\" style=\"white-space: nowrap;\">
+     <input readonly=\"true\" type=\"text\" size=\"17\" name=\"tf_contact_timecreate\" value=\"\" />
+     <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_new_criterion.tf_contact_timecreate,'../agenda/agenda_index.php?action=calendar&popup=1');\">
+       <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
+     </a>
+    </td>     
+  </tr>
+  <tr>  
+    <td class=\"detailLabel\">$l_datasource</td>
+    <td class=\"detailLabel\">$l_town</td>   
+    <td class=\"detailLabel\">$l_postcode</td>
+  </tr>
+  <tr>    
+    <td class=\"detailForm\"><select name=\"sel_contact_datasource_id\">$sel_dsr</select></td>        
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_town\" value=\"\" /></td>    
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_contact_zipcode\" value=\"\" /></td>
+  </tr>  
+  <tr>  
+    <td class=\"detailLabel\">$l_contact_cat1</td>
+    <td class=\"detailLabel\">$l_contact_cat2</td>   
+    <td class=\"detailLabel\">$l_function</td>
+  </tr> 
+  <tr>  
+    <td class=\"detailForm\"><select name=\"sel_contactcategory1link_category_id\">$sel_cat1</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_contactcategory2link_category_id\">$sel_cat2</select></td>    
+    <td class=\"detailForm\"><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
+  </tr> 
   </table>
   ";
   return $block;

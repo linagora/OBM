@@ -29,7 +29,13 @@ $l_export_intro = "Sélectionner le format d'export souhaité";
 $l_select_list = "Sélectionner les listes cibles de l'export";
 $l_list_wizard = "Recherche globale";
 $l_criterion = "Critères de recherche";
-
+$l_timecreate = "Date de création";
+$l_timeupdate = "Date de mise à jour";
+$l_market = "Responsable";
+$l_contact_cat1 = "Categorie 1";
+$l_contact_cat2 = "Categorie 2";
+$l_category = "Categorie";
+$l_show_query = "Utiliser le champ de requête manuel";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";

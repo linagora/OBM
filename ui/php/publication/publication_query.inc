@@ -28,8 +28,8 @@ function run_query_search($publication, $p_new_order, $p_order_dir) {
   $zip = $publication["zip"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   // If a title has been given we search its sound too
   $req = "select
@@ -165,7 +165,7 @@ function run_query_insert_subscription($publication) {
 
   $c_id = $publication["contact_id"];
   $quantity = $publication["quantity"];
-  $p_id = $publication["publication_id"];
+  $p_id = $publication["id"];
   $renew = $publication["renew"];
   $recept = $publication["recept"];
   
@@ -854,6 +854,64 @@ function run_query_get_contact_lang($p_id) {
   $obm_q->next_record();
 
   return $obm_q->f("kind_lang");
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//                                       //
+// Parameters:
+//   - $p_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_subscription_external_search($hash_table) {
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  $contact = $hash_table["id"];
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;     
+  $timeupdate = sql_date_format($type, "subscription_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type, "subscription_timecreate", "timecreate");
+
+    $query = "
+        SELECT
+	      $timeupdate,$timecreate,subscription_contact_id,subscription_publication_id,
+	      publication_title,publication_year, subscriptionrenewal_label,
+	      subscriptionreception_label, subscription_quantity 
+        FROM Subscription 
+	LEFT JOIN Publication ON publication_id = subscription_publication_id
+	LEFT JOIN SubscriptionRenewal ON subscriptionrenewal_id = subscription_renewal_id 
+	LEFT JOIN SubscriptionReception ON subscriptionreception_id = subscription_reception_id 	
+        where
+        subscription_contact_id='$contact'
+	Order by  subscription_timecreate desc";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+//                                       //
+// Parameters:
+//   - $p_id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_subscription_detail($c_id,$p_id){
+  global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+  $obm_q = new DB_OBM;
+
+    $query = "
+        SELECT
+	      subscription_contact_id,subscription_publication_id,
+	      publication_title, subscription_renewal_id,
+	      subscription_reception_id, subscription_quantity 
+        FROM Subscription 
+	LEFT JOIN Publication ON publication_id = subscription_publication_id
+	LEFT JOIN SubscriptionRenewal ON subscriptionrenewal_id = subscription_renewal_id 
+	LEFT JOIN SubscriptionReception ON subscriptionreception_id = subscription_reception_id 	
+        where
+        subscription_contact_id='$c_id' and subscription_publication_id='$p_id'
+	";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  return $obm_q;
 }
 
 </script>

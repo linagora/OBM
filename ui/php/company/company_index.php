@@ -94,7 +94,10 @@ if ($action == "ext_get_id") {
   $extra_css = "category.css";
   require("company_js.inc");
   $display["detail"] =  html_category_tree($document);
-
+} elseif ($action == "ext_get_cat_code") {
+  $extra_css = "category.css";
+  require("company_js.inc");
+  $display["detail"] =  html_category_code_tree($document);
 ///////////////////////////////////////////////////////////////////////////////
 // Normal calls
 ///////////////////////////////////////////////////////////////////////////////
@@ -697,16 +700,40 @@ function get_company_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
-					       
+
+// Category Select 
+  $actions["COMPANY"]["ext_get_cat_ids"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_cat_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+// Category Select 
+  $actions["COMPANY"]["ext_get_cat_code"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_cat_code",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+// Company Select 
+  $actions["COMPANY"]["ext_get_id"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
+// Category Select 
+  $actions["COMPANY"]["ext_get_id_url"]  = array (
+    'Url'      => "$path/company/company_index.php?action=ext_get_id_url",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
 // Document add
-  $actions["DEAL"]["document_add"] = array (
+  $actions["COMPANY"]["document_add"] = array (
     'Url'      => "$path/company/company_index.php?action=document_add",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     
-
 }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Company Actions URL updates (after processing, before displaying menu)

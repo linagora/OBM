@@ -170,3 +170,14 @@ $l_j_kind_create = "Vous devez saisir toutes les informations d'un genre pour le
 
 // For the display preferences modification screen 
 $l_contact_display = "Options d'affichage des listes de contacts";
+
+
+// external Fields 
+$l_timecreate = "Date de Création";
+$l_timeupdate = "Date de Mise à jour";
+$l_publication_title = "Titre";
+$l_year = "Année";
+$l_renewal = "Mode de renouvellement";
+$l_recep = "Mode de réception";
+$l_quantity = "Quantité";
+

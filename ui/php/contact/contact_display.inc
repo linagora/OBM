@@ -241,7 +241,7 @@ function dis_contact_search_list($contact) {
   $popup = $contact["popup"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contact");
-  $obm_q = run_query_search($contact, $new_order, $order_dir);
+  $obm_q = run_query_contact_search($contact, $new_order, $order_dir);
   $nb_contact = $obm_q->num_rows();
   if ($nb_contact == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);
@@ -324,13 +324,50 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Contact search result                                            //
+// Parameters:
+//   - $contact[] : contact search criteria
+//     keys used  : company_id, name, company
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_consult($contact) {
+  global $display, $l_no_found,$path;
+  global $auth, $new_order, $order_dir;
+
+  $view = $contact["view"];
+  $param_contact = $contact["id"];
+  $con_q = run_query_contact_detail($param_contact);
+  if ($con_q->num_rows() != 1) {
+    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+  }
+  if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
+    $display["link"] = html_contact_links($id);
+    $display["detailInfo"] = display_record_info($con_q);
+    $block .= html_contact_header($con_q);
+    if($view != "") {
+      include("$path/$view/".$view."_display.inc");
+      include("$path/$view/".$view."_query.inc");
+      $block .= dis_subscription_external_list($contact);
+    }
+    else {
+      $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
+      $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
+      $block .= html_contact_body($con_q,$cat1_q,$cat2_q);
+    }
+  } else {
+    $display["msg"] .= display_err_msg($l_error_visibility);
+  }      
+
+  return $block;
+}
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Consultation                                         //
 // Parameters:
 //   - $co_q : contact database result
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_consult($co_q,$cat1_q,$cat2_q) {
+function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_company,$l_lastname,$l_firstname,$l_kind,$l_function,$l_title;
   global $l_phone, $l_hphone,$l_mphone,$l_fax, $l_address,$l_postcode;
   global $l_market, $l_town,$l_country,$l_email,$l_mailing_ok,$l_expresspostal;
@@ -373,7 +410,6 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   $com = nl2br($co_q->f("contact_comment"));
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
-  $display["link"] = html_contact_links($id);
 
   // Conditionnal fields
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
@@ -653,8 +689,8 @@ function html_contact_links($id) {
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
   $nb_document = run_query_document_nb ($id,"Contact");
   $nb_subscription = run_query_subscription_nb ($id);
-  $url_subscription = url_prepare("$path/contact/contact_index.php?action=externaldetail&amp;module=publication&amp;param_contact=$id");
-  $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id");
+  $url_subscription = url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;view=publication&amp;param_contact=$id");
+  $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id&amp;popup=1");
 
   
   $block = "<div class=\"link\">
@@ -674,8 +710,8 @@ function html_contact_links($id) {
   <ul class=\"linkList\">
     <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
         <a href=\"$url_subscription\">$l_subscription ($nb_subscription)</a></li>
-    <li><a href=\"$url_subscription_new\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
-        <a href=\"$url_subscription_new\">$l_subscription_new</a></li>
+    <li><a  href=\"javascript: void(0);\"  onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
+	<a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_new','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> $l_subscription_new</a></li>
   </ul>
  </div>
  ";
@@ -872,14 +908,14 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       $k_label = $kind_q->f("kind_minilabel");
       $k_header = $kind_q->f("kind_header");
       if($k_lang != $k_old_lang) {
-	$k_kind_js .= "lang_array['$k_lang'] = new Array ();\n";
+	$k_kind_js .= "lang_array[\"$k_lang\"] = new Array ();\n";
 	$k_old_lang = $k_lang;
       }     
       if($k_label != $k_old_label) {
-	$k_kind_js .= "lang_array['$k_lang']['$k_label'] = new Array ();\n";
+	$k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"] = new Array ();\n";
 	$k_old_label = $k_label;
       }
-      $k_kind_js .= "lang_array['$k_lang']['$k_label']['$k_header'] = '$k_id';\n";
+      $k_kind_js .= "lang_array[\"$k_lang\"][\"$k_label\"][\"$k_header\"] = '$k_id';\n";
       $k_kind[$k_lang][$k_label][$k_header] = $k_id;
       if($k_id == $kind){
 	$kind_lang = $k_lang;

@@ -299,6 +299,22 @@ function get_user_action() {
     'Condition'=> array ('all') 
                                     );
 
+// Get Ids
+  $actions["USER"]["ext_get_ids"] = array (
+    'Url'      => "$path/user/user_index.php?action=ext_get_ids",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
+
+// Get Users
+  $actions["USER"]["ext_get_users"] = array (
+    'Url'      => "$path/user/user_index.php?action=ext_get_users",
+    'Right'    => $cright_read,
+    'Condition'=> array ('none'),
+    'popup' => 1
+                                    );
+
 // New
   $actions["USER"]["new"] = array (
     'Name'     => $l_header_new,

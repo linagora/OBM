@@ -15,7 +15,7 @@
 //   - $p_new_order  : infos for order clause
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search($contact, $p_new_order, $p_order_dir) {
+function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   global $auth, $cdg_sql, $c_all;
 
   $company_id = $contact["company_id"];
@@ -228,7 +228,7 @@ function run_query_contactcategory2() {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_detail($p_id) {
+function run_query_contact_detail($p_id) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -288,7 +288,7 @@ function run_query_detail($p_id) {
 //     keys used : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
 //               : ctry, func, phone, hphone, mphone, fax, email, com, vis
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($contact) {
+function run_query_contact_insert($contact) {
   global $auth, $cdg_sql;
 
   $comp_id = $contact["comp_new_id"];
@@ -438,7 +438,7 @@ function run_query_insert($contact) {
 //     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town
 //                : cdx, ctry, func, phone, hphone, mphone, fax, email, com,vis
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_update($contact) {
+function run_query_contact_update($contact) {
   global $auth, $cdg_sql;
 
   $id = $contact["id"];
@@ -710,7 +710,7 @@ function run_query_contact_list_links($p_id) {
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_id) {
+function run_query_contact_delete($p_id) {
   global $cdg_sql;
 
   $comp_id = get_contact_company_id($p_id);
@@ -832,7 +832,7 @@ function check_contact_context($cid, $contact) {
 //     keys used  : lname, fname, phone, hphone, mphone, fax, email
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form($cid, $contact) {
+function check_contact_data_form($cid, $contact) {
   global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;

@@ -43,10 +43,10 @@ $cgp_show["section"]["aliamin"] = false;
 //$cgp_hide["company"]["address3"] = true;
 
 // Contact module
-$cgp_hide["contact"]["contact_function"] = true;
-$cgp_hide["contact"]["contact_title"] = true;
+//$cgp_hide["contact"]["contact_function"] = true;
+//$cgp_hide["contact"]["contact_title"] = true;
 //$cgp_hide["contact"]["category1"] = true;
-$cgp_hide["contact"]["category2"] = true;
-$cgp_hide["contact"]["address3"] = true;
+//$cgp_hide["contact"]["category2"] = true;
+//$cgp_hide["contact"]["address3"] = true;
 
 </script>

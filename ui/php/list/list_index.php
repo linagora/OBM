@@ -88,6 +88,7 @@ if (! $popup) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "new_criterion") {
+  require("$obminclude/calendar.js");  
   $display["detail"] = dis_add_criterion_form($list);
 }
 elseif (($action == "index") || ($action == "")) {
@@ -284,10 +285,21 @@ function get_param_list() {
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $new_order, $order_dir,$popup,$row_index;
-  global $tf_company_name,$tf_company_country,$tf_company_zipcode,$tf_company_town;
-  global $tf_contact_firstname,$tf_contact_lastname,$tf_contact_country;
-  global $tf_contact_zipcode,$tf_contact_town,$sel_log_and,$sel_log_not;
+  
+  global $tf_company_name,$tf_company_zipcode,$tf_company_town;
+  global $tf_company_timeupdate,$tf_company_timecreate;
+  global $sel_company_country_id,$sel_company_marketingmanager_id;
+  global $sel_company_datasource_id,$sel_companycategory_code;
+
+  global $tf_contact_firstname,$tf_contact_lastname;
+  global $tf_contact_zipcode,$tf_contact_town;
+  global $tf_contact_timeupdate,$tf_contact_timecreate;
+  global $sel_contact_country_id,$sel_contact_marketingmanager_id;
+  global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
+  global $sel_contactcategory2link_category_id,$sel_contact_function_id;
+  
   global $tf_publication_title,$tf_publication_lang,$tf_publication_year;
+  global $sel_log_and,$sel_log_not;
   global $se_criteria;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
@@ -322,15 +334,28 @@ function get_param_list() {
   //Criteria params :
   //Company
   if (isset ($tf_company_name)) $list["criteria"]["modules"]["company"]["company_name"] = $tf_company_name;
-  if (isset ($tf_company_country)) $list["criteria"]["modules"]["company"]["c1.country_name"] = $tf_company_country;
+  if (isset ($sel_company_country_id)) $list["criteria"]["modules"]["company"]["company_country_id"] = $sel_company_country_id;
+  if (isset ($tf_company_timeupdate)) $list["criteria"]["modules"]["company"]["company_timeupdate"] = $tf_company_timeupdate; 
   if (isset ($tf_company_zipcode)) $list["criteria"]["modules"]["company"]["company_zipcode"] = $tf_company_zipcode;
+  if (isset ($sel_company_marketingmanager_id)) $list["criteria"]["modules"]["company"]["company_marketingmanager_id"] = $sel_company_marketingmanager_id;
+  if (isset ($tf_company_timecreate)) $list["criteria"]["modules"]["company"]["company_timecreate"] = $tf_company_timecreate;
   if (isset ($tf_company_town)) $list["criteria"]["modules"]["company"]["company_town"] = $tf_company_town;
+  if (isset ($sel_company_datasource_id)) $list["criteria"]["modules"]["company"]["company_datasource_id"] = $sel_company_datasource_id;
+  if (isset ($sel_companycategory_code)) $list["criteria"]["modules"]["company"]["companycategory_code"] = $sel_companycategory_code;
+  
   //Contact
   if (isset ($tf_contact_firstname)) $list["criteria"]["modules"]["contact"]["contact_firstname"] = $tf_contact_firstname;
+  if (isset ($sel_contact_country_id)) $list["criteria"]["modules"]["contact"]["contact_country_id"] = $sel_contact_country_id;
+  if (isset ($tf_contact_timeupdate)) $list["criteria"]["modules"]["contact"]["contact_timeupdate"] = $tf_contact_timeupdate;
   if (isset ($tf_contact_lastname)) $list["criteria"]["modules"]["contact"]["contact_lastname"] = $tf_contact_lastname;
-  if (isset ($tf_contact_country)) $list["criteria"]["modules"]["contact"]["c2.country_name"] = $tf_contact_country;
-  if (isset ($tf_contact_zipcode)) $list["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
+  if (isset ($sel_contact_marketingmanager_id)) $list["criteria"]["modules"]["contact"]["contact_marketingmanager_id"] = $sel_contact_marketingmanager_id;
+  if (isset ($tf_contact_timecreate)) $list["criteria"]["modules"]["contact"]["contact_timecreate"] = $tf_contact_timecreate;
+  if (isset ($sel_contact_datasource_id)) $list["criteria"]["modules"]["contact"]["contact_datasource_id"] = $sel_contact_datasource_id;
   if (isset ($tf_contact_town)) $list["criteria"]["modules"]["contact"]["contact_town"] = $tf_contact_town;
+  if (isset ($tf_contact_zipcode)) $list["criteria"]["modules"]["contact"]["contact_zipcode"] = $tf_contact_zipcode;
+  if (isset ($sel_contactcategory1link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $sel_contactcategory1link_category_id;
+  if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
+  if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
   //Publication
   if (isset ($tf_publication_title)) $list["criteria"]["modules"]["publication"]["publication_title"] = $tf_publication_title;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;

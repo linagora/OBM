@@ -630,6 +630,12 @@ function get_agenda_action() {
     'Condition'=> array ('None') 
                                          );
 
+  // Decision
+  $actions["AGENDA"]["calendar"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=calendar",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                         );
   // New   
   $actions["AGENDA"]["new"] = array (
     'Name'     => $l_header_new_event,

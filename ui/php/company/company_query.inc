@@ -702,7 +702,7 @@ function run_query_get_companycat($id) {
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
   $i=0;
-  $links = run_query_ordered_category($obm_q);
+  $links = get_ordered_category($obm_q);
   return $links;
 }
 
@@ -1121,7 +1121,7 @@ function run_query_get_tree() {
 // place Category in the correct order
 // Parameters: DB object of categories.
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_ordered_category($cat_q) {
+function get_ordered_category($cat_q) {
 
   $wc =0; 
   while($cat_q->next_record()) {

@@ -57,6 +57,16 @@ function add_criterion(form,index) {
   } else {
     criteria = target.all['list_criterion'];
   }
+  if (W3C) {
+    target.getElementById('ta_query').style.visibility = \"hidden\";
+    target.getElementById('query_show').style.visibility = \"visible\";
+  } else if (NS4) {
+    target.layers['ta_query'].visibility = \"hide\";
+    target.layers['query_show'].visibility = \"visible\";
+  } else {
+    target.all['ta_query'].style.visibility = \"hidden\";
+    target.all['query_show'].style.visibility = \"visible\";
+  }  
   if(index == -1) {
     index = criteria.rows.length;
   }
@@ -96,10 +106,6 @@ function add_criterion(form,index) {
 
 function del_row(row) {
   i = row.rowIndex;
-  length = row.cells.length;
-  for(j=0;j++;j<length) {
-    row.deleteCell(j);
-  }
   table = row.parentNode;
   table.deleteRow(i-1);
   table.deleteRow(i-1);
@@ -136,7 +142,9 @@ function get_values(form) {
   row = criteria.rows.item(".($row_index+1).");
   cells = row.cells;
   for(i=4;i<cells.length;i++) {
-    form.elements[i-4].value = cells.item(i).lastChild.value;
+    name = cells.item(i).lastChild.name;
+    field = eval('form.'+name.substr(0,name.length-2));
+    field.value = cells.item(i).lastChild.value;
   }
 
 }
@@ -159,15 +167,16 @@ function company_criterion(form,labels,values,i) {
     defaultCell.innerHTML +='<input type=\"hidden\" name=\"tf_company_name[]\" value=\"\" />';
   }
 
-  if(form.tf_company_country.value != '') {  
+  if(form.sel_company_country_id.value != '') {  
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_company: $l_country'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_company_country[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_country.value+'\" />';
+    field = form.sel_company_country_id;
+    cell.innerHTML = '<select name=\"sel_company_country_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;  
   }
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_country[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_country_id[]\" value=\"\" />';
   }
 
   if(form.tf_company_zipcode.value != '') {    
@@ -191,6 +200,64 @@ function company_criterion(form,labels,values,i) {
   else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_town[]\" value=\"\" />';
   }
+
+  if(form.tf_company_timeupdate.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $l_timeupdate'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timeupdate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timeupdate.value+'\" />';
+    i++;
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timeupdate[]\" value=\"\" />';
+  }
+
+  if(form.tf_company_timecreate.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $l_timecreate'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_company_timecreate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_company_timecreate.value+'\" />';
+    i++;
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_company_timecreate[]\" value=\"\" />';
+  }
+  
+  if(form.sel_company_marketingmanager_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $l_market'; 
+    cell = values.insertCell(i);
+    field = form.sel_company_marketingmanager_id;
+    cell.innerHTML = '<select name=\"sel_company_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_marketingmanager_id[]\" value=\"\" />';
+  }
+   
+  if(form.sel_companycategory_code.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $l_category'; 
+    cell = values.insertCell(i);
+    field = form.sel_companycategory_code;
+    cell.innerHTML = '<select name=\"sel_companycategory_code[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_companycategory_code[]\" value=\"\" />';
+  }   
+  
+  if(form.sel_company_datasource_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_company: $l_datasource'; 
+    cell = values.insertCell(i);
+    field = form.sel_company_datasource_id;
+    cell.innerHTML = '<select name=\"sel_company_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_company_datasource_id[]\" value=\"\" />';
+  }   
   return i;
 }
 
@@ -223,15 +290,16 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_contact_firstname[]\" value=\"\" />';
   }
 
-  if(form.tf_contact_country.value != '') {    
+  if(form.sel_contact_country_id.value != '') {    
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_contact: $l_country';  
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_country[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_country.value+'\" />';
+    field = form.sel_contact_country_id;
+    cell.innerHTML = '<select name=\"sel_contact_country_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
     i++;    
   }  
   else {
-    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_country[]\" value=\"\" />';
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_country_id[]\" value=\"\" />';
   }
 
   if(form.tf_contact_zipcode.value != '') {    
@@ -256,6 +324,91 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_town[]\" value=\"\" />';
   }
 
+  if(form.tf_contact_timeupdate.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_timeupdate'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timeupdate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timeupdate.value+'\" />';
+    i++;
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timeupdate[]\" value=\"\" />';
+  }
+
+  if(form.tf_contact_timecreate.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_timecreate'; 
+    cell = values.insertCell(i);
+    cell.innerHTML = '<input type=\"text\" name=\"tf_contact_timecreate[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_contact_timecreate.value+'\" />';
+    i++;
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_contact_timecreate[]\" value=\"\" />';
+  }
+
+  if(form.sel_contact_marketingmanager_id.value != '') {    
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_market';  
+    cell = values.insertCell(i);
+    field = form.sel_contact_marketingmanager_id;
+    cell.innerHTML = '<select name=\"sel_contact_marketingmanager_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;    
+  }  
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_marketingmanager_id[]\" value=\"\" />';
+  }
+
+  if(form.sel_contact_datasource_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_datasource'; 
+    cell = values.insertCell(i);
+    field = form.sel_contact_datasource_id;
+    cell.innerHTML = '<select name=\"sel_contact_datasource_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_datasource_id[]\" value=\"\" />';
+  }   
+  
+  if(form.sel_contactcategory1link_category_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_contact_cat1'; 
+    cell = values.insertCell(i);
+    field = form.sel_contactcategory1link_category_id;
+    cell.innerHTML = '<select name=\"sel_contactcategory1link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory1link_category_id[]\" value=\"\" />';
+  }  
+
+  
+  if(form.sel_contactcategory2link_category_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_contact_cat2'; 
+    cell = values.insertCell(i);
+    field = form.sel_contactcategory2link_category_id;
+    cell.innerHTML = '<select name=\"sel_contactcategory2link_category_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contactcategory2link_category_id[]\" value=\"\" />';
+  }  
+  
+
+  if(form.sel_contact_function_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_function'; 
+    cell = values.insertCell(i);
+    field = form.sel_contact_function_id;
+    cell.innerHTML = '<select name=\"sel_contact_function_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_function_id[]\" value=\"\" />';
+  }   
+
+  
   return i;
 }
 
@@ -300,6 +453,30 @@ function publication_criterion(form,labels,values,i) {
   }
   return i;
   }
+///////////////////////////////////////////////////////////////////////////////
+// Show the manual query field                              //
+///////////////////////////////////////////////////////////////////////////////
 
-
+function show_query_field() {
+  if (W3C) {
+    table = document.getElementById('list_criterion');
+  } else if (NS4) {
+    table = document.layers['list_criterion'];
+  } else {
+    table = document.all['list_criterion'];
+  }
+  if (W3C) {
+    document.getElementById('query_show').style.visibility = \"hidden\";
+    document.getElementById('ta_query').style.visibility = \"visible\";
+  } else if (NS4) {
+    document.layers['query_show'].visibility = \"hide\";
+    document.layers['ta_query'].visibility = \"show\";
+  } else {
+    document.all['query_show'].style.visibility = \"hidden\";
+    document.all['ta_query'].style.visibility = \"visible\";
+  }  
+  len = table.rows.length
+  for(i=0;i<len;i++) 
+    table.deleteRow(0);  
+}
 </script>";

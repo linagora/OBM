@@ -713,7 +713,70 @@ function run_query_contacts_for_letter($list_ids) {
   }
   return $connect_db;
 }
+///////////////////////////////////////////////////////////////////////////////
+// Contact Category 1 query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contactcategory1() {
+  global $cdg_sql;
 
+  $query = "select * from ContactCategory1 order by contactcategory1_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact Category 2 query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contactcategory2() {
+  global $cdg_sql;
+
+  $query = "select * from ContactCategory2 order by contactcategory2_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+///////////////////////////////////////////////////////////////////////////////
+// Contact: Function select query execution
+// Returns:
+//   DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_function() {
+  global $cdg_sql;
+
+  $query = "select function_id, function_label
+    from Function
+    order by function_label";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// get all the companycategories
+// Parameters:
+///////////////////////////////////////////////////////////////////////////////
+function run_query_companycategory() {
+  global $cdg_sql;  
+  $query = "select * from CompanyCategory order by  companycategory_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  
+  return $obm_q;  
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Make an SQL Query with the list of criteria.        //
 // Parameters:
@@ -728,17 +791,48 @@ function make_query($list) {
   $bollean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
 
+  
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
-
+  
+  $common_like = "%f $like '%v%'";
+  $common_equal = "%f = '%v'";
+  $category_equal = "(%f $like '%v.%' OR %f = '%v')";
+  
+  $operateurs = array(
+    "company_name" => $common_like,
+    "company_country_id" => $common_equal,
+    "company_timeupdate"  => $common_equal,
+    "company_zipcode"  => $common_like,
+    "company_marketingmanager_id" => $common_equal,
+    "company_timecreate" => $common_equal,
+    "company_town"  => $common_like,
+    "company_datasource_id" => $common_equal,
+    "companycategory_code" => $category_equal,
+    "contact_firstname"  => $common_like,
+    "contact_country_id" => $common_equal,
+    "contact_timeupdate"  => $common_equal,
+    "contact_lastname"  => $common_like,
+    "contact_marketingmanager_id" => $common_equal,
+    "contact_timecreate"  => $common_equal,
+    "contact_datasource_id" => $common_equal,
+    "contact_town"  => $common_like,
+    "contact_zipcode"  => $common_like,
+    "contactcategory1link_category_id" => $common_equal,
+    "contactcategory2link_category_id" => $common_equal,
+    "contact_function_id" => $common_equal,
+    "publication_title"  => $common_like,
+    "publication_lang"  => $common_like,
+    "publication_year"  => $common_like,
+  );
+    
   $query = "
         SELECT DISTINCT
         contact_id,
         contact_lastname,
         contact_firstname,
         contact_expresspostal,
-        c1.country_name,
         contact_phone,
         contact_homephone,
         contact_mobilephone,
@@ -746,14 +840,14 @@ function make_query($list) {
         company_id,
         company_name,
         company_zipcode,
-        company_town,
-        c1.country_name,
-        c2.country_name
+        company_town
         FROM
         Contact
              left join Company on contact_company_id=company_id
-             left join Country as c1 on contact_country_id=c1.country_id
-             left join Country as c2 on company_country_id=c2.country_id 
+	     left join CompanyCategoryLink on company_id = companycategorylink_company_id 
+	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
+	     left join ContactCategory1link on contact_id = contactcategory1link_contact_id
+	     left join ContactCategory2link on contact_id = contactcategory2link_contact_id
 	     left join Subscription on subscription_contact_id = contact_id
 	     left join Publication on publication_id = subscription_publication_id";  
   
@@ -793,7 +887,10 @@ function make_query($list) {
           if(is_array($criterion)) {
             foreach($criterion as $line => $value) {
               if($value != "") {
-                $condition[$line] .= $and[$line]." $field $like '$value%'";
+		$operation = $operateurs[$field];
+		$operation = str_replace('%f',$field,$operation);
+		$operation = str_replace('%v',$value,$operation);
+		$condition[$line] .= $and[$line]." ". $operation;
 		$and[$line] = " AND";
 	      }		
             }

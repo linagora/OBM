@@ -111,25 +111,13 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contact > 0) {
-    $con_q = run_query_detail($param_contact);
-    if ($con_q->num_rows() != 1) {
-      $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
-    }
-    if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
-      $display["detailInfo"] = display_record_info($con_q);
-      $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
-      $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
-      $display["detail"] = html_contact_consult($con_q,$cat1_q,$cat2_q);
-    } else {
-      // this contact's page has "private" access
-      $display["msg"] .= display_err_msg($l_error_visibility);
-    }      
+    $display["detail"] = dis_contact_consult($contact);
   }
   
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contact > 0) {
-    $con_q = run_query_detail($param_contact);
+    $con_q = run_query_contact_detail($param_contact);
     if ($con_q->num_rows() == 1) {
       require("contact_js.inc");
       $display["detailInfo"] = display_record_info($con_q);
@@ -142,7 +130,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contact > 0 && $module !="") {
     include("$path/$module/".$module."_display.inc");
-    $con_q = run_query_detail($param_contact);
+    $con_q = run_query_contact_detail($param_contact);
     if ($con_q->num_rows() != 1) {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
     }
@@ -158,11 +146,11 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $contact)) {
+  if (check_contact_data_form("", $contact)) {
 
     // If the context (same contacts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
-      $retour = run_query_insert($contact);
+      $retour = run_query_contact_insert($contact);
       if ($retour) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
       } else {
@@ -177,7 +165,7 @@ if ($action == "index" || $action == "") {
 	$display["title"] = display_title("$l_contact : $l_insert");
         $display["detail"] = dis_contact_warn_insert("", $obm_q, $contact);
       } else {
-        $retour = run_query_insert($contact);
+        $retour = run_query_contact_insert($contact);
         if ($retour) {
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {
@@ -196,14 +184,14 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $contact)) {
-    $retour = run_query_update($contact);
+  if (check_contact_data_form("", $contact)) {
+    $retour = run_query_contact_update($contact);
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
       $display["msg"] .= display_err_msg($l_update_error);
     }
-    $con_q = run_query_detail($param_contact);
+    $con_q = run_query_contact_detail($param_contact);
     $display["detailInfo"] = display_record_info($con_q);
     $cat1_q = run_query_get_contactcategory1_label($con_q->f("contact_id"));
     $cat2_q = run_query_get_contactcategory2_label($con_q->f("contact_id"));
@@ -221,7 +209,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($param_contact);
+  $retour = run_query_contact_delete($param_contact);
   if ($retour) {
     $display["msg"] .= display_ok_msg($l_delete_ok);
   } else {
@@ -411,7 +399,7 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
-  $con_q = run_query_detail($contact["id"]);
+  $con_q = run_query_contact_detail($contact["id"]);
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
@@ -448,7 +436,7 @@ function get_param_contact() {
   global $sel_market, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $tf_func, $tf_label, $tf_lang, $tf_header;
+  global $tf_func, $tf_label, $tf_lang, $tf_header,$view;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2,$tf_code2,$tf_code1;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -471,6 +459,7 @@ function get_param_contact() {
     }
     $contact["doc_nb"] = $nb_d;
   }
+  if (isset ($view)) $contact["view"] = $view;
   if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
   if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;
   if (isset ($tf_cat1)) $contact["cat1_label"] = $tf_cat1;

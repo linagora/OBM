@@ -523,15 +523,15 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
   global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
   global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
 
-
+  $popup = $publication["popup"];
 
   if($action == "detailupdate_subscription") {
-   $pub_id = $sub_q->f("subscritpion_publication_id"); 
+   $pub_id = $sub_q->f("subscription_publication_id"); 
    $title = $sub_q->f("publication_title"); 
-   $cont_id = $sub_q->f("subscritpion_contact_id"); 
-   $quantity = $sub_q->f("subscritpion_quantity"); 
-   $renew = $sub_q->f("subscritpion_renewal_id"); 
-   $reception = $sub_q->f("subscritpion_reception_id"); 
+   $cont_id = $sub_q->f("subscription_contact_id"); 
+   $quantity = $sub_q->f("subscription_quantity"); 
+   $renew = $sub_q->f("subscription_renewal_id"); 
+   $reception = $sub_q->f("subscription_reception_id"); 
    $lang = $sub_q->f("publication_lang"); 
   }
   // If parameters have been given, they supercede the default action value
@@ -563,7 +563,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
   }
   $sel_recept .= "</select>";
   
-  if (($action == "detailupdate") || ($action == "update")) {
+  if (($action == "detailupdate_supscritpion") || ($action == "update_supscritpion")) {
     $dis_button = "
       <!-- Update button -->
       <input type=\"hidden\" name=\"param_contact\" id=\"param_publication\" value=\"$id\" />
@@ -577,7 +577,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
       <input type=\"submit\" value=\"$l_insert_sub\" />
       ";
   }
-
+  $dis_button .= "<input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"$popup\" />";
   $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
 
   $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
@@ -1445,19 +1445,20 @@ function dis_publication_display_pref($display_pref_q) {
 //   - $publication[] : publication search criteria
 //     keys used  : name, type, zip
 ///////////////////////////////////////////////////////////////////////////////
-function dis_subscription_external_list() {
-  global $display, $l_no_found;
+function dis_subscription_external_list($hash_table) {
+  global $display,$l_subscription, $l_no_found;
   global $auth, $new_order, $order_dir;
-
-  $pref_q = run_query_display_pref($auth->auth["uid"], "subscription");
-  $obm_q = run_query_search($publication, $new_order, $order_dir);
-  $nb_publication = $obm_q->num_rows();
-  if ($nb_publication == 0) {
+  
+  $obm_q = run_query_subscription_external_search($hash_table);
+  $nb_subscription = $obm_q->num_rows();
+  if ($nb_subscription == 0) {
     $display["msg"] = display_warn_msg($l_no_found);
   } else {
-    $block = html_publication_search_list($obm_q,$pref_q,$nb_publication,$publication,$popup);
+    $block .= "<div class=\"detailHead\">$l_subscription</div>";
+    $block .= html_subscription_list_result($obm_q,$nb_subscription);
   }
 
+  
   return $block;
 }
 
@@ -1470,53 +1471,47 @@ function dis_subscription_external_list() {
 //   - $time[]   : time search criteria
 //     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
-function dis_subscription_list_result($task_q,$pref_q,$time) {
-  //-- Themes
-  global $set_theme,$ico_mail;
-  //-- Labels
-  global $l_date_task, $l_company;
-  global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
-  global $l_update, $l_length, $l_task_list;
+function html_subscription_list_result($sub_q,$nb_subscription) {
+  global $set_theme,$ico_update;
+  global $l_timecreate, $l_timeupdate,$l_publication_title;
+  global $l_year, $l_renewal,$l_recep,$l_quantity;
+  global  $path, $auth,$popup_height,$popup_width;
 
-  //  dis_table_title($l_found_task) ;
-
-  //oldstart
-  //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
- 
-  $block .= "
-     <form method=\"post\" name=\"f_task_del\" action=\"".url_prepare("time_index.php").
-    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
-     ";
-
-  $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
-  $dis_task_list->data_set = $task_q;
-  $dis_task_list->data_header = "top";
-  $dis_task_list->data_page = false;
-  //  $dis_task_list->data_url = $url; 
-  $dis_task_list->data_cb_text = $l_task_del;
-  $dis_task_list->data_idfield = "timetask_id"; 
-  $dis_task_list->data_order = false; 
-  $dis_task_list->data_cb_side = "left";
-  $dis_task_list->data_cb_name = "delete_";
-  $dis_task_list->data_cb_show = "test_status";
-
-  $block .= "<div class=\"detailHead\">$l_task_list</div>\n";
-  $block .= $dis_task_list->display("dis_data_time");
-
-  $dis_button = "
-    <input type=\"hidden\" name=\"user_id\" value=\"".$time["user_id"]."\" />
-    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
-    <input type=\"hidden\" name=\"action\" value=\"delete\" />
-    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
-
-  $block .= "
-     <p class=\"detailButton\">
-      <p class=\"detailButtons\">$dis_button</p>
-     </p>
-
-     </form>
-     ";
-
+  $block = " 
+  <div class=\"result\"><table class=\"resultTable\">
+   <tr>
+    <td class=\"resultHead\">$l_publication_title</td>
+    <td class=\"resultHead\">$l_year</td>
+    <td class=\"resultHead\">$l_renewal</td>
+    <td class=\"resultHead\">$l_recept</td>
+    <td class=\"resultHead\">$l_quantity</td>
+    <td class=\"resultHead\">$l_timecreate</td>    
+    <td class=\"resultHead\">$l_timeupdate</td>
+    <td class=\"resultHead\"></td>
+   </tr>
+   ";
+  while($sub_q->next_record()) {
+    $c_id = $sub_q->f("subscription_contact_id");
+    $p_id = $sub_q->f("subscription_publication_id");
+    
+   $url_subscription_update = url_prepare("$path/publication/publication_index.php?action=detailupdate_subscription&amp;param_contact=$c_id&amp;param_publication=$p_id&amp;popup=1");
+    $block .= "
+    <tr>
+    <td class=\"resultText\">".$sub_q->f("publication_title")."</td>
+    <td class=\"resultText\">".$sub_q->f("publication_year")."</td>
+    <td class=\"resultText\">".$sub_q->f("subscriptionrenewal_label")."</td>
+    <td class=\"resultText\">".$sub_q->f("subscriptionreception_label")."</td>
+    <td class=\"resultText\">".$sub_q->f("subscription_quantity")."</td>
+    <td class=\"resultText\">".datetime_format($sub_q->f("timecreate"))."</td>
+    <td class=\"resultText\">".datetime_format($sub_q->f("timeupdate"))."</td>    
+    <td class=\"resultText\">
+    <a href=\"javascript: void(0);\" onclick=\"window.name='$l_contact'; window.open('$url_subscription_update','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\" alt=\"Update Subscription\">
+    <img src=\"/images/$set_theme/$ico_update\" />
+    </a>
+    </td>    
+    </tr>
+    ";
+  }
   return $block;
 }
 

@@ -360,6 +360,20 @@ if (isset($ext_target) && $ext_target!="") {
      }
    }
  }
+ function fill_ext_code_form(value) {
+   ext_field = window.opener.document.$ext_target;
+   ext_size = ext_field.length;
+   ext_field = window.opener.document.$ext_target;
+   bool= false;
+   for(j=0; j< ext_size  && bool == false; j++) {
+     if(ext_field.options[j].value == value) {
+       ext_field.options[j].selected =true;
+       bool=true;
+     }
+   }
+   window.close();
+ } 
+
 ";
 }
 $extra_js .= "

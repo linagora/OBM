@@ -172,3 +172,11 @@ $l_j_kind_update = "You have to select a kind and enter a new name to update it 
 $l_j_kind_create = "You have to fill all kind informations kind to create it !";
 // For the display parameters modification screen
 $l_contact_display = "Display options for contacts list"; 
+//External Field
+$l_timecreate = "Creation";
+$l_timeupdate = "Last update";
+$l_publication_title = "Title";
+$l_year = "Year";
+$l_renewal = "Renewal mode";
+$l_recep = "Reception mode";
+$l_quantity = "Quantity";
