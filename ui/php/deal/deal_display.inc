@@ -276,7 +276,6 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal search result                                            //
 // Parameters:
@@ -356,7 +355,7 @@ function beautify_deal_comment($com) {
   $col0 = "FFFFFF";
   $col1 = "BBBBBB";
 
-  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/";
+  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/U";
   $replace = "</td>
     </tr>
     <tr>
@@ -465,7 +464,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
-  if ($auth->auth["perm"] != $perms_user) {
+  if ($auth->auth["perm"] == $perms_user) {
     echo "<a href=\"".url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br /><br />";
     // this is displayed close to links so we use that color too
     echo "$nb_invoices $l_invoices_connected.";
@@ -821,6 +820,15 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }
   $sel_usercomment .= "</select>";
 
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+  }
 
   if($contr_q == 0) 
     $ch_add_contr = "<input type=\"checkbox\" name=\"ch_contrat\" />";
@@ -835,7 +843,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $dis_visibility .= " /></td></tr><tr>";
   }
 
- if ($action == "detailupdate") {
+  if ($action == "detailupdate") {
     $dis_contact_2 = "<a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
              <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
@@ -864,10 +872,9 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <input type=\"submit\" value=\"$l_delete\" />
         </td></tr>
         </table>
-
         </form>";
   } else {
-     $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"param_parent\" value=\"$pid\" />
       <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
@@ -876,6 +883,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
+
 
 
   echo "
@@ -957,11 +965,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
       </tr><tr>
         <td colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $dis_comment
       </tr>
      </table>
     <table class =\"details\">
@@ -1842,7 +1846,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
 
   $ret_url = urlencode("$path/deal/deal_index.php?action=new&amp;param_parent=$parent&amp;sel_market=$pmarket&amp;sel_tech=$ptech&amp;param_company=");
   $title = urlencode($l_deal_select_company);
-  $win_url = url_prepare("../company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
+  $win_url = url_prepare("$path/company/company_index.php?action=ext_get_id_url&amp;popup=1&amp;title=$title&amp;url=$ret_url");
   $f_new = "<form name=\"form_deal_new\"
       action=\"" . url_prepare("deal_index.php") . "\" method=\"get\"
       onsubmit=\"window.open('$win_url','company','height=$popup_height,width=$popup_width'); return false;\">

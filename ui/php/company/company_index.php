@@ -75,11 +75,11 @@ if ($popup) {
   if ($action == "ext_get_id") {
     require("company_js.inc");
     $comp_q = run_query_company();
-    html_select_company($comp_q, stripslashes($title));
+    html_select_company($comp_q, $company["title"]);
   } elseif ($action == "ext_get_id_url") {
     require("company_js.inc");
     $comp_q = run_query_company();
-    html_select_company($comp_q, stripslashes($title), $url);
+    html_select_company($comp_q, $company["title"], $company["url"]);
   } else {
     display_err_msg($l_error_permission);
   }
@@ -336,6 +336,7 @@ function get_param_company() {
   global $tf_num, $cb_state, $tf_name, $sel_kind, $tf_ad1, $tf_ad2, $tf_zip;
   global $tf_town, $tf_cdx, $tf_ctry, $tf_phone, $tf_fax, $tf_web, $tf_email;
   global $sel_act, $sel_market, $ta_com, $param_company;
+  global $title, $url;
   global $cdg_param;
 
   if (isset ($param_company)) $company["id"] = $param_company;
@@ -356,6 +357,9 @@ function get_param_company() {
   if (isset ($tf_web)) $company["web"] = $tf_web;
   if (isset ($tf_email)) $company["email"] = $tf_email;
   if (isset ($ta_com)) $company["com"] = $ta_com;
+
+  if (isset ($title)) $company["title"] = stripslashes(urldecode($title));
+  if (isset ($url)) $company["url"] = urldecode($url);
 
   if (debug_level_isset($cdg_param)) {
     if ( $company ) {
