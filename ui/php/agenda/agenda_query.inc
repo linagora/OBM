@@ -419,7 +419,6 @@ function run_query_get_latent_conflicts($event_id, $user_id) {
   while( $obm_db->next_record() ) {
     $conflicts = run_query_get_conflicts($obm_db->f("datebegin"),$obm_db->f("dateend"),array($user_id));
     $return_info = array_merge($return_info, $conflicts);
-    var_dump($return_info);
   }
   return $return_info;  
 }
@@ -538,20 +537,23 @@ function run_query_waiting_events() {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $param_event
-//    $date_begin
-//    $date_end
-//    $user_id
-//    $state
+//    - $param_event
+//    - $date_begin
+//    - $date_end
+//    - $user_id
+//    - $state
 
 /////////////////////////////////////////////////////////////////////////////
 function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user_id,$state) {
   global $cdg_sql;
   $obm_db = new DB_OBM;
+  
   $date_begin_time = mktime(substr($date_begin,8,2), substr($date_begin,10,2), "00", substr($date_begin,4,2), substr($date_begin,6,2), substr($date_begin,0,4));
   $date_end_time = mktime(substr($date_end,8,2), substr($date_end,10,2), "00", substr($date_end,4,2), substr($date_end,6,2), substr($date_end,0,4));
+  
   $query = "SELECT DISTINCT calendarsegment_date FROM CalendarSegment,CalendarEvent WHERE
             calendarsegment_customerid = $user_id AND calendarsegment_eventid = $event_id
+	    AND calendarsegment_eventid = calendarevent_id
 	    AND ((calendarsegment_flag = 'begin' AND calendarsegment_date < $date_end AND
 	          UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) + calendarevent_length > $date_begin_time)
 	      OR (calendarsegment_flag = 'end' AND calendarsegment_date > $date_begin AND	    
@@ -570,7 +572,18 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
   $query.=")";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
-  return $obm_db; 
+
+  if($state == 'R') {
+    $query = "SELECT COUNT(*) AS isDeprectated FROM CalendarSegment WHERE calendarsegment_eventid = $event_id AND calendarsegment_state != 'R'";
+    $obm_db->query($query);
+    $obm_db->next_record();    
+    if($obm_db->f("isDeprectated") == 0) {
+      $query = "DELETE FROM CalendarSegment WHERE calendarsegment_eventid = $event_id";
+      $obm_db->query($query);
+      $query = "DELETE FROM CalendarEvent WHERE calendarevent_id = $event_id";
+      $obm_db->query($query);
+    }
+  }
 
 }
   
@@ -579,11 +592,11 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $date_begin : 
-//    $date_end : 
-//    $user_id :
-//    $event_id :
-//    $state :
+//    - $date_begin : 
+//    - $date_end : 
+//    - $user_id :
+//    - $event_id :
+//    - $state :
 /////////////////////////////////////////////////////////////////////////////
 
 function run_query_insert_occurence($date_begin,$date_end,$user_id,$event_id,$state) {
@@ -611,9 +624,9 @@ function run_query_insert_occurence($date_begin,$date_end,$user_id,$event_id,$st
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $date_begin
-//    $date_end
-//    $user_id :
+//    - $date_begin
+//    - $date_end
+//    - $user_id :
 /////////////////////////////////////////////////////////////////////////////
 function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
   global $cdg_sql;
@@ -642,9 +655,9 @@ function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $date_begin
-//    $date_end
-//    $user_id :
+//    - $date_begin
+//    - $date_end
+//    - $user_id :
 ////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
@@ -687,9 +700,9 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $date_begin
-//    $date_end
-//    $user_id :
+//    - $date_begin
+//    - $date_end
+//    - $user_id :
 ////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$event_id) {
@@ -734,7 +747,7 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $agenda : hashed agenda params
+//    - $agenda : hashed agenda params
 /////////////////////////////////////////////////////////////////////////////
 
 function run_query_insert_event_data($agenda) {
@@ -802,8 +815,8 @@ function run_query_get_eventcategories() {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $agenda : Agenda params
-//    $contacts_array : List of the users 
+//    - $agenda : Agenda params
+//    - $contacts_array : List of the users 
 /////////////////////////////////////////////////////////////////////////////
 function run_query_modify_event($agenda,$contacts_array,&$event_id) {
   global $auth;
@@ -855,7 +868,7 @@ function run_query_modify_event($agenda,$contacts_array,&$event_id) {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $agenda
+//    - $agenda
 /////////////////////////////////////////////////////////////////////////////
 
 function  run_query_update_deprecated_events($agenda) {
@@ -902,9 +915,9 @@ function valid_event($status_event) {
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $agenda : agenda params
-//    $contacts_array : array containing the id of the contact(s) the event is assigned to 
-//    $groups_array   : array containing the id of the group(s) the event is assigned to 
+//    - $agenda : agenda params
+//    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
+//    - $groups_array   : array containing the id of the group(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
 
 function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_end) {
@@ -973,9 +986,9 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $agenda : agenda params
-//    $contacts_array : array containing the id of the contact(s) the event is assigned to 
-//    $groups_array   : array containing the id of the group(s) the event is assigned to 
+//    - $agenda : agenda params
+//    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
+//    - $groups_array   : array containing the id of the group(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
 
 function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_end) {
@@ -1038,7 +1051,7 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $contacts_array : array containing the id of the contact(s) the event is assigned to 
+//    - $contacts_array : array containing the id of the contact(s) the event is assigned to 
 /////////////////////////////////////////////////////////////////////////////
 
 function store_users($user_q) {
@@ -1251,8 +1264,8 @@ function get_event_repetition_dates($agenda) {
 //------------------------------------------------------------------------
 // Argument:
 // ---------
-// $format : format of the wished result
-// $timestamp : time to format
+//    - $format : format of the wished result
+//    - $timestamp : time to format
 ///////////////////////////////////////////////////////////////////////////////
 function localizeDate($format, $timestamp) {
  global $l_daysofweek, $l_daysofweekshort, $l_daysofweekreallyshort;
@@ -1287,8 +1300,8 @@ function localizeDate($format, $timestamp) {
 //------------------------------------------------------------------------
 // Argument:
 // ---------
-// $Ymd 
-// $$day
+//     - $Ymd 
+//     - $day
 ///////////////////////////////////////////////////////////////////////////////
 
 function dateOfWeek($Ymd, $day) {
