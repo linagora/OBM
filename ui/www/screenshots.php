@@ -74,6 +74,31 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
     </tr>
   </table>
 
+  <h2>agenda views<a name="2"></a></h2>
+  <table class="picture">
+    <tr> 
+      <td><a href="#2"><img src="images/vignettes/agenda01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Annual view</td>
+      <td><a href="#2"><img src="images/vignettes/agenda02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Month view</td>
+      <td><a href="#2"><img src="images/vignettes/agenda03.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda03.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Week view </td>
+      <td><a href="#2"><img src="images/vignettes/agenda04.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda04.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Day view</td>
+    </tr>
+  </table>
+  <table class="picture">
+    <tr> 
+      <td width="48%"><a href="#2"><img src="images/vignettes/agenda05.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda05.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Create a meeting</td>
+      <td width="48%"><a href="#2"><img src="images/vignettes/agenda08.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda08.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        search a meeting time</td>
+      <td width="2%"><a href="#2"><img src="images/vignettes/agenda07.png" alt="Zoom" width="150" height="116" border="0" onClick="MM_openBrWindow('zoom_agenda07.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Create an appointement</td>
+      <td width="2%"><a href="#2"><img src="images/vignettes/agenda06.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda06.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        user's Authorisation</td>
+    </tr>
+  </table>
   <h2>contract and incident views<a name="1" id="1"></a></h2>
 
     <table class="picture">
@@ -92,49 +117,32 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
    </table> 
 
 
-  <h2>agenda views<a name="2"></a></h2>
-
-    <table class="picture">
-      <tr> 
-        
-      <td><a href="#2"><img src="images/vignettes/agenda01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-          Annual view</td>
-        
-      <td><a href="#2"><img src="images/vignettes/agenda02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-          Month view</td>
-        
-      <td><a href="#2"><img src="images/vignettes/agenda03.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda03.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-          Week view </td>
-
-        
-      <td><a href="#2"><img src="images/vignettes/agenda04.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda04.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-          Day view</td>
-      </tr>
-    </table>
-
-    <table class="picture">
-      <tr> 
-        
-      <td width="48%"><a href="#2"><img src="images/vignettes/agenda05.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda05.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        Create a meeting</td>
-
-        
-      <td width="48%"><a href="#2"><img src="images/vignettes/agenda08.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda08.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        search a meeting time</td>
-        
-      <td width="2%"><a href="#2"><img src="images/vignettes/agenda07.png" alt="Zoom" width="150" height="116" border="0" onClick="MM_openBrWindow('zoom_agenda07.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        Create an appointement</td>
-        
-      <td width="2%"><a href="#2"><img src="images/vignettes/agenda06.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_agenda06.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        user's Authorisation</td>
-      </tr>
-     </table>
-     
-  <br>
-
-    <h2>File management views<a name="3"></a></h2>
-
+  <h2>Project views<a name="7" id="7"></a></h2>
   <table class="picture">
+    <tr> 
+      <td><a href="#7"><img src="images/vignettes/projets01.png" alt="Zoom" width="150" height="116" border="0" onClick="MM_openBrWindow('zoom_projets01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Search a project</td>
+      <td><a href="#7"><img src="images/vignettes/projets02.png" alt="Zoom" width="150" height="116" border="0" onClick="MM_openBrWindow('zoom_projets02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Project view</td>
+      <td>&nbsp;</td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <h2>Time management views<a name="4" id="4"></a></h2>
+  <table class="picture">
+    <tr> 
+      <td><a href="#4"><img src="images/vignettes/gestiontemps01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Manageing your week</td>
+      <td><a href="#4"><img src="images/vignettes/gestiontemps02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        W eek view</td>
+      <td><a href="#4"><img src="images/vignettes/gestiontemps03.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps03.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
+        Month view </td>
+      <td>&nbsp;</td>
+    </tr>
+  </table>
+  <h2>File management views<a name="3"></a></h2>
+
+    <table class="picture">
     <tr> 
       <td><a href="#3"><img src="images/vignettes/documents01.png" alt="Zoom" width="150" height="110" border="0" onClick="MM_openBrWindow('zoom_documents01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
         Search a file</td>
@@ -147,23 +155,6 @@ function MM_openBrWindow(theURL,winName,features) { //v2.0
         Create a file</td>
     </tr>
   </table>
-  <br>
-  <h2>Time management views<a name="4" id="4"></a></h2>
-  <table class="picture">
-    <tr> 
-      <td><a href="#4"><img src="images/vignettes/gestiontemps01.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps01.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-
-        Manageing your week</td>
-      <td><a href="#4"><img src="images/vignettes/gestiontemps02.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps02.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        W eek view</td>
-      <td><a href="#4"><img src="images/vignettes/gestiontemps03.png" alt="Zoom" border="0" onClick="MM_openBrWindow('zoom_gestiontemps03.html','ScreenCaptured','toolbar=yes,location=yes,status=yes,menubar=yes,scrollbars=yes,resizable=yes,width=820,height=660')"></a><br>
-        Month view </td>
-      <td>&nbsp;</td>
-    </tr>
-
-  </table>
-  <br>
-  
   <h2>Settings views<a name="5"></a></h2>
   <table class="picture">
     <tr> 
