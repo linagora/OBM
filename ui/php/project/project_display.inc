@@ -581,56 +581,6 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Project Infos (main informations)                            //
-// Parameters :
-//   - $project_q   : DBO : information about the project
-//   - $project[]   : project search criteria
-//     keys used    : 
-///////////////////////////////////////////////////////////////////////////////
-// function html_project_infos($project_q, $project) {
-//   global $l_name, $l_tasktype, $l_company_name, $l_soldtime;
-//   global $l_interninfos, $l_externinfos, $l_membersinfos;
-
-//   $name = $project_q->f("project_label");
-//   $tt = $project_q->f("project_tasktype_label");
-//   $company = $project_q->f("project_company_name");
-//   $status = $project_q->f("project_status");
-//   $soldtime = $project_q->f("project_soldtime");
-
-//   // Table header
-//   $title = ($status == 1 ? $l_externinfos : $l_interninfos);
-
-//   // Company name
-//   if ($status == 1) {
-//     $dis_company = "<td class=\"detailLabel\">$l_company_name</td>
-//                     <td class=\"detailText\">$company</td>
-//                     </tr><tr>";
-//   }
-//   // --- HTML Template --------------------------------------------------------
-
-//   $block = "
-
-//     <div class=\"detailHead\">$title</div>
-
-//     <table class=\"detail\">
-//      <tr>
-//       <td class=\"detailLabel\">$l_name</td>
-//       <td class=\"detailText\">$name</td>
-//      </tr><tr>
-//       $dis_company
-//       <td class=\"detailLabel\">$l_tasktype</td>
-//       <td class=\"detailText\">$tt</td>
-//      </tr><tr>
-//       <td class=\"detailLabel\">$l_soldtime</td>
-//       <td class=\"detailText\">$soldtime</td>
-//      </tr>
-//     </table>
-//   ";
-
-//   return $block;
-// }
-
-///////////////////////////////////////////////////////////////////////////////
 // HTML Display Project Consult (main infos, advance infos, members infos)   //
 // Parameters :
 //   -  $project_q : DBO : information about the project
@@ -640,14 +590,14 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 //     keys used   : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project) {
-  global $set_theme, $display;
+  global $set_theme, $display, $action;
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
-  global $l_interninfos, $l_externinfos, $l_membersinfos, $l_advanceinfos;
+  global $l_interninfos, $l_externinfos, $l_progressinfos, $l_advanceinfos;
   global $l_projected, $l_used, $l_remaining, $l_missing, $l_diff, $l_sold;
   global $l_allotted, $l_no_members, $l_adv_update, $l_project, $l_resume;
   global $l_allosold, $l_usedsold, $l_progeval, $l_progress, $l_nbtask;
-  global $l_nbmem, $l_no_projected, $l_no_tasks, $l_archive, $l_yes, $l_no;
-  global $l_projected, $l_alloproj, $l_usedproj;
+  global $l_nbmem, $l_tasksdef, $l_membersdef, $l_archive, $l_yes, $l_no;
+  global $l_projected, $l_alloproj, $l_usedproj, $l_no_tasks;
 
   $pid = $project["id"];
   $cpt_t = 0;
@@ -662,10 +612,18 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
 
-  // Table header
-  $title = ($status == 1) ? $l_externinfos : $l_interninfos;
-  $l_time = ($status == 1) ? $l_sold : $l_projected;
-  $l_allotime = ($status == 1) ? $l_allosold : $l_alloproj;
+  // Labels are different for deals and internal projects
+  if ($status == 1) {
+    $title = $l_externinfos;
+    $l_time = $l_sold;
+    $l_allotime = $l_allosold;
+    $l_usedtime = $l_usedsold;
+  } else {
+    $title = $l_interninfos;
+    $l_time = $l_projected;
+    $l_allotime = $l_alloproj;
+    $l_usedtime = $l_usedproj;
+  }
 
   // Company name
   if ($status == 1) {
@@ -688,6 +646,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   // we don't have informations about time allocation
   if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
     
+    $action = "consultnoadv";
     $tab_style = "class=\"detail\"";
 
     $dis_advance = "
@@ -704,39 +663,23 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
       
       $dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_no_projected :</td>
+        <td class=\"detailLabel\" colspan=\"2\">$l_tasksdef :</td>
        </tr>";
-
-      //--------------------------------
-//     while ($tasks_q->next_record()) {
-
-//       $t_id = $tasks_q->f("projecttask_id");
-//       $t_parent = $tasks_q->f("parent_id");
-
-//       $array_tsk[$cpt_t]["id"] = $t_id;
-//       $array_tsk[$cpt_t]["label"] = $tasks_q->f("projecttask_label");
-//       $array_tsk[$cpt_t]["parent"] = ($t_parent == 0) ? 1 : 0;
-
-//       if ($t_parent)
-// 	$array_child[$t_parent] = 1;
-
-//       $array_parent[$t_id] = $t_parent;
-
-//       $cpt_t++; 
-//     }
-    //---------------------------------
 
       while ($tasks_q->next_record()) {
 	$tsk_name = $tasks_q->f("projecttask_label");
 
+	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
+
 	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
-        <td class=\"detailText\">- $tsk_name</td>
+        <td class=\"detailText\">$img $tsk_name</td>
        </tr>";
       }
 
     } else {
+      $action = "consultnoproj";
 
       $dis_member .= "
         <tr>
@@ -744,11 +687,16 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
         </tr>";
     }
     
-    if (($members_q != 0) && ($members_q->num_rows() != 0)){
-      
-      $dis_member .= "
+   $dis_member .= "
+     <tr>
+      <td>&nbsp;</td>
+     <tr>";
+
+   if (($members_q != 0) && ($members_q->num_rows() != 0)){
+     
+     $dis_member .= "
        <tr>
-        <td class=\"detailLabel\" colspan=\"2\">$l_no_projected :</td>
+        <td class=\"detailLabel\" colspan=\"2\">$l_membersdef :</td>
        </tr>";
 
       while (list($key,$val) = each($array_mem)) {
@@ -762,6 +710,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
       }
 
     } else {
+      $action = "consultnoproj";
+      
       $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_no_members</td>
@@ -775,7 +725,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
     $usedtime = 0;
     $missingtime = 0;
 
-    $tab_style = "cellspacing=\"1\"";
+    $tab_style = "class=\"projectDetail\"";
 
     while ($tasks_q->next_record()) {
 
@@ -959,7 +909,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
      <td class=\"detailLabel\">&nbsp;$l_allotted&nbsp;</td>
      <td class=\"detailText\" align=\"right\">$allotted</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$l_usedsold&nbsp;</td>
+     <td class=\"detailLabel\">&nbsp;$l_usedtime&nbsp;</td>
      <td class=\"detailText\" align=\"right\">$ratio_usedsold %</td>
     </tr>
     <tr>
@@ -1015,14 +965,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
       $dis_advance
     </table>
 
-    <div class=\"detailHead\">$l_membersinfos</div>
+    <div class=\"detailHead\">$l_progressinfos</div>
 
-    <center>
+    <div class=\"projectCenter\">
     <table $tab_style>
       $dis_memhead
       $dis_member
     </table>
-    </center>
+    </div>
     ";
   //remettre le cellpadding
   return $block;
@@ -1036,6 +986,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 //     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
+  global $set_theme;
   global $l_tasksinfos, $l_del_task_sel, $l_valid_task, $l_task_add;
   global $l_no_tasks;
 
@@ -1064,7 +1015,9 @@ function html_project_tasklist($tasks_q, $project) {
           <td align=\"right\">
            <input type=\"checkbox\" name=\"cb_task$t_id\" />
           </td>
-	  <td class=\"detailText\" colspan=\"2\">|----- $t_label</td>
+	  <td class=\"detailText\" colspan=\"2\">
+           <img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />$t_label
+          </td>
          </tr>";
       }
    }
@@ -1220,13 +1173,13 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
       } 
     }
 
-    $dis_memhead = "<tr><td>&nbsp;</td>";
+    $dis_memhead = "<tr><td class=\"projectHead\">&nbsp;</td>";
 
     // diplay the members of the project
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
       $m_id = $array_mem[$cpt_e]["id"];
       $m_name = $array_mem[$cpt_e]["name"];
-      $dis_memhead .= "<td class=\"detailLabel\" width=\"50\">$m_name</td>\n";
+      $dis_memhead .= "<td class=\"projectHead\" width=\"50\">$m_name</td>\n";
     }
 
     $dis_memhead .= "<tr>";
@@ -1240,9 +1193,9 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
       $t_parent = $array_child[$t_id];
 
       if ($array_parent[$t_id])
-	$dis_member .= "<tr>\n<td class=\"detailText\">$t_label</td>\n";
+	$dis_member .= "<tr>\n<td class=\"projectPtask\">$t_label</td>\n";
       else
-      	$dis_member .= "<tr>\n<td class=\"detailText\">
+      	$dis_member .= "<tr>\n<td class=\"projectCtask\">
           <img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />$t_label</td>\n";
 
       //ecrit la ligne pour un tache sans enfants
@@ -1252,14 +1205,20 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 	$tm_proj = $array_time[$t_id][$m_id];
 
 	if ($t_parent) {
- 	  $dis_member .= "<td class=\"detailLabel\">&nbsp;</td>\n";
+ 	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
+	} else if ($array_parent[$t_id]) {
+	  $dis_member .= "
+            <td class=\"projectPtime\">
+             <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
+	    </td>";
 	} else {
 	  $dis_member .= "
-            <td class=\"detailLabel\">
+            <td class=\"projectCtime\">
              <input type=\"text\" name=\"tf_projected[$m_id][$t_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_proj\" />
 	    </td>";
 	}
       }
+
       $dis_member .= "</tr>\n";
     }
     
@@ -1278,11 +1237,12 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 
       <div class=\"detailHead\">$l_memberstimeinfos</div>
 
-      <table class=\"detail\">
+      <table class=\"projectDetail\">
        $dis_memhead
        $dis_member
       </table>
-       <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+
+      <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
 
      <div class=\"detailButton\">
       <p class=\"detailButtons\">$dis_button</p>
@@ -1346,13 +1306,13 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
     } 
   }
 
-  $dis_memhead = "<td>&nbsp;</td>";
+  $dis_memhead = "<td class=\"projectHead\">&nbsp;</td>";
 
   // diplay the members of the project
   for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
     $m_id = $array_mem[$cpt_e]["id"];
     $m_name = $array_mem[$cpt_e]["name"];
-    $dis_memhead .= "<td class=\"detailLabel\">$m_name</td>\n";
+    $dis_memhead .= "<td class=\"projectHead\">$m_name</td>\n";
   }
 
   // display the rest of the array (ie. tasknames - projected times)
@@ -1363,9 +1323,17 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 
     $t_parent = $array_child[$t_id];
 
-    $img = (!($array_parent["$t_id"])) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />$t_label</td>" : "";
+    if ($array_parent["$t_id"]) {
+      $img = "";
+      $classTask = "projectPtask";
+      $classInput = "projectPtime";
+    }else{
+      $img = "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />";
+      $classTask = "projectCtask";
+      $classInput = "projectCtime";
+    }
 
-    $dis_member .= "<tr>\n<td class=\"detailText\">$img $t_label</td>\n";
+    $dis_member .= "<tr>\n<td class=\"$classTask\">$img $t_label</td>\n";
       
     //ecrit la ligne pour un tache sans enfants
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {
@@ -1376,11 +1344,11 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 
       if ($tm_proj != 0) {
 	$dis_member .= "
-          <td class=\"detailLabel\">
+          <td class=\"$classInput\">
 	   <input type=\"text\" name=\"tf_missing[$t_id][$m_id]\" size=\"10\" maxlength=\"8\" value=\"$tm_miss\" />
 	  </td>\n";
       } else {
-	$dis_member .= "<td class=\"detailText\">&nbsp;</td>\n";
+	$dis_member .= "<td class=\"$classInput\">&nbsp;</td>\n";
       }
     }
       
@@ -1406,7 +1374,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 
      <div class=\"detailHead\">$l_advupdateinfos</div>
 
-     <table class=\"detail\">
+     <table class=\"projectDetail\">
        $dis_memhead
        $dis_member
      </table>

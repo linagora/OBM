@@ -658,7 +658,7 @@ function get_project_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate') 
+    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate') 
                                      	      );
 
 // Task Fill
@@ -666,7 +666,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate') 
+    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate') 
                                      );
 
 // Member Fill
@@ -674,7 +674,7 @@ function get_project_action() {
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate') 
+    'Condition'=> array ('detailconsult', 'consultnoproj', 'consultnoadv', 'd_update', 'a_update', 'validate') 
                                      );
 
 // MemberTime Fill
@@ -682,7 +682,7 @@ function get_project_action() {
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=membertime_fill&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'd_update', 'a_update', 'validate') 
+    'Condition'=> array ('detailconsult', 'consultnoadv', 'd_update', 'a_update', 'validate') 
                                      );
 
 // Validate

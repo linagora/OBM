@@ -7,6 +7,17 @@
 ///////////////////////////////////////////////////////////////////////////////
 */
 
+.projectCenter			{
+	text-align:		center;
+	}
+
+table.projectDetail		{
+	border-spacing:		1;
+	margin:			auto;
+	background-color:	#a5bace;
+	margin-top: 10px;
+	}
+
 td.projectHead 	 	 	{
 	font-family:		sans-serif;
 	font-size:		12px;
