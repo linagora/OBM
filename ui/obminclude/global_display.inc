@@ -296,7 +296,7 @@ class OBM_DISPLAY {
             && ( ($cpt < $set_rows) || ( ! $this->data_page) ) ) {
 
       if (function_exists($dis_data_entity)) {
-	$res = $dis_data_entity($this, "set_column_style", $link_ok);
+	$res = $dis_data_entity($this, "row_style", $link_ok);
 	$rowstyle = $res["style"];
       }	  
       

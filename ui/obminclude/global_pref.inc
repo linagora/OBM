@@ -61,6 +61,7 @@ if ($last_contact == "") $last_contact=$last_contact_default;
 if ($last_account == "") $last_account=$last_account_default;
 if ($last_invoice == "") $last_invoice=$last_invoice_default;
 if ($last_payment == "") $last_payment=$last_payment_default;
+if ($last_project == "") $last_project=$last_project_default;
 if ($last_contract == "") $last_contract=$last_contract_default;
 if ($last_incident == "") $last_incident=$last_incident_default;
 

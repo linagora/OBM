@@ -1142,11 +1142,23 @@ td.timePeriod			{
 	color:			#4f7091;
 	}
 
-td.timeLinks			{
-	vertical-align: 	middle;
+table.timeDetail		{
  	font-family: 		sans-serif;
-	font-size: 		10px;
-	font-weight: 		80;
+	font-size:		12px;
+	font-weight: 		600;
+	text-align:		left;
+	background-color:	#a5bace;
+	border-spacing:		1;
+	}
+
+td.timeForm			{
+ 	font-family: 		sans-serif;
+	font-size:		12px;
+	font-weight: 		600;
+	text-align:		left;
+	color:			#a5bace;
+	background-color:	#e7ebef;
+	padding:		4;
 	}
 
 td.timeWeekhead			{
@@ -1235,32 +1247,6 @@ td.timeUserhead		{
 td.timeUserback		{
  	text-align: 		center; 
 	background-color:	#ffffff;
-	}
-
-///////////////////////////////
-
-th.timeTask			{
-	background-color:	#a6b8ca;
- 	text-align: 		left; 
-	vertical-align: 	middle;
- 	font-family: 		sans-serif;
-	font-size: 		12px;
-	font-weight: 		80;
-	}
-
-td.timeTask			{
-	vertical-align: 	middle;
- 	font-family: 		sans-serif;
-	font-size: 		12px;
-	font-weight: 		80;
-	}
-
-///////////////////////////////////
-
-tr.timeHeader			{
-	background-color:	#a5bace;
-	vertical-align: 	middle;
- 	font-family: 		sans-serif;
 	}
 
 tr.timeUnvalid			{

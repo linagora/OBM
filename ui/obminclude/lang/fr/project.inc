@@ -13,7 +13,6 @@ $l_name = "Nom";
 $l_label = "Nom";
 $l_company_name = "Nom Société";
 $l_tasktype = "Catégorie";
-$l_archive = "Archive";
 $l_soldtime = "Temps vendu";
 
 $l_sold = "Vendu";
@@ -81,7 +80,7 @@ $l_select_company = "Sélectionner la société";
 // Messages
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des projets correspondants.";
 $l_new_projects = "Liste des projets non initialisés";
-$l_found = "projets trouvés.";
+$l_found = "projet(s) trouvés.";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
 $l_no_tasks = "Il n'y a pas encore de tâches définies";
 $l_no_members = "Il n'y a pas de renseignements sur les participants au projet";

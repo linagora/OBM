@@ -361,15 +361,15 @@ function display_inactive_tab($tab) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited($path="..") {
-  global $set_theme;
+  global $set_theme, $ico_project;
   global $ico_company, $ico_contact, $ico_parentdeal, $ico_deal, $ico_list;
   global $ico_contract, $ico_incident, $ico_account, $ico_invlice, $ico_payment;
   global $last_company,$last_contact,$last_deal,$last_parentdeal,$last_list;
-  global $last_contract, $last_incident;
+  global $last_contract, $last_incident, $last_project;
   global $last_account,$last_invoice, $last_payment;
   global $last_company_name, $last_contact_name, $last_deal_name;
   global $last_parentdeal_name, $last_list_name, $last_contract_name;
-  global $last_incident_name;
+  global $last_incident_name, $last_project_name;
   global $last_payment_name, $last_account_name, $last_invoice_name;
 
   $block = "
@@ -438,6 +438,13 @@ function display_last_visited($path="..") {
     $contract_name = substr($last_contract_name,0,30);
     $block .= "<li class=\"lastList\"><a href=\"$contract_url\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
         <a href=\"$contract_url\">$contract_name</a></li>";
+  }
+
+  if ($last_project_name != "") {
+    $project_url = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=".$last_project);
+    $project_name = substr($last_project_name,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$project_url\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+        <a href=\"$project_url\">$project_name</a></li>";
   }
 
   if ($last_incident_name != "") {

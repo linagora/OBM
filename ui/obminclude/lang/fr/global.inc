@@ -181,5 +181,5 @@ $l_header_statsuser = "Statistiques utilisateur";
 //time headers
 $l_header_weeklyview = "Semaine";
 $l_header_monthlyview = "Mois";
-$l_header_globalview = "Vue Globale";
+$l_header_globalview = "Validation";
 $l_header_stats = "Statistiques";

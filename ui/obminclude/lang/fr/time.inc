@@ -13,7 +13,7 @@ $l_task_div = "Taches Diverses";
 $l_task_int = "Tâches Internes";
 
 // Database fields
-$l_date_task="Date tâche";
+$l_date_task="Date";
 $l_tasktype = "Type tâche";
 $l_tasklabel="Commentaire";
 $l_deallabel="Projet/Affaire";

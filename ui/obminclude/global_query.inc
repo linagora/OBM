@@ -344,6 +344,7 @@ function session_load_user_prefs() {
   global $last_company_name,$last_contact_name,$last_deal_name,$last_list_name;
   global $last_parentdeal_name, $last_contract_name, $last_incident_name;
   global $last_account_name, $last_invoice_name, $last_payment_name;
+  global $last_project_name;
 
   $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
   while ($obm_q_name_var->next_record()) {
@@ -371,6 +372,8 @@ function session_load_user_prefs() {
   $sess->register("last_payment_name");
   $last_contract_name = run_query_global_contract_label ($last_contract); 
   $sess->register("last_contract_name");
+  $last_project_name = run_query_global_project_label($last_project);
+  $sess->register("last_project_name");
   $last_incident_name = run_query_global_incident_label ($last_incident); 
   $sess->register("last_incident_name");
 }
@@ -591,6 +594,23 @@ function run_query_global_payment_label($p_id) {
   $obm_db->query($query);
   $obm_db->next_record();
   return $obm_db->f("payment_label");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the deal project from the project Id
+// Parameters:
+//   - $p_id : project id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_project_label($p_id) {
+  global $cdg_sql;
+
+  $query = "select deal_label as project_label from Deal where deal_id='$p_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+  return $obm_db->f("project_label");
 }
 
 

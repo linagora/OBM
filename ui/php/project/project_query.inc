@@ -23,6 +23,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $tt = $project["tt"];
   $manager = $project["manager"];
   $member = $project["member"];
+  $archive = $project["archive"];
 
   $query = "select distinct
       deal_id as project_id,
@@ -45,8 +46,11 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   
   $query .= " left join Company on deal_company_id=company_id";
   $query .= " where tasktype_id=deal_tasktype_id
-              and ((deal_project_status = 1) or (deal_project_status = 2))
-              and deal_archive = 0";
+              and ((deal_project_status = 1) or (deal_project_status = 2))";
+
+  if (!($archive)) {
+    $query .= " and deal_archive = 0";
+  }
 
   if ($name != "") {
     $query .= " and deal_label like '$name%'";

@@ -17,7 +17,7 @@ $fieldnames["project_initlabel"] = $l_label;
 $fieldnames["project_company_name"] = $l_company_name;
 $fieldnames["project_tasktype"] = $l_tasktype;
 $fieldnames["project_soldtime"] = $l_soldtime;
-$fieldnames["project_archive"] = $l_archive;
+$fieldnames["project_archive"] = $l_archive_first;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -74,8 +74,8 @@ function dis_project_search_form ($project) {
 //     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
-  global $l_name, $l_company_name, $l_tasktype, $l_manager, $l_member;
-  global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_new; 
+  global $l_name, $l_company_name, $l_tasktype, $l_manager, $l_member, $l_new;
+  global $l_all, $l_find,$l_task_fac, $l_task_div, $l_task_int, $l_archive;
   global $c_all;
 
   $name = $project["name"];
@@ -84,6 +84,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $manager = $project["manager"];
   $member = $project["member"];
   $new = $project["newlist"];
+  $archive = $project["archive"];
 
   $task_list = array($l_task_fac, $l_task_int, $l_task_div);
 
@@ -130,9 +131,12 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   $checked = ($new) ? "checked" : "";
   $cb_new = "<input type=\"checkbox\" name=\"cb_new\" $checked/>";
 
+  $checked = ($archive) ? "checked" : "";
+  $cb_archive = "<input type=\"checkbox\" name=\"cb_archive\" $checked/>";
+
   // --- HTML Template --------------------------------------------------------
 
-  $block = "    
+  $block = "
     <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"" . url_prepare("project_index.php") . "\">
 
     <div class=\"search\">
@@ -153,6 +157,9 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
       </div>
       <div class=\"searchLabel\">$l_new<br />
         $cb_new
+      </div>
+      <div class=\"searchLabel\">$l_archive<br />
+        $cb_archive
       </div>
       <div class=\"searchLabel\">&nbsp;<br />
         <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />

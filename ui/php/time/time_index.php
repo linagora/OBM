@@ -326,7 +326,7 @@ elseif ($action == "delete") {
 					       $uid);
 }
 
-elseif ($action == "update") {
+elseif ($action == "detailupdate") {
 //////////////////////////////////////////////////////////////////////////////
 
   // interval is week -- see if we may need to use others intervals
@@ -343,7 +343,7 @@ elseif ($action == "update") {
     // Creating the dates for the selected (or current) date
     $day_q = get_this_week($d_start_week, $c_days_in_a_week);
     
-    $display["detail"] .= dis_form_addtask("update",
+    $display["detail"] .= dis_form_addtask("detailupdate",
 					   $obm_project_q, 
 					   $obm_projecttask_q, 
 					   $obm_tasktype_q, 
@@ -351,6 +351,7 @@ elseif ($action == "update") {
 					   $c_day_fraction, 
 					   $time, 
 					   null);
+
   }
 
   else {
@@ -362,12 +363,13 @@ elseif ($action == "update") {
     $display["detail"] .= "
     <Script language=\"javascript\">
      window.opener.location.href='$path/time/time_index.php?action=index&wbegin=".$wbegin."';
-     window.close();
+
     </script>
     ";
   }
 }  
- 
+//      window.close();
+
 elseif ($action == "admin") {
 //////////////////////////////////////////////////////////////////////////////
 

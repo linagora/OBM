@@ -43,7 +43,7 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
 
   $res["style"] = "";
   
-  if (($fieldname == "set_column_style") && ($OD->data_set->f("timetask_id"))) {
+  if (($fieldname == "row_style") && ($OD->data_set->f("timetask_id"))) {
     $parity = $OD->data_set->f("date_parity") % 2;
 
     if ($OD->data_set->f("timetask_status") == 0)
@@ -65,7 +65,7 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
       $res["popup"] = true;
       $res["popup_width"] = 970;
       $res["popup_height"] = 270;
-      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;param_begin=".$time["date"]."&amp;param_end=".$time["date_end"];
+      $res["url"] = "time_index.php?action=detailupdate&amp;popup=1&amp;task_id=".$OD->data_set->f("timetask_id")."&amp;wbegin=".$time["date"];
       $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\">";
     } else {
       $res["name"] = "&nbsp;";
@@ -160,7 +160,7 @@ function dis_time_links ($time, $type="all") {
       <center>
        <table width=\"$tot_width\" border=0>
         <tr>
-         <td class=\"timeLinks\" align=\"left\">
+         <td align=\"left\">
           <a href=\"" .
              url_prepare("time_index.php?action=".$time["action"].
        	     "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
@@ -170,7 +170,7 @@ function dis_time_links ($time, $type="all") {
          <td class=\"timePeriod\">
            $user : $l_week $l_from $hum_date_start $l_to $hum_date_end
          </td>
-         <td class=\"timeLinks\" align=\"right\">
+         <td align=\"right\">
           <a href=\"" .
              url_prepare("time_index.php?action=".$time["action"].
              "&amp;wbegin=".date("Ymd",$d_start_next))."\">
@@ -1173,18 +1173,18 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $task_list  = array($l_task_fac, $l_task_div, $l_task_int);
   
   //get different attribute for task to be modify
-  if ($action == "update") {
+  if ($action == "detailupdate") {
     $task_id = $time["task_id"];
-    $task_to_be_modify = run_query_get_task($task_id);
-    $is_day = substr($task_to_be_modify->f("timetask_date"),0,8);
-    $is_tt = $task_to_be_modify->f("timetask_tasktype_id");
-    $is_proj = $task_to_be_modify->f("timetask_project_id");
-    $is_projtask = $task_to_be_modify->f("timetask_projecttask_id");
-    $is_time = $task_to_be_modify->f("timetask_length");
+    $task_q = run_query_get_task($task_id);
+    $is_day = substr($task_q->f("timetask_date"),0,8);
+    $is_tt = $task_q->f("timetask_tasktype_id");
+    $is_proj = $task_q->f("timetask_project_id");
+    $is_projtask = $task_q->f("timetask_projecttask_id");
+    $is_time = $task_q->f("timetask_length");
   }
 
   // Day radio select (for update)
-  if ($action == "update") {
+  if ($action == "detailupdate") {
     for ($day=0;$day< sizeof($day_q);  $day++) {
       $dlabel = $day_q[$day][0];
       $rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"".$day_q[$day][1]."\"";
@@ -1309,8 +1309,8 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_projtask .= "</select>";
 
   // Project Label
-  if ($action == "update")
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("timetask_label")."\" />";
+  if ($action == "detailupdate")
+    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_q->f("timetask_label")."\" />";
   else
     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
 
@@ -1346,41 +1346,43 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       <form method=post  name=form_add_task 
         onSubmit=\"if (check_addtaskform(this)) return true; else return false;\"
         action=\"".url_prepare("time_index.php")."\">
-      <input type=\"hidden\" name=\"action\" value=\"update\">
+      <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
       <input type=\"hidden\" name=\"popup\" value=0>";
   }
 
-  if ($action != "update")
-    $dis_date .= "$l_date :</td><td>$ch_day";
+  if ($action != "detailupdate")
+    $dis_date .= "$l_date :</td><td class=\"timeForm\">$ch_day";
   else
-    $dis_date .= "$l_date :</td><td>$rd_day";
+    $dis_date .= "$l_date :</td><td class=\"timeForm\">$rd_day";
 
   $block .= "
    <div class=\"detailHead\">$l_fill_addtask</div>
 
-   <table border=0 cellspacing=0 width=95%>
-    <tr class=\"timeHeader\">
-     <td>$dis_date</td>
-     <td>$l_duration :</td>
-     <td>$sel_time</td>
+   <center>
+   <table class=\"timeDetail\" width=\"95%\">
+    <tr>
+     <td class=\"timeForm\">$dis_date</td>
+     <td class=\"timeForm\">$l_duration :</td>
+     <td class=\"timeForm\">$sel_time</td>
     </tr>
-    <tr class=\"timeHeader\">
-     <td>$l_cat :</td>
-     <td colspan=\"3\">$sel_tt</td>
+    <tr>
+     <td class=\"timeForm\">$l_cat :</td>
+     <td class=\"timeForm\" colspan=\"3\">$sel_tt</td>
     </tr>
-    <tr class=\"timeHeader\">
-     <td>$l_project</td>
-     <td colspan=\"3\">$sel_proj</td>
+    <tr>
+     <td class=\"timeForm\">$l_project</td>
+     <td class=\"timeForm\" colspan=\"3\">$sel_proj</td>
     </tr>
-    <tr class=\"timeHeader\">
-     <td>$l_task</td>
-     <td colspan=\"3\">$sel_projtask</td>
+    <tr>
+     <td class=\"timeForm\">$l_task</td>
+     <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
     </tr>
-    <tr class=\"timeHeader\">
-     <td>$l_label</td>
-     <td colspan=\"3\">$tf_label</td>
+    <tr>
+     <td class=\"timeForm\">$l_label</td>
+     <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
     </tr>
-   </table>";
+   </table>
+   </center>";
 
   if ($action == "insert") {
     $block .= "<br><input type=submit value=\"$l_add\">";
@@ -1394,19 +1396,19 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $block .= "
     <input type=hidden name=wbegin value=\"".$time["date"]."\">\n";
   
-  if ($action == "update"){
-    $block .= "<script language=\"JavaScript\">\n";
-    //     $block .= "alert(document.form_add_task.sel_tasktype.value);";
-    $block .= "fill_project(document.form_add_task.sel_project,";
-    $block .= " document.form_add_task.sel_tasktype.value,";
-    $block .= " document.form_add_task.sel_projecttask);\n";
-    $block .= "fill_projecttask(document.form_add_task.sel_projecttask, $is_proj);";
-    $block .= "select_default(document.form_add_task.sel_project, $is_proj);\n";
-    $block .= "select_default(document.form_add_task.sel_projecttask, $is_projtask);\n";
-    $block .= "</script>\n";
+  if ($action == "detailupdate"){
+    $block .= "
+      <script language=\"JavaScript\">
+        fill_project(document.form_add_task.sel_project,
+          document.form_add_task.sel_tasktype.value,
+          document.form_add_task.sel_projecttask);
+        fill_projecttask(document.form_add_task.sel_projecttask, $is_proj);
+        select_default(document.form_add_task.sel_project, $is_proj);
+        select_default(document.form_add_task.sel_projecttask, $is_projtask);
+      </script>";
   }
   
-  $block .= "</form><p></p>";
+  $block .= "</form>";
 
   return $block;
 }

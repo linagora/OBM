@@ -383,7 +383,7 @@ function run_query_update($task) {
 
   $id = $task["task_id"];
   $ttype = $task["tasktype"];
-  $project = $task["project"];
+  $projecttask = $task["projecttask"];
   $time = $task["time"];
   $label = $task["label"];
   $date = $task["sel_date"];
@@ -391,11 +391,11 @@ function run_query_update($task) {
   $query = "
   update TimeTask set
     timetask_date='$date',
-    timetask_tasktype_id='$ttype',
+    timetask_tasktype_id=$ttype,
     timetask_length='$time',
     timetask_label='$label',
-    timetask_projecttask_id='$projecttask'
-  where timetask_id='$id'";
+    timetask_projecttask_id=$projecttask
+  where timetask_id=$id";
 
   display_debug_msg($query, $cdg_sql, "run_query_update");
   $obm_db = new DB_OBM;

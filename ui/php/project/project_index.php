@@ -48,13 +48,13 @@ require("project_js.inc");
 $uid = $auth->auth["uid"];
 
 // updating the project bookmark : 
-// if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
-//   $last_project = $last_project_default;
-// } else if ( ($param_project > 0 ) && ($last_project != $param_project) ) {
-//   $last_project = $param_project;
-//   run_query_set_user_pref($auth->auth["uid"],"last_project",$param_project);
-//   $last_project_name = run_query_global_project_name($last_project);
-// }
+if ( ($param_project == $last_project) && (strcmp($action,"delete")==0) ) {
+  $last_project = $last_project_default;
+} else if ( ($param_project > 0 ) && ($last_project != $param_project) ) {
+  $last_project = $param_project;
+  run_query_set_user_pref($auth->auth["uid"],"last_project",$param_project);
+  $last_project_name = run_query_global_project_label($last_project);
+}
 
 page_close();
 if($action == "") $action = "index";
@@ -97,6 +97,8 @@ if ($action == "index" || $action == "") {
 
       $project["name"] = $project_q->f("project_label");
       $project["tt"] = $project_q->f("project_tasktype_id");
+      $project["manager"] = $c_all;
+      $project["member"] = $c_all;
 
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $display["search"] = dis_project_search_form($project);
@@ -468,7 +470,7 @@ if ($action == "index" || $action == "") {
   if ($perm->have_perm("editor")) {
     $pid = $project["ext_id"];
     $project["id"] = $pid;
-    $project["label"] = run_query_projectname($param_project);
+    $project["label"] = run_query_projectname($pid);
 
     if ($project["mem_nb"] > 0) {
       $nb = run_query_memberlist_insert($project);
@@ -554,7 +556,7 @@ display_page($display);
 function get_param_project() {
 
   global $param_project, $param_origin, $tf_missing, $tf_projected, $hd_status;
-  global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel;
+  global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel, $cb_archive;
   global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext, $cb_new;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
@@ -570,11 +572,11 @@ function get_param_project() {
   if (isset ($tf_missing)) $project["missing"] = $tf_missing;
   if (isset ($tf_projected)) $project["projected"] = $tf_projected;
   if (isset ($hd_status)) $project["status"] = $hd_status;
-  if (isset ($cb_archive)) {
-    $project["archive"] = $cb_archive;
-  } else {
-    $project["archive"] = "0";
-  }
+//   if (isset ($cb_archive)) {
+//     $project["archive"] = $cb_archive;
+//   } else {
+//     $project["archive"] = "0";
+//   }
 
   // Search fields
   if (isset ($tf_name)) $project["name"] = $tf_name;
@@ -583,6 +585,7 @@ function get_param_project() {
   if (isset ($sel_manager)) $project["manager"] = $sel_manager;
   if (isset ($sel_member)) $project["member"] = $sel_member;
   if (isset ($cb_new)) $project["newlist"] = $cb_new;
+  if (isset ($cb_archive)) $project["archive"] = $cb_archive;
 
   // External param
   if (isset ($ext_action)) $project["ext_action"] = $ext_action;
@@ -759,7 +762,7 @@ function get_project_action() {
     'Right'    => $user_write,
     'Popup'    => 1,
     'Target'   => $l_list,
-    'Condition'=> array ('all', 'member_fill', 'member_add','member_del') 
+    'Condition'=> array ('member_fill', 'member_add','member_del') 
                                     	  );
 
 // Display

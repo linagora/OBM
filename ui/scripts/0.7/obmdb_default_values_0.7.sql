@@ -70,6 +70,9 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Deal bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_deal','0');
 
+-- Project bookmark
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_project','0');
+
 -- List bookmark
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','last_list','0');
 
