@@ -29,7 +29,7 @@ function display_page(&$display) {
     return;
   }
 
-  if (($display["link"] != "") || ($display["detailInfo"] != "" || $display["features"] != "")) {
+  if (($display["link"] != "") || ($display["detailInfo"] != "")) {
     $right_panel = true;
   } else {
     $right_panel = false;

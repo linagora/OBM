@@ -34,7 +34,6 @@ $www = "   <p class=\"messageInfo\">
        alt=\"Valid CSS!\" />²
 	 </a>
   	</p>";
-
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,9 +124,7 @@ if ($action == "index") {
     $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
     $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
   }
-}
-
-elseif ($action == "view_day") {
+} elseif ($action == "view_day") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
@@ -143,9 +140,7 @@ elseif ($action == "view_day") {
   $display["result"] = dis_day_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
 
-}
-
-elseif ($action == "view_week") {
+} elseif ($action == "view_week") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
     $sel_user_id = slice_user($sel_user_id);
@@ -160,9 +155,7 @@ elseif ($action == "view_week") {
     $user_obm = run_query_userobm_readable();  
     $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
     $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-}
-
-elseif ($action == "view_month") {
+} elseif ($action == "view_month") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
@@ -177,9 +170,7 @@ elseif ($action == "view_month") {
   $user_obm = run_query_userobm_readable();  
   $display["result"] = dis_month_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-}
-
-elseif ($action == "view_year") {
+} elseif ($action == "view_year") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   $sel_user_id = slice_user($sel_user_id);
@@ -193,9 +184,7 @@ elseif ($action == "view_year") {
   $user_obm = run_query_userobm_readable();  
   $display["result"] = dis_year_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-}
-
-elseif ($action == "new") {
+} elseif ($action == "new") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -209,9 +198,7 @@ elseif ($action == "new") {
   }
   $user_obm = run_query_userobm_in($p_user_array);
   $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $p_user_array);
-}
-
-elseif ($action == "insert") {
+} elseif ($action == "insert") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($agenda)){    
@@ -234,10 +221,7 @@ elseif ($action == "insert") {
     $cat_event = run_query_get_eventcategories();
     $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
-}
-
-
-elseif ($action == "detailconsult") {
+} elseif ($action == "detailconsult") {
 ////////////////////////////////////DONE///////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
@@ -246,9 +230,7 @@ elseif ($action == "detailconsult") {
     $display["detailInfo"] = display_record_info($eve_q);
     $display["detail"] = html_calendar_consult($eve_q, $cust_q,$obm_q_grp);
   }
-}
-
-elseif ($action == "detailupdate") {
+} elseif ($action == "detailupdate") {
 ////////////////////////////////////DONE///////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
 if ($param_event > 0) {  
@@ -263,9 +245,7 @@ if ($param_event > 0) {
   $display["detailInfo"] = display_record_info($eve_q);
   $display["detail"] = dis_event_form($action, $agenda,$eve_q, $user_obm,$grp_obm, $cat_event, $p_user_array);
   }
-}
-
-elseif ($action == "update") {
+} elseif ($action == "update") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form($agenda)) {
@@ -288,9 +268,7 @@ elseif ($action == "update") {
     $cat_event = run_query_get_eventcategories();
     $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm,$grp_obm, $cat_event, $sel_user_id);
   }
-}
-
-elseif ($action == "update_decision") {
+} elseif ($action == "update_decision") {
 /////////////////////////TODO : CONFLICTS//////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update_occurence_state($agenda["id"],$auth->auth["uid"],$agenda["decision_event"]);
@@ -302,17 +280,13 @@ elseif ($action == "update_decision") {
   $user_obm = run_query_userobm_readable();  
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-}
-
-elseif ($action == "check_delete") {
+} elseif ($action == "check_delete") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_event > 0) {
     $display["detail"] = html_dis_delete($agenda);
   }
-}
-
-elseif ($action == "delete") {
+} elseif ($action == "delete") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -329,9 +303,7 @@ elseif ($action == "delete") {
   $user_obm = run_query_userobm_readable();  
   $display["result"] = dis_week_planning($agenda,$user_q,$user_obm);
   $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
-}
-
-elseif ($action == "rights_admin") {
+} elseif ($action == "rights_admin") {
 ////////////////////////////////////DONE///////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -357,10 +329,9 @@ elseif ($action == "rights_admin") {
 ////////////////////////////////////DONE///////////////////////////////////////  
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
-  if (count($sel_user_id) != 0) {
-    $p_user_array =  $sel_user_id;
-  }
-  else {
+  if (count($agenda["user_meeting"]) != 0) {
+    $p_user_array =  $agenda["user_meeting"] ;
+  } else {
     $p_user_array =  array($uid);
   }
   $user_q = store_users(run_query_get_user_name($p_user_array));
@@ -437,7 +408,7 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_grp_id;
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new,$sel_grp_id,$sel_user_meeting_id;
 
   // Agenda fields
   if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
@@ -464,6 +435,8 @@ function get_param_agenda() {
   if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
   if (is_array($sel_deny_read)) $agenda["deny_r"] = $sel_deny_read;
   if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
+  if (is_array($sel_user_meeting_id)) $agenda["user_meeting"] = $sel_user_meeting_id;
+
   if (isset($sel_time_duration)) {
     $agenda["duration"] = $sel_time_duration;
     if(isset($sel_min_duration)) {

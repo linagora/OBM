@@ -325,7 +325,6 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $minend = date("i",$dateend);
     $dateend = date("Y-m-d",$dateend);
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
-    $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays");
     if($repeat_kind != "none") {
@@ -360,15 +359,16 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     $day_array2[0] = $agenda["date_end"];
   }
   if (isset($agenda["privacy"])) { $privacy = $agenda["privacy"]; }
-  if (isset($agenda["occupied"])) { $occupied_day = $agenda["occupied"]; }
   if (isset($agenda["kind"])) { $repeat_kind = $agenda["kind"]; }
-  if (isset($agenda["repeat_days"])) { $repeat_days = $agenda["repeat_days"];}
+  if (isset($agenda["repeat_days"]) && $agenda["repeat_days"] != "000000") { $repeat_days = $agenda["repeat_days"];}
   if (isset($agenda["repeat_end"]) && $agenda["repeat_end"] != "") {
     preg_match("/^(\d{4})(\d{2})(\d{2})/", $agenda["repeat_end"], $day_array3);
     $repeat_end = $day_array3[1]."-".$day_array3[2]."-".$day_array3[3];
   }
   if (isset($agenda["force"])) { $force = $agenda["force"]; }
-
+  if($repeat_kind != "weekly") {
+    $repeat_days = "000000";
+  }
   
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
@@ -391,7 +391,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       <option value=\"daily\" $daily>$l_daily</option>
       <option value=\"weekly\" $weekly>$l_weekly</option>
       <option value=\"monthlybydate\" $monthlybydate>$l_monthlybydate</option>
-      <!--     <option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option> -->
+      <option value=\"monthlybyday\" $monthlybyday>$l_monthlybyday</option>
       <option value=\"yearly\" $yearly>$l_yearly</option>
     </select>";
   switch($priority) {
@@ -757,7 +757,6 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   $datebegin = datetime_format($obm_q_event->f("calendarevent_date"));
   $dateend =  datetime_format($obm_q_event->f("calendarevent_date") + $obm_q_event->f("calendarevent_duration"));
   $privacy = $obm_q_event->f("calendarevent_privacy");
-  $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
   $kind = ${"l_".$obm_q_event->f("calendarevent_repeatkind")};
   $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
   if($kind != "none") {
@@ -1168,16 +1167,16 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
       $u_lname = $usr_q->f("userobm_lastname");
       $u_fname = $usr_q->f("userobm_firstname");
       if (in_array($u_id, $p_user_array)) {
-	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
-      <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
+	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_meeting_id$u_id\">
+      <a href=\"javascript: remove_element('sel_user_meeting_id$u_id','sel_user_meeting_id');\">
       <img src=\"/images/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
-      <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
+      <input value=\"$u_id\" name=\"sel_user_meeting_id[]\" type=\"hidden\" />
       </div>";
       }
     }
-    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_meeting_id";
    
     $block_user = "
     <td class=\"detailLabel\">
@@ -1188,7 +1187,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
        <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
-     <td class=\"detailForm\" id=\"sel_user_id\">
+     <td class=\"detailForm\" id=\"sel_user_meeting_id\">
        $dis_sel_user
      </td>
      ";
@@ -1264,6 +1263,8 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description,$display;              
 
+
+  $user_meeting = $agenda["user_meeting"]; 
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
   $time_unit = 60 / $set_cal_interval; 
@@ -1274,6 +1275,9 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
   $week_num = get_week_num($unix_time); 
   $next_week = date("Ymd", strtotime("+1 week",  $unix_time));
   $prev_week = date("Ymd", strtotime("-1 week",  $unix_time));
+  foreach($user_meeting as $user) {
+    $param_user .= "&amp;sel_user_meeting_id[]=$user";
+  }
   
   $start_week_day = strtotime(dateOfWeek($getdate, $set_weekstart_default));
   $end_week_time = $start_week_day + ((6 * 24 + $set_stop_time) * 3600);
@@ -1340,7 +1344,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
    <table class=\"agendaCalWeek\">
     <tr>
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$prev_week$param_user&amp;param_duration=$param_duration")."\">
        <img src=\"/images/$set_theme/$ico_left_day\" alt=\"[Previous Week]\" />
       </a>     
      </td>
@@ -1348,7 +1352,7 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
       $display_date
      </td>  
      <td class=\"agendaHead\">
-      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week&amp;param_duration=$param_duration")."\">
+      <a href=\"".url_prepare("agenda_index.php?action=perform_meeting&amp;param_date=$next_week$param_user&amp;param_duration=$param_duration")."\">
        <img src=\"/images/$set_theme/$ico_right_day\" alt=\"[Next Week]\" />
       </a>     
      </td>
@@ -1847,27 +1851,6 @@ END:VCALENDAR";
 
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the planning for the week beginning at the specified date
 // Parameters:
@@ -1908,7 +1891,7 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
   for ($i=0; $i<7; $i++) {
     $day_num = date("w","$start_day");
     $day = $l_daysofweekshort[$day_num];
-    $dis_day .= "<td class=\"agendaHead2\">$day</td>";
+    $dis_day .= "<td class=\"agendaHead2\" style=\"width: 30px;\">$day</td>";
     $start_day = strtotime("+1 day", $start_day); 
   }
   

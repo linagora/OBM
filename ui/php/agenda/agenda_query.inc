@@ -319,10 +319,12 @@ function run_query_insert_user_event($user_id,$event_id,$state){
   $query = "INSERT INTO CalendarUser (
     calendaruser_event_id, 
     calendaruser_user_id,
+    calendaruser_required,
     calendaruser_state) 
             VALUES (
     $event_id,
     $user_id,
+    '0',
     '$state')";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
@@ -391,7 +393,8 @@ function run_query_insert_event_data($agenda) {
   $max_id = $obm_db->f("max_id")+1;
   $query = "INSERT INTO CalendarEvent (
     calendarevent_id,calendarevent_timecreate,                         
-    calendarevent_usercreate, 
+    calendarevent_usercreate,
+    calendarevent_owner,
     calendarevent_title, 
     calendarevent_date,     
     calendarevent_description,
@@ -400,11 +403,13 @@ function run_query_insert_event_data($agenda) {
     calendarevent_privacy, 
     calendarevent_duration,
     calendarevent_repeatkind,
+    calendarevent_repeatfrequence,
     calendarevent_repeatdays,
     calendarevent_endrepeat)
 	         VALUES (
     $max_id,
     '".date("Y-m-d H:i")."',
+    ".$auth->auth["uid"].",
     ".$auth->auth["uid"].",
     '$title',
     '".date("Y-m-d H:i",$stamp_beg)."',
@@ -414,6 +419,7 @@ function run_query_insert_event_data($agenda) {
     $privacy,
     $duration,		
     '$repeat_kind',
+    '1',
     '$repeat_days',
     '".date("Y-m-d H:i",$repeat_end)."')";
   display_debug_msg($query, $cdg_sql);
@@ -1006,16 +1012,6 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if (trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
-    $err_msg = $l_err_end_repeat3;
-    return false;
-  }  
-  
-  if (trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
-    $err_msg = $l_err_end_repeat2;
-    return false;
-  }  
-  
   if ($kind != "none" && $dateend > $datebegin) {
     $err_msg = $l_err_repeat;
     return false;
@@ -1073,7 +1069,6 @@ function localizeDate($format, $timestamp) {
 ///////////////////////////////////////////////////////////////////////////////
 function dateOfWeek($Ymd, $day) {
   global $set_weekstart_default;
-
   if (!isset($set_weekstart_default)) $set_weekstart_default = 'Sunday';
   $timestamp = strtotime($Ymd);
   $num = date('w', strtotime($set_weekstart_default));
@@ -1269,7 +1264,7 @@ function events_model($start_time, $end_time,$calendar_user) {
   }
   
   $obm_repeat = run_query_repeat_events($start_time,$end_time,$calendar_user);
-  
+   
   while($obm_repeat->next_record()) {
     $id = $obm_repeat->f("calendarevent_id");
     $title = $obm_repeat->f("calendarevent_title");
@@ -1309,7 +1304,8 @@ function events_model($start_time, $end_time,$calendar_user) {
 	}
         break; 
       case "weekly" :
-	$temp_date = strtotime(dateOfWeek(date("YmdHis",$date), $set_weekstart_default));
+	$temp_date = strtotime(dateOfWeek(date("Ymd",$date), $set_weekstart_default));
+	$temp_date = strtotime("+".date("H",$date)." hours +".date("i",$date)." minutes",$temp_date);
 	if($temp_date < $start_time) {
 	  $temp_date = ceil(($start_time - $temp_date) / $day_duration);
 	  $hour_diff = date("H",$date) - date("H",$start_time);
@@ -1318,30 +1314,81 @@ function events_model($start_time, $end_time,$calendar_user) {
 	  if($temp_date == "") $temp_date = 0;
 	  $temp_date = strtotime("-$temp_date days +$hour_diff hours +$min_diff minutes", $start_time);
 	}
-        for($i=0; $i<strlen($repeatdays);$i++) {
-          $repeat_days[$i]=substr($repeatdays, $i, 1);
+	$num = (date('w', $temp_date) - date('w', strtotime($set_weekstart_default)) +7)%7;
+	for($i=$num; $i<strlen($repeatdays);$i++) {
+          $repeat_days[$i - $num]=substr($repeatdays, $i, 1);
 	}	
 	while($temp_date <= $end_date) {
-	  foreach($repeat_days as $delta_day => $repeatition) {	   
+	  foreach($repeat_days as $delta_day => $repeatition) {	  
 	    if($repeatition == 1) {
 	      $current_date = strtotime("+$delta_day days",$temp_date);
-	      $day = &$day_events[date("Ymd",$current_date)];
-	      if(!is_object($day)) {
-		$day = &new Day($current_date);
-		$day_events[date("Ymd",$current_date)] = &$day;
+	      if($current_date >= $date) {
+		$day = &$day_events[date("Ymd",$current_date)];
+		if(!is_object($day)) {
+		  $day = &new Day($current_date);
+		  $day_events[date("Ymd",$current_date)] = &$day;
+		}
+		$day->add_event(&$event,$current_date,$user_id);
 	      }
-	      $day->add_event(&$event,$current_date,$user_id);
 	    }	  
 	  }	  
 	  $temp_date = strtotime("+$repeatfrequence weeks",$temp_date);
 	}		
 	break;
       case "monthlybyday" :
+	$start_week = date('w', strtotime($set_weekstart_default));
+	$num = (date('w', $date) - $start_week +7)%7;	
+	$monthlybyday = ceil( date('d',$date) / 7 ) ;
+	if($temp_date < $start_time) {
+	  $month_diff = (date("Y",$start_time) - date("Y",$temp_date)) * 12;	
+	  $month_diff += date("m",$start_time) - date("m",$temp_date);
+	  $hour_diff = date("H",$date) - date("H",$start_time);
+	  $min_diff = date("i",$date) - date("i",$start_time); 
+          $month_diff = $month_diff % ($repeatfrequence);	  
+	  if($month_diff > 0) {	  
+	    $month_diff = $repeatfrequence - $month_diff;
+	  }		      
+	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $start_time);
+	}
+	$hour_diff = date("H",$date);
+	$min_diff = date("i",$date);  
+
+	while($temp_date <= $end_date) {
+	  $this_month = strtotime(date("Ym01",$temp_date));
+	  $start_num = (date('w', $this_month) - $start_week +7)%7;
+          $day_diff = ($num -  $start_num +7)%7;
+	  $day_diff += 7*($monthlybyday-1);
+	  $current_date =   strtotime("+ $day_diff days +$hour_diff hours +$min_diff minutes",$this_month);
+	  if(date("m",$temp_date) == date("m",$current_date) 
+	     && date("Ymd",$current_date) >= date("Ymd",$start_time)) {
+	    $day = &$day_events[date("Ymd",$current_date)];
+	    if(!is_object($day)) {
+	      $day = &new Day($current_date);
+	      $day_events[date("Ymd",$current_date)] = &$day;
+	    }
+	    $day->add_event(&$event,$current_date,$user_id);
+	  }
+	  $temp_date = strtotime("+$repeatfrequence months",$temp_date);
+	}		
         break;
       case "monthlybydate" :
-	while($temp_date < $start_time) {
-	  $temp_date = strtotime("$repeatfrequence months",$temp_date);
-	}
+	if($temp_date < $start_time) {
+	  $temp_date = strtotime(date("Ym01",$start_time));
+	  $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;	
+	  $month_diff += date("m",$start_time) - date("m",$date);
+	  $hour_diff = date("H",$date) - date("H",$start_time);
+	  $min_diff = date("i",$date) - date("i",$start_time); 
+          $month_diff = $month_diff % ($repeatfrequence);	  
+	  if($month_diff > 0) {	  
+	    $month_diff = $repeatfrequence - $month_diff;
+	  }	  
+    
+	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
+	}	
+	$hour_diff = date("H",$date);
+	$min_diff = date("i",$date);  	
+	$temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
+        $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
 	while($temp_date <= $end_date) {
 	  $day = &$day_events[date("Ymd",$temp_date)];
 	  if(!is_object($day)) {
@@ -1352,6 +1399,33 @@ function events_model($start_time, $end_time,$calendar_user) {
 	  $temp_date = strtotime("+$repeatfrequence months",$temp_date);
 	}
 	break;
+      case "yearly" :
+	if($temp_date < $start_time) {
+	  $temp_date = strtotime(date("Ym01",$start_time));
+	  $month_diff = (date("Y",$start_time) - date("Y",$date)) * 12;
+	  $month_diff += date("m",$start_time) - date("m",$date);
+	  $hour_diff = date("H",$date) - date("H",$start_time);
+	  $min_diff = date("i",$date) - date("i",$start_time); 
+          $month_diff = $month_diff % ($repeatfrequence*12);	  
+	  if($month_diff > 0) {	  
+	    $month_diff = $repeatfrequence*12 - $month_diff;
+	  }
+	  $temp_date = strtotime("+$month_diff months +$hour_diff hours +$min_diff minutes", $temp_date);
+	}
+	$hour_diff = date("H",$date);
+	$min_diff = date("i",$date);  	
+	$temp_date = strtotime(date("Ym".date("d",$date),$temp_date));
+        $temp_date =   strtotime("+$hour_diff hours +$min_diff minutes",$temp_date);	
+	while($temp_date <= $end_date) {
+	  $day = &$day_events[date("Ymd",$temp_date)];
+	  if(!is_object($day)) {
+	    $day = &new Day($temp_date);
+	    $day_events[date("Ymd",$temp_date)] = &$day;
+	  }
+	  $day->add_event(&$event,$temp_date,$user_id);
+	  $temp_date = strtotime("+$repeatfrequence years",$temp_date);
+	}
+	break;	
     }
   }
   

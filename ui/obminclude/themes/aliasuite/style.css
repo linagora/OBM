@@ -95,8 +95,9 @@ p			{
 
 ul.header {
        margin:0;
-       padding-top: 2px;
-       padding-bottom: 2px;
+       padding: 0;
+       border-top: 2px solid #535353;
+       border-bottom: 2px solid #535353;
        text-align: right;
        background-color: #535353;
        font-size: 10px;
@@ -112,8 +113,9 @@ ul.header {
 
 
 ul.header li {
+        padding: 0 6px 0 6px;
 	display: inline;
-	border-left: 1px solid #fff;
+	border-left: 1px solid #fff;  
 }
 
 ul.header li a:link          { color: #fff; background-color: transparent;text-decoration:underline;}
@@ -147,8 +149,7 @@ ul.header li.logout a:hover         { color: #009fc3; background-color: transpar
 ul.section {
        background-color: #009fc3;
        margin:0;
-       padding: 3px;
-       padding-left : 250px;
+       padding: 3px 3px 2px 250px;
        font-size: 14px;
        font-weight: bold;
        color: black;
