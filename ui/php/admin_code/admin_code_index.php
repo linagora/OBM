@@ -45,8 +45,9 @@ switch ($mode) {
    if($action == "") $action = "index";
    get_admin_code_action();
    $perm->check();
-   display_head("Admin_Code");
-   generate_menu($menu, $section);
+   $display["head"] = display_head("Admin_Code");
+   $display["header"] = generate_menu($menu, $section);
+   echo $display["head"] . $display["header"];
    break;
 }
 
@@ -79,7 +80,8 @@ switch ($mode) {
    break;
  case "html":
    page_close();
-   display_end();
+   $display["end"] = display_end();
+   echo $display["end"];
    break;
 }
 

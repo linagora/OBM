@@ -45,11 +45,12 @@ switch ($mode) {
    $debug = $set_debug;
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
-   display_head("Admin_Pref");
    if ($action == "") $action = "index";
    get_admin_pref_action();
    $perm->check();
-   generate_menu($menu, $section);
+   $display["head"] = display_head("Admin_Pref");
+   $display["header"] = generate_menu($menu, $section);
+   echo $display["head"] . $display["header"];
    break;
  default:
    echo "No mode specified !";
@@ -97,7 +98,8 @@ switch ($mode) {
    break;
  case "html":
    page_close();
-   display_end();
+   $display["end"] = display_end();
+   echo $display["end"];
    break;
 }
 
