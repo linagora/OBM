@@ -13,7 +13,6 @@ $l_groups = "Grupos";
 $l_title = "Título";
 $l_priority = "Prioridad";
 $l_private_description = "Este evento es privado y no puede ver mas información";
-$l_description = "Descripción";
 $l_state = "Estado";
 $l_high = "Alta";
 $l_low = "Baja";

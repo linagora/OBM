@@ -18,7 +18,6 @@ $l_import = "Import";
 
 // Labels and texts
 $l_file = "File";
-$l_desc = "Description";
 $l_format = "Format";
 $l_csv_sep = "CSV Separator";
 $l_enclosed = "Fields enclosed by";

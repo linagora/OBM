@@ -11,7 +11,6 @@
 $l_document_new = "Nuovo documento";
 $l_document_insert = "Inserisci documento";
 $l_document_generate= "Crea documento Tex";
-$l_descdocument = "Descrizione  Documento";
 $l_namedocument = "La Lettera";
 $l_namesoc = "Azienda";
 $l_typedocument = "Tipo";

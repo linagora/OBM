@@ -18,7 +18,6 @@ $l_import = "Import";
 
 // Labels and texts
 $l_file = "Fichier";
-$l_desc = "Description";
 $l_format = "Format";
 $l_csv_sep = "Separateur CSV";
 $l_enclosed = "Champs entourés par";

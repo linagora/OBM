@@ -13,7 +13,6 @@ $l_cat1 = "Category";
 $l_owner = "Owner";
 $l_logger = "Technical manager";
 $l_duration = "Total duration";
-$l_description = "Description";
 $l_solution = "Client synthesis";
 $l_date_before ="Date Before";
 $l_date_after ="Date After";

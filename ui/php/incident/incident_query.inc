@@ -208,7 +208,7 @@ function run_query_insert($incident) {
   $cat1 = $incident["cat1"];
   $date = $incident["date"];
   $hour = $incident["hour"];
-  $duration = $incident["duration"];
+  $add_duration = $incident["add_duration"];
   $archive = ($incident["archive"] ? $incident["archive"] : "0");
   $contract_id = $incident["contract_id"];
   $call_date = "$date $hour:0:0";
@@ -248,7 +248,7 @@ function run_query_insert($incident) {
     '$comment',
     $logger,
     $owner,
-    '$duration',
+    '$add_duration',
     '$archive',
     '$solu')";
 

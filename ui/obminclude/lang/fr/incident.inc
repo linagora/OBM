@@ -14,7 +14,6 @@ $l_date = "Date";
 $l_logger = "Récepteur";
 $l_owner = "Responsable Technique";
 $l_duration = "Durée totale de résolution";
-$l_description = "Description";
 $l_solution = "Solution apportée";
 $l_client_manager = "Responsable Client";
 $l_date_before ="Date Avant";

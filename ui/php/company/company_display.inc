@@ -517,8 +517,8 @@ function html_company_links($co_q) {
   global $set_theme,$ico_contact,$ico_contact_new,$ico_deal,$ico_deal_new;
   global $ico_document,$ico_document_new, $ico_project, $ico_contract;
   global $ico_invoice;
-  global $l_new, $l_header_contact, $l_header_project, $l_header_deal;
-  global $l_header_contract, $l_header_invoice, $l_header_document;
+  global $l_new, $l_module_contact, $l_module_project, $l_module_deal;
+  global $l_module_contract, $l_module_invoice, $l_module_document;
   global $l_document_add;
   global $l_company, $path, $auth, $cgp_show, $popup_height,$popup_width;
 
@@ -538,10 +538,10 @@ function html_company_links($co_q) {
     $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
     $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry&amp;tf_email=$email");
     $block_contact = "
-  <div class=\"linkTitle\">:: $l_header_contact</div>
+  <div class=\"linkTitle\">:: $l_module_contact</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_con_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact\" /></a>
-        <a href=\"$url_con_list\">$l_header_contact ($con_num)</a></li>
+        <a href=\"$url_con_list\">$l_module_contact ($con_num)</a></li>
     <li><a href=\"$url_con_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contact_new\" /></a>
         <a href=\"$url_con_new\">$l_new</a></li>
   </ul>";
@@ -553,10 +553,10 @@ function html_company_links($co_q) {
     $url_deal_total = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname&amp;cb_archive=1");
     $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_deal = "
-  <div class=\"linkTitle\">:: $l_header_deal</div>
+  <div class=\"linkTitle\">:: $l_module_deal</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_deal_list\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
-        $l_header_deal (
+        $l_module_deal (
         <a href=\"$url_deal_list\">$deal_num</a> /
         <a href=\"$url_deal_total\">$deal_total</a> )</li>
     <li><a href=\"$url_deal_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal_new\" /></a>
@@ -571,10 +571,10 @@ function html_company_links($co_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/company/company_index.php")."&amp;ext_id=$id&amp;ext_target=$l_company";
     $nb_document = run_query_document_nb ($id, "company");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_header_document</div>
+  <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
-        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
@@ -593,10 +593,10 @@ function html_company_links($co_q) {
     $nb_pro_total = run_query_linked_project_nb ($id, "company", 1);
     $url_pro_new = url_prepare("$path/project/project_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
     $block_project = "
-  <div class=\"linkTitle\">:: $l_header_project</div>
+  <div class=\"linkTitle\">:: $l_module_project</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
-        $l_header_project ( <a href=\"$url_pro\">$nb_pro</a> /
+        $l_module_project ( <a href=\"$url_pro\">$nb_pro</a> /
         <a href=\"$url_pro_tot\">$nb_pro_total</a> )</li>
     <li><a href=\"$url_pro_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" /></a>
         <a href=\"$url_pro_new\">$l_new</a></li>
@@ -610,10 +610,10 @@ function html_company_links($co_q) {
     $url_ctra_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_company=$id&amp;tf_company_name=$uname");
 
      $block_contract = "
-  <div class=\"linkTitle\">:: $l_header_contract</div>
+  <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_ctra\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
-        <a href=\"$url_ctra\">$l_header_contract ($nb_ctra)</a></li>
+        <a href=\"$url_ctra\">$l_module_contract ($nb_ctra)</a></li>
     <li><a href=\"$url_ctra_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" /></a>
         <a href=\"$url_ctra_new\">$l_new</a></li>
   </ul>";
@@ -627,10 +627,10 @@ function html_company_links($co_q) {
     $nb_inv_tot = run_query_linked_invoice_nb($id, "company", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "company");
     $block_invoice = "
-  <div class=\"linkTitle\">:: $l_header_invoice</div>
+  <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
     <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>

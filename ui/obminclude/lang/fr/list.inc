@@ -23,7 +23,6 @@ $l_list_display = "Options d'affichage des listes de listes";
 $l_contact_display = "Options d'affichage des listes de contacts";
 $l_list_set = "Listes cibles";
 $l_export_format = "Formats d'export disponibles";
-$l_desc = "Description";
 $l_export_intro = "Sélectionner le format d'export souhaité";
 $l_select_list = "Sélectionner les listes cibles de l'export";
 $l_list_wizard = "Recherche globale";

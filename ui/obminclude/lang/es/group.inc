@@ -9,7 +9,6 @@
 
 // Database fields
 $l_system = "Sistema";
-$l_desc = "Descripción";
 $l_email = "E-mail";
 $l_creator = "Creador";
 $l_date_creation = "Fecha de Creación";
@@ -21,7 +20,6 @@ $l_nb_user = "# Usuarios";
 $l_group_user = "Tiene como usuario";
 $l_group_display = "Opciones de despliegue de listas de grupos";
 $l_user_display = "Opciones de despliegue de listas de grupos";
-$l_desc = "Descripción";
 
 // Contact
 $l_lastname = "Apellido";

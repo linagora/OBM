@@ -12,7 +12,6 @@ $l_users = "Utilisateurs";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_private_description = "Cet événement est personnel. Impossible de voir le détail.";
-$l_description = "Description";
 $l_state = "Etat";
 $l_high = "Haute";
 $l_low = "Basse";

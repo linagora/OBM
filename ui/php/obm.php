@@ -107,7 +107,7 @@ function dis_logout_detail() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_calendar_portal() {
   global $ico_agenda_portal,$set_theme;
-  global $l_header_agenda,$l_daysofweekreallyshort,$l_youre_agenda,$l_waiting_events;
+  global $l_module_agenda,$l_daysofweekreallyshort,$l_your_agenda,$l_waiting_events;
   global $auth,$set_weekstart_default;
 
   $num = run_query_waiting_events() ;
@@ -169,7 +169,7 @@ function dis_calendar_portal() {
    <div class=\"portalModuleLeft\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_agenda_portal\" />
    </div>
-   <div class=\"portalTitle\">$l_header_agenda</div>
+   <div class=\"portalTitle\">$l_module_agenda</div>
    <div class=\"portalContent\">
     <table class=\"agendaCalendar\" >
      <tr>
@@ -179,7 +179,7 @@ function dis_calendar_portal() {
     </table>  
     $num $l_waiting_events
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_youre_agenda</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("agenda/agenda_index.php")."\">$l_your_agenda</a></div>
   </div>
   ";
   return $block;
@@ -190,8 +190,7 @@ function dis_calendar_portal() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_portal() {
   global $ico_time_portal,$set_theme;
-  global $l_header_time,$l_youre_time, $l_unfilled;
-  global $auth;
+  global $l_module_time,$l_your_time, $l_unfilled;
 
   $num = run_query_days_unfilled();
   $block = "
@@ -199,13 +198,13 @@ function dis_time_portal() {
    <div class=\"portalModuleLeft\">
     <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_time_portal\" />
    </div>
-   <div class=\"portalTitle\">$l_header_time</div>
+   <div class=\"portalTitle\">$l_module_time</div>
    <div class=\"portalContent\">
     <div class=\"timeWarn\">
     $num $l_unfilled
     </div>
    </div>
-   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_youre_time</a></div>
+   <div class=\"portalLink\"><a href=\"".url_prepare("time/time_index.php")."\">$l_your_time</a></div>
   </div>
   ";
   return $block;

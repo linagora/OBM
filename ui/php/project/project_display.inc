@@ -335,7 +335,7 @@ function html_project_search_list($proj_q, $pref_q, $nb_project, $project) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_links($p_q) {
   global $set_theme, $ico_document, $ico_document_new, $ico_invoice;
-  global $l_new, $l_header_invoice, $l_header_document;
+  global $l_new, $l_module_invoice, $l_module_document;
   global $l_document_add, $l_project;
   global $path, $auth, $cgp_show, $popup_height, $popup_width;
 
@@ -356,10 +356,10 @@ function html_project_links($p_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=$id&amp;ext_target=$l_project";
     $nb_document = run_query_document_nb ($id, "project");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_header_document</div>
+  <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" /></a>
-        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
     <li><a href=\"\" 
@@ -378,10 +378,10 @@ function html_project_links($p_q) {
     $nb_inv_tot = run_query_linked_invoice_nb($id, "project", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "project");
     $block_invoice = "
-  <div class=\"linkTitle\">:: $l_header_invoice</div>
+  <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
     <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>

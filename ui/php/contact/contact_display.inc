@@ -1010,7 +1010,7 @@ function html_contact_header($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
   global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
-  global $l_header_document,$l_contact;
+  global $l_module_document, $l_contact;
   global $l_document_new,$l_document_add;
   global $l_subscription_new, $l_subscription, $l_subscription_list;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
@@ -1022,10 +1022,10 @@ function html_contact_links($id) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
     $nb_document = run_query_document_nb ($id, "contact");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_header_document</div>
+  <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
-        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 

@@ -428,8 +428,8 @@ function dis_user_consult($user) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_email, $l_lastaccess, $l_archive, $l_datebegin;
-  global $l_phone, $l_phone2, $l_fax, $l_fax2;
+  global $l_user, $l_lastaccess, $l_archive, $l_datebegin;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2, $l_email, $l_desc;
   global $l_group_member, $l_group, $l_local, $l_ext_id;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $path, $display, $c_yes, $c_no;
@@ -446,6 +446,7 @@ function html_user_consult($obm_q) {
   $fax = $obm_q->f("userobm_fax");
   $fax2 = $obm_q->f("userobm_fax2");
   $email = $obm_q->f("userobm_email");
+  $desc = $obm_q->f("userobm_description");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
   $archive = ($obm_q->f("userobm_archive") == 1 ? $c_yes : $c_no);
@@ -523,6 +524,9 @@ function html_user_consult($obm_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_lastaccess</td>
       <td class=\"detailText\">$lastaccess</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_desc</td>
+      <td class=\"detailText\">$desc</td>
     </tr>
     </table>
 

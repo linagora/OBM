@@ -23,7 +23,6 @@ $l_list_display = "Opciones de despliegue para listas de Listas";
 $l_contact_display = "Opciones de despliegue para listas de Contactos";
 $l_list_set = "Configurar Lista";
 $l_export_format = "Formatos disponibles para exportar";
-$l_desc = "Descripción";
 $l_export_intro = "Se necesita seleccionar un formato de exportación";
 $l_select_list = "Seleccione la lista a exportar";
 

@@ -46,6 +46,7 @@ $l_postcode = "CAP";
 $l_town = "Citta";
 $l_expresspostal = "CAP 2";
 $l_country = "Nazione";
+$l_desc = "Descrizione";
 $l_priority = "Priorita";
 $l_datasource = "Data sorgente";
 $l_cat = "Categoria";
@@ -125,51 +126,35 @@ $l_daysofweekreallyshort = array ('D','L','M','M','G','V','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_header_com    = "COMMERCIALE";
-$l_header_prod   = "PRODUZIONE";
-$l_header_compta = "CONTABILITA";
-$l_header_users  = "UTENTI";
-$l_header_admins = "AMMINISTRAZIONE";
+$l_section_com    = "COMMERCIALE";
+$l_section_prod   = "PRODUZIONE";
+$l_section_compta = "CONTABILITA";
+$l_section_user   = "UTENTI";
+$l_section_admin  = "AMMINISTRAZIONE";
 
-$l_header_settings = "Impostazioni";
-$l_header_company = "Aziende";
-$l_header_contact = "Contatti";
-$l_header_contract = "Contratti";
-$l_header_incident = "Incidents";
-$l_header_deal = "Affari";
-$l_header_list = "Liste";
-$l_header_user = "Utenti";
-$l_header_group = "Gruppi";
+$l_module_settings = "Impostazioni";
+$l_module_company = "Aziende";
+$l_module_contact = "Contatti";
+$l_module_contract = "Contratti";
+$l_module_incident = "Incidents";
+$l_module_deal = "Affari";
+$l_module_list = "Liste";
+$l_module_user = "Utenti";
+$l_module_group = "Gruppi";
 
-$l_header_admin = "Amministrazione";
-$l_header_admin_lang = "Lingua";
-$l_header_admin_data = "Data";
-$l_header_admin_pref = "Prefs";
-$l_header_admin_code = "Codice";
-$l_header_admin_ref = "Referenze";
+$l_module_admin = "Amministrazione";
+$l_module_admin_lang = "Lingua";
+$l_module_admin_data = "Data";
+$l_module_admin_pref = "Prefs";
+$l_module_admin_code = "Codice";
+$l_module_admin_ref = "Referenze";
 
-$l_header_computer = "Computers";
-$l_header_account = "Accounts";
-$l_header_invoice = "Fatture";
-$l_header_payment = "Pagamenti";
-$l_header_time = "Gestione del Tempo" ;
-$l_header_agenda = "Calendario";
-
-
-$l_header_title_computer = "COMPUTER" ;
-$l_header_title_settings = "IMPOSTAZIONI";
-$l_header_title_company = "AZIENDA";
-$l_header_title_contact = "CONTATTO";
-$l_header_title_contract = "CONTRATTO";
-$l_header_title_incident = "INCIDENT";
-$l_header_title_deal = "AFFARI";
-$l_header_title_list = "LISTE" ;
-$l_header_title_user = "UTENTI";
-$l_header_title_admin = "AMMINISTRAZIONE";
-$l_header_title_account = "ACCOUNT";
-$l_header_title_invoice = "FATTURA";
-$l_header_title_payment = "PAGAMENTI";
-$l_header_title_agenda = "CALENDARIO";
+$l_module_computer = "Computers";
+$l_module_account = "Accounts";
+$l_module_invoice = "Fatture";
+$l_module_payment = "Pagamenti";
+$l_module_time = "Gestione del Tempo" ;
+$l_module_agenda = "Calendario";
 
 $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";

@@ -15,7 +15,6 @@ $l_document_new = "Nytt dokument";
 $l_document_insert = "Legg til dokument";
 $l_document_generate= "Lag tex-dokument";
 
-$l_descdocument = "Dokument-beskriving";
 $l_namedocument = "Brevet";
 $l_namesoc = "Society";
 $l_typedocument = "Type";

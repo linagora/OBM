@@ -45,6 +45,7 @@ $l_postcode = "Postleitzahl";
 $l_town = "Ort";
 $l_expresspostal = "Eilzustellung";
 $l_country = "Land";
+$l_desc = "Beschreibung";
 $l_priority = "Priority";
 $l_datasource = "Data source";
 $l_cat = "Kategorie";
@@ -104,39 +105,39 @@ $l_invalid_perm = "keine Berechtigung";
 ////// Theme headers lang files ////////////////////////
 ////////////////////////////////////////////////////////
 
-$l_header_com    = "Verwaltung";
-$l_header_prod   = "Produktion";
-$l_header_compta = "Buchhaltung";
-$l_header_users  = "Benutzer";
-$l_header_admins = "Administration";
+$l_section_com    = "Verwaltung";
+$l_section_prod   = "Produktion";
+$l_section_compta = "Buchhaltung";
+$l_section_user   = "Benutzer";
+$l_section_admin  = "Administration";
 
-$l_header_company = "Firmen";
-$l_header_contact = "Kontakte";
-$l_header_deal = "Verträge";
-$l_header_list = "Maillisten";
-$l_header_agenda = "Kalender";
-$l_header_todo    = "Aufgaben";
+$l_module_company = "Firmen";
+$l_module_contact = "Kontakte";
+$l_module_deal = "Verträge";
+$l_module_list = "Maillisten";
+$l_module_agenda = "Kalender";
+$l_module_todo    = "Aufgaben";
 
-$l_header_time = "Zeiterfassung";
-$l_header_project = "Projekt";
-$l_header_contract = "Kontrakt";
-$l_header_incident = "Vorfall";
-$l_header_document = "Dokument";
+$l_module_time = "Zeiterfassung";
+$l_module_project = "Projekt";
+$l_module_contract = "Kontrakt";
+$l_module_incident = "Vorfall";
+$l_module_document = "Dokument";
 
-$l_header_account = "Konto";
-$l_header_invoice = "Rechnung";
-$l_header_payment = "Zahlung";
+$l_module_account = "Konto";
+$l_module_invoice = "Rechnung";
+$l_module_payment = "Zahlung";
 
-$l_header_settings = "Einstellungen";
-$l_header_user = "Benutzer";
-$l_header_group = "Gruppe";
+$l_module_settings = "Einstellungen";
+$l_module_user = "Benutzer";
+$l_module_group = "Gruppe";
 
-$l_header_admin = "Administration";
-$l_header_admin_lang = "Sprache";
-$l_header_admin_data = "Daten";
-$l_header_admin_pref = "Eigenschaften";
-$l_header_admin_code = "Code";
-$l_header_admin_ref = "Referential";
+$l_module_admin = "Administration";
+$l_module_admin_lang = "Sprache";
+$l_module_admin_data = "Daten";
+$l_module_admin_pref = "Eigenschaften";
+$l_module_admin_code = "Code";
+$l_module_admin_ref = "Referential";
 
 $l_header_new_f = "Neu";
 $l_header_new = "Neu";

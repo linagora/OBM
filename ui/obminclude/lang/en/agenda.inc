@@ -12,7 +12,6 @@ $l_users = "Users";
 $l_groups = "Groups";
 $l_title = "Title";
 $l_private_description = "This is a private event, you cannot see the details";
-$l_description = "Description";
 $l_state = "Status";
 $l_back_mono = "Back to your own view";
 

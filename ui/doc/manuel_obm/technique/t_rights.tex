@@ -39,7 +39,7 @@ Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lectu
 \begin{minipage}{13cm}
 \begin{verbatim}
 if ($cgp_show["section"]["user"]) {
-  $sections["USER"] = array('Name' => $l_header_user,
+  $sections["user"] = array('Name' => $l_section_user,
                            'Url'  => $cgp_show["section"]["user"],
                            'Right'=> $cright_read);
 }
@@ -57,8 +57,8 @@ Un droit d'accès unitaire est requis (l'utilisateur doit avoir le droit de lectu
 \begin{minipage}{13cm}
 \begin{verbatim}
   if ($cgp_show["module"]["settings"]) {
-    $menus["USER"]["SETTINGS"] = array(
-                               'Name'=> $l_header_settings,
+    $modules["settings"] = array(
+                               'Name'=> $l_module_settings,
                                'Ico' => "$ico_setting",
 		               'Url' => "$path/settings/settings_index.php",
 			       'Right'=> $cright_read);

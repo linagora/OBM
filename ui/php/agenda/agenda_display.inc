@@ -302,10 +302,10 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   global $ico_add_user, $ico_add_group;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc, $l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail,$l_groups;
   global $l_agenda_select_group, $l_hour,$ico_delete;
 
@@ -543,7 +543,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     }
   }
   $dis_min_e .= "</select>";
-  $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
+  $display["title"] = "<div class=\"title\">$l_module_agenda : $title</div>";
   $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[5]";
   $url2 = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_widget=forms[0].elements[6]&amp;ext_title=" . urlencode($l_agenda_select_group);
 
@@ -553,7 +553,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   <form method=\"get\" name=\"f_mod_calendar\"
    onsubmit=\"if (check_calendar(this)) return true; else return false;\"
    action=\"".url_prepare("agenda_index.php")."\">
-   <div class=\"detailHead\">$l_header_agenda</div>
+   <div class=\"detailHead\">$l_module_agenda</div>
    <table class=\"detail\">
     <tr>
      <td class=\"detailLabel\">$l_title</td>
@@ -629,7 +629,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\">$dis_repeat_day</td>
     </tr>
     </table>
-   <div class=\"detailHead\">$l_description</div>
+   <div class=\"detailHead\">$l_desc</div>
    <table class=\"detail\">     
     <tr>    
      <td colspan=\"2\" class=\"detailLabel\"><textarea name=\"ta_event_description\" rows=\"3\" cols=\"72\">$desc</textarea></td> 
@@ -649,10 +649,11 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
-  global $l_users, $l_title, $l_priority, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_cat,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+
   while ($obm_wait->next_record()) {
     $current_user = $obm_wait->f("userobm_id");
     $current_lname = $obm_wait->f("userobm_lastname");
@@ -746,10 +747,10 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   global $display;
   global $set_theme,$set_weekstart_default;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_desc,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state,$l_groups;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait,$l_none;
-  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
+  global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_module_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
   $title = $obm_q_event->f("calendarevent_title");
   $category = $obm_q_event->f("calendarcategory_label");
@@ -808,11 +809,11 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
     $dis_grp_list .= $obm_q_grp->f("group_name")."<br />";
   }*/
 
-  $display["title"] = "<div class=\"title\">$l_header_agenda : $title</div>";
+  $display["title"] = "<div class=\"title\">$l_module_agenda : $title</div>";
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_mod_decision\">
-  <div class=\"detailHead\">$l_header_agenda</div>
+  <div class=\"detailHead\">$l_module_agenda</div>
    <table class=\"detail\">
     <tr>
      <td class=\"detailLabel\">$l_title</td>
@@ -861,7 +862,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
      <td class=\"detailText\">$dis_repeat_days</td>
     </tr>
    </table>
-   <div class=\"detailHead\">$l_description</div>
+   <div class=\"detailHead\">$l_desc</div>
    <table class=\"detail\">   
     <tr>    
      <td colspan=\"2\" class=\"detailText\">$description</td>
@@ -1260,7 +1261,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
 //   - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_free_interval($agenda,$calendar_user,$usr_q ){
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description,$display;              
 
@@ -1862,7 +1863,7 @@ END:VCALENDAR";
 ///////////////////////////////////////////////////////////////////////////////
 function dis_year_planning($agenda,$calendar_user,$usr_q) {
 
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_daysofweek,$l_daysofweekshort,$ico_calendar_nouser;  
   global $l_private,$l_private_description;
@@ -2042,7 +2043,7 @@ return $block;
 //   - $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_month_planning($agenda,$calendar_user,$usr_q) { 
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description,$l_daysofweek;
 
@@ -2231,7 +2232,7 @@ function month_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties
 //    - $groups_array   : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($agenda,$calendar_user,$usr_q) {
-  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$l_description ,$ico_event,$auth;
+  global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer ,$ico_event,$auth;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_new_event;
   global $l_private,$l_private_description;
 
@@ -2400,7 +2401,7 @@ function week_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_day_planning($agenda,$calendar_user,$usr_q) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
-  global $set_start_time, $set_stop_time,$set_cal_interval,$l_description,$set_weekstart_default;
+  global $set_start_time, $set_stop_time,$set_cal_interval,$set_weekstart_default;
   global $l_private,$l_private_description,$auth;
 
 

@@ -23,7 +23,6 @@ $l_list_display = "Display options for Lists list";
 $l_contact_display = "Display options for Contacts list";
 $l_list_set = "List Set";
 $l_export_format = "Available export formats";
-$l_desc = "Description";
 $l_export_intro = "Select the export format needed";
 $l_criterion = "Search criteria";
 $l_select_list = "Select the lists to be exported";

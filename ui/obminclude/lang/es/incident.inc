@@ -13,7 +13,6 @@ $l_status = "Estado";
 $l_logger = "Gerente Técnico";
 $l_owner = "Responsable";
 $l_duration = "Tiempo tomado para solución";
-$l_description = "Descripción";
 $l_solution = "Solución encontrada";
 $l_num = "Número";
 $l_to = "Para"; 

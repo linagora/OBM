@@ -132,13 +132,13 @@ function generate_menu($module) {
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
-  if($aliamin_link) {
+  if ($aliamin_link) {
     $dis_aliamin = "<li>&nbsp;<a href=\"$aliamin_link\">Aliamin</a>&nbsp;</li>";
   }
-  if($aliacms_link) {
+  if ($aliacms_link) {
     $dis_aliacms = "<li>&nbsp;<a href=\"$aliacms_link\">Aliacms</a>&nbsp;</li>";
   }
-  if($blogs_link) {
+  if ($blogs_link) {
     $dis_blogs = "<li>&nbsp;<a href=\"$blogs_link\">Blogs</a>&nbsp;</li>";
   }
   
@@ -156,6 +156,7 @@ function generate_menu($module) {
   <li class=\"login\">&nbsp;$l_login : $login&nbsp;</li>
   <li class=\"profil\">&nbsp;$l_profile : $profil&nbsp;</li>
   <li class=\"logout\">&nbsp;<a href='".$path."/obm.php?action=logout'>$l_logout</a>&nbsp;</li>
+  <li>OBM : $obm_version</li>
 </ul>
 " . $display["section"] ."
 <p style=\"clear:both\" />

@@ -148,6 +148,7 @@ function run_query_insert($user) {
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
   $fname = $user["firstname"];
+  $desc = $user["description"];
   $phone = $user["phone"];
   $phone2 = $user["phone2"];
   $fax = $user["fax"];
@@ -171,6 +172,7 @@ function run_query_insert($user) {
     userobm_fax,
     userobm_fax2,
     userobm_email,
+    userobm_description,
     userobm_timelastaccess)
   values (
     null,
@@ -189,6 +191,7 @@ function run_query_insert($user) {
     '$fax',
     '$fax2',
     '$email',
+    '$desc',
     null)";
 
   display_debug_msg($query, $cdg_sql);
@@ -225,6 +228,7 @@ function run_query_update($p_id, $user) {
   $fax = $user["fax"];
   $fax2 = $user["fax2"];
   $email = $user["email"];
+  $desc = $user["description"];
 
   $query = "update UserObm set
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
@@ -240,7 +244,8 @@ function run_query_update($p_id, $user) {
     userobm_phone2='$phone2',
     userobm_fax='$fax',
     userobm_fax2='$fax2',
-    userobm_email='$email'
+    userobm_email='$email',
+    userobm_description='$desc'
   where userobm_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);

@@ -67,8 +67,8 @@ $cgp_show["section"] = ""; // Needed if module order to change
 $cgp_show["section"]["com"] = "$path/agenda/agenda_index.php";
 $cgp_show["section"]["user"] = "$path/user/user_index.php";
 $cgp_show["section"]["prod"] = "$path/document/document_index.php";
-$cgp_show["section"]["SETTINGS"] = "$path/settings/settings_index.php";
-$cgp_show["section"]["ADMIN"] = "$path/admin/admin_index.php?mode=html";
+$cgp_show["section"]["settings"] = "$path/settings/settings_index.php";
+$cgp_show["section"]["admin"] = "$path/admin/admin_index.php?mode=html";
 
 // modules -- false to hide, otherwise section
 $cgp_show["module"] = ""; // Needed if module order to change

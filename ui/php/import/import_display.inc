@@ -436,7 +436,7 @@ function html_import_file_import($import_q, $import) {
   global $l_company_defaultname, $ccsvd_tab;
   global $l_invalid_row, $l_invalid_rows, $l_conflict_rows;
   global $l_import_end,$l_file_error, $l_lines_processed, $l_conflict_detected;
-  global $l_header_company, $l_header_contact, $l_nb_insert, $l_nb_update;
+  global $l_module_company, $l_module_contact, $l_nb_insert, $l_nb_update;
   global $display;
 
   $file = $import["file_saved"];
@@ -651,8 +651,8 @@ function html_import_file_import($import_q, $import) {
   if (! $stop) {
     $msg .= ". $l_import_end";
   }
-  $msg .= "<br />$l_header_company : $nb_comp_ins $l_nb_insert, $nb_comp_upd $l_nb_update";
-  $msg .= "<br />$l_header_contact : $nb_con_ins $l_nb_insert, $nb_con_upd $l_nb_update";
+  $msg .= "<br />$l_module_company : $nb_comp_ins $l_nb_insert, $nb_comp_upd $l_nb_update";
+  $msg .= "<br />$l_module_contact : $nb_con_ins $l_nb_insert, $nb_con_upd $l_nb_update";
 
   $display["msg"] .= display_ok_msg("$msg");
   if (($nb_line_err > 0) || ($nb_line_conf > 0)) {

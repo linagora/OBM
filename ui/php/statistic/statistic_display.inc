@@ -57,7 +57,7 @@ function dis_menu_stats() {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_resp_stats($cont_q,$comp_q) {
   global $path, $set_theme;
-  global $set_theme, $l_header_company,$l_header_contact,$l_key;
+  global $set_theme, $l_module_company, $l_module_contact, $l_key;
 
   $max = 1;
   while($cont_q->next_record()) {
@@ -103,14 +103,14 @@ function dis_resp_stats($cont_q,$comp_q) {
     <td class=\"detailLabel\" class=\"detailLabel\" rowspan =\"2\">$l_key</td>
     <td class=\"detailForm\">
      <table>
-      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_header_contact</td></tr>
+      <tr><td style=\"width:20px;background-color:#DE5B5B;\">&nbsp;</td><td>$l_module_contact</td></tr>
      </table>
     </td>
    </tr>
    <tr>
     <td class=\"detailForm\">
     <table>
-    <tr><td style=\"width:20px;background-color:#5C8CBC;\">&nbsp;</td><td>$l_header_company</td></tr>
+    <tr><td style=\"width:20px;background-color:#5C8CBC;\">&nbsp;</td><td>$l_module_company</td></tr>
     </table>   
     </td>
    </tr>
@@ -154,7 +154,6 @@ function dis_list_select($list_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
-  global $l_header_company,$l_header_contact,$l_key;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
 
   while ($comp_q->next_record()) {
@@ -278,7 +277,6 @@ function dis_cat_stats($comp_q,$tot) {
 ///////////////////////////////////////////////////////////////////////////////
 function export_cat_stats($comp_q,$tot) {
   global $path, $set_theme;
-  global $l_header_company,$l_header_contact,$l_key;
   global $l_null,$l_totals, $l_header_country,$l_compcat;
   global $set_csv_sep;
 

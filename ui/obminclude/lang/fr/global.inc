@@ -49,6 +49,7 @@ $l_postcode = "Code Postal";
 $l_town = "Ville";
 $l_expresspostal = "Cedex";
 $l_country = "Pays";
+$l_desc = "Description";
 $l_priority = "Priorité";
 $l_datasource = "Source de données";
 $l_after = "Après";
@@ -141,43 +142,43 @@ $l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 // Theme headers lang files
 //---------------------------------------------------------------------------//
 
-$l_header_com    = "COMMERCIAL";
-$l_header_prod   = "PRODUCTION";
-$l_header_compta = "COMPTABILITE";
-$l_header_users  = "UTILISATEUR";
-$l_header_admins = "ADMINISTRATION";
-$l_header_aliamin = "ALIAMIN";
+$l_section_com    = "COMMERCIAL";
+$l_section_prod   = "PRODUCTION";
+$l_section_compta = "COMPTABILITE";
+$l_section_user   = "UTILISATEUR";
+$l_section_admin  = "ADMINISTRATION";
+$l_section_aliamin = "ALIAMIN";
 
-$l_header_company = "Sociétés";
-$l_header_contact = "Contacts";
-$l_header_deal    = "Affaires";
-$l_header_list    = "Listes";
-$l_header_agenda  = "Agenda";
-$l_header_todo    = "A faire";
-$l_header_publication  = "Publication";
-$l_header_statistic    = "Statistiques";
+$l_module_company = "Sociétés";
+$l_module_contact = "Contacts";
+$l_module_deal    = "Affaires";
+$l_module_list    = "Listes";
+$l_module_agenda  = "Agenda";
+$l_module_todo    = "A faire";
+$l_module_publication  = "Publication";
+$l_module_statistic    = "Statistiques";
 
-$l_header_time = "Gestion des temps";
-$l_header_project = "Projets";
-$l_header_contract = "Contrats";
-$l_header_incident = "Incidents";
-$l_header_document = "Documents";
+$l_module_time = "Gestion des temps";
+$l_module_project = "Projets";
+$l_module_contract = "Contrats";
+$l_module_incident = "Incidents";
+$l_module_document = "Documents";
 
-$l_header_account = "Comptes";
-$l_header_invoice = "Factures";
-$l_header_payment = "Paiements";
+$l_module_account = "Comptes";
+$l_module_invoice = "Factures";
+$l_module_payment = "Paiements";
 
-$l_header_settings = "Configuration";
-$l_header_user = "Utilisateurs";
-$l_header_group = "Groupes";
+$l_module_settings = "Configuration";
+$l_module_user = "Utilisateurs";
+$l_module_group = "Groupes";
 
-$l_header_admin = "Administration";
-$l_header_admin_lang = "Langue";
-$l_header_admin_data = "Données";
-$l_header_admin_pref = "Préférences";
-$l_header_admin_code = "Code";
-$l_header_admin_ref = "Référentiel";
-$l_header_import = "Import";
+$l_module_admin = "Administration";
+$l_module_admin_lang = "Langue";
+$l_module_admin_data = "Données";
+$l_module_admin_pref = "Préférences";
+$l_module_admin_code = "Code";
+$l_module_admin_ref = "Référentiel";
+$l_module_import = "Import";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
@@ -249,6 +250,6 @@ $l_document_add = "Lier des documents";
 
 $l_waiting_events = "Evémenement(s) en attente";
 $l_unfilled = "Jour(s) non remplis";
-$l_youre_agenda = "Votre agenda";
-$l_youre_time = "Votre gestion du temps";
+$l_your_agenda = "Votre agenda";
+$l_your_time = "Votre gestion du temps";
 

@@ -12,7 +12,6 @@ $l_status = "Stato";
 $l_owner = "Possessore";
 $l_logger = "Resp. Tecnico";
 $l_duration = "Durata";
-$l_description = "Descrizione";
 $l_solution = "Solutione trovata";
 $l_num = "Numero del Contratto ";
 $l_date_before ="Data Precedente";

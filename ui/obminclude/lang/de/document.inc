@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 //////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Deutsch (German)
 //     - File     : document.inc
@@ -12,7 +12,6 @@ $l_document_new = "neues Dokument";
 $l_document_insert = "anlegen Dokument";
 $l_document_generate= "TeX-Dokument erzeugen";
 
-$l_descdocument = "Dokument Beschreibung";
 $l_namedocument = "Brief";
 $l_namesoc = "Firma";
 $l_typedocument = "Typ";

@@ -38,7 +38,7 @@ ALTER TABLE UGroup ADD COLUMN group_ext_id varchar(16) after group_local;
 ALTER TABLE UserObm ADD COLUMN userobm_phone2 varchar(32) after userobm_phone;
 ALTER TABLE UserObm ADD COLUMN userobm_fax varchar(32) after userobm_phone2;
 ALTER TABLE UserObm ADD COLUMN userobm_fax2 varchar(32) after userobm_fax;
-ALTER TABLE UserObm ADD COLUMN userobm_description varchar(255) after userobm_fax2;
+ALTER TABLE UserObm ADD COLUMN userobm_description varchar(255) after userobm_email;
 
 -- Add column _calendar_version
 ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp(14) after userobm_perms;

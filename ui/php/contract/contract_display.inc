@@ -348,8 +348,8 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
   global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_document_new;
-  global $l_header_incident, $l_incident_list, $l_incident_new, $l_last;
-  global $l_header_deal, $l_header_document, $l_contract;
+  global $l_module_incident, $l_incident_list, $l_incident_new, $l_last;
+  global $l_module_deal, $l_module_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
   global $path, $auth, $cgp_show;
 
@@ -366,7 +366,7 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
   }
 
   $block = "<div class=\"link\">
-  <div class=\"linkTitle\">:: $l_header_incident</div>
+  <div class=\"linkTitle\">:: $l_module_incident</div>
   <ul class=\"linkList\">
   <li>
     <a href=\"$url_inc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_incident\" /></a>
@@ -378,7 +378,7 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
     <a href=\"$url_inc_new\">$l_incident_new</a></li>
   </ul>
 
-  <div class=\"linkTitle\">:: $l_header_deal</div>
+  <div class=\"linkTitle\">:: $l_module_deal</div>
   <ul class=\"linkList\">
   <li>
     <a href=\"$url_deal\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_deal\" /></a>
@@ -394,10 +394,10 @@ function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
 
     $nb_document = run_query_document_nb ($id,"Contract");
     $block .= "
-  <div class=\"linkTitle\">:: $l_header_document</div>
+  <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
-        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 

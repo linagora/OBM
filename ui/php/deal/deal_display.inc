@@ -520,9 +520,9 @@ function html_deal_links($deal_q) {
   global $set_theme, $ico_pdeal, $ico_deal, $ico_contract;
   global $ico_contract_new, $ico_invoice, $ico_invoice_new, $ico_project;
   global $l_new;
-  global $l_parentdeal, $l_affect_deal, $l_header_contract;
-  global $l_header_project, $l_header_invoice;
-  global $l_header_document,$ico_document, $l_deal, $l_header_project;
+  global $l_parentdeal, $l_affect_deal, $l_module_contract;
+  global $l_module_project, $l_module_invoice;
+  global $l_module_document,$ico_document, $l_deal;
   global $l_document_add, $ico_document_new;
   global $path, $auth, $cgp_show, $popup_height,$popup_width;
 
@@ -557,7 +557,7 @@ function html_deal_links($deal_q) {
     $url_pro = url_prepare("$path/project/project_index.php?action=search&amp;param_deal=$id");
     $dis_ico_project = "
         <li><a href=\"$url_pro\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_project\" alt=\"\" /></a>
-            <a href=\"$url_pro\">$l_header_project ($nb_pro)</a></li>";
+            <a href=\"$url_pro\">$l_module_project ($nb_pro)</a></li>";
 
     // New project allowed only if hitrate = 100
     if ($hitrate == "100") {
@@ -568,7 +568,7 @@ function html_deal_links($deal_q) {
     }
     
     $block_project = "
-     <div class=\"linkTitle\">:: $l_header_project</div>
+     <div class=\"linkTitle\">:: $l_module_project</div>
      <ul class=\"linkList\">
        $dis_ico_project
      </ul>";
@@ -580,10 +580,10 @@ function html_deal_links($deal_q) {
     $url_contract = url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=$id");
     $url_contract_new = url_prepare("$path/contract/contract_index.php?action=new&amp;param_deal=$id&amp;param_company=$cid&amp;deal_label=$label&amp;sel_con1=$con1&amp;sel_con2=$con2&amp;sel_market=$market&amp;sel_tech=$tech");
     $block_contract = "
-  <div class=\"linkTitle\">:: $l_header_contract</div>
+  <div class=\"linkTitle\">:: $l_module_contract</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_contract\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
-        <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
+        <a href=\"$url_contract\">$l_module_contract ($contract_nb)</a></li>
     <li><a href=\"$url_contract_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_new</a></li>
   </ul>";
@@ -597,10 +597,10 @@ function html_deal_links($deal_q) {
     $nb_inv_tot = run_query_linked_invoice_nb($id, "deal", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "deal");
     $block_invoice = "
-  <div class=\"linkTitle\">:: $l_header_invoice</div>
+  <div class=\"linkTitle\">:: $l_module_invoice</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_inv\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
-        $l_header_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
+        $l_module_invoice ( <a href=\"$url_inv\">$nb_inv</a> /
         <a href=\"$url_inv_tot\">$nb_inv_tot</a> )</li>
     <li><a href=\"$url_inv_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_new</a></li>
@@ -614,10 +614,10 @@ function html_deal_links($deal_q) {
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/deal/deal_index.php")."&amp;ext_id=$id&amp;ext_target=$l_deal";
     $nb_document = run_query_document_nb($id, "deal");
     $block_doc = "
-  <div class=\"linkTitle\">:: $l_header_document</div>
+  <div class=\"linkTitle\">:: $l_module_document</div>
   <ul class=\"linkList\">
     <li><a href=\"$url_doc\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document\" alt=\"\" /></a>
-        <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
+        <a href=\"$url_doc\">$l_module_document ($nb_document)</a></li>
     <li><a href=\"$url_doc_new\"><img src=\"".C_IMAGE_PATH."/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_new</a></li>
 	<li><a href=\"\" 

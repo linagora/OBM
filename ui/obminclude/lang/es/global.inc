@@ -47,6 +47,7 @@ $l_postcode = "Código Postal";
 $l_town = "Ciudad";
 $l_expresspostal = "Dirección de correo";
 $l_country = "País";
+$l_desc = "Descripción";
 $l_datasource = "Fuente de Datos";
 $l_cat = "Categoría";
 $l_visibility = "Acceso";
@@ -130,42 +131,42 @@ $l_daysofweekshort = array ('Dom','Lun','Mar','Mie','Jue','Vie','Sab');
 $l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 
 //---------------------------------------------------------------------------//
-// Theme headers lang files
+// Theme Header lang files
 //---------------------------------------------------------------------------//
 
-$l_header_com    = "COMMERCIAL";
-$l_header_prod   = "PRODUCCIÓN";
-$l_header_compta = "CONTABILIDAD";
-$l_header_users  = "USUARIOS";
-$l_header_admins = "ADMINISTRACIÓN";
+$l_section_com    = "COMMERCIAL";
+$l_section_prod   = "PRODUCCIÓN";
+$l_section_compta = "CONTABILIDAD";
+$l_section_user   = "USUARIOS";
+$l_section_admin  = "ADMINISTRACIÓN";
 
-$l_header_company = "Compañías";
-$l_header_contact = "Contactos";
-$l_header_deal = "Negocios";
-$l_header_list = "Listas";
-$l_header_agenda = "Calendario";
-$l_header_todo    = "Tareas";
+$l_module_company = "Compañías";
+$l_module_contact = "Contactos";
+$l_module_deal = "Negocios";
+$l_module_list = "Listas";
+$l_module_agenda = "Calendario";
+$l_module_todo    = "Tareas";
 
-$l_header_time = "Manejo de tiempo";
-$l_header_project = "Proyectos";
-$l_header_contract = "Contratos";
-$l_header_incident = "Incidentes";
-$l_header_document = "Documentos";
+$l_module_time = "Manejo de tiempo";
+$l_module_project = "Proyectos";
+$l_module_contract = "Contratos";
+$l_module_incident = "Incidentes";
+$l_module_document = "Documentos";
 
-$l_header_account = "Cuentas";
-$l_header_invoice = "Facturas";
-$l_header_payment = "Pagos";
+$l_module_account = "Cuentas";
+$l_module_invoice = "Facturas";
+$l_module_payment = "Pagos";
 
-$l_header_settings = "Opciones";
-$l_header_user = "Usuarios";
-$l_header_group = "Grupos";
+$l_module_settings = "Opciones";
+$l_module_user = "Usuarios";
+$l_module_group = "Grupos";
 
-$l_header_admin = "Administración";
-$l_header_admin_lang = "Idioma";
-$l_header_admin_data = "Datos";
-$l_header_admin_pref = "Pref";
-$l_header_admin_code = "Código";
-$l_header_admin_ref = "Referential";
+$l_module_admin = "Administración";
+$l_module_admin_lang = "Idioma";
+$l_module_admin_data = "Datos";
+$l_module_admin_pref = "Pref";
+$l_module_admin_code = "Código";
+$l_module_admin_ref = "Referential";
 
 $l_header_new_f = "Nuevo";
 $l_header_new = "Nuevo";

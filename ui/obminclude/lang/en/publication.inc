@@ -12,7 +12,6 @@ $l_publication_title = "Publication Title";
 $l_type = "Type";
 $l_year= "Year";
 $l_market = "Marketing manager";
-$l_desc = "Description";
 $l_header_new_auto = "Renewal";
 // Labels and texts
 $l_type_manage = "Publication Type Management";
