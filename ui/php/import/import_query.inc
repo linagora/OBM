@@ -280,7 +280,7 @@ function check_import_context($id, $import) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// List Form Data checking and formatting
+// Import Form Data checking and formatting
 // Parameters:
 //   - $id       : import id (empty on insertion)
 //   - $import[] : values checked
@@ -307,6 +307,48 @@ function check_data_form($id, $import) {
   }
 
   return true;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get Import field mapping sorted like file fields order
+// Parameters:
+//   - $import_q : Import database result 
+///////////////////////////////////////////////////////////////////////////////
+function get_import_field_mapping($import_q) {
+  global $l_company, $l_number, $l_address, $l_postcode, $l_town;
+  global $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
+
+  $desc = $import_q->f("import_desc");
+  eval ($desc);
+
+  // Get the mapping field_num -> $field[]
+  while (list($field, $el) = each($comp)) {
+    $label = ${$el["label"]};
+    $value = $el["value"];
+    $default = $el["default"];
+    if (($label != "") && ($value != "")) {
+      $map["$value"]["label"] = $label;
+      $map["$value"]["col"] = $field;
+    }
+  }
+
+  while (list($field, $el) = each($con)) {
+    $label = ${$el["label"]};
+    $value = $el["value"];
+    $default = $el["default"];
+    if (($label != "") && ($value != "")) {
+      if ($value != "") {
+	$map["$value"] = $field;
+      }
+    }
+  }
+
+  // We sort mapping like file mapping
+  ksort($map);
+
+  return $map;
 }
 
 

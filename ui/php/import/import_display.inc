@@ -98,7 +98,7 @@ function html_import_search_form ($import, $dsrc_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Import search result
 // Parameters:
-//   - $import[] : list search criteria
+//   - $import[] : import hash values
 //     keys used : name, subject, email
 //   - $popup    : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
@@ -194,7 +194,7 @@ function html_import_consult($import_q) {
       if ($value != "") {
 	$map["$value"] = $field;
       }
-   }
+    }
   }
 
   $mapping .= "
@@ -259,14 +259,68 @@ function html_import_consult($import_q) {
     <tr>
       <td class=\"detailLabel\">$l_test_file</td>
       <td class=\"detailForm\">
-        <input type=\"file\" name=\"fi_file\" id=\"fi_file\" size=\"30\" value=\"\" />
+        <input type=\"file\" name=\"test_file\" id=\"test_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
         <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
     </tr>
     </table>
     </form>";
 
-  $block .= display_info_msg($message);
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Import Test File
+// Parameters:
+//   - $import_q : Import database result 
+//   - $import[] : import hash values
+//   - $max_rows : max rows displayed from test file
+///////////////////////////////////////////////////////////////////////////////
+function html_import_test_file($import_q, $import, $max_rows) {
+  global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
+  global $l_mapping, $l_field_num, $l_field, $l_default;
+  global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
+  global $display, $perm, $action;
+
+  $file = $import["file"];
+  $file_name = $import["file_name"];
+  $file_size = $import["file_size"];
+  $csv_sep = $import_q->f("import_separator");
+  $enclosed = $import_q->f("import_enclosed");
+
+  $map = get_import_field_mapping($import_q);
+
+  $mapping_head .= "<tr>";
+  while (list($num, $el) = each($map)) {
+    $label = $el["label"];
+    $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
+  }
+  $mapping_head .= "</tr>";
+
+  $regexp_sep = "/$enclosed$csv_sep$enclosed/";
+  $r = file($file);
+  while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
+    $tok = preg_split($regexp_sep, $line);
+    $mapping .= "<tr>";
+    while (list($num, $el) = each($tok)) {
+      $idx = $num + 1;
+      if ($map[$idx]["label"] != "") {
+	$mapping .= "<td class=\"detailForm\">$el</td>";
+      }
+    }
+    $mapping .= "</tr>";
+  }
+
+  $block = "
+    <div class=\"detailHead\">$file_name</div>
+    <table class=\"detail\">
+    <tr>
+      $mapping_head
+    </tr>
+      $mapping
+    </table>
+    </form>";
 
   return $block;
 }

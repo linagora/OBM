@@ -79,19 +79,6 @@ $import = get_param_import();
 get_import_action();
 $perm->check_permissions($menu, $action);
 
-echo "<br>fi_file=$fi_file";
-echo "<br>fi_name=$fi_file_name";
-echo "<br>fi_size=$fi_file_size";
-// ses_list is the session array of lists id to export
-if (sizeof($ses_list) >= 1) {
-  $sess->register("ses_list");
-}
-if ($action != "export_add") {
-  $ses_list = "";
-  $sess->unregister("ses_list");
-}
-page_close();
-
 require("import_js.inc");
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -210,22 +197,7 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_detail($import["id"]);
   $display["detail"] = html_import_consult($import_q);
-  $r = file($fi_file);
-  foreach ($r as $line) {
-    $display["detail"] .= $line . "<br>";
-  }
-}
-
-///////////////////////////////////////////////////////////////////////////////
-// External calls (main menu not displayed)                                  //
-///////////////////////////////////////////////////////////////////////////////
-if ($action == "ext_get_ids") {
-  $display["search"] = html_list_search_form($list);
-  if ($set_display == "yes") {
-    $display["detail"] = dis_list_search_list($list, $popup);
-  } else {
-    $display["msg"] .= display_ok_msg($l_no_display);
-  }
+  $display["detail"] .= html_import_test_file($import_q, $import, 5);
 }
 
 
@@ -404,6 +376,7 @@ function get_param_import() {
   global $tf_con_hpho, $tf_con_hpho_d, $tf_con_mpho, $tf_con_mpho_d;
   global $tf_con_fax, $tf_con_fax_d, $tf_con_mail, $tf_con_mail_d;
   global $tf_con_com, $tf_con_com_d;
+  global $test_file, $test_file_name, $test_file_size;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // Import fields
@@ -470,6 +443,11 @@ function get_param_import() {
   if (isset ($tf_con_mail_d)) $import["con_mail_d"] = trim($tf_con_mail_d);
   if (isset ($tf_con_com)) $import["con_com"] = trim($tf_con_com);
   if (isset ($tf_con_com_d)) $import["con_com_d"] = trim($tf_con_com_d);
+
+  // File
+  if (isset ($test_file)) $import["file"] = $test_file;
+  if (isset ($test_file_name)) $import["file_name"] = $test_file_name;
+  if (isset ($test_file_size)) $import["file_size"] = $test_file_size;
   
 
 
@@ -558,7 +536,7 @@ function get_import_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
      'Right'    => $cright_write_admin,
-     'Condition'=> array ('detailconsult', 'update') 
+     'Condition'=> array ('detailconsult', 'update', 'test_file') 
                                            );
 
 // Insert
@@ -600,6 +578,7 @@ function get_import_action() {
 
 
 
+
 // Contact ADD
   $actions["LIST"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
@@ -619,16 +598,6 @@ function get_import_action() {
     'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult','contact_add','contact_del') 
-                                     	 );
-
-// Export
-  $actions["LIST"]["export"] = array (
-    'Name'     => $l_header_global_export,
-    'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
-    'Right'    => $cright_write_admin,
-    'Popup'    => 1,
-    'Target'   => $l_list,
-    'Condition'=> array ('all') 
                                      	 );
 
 // Display
