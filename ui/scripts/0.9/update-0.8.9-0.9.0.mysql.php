@@ -151,7 +151,7 @@ include("$obminclude/global.inc");
       $rec_state = $state;
     $query = "INSERT INTO CalendarUser VALUES('".addslashes($timeupdate)."', '".addslashes($timecreate)."',
                                                 '".addslashes($userupdate)."', '".addslashes($usercreate)."',
-						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."')";	
+						'".addslashes($old_u)."','".addslashes($id)."','".addslashes($rec_state)."',0)";	
     display_debug_msg($query, $cdg_sql);
     $obm_ins_db->query($query);
     }
