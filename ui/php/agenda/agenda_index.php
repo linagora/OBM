@@ -102,10 +102,14 @@ elseif ($action == "new") {
 elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if(check_data_form($agenda)){    
+    $conflict = run_query_add_event($agenda,$sel_user_id);
+  }
+  else {
+    display_warn_msg($l_invalid_data . " : " . $err_msg);
     $user_obm = run_query_userobm();
-//    $cat_event = run_query_get_eventcategories();
-    $p_user_array = array($auth->auth["uid"],6);
-    dis_event_form($action, $agenda, $user_obm, $cat_event, $p_user_array);
+    $cat_event = run_query_get_eventcategories();
+    $p_user_array = array($auth->auth["uid"]);
+    dis_event_form($action, $agenda, $user_obm, $cat_event, $sel_user_id[]);
   }
 }
 
@@ -116,7 +120,7 @@ elseif ($action == "insert") {
 
 function get_param_agenda() {
   global $param_date,$param_event,$tf_title,$sel_category_id,$sel_priority,$ta_event_description;
-  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$sel_repeat_kind,$tf_interval;
+  global $set_start_time, $set_stop_time,$tf_date_begin,$tf_time_begin,$sel_repeat_kind;
   global $cdg_param,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy;
 
@@ -149,12 +153,11 @@ function get_param_agenda() {
     }
   }
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
-  if (isset($tf_interval)) $agenda["interval"] = $tf_interval;
   for ($i=0; $i<7; $i++) {
     if (isset(${"cb_repeatday_".$i})) 
       $agenda["repeat_days"] .= ${"cb_repeatday_".$i};
   }
-
+  
   if (debug_level_isset($cdg_param)) {
     if ( $agenda ) {
       while ( list( $key, $val ) = each( $agenda ) ) {
@@ -178,7 +181,7 @@ function get_agenda_action() {
   global $l_header_month,$l_header_new_event,$param_event;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
-//Index
+  //Index
 
   $actions["AGENDA"]["index"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=index",

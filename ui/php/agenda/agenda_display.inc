@@ -984,7 +984,6 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     $privacy = $obm_q_event->f("calendarevent_privacy"); 
     $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
     $repeat_kind = $obm_q_event->f("calendarevent_repeatkind");
-    $repeat_interval = $obm_q_event->f("calendarevent_repeat_interval");
     $repeat_days =$obm_q_event->f("calendarevent_repeatdays"); 
     $repeat_end = $obm_q_event->f("calendarevent_endrepeat");
   } else {
@@ -993,14 +992,13 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     $category_id = $agenda["category"];
     $priority = $agenda["priority"];
     $description = $agenda["description"];
-    $datebegin = substr($agenda["date_begin"],0,8);
-    $timebegin = substr($agenda["date_begin"],8,4);
-    $dateend = substr($agenda["date_end"],0,8);
-    $timeend = substr($agenda["date_begin"],8,6);
+    $datebegin = substr($agenda["date_begin"],0,10);
+    $timebegin = substr($agenda["date_begin"],10,2).":".substr($agenda["date_begin"],12,2);
+    $dateend = substr($agenda["date_end"],0,10);
+    $timeend = substr($agenda["date_end"],10,2).":".substr($agenda["date_begin"],12,2);
     $privacy = $agenda["privacy"]; 
     $occupied_day = $agenda["occupied"];
     $repeat_kind = $agenda["kind"];
-    $repeat_interval = $agenda["interval"];
     $repeat_days =$agenda["repeat_days"]; 
     $repeat_end = $agenda["repeat_end"];
     $force = $agenda["force"];
@@ -1064,8 +1062,8 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   // eventcategory select
   $sel_cat = "<select name=\"sel_category_id\">"; 
   while ($category_list->next_record()) {
-    $c_id = $category_list->f("eventcategory_id");
-    $c_label = $category_list->f("eventcategory_label");
+    $c_id = $category_list->f("calendarcategory_id");
+    $c_label = $category_list->f("calendarcategory_label");
     $sel_cat .= "<option value=\"$c_id\"";
     if ($c_id == $category_id) {
       $sel_cat .= " selected=\"selected\"";
@@ -1090,7 +1088,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   }
 
   // userobm select
-  $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\">";
+  $dis_sel_user = "<select name=\"sel_user_id\" size=\"6\" multiple=\"multiple\">";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $u_lname = $usr_q->f("userobm_lastname");
@@ -1127,7 +1125,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
   
   // --- HTML Template --------------------------------------------------------
   echo "
-  <form method=\"post\" name=\"f_mod_calendar\"
+  <form method=\"get\" name=\"f_mod_calendar\"
    onsubmit=\"if (check_calendar(this)) return true; else return false;\"
    action=\"".url_prepare("agenda_index.php")."\">
    <table class=\"details\">
@@ -1159,7 +1157,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     </tr>   
     <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format</td>
-     <td><input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$date_begin\" /></td>
+     <td><input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" /></td>
     </tr>
     <tr>
      <td class=\"detailLabel\">$l_timebegin</td>
@@ -1167,7 +1165,7 @@ function  dis_event_form($action, $agenda, $usr_q, $category_list, $p_user_array
     </tr>
     <tr>
      <td class=\"detailLabel\">$l_dateend $l_format</td>
-     <td><input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$date_end\" /></td>       
+     <td><input type=\"text\" id=\"tf_date_end\" name=\"tf_date_end\" maxlength=\"10\" size=\"12\" value=\"$dateend\" /></td>       
     </tr>
     <tr>    
      <td class=\"detailLabel\">$l_timeend</td>

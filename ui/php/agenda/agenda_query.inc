@@ -27,36 +27,36 @@ function run_query_day_event_list($agenda,$contacts_array) {
   
   $obm_db = new DB_OBM;
   $query = "SELECT calendarevent_id,
-                   calendarevent_usercreate,
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
-		   calendarevent_datebegin,
-		   calendarevent_dateend,
-		   eventcategory_label,
-		   eventuser_user_id,
-		   calendarsegment_date,
-		   calendarsegment_flag
-            FROM CalendarEvent,EventCategory,EventUser, CalendarSegment
-	    WHERE calendarevent_category_id=eventcategory_id
-	      AND calendarevent_id = calendarsegment_id
-              AND eventuser_state <> 'R'
-	      AND eventuser_event_id=calendarevent_id	      
-	      AND calendarevent_datebegin < $end_day  
-	      AND calendarevent_dateend > $start_day
-             ";
+		   calendarcategory_label,
+		   cs1.calendarsegment_customerid,
+		   cs1.calendarsegment_date,
+		   cs1.calendarsegment_flag
+		   FROM CalendarEvent,CalendarCategory, CalendarSegment cs1,CalendarSegment cs2
+	    WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = cs1.calendarsegment_eventid
+	      AND cs1.calendarsegment_eventid = cs2.calendarsegment_eventid
+	      AND cs1.calendarsegment_customerid = cs2.calendarsegment_customerid
+	      AND cs1.calendarsegment_state = 'A'
+	      AND ((cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $end_day
+	            AND cs2.calendarsegment_flag = 'end' AND cs2.calendarsegment_date > $start_day)
+		OR (cs1.calendarsegment_flag = 'end' AND cs1.calendarsegment_date > $start_day
+	    	    AND cs2.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date < $end_day))
+	      ";
 
 
 
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
-    $query .= "AND eventuser_user_id IN ('".$contacts_array[0]."'";
+    $query .= "AND cs1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
     for ($i=1;$i<count($contacts_array);$i++) {
       $query.= ",'".$contacts_array[$i]."'";
     }
     $query.=")";
   }    
         
-  $query.=" ORDER BY calendarsegment_date"; 
+  $query.=" ORDER BY cs1.calendarsegment_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -84,36 +84,35 @@ function run_query_week_event_list($agenda,$contacts_array) {
   
   $obm_db = new DB_OBM;
   $query = "SELECT calendarevent_id,
-                   calendarevent_usercreate,
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
-		   calendarevent_datebegin,
-		   calendarevent_dateend,
-		   eventcategory_label,
-		   eventuser_user_id,
-		   calendarsegment_date,
-		   calendarsegment_flag
-            FROM CalendarEvent,EventCategory,EventUser, CalendarSegment
-	    WHERE calendarevent_category_id=eventcategory_id
-	      AND calendarevent_id = calendarsegment_id
-              AND eventuser_state <> 'R'
-	      AND eventuser_event_id=calendarevent_id	      
-	      AND calendarevent_datebegin < $end_week_time  
-	      AND calendarevent_dateend > $start_week_time
-             ";
+		   calendarcategory_label,
+		   cs1.calendarsegment_customerid,
+		   cs1.calendarsegment_date,
+		   cs1.calendarsegment_flag
+		   FROM CalendarEvent,CalendarCategory, CalendarSegment cs1,CalendarSegment cs2
+	      WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = cs1.calendarsegment_eventid
+	      AND cs1.calendarsegment_eventid = cs2.calendarsegment_eventid
+	      AND cs1.calendarsegment_customerid = cs2.calendarsegment_customerid
+	      AND cs1.calendarsegment_state = 'A'
+	      AND ((cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $end_week_time
+	            AND cs2.calendarsegment_flag = 'end' AND cs2.calendarsegment_date > $start_week_time)
+		OR (cs1.calendarsegment_flag = 'end' AND cs1.calendarsegment_date > $start_week_time
+	    	    AND cs2.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date < $end_week_time))
+	      ";
 
-
-
+  
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
-    $query .= "AND eventuser_user_id IN ('".$contacts_array[0]."'";
+    $query .= "AND  cs1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
     for ($i=1;$i<count($contacts_array);$i++) {
       $query.= ",'".$contacts_array[$i]."'";
     }
     $query.=")";
   }    
         
-  $query.=" ORDER BY calendarsegment_date"; 
+  $query.=" ORDER BY cs1.calendarsegment_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -141,31 +140,31 @@ function run_query_month_event_list($agenda,$contacts_array) {
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
-		   calendarevent_datebegin,
-		   calendarevent_dateend,
-		   eventcategory_label,
-		   eventuser_user_id,
-		   calendarsegment_date,
-		   calendarsegment_flag
-            FROM CalendarEvent,EventCategory,EventUser, CalendarSegment
-	    WHERE calendarevent_category_id=eventcategory_id
-	      AND calendarevent_id = calendarsegment_id
-              AND eventuser_state <> 'R'
-	      AND eventuser_event_id=calendarevent_id	      
-	      AND calendarevent_datebegin LIKE '$month%'  
+		   calendarcategory_label,
+		   c1.calendarsegment_customerid,
+		   c1.calendarsegment_date,
+		   c1.calendarsegment_flag
+            FROM CalendarEvent,CalendarCategory, CalendarSegment c1,
+	    CalendarSegment c2
+	    WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = c1.calendarsegment_eventid
+	      AND c1.calendarsegment_state = 'A'
+	      AND c1.calendarsegment_eventid = c2.calendarsegment_eventid
+	      AND c2.calendarsegment_flag = 'begin'
+	      AND c2.calendarsegment_date LIKE '$month%'  
              ";
 
 
 
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
-    $query .= "AND eventuser_user_id IN ('".$contacts_array[0]."'";
+    $query .= "AND c1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
     for ($i=1;$i<count($contacts_array);$i++) {
       $query.= ",'".$contacts_array[$i]."'";
     }
     $query.=")";
   }    
         
-  $query.=" ORDER BY calendarsegment_date"; 
+  $query.=" ORDER BY c1.calendarsegment_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -193,31 +192,31 @@ function run_query_year_event_list($agenda,$contacts_array) {
 		   calendarevent_title,
 		   calendarevent_priority,
 		   calendarevent_privacy,
-		   calendarevent_datebegin,
-		   calendarevent_dateend,
-		   eventcategory_label,
-		   eventuser_user_id,
-		   calendarsegment_date,
-		   calendarsegment_flag
-            FROM CalendarEvent,EventCategory,EventUser, CalendarSegment
-	    WHERE calendarevent_category_id=eventcategory_id
-	      AND calendarevent_id = calendarsegment_id
-              AND eventuser_state <> 'R'
-	      AND eventuser_event_id=calendarevent_id	      
-	      AND calendarevent_datebegin LIKE '$year%'  
+		   calendarcategory_label,
+		   c1.calendarsegment_customerid,
+		   c1.calendarsegment_date,
+		   c1.calendarsegment_flag
+            FROM CalendarEvent,CalendarCategory, CalendarSegment c1,
+	    CalendarSegment c2
+	    WHERE calendarevent_category_id = calendarcategory_id
+	      AND calendarevent_id = c1.calendarsegment_eventid
+	      AND c1.calendarsegment_state = 'A'
+	      AND c1.calendarsegment_eventid = c2.calendarsegment_eventid
+	      AND c2.calendarsegment_flag = 'begin'
+	      AND c2.calendarsegment_date LIKE '$year%'  
              ";
 
 
 
   if(is_array($contacts_array) and (count($contacts_array)>0) ) {
-    $query .= "AND eventuser_user_id IN ('".$contacts_array[0]."'";
+    $query .= "AND c1.calendarsegment_customerid IN ('".$contacts_array[0]."'";
     for ($i=1;$i<count($contacts_array);$i++) {
       $query.= ",'".$contacts_array[$i]."'";
     }
     $query.=")";
   }    
         
-  $query.=" ORDER BY calendarsegment_date"; 
+  $query.=" ORDER BY c1.calendarsegment_date"; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   return $obm_db;
@@ -247,135 +246,188 @@ function run_query_get_user_name($contacts_array) {
   return $obm_db;
 }
 /////////////////////////////////////////////////////////////////////////////
-// Insert a event
+// Perform the addiction of a event
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
-//    $contacts_array : array containing the id of the contact(s) the event is assigned to 
+//    $agenda : Agenda params
+//    $contacts_array : List of the users 
 /////////////////////////////////////////////////////////////////////////////
-function run_query_insert_event($agenda) {
-  global $cdg_sql,$auth;
 
+function run_query_add_event($agenda,$contacts_array) {
+  global $auth;
+  $return_info = array();
+  $event_repeat_dates = get_repeat_date();
+  foreach($event_repeat_dates as $dates) {
+    $conflicts = run_query_get_conflicts($dates["date_begin"],$dates["date_end"],$contacts_array);
+    $return_info = array_merge($return_info, $conflicts);
+  }
+  if($force == 1 || count($return_info) == 0){    
+    $event_id = run_query_insert_event_data($agenda);   
+    foreach($event_repeat_dates as $dates) {
+      foreach($contacts_array as $user_id) {
+	if($user_id == $auth->auth["uid"]) {
+	  $conflicts = run_query_get_conflicts_user($dates["date_begin"],$dates["date_end"],$user_id);
+	  run_query_delete_occurence($conflicts,$user_id);
+  	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'A');	
+	}
+	else{
+	  run_query_insert_occurence($dates["date_begin"],$dates["date_end"],$user_id,$event_id,'W');	
+	}
+      }
+    }
+  }
+  return $return_info;
+}
+/////////////////////////////////////////////////////////////////////////////
+// Insert a occurence of a event
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $date_begin : 
+//    $date_end : 
+//    $user_id :
+//    $event_id :
+//    $state :
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_insert_occurence($date_begin,$date_end,$user_id,$event_id,$state) {
+  global $cdg_sql;
   $obm_db = new DB_OBM;
+  $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
+                                         calendarsegment_type, calendarsegment_state) 
+                                  VALUES ($event_id,$user_id,'$date_begin','begin','user','$state')";
+  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $query = "INSERT INTO CalendarSegment (calendarsegment_eventid, calendarsegment_customerid, calendarsegment_date, calendarsegment_flag,
+                                         calendarsegment_type, calendarsegment_state) 
+                                  VALUES ($event_id,$user_id,'$date_end','end','user','$state')";
+  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  return $obm_q; 
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Delete occurence of a events for a user 
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $occur : object which contains events id, date of the occurence
+//    $user_id :
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_delete_occurence($occur,$user_id) {
+  global $cdg_sql;
+  while($occur->next_record()) {
+    $obm_db = new DB_OBM;
+    $query = "DELETE CalendarSegment WHERE calendarsegment_customerid = $user_id 
+            AND calendarsegment_eventid = ".$occur->f("calendarsegment_eventid")." AND 
+	    ( calendarsegment.date = '".$occur->f("date_begin")."' OR calendarsegment.date = '".$occur->f("date_end")."')";
+    
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// search all conflict for a user in a laps of  time 
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $date_begin
+//    $date_end
+//    $user_id :
+/////////////////////////////////////////////////////////////////////////////
+function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
+  global $cdg_sql;
+  $obm_db = new DB_OBM;
+  $query = "SELECT cs1.calendarsegment_eventid ,cs1.calendarsegment_date as date_begin
+            ,cs2.calendarsegment_date as date_end FROM CalendarSegment cs1, CalendarSegment cs2 
+            WHERE cs1.calendarsegment_eventid = cs2.calendarsegment_eventid and cs1.calendarsegment_date < '$date_end'
+	    AND cs1.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date > 'date_begin' AND
+	    cs2.calendarsegment_flag = 'end' AND calendarsegment_customerid = $user_id AND calendarsegment_type = 'user'";
+  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  return $obm_q;
+}
+/////////////////////////////////////////////////////////////////////////////
+// search all conflict for a user in a laps of  time 
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $date_begin
+//    $date_end
+//    $user_id :
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
+  global $cdg_sql;
+  $obm_db = new DB_OBM;
+  $query = "SELECT cs1.calendarsegment_eventid ,cs1.calendarsegment_customerid,cs1.calendarsegment_date as date_begin
+            ,cs2.calendarsegment_date as date_end FROM CalendarSegment cs1, CalendarSegment cs2 
+            WHERE cs1.calendarsegment_eventid = cs2.calendarsegment_eventid and cs1.calendarsegment_date < '$date_end'
+	    AND cs1.calendarsegment_flag = 'begin' AND cs2.calendarsegment_date > 'date_begin' AND
+	    cs2.calendarsegment_flag = 'end' AND calendarsegment_type = 'user'";
+  $query .= " AND calendarsegment_customerid IN ('".$contacts_array[0]."'";
+  for ($i=1;$i<count($contacts_array);$i++) {
+    $query.= ",'".$contacts_array[$i]."'";
+  }
+  $query.=")";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  while ($obm_q->next_record()) {
+    $conflict_array[] = array("event_id" => $obm_q->f("calendarsegment_eventid"), "user_id" => $obm_q->f("calendarsegment_customerid"));
+  }
+  return $conflict_array;
+}
+	    
+/////////////////////////////////////////////////////////////////////////////
+// Insert data of a event  Return the id of this event
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $agenda : hashed agenda params
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_insert_event_data($agenda) {
+  global $cdg_sql;
+
   $title = $agenda["title"];
   $category_id = $agenda["category"];
   $priority = $agenda["priority"];
   $description = $agenda["description"];
-  $datebegin = $agenda["date_begin"];
-  $dateend = $agenda["date_end"];
+  $datebegin = substr($agenda["date_begin"],0,8);
+  $timebegin = substr($agenda["date_begin"],8,4);
+  $dateend = substr($agenda["date_end"],0,8);
+  $timeend = substr($agenda["date_begin"],8,6);
   $privacy = $agenda["privacy"]; 
-  $occupied_day = $agenda["occupied"];
   $repeat_kind = $agenda["kind"];
-  $repeat_interval = $agenda["interval"];
   $repeat_days =$agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
-  $force = $agenda["force"];
-  
-  if ($interval =='') {
-    $interval=1;
-  }
 
-  if($repeat_end == '') {
-    $repeat_end = substr($agenda["date_end"],0,8);
-  }
-  
-  switch($repeat_kind) {
-    case 'daily'   : $inter = '+1 day'; break;
-    case 'weekly'  : $inter = '+1 week'; break;
-    case 'monthly' : $inter = '+1 month'; break; 
-    case 'yearly'  : $inter = '+1 year'; break; 
-    default        : $inter = '+$interval days'; break;  
-    }
- 
-  if ($privacy != 1) {
-    $privacy=0;
-  }
-
-  
-  for($i=substr($agenda["date_end"],0,8); $i< $repeat_end; $i = date("Ymd",strtotime("$inter",$i))) {
-/////////////////////////////////////// 
-// Verification de l'absence de conflit
-///////////////////////////////////////
-    $query = "SELECT calendarevent_id,
-              FROM CalendarEvent,EventUser
-	      WHERE  eventuser_state <> 'R' AND eventuser_event_id=calendarevent_id AND calendarevent_datebegin < $date_end  
-	      AND calendarevent_dateend > $date_begin";
-
-	      
-    if(is_array($contacts_array) and (count($contacts_array)>0) ) {
-      $query .= "AND eventuser_user_id in ('".$contacts_array[0]."'";
-      for ($i=1;$i<count($contacts_array);$i++) {
-      	$query.= ",'".$contacts_array[$i]."'";
-      }
-      $query.=")";
-    }      
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-//////////////////////////////////////////////////
-// Si pas de conflit ou que l'on force l'insertion
-//////////////////////////////////////////////////
-    if($obm_q->nf() == 0 || $force == 1) {
-      if($force == 1 && $obm_q->nf()>0) {
-/////////////////////////////////////////////////////////////////////////////	
-// Si Conflit et que l'insertion est forcée on supprime l'ancien rendez vous.
-/////////////////////////////////////////////////////////////////////////////
-	run_query_delete_event($p_user_array, $obm_q->f("calendarevent_id"));
-      }
-/////////////////////////////////////////      
-// Insertion des données de l'évenement.
-/////////////////////////////////////////
-      $query = "INSERT INTO CalendarEvent (calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, 
-                                         calendarevent_usercreate, calendarevent_origin_id, calendarevent_title, calendarevent_description,
-					 calendarevent_category_id,calendarevent_priority,calendarevent_privacy,calendarevent_datebegin,
-					 calendarevent_dateend,calendarevent_occupied_day,calendarevent_repeatkind,
-					 calendarevent_repeat_interval,calendarevent_repeatdays,calendarevent_endrepeat)
-			         VALUES (null,'".date("YmdHis")."',null,".$auth->auth["uid"].",$p_origin,'$title',
-				         '$description',$category_id,$priority,$privacy,'$datebegin','$dateend',
-					 $repeat_interval,'$repeatdays','$endrepeat')";
-
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
-//////////////////////////////////////////////////////////////      
-// On rechecher l'id de l'evenement que l'ont vient d'inserer
-//////////////////////////////////////////////////////////////
-      $query = "SELECT calendarevent_id FROM CalendarEvent 
-                                      WHERE calendarevent_title='$p_title' AND calendarevent_usercreate='".$auth->auth["uid"]."'
-	  			      AND calendarevent_datebegin='$p_datebegin' AND calendarevent_dateend='$p_dateend'";
-      display_debug_msg($query, $cdg_sql);
-      $obm_db->query($query);
-      $obm_db->next_record();
-      $event_id = $obm_db->f("calendarevent_id");
-////////////////////////////////////////////////////////////////////      
-// Calcul des dates de début et de fin dans Calendar Segment.
-// On insere les données de Calendar Segment, permettant l'affichage
-////////////////////////////////////////////////////////////////////
-      $query = "INSERT INTO CalendarSegment (calendarsegment_id,calendarsegment_date,calendarsegment_flag)
-                            VALUES ($event_id, '$date_b', 'begin')";
-      $obm_q->query($query);   
-      $query = "INSERT INTO CalendarSegment (calendarsegment_id,calendarsegment_date,calendarsegment_flag)
-                          VALUES ($event_id, '$date_e', 'end')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query); 		     
-////////////////////////////////////////////////////////////      
-// On insère les liens entre les utilisateurs et l'evenement
-////////////////////////////////////////////////////////////
-      foreach($p_user_array as $user_id) {
-	if($user_id == $auth->auth["uid"]) {$state = 'A';} else {	$state = 'W'; }		    
-	$query = "INSERT INTO CalendarSegment (eventuser_event_id, eventuser_user_id, eventuser_state)
-                            VALUES($event_id,$user_id,$state)";
-        display_debug_msg($query, $cdg_sql);
-        $obm_q->query($query);		  
-      }	
-      if($p_origin=='null')
-        $p_origin=$event_id;
-    }
-  }
+  $obm_db = new DB_OBM;
+  $obm_db->lock("CalendarEvent");
+  $query = "SELECT MAX(calendarevent_id) FROM CalendarEvent";
   display_debug_msg($query, $cdg_sql);
-  $obm_q =new DB_OBM;
-  $obm_q->query($query); 
+  $obm_db->query($query);
+  $max_id = $obm_db->f("max(calendarevent_id)");
+  $query = "INSERT INTO CalendarEvent (calendarevent_id,calendarevent_timeupdate, calendarevent_timecreate, calendarevent_userupdate, 
+                         calendarevent_usercreate, calendarevent_title, calendarevent_description,
+			 calendarevent_category_id,calendarevent_priority,calendarevent_privacy,
+			 calendarevent_repeatkind,calendarevent_repeatdays,calendarevent_endrepeat)
+	         VALUES ($max_id,null,'".date("YmdHis")."',null,".$auth->auth["uid"].",'$title',
+		         '$description',$category_id,$priority,$privacy,
+			 $repeat_interval,'$repeatdays','$endrepeat')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_db->unlock();
+  return $max_id;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////
 // Get all event categories
@@ -383,7 +435,7 @@ function run_query_insert_event($agenda) {
 function run_query_get_eventcategories() {
   global $cdg_sql;
 
-  $query = "SELECT * FROM EventCategory";
+  $query = "SELECT * FROM CalendarCategory";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -434,14 +486,14 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
     }
     while($obm_q->f("calendarsegment_date") == $current_time) {
       if($obm_q->f("calendarsegment_flag") == "begin") {
-	$curent_event[$current_time][$obm_q->f("eventuser_user_id")] = $obm_q->f("calendarevent_id");
+	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = $obm_q->f("calendarevent_id");
 	$event_data[$obm_q->f("calendarevent_id")] = 
-  	      array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("eventcategory_label"),
-	      "begin"=>date("H:i",$obm_q->f("calendarevent_datebegin")),"end"=>date("H:i",$obm_q->f("calendarevent_dateend")), 
-	      "status"=>0);
+  	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
+	$obm_q->f("calendarsegment_flag")=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+	substr($obm_q->f("calendarsegment_date"),10,2),"status"=>0);
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
-	$curent_event[$current_time][$obm_q->f("eventuser_user_id")] = -1;
+	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
 	$obm_q->next_record(); 
       }       
     }
@@ -449,7 +501,8 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
   }    
 }
 /////////////////////////////////////////////////////////////////////////////
-// Return tables of hashed events and of data event.(hashed by day)
+// Return tables of hashed events and of data event.(hashed by day for year
+//                 and month view)
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
 // -----------
@@ -475,10 +528,10 @@ function store_daily_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_
       if($obm_q->f("calendarsegment_flag") == "begin") {
 	$curent_event[$current_time][$obm_q->f("calendarevent_id")] = 1;
 	$event_data[$obm_q->f("calendarevent_id")] = 
-	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("eventcategory_label"),
-	"begin"=>date("H:i",$obm_q->f("calendarevent_datebegin")),"end"=>date("H:i",$obm_q->f("calendarevent_dateend")), 
-	"status"=>0);
-	$event_data[$obm_q->f("calendarevent_id")]["user_id"][] = $obm_q->f("eventuser_user_id");
+	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
+	$obm_q->f("calendarsegment_flag")=>substr($obm_q->f("calendarsegment_date"),8,2).":".
+	substr($obm_q->f("calendarsegment_date"),10,2),"status"=>0);
+	$event_data[$obm_q->f("calendarevent_id")]["user_id"][] = $obm_q->f("calendarsegment_customerid");
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
 	$curent_event[$current_time][$obm_q->f("calendarevent_id")] = -1;
@@ -513,7 +566,7 @@ function store_users($user_q) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($agenda) {
-  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_incorect_datebegin, $l_incorect_dateend ;
+  global $l_fill_title, $l_fill_dateend, $l_fill_datebegin, $l_incorect_datebegin, $l_incorect_dateend,$err_msg ;
 
   
   $title = $agenda["title"];
