@@ -55,10 +55,10 @@ $cs_lifetime = 7200;
 //$cas_server_uri = "";
 
 // Shall the login page encrypt authentication password
-$auth_encryption = 0;
+$auth_encryption = 1;
 
 // encyption used to store password : "plain", "md5" or "crypt"
-$password_encryption = "plain";
+$password_encryption = "md5";
 
 // Modules specific parameters ----------------------------------------------//
 
@@ -137,22 +137,6 @@ $cgp_hide["contact"]["category2"] = true;
 // Deal module
 $cgp_hide["deal"]["category1"] = true;
 
-<<<<<<< obm_conf.inc
-=======
-// authentification : 'CAS' or 'standalone' : defaults to 'standalone'
-
-// authentification 
-// 'CAS' or 'standalone'
-// defaults to 'standalone'
-// $auth_kind="CAS"; 
-// CAS specific parameters.
-// useless in standalone mode
-// Authentication used :
-$cas_server = "sso.aliacom.local";
-$cas_server_port = 8443;
-$cas_server_uri = "";
-
->>>>>>> 1.113
 //Set if there is a link for Aliamin, Blogs and Aliacms
 //$aliamin_link = "http://aliamin.aliacom.local/";
 //$aliacms_link = "http://cms.aliacom.local/";

@@ -100,7 +100,7 @@ if ($action == "ext_get_ids") {
         $user_id = get_user_id($obm_user["login"]);
         run_query_default_preferences_insert($user_id);
       } else {
-      $display["msg"] .= display_err_msg($l_insert_error);
+	$display["msg"] .= display_err_msg($l_insert_error);
       }
       $display["search"] = html_user_search_form($obm_user);
 

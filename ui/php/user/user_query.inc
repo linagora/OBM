@@ -95,7 +95,7 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User detail query execution                                               //
+// User detail query execution
 // Parameters:
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
@@ -131,7 +131,7 @@ function run_query_detail($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// User insert query execution                                               //
+// User insert query execution
 // Parameters:
 //   - $user[]   : entry values
 //     keys used : login, passwd, perms, archive, *name, email

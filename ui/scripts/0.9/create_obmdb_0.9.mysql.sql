@@ -96,7 +96,7 @@ CREATE TABLE UserObm (
   userobm_datebegin         date,
   userobm_archive           char(1) not null default '0',
   userobm_lastname          varchar(32),
-  userobm_firstname         varchar(32),
+  userobm_firstname         varchar(48),
   userobm_phone             varchar(32),
   userobm_phone2            varchar(32),
   userobm_fax               varchar(32),
