@@ -265,7 +265,7 @@ function get_param_invoice() {
 function get_invoice_action() {
   global $invoice, $actions, $path;
   global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_consult, $l_header_display,$l_header_dupplicate,$l_header_admin;
+  global $l_header_consult, $l_header_display,$l_header_duplicate,$l_header_admin;
   global $l_header_add_deal, $invoice_admin_write;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
@@ -289,7 +289,7 @@ function get_invoice_action() {
     'Name'     => $l_header_new_f,
     'Url'      => "$path/invoice/invoice_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult','display') 
+    'Condition'=> array ('','search','index','detailconsult','delete','display') 
                                    );
 
 //Insert
@@ -309,7 +309,7 @@ function get_invoice_action() {
 
 // Duplicate
   $actions["INVOICE"]["duplicate"] = array (
-    'Name'     => $l_header_dupplicate,
+    'Name'     => $l_header_duplicate,
     'Url'      => "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult', 'update')

@@ -21,6 +21,7 @@ $l_fax = "Fax";
 $l_web = "W";
 $l_email = "@M";
 $l_coord = "Coordonnées";
+$l_vat = "Numéro Intracommunautaire";
 
 // Labels et textes
 $l_comment = "Commentaire";

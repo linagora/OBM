@@ -192,7 +192,7 @@ $l_header_new_child = "Nouvelle Affaire liée";
 $l_header_new_parent = "Nouvelle SurAffaire";
 
 $l_header_reconcile = "Rapprocher";
-$l_header_dupplicate = "Dupliquer";
+$l_header_duplicate = "Dupliquer";
 $l_header_compute_balance = "Calculez solde";
 
 $l_header_add_contact = "Ajouter contact";

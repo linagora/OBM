@@ -65,6 +65,7 @@ $cgp_show["section"]["aliamin"] = false;
 
 // Company module
 //$cgp_hide["company"]["number"] = true;
+$cgp_hide["company"]["vat"] = true;
 //$cgp_hide["company"]["companytype_label"] = true;
 //$cgp_hide["company"]["companyactivity_label"] = true;
 //$cgp_hide["company"]["companynafcode_code"] = true;

@@ -13,6 +13,8 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["company_name"] = $l_name;
+$fieldnames["company_number"] = $l_number;
+$fieldnames["company_vat"] = $l_vat;
 $fieldnames["company_archive"] = $l_archive_first;
 $fieldnames["company_address"] = $l_address;
 $fieldnames["company_address1"] = "$l_address 1";
@@ -638,7 +640,7 @@ function html_company_links($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q, $cat_q) {
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
-  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode;
+  global $l_name, $l_aka, $l_number, $l_kind, $l_activity, $l_nafcode, $l_vat;
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market, $l_archive;
   global $l_insert,$l_update, $l_company, $l_coord,$l_category;
@@ -646,6 +648,7 @@ function html_company_consult($co_q, $cat_q) {
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
+  $vat = $co_q->f("company_vat");
   $archive = ($co_q->f("company_archive") == 1 ? $c_yes : $c_no);
   $name = $co_q->f("company_name");
   $aka = $co_q->f("company_aka");
@@ -687,6 +690,7 @@ function html_company_consult($co_q, $cat_q) {
 
   // Conditionnal fields
   $show_number = (! $cgp_hide["company"]["number"]);
+  $show_vat = (! $cgp_hide["company"]["vat"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
@@ -699,6 +703,15 @@ function html_company_consult($co_q, $cat_q) {
     <tr>
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailText\">$num</td>
+    </tr>";
+  }
+
+  // VAT field
+  if ($show_vat) {
+    $block_vat = "
+    <tr>
+      <td class=\"detailLabel\">$l_vat</td>
+      <td class=\"detailText\">$vat</td>
     </tr>";
   }
 
@@ -827,7 +840,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_add_comment,$l_upd_comment;
-  global $l_number, $l_market, $l_coord;
+  global $l_number, $l_vat, $l_market, $l_coord;
   global $l_insert, $l_update, $l_internal, $l_company, $l_archive;
 
   $uid = $auth->auth["uid"];
@@ -837,6 +850,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   if ($action == "detailupdate") {
     $id = $co_q->f("company_id");
     $num = $co_q->f("company_number");
+    $vat = $co_q->f("company_vat");
     $archive = ($co_q->f("company_archive") == 1 ? " checked" : "");
     $name = $co_q->f("company_name");
     $aka = $co_q->f("company_aka");
@@ -871,6 +885,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
   // If parameters have been given, they supercede the default action value
   if (isset($company["id"])) { $id = $company["id"]; }
   if (isset($company["num"])) { $num = stripslashes($company["num"]); }
+  if (isset($company["vat"])) { $vat = stripslashes($company["vat"]); }
   if (isset($company["archive"])) { $archive = ($company["archive"] == 1 ? "checked" : ""); }
   if (isset($company["name"])) { $name = stripslashes($company["name"]); }
   if (isset($company["aka"])) { $aka = stripslashes($company["aka"]); }
@@ -898,6 +913,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
   // Conditionnal fields
   $show_number = (! $cgp_hide["company"]["number"]);
+  $show_vat = (! $cgp_hide["company"]["vat"]);
   $show_kind = (! $cgp_hide["company"]["companytype_label"]);
   $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
   $show_naf = (! $cgp_hide["company"]["companynafcode_code"]);
@@ -915,6 +931,14 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>";
+  }
+
+  // Vat field
+  if ($show_vat) {
+    $block_vat = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_vat</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_vat\" name=\"tf_vat\" value=\"$vat\" size=\"20\" maxlength=\"20\" /></td>";
   }
 
   // data source select
@@ -1141,6 +1165,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
       <td class=\"detailLabel\">$l_aka</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
     $block_num
+    $block_vat
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td> 
       <td class=\"detailForm\">$sel_dsrc</td>
@@ -1371,6 +1396,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   global $c_yes, $c_no;
 
   $num = $company["num"];
+  $vat = $company["vat"];
   $archive = ($company["archive"] == 1 ? "1" : "0");
   $name = $company["name"];
   $kind = $company["kind"];
@@ -1417,6 +1443,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+    <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
@@ -1445,6 +1472,7 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     action=\"" .url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"new\" />
     <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+    <input type=\"hidden\" name=\"tf_vat\" value=\"$vat\" />
     <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
     <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />

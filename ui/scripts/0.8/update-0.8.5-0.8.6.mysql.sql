@@ -116,3 +116,17 @@ UPDATE Invoice set invoice_status_id=6 where invoice_status_id=1;
 UPDATE Invoice set invoice_status_id=9 where invoice_status_id=2;
 
 DELETE FROM InvoiceStatus where invoicestatus_id < 5;
+
+
+-------------------------------------------------------------------------------
+-- Update Company table
+-------------------------------------------------------------------------------
+ALTER TABLE Company ADD COLUMN company_vat varchar(20) after company_number;
+
+
+-------------------------------------------------------------------------------
+-- Update Subscription table
+-------------------------------------------------------------------------------
+ALTER TABLE Subscription ADD COLUMN subscription_id int(8) NOT NULL FIRST;
+ALTER TABLE Subscription DROP PRIMARY KEY;
+ALTER TABLE Subscription ADD PRIMARY KEY (subscription_id);

@@ -630,7 +630,7 @@ function get_payment_action() {
   global $payment, $actions, $path;
   global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_reconcile,$l_header_admin;
-  global $l_header_dupplicate;
+  global $l_header_duplicate;
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 //Index
@@ -680,7 +680,7 @@ function get_payment_action() {
 
 // Duplicate
   $actions["PAYMENT"]["duplicate"] = array (
-     'Name'     => $l_header_dupplicate,
+     'Name'     => $l_header_duplicate,
      'Url'      => "$path/payment/payment_index.php?action=duplicate&amp;param_payment=".$payment["payment"]."",
      'Right'    => $cright_write,
      'Condition'=> array ('detailconsult') 

@@ -230,6 +230,7 @@ CREATE TABLE Company (
   company_usercreate           integer,
   company_datasource_id        integer,
   company_number               varchar(32),
+  company_vat                  varchar(20),
   company_archive              char(1) DEFAULT '0' NOT NULL,
   company_name                 varchar(96) DEFAULT '' NOT NULL,
   company_aka                  varchar(255),

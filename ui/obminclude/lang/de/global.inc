@@ -153,7 +153,7 @@ $l_header_new_parent = "Neuer Hauptvertrag";
 
 $l_header_reconcile =  "?reconcile";
 $l_header_compute_balance =  "?compute balance?";
-$l_header_dupplicate =  "?duplicate";
+$l_header_duplicate =  "?duplicate";
 $l_header_add_contact = "Neuer Kontakt";
 
 // Project headers

@@ -197,7 +197,7 @@ $l_header_new_parent = "Nuevo Negocio Original (Padre)";
 
 $l_header_reconcile = "Reconciliar";
 $l_header_compute_balance = "Computo de balance";
-$l_header_dupplicate = "Duplicado";
+$l_header_duplicate = "Duplicado";
 
 $l_header_add_contact = "Nuevo contacto";
 

@@ -190,7 +190,7 @@ $l_header_new_parent = "New ParentDeal";
 
 $l_header_reconcile = "Reconcile";
 $l_header_compute_balance = "Compute balance";
-$l_header_dupplicate = "Dupplicate";
+$l_header_duplicate = "Dupplicate";
 
 $l_header_add_contact = "Add contact";
 

@@ -7,6 +7,7 @@
     </tr>
     $dis_aka
     $block_num
+    $block_vat
     <tr> 
       <td class="detailLabel">$l_archive</td>
       <td class="detailText">$archive</td>

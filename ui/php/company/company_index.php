@@ -454,7 +454,7 @@ function get_param_company() {
   global $ta_com, $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_dateafter, $tf_datebefore, $cb_fuzzy;
   global $sel_dsrc, $tf_kind, $tf_act, $tf_cat_code, $tf_cat, $sel_cat;
-  global $tf_naf_code, $tf_naf_label, $cb_naf_title;
+  global $tf_naf_code, $tf_naf_label, $cb_naf_title, $tf_vat;
   global $action, $param_company, $cdg_param;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;  
   global $ext_widget, $ext_widget_text;
@@ -490,6 +490,7 @@ function get_param_company() {
   
   if (isset ($param_company)) $company["id"] = $param_company;
   if (isset ($tf_num)) $company["num"] = $tf_num;
+  if (isset ($tf_vat)) $company["vat"] = $tf_vat;
   if (isset ($cb_archive)) $company["archive"] = ($cb_archive == 1 ? 1 : 0);
   if (isset ($tf_name)) $company["name"] = $tf_name;
   if (isset ($tf_aka)) $company["aka"] = $tf_aka;

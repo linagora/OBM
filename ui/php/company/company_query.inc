@@ -131,6 +131,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       company_id as id,
       company_id,
       company_name,
+      company_number,
+      company_vat,
       company_archive,
       company_type_id,
       company_activity_id,
@@ -254,6 +256,7 @@ function run_query_insert($company) {
   $now = date("Y-m-d H:i:s");
 
   $num = $company["num"];
+  $vat = $company["vat"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = trim($company["aka"]);
@@ -295,6 +298,7 @@ function run_query_insert($company) {
     company_usercreate,
     company_datasource_id,
     company_number,
+    company_vat,
     company_archive,
     company_name,
     company_aka,
@@ -321,6 +325,7 @@ function run_query_insert($company) {
     '$uid',
     '$dsrc',
     '$num',
+    '$vat',
     '$archive',
     '$name',
     '$aka',
@@ -398,6 +403,7 @@ function run_query_update($cid, $company) {
   global $auth, $cdg_sql, $cgp_hide;
 
   $num = $company["num"];
+  $vat = $company["vat"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
   $aka = trim($company["aka"]);
@@ -442,6 +448,7 @@ function run_query_update($cid, $company) {
     company_userupdate='". $auth->auth["uid"] ."',
     company_datasource_id='$dsrc',
     company_number='$num',
+    company_vat='$vat',
     company_archive='$archive',
     company_name='$name',
     company_aka='$aka',
@@ -1187,7 +1194,7 @@ function get_kind_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of a Category from its id                                       //
+// Get the label of a Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////

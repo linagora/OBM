@@ -19,6 +19,7 @@ $l_fax = "Fax";
 $l_web = "Web";
 $l_email = "E-Mail";
 $l_coord = "Detalles";
+$l_vat = "EU VAT";
 
 // Labels and texts
 $l_contact_new = "Nuevo Contacto";

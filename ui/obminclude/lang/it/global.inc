@@ -198,7 +198,7 @@ $l_header_new_parent = "Nuovo Affare";
 $l_header_find_parent = "Trova Affare";
 
 $l_header_reconcile =  "Riconcili";
-$l_header_dupplicate =  "Duplicato";
+$l_header_duplicate =  "Duplicato";
 $l_header_compute_balance =  "Calcola saldo";
 
 $l_header_export = "Esporta";
