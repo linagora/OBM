@@ -25,6 +25,7 @@ $l_none = "---";
 $l_comment = "Comentario";
 $l_add_comment = "Adicionar un comentario";
 $l_upd_comment = "Actualizar comentario";
+$l_default = "Default";
 $l_lang = "Idioma";
 $l_archive = "Archivo";
 $l_archive_first = "Arch";

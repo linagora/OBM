@@ -243,7 +243,7 @@ CREATE TABLE Company (
   company_address3             varchar(64),
   company_zipcode              varchar(14),
   company_town                 varchar(64),
-  company_expresspostal        varchar(8),
+  company_expresspostal        varchar(16),
   company_country_iso3166      char(2) DEFAULT '',
   company_phone                varchar(32),
   company_fax                  varchar(32),
@@ -306,7 +306,7 @@ CREATE TABLE Contact (
   contact_address3             varchar(64),
   contact_zipcode              varchar(14),
   contact_town                 varchar(64),
-  contact_expresspostal        varchar(8),
+  contact_expresspostal        varchar(16),
   contact_country_iso3166      char(2) DEFAULT '',
   contact_function_id          int(8),
   contact_title                varchar(64),
@@ -336,6 +336,7 @@ CREATE TABLE Kind (
   kind_minilabel   varchar(64),
   kind_header      varchar(64),
   kind_lang        char(2),
+  kind_default     int(1) NOT NULL DEFAULT '0,
   PRIMARY KEY (kind_id)
 );
 

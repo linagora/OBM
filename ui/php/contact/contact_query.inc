@@ -266,7 +266,11 @@ function run_query_contact_company($c_id) {
 function run_query_kind() {
   global $cdg_sql;
 
-  $query = "select kind_id, kind_minilabel, kind_header, kind_lang
+  $query = "select kind_id,
+      kind_minilabel,
+      kind_header,
+      kind_lang,
+      kind_default
     from Kind
     order by kind_lang, kind_minilabel, kind_header";
 
@@ -1190,19 +1194,47 @@ function run_query_kind_insert($contact) {
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];
   $header = $contact["kind_header"];
+  $default = ($contact["kind_default"] == 1 ? 1 : 0);
+
+  // If kind is new default for this lang, we cancel other defaults
+  if ($default == 1) {
+    run_query_kind_clear_default($lang);
+  }
 
   $query = "insert into Kind (
     kind_timecreate,
     kind_usercreate,
     kind_minilabel,
     kind_header,
-    kind_lang)
+    kind_lang,
+    kind_default)
   values (
     '$timecreate',
     '$usercreate',
     '$label',
     '$header',
-    '$lang')";
+    '$lang',
+    '$default')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Clear the default kind for the given lang
+// Parameters:
+//   - $lang : lang to clear default kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_kind_clear_default($lang) {
+  global $cdg_sql;
+
+  $query = "update Kind
+    set kind_default=0
+    where kind_lang = '$lang'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1227,13 +1259,20 @@ function run_query_kind_update($contact) {
   $label = $contact["kind_label"];
   $lang = $contact["kind_lang"];
   $header = $contact["kind_header"];
+  $default = ($contact["kind_default"] == 1 ? 1 : 0);
+
+  // If kind is new default for this lang, we cancel other defaults
+  if ($default == 1) {
+    run_query_kind_clear_default($lang);
+  }
 
   $query = "update Kind set
       kind_timeupdate='$timeupdate',
       kind_userupdate='$userupdate',
       kind_minilabel='$label',
       kind_header='$header',
-      kind_lang='$lang'
+      kind_lang='$lang',
+      kind_default='$default'
     where
       kind_id='$id'";
 

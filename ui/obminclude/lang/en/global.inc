@@ -26,6 +26,7 @@ $l_comment = "Comment";
 $l_add_comment = "Add a comment";
 $l_upd_comment = "Update comment";
 $l_lang = "Lang";
+$l_default = "Default";
 $l_archive = "Archive";
 $l_archive_first = "Arc";
 $l_date = "Date";

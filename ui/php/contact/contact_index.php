@@ -400,7 +400,7 @@ display_page($display);
 // returns : $contact hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contact() {
-  global $action;
+  global $action, $view;
   global $sel_dsrc, $sel_kind, $tf_lname, $tf_fname, $tf_company, $tf_service;
   global $tf_ad1, $tf_ad2, $tf_ad3, $tf_zip, $tf_town, $tf_cdx, $sel_ctry;
   global $sel_func, $tf_title, $tf_phone, $tf_hphone, $tf_mphone, $tf_fax;
@@ -408,7 +408,7 @@ function get_param_contact() {
   global $tf_datecomment, $sel_usercomment, $ta_add_comment, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $tf_func, $tf_label, $tf_lang, $tf_header,$view;
+  global $tf_func, $tf_label, $tf_lang, $tf_header, $cb_default;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $tf_cat1,$tf_cat2,$sel_cat1, $sel_cat2,$tf_code2,$tf_code1;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
@@ -482,6 +482,7 @@ function get_param_contact() {
   if (isset ($tf_label)) $contact["kind_label"] = $tf_label;
   if (isset ($tf_lang)) $contact["kind_lang"] = $tf_lang;
   if (isset ($tf_header)) $contact["kind_header"] = $tf_header;
+  if (isset ($cb_default)) $contact["kind_default"] = ($cb_default == 1 ? 1 : 0);
 
   // External param
   if (isset ($popup)) $contact["popup"] = $popup;

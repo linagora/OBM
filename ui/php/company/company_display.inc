@@ -1206,7 +1206,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"16\" size=\"16\" value=\"$cdx\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td class=\"detailForm\">$sel_ctry</td>

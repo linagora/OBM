@@ -1049,7 +1049,7 @@ function get_import_companycategory_hash() {
 function get_import_kind_hash() {
   global $cdg_sql;
 
-  $kind_q = run_query_kind();
+  $kind_q = run_query_import_kind();
 
   while ($kind_q->next_record()) {
     $lang = strtoupper($kind_q->f("kind_lang"));
@@ -1067,12 +1067,14 @@ function get_import_kind_hash() {
 // Contact: Kind select query execution                                      //
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_kind() {
+function run_query_import_kind() {
   global $cdg_sql;
 
-  $query = "select kind_id, kind_minilabel, kind_header, kind_lang
+  $query = "select kind_id,
+      kind_lang,
+      kind_default
     from Kind
-    order by kind_lang, kind_minilabel, kind_header";
+    order by kind_lang, kind_default desc";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;

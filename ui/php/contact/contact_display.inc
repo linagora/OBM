@@ -1376,7 +1376,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_expresspostal</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
+    <td class=\"detailForm\"><input type=\"text\" name=\"tf_cdx\" size=\"16\" maxlength=\"16\" value=\"$cdx\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_country</td>
     <td class=\"detailForm\">$sel_ctry</td>
@@ -2303,7 +2303,7 @@ function dis_function_links($contact) {
 function html_contact_kind_form($kind_q) {
   global $l_kind_manage, $l_kind_exist, $l_kind_no;
   global $l_kind_checkdelete, $l_kind_update, $l_kind_new, $l_kind_insert;
-  global $l_label, $l_lang, $l_header;
+  global $l_label, $l_lang, $l_default, $l_header;
 
   if ($kind_q->num_rows() > 0) {
 
@@ -2315,6 +2315,11 @@ function html_contact_kind_form($kind_q) {
       pos = mytext.indexOf('-');
       lang = mytext.substr(0, pos);
 
+      // Get Default
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf('-');
+      ldefault = mytext.substr(0,pos);
+
       // Get Label
       mytext = mytext.substr(pos+1);
       pos = mytext.indexOf('-');
@@ -2324,15 +2329,22 @@ function html_contact_kind_form($kind_q) {
       header = mytext.substr(pos+1);
 
       forms.form_kind_update.tf_lang.value=lang;
+      if (ldefault == 'X') {
+        forms.form_kind_update.cb_default.checked=true;
+      } else {
+        forms.form_kind_update.cb_default.checked=false;
+      }
       forms.form_kind_update.tf_label.value=label;
       forms.form_kind_update.tf_header.value=header;\"
       size=\"8\">";
+
     while ($kind_q->next_record()) {
       $id = $kind_q->f("kind_id");
       $lang = $kind_q->f("kind_lang");
+      $default = ($kind_q->f("kind_default") == 1 ? "X" : " ");
       $mlabel = $kind_q->f("kind_minilabel");
       $header = $kind_q->f("kind_header");
-      $sel_kind .= "\n<option value=\"$id\">$lang-$mlabel-$header</option>";
+      $sel_kind .= "\n<option value=\"$id\">$lang-$default-$mlabel-$header</option>";
     }
     $sel_kind .= "</select>";
 
@@ -2379,6 +2391,12 @@ function html_contact_kind_form($kind_q) {
           <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
             onclick=\"if (check_kind_upd(this.form,document.form_kind_delete.sel_kind)) return true; else return false;\" />
           </td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_default : </td>
+          <td>
+            <input type=\"checkbox\" name=\"cb_default\" value=\"1\" />
+	  </td>
         </tr>
         <tr>
           <td class=\"adminLabel\">$l_label : </td>
@@ -2429,6 +2447,12 @@ function html_contact_kind_form($kind_q) {
         <tr>
           <td class=\"adminLabel\">$l_lang : </td>
           <td><input name=\"tf_lang\" size=\"2\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_default : </td>
+          <td>
+            <input type=\"checkbox\" name=\"cb_default\" value=\"1\"/>
+	  </td>
         </tr>
         <tr>
           <td class=\"adminLabel\">$l_label : </td>
