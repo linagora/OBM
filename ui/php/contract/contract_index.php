@@ -2,30 +2,31 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_index.php                                           //
 //     - Desc : Contract Support Index File                                  //
-// 2001-07-17 : Richard FILIPPI                                              //
+// 2001-07-17 : Aliacom                                                      //
 ///////////////////////////////////////////////////////////////////////////////
 //  $Id$
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
-// - index (default) -- search fields  -- show the Contract search form
-// - search          -- search fields  -- show the result set of search
-// - company_new     --                -- show the company selection form
-// - new             -- $param_company -- show the new Contract form
+// - index (default) -- search fields   -- show the Contract search form
+// - search          -- search fields   -- show the result set of search
+// - new             -- $param_company, -- show the new Contract form
 // - detailconsult   -- $param_contract -- show the Contract detail
 // - detailupdate    -- $param_contract -- show the Contract detail form
-// - insert          -- form fields    -- insert the Contract 
-// - update          -- form fields    -- update the Contract
+// - insert          -- form fields     -- insert the Contract 
+// - update          -- form fields     -- update the Contract
+// - check_delete    -- $param_contract -- check links before delete
 // - delete          -- $param_contract -- delete the Contract
-// - admin	     --		       -- admin index (kind)
-// - admin_insert     -- form fields    -- insert the kind
-// - admin_update     -- form fields    -- update the kind
-// - admin_delete     -- form fields    -- delete the kind
-// - display         --                -- display and set display parameters
-// - dispref_display --                -- update one field display value
-// - dispref_level   --                -- update one field display position 
+// - admin	     --		        -- admin index (kind)
+// - type_insert     -- form fields     -- insert the type
+// - type_update     -- form fields     -- update the type
+// - type_checklink  -- $sel_kind       -- check if kind is used
+// - type_delete     -- $sel_kind       -- delete the type
+// - display         --                 -- display and set display parameters
+// - dispref_display --                 -- update one field display value
+// - dispref_level   --                 -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
-$www ="   <p class=\"messageInfo\">
+$www = "  <p class=\"messageInfo\">
     	<a href=\"http://validator.w3.org/check/referer\"><img
         src=\"http://www.w3.org/Icons/valid-xhtml10\"
         alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
@@ -58,16 +59,16 @@ require("contract_display.inc");
 if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
   $last_contract=$last_contract_default;
 } elseif  ( ($param_contract > 0) && ($last_contract != $param_contract) ) {
-    $last_contract=$param_contract;
-    run_query_set_user_pref($auth->auth["uid"],"last_contract",$param_contract);
-    $last_contract_name = run_query_global_contract_label($last_contract);
-    //$sess->register("last_contract");
+  $last_contract=$param_contract;
+  run_query_set_user_pref($auth->auth["uid"],"last_contract",$param_contract);
+  $last_contract_name = run_query_global_contract_label($last_contract);
+  //$sess->register("last_contract");
 }
 
 page_close();
 
 if($action == "") $action = "index";
-$contract=get_param_contract();
+$contract = get_param_contract();
 get_contract_action();
 $perm->check();
 display_head($l_contract);     // Head & Body
@@ -85,7 +86,7 @@ if ($popup) {
     $cont_q = run_query_contract();
     html_select_contract($cont_q, stripslashes($title), $url);
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
 
   display_end();
@@ -124,87 +125,104 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-   require("contract_js.inc");
-   if($param_deal != "") 
-   display_ok_msg(stripslashes($ok_message)."<br />".$l_add_contract_deal);
-   html_contract_form($action,new DB_OBM,"",run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
-  
-} elseif ($action == "display") {
-//OK///////////////////////////////////////////////////////////////////////////
-  $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
-  dis_contract_display_pref($pref_q);
-  
-}else if($action == "dispref_display") {
-///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
-  $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
-  dis_contract_display_pref($pref_q);
-  
-} else if($action == "dispref_level") {
-///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
-  $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
-  dis_contract_display_pref($pref_q);
-  
+  require("contract_js.inc");
+  if ($param_deal != "") 
+    display_ok_msg(stripslashes($ok_message)."<br />".$l_add_contract_deal);
+  html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
-    html_contract_consult($contract_q,run_query_contracttype(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")),$contract_q->f("contract_company_id"),run_query_deal($contract_q->f("contract_deal_id")));
+    html_contract_consult($contract_q);
   }
   
 } elseif ($action == "detailupdate")  {
-///////////////////////h//////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $contract_q = run_query_detail($param_contract);
     require("contract_js.inc");
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
-
-    html_contract_form($action,$contract_q,run_query_deal($contract_q->f("contract_deal_id")),run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
+    html_contract_form($action,$contract_q,run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
   }
   
 } elseif ($action == "insert")  {
-//OK///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+ if (check_contract_form("", $contract)) {
+   $retour = run_query_insert($contract);
+   if ($retour) {
+     display_ok_msg($l_insert_ok);
+   } else {
+     display_err_msg($l_insert_error);
+   }
+   require("contract_js.inc");
+   $usr_q = run_query_userobm();
+   html_contract_search_form($contract, $usr_q, run_query_contracttype());
+ } else {
+   display_err_msg($err_msg);
+   html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+ }
 
- if (check_data_form("", $contract)) {
-   run_query_insert($contract);
-    display_ok_msg($l_insert_ok);
-  } else {
-    display_err_msg($l_invalid_data . " : " . $err_msg);
-  }
-  require("contract_js.inc");
-  $usr_q = run_query_userobm();
-  html_contract_search_form($contract, $usr_q, run_query_contracttype());
-  
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form("", $contract)) {  
-    run_query_update($contract);         
-    display_ok_msg($l_update_ok);
-  } else  display_err_msg($l_invalid_data . " : " . $err_msg);
+  if (check_contract_form("", $contract)) {  
+    $ret = run_query_update($contract);         
+    if ($ret) {
+      display_ok_msg($l_update_ok);
+    } else {
+     display_err_msg($l_update_error);
+    }
+    $usr_q = run_query_userobm();
+    html_contract_search_form($contract, $usr_q, run_query_contracttype());
+  } else {
+    require("contract_js.inc");
+    display_err_msg($l_invalid_data . " : " . $err_msg);
+    html_contract_form($action,new DB_OBM,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  }
+
+} elseif ($action == "check_delete")  {
+///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
-  $usr_q = run_query_userobm();
-  html_contract_search_form($contract, $usr_q, run_query_contracttype());
-  
+  dis_check_links($param_contract);
+
 } elseif ($action == "delete")  {
-///OK//////////////////////////////////////////////////////////////////////////
-  run_query_delete($param_contract);
-  display_ok_msg($l_delete_ok);
+///////////////////////////////////////////////////////////////////////////////
+  $ret = run_query_delete($param_contract);
+  if ($ret) {
+    display_ok_msg($l_delete_ok);
+  } else {
+    display_err_msg($l_delete_error);
+  }
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
+
+} elseif ($action == "display") {
+///////////////////////////////////////////////////////////////////////////////
+  $pref_q = run_query_display_pref($auth->auth["uid"], "contract",1);
+  dis_contract_display_pref($pref_q);
+  
+} elseif ($action == "dispref_display") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_update($entity, $fieldname, $display);
+  $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
+  dis_contract_display_pref($pref_q);
+  
+} elseif ($action == "dispref_level") {
+///////////////////////////////////////////////////////////////////////////////
+  run_query_display_pref_level_update($entity, $new_level, $fieldorder);
+  $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
+  dis_contract_display_pref($pref_q);
   
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   html_contract_admin_form(run_query_contracttype());
   
-} elseif ($action == "admintypeinsert")  {
+} elseif ($action == "type_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $query = query_type_insert();
-  $obm_q = new DB_OBM;
-  display_debug_msg($query, $cdg_sql);
-  if ($obm_q->query($query)) {
+  $retour = run_query_type_insert($contract);
+  if ($retour) {
     display_ok_msg($l_type_insert_ok);
   } else {
     display_err_msg($l_type_insert_error);
@@ -212,39 +230,34 @@ if ($action == "index" || $action == "") {
   require("contract_js.inc");
   html_contract_admin_form(run_query_contracttype());
     
-} elseif ($action == "admintypedelete")  {
-  ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = new DB_OBM;
-  $query = query_type_verif();  // kind referenced in a Contract Contract ?
-  $obm_q->query($query);
-  if ($obm_q->num_rows() > 0) {
-    //Font?
-    display_err_msg($l_type_delete_error);
-    dis_type_links($obm_q);
-  } else {
-    $query = query_type_delete(); 
-    if ($obm_q->query($query)) {
-      display_ok_msg($l_type_delete_ok);
-    } else {
-      display_err_msg($l_type_delete_error);
-    }
-  }
-  require("contract_js.inc");
-  html_contract_admin_form(run_query_contracttype());
-  
-} elseif ($action == "admintypeupdate")  {
+} elseif ($action == "type_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = new DB_OBM;
-  $query = query_type_update();
-  display_debug_msg($query, $cdg_sql);
-  if ($obm_q->query($query)) {
+  $retour = run_query_type_update($contract);
+  if ($retour) {
     display_ok_msg($l_type_update_ok);
   } else {
     display_err_msg($l_type_update_error);
   }
   require("contract_js.inc");
   html_contract_admin_form(run_query_contracttype());
+
+} elseif ($action == "type_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  dis_type_links($contract["type"]);
+  require("contract_js.inc");
+  html_contract_admin_form(run_query_contracttype());
   
+} elseif ($action == "type_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_type_delete($contract["type"]);
+  if ($retour) {
+    display_ok_msg($l_type_delete_ok);
+  } else {
+    display_err_msg($l_type_delete_error);
+  }
+  require("contract_js.inc");
+  html_contract_admin_form(run_query_contracttype());
+
 }
 
 
@@ -255,10 +268,11 @@ if ($action == "index" || $action == "") {
 function get_param_contract() {
   global $tf_label,$tf_company_name,$sel_type;
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
-  global $param_contract,$tf_num,$sel_market, $sel_tech, $hd_soc;
+  global $param_contract,$tf_num,$sel_market, $sel_tech;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
-  global $hd_usercreate,$hd_timeupdate, $param_deal, $deal_new_id;
+  global $hd_usercreate,$hd_timeupdate,$param_deal,$deal_label,$deal_new_id;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
+  global $tf_type;
   global $cdg_param, $action;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
@@ -280,8 +294,6 @@ function get_param_contract() {
   if (isset ($ta_clause)) $contract["clause"] = $ta_clause;  
   if (isset ($ta_com)) $contract["comment"] = $ta_com;  
 
-  if (isset ($hd_soc)) $contract["company_id"] = $hd_soc;
-
   if (isset ($hd_usercreate)) $contract["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $contract["timeupdate"] = $hd_timeupdate;
 
@@ -296,8 +308,13 @@ function get_param_contract() {
   if (isset ($hd_company_zip)) $contract["company_zip"] = $hd_company_zip;
   if (isset ($hd_company_town)) $contract["company_town"] = $hd_company_town;
 
+  // Deal infos
   if (isset ($param_deal)) $contract["deal_id"] = $param_deal;
   if (isset ($deal_new_id)) $contract["deal_new_id"] = $deal_new_id;
+  if (isset ($deal_label)) $contract["deal_label"] = $deal_label;
+
+  if (isset ($tf_type)) $contract["type_label"] = $tf_type;
+
   if (debug_level_isset($cdg_param)) {
     echo "<br>action=$action";
     if ( $contract ) {
@@ -315,8 +332,8 @@ function get_param_contract() {
 // Contract actions
 //////////////////////////////////////////////////////////////////////////////
 function get_contract_action() {
-  global $contract, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $contract, $actions, $path, $l_select_company;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $contract_read, $contract_write, $contract_admin_read, $contract_admin_write;
 
@@ -360,7 +377,7 @@ function get_contract_action() {
 
 // Detail Update
   $actions["CONTRACT"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
+    'Name'     => $l_header_update,
     'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."",
     'Right'    => $contract_write,
     'Condition'=> array ('detailconsult') 
@@ -381,9 +398,9 @@ function get_contract_action() {
                                     	);
 
 // Delete
-  $actions["CONTRACT"]["delete"] = array (
+  $actions["CONTRACT"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$contract["id"]."",
+    'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $contract_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
@@ -396,22 +413,22 @@ function get_contract_action() {
                                       	);
 
 // Admin Type Insert
-  $actions["CONTRACT"]["admintypeinsert"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=admintypeinsert",
+  $actions["CONTRACT"]["type_insert"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=type_insert",
     'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type Insert
-  $actions["CONTRACT"]["admintypedelete"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=admintypedelete",
+  $actions["CONTRACT"]["type_delete"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=type_delete",
     'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type Update
-  $actions["CONTRACT"]["admintypeupdate"] = array (
-    'Url'      => "$path/contract/contract_index.php?action=admintypeupdate",
+  $actions["CONTRACT"]["type_update"] = array (
+    'Url'      => "$path/contract/contract_index.php?action=type_update",
     'Right'    => $contract_admin_write,
     'Condition'=> array ('None') 
                                     	);

@@ -15,10 +15,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 function dis_help($mode) {
 
-  if ($mode == "html") echo "<table border=1><tr><td><pre>\n";
-  include ("admin_code_help.inc");
-  if ($mode == "html") echo "\n</pre></td></tr></table>";
+  if ($mode == "html")
+    echo "<table class=\"details\">
+      <tr>
+        <td><pre>";
 
+  include ("admin_code_help.inc");
+
+  if ($mode == "html")
+    echo "</pre>
+        </td>
+      </tr>
+      </table>";
 }
 
 
@@ -48,9 +56,7 @@ function dis_code_index($mode, $actions, $words) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_code_index($actions, $words) {
-  global $sess;
-  global $l_execute, $l_help;
-  global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
+  global $l_execute;
 
   // exlude words list
   list ($key, $val) = each ($words);
@@ -60,20 +66,23 @@ function html_code_index($actions, $words) {
   }
 
   echo "
-    <a href=\"" . $sess->url("admin_code_index.php?action=help&amp;mode=html"). "\">$l_help</a>
-    <p>
-    <FORM method=get action=\"" . $sess->url("admin_code_index.php"). "\">
-    <table border=1>
+    <br />
+    <form method=\"get\" action=\"" . url_prepare("admin_code_index.php"). "\">
+    <table class=\"admin\">
     <tr>
-      <td>action : show_amp<br>
-        <font color=\"#$col_textem\">Show misuse of & in url (& amp; required) from source</font></td>
-      <td>Excluded words :<br><tt>$word_list</tt></td>
-      <td><input type=hidden name=mode value=\"html\">
-          <input type=hidden name=action value=show_amp>
-          <input type=submit value=\"$l_execute\"></td>
+      <td class=\"adminHead\">action : show_amp</td>
+      <td class=\"adminHead\">Excluded words</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"show_amp\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">
+        Show misuse of & in url (& amp; required) from source</td>
+      <td class=\"adminText\"><tt>$word_list</tt></td>
     </tr>
     </table>
-    </FORM>";
+    </form>";
 }
 
 
@@ -91,7 +100,7 @@ function dis_amp($mode, $words) {
 ------------------------------------------------------------------------------
 ";
   } else {
-    echo "<table>";
+    echo "<table class=\"admin\">";
   }
   dis_amp_directory($mode, $words, $obm_root);
   if ($mode == "txt") {
@@ -102,7 +111,7 @@ $cpt_line lines parsed
 ";
   } else {
     echo "</table>
-      <p>
+      <p />
       <b>$cpt_line</b> lines parsed";
   }
 
@@ -151,7 +160,6 @@ function dis_amp_directory($mode, $words, $dir) {
 //   - $file : file name (complete with path)
 ///////////////////////////////////////////////////////////////////////////////
 function dis_amp_file($mode, $file) {
-  global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
   global $regexp, $debug, $cpt_line;
 
   $first = true;  // first line matching in this file
@@ -176,12 +184,10 @@ function dis_amp_file($mode, $file) {
 ------------------------------------------------------------------------------
 ";
 	} else {
-	  echo "<tr><td colspan=2 align=center>
-          <font color=\"#$col_textem\">$file</font>
-      </td>
-    </tr><tr>
-      <td bgcolor=\"#$col_a_tableh\"><font color=\"#$col_textem\">#</font></td>
-      <td bgcolor=\"#$col_a_tableh\"><font color=\"#$col_textem\">Line</font></td>
+	  echo "
+    <tr>
+      <td class=\"adminHead\">#&nbsp;Line</td>
+      <td class=\"adminHead\">$file</td>
     </tr>";
 
 	}
@@ -191,8 +197,8 @@ function dis_amp_file($mode, $file) {
 	echo "$line_num : $line";
       } else {
 	echo "<tr>
-          <td>$line_num</td>
-          <td><pre>$line</pre></td>
+          <td class=\"adminLabel\">$line_num</td>
+          <td class=\"adminText\">$line</td>
         </tr>";
       }
 
@@ -201,7 +207,6 @@ function dis_amp_file($mode, $file) {
   }
 
   return true;
-
 }
 
 

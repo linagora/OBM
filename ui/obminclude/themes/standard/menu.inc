@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction which perform the menu                   //
+// Fonction which perform the menu
 // Parametres:
 //   - $tab  : active tab 
 //   - $menu : menu selected
@@ -24,20 +24,6 @@ function generate_menu($menu, $section) {
     $path = "";
   else 
     $path = "..";
-
-  $lang_file = "$obminclude/lang/$set_lang/header.inc";
-  if (file_exists("$path/../$lang_file")) {
-    include ($lang_file);
-  } else {
-    include ("$obminclude/lang/$set_lang_default/header.inc");
-  }
-
-  $theme_file = "$obminclude/themes/$set_theme/theme.inc";
-  if (file_exists("$path/../$theme_file")) {
-    include ($theme_file);
-  } else {
-    include ("$obminclude/themes/$set_theme_default/theme.inc");
-  }
 
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
@@ -137,21 +123,19 @@ function display_menu_bar($section, $menu) {
   <tr>
     <td><img class=\"menuBarIconG\" src=\"/images/$set_theme/barre_g.gif\" alt=\"\" /></td>
     <td class=\"menuBarLabel\">$dico$name</td>
-    <td class=\"menuBarText\">
-";
+    <td class=\"menuBarText\">";
 
-   if(is_array($actions[$menu])){
+   if (is_array($actions[$menu])) {
      foreach($actions[$menu] as $key => $value){
-      if(in_array("all",$value["Condition"]) || in_array($action,$value["Condition"])) {
-         if(($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
+       if (in_array("all",$value["Condition"])
+           || in_array($action,$value["Condition"])) {
+         if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
            if($value["Popup"] == 1) {
              echo "
               <a href=\"\" class=\"menuBar\" 
               onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">
-	      ".$value["Name"]."</a> &nbsp;
-           ";
-           }
-           else {
+	      ".$value["Name"]."</a> &nbsp;";
+           } else {
             echo "
                <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
            }
@@ -160,15 +144,13 @@ function display_menu_bar($section, $menu) {
      }
    }  
 
-    echo "
+   echo "
     </td>
     <td><img class=\"menuBarIconD\" src=\"/images/$set_theme/barre_d.gif\" alt=\"\" /></td>
   </tr>
-</table>
+  </table>
 ";
 }
-
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -177,27 +159,42 @@ function display_menu_bar($section, $menu) {
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_menus($section) {
-  global $set_theme;
+  global $set_theme, $set_menu, $cme_txt, $cme_ico, $cme_both;
   global $path, $menus, $perm, $auth;
 
-    echo "
-      <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
-        <tr>
+  if (($set_menu == $cme_ico) || ($set_menu == $cme_both))
+    $fico = true;
+  else $fico = false;
+
+  if (($set_menu == $cme_txt) || ($set_menu == $cme_both))
+    $ftext = true;
+  else $ftext = false;
+
+  echo "
+    <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
+      <tr>
     ";
   if (is_array($menus[$section])) {
     foreach ($menus[$section] as $key => $value) {
       if (($key != "Name" && $key != "Url" && $key != "Right") 
           && 
          (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"])) {
-	$ico = $value["Ico"];
-	if ($ico)
-          $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />";
-	else
-	  $dico = "<img src=\"/images/$set_theme/puce.gif\" alt=\"\" />";
+	if ($fico) {
+	  $ico = $value["Ico"];
+	  if ($ico)
+	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/$ico\" alt=\"\" /></a>";
+	  else
+	    $dis_ico = "<a class=\"menus\" href=\"".$value["Url"]."\"><img src=\"/images/$set_theme/puce.gif\" alt=\"\" /></a>";
+	}
+
+	if ($ftext) {
+	  $dis_text = "<a class=\"menus\" href=\"".$value["Url"]."\">".$value["Name"]."</a>";
+	}
+
         echo "
-            <td>&nbsp;&nbsp;</td>
-            <td class=\"menusLabel\">&nbsp; $dico
-            <a class=\"menus\" href=\"".$value["Url"]."\">".$value["Name"]."</a></td>
+          <td>&nbsp;&nbsp;</td>
+          <td class=\"menusLabel\">&nbsp; $dis_ico $dis_text
+          </td>
         ";
       }
     }

@@ -360,9 +360,10 @@ function run_query_update($deal) {
     }
   }
 
-
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Deal ID : Get the id of the deal inserted.                                //
 // Parameters:
@@ -490,6 +491,26 @@ function run_query_dealstatus() {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the contracts attached to the deal
+// Parameters:
+//   - $p_id : deal Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_deal_contract_links($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select distinct contract_id, contract_label 
+            from Contract
+            where contract_deal_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
   return $obm_q;
 }
 
@@ -1517,6 +1538,7 @@ function run_query_search_connected_invoices ($p_deal_id, $incl_arch = 0) {
   return $go;
 }
 
+
 //////////////////////////////////////////////////////////////////////////////
 // returns the number of archived invoices connected to a deal
 //////////////////////////////////////////////////////////////////////////////
@@ -1536,6 +1558,7 @@ function run_query_nb_archived_invoices ($p_deal_id) {
   return $go->nf();
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Selection of the Deal according to Company id           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -1551,6 +1574,8 @@ function run_query_deal($comp_id = "0") {
   $obm_q->query($query);
   return $obm_q;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Search for contact linked to this Deal                  //
 ///////////////////////////////////////////////////////////////////////////////

@@ -56,11 +56,8 @@ $l_impossible_deletion = " payments are associated with this account. Deletion i
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe account number is not valid!";
 $lj_fill_number = "You have to fill the number before submitting!";
-$lj_fill_label = "You have to fill the label before submitting!";
 $lj_fill_bank = "You have to fill the bank field before submitting!";
 $lj_confirm_no_bank="This account has no associated bank. Click on OK to confirm.";
-$l_invalid_date="\\nInvalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ)";
-$l_fill_date = "\\n You have to fill the Date before submitting.";
 
 // For the display parameters modification screen
 $l_account_options = "Display options for accounts list"; 

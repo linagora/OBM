@@ -1,7 +1,7 @@
 <?php
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : account_display.inc                                          //
-//     - Desc : Account (treso ???) display file                             //
+//     - Desc : Account display file                                         //
 // 2002-07-16 Pierre Baudracco (from N. Roman)                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
@@ -42,7 +42,6 @@ function html_account_form($obm_q_account, $action){
   global $l_initial_balance, $l_comment;
   global $l_insert,$l_update, $l_delete;
   global $obm_q_company;
-  global $sess, $auth;
   global $border,$cellspacing;
   
   echo "
@@ -164,7 +163,6 @@ function html_account_form($obm_q_account, $action){
 ///////////////////////////////////////////////////////////////////////////////
 function html_account_search_form ($p_action, $account) {
   global $l_label_start, $l_bank, $l_number, $l_find;
-  global $sess;
 
   $label = $account["label"];
   $bank = $account["bank"];
@@ -222,9 +220,7 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   //-- Labels
   global $l_label,$l_bank,$l_number;
   global $l_found;
-  //-- Authentication
   global $perms_user,$l_perms_user;
-  global $auth, $sess;  
 
   $label = $account["label"];
   $bank = $account["bank"];
@@ -297,9 +293,7 @@ function html_account_consult($obm_q_account, $p_action){
   global $col_balance_neg, $col_balance_pos;
   global $l_label,$l_comment,$l_bank, $l_number;
   global $l_balance, $l_compute_balance;
-  
-  global $perms_user,$l_perms_user;
-  global $auth, $sess;
+  global $auth, $perms_user,$l_perms_user;
   global $border, $cellspacing;
 
   $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
@@ -395,7 +389,6 @@ function html_account_consult($obm_q_account, $p_action){
 ///////////////////////////////////////////////////////////////////////////////
 function html_impossible_deletion ($p_account_id, $q_related_payments) {
   global $col_error ,$l_impossible_deletion, $l_cancel;
-  global $sess;
 
   echo "
    <center>
@@ -426,7 +419,6 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
   global $l_compute_balance, $l_choose_balance_date;
   global $l_nb_expected_used, $l_used_payments, $l_used_expected_payments;
   global $l_expected_payments, $l_payments, $l_totals;
-  global $sess;
 
   // if $p_date == "", we use today :
   $p_date = ($p_date =="") ? date("Y-m-d") : $p_date;

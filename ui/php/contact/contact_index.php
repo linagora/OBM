@@ -123,9 +123,9 @@ if ($action == "index" || $action == "") {
     if ( ($con_q->f("contact_visibility")==0) || ($con_q->f("contact_usercreate") == $uid) ) {
       display_record_info($con_q->f("contact_usercreate"),$con_q->f("contact_userupdate"),$con_q->f("timecreate"),$con_q->f("timeupdate")); 	    
       html_contact_consult($con_q);
-    }else {
+    } else {
       // this contact's page has "private" access
-      display_error_visibility();   
+      display_err_msg($l_error_visibility);
     }      
   }
   
@@ -306,7 +306,7 @@ function get_param_contact() {
 
 function get_contact_action() {
   global $contact, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $contact_read, $contact_write, $contact_admin_read, $contact_admin_write;
 
@@ -342,7 +342,7 @@ function get_contact_action() {
 
 // Detail Update
   $actions["CONTACT"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
+    'Name'     => $l_header_update,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $contact_write,
     'Condition'=> array ('detailconsult') 

@@ -4,7 +4,7 @@
 //     - File     : admin.inc                                                //
 // 2001-12-24 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // labels
@@ -15,6 +15,7 @@ $l_database = "Base de données";
 $l_host = "Hôte";
 $l_session_stats = "Statistiques des Sessions";
 $l_date = "Date";
+$l_lifetime = "Durée d'une session utilisateur (en secondes)"; 
 $l_user_session = " Entrées dans ActiveUserObm";
 $l_active_user = "Utilisateurs actuellement actifs";
 $l_login_date = "Date de login";

@@ -176,9 +176,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  echo "<CENTER><FONT color=\"#$col_error\">";
-  echo "To come...";
-  echo "</FONT></CENTER><BR>";
+  echo "<center>Nothing here</center><br />";
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -224,7 +222,7 @@ function get_param_user() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_user_action() {
   global $obm_user, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_reset;
   global $user_read, $user_write, $user_admin_read, $user_admin_write;
 
@@ -268,7 +266,7 @@ function get_user_action() {
 
 // Detail Update
   $actions["USER"]["detailupdate"] = array (
-     'Name'     => $l_header_modify,
+     'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
      'Right'    => $user_write,
      'Condition'=> array ('detailconsult') 

@@ -106,20 +106,13 @@ $l_update_error = "La mise à jour du Paiement a échoué";
 $l_query_error = "Problème durant l'exécution de la requête...";
 $l_insert_paymentinvoice_ok = "L'association Paiement/Facture s'est bien passé";
 
-// Specifics fields
-// MySQL Date and time format for display in the detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_no_number = "\\nLe numérod u Paiement est invalide !";
 $l_check_amount = "\\Le montant est invalide !";
 $l_check_inout = "\\nVous deve choisir entre Paiement Client ou Paiement Fournisseur !";
-$l_fill_label = "\\n Vous devez fournir un label ";
-$l_invalid_date="\\n Format de Date Invalide (MM/JJ/AAAA ou AAAA-MM-JJ)";
 $l_check_paymentkind = "Vous devez choisir un type de Paiement !";
 $l_check_account = "Vous devez choisir un Compte !";
 $l_no_amount = "Vous devez entrer un montant pour ce Paiement ";
-$l_fill_date = "You have to fill this field";
 $l_invalid_amount = "Le montant entré est invalide ";
 
 // For the display parameters modification screen

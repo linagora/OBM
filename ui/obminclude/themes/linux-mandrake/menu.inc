@@ -346,7 +346,7 @@ if($www_site=="") $www_site="www.aliacom.fr";
     };
   } else {
                                 menu_blob("<A HREF=\"".
-     $sess->url($chemin."contract/incident_index.php?action=index")."\" target=_top>$l_header_incident</A>");
+     $sess->url($chemin."incident/incident_index.php?action=index")."\" target=_top>$l_header_incident</A>");
   };
 
   echo "                    </TD>

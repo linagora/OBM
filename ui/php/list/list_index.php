@@ -362,7 +362,7 @@ function get_param_list() {
 //////////////////////////////////////////////////////////////////////////////
 function get_list_action() {
   global $list, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_export, $l_header_global_export;
   global $l_header_admin, $l_header_add_contact, $l_select_list;
   global $list_read, $list_write, $list_admin_read, $list_admin_write;
@@ -398,7 +398,7 @@ function get_list_action() {
 
 // Detail Update
   $actions["LIST"]["detailupdate"] = array (
-     'Name'     => $l_header_modify,
+     'Name'     => $l_header_update,
      'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
      'Right'    => $list_write,
      'Condition'=> array ('detailconsult','contact_add','contact_del') 

@@ -51,11 +51,9 @@ function html_payment_form($p_action, $q_payment, $q_paymentkind, $q_account) {
   global $set_theme, $col_label, $col_table, $coltextem, $col_ok;
   // labels :
   global $l_insert, $l_update, $l_delete, $l_bank, $l_add_invoices;
-  global $l_label, $l_amount, $l_type, $l_date, $l_expected_date, 
-    $l_number, $l_comment, $l_inout, $l_client, $l_fournisseur, 
-    $l_account, $l_pick_paymentkind, $l_pick_account;
-  // session :
-  global $sess, $auth;
+  global $l_label, $l_amount, $l_type, $l_date, $l_expected_date;
+  global $l_number, $l_comment, $l_inout, $l_client, $l_fournisseur;
+  global $l_account, $l_pick_paymentkind, $l_pick_account;
 
   // we use those vars to skip tests on the action value
   // for each form field...
@@ -294,7 +292,6 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
   global $l_deal, $l_company, $l_include_checked;
   global $l_find, $l_all, $l_both, $l_client, $l_fournisseur;
   global $l_status, $l_paid, $l_unpaid;
-  global $sess;
   global $cellspacing,$border;
 
   $label = $payment["label"];
@@ -474,10 +471,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $payment){
   // themes
   global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
-  // Labels
   global $l_found;
-  // session stuff
-  global $perms_user,$l_perms_user;
 
   // get payment data :
   $label = $payment["label"];
@@ -521,9 +515,7 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   global $l_label,$l_comment,$l_number, $l_date, $l_amount, $l_expected_date;
   global $l_account, $l_kind, $l_type;
   global $l_no_invoices_connected, $l_invoices_connected, $l_break_asso;
-  // session
-  global $perms_user,$l_perms_user;
-  global $auth, $sess, $perm, $param_payment;
+  global $param_payment;
   global $border, $cellspacing;
 
   // amount display color
@@ -711,9 +703,7 @@ function html_chose_invoices_form ($p_action, $payment, $dis_options_invoice, $q
   global $l_label, $l_number, $l_amount, $l_kind, $l_date, $l_expected_date;
   global $l_invoice_label, $l_invoice_date, $l_invoice_TTC,$l_invoice_status;
   global $l_invoice_company;
-  // session stuff
-  global $perms_user,$l_perms_user;
-  global $auth, $sess, $cdg_param;
+  global $cdg_param;
   
   if ($p_action == "search_invoice") {
     $url = url_prepare("payment_index.php?action=search_invoice&amp;param_payment=".$payment["payment"]);
@@ -904,7 +894,6 @@ echo "
 function html_banking_problem ($p_error, $p_payment, $p_invoices) {
   global $l_too_much, $l_not_enough, $l_trouble_invoice;
   global $l_bank_again, $l_bank_anyway;
-  global $sess;
 
   display_err_msg ($p_error);
   // where the user goes if he clicks on "carry on"
@@ -986,7 +975,6 @@ function html_breaking_associations ($p_action,$q_payment, $q_connected_invoices
   global $l_break_asso_strong_confirm, $l_break_asso_go;
   global $l_break_asso_soft_confirm, $l_break_asso_easy_confirm;
   global $l_payment_break_asso;
-  global $sess,$perm;
 
   // we display payment infos :
   html_payment_consult ($p_action, $q_payment, run_query_paymentkind(),
@@ -1109,7 +1097,6 @@ function dis_payment_display_pref ($payment_options, $invoices_options, $et_opti
 function html_choose_csv_file () {
   global $border, $cellspacing;
   global $l_choose_csv;
-  global $sess;
 
   $url = url_prepare("payment_index.php?action=reconcile_import");
 
@@ -1135,7 +1122,7 @@ function html_choose_csv_file () {
 // $q_et_prefs display prefs for EntryTemp
 ///////////////////////////////////////////////////////////////////////////////
 function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
-  global $sess,$col_textem;
+  global $col_textem;
   global $l_import_ok, $l_restart_import;
 
   // il faut displayer les entrytemp, puis un form de confirm..
@@ -1179,7 +1166,7 @@ function html_reconcile_import ($q_entrytemp, $q_et_prefs) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_select_reconcile ($q_payments, $q_et, $q_pay_pref, $q_et_pref) {
   global $border, $cellspacing;
-  global $sess, $set_rows;
+  global $set_rows;
   global $l_reconcile, $l_nb_payments_to_reconcile;
   global $l_nb_entrytemp_to_reconcile;
   

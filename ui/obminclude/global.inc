@@ -16,6 +16,7 @@ $set_theme_default = "aliacom";
 $set_rows_default = 10;
 $set_display_default = "no";
 $set_date_default = "Y-m-d";
+$set_menu_default = "both";
 //$set_debug_default=0;
 $last_deal_default = 0;
 $last_company_default = 0;
@@ -56,7 +57,12 @@ $c_php_isodate_format = "Y-m-d";  // AAAA-MM-JJ iso format for php date()
 $cda_iso = "Y-m-d"; // Iso format
 $cda_en = "m/d/Y";  // us format
 $cda_fr = "d/m/Y";  // fr format
-$cda_txt = "d M Y";  // fr format
+$cda_txt = "d M Y"; // txt format
+
+// Menu display options constants
+$cme_txt = "text";  // text
+$cme_ico = "icon";  // icon
+$cme_both = "both"; // both
 
 // Perms
 $perms_user = "user" ;
@@ -290,8 +296,7 @@ function display_debug_msg($msg, $debug=0, $function_name="") {
   if (! empty($function_name))
 	$function_name .= " : ";
   if (($set_debug > 0) && (($set_debug & $debug) == $debug)) {
-    echo "<font color=\"#$col_green\">$function_name</font>$msg";
-    echo "<HR>\n";
+    echo "$function_name : $msg<hr>";
   }
 }  
 
@@ -306,10 +311,9 @@ require_once("$obminclude/global_display.inc");
 // Display HTML Head
 ///////////////////////////////////////////////////////////////////////////////
 function display_head($l_module) { 
-  global $l_title;
-  global $col_text,$col_bg,$col_link,$img_bg;
-  global $set_theme, $obminclude;
-  $headers_e =  "
+  global $l_title, $set_theme, $obminclude;
+
+  $headers_e = "
    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
     \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
    <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
@@ -323,13 +327,6 @@ function display_head($l_module) {
      <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
     </head>
     <body >";
-    /*TEXT=\"#$col_text\" ";
-     if ($img_bg != "") {echo "background=\"/images/$set_theme/$img_bg\" ";}
-     if ($col_bg != "") {echo "bgcolor=\"#$col_bg\" ";}
-     if ($col_link != "") {echo "link=\"#$col_link\" ";}
-     if ($col_link != "") {echo "vlink=\"#$col_link\"";}
-  echo " marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
-*/
 }
 
 
@@ -337,9 +334,9 @@ function display_head($l_module) {
 // Displays the end of an HTML page
 ///////////////////////////////////////////////////////////////////////////////
 function display_end() { 
-echo "
-</body>
-</html>
+  echo "
+    </body>
+    </html>
 ";
 
 }
@@ -365,7 +362,8 @@ function display_warn_msg($msg) {
 // Display an OK message
 ////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg) {
-  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
+  //  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
+  echo "<p class=\"messageOk\">$msg</p>";
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -408,17 +406,17 @@ function display_bookmarks($path="..") {
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
+     href=\"".url_prepare("$path/account/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
      ".substr($last_account_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
+     href=\"".url_prepare("$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
      ".substr($last_invoice_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
+     href=\"".url_prepare("$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
      ".substr($last_payment_name,0,30)."</a>
          </td>
 	 <td class=\"bookmarks\">
@@ -428,7 +426,7 @@ function display_bookmarks($path="..") {
          </td>
 	 <td class=\"bookmarks\">
      <a class=\"bookmarks\"
-     href=\"".url_prepare("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
+     href=\"".url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
      ".substr($last_incident_name,0,30)."</a>
          </td>
        </tr>
@@ -557,35 +555,6 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
 ///////////////////////////////////////////////////////////////////////////////
 function return_yes_no($number) {
   return ($number == 1) ? "yes" : "no" ;
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-// Display the permission error message
-///////////////////////////////////////////////////////////////////////////
-function display_error_permission()
-{	
-	global $col_error;
-	global $l_error_permission;
-
-	echo "<CENTER><FONT color=\"#$col_error\">";
-  	echo $l_error_permission;
-  	echo "</FONT></CENTER><BR>";
-}
-
-
-///////////////////////////////////////////////////////////////////////////
-// Display the "visibility" error message : it occurs when a user tries 
-// to access a contact or a deal which access is private.
-///////////////////////////////////////////////////////////////////////////
-function display_error_visibility()
-{	
-	global $col_error;
-	global $l_error_visibility;
-
-
-  	 display_err_msg($l_error_visibility);
-
 }
 
 

@@ -18,14 +18,15 @@ $l_validate = "Valider";
 $l_all = "Tout";
 $l_all_f = "Toutes";
 $l_none = "---";
+$l_comment = "Commentaire";
 $l_archive = "Archive";
 $l_invalid_data = "Données invalides";
+$l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
+$l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
 
 // Mysql Date format
 $l_datetime_format = "%Y-%m-%d %H:%i:%s"; // Complete Date + Time
-$l_date_format = "%Y-%m-%d"; // Date only 
 $l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
-$l_time_format = "%H:%i:%s"; // Time only
 
 // OBM_DISPLAY
 $l_field = "Champ";
@@ -45,6 +46,11 @@ $l_help_display_no = "Le champ n'est pas affiché. Cliquer pour l'afficher";
 $l_help_mandatory = "Le champ est obligatoire";
 $l_help_down  = "Descendre le champ d'un cran";
 $l_help_up = "Monter le champ d'un cran";
+
+// Javascript common messages
+$l_fill_label = "Vous devez renseigner le Label.";
+$l_fill_date = "La date doit être renseignée.";
+$l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 
 //used by many modules
 // days and months
@@ -86,14 +92,13 @@ $l_header_users  = "UTILISATEUR";
 $l_header_admins = "ADMINISTRATION";
 
 $l_header_settings = "Configuration";
-$l_header_company = "Soci&eacute;t&eacute;s";
+$l_header_company = "Sociétés";
 $l_header_contact = "Contacts";
 $l_header_contract = "Contrats";
 $l_header_incident = "Incidents";
 $l_header_deal = "Affaires";
 $l_header_list = "Listes";
 $l_header_user = "Utilisateurs";
-$l_header_computer = "Ordinateurs" ;
 $l_header_admin = "Administration";
 $l_header_admin_lang = "Langue";
 $l_header_admin_data = "Données";
@@ -102,33 +107,17 @@ $l_header_admin_code = "Code";
 $l_header_account = "Comptes";
 $l_header_invoice = "Factures";
 $l_header_payment = "Paiements";
-$l_header_time = "Gestion des temps" ;
+$l_header_time = "Gestion des temps";
 $l_header_agenda = "Agenda";
-
-$l_header_title_settings = "CONFIGURATION";
-$l_header_title_company = "SOCIETE";
-$l_header_title_contact = "CONTACT";
-$l_header_title_contract = "CONTRAT";
-$l_header_title_incident = "INCIDENT";
-$l_header_title_deal = "AFFAIRE";
-$l_header_title_list = "LISTE"; 
-$l_header_title_user = "UTILISATEUR";
-$l_header_title_computer = "ORDINATEUR" ;
-$l_header_title_admin = "ADMINISTRATION";
-$l_header_title_account = "COMPTES";
-$l_header_title_invoice = "FACTURES";
-$l_header_title_payment = "PAIEMENTS";
-$l_header_title_agenda = "AGENDA";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
 $l_header_find = "Chercher";
-$l_header_modify = "Modifier";
+$l_header_update = "Modifier";
 $l_header_display = "Affichage";
 $l_header_delete = "Supprimer";
 
 $l_header_new_parent = "Nouvelle SurAffaire";
-$l_header_find_parent = "Chercher SurAffaire";
 
 $l_header_global_export = "Export";
 $l_header_export = "Exporter";
@@ -140,9 +129,9 @@ $l_header_add_contact = "Ajouter contact";
 
 $l_header_reset = "Préférence par défaut";
 
-$l_header_amp	= "Afficher les esperluettes";
+$l_header_amp = "Afficher les esperluettes";
 $l_header_clear_sess = "Nettoyer les sessions";
-$l_header_index     = "Accueil";
+$l_header_index = "Accueil";
 $l_header_help = "Aide";
 $l_header_pref_update = "Réinitialiser les préférences utilisateur";
 
@@ -153,4 +142,5 @@ $l_header_year = "Année";
 $l_header_new_event = "Nouveau rdv";
 
 //TIME
-$l_header_time = "Gestion temps" ;
+$l_header_admin = "Administration";
+$l_header_stats = "Statistiques";

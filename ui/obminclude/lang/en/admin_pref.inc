@@ -1,17 +1,16 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
-//     - File     : admin.inc                                                //
+//     - File     : admin_pref.inc                                           //
 // 2001-12-24 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 $l_user_pref = "Users preferences";
 $l_global_pref = "Global preferences";
 $l_session_lifetime = "User session lifetime (max idle time before a user is deconnected) in seconds";
 $l_session_cookie = "Do session cookie (cookie expires when the client close the browser). This should avoid problem with date differences between client and server. Recommended.";
-$l_lifetime = "User session lifetime (seconds)";
 
 // Actions
 $l_execute = "Execute action";

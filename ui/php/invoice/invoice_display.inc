@@ -50,7 +50,6 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
   global $l_find, $l_all_f, $l_both, $l_client, $l_fournisseur;
-  global $sess;
   global $cellspacing,$border;
 
   $cellspacing = 10;
@@ -242,7 +241,6 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
   global $l_insert,$l_update, $l_delete;
   global $default_invoice_numbering;
   global $q_company;
-  global $sess, $auth;
   global $default_tax, $l_tax_rate, $l_compute_tax; 
 
   global $cellspacing,$border;
@@ -498,9 +496,7 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
   global $l_found, $l_archive_invoices, $l_archive_update;
   global $l_label, $l_number, $l_amount_HT, $l_amount_TTC, 
     $l_date, $l_status, $l_deal;
-  //-- Authentication
-  global $perms_user,$l_perms_user, $perms_admin;
-  global $auth, $sess;
+  global $auth, $perms_user,$l_perms_user, $perms_admin;
 
   $label = $invoice["label"];
   $number = $invoice["number"];
@@ -611,7 +607,7 @@ function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_
   global $l_label,$l_comment,$l_number, $l_date, $l_amount_HT, $l_amount_TTC, 
     $l_deal, $l_status;
   global $perms_user,$l_perms_user;
-  global $auth, $sess, $perm, $param_invoice;
+  global $perm, $param_invoice;
   global $border, $cellspacing;
 
   dis_invoice_detail ($action,$q_invoice, $q_status);
@@ -715,7 +711,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
   global $l_invoice_deal_archive ;
   global $l_add_deal, $l_add_deal_chosen, $l_no_deal_found, $l_no_deal_display;
   global $cellspacing, $border;
-  global $action, $perm, $sess, $col_label;
+  global $action, $perm, $col_label;
   //$param_invoice;
   global $l_invoice_deal_company;
 
@@ -800,7 +796,7 @@ function dis_search_deal_form ($p_action, $q_invoice, $dis_option_deal, $q_deal=
 // displays an invoice details :
 /////////////////////////////////////////////////////////////////////////////
 function dis_invoice_detail ($p_action, $q_invoice, $q_status){
-  global $auth, $sess, $param_invoice;
+  global $param_invoice;
   global $border, $cellspacing;
   global $l_update, $l_comment,$l_amount_HT, $l_amount_TTC,
     $l_status, $l_date, $l_label, $col_label,$l_number, $l_inout, 

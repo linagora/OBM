@@ -58,16 +58,11 @@ $l_update_error = "La mise à jour du compte a échoué !";
 $l_query_error = "Problème durant l'exécution d'une requête...";
 $l_impossible_deletion = " paiements sont liés à ce compte. La suppression est impossible"; // must be used with the number of payments leading...
 
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe numéro du compte n\\'est pas valide !";
 $l_fill_number = "Vous devez fournir un numéro de compte !";
-$l_fill_label = "Vous devez fournir un label !";
 $l_fill_bank = "Vous devez renseigner le champ banque !";
 $l_confirm_no_bank="Ce Compte n\\'est associé à aucune banque. Cliquez sur OK pour confirmer .";
-$l_invalid_date="\\n Format de date invalide (MM/JJ/AAAA or AAAA-MM-JJ)";
-$l_fill_date = "\\n Vous devez fournir une date.";
 
 // For the display parameters modification screen
 $l_account_options = "Options d'affichage pour les listes de Comptes"; 

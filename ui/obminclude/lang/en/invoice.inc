@@ -100,12 +100,6 @@ $l_update_ok = "The invoice has been updated successfully.";
 $l_update_error = "The update of the invoice has failed !";
 $l_query_error = "Trouble executing the query...";
 
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_short_date_format = "%Y-%d-%m";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nThe invoice number is not valid!";
 $lj_check_money_ht = "\\nThe amount without charges is not valid!";

@@ -78,12 +78,9 @@ $l_query_error = "Trouble executing the query...";
 $lj_no_number = "\\nThe payment number is not valid!";
 $lj_check_amount = "\\nThe amount is not valid!";
 $lj_check_inout = "\\nYou have to decide wether it's a payment from a customer or to a supplier before submitting";
-$lj_fill_label = "\\n You have to fill the Label before submitting.";
-$l_invalid_date="\\nInvalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ)";
 $lj_check_paymentkind = "You have to choose a payment kind before submitting!";
 $lj_check_account = "You have to choose an account before submitting!";
 $l_no_amount = "You have to enter an amount for the payment";
-$l_fill_date = "You have to fill this field";
 $l_invalid_amount = "The last amount you entered is not valid";
 // For the display parameters modification screen
 $l_payment_options = "Display options for payments list"; 

@@ -16,6 +16,7 @@ $l_set_lang = "Velg språk";
 $l_set_theme = "Velg fargeval.";
 $l_set_rows = "# Rows displayed per page";
 $l_set_date = "Date format";
+$l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";
 
 $l_dg_id = "Id";
@@ -26,3 +27,7 @@ $l_da_iso = "yyyy-mm-dd";
 $l_da_en = "mm/dd/yyyy";
 $l_da_fr = "dd/mm/yyyy";
 $l_da_txt = "dd month yyyy";
+
+$l_me_txt = "text";
+$l_me_ico = "icon";
+$l_me_both = "text+icon";

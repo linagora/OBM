@@ -83,15 +83,11 @@ $l_link_list = "Il contatto è registrato in queste liste ...";
 $l_link_list_no = "il contatto non è presente nelle liste...";
 $l_cant_delete = "Il contatto non può essere eliminato!";
 $l_can_delete = "Contatto eliminabile.";
-$l_error_permission = "Pagina riservata - necessaria autorizzazione.";
-$l_error_visibility = "Informazioni private. necessaria autorizzazione.";
-$l_no_display = "Riempi i campi e click su  < TROVA > per eseguire la ricerca.";
+$l_no_display = "Riempi i campi e click su < TROVA > per eseguire la ricerca.";
 $l_found_task = "Tasks della settimana:";
 $l_found = "trovati tasks.";
 $l_no_found = "Nessun task per l'utente";
-$l_addtask_start = "Inserisci l'informazione per la settimana corrente. La durata è una frazione di giorno
-
- (tra  1/";
+$l_addtask_start = "Inserisci l'informazione per la settimana corrente. La durata è una frazione di giorno (tra  1/";
 $l_addtask_end = " e 1).";
 $l_modtask = "Modifica task:";
 $l_total_day = "Vista giornaliera. Se il giorno è completo,<BR> Confirm it by selecting complet days and validate form.";

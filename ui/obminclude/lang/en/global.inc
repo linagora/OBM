@@ -4,7 +4,7 @@
 //     - File     : global.inc                                               //
 // 2001-12-27 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Common actions
@@ -18,14 +18,15 @@ $l_validate = "Validate";
 $l_all = "All";
 $l_all_f = "All";
 $l_none = "---";
+$l_comment = "Comment";
 $l_archive = "Archive";
 $l_invalid_data = "Invalid Data";
+$l_error_permission = "You are not allowed to execute this action";
+$l_error_visibility = "You can't access this information, it is private.";
 
 // Mysql Date format
 $l_datetime_format = "%m-%d-%Y %H:%i:%s"; // Complete Date + Time
-$l_date_format = "%m-%d-%Y"; // Date only 
 $l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
-$l_time_format = "%H:%i:%s"; // Time only
 
 // OBM_DISPLAY
 $l_field = "Field";
@@ -46,6 +47,10 @@ $l_help_mandatory = "This field is mandatory";
 $l_help_down  = "Move the field down";
 $l_help_up = "Move the field up";
 
+// Javascript common messages
+$l_fill_label = "You have to fill the label";
+$l_fill_date = "The date must be filled";
+$l_invalid_date = "Invalid date format (JJ/MM/AAAA ou AAAA-MM-JJ)";
 
 //used by many modules
 // days and months
@@ -98,7 +103,6 @@ $l_header_admin_lang = "Lang";
 $l_header_admin_data = "Data";
 $l_header_admin_pref = "Prefs";
 $l_header_admin_code = "Code";
-$l_header_computer = "Computers";
 $l_header_account = "Accounts";
 $l_header_invoice = "Invoices";
 $l_header_payment = "Payments";
@@ -107,32 +111,15 @@ $l_header_agenda = "Calendar";
 //TIME
 $l_header_time = "Time management" ;
 
-
-$l_header_title_computer = "COMPUTER" ;
-$l_header_title_settings = "SETTINGS";
-$l_header_title_company = "COMPANY";
-$l_header_title_contact = "CONTACT";
-$l_header_title_contract = "CONTRACT";
-$l_header_title_incident = "INCIDENT";
-$l_header_title_deal = "DEAL";
-$l_header_title_list = "LIST" ; 
-$l_header_title_user = "USER";
-$l_header_title_admin = "ADMINISTRATION";
-$l_header_title_account = "ACCOUNT";
-$l_header_title_invoice = "INVOICE";
-$l_header_title_payment = "PAYMENT";
-$l_header_title_agenda = "CALENDAR";
-
 $l_header_new_f = "New";
 $l_header_new = "New";
 $l_header_find = "Find";
 $l_header_display = "Display";
 $l_header_export = "Export";
-$l_header_modify = "Modify";
+$l_header_update = "Modify";
 $l_header_delete = "Delete";
 
 $l_header_new_parent = "New ParentDeal";
-$l_header_find_parent = "Find ParentDeal";
 
 $l_header_add_contact = "Add contact";
 

@@ -21,6 +21,8 @@ $l_none = "---";
 $l_comment = "Commento";
 $l_archive = "Archivio";
 $l_invalid_data = "Dati non valida";
+$l_error_permission = "Non hai i permessi di accesso alla pagina.";
+$l_error_visibility = "Le informazioni della pagina sono private - Non consultabili";
 
 // OBM_DISPLAY
 $l_field = "Campo";
@@ -41,6 +43,10 @@ $l_help_mandatory = "Campo obbligatorio";
 $l_help_down  = "Sposta sotto";
 $l_help_up = "Sposta sopra";
 
+// Javascript common messages
+$l_fill_label = "Scrivi prima nome.";
+$l_fill_date = "Scrivi prima Data.";
+$l_invalid_date = "Formato data non valido (JJ/MM/AAAA ou AAAA-MM-JJ).";
 
 //used by many modules
 // days and months
@@ -70,6 +76,7 @@ $l_short_october="Ott";
 $l_short_november="Nov";
 $l_short_december="Dic";
 $l_invalid_perm = "Word to define";
+
 ////////////////////////////////////////////////////////
 ////// Theme headers lang files ////////////////////////
 ////////////////////////////////////////////////////////
@@ -118,8 +125,9 @@ $l_header_title_agenda = "CALENDARIO";
 $l_header_new_f = "Nuovo";
 $l_header_new = "Nuovo";
 $l_header_find = "Trova";
-$l_header_display = "Visualizza";
+$l_header_update = "Modifica";
 $l_header_delete =  "Word to define";
+$l_header_display = "Visualizza";
 
 $l_header_new_parent = "Nuovo ParentDeal";
 $l_header_find_parent = "Trova ParentDeal";

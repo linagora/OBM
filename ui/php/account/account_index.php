@@ -69,9 +69,10 @@ if ($action == "index" || $action == "") {
      html_account_search_list($obm_q, $display_prefs, $nb_accounts, $account);
    }
      
-  }else {
+  } else {
     display_ok_msg($l_no_display);
   }
+
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
@@ -85,14 +86,16 @@ if ($action == "index" || $action == "") {
     $display_pref = run_query_display_pref ($auth->auth["uid"], "account");
     html_account_search_list($obm_q, $display_pref, $nb_accounts, $account);
   }
+
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
     require("account_js.inc");
     html_account_form($obm_q_accounts, $action);
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
+
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_insert($account);
@@ -155,7 +158,7 @@ if ($action == "index" || $action == "") {
     $expected_payments_options = run_query_display_options ($auth->auth["uid"], "payment");
     html_compute_balance ($q_account, $q_payments, $q_expected_payments, $payments_options, $expected_payments_options, $tf_balance_date);
   } else{
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
   */
   if (true) {
@@ -170,7 +173,7 @@ if ($action == "index" || $action == "") {
     html_compute_balance ($account["account"], $payments_prefs, $tf_balance_date);
 
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   } 
   /*  
 $q_account = run_query_detail ($account["account"]);
@@ -187,11 +190,9 @@ $q_account = run_query_detail ($account["account"]);
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {  
-    echo "<CENTER><FONT color=\"#$col_error\">";
-    echo "To come...";
-    echo "</FONT></CENTER><BR>";
+    echo "<center>Nothing here for now</center><br />";
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }	
     
 } elseif ($action == "display") {
@@ -253,21 +254,21 @@ function get_param_account() {
 
 function get_account_action() {
   global $account, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_compute_balance;
   global $account_read, $account_write, $account_admin_read, $account_admin_write;
 
 // Index
   $actions["ACCOUNT"]["index"] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/treso/account_index.php?action=index",
+    'Url'      => "$path/account/account_index.php?action=index",
     'Right'    => $account_read,
     'Condition'=> array ('all') 
                                        );
 
 // Search
   $actions["ACCOUNT"]["search"] = array (
-    'Url'      => "$path/treso/account_index.php?action=search",
+    'Url'      => "$path/account/account_index.php?action=search",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                        );
@@ -275,21 +276,21 @@ function get_account_action() {
 // New
   $actions["ACCOUNT"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/treso/account_index.php?action=new",
+    'Url'      => "$path/account/account_index.php?action=new",
     'Right'    => $account_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
      		                     );
 
 // Insert
   $actions["ACCOUNT"]["insert"] = array (
-    'Url'      => "$path/treso/account_index.php?action=insert",
+    'Url'      => "$path/account/account_index.php?action=insert",
     'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
 
 // Detail Consult
   $actions["ACCOUNT"]["detailconsult"] = array (
-    'Url'      => "$path/treso/account_index.php?action=detailconsult",
+    'Url'      => "$path/account/account_index.php?action=detailconsult",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                        );
@@ -297,22 +298,22 @@ function get_account_action() {
 // Compute Balance
   $actions["ACCOUNT"]["compute_balance"] = array (
     'Name'     => $l_header_compute_balance,
-    'Url'      => "$path/treso/account_index.php?action=compute_balance&amp;param_account=".$account["account"]."",
+    'Url'      => "$path/account/account_index.php?action=compute_balance&amp;param_account=".$account["account"]."",
     'Right'    => $account_write,
     'Condition'=> array ('detailconsult') 
                                      		 );
 
 // Detail Update
   $actions["ACCOUNT"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
-    'Url'      => "$path/treso/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
+    'Name'     => $l_header_update,
+    'Url'      => "$path/account/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
     'Right'    => $account_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
 
 // Update
   $actions["ACCOUNT"]["update"] = array (
-    'Url'      => "$path/treso/account_index.php?action=update",
+    'Url'      => "$path/account/account_index.php?action=update",
     'Right'    => $account_write,
     'Condition'=> array ('None') 
                                        );
@@ -320,7 +321,7 @@ function get_account_action() {
 // Delete
   $actions["ACCOUNT"]["delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/treso/account_index.php?action=delete&amp;param_account=".$account["account"]."",
+    'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["account"]."",
     'Right'    => $account_write,
     'Condition'=> array ('detailconsult') 
                                      	);
@@ -328,7 +329,7 @@ function get_account_action() {
 // Admin
   $actions["ACCOUNT"]["admin"] = array (
     'Name'     => $l_header_admin,
-    'Url'      => "$path/treso/account_index.php?action=admin",
+    'Url'      => "$path/account/account_index.php?action=admin",
     'Right'    => $account_admin_read,
     'Condition'=> array ('all') 
                                       );
@@ -336,7 +337,7 @@ function get_account_action() {
 // Display
   $actions["ACCOUNT"]["display"] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/treso/account_index.php?action=display",
+    'Url'      => "$path/account/account_index.php?action=display",
     'Right'    => $account_read,
     'Condition'=> array ('all') 
                                       	 );
@@ -344,7 +345,7 @@ function get_account_action() {
 // Display Preferences
   $actions["ACCOUNT"]["dispref_display"] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/treso/account_index.php?action=dispref_display",
+    'Url'      => "$path/account/account_index.php?action=dispref_display",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                       	 );
@@ -352,7 +353,7 @@ function get_account_action() {
 // Display Preferences
   $actions["ACCOUNT"]["level_display"] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/treso/account_index.php?action=level_display",
+    'Url'      => "$path/account/account_index.php?action=level_display",
     'Right'    => $account_read,
     'Condition'=> array ('None') 
                                       	 );

@@ -98,6 +98,11 @@ $l_update_parent = "Modifier SurAffaire";
 $l_delete_parent = "Supprimer SurAffaire";
 $l_parentdeal_deal_new = "Créer nouvelle affaire";
 
+$l_link_contract = "L'affaire est référencée par ces contrats";
+$l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
+$l_cant_delete = "L'affaire ne peut être supprimée !";
+$l_can_delete = "L'affaire peut être supprimée.";
+
 $l_kind_checkdelete = "Vérifier ou Supprimer le Type";
 $l_kind_delete = "Supprimer le Type";
 $l_kind_can_delete = "Le type peut être supprimé";
@@ -129,8 +134,6 @@ $l_err_market_empty = "Le responsable commercial doit être renseigné !";
 $l_err_tech_empty = "Le responsable technique doit être renseigné !";
 $l_err_hitrate = "Le pourcentage de réussite doit être entre 0 et 100 !";
 $l_updateaffect_ok = "L'affaire a bien été affectée a une surAffaire.";
-$l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
-$l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas les consulter";
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
 $l_found = "affaire(s) trouvée(s).";
 $l_no_found = "Aucune affaire ne correspond à ces critères !";

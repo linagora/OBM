@@ -82,7 +82,7 @@ if ($popup) {
     $comp_q = run_query_company();
     html_select_company($comp_q, stripslashes($title), $url);
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
   display_end();
   exit();
@@ -376,7 +376,7 @@ function get_param_company() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_company_action() {
   global $company, $actions, $path;
-  global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin;
   global $company_read, $company_write, $company_admin_read, $company_admin_write;
 
@@ -412,7 +412,7 @@ function get_company_action() {
 
 // Detail Update
   $actions["COMPANY"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
+    'Name'     => $l_header_update,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
     'Right'    => $company_write,
     'Condition'=> array ('detailconsult', 'update') 

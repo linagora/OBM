@@ -60,10 +60,8 @@ comp_lang        | module | Compares variables referenced in the module source
 -------------------------------------------------------------------------------
 Not implemented in txt mode 
 ===============================================================================
-comp_header_lang | theme  | Special case for action 'comp_lang' for the special
-                 | lang1  | module header. As this module is theme dependant
-                 | lang2  | and its files are different from other modules :
-                 |        | source : obminclude/theme/$theme/menu.inc
+comp_global_lang | lang1  | Special case for action 'comp_lang' for the special
+                 | lang2  | global.inc lang files as it is module independant
 -------------------------------------------------------------------------------
 Not implemented in txt mode 
 ===============================================================================

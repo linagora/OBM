@@ -150,12 +150,17 @@ function run_query_incident_contract($cid) {
       u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
       u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
       c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
-      c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2
-    from (((Contract
+      c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
+      company_name,
+      company_address1,
+      company_zipcode,
+      company_town
+    from ((((Contract
               left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
               left join UserObm u2 on contract_techmanager_id=u2.userobm_id)
               left join Contact c1 on contract_contact1_id=c1.contact_id)
-              left join Contact c2 on contract_contact2_id=c2.contact_id
+              left join Contact c2 on contract_contact2_id=c2.contact_id)
+              left join Company on contract_company_id=company_id
     where contract_id='$cid'
     order by contract_label";
 
@@ -165,20 +170,6 @@ function run_query_incident_contract($cid) {
   $obm_q->next_record();
 
   return $obm_q;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Query   : company contract       :  Table Company                         //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_company_contract($p_company_id) {
-  global $cdg_sql;
-  
-  $connect_db=new DB_OBM;
-  $query = "select company_name, company_address1,company_zipcode,company_town from Company where company_id=".$p_company_id;
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
 }
 
 
@@ -307,20 +298,6 @@ function run_query_contracttype($type_id) {
   global $cdg_sql;
   $connect_db=new DB_OBM;
   $query = "select contracttype_label,contracttype_id from ContractType where contracttype_id=".$type_id."";
-  display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
-}
-
-
-//////////////////////////////////////////////////////////////////////////////
-// Query   : company contacts contract  :  Table Contact                     //
-//////////////////////////////////////////////////////////////////////////////
-function run_query_contact_contract($p_company_id) {
-  global $cdg_sql;
-  
-  $connect_db=new DB_OBM;
-  $query = "select contact_id,contact_lastname,contact_firstname,contact_phone from Contact where contact_company_id=".$p_company_id;
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
   return $connect_db;

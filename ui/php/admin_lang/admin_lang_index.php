@@ -59,8 +59,8 @@ switch ($action) {
   case "comp_lang":
     dis_comp_lang_vars($mode, $module, $lang, $lang2);
     break;
-  case "comp_header_lang":
-    dis_comp_header_lang_vars($mode, $theme, $lang, $lang2);
+  case "comp_global_lang":
+    dis_comp_global_lang_vars($mode, $lang, $lang2);
     break;
   default:
     echo "No action specified !";
@@ -197,7 +197,7 @@ function get_admin_lang_action() {
   // index : launch forms
   $actions["ADMIN_LANG"]["index"] = array (
      'Name'     => $l_header_index,
-     'Url'      => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=htm",
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=html",
      'Right'    => $admin_lang_read,
      'Condition'=> array ('all') 
                                     	 ); 
@@ -226,9 +226,9 @@ function get_admin_lang_action() {
      'Right'    => $admin_lang_write,
      'Condition'=> array ('None')
                                     	);
-  // comp_header_lang : 
-  $actions["ADMIN_LANG"]["comp_header_lang"] = array (
-     'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_header_lang&amp;mode=html",
+  // comp_global_lang : 
+  $actions["ADMIN_LANG"]["comp_global_lang"] = array (
+     'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_global_lang&amp;mode=html",
      'Right'    => $admin_lang_write,
      'Condition'=> array ('None')
                                     	);

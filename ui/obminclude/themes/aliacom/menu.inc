@@ -151,7 +151,7 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     echo " &middot; <font color=\"#b2ebe8\">[$l_header_incident]</font>";
   } else {
     echo "
-     &middot; <a class=header_white href=\"".url_prepare($path."contract/incident_index.php?action=index")."\">$l_header_incident</a>";
+     &middot; <a class=header_white href=\"".url_prepare($path."incident/incident_index.php?action=index")."\">$l_header_incident</a>";
   }
 
   // TRESO STUFF :
@@ -159,19 +159,19 @@ a:hover.header_black {color:#000000;text-decoration: underline;}
     if ($menu =="ACCOUNT") {
       echo " &middot; <font color=\"#b2ebe8\">[$l_header_account]</font>" ;
     } else {
-      echo " &middot; <a class=header_white href=\"".url_prepare($path."treso/account_index.php?action=index")."\">$l_header_account</a>";
+      echo " &middot; <a class=header_white href=\"".url_prepare($path."account/account_index.php?action=index")."\">$l_header_account</a>";
     }
 
     if ($menu =="INVOICE") {
       echo " &middot; <font color=\"#b2ebe8\">[$l_header_invoice]</font>" ;
     } else {
-      echo " &middot; <a class=header_white href=\"".url_prepare($path."treso/invoice_index.php?action=index")."\">".$l_header_invoice."</a>" ;
+      echo " &middot; <a class=header_white href=\"".url_prepare($path."invoice/invoice_index.php?action=index")."\">".$l_header_invoice."</a>" ;
     }
 
     if ($menu =="PAYMENT") {
       echo " &middot; <font color=\"#b2ebe8\">[$l_header_payment]</font>" ;
     } else {
-      echo " &middot; <a class=header_white href=\"".url_prepare($path."treso/payment_index.php?action=index")."\">".$l_header_payment."</a>" ;
+      echo " &middot; <a class=header_white href=\"".url_prepare($path."payment/payment_index.php?action=index")."\">".$l_header_payment."</a>" ;
     } 
   }
 

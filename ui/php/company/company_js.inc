@@ -18,8 +18,13 @@ require("$obminclude/javascript/check_js.inc");
 echo "
 
 function check_get_id(form) {
-  valeur = form.param_company.options[form.param_company.selectedIndex].value;
-  text = form.param_company.options[form.param_company.selectedIndex].text;
+  comp_pos = form.param_company.selectedIndex;
+  if (! (comp_pos >= 0)) {
+    alert (\"$l_j_select_company\");
+    return false;
+  }
+  valeur = form.param_company.options[comp_pos].value;
+  text = form.param_company.options[comp_pos].text;
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
@@ -33,8 +38,13 @@ function check_get_id(form) {
 
 
 function check_get_id_url(form, p_url) {
-  valeur = form.param_company.options[form.param_company.selectedIndex].value;
-  text = form.param_company.options[form.param_company.selectedIndex].text;
+  comp_pos = form.param_company.selectedIndex;
+  if (! (comp_pos >= 0)) {
+    alert (\"$l_j_select_company\");
+    return false;
+  }
+  valeur = form.param_company.options[comp_pos].value;
+  text = form.param_company.options[comp_pos].text;
   if ((valeur < 1) || (valeur == null)) {
     alert (\"$l_j_select_company\");
     return false;
@@ -45,18 +55,16 @@ function check_get_id_url(form, p_url) {
     return true;
   }
 }
-";
 
-echo "
+
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
   else
     return false;
 }
-";
 
-echo "
+
 function check_company(form) {
 
   // MANDATORY : Check that the Company name is not empty

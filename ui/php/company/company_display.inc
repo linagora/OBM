@@ -178,7 +178,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $dis_companies_list->data_set = $obm_q_comp;
   $dis_companies_list->data_url = $url;
   $dis_companies_list->data_header = "both";
-  display_info_msg($nb_company." ".$l_found);
+  display_info_msg("$nb_company $l_found");
   $dis_companies_list->display();
 }
 
@@ -600,8 +600,6 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
    </form>
     $dis_delete
    ";
-
-  
 }
 
 
@@ -631,7 +629,7 @@ function dis_check_links($p_id) {
       </td></tr>";
     }
   } else {
-    $display_linkc =  "<tr><td class=\"detailHead\">$l_link_contact_no</td></tr>";
+    $display_linkc = "<tr><td class=\"detailHead\">$l_link_contact_no</td></tr>";
   }
 
   // Links from deals
@@ -652,25 +650,33 @@ function dis_check_links($p_id) {
     $display_linkd =  "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>" ;
   }
 
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+    action=\"".url_prepare("company_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
-    echo "<table class=\"details\"><tr>
-          <td class=\"detailHead\">";
-    dis_delete_form($p_id);
-    echo "</td></tr>";
+    echo "<table class=\"details\">
+          <tr><td>
+            <table>
+            <tr>
+              <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
+              <td class=\"detailHead\">$dis_back</td>
+            </tr>
+            </table>
+          </td></tr>";
   } else {
     display_warn_msg($l_cant_delete);
-    echo "<table class=\"details\">";
+    echo "<table class=\"details\">
+          <tr><td class=\"detailHead\">$dis_back</td></tr>";
   }
   echo "
    $display_linkc
    $display_linkd 
-   <tr><td class=\"detailHead\"><form name=\"form_back\" method=\"post\"
-   action=\"".url_prepare("company_index.php") ."\">
-   <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
-   <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
-   <input type=\"submit\" value=\"$l_back\" />
-   </form></td></tr></table>";
+   </table>";
 }
 
 
@@ -775,13 +781,15 @@ function dis_company_warn_insert($cid, $co_q, $company) {
 function dis_delete_form($p_id) {
   global $l_delete;
 
-  echo "\n<form name=\"form_delete\" " .
-      "method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
+  $ret = "<form name=\"form_delete\" method=\"post\"
+      action=\"" . url_prepare("company_index.php") . "\">
     <input type=\"hidden\" name=\"action\" value=\"delete\" />
     <input type=\"hidden\" name=\"hd_company_id\" value=\"$p_id\" />
     <input type=\"submit\" value=\"$l_delete\"
-    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />";
-  echo "</form>\n";
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
+
+  return $ret;
 }
 
 
@@ -828,60 +836,59 @@ function html_company_kind_form($kind_q) {
 
         <table>
         <tr>
-         <td colspan=\"3\">
-        <form name=\"form_admin_kind_delete\"
-      method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
-         <table>
-          <tr>
-          <td class=\"adminLabel\">$l_kind_exist</td>
-          <td class=\"adminLabel\">$sel_kind</td>
-          <td>
-            <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
-            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
-              onclick=\"if (check_kind_checkdel(this.form)) return true;
-              else return false;\" />
+          <td colspan=\"3\">
+            <form name=\"form_admin_kind_delete\" method=\"post\"
+              action=\"" . url_prepare("company_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_kind_exist</td>
+              <td class=\"adminLabel\">$sel_kind</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
+              <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\" onclick=\"if (check_kind_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
           </td>
         </tr>
-        </table>
-    </form>
-        </td></tr>
 
 <!-- Kind Update Section -->
 
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
-    <form name=\"form_admin_kind_update\"
-      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
+            <form name=\"form_admin_kind_update\" method=\"get\"
+              action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
             <input type=\"text\" name=\"tf_kind_upd\" />
             <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
               onclick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\" />
-    </form>
+            </form>
           </td>
           <td>&nbsp;</td>
         </tr>
-
         </table>
       </td>
       <td>
 
 <!-- New Kind Section -->
 
-    <form name=\"form_admin_kind_new\"
-      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_new\" /></td>
-      </tr><tr>
-        <td class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
-          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
-            onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
-        </td>
-      </tr>
-      </table>
-    </form>
+        <form name=\"form_admin_kind_new\" method=\"get\"
+          action=\"" . url_prepare("company_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_kind_new :
+            <input name=\"tf_kind_new\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
+              onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
       </td>
     </tr>
     </table>
@@ -925,33 +932,45 @@ function dis_kind_links($label) {
   $del_form = dis_kind_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$l_kind_link_company $label</td></tr>";
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_kind_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$l_kind_link_company $label</td>
+    </tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link .="<tr><td class=\"detailText\">
-                   <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname
-                   </a></td></tr>\n";
+      $dis_link .="
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
     }
-    $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_kind_cant_delete</td></tr>";
+
   } else {
-    $dis_link = "<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">
-    $l_kind_link_company_no '$label' : $l_kind_can_delete</td></tr>
-      <tr>
-        <td>
-        $del_form
-        </td>
-        <td>
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">
+      $l_kind_link_company_no '$label' : $l_kind_can_delete</td>
+    </tr><tr>
+      <td>$del_form</td>
+      <td>
         <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("company_index.php") . "\">
+          action=\"" .url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
-        </td>
-      </tr>
-      </table>";
+      </td>
+    </tr>
+    </table>";
   }
- echo "$dis_link";
+  echo "$dis_link";
 }
 
 
@@ -985,59 +1004,60 @@ function html_company_activity_form($act_q) {
 <!-- Activity Check Delete Section -->
         <table>
         <tr>
-         <td colspan=\"3\">
-        <form name=\"form_admin_act_delete\"
-      method=\"post\" action=\"" . url_prepare("company_index.php") . "\">
-         <table>
+          <td colspan=\"3\">
+          <form name=\"form_admin_act_delete\" method=\"post\"
+            action=\"" . url_prepare("company_index.php") . "\">
+          <table>
           <tr>
-          <td class=\"adminLabel\">$l_act_exist</td>
-          <td class=\"adminLabel\">$sel_act</td>
-          <td>
-            <input type=\"hidden\" name=\"action\" value=\"activity_checklink\" />
-            <input type=\"submit\" name=\"sub_act\" value=\"$l_act_checkdelete\"
-              onclick=\"if (check_act_checkdel(this.form)) return true;
-              else return false;\" />
+            <td class=\"adminLabel\">$l_act_exist</td>
+            <td class=\"adminLabel\">$sel_act</td>
+            <td>
+              <input type=\"hidden\" name=\"action\" value=\"activity_checklink\" />
+              <input type=\"submit\" name=\"sub_act\" value=\"$l_act_checkdelete\"
+                onclick=\"if (check_act_checkdel(this.form)) return true;
+                else return false;\" />
+            </td>
+          </tr>
+          </table>
+          </form>
           </td>
         </tr>
-        </table>
-    </form>
-        </td></tr>
 
 <!-- Activity Update Section -->
 
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
-    <form name=\"form_admin_act_update\"
-      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
+            <form name=\"form_admin_act_update\" method=\"get\"
+              action=\"" . url_prepare("company_index.php") . "\">
             <input type=\"hidden\" name=\"sel_act\" value=\"\" />
             <input type=\"hidden\" name=\"action\" value=\"activity_update\" />
             <input type=\"text\" name=\"tf_act_upd\" />
             <input type=\"submit\" name=\"sub_act\" value=\"$l_act_update\"
               onclick=\"if (check_act_upd(this.form,document.form_admin_act_delete)) return true; else return false;\" />
-    </form>
+            </form>
           </td>
           <td>&nbsp;</td>
         </tr>
-
         </table>
       </td>
       <td>
 
 <!-- New Activity Section -->
-    <form name=\"form_admin_act_new\"
-      method=\"get\" action=\"" . url_prepare("company_index.php") . "\">
-      <table>
-      <tr>
-        <td class=\"adminLabel\">$l_act_new : <input name=\"tf_act_new\" /></td>
-      </tr><tr>
-        <td class=\"adminLabel\">
-          <input type=\"hidden\" name=\"action\" value=\"activity_insert\" />
-          <input type=\"submit\" name=\"sub_act\" value=\"$l_act_insert\"
-            onclick=\"if (check_act_new(this.form)) return true; else return false;\" />
-        </td>
-      </tr>
-      </table>
-    </form>
+        <form name=\"form_admin_act_new\" method=\"get\"
+          action=\"" . url_prepare("company_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_act_new :
+            <input name=\"tf_act_new\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"activity_insert\" />
+            <input type=\"submit\" name=\"sub_act\" value=\"$l_act_insert\"
+              onclick=\"if (check_act_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
       </td>
     </tr>
     </table>
@@ -1081,33 +1101,45 @@ function dis_activity_links($label) {
   $del_form = dis_activity_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$l_act_link_company $label</td></tr>";
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_act_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$label : $l_act_link_company</td>
+    </tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link .="<tr><td class=\"detailText\">
-                   <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname
-                   </a></td></tr>\n";
+      $dis_link .= "
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
     }
-    $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_act_cant_delete</td></tr>";
+
   } else {
-    $dis_link = "<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">
-    $l_act_link_company_no '$label' : $l_act_can_delete</td></tr>
-      <tr>
-        <td>
-        $del_form
-        </td>
-        <td>
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">
+        $l_act_link_company_no '$label' : $l_act_can_delete</td>
+    </tr><tr>
+      <td>$del_form</td>
+      <td>
         <form name=\"form_back\" method=\"get\"
-        action=\"" .url_prepare("company_index.php") . "\">
+          action=\"" .url_prepare("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
         <input type=\"submit\" value=\"$l_back\" />
         </form>
-        </td>
-      </tr>
-      </table>";
+      </td>
+    </tr>
+    </table>";
   }
- echo "$dis_link";
+  echo $dis_link;
 }
 
 

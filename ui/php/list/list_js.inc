@@ -1,8 +1,10 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File  : maillist_js.inc                                             //
-//     - Desc  : Maillist javascript functions File                          //
-// 200-16-02 Vincent MARGUERIT : Last Update 2000-16-02                      //
+// OBM - File : list_js.inc                                                  //
+//     - Desc : List javascript functions File                               //
+// 200-16-02 Vincent MARGUERIT                                               //
+///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "

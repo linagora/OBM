@@ -122,13 +122,6 @@ $l_too_much_money = "The total amount of paiements is bigger than the invoice to
 $l_error_try_again = "There are errors !! Please restart from the beginning";
 $l_try_again = "Try Again !";
 
-// champs specifiques
-// format de date et heure pour MySQL pour affichage dans ecran detail affaire
-// Specifics fields
-// MySQL Date and time format for display in the deal detail screen
-$l_time_format = "%Y-%m-%d %H:%i:%s";
-$l_short_date_format = "%Y-%m-%d";
-
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_check_number = "\\nLe Numéro de la Facture n'est pas valide !";
 $l_check_money_ht = "\\n Le montant HT de la Facture est incorrect !";
@@ -137,9 +130,6 @@ $l_check_amounts = "\\n Le montant TTC doit être supérieur au montant HT !";
 $l_check_inout = "\\nVous devez choisir un type !";
 $l_changing_inout = "You cannot change an invoice kind if there are \\n deals linked to it...Vous ne pouvez pas changer le type d'une Facture si elle est associée à des Affaires";
 $l_no_number="\\nUne Facture doit avoir un numéro !";
-$l_fill_date = "\\n Vous devez fournir une date.";
-$l_fill_label = "\\n Vous devez fournir un label.";
-$l_invalid_date="\\nFormat de date invalide (MM/JJ/AAAA or AAAA-MM-JJ)";
 $l_check_deal = "Vous devez sélectionner une Affaire";
 $l_select_deals = "You have to select a number of deals";
 $l_rate_nan = "Le taux TVA est invalide !";

@@ -50,8 +50,7 @@ $l_insert = "Record the Incident";
 $l_update = "Modify the Incident";
 $l_checkdelete = "Delete the Incident";
 
-//Message
-$l_error_permission = "You doesn't have the rights to access this page";
+// Messages
 $l_found = "incidents found";
 $l_no_found = "No incident found matching the query !";
 $l_insert_ok = "The incident has been inserted successfully.";
@@ -62,10 +61,7 @@ $l_incident_select_contract = "Select the contract of the Incident";
 $l_incident_display = "Display options for Incidents";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_fill_label = "You have to fill the Label before submitting.";
 $l_length_label = "The Label is too long";
-$l_fill_date = "You have to fill the Date before submitting.";
-$l_invalid_date = "Invalid date format (DD/MM/YYYY or YYYY-MM-DD).";
 $l_j_select_contract = "You have to select a contract !";
 $l_delete_confirm="Really delete the Incident ?";
 $l_date_after_js ="Date After";

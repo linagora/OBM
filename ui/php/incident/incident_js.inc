@@ -22,6 +22,7 @@ function confirm_del() {
     return false;
 }
 
+
 function verifie(form) {
   Index = form.param_contract.selectedIndex;
   if ((Index == -1)) {
@@ -37,8 +38,8 @@ function verifie(form) {
   };
 }
 
-function verifier_inc(f_aff) {
 
+function verifier_inc(f_aff) {
   if (f_aff.tf_dateafter.value != '' && check_date(f_aff.tf_dateafter, '".addslashes($l_date_after_js)."') == false) {
     return false;
   }
@@ -47,6 +48,7 @@ function verifier_inc(f_aff) {
   }
   return true;
 }
+
 
 function check_incident(form) {
   // MANDATORY : Check that Contact name is not empty
@@ -63,6 +65,7 @@ function check_incident(form) {
     }
  return true;
 }
+
 
 function auto_archive(form) {
   if (form.sel_status.value == 'CLOSED')

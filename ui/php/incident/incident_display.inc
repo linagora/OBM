@@ -32,7 +32,7 @@ $fieldnames["incident_company_name"] = $l_incident_company;
 ///////////////////////////////////////////////////////////////////////////////
 function html_incident_search_form ($usr_q, $incident) {
   global $l_incident_label,$l_contract_label,$l_incident_priority,$l_incident_status, $l_find,$l_incident_owner;
-  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$sess,$c_all,$l_all;
+  global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed,$c_all,$l_all;
   global $l_date_after,$l_date_before,$l_archive;
 
   $lincident = stripslashes($incident["lincident"]);
@@ -96,7 +96,7 @@ function html_incident_search_form ($usr_q, $incident) {
 
   echo "
      <form method=\"get\" name=\"f_incident\" action=\"" .
-     $sess->url("incident_index.php") . " \" onsubmit=\"if (verifier_inc(this)) return true; else return false;\">
+     url_prepare("incident_index.php") . " \" onsubmit=\"if (verifier_inc(this)) return true; else return false;\">
      <table class=\"details\">
       <tr><td>
        <table>
@@ -178,19 +178,14 @@ function dis_incident_search_list($incident) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Search result                                                //
 // Parameters : 
-//   - $obm_q_comp    : list of incidents
-//   - $obm_q_display : the fields which have to be displayed
-//   - $nb_incident    : nb incidents to return by the query search
-//   - $company[]     : incidents search criteria
-//     keys used      : status, label incident, priority, label contract
+//   - $in_q        : list of incidents
+//   - $pref_q      : the fields which have to be displayed
+//   - $nb_incident : nb incidents to return by the query search
+//   - $company[]   : incidents search criteria
+//     keys used    : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$incident) {
-  //-- Themes
-  global $set_theme,$col_textem,$col_table,$col_tableh;
-  //-- Labels
-  global $l_found, $l_no_found;
-  //-- Authentication
-  global $perms_user,$l_perms_user;
+function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
+  global $set_theme, $l_found, $l_no_found;
 
   $lincident = $incident["lincident"];
   $lcontract = $incident["lcontract"];
@@ -204,10 +199,10 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
 
   $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
 
-  $obm_q_comp->seek($first_row);
+  $in_q->seek($first_row);
 
-  $dis_incidents_list=new OBM_DISPLAY("DATA",$obm_q_display);
-  $dis_incidents_list->data_set = $obm_q_comp;
+  $dis_incidents_list=new OBM_DISPLAY("DATA", $pref_q);
+  $dis_incidents_list->data_set = $in_q;
   $dis_incidents_list->data_url = $url;
   $dis_incidents_list->data_header = "both";
 
@@ -215,8 +210,8 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
 
   display_info_msg("$nb_incident $l_found");
   $dis_incidents_list->display();
- 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Incident Form                                                     //
@@ -234,7 +229,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status,$l_incident;
   global $l_contract_label, $l_contract_num, $l_update, $l_checkdelete, $l_insert, $l_contract_date_init;
   global $l_contract_date_expir,$l_incident_description,$l_incident_solution,$l_incident_date, $l_archive_new;
-  global $sess, $auth,$popup_height,$popup_width, $set_theme, $ico_contract, $l_incident_select_contract,$l_contract_label ;
+  global $path, $auth,$popup_height,$popup_width, $set_theme, $ico_contract, $l_incident_select_contract,$l_contract_label ;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -324,7 +319,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   // check delete
     $dis_delete .= "<form method=\"get\" name=\"f_del_con\"
         onsubmit=\"if (confirm_del()) return true; else return false;\"
-        action=\"" . $sess->url("incident_index.php") . "\">
+        action=\"" . url_prepare("incident_index.php") . "\">
       <table class=\"details\">
       <tr><td>
         <input type=\"hidden\" name=\"action\" value=\"delete\" />
@@ -343,7 +338,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
   // --- html template --------------------------------------------------------
 
   echo "
-<form method=\"get\" name=\"form_mod_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"".$sess->url("incident_index.php")."\">
+<form method=\"get\" name=\"form_mod_incident\" onsubmit=\"if (check_incident(this)) return true; else return false;\" action=\"". url_prepare("incident_index.php")."\">
 <table class=\"details\">
  <tr>
   <td colspan=\"2\" class=\"detailHead\">$l_incident</td>
@@ -362,10 +357,10 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
  </tr><tr>
   <td class=\"detailLabel\">$l_contract_label</td>
   <td>
-   <a href=\"".$sess->url("../contract/contract_index.php?action=detailconsult&amp;param_contract=$c_id")."\">$c_name</a>
+   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$c_id")."\">$c_name</a>
    <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
    <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
-   <a href=\"\" onclick=\"window.open('../contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_incident_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
+   <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_incident_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
    <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>
    <input type=\"text\" name=\"contract_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
   </td>
@@ -398,7 +393,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
 </form>
 $dis_delete
 ";
-
 }
 
 
@@ -407,10 +401,8 @@ $dis_delete
 // Parameters:
 //   - $inc_q : DBO : incident result
 //   - $con_q : DBO : contract result
-//      $obm_q_company : list of companies
-//      $contact_q : list of contact from the company 
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
+function html_incident_consult($inc_q,$con_q) {
   // -- Themes
   global $set_theme,$ico_contract,$ico_company;
   // - Labels
@@ -418,7 +410,7 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
   global $l_incident_logger,$l_incident_owner,$l_incident_priority,$l_incident_status,$l_incident;
   global $l_update,$l_incident_description,$l_incident_solution,$l_incident_date,$l_contract_num;
   global $l_to, $l_from,$l_manager,$l_client_manager,$l_update,$l_archive_consult,$l_contract_label;
-  global $sess;
+  global $path;
 
   $label = $inc_q->f("incident_label");
   $pri = $inc_q->f("incident_priority");
@@ -435,11 +427,10 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
   $con_exp = $con_q->f("contract_dateexp");
   $tech = $con_q->f("contract_techmanager_id");
   $market = $con_q->f("contract_marketmanager_id");
-  $obm_q_company->next_record();
-  $comp_name = $obm_q_company->f("company_name");
-  $comp_ad1 = $obm_q_company->f("company_address1");
-  $comp_zip = $obm_q_company->f("company_zipcode");
-  $comp_town = $obm_q_company->f("company_town");
+  $comp_name = $con_q->f("company_name");
+  $comp_ad1 = $con_q->f("company_address1");
+  $comp_zip = $con_q->f("company_zipcode");
+  $comp_town = $con_q->f("company_town");
 
   $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
   $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
@@ -461,7 +452,7 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
  </tr><tr>
   <td class=\"detailLabel\">
    $comp_name
-   <a href=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+   <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
    <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
   </td>
   <td class=\"detailText\">
@@ -486,10 +477,10 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
   <td colspan=\"2\" class=\"detailHead\">$l_contract_label</td>
  </tr><tr>
   <td class=\"detailLabel\">
-   <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
+   <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\">
    </a> 
    $con_label
-   <a href=\"".$sess->url("contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
+   <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
    <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
   </td>
   <td class=\"detailText\">

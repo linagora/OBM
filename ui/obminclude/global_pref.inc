@@ -17,6 +17,7 @@ if ($set_theme == "") $set_theme = $set_theme_default;
 if ($set_display == "") $set_display = $set_display_default;
 if ($set_rows == "") $set_rows = $set_rows_default;
 if ($set_date == "") $set_date = $set_date_default;
+if ($set_menu == "") $set_menu = $set_menu_default;
 if ($set_debug == "") $set_debug = $set_debug_default;
 
 if ($last_company == "") $last_company=$last_company_default;
@@ -86,21 +87,22 @@ $c_export_format[3]["icon"] = $ico_excel;
 //////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Sections
 //////////////////////////////////////////////////////////////////////////////
-$menus["COM"]	 =	array('Name' => $l_header_com,
-		 	      'Url'  => "$path/company/company_index.php",
-			      'Right'=> $com_read);
-$menus["PROD"]	 =	array('Name' => $l_header_prod,
-		 	      'Url'  => "$path/contract/contract_index.php",
-			      'Right'=> $prod_read);
-$menus["COMPTA"] =	array('Name' => $l_header_compta,
-			      'Url'  => "$path/treso/account_index.php",
-			      'Right'=> $compta_read);
-$menus["USERS"]   =	array('Name' => $l_header_users,
-			      'Url'  => "$path/time/time_index.php",
-			      'Right'=> $users_read);
-$menus["ADMINS"]  =	array('Name' => $l_header_admins,
-		              'Url'  => "$path/admin/admin_index.php?mode=html",
-			      'Right'=> $admins_read);
+$menus["COM"]    = array('Name' => $l_header_com,
+                         'Url'  => "$path/company/company_index.php",
+                         'Right'=> $com_read);
+$menus["PROD"]   = array('Name' => $l_header_prod,
+                         'Url'  => "$path/contract/contract_index.php",
+                         'Right'=> $prod_read);
+$menus["COMPTA"] = array('Name' => $l_header_compta,
+                         'Url'  => "$path/account/account_index.php",
+                         'Right'=> $compta_read);
+$menus["USERS"]  = array('Name' => $l_header_users,
+                         'Url'  => "$path/time/time_index.php",
+                         'Right'=> $users_read);
+$menus["ADMINS"] = array('Name' => $l_header_admins,
+                         'Url'  => "$path/admin/admin_index.php?mode=html",
+                         'Right'=> $admins_read);
+
 //////////////////////////////////////////////////////////////////////////////
 // Menu item defintion : Modules
 //////////////////////////////////////////////////////////////////////////////
@@ -135,48 +137,48 @@ if ($section == "COM") {
 			             'Right'=> $contract_read);
   $menus["PROD"]["INCIDENT"] = array('Name'=> $l_header_incident,
                                      'Ico' => "$ico_incident",
-  			      	     'Url' => "$path/contract/incident_index.php",
+  			      	     'Url' => "$path/incident/incident_index.php",
 			             'Right'=> $incident_read);
 
 } elseif ($section == "ADMINS") {
 
-  $menus["ADMINS"]["ADMIN"]       = array('Name'=> $l_header_admin,
+  $menus["ADMINS"]["ADMIN"]      = array('Name'=> $l_header_admin,
                                      'Ico' => "$ico_admin",
-			              'Url' => "$path/admin/admin_index.php?mode=html",
-			              'Right'=> $admin_read);
-  $menus["ADMINS"]["ADMIN_CODE"]  = array('Name'=> $l_header_admin_code,
+			             'Url' => "$path/admin/admin_index.php?mode=html",
+			             'Right'=> $admin_read);
+  $menus["ADMINS"]["ADMIN_CODE"] = array('Name'=> $l_header_admin_code,
                    'Ico' => "$ico_code",
 		   'Url' => "$path/admin_code/admin_code_index.php?mode=html",
 		   'Right'=> $admin_code_read);
-  $menus["ADMINS"]["ADMIN_PREF"]  = array('Name'=> $l_header_admin_pref,
+  $menus["ADMINS"]["ADMIN_PREF"] = array('Name'=> $l_header_admin_pref,
                    'Ico' => "$ico_pref",
                    'Url' => "$path/admin_pref/admin_pref_index.php?mode=html",
                    'Right'=> $admin_pref_read);
-  $menus["ADMINS"]["ADMIN_DATA"]  = array('Name'=> $l_header_admin_data,
+  $menus["ADMINS"]["ADMIN_DATA"] = array('Name'=> $l_header_admin_data,
                    'Ico' => "$ico_data",
                    'Url' => "$path/admin_data/admin_data_index.php?mode=html",
                    'Right'=> $admin_data_read);
-  $menus["ADMINS"]["ADMIN_LANG"]  = array('Name'=> $l_header_admin_lang,
+  $menus["ADMINS"]["ADMIN_LANG"] = array('Name'=> $l_header_admin_lang,
                    'Ico' => "$ico_lang",
                    'Url' => "$path/admin_lang/admin_lang_index.php?mode=html",
                    'Right'=> $admini_lang_read);
 
-}elseif($section == "COMPTA") {
+} elseif ($section == "COMPTA") {
 
   $menus["COMPTA"]["ACCOUNT"] = array('Name'=> $l_header_account,
-                                      'Ico' => "$ico_account",
-			              'Url' => "$path/treso/account_index.php",
-			              'Right'=> $account_read);
+                   'Ico' => "$ico_account",
+                   'Url' => "$path/account/account_index.php",
+                   'Right'=> $account_read);
   $menus["COMPTA"]["INVOICE"] = array('Name'=> $l_header_invoice,
-                                      'Ico' => "$ico_invoice",
-			              'Url' => "$path/treso/invoice_index.php",
-			              'Right'=> $invoice_read);
+                   'Ico' => "$ico_invoice",
+                   'Url' => "$path/invoice/invoice_index.php",
+                   'Right'=> $invoice_read);
   $menus["COMPTA"]["PAYMENT"] = array('Name'=> $l_header_payment,
-                                      'Ico' => "$ico_payment",
-			              'Url' => "$path/treso/payment_index.php",
-			              'Right'=> $payment_read);
+                   'Ico' => "$ico_payment",
+                   'Url' => "$path/payment/payment_index.php",
+                   'Right'=> $payment_read);
 
-}elseif($section == "USERS") {
+} elseif ($section == "USERS") {
 
   $menus["USERS"]["TIME"]     = array('Name'=> $l_header_time,
                                       'Ico' => "$ico_time",
@@ -191,4 +193,3 @@ if ($section == "COM") {
 			              'Url' => "$path/settings/settings_index.php",
 			              'Right'=> $settings_read);
 }
-

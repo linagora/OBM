@@ -337,7 +337,6 @@ function dis_deal_search_list($deal) {
 //                    manager, dateafter, datebefore
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
-  //-- Themes
   //-- Labels
   global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
   global $l_date_alarm, $l_archive_update, $l_found;
@@ -429,7 +428,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
   global $l_contract_list;
-  global $auth, $c_yes, $c_no;
+  global $path,$auth, $c_yes, $c_no;
   global $perms_user, $perms_editor, $perms_admin;
 
   $id = $deal_q->f("deal_id");
@@ -483,11 +482,10 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   // parent deal info (if exists) : link and bind
   if ($pid > 0) {
     $plabel = get_parent_label($pid);
-    echo "<a href=\"". url_prepare("deal_index.php?action=parent_detailconsult&amp;param_parent=$pid")." \">$l_parentdeal</a><br>$plabel<br>";
+    echo "<a href=\"". url_prepare("deal_index.php?action=parent_detailconsult&amp;param_parent=$pid")." \">$l_parentdeal</a><br />$plabel<br />";
   }
   if ($auth->auth["perm"] != $perms_user) {
-    echo "<a href=\"". url_prepare("deal_index.php?action=affect&amp;param_deal=$id")
-           . "\">$l_affect_deal</a><br><br>";
+    echo "<a href=\"". url_prepare("deal_index.php?action=affect&amp;param_deal=$id") . "\">$l_affect_deal</a><br><br>";
   }
   echo "
   <a href=\"". url_prepare("../contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
@@ -496,17 +494,15 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
   if ($auth->auth["perm"] == $perms_admin) {
-    echo "<a href=\"".url_prepare("../treso/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br><br>";
+    echo "<a href=\"".url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br /><br />";
     // this is displayed close to links so we use that color too
-    echo "<font color=\"#$col_link\">".
-      $nb_invoices." ".$l_invoices_connected.
-      "</font>";
+    echo "$nb_invoices $l_invoices_connected.";
     // how many archived invoices connected :
     $nb_arch_invoices = run_query_nb_archived_invoices ($id);
-    echo "<br><br><font color=\"#$col_link\">".
-      $nb_arch_invoices." ".$l_archived_invoices_connected.
-      "</font>";
-  } else { echo "probleme...";  }
+    echo "<br /><br />$nb_arch_invoices $l_archived_invoices_connected.";
+  } else {
+    echo "probleme...";
+  }
 //////////////////////
 //FIN LIENS EXTERNES//
 //////////////////////
@@ -846,11 +842,11 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
 
  if ($action == "detailupdate") {
     $dis_contact_2 = "<a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
-                      <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
- 		      </a>";
+             <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+             </a>";
     $dis_contact_1 = "<a href=\"" . url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1")."\">
-                      <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
-		      </a>";
+             <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
+             </a>";
   }
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
@@ -864,7 +860,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <input type=\"submit\" value=\"$l_update\" />
       ";
     $dis_button2 =" <form method=\"post\" name=\"form_deal_delete\"
-      onsubmit=\"if (valider_suppression()) return true; else return false;\"
+      onsubmit=\"if (confirm_del()) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
       <table class =\"details\">
        <tr><td class=\"detailHead\">
@@ -971,7 +967,96 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     </form>
     $dis_button2
 ";
-  
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays and check the deal links (and delete form if ok)                 //
+// Parameters:
+//   - $p_id : deal id
+///////////////////////////////////////////////////////////////////////////////
+function dis_check_links($p_id) {
+  global $path, $l_can_delete, $l_cant_delete, $l_back;
+  global $l_link_contract, $l_link_contract_no;
+
+  $delete_ok = true;
+
+  // Links from Contract
+  $obm_q = run_query_deal_contract_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $display_linkc ="<tr><td class=\"detailHead\">$l_link_contract</td></tr>";
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contract_id");
+      $clabel = $obm_q->f("contract_label");
+      $display_linkc .= "
+    <tr>
+      <td class=\"detailText\">
+        <a class=\"details\" href=\"" . url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$cid") . "\">$clabel</a>
+      </td>
+    </tr>";
+    }
+  } else {
+    $display_linkc = "
+    <tr>
+      <td class=\"detailHead\">$l_link_contract_no</td>
+    </tr>";
+  }
+
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+    action=\"".url_prepare("deal_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_deal\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  if ($delete_ok == true) {
+    display_ok_msg($l_can_delete);
+    echo "
+    <table class=\"details\">
+    <tr>
+      <td>
+        <table>
+        <tr>
+          <td class=\"detailHead\">" . dis_delete_form($p_id) . "</td>
+          <td class=\"detailHead\">$dis_back</td>
+        </tr>
+        </table>
+      </td>
+    </tr>";
+
+  } else {
+    display_warn_msg($l_cant_delete);
+    echo "
+    <table class=\"details\">
+    <tr>
+      <td class=\"detailHead\">$dis_back</td>
+    </tr>";
+  }
+  echo "
+    $display_linkc
+    </table>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the delete form (button)                                         //
+// Parameters:
+//   - $p_id : deal Id
+///////////////////////////////////////////////////////////////////////////////
+function dis_delete_form($p_id) {
+  global $l_delete;
+
+  $ret = "<form name=\"form_delete\" method=\"post\"
+      action=\"" . url_prepare("deal_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"param_deal\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />
+    </form>";
+
+  return $ret;
 }
 
 
@@ -994,19 +1079,23 @@ function html_deal_affect($parent_q, $p_deal_id) {
     echo "
       <form name=\"form_affect_deal\" method=\"get\"
         action=\"" . url_prepare("deal_index.php") . "\">
-     <table class=\"details\">
-     <tr><td class=\"messageInfo\">
-      $l_deal_select_parentdeal
-     </td></tr>
-     <tr><td>
-      $sel_parent
-      <input type=\"hidden\" name=\"action\" value=\"affect_update\" />
-      <input type=\"hidden\" name=\"param_deal\" value=\"$p_deal_id\" />
-     </td></tr>
-     <tr><td class=\"detailHead\">
-      <input type=\"submit\" name=\"sub_affect_deal\" value=\"$l_affect\" />
-     </td></tr>
-     </table>      
+      <table class=\"details\">
+      <tr>
+        <td class=\"messageInfo\">$l_deal_select_parentdeal</td>
+      </tr>
+      <tr>
+        <td>
+        $sel_parent
+        <input type=\"hidden\" name=\"action\" value=\"affect_update\" />
+        <input type=\"hidden\" name=\"param_deal\" value=\"$p_deal_id\" />
+        </td>
+      </tr>
+      <tr>
+        <td class=\"detailHead\">
+        <input type=\"submit\" name=\"sub_affect_deal\" value=\"$l_affect\" />
+        </td>
+      </tr>
+      </table>      
       </form>";
 }
          
@@ -1135,7 +1224,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
       method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
       <table>
       <tr>
-        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_new\" /></td>
+        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind\" /></td>
         <td>
           <input type=\"radio\" name=\"rd_kind_inout\" value=\"-\" checked=\"checked\" />$l_minus<br />
           <input type=\"radio\" name=\"rd_kind_inout\" value=\"+\" />$l_plus
@@ -1324,11 +1413,11 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
             "else return false;\" />
         </td>
       </tr>
-     </table>
-    </form>
-     </td>
-      </tr>
       </table>
+      </form>
+    </td>
+  </tr>
+  </table>
 ";
 }
 
@@ -1346,29 +1435,44 @@ function dis_kind_links($id) {
   $obm_q = run_query_kind_links($id);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$label : $l_kind_link_deal</td></tr>";
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_kind_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$label : $l_kind_link_deal</td>
+    </tr>";
+
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link .= "<tr><td class=\"detailText\">
-                    <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
-                    $dlabel</a></td></tr>\n";
+      $dis_link .= "
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+      </td>
+    </tr>";
     }
-    $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_kind_cant_delete</td></tr>";
+
   } else {
-     $dis_link ="<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">
-          $label : $l_kind_can_delete
-          <tr><td>
-        <form name=\"form_kind_delete\".
-          method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-        <input type=\"hidden\" name=action value=\"kind_delete\" />
-        <input type=\"hidden\" name=sel_kind value=\"$id\" />
-        <input type=\"submi\"t name=sub_kind value=\"$l_kind_delete\" />
-        </form>
-      </td><td>
-        <form name= /form_back / method= /post /
+     $dis_link ="
+     <table class=\"details\">
+     <tr>
+       <td colspan=\"2\" class=\"messageOk\">$label : $l_kind_can_delete</td>
+     </tr><tr>
+       <td>
+         <form name=\"form_kind_delete\".
+           method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
+         <input type=\"hidden\" name=action value=\"kind_delete\" />
+         <input type=\"hidden\" name=sel_kind value=\"$id\" />
+         <input type=\"submit\" name=sub_kind value=\"$l_kind_delete\" />
+         </form>
+       </td><td>
+         <form name=\"form_back\" method=\"post\"
      action=\"" .url_prepare("deal_index.php") . "\">
-     <input type=hidden name=action value=admin />
+     <input type=\"hidden\" name=\"action\" value=\"admin\" />
      <input type=submit value=\"$l_back\" />
      </form></td></tr></table>";
   }
@@ -1389,19 +1493,34 @@ function dis_status_links($id) {
   $obm_q = run_query_status_links($id);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$label : $l_status_link_deal</td></tr>";
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_status_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$label : $l_status_link_deal</td>
+    </tr>";
+
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      $dis_link.= "<tr><td class=\"detailText\">
-	  	    <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
-                    $dlabel</a></td></tr>\n";
+      $dis_link.= "
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</a>
+      </td>
+    </tr>";
     }
-    $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_status_cant_delete</td></tr>";
+
   } else {
-   $dis_link = "<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">
-    $l_kind_link_company_no '$label' : $l_kind_can_delete</td></tr>
-      <tr><td>
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">$label : $l_status_can_delete</td>
+    </tr><tr>
+      <td>
         <form name=\"form_kind_delete\".
           method=post action=\"" . url_prepare("deal_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"status_delete\" />
@@ -1410,12 +1529,15 @@ function dis_status_links($id) {
         </form>
       </td><td>
         <form name=\"form_back\" method=\"post\"
-     action=\"" .url_prepare("deal_index.php") . "\">
-     <input type=\"hidden\" name=\"action\" value=\"admin\" />
-     <input type=\"submit\" value=\"$l_back\" />
-     </form></td></tr></table>";
+          action=\"" .url_prepare("deal_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+      </td>
+    </tr>
+    </table>";
   }
- echo $dis_link;
+  echo $dis_link;
 }
 
 
@@ -1432,33 +1554,51 @@ function dis_cat_links($id) {
   $obm_q = run_query_cat_links($id);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$label $l_cat_link_deal</td></tr>";
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td class=\"messageWarning\">$label : $l_cat_cant_delete</td>
+    </tr><tr>
+      <td>&nbsp;</td>
+    </tr><tr>
+      <td class=\"detailHead\">$label : $l_cat_link_deal</td>
+    </tr>";
+
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("deal_id");
       $clabel = $obm_q->f("deal_label");
-      $dis_link .= "<tr><td class=\"detailText\">
-                    <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$cid") . "\">
-                    $clabel</a></td></tr>\n";
+      $dis_link .= "
+    <tr>
+      <td class=\"detailText\">
+        <a href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$cid") . "\">$clabel</a>
+      </td>
+    </tr>";
     }
-   $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_cat_cant_delete</td></tr>";
+
   } else {
-    $dis_link = "<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">$label : $l_cat_can_delete
-        <tr><td>
+    $dis_link = "
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"messageOk\">$label : $l_cat_can_delete</td>
+    </tr><tr>
+      <td>
         <form name=\"form_cat_delete\".
           method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
-        <input type=\"hidden\" name=\"action\" value=\"cat_delete\">
-        <input type=\"hidden\" name=\"sel_cat\" value=\"$id\">
-        <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_delete\">
+        <input type=\"hidden\" name=\"action\" value=\"cat_delete\" />
+        <input type=\"hidden\" name=\"sel_cat\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_cat\" value=\"$l_cat_delete\" />
         </form>
       </td><td>
         <form name=\"form_back\" method=\"post\"
-     action=\"" .url_prepare("deal_index.php") . "\">
-     <input type=\"hidden\" name=\"action\" value=\"admin\">
-     <input type=\"submit\" value=\"$l_back\">
-     </form>
-   </tr></table>";
+          action=\"" .url_prepare("deal_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>
+      </td>
+    </tr>
+    </table>";
   }
-echo $dis_link;
+  echo $dis_link;
 }
 
 
@@ -1618,7 +1758,7 @@ function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
         <input type=\"submit\" value=\"$l_update_parent\" />
          ";
      $dis_button2 ="<form method=\"post\" name=\"form_parentdeal_delete\"
-      onsubmit=\"if (valider_suppression()) return true; else return false;\"
+      onsubmit=\"if (confirm_del()) return true; else return false;\"
       action=\"" . url_prepare("deal_index.php") . "\">
       <table class=\"details\"><tr><td class=\"detailHead\">
        <input type=\"hidden\" name=\"action\" value=\"parent_delete\" />
@@ -1803,8 +1943,8 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $dis_list_deal->data_set->seek($first_row);
 
   $dis_list_deal->display();
-    
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Deal Select Form                                               //

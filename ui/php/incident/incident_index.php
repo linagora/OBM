@@ -9,7 +9,7 @@
 // Actions :
 // - index (default) -- search fields  -- show the Incident search form
 // - search          -- search fields  -- show the result set of search
-// - new             -- $param_contract -- show the new Incidentform
+// - new             -- $param_contract-- show the new Incident form
 // - detailconsult   -- $param_incident-- show the Incident detail
 // - detailupdate    -- $param_incident-- show the Incident detail form
 // - insert          -- form fields    -- insert the Incident 
@@ -60,7 +60,7 @@ $perm->check();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_incident);     // Head & Body
-generate_menu($menu,$section);      // Menu
+generate_menu($menu,$section); // Menu
 display_bookmarks();
 
 
@@ -99,8 +99,7 @@ if ($action == "index" || $action == "") {
       display_err_msg($l_query_error . " - " . $inc_q->query . " !");
     }
     display_record_info($inc_q->f("incident_usercreate"),$inc_q->f("incident_userupdate"),$inc_q->f("timecreate"),$inc_q->f("timeupdate"));
-    $comp_id = $con_q->f("contract_company_id");
-    html_incident_consult($inc_q, $con_q, run_query_company_contract($comp_id), run_query_contact_contract($comp_id));
+    html_incident_consult($inc_q, $con_q);
   }
 
 } elseif ($action == "detailupdate")  {
@@ -219,21 +218,21 @@ function get_param_incident() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_incident_action() {
   global $incident, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display;
   global $incident_read, $incident_write, $incident_admin_write, $incident_admin_read;
 
 //  Index
   $actions["INCIDENT"]["index"] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/contract/incident_index.php?action=index",
+    'Url'      => "$path/incident/incident_index.php?action=index",
     'Right'    => $incident_read,
     'Condition'=> array ('all') 
                                 	);
 
 //  Search
   $actions["INCIDENT"]["search"] = array (
-    'Url'      => "$path/contract/incident_index.php?action=search",
+    'Url'      => "$path/incident/incident_index.php?action=search",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                 	);
@@ -241,36 +240,36 @@ function get_incident_action() {
 // New
   $actions["INCIDENT"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/contract/incident_index.php?action=new",
+    'Url'      => "$path/incident/incident_index.php?action=new",
     'Right'    => $incident_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
                     		       );
 
 // Detail Consult
   $actions["INCIDENT"]["detailconsult"] = array (
-    'Url'      => "$path/contract/incident_index.php?action=consult",
+    'Url'      => "$path/incident/incident_index.php?action=consult",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                 	       );
 
 // Detail Update
   $actions["INCIDENT"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
-    'Url'      => "$path/contract/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
+    'Name'     => $l_header_update,
+    'Url'      => "$path/incident/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	        );
 
 // Insert
   $actions["INCIDENT"]["insert"] = array (
-    'Url'      => "$path/contract/incident_index.php?action=insert",
+    'Url'      => "$path/incident/incident_index.php?action=insert",
     'Right'    => $incident_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
   $actions["INCIDENT"]["update"] = array (
-    'Url'      => "$path/contract/incident_index.php?action=update",
+    'Url'      => "$path/incident/incident_index.php?action=update",
     'Right'    => $incident_write,
     'Condition'=> array ('None') 
                                      	 );
@@ -278,28 +277,28 @@ function get_incident_action() {
 // Delete
   $actions["INCIDENT"]["delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/contract/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
+    'Url'      => "$path/incident/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
 // Display
   $actions["INCIDENT"]["display"] = array (
      'Name'     => $l_header_display,
-     'Url'      => "$path/contract/incident_index.php?action=display",
+     'Url'      => "$path/incident/incident_index.php?action=display",
      'Right'    => $incident_read,
      'Condition'=> array ('all') 
                                       	   );
 
 // Display Préférence
   $actions["INCIDENT"]["dispref_display"] = array (
-     'Url'      => "$path/contract/incident_index.php?action=dispref_display",
+     'Url'      => "$path/incident/incident_index.php?action=dispref_display",
      'Right'    => $incident_read,
      'Condition'=> array ('None') 
                                       	   );
 
 // Display level
   $actions["INCIDENT"]["dispref_level"] = array (
-     'Url'      => "$path/contract/incident_index.php?action=dispref_level",
+     'Url'      => "$path/incident/incident_index.php?action=dispref_level",
      'Right'    => $incident_read,
      'Condition'=> array ('None') 
                                       	   );

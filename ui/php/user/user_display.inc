@@ -30,7 +30,7 @@ function html_user_search_form($user) {
   global $l_login, $l_lastname, $l_user_perms, $l_find, $l_all, $l_archive;
   global $perms_user, $perms_admin, $perms_editor;
   global $l_perms_user, $l_perms_admin, $l_perms_editor;
-  global $c_all, $sess;
+  global $c_all;
 
   $login = $user["login"];
   $lname = $user["lastname"];
@@ -38,34 +38,37 @@ function html_user_search_form($user) {
   $archive = ($user["archive"] == "1" ? "checked" : "");
 
   echo "<center>
-  <form method=get name=f_user action=\"".$sess->url("user_index.php")."\">
-  <table border=0>
+  <form method=\"get\" name=\"f_user\"
+    action=\"". url_prepare("user_index.php")."\">
+  <table class=\"details\">
   <tr>
-    <td><font size=-2>$l_login</font><br>
-    <input type=text name=tf_login size=20 maxlength=32 value=\"$login\"></td>
+    <td class=\"textLabelForm\">$l_login<br />
+    <input type=\"text\" name=\"tf_login\" size=\"20\" maxlength=\"32\"
+      value=\"$login\" /></td>
     <td>&nbsp;&nbsp;</td>
-    <td><font size=-2>$l_lastname</font><br>
-    <input type=text name=tf_lastname size=20 maxlength=32 value=\"$lname\"></td>
+    <td class=\"textLabelForm\">$l_lastname<br />
+    <input type=\"text\" name=\"tf_lastname\" size=\"20\" maxlength=\"32\"
+      value=\"$lname\" /></td>
     <td>&nbsp;&nbsp;</td>
-    <td align=left><font size=-2> $l_user_perms </font><br>
-      <select type=text name=sel_perms>
-        <option value=\"$c_all\"> $l_all
-        <option value=\"$perms_user\"> $l_perms_user
-        <option value=\"$perms_editor\"> $l_perms_editor
-        <option value=\"$perms_admin\"> $l_perms_admin
+    <td  class=\"textLabelForm\">$l_user_perms<br />
+      <select type=\"text\" name=\"sel_perms\">
+        <option value=\"$c_all\" /> $l_all
+        <option value=\"$perms_user\" /> $l_perms_user
+        <option value=\"$perms_editor\" /> $l_perms_editor
+        <option value=\"$perms_admin\" /> $l_perms_admin
       </select>
     </td>
     <td>&nbsp;&nbsp;</td>
-    <td align=center><font size=-2>$l_archive</font><br>
-      <input type=checkbox name=cb_archive value=1 $archive>
+    <td class=\"textLabelForm\">$l_archive<br />
+      <input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive>
     </td>
     <td valign=bottom>&nbsp;&nbsp;
-    <input name=\"action\" type=hidden value=\"search\">
-    <input name=\"submit\" type=submit value=\"$l_find\">&nbsp;&nbsp;</td>
+    <input name=\"action\" type=\"hidden\" value=\"search\">
+    <input name=\"submit\" type=\"submit\" value=\"$l_find\">&nbsp;&nbsp;</td>
   </tr>
   </table>
 
-  </form><hr>
+  </form><hr />
   </center>";
 }
 
@@ -101,14 +104,14 @@ function dis_user_search_list($user) {
 //     keys used : login, lastname, pemrs
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
-  global $col_textem, $l_found;
+  global $l_found;
 
   $login = $user["login"];
   $lname = $user["lastname"];
   $perms = $user["perms"];
   $archive = $user["archive"];
 
-  echo "<font color=\"#$col_textem\">$nb_user $l_found</font><br>";
+  display_info_msg("$nb_user $l_found");
 
   $url = url_prepare("user_index.php?action=search&amp;tf_login=$login&amp;$tf_lastname=$lname&amp;sel_perms=$perms&amp;cb_archive=$archive");
 
@@ -133,7 +136,7 @@ function html_user_form($first_try, $usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
   global $l_email, $l_archive, $l_insert,$l_update,$l_checkdelete,$l_reset,$l_none;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
-  global $action, $sess;
+  global $action;
 
   // if update mode and first time value are taken from database
   if (($action == "detailupdate") && ($first_try == 1)) {
@@ -164,7 +167,7 @@ function html_user_form($first_try, $usr_q, $user) {
   echo "<table>
     <form method=post name=form_user
       onSubmit=\"if (check_user(this)) return true; else return false;\"
-      action=\"" . $sess->url("user_index.php") . "\">
+      action=\"" . url_prepare("user_index.php") . "\">
     <tr><td>
 
     <table>
@@ -210,7 +213,7 @@ function html_user_form($first_try, $usr_q, $user) {
       </form>
       <p>
       <form method=post name=f_del
-        action=\"" . $sess->url("user_index.php") . "\">
+        action=\"" . url_prepare("user_index.php") . "\">
       <input type=hidden name=\"action\" value=\"check_delete\">
       <input type=hidden name=\"param_user\" value=\"$id\">
       <input type=submit value=\"$l_checkdelete\">";
@@ -218,7 +221,7 @@ function html_user_form($first_try, $usr_q, $user) {
 
   echo "</form>
       <form method=post name=f_reset
-        action=\"" . $sess->url("user_index.php") . "\">
+        action=\"" . url_prepare("user_index.php") . "\">
       <input type=hidden name=\"action\" value=\"reset\">
       <input type=hidden name=\"param_user\" value=\"$id\">
       <input type=submit value=\"$l_reset\">
@@ -232,13 +235,14 @@ function html_user_form($first_try, $usr_q, $user) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display User Consultation                                            //
 // Parameters:
-//   - $obm_q     : user database result
+//   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
-  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname, $l_email, $l_lastaccess, $l_archive;
+  global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
+  global $l_email, $l_lastaccess, $l_archive;
   global $l_insert,$l_update,$l_delete;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
-  global $action, $sess, $c_yes, $c_no, $col_label;
+  global $action, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
   $login = $obm_q->f("userobm_login");
@@ -254,40 +258,42 @@ function html_user_consult($obm_q) {
   if ($perms == $perms_editor) $l_perms = $l_perms_editor;
   if ($perms == $perms_admin) $l_perms = $l_perms_admin;
 
-  echo "<table>
-    <tr><td>
+  echo "
+    <table class=\"details\">
+    <tr>
+      <td>
 
-      <table>
+      <table class=\"details\">
       <tr>
-        <td><font color=\"#$col_label\">$l_archive</font></td>
-        <td>$archive</td>
+        <td class=\"detailLabel\">$l_archive</td>
+        <td class=\"detailText\">$archive</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_login</font></td>
-        <td>$login</td>
+        <td class=\"detailLabel\">$l_login</td>
+        <td class=\"detailText\">$login</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_password</font></td>
-        <td>$passwd</td>
+        <td class=\"detailLabel\">$l_password</td>
+        <td class=\"detailText\">$passwd</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_user_perms</font></td>
-        <td>$l_perms</td>
+        <td class=\"detailLabel\">$l_user_perms</td>
+        <td class=\"detailText\">$l_perms</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_lastname</font></td>
-        <td>$lname</td>
+        <td class=\"detailLabel\">$l_lastname</td>
+        <td class=\"detailText\">$lname</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_firstname</font></td>
-        <td>$fname</td>
+        <td class=\"detailLabel\">$l_firstname</td>
+        <td class=\"detailText\">$fname</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_email</font></td>
-        <td>$email</td>
+        <td class=\"detailLabel\">$l_email</td>
+        <td class=\"detailText\">$email</td>
       </tr><tr>
-        <td><font color=\"#$col_label\">$l_lastaccess</font></td>
-        <td>$lastaccess</td>
+        <td class=\"detailLabel\">$l_lastaccess</td>
+        <td class=\"detailText\">$lastaccess</td>
       </tr>
       </table>
 
       </td><td align=middle>
       <form method=get name=form_user
-            action=\"" . $sess->url("user_index.php") . "\">
+            action=\"" . url_prepare("user_index.php") . "\">
       <input type=hidden name=\"action\" value=\"detailupdate\">
       <input type=hidden name=param_user value=\"$id\">
       <input type=submit value=\"$l_update\">
@@ -309,7 +315,7 @@ function html_user_consult($obm_q) {
 /////////////////////////////////////////////////////////////////////////////
 function dis_user_warn_insert($p_id, $usr_q, $user) {
   global $l_check_sameuser, $l_confirm, $l_back;
-  global $sess, $c_yes, $c_no;
+  global $c_yes, $c_no;
 
   $login = $user["login"];
   $passwd = $user["passwd"];
@@ -323,13 +329,13 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   while ($usr_q->next_record()) {
     $id = $usr_q->f("userobm_id");
     $samename = $usr_q->f("userobm_login");
-    echo "<BR><A HREF=\"" .$sess->url("user_index.php?action=detailconsult&amp;param_user=$id") . "\">$samename</A>";
+    echo "<BR><A HREF=\"" . url_prepare("user_index.php?action=detailconsult&amp;param_user=$id") . "\">$samename</A>";
   }
 
   echo "<P>
     <TABLE><TR><TD>
     <FORM METHOD=POST NAME=form_insert
-    ACTION=\"" .$sess->url("user_index.php") . "\">
+    ACTION=\"" . url_prepare("user_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=insert>
     <INPUT TYPE=hidden NAME=hd_confirm VALUE=\"$c_yes\">
     <INPUT TYPE=hidden NAME=tf_login VALUE=\"$login\">
@@ -343,7 +349,7 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     </FORM>
     </TD><TD>
     <FORM NAME=form_back METHOD=POST
-    ACTION=\"" .$sess->url("user_index.php") . "\">
+    ACTION=\"" . url_prepare("user_index.php") . "\">
     <INPUT TYPE=hidden NAME=action VALUE=new>
     <INPUT TYPE=hidden NAME=tf_login VALUE=\"$login\">
     <INPUT TYPE=hidden NAME=tf_passwd VALUE=\"$passwd\">
@@ -365,16 +371,14 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
 //   - $p_id : user id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_check_links($p_id) {
-  global $col_textem;
-  global $l_no_user;
-  global $l_check_usercreate, $l_check_userupdate;
+  global $l_no_user, $l_check_usercreate, $l_check_userupdate;
 
   $delete_ok = true;
 
   $obm_q = new DB_OBM;
   $tables = $obm_q->table_names();
 
-  echo "<TABLE border=0>";
+  echo "<table class=\"details\">";
   $i = 0;
   while ($tables[$i]["table_name"]) {
 
@@ -402,20 +406,27 @@ function dis_check_links($p_id) {
       $c_q->next_record();
       $nbu = $c_q->f("0");
 
-      echo "<TR><TD rowspan=2><FONT color=\"#$col_textem\">$table</FONT></TD>
-        <TD><FONT color=\"#$col_textem\">$nbc</FONT> $l_check_usercreate</TD>
-      </TR><TR>
-        <TD><FONT color=\"#$col_textem\">$nbu</FONT> $l_check_userupdate</TD>
-      </TR>";
+      echo "
+      <tr>
+        <td class=\"detailHead\" rowspan=\"2\">$table</td>
+        <td class=\"detailText\"><b>$nbc</b> $l_check_usercreate</td>
+      </tr><tr>
+        <td class=\"detailText\"><b>$nbu</b> $l_check_userupdate</td>
+      </tr>";
     } else {
-      echo "<TR><TD><FONT color=\"#$col_textem\">$table</FONT></TD>
-            <TD>$l_no_user</TD></TR>";
+      echo "
+      <tr>
+        <td class=\"detailHead\">$table</td>
+        <td class=\"detailText\">$l_no_user</td>
+      </tr>";
     }
-    echo "<TR><TD colspan=2><HR></TD></TR>";
+    echo "<tr>
+      <td colspan=\"2\"><hr /></td>
+    </tr>";
     $i++;
   }
  
-  echo "</TABLE>";
+  echo "</table>";
 
   dis_delete_form($p_id);
 }
@@ -428,15 +439,14 @@ function dis_check_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_delete_form($p_id) {
   global $l_delete;
-  global $sess;
 
-  echo "\n<FORM name=\"form_delete\" " .
-      "METHOD=post action=\"" . $sess->url("user_index.php") . "\">
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"delete\">
-    <INPUT TYPE=\"hidden\" name=\"param_user\" value=\"$p_id\">
-    <INPUT TYPE=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\">";
-  echo "</FORM>\n";
+  echo "<form name=\"form_delete\"
+      method=post action=\"" . url_prepare("user_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\">
+    <input type=\"hidden\" name=\"param_user\" value=\"$p_id\">
+    <input type=\"submit\" value=\"$l_delete\"
+    onClick=\"if (confirm_del(this.form)) return true; else return false;\">
+    </form>";
 }
 
 

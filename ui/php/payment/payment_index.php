@@ -57,10 +57,10 @@ if ($action =="new") {
   if (true) {
     display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
     html_payment_form($action,"",run_query_paymentkind(), run_query_account());
+  } else {
+    display_err_msg($l_error_permission);
   }
-  else {
-    display_error_permissions();
-  }
+
 } elseif ($action =="new_with_invoices") {
 ///////////////////////////////////////////////////////////////////////////////
   if (true) {
@@ -84,7 +84,7 @@ if ($action =="new") {
     html_chose_invoices_form ($action, $payment, $q_options_invoices,$q_invoices);
   }
   else {
-    display_error_permissions();
+    display_err_msg($l_error_permission);
   }
 ///////////////////////////////////////////////////////////////////////////////
 } elseif ($action == "insert_with_invoices") {
@@ -295,7 +295,7 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
 } elseif ($action == "break_asso") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_admin) {
-    display_error_permission ();
+    display_err_msg($l_error_permission);
   } else {
     // first, we get payment details :
     $q_payment = run_query_detail ($payment["payment"]);
@@ -313,7 +313,7 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
 } elseif ($action == "do_break_asso") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_admin) {
-    display_error_permission ();
+    display_err_msg($l_error_permission);
   } else {
   // this is where we actually break associations, 
   // once we've checked the situation...
@@ -358,12 +358,10 @@ elseif (($action == "search_invoice")||($action == "search_invoice_new")) {
 } elseif ($action == "admin") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {  
-    echo "<CENTER><FONT color=\"#$col_error\">";
-    echo "To come...";
-    echo "</FONT></CENTER><BR>";
+    echo "<center>Nothing here for now</center><br />";
   }
   else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }	
 }
 
@@ -659,7 +657,7 @@ function get_invoices_data ($nb) {
 
 function get_payment_action() {
   global $payment, $actions, $path;
-  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_reconcile,$l_header_admin;
   global $l_header_dupplicate;
   global $payment_read, $payment_write, $payment_admin_read, $payment_admin_write;
@@ -667,28 +665,28 @@ function get_payment_action() {
 //Index
   $actions["PAYMENT"]["index"] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/treso/payment_index.php?action=index",
+    'Url'      => "$path/payment/payment_index.php?action=index",
     'Right'    => $payment_read,
     'Condition'=> array ('all') 
                                         );
 
 // New With Invoice
   $actions["PAYMENT"]["new_with_invoice"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=new_whith_invoice",
+    'Url'      => "$path/payment/payment_index.php?action=new_whith_invoice",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                         );
 
 // New With Invoice
   $actions["PAYMENT"]["insert_with_invoice"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=new_whith_invoice",
+    'Url'      => "$path/payment/payment_index.php?action=new_whith_invoice",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                         );
 
 // Search
   $actions["PAYMENT"]["search"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=search",
+    'Url'      => "$path/payment/payment_index.php?action=search",
     'Right'    => $payment_read,
     'Condition'=> array ('None') 
                                         );
@@ -696,7 +694,7 @@ function get_payment_action() {
 // New
   $actions["PAYMENT"]["new"] = array (
     'Name'     => $l_header_new,
-    'Url'      => "$path/treso/payment_index.php?action=new",
+    'Url'      => "$path/payment/payment_index.php?action=new",
     'Right'    => $payment_write,
     'Condition'=> array ('search','admin','index','detailconsult','display') 
                                      );
@@ -704,7 +702,7 @@ function get_payment_action() {
 // Reconcile
   $actions["PAYMENT"]["reconcile"] = array (
     'Name'     => $l_header_reconcile,
-    'Url'      => "$path/treso/payment_index.php?action=reconcile",
+    'Url'      => "$path/payment/payment_index.php?action=reconcile",
     'Right'    => $payment_write,
     'Condition'=> array ('admin','search','index','detailconsult','display') 
                                            );
@@ -712,64 +710,64 @@ function get_payment_action() {
 // Duplicate
   $actions["PAYMENT"]["duplicate"] = array (
      'Name'     => $l_header_dupplicate,
-     'Url'      => "$path/treso/payment_index.php?action=duplicate&amp;param_payment=".$payment["payment"]."",
+     'Url'      => "$path/payment/payment_index.php?action=duplicate&amp;param_payment=".$payment["payment"]."",
      'Right'    => $payment_write,
      'Condition'=> array ('detailconsult') 
                                            );
 
 // Detail Consult
   $actions["PAYMENT"]["detailconsult"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=detailconsult",
+    'Url'      => "$path/payment/payment_index.php?action=detailconsult",
     'Right'    => $payment_read,
     'Condition'=> array ('None') 
                                         );
 
 // Detail Update
   $actions["PAYMENT"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
-    'Url'      => "$path/treso/payment_index.php?action=detailupdate&amp;param_payment=".$payment["payment"]."",
+    'Name'     => $l_header_update,
+    'Url'      => "$path/payment/payment_index.php?action=detailupdate&amp;param_payment=".$payment["payment"]."",
     'Right'    => $payment_write,
     'Condition'=> array ('detailconsult') 
                                      	      );
 
 // Search Invoice
   $actions["PAYMENT"]["search_invoice"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=search_invoice",
+    'Url'      => "$path/payment/payment_index.php?action=search_invoice",
     'Right'    => $payment_read,
     'Condition'=> array ('None') 
                                                 );
 
 // Search Invoice New
   $actions["PAYMENT"]["search_invoice_new"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=search_invoice_new",
+    'Url'      => "$path/payment/payment_index.php?action=search_invoice_new",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Add Invoices
   $actions["PAYMENT"]["add_invoices"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=add_invoices",
+    'Url'      => "$path/payment/payment_index.php?action=add_invoices",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Check banking
   $actions["PAYMENT"]["check_banking"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=check_banking",
+    'Url'      => "$path/payment/payment_index.php?action=check_banking",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Insert
   $actions["PAYMENT"]["insert"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=insert",
+    'Url'      => "$path/payment/payment_index.php?action=insert",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                                 );
 
 // Update
   $actions["PAYMENT"]["update"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=update",
+    'Url'      => "$path/payment/payment_index.php?action=update",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                                 );
@@ -777,21 +775,21 @@ function get_payment_action() {
 // Delete
   $actions["PAYMENT"]["delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/treso/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
+    'Url'      => "$path/payment/payment_index.php?action=delete&amp;param_payment=".$payment["payment"]."",
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
 
 // Break Association
   $actions["PAYMENT"]["break_asso"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=break_asso",
+    'Url'      => "$path/payment/payment_index.php?action=break_asso",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                              );
 
 // Do Break Association
   $actions["PAYMENT"]["do_break_asso"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=do_break_asso",
+    'Url'      => "$path/payment/payment_index.php?action=do_break_asso",
     'Right'    => $payment_write,
     'Condition'=> array ('None') 
                                              );
@@ -799,28 +797,28 @@ function get_payment_action() {
 // Admin
   $actions["PAYMENT"]["admin"] = array (
     'Name'     => $l_header_admin,
-    'Url'      => "$path/treso/payment_index.php?action=admin",
+    'Url'      => "$path/payment/payment_index.php?action=admin",
     'Right'    => $payment_admin_read,
     'Condition'=> array ('all') 
                                        );
 
 // Import Reconcile
   $actions["PAYMENT"]["reconcile_import"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=reconcile_import",
+    'Url'      => "$path/payment/payment_index.php?action=reconcile_import",
     'Right'    => $payment_admin_write,
     'Condition'=> array ('None') 
                                       		 );
 
 // Select Reconcile
   $actions["PAYMENT"]["select_reconcile"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=select_reconcile",
+    'Url'      => "$path/payment/payment_index.php?action=select_reconcile",
     'Right'    => $payment_admin_write,
     'Condition'=> array ('None') 
                                       		 );
 
 // Do Reconcile
   $actions["PAYMENT"]["do_reconcile"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=do_reconcile",
+    'Url'      => "$path/payment/payment_index.php?action=do_reconcile",
     'Right'    => $payment_admin_write,
     'Condition'=> array ('None') 
                                       		 );
@@ -828,21 +826,21 @@ function get_payment_action() {
 // Display
   $actions["PAYMENT"]["display"] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/treso/payment_index.php?action=display",
+    'Url'      => "$path/payment/payment_index.php?action=display",
     'Right'    => $payment_read,
     'Condition'=> array ('all') 
                                       	 );
 
 // Display Préférences
   $actions["PAYMENT"]["display_dispref"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=display_dispref",
+    'Url'      => "$path/payment/payment_index.php?action=display_dispref",
     'Right'    => $payment_read, 
     'Condition'=> array ('None') 
                                       	 );
 
 // Display Level
   $actions["PAYMENT"]["display_level"] = array (
-    'Url'      => "$path/treso/payment_index.php?action=display_level",
+    'Url'      => "$path/payment/payment_index.php?action=display_level",
     'Right'    => $payment_read, 
     'Condition'=> array ('None') 
                                       	        );

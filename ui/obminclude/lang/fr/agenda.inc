@@ -76,8 +76,6 @@ $l_reject = "Refuser";
 $l_select = "S&eacute;lectionner";
 
 // Messages 
-$l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
-$l_error_visibility = "Les informations contenues dans cette page sont priv&eacute;es. Vous ne pouvez pas les consulter";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
 $l_event_insert_ok = "L'enregistrement du rendez-vous a &eacute;t&eacute; correctement effectu&eacute;";

@@ -84,6 +84,11 @@ $l_delete_parent = "Elimina Sub-Impegno";
 $l_affect = "Affect";
 $l_parentdeal_deal_new = "Crea nuovo impegno";
 
+$l_link_contract = "The deal is involved in these contracts";
+$l_link_contract_no = "The deal isn't involved in any contracts";
+$l_cant_delete = "The deal can't be deleted !";
+$l_can_delete = "The deal can be deleted.";
+
 $l_kind_checkdelete = "Controlla o Elimina Tipo";
 $l_kind_delete = "Elimina Tipo";
 $l_kind_can_delete = "Tipo può essere eliminato!";
@@ -98,7 +103,7 @@ $l_status_can_delete = "Status può essere eliminato";
 $l_status_cant_delete = "Status non può essere eliminato";
 $l_status_link_deal = "Status necessario in questi Impegni";
 $l_status_insert = "Inserisci Status";
-$l_cat_checkdelete = "Check o Elimina Categoria";
+$l_cat_checkdelete = "Controlla o Elimina Categoria";
 $l_cat_delete = "Elimina Categoria";
 $l_cat_can_delete = "Categoria eliminabile";
 $l_cat_cant_delete = "Categoria NON può essere eliminata";
@@ -117,8 +122,6 @@ $l_err_tech_empty = "Scrivi responsabile tecnico!";
 $l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
 
 $l_updateaffect_ok = "Impegno collegato al Sub-impegno";
-$l_error_permission = "Accesso negato alla pagina";
-$l_error_visibility = "Accesso negato alla pagina: informazione riservata.";
 $l_no_display = "Scrivi nei campi e click su < TROVA > per la ricerca";
 $l_found = "Impegni trovati.";
 $l_no_found = "Non sono stati trovati impegni!";

@@ -63,8 +63,6 @@ $l_reject = "Respingi";
 $l_select = "Scegli";
 
 // Messages
-$l_error_permission = "Non hai i permessi di accesso alla pagina.";
-$l_error_visibility = "Le informazioni della pagina sono private - Non consultabili";
 $l_select_contacts = "Scegliere un mese od un gruppo.";
 $l_select_repeat_day = "Scegli il giorno della ripetizione.";
 $l_event_insert_ok = "Registrazione appuntamento effettuata;";

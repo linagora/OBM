@@ -78,12 +78,9 @@ $l_query_error = "Problemi durante la query.....";
 $lj_no_number = "\\nNumero pagamento non valido!";
 $lj_check_amount = "\\nImporto non valido!";
 $lj_check_inout = "\\nSeleziona prima se uscita o entrata";
-$lj_fill_label = "\\n Riempoi prima etichetta.";
-$l_invalid_date="\\nInvalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ)";
 $lj_check_paymentkind = "Scegli prima il tipo di pagamento!";
 $lj_check_account = "Scegli prima un account !";
 $l_no_amount = "Inserisci prima importo del pagamento";
-$l_fill_date = "Riempi questo campo";
 $l_invalid_amount = "Ultimo importo inserto non valido";
 
 // For the display parameters modification screen

@@ -89,38 +89,39 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// ContractContract: Select query construction                               //
+// Contract deatil query execution                                           //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_contract_id) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $connect_db = new DB_OBM;
-  if ($connect_db->type == $db_type_mysql) {
-    $query = "select *,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        UNIX_TIMESTAMP(contract_datebegin) as datebegin,
-        UNIX_TIMESTAMP(contract_dateexp) as dateexp,
-        UNIX_TIMESTAMP(contract_timeupdate) as timeupdate,
-        UNIX_TIMESTAMP(contract_timecreate) as timecreate
-      from (Contract
-            left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
-            left join UserObm u2 on contract_techmanager_id=u2.userobm_id
-      where contract_id='$p_contract_id'";
-  }
-  else if ($connect_db->type == $db_type_pgsql) {
-    $query = "select *,
-        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
-        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
-        contract_datebegin as datebegin,
-        contract_dateexp as dateexp,
-        contract_timeupdate as timeupdate,
-        contract_timecreate as timecreate
-      from (Contract
-            left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
-            left join UserObm u2 on contract_techmanager_id=u2.userobm_id
-      where contract_id='$p_contract_id'";
-  }
+  $query = "select Contract.*,
+      deal_id,
+      deal_label,
+      contracttype_label,
+      company_name,
+      company_address1,
+      company_zipcode,
+      company_town,
+      u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+      u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
+      c1.contact_lastname as clname1, c1.contact_firstname as cfname1,
+      c2.contact_lastname as clname2, c2.contact_firstname as cfname2,
+      c1.contact_phone as cphone1, c2.contact_phone as cphone2,
+      UNIX_TIMESTAMP(contract_datebegin) as datebegin,
+      UNIX_TIMESTAMP(contract_dateexp) as dateexp,
+      UNIX_TIMESTAMP(contract_timeupdate) as timeupdate,
+      UNIX_TIMESTAMP(contract_timecreate) as timecreate
+    from ((((((Contract
+          left join UserObm u1 on contract_marketmanager_id=u1.userobm_id)
+          left join UserObm u2 on contract_techmanager_id=u2.userobm_id)
+          left join Contact c1 on contract_contact1_id=c1.contact_id)
+          left join Contact c2 on contract_contact2_id=c2.contact_id)
+          left join Company on contract_company_id=company_id)
+          left join ContractType on contract_type_id=contracttype_id)
+          left join Deal on contract_deal_id=deal_id
+    where contract_id='$p_contract_id'";
+
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
   $connect_db->next_record();
@@ -148,7 +149,7 @@ function run_query_insert($contract) {
   $sel_tech  = $contract["tech"];
   $sel_market = $contract["market"];
   $deal_id = $contract["deal_id"];
-  $connect_db=new DB_OBM;
+  $connect_db = new DB_OBM;
 
   $query = "insert into Contract
      (contract_timeupdate,
@@ -188,9 +189,10 @@ function run_query_insert($contract) {
       '$ta_com')";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-}
+  $retour = $connect_db->query($query);
 
+  return $retour;
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -244,35 +246,61 @@ function run_query_update($contract) {
     where contract_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);  
+  $ret = $connect_db->query($query);  
+
+  return $ret;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete query construction                                                 //
+// Delete query execution                                                    //
+// Parameters:
+//   - $p_id : contract id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_delete($p_contract_id) {
+function run_query_delete($p_id) {
   global $cdg_sql;
   
-  $connect_db=new DB_OBM;
-  $query = "delete from Contract where contract_id=".$p_contract_id;
+  $obm_q = new DB_OBM;
+  $query = "delete from Contract where contract_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
+  $ret = $obm_q->query($query);
+
+  return $ret;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Requete : Liste des TYPES de contract : Table ContractType                  //
-// Query   : Leads kinds Contract          : Table ContractType                   //
+// Query : get contracttype entries                                          //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contracttype() {
-
   global $cdg_sql;
-  $connect_db=new DB_OBM;
+
+  $obm_q = new DB_OBM;
   $query = "select contracttype_label,contracttype_id from ContractType";
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return $connect_db;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the incidents attached to the contract
+// Parameters:
+//   - $p_id : contract Id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contract_incident_links($p_id) {
+  global $cdg_sql;
+
+  $obm_q = new DB_OBM;
+  $query = "select distinct incident_id, incident_label 
+            from Incident
+            where incident_contract_id='$p_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 
@@ -280,8 +308,8 @@ function run_query_contracttype() {
 // Query   : company List         : Table Company                            //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_company() {
-
   global $cdg_sql;
+
   $connect_db=new DB_OBM;
   $query = "select company_id,company_name from Company order by company_name";
   display_debug_msg($query, $cdg_sql);
@@ -313,14 +341,15 @@ function run_query_company_info($id) {
 // Query   : company contacts contract  :  Table Contact                     //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_contract($p_company_id) {
-  
   global $cdg_sql;
-  $connect_db=new DB_OBM;
+
+  $connect_db = new DB_OBM;
   $query = "select contact_id,contact_lastname,contact_firstname,contact_phone from Contact where contact_company_id='$p_company_id'";
   display_debug_msg($query, $cdg_sql);
   $connect_db->query($query);
   return $connect_db;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query   :  contract  :  Table Contract                        //
@@ -337,69 +366,132 @@ function run_query_contract() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type insertion query construction                                         //
+// Query execution : Type insert                                             //
+// Parameters:
+//   - $contract[] : contract hash info : keys used : type_label
 ///////////////////////////////////////////////////////////////////////////////
-function query_type_insert() {
-  global $cdg_sql;
-  global $tf_type_new,$rd_type_inout; 
-  global $auth;
+function run_query_type_insert($contract) {
+  global $auth, $cdg_sql;
 	
-  $query = "insert into ContractType (contracttype_timeupdate,contracttype_timecreate,contracttype_userupdate,contracttype_usercreate,contracttype_label) values (null,'".date("Y-m-d H:i:s")."',null,".$auth->auth["uid"].",'". $tf_type_new ."')";
+  $label = $contract["type_label"];
+
+  $query = "insert into ContractType (contracttype_timeupdate,
+    contracttype_timecreate,
+    contracttype_usercreate,
+    contracttype_label)
+  values ('null',
+    '".date("Y-m-d H:i:s")."',
+    ".$auth->auth["uid"].",
+    '$label')";
+
   display_debug_msg($query, $cdg_sql);
-  return $query;
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type update query construction                                            //
+// Query execution : Type update                                             //
+// Parameters:
+//   - $contract[] : contract hash info : keys used : type, type_label
 ///////////////////////////////////////////////////////////////////////////////
-function query_type_update() {
-  global $cdg_sql;
-   global $tf_type_upd,$sel_type,$rd_type_inout;
-   global $auth;  
+function run_query_type_update($contract) {
+  global $auth, $cdg_sql;
 
-  $query = "update ContractType set contracttype_label='". $tf_type_upd ."', contracttype_timeupdate='".date("Y-m-d H:i:s")."', contracttype_userupdate=".$auth->auth["uid"]." where contracttype_id=". $sel_type;
+  $type = $contract["type"];
+  $label = $contract["type_label"];
+
+  $query = "update ContractType set contracttype_label='$label',
+      contracttype_timeupdate='".date("Y-m-d H:i:s")."',
+      contracttype_userupdate='".$auth->auth["uid"]."'
+    where contracttype_id='$type'";
+
   display_debug_msg($query, $cdg_sql);
-  return $query;
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Type deletion query construction                                          //
+// Query execution : Type deletion                                           //
+// Parameters:
+//   - $id : Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function query_type_delete() {
-  global $sel_type; 	
+function run_query_type_delete($id) {
   global $cdg_sql;
-	
-  $query="delete from ContractType where contracttype_id=$sel_type";
+
+  $query = "delete from ContractType where contracttype_id='$id'";
+
   display_debug_msg($query, $cdg_sql);
-  return $query;
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  return $retour;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Type verif query construction                                             //
+// Query execution : Links to the Type given                                 //
+// Parameters:
+//   - $t_id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function query_type_verif() {
-  global $sel_type; 
+function run_query_type_links($t_id) {
   global $cdg_sql;
 
-  $query = "select * from Contract,ContractType where Contract.contract_type_id=ContractType.contracttype_id and ContractType.contracttype_id=". $sel_type;
+  $query = "select contract_id, contract_label
+    from Contract
+    where contract_type_id='$t_id'";
+
   display_debug_msg($query, $cdg_sql);
-  return $query;
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Data checking and formatting
+// Get the label of a type                                                   //
+// Parameters:
+//   - $id : type id
 ///////////////////////////////////////////////////////////////////////////////
-function check_data_form() {
-  global  $cb_arc, $lcb_arc,$tf_datealarme,$tf_datebegin;
-  global $err_msg;
+function get_type_label($id) {
   global $cdg_sql;
 
+  $query = "select contracttype_label
+    from ContractType
+    where contracttype_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  
+  $retour = $obm_q->f("contracttype_label");
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contract Form Data checking and formatting
+// Parameters:
+//   - $cid        : contract id : (empty on insertion)
+//   - $contract[] : values to check
+// Return : true if check ok, else false
+///////////////////////////////////////////////////////////////////////////////
+function check_contract_form($cid, $contract) {
+  global $cb_arc, $lcb_arc,$tf_datealarme,$tf_datebegin;
+  global $err_msg, $l_err_label_empty;
+
+  // Check if the label is filled
+  if (trim($contract["label"]) == "") {
+    $err_msg = $l_err_label_empty;
+    return false;
+  }
 
   // Date alarme check
   if ($tf_datebegin == "") {
@@ -424,21 +516,5 @@ function check_data_form() {
   return true;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Select the deal linked to the contract                                    //
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal($deal_id) {
-  global $sel_type; 
-  global $cdg_sql;
-  $obm_q= new DB_OBM;
-  if($deal_id != 0) { 
-    $query = "select * from Deal where deal_id = $deal_id";
-    display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);
-    $obm_q->next_record();
-  }
-  return $obm_q;
-}
 
-
-</SCRIPT>
+</script>

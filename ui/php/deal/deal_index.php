@@ -14,6 +14,7 @@
 // - detailupdate    -- $param_deal    -- show the deal detail form
 // - insert          -- form fields    -- insert the deal
 // - update          -- form fields    -- update the deal
+// - check_delete    -- $param_deal    -- check links before delete
 // - delete          -- $param_deal    -- delete the deal
 // - affect          -- $param_deal    -- show the new parent deal form
 // - affect_update   -- $param_deal    -- affect the deal to the parentdeal
@@ -93,7 +94,7 @@ if ($popup) {
     $deak_q = run_query_deal($comp_id);
     html_select_deal($deal_q, stripslashes($title), $url);
   } else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
 
   display_end();
@@ -148,14 +149,12 @@ if (($action == "index") || ($action == "")) {
       display_record_info($deal_q->f("deal_usercreate"),$deal_q->f("deal_userupdate"),$deal_q->f("timecreate"),$deal_q->f("timeupdate"));
       $cid = $deal_q->f("deal_company_id");
       // we retrieve invoices data :
-      $q_invoices = run_query_search_connected_invoices ($param_deal, $incl_arch);
-      //      $q_invoices->next_record();
-      $invoices_options = run_query_display_pref ($uid, "invoice");
-      html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $q_invoices, $invoices_options);
-    }
-    else {
+      $inv_q = run_query_search_connected_invoices ($param_deal, $incl_arch);
+      $pref_q = run_query_display_pref ($uid, "invoice");
+      html_deal_consult($deal_q, run_query_contact_deal($cid), $cid, $inv_q, $pref_q);
+    } else {
       // this deal's page has "private" access
-      display_error_visibility();  
+      display_err_msg($l_error_visibility);
     } 	
   }
   
@@ -180,7 +179,7 @@ if (($action == "index") || ($action == "")) {
         $param_deal = run_query_deal_id($deal);
 	echo "
         <script type=\"text/javascript\">
-         window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_insert_ok)."'
+         window.location.href = '$path/contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&hd_deal_label=".$deal["label"]."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_insert_ok)."'
         </script>
         ";
       }
@@ -205,7 +204,7 @@ if (($action == "index") || ($action == "")) {
         $param_deal = run_query_deal_id($deal);
 	echo "
         <script type=\"text/javascript\">
-         window.location.href = '../contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_update_ok)."'
+         window.location.href = '$path/contract/contract_index.php?action=new&param_company=".$deal["company"]."&param_deal=".$param_deal."&hd_deal_label=".$deal["label"]."&sel_con1=".$deal["contact1"]."&sel_con2=".$deal["contact2"]."&sel_tech=".$deal["tech"]."&sel_market=".$deal["market"]."&tf_label=".$deal["label"]."&ok_message=".addslashes($l_update_ok)."'
         </script>
         ";
       }
@@ -234,7 +233,12 @@ if (($action == "index") || ($action == "")) {
       run_query_update_archive($param_deal,$param_parent);
     }
   }
-  
+
+} elseif ($action == "check_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("deal_js.inc");
+  dis_check_links($param_deal);
+
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($param_deal);
@@ -253,7 +257,6 @@ if (($action == "index") || ($action == "")) {
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
   
-
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
@@ -261,7 +264,6 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
-  
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -277,7 +279,6 @@ if (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_insert($deal);
@@ -289,7 +290,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_update($deal);
@@ -301,14 +301,12 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_kind_links($deal["kind"]);
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_delete($deal["kind"]);
@@ -320,7 +318,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_insert($deal);
@@ -343,7 +340,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_status_links($deal["state"]);
@@ -361,7 +357,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "cat_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_insert($deal);
@@ -373,7 +368,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "cat_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_update($deal);
@@ -384,7 +378,6 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
-  
 
 } elseif ($action == "cat_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -392,7 +385,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 } elseif ($action == "cat_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_cat_delete($deal["cat"]);
@@ -404,7 +396,6 @@ if (($action == "index") || ($action == "")) {
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
   
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // -- Actions about ParentDeal -- 
@@ -656,7 +647,7 @@ function dis_debug_param($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_deal_action() {
   global $deal, $actions, $path;
-  global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_admin,$l_header_new_parent;
   global $l_deal_select_company;
   global $deal_read, $deal_write, $deal_admin_read, $deal_admin_write;
@@ -718,7 +709,7 @@ function get_deal_action() {
 
   // Detail Update
   $actions["DEAL"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
+    'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=detailupdate&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
     'Condition'=> array ('detailconsult', 'update') 
@@ -726,7 +717,7 @@ function get_deal_action() {
 
   // Parent Detail Update
   $actions["DEAL"]["parent_detailupdate"] = array (
-    'Name'     => $l_header_modify,
+    'Name'     => $l_header_update,
     'Url'      => "$path/deal/deal_index.php?action=parent_detailupdate&amp;param_parent=".$deal["parent"]."",
     'Right'    => $deal_write,
     'Condition'=> array ('parent_detailconsult') 
@@ -747,9 +738,9 @@ function get_deal_action() {
                                             );
 
   // Delete
-  $actions["DEAL"]["delete"] = array (
+  $actions["DEAL"]["check_delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/deal/deal_index.php?action=delete&amp;param_deal=".$deal["id"]."",
+    'Url'      => "$path/deal/deal_index.php?action=check_delete&amp;param_deal=".$deal["id"]."",
     'Right'    => $deal_write,
     'Condition'=> array ('detailconsult', 'update') 
                                      );

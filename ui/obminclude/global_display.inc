@@ -510,7 +510,7 @@ class OBM_DISPLAY {
 	// invoice from the deal display screen
         //-------------------------------------
 	elseif ($fieldname == "deal_invoice_label") {
-	  $url = "../treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
+	  $url = "../invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
 	} elseif (($fieldname == "deal_invoice_HT") 
 		   || ($fieldname == "deal_invoice_TTC") ) {
 	  $amount = $this->data_set->f($fieldname);
@@ -579,11 +579,11 @@ class OBM_DISPLAY {
 	elseif ($fieldname == "invoice_deal") {
 	  $url="../deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
 	} elseif ($fieldname == "invoice_label") {
-	  $url="../treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
+	  $url="../invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
 	} elseif ($fieldname == "invoice_company") {
 	  $url="../company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
 	} elseif ($fieldname == "invoice_pay_label") {
-	  $url = "../treso/payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("invoice_payment_id");
+	  $url = "../payment/payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("invoice_payment_id");
 	} // amount column color 
 	elseif (($fieldname == "invoice_amount_HT") 
 		|| ($fieldname == "invoice_amount_TTC")
@@ -663,7 +663,7 @@ class OBM_DISPLAY {
 	// For the incidents 
 	//------------------------------
         else if ($fieldname == "incident_label") {
-	  $url = "../contract/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
+	  $url = "../incident/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
 	}
        	else if ($fieldname == "incident_owner_lastname") {
 	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_owner");

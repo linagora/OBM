@@ -55,11 +55,8 @@ $l_impossible_deletion = " alcuni pagamenti sono associati a questo account. Imp
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $lj_check_number = "\\nNumero account non valido ! ";
 $lj_fill_number = " Inserisci prima il numero ! ";
-$lj_fill_label = "Inserisci prima l'etichetta !";
 $lj_fill_bank = "Inserisci prima la Banca !";
 $lj_confirm_no_bank="Questo accoutn non è associato a banche. Click OK per confermare.";
-$l_invalid_date="\\nForamto data non valido (GG/MM/AAAA or AAAA-MM-GG)";
-$l_fill_date = "\\n Inserisci prima la data .";
 
 // For the display parameters modification screen
 $l_account_options = "Visualizza le opzioni per la lista di account ";

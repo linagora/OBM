@@ -70,19 +70,7 @@ function check_contact(form) {
   return true;
 }
 
-function verifie(form) {
-  valeur = form.param_company.options[form.param_company.selectedIndex].value;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_company\");
-    return false;
-  } else {
-    return true;
-  };
-}
-
-
 
 // -->
 </script>
 ";
-

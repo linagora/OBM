@@ -18,13 +18,13 @@ $themes = get_themes_array();
 // Return : $langs : array of langs
 ///////////////////////////////////////////////////////////////////////////////
 function get_langs_array() {
-  global $obminclude;
+  global $obminclude, $path;
 
   // Lang dirs to exclude
   $exclude = array('.', '..', 'CVS');
   $langs = array();
 
-  $lang_dir = dir("../../$obminclude/lang");
+  $lang_dir = dir("$path/../$obminclude/lang");
   while($entry=$lang_dir->read()) {
     if (! in_array ($entry, $exclude) && is_dir($lang_dir->path."/".$entry)) {
       array_push($langs, $entry);
@@ -41,13 +41,13 @@ function get_langs_array() {
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
 function get_themes_array() {
-  global $obminclude;
+  global $obminclude, $path;
 
   // Themes dirs to exclude
   $exclude = array('.', '..', 'CVS', 'images');
   $themes = array();
 
-  $theme_dir = dir("../../$obminclude/themes");
+  $theme_dir = dir("$path/../$obminclude/themes");
   while($entry=$theme_dir->read()) {
     if (! in_array ($entry, $exclude) && is_dir($theme_dir->path."/".$entry)) {
       array_push($themes, $entry);
@@ -67,9 +67,7 @@ function get_themes_array() {
 //   - $resultat : array of var present in the module sources
 ///////////////////////////////////////////////////////////////////////////////
 function get_src_vars($module) {
-  global $debug;
-
-  $path = "..";
+  global $debug, $path;
 
   if ($debug > 0) {
     echo "Source vars : Files read : ";
@@ -125,9 +123,7 @@ function get_src_vars($module) {
 //   - $resultat : array of var present and used in the module sources
 ///////////////////////////////////////////////////////////////////////////////
 function get_src_used_vars($module) {
-  global $debug;
-
-  $path = "..";
+  global $debug, $path;
 
   if ($debug > 0) {
     echo "Source used vars : Files read : ";
@@ -193,41 +189,39 @@ function get_src_used_vars($module) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Returns the list of vars used in the header section ($theme/menu.inc)     //
-// There is no unused notion here as the lang file is included in function
-// and so the vars are not defined as global
+// Get the list of lang vars that appears and are really used in the file
+// sources (not just defined in a global line)
 // Parameters:
-//   - $theme : theme where to get the menu file
+//   - $myfile : file to process
+// Returns:
+//   - $resultat : array of var present and used in the file source
 ///////////////////////////////////////////////////////////////////////////////
-function get_src_header_vars($theme) {
-  global $debug, $obminclude;
-
-  $path = "..";
+function get_src_used_vars_file($myfile) {
+  global $debug, $path;
 
   if ($debug > 0) {
-    echo "Source header used vars : Files read : ";
+    echo "Source used vars : File read : $myfile";
   }
 
   $tableau = array();
   $contents = array();
-  $file = "$path/../$obminclude/themes/$theme/menu.inc";
 
+  $file = "$myfile";
   if (file_exists($file)) {
     $contents = file($file);
     if ($debug > 0) { echo "file=$file\n"; }
+  } else {
+    echo "File not found ! global_display.inc";
   }
 
   // For each line of the file
   while (list($line_num, $line) = each($contents)) {
 
-    $valid = true;
-    // If var is in a global, comment or function line we bypass this variable
     // if the global identifier is present (begin of the line), we note it
     if (preg_match('/^[\s\t]*global .*$/Us',$line, $matches)) {
-      $valid = false;
-    }
-    if (preg_match('/^.*(\/\/|function).*$l_.*$/Us',$line, $matches)) {
-      $valid = false;
+      $global = true;
+    } else {
+      $global = false;
     }
 
     // for each lang var, we note it as recorded "R_" and put it in the array
@@ -243,14 +237,49 @@ function get_src_header_vars($theme) {
       }
       $line = preg_replace("/$pattern/", "\$R_", $line, 1);
 
-      array_push($tableau, $lvar);      
+      // We add the var in the result only if it is not a declaration (global)
+      // ie the var is really used.
+      if (! $global) array_push($tableau, $lvar);      
 
-      // We add the var in the result only if it has to be
-      if ($valid) array_push($tableau, $lvar);      
     }
   }
 
   $resultat = array_unique($tableau);
+  return $resultat;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Returns the list of all vars used in OBM modules                          //
+///////////////////////////////////////////////////////////////////////////////
+function get_all_src_used_vars() {
+  global $debug, $obminclude, $path, $modules;
+
+  $all_vars = array();
+  $vars = array();
+
+  while (list($key, $mod) = each($modules)) {
+    if ($debug > 0) {
+      echo "All Source used vars : module : $mod";
+    }
+
+    $vars = get_src_used_vars($mod);
+    $all_vars = array_merge($all_vars, $vars);
+  }
+
+  $vars = get_src_used_vars_file("$path/../$obminclude/global.inc");
+  $all_vars = array_merge($all_vars, $vars);
+  $vars = get_src_used_vars_file("$path/../$obminclude/global_display.inc");
+  $all_vars = array_merge($all_vars, $vars);
+  $vars = get_src_used_vars_file("$path/../$obminclude/global_pref.inc");
+  $all_vars = array_merge($all_vars, $vars);
+  $vars = get_src_used_vars_file("$path/../$obminclude/lang/fr/check_date_js.inc");
+  $all_vars = array_merge($all_vars, $vars);
+  $vars = get_src_used_vars_file("$path/../$obminclude/phplib/obmlib.inc");
+  $all_vars = array_merge($all_vars, $vars);
+
+  $resultat = array_unique($all_vars);
+
   return $resultat;
 }
 
@@ -264,9 +293,7 @@ function get_src_header_vars($theme) {
 //   - $tableau : array of lang module vars : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
 function get_lang_vars($module, $lang) {
-  global $debug, $obminclude;
-
-  $path = "..";
+  global $debug, $obminclude, $path;
 
   $tableau = array();
   $file = "$path/../$obminclude/lang/$lang/${module}.inc";
@@ -293,7 +320,6 @@ function get_lang_vars($module, $lang) {
       $line = preg_replace("/$pattern/", "\$R_", $line, 1);
 
       $tableau[$lvar] = $lvalue;
-
     }
   }
 
@@ -310,9 +336,7 @@ function get_lang_vars($module, $lang) {
 //   - $tableau : array of global lang vars : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
 function get_global_lang_vars($lang) {
-  global $debug, $obminclude;
-
-  $path = "..";
+  global $debug, $obminclude, $path;
 
   $tableau = array();
   $file = "$path/../$obminclude/lang/$lang/global.inc";
@@ -339,24 +363,25 @@ function get_global_lang_vars($lang) {
       $line = preg_replace("/$pattern/", "\$R_", $line, 1);
 
       $tableau[$lvar] = $lvalue;
-
     }
   }
 
   return $tableau;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the module list                                                       //
 // Return : $modules : array of modules
 ///////////////////////////////////////////////////////////////////////////////
 function get_modules_array() {
-  global $cdg_sql;
+  global $cdg_sql, $path;
 
   // Module dirs to exclude
   $exclude = array('.', '..', 'CVS', 'obminclude', 'images');
   $modules = array();
 
-  $mod_dir = dir("..");
+  $mod_dir = dir("$path");
   while($entry=$mod_dir->read()) {
     if (! in_array ($entry, $exclude) && is_dir($mod_dir->path."/".$entry)) {
       array_push($modules, $entry);

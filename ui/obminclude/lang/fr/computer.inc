@@ -80,21 +80,3 @@ $l_del_port = "Enlever des ports" ;
 $l_update_port = "Scanner les ports" ;
 $l_modify_compu = "Modifier l'ordinateur" ;
 $l_del_compu = "Supprimer l'ordinateur" ;
-
-$l_time_format = "%d-%m-%Y %H:%i";
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

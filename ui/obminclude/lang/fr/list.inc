@@ -89,7 +89,3 @@ $c_export_format[2]["info"] = "Génération d'étiquettes RTF";
 // Format 3 : Excel data
 $c_export_format[3]["name"] = "Tableau Excel";
 $c_export_format[3]["info"] = "Tableau Excel pour publipostage";
-
-// Champs specifiques
-// Format de date et heure pour MySQL pour affichage dans ecran detail affaire
-$l_time_format = "%d-%m-%Y %H:%i";

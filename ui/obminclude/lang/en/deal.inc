@@ -87,6 +87,11 @@ $l_delete_parent = "Delete the ParentDeal";
 $l_affect = "Affect";
 $l_parentdeal_deal_new = "Create a new deal";
 
+$l_link_contract = "The deal is involved in these contracts";
+$l_link_contract_no = "The deal isn't involved in any contracts";
+$l_cant_delete = "The deal can't be deleted !";
+$l_can_delete = "The deal can be deleted.";
+
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
 $l_kind_can_delete = "The Kind can be deleted !";
@@ -120,8 +125,6 @@ $l_err_tech_empty = "You must fill the technical manager !";
 $l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
 
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
-$l_error_permission = "You have not the rights to access this page";
-$l_error_visibility = "You can't consult this page : the information is private.";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the deals";
 $l_found = "deals found.";
 $l_no_found = "No deal found matching the query !";

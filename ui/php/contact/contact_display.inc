@@ -31,7 +31,7 @@ $fieldnames["contact_company_name"] = $l_company;
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact) {
   global $l_contact_name, $l_phone, $l_from_company, $l_find;
-  global $sess, $popup;
+  global $popup;
 
   $lname = stripslashes($contact["lname"]);
   $phone = stripslashes($contact["phone"]);
@@ -110,7 +110,7 @@ function dis_contact_search_list($contact, $popup=false) {
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
-  global $sess,  $l_found, $l_add, $l_close;
+  global $l_found, $l_add, $l_close;
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -165,7 +165,7 @@ function html_contact_consult($co_q) {
   global $l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_public,$l_private,$l_visibility;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $set_theme,  $ico_mail;
-  global $action, $auth, $sess;
+  global $action, $auth;
   global $perms_user,$l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
@@ -300,7 +300,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
-  global $sess, $auth;
+  global $auth;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -495,7 +495,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 /////////////////////////////////////////////////////////////////////////////
 function dis_contact_warn_insert($cid, $co_q, $contact) {
   global $l_check_samecontact, $l_confirm, $l_back;
-  global $sess, $c_yes, $c_no;
+  global $c_yes, $c_no;
 
   $cid = $contact["company_id"];
   $kind = $contact["kind"];
@@ -597,7 +597,6 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
 function dis_check_links($p_id) {
   global $l_can_delete, $l_cant_delete, $l_back;
   global $l_link_deal, $l_link_deal_no, $l_link_list, $l_link_list_no;
-  global $sess;
 
   $delete_ok = true;
 
@@ -670,7 +669,6 @@ function dis_check_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_delete_form($p_id) {
   global $l_delete;
-  global $sess;
 
   // --- HTML Template --------------------------------------------------------
   echo "\n<form name=\"form_delete\" " .

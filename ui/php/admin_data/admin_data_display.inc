@@ -11,21 +11,29 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display the help screen
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_help($mode) {
 
-  if ($mode == "html") echo "<table border=1><tr><td><pre>\n";
-  include ("admin_data_help.inc");
-  if ($mode == "html") echo "\n</pre></td></tr></table>";
+  if ($mode == "html")
+    echo "<table class=\"details\">
+      <tr>
+        <td><pre>";
 
+  include ("admin_data_help.inc");
+
+  if ($mode == "html")
+    echo "</pre>
+        </td>
+      </tr>
+      </table>";
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the search form for data module
 // Parameters:
-//   - $mode   : "txt" ou "html"
+//   - $mode : "txt" ou "html"
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_index($mode, $actions, $modules) {
 
@@ -48,49 +56,50 @@ function dis_data_index($mode, $actions, $modules) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_data_index($actions, $modules) {
-  global $sess;
   global $l_execute, $l_help;
-  global $col_textem, $col_a_table, $col_a_text, $col_a_tableh;
 
   // modules SELECT
-  $sel_module = "<SELECT name=module>";
+  $sel_module = "<select name=module>";
   while (list ($key, $val) = each ($modules)) {
-    $sel_module .= "<OPTION value=\"$val\">$val";
+    $sel_module .= "<option value=\"$val\">$val";
   }
-  $sel_module .= "</SELECT>";
+  $sel_module .= "</select>";
 
   echo "
-    <a href=\"" . $sess->url("admin_data_index.php?action=help&amp;mode=html"). "\">$l_help</a>
-    <p>
-    <FORM method=get action=\"" . $sess->url("admin_data_index.php"). "\">
-    <table border=1>
+    <br />
+    <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
+    <table class=\"admin\">
     <tr>
-      <td>action : data_show<br>
-        <font color=\"#$col_textem\">Show inconsistencies in data</font></td>
-      <td>module :<br>$sel_module</td>
-      <td><input type=hidden name=mode value=\"html\">
-          <input type=hidden name=action value=data_show>
-          <input type=submit value=\"$l_execute\"></td>
+      <td class=\"adminHead\">action : data_show</td>
+      <td class=\"adminHead\">module</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"data_show\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">Show inconsistencies in data</td>
+      <td class=\"adminText\">$sel_module</td>
     </tr>
     </table>
-    </FORM>
+    </form>
 
-    <HR>
+    <hr />
 
-    <FORM method=get action=\"" . $sess->url("admin_data_index.php"). "\">
-    <table border=1>
+    <form method=\"get\" action=\"" . url_prepare("admin_data_index.php"). "\">
+    <table class=\"admin\">
     <tr>
-      <td>action : data_update<br>
-        <font color=\"#$col_textem\">Update inconsistencies in data</font></td>
-      <td>module :<br>$sel_module</td>
-      <td><input type=hidden name=mode value=\"html\">
-          <input type=hidden name=action value=data_update>
-          <input type=submit value=\"$l_execute\"></td>
+      <td class=\"adminHead\">action : data_update</td>
+      <td class=\"adminHead\">module</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"data_update\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">Update inconsistencies in data</td>
+      <td class=\"adminText\">$sel_module</td>
     </tr>
     </table>
-    </FORM>
-
-    <HR>
+    </form>
 ";
 
 }
@@ -141,25 +150,26 @@ function dis_data_company($action, $mode) {
 ";
   } else {
     if ($action == "data_update") {
-      $update = "<th>Update</th>";
+      $update = "<td class=\"adminLabel\">Update</td>";
     } else {
       $update = "";
     }
-    echo "<table border=1>
+    echo "
+      <table class=\"admin\">
       <tr>
-        <th>Company ($nb_comp)</th>
-        <th colspan=2># Contact</th>
-        <th colspan=2># Deal Active</th>
-        <th colspan=2># Deal Total</th>
+        <td class=\"adminHead\">Company ($nb_comp)</td>
+        <td class=\"adminHead\" colspan=\"2\"># Contact</td>
+        <td class=\"adminHead\" colspan=\"2\"># Deal Active</td>
+        <td class=\"adminHead\" colspan=\"2\"># Deal Total</td>
         $update
       </tr><tr>
-        <th>Id</th>
-        <th>field</th>
-        <th>calculated</th>
-        <th>field</th>
-        <th>calculated</th>
-        <th>field</th>
-        <th>calculated</th>
+        <td class=\"adminHead\">Id</td>
+        <td class=\"adminHead\">field</td>
+        <td class=\"adminHead\">calculated</td>
+        <td class=\"adminHead\">field</td>
+        <td class=\"adminHead\">calculated</td>
+        <td class=\"adminHead\">field</td>
+        <td class=\"adminHead\">calculated</td>
         $update
       </tr>";
   }
@@ -183,13 +193,13 @@ function dis_data_company($action, $mode) {
 	echo "\nCompany (id=$id) : Contact ($con_num, $new_con_num) : Deal ($deal_num, $new_deal_num) : Deal total ($deal_total, $new_deal_total)";
       } else {
 	echo "<tr>
-          <td>$id</td>
-          <td>$con_num</td>
-          <td>$new_con_num</td>
-          <td>$deal_num</td>
-          <td>$new_deal_num</td>
-          <td>$deal_total</td>
-          <td>$new_deal_total</td>";
+          <td class=\"adminText\">$id</td>
+          <td class=\"adminText\">$con_num</td>
+          <td class=\"adminText\">$new_con_num</td>
+          <td class=\"adminText\">$deal_num</td>
+          <td class=\"adminText\">$new_deal_num</td>
+          <td class=\"adminText\">$deal_total</td>
+          <td class=\"adminText\">$new_deal_total</td>";
       }
 
       if ($action == "data_update") {
@@ -198,13 +208,13 @@ function dis_data_company($action, $mode) {
 	  if ($mode == "txt") {
 	    echo "OK";
 	  } else {
-	    echo "<td>OK</td>";
+	    echo "<td class=\"adminLabel\">OK</td>";
 	  }
 	} else {
 	  if ($mode == "txt") {
 	    echo "Problem !";
 	  } else {
-	    echo "<td>Problem !</td>";
+	    echo "<td class=\"adminLabel\">Problem !</td>";
 	  }
 	}
       }
@@ -219,7 +229,9 @@ function dis_data_company($action, $mode) {
       if ($mode =="txt") {
 	echo ".";
       } else {
-	echo "<tr><th colspan=8 align=center>$cpt_c</th></tr>";
+	echo "<tr>
+          <td class=\"adminLabel\" colspan=\"8\">$cpt_c</td>
+        </tr>";
 	flush();
       }
     }
@@ -233,9 +245,9 @@ function dis_data_company($action, $mode) {
 ";
   } else {
     echo "<tr>
-        <td colspan=6>Company : $nb_comp to parse, $cpt_cu inconsistencies</td>
+        <td class=\"adminLabel\" colspan=\"8\">
+          Company : $nb_comp to parse, $cpt_cu inconsistencies</td>
       </tr>
       </table>";
   }
 }
-

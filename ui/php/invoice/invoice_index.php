@@ -91,7 +91,7 @@ if ($action == "index" || $action == "") {
     html_invoice_form($obm_q_invoice, $action, run_query_invoicestatus(),0, $deal_linked);
   }
   else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }
 
 }elseif ($action == "insert")  {
@@ -169,10 +169,10 @@ if ($action == "index" || $action == "") {
     $dis_options_deal = run_query_display_pref($auth->auth["uid"],"deal");
 
     dis_search_deal_form ($action, $obm_q_invoice, $dis_options_deal);
-  }else{
-    display_error_permissions();
+  } else{
+    display_err_msg($l_error_permission);
   }
-}elseif ($action == "search_deal"){
+} elseif ($action == "search_deal"){
 //////////////////////////////////////////////////////////////////////////////
   if (true){
     display_debug_msg("FIXME PERMISSION : ", $cdg_param);
@@ -181,8 +181,8 @@ if ($action == "index" || $action == "") {
     $dis_options_deal = run_query_display_pref($auth->auth["uid"],"deal");
     $obm_q_deal = run_query_deal ($obm_q_invoice, $tf_deal_label, $tf_deal_company, $cb_deal_archive);
     dis_search_deal_form ($action, $obm_q_invoice, $dis_options_deal, $obm_q_deal,$tf_deal_label, $tf_deal_company, $cb_deal_archive);
-  }else{
-    display_error_permissions();
+  } else{
+    display_err_msg($l_error_permission);
   }
 }elseif ($action == "add_deal_chosen") {
   //////////////////////////////////////////////////////////////////////////////
@@ -216,11 +216,11 @@ if ($action == "index" || $action == "") {
     
     html_invoice_consult($action,$obm_q_invoice, run_query_invoicestatus(),$obm_q_deals, $options_deal,$obm_q_payment, $options_payment);
 
-  }else{
-    display_error_permissions();
+  } else{
+    display_err_msg($l_error_permission);
   }
-}elseif ($action == "del_deal") {
-  ///////////////////////h//////////////////////////////////////////////////////
+} elseif ($action == "del_deal") {
+///////////////////////////////////////////////////////////////////////////////
   if (true) {
     display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
     $q_invoice = run_query_detail ($invoice["invoice"]);
@@ -231,12 +231,12 @@ if ($action == "index" || $action == "") {
     $payments_options = run_query_display_pref ($auth->auth["uid"], "payment");
     html_invoice_consult ($action, $q_invoice, run_query_invoicestatus(),$invoice_deals, $deal_dis_options, $q_payments, $payments_options); 
 
-  }else {
-    display_error_permissions();
+  } else {
+    display_err_msg($l_error_permission);
   }
 
-}elseif ($action == "del_deal_chosen"){
-  ///////////////////////h//////////////////////////////////////////////////////
+} elseif ($action == "del_deal_chosen"){
+///////////////////////////////////////////////////////////////////////////////
   if (true){
     display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
     reset ($HTTP_POST_VARS);
@@ -277,12 +277,12 @@ if ($action == "index" || $action == "") {
     display_record_info($q_invoice->f("invoice_usercreate"),$q_invoice->f("invoice_userupdate"),$q_invoice->f("timecreate"),$q_invoice->f("timeupdate"));
     
     html_invoice_consult($action, $q_invoice, run_query_invoicestatus(),$q_deals, $options_deal, $q_payments, $payments_options);
-  }else{
-    display_error_permissions();
+  } else{
+    display_err_msg($l_error_permission);
   }
 
 } /*elseif ($action =="add_payment") {
-////////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if (true) {
     $q_invoice = run_query_detail ($invoice["invoice"]);
     $q_invoice->next_record();
@@ -297,10 +297,11 @@ if ($action == "index" || $action == "") {
       dis_search_payment_form ($q_invoice, $dis_options_payment);
     }
   } else {
-    display_error_permissions();
+    display_err_msg($l_error_permission);
   }
+
 } elseif ($action =="search_payment") {
-////////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if (true) {
     display_ok_msg ("PERMISSIONS");
     $q_invoice = run_query_detail ($invoice["invoice"]);
@@ -309,8 +310,9 @@ if ($action == "index" || $action == "") {
     $q_payment = run_query_payment ($q_invoice, $tf_payment_label);
     dis_search_payment_form ($q_invoice, $dis_options_payment, $q_payment);
   } else {
-    display_error_permissions();
+    display_err_msg($l_error_permission);
   }
+
 } elseif ($action == "check_payment_chosen") {
 ///////////////////////////////////////////////////////////////////////////////
   
@@ -340,10 +342,11 @@ if ($action == "index" || $action == "") {
     if ($nb_payments_added!=0){
       run_query_update_updater ($auth, $invoice["invoice"]);
     }
-  }else{
-    display_error_permissions();
+  } else{
+    display_err_msg($l_error_permission);
   }
-}elseif ($action == "del_payment") {
+
+} elseif ($action == "del_payment") {
 ////////////////////////h//////////////////////////////////////////////////////
   if (true) {
     display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
@@ -355,8 +358,8 @@ if ($action == "index" || $action == "") {
     $deals_options = run_query_display_option ($auth, "deal");
     $q_deals = run_query_search_deal_invoice ($invoice["invoice"]);
     html_invoice_consult ($action, $q_invoice, run_query_invoicestatus(),$q_deals, $deals_options, $invoice_payments, $payment_dis_options); 
-  }else {
-    display_error_permissions();
+  } else {
+    display_err_msg($l_error_permission);
   }
 
 } elseif ($action =="del_payment_chosen") {
@@ -390,7 +393,7 @@ if ($action == "index" || $action == "") {
     
     html_invoice_consult($action, $obm_q_invoice, run_query_invoicestatus(),$obm_q_deals, $options_deal, $obm_q_payments, $options_payment);
   } else {
-    display_error_permissions();
+    display_err_msg($l_error_permission);
   }
   }*/
 ///////////////////////h//////////////////////////////////////////////////////
@@ -445,12 +448,10 @@ elseif ($action == "delete")  { // delete means delete an invoice
 }elseif ($action == "admin")  {
 //////////////////////h////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {  
-    echo "<center><font color=\"#$col_error\">";
-    echo "To come...";
-    echo "</font></center><br>";
+    echo "<center>Nothing here for now</center><br />";
   }
   else {
-    display_error_permission();
+    display_err_msg($l_error_permission);
   }	
 }
   
@@ -507,21 +508,21 @@ function get_param_invoice() {
 //////////////////////////////////////////////////////////////////////////////
 function get_invoice_action() {
   global $invoice, $actions, $path;
-  global $l_header_find,$l_header_new_f,$l_header_modify,$l_header_delete;
+  global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
   global $l_header_display,$l_header_dupplicate,$l_header_admin;
   global $invoice_read, $invoice_write, $invoice_admin_read, $invoice_admin_write;
 
 // Index 
   $actions["INVOICE"]["index"] = array (
     'Name'     => $l_header_find,
-    'Url'      => "$path/treso/invoice_index.php?action=index",
+    'Url'      => "$path/invoice/invoice_index.php?action=index",
     'Right'    => $invoice_read,
     'Condition'=> array ('all') 
                                        );
 
 // Search
   $actions["INVOICE"]["search"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=search",
+    'Url'      => "$path/invoice/invoice_index.php?action=search",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
                                    );
@@ -529,21 +530,21 @@ function get_invoice_action() {
 // New
   $actions["INVOICE"]["new"] = array (
     'Name'     => $l_header_new_f,
-    'Url'      => "$path/treso/invoice_index.php?action=new",
+    'Url'      => "$path/invoice/invoice_index.php?action=new",
     'Right'    => $invoice_write,
     'Condition'=> array ('','search','index','detailconsult','display') 
                                    );
 
 //Insert
   $actions["INVOICE"]["insert"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=insert",
+    'Url'      => "$path/invoice/invoice_index.php?action=insert",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                    );
 
 // Detail Consult
   $actions["INVOICE"]["detailconsult"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=detailconsult",
+    'Url'      => "$path/invoice/invoice_index.php?action=detailconsult",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
                                    );
@@ -551,57 +552,57 @@ function get_invoice_action() {
 // Duplicate
   $actions["INVOICE"]["duplicate"] = array (
     'Name'     => $l_header_dupplicate,
-    'Url'      => "$path/treso/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["invoice"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $invoice_write,
     'Condition'=> array ('detailconsult') 
                                      	   );
 
 // Detail Update
   $actions["INVOICE"]["detailupdate"] = array (
-    'Name'     => $l_header_modify,
-    'Url'      => "$path/treso/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["invoice"]."",
+    'Name'     => $l_header_update,
+    'Url'      => "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $invoice_write,
     'Condition'=> array ('detailconsult') 
                                      	       );
 
 // Update
   $actions["INVOICE"]["update"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=update",
+    'Url'      => "$path/invoice/invoice_index.php?action=update",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
 // Update Archive
   $actions["INVOICE"]["updatearchive"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=updatearchive",
+    'Url'      => "$path/invoice/invoice_index.php?action=updatearchive",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
 // Add Deal
   $actions["INVOICE"]["add_deal"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=add_deal",
+    'Url'      => "$path/invoice/invoice_index.php?action=add_deal",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
 // Search Deal
   $actions["INVOICE"]["search_deal"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=search_deal",
+    'Url'      => "$path/invoice/invoice_index.php?action=search_deal",
     'Right'    => $invoice_read,
     'Condition'=> array ('None') 
                                         );
 
 // Add Deal Chosen
   $actions["INVOICE"]["add_deal_chosen"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=add_deal_chosen",
+    'Url'      => "$path/invoice/invoice_index.php?action=add_deal_chosen",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
 
 // Delete Deal 
   $actions["INVOICE"]["del_deal"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=del_deal",
+    'Url'      => "$path/invoice/invoice_index.php?action=del_deal",
     'Right'    => $invoice_write,
     'Condition'=> array ('None') 
                                         );
@@ -609,14 +610,14 @@ function get_invoice_action() {
 // Delete
   $actions["INVOICE"]["delete"] = array (
     'Name'     => $l_header_delete,
-    'Url'      => "$path/treso/invoice_index.php?action=delete&amp;param_invoice=".$invoice["invoice"]."",
+    'Url'      => "$path/invoice/invoice_index.php?action=delete&amp;param_invoice=".$invoice["invoice"]."",
     'Right'    => $incident_write,
     'Condition'=> array ('detailconsult') 
                                      	);
 // Administration
   $actions["INVOICE"]["admin"] = array (
     'Name'     => $l_header_admin,
-    'Url'      => "$path/treso/invoice_index.php?action=admin",
+    'Url'      => "$path/invoice/invoice_index.php?action=admin",
     'Right'    => $contract_admin_read,
     'Condition'=> array ('all') 
                                        );
@@ -624,21 +625,21 @@ function get_invoice_action() {
 // Display
   $actions["INVOICE"]["display"] = array (
     'Name'     => $l_header_display,
-    'Url'      => "$path/treso/invoice_index.php?action=display",
+    'Url'      => "$path/invoice/invoice_index.php?action=display",
     'Right'    => $incident_read,
     'Condition'=> array ('all') 
                                         );
 
 // Display Preferences
   $actions["INVOICE"]["dispref_display"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=dispref_display",
+    'Url'      => "$path/invoice/invoice_index.php?action=dispref_display",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
 
 // Display Préférences
   $actions["INVOICE"]["dispref_level"] = array (
-    'Url'      => "$path/treso/invoice_index.php?action=dispref_level",
+    'Url'      => "$path/invoice/invoice_index.php?action=dispref_level",
     'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
@@ -646,4 +647,3 @@ function get_invoice_action() {
 }
 
 </SCRIPT>
-

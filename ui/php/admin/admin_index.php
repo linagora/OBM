@@ -99,9 +99,10 @@ where Options:
 -h, --help help screen
 -a action  ($lactions)
 
-Ex: php4 admin_clear_sess.php -a clear_sess
+Ex: php4 admin_index.php -a clear_sess
 ";
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
@@ -135,6 +136,8 @@ function parse_arg($argv) {
 
   if (! $action) $action = "clear_sess";
 }
+
+
 //////////////////////////////////////////////////////////////////////////////
 // ADMIN actions
 //////////////////////////////////////////////////////////////////////////////
@@ -143,33 +146,33 @@ function get_admin_action() {
   global $l_header_clear_sess,$l_header_index,$l_header_help;
   global $admin_read, $admin_write;
 
-// Index 
+  // Index 
   $actions["ADMIN"]["index"] = array (
     'Name'     => $l_header_index,   
     'Url'      => "$path/admin/admin_index.php?action=index&amp;mode=html",
     'Right'    => $admin_read,
     'Condition'=> array ('all') 
                                      );
-// data_show 
+  // data_show 
   $actions["ADMIN"]["data_show"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
     'Right'    => $admin_read,
     'Condition'=> array ('None') 
                                      );
-// Data Update 
+  // Data Update 
   $actions["ADMIN"]["data_update"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
     'Right'    => $admin_write,
     'Condition'=> array ('None') 
                                      );
-// Help
+  // Help
   $actions["ADMIN"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
      'Right'    => $admin_read,
      'Condition'=> array ('all') 
                                     );
-// Clear Session
+  // Clear Session
   $actions["ADMIN"]["clear_sess"] = array (
      'Name'     => $l_header_clear_sess,
      'Url'      => "$path/admin/admin_index.php?action=clear_sess&amp;mode=html",
@@ -177,4 +180,5 @@ function get_admin_action() {
      'Condition'=> array ('index') 
                                     );
 }
+
 </SCRIPT>

@@ -14,10 +14,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 function dis_help($mode) {
 
-  if ($mode == "html") echo "<table border=1><tr><td><pre>\n";
-  include ("admin_help.inc");
-  if ($mode == "html") echo "\n</pre></td></tr></table>";
+  if ($mode == "html")
+    echo "<table class=\"details\">
+      <tr>
+        <td><pre>";
 
+  include ("admin_help.inc");
+
+  if ($mode == "html")
+    echo "</pre>
+        </td>
+      </tr>
+      </table>";
 }
 
 
@@ -52,10 +60,9 @@ function dis_index($mode, $lifetime) {
 //   - $obm_u       : DBO : List of Active User Session
 ///////////////////////////////////////////////////////////////////////////////
 function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
-  global $col_textem, $col_a_table, $col_a_tableh, $col_a_text, $l_help;
   global $l_check, $l_database_server, $l_database,$l_last_page,$l_user_ip,$l_execute;
   global $l_session_stats, $l_session, $l_user_session, $l_lifetime, $l_active_user, $l_login_date, $l_last_acces,$l_nb_connec;
-  global $sess, $obm_version, $l_version, $l_date, $l_host;
+  global $obm_version, $l_version, $l_date, $l_host;
 
   $date = datetime_format();
   if ($lifetime > 0) {
@@ -75,106 +82,77 @@ function html_admin_status($lifetime, $nb_user_ses, $obm_u) {
     $nb_con = $obm_u->f("activeuserobm_nb_connexions");
     $lastpage = $obm_u->f("activeuserobm_lastpage");
     $ip = $obm_u->f("activeuserobm_ip");
-    $list_user .= "<tr align=center>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$login</font></td>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$login_date</font></td>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$last_acces</font></td>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$nb_con</font></td>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$lastpage</font></td>
-      <td bgcolor=\"#$col_a_table\">
-        <font color=\"#$col_a_text\">$ip</font></td>
-   </tr>";
+    $list_user .= "
+      <tr>
+      <td class=\"adminText\">$login</td>
+      <td class=\"adminText\">$login_date</td>
+      <td class=\"adminText\">$last_acces</td>
+      <td class=\"adminText\">$nb_con</td>
+      <td class=\"adminText\">$lastpage</td>
+      <td class=\"adminText\">$ip</td>
+      </tr>";
 }
 
   echo "
-   <center>
-
-    <a href=\"" . $sess->url("admin_index.php?action=help&amp;mode=html"). "\">$l_help</a>
-    <p>
-        <table border=1 width=50%>
-    <tr align=center> 
-      <td colspan=2 bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">&nbsp;$l_check&nbsp;</font></td>
-    </tr><tr align=center> 
-      <td width=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_version</font></td>
-      <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$obm_version</font></td>
-    </tr><tr align=center> 
-      <td width=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_database_server</font></td>
-      <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">". strtoupper($obm_u->type). "</font></td>
-    </tr><tr align=center>
-      <td width=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_database</font></td>
-      <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">" . $obm_u->Database . "</font></td>
-    </tr><tr align=center>
-      <td width=50% bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_host</font></td>
-      <td bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">" . $obm_u->Host . "</font></td>
-    </tr></table>
-    </center>
+    <br />
+    <table class=\"admin\">
+    <tr> 
+      <td class=\"adminHead\" colspan=\"2\">$l_check</td>
+    </tr><tr> 
+      <td class=\"adminLabel\">$l_version</td>
+      <td class=\"adminText\">$obm_version</td>
+    </tr><tr> 
+      <td class=\"adminLabel\">$l_database_server</td>
+      <td class=\"adminText\">". strtoupper($obm_u->type). "</td>
+    </tr><tr>
+      <td class=\"adminLabel\">$l_database</td>
+      <td class=\"adminText\">" . $obm_u->Database . "</td>
+    </tr><tr>
+      <td class=\"adminLabel\">$l_host</td>
+      <td class=\"adminText\">" . $obm_u->Host . "</td>
+    </tr>
+    </table>
 
   <!--  Mini stats section -->
 
-    <p><center>
-    <table border=1 >
-    <tr align=center> 
-      <td colspan=6 bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">&nbsp;$l_session_stats&nbsp;</font></td>
+    <p />
+    <table class=\"admin\">
+    <tr> 
+      <td class=\"adminHead\" colspan=\"6\">$l_session_stats</td>
+    </tr><tr> 
+      <td class=\"adminLabel\" colspan=\"4\">$l_date</td>
+      <td class=\"adminText\" colspan=\"2\">$date</td>
+    </tr><tr> 
+      <td class=\"adminLabel\" colspan=\"4\">$l_lifetime</td>
+      <td class=\"adminText\" colspan=\"2\">$lifetime</td>
+    </tr><tr> 
+      <td class=\"adminLabel\" colspan=\"4\">$l_user_session</td>
+      <td class=\"adminText\" colspan=\"2\">$nb_user_ses</td>
     </tr><tr align=center> 
-      <td colspan=4 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_date</font></td>
-      <td colspan=2 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$date</font></td>
-    </tr><tr align=center> 
-      <td colspan=4 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_lifetime</font></td>
-      <td colspan=2 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$lifetime</font></td>
-    </tr><tr align=center> 
-      <td colspan=4 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$l_user_session</font></td>
-      <td colspan=2 bgcolor=\"#$col_a_table\">
-      <font color=\"#$col_a_text\">$nb_user_ses</font></td>
-    </tr><tr align=center> 
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_active_user</font></td>
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_login_date</font></td>
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_last_acces</font></td>
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_nb_connec</font></td>
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_last_page</font></td>
-      <td bgcolor=\"#$col_a_tableh\">
-      <font color=\"#$col_textem\">$l_user_ip</font></td>
+      <td class=\"adminHead\">$l_active_user</td>
+      <td class=\"adminHead\">$l_login_date</td>
+      <td class=\"adminHead\">$l_last_acces</td>
+      <td class=\"adminHead\">$l_nb_connec</td>
+      <td class=\"adminHead\">$l_last_page</td>
+      <td class=\"adminHead\">$l_user_ip</td>
 
     </tr>
     $list_user
     </table>
-    </center>
-    <br>
-    <form method=get action=\"" . $sess->url("admin_index.php"). "\">
-    <table border=1>
+
+    <br />
+    <form method=\"get\" action=\"" . url_prepare("admin_index.php"). "\">
+    <table class=\"admin\">
     <tr>
-      <td>action : clear_sess<br>
-        <font color=\"#$col_textem\">Clear all passive users sessions</font></td>
-      <td>Passive Sessions (delay > $d_lifetime) :
-        <br><center>$nb_sess_to_clear</center></td>
-      <td><input type=hidden name=mode value=\"html\">
-          <input type=hidden name=action value=clear_sess>
-          <input type=submit value=\"$l_execute\"></td>
-    </tr>
+      <td class=\"adminHead\">action : clear_sess</td>
+      <td class=\"adminHead\">Passive Sessions (delay > $d_lifetime)</td>
+      <td class=\"adminLabel\" rowspan=\"2\">
+        <input type=\"hidden\" name=\"mode\" value=\"html\" />
+        <input type=\"hidden\" name=\"action\" value=\"clear_sess\" />
+        <input type=\"submit\" value=\"$l_execute\" /></td>
+    </tr><tr>
+      <td class=\"adminText\">Clear all passive users sessions</td>
+      <td class=\"adminText\">$nb_sess_to_clear</td>
     </table>
     </form>";
 }
