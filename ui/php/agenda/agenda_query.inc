@@ -1065,7 +1065,8 @@ function run_query_update_right($agenda) {
 
 function valid_event($status_event) {
   return ($status_event != -1);
-}  
+  
+} 
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event (hashed by the time units
 //define in global.inc)

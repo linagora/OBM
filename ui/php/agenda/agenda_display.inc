@@ -443,7 +443,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	$user_indice=1;
 	foreach($calendar_user as $id => $user_data ) {
 	  if(is_array($current_events[$current_time][$id])){
-	    $temp_data =$event_data[$current_events[$current_time][$id][0]];
+	    $temp_data =$event_data[current($current_events[$current_time][$id])];
 	    $temp_ib = substr("0$i:00",-5);
 	    $temp_ie = date("H:i", strtotime("+$j days $i hours $time_unit minutes",$start_week_day));
 	    if(($temp_data["status"] > 0 && $temp_data["begin"] >= $temp_ib && $temp_data["begin"] < $temp_ie) || $i==$set_start_time) {
@@ -536,7 +536,7 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 	  $user_indice=1;
 	  foreach($calendar_user as $id => $user_data ) {
 	    if(is_array($current_events[$current_time][$id])){    
-	      $temp_data =$event_data[$current_events[$current_time][$id][0]];
+	      $temp_data =$event_data[current($current_events[$current_time][$id])];
 	      $temp_ib = substr($current_time,8,2).":".substr($current_time,10,2);
 	      $temp_ie = date("H:i", strtotime("+$j days $i hours ".(($k+1)*$time_unit)." minutes",$start_week_day));
 	      if($temp_data["status"] > 0 && $temp_data["begin"] >= $temp_ib && $temp_data["begin"] < $temp_ie) {	     
@@ -717,7 +717,7 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $user_indice = 0;
       foreach($calendar_user as $id => $user_data ) {
 	if(is_array($current_events[$current_time][$id])){
-	  if($event_data[$current_events[$current_time][$id][0]]["status"] > 0) {
+	  if($event_data[current($current_events[$current_time][$id])]["status"]>0) {
 	    $is_title = FALSE;	  
 	    $indice_time = $current_time;
 	    reset($current_events);
@@ -734,7 +734,10 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		if($is_title == FALSE) {
 		  $td_begin = "<td width=\"$td_width\" class=\"".$user_data["class"]."\" ";
 		  $is_title = TRUE;
-		  $event_head_display .= "<a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\" onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\" onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
+		  $event_head_display .= "
+		  <a class=\"agendaLink4\" href=\"agenda_index.php?action=detailconsult&param_event=".$idOfEvent."&param_date=$getdate\"
+		   onMouseOver=\"window.status='Voir cet &eacute;v&eacute;nement'; show(event,'$getdate-$idOfEvent'); return true;\"
+		   onMouseOut=\"hide('$getdate-$idOfEvent'); return true;\">";
 		   $hidden_div .= "<div id=\"$getdate-$idOfEvent\" style=\"position: absolute; z-index: 20; visibility: hidden; top: 0px; left: 0px;\"><table border=\"0\" width=\"100%\" cellpadding=\"0\" cellspacing=\"1\"><tr><td bgcolor=\"transparent\"><table bgcolor=\"#000000\" border=\"1\" width=\"200\"    cellpadding=\"0\" cellspacing=\"1\"><tr><td  class=\"agendaHead2\">".$event_data[$idOfEvent]["title"]."</td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["type"]." ".$event_data[$idOfEvent]["begin"]."-".$event_data[$idOfEvent]["end"]." </td></tr><tr><td class=\"agendaEventHead\">".$event_data[$idOfEvent]["description"]."</td></tr></table></td></tr></table></div>";
 		  $event_head_display .= "&#8226;";
 		  if($nb_user == 1) {
@@ -756,8 +759,8 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
 		  }
 		  $event_head_display .= $event_data[$idOfEvent]["title"];
 		  $event_head_display .= "</a>";	  
-	 	  $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;
-	        }
+		  $event_data[$idOfEvent]["status"] = $event_data[$idOfEvent]["status"] -1;
+	       }
 	      }
 	      $rowspan_event++;
 	      $temp_array = $current_events[$indice_time][$id];
@@ -789,8 +792,8 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       if(is_array($current_events[$current_time])) {
 	$user_indice = 1;
 	foreach($calendar_user as $id => $user_data ) {
-	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){     
-	    if($event_data[$current_events[$current_time][$id][0]]["status"] > 0) {
+	  if(isset($current_events[$current_time][$id]) && $current_events[$current_time][$id] != -1){
+	    if($event_data[current($current_events[$current_time][$id])]["status"]>0) {
 	      $is_title = FALSE;	  
 	      $indice_time = $current_time;
 	      reset($current_events);

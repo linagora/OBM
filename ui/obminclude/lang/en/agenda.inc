@@ -136,6 +136,18 @@ $l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must 
 
 $l_unknown="Inconnu";
 
+
+$l_header_right = "Right management";
+$l_authorize_list = "Authorized people";
+$l_denie_list = "Unauthorized people";
+$l_read_permission = "Read access management";
+$l_write_permission = "Write access management";
+$l_everyone = "Authorized everybody";
+$l_noone = "Authorized nobody";
+$l_list = "Authorized list people";
+$l_authorize = "&lt;&lt;&lt;&lt;";
+$l_deny = "&gt;&gt;&gt;&gt;";
+
 //Mail
 $l_add_event_mail_head = "A new event has been set for you on the obm application.\nThis event title is :";
 $l_update_event_mail_head = "A event has been updated for you on the obm application.\nThis event title is :";
