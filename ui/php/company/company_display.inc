@@ -28,6 +28,93 @@ $fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact
 $fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal\" alt=\"D\" />";
 
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Company specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_company(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $ico_mail, $ico_web, $ico_contact_new;
+
+  if ($fieldname == "company_name") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+  }
+
+  else if ($fieldname == "company_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
+    else $res["name"] = "&nbsp;";
+  }
+
+  else if ($fieldname == "company_email") {
+    $email = $OD->data_set->f("company_email");
+    if (strcmp($email,"") != 0) {
+      $res["url"] = "mailto:$email";
+      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+    }
+  } 
+
+  else if ($fieldname == "company_web") {
+    $web = $OD->data_set->f("company_web");
+    if (strcmp($web,"") != 0) {
+      if (strcmp(substr($web,0,5), "http:") != 0) {
+	$res["url"] = "http://";
+      }
+      $res["url"] .= $web;
+      $res["name"] = "<img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" />";
+    }
+  }
+
+  else if ($fieldname == "company_contact_number") {
+    $res["name"] = $OD->data_set->f("company_contact_number");
+    if ($res["name"] > 0) {
+      $res["url"] = "$path/contact/contact_index.php?action=search&amp;param_company=".$OD->data_set->f("company_id")."&amp;tf_company=".urlencode("".$OD->data_set->f("company_name"));
+    }
+    $res["align"] = "center";
+  }
+
+  else if ($fieldname == "company_new_contact") {
+    $res["align"] = "center";
+    $res["url"] = "$path/contact/contact_index.php?action=new&amp;param_company=".$OD->data_set->f("company_id");
+    $res["name"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
+  }
+
+  else if ($fieldname == "company_deal_number") {
+    $res["name"] = $OD->data_set->f("company_deal_number") . " / ";
+    $res["name"] .= $OD->data_set->f("company_deal_total");
+    $c_id = $OD->data_set->f("company_id");
+    if ($res["name"] != "0 / 0") {
+      $res["url"] = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
+    }
+    $res["align"] = "center";
+  }
+  
+  else if ($fieldname == "company_address1") {
+    if ($OD->data_set->f("company_address1") != "") {
+      $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
+    }
+    if ($OD->data_set->f("company_address2") != "") {
+      $res["name"] .= $OD->data_set->f("company_address2")."<br />\n";
+    }
+    if ($OD->data_set->f("company_zipcode") != "" ) {
+      $res["name"] .= $OD->data_set->f("company_zipcode") . "&nbsp;&nbsp;";
+    } else {
+      $res["name"] .= "&nbsp;&nbsp;";
+    }
+    if ($OD->data_set->f("company_town") != "" ) {
+      $res["name"] .= $OD->data_set->f("company_town");
+    }
+  }
+
+  return $res;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company search Form                                               //
 // Parameters:
@@ -175,7 +262,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $dis_companies_list->data_url = $url;
   $dis_companies_list->data_header = "both";
   display_info_msg("$nb_company $l_found");
-  $dis_companies_list->display();
+  $dis_companies_list->display("dis_data_company");
 }
 
 

@@ -34,7 +34,7 @@ class OBM_DISPLAY {
   var $data_cb_show = 1;      // To set visible
                               //   1 -> visible
                               //   "string" if ->f["string"] == 0 -> visible
-  var $separator = ";";        // for file generation : .csv by default
+  var $separator = ";";       // for file generation : .csv by default
 
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY Constructor
@@ -57,13 +57,13 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   // OBM_DISPLAY main display function
   /////////////////////////////////////////////////////////////////////////////
-  function display() {
-    if($this->display_type == "PREFERENCES") {
+  function display($dis_data_entity="") {
+    if ($this->display_type == "PREFERENCES") {
       $this->check_preferences_vars();
       $this->dis_preferences();
-    }else if($this->display_type == "DATA") {
+    } else if ($this->display_type == "DATA") {
       $this->check_data_vars();
-      $this->dis_data();
+      $this->dis_data($dis_data_entity);
     }
   }
 
@@ -264,12 +264,12 @@ class OBM_DISPLAY {
 
   /////////////////////////////////////////////////////////////////////////////
   // Function that display the dataset
+  // Parameters:
+  //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
-  function dis_data() {
+  function dis_data($dis_data_entity) {
     global $col_textem,$col_table,$col_tableh,$col_error,$col_ok,$col_text_hot;
-    global $col_frs, $col_client,$col_balance_pos, $col_balance_neg,$col_text_redhot;
-    global $col_inc_redhot,$col_inc_hot,$col_inc_closed;
-    global $ico_mail,$ico_contact_new,$ico_web,$ico_ball, $ico_crow;
+    global $col_text_redhot;
     global $cdg_id, $set_debug, $set_theme, $set_rows;
     global $path, $time;
 
@@ -317,14 +317,6 @@ class OBM_DISPLAY {
 	  echo "<td class=\"OBMDisplayText\">&nbsp;</td>";
       }
 
-      //Incident Rows special Color
-      if ($this->data_set->f("incident_state") == "CLOSED")  {
-       $special_col_table=$col_inc_closed;
-      }elseif ($this->data_set->f("incident_priority") == "REDHOT")  {
-	$special_col_table=$col_inc_redhot;
-      }elseif ($this->data_set->f("incident_priority") == "HOT") {
-	$special_col_table=$col_inc_hot;
-      }
 
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
@@ -334,14 +326,8 @@ class OBM_DISPLAY {
 	$popup = false;
 	$popup_width = 600;
 	$popup_height = 400;
-	$ico = "";
 	$align = "left";
 	$fieldname = $this->display_pref->f("display_fieldname");
-
-        //=====================================================================
-        // Special parameters for some fields
-        // $url, $name (eg: to change color), $align,...
-        //=====================================================================
 
 	//------------------------------
 	// For any field to be used as a date field
@@ -350,179 +336,7 @@ class OBM_DISPLAY {
 	//------------------------------
 	// For date:
 	if (substr($fieldname,0,5) == "date_") {
-	  $name =date_format($this->data_set->f($fieldname));
-	}
-	//------------------------------
-	// For lists 
-	//------------------------------
-	// For contacts urls (link):
-	if ($fieldname == "list_contact_lastname") {
-	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("list_contact_id");
-	}
-	// For Company urls (link):
-	else if ($fieldname == "list_contact_company") {
-	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("list_contact_company_id");
-        }
-	
-	//------------------------------
-	// For the companies 
-	//------------------------------
-	else if ($fieldname == "company_name") {
-	   $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
-	}
-	else if ($fieldname == "company_archive") {
-          $align = "center";
-          if ($this->data_set->f($fieldname)) $name ="X";
-          else $name="&nbsp;";
-	}
-	else if ($fieldname == "company_email") {
-	  if (strcmp($this->data_set->f("company_email"),"") != 0) {
-	    $url = "mailto:".$this->data_set->f("company_email");
-	    $name = "<img src=\"/images/".$set_theme."/".$ico_mail."\" alt=\"".$this->data_set->f("company_email")."\" />";
-          }
-        } 
-	else if ($fieldname == "company_web") {
-	  if (strcmp($this->data_set->f("company_web"),"") != 0) {
-	    if (strcmp(substr($this->data_set->f("company_web"),0,5), "http:") != 0) {
-	      $url = "http://";
-	    }
-	    $url .= $this->data_set->f("company_web");
-	    $name = "<img src=\"/images/$set_theme/$ico_web\" alt=\"".$this->data_set->f("company_web")."\" />";
-	  }
-        }
-        else if ($fieldname == "company_contact_number") {
-	  $name = $this->data_set->f("company_contact_number");
-	  if ($name > 0) {
-	    $url = "$path/contact/contact_index.php?action=search&amp;param_company=".$this->data_set->f("company_id")."&amp;tf_company=".urlencode("".$this->data_set->f("company_name"));
-	  }
-          $align = "center";
-        }
-        else if ($fieldname == "company_new_contact") {
-          $align = "center";
-	  $url = "$path/contact/contact_index.php?action=new&amp;param_company=".$this->data_set->f("company_id");
-          $name = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
-        }
-        else if ($fieldname == "company_deal_number") {
-	  $name = $this->data_set->f("company_deal_number") . " / ";
-	  $name .= $this->data_set->f("company_deal_total");
-	  $c_id = $this->data_set->f("company_id");
-	  if ($name != "0 / 0") {
-	    $url = "$path/deal/deal_index.php?action=search&amp;param_company=$c_id";
-	  }
-          $align = "center";
-        }
-       
-        else if ($fieldname == "company_address1") {
-	  if ($this->data_set->f("company_address1") != "") {
-	    $name .= $this->data_set->f("company_address1")."<br />\n";
-	  }
-	  if ($this->data_set->f("company_address2") != "") {
-	    $name .= $this->data_set->f("company_address2")."<br />\n";
-	  }
-	  if ($this->data_set->f("company_zipcode") != "" ) {
-	    $name .= $this->data_set->f("company_zipcode") . "&nbsp;&nbsp;";
-	  } else {
-	    $name.= "&nbsp;&nbsp;";
-	  }
-	  if ($this->data_set->f("company_town") != "" ) {
-	    $name .= $this->data_set->f("company_town");
-	  }
-	}
-
-	//------------------------------
-	// For the contacts 
-	//------------------------------
-        else if (($fieldname == "contact_lastname") && $link_ok) {
-	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("contact_id");
-	}
-       	else if (($fieldname == "contact_company_name") && $link_ok){
-	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contact_company_id");
-	}
-	else if ($fieldname == "contact_archive") {
-          $align = "center";
-          if ($this->data_set->f($fieldname)) $name ="X";
-          else $name="&nbsp;";
-	}
-	else if ($fieldname == "contact_function") {
-	  $name = $this->data_set->f("contact_function");
-	}
-	else if ($fieldname == "contact_phone") {
-          $phone = $this->data_set->f("contact_phone");
-          $c_phone = $this->data_set->f("company_phone");
-          if ( (trim($phone) != "") && ($phone == $c_phone)) {
-            $phone = "($phone)";
-          }
-	  $name = $phone;
-	}
-	else if ($fieldname == "contact_email") {
-	  if (strcmp($this->data_set->f("contact_email"),"") != 0) {
-	    $url = "mailto:".$this->data_set->f("contact_email");
-	    $name = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"".$this->data_set->f("contact_email")."\" />";
-	  }
-        }
-
-	//------------------------------
-	// For the parentdeals and deals
-	//------------------------------
- 	else if ($fieldname == "parentdeal_label") {
-	  $url = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$this->data_set->f("parentdeal_id");
-	}
-        else if ($fieldname == "parentdeal_marketing_lastname") {
-	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_marketingmanager_id");
-	}
-        else if ($fieldname == "parentdeal_technical_lastname") {
-	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_technicalmanager_id");
-	} 
-	else if ($fieldname == "deal_label") {
-	  $name="";
-	  $url = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
-	}
-	else if ($fieldname == "deal_archive") {
-          $align = "center";
-          if ($this->data_set->f($fieldname)) $name ="X";
-          else $name="&nbsp;";
-	}
-	else if ($fieldname == "deal_hitrate") {
-          $align = "center";
-          $name = $this->data_set->f($fieldname) . " %";
-	}
-	else if ($fieldname == "deal_company_name") {
-	  $name="";
-	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("deal_company_id");
-        } 
-	else if ($fieldname == "deal_datealarm") {
-	  $date = $this->data_set->f($fieldname);
-	  $datealarm = date_format($date);
-	  $time = time();
-	  if ($time > ($date + 86400)) {
-            $name="<font color=\"#$col_error\">$datealarm</font>";
-	  } else if ($time > $date) {
-	    $name="<font color=\"#$col_ok\">$datealarm</font>";
-	  } else {
-	    $name="$datealarm";
-	  }
-	}
-
-	//------------------------------
-	// For the List
-	//------------------------------
- 	else if (($fieldname == "list_name")  && $link_ok) {
-	  $url = "list_index.php?action=detailconsult&amp;param_list=".$this->data_set->f("list_id");
-	}
-        else if ($fieldname == "list_nb_contact") {
-          $nb_q = new DB_OBM;
-          $id = $this->data_set->f("list_id");
-          $query = "select count(*) from ContactList where ContactList_listid='$id'";
-          $nb_q->query($query);
-	  $nb_q->next_record();
-	  $name = $nb_q->f(0);
-          $align = "center";
-	}
-	else if ($fieldname == "timecreate") {
-	  $name = datetime_format($this->data_set->f($fieldname));
-	}
-	else if ($fieldname == "timeupdate") {
-	  $name = datetime_format($this->data_set->f($fieldname));
+	  $name = date_format($this->data_set->f($fieldname));
 	}
 
         //-------------------------------------
@@ -541,162 +355,6 @@ class OBM_DISPLAY {
 	  }
 	  $name = "$amount";
 	}
-
-	//------------------------------
-	// For the users 
-	//------------------------------
-	else if (($fieldname == "userobm_login") && $link_ok) {
-	   $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("userobm_id");
-	}
-	else if ($fieldname == "userobm_email") {
-          $email = $this->data_set->f("userobm_email");
-	  if (strcmp($email ,"") != 0) {
-	    $url = "mailto:$email";
-	    $name = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\">$email";
-          }
-        } 
-	else if ($fieldname == "userobm_archive") {
-          $align = "center";
-          if ($this->data_set->f($fieldname)) $name ="X";
-          else $name="&nbsp;";
-	}
-	else if ($fieldname == "userobm_timelastaccess") {
-	  $date = $this->data_set->f($fieldname);
-	  $name = date_format($date);
-	}
-
-	//------------------------
-	// For the accounts :
-        //------------------------
-	elseif ($fieldname == "account_label") {
-	  $url="./account_index.php?action=detailconsult&amp;param_account=".$this->data_set->f("account_id");
-	}
-	elseif ( ($fieldname == "account_today") 
-		  || ($fieldname == "account_balance") ) {
-	  // balance column color :
-	  $balance = $this->data_set->f($fieldname);
-	  if ($balance > 0) {
-	    $couleur = $col_balance_pos;
-	  } else {
-	    $couleur = $col_balance_neg;
-	  }
-	  $name = "<font color=\"#$couleur\">$balance</font>";
-	}
-	elseif ($fieldname == "account_pay_label") {
-	  $url="./payment_index.php?action=detailconsult&amp;param_pay_label=".$this->data_set->f("account_pay_id");
-	}
-	elseif ($fieldname == "account_pay_amount") {
-	  // amount column color
-	  $amount = $this->data_set->f($fieldname);
-	  if ($this->data_set->f("payment_inout") == '+') {
-	    $couleur = $col_balance_pos;
-	  } else {
-	    $couleur = $col_balance_neg;
-	  }
-	  $name = "<font color=\"#$couleur\">$amount</font>";
-	}
-
-	//------------------------
-	// For the invoices :
-	//------------------------
-	elseif ($fieldname == "invoice_deal") {
-	  $url="$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$this->data_set->f("deal_id");
-	} elseif ($fieldname == "invoice_label") {
-	  $url="$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
-	} elseif ($fieldname == "invoice_company") {
-	  $url="$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
-	} elseif ($fieldname == "invoice_pay_label") {
-	  $url = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("invoice_payment_id");
-	} // amount column color 
-	elseif (($fieldname == "invoice_amount_HT") 
-		|| ($fieldname == "invoice_amount_TTC")
-		|| ($fieldname == "invoice_paid")) {
-
-	  $amount = $this->data_set->f($fieldname);
-	  if ($this->data_set->f("invoice_inout") == '+') {
-	    $couleur = $col_client;
-	  } else {
-	    $couleur = $col_frs;
-	  }
-	  $name = "$amount";
-	}
-        else if ($fieldname == "invoice_date") {
-	  $name = $this->data_set->f("date");
-	}
-
-        //------------------------
-	// For the payments :
-        //------------------------
-	elseif ($fieldname == "payment_label") {
-	  $url = "./payment_index.php?action=detailconsult&amp;param_payment=".$this->data_set->f("payment_id");
-	} elseif ($fieldname == "payment_account_lbl") {
-	  $url = "./account_index.php?action=detailconsult&amp;param_account=".$this->data_set->f("account_id");
-	} elseif ($fieldname == "pay_inv_label") {
-	  $url = "./invoice_index.php?action=detailconsult&amp;param_invoice=".$this->data_set->f("invoice_id");
-	} elseif ($fieldname == "pay_inv_company") {
-	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("company_id");
-	}// amount column color 
-	elseif (($fieldname == "payment_amount")
-		 || ($fieldname == "pay_inv_paid")) {
-	  $amount = $this->data_set->f($fieldname);
-	  if ( ($this->data_set->f("payment_inout") == '+') // for a payment
-	       // for an invoice
-	       || ($this->data_set->f("invoice_inout") == '+') ) {
-	    $couleur = $col_client;
-	  } else {
-	    $couleur = $col_frs;
-	  }
-	  $name = "<FONT COLOR=\"#$couleur\">$amount</FONT>";
-	}
-        else if ($fieldname == "payment_date") {
-	  $name = date_format($this->data_set->f("date"));
-	}
-        else if ($fieldname == "payment_expect_date") {
-	  $name = date_format($this->data_set->f("expect_date"));
-	}
-
-	//For Image scan (crow or round):
-	if($fieldname == "service_status") {
-	  $name = ($this->data_set->f($fieldname) == 1) ? "<img border=0 src=\"/images/$set_theme/$ico_ball\">" : "<img border=0 src=\"/images/$set_theme/$ico_crow\">";
-	  $align = "center";
-	}
-
-	//------------------------------
-	// For the contracts 
-	//------------------------------
-        else if ($fieldname == "contract_label") {
-	  $url = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$this->data_set->f("contract_id");
-	}
-       	else if ($fieldname == "contract_company_name") {
-	  $url = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$this->data_set->f("contract_company_id");
-       	}
-        else if ($fieldname == "contract_marketmanager") {
-	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_techmanager_id");
-	  $name = $this->data_set->f("lmarket") . " " . $this->data_set->f("fmarket");
-	}
-        else if ($fieldname == "contract_techmanager") {
-	  $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_marketmanager_id");
-	  $name = $this->data_set->f("ltech") . " " . $this->data_set->f("ftech");
-	}
-        else if ($fieldname == "contract_dateexp") {
-	  $date = $this->data_set->f($fieldname);
-	  $name = date_format($date);
-	}
-	//------------------------------
-	// For the incidents 
-	//------------------------------
-        else if ($fieldname == "incident_label") {
-	  $url = "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
-	}
-       	else if ($fieldname == "incident_owner_lastname") {
-	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_owner");
-	}
-       	else if ($fieldname == "incident_logger_lastname") {
-	  $url = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
-	}
-        else if ($fieldname == "incident_date") {
-	  $name = date_format($this->data_set->f("date"));
-	}
 	
         //------------------------------
         // For the time management
@@ -712,15 +370,19 @@ class OBM_DISPLAY {
 	else if ($fieldname == "task_id")
            $name = " ";
  
-        //===================
-        // Final cell writing
-        //===================
-        // if ($special_col_table != "") {
-	//   $td = "<td align=\"$align\" bgcolor=\"#$special_col_table\">";
-        // }
-	// else {
-	//   $td = "<td align=\"$align\" bgcolor=\"#$col_table\">";
-	// }
+
+
+        //--------------------------------------------------
+        // We call module specific field display disposition
+        //--------------------------------------------------
+	if (function_exists($dis_data_entity)) {
+	  $res = $dis_data_entity($this, $fieldname, $link_ok);
+	  $align = $res["align"];
+	  $name = $res["name"];
+	  $url = $res["url"];
+	} else {
+	  $name = $this->data_set->f($fieldname);
+	}	  
 
 	// Set the alignment
 	if ($align == "center") {
@@ -765,7 +427,6 @@ class OBM_DISPLAY {
       }
       $this->display_pref->seek(0);
       echo "</tr>";
-      $special_col_table="";
     }
 
     //--------------------------------------------------------
@@ -892,7 +553,7 @@ class OBM_DISPLAY {
 
     $this->display_pref->seek(0);
     
-    while($this->display_pref->next_record()) {
+    while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
       $label = $fieldnames[$fieldname];
 
@@ -912,7 +573,7 @@ class OBM_DISPLAY {
 
     $this->dis_data_header_file($sep);
 
-	//    echo "nb lignes : ". $this->data_set->num_rows() . "\n";
+    //    echo "nb lignes : ". $this->data_set->num_rows() . "\n";
     // Iteration on each data row of dataset
     while ($this->data_set->next_record()) {
       $this->display_pref->seek(0);
@@ -920,17 +581,15 @@ class OBM_DISPLAY {
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
       while ($this->display_pref->next_record()) {
-   	    $fieldname = $this->display_pref->f("display_fieldname");
-
- 
+	$fieldname = $this->display_pref->f("display_fieldname");
         echo $this->data_set->f($fieldname) . $sep;
-	  }
-	  echo "\n";
-	}
- 	echo "\n\n\n";
+      }
 
+      echo "\n";
+    }
+    echo "\n\n\n";
+    
   }
-
 
 
 } // End of the object OBM_DISPLAY

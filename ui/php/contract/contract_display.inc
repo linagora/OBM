@@ -21,6 +21,45 @@ $fieldnames["contract_marketmanager"] = $l_marketing_manager;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Contract specific dataset fields                                  //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_contract(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme;
+
+  if ($fieldname == "contract_label") {
+    $res["url"] = "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$OD->data_set->f("contract_id");
+  }
+
+  else if ($fieldname == "contract_company_name") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contract_company_id");
+  }
+
+  else if ($fieldname == "contract_marketmanager") {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_techmanager_id");
+    $res["name"] = $OD->data_set->f("lmarket") . " " . $OD->data_set->f("fmarket");
+  }
+
+  else if ($fieldname == "contract_techmanager") {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("contract_marketmanager_id");
+    $res["name"] = $OD->data_set->f("ltech") . " " . $OD->data_set->f("ftech");
+  }
+
+  else if ($fieldname == "contract_dateexp") {
+    $date = $OD->data_set->f($fieldname);
+    $res["name"] = date_format($date);
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Contract search form                                              //
 // Parameters : 
 //   - $contract[] : default form values
@@ -172,7 +211,7 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
 
   $contract_q->seek($first_row);
 
-  $dis_contracts_list = new obm_display("DATA", $obm_q_display_options);
+  $dis_contracts_list = new OBM_DISPLAY("DATA", $obm_q_display_options);
   $dis_contracts_list->data_set = $contract_q;
   $dis_contracts_list->data_url = $url;
   $dis_contracts_list->data_header = "both";
@@ -180,7 +219,7 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
   // --- html template --------------------------------------------------------
 
   display_info_msg($nb_contract." ".$l_found);
-  $dis_contracts_list->display() ;
+  $dis_contracts_list->display("dis_data_contract");
 }
 
 
@@ -819,7 +858,7 @@ function dis_type_links($id) {
 function dis_contract_display_pref($pref_q) {
   global $l_contract_display;
   
-  $dis_pref = new obm_display("PREFERENCES", $pref_q);
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $pref_q);
   $dis_pref->display_entity = "contract"; 
   $dis_pref->pref_title = $l_contract_display;
   $dis_pref->pref_dis_help = 1;

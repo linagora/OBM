@@ -40,6 +40,60 @@ $fieldnames["entrytemp_comment"] = $l_entrytemp_comment;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Payment specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_payment(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $col_frs, $col_client;
+
+  if ($fieldname == "payment_label") {
+    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("payment_id");
+  }
+
+  elseif ($fieldname == "payment_account_lbl") {
+    $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;param_account=".$OD->data_set->f("account_id");
+  }
+
+  elseif ($fieldname == "pay_inv_label") {
+    $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$OD->data_set->f("invoice_id");
+  }
+
+  elseif ($fieldname == "pay_inv_company") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+  }
+
+  // amount column color 
+  elseif (($fieldname == "payment_amount")
+	  || ($fieldname == "pay_inv_paid")) {
+    $amount = $OD->data_set->f($fieldname);
+    if ( ($OD->data_set->f("payment_inout") == '+') // for a payment
+	 // for an invoice
+	 || ($OD->data_set->f("invoice_inout") == '+') ) {
+      $couleur = $col_client;
+    } else {
+      $couleur = $col_frs;
+    }
+    $res["name"] = "<font color=\"#$couleur\">$amount</font>";
+  }
+  
+  else if ($fieldname == "payment_date") {
+    $res["name"] = date_format($OD->data_set->f("date"));
+  }
+   
+  else if ($fieldname == "payment_expect_date") {
+    $res["name"] = date_format($OD->data_set->f("expect_date"));
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // creating/updating payment form
 // $q_payment if update, data about that payment
 // $q_paymentkind data about all existing payment kinds
@@ -457,7 +511,7 @@ function html_payment_search_form ($p_action, $q_paymentkind, $q_account, $payme
 ///////////////////////////////////////////////////////////////////////////////
 // matching payment found display
 ///////////////////////////////////////////////////////////////////////////////
-function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $payment){
+function html_payment_search_list ($q_payment, $payment_options, $nb_payment, $payment){
   // themes
   global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
   global $l_found;
@@ -472,10 +526,6 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   $kind = $payment["kind"];
   $account = $payment["account"];
 
-  echo "<CENTER><FONT color=\"#$col_textem\">";
-  echo "$nb_payments $l_found";
-  echo "</FONT><BR></CENTER>";
-
   $url = url_prepare("payment_index.php?action=search".
 		    "&amp;tf_label=$label".
 		    "&amp;tf_number=$number".
@@ -489,7 +539,8 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   $dis_payment->data_header = "top";
   $dis_payment->data_url = $url;
 
-  $dis_payment->display ();
+  display_info_msg("$nb_payment $l_found");
+  $dis_payment->display ("dis_data_payment");
 }
 
 
@@ -595,11 +646,9 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   if ($action == "detailconsult") {
     // if $action == "search_invoice", we don't need those buttons...
     echo "
-      <tr><td>";
-    echo"
+      <tr><td>
        <table border=$border cellspacing=$cellspacing width=\"100%\">
-        <tr>";
-    echo "
+        <tr>
        <form method=post name=form_payment_update action=\"\">
          <td align=\"center\">";
     // we do not need that button if the payment is checked :
@@ -623,18 +672,15 @@ function html_payment_consult ($action, $q_payment, $q_paymentkind,$q_account, $
   // but not to show it :
     echo "
   <input type=hidden name=\"hd_inout\" ".
-      " value=\"".$q_payment->f("payment_inout")."\">";
-    echo "
+      " value=\"".$q_payment->f("payment_inout")."\">
         </td>
-       </form>";
-    echo "
+       </form>
      </tr></table>
      </td></tr>
 ";
   }
   echo "
-     </td></tr>";
-  echo "
+     </td></tr>
     </table><br><br>";
   // we display the invoice connected to that payment (if not banking)
   if ($action == "detailconsult" || $action == "search_invoice") {

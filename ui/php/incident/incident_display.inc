@@ -24,6 +24,54 @@ $fieldnames["incident_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Incident specific dataset fields                                  //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_incident(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme;
+  global $col_inc_redhot, $col_inc_hot, $col_inc_closed;
+
+  if ($fieldname == "incident_label") {
+    $res["url"] = "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$OD->data_set->f("incident_id");
+  }
+
+  else if ($fieldname == "incident_owner_lastname") {
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("incident_owner");
+  }
+
+  else if ($fieldname == "incident_logger_lastname") {
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("incident_logger");
+  }
+
+  else if ($fieldname == "incident_date") {
+    $res["name"] = date_format($OD->data_set->f("date"));
+  }
+
+  else if ($fieldname == "incident_priority") {
+    $pri = $OD->data_set->f($fieldname);
+    if ($pri == "Red Hot") {
+      $col = $col_inc_redhot;
+    } elseif ($pri == "Hot") {
+      $col = $col_inc_hot;
+    } elseif ($pri == "Normal") {
+      $col = $col_inc_closed;
+    } else {
+      $col = "AAAAA";
+    }
+      $col = "AAAAA";
+    $res["name"] = "<font color=\"#$col\">$pri</font>";
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Incident search Form                                              //
 // Parameters:
 //   - $usr_q      : DB result object (userobm list)
@@ -200,7 +248,7 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
   // --- HTML Template --------------------------------------------------------
 
   display_info_msg("$nb_incident $l_found");
-  $dis_incidents_list->display();
+  $dis_incidents_list->display("dis_data_incident");
 }
 
 

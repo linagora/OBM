@@ -33,6 +33,53 @@ $fieldnames["list_contact_email"] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display List specific dataset fields                                      //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_list(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme;
+
+  if (($fieldname == "list_name")  && $link_ok) {
+    $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
+  }
+  
+  else if ($fieldname == "list_nb_contact") {
+    $nb_q = new DB_OBM;
+    $id = $OD->data_set->f("list_id");
+    $query = "select count(*) from ContactList where ContactList_listid='$id'";
+    $nb_q->query($query);
+    $nb_q->next_record();
+    $res["name"] = $nb_q->f(0);
+    $res["align"] = "center";
+  }
+  
+  else if ($fieldname == "timecreate") {
+    $res["name"] = datetime_format($OD->data_set->f($fieldname));
+  }
+
+  else if ($fieldname == "timeupdate") {
+    $res["name"] = datetime_format($OD->data_set->f($fieldname));
+  }
+
+  // For contacts urls (link):
+  else if ($fieldname == "list_contact_lastname") {
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("list_contact_id");
+  }
+
+  else if ($fieldname == "list_contact_company") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("list_contact_company_id");
+  }
+  
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display List search Form                                                  //
 // Parameters : 
 //   - $list[]        : default form values
@@ -155,7 +202,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
   $dis_list->data_set = $obm_q;
   $dis_list->data_header = "both";
   $dis_list->data_url = $url;
-  $dis_list->display();
+  $dis_list->display("dis_data_list");
 
   if ($popup) {
     echo "<input type=\"submit\" value=\"$l_add\" /> 
@@ -231,7 +278,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       echo "<form method=\"get\" action=\"list_index.php\">";
     }
 
-    $dis_infos->display();
+    $dis_infos->display("dis_data_list");
 
     if ($perm->have_perm("editor")) {
       echo "

@@ -46,6 +46,68 @@ $fieldnames["invoice_company"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Deal specific dataset fields                                      //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_deal(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $col_ok, $col_error;
+
+  if ($fieldname == "parentdeal_label") {
+    $res["url"] = "$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$OD->data_set->f("parentdeal_id");
+  }
+
+  else if ($fieldname == "parentdeal_marketing_lastname") {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_marketingmanager_id");
+  }
+
+  else if ($fieldname == "parentdeal_technical_lastname") {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("parentdeal_technicalmanager_id");
+  }
+
+  else if ($fieldname == "deal_label") {
+    $res["name"] = "";
+    $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
+  }
+
+  else if ($fieldname == "deal_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
+    else $res["name"] = "&nbsp;";
+  }
+
+  else if ($fieldname == "deal_hitrate") {
+    $res["align"] = "center";
+    $res["name"] = $OD->data_set->f($fieldname) . " %";
+  }
+
+  else if ($fieldname == "deal_company_name") {
+    $res["name"] = "";
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("deal_company_id");
+  }
+  
+  else if ($fieldname == "deal_datealarm") {
+    $date = $OD->data_set->f($fieldname);
+    $datealarm = date_format($date);
+    $time = time();
+    if ($time > ($date + 86400)) {
+      $res["name"] = "<font color=\"#$col_error\">$datealarm</font>";
+    } else if ($time > $date) {
+      $res["name"] = "<font color=\"#$col_ok\">$datealarm</font>";
+    } else {
+      $res["name"] = "$datealarm";
+    }
+  }
+  
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Deal index page                                                   //
 // Parameters:
 //   - $deal[] : hash with deal and parent deal values
@@ -338,7 +400,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 
   display_info_msg($nb_deal." ".$l_found);
 
-  $dis_deals_list->display();
+  $dis_deals_list->display("dis_data_deal");
 
 }
 
@@ -1767,7 +1829,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $obm_dis_list_parentdeal->data_header = "both";
   $obm_dis_list_parentdeal->data_idfield = "parentdeal_id"; 
   $obm_dis_list_parentdeal->data_set->seek($first_row);
-  $obm_dis_list_parentdeal->display();
+  $obm_dis_list_parentdeal->display("dis_data_deal");
 }
 
 

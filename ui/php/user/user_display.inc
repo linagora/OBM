@@ -20,6 +20,44 @@ $fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
+
+///////////////////////////////////////////////////////////////////////////////
+// Display User specific dataset fields                                      //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_user(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $ico_mail;
+
+  if (($fieldname == "userobm_login") && $link_ok) {
+    $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("userobm_id");
+  }
+  else if ($fieldname == "userobm_email") {
+    $email = $OD->data_set->f("userobm_email");
+    if (strcmp($email ,"") != 0) {
+      $res["url"] = "mailto:$email";
+      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\">$email";
+    }
+  } 
+  else if ($fieldname == "userobm_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] = "X";
+    else $res["name"] = "&nbsp;";
+  }
+  else if ($fieldname == "userobm_timelastaccess") {
+    $date = $OD->data_set->f($fieldname);
+    $res["name"] = date_format($date);
+  }
+
+  return $res;
+
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display User search form                                                  //
 // Parameters:
@@ -168,7 +206,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
   // --- HTML Template --------------------------------------------------------
   display_info_msg("$nb_user $l_found");
   echo $display_popup_head;
-  $user_d->display();
+  $user_d->display("dis_data_user");
   echo $display_popup_end;
 
 }

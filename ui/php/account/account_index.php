@@ -57,17 +57,7 @@ if ($action == "index" || $action == "") {
   require("account_js.inc");
   html_account_search_form ($action, $account);
   if ($set_display == "yes") {
-    $obm_q = run_query_search($account, $new_order, $order_dir);
-    $nb_accounts = $obm_q->num_rows();
-    if ($nb_accounts == 0) {
-      display_warn_msg($l_no_found);
-   } else {
-     $display_prefs = run_query_display_pref ($auth->auth["uid"], "account");
-     //run_query_display_options($auth->auth["uid"], "account");
-
-     html_account_search_list($obm_q, $display_prefs, $nb_accounts, $account);
-   }
-     
+    dis_account_search_list($account);
   } else {
     display_ok_msg($l_no_display);
   }
@@ -76,16 +66,8 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   html_account_search_form($action, $account);
+  dis_account_search_list($account);
   
-  $obm_q = run_query_search($account, $new_order, $order_dir);
-  $nb_accounts = $obm_q->num_rows();
-  if ($nb_accounts == 0) {
-    display_warn_msg($l_no_found);
-  } else {
-    $display_pref = run_query_display_pref ($auth->auth["uid"], "account");
-    html_account_search_list($obm_q, $display_pref, $nb_accounts, $account);
-  }
-
 } elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
@@ -142,6 +124,7 @@ if ($action == "index" || $action == "") {
     require("account_js.inc");
     html_account_search_form($action,'');
   }
+
 } elseif ($action == "compute_balance") {
 ///////////////////////////////////////////////////////////////////////////////
   /*  if (true){
@@ -240,10 +223,10 @@ function get_param_account() {
   if (isset ($ta_comment)) $account["comment"] = $ta_comment;
   
   if (($set_debug > 0) && (($set_debug & $cdg_param) == $cdg_param)) {
-    echo "<BR>action = $action";
+    echo "<br />action = $action";
     if ( $account ) {
       while ( list( $key, $val ) = each( $account ) ) {
-        echo "<BR>account[$key]=$val";
+        echo "<br />account[$key]=$val";
       }
     }
   }

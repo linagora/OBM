@@ -40,6 +40,55 @@ $fieldnames["payment_amount"] = $l_invoice_payment_amount;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Invoice specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_invoice(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $col_frs, $col_client;
+
+  if ($fieldname == "invoice_deal") {
+    $res["url"] = "$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$OD->data_set->f("deal_id");
+  }
+
+  elseif ($fieldname == "invoice_label") {
+    $res["url"] = "$path/invoice/invoice_index.php?action=detailconsult&amp;param_invoice=".$OD->data_set->f("invoice_id");
+  }
+
+  elseif ($fieldname == "invoice_company") {
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
+  }
+  
+  elseif ($fieldname == "invoice_pay_label") {
+    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_payment=".$OD->data_set->f("invoice_payment_id");
+  }
+
+  // amount column color 
+  elseif (($fieldname == "invoice_amount_HT") 
+	  || ($fieldname == "invoice_amount_TTC")
+	  || ($fieldname == "invoice_paid")) {
+    $amount = $OD->data_set->f($fieldname);
+    if ($OD->data_set->f("invoice_inout") == '+') {
+      $couleur = $col_client;
+    } else {
+      $couleur = $col_frs;
+    }
+    $res["name"] = "$amount";
+  }
+
+  else if ($fieldname == "invoice_date") {
+    $res["name"] = $OD->data_set->f("date");
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // invoice search Form
 // Parameters :
 //  $p_action : current action in the application
@@ -460,7 +509,7 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
 // $q_display_options : fields to display in the list of invoices
 // $nb_invoices : number of invoices
 //
-function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices, $invoice) {
+function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoice, $invoice) {
   //-- Themes
   global $col_tableh,$col_textem,$col_table,$col_error, $col_frs, $col_client;
   //-- Labels
@@ -480,9 +529,6 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
   $deal = urlencode($invoice["deal"]);
   $company = urlencode($invoice["company"]);
 
-  echo "<center><font color=\"#$col_textem\">\n";
-  echo "$nb_invoices $l_found\n";
-  echo "</font><br></center>\n";
 
   $url = url_prepare("invoice_index.php?action=search".
 		    "&amp;tf_label=$label".
@@ -508,12 +554,14 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
     $dis_invoice->data_cb_name = "archive_";
   }
 
-  $dis_invoice->display ();
+  display_info_msg("$nb_invoice $l_found");
+  $dis_invoice->display("dis_data_invoice");
   if ($auth->auth["perm"] == $perms_admin) {
     echo "<input type=\"submit\" value=\"$l_archive_update\">
  </form>";
   }
-} // html_invoice_search_list ()
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Display the screen used to change the display parameters of invoices

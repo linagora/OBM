@@ -28,6 +28,251 @@ $fieldnames["payment_amount"] = $l_amount;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Account specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_account(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme,$col_balance_pos, $col_balance_neg;
+
+  if ($fieldname == "account_label") {
+    $res["url"] = "$path/account/account_index.php?action=detailconsult&amp;param_account=".$OD->data_set->f("account_id");
+  }
+
+  elseif ( ($fieldname == "account_today") 
+	   || ($fieldname == "account_balance") ) {
+    // balance column color :
+    $balance = $OD->data_set->f($fieldname);
+    if ($balance > 0) {
+      $couleur = $col_balance_pos;
+    } else {
+      $couleur = $col_balance_neg;
+    }
+    $res["name"] = "<font color=\"#$couleur\">$balance</font>";
+  }
+
+  elseif ($fieldname == "account_pay_label") {
+    $res["url"] = "$path/payment/payment_index.php?action=detailconsult&amp;param_pay_label=".$OD->data_set->f("account_pay_id");
+  }
+
+  elseif ($fieldname == "account_pay_amount") {
+    // amount column color
+    $amount = $OD->data_set->f($fieldname);
+    if ($OD->data_set->f("payment_inout") == '+') {
+      $couleur = $col_balance_pos;
+    } else {
+      $couleur = $col_balance_neg;
+    }
+    $res["name"] = "<font color=\"#$couleur\">$amount</font>";
+  }
+
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Account Search Form
+// Parameters :
+//  $p_action : current action in the application
+//  $account hash table containing values for
+//  name account and number.
+///////////////////////////////////////////////////////////////////////////////
+function html_account_search_form ($p_action, $account) {
+  global $l_label_start, $l_bank, $l_number, $l_find;
+
+  $label = $account["label"];
+  $bank = $account["bank"];
+  $number = $account["number"];
+
+  $url = url_prepare("account_index.php");
+
+  echo "
+  <form method=\"get\" name=\"form_account\"
+    onSubmit=\"if (check_form(this) == false) return false; else return true;\"
+    action=\"$url\">
+  <table class=\"details\">
+  <tr>
+    <td class=\"textLabelForm\">$l_label_start<br />
+      <input name=\"tf_label\" size=\"20\" value=\"$label\" />
+    </td>
+    <td>&nbsp;&nbsp;</td>
+    <td class=\"textLabelForm\">$l_bank<br />
+      <input name=\"tf_bank\" size=\"20\" value=\"$bank\" />
+    </td>
+    <td>&nbsp;&nbsp;</td>
+    <td class=\"textLabelForm\">$l_number<br />
+      <input name=\"tf_number\" size=\"12\" value=\"$number\" />
+    </td>
+    <td>&nbsp;&nbsp;&nbsp;&nbsp;
+      <input name=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" type=\"submit\" value=\"$l_find\" />
+    </td>
+  </tr>
+  </table>
+  </form>
+  <hr />";
+}  
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Account search result                                         //
+// Parameters:
+//   - $account[] : account search criteria
+//     keys used   : label, bank, number
+///////////////////////////////////////////////////////////////////////////////
+function dis_account_search_list($account) {
+  global $l_no_found;
+  global $auth, $new_order, $order_dir;
+
+  $pref_q = run_query_display_pref($auth->auth["uid"], "account");
+  $obm_q = run_query_search($account, $new_order, $order_dir);
+  $nb_account = $obm_q->num_rows();
+  if ($nb_account == 0) {
+    display_info_msg($l_no_found);
+  } else {
+    html_account_search_list($obm_q, $pref_q, $nb_account, $account);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Search result
+// Parameters:
+//   - $acc_q      : list of accounts
+//   - $pref_q     : the fields which have to be displayed
+//   - $nb_account : number of accounts
+//   - $account[]  : accounts search criteria
+//     keys used   : label, bank, number
+///////////////////////////////////////////////////////////////////////////////
+function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
+  global $l_label, $l_bank, $l_number, $l_found;
+
+  $label = urlencode($account["label"]);
+  $bank = urlencode($account["bank"]);
+  $number = urlencode($account["number"]);
+
+  $url = url_prepare("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
+
+  $dis_account = new OBM_DISPLAY("DATA", $pref_q);
+  $dis_account->data_set = $acc_q;
+  $dis_account->data_url = $url;
+
+  display_info_msg("$nb_account $l_found");
+  $dis_account->display("dis_data_account");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Parameters :
+// ------------
+//  $obm_q_account : information about the account
+//  $p_action : action in account_index.php that brought us here
+///////////////////////////////////////////////////////////////////////////////
+function html_account_consult($obm_q_account, $p_action){
+  // -- Themes
+  global $set_theme,$col_label,$col_table,$col_textem,$col_ok;
+  // - Labels
+  global $l_update,$l_delete,$l_insert;
+  global $col_balance_neg, $col_balance_pos;
+  global $l_label,$l_comment,$l_bank, $l_number, $l_balance,$l_compute_balance;
+  global $auth, $perms_user,$l_perms_user;
+  global $border, $cellspacing;
+
+
+  $label = $obm_q_account->f("account_label");
+  $number = $obm_q_account->f("account_number");
+  $today = $obm_q_account->f("account_today");
+  $bank = $obm_q_account->f("account_bank");
+  $comment = nl2br($obm_q_account->f("account_comment"));
+
+  $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
+
+  
+  // number and label
+  echo "
+  <center>
+  <table border=$border cellspacing=$cellspacing>
+  <tr>
+    <td>
+      <table border=$border cellspacing=$cellspacing width=\"100%\">
+      <tr>
+        <td width=\"60%\">
+          <font color=\"#$col_label\">$l_label</font>
+          <br />$label
+        </td>
+        <td width=\"20%\">
+          <font color=\"#$col_label\">$l_number</font>
+          <br />$number
+        </td>
+        <td width=\"20%\">
+         <font color=\"#$col_label\">$l_balance</font><br>
+         <font color=\"#$col_balance\">$today</font>
+        </td>
+      </tr>
+      </table>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <font color=\"#$col_label\">$l_bank</font>
+      <br />$bank
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <font color=\"#$col_label\">$l_comment</font>
+      <br />$comment
+    </td>
+  </tr>";
+
+  // we display buttons only if we need them :
+  if ($p_action == "detailconsult") {
+    echo "<br /><br /><br />
+    <tr><td>";  
+    // update/ compute balance of the account
+    echo "
+     <table border=$border cellspacing=$cellspacing width=\"100%\">
+      <tr><td align=\"center\" valign=\"top\">";
+    // if ($auth->auth["perm"] != $perms_user) {
+    echo "
+       <form method=\"post\" action=\"\">";
+    $url_upd = url_prepare("account_index.php?action=detailupdate".
+			   "&amp;param_account=".
+			   $obm_q_account->f("account_id"));
+    $url_comp = url_prepare("account_index.php?action=compute_balance".
+			   "&amp;param_account=".
+			   $obm_q_account->f("account_id"));
+    
+    echo " 
+        <input type=\"button\" value=\"$l_update\" ".
+      "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
+
+    // compute the balance 
+    // useless ?
+//        <input type=hidden name=hd_balance value=\"".
+//      $obm_q_account->f("account_balance")."\">
+    echo "
+      </td><td align=\"center\" valign=\"top\">
+        <input type=\"button\" value=\"$l_compute_balance\" ".
+      "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
+       </form>
+      </td></tr>
+     </table>";
+    //}
+    echo "
+    </td></tr>";
+  }
+  echo "
+   </table>
+  </center>";
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Account Form              
 // Parameters:
 //  $obm_q_account : if updating, contains the account current info
@@ -161,95 +406,6 @@ function html_account_form($obm_q_account, $action) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Account Search Form
-// Parameters :
-//  $p_action : current action in the application
-//  $account hash table containing values for
-//  name account and number.
-///////////////////////////////////////////////////////////////////////////////
-function html_account_search_form ($p_action, $account) {
-  global $l_label_start, $l_bank, $l_number, $l_find;
-
-  $label = $account["label"];
-  $bank = $account["bank"];
-  $number = $account["number"];
-
-  $url = url_prepare("account_index.php?action=search");
-  echo "
-<center>
- <form method=\"post\" name=\"form_account\" ".
-    " onSubmit=\"if (check_form(this) == false) return false ;".
-    " else return true;\"".
-    " action=\"$url\">";
-  echo "
-  <table border=0>
-   <tr>";
-  //--------------------------------------------------------------------------
-  // account label
-  echo "<td>
-    <font size=\"-2\">".$l_label_start."</font><br>
-    <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"".$label."\"
-   </td>";
-  //--------------------------------------------------------------------------
-  // bank name 
-  echo "<td><font size=\"-2\">".$l_bank."</font><br>".
-    "<input type=\"text\" name=\"tf_bank\" size=\"40\" value=\"".$bank.
-    "\"</td>";
-  //--------------------------------------------------------------------------
-  // account number 
-  echo "<td><font size=\"-2\">".$l_number."</font><br>".
-    "<input type=\"text\" name=\"tf_number\" size=\"12\" value=\"".$number.
-    "\"</td>";
-  //--------------------------------------------------------------------------
-  // bouton valider
-  echo "<td valign=\"bottom\"> ";
-  echo "<input name=\"submit\" type=\"submit\" value=\"$l_find\"></td>";
-  echo "</tr></table></form><hr></center>";
-}  
-
-///////////////////////////////////////////////////////////////////////////////
-// Display Search result (if it has to be done                               //
-// if ($set_display != "no") or if it comes from the submit bouton           //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// $obm_q_accounts : list of accounts
-// $obm_q_display_options : fields to display in the list of accounts
-// $nb_accounts : number of accounts
-//
-// $account hash table containing :
-// $label,
-// $bank,
-// $number values of search fields
-function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_accounts, $account) {
-  //-- Themes
-  global $col_tableh,$col_textem,$col_table,$col_error;
-  //-- Labels
-  global $l_label,$l_bank,$l_number;
-  global $l_found;
-  global $perms_user,$l_perms_user;
-
-  $label = urlencode($account["label"]);
-  $bank = urlencode($account["bank"]);
-  $number = urlencode($account["number"]);
-
-  echo "<center><font color=\"#$col_textem\">$nb_accounts $l_found</font>
-    <br /></center>";
-
-  $url = url_prepare("account_index.php?action=search".
-		    "&amp;tf_label=$label".
-		    "&amp;tf_bank=$bank".
-		    "&amp;tf_number=$number");
-  $dis_account = new OBM_DISPLAY("DATA",$obm_q_display_options);
-  $dis_account->data_set = $obm_q_accounts;
-  $dis_account->data_url = $url;
-
-  $url = url_prepare("account_index.php?action=search&amp;tf_label=$label&amp;tf_bank=$bank&amp;tf_number=$number");
-
-  $dis_account->display ();
-} // html_account_search_list ()
-
-
 //////////////////////////////////////////////////////////////////////////
 // Display the screen used to change the display parameters of accounts
 //////////////////////////////////////////////////////////////////////////
@@ -286,113 +442,7 @@ function dis_account_display_pref ($account_options, $payment_options) {
 
   echo  "</center>" ;
 }
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// ------------
-//  $obm_q_account : information about the account
-//  $p_action : action in account_index.php that brought us here
-///////////////////////////////////////////////////////////////////////////////
-function html_account_consult($obm_q_account, $p_action){
-  // -- Themes
-  global $set_theme,$col_label,$col_table,$col_textem,$col_ok;
-  // - Labels
-  global $l_update,$l_delete,$l_insert;
-  global $col_balance_neg, $col_balance_pos;
-  global $l_label,$l_comment,$l_bank, $l_number;
-  global $l_balance, $l_compute_balance;
-  global $auth, $perms_user,$l_perms_user;
-  global $border, $cellspacing;
 
-
-  $label = $obm_q_account->f("account_label");
-  $number = $obm_q_account->f("account_number");
-  $today = $obm_q_account->f("account_today");
-  $bank = $obm_q_account->f("account_bank");
-  $comment = nl2br($obm_q_account->f("account_comment"));
-
-  $col_balance = ($obm_q_account->f("account_balance")>0) ? $col_balance_pos:$col_balance_neg;
-
-  
-  // number and label
-  echo "
-  <center>
-  <table border=$border cellspacing=$cellspacing>
-  <tr>
-    <td>
-      <table border=$border cellspacing=$cellspacing width=\"100%\">
-      <tr>
-        <td width=\"60%\">
-          <font color=\"#$col_label\">$l_label</font>
-          <br />$label
-        </td>
-        <td width=\"20%\">
-          <font color=\"#$col_label\">$l_number</font>
-          <br />$number
-        </td>
-        <td width=\"20%\">
-         <font color=\"#$col_label\">$l_balance</font><br>
-         <font color=\"#$col_balance\">$today</font>
-        </td>
-      </tr>
-      </table>
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <font color=\"#$col_label\">$l_bank</font>
-      <br />$bank
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <font color=\"#$col_label\">$l_comment</font>
-      <br />$comment
-    </td>
-  </tr>";
-
-  // we display buttons only if we need them :
-  if ($p_action == "detailconsult") {
-    echo "<br><br><br>";
-
-    echo "
-    <tr><td>";  
-    // update/ compute balance of the account
-    echo "
-     <table border=$border cellspacing=$cellspacing width=\"100%\">
-      <tr><td align=\"center\" valign=\"top\">";
-    // if ($auth->auth["perm"] != $perms_user) {
-    echo "
-       <form method=\"post\" action=\"\">";
-    $url_upd = url_prepare("account_index.php?action=detailupdate".
-			   "&amp;param_account=".
-			   $obm_q_account->f("account_id"));
-    $url_comp = url_prepare("account_index.php?action=compute_balance".
-			   "&amp;param_account=".
-			   $obm_q_account->f("account_id"));
-    
-    echo " 
-        <input type=\"button\" value=\"$l_update\" ".
-      "onClick=\"this.form.action='$url_upd' ; this.form.submit ();\">";
-
-    // compute the balance 
-    // useless ?
-//        <input type=hidden name=hd_balance value=\"".
-//      $obm_q_account->f("account_balance")."\">
-    echo "
-      </td><td align=\"center\" valign=\"top\">
-        <input type=\"button\" value=\"$l_compute_balance\" ".
-      "onClick=\"this.form.action='$url_comp' ; this.form.submit ();\">
-       </form>
-      </td></tr>
-     </table>";
-    //}
-    echo "
-    </td></tr>";
-  }
-  echo "
-   </table>
-  </center>";
-}
 
 ///////////////////////////////////////////////////////////////////////////////
 // displays an error message when 

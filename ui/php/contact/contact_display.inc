@@ -25,6 +25,57 @@ $fieldnames["contact_company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Display Contact specific dataset fields                                   //
+// Parameters:
+//   - $OD        : OBM_DISPLAY object (passed by reference)
+//   - $fieldname : field to display
+//   - $link_ok   : true if links must be displayed
+// Returns:
+//   - $res : hash with 'name', 'url', 'align' values
+///////////////////////////////////////////////////////////////////////////////
+function dis_data_contact(&$OD, $fieldname, $link_ok) {
+  global $path, $set_theme, $ico_mail;
+
+  if (($fieldname == "contact_lastname") && $link_ok) {
+    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
+  }
+
+  else if (($fieldname == "contact_company_name") && $link_ok){
+    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contact_company_id");
+  }
+
+  else if ($fieldname == "contact_archive") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) $res["name"] ="X";
+    else $res["name"] = "&nbsp;";
+  }
+
+  else if ($fieldname == "contact_function") {
+    $res["name"] = $OD->data_set->f("contact_function");
+  }
+
+  else if ($fieldname == "contact_phone") {
+    $phone = $OD->data_set->f("contact_phone");
+    $c_phone = $OD->data_set->f("company_phone");
+    if ( (trim($phone) != "") && ($phone == $c_phone)) {
+      $phone = "($phone)";
+    }
+    $res["name"] = $phone;
+  }
+
+  else if ($fieldname == "contact_email") {
+    $email = $OD->data_set->f("contact_email");
+    if (strcmp($email,"") != 0) {
+      $res["url"] = "mailto:$email";
+      $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
+    }
+  }
+  
+  return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Display Company search Form                                               //
 // Parameters:
 //   - $contact[] : default form values
@@ -172,7 +223,7 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   // --- HTML Template --------------------------------------------------------
   display_info_msg("$nb_con $l_found");
   echo $display_popup_head;
-  $dis_contact_list->display();
+  $dis_contact_list->display("dis_data_contact");
   echo $display_popup_end;
 }
 
