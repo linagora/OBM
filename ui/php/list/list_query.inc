@@ -846,8 +846,8 @@ function make_query($list) {
         contact_town,
         company_town
         FROM
-        Company
-             left join Contact on contact_company_id=company_id
+	Contact  
+             left join Company on contact_company_id=company_id
 	     left join CompanyCategoryLink on company_id = companycategorylink_company_id 
 	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
 	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id
