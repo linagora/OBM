@@ -71,13 +71,13 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_todo_form($todo, $user_q, $todo_q = 0) {
   global $set_theme, $set_date, $ico_mini_cal;
-  global $l_add, $l_update, $l_close;
+  global $l_add, $l_update, $l_close,$display,$l_todo;
   global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_content;
 
   $max_priority = 5;
   $action = $todo["action"];
   $popup = $todo["popup"];
-
+ 
   if ($action == "update") {
     $t_id = $todo["id"];
 
@@ -103,6 +103,7 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
   }
   $sel_user .= "</select>";
 
+  $display["title"] = "<div class=\"title\">$l_todo : $title</div>";
   // Priority select
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";
 
