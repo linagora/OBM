@@ -140,7 +140,8 @@ $l_short_sunday="Dim";
 $l_unknown="Inconnu";
 $l_checkdelete ="Supprimer";
 $l_repeat_update ="Mettre à jour les répétitions";
-
+$l_user_calendar = "Utilisateurs du Calendrier";
+$l_valid = "Valider";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";

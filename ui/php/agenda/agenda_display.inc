@@ -18,7 +18,7 @@
 //    $contacts_array : array of selected contacts 
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_year_planning($agenda,$obm_q,$user_q) {
+function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek,$l_daysofweekshort;
   
@@ -195,7 +195,7 @@ function dis_year_planning($agenda,$obm_q,$user_q) {
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-   html_planning_bar($agenda);
+   html_planning_bar($agenda,$usr_q, $p_user_array);
 echo "
  </tr>
 </table>
@@ -215,7 +215,7 @@ echo "
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_month_planning($agenda,$obm_q,$user_q) {
+function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default,$l_daysofweek;
 	
@@ -368,7 +368,7 @@ function dis_month_planning($agenda,$obm_q,$user_q) {
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda);
+  html_planning_bar($agenda,$usr_q, $p_user_array);
 echo "
  </tr>
 </table>
@@ -388,7 +388,7 @@ echo "
 //    $contacts_array : array of selected contacts 
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
-function dis_week_planning($agenda,$obm_q,$user_q) {
+function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_weekstart_default, $set_start_time, $set_stop_time,$set_time_unit;
   
@@ -531,7 +531,7 @@ echo "
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda);
+  html_planning_bar($agenda,$usr_q, $p_user_array);
 echo "
  </tr>
 </table>
@@ -549,7 +549,7 @@ echo "
 //    $groups_array : array of selected groups 
 ///////////////////////////////////////////////////////////////////////////////
 
-function dis_day_planning($agenda,$obm_q,$user_q) {
+function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer;
   global $set_start_time, $set_stop_time,$set_time_unit;
 
@@ -670,7 +670,7 @@ echo "
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda);
+  html_planning_bar($agenda,$usr_q, $p_user_array);
 echo "
  </tr>
 </table>
@@ -685,9 +685,9 @@ echo "
 //    $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 
-function html_planning_bar($agenda) {
-  global $set_theme,$ico_spacer,$l_go_to,$l_tomorrow_event;
-  global $set_weekstart_default, $l_daysofweekreallyshort;
+function html_planning_bar($agenda,$usr_q,$p_user_array) {
+  global $set_theme,$ico_spacer,$l_go_to,$l_tomorrow_event,$l_user_calendar;
+  global $set_weekstart_default, $l_daysofweekreallyshort,$l_valid;
   
   $getdate = $agenda["date"];
   $unix_time = strtotime($getdate);
@@ -772,6 +772,32 @@ function html_planning_bar($agenda) {
     }
     $year_time = strtotime ("+1 year", $year_time);
 }
+
+// User Selection
+  $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"6\" multiple=\"multiple\">";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $u_lname = $usr_q->f("userobm_lastname");
+    $u_fname = $usr_q->f("userobm_firstname");
+    $dis_sel_user .= "\n<option value=\"$u_id\"";
+       
+    if (count($p_user_array)>0) {
+      $tag_user = "";
+      while ( (list($key, $user_id) = each($p_user_array) )
+              && ($tag_user == "") ) {
+	if ($u_id == $user_id ) {
+	  $tag_user = " selected=\"selected\"";
+	}
+      }
+      reset($p_user_array);
+    }
+    
+    $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
+  } 
+  $dis_sel_user .= "</select>";
+  $dis_sel_user .= "<input type=\"submit\" value=\"$l_valid\" />";
+
+
 
 // Minicalendar Head
 
@@ -880,7 +906,7 @@ echo "
         <td width=\"1%\" class=\"agendaHead2\">
          <img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" />
         </td>
-        <td width=\"98%\" class=\"agendaHead2\">$l_tomorrow_event</td>
+        <td width=\"98%\" class=\"agendaHead2\">$l_user_calendar</td>
 	<td width=\"1%\" class=\"agendaHead2\"></td>
        </tr>
        <tr>
@@ -888,15 +914,10 @@ echo "
        </tr>
        <tr>
         <td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
-        <td colspan=\"2\" class=\"agendaHead2\" align=\"left\">
-
-
-<!-- VARIABLE PHP -->
-         <a class=\"psf\" href=\"javascript:openEventInfo('CS%2B-%2BLab%2B2%2BDue', 'School', 'All day event', '', '')\">
-          <font class=\"G10B\">CS - Lab 2 Due</font>
-         </a>
-
-
+        <td colspan=\"2\" class=\"agendaVide\" align=\"left\">
+	 <form action=\"\" method=\"post\">
+	  $dis_sel_user
+	 </form>
         </td>
        </tr>
        <tr>

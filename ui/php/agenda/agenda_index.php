@@ -56,55 +56,93 @@ if($action == "") $action = "index";
 
 if ($action == "index") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],30);
+  $p_user_array =  array($auth->auth["uid"]);
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
-  dis_week_planning($agenda,$obm_q,$user_q);
+  $user_obm = run_query_userobm();  
+  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "view_day") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],30);
+  if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
   $obm_q = run_query_day_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
-  dis_day_planning($agenda,$obm_q,$user_q);
+  $user_obm = run_query_userobm();  
+  dis_day_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "view_week") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],30);
+  if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
   $obm_q = run_query_week_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
-  dis_week_planning($agenda,$obm_q,$user_q);
+  $user_obm = run_query_userobm();  
+  dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "view_month") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],30);
+var_dump($sel_user_id);
+ if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
   $obm_q = run_query_month_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
-  dis_month_planning($agenda,$obm_q,$user_q);
+  $user_obm = run_query_userobm();  
+  dis_month_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 }
 elseif ($action == "view_year") {
 ///////////////////////////////////////////////////////////////////////////////
-  $p_user_array = array($auth->auth["uid"],30);
+  if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
   $obm_q = run_query_year_event_list($agenda,$p_user_array);
   $user_q = run_query_get_user_name($p_user_array);
-  dis_year_planning($agenda,$obm_q,$user_q);
+  $user_obm = run_query_userobm();  
+  dis_year_planning($agenda,$obm_q,$user_q,$user_obm);
 }
 elseif ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
   $user_obm = run_query_userobm();
   $cat_event = run_query_get_eventcategories();
-  $p_user_array = array($auth->auth["uid"]);
+  if(count($sel_user_id) != 0){
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
+  $user_obm = run_query_userobm();  
   dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }
 elseif ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if(check_data_form($agenda)){    
     $conflict = run_query_add_event($agenda,$sel_user_id);
-    $p_user_array = array($auth->auth["uid"],30);
-    $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
-    dis_week_planning($agenda,$obm_q,$user_q);
+    if(count($conflict) == 0) {
+      $p_user_array =  array($auth->auth["uid"]);
+      $obm_q = run_query_week_event_list($agenda,$p_user_array);
+      $user_q = run_query_get_user_name($p_user_array);
+      $user_obm = run_query_userobm();
+      dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+    }
+    else{
+      //html_dis_conflict($agenda,$conflict);
+    }
   }
   else {
     require("agenda_js.inc");
@@ -137,6 +175,25 @@ if ($param_event > 0) {
   dis_event_form($action, $agenda,$eve_q, $user_obm, $cat_event, $p_user_array);
   }
 }
+elseif ($action == "update") {
+///////////////////////////////////////////////////////////////////////////////
+  if(check_data_form($agenda)){    
+    $conflict = run_query_add_event($agenda,$sel_user_id);
+    $p_user_array =  array($auth->auth["uid"]);
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    $user_obm = run_query_userobm();    
+    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  }
+  else {
+    require("agenda_js.inc");
+    display_warn_msg($l_invalid_data . " : " . $err_msg);
+    $user_obm = run_query_userobm();
+    $cat_event = run_query_get_eventcategories();
+    dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+  }
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores in $agenda hash, Agenda parameters transmited
 // returns : $agenda hash with parameters set
