@@ -11,6 +11,7 @@
 // - search          -- search fields  -- show the result set of search
 // - new             -- $param_company -- show the new project form
 // - init            -- form fields    -- show the init project form
+// - init_short      -- form fields    -- show the init project form
 // - task_fill       -- $param_project -- 
 // - member_fill     -- $param_project -- 
 // - membertime_fill -- $param_project -- 
@@ -89,8 +90,12 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "init")  {
 ///////////////////////////////////////////////////////////////////////////////
   $project_q = run_query_detail($param_project);
-
   $display["detail"] = html_project_init_form($action, $project_q, $project);
+
+} elseif ($action == "init_short")  {
+///////////////////////////////////////////////////////////////////////////////
+  $project_q = run_query_detail($param_project);
+  $display["detail"] = html_project_init_short_form($action, $project_q, $project);
 
 } elseif ($action == "task_fill")  {
 /////////////////////////////////////////////////////////////////////////////// 
@@ -157,7 +162,8 @@ if ($action == "index" || $action == "") {
     // Displays new infos
     if (($project_q->f("project_visibility")==0) ||
 	($project_q->f("usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						   $project_q->f("timecreate"),$project_q->f("timeupdate"));
       
       $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
     } else {
@@ -179,7 +185,9 @@ if ($action == "index" || $action == "") {
 	
 	$project_q = run_query_detail($param_project);
 	
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
+
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       } else {
 	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
@@ -192,6 +200,34 @@ if ($action == "index" || $action == "") {
       $display["detail"] = html_project_init_form($action, $project_q, $project);
     }
 
+  } else if ($origin == "init_short") {
+    
+    if (check_init_short_form($param_project, $project)) {
+      $retour = run_query_create_short($project);
+      
+      if ($retour) {
+	$display["msg"] .= display_ok_msg($l_insert_ok);
+	
+	$project_q = run_query_detail($param_project);
+	$tasks_q = run_query_tasks($param_project);
+	$members_q = run_query_members($param_project);
+	$membertime_q = run_query_membertime($param_project);
+	
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
+
+	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
+      } else {
+	$display["msg"] .= display_err_msg("$l_insert_error : $err_msg");
+      }
+      
+    } else { 
+      $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
+      
+      $project_q = run_query_detail($param_project);
+      $display["detail"] = html_project_init_short_form($action, $project_q, $project);
+    }
+
   } else if ($origin == "new") {
 
     if (check_new_form($param_project, $project)) {
@@ -202,7 +238,8 @@ if ($action == "index" || $action == "") {
 	
 	$project_q = run_query_detail($param_project);
 	
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       }
       else {
@@ -228,7 +265,8 @@ if ($action == "index" || $action == "") {
 
     if (($project_q->f("project_visibility")==0) ||
         ($project_q->f("usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						   $project_q->f("timecreate"),$project_q->f("timeupdate"));
       
       $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
     } else {
@@ -247,7 +285,8 @@ if ($action == "index" || $action == "") {
   if ($param_project > 0) {
     $project_q = run_query_detail($param_project);
     
-    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+    $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						 $project_q->f("timecreate"),$project_q->f("timeupdate"));
     
     if ($project_q->f("project_status")==1) {
       $display["detail"] = html_project_init_form($action, $project_q, $project);
@@ -275,7 +314,8 @@ if ($action == "index" || $action == "") {
      
       if (($project_q->f("project_visibility")==0) ||
 	  ($project_q->f("usercreate")==$uid) ) {
-	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						     $project_q->f("timecreate"),$project_q->f("timeupdate"));
 	
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       } else {
@@ -344,7 +384,8 @@ if ($action == "index" || $action == "") {
     // Displays new infos
     if (($project_q->f("project_visibility")==0) ||
 	($project_q->f("usercreate")==$uid) ) {
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),
+						   $project_q->f("timecreate"),$project_q->f("timeupdate"));
     
       $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
     } else {
@@ -524,7 +565,7 @@ display_page($display);
 function get_param_project() {
 
   global $param_project, $param_origin, $param_user, $param_status;
-  global $tf_missing, $tf_projected, $hd_status;
+  global $tf_missing, $tf_projected, $hd_status, $hd_name;
   global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel, $cb_archive;
   global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext, $cb_new;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
@@ -546,6 +587,7 @@ function get_param_project() {
 
   // Search fields
   if (isset ($tf_name)) $project["name"] = $tf_name;
+  if (isset ($hd_name)) $project["name"] = $hd_name;
   if (isset ($tf_company_name)) $project["company_name"] = $tf_company_name;
   if (isset ($sel_tt)) $project["tt"] = $sel_tt;
   if (isset ($sel_manager)) $project["manager"] = $sel_manager;
@@ -641,6 +683,13 @@ function get_project_action() {
 // Init
   $actions["PROJECT"]["init"] = array (
     'Url'      => "$path/project/project_index.php?action=init",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                     );
+
+// Init
+  $actions["PROJECT"]["short_init"] = array (
+    'Url'      => "$path/project/project_index.php?action=short_init",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                      );

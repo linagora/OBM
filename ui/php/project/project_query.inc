@@ -207,6 +207,93 @@ function run_query_create($project) {
   return $retour;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Creat query execution (change state of a deal from 0 to 1                 //
+// Parameters:
+//   - $project[] : Entry's values
+//     keys used  : id, soldtime
+///////////////////////////////////////////////////////////////////////////////
+function run_query_create_short($project) {
+  global $auth, $cdg_sql;
+
+  $p_id = $project["id"];
+  $name = $project["name"];
+
+  $soldtime = $project["soldtime"];
+  $member = $project["member"];
+  $retour = 0;
+
+  // We create the project entry
+  $query = "update Deal
+    set
+      deal_timeupdate='". date("Y-m-d H:i:s") ."',
+      deal_userupdate='". $auth->auth["uid"] ."',
+      deal_soldtime = $soldtime,
+      deal_project_status = 1
+    where deal_id = $p_id";
+
+  display_debug_msg($query, $cdg_sql, "run_query_short_create(create)");
+  $obm_q = new DB_OBM;
+  $retour |= $obm_q->query($query);
+
+  // We create a task for this project
+  $query = "
+    insert into ProjectTask (
+      projecttask_deal_id,
+      projecttask_timecreate,
+      projecttask_usercreate,
+      projecttask_label,
+      projecttask_parenttask_id,
+      projecttask_rank)
+    values (
+      $p_id,
+      '". date("Y-m-d H:i:s") ."',
+      '". $auth->auth["uid"] ."',
+      '$name',
+      0,
+      1)
+      ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_short_create(create task)");
+  $retour |= $obm_q->query($query);
+
+  $query = "
+    select projecttask_id
+    from ProjectTask
+    where projecttask_deal_id = $p_id";
+
+  display_debug_msg($query, $cdg_sql, "run_query_short_create(get task)");
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $t_id = $obm_q->f("projecttask_id");
+
+  // We affect a member to this project
+  $query = "
+    insert into ProjectUser 
+      (projectuser_user_id,
+       projectuser_deal_id,
+       projectuser_projecttask_id,
+       projectuser_timecreate,
+       projectuser_usercreate,
+       projectuser_projectedtime,
+       projectuser_missingtime,
+       projectuser_manager
+      )
+    values
+      ($member,
+      $p_id,
+      $t_id,
+      '".date("Y-m-d H:i:s")."',
+      ". $auth->auth["uid"] .",
+      $soldtime,
+      $soldtime,
+      1)";
+
+  display_debug_msg($query, $cdg_sql, "run_query_short_create(add member)");
+  $retour |= $obm_q->query($query);
+
+  return $retour;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Update query execution                                                    //
@@ -944,6 +1031,22 @@ function run_query_managers($p_id = 0) {
   return $obm_q;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Get all the contacts of the companyusing obm
+//  -- THIS SHOULD CHANGE TO USE THE User TABLE --
+//////////////////////////////////////////////////////////////////////////
+function run_query_get_obmusers() {
+  global $cdg_sql;
+ 
+  $obm_db=new DB_OBM;
+  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm 
+          where userobm_archive!=1 order by userobm_lastname";
+  display_debug_msg($query, $cdg_sql, "run_query_get_obmusers");
+
+  $obm_db->query($query);
+  return $obm_db;
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the project that are still in commercial state
 // Parameters :
@@ -1063,8 +1166,9 @@ function check_new_form($pid, $project) {
 
   return true; 
 }
+
 ///////////////////////////////////////////////////////////////////////////////
-// Project Init Form Data checking and formatting                                 //
+// Project Init Form Data checking and formatting                            //
 // Parameters:
 //   - $pid   : project id
 //   - $project[] : values checked
@@ -1088,6 +1192,50 @@ function check_init_form($pid, $project) {
   // MANDATORY: Soldtime
   if (trim($soldtime) == 0) {
     $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+//   if (ereg($php_regexp_number, $soldtime) == false) {
+//     $err_msg = $l_fill_soldnumber;
+//     return false;
+//   }
+
+  return true; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Project Short Init Form Data checking and formatting                      //
+// Parameters:
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : tt, soldtime
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_init_short_form($pid, $project) {
+  global $l_fill_soldtime, $l_fill_soldnumber, $l_fill_member;
+  global $err_msg;
+  global $php_regexp_number;
+
+  $soldtime = $project["soldtime"];
+  $member = $project["member"];
+
+  // MANDATORY: Soldtime
+  if (trim($soldtime) == "") {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+  if (trim($soldtime) == 0) {
+    $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Soldtime
+  if ($member == 0) {
+    $err_msg = $l_fill_member;
     return false;
   }
 

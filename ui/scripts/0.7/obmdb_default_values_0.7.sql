@@ -104,6 +104,15 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 -- Day the week start 
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_day_weekstart','monday');
 
+-- Day the week start 
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_order','todo_priority');
+
+-- Todo top list
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_1_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_2_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_3_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_4_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_5_id','0');
 
 -------------------------------------------------------------------------------
 -- Default values for the table 'DisplayPref'
@@ -177,6 +186,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_priority', 2, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_todo', 3, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_deadline', 4, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_id', 5, 2);
 
 -- module 'list_contact'
 

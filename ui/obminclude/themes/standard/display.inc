@@ -36,20 +36,27 @@ function display_page(&$display) {
 
   echo $display["head"] . $display["header"] . "
 
-    <!-- left panel -->  <div class=\"leftpanel\">" .
-      $display["last"] . "
-    <!-- left panel end --> </div>
+    <!-- left panel -->
+    <div class=\"leftpanel\">" .
+      $display["last"] .
+      $display["todo"] . "
+    </div>
+    <!-- left panel end -->
 
-    <div class=\"detailpanel\">";
+  <div class=\"detailpanel\">";
  
   if ($right_panel) {
     echo "
-    <!-- right panel -->  <div class=\"rightpanel\">" .
+    <!-- right panel -->
+    <div class=\"rightpanel\">" .
       $display["detailInfo"] . "<p />" .
-      $display["link"] . "<p />" . $display["features"] ."
-    <!-- right panel end --> </div>
+      $display["link"] . "<p />" .
+      $display["features"] ."
+    </div>
+    <!-- right panel end -->
 
-    <!-- center zone --> <div class=\"middlepanel\">";
+    <!-- center zone -->
+    <div class=\"middlepanel\">";
   }
 
   echo
@@ -59,8 +66,13 @@ function display_page(&$display) {
     $display["result"] .
     $display["detail"] . "
     
-    <!-- center zone end --> </div>
+    </div>
+    <!-- center zone end -->
   ";
+
+  if ($right_panel) {
+    echo "</div>";
+  }
 
   echo
     $display["end"];
@@ -121,8 +133,7 @@ function generate_menu($menu, $section) {
   $display["menu"] = display_menus($section);
   $display["action"] = display_menu_bar($section, $menu);
   $display["last"] = display_last_visited();
-//   $display["last"] .= display_todo_toplist();
-
+  $display["todo"] = display_todo_toplist();
 
   $block = "
 <table cellpadding=\"0\" cellspacing=\"0\" class=\"global\">
@@ -515,6 +526,50 @@ function display_last_visited($path="..") {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todo_toplist($path="..") {
+  global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
+  global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
+  global $todo_5_id, $todo_5_title;
+
+  $block = "
+    <div class=\"last\"> 
+     <div class=\"lastTitle\">:: Todo</div>
+     <ul class=\"lastList\">";
+
+  if ($todo_1_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_1_id);
+    $todo_title = substr($todo_1_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_2_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_2_id);
+    $todo_title = substr($todo_2_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_3_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_3_id);
+    $todo_title = substr($todo_3_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_4_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_4_id);
+    $todo_title = substr($todo_4_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_5_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_5_id);
+    $todo_title = substr($todo_5_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  $block .= "
+     </ul>
+    </div>";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

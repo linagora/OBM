@@ -286,6 +286,7 @@ function html_project_form($action, $project_q, $tt_q, $project) {
 //     keys used  : id, soldtime
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_init_form($action, $project_q, $project) {
+  global $display;
   global $l_dealinfos, $l_projectinfos, $l_member_add, $l_insert, $l_update;
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_archive;
 
@@ -324,10 +325,9 @@ function html_project_init_form($action, $project_q, $project) {
   $dis_button = "$dis_action
     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
     <input type=\"hidden\" name=\"param_origin\" value=\"init\" />
-    <input type=\"hidden\" name=\"hd_status\" value=1 />
+    <input type=\"hidden\" name=\"hd_status\" value=\"1\" />
     <input type=\"submit\" value=\"$l_button\" />";
 
-  if ($action == "detailupdate") 
     $display["title"] = "<div class=\"title\">$l_project : $name</div>";
 
   // --- HTML Template --------------------------------------------------------
@@ -358,6 +358,97 @@ function html_project_init_form($action, $project_q, $project) {
      <tr>
       <td class=\"detailLabel\">$l_soldtime</td>
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
+     </tr>
+    </table>
+
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>
+    ";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Short Init Project Form                                                 //
+// Parameters:
+//   - $action    : 
+//   - $project_q : database object with project infos
+//   - $project[] : default form values
+//     keys used  : id, soldtime
+///////////////////////////////////////////////////////////////////////////////
+function html_project_init_short_form($action, $project_q, $project) {
+  global $display;
+  global $l_none;
+  global $l_dealinfos, $l_projectinfos, $l_member_add, $l_insert, $l_member;
+  global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_archive;
+
+  $member_q = run_query_get_obmusers();
+
+  $pid = $project["id"];
+
+  $name = $project_q->f("project_label");
+  $tt = $project_q->f("project_tasktype_label");
+  $company = $project_q->f("project_company_name");
+
+  $soldtime = $project["soldtime"];
+
+  // member select
+  $sel_member = "<select id=\"sel_member\" name=\"sel_member\">
+    <option value=\"0\">$l_none</option>\n";
+  while($member_q->next_record()) {
+    $mb_id = $member_q->f("userobm_id");
+    $sel_member .= "
+      <option value=\"$mb_id\">"
+      . $member_q->f("userobm_lastname") ." "
+      . $member_q->f("userobm_firstname") . "
+      </option>\n";
+  }
+  $sel_member .= "</select>";
+
+  $dis_button = "
+    <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+    <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
+    <input type=\"hidden\" name=\"param_origin\" value=\"init_short\" />
+    <input type=\"hidden\" name=\"hd_status\" value=\"1\" />
+    <input type=\"hidden\" name=\"hd_name\" value=\"$name\" />
+    <input type=\"submit\" value=\"$l_insert\" />";
+
+  $display["title"] = "<div class=\"title\">$l_project : $name</div>";
+
+  // --- HTML Template --------------------------------------------------------
+  $block = "
+    <form method=\"post\" name=\"form_project_init\" 
+      onsubmit=\"if (check_short_init_project(this)) return true; else return false;\"
+      action=\"".url_prepare("project_index.php")."\">
+
+    <div class=\"detailHead\">$l_dealinfos</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_company_name</td>
+      <td class=\"detailText\">$company</td>
+     </tr><tr>
+      <td class=\"detailLabel\">$l_tasktype</td>
+      <td class=\"detailText\">$tt</td>
+     </tr>
+     $dis_archive
+    </table>
+
+    <div class=\"detailHead\">$l_projectinfos</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_soldtime</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_member</td>
+      <td class=\"detailForm\">$sel_member</td>
      </tr>
     </table>
 

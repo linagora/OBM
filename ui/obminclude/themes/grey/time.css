@@ -9,18 +9,22 @@
 
 .timeCenter			{
 	text-align:		center;
+	margin-bottom: 15px;
 	}
 
 div.timeBar {
 	width:			170px;
 	margin-bottom:		20px;
-}
+	}
 
 /* Time browsing panel */
 
 table.timeLinks			{
-	border-spacing:		1;
+	border-spacing:		0;
 	margin:			auto;
+	background-color: 	#FFFFFF;
+	border: 		2px solid #394D5A;
+	padding: 		2px;
 	}
 
 table.timeMonth			{
@@ -34,16 +38,17 @@ td.timePeriod			{
  	font-family: 		sans-serif;
 	font-size: 		12px;
 	font-weight: 		600;
-	color:			#4f7091;
+	color:			#39495A;
 	}
 
 table.timeValid			{
-	border:			1px #4f7091 solid;
+	border: 		2px solid #394D5A;
 	border-spacing:		1;
 	margin:			auto;
 	padding:		2;
 	text-align:		left;
 	font-size:		12px;
+	background-color: 	#FFFFFF;
 	}
 
 /* Addtask form */
@@ -53,9 +58,10 @@ table.timeDetail		{
 	font-size:		12px;
 	font-weight: 		600;
 	text-align:		left;
-	background-color:	#a5bace;
+	background-color:	#CCCCCC;
 	border-spacing:		1;
 	margin:			auto;
+	border: 		2px solid #394D5A;
 	}
 
 td.timeForm			{
@@ -63,35 +69,45 @@ td.timeForm			{
 	font-size:		10px;
 	font-weight: 		300;
 	text-align:		left;
-	color:			#4f7091;
-	background-color:	#e7ebef;
+	color:			#394D5A;
+	background-color:	#FFFFFF;
 	padding:		3;
 	}
 
 /* Week panel */
 
 td.timeWeekhead			{
- 	font-family: 		sans-serif;
+	font-family: 		sans-serif;
 	font-size:		10px;
 	text-align:		center;
-	color:			#4f7091;
-	background-color:	#a5bace;
+	color:			#FFFFFF;
+	background-color:	#394D5A;
+	background-image: 	url(fond_bandeau02.png);
+	border:			0;
+	margin: 		0px;
+	border-spacing:		0;
 	}
 
 td.timeWeekunvalid			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		center;
-	color:			#4f7091;
-	background-color:	#fbf7db;
+	color:			#394D5A;
+	background-color:	#D6D7DA;
+	border:			0;
+	margin:			0px;
+	border-spacing:		0;
 	}
 
 td.timeWeekvalid			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		center;
-	color:			#4f7091;
-	background-color:	#c1cfdd;
+	color:			#39495A;
+	background-color:	#FFFFFF;
+	border:			0;
+	margin: 		0px;
+	border-spacing:		0;
 	}
 
 /* Month panel */
@@ -100,34 +116,46 @@ td.timeUnvalid			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		center;
-	color:			#4f7091;
-	background-color:	#fbf7db;
+	color:			#394D5A;
+	background-color:	#D6D7DA;
+	border:		0;
+	margin: 0px;
+	border-spacing:		0;
 	}
 
 td.timeValid			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		center;
-	color:			#4f7091;
-	background-color:	#c1cfdd;
+	color:			#39495A;
+	background-color:	#FFFFFF;
+	border:		0;
+	margin: 0px;
+	border-spacing:		0;
 	}
 
 td.timeWorkday 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#4f7091;
+	font-family: 		sans-serif;
+	font-size:		10px;
 	text-align:		center;
-	background-color:	#a5bace;
-	font-weight: 		bold;
+	color:			#FFFFFF;
+	background-color:	#394D5A;
+	background-image: 	url(fond_bandeau02.png);
+	border:			0;
+	margin: 		0px;
+	border-spacing:		0;
 }
 
 td.timeOffday 	 	 {
-	font-family:		sans-serif;
-	font-size:		12px;
-	color:			#c6cfde;
+	font-family: 		sans-serif;
+	font-size:		10px;
 	text-align:		center;
-	background-color:	#97aec6;
-	font-weight: 		bold;
+	color:			#FFFFFF;
+	background-color:	#394D5A;
+	background-image: 	url(fond_bandeau02.png);
+	border:			0;
+	margin: 		0px;
+	border-spacing:		0;
 }
 
 /* Validation panel */
@@ -135,22 +163,22 @@ td.timeOffday 	 	 {
 td.timeValunfilled		{
 	font-family:		sans-serif;
 	text-align:		right;
-	color:			#4f7091;
-	background-color:	#fbf7db;
+	color:			#394D5A;
+	background-color:	#D6D7DA;
 	}
 
 td.timeValfilled		{
 	font-family:		sans-serif;
 	text-align:		right;
-	color:			#4f7091;
-	background-color:	#c1cfdd;
+	color:			#39495A;
+	background-color:	#FFFFFF;
 	}
 
 td.timeValok			{
 	font-family:		sans-serif;
 	text-align:		right;
 	color:			#4f7091;
-	background-color:	#ffffff;
+	background-color:	#ddffdd;
 	}
 
 /* User select panel */
@@ -211,14 +239,14 @@ tr.timeUnvalid			{
 	font-size:		10px;
 	text-align:		left;
 	color:			#000000;
-	background-color:	#fbf7db;
+	background-color:	#d6d7da;
 	}
 
 tr.timeValid0			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		left;
-	color:			#000000;
+	color:			#394d5a;
 	background-color:	#ffffff;
 	}
 
@@ -226,6 +254,6 @@ tr.timeValid1			{
 	font-family:		sans-serif;
 	font-size:		10px;
 	text-align:		left;
-	color:			#000000;
-	background-color:	#ebf0f1;
+	color:			#394d5a;
+	background-color:	#eeeeee;
 	}

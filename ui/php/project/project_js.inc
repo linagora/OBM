@@ -93,6 +93,38 @@ function check_init_project(form) {
     return true;
 } 
 
+///////////////////////////////////////////////////////////////////////////////
+// Check if the short init project form                                      //
+///////////////////////////////////////////////////////////////////////////////
+
+function check_short_init_project(form) {
+
+  // MANDATORY : Check that the Project soldtime is not empty
+  if (trim(form.tf_soldtime.value) == \"\") {
+    alert (\"$l_fill_soldtime\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is a number
+  else if (!(check_number(form.tf_soldtime.value))) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not null
+  else if ((form.tf_soldtime.value) == 0) {
+    alert (\"$l_fill_soldnumber\");
+    return false;
+  }
+
+  // MANDATORY : Check that the Project soldtime is not null
+  else if ((form.sel_member.value) == 0) {
+    alert (\"$l_fill_member\");
+    return false;
+  }
+  else
+    return true;
+} 
 
 ///////////////////////////////////////////////////////////////////////////////
 // Select the task add form                                                  //

@@ -46,9 +46,13 @@ function display_page(&$display) {
     <!-- zone Last -->
     ". $display["last"] ."
     <!-- Fin zone Last -->
-    <!-- left panel end --> 
+    <!-- zone Todo -->
+    ". $display["todo"] . "
+    <!-- Fin zone Todo -->
 
     </div>
+
+    <!-- left panel end --> 
 
     <div class=\"detailpanel\">";
  
@@ -139,7 +143,7 @@ function generate_menu($menu, $section) {
   $display["menu"] = display_menus($section);
   $display["action"] = display_menu_bar($section, $menu);
   $display["last"] = display_last_visited();
-//   $display["last"] .= display_todo_toplist();
+  $display["todo"] = display_todo_toplist();
 
 
   $block = "
@@ -152,7 +156,7 @@ function generate_menu($menu, $section) {
       Login&nbsp;: $login&nbsp;&nbsp;<br />
 
       Profil&nbsp;: $profil&nbsp; <br />
-      <a href=\"http://cameleon/obm.php?action=logout\">Logout</a>
+      <a href=\"$path/obm.php?action=logout\">Logout</a>
      </div>
     </div>
     <!-- Fin zone Login -->
@@ -455,7 +459,6 @@ function display_last_visited($path="..") {
   return $block;
 }
 
-
 // bcontins todo experiment (cette fontion)
 ///////////////////////////////////////////////////////////////////////////////
 // Display : Returns the last visited display block
@@ -463,6 +466,50 @@ function display_last_visited($path="..") {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_todo_toplist($path="..") {
+  global $todo_1_id, $todo_1_title, $todo_2_id, $todo_2_title;
+  global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
+  global $todo_5_id, $todo_5_title;
+
+  $block = "
+    <div class=\"last\"> 
+     <div class=\"lastTitle\">:: Todo</div>
+     <ul class=\"lastList\">";
+
+  if ($todo_1_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_1_id);
+    $todo_title = substr($todo_1_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_2_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_2_id);
+    $todo_title = substr($todo_2_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_3_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_3_id);
+    $todo_title = substr($todo_3_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_4_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_4_id);
+    $todo_title = substr($todo_4_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  if ($todo_5_id) {
+    $todo_url = url_prepare("$path/todo/todo_index.php?action=detailconsult&amp;param_todo=".$todo_5_id);
+    $todo_title = substr($todo_5_title,0,30);
+    $block .= "<li class=\"lastList\"><a href=\"$todo_url\">$todo_title</a></li>";
+  }
+
+  $block .= "
+     </ul>
+    </div>";
+
+  return $block;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

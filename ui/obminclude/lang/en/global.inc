@@ -112,6 +112,7 @@ $l_header_contact = "Contacts";
 $l_header_deal = "Deals";
 $l_header_list = "Lists";
 $l_header_agenda = "Calendar";
+$l_header_todo    = "Todo";
 
 $l_header_time = "Time management";
 $l_header_project = "Projects";

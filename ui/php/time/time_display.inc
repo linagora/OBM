@@ -550,9 +550,9 @@ function dis_time_list_result($task_q,$pref_q,$time) {
     <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
 
   $block .= "
-     <div class=\"detailButton\">
+     <p class=\"detailButton\">
       <p class=\"detailButtons\">$dis_button</p>
-     </div>
+     </p>
 
      </form>
      ";

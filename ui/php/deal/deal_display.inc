@@ -501,7 +501,7 @@ function html_deal_links($deal_q, $inv_nb) {
   global $ico_contract_new, $ico_invoice, $ico_invoice_new, $ico_project;
   // -- Labels
   global $l_parentdeal, $l_affect_deal, $l_header_contract, $l_contract_new;
-  global $l_create_project, $l_view_project;
+  global $l_create_project, $l_create_short_project, $l_view_project;
   global $l_header_document,$ico_document,$l_deal, $l_project;
   global $l_header_invoice, $l_archived_invoices, $l_invoice_new;
   global $l_document_new,$l_document_add,$ico_document_new;
@@ -531,18 +531,26 @@ function html_deal_links($deal_q, $inv_nb) {
   // project
   if ($project or ($hitrate == "100")) {
     if ($project) {
-      $l_text_project = $l_view_project;
       $url_project = url_prepare("$path/project/project_index.php?action=detailconsult&amp;param_project=$id");
+      $dis_ico_project = "
+        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+            <a href=\"$url_project\">$l_view_project</a></li>";
     } else {
-      $l_text_project = $l_create_project;
       $url_project = url_prepare("$path/project/project_index.php?action=init&amp;param_project=$id");
+      $dis_ico_project = "
+        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+            <a href=\"$url_project\">$l_create_project</a></li>";
+
+      $url_project = url_prepare("$path/project/project_index.php?action=init_short&amp;param_project=$id");
+      $dis_ico_project .= "
+        <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
+            <a href=\"$url_project\">$l_create_short_project</a></li>";
     }
     
     $dis_project_link ="
      <div class=\"linkTitle\">:: $l_project</div>
      <ul class=\"linkList\">
-      <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
-          <a href=\"$url_project\">$l_text_project</a></li>
+       $dis_ico_project
      </ul>";
   }
 

@@ -15,6 +15,7 @@ $fieldnames["date_todo"] = $l_date;
 $fieldnames["date_deadline"] = $l_deadline;
 $fieldnames["todo_priority"] = $l_priority;
 $fieldnames["todo_title"] = $l_todotitle;
+$fieldnames["todo_id"] = $l_update;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company specific dataset fields                                   //
@@ -47,6 +48,15 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
     $res["align"] = "center";
   }
 
+  else if ($fieldname == "todo_id") {
+    $t_id = $OD->data_set->f("todo_id");
+
+    $res["popup"] = true;
+    $res["popup_width"] = 700;
+    $res["popup_height"] = 180;
+    $res["url"] = "todo_index.php?action=update&amp;param_todo=$t_id&amp;popup=1";
+    $res["name"] = "<img border=\"0\" src=\"/images/$set_theme/modify.png\" alt=\"\" />";
+  }
 
 //   else if ($fieldname == "company_archive") {
 //     $res["align"] = "center";
@@ -74,12 +84,25 @@ function dis_data_todo(&$OD, $fieldname, $link_ok) {
 // Returns:
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
-function dis_todo_form($todo, $user_q) {
-  global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_add, $l_content;
+function dis_todo_form($todo, $user_q, $todo_q = 0) {
+  global $l_add, $l_update, $l_close;
+  global $l_deadline, $l_priority, $l_todotitle, $l_user, $l_content;
 
   $max_priority = 5;
-  $uid = $todo["uid"];
+  $popup = $todo["popup"];
 
+  if ($popup) {
+    $t_id = $todo["id"];
+
+    $uid = $todo_q->f("todo_user");
+    $title = $todo_q->f("todo_title");
+    $content = $todo_q->f("todo_content");
+    $priority = $todo_q->f("todo_priority");
+    $deadline = ($todo_q->f("date_deadline")) ? $todo_q->f("todo_deadline") : "";
+  } else {
+    $uid = $todo["uid"];
+    $priority = intval(($max_priority+1)/2);
+  }
   // User select
   $sel_user = "<select id=\"sel_user\" name=\"sel_user\">";
 
@@ -95,11 +118,25 @@ function dis_todo_form($todo, $user_q) {
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";
 
   for ($i=1; $i<=$max_priority; $i++) {
-    $selected = ($i == intval(($max_priority+1)/2)) ? "selected=\"selected\"" : "";
+    $selected = ($i == $priority) ? "selected=\"selected\"" : "";
     $sel_priority .= "<option value=\"$i\" $selected>$i</option>";
   }
-
   $sel_priority .= "</select>";
+
+  if ($popup) {
+    $dis_button = "
+      <input type=\"hidden\" id=\"param_todo\" name=\"param_todo\" value=\"$t_id\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"update\" />
+      <input type=\"hidden\" id=\"popup\" name=\"popup\" value=\"0\" />
+      <input type=\"submit\" value=\"$l_update\" />
+      <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
+    ";
+  } else {
+    $dis_button = "
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"add\" />
+      <input type=\"submit\" value=\"$l_add\" />
+    ";
+  }
 
   $block = "
     <form method=\"post\" name=\"f_add_todo\"
@@ -109,32 +146,31 @@ function dis_todo_form($todo, $user_q) {
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_todotitle</td>
-      <td class=\"detailForm\" colspan=\"5\">
-       <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" />
+      <td class=\"detailForm\" colspan=\"3\">
+       <input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"100\" size=\"100\" value=\"$title\" />
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_user</td>
-      <td class=\"detailForm\">$sel_user</td>
-
+      <td class=\"detailForm\" colspan=\"3\">$sel_user</td>
+     </tr><tr>
       <td class=\"detailLabel\">$l_priority</td>
       <td class=\"detailForm\">$sel_priority</td>
 
       <td class=\"detailLabel\">$l_deadline</td>
       <td class=\"detailForm\">
-       <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" />
+       <input type=\"text\" id=\"tf_deadline\" name=\"tf_deadline\" maxlength=\"10\" size=\"10\" value=\"$deadline\" />
       </td>
      </tr><tr>
       <td class=\"detailLabel\">$l_content</td>
-      <td class=\"detailForm\" colspan=\"5\">
-       <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\"></textarea>
+      <td class=\"detailForm\" colspan=\"3\">
+       <textarea id=\"ta_content\" name=\"ta_content\" rows=\"3\" cols=\"80\">$content</textarea>
       </td>
      </tr>
     </table>
 
     <div class=\"detailButton\">
      <p class=\"detailButtons\">
-      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"add\" />
-      <input type=\"submit\" value=\"$l_add\" />
+      $dis_button
      </p>
     </div>
 
@@ -185,12 +221,12 @@ function dis_todo_list($todo, $todo_q) {
   $block .= $todo_d->display("dis_data_todo");
 
   $block .= "
-    <div class=\"detailButton\">
+    <p class=\"detailButton\">
      <p class=\"detailButtons\">
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
      </p>
-    </div>
+    </p>
     </form>
     ";
 
@@ -252,6 +288,27 @@ function dis_todo_detail($todo, $todo_q) {
     ";
   
   return $block;
-
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Time Display preference screen                             //
+// Parameters:
+//   - $display_newpref_q    : DBO : Field list to display
+//   - $display_searchpref_q : DBO : Field list to display
+///////////////////////////////////////////////////////////////////////////////
+function dis_todo_display_pref($display_searchpref_q) {
+  global $l_todo_display;
+
+  $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);
+  $dis_pref->display_entity = "todo";
+  $dis_pref->pref_title = $l_todo_display;
+
+  $block .= "<td>";
+  $block .= $dis_pref->display();
+  $block .= "</td></tr></table>";
+
+  $block .= $dis_pref->dis_pref_help();
+  return $block;
+}
+
 </script>
