@@ -249,6 +249,7 @@ function show_hide_field()
     basic_show('browse_img');
     basic_hide('browse_field');
     basic_show('url_field');
+    document.f_mod_document.preurl.value =\"http://\";
   }
 }
 

@@ -269,7 +269,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     if(islink($doc_q->f("document_name"))) {
       $kind = "link";
       $fi_path = $doc_q->f("document_path");
-      $url = $doc_q->f("document_name");
+      $url = substr($doc_q->f("document_name"),strrpos($doc_q->f("document_name"),'/')+1);
       if(strrpos($fi_path,'/') != strlen($fi_path) -1)  {
 	$fi_path = $doc_q->f("document_path").'/';
       }
@@ -365,7 +365,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
      $dis_field = " style=\"display: none;\" ";
      $dis_img2 = " style=\"display: none;\" ";
      $checked = "checked=\"checked\"";
-     
+     $tp = "http://";
    }else 
      $checked = "";
 
@@ -378,7 +378,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   // --- HTML Template --------------------------------------------------------
   $block = "
     <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
-      onsubmit=\"if (check_document(this)) return true; else return false;\"
+      onsubmit=\"if (check_document(this)){this.tf_url.value= this.preurl.value + this.tf_url.value; return true;} else return false;\"
       action=\"document_index.php\">
 
     <div class=\"detailHead\">$l_document</div>
@@ -429,7 +429,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </tr>
     <tr id=\"url_field\" $dis_url>
       <td class=\"detailLabel\">$l_url</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" disabled=\"true\" name=\"preurl\" value=\"$tp\" size=\"5\" /><input type=\"text\" id=\"tf_url\" name=\"tf_url\" size=\"50\" value=\"$url\" /></td>
     </tr> 
    </table>
    <div class=\"detailButton\">
