@@ -150,3 +150,7 @@ $l_header_week = "Semaine";
 $l_header_month = "Mois";
 $l_header_new_event = "Nouveau rdv";
 
+//TIME
+$l_header_time = "Gestion temps" ;
+$l_header_stats = "Statistiques";
+$l_header_base = "Base";
