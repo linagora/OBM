@@ -147,7 +147,7 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 function dis_company_search_form($company="") {
 
   $type_q = run_query_companytype();
-  $cat_q = run_query_companycat();
+  $cat_q = get_ordered_companycat();
   $act_q = run_query_companyactivity();
   $naf_q = run_query_companynafcode();
   $usr_q = run_query_userobm_active();
@@ -222,7 +222,7 @@ function html_company_search_form($kind_q, $cats, $act_q, $naf_q, $usr_q, $ctry_
   if ($show_cat) {
     $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat\">
     <option value=\"$c_all\">$l_all</option>";
-    foreach($cats as $one_cat) {
+    foreach ($cats as $one_cat) {
       $c_id = $one_cat["id"];
       $c_code = str_pad($one_cat["code"], 8, ".");
       $c_label = $one_cat["label"];
@@ -421,7 +421,6 @@ function dis_company_search_list($company) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup) {
   global $display, $l_found,$l_close;
-
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -712,7 +711,7 @@ function html_company_consult($co_q, $cat_q) {
     $cat_a = get_ordered_category($cat_q);
     $i = 0;
     foreach($cat_a as $cat_info) {
-      if ($i==0) {
+      if ($i == 0) {
 	$cat_disp .= "<tr>";
       }
       $label = $cat_info["code"];
@@ -775,14 +774,14 @@ function html_company_consult($co_q, $cat_q) {
 //   - $act_q     : activity database result 
 //   - $naf_q     : nafcode database result 
 //   - $usr_q     : userobm database result 
-//   - $cat_q     : category database result 
+//   - $cats      : ordered array of category
 //   - $compcat   : array of category referenced by the company
 //   - $ctry_q    : country database result 
 //   - $company[] : default values
 //     keys used  : id, num, archive, name, kind, ad1, ad2, ad3, zip, town, cdx
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cat_q, $compcat, $ctry_q, $company) {
+function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $usr_q, $cats, $compcat, $ctry_q, $company) {
   global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind, $l_activity, $l_nafcode;
@@ -897,11 +896,10 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $naf_q, $us
 
   // Cat select field
   if ($show_cat) {
-    $cat_a = get_ordered_category($cat_q);
     $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat\"  style=\"font-family:monospace;font-weight:400;\">";
     $j = 0;
-    if (is_array($cat_a)) {
-      foreach ($cat_a as $cat_info) {
+    if (is_array($cats)) {
+      foreach ($cats as $cat_info) {
 	$c_id = $cat_info["id"];
 	$c_code = $cat_info["code"];
 	$c_label = $cat_info["label"];
@@ -1434,8 +1432,8 @@ function dis_admin_index() {
   }
 
   if (! $cgp_hide["company"]["category"]) {
-    $cat_q = run_query_companycat();
-    $block .= html_company_cat_form($cat_q);
+    $cats = get_ordered_companycat();
+    $block .= html_company_cat_form($cats);
   }
 
   if (! $cgp_hide["company"]["companyactivity_label"]) {
@@ -1633,9 +1631,9 @@ function dis_kind_links($company) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Company Category section
 // Parameters:
-//   - $cat_q : Category list database object
+//   - $cats : Category ordered array
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_cat_form($cat_q) {
+function html_company_cat_form($cats) {
   global $l_cat_manage,$l_cat_exist,$l_cat_code,$l_cat_label,$l_cat_no;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_new,$l_cat_insert;
 
@@ -1648,19 +1646,15 @@ function html_company_cat_form($cat_q) {
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
-  if ($cat_q->nf()>0) {
-    $cat_a = get_ordered_category($cat_q);
-    foreach($cat_a as $cat_info) {
-      $id = $cat_info["id"];
-      $code = $cat_info["code"];
-      $label = $cat_info["label"];
-      $length = 8 - strlen($code);
-      $label2 = $code;
-      for ($i=0;$i<$length;$i++) {
-        $label2 .= "&nbsp;";
-      }
-      $label2 .= " ".$label;    
-      $sel_cat .= "\n<option value=\"$id\">$label2</option>";
+
+  if (is_array($cats)) {
+    foreach ($cats as $one_cat) {
+      $c_id = $one_cat["id"];
+      $c_code = str_pad($one_cat["code"], 8, ".");
+      $c_label = $one_cat["label"];
+      $sel_cat .= "\n<option value=\"$c_id\"";
+      if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }
+      $sel_cat .= ">$c_code $c_label</option>\n";
     }
     $sel_cat .= "</select>";
   }

@@ -45,41 +45,6 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
 
-  $req = "select
-      company_id as Id,
-      company_id,
-      company_name,
-      company_archive,
-      company_type_id,
-      company_activity_id,
-      company_nafcode_id,
-      company_marketingmanager_id,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
-      company_country_id,
-      company_phone,
-      company_fax,
-      company_web,
-      company_email,
-      company_contact_number,
-      company_deal_number,
-      company_deal_total,
-      companytype_label,
-      companyactivity_label,
-      companynafcode_code,
-      companynafcode_label,
-      country_name
-    from Company
-         LEFT JOIN CompanyType on company_type_id=companytype_id
-         LEFT JOIN CompanyCategoryLink on company_id=companycategorylink_company_id
-         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
-         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
-         LEFT JOIN Country on company_country_id=country_id";
-
   $and = "";
   if ($name != "") {
     $where_name = " company_name $like '$name%'";
@@ -90,6 +55,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
     $and = "and";
   }
   if (($cat != $c_all) && ($cat != "")) { 
+    $join_cat = "LEFT JOIN CompanyCategoryLink on company_id=companycategorylink_company_id";
     $where .= " $and companycategorylink_category_id='$cat'";
     $and = "and";
   }
@@ -154,6 +120,41 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
       || (strcmp($p_new_order,"company_new_contact") == 0) ) {
     $order = "company_name";
   }
+
+  $req = "select
+      company_id as Id,
+      company_id,
+      company_name,
+      company_archive,
+      company_type_id,
+      company_activity_id,
+      company_nafcode_id,
+      company_marketingmanager_id,
+      company_address1,
+      company_address2,
+      company_address3,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
+      company_country_id,
+      company_phone,
+      company_fax,
+      company_web,
+      company_email,
+      company_contact_number,
+      company_deal_number,
+      company_deal_total,
+      companytype_label,
+      companyactivity_label,
+      companynafcode_code,
+      companynafcode_label,
+      country_name
+    from Company
+         LEFT JOIN CompanyType on company_type_id=companytype_id
+         $join_cat
+         LEFT JOIN CompanyActivity on company_activity_id=companyactivity_id
+         LEFT JOIN CompanyNafCode on company_nafcode_id=companynafcode_id
+         LEFT JOIN Country on company_country_id=country_id";
 
   $query = "$req $whereq order by $order $p_order_dir";
 
@@ -730,9 +731,9 @@ function run_query_kind_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Category company query execution                                          //
 // Return:
-//   Database Object
+//   Array with orderer categories
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_companycat() {
+function get_ordered_companycat() {
   global $cdg_sql, $cgp_hide;
 
   $show_cat = (! $cgp_hide["company"]["category"]);
@@ -1327,6 +1328,7 @@ function check_data_form($cid, $company) {
 
   return true; 
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query to build the category tree
