@@ -9,7 +9,7 @@
 
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -154,5 +154,5 @@ function check_kind_new(form)
 }
 
 // -->
-</SCRIPT>
+</script>
 ";

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_index.php                                            //
 //     - Desc : Company Index File                                           //
@@ -28,7 +28,6 @@
 // - ext_get_id      -- $title         -- select a company (return id) 
 // - ext_get_id_url  -- $url, $title   -- select a company (id), load URL 
 ///////////////////////////////////////////////////////////////////////////////
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Session, Auth, Perms  Management                                          //
@@ -81,7 +80,6 @@ if ($popup) {
   } else {
     display_error_permission();
   }
-
   display_end();
   exit();
 }
@@ -100,27 +98,20 @@ if ($action == "index" || $action == "") {
   if ($set_display == "yes") {
     dis_company_search_list($company);
   } else {
-    display_ok_msg($l_no_display);
+    display_info_msg($l_no_display);
   }
-
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   $type_q = run_query_companytype();
   $usr_q = run_query_userobm();
   html_company_search_form($type_q, $usr_q, $company);
   dis_company_search_list($company);
-
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    $type_q = run_query_companytype();
-    $usr_q = run_query_userobm();
-    require("company_js.inc");
-    html_company_form($action,"",$type_q, $usr_q, $company);
-  } 
-  else {
-    display_error_permission();
-  }
+  $type_q = run_query_companytype();
+  $usr_q = run_query_userobm();
+  require("company_js.inc");
+  html_company_form($action,"",$type_q, $usr_q, $company);
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_company > 0) {
@@ -148,7 +139,6 @@ if ($action == "index" || $action == "") {
       display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
   }
-
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $company)) {
@@ -164,7 +154,6 @@ if ($action == "index" || $action == "") {
       $type_q = run_query_companytype();
       $usr_q = run_query_userobm();
       html_company_search_form($type_q, $usr_q, $company);
-
     // If it is the first try, we warn the user if some companies seem similar
     } else {
       $obm_q = check_company_context("", $company);
@@ -190,6 +179,7 @@ if ($action == "index" || $action == "") {
     $usr_q = run_query_userobm();
     html_company_form($action, "", $type_q, $usr_q, $company);
   }
+
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -228,18 +218,11 @@ if ($action == "index" || $action == "") {
   $type_q = run_query_companytype();
   $usr_q = run_query_userobm();
   html_company_search_form($type_q, $usr_q, $company);
-
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    $obm_q_type = run_query_companytype();
-    require("company_js.inc");
-    html_company_kind_form($obm_q_type);
-  } 
-  else {
-    display_error_permission();
-  }
-
+   $obm_q_type = run_query_companytype();
+   require("company_js.inc");
+   html_company_kind_form($obm_q_type);
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_kind_insert($tf_kind_new);
@@ -289,19 +272,15 @@ if ($action == "index" || $action == "") {
   $obm_q_type = run_query_companytype();
   require("company_js.inc");
   html_company_kind_form($obm_q_type);
-
-
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
   dis_company_display_pref($pref_q);
-
 } else if ($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($auth->auth["uid"], "company", 1);
   dis_company_display_pref($pref_q);
-
 } else if ($action == "dispref_level") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);

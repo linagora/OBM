@@ -259,13 +259,14 @@ class Auth {
         if ( $this->auth_refreshlogin() ) {
           $this->auth["refresh"] = time() + (60 * $this->refresh);
         } else {
-          return false;
+         return false;
         }
       }
 
       return $this->auth["uid"];
     } else {
       return false;
+      return $this->auth["uid"];
     }
   }
     

@@ -302,19 +302,27 @@ function display_head($l_module) {
   global $l_title;
   global $col_text,$col_bg,$col_link,$img_bg;
   global $set_theme, $obminclude;
+  $headers_e =  "
+   <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+   <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
+  $headers_et = "<html>";
 
   echo "
-  <html>
+    $headers_e
     <head>
+     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/>
      <title>$l_title - $l_module</title>
-     <link rel=stylesheet type=\"text/css\" href=\"/images/$set_theme/style.css\">
+     <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
     </head>
-    <body TEXT=\"#$col_text\" ";
+    <body >";
+    /*TEXT=\"#$col_text\" ";
      if ($img_bg != "") {echo "background=\"/images/$set_theme/$img_bg\" ";}
      if ($col_bg != "") {echo "bgcolor=\"#$col_bg\" ";}
      if ($col_link != "") {echo "link=\"#$col_link\" ";}
      if ($col_link != "") {echo "vlink=\"#$col_link\"";}
   echo " marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
+*/
 }
 
 
@@ -353,11 +361,7 @@ function debug_level_isset($debug) {
 // Display an error message
 /////////////////////////////////////////////////////////////////////////////
 function display_err_msg($msg) {
-  global $col_error; 
-
-  echo "<FONT color=\"#$col_error\">";
-  echo $msg;
-  echo "</FONT><BR>";
+  echo "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
 }
 
 
@@ -365,11 +369,7 @@ function display_err_msg($msg) {
 // Display a warnig message
 /////////////////////////////////////////////////////////////////////////////
 function display_warn_msg($msg) {
-  global $col_textem; 
-
-  echo "<FONT color=\"#$col_textem\">";
-  echo $msg;
-  echo "</FONT><BR>";
+  echo "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
 }
 
 
@@ -377,13 +377,15 @@ function display_warn_msg($msg) {
 // Display an OK message
 ////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg) {
-  global $col_ok; 
-
-  echo "<CENTER><FONT color=\"#$col_ok\">";
-  echo $msg;
-  echo "</FONT><CENTER><BR>";
+  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
 }
 
+////////////////////////////////////////////////////////////////////////////
+// Display an Info message
+////////////////////////////////////////////////////////////////////////////
+function display_info_msg($msg) {
+  echo "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the links to the last visited company, contact and deal
@@ -397,42 +399,54 @@ function display_bookmarks($path="..") {
   global $last_payment_name, $last_account_name, $last_invoice_name,$last_incident_name;
   global $sess;
 
-  echo "<center>
-     <table border=0>
-     <tr><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
-     ".substr($last_company_name,0,30)."</a></font>
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
-     ".substr($last_contact_name,0,30)."</a></font>
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
-     ".substr($last_deal_name,0,30)."</a></font>
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
-     ".substr($last_account_name,0,30)."</a></font>
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
-     ".substr($last_invoice_name,0,30)."</a></font>
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
-     ".substr($last_payment_name,0,30)."</a></font> 
-     </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
-     ".substr($last_contract_name,0,30)."</a></font>
-    </td><td>
-     <font size=-2>
-     <a href=\"".$sess->url("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
-     ".substr($last_incident_name,0,30)."</a></font>"; 
-  echo "          </td></tr></table></center>
-     <hr>"; 
+  echo "
+     <table class=\"bookmarks\">
+       <tr>
+         <td class=\"bookmarks\">
+     <a class=\"bookmarks\" 
+     href=\"".$sess->url("$path/company/company_index.php?action=detailconsult&amp;param_company=".$last_company)."\">
+     ".substr($last_company_name,0,30)."
+     </a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$last_contact)."\">
+     ".substr($last_contact_name,0,30)."</a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">
+     ".substr($last_deal_name,0,30)."
+     </a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/treso/account_index.php?action=detailconsult&amp;param_account=".$last_account)."\">
+     ".substr($last_account_name,0,30)."</a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/treso/invoice_index.php?action=detailconsult&amp;param_invoice=".$last_invoice)."\">
+     ".substr($last_invoice_name,0,30)."</a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/treso/payment_index.php?action=detailconsult&amp;param_payment=".$last_payment)."\">
+     ".substr($last_payment_name,0,30)."</a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$last_contract)."\">
+     ".substr($last_contract_name,0,30)."</a>
+         </td>
+	 <td class=\"bookmarks\">
+     <a class=\"bookmarks\"
+     href=\"".$sess->url("$path/contract/incident_index.php?action=detailconsult&amp;param_incident=".$last_incident)."\">
+     ".substr($last_incident_name,0,30)."</a>
+         </td>
+       </tr>
+     </table>
+     <hr />"; 
 }
 
 
@@ -465,27 +479,23 @@ function display_record_info($p_usercreate_id,$p_userupdate_id,$p_timecreate,$p_
   $query_created = "select userobm_login from UserObm where userobm_id=".$p_usercreate_id;
   $query_modified = "select userobm_login from UserObm where userobm_id=".$p_userupdate_id;
 
-  echo "<table width=\"100%\">";
-  echo "  <tr><td width=\"60%\">";
-  echo "    &nbsp;"; 
-  echo "  </td><td align=right>";
+  echo "<table class=\"recordInfo\">";
+  echo "<tr><td class=\"recordInfo\">";
   if ($p_usercreate_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
-    echo "    <font size=1>";
-    echo "      created :" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timecreate). " " .timestamp_to_time($p_timecreate) .")";
-    echo "    </font>";
+    echo "created :".$obm_q->f("userobm_login")." (".timestamp_to_date($p_timecreate)." ".timestamp_to_time($p_timecreate).")";
   }
-  echo "<br>";
+  echo "</td>
+	</tr><tr>
+	<td class=\"recordInfo\">";
 
   if ($p_userupdate_id != "") {
     $obm_q->query($query_modified);
     $obm_q->next_record();
-    echo "    <font size=1>";
-    echo "      modified:" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timeupdate). " " .timestamp_to_time($p_timeupdate) .")";
-    echo "    </font>";
+    echo "modified:" . $obm_q->f("userobm_login") . " (". timestamp_to_date($p_timeupdate). " " .timestamp_to_time($p_timeupdate) .")";
   }
-  echo "  </td><tr>";
+  echo "  </td></tr>";
   echo "</table>";
 
 }

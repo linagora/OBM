@@ -27,7 +27,16 @@
 // External API ---------------------------------------------------------------
 // - ext_get_ids     --                -- select multiple contacts (return id) 
 ///////////////////////////////////////////////////////////////////////////////
-
+$www ="   <p class=\"messageInfo\">
+    	<a href=\"http://validator.w3.org/check/referer\"><img
+        src=\"http://www.w3.org/Icons/valid-xhtml10\"
+        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
+	<a href=\"http://jigsaw.w3.org/css-validator/\">
+ 	 <img style=\"border:0;width:88px;height:31px\"
+       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
+       alt=\"Valid CSS!\" />
+	 </a>
+  	</p>";
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
@@ -96,12 +105,14 @@ if ($action == "index" || $action == "") {
   } else {
     display_ok_msg($l_no_display);
   }
+  echo $www;
 
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
   dis_contact_search_list($contact, $popup);
- 
+  echo $www;
+
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (isset($param_company)) {
@@ -226,18 +237,21 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q); 
+  echo $www;
 
 } else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q);
+  echo $www;
 
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "contact", 1);
   dis_contact_display_pref($pref_q);
+  echo $www;
 }
 
 

@@ -116,20 +116,20 @@ class OBM_DISPLAY {
     }
 
     echo "
-    <table bgcolor=\"#$col_tableh\" cellspacing=\"2\" border=\"0\" >
+    <table class=\"OBMDisplayPref\" >
        <tr>
-         <td align=\"center\" colspan=\"4\">
-           <font color=\"#$col_textem\"><b>".$this->pref_title."</b></td>
+         <td class=\"OBMDisplayHead\" colspan=\"4\">
+          ".$this->pref_title."</td>
        </tr>
        <tr>
-         <td bgcolor=\"#$col_tableh\" align=\"center\">
-            <font color=\"#$col_textem\">$l_displayed</font></td>
-         <td bgcolor=\"#$col_tableh\" align=\"center\">
-            <font color=\"#$col_textem\">$l_order</font></td>
-        <td bgcolor=\"#$col_tableh\" align=\"center\">
-            <font color=\"#$col_textem\">$l_field</font></td>
-         <td bgcolor=\"#$col_tableh\" align=\"center\">
-            <font color=\"#$col_textem\">$l_move</font></td>
+         <td class=\"OBMDisplayLabel\">
+            $l_displayed</td>
+         <td class=\"OBMDisplayLabel\">
+            $l_order</td>
+        <td class=\"OBMDisplayLabel\">
+            $l_field</td>
+         <td class=\"OBMDisplayLabel\">
+            $l_move</td>
        </tr>";
 
     $i = 0;
@@ -140,51 +140,51 @@ class OBM_DISPLAY {
       $display = $this->display_pref->f("display_display");
       echo "
           <tr>
-            <td bgcolor=\"#$col_table\" align=\"center\">";
+            <td class=\"OBMDisplayText\">";
       if ($display == 1) {
-	echo "<a href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
-        <img alt=\"$l_display_no\" border=0 src=\"/images/$set_theme/$ico_round\"></a>";
+	echo "<a class=\"OBMDisplayText\" href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
+        <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_round\" /></a>";
       } else if ($display == 0) {
 	$nb_field_hidden++;
-	echo "<a href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
-          <img alt=\"$l_display_yes\" border=0 src=\"/images/$set_theme/$ico_crow\"></a>";
+	echo "<a class=\"OBMDisplayText\" href=\"".$sess->url("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
+          <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
       } else if($display == 2) {
-	echo "<img alt=\"$l_mandatory\" border=0 src=\"/images/$set_theme/$ico_forbidden\"></a>";
+	echo "<img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
       }
       echo "
             </td>
-            <td bgcolor=\"#$col_table\" align=\"center\">
-               <b>";
+            <td class=\"OBMDisplayText\">
+              ";
       if($display == 0) {
-	echo "<b>&nbsp;</b>";
+	echo "&nbsp;";
       } else {
 	$pos = $this->display_pref->f("display_fieldorder") - $nb_field_hidden;
-	echo "<b>$pos</b>";
+	echo "$pos";
       }
       echo "
              </td>
-            <td bgcolor=\"#$col_table\" align=\"center\">
+            <td class=\"OBMDisplayText\">
                    ".$fieldnames[$fieldname]."
             </td>
-            <td bgcolor=\"#$col_table\" align=\"center\">
+            <td class=\"OBMDisplayText\">
               <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
                 <tr>";
 
       // If last field we doesn't display the down arrow
       if ($i == $nb_field) {
-	echo "<td align=\"left\">&nbsp;</td>";
+	echo "<td>&nbsp;</td>";
       } else {
-	echo "<td align=\"left\"><a href=\"".$sess->url("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
-           <img border=0 alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\"></a></td>";
+	echo "<td><a href=\"".$sess->url("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
+           <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
       }
 
       // If first field we doesn't display the up arrow
       if ($i == 0) {
-	echo "<td align=\"right\">&nbsp;</td>";
+	echo "<td >&nbsp;</td>";
       } else {
-	echo "<td align=\"right\">
+	echo "<td>
               <a href=\"".$sess->url("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder")."&amp;which=".$this->pref_which)."\">
-            <img alt=\"$l_up\" border=0 src=\"/images/$set_theme/$ico_arrow_up\"></a></td>";
+            <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       echo "
                 </tr>
@@ -194,9 +194,7 @@ class OBM_DISPLAY {
       $i++;
     }
     echo "
-            </td>
-          </tr>";
-    echo "</table>";
+        </table>";
 
     // If help is set, we display the help panel
     if($this->pref_dis_help == 1) {
@@ -214,49 +212,49 @@ class OBM_DISPLAY {
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_round, $ico_forbidden;
 
-    echo "<br><hr>
-      <table bgcolor=\"#$col_tableh\" cellspacing=\"2\" border=\"0\" >
+    echo "<hr />
+      <table class=\"OBMDisplayPref\">
       <tr>
-        <td align=center colspan=2><font color=\"#$col_textem\">
-        <b>$l_help</b></td>
+        <td class=\"OBMDisplayHead\" colspan=\"2\">
+        $l_help</td>
       </tr>
       <tr>
-        <td align=\"center\" valign=\"middle\" bgcolor=\"#$col_table\">
-          <img border=0 src=\"/images/$set_theme/$ico_round\"></a>
+        <td class=\"OBMDisplayLabel\">
+          <img src=\"/images/$set_theme/$ico_round\" alt=\"\" />
         </td>
-        <td valign=\"middle\" bgcolor=\"#$col_table\">
+        <td class=\"OBMDisplayText\">
           $l_help_display_yes
         </td>
       </tr>
       <tr>
-        <td align=\"center\" valign=\"middle\" bgcolor=\"#$col_table\">
-          <img border=0 src=\"/images/$set_theme/$ico_crow\">
+        <td class=\"OBMDisplayLabel\">
+          <img src=\"/images/$set_theme/$ico_crow\" alt=\"\" />
         </td>
-        <td valign=\"middle\" bgcolor=\"#$col_table\">
+        <td class=\"OBMDisplayText\">
           $l_help_display_no
         </td>
       </tr>
       <tr>
-        <td align=\"center\" valign=\"middle\" bgcolor=\"#$col_table\">
-         <img border=0 src=\"/images/$set_theme/$ico_forbidden\">
+        <td class=\"OBMDisplayLabel\">
+         <img src=\"/images/$set_theme/$ico_forbidden\" alt=\"\" />
         </td>
-        <td valign=\"middle\" bgcolor=\"#$col_table\">
+        <td class=\"OBMDisplayText\">
           $l_help_mandatory
         </td>
       </tr>
       <tr>
-        <td align=\"center\" valign=\"middle\" bgcolor=\"#$col_table\">
-         <img border=0 src=\"/images/$set_theme/$ico_arrow_down\">
+        <td class=\"OBMDisplayLabel\">
+         <img src=\"/images/$set_theme/$ico_arrow_down\" alt=\"\" />
         </td>
-        <td valign=\"middle\" bgcolor=\"#$col_table\">
+        <td class=\"OBMDisplayText\">
           $l_help_down
         </td>
       </tr>
       <tr>
-        <td align=\"center\" valign=\"middle\" bgcolor=\"#$col_table\">
-          <img border=0 src=\"/images/$set_theme/$ico_arrow_up\">
+        <td class=\"OBMDisplayLabel\">
+          <img src=\"/images/$set_theme/$ico_arrow_up\" alt=\"\" />
         </td>
-        <td valign=\"middle\" bgcolor=\"#$col_table\">
+        <td class=\"OBMDisplayText\">
           $l_help_up
         </td>
       </tr>
@@ -282,7 +280,7 @@ class OBM_DISPLAY {
       $this->dis_data_index($this->data_url);
     }
 
-    echo "<table bgcolor=\"#$col_tableh\" border=\"0\" width=100%>";
+    echo "<table class=\"OBMDisplayData\">";
     $this->dis_data_header($this->data_url);
 
     $this->display_pref->seek(0);
@@ -297,7 +295,7 @@ class OBM_DISPLAY {
       // If debug level Id is set, display the entity id
       if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
 	$dg_id = $this->data_set->f("Id");
-	echo "<td>$dg_id</td>";
+	echo "<td class=\"OBMDisplayText\">$dg_id</td>";
       }
 
       // If a left checkbox has to be displayed
@@ -312,12 +310,11 @@ class OBM_DISPLAY {
 	  } else {
 	    $cb_check = "";
 	  }
-	  echo "<td align=\"center\" bgcolor=\"#$col_table\">
-                <input type=checkbox name=\"$name\" $cb_check></td>";
+	  echo "<td class=\"OBMDisplayText\">
+                <input type=\"checkbox\" id=\"$name\" name=\"$name\" $cb_check /></td>";
 	}
 	else
-	  echo "<td align=\"center\" bgcolor=\"#$col_table\">
-                &nbsp;</td>";
+	  echo "<td class=\"OBMDisplayText\">&nbsp;</td>";
       }
 
       //Incident Rows special Color
@@ -369,7 +366,7 @@ class OBM_DISPLAY {
 	else if ($fieldname == "company_email") {
 	  if (strcmp($this->data_set->f("company_email"),"") != 0) {
 	    $url = "mailto:".$this->data_set->f("company_email");
-	    $name = "<IMG BORDER=0 SRC=\"/images/".$set_theme."/".$ico_mail."\" ALT=\"".$this->data_set->f("company_email")."\">";
+	    $name = "<img src=\"/images/".$set_theme."/".$ico_mail."\" alt=\"".$this->data_set->f("company_email")."\" />";
           }
         } 
 	else if ($fieldname == "company_web") {
@@ -378,7 +375,7 @@ class OBM_DISPLAY {
 	      $url = "http://";
 	    }
 	    $url .= $this->data_set->f("company_web");
-	    $name = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_web\" ALT=\"".$this->data_set->f("company_web")."\">";
+	    $name = "<img src=\"/images/$set_theme/$ico_web\" alt=\"".$this->data_set->f("company_web")."\" />";
 	  }
         }
         else if ($fieldname == "company_contact_number") {
@@ -390,7 +387,7 @@ class OBM_DISPLAY {
         }
         else if ($fieldname == "company_new_contact") {
 	  $url = "../contact/contact_index.php?action=new&amp;param_company=".$this->data_set->f("company_id");
-          $name = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\" ALT=C>";
+          $name = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"\" />";
         }
         else if ($fieldname == "company_deal_number") {
 	  $name = $this->data_set->f("company_deal_number");
@@ -402,12 +399,11 @@ class OBM_DISPLAY {
         }
        
         else if ($fieldname == "company_address1") {
-	  $name="<FONT SIZE=-2>&nbsp;";
 	  if ($this->data_set->f("company_address1") != "") {
-	    $name .= $this->data_set->f("company_address1")."<BR>\n";
+	    $name .= $this->data_set->f("company_address1")."<br />\n";
 	  }
 	  if ($this->data_set->f("company_address2") != "") {
-	    $name .= $this->data_set->f("company_address2")."<BR>\n";
+	    $name .= $this->data_set->f("company_address2")."<br />\n";
 	  }
 	  if ($this->data_set->f("company_zipcode") != "" ) {
 	    $name .= $this->data_set->f("company_zipcode") . "&nbsp;&nbsp;";
@@ -417,7 +413,6 @@ class OBM_DISPLAY {
 	  if ($this->data_set->f("company_town") != "" ) {
 	    $name .= $this->data_set->f("company_town");
 	  }
-	  $name .="</FONT>";
 	}
 
 	//------------------------------
@@ -443,7 +438,7 @@ class OBM_DISPLAY {
 	else if ($fieldname == "contact_email") {
 	  if (strcmp($this->data_set->f("contact_email"),"") != 0) {
 	    $url = "mailto:".$this->data_set->f("contact_email");
-	    $name = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_mail\" ALT=\"".$this->data_set->f("contact_email")."\">";
+	    $name = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"".$this->data_set->f("contact_email")."\" />";
 	  }
         }
 
@@ -554,7 +549,7 @@ class OBM_DISPLAY {
           $email = $this->data_set->f("userobm_email");
 	  if (strcmp($email ,"") != 0) {
 	    $url = "mailto:$email";
-	    $name = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_mail\" ALT=\"$email\">$email";
+	    $name = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\">$email";
           }
         } 
 	else if ($fieldname == "userobm_archive") {
@@ -724,10 +719,11 @@ class OBM_DISPLAY {
 	else {
 	 $td = "<td align=\"$align\" bgcolor=\"#$col_table\">";
 	}
-        $content = "<font size=-1>";
+         $td = "<td class=\"OBMDisplayText\">";
+        $content = "";
 	
 	if($popup_display!="") { //make the popup link for timemanagement modification
-	  $content ="&nbsp;<a href=\"\" OnClick=\"window.name='root';window.open('$popup_display','',config='height=270,width=970,scrollbar=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	  $content ="&nbsp;<a class=\"OBMDisplayText\" href=\"\" OnClick=\"window.name='root';window.open('$popup_display','',config='height=270,width=970,scrollbar=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
 	  if ($name == "") {
 	     $content .= $this->data_set->f($fieldname);
 	  } else {
@@ -737,7 +733,7 @@ class OBM_DISPLAY {
 	}
 	else {
 	if ($url != "") {
-	  $content .= "&nbsp;<a href=\"".$sess->url("$url")."\">";
+	  $content .= "&nbsp;<a class=\"OBMDisplayText\" href=\"".$sess->url("$url")."\">";
 	  if ($name == "") { 
 	    $content .= $this->data_set->f($fieldname);
 	  } else {
@@ -752,7 +748,7 @@ class OBM_DISPLAY {
 	  }
 	}
       }
-	echo "$td $content </font></td>\n";
+	echo "$td $content </td>\n";
       }
       
 
@@ -762,7 +758,8 @@ class OBM_DISPLAY {
       if (($this->data_cb_side == "right")
             && ($this->data_cb_text != "")) {
 	echo "<td align=\"center\" bgcolor=\"#$col_table\">
-                <input type=checkbox name=\"".$this->data_cb_name.$this->data_set->f($this->data_idfield)."\"></td>";
+                <input type=\"checkbox\" id=\"".$this->data_cb_name.$this->data_set->f($this->data_idfield)."\" 
+                 name=\"".$this->data_cb_name.$this->data_set->f($this->data_idfield)."\" /></td>";
       }
       $this->display_pref->seek(0);
       echo "</tr>";
@@ -809,7 +806,7 @@ class OBM_DISPLAY {
 
     $nb_page = floor(($nb_list-1) / $set_rows);
     $first_row = $page * $set_rows;
-
+    echo "<p class=\"messageInfo\">";
     // skip if display possible on a single page if nb_page==0
     if ($nb_page > 0) {
       // Table of content (pages)
@@ -823,7 +820,7 @@ class OBM_DISPLAY {
 	if ($i != $page) echo "</a>\n";
 	$i++;
       }
-      echo "<br><br>";
+      echo "</p>";
       $this->data_set->seek($first_row);
     }
   }
@@ -847,14 +844,13 @@ class OBM_DISPLAY {
     
     // If debug level Id is set, display the entity id
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
-      echo "<td>Id</td>";
+      echo "<td class=\"OBMDisplayHead\">Id</td>";
     }
 
     // Display the checkbox title if needed (exists and left side)
     if (($this->data_cb_side == "left")
           && ($this->data_cb_text != "")) {
-      echo "<td align=\"center\" bgcolor=\"#$col_tableh\">
-         <font color=\"#$col_textem\">".$this->data_cb_text."</font></td>";
+      echo "<td class=\"OBMDisplayHead\">".$this->data_cb_text."</td>";
     }
 
     while($this->display_pref->next_record()) {
@@ -862,11 +858,9 @@ class OBM_DISPLAY {
       $label = $fieldnames[$fieldname];
       $order = ($order_dir == "ASC" ? "DESC" : "ASC");
 
-      echo "<td align=\"center\" bgcolor=\"#$col_tableh\">
-                <font color=\"#$col_textem\">";
-
+      echo "<td class=\"OBMDisplayHead\">";
       if ($this->data_order) {
-        echo "<a href=\"".$url.
+        echo "<a class=\"OBMDisplayHead\" href=\"".$url.
           (($url != "") ? "&amp;page=$page" : "" ) .
           "&amp;new_order=$fieldname&amp;order_dir=$order\">";
       }
@@ -875,15 +869,13 @@ class OBM_DISPLAY {
         echo "</a>";
       }
 
-      echo " </font>
-           </td>";
+      echo "</td>";
     }
 
     // Display the checkbox title if needed (exists and right side)
     if (($this->data_cb_side == "right")
          && ($this->data_cb_text != "")) {
-      echo "<td align=\"center\" bgcolor=\"#$col_tableh\">
-         <font color=\"#$col_textem\">".$this->data_cb_text."</font></td>";
+      echo "<td class=\"OBMDisplayHead\">".$this->data_cb_text."</td>";
     }
     echo "</tr>";
   }

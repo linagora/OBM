@@ -24,35 +24,40 @@ function html_contact_search_form ($contact) {
     $ext_action = $contact["ext_action"];
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
-    $ext = "<INPUT NAME=ext_action TYPE=hidden VALUE=\"$ext_action\">
-            <INPUT NAME=ext_id TYPE=hidden VALUE=\"$ext_id\">
-            <INPUT NAME=ext_url TYPE=hidden VALUE=\"$ext_url\">";
+    $ext = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">";
   }
 
   // --- HTML Template --------------------------------------------------------
-  echo "<CENTER>
-     <FORM METHOD=GET NAME=f_contact ACTION=\"" .
-     $sess->url("contact_index.php") . "\">
-     <TABLE BORDER=0><TR>
-       <TD><FONT SIZE=-2>$l_contact_name</FONT><BR>
-         <INPUT TYPE=text NAME=tf_lname size=16 value=\"$lname\"></TD>
-       <TD>&nbsp;&nbsp;</TD>
-       <TD><FONT SIZE=-2>$l_phone</FONT><BR>
-         <INPUT TYPE=text NAME=tf_phone size=14 value=\"$phone\"></TD>
-       <TD>&nbsp;&nbsp;</TD>
-       <TD align=left><FONT SIZE=-2> $l_from_company </FONT><BR>
-         <INPUT TYPE=text NAME=tf_company size=16 value=\"$company\"></TD>
-       <TD VALIGN=bottom>&nbsp;&nbsp;
-         <INPUT NAME=\"hd_company_id\" TYPE=hidden VALUE=\"\">
-         <INPUT NAME=\"popup\" TYPE=hidden VALUE=\"$popup\">
-         <INPUT NAME=\"action\" TYPE=hidden VALUE=\"search\">
-         <INPUT NAME=\"submit\" TYPE=submit VALUE=\"$l_find\">
-         $ext&nbsp;
-       </TD>
-     </TR>
-     </TABLE>
-     </FORM><HR>
-   </CENTER>";
+  echo "
+    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"".$sess->url("contact_index.php")."\">
+    <table class=\"details\">
+      <tr>
+        <td class=\"textLabelForm\">$l_contact_name</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_phone</td>
+        <td>&nbsp;&nbsp;</td>
+        <td class=\"textLabelForm\">$l_from_company</td>
+        <td rowspan=\"2\">&nbsp;&nbsp;&nbsp;&nbsp;
+        <input name=\"hd_company_id\" type=\"hidden\" value=\"\" />
+        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+        <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+        <input name=\"popup\" type=\"hidden\" value=\"$popup\" />
+        $ext&nbsp;
+        </td>
+      </tr>
+      <tr>
+        <td><input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td><input type=\"text\" name=\"tf_phone\" size=\"14\" value=\"$phone\" /></td>
+        <td>&nbsp;&nbsp;</td>
+        <td><input type=\"text\" name=\"tf_phone\" size=\"16\" value=\"$company\" /></td>
+      </tr>
+    </table>
+    </form>
+    <hr />";
+
 }
 
 
@@ -113,26 +118,26 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
     $dis_contact_list->data_cb_text = "X";
     $dis_contact_list->data_idfield = "contact_id";
     $dis_contact_list->data_cb_name = "cb_con";
-    $display_popup_head = "\n<FORM TARGET=root METHOD=POST action=\"$ext_url\">";
-    $display_popup_end = "<INPUT TYPE=submit value=\"$l_add\">
-      <INPUT TYPE=hidden name=param_list value=\"$ext_id\">
-      <INPUT TYPE=hidden name=action value=\"$ext_action\">
-      </FORM>
-      <p align=right>
-      <a href=\"\" onclick='window.close();'>$l_close</a>";
+    $display_popup_head = "\n<form target=\"root\" method=\"post\" action=\"$ext_url\">";
+    $display_popup_end = "<input type=\"submit\" value=\"$l_add\" />
+      <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" />
+      <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+      </form>
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
   }
   $dis_contact_list->data_set = $obm_q;
   $dis_contact_list->data_header = "both";
   $dis_contact_list->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-
+  display_info_msg($nb_con." ".$l_found);
   echo "
-  <center><font color=\"#$col_textem\">$nb_con $l_found</font><br>
   $display_popup_head".
   $dis_contact_list->display();
   echo "$display_popup_end
-  </center>";
+  ";
 }
 
 
@@ -292,7 +297,7 @@ function html_contact_consult($co_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $kind_q, $contact) {
   global $set_theme, $ico_mail, $col_table;
-  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_private;
+  global $l_lastname,$l_firstname,$l_kind,$l_function,$l_company,$l_phone,$l_hphone,$l_mphone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_comment,$l_private,$l_coord, $l_contact;
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $sess, $auth;
@@ -407,59 +412,59 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<CENTER>
-    <TABLE BORDER=0>
-    <FORM METHOD=GET NAME=form_mod_contact onSubmit=\"if (check_contact(this)) return true; else return false;\" ACTION=\"".$sess->url("contact_index.php")."\">
-    <TR><TD>
+  echo "
+    <form method=\"post\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" ACTION=\"".$sess->url("contact_index.php")."\">
 
-  <TABLE BORDER=0>
-  <TR><TD>
-    <TABLE BORDER=0>
-    <TR>
-    <TD><FONT SIZE=-2>$l_lastname</FONT></TD>
-    <TD><INPUT NAME=tf_lname size=30 value=\"$lname\"></TD>
-    </TR>
-    <TR>
-    <TD><FONT SIZE=-2>$l_firstname</FONT> </TD>
-    <TD><INPUT NAME=tf_fname size=30 value=\"$fname\"></TD>
-    </TR><TR>
-    <TD><FONT SIZE=-2>$l_function</FONT> </TD>
-    <TD><INPUT NAME=tf_func size=30 value=\"$func\"></TD>
-    </TR><TR>
-    <TD><FONT SIZE=-2>$l_company</FONT> </TD>
-    <TD>
-      <A HREF=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+    <table class=\"details\">
+    <tr>
+    <td colspan=\"2\" class=\"detailHead\">$l_contact</td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_lastname</td>
+    <td><input type=\"text\" name=\"tf_lname\" size=\"30\" value=\"$lname\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_firstname</td>
+    <td><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_function</td>
+    <td><input type=\"text\" name=\"tf_func\" size=\"30\" value=\"$func\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_company</td>
+    <td>
+      <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
       $c_name
-      </A><INPUT TYPE=hidden NAME=param_company value=\"$c_id\">
-      <INPUT TYPE=hidden NAME=company_name value=\"$c_name\">
-      <INPUT TYPE=hidden NAME=company_new_id value=\"$c_new_id\">
+      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
+      <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
+      <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
       <a href=\"\" onclick=\"window.open('../company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"/images/$set_theme/$ico_mail\"></a>
-      <INPUT TYPE=text NAME=company_new_name value=\"$c_new_name\" style=\"border:none\" READONLY onfocus=\"this.blur();\">
-    </TD>
-    </TR><TR>
-    <TD colspan=2>
-      <TABLE BORDER=0><TR>     
-      <TD><FONT SIZE=-2>$l_phone</FONT> </TD>
-      <TD><INPUT NAME=tf_phone size=16 value=\"$phone\"></TD>
-      <TD><FONT SIZE=-2>$l_hphone</FONT> </TD>
-      <TD><INPUT NAME=tf_hphone size=16 value=\"$hphone\"></TD>
-      </TR><TR>
-      <TD><FONT SIZE=-2>$l_fax</FONT> </TD>
-      <TD><INPUT NAME=tf_fax size=16 value=\"$fax\"></TD>
-      <TD><FONT SIZE=-2>$l_mphone</FONT> </TD>
-      <TD><INPUT NAME=tf_mphone size=16 value=\"$mphone\"></TD>
-      <TR></TABLE>
-    </TD>
-    </TR></TABLE>
-  </TD>
-  <TD>&nbsp;&nbsp;</TD>
-  <TD valign=top>
+      <img src=\"/images/$set_theme/$ico_mail\" alt=\"\" /></a>
+      <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
+    </td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_kind</td>
+    <td>$sel_kind</td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_coord</td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_phone</td>
+    <td><input type=\"text\" name=\"tf_phone\" size=\"16\" value=\"$phone\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_hphone</td>
+    <td><input type=\"text\" name=\"tf_hphone\" size=\"16\" value=\"$hphone\"></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_fax</td>
+    <td><input type=\"text\" name=\"tf_fax\" size=\"16\" value=\"$fax\"></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_mphone</td>
+    <td><input type=\"text\" name=\"tf_mphone\" size=\"16\" value=\"$mphone\"></td>
+    </tr><tr>
+    <td class=\"detailLabel\"></td>
+    <td></td>
+    </tr><tr>
+    <td class=\"detailLabel\"></td>
+    <td></td>
+    </tr><tr>
 
-    <TABLE BORDER=0>
-    <TR>
-    <TD ALIGN=right><FONT SIZE=-2>$l_kind &nbsp;</FONT></TD>
-    <TD>$sel_kind</TD>
+
   </TR><TR>
     <TD ALIGN=right><FONT SIZE=-2>$l_address&nbsp;&nbsp;<BR>1&nbsp;&nbsp;</FONT></TD>
     <TD><INPUT NAME=tf_ad1 size=30 VALUE=\"$ad1\"></TD>
@@ -508,6 +513,75 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   </TD></TR></TABLE>
   </CENTER>";
 
+
+/*
+    <form method=\"post\" name=\"f_mod_societe\"
+      onsubmit=\"if (check_company(this)) return true; else return false;\"
+      action=\"".$sess->url("company_index.php")."\">
+    <table class=\"details\">
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">$l_company</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td>$sel_kind</td>
+    </tr><tr>    
+      <td class=\"detailLabel\">$l_market</td> 
+      <td>$sel_market</td>
+    </tr><tr>
+      <td colspan=\"2\" class=\"detailHead\">$l_coord</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 1</td>
+      <td><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"30\" size=\"30\" value=\"$ad1\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 2</td>
+      <td><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_postcode</td>
+      <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_town</td>
+      <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_country</td>
+      <td><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"16\" size=\"16\" value=\"$fax\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email</td>
+      <td><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_web</td>
+      <td><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
+    </tr><tr>
+      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
+    </tr><tr>
+      <td colspan=\"2\"><textarea id=\"ta_com\" name=\"ta_com\" rows=\"8\" cols=\"80\">$com</textarea></td>
+    </tr>
+    </table>
+   <table class=\"details\">
+    <tr>
+     <td>
+      $dis_button
+     </td>
+    </tr>
+   </table>
+   </form>
+    $dis_delete
+";
+*/
 }
 
 
@@ -713,9 +787,8 @@ function dis_contact_display_pref($display_pref_q) {
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<center>";
   $dis_pref->display();
-  echo "<br></center>";
+
 }
 
 

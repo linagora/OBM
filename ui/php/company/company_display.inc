@@ -29,61 +29,68 @@ function html_company_search_form ($kind_q, $usr_q, $company) {
   $zip = stripslashes($company["zip"]);
 
   // kind select
-  $sel_kind = "<select name=sel_kind>
-    <option value=\"$c_all\">$l_all";
+  $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
+    <option value=\"$c_all\">$l_all</option>";
   while($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
-    if ($k_id == $kind) { $sel_kind .= " selected"; }
-    $sel_kind .= ">". $kind_q->f("companytype_label") . "\n";
+    if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
+    $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
   }
   $sel_kind .= "</select>";
 
   // Marketing manager select
-  $sel_market = "<select name=sel_market>
-    <option value=\"$c_all\">$l_all";
+  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+    <option value=\"$c_all\">$l_all</option>";
   while($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $mark) { $sel_market .= " selected"; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "\n";
+    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
   }
   $sel_market .= "</select>";
 
-  if ($state == '1') $cstate = " checked";
+  if ($state == '1') $cstate = " checked=\"checked\"";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<center>
-    <form method=get name=f_societe
-      action=\"" . $sess->url("company_index.php") . "\">
-    <table border=0>
+  echo "    
+    <form method=\"get\" name=\"f_societe\" id=\"f_societe\" action=\"" . $sess->url("company_index.php") . "\">
+    <table class=\"details\">
     <tr>
-      <td><font size=-2>$l_company_name</font><br>
-        <input type=text name=tf_name size=20 value=\"$name\">
+      <td class=\"textLabelForm\">$l_company_name</td>
       <td>&nbsp;&nbsp;</td>
-      <td><font size=-2>$l_phone</font><br>
-        <input type=text name=tf_phone size=14 value=\"$phone\"></td>
+      <td class=\"textLabelForm\">$l_phone</td>
       <td>&nbsp;&nbsp;</td>
-      <td><font size=-2>$l_company_kind</font><br>
-        $sel_kind
-      </td>
+      <td class=\"textLabelForm\">$l_company_kind</td>
       <td>&nbsp;&nbsp;</td>
-      <td><font size=-2>$l_postcode</font><br>
-        <input type=text name=tf_zip size=6 value=\"$zip\"></td>
+      <td class=\"textLabelForm\">$l_postcode</td>
       <td>&nbsp;&nbsp;</td>
-      <td><font size=-2>$l_market</font><br>
-        $sel_market
+      <td class=\"textLabelForm\">$l_market</td>
       <td>&nbsp;&nbsp;</td>
-      <td align=center><font size=-2>$l_internal</font><br>
-        <input type=\"checkbox\" name=\"cb_state\" value=\"1\" $cstate></td>
-      <td align=center>&nbsp;&nbsp;&nbsp;&nbsp;
-        <input name=\"action\" type=\"hidden\" value=\"search\">
-        <input name=\"submit\" type=\"submit\" value=\"$l_find\">
+      <td class=\"textLabelForm\">$l_internal</td>
+      <td rowspan=\"2\">&nbsp;&nbsp;&nbsp;&nbsp;
+        <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+        <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
       </td>
     </tr>
+    <tr>
+      <td><input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"20\" value=\"$name\" /></td>
+      <td>&nbsp;&nbsp;</td>
+      <td><input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"14\" value=\"$phone\" /></td>
+      <td>&nbsp;&nbsp;</td>
+      <td>$sel_kind</td>
+      <td>&nbsp;&nbsp;</td>
+      <td><input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\" value=\"$zip\" /></td>
+      <td>&nbsp;&nbsp;</td>
+      <td>$sel_market</td>
+      <td>&nbsp;&nbsp;</td>
+      <td><input type=\"checkbox\" name=\"cb_state\" id=\"cb_state\" value=\"1\" $cstate /></td>
+      <td>&nbsp;&nbsp;</td>
+    </tr>
     </table>
-    </form><hr>";
+    </form>
+    <hr />";
 }
 
 
@@ -118,7 +125,7 @@ function dis_company_search_list($company) {
 //     keys used   : state, name, kind, zip
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
-  global $sess, $col_textem, $l_found;
+  global $sess,  $l_found;
 
   // we urlencode to avoid breakage for space char
   $state = $company["state"];
@@ -127,7 +134,6 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $kind = $company["kind"];
   $zip = urlencode(stripslashes($company["zip"]));
   
-  echo "<font color=\"#$col_textem\">$nb_company $l_found</font><br>";
 
   $url = $sess->url("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;tf_zip=$zip&amp;cb_state=$state");
 
@@ -137,7 +143,7 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
   $dis_companies_list->data_set = $obm_q_comp;
   $dis_companies_list->data_url = $url;
   $dis_companies_list->data_header = "both";
-
+  display_info_msg($nb_company." ".$l_found);
   $dis_companies_list->display();
 }
 
@@ -163,23 +169,29 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
   $uname = urlencode($name);
 
   // -------| Menu Liste Contacts
-  $r = "<a href=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\"><img border=0
-          src=\"/images/$set_theme/$ico_contact_list\"></a>
-        <font size=-1><a href=\"" . $sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company=$uname\">$l_contact_list</a> ($con_num)</font>";
+  $r = "<a href=\"".$sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+        <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
+        <font size=-1>
+         <a href=\"".$sess->url("../contact/contact_index.php?action=search&amp;param_company=$p_id")."&amp;tf_company=$uname\">
+         $l_contact_list</a> ($con_num)</font>";
 
   // -------| Menu Nouveau Contact
   if ($auth->auth["perm"] != $perms_user) {
     $r .= "<br>
-      <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\"><img border=0
-        src=\"/images/$set_theme/$ico_contact_new\"></a>
-      <font size=-1><a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">$l_contact_new</a></font>";
+           <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           <img border=0 src=\"/images/$set_theme/$ico_contact_new\"></a>
+           <font size=-1>
+           <a href=\"" . $sess->url("../contact/contact_index.php?action=new&amp;param_company=$p_id") . "\">
+           $l_contact_new</a></font>";
   }
 
   // -------| Menu Liste Affaires
   $r .= "<br>
-    <a href=\"" . $sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\"><img border=0
-      src=\"/images/$set_theme/$ico_contact_list\"></a>
-    <font size=-1><a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">$l_deal_list</a> ($deal_num)</font>";
+         <a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         <img border=0 src=\"/images/$set_theme/$ico_contact_list\"></a>
+         <font size=-1>
+         <a href=\"".$sess->url("../deal/deal_index.php?action=search&amp;param_company=$p_id") . "&amp;tf_company_name=$uname\">
+         $l_deal_list</a> ($deal_num)</font>";
 
   // -------| Menu Nouvelle Affaire
   if ($auth->auth["perm"] != $perms_user) {
@@ -201,7 +213,7 @@ function html_company_links($p_id, $name, $con_num, $deal_num) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_consult($co_q, $kind_q) {
   // - Themes
-  global $set_theme,$col_label;
+  global $set_theme;
   global $ico_contact_list,$ico_contact_new,$ico_web,$ico_mail;
   // - Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
@@ -209,7 +221,7 @@ function html_company_consult($co_q, $kind_q) {
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
   global $l_insert,$l_update,$l_delete, $l_company;
   global $perms_user,$l_perms_user,$l_coord;
-  global $auth, $sess;
+  global $sess;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
@@ -246,7 +258,7 @@ function html_company_consult($co_q, $kind_q) {
   if ($email != "") {
     $link_email = "<a href=\"mailto:$email\">
       <img border=\"0\" src=\"/images/$set_theme/$ico_mail\"
-      alt=\"$email\"></a>";
+      alt=\"$email\" /></a>";
   } else {
     $link_email = "&nbsp;";
   }
@@ -257,7 +269,7 @@ function html_company_consult($co_q, $kind_q) {
     if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
     $link_web .= "$web\">
       <img border=\"0\" src=\"/images/$set_theme/$ico_web\"
-      alt=\"$web\"></a>";
+      alt=\"$web\" /></a>";
   } else {
     $link_web = "&nbsp;";
   }
@@ -269,9 +281,7 @@ function html_company_consult($co_q, $kind_q) {
 
   // --- HTML Template --------------------------------------------------------
   echo "
-   <p>
-    $links
-    <table class=\"detail\">
+    <table class=\"details\">
     <tr>
       <td class=\"detailHead\" colspan=\"2\">$l_company</td>
     </tr><tr>
@@ -303,7 +313,7 @@ function html_company_consult($co_q, $kind_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_expresspostal</td>
       <td class=\"detailText\">$cdx</td>
-    </tr><tr>
+    </tr><tr> 
       <td class=\"detailLabel\">$l_town</td>
       <td class=\"detailText\">$town</td>
     </tr><tr>
@@ -320,144 +330,15 @@ function html_company_consult($co_q, $kind_q) {
       <td class=\"detailText\"> $email $link_email</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_web</td>
-      <td class=\"detailText\">$web $link_web</font></td>
+      <td class=\"detailText\">$web $link_web</td>
     </tr><tr>
       <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
     </tr><tr>
       <td class=\"detailText\" colspan=\"2\">".nl2br($com)."</td>
     </tr>
     </table>
-   </p>";
-
-/*
-  echo "<center>
-    <table border=0>
-    <tr>
-      <td valign=top>
-      $links
-      </td>
-      <td>
-      <table border=0>
-      <tr>
-        <td valign=top>
-        <table border=0>
-        <tr>
-  <!-- NUMBER -->
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_number &nbsp;&nbsp;</font>
-          </td>
-          <td>$num</td>
-  <!-- NAME -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_name &nbsp;&nbsp;</font>
-          </td>
-          <td>$name</td>
-  <!-- KIND -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_kind &nbsp;&nbsp;</font>
-          </td>
-          <td>$lkind</td>
-  <!-- Marketing manage -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_market &nbsp;&nbsp;</font>
-          </td>
-          <td>$lmarket</td>
-  <!-- EMPTY -->
-        </tr><TR>
-          <td>&nbsp;</td>
-          <td>&nbsp;</td>
-  <!-- PHONE -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_phone &nbsp;</font>
-          </td>
-          <td>$phone</td>
-  <!-- FAX -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_fax &nbsp;</font>
-          </td>
-          <td>$fax</td>
-        </tr>
-        </table>
-        </td>
-
-        <td>&nbsp;&nbsp;</td>
-        <td valign=top>
-
-        <table border=0>
-        <tr>
-  <!-- ADDRESS 1 -->
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_address &nbsp;1&nbsp;</font>
-          </td>
-          <td>$ad1</td>
-  <!-- ADDRESS 2 -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_address &nbsp;2&nbsp;</font>
-          </td>
-          <td>$ad2</td>
-  <!-- ZIP CODE + Express POSTAL -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_postcode &nbsp;</font>
-          </td>
-          <td>$zip &nbsp;&nbsp;&nbsp;
-            <font color=\"#$col_label\" size=-2>$l_expresspostal &nbsp;$cdx</font>
-          </td>
-  <!-- TOWN -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_town &nbsp;</font>
-          </td>
-          <td>$town</td>
-  <!-- COUNTRY -->
-        </tr><tr>
-          <td align=right>
-            <font color=\"#$col_label\" size=-2>$l_country &nbsp;</font>
-          </td>
-          <td>$ctry</td>
-        </tr>
-        </table>
-
-        </td>
-      </tr>
-      </table>
-
-      <table border=0>
-      <tr>
-  <!-- EMAIL + LINK -->
-        <td align=right>
-          <font color=\"#$col_label\" size=-2>$l_email &nbsp;</font>
-        </td>
-        <td>$email</td>
-        <td align=center>$link_email</td>
-      </tr><tr>
-  <!-- WEB + LINK -->
-        <td align=right>
-          <font color=\"#$col_label\" size=-2>$l_web &nbsp;</font>
-        </td>
-        <td>$web</td>
-        <td align=center>$link_web</td>
-      </tr>
-      </table>
-
-  <!-- COMMENTS -->
-      <p>
-      <font color=\"#$col_label\" size=-2>$l_comment</font>
-      <br>
-      $lcom
-
-      $dis_update
-      </td>
-    </tr>
-    </table>
-    </center>";
-*/
+    $dis_button
+";
 }
 
 
@@ -524,45 +405,45 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   }
 
   // kind select
-  $sel_kind = "<select name=sel_kind>";
+  $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">";
   while($kind_q->next_record()) {
     $k_id = $kind_q->f("companytype_id");
     $sel_kind .= "\n<option value=\"$k_id\"";
-    if ($k_id == $kind) { $sel_kind .= " selected"; }
-    $sel_kind .= ">". $kind_q->f("companytype_label") . "\n";
+    if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
+    $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
   }
   $sel_kind .= "</select>";
 
   // Marketing manager select
-  $sel_market = "<select name=sel_market>";
+  $sel_market = "<select name=\"sel_market\" id=\"sel_market\">";
   while($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
-    if ($u_id == $mark) { $sel_market .= " selected"; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "\n";
+    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
   }
   $sel_market .= "</select>";
 
   // cb state state
-  if ($state == 1) $lstate = " checked";
+  if ($state == 1) $lstate = " checked=\"checked\"";
 
   // Email link
   if (($action=="detailupdate") || ($action=="update")) { 
     if ($email != "") {
-      $link_email = "<A HREF=\"mailto:$email\">
-        <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_mail\"
-        ALT=\"$email\"></A>";
+      $link_email = "<a href=\"mailto:$email\">
+        <img src=\"/images/$set_theme/$ico_mail\"
+        alt=\"$email\" /></a>";
     } else { $link_email = "&nbsp;"; }
   } else { $link_email = "&nbsp;"; }
 
   // Web link
   if (($action=="detailupdate") || ($action=="update")) {
     if ($web != "") {
-      $link_web = "<A TARGET=_blank HREF=\"";
+      $link_web = "<a target=\"_blank\" href=\"";
       if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
       $link_web .= $web . "\">
-        <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_web\"
-        ALT=\"$web\"></A>";
+        <img src=\"/images/$set_theme/$ico_web\"
+        alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
 
@@ -573,104 +454,103 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   if (($action == "detailupdate") || ($action == "update")) {
     $dis_button = "
       <!-- Update button -->
-      <input type=hidden name=param_company value=\"$id\">
-      <input type=\"hidden\" name=\"action\" value=\"update\">
-      <input type=\"submit\" value=\"$l_update\"> 
-      </form>
-      </td>
-
-      <!-- Delete button -->
-      <td><form method=post name=f_sup_societe
-      onSubmit=\"if (valider_suppression()) return true; else return false;\"
+      <input type=\"hidden\" name=\"param_company\" id=\"param_company\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update\" /> 
+      ";
+    $dis_delete = "
+      <form method=\"post\" name=\"f_sup_societe\"
+      onsubmit=\"if (valider_suppression()) return true; else return false;\"
       action=\"" . $sess->url("company_index.php") . "\"> 
-      <input type=hidden name=action value=check_delete>
-      <input type=hidden name=param_company value=\"$id\">
-      <input type=submit value=\"$l_checkdelete\">
-      </form>";
+      <table class=\"details\">
+        <tr>
+          <td>
+      <input type=\"hidden\" name=\"action\" value=\"check_delete\" />
+      <input type=\"hidden\" name=\"param_company\" value=\"$id\" />
+      <input type=\"submit\" value=\"$l_checkdelete\" />
+         </td>
+       </tr>
+      </table>
+      </form>
+      ";
   } elseif (($action == "new") || ($action == "insert")) {
-    $dis_button = "<input type=hidden name=\"action\" value=\"insert\">
-      <input type=submit value=\"$l_insert\">
-      </form>";
+    $dis_button = "
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\" />
+      ";
   }
 
 
   // --- HTML Template --------------------------------------------------------
-  echo "<CENTER>
-    <FORM METHOD=POST NAME=f_mod_societe
-      onSubmit=\"if (check_company(this)) return true; else return false;\"
-      ACTION=\"".$sess->url("company_index.php")."\">";
-
   echo "
-    <table class=\"detail\">
+    <form method=\"post\" name=\"f_mod_societe\"
+      onsubmit=\"if (check_company(this)) return true; else return false;\"
+      action=\"".$sess->url("company_index.php")."\">
+    <table class=\"details\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">$l_company</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_name</td>
-      <td><input type=\"text\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\"></td>
+      <td><input type=\"text\" id=\"tf_name\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
-      <td><input type=\"text\" name=tf_num value=\"$num\" size=\"30\" maxlength=\"32\"></td>
+      <td><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
-      <td>$sel_kind </font></td>
+      <td>$sel_kind</td>
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td>$sel_market</td>
     </tr><tr>
-      <td colspan=2 class=\"detailHead\">
-        $font_label<b>$l_coord</b></font></td>
+      <td colspan=\"2\" class=\"detailHead\">$l_coord</td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_address 1</b></font></td>
-      <td><input NAME=tf_ad1 maxlength=30 size=30 value=\"$ad1\"></td>
+      <td class=\"detailLabel\">$l_address 1</td>
+      <td><input type=\"text\" id=\"tf_ad1\" name=\"tf_ad1\" maxlength=\"30\" size=\"30\" value=\"$ad1\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_address 2</b></font></td>
-      <td><input NAME=tf_ad2 maxlength=30 size=30 value=\"$ad2\"></td>
+      <td class=\"detailLabel\">$l_address 2</td>
+      <td><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_postcode</b></font></td>
-      <td><input NAME=tf_zip maxlength=14 size=6 value=\"$zip\"></td>
+      <td class=\"detailLabel\">$l_postcode</td>
+      <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_expresspostal</b></font></td>
-      <td><input NAME=tf_cdx maxlength=8 size=8 value=\"$cdx\"></td>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_town</b></font></td>
-      <td><input NAME=tf_town maxlength=24 size=24 value=\"$town\"></td>
+      <td class=\"detailLabel\">$l_town</td>
+      <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_country</b></font></td>
-      <td><input NAME=tf_ctry maxlength=24 size=24 value=\"$ctry\"></td>
+      <td class=\"detailLabel\">$l_country</td>
+      <td><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_phone</b></font></td>
-      <td><INPUT NAME=tf_phone maxlength=16 size=16 value=\"$phone\"></td>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td><input type=\"text\" id=\"tf_phone\" name=\"tf_phone\" maxlength=\"16\" size=\"16\" value=\"$phone\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_fax</b></font></td>
-      <td><input NAME=tf_fax maxlength=16 size=16 value=\"$fax\"></td>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td><input type=\"text\" id=\"tf_fax\" name=\"tf_fax\" maxlength=\"16\" size=\"16\" value=\"$fax\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_email</b></font></td>
-      <td><input NAME=tf_email maxlength=64 size=45 value=\"$email\"></td>
+      <td class=\"detailLabel\">$l_email</td>
+      <td><input type=\"text\" id=\"tf_email\" name=\"tf_email\" maxlength=\"64\" size=\"45\" value=\"$email\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$font_label<b>$l_web</b></font></td>
-      <td><input NAME=tf_web maxlength=52 size=45 value=\"$web\"></td>
+      <td class=\"detailLabel\">$l_web</td>
+      <td><input type=\"text\" id=\"tf_web\" name=\"tf_web\" maxlength=\"52\" size=\"45\" value=\"$web\" /></td>
     </tr><tr>
-      <td class=\"detailHead\" colspan=2 >
-        $font_label<b>$l_comment</b></font></td>
+      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
     </tr><tr>
-      <td colspan=2><textarea NAME=ta_com ROWS=8 COLS=80>$com</textarea></td>
+      <td colspan=\"2\"><textarea id=\"ta_com\" name=\"ta_com\" rows=\"8\" cols=\"80\">$com</textarea></td>
     </tr>
-    </table>";
+    </table>
+   <table class=\"details\">
+    <tr>
+     <td>
+      $dis_button
+     </td>
+    </tr>
+   </table>
+   </form>
+    $dis_delete
+   ";
 
   
-  if (($action == "detailupdate") || ($action == "update")) {
-    // -------| BITBTN 1 - VALIDER LES CHANGEMENTS
-    echo "<INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
-      <INPUT TYPE=\"hidden\" name=\"action\" value=\"update\">
-      <INPUT TYPE=\"submit\" value=\"$l_update\">";
-
-  } elseif (($action == "new") || ($action == "insert")) {
-    echo "<INPUT TYPE=hidden name=\"action\" value=\"insert\">
-      <INPUT TYPE=submit value=\"$l_insert\">";
-  }
-
-  echo "</FORM>
-  </center>";
 /*
   echo "<center>
     <form method=post name=f_mod_societe
@@ -817,15 +697,17 @@ function dis_check_links($p_id) {
 
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    echo "$l_link_contact";
+    $display_linkc ="<tr><td class=\"detailHead\">$l_link_contact</td></tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("contact_id");
       $cname = $obm_q->f("contact_lastname") . " " . $obm_q->f("contact_firstname");
-      echo "<BR><A HREF=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</A>\n";
+      $display_linkc .= "<tr><td class=\"detailText\">
+      <a class=\"details\" href=\"" . $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">
+      $cname</a>
+      </td></tr>";
     }
-    echo "<P>";
   } else {
-    echo  $l_link_contact_no . "<P>";
+    $display_linkc =  "<tr><td class=\"detailHead\">$l_link_contact_no</td></tr>";
   }
 
   // Links from deals
@@ -833,36 +715,38 @@ function dis_check_links($p_id) {
 
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    echo "$l_link_deal";
+    $display_linkd = "<tr><td class=\"detailHead\">$l_link_deal</td></tr>";
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      echo "<BR><A HREF=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</A>\n";
+      $display_linkd .="<tr><td class=\"détailText\">
+      <a class=\"details\" href=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">
+      $dlabel</a>
+      </td></tr>";
     }
-    echo "<P>";
   } else {
-    echo  $l_link_deal_no . "<P>";
+    $display_linkd =  "<tr><td class=\"detailHead\">$l_link_deal_no</td></tr>" ;
   }
 
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
-    echo "<TABLE><TR><TD>";
+    echo "<table class=\"details\"><tr>
+          <td class=\"detailHead\">";
     dis_delete_form($p_id);
-    echo "</TD>";
+    echo "</td></tr>";
   } else {
-    echo "<P>";
     display_warn_msg($l_cant_delete);
-    echo "<TABLE><TR>";
+    echo "<table class=\"details\">";
   }
-
-  echo "<TD>";
-  echo "<FORM NAME=form_back METHOD=POST
-   ACTION=\"" . $sess->url("company_index.php") ."\">
-   <INPUT TYPE=hidden NAME=action VALUE=detailupdate>
-   <INPUT TYPE=hidden NAME=param_company VALUE=\"$p_id\">
-   <INPUT TYPE=submit VALUE=\"$l_back\">
-   </FORM>";
-  echo "</TR></TABLE>";
+  echo "
+   $display_linkc
+   $display_linkd 
+   <tr><td class=\"detailHead\"><form name=\"form_back\" method=\"post\"
+   action=\"".$sess->url("company_index.php") ."\">
+   <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
+   <input type=\"hidden\" name=\"param_company\" value=\"$p_id\" />
+   <input type=\"submit\" value=\"$l_back\" />
+   </form></td></tr></table>";
 }
 
 
@@ -896,60 +780,66 @@ function dis_company_warn_insert($cid, $co_q, $company) {
   $email = $company["email"];
   $com = $company["com"];
 
-  echo $l_check_samecompany;
+  $disp_same_comp = "<tr><td colspan =\"2\" class=\"detailHead\">$l_check_samecompany</td></tr>";
   while ($co_q->next_record()) {
     $id = $co_q->f("company_id");
     $samename = $co_q->f("company_name");
     $samezip = $co_q->f("company_zip");
-    echo "<BR><A HREF=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$id") . "\">$samename ($samezip)</A>";
+    $disp_same_comp .= "
+          <tr><td colspan =\"2\" class=\"detailText\">
+             <a class=\"details\" href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
+              $samename ($samezip)</a>
+          </td></tr>";
   }
 
-  echo "<P>
-    <TABLE><TR><TD>
-    <FORM METHOD=POST NAME=form_insert
-    ACTION=\"" .$sess->url("company_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=insert>
-    <INPUT TYPE=hidden NAME=hd_confirm VALUE=\"$c_yes\">
-    <INPUT TYPE=hidden NAME=tf_num VALUE=\"$num\">
-    <INPUT TYPE=hidden NAME=cb_state VALUE=\"$state\">
-    <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
-    <INPUT TYPE=hidden NAME=sel_kind VALUE=\"$kind\">
-    <INPUT TYPE=hidden NAME=tf_ad1 VALUE=\"$ad1\">
-    <INPUT TYPE=hidden NAME=tf_ad2 VALUE=\"$ad2\">
-    <INPUT TYPE=hidden NAME=tf_zip VALUE=\"$zip\">
-    <INPUT TYPE=hidden NAME=tf_town VALUE=\"$town\">
-    <INPUT TYPE=hidden NAME=tf_cdx VALUE=\"$cdx\">
-    <INPUT TYPE=hidden NAME=tf_ctry VALUE=\"$ctry\">
-    <INPUT TYPE=hidden NAME=tf_phone VALUE=\"$phone\">
-    <INPUT TYPE=hidden NAME=tf_fax VALUE=\"$fax\">
-    <INPUT TYPE=hidden NAME=tf_web VALUE=\"$web\">
-    <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
-    <INPUT TYPE=hidden NAME=ta_com VALUE=\"$com\">
-    <INPUT TYPE=submit NAME=submit VALUE=\"$l_confirm\">
-    </FORM>
-    </TD><TD>
-    <FORM NAME=form_back METHOD=POST
-    ACTION=\"" .$sess->url("company_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=new>
-    <INPUT TYPE=hidden NAME=tf_num VALUE=\"$num\">
-    <INPUT TYPE=hidden NAME=cb_state VALUE=\"$state\">
-    <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
-    <INPUT TYPE=hidden NAME=sel_kind VALUE=\"$kind\">
-    <INPUT TYPE=hidden NAME=tf_ad1 VALUE=\"$ad1\">
-    <INPUT TYPE=hidden NAME=tf_ad2 VALUE=\"$ad2\">
-    <INPUT TYPE=hidden NAME=tf_zip VALUE=\"$zip\">
-    <INPUT TYPE=hidden NAME=tf_town VALUE=\"$town\">
-    <INPUT TYPE=hidden NAME=tf_cdx VALUE=\"$cdx\">
-    <INPUT TYPE=hidden NAME=tf_ctry VALUE=\"$ctry\">
-    <INPUT TYPE=hidden NAME=tf_phone VALUE=\"$phone\">
-    <INPUT TYPE=hidden NAME=tf_fax VALUE=\"$fax\">
-    <INPUT TYPE=hidden NAME=tf_web VALUE=\"$web\">
-    <INPUT TYPE=hidden NAME=tf_email VALUE=\"$email\">
-    <INPUT TYPE=hidden NAME=ta_com VALUE=\"$com\">
-    <INPUT TYPE=submit VALUE=\"$l_back\">
-    </FORM>
-    </TD></TR>
-    </TABLE>";
+  echo "
+    <table class=\"details\">
+    $disp_same_comp
+    <tr><td>
+    <form method=\"post\" id=\"form_insert\" name=\"form_insert\"
+    action=\"" .$sess->url("company_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"insert\" />
+    <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+    <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+    <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
+    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
+    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
+    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
+    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
+    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
+    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
+    <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
+    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    <input type=\"submit\"  value=\"$l_confirm\" />
+    </form>
+    </td><td>
+    <form id=\"form_back\" name=\"form_back\" method=\"post\"
+    action=\"" .$sess->url("company_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"new\" />
+    <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+    <input type=\"hidden\" name=\"cb_state\" value=\"$state\" />
+    <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+    <input type=\"hidden\" name=\"sel_kind\" value=\"$kind\" />
+    <input type=\"hidden\" name=\"tf_ad1\" value=\"$ad1\" />
+    <input type=\"hidden\" name=\"tf_ad2\" value=\"$ad2\" />
+    <input type=\"hidden\" name=\"tf_zip\" value=\"$zip\" />
+    <input type=\"hidden\" name=\"tf_town\" value=\"$town\" />
+    <input type=\"hidden\" name=\"tf_cdx\" value=\"$cdx\" />
+    <input type=\"hidden\" name=\"tf_ctry\" value=\"$ctry\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
+    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
+    <input type=\"hidden\" name=\"tf_web\" value=\"$web\" />
+    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"ta_com\" value=\"$com\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>
+    </td></tr>
+    </table>";
 }
 
 
@@ -962,13 +852,13 @@ function dis_delete_form($p_id) {
   global $l_delete;
   global $sess;
 
-  echo "\n<FORM name=\"form_delete\" " .
-      "METHOD=post action=\"" . $sess->url("company_index.php") . "\">
-    <INPUT TYPE=\"hidden\" name=\"action\" value=\"delete\">
-    <INPUT TYPE=\"hidden\" name=\"hd_company_id\" value=\"$p_id\">
-    <INPUT TYPE=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\">";
-  echo "</FORM>\n";
+  echo "\n<form name=\"form_delete\" " .
+      "method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input type=\"hidden\" name=\"hd_company_id\" value=\"$p_id\" />
+    <input type=\"submit\" value=\"$l_delete\"
+    onclick=\"if (confirm_del(this.form)) return true; else return false;\" />";
+  echo "</form>\n";
 }
 
 
@@ -983,83 +873,78 @@ function html_company_kind_form($kind_q) {
   global $l_kind_checkdelete,$l_kind_update,$l_kind_new,$l_kind_insert;
   global $sess;
 
-  $sel_kind = "<select name=\"sel_kind\" size=4 >";
+  $sel_kind = "<select name=\"sel_kind\" size=\"4\" >";
   while ($kind_q->next_record()) {
     $label = $kind_q->f("companytype_label");
     $sel_kind .= "\n<option value=\"$label\">$label</option>";
   }
-  $sel_kind .= "</select></td>";
+  $sel_kind .= "</select>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<center>
-    <form name=\"form_admin_kind_delete\"
-      method=post action=\"" . $sess->url("company_index.php") . "\">
-    <table width=90% border=1 bgcolor=\"#$col_a_table\">
+  echo "
+    <table class=\"admin\">
     <tr>
-      <td colspan=5 bgcolor=\"#$col_a_tableh\">
-        <i><font color=\"#$col_textem\">$l_kind_manage</font></i>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_kind_manage
       </td>
     </tr><tr>
       <td>
 
 <!-- Kind Check Delete Section -->
-
-        <table border=0>
+        <table>
         <tr>
-          <td>$l_kind_exist</td>
+          <td class=\"adminLabel\">$l_kind_exist</td>
+          <td class=\"adminLabel\">$sel_kind</td>
           <td>
-            $sel_kind
-          </td>
-          <td>
-            <input type=hidden name=\"action\" value=\"kind_checklink\">
-            <input type=submit name=sub_kind value=\"$l_kind_checkdelete\"
-              onClick=\"if (check_kind_checkdel(this.form)) return true;
-              else return false;\">
+    <form name=\"form_admin_kind_delete\"
+      method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
+            <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
+              onclick=\"if (check_kind_checkdel(this.form)) return true;
+              else return false;\" />
+    </form>
           </td>
         </tr>
-    </form>
 
 <!-- Kind Update Section -->
 
-    <form name=\"form_admin_kind_update\"
-      method=get action=\"" . $sess->url("company_index.php") . "\">
         <tr>
-          <td colspan=2 align=center>
-            <input type=hidden name=sel_kind value=\"\">
-            <input type=hidden name=action value=\"kind_update\">
-            <input type=text name=tf_kind_upd>
-          </td><td>
-            <input type=submit name=sub_kind value=\"$l_kind_update\"
-              onClick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\">
-
+          <td colspan=\"2\" class=\"adminLabel\">
+    <form name=\"form_admin_kind_update\"
+      method=\"get\" action=\"" . $sess->url("company_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
+            <input type=\"text\" name=\"tf_kind_upd\" />
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
+              onclick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\" />
+    </form>
           </td>
         </tr>
+
         </table>
       </td>
       <td>
-    </form>
 
 <!-- New Kind Section -->
-
     <form name=\"form_admin_kind_new\"
-      method=get action=\"" . $sess->url("company_index.php") . "\">
+      method=\"get\" action=\"" . $sess->url("company_index.php") . "\">
       <table>
       <tr>
-        <td align=right>$l_kind_new : <input name=\"tf_kind_new\"></td>
+        <td class=\"adminLabel\">$l_kind_new : <input name=\"tf_kind_new\" /></td>
       </tr><tr>
-        <td align=center>
-          <input type=hidden name=action value=\"kind_insert\">
-          <input type=submit name=sub_kind value=\"$l_kind_insert\"
-            onClick=\"if (check_kind_new(this.form)) return true; else return false;\">
+        <td class=\"adminLabel\">
+          <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
+            onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
         </td>
       </tr>
       </table>
+    </form>
       </td>
     </tr>
     </table>
-    </form>
-  </center>";
+";
 
 }
 
@@ -1141,9 +1026,7 @@ function dis_company_display_pref($display_pref_q) {
   $dis_pref->pref_title = $l_company_display;
   $dis_pref->pref_dis_help = 1;
 
-  echo "<center>";
   $dis_pref->display();
-  echo "<br></center>";
 }
 
 
@@ -1165,31 +1048,35 @@ function html_select_company($comp_q, $title, $url="") {
   }
 
   // Company Select
-  $sel_company = "<font size=2 face=courier>
-    <select name=param_company size=10 style=\"font-family:fixed,courier\">";
+  $sel_company = "
+    <select name=\"param_company\" size=\"10\" style=\"font-family:fixed\">";
   while($comp_q->next_record()) {
     $id = $comp_q->f("company_id");
     $name = $comp_q->f("company_name");
     $name = str_pad($name, 40, ".");
     $town = $comp_q->f("company_town");
-    $sel_company .= "\n<option value=\"$id\">$name | $town</option>";
+    $sel_company .= "\n<option value=\"$id\">".htmlspecialchars($name)." | ".htmlspecialchars($town)."</option>";
   }
-  $sel_company .= "</select></font>";
+  $sel_company .= "</select>";
 
   // --- HTML Template --------------------------------------------------------
 
-  echo "<center>
-    <form method=get name=form_comp
-          onSubmit=\"if ($jsfunc) return true; else return false;\"
+  echo "
+  <table class=\"details\">
+    <tr>
+      <td class=\"detailHead\">
+        <form method=\"get\" name=\"form_comp\"
+          onsubmit=\"if ($jsfunc) return true; else return false;\"
           action=\"\">
-    $title
-    <p>
-    $sel_company
-    <p>
-    <input type=\"hidden\" name=\"action\" value=\"new\">
-    <input type=submit value=\"$l_select_company\">
-    </form>
-    </center>";
+         $title<br />
+         $sel_company<br />
+         <input type=\"hidden\" name=\"action\" value=\"new\" /><br />
+         <input type=\"submit\" value=\"$l_select_company\" />
+        </form>
+      </td>
+    </tr>
+  </table>
+    ";
 }
 
 

@@ -529,13 +529,15 @@ class Session {
 //    $this->gc();
     $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
     session_name($this->name);
+    $HTTP_COOKIE_VARS[$this->name] = "OBM_Session";
     if (isset($HTTP_COOKIE_VARS[$this->name])) {
       $this->mode = "cookie";
     } else {
       $this->mode = "get";
     }
+
     session_start();
     $this->id = session_id();
-  }
+   }
 }
 ?>

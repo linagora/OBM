@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // SECURINET - File : menu.inc (standard)                                    //
 //           - Desc : Standard menu display File                             //
@@ -17,10 +17,8 @@ function generate_menu($menu, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
-  global $auth, $sess, $securinet_version, $obminclude; 
-  global $cong_app, $cong_usr, $cong_adm;
-  global $col_clear_grey, $col_dark_grey, $col_white;
-  global $font_version, $font_fonction,$obm_version;
+  global $auth, $sess, $obminclude; 
+  global $obm_version;
 
   if ($menu == "")
     $path = "";
@@ -46,73 +44,75 @@ function generate_menu($menu, $section) {
   $profil = $auth->auth["perm"];
 
   echo "
-<table valign=top cellpadding=0 cellspacing=0 width=100% border=0>
+<table cellpading=\"0\" cellspacing=\"0\" class=\"global\">
 <tr>
-<!------------ tableau du logo et identification société --------------------->
-  <td valign=top width=180>
-    <table cellspacing=0 cellpadding=0 border=0 width=180 valign=top bgcolor=\"#$col_clear_grey\">
+<!-- Taleau du logo et identification société -->
+  <td class=\"globalLogo\">
+    <table cellpading=\"0\" cellspacing=\"0\" class=\"logo\">
     <tr>
-      <td colspan=4><img src=\"/images/$set_theme/logo_obm.gif\"></td>
+      <td colspan=\"4\"><img src=\"/images/$set_theme/logo_obm.gif\" alt=\"\" /></td>
     </tr><tr>
-      <td><img src=\"/images/$set_theme/logo_g.gif\"></td>
-      <td bgcolor=\"#$col_white\"><img src=\"/images/$set_theme/logo_obm2.gif\"></td>
-      <td bgcolor=\"#$col_white\" align=right>
-        $font_version<b>v.$obm_version</b></font></td>
-      <td><img src=\"/images/$set_theme/logo_d.gif\"></td>
+      <td><img src=\"/images/$set_theme/logo_g.gif\" alt=\"\" /></td>
+      <td class=\"logoInside\"><img src=\"/images/$set_theme/logo_obm2.gif\" alt=\"\" /></td>
+      <td class=\"logoVersion\">v.$obm_version</td>
+      <td><img src=\"/images/$set_theme/logo_d.gif\" alt=\"\" /></td>
     </tr><tr>
-      <td valign=top><img src=\"/images/$set_theme/logo_bg.gif\"></td>  
-      <td colspan=2><img src=\"/images/$set_theme/logo_bm.gif\"></td>
-      <td valign=top><img src=\"/images/$set_theme/logo_bd.gif\"></td>
+      <td class=\"logoBottom\"><img src=\"/images/$set_theme/logo_bg.gif\" alt=\"\" /></td>  
+      <td colspan=\"2\"><img src=\"/images/$set_theme/logo_bm.gif\" alt=\"\" /></td>
+      <td class=\"logoBottom\"><img src=\"/images/$set_theme/logo_bd.gif\" alt=\"\" /></td>
     </tr>
     </table>
   </td>
-<!-------------- fin du tableau du logo et identification société ------------>
+<!-- fin du tableau du logo et identification société -->
 
-<!--------- Tableau partie droite du bandeau (Login, Onglets, menus) --------->
+<!-- Tableau partie droite du bandeau (Login, Onglets, menus) -->
 
-  <td valign=top>
-    <table border=0 cellspacing=0 cellpadding=0 valign=top width=100%>
+  <td class=\"globalHeader\">
+    <table cellpading=\"0\" cellspacing=\"0\" class=\"header\">
     <tr>
-    <!--------------------------- zone Login --------------------------------->
+    <!-- zone Login -->
 
-      <td height=21 valign=top bgcolor=\"#$col_dark_grey\" width=100% nowrap>
-        <img src=\"/images/$set_theme/login.gif\" align=middle>
-        $font_fonction<b>Login&nbsp;: $login&nbsp;&nbsp;</b></font>
-        <img src=\"/images/$set_theme/profil.gif\" align=middle>
-        $font_fonction<b>Profil&nbsp;: $profil&nbsp;</b></font>
-        <img src=\"/images/$set_theme/logout.gif\" align=middle>
-        <a href=\"$path/obm.php?action=logout\">$font_fonction<b>Logout</b></font></a>
+      <td class=\"header\">
+        <img class=\"header\" src=\"/images/$set_theme/login.gif\" alt=\"\" />
+        Login&nbsp;: $login&nbsp;&nbsp;
+        <img class=\"header\" src=\"/images/$set_theme/profil.gif\" alt=\"\" />
+        Profil&nbsp;: $profil&nbsp;
+        <img class=\"header\" src=\"/images/$set_theme/logout.gif\" alt=\"\" />
+        <a class=\"header\" href=\"$path/obm.php?action=logout\">Logout</a>
       </td>
-      <td height=21 align=right bgcolor=\"#$col_dark_grey\" nowrap>
-        $font_fonction<b>Société Aliacom</b></font>
+      <td>
+        Société Aliacom
       </td>
-      <td bgcolor=\"$col_dark_grey\">&nbsp;</td>
-    <!--------------------------- Fin zone Login ----------------------------->
+      <td>&nbsp;</td>
+    <!-- Fin zone Login -->
     </tr><tr>
 
-    <!--------------------------- zone Onglets ------------------------------->
-      <td colspan=2>";
+    <!-- zone Onglets -->
+      <td colspan=\"2\" height=\"10\">";
   display_tabs($section);
   echo "
       </td>
-    <!-------------------------- Fin zone Onglets ---------------------------->
+    <!-- Fin zone Onglets -->
 
     </tr><tr>
-    <!-------------------------- zone Menu ----------------------------------->
-      <td colspan=2 bgcolor=\"#$col_white\" height=25>";
+    <!-- zone Menu -->
+      <td colspan=\"2\" class=\"headerMenu\">";
   display_menus($section);
   echo "
       </td>
-    <!-------------------------- Fin zone Menu ------------------------------->
+    <!-- Fin zone Menu -->
     </tr>
     </table>
   </td>
 </tr>
 </table>
-<br>";
-
+<p>
+</p>
+";
   display_menu_bar($section, $menu);
-  echo "<br>";
+echo "
+<p>
+</p>";
 }
 
 
@@ -123,36 +123,40 @@ function generate_menu($menu, $section) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_menu_bar($section, $menu) {
   global $set_theme, $menus, $action, $popup_height, $perm ;
-  global $col_barre, $font_fonction,$actions, $popup_width, $auth;
+  global $actions, $popup_width, $auth;
 
   echo "
-<table width=90% cellspacing=0 cellpadding=0 align=center>
+<table cellpading=\"0\" cellspacing=\"0\" class=\"menuBar\">
   <tr>
-    <td align=right><img src=\"/images/$set_theme/barre_g.gif\"></td>
-    <td bgcolor=\"#$col_barre\">$font_fonction<b>".$menus[$section][$menu]["Name"]."</b></font></td>
-    <td bgcolor=\"#$col_barre\" align=right>
+    <td><img class=\"menuBarIconG\" src=\"/images/$set_theme/barre_g.gif\" alt=\"\" /></td>
+    <td class=\"menuBarLabel\">".$menus[$section][$menu]["Name"]."</td>
+    <td class=\"menuBarText\">
 ";
+
    if(is_array($actions[$menu])){
      foreach($actions[$menu] as $key => $value){
       if(in_array("all",$value["Condition"]) || in_array($action,$value["Condition"])) {
          if(($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
            if($value["Popup"] == 1) {
              echo "
-              <a href=\"\" href=\"\" onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+              <a href=\"\" class=\"menuBar\" 
+              onclick=\"window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">
+	      ".$value["Name"]."</a> &nbsp;
            ";
            }
            else {
             echo "
-               <a href=\"".$value["Url"]."\">$font_fonction<b>".$value["Name"]."</b></font></a> &nbsp;
+               <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;
             ";
            }
          }
        }
      }
    }  
+
     echo "
     </td>
-    <td><img src=\"/images/$set_theme/barre_d.gif\"></td>
+    <td><img class=\"menuBarIconD\" src=\"/images/$set_theme/barre_d.gif\" alt=\"\" /></td>
   </tr>
 </table>
 ";
@@ -167,11 +171,11 @@ function display_menu_bar($section, $menu) {
 //   - $section : active section
 ///////////////////////////////////////////////////////////////////////////////
 function display_menus($section) {
-  global $set_theme, $cong_app, $cong_usr, $cong_adm;
-  global $path, $col_menu, $font_menu, $menus, $perm, $auth;
+  global $set_theme;
+  global $path, $menus, $perm, $auth;
 
     echo "
-        <table cellspacing=0 cellpadding=0 border=0>
+      <table cellpading=\"0\" cellspacing=\"0\"  class=\"menus\">
         <tr>
     ";
   if(is_array($menus[$section])) {
@@ -181,19 +185,17 @@ function display_menus($section) {
          (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"])) {
         echo "
             <td>&nbsp;&nbsp;</td>
-            <td nowrap><img src=\"/images/$set_theme/puce.gif\">&nbsp;
-            <a href=\"".$value["Url"]."\">$font_menu".$value["Name"]."</font></a></td>
+            <td class=\"menusLabel\"><img src=\"/images/$set_theme/puce.gif\" alt=\"\" />&nbsp;
+            <a class=\"menus\" href=\"".$value["Url"]."\">".$value["Name"]."</a></td>
         ";
       }
     }
   }
   echo "
           <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-          <td align=right width=100%>";
- //   display_bookmarks() ;
-    echo "</td>
+          <td class=\"menusText\"></td>
         </tr>  
-        </table>";
+      </table>";
 }
 
 
@@ -203,12 +205,12 @@ function display_menus($section) {
 //   - $section : acrtive section 
 ///////////////////////////////////////////////////////////////////////////////
 function display_tabs($section) {
-  global $col_green, $menus,$col_blue, $auth, $perm;
+  global $menus, $auth, $perm;
 
   echo "
-        <table cellspacing=0 cellpadding=0 border=0>
+        <table cellpading=\"0\" cellspacing=\"0\"  class=\"sections\">
         <tr>
-          <td>";
+          ";
   foreach($menus as $key => $value) {
     if(($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
       if ($key == $section) {
@@ -223,13 +225,13 @@ function display_tabs($section) {
     }
   }
      echo "
-          <!------- Remplissage apres tabs -------------------------------->
-	  <td height=100% width=100%>
-            <table cellpadding=0 cellspacing=0 border=0 width=100% height=100%>
+          <!-- Remplissage apres tabs -->
+	  <td class=\"sectionsfilling\">
+            <table cellpading=\"0\" cellspacing=\"0\"  class=\"sectionsfilling\">
             <tr>
-              <td bgcolor=\"#$col_blue\" height=32></td>
+              <td></td>
 	    </tr><tr>
-              <td height=1 bgcolor=\"#$col_green\" width=100%></td>  
+              <td class=\"sectionsLine\"></td>  
             </tr>	 
             </table>
           </td>
@@ -247,21 +249,19 @@ function display_tabs($section) {
 //   - $tab : tab's parameters
 ///////////////////////////////////////////////////////////////////////////////
 function display_active_tab($tab) {
-  global $set_theme, $col_white, $col_black;
-
-  $font_tab_a = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_black\" size=-2>";
+  global $set_theme;
 
   echo "
-    <table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><img src=\"/images/$set_theme/tab_actif_hg.gif\"></td>
-      <td><img src=\"/images/$set_theme/tab_actif_h.gif\"></td>
-      <td><img src=\"/images/$set_theme/tab_actif_hd.gif\"></td>
-    </tr><tr>
-      <td><img src=\"/images/$set_theme/tab_actif_g.gif\"></td>  
-      <td bgcolor=\"#$col_white\" align=center>$font_tab_a<b>".$tab["Name"]."</b></font></td>
-      <td><img src=\"/images/$set_theme/tab_actif_d.gif\"></td>  
-    </tr>	 
+    <table cellpading=\"0\" cellspacing=\"0\" class=\"sections\">
+      <tr>
+        <td><img src=\"/images/$set_theme/tab_actif_hg.gif\" alt=\"\" /></td>
+        <td><img src=\"/images/$set_theme/tab_actif_h.gif\" alt=\"\" /></td>
+        <td><img src=\"/images/$set_theme/tab_actif_hd.gif\" alt=\"\" /></td>
+      </tr><tr>
+        <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_g.gif\" alt=\"\" /></td>  
+        <td class=\"sectionsActifLabel\">".$tab["Name"]."</td>
+        <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_d.gif\" alt=\"\" /></td>  
+      </tr>	 
     </table>	 
 ";
 }
@@ -273,23 +273,22 @@ function display_active_tab($tab) {
 //   - $tab : tab's parameters
 ///////////////////////////////////////////////////////////////////////////////
 function display_inactive_tab($tab) {
-  global $set_theme, $col_green, $col_black, $col_tab, $col_tab_texte;
+  global $set_theme;
 
-  $font_tab = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_tab_texte\" size=1>";
 
   echo "
-    <table cellpadding=0 cellspacing=0 border=0>
-    <tr>
-      <td><img src=\"/images/$set_theme/tab_inactif_hg.gif\"></td>
-      <td><img src=\"/images/$set_theme/tab_inactif_h.gif\"></td>
-      <td><img src=\"/images/$set_theme/tab_inactif_hd.gif\"></td>
-    </tr><tr>
-      <td rowspan=2><img src=\"/images/$set_theme/tab_inactif_g.gif\"></td>
-      <td bgcolor=\"#$col_tab\" align=center height=19><a href=\"".$tab["Url"]."\">$font_tab<b>".$tab["Name"]."</b></a></font></td>
-      <td rowspan=2><img src=\"/images/$set_theme/tab_inactif_d.gif\"></td>
-    </tr><tr>
-      <td height=1 bgcolor=\"#$col_green\"></td>
-    </tr>  
+    <table cellpading=\"0\" cellspacing=\"0\"  class=\"sections\">
+      <tr>
+        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hg.gif\" alt=\"\" /></td>
+        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_h.gif\" alt=\"\" /></td>
+        <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hd.gif\" alt=\"\" /></td>
+      </tr><tr>
+        <td rowspan=\"2\"><img src=\"/images/$set_theme/tab_inactif_g.gif\" alt=\"\" /></td>
+        <td class=\"sectionsInactifLabel\"><a class=\"sections\" href=\"".$tab["Url"]."\">".$tab["Name"]."</a></td>
+        <td rowspan=\"2\"><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_d.gif\" alt=\"\" /></td>
+      </tr><tr>
+        <td class=\"sectionsLine\"></td>
+      </tr>  
     </table>
 ";
 }

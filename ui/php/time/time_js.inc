@@ -12,7 +12,6 @@ echo "
 <!--
 ";
 
-$obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/javascript/check_js.inc");
 
 
