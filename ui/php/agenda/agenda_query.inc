@@ -1075,9 +1075,10 @@ function run_query_agendacategory() {
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_category_insert($label) {
+function run_query_category_insert($agenda) {
   global $auth, $cdg_sql;
 
+  $label = $agenda["category_label"];
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
 
@@ -1104,12 +1105,13 @@ function run_query_category_insert($label) {
 //   - $label     : label to set
 //   - $label_old : category label to update
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_category_update($label, $category_id) {
+function run_query_category_update($agenda) {
   global $auth, $cdg_sql;
 
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
-
+  $label = $agenda["category_label"];
+  $category_id = $agenda["category_id"];
   $query = "update CalendarCategory set
     calendarcategory_label='$label',
     calendarcategory_timeupdate='$timeupdate',
@@ -1130,9 +1132,9 @@ function run_query_category_update($label, $category_id) {
 // Parameters:
 //   - category_id     : category id to delete
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_category_delete($category_id) {
+function run_query_category_delete($agenda) {
   global $cdg_sql;
-
+  $category_id = $agenda["category_id"];
   $query = "delete from CalendarCategory where calendarcategory_id = $category_id";
 
   display_debug_msg($query, $cdg_sql);
@@ -1147,9 +1149,10 @@ function run_query_category_delete($category_id) {
 // Parameters:
 //   - $label     : category label to delete
 ///////////////////////////////////////////////////////////////////////////////
-function get_category_label($category_id) {
+function get_category_label($agenda) {
   global $cdg_sql;
 
+  $category_id = $agenda["category_id"];
   $query = "Select * from CalendarCategory Where calendarcategory_id = $category_id";
 
   display_debug_msg($query, $cdg_sql);

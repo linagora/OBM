@@ -483,7 +483,10 @@ function sendDate(month, day, year)
     selectedDate = selectedDate.replace(/d/, day);
     selectedDate = selectedDate.replace(/y/, year);
     targetDateField.value = selectedDate;
+    if(targetDateField.name == 'tf_date_begin')
+    window.opener.changeDateEnd(targetDateField.form);
     parent.window.close();
+    
 }
 
 // }}}

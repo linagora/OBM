@@ -55,6 +55,8 @@ if(count($sel_user_id) != 0 ) {
 $sess->register("agenda_user_view");
 page_close();
 $sel_user_id = $agenda_user_view;
+if($action != "perform_meeting" && count($sel_user_id) > 6)
+$sel_user_id = array_slice ($sel_user_id, 0, 6);
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
@@ -409,7 +411,7 @@ elseif ($action == "perform_right") {
 
 } elseif ($action == "category_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_insert($tf_category_new);
+  $retour = run_query_category_insert($agenda);
   if ($retour) {
     display_ok_msg($l_category_insert_ok);
   } else {
@@ -420,7 +422,7 @@ elseif ($action == "perform_right") {
 
 } elseif ($action == "category_update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_update($tf_category_upd, $sel_category);
+  $retour = run_query_category_update($agenda);
   if ($retour) {
     display_ok_msg($l_category_update_ok);
   } else {
@@ -431,13 +433,13 @@ elseif ($action == "perform_right") {
 
 } elseif ($action == "category_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
-  dis_category_links($sel_category);
+  dis_category_links($agenda);//$sel_category);
   require("agenda_js.inc");
   dis_admin_index();
 
 } elseif ($action == "category_delete")  {
-///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_category_delete($hd_category_label);
+  ///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_category_delete($agenda);
   if ($retour) {
     display_ok_msg($l_category_delete_ok);
   } else {
@@ -459,8 +461,12 @@ function get_param_agenda() {
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
-	
-  // Deal fields
+  global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new;
+  // Agenda fields
+  if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
+  if (isset($hd_category_label)) $agenda["category_label"] = $hd_category_label;
+  if (isset($tf_category_upd)) $agenda["category_label"] = $tf_category_upd;
+  if (isset($sel_category)) $agenda["category_id"] = $sel_category;
   if (isset ($param_date))
     $agenda["date"] = $param_date; 
   else 
@@ -496,6 +502,7 @@ function get_param_agenda() {
   if (isset($tf_date_begin)) {
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_date_begin , $day_array2);
     $agenda["date_begin"] .=  $day_array2[1].$day_array2[2].$day_array2[3];
+    $agenda["date"] = $agenda["date_begin"];
     if (isset($sel_time_begin) && isset($sel_min_begin)) {
       $agenda["date_begin"] = $agenda["date_begin"].$sel_time_begin.$sel_min_begin;
     }
@@ -519,8 +526,11 @@ function get_param_agenda() {
   else {
     $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime(date("Ymd"))));
   }
-  if (isset($param_date_begin)) $agenda["date_begin"] = $param_date_begin;
-  if (isset($param_date_end)) $agenda["date_end"] = $param_date_end;
+  if (isset($param_date_begin)) { 
+    $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime($param_date_begin)));
+  }
+  if (isset($param_date_end))   
+    $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($param_date_end)));
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
     if (isset(${"cb_repeatday_".$i}))  {

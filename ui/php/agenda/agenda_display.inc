@@ -1175,14 +1175,17 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   elseif ( ($action != "view_day") && ($action != "view_week") &&
        ($action != "view_month") && ($action != "view_year") ) {
     $new_action = "view_week";
+    $check_sel_user = "onsubmit=\"if (check_count_user(this)) return true; else return false;\"";
   }  
   else {
     $new_action = $action;
+    $check_sel_user = "onsubmit=\"if (check_count_user(this)) return true; else return false;\"";
   }
   if(count($p_user_array)>1 || !in_array($auth->auth["uid"],$p_user_array)) {
     $dis_back_monoview = "<br/><a class=\"agendaLink\" href=\"agenda_index.php?action=$new_action$p_duration&amp;sel_user_id[]=".$auth->auth["uid"]."\" >$l_back_mono</a>";
   }
   $dis_sel_user = "<select name=\"sel_user_id[]\" size=\"12\" multiple=\"multiple\" style=\"font-size:10px\">";
+  
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
     $u_lname = $usr_q->f("userobm_lastname");
@@ -1349,7 +1352,7 @@ echo "
        <tr>
 	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
         <td colspan=\"2\" class=\"agendaVide\" align=\"left\">
-	 <form action=\"agenda_index.php\" method=\"get\" onsubmit=\"if (check_count_user(this)) return true; else return false;\">
+	 <form action=\"agenda_index.php\" method=\"get\" $check_sel_user>
 	  $dis_sel_user
 	  <input type=\"hidden\" name=\"param_date\" value=\"$getdate\" />
 	  $dis_back_monoview
@@ -1707,8 +1710,8 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     <tr>
      <td class=\"detailLabel\">$l_datebegin $l_format</td>
      <td>
-      <input type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
-      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1');\">
+      <input onchange=\"changeDateEnd(this.form)\" \"type=\"text\" id=\"tf_date_begin\" name=\"tf_date_begin\" maxlength=\"10\" size=\"12\" value=\"$datebegin\" />
+      <a href=\"javascript: void(0);\" onclick=\"return getCalendar(document.f_mod_calendar.tf_date_begin,'agenda_index.php?action=calendar&popup=1') ;\">
        <img src=\"/images/$set_theme/$ico_mini_cal\" border=\"0\" />
       </a>
      </td>
@@ -2615,13 +2618,13 @@ function html_agenda_category_form($category_q) {
 // Retuns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function dis_category_delete_form($id) {
+function dis_category_delete_form($agenda) {
   global $l_category_delete;
-
+  $id = $agenda["category_id"];
   $r = "<form name=\"form_category_delete\"
           method=post action=\"" . url_prepare("agenda_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"category_delete\">
-        <input type=\"hidden\" name=\"hd_category_label\" value=\"$id\">
+        <input type=\"hidden\" name=\"sel_category\" value=\"$id\">
         <input type=\"submit\" name=\"sub_category\" value=\"$l_category_delete\">
         </form>";
 

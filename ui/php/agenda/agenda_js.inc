@@ -159,6 +159,12 @@ function hide ( name ) {
     document.all[name].style.visibility = \"hidden\";
   }
 }
+
+function changeDateEnd ( form ) {
+  form.tf_date_end.value = form.tf_date_begin.value; 
+
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the category check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
