@@ -41,6 +41,7 @@ $www = "   <p class=\"messageInfo\">
 $path = "..";
 $section = "COM";
 $menu="AGENDA";
+$extra_css = "calendar.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");

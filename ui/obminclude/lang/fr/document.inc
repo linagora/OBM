@@ -40,6 +40,7 @@ $l_repository = "Répertoire";
 $l_add_repos = "Créer le répertoire";
 $l_header_tree = "Arborescence";
 $l_auto = "Par défaut";
+$l_consult = "Consulter le document";
 
 // Message
 $l_cat1_checkdelete = "Vérifier ou supprimer catégorie 1"; 

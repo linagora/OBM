@@ -261,13 +261,12 @@ function run_query_get_mime($document){
 ///////////////////////////////////////////////////////////////////////////////
 
 function run_query_get_mimetype($path){
-  $ext = substr($path,strrpos($path,'/'));
   $ext = substr(strrchr($path,'.'),1);
-  $return = run_query_get_type_by_ext($ext);
+  $return = run_query_get_type_mime_by_ext($ext);
   if($return) {
     return $return;
   }
-  $return = run_query_get_type_by_ext("html");
+  $return = run_query_get_type_mime_by_ext("html");
   return $return ;
 }
 
@@ -312,6 +311,26 @@ function run_query_get_type_by_ext($ext) {
     return false;
 }   
 
+///////////////////////////////////////////////////////////////////////////////
+// Get the Mime Type of a file
+// Parameters:
+//   - $ext : Extension 
+///////////////////////////////////////////////////////////////////////////////
+
+function run_query_get_type_mime_by_ext($ext) {
+  global $auth, $cdg_sql;
+
+  $query = "select * from DocumentMimeType where documentmimetype_extension ='$ext'";
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+  if($obm_q->nf() > 0) {
+    $obm_q->next_record();
+    return $obm_q->f("documentmimetype_mime");
+  }
+  else 
+    return false;
+}   
 
   
 ///////////////////////////////////////////////////////////////////////////////

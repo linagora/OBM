@@ -202,7 +202,7 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   global $display;
   global $set_theme,$l_document,$l_new_file,$l_link,$l_existing_file,$path,$ico_browse_file;
   global $l_title, $l_category1, $l_mimetype,$l_private,$ico_browse,$set_theme;
-  global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width; 
+  global $l_find, $l_author, $l_category2,$l_path,$l_kind,$popup_width,$document_path; 
   global $l_file,$l_insert,$l_update,$l_checkdelete,$popup_height,$l_auto,$c_auto;
 
 
@@ -317,7 +317,6 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   $url2 = "$path/document/document_index.php?action=ext_get_path&amp;popup=1&amp;ext_target=forms[0].tf_path&amp;ext_disp_file=true"; 
 
   // --- HTML Template --------------------------------------------------------
-
   $block = "
     <form method=\"post\"  enctype=\"multipart/form-data\" name=\"f_mod_document\"
       onsubmit=\"if (check_document(this)) return true; else return false;\"
@@ -367,9 +366,9 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     </tr> 
     <tr id=\"browse_field\" $dis_field>
       <td class=\"detailLabel\">$l_file</td>
-      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" maxlength=\"30\" size=\"30\" value=\"$file\" /></td>
+      <td class=\"detailForm\"><input type=\"file\" id=\"fi_file\" name=\"fi_file\" size=\"30\" value=\"$file\" /></td>
     </tr> 
-    </table>
+   </table>
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
@@ -439,7 +438,7 @@ function html_document_consult($doc_q) {
   global $l_title, $l_category1, $l_mimetype,$l_private;
   global $l_find, $l_author, $l_category2,$l_path,$l_name; 
   global $l_file,$l_insert,$l_update,$l_checkdelete;
-  global $c_yes, $c_no;
+  global $c_yes, $c_no,$l_consult;
   // if update mode and first display values are taken from database
   $id = $doc_q->f("document_id");
   $title = $doc_q->f("document_title");
@@ -496,8 +495,13 @@ function html_document_consult($doc_q) {
     <tr>
       <td class=\"detailLabel\">$l_size</td>
       <td class=\"detailText\">$size $l_bytes</td>
-    </tr>      
+     </tr>    
     </table>
+    <div class=\"detailHead\">
+    <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$path&amp;fi_file_name=$name&amp;popup=1\">
+     $l_consult
+    </a>
+    </div>
    ";
 
   return $block;
@@ -1116,12 +1120,12 @@ function dis_repository_rec($document,$repository,$display_file) {
     $name = substr($repository,strrpos($repository,'/')+1);
   }
   if($popup) {
-    if($display_file == "false") {
-      $js = "onclick=\"fill_ext_form('$relative_path');return false;\"";
-      $link_repo = "<a href=\"\" $js>";
-      $link_repo_end ="</a>";
-    }
-    $close = "<a href=\"javascript:window.close();\">$l_close</a>";
+   if($display_file == "false") {
+     $js = "onclick=\"fill_ext_form('$relative_path');return false;\"";
+     $link_repo = "<a href=\"\" $js>";
+     $link_repo_end ="</a>";
+   }
+   $close = "<a href=\"javascript:window.close();\">$l_close</a>";
   }
 
   $files = array();
@@ -1155,9 +1159,10 @@ function dis_repository_rec($document,$repository,$display_file) {
    $js_int <img id=\"img_$relative_path\" src=\"$img\" alt=\"\" />$js_int2 
    $link_repo $ind $name $link_repo_end
   </div>";
+
   $block .= "<div id=\"$relative_path\" style=\"display:none;\" class=\"documentBox\">";
 
-  foreach($repos as $path) {
+   foreach($repos as $path) {
     $block .= dis_repository_rec($document,$path,$display_file);
   }
   
@@ -1167,7 +1172,7 @@ function dis_repository_rec($document,$repository,$display_file) {
     }
 
     $block .= "<div class=\"documentFile\"><img src=\"/images/$set_theme/$ico_file\" alt=\"\" />
-                <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>$file<br /></div>";
+     <a target=\"_blank\" href=\"document_index.php?action=accessfile&amp;tf_path=$relative_path&amp;fi_file_name=$file&amp;popup=1\" $js>$file</a><br /></div>";
   }
   $block .= "</div>";
   return $block;
@@ -1192,7 +1197,7 @@ function dis_file($document) {
   }
   $doc_q = run_query_detail_by_path($path,$name);
   if(!$doc_q) {
-    $mime = run_query_get_mimetype($path);
+    $mime = run_query_get_mimetype($name);
   }
   else {
     $mime = $doc_q->f("documentmimetype_mime");  

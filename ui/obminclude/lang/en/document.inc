@@ -43,6 +43,7 @@ $l_link = "HTML Link";
 $l_existing_file = "File alreand sent";
 $l_kind = "Kind of document";
 $l_auto = "Default value";
+$l_consult = "Consult document";
 
 // Message
 $l_cat1_checkdelete = "Check or delete Category 1"; 
