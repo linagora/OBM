@@ -11,7 +11,7 @@ $path = "..";
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
-$section = "USERS";
+$section = "USER";
 $menu = "SETTINGS";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if($obminclude == "") $obminclude="obminclude";
@@ -54,7 +54,8 @@ if ($form_user_pref) {
 
   if ($param_rows != "") {
     $set_rows = $param_rows;
-    $sess->register("set_rows");
+    $_SESSION['set_rows'] = $set_rows;
+    //    $sess->register("set_rows");
     run_query_set_user_pref($uid, "set_rows", $set_rows);
   }
 

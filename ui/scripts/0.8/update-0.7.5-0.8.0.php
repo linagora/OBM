@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : update-0.7.5-0.8.0.php                                       //
-//     - Desc : Update data from 0.7.5 to 0.8.0 (ProjectUser data)           //
+//     - Desc : Update data from 0.7.5 to 0.8.0 (ProjectUser, password data) //
 // 2004-01-02 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
@@ -11,8 +11,66 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
 
+// Correct Project User assignations
 $p_q = get_projectuser_list();
 process_projectuser_list($p_q);
+
+// Convert password to crypt form
+$u_q = get_userobm_list();
+process_userobm_list($u_q);
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - UserObm list
+///////////////////////////////////////////////////////////////////////////////
+function get_userobm_list() {
+
+  echo "Retrieving current Users (UserObm)\n";
+
+  $query = "select userobm_id,
+      userobm_login,
+      userobm_password
+    from UserObm
+    ";
+
+  $u_q = new DB_OBM;
+  $u_q->query($query);
+
+  return $u_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Process the UserObm list
+// Parameters:
+//   - $u_q : DBO UserObm list (with associated info)
+///////////////////////////////////////////////////////////////////////////////
+function process_userobm_list($u_q) {
+
+  $nb_u = $u_q->num_rows();
+
+  echo "** Processing UserObm list (converting passwords) : $nb_u entries\n";
+
+  while ($u_q->next_record()) {
+    $u_id = $u_q->f("userobm_id");
+    $login = $u_q->f("userobm_login");
+    $password = $u_q->f("userobm_password");
+    $new_password = md5($password);
+
+    echo "User $login ($u_id)";
+
+    $query = "update UserObm
+      set userobm_password='$new_password'
+      where userobm_id='$u_id'";
+    $user_q = new DB_OBM;
+    $user_q->query($query);
+
+    echo " - OK\n";
+  }
+
+  echo "** End Processing UserObm list : $nb_u entries\n";
+
+}
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -69,6 +69,7 @@ class Auth {
     #  3) Login in progress (if $$cl, revert to state 1)
     if ($this->is_authenticated()) {
       $uid = $this->auth["uid"];
+//echo "<p>auth_>start : is_authenticated : ok : uid = $uid";
       switch ($uid) {
         case "form":
           # Login in progress
@@ -85,6 +86,7 @@ class Auth {
           break;
         default:
           # User is authenticated and auth not expired
+//echo "<p>User is authenticated";
           $state = 2;
           break;
       }
@@ -144,9 +146,10 @@ class Auth {
         # Valid auth info
         # Refresh expire info
         ## DEFAUTH handling: do not update exp for nobody.
-        if ($uid != "nobody")
+        if ($uid != "nobody") {
           // OBM : we get the global lifetime which is in seconds
           $this->auth["exp"] = time() + $this->lifetime;
+        }
         break;
       case 3:
         # Login in progress, check results and act accordingly
@@ -248,7 +251,6 @@ class Auth {
       return $this->auth["uid"];
     } else {
       return false;
-      return $this->auth["uid"];
     }
   }
     

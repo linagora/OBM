@@ -7,7 +7,7 @@
 --/////////////////////////////////////////////////////////////////////////////
 
 -- Uncoment next line if you use Postgres with Unicode or no latin1 charset
-\encoding latin1
+--\encoding latin1
 
 --
 -- Dumping data for table 'CompanyType'
@@ -192,5 +192,8 @@ VALUES (11,'Fichier CSV','csv','text/x-csv');
 
 -- Add system Groups
 INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
-(1, 'Commercial', 'groupe système Commercial', ''),
+(1, 'Admin', 'groupe système Administration', 'admin');
+INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
+(1, 'Commercial', 'groupe système Commercial', '');
+INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
 (1, 'Production', 'groupe système Production', '');

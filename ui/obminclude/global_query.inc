@@ -1219,9 +1219,9 @@ function get_email_used($id="", $gid="", $lid="") {
 //  - $force      : Mail should be forced (all user even with no set_mail)
 ///////////////////////////////////////////////////////////////////////////////
 function send_mail($subject, $message, $recipients, $force) {
-  global $gp_mail_enabled;
+  global $cgp_mail_enabled;
   $message = stripslashes($message);
-  if (! $gp_mail_enabled) {
+  if (! $cgp_mail_enabled) {
     return 0;
   }
 

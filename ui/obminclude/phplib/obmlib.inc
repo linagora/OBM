@@ -53,24 +53,23 @@ class DB_OBM extends DB_Sql {
 
 
 class OBM_CT_Sql extends CT_Sql {
-  var $database_class = "DB_OBM";           ## Which database to connect...
-  var $database_table = "ActiveSessions";  ## and find our session data in this table.
+  var $database_class = "DB_OBM";          // Which database to connect...
+  var $database_table = "ActiveSessions";  // and find our session data in this table.
 }
 
 
 class OBM_User_Sql extends CT_Sql {
-  var $database_class = "DB_OBM";         ## Which database to connect...
-  var $database_table = "ActiveUserObm";  ## our session data in this table.
+  var $database_class = "DB_OBM";         // Which database to connect...
+  var $database_table = "ActiveUserObm";  // our session data in this table.
 
   function ac_store($id, $name, $str) {
     $ret = true;
     $name = addslashes($name);
 
-    ## update duration of visit
+    // update duration of visit
     global $HTTP_REFERER, $HTTP_SERVER_VARS, $HTTP_USER_AGENT, $REMOTE_ADDR, $action;
     $module_name = substr(strrchr($HTTP_SERVER_VARS['SCRIPT_NAME'],"/"),1);
     $module_name = substr($module_name,0,strlen($module_name)-10);
-  //  $module_name = substr(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),0,strpos(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),"_"));
     $now = date("Y-m-d H:i:s", time());
     $uquery = sprintf("update %s
                set activeuserobm_userobm_id='%d',
@@ -118,16 +117,16 @@ class OBM_User_Sql extends CT_Sql {
 
     $this->db->query($uquery);
 
-    # FIRST test to see if any rows were affected.
-    #   Zero rows affected could mean either there were no matching rows
-    #   whatsoever, OR that the update statement did match a row but made
-    #   no changes to the table data (i.e. UPDATE tbl SET col = 'x', when
-    #   "col" is _already_ set to 'x') so then,
-    # SECOND, query(SELECT...) on the sid to determine if the row is in
-    #   fact there,
-    # THIRD, verify that there is at least one row present, and if there
-    #   is not, then
-    # FOURTH, insert the row as we've determined that it does not exist.
+    // FIRST test to see if any rows were affected.
+    //   Zero rows affected could mean either there were no matching rows
+    //   whatsoever, OR that the update statement did match a row but made
+    //   no changes to the table data (i.e. UPDATE tbl SET col = 'x', when
+    //   "col" is _already_ set to 'x') so then,
+    // SECOND, query(SELECT...) on the sid to determine if the row is in
+    //   fact there,
+    // THIRD, verify that there is at least one row present, and if there
+    //   is not, then
+    // FOURTH, insert the row as we've determined that it does not exist.
  
     if ( $this->db->affected_rows() == 0
         && $this->db->query($squery)
@@ -142,20 +141,19 @@ class OBM_User_Sql extends CT_Sql {
 
 
 class OBM_Session extends Session {
-  var $classname 	= "OBM_Session";
-  var $cookiename     	= "";           ## defaults to classname
-  var $mode           	= "cookie";     ## We propagate session ID with cookies
-  var $lifetime_default = 0x7fffffff;   ## session cookie if global lifetime=0
-  var $that_class     	= "OBM_CT_Sql"; ## Which database to connect...
+  var $cookie_name     	= "OBM_Session";
+  var $cookie_domain  	= "aliacom.local";
+  var $mode           	= "cookie";     // We propagate session ID with cookies
+  var $lifetime_default = 0x7fffffff;   // session cookie if global lifetime=0
   var $allowcache	= "" ;
 }
+
 
 
 class OBM_Challenge_Auth extends Auth {
   var $classname      = "OBM_Challenge_Auth";
   var $lifetime       =  1200;
-
-  var $magic          = "Simsalabim";  ## Challenge seed
+  var $magic          = "Simsalabim";  // Challenge seed
   var $database_class = "DB_OBM";
   var $database_table = "UserObm";
 
@@ -175,8 +173,12 @@ class OBM_Challenge_Auth extends Auth {
     if(isset($login)) {
       $this->auth["uname"]=$login;     ## This provides access for "loginform.ihtml"
     }
-    $this->db->query(sprintf("select userobm_id,userobm_perms,userobm_password ".
-                "from %s where userobm_login = '%s' and userobm_archive = '0'",
+    $this->db->query(sprintf("select userobm_id,
+      userobm_perms,
+      userobm_password
+    from %s
+    where userobm_login = '%s'
+      and userobm_archive = '0'",
                           $this->database_table,
                           addslashes($login)));
 
@@ -241,6 +243,86 @@ class OBM_Perm extends Perm {
   }
 
 }
+
+
+//---------------------------------------------------------------------------//
+// Mysql Session Handler
+//---------------------------------------------------------------------------//
+function sess_db_open($save_path, $session_name) {
+  global $sess_save_path, $sess_session_name;
+     
+  $sess_save_path = $save_path;
+  $sess_session_name = $session_name;
+  return(true);
+}
+
+function sess_db_close() {
+  return(true);
+}
+
+function sess_db_read ($id) {
+  global $sess_save_path, $sess_session_name;
+
+  $s_q = new DB_OBM;
+  $query = "select obmsession_data
+    from ObmSession
+    where obmsession_sid = '$id'";
+
+  if ($s_q->query($query)) {
+    $s_q->next_record();
+    $ret = $s_q->f("obmsession_data");
+  } else {
+    $ret = "";
+  }
+
+  return $ret;
+}
+
+
+function sess_db_write ($id, $sess_data) {
+  global $sess_save_path, $sess_session_name;
+
+  $now = date("Y-m-d H:i:s");
+  $s_q = new DB_OBM;
+  $query = "REPLACE ObmSession ( 
+      obmsession_sid,
+      obmsession_timeupdate,
+      obmsession_name,
+      obmsession_data)
+    VALUES (
+      '$id',
+      '$now',
+      '$sess_session_name',
+      '".addslashes($sess_data)."')";
+
+  //  echo "<p>query=$query";
+  $ret = $s_q->query($query);
+
+  return $ret;
+}
+
+function sess_db_destroy ($id) {
+  global $sess_save_path, $sess_session_name;
+     
+  $s_q = new DB_OBM;
+  $query = "DELETE from ObmSession
+    where
+      obmsession_sid = '$id'
+      and obmsession_name = '$sess_session_name'";
+
+  $ret = $s_q->query($query);
+  return $ret;
+}
+
+/*********************************************
+ * WARNING - You will need to implement some *
+ * sort of garbage collection routine here.  *
+ *********************************************/
+function sess_db_gc ($maxlifetime) {
+  return true;
+}
+
+//session_set_save_handler ("sess_db_open", "sess_db_close", "sess_db_read", "sess_db_write", "sess_db_destroy", "sess_db_gc");
 
 
 </script>

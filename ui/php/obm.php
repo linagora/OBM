@@ -20,6 +20,7 @@ include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 
+
 if ($action == "logout") {
   include("$obminclude/global_pref.inc");
   $display["head"] = display_head("OBM Version $obm_version");

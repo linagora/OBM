@@ -184,6 +184,9 @@ function run_query_insert($user) {
 
   $login = $user["login"];
   $passwd = $user["passwd"];
+  if ($passwd != "") {
+    $passwd_crypt = $user["passwd_crypt"];
+  }
   $perms = $user["perms"];
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
@@ -210,7 +213,7 @@ function run_query_insert($user) {
     null,
     ". $auth->auth["uid"] . ",
     '$login',
-    '$passwd',
+    '$passwd_crypt',
     '$perms',
     '$archive',
     '$lname',
@@ -239,6 +242,10 @@ function run_query_update($p_id, $user) {
 
   $login = $user["login"];
   $passwd = $user["passwd"];
+  if ($passwd != "") {
+    $passwd_crypt = $user["passwd_crypt"];
+    $passwd_update = "userobm_password='$passwd_crypt',";
+  }
   $perms = $user["perms"];
   $archive = ($user["archive"] ? "1" : "0");
   $lname = $user["lastname"];
@@ -250,7 +257,7 @@ function run_query_update($p_id, $user) {
     userobm_timeupdate='". date("Y-m-d H:i:s")."',
     userobm_userupdate=". $auth->auth["uid"] .",
     userobm_login='$login',
-    userobm_password='$passwd',
+    $passwd_update
     userobm_perms='$perms',
     userobm_archive='$archive',
     userobm_lastname='$lname',

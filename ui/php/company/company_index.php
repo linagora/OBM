@@ -47,6 +47,7 @@ include("$obminclude/global_pref.inc");
 require("company_query.inc");
 require("company_display.inc");
 
+
 // updating the company bookmark : 
 if ( ($param_company == $last_company) && (strcmp($action,"delete")==0) ) {
   $last_company = $last_company_default;

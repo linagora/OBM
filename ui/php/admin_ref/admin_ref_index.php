@@ -26,7 +26,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "ADMIN_REF";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_lang_index.php                                         //
 //     - Desc : lang admin index File                                        //
@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "ADMIN_LANG";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

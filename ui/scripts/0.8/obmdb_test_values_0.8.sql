@@ -13,11 +13,11 @@
 -- Default User creation
 -------------------------------------------------------------------------------
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uadmin','padmin','admin', 'Admin Lastname', 'Admin Firstname');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uadmin','6589c59cab273225e6662a1b1558e92b','admin', 'Admin Lastname', 'Admin Firstname');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('ueditor','peditor','editor', 'Itor', 'Ed');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('ueditor','43e77d678db7b87c7b7494685419f7b6','editor', 'Itor', 'Ed');
 
-INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uuser','puser','user', 'User', 'John');
+INSERT INTO UserObm (userobm_login, userobm_password,userobm_perms, userobm_lastname, userobm_firstname) VALUES ('uuser','8cb1ecc05c0b32c2235046b0d9f23bea','user', 'User', 'John');
 
 
 -------------------------------------------------------------------------------

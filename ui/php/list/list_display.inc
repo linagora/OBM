@@ -348,6 +348,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
   return $block;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display List Form (graphical or not)                                     //
 // Parameters :

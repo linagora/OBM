@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_code_index.php                                         //
 //     - Desc : code admin index File                                        //
@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "ADMIN_CODE";
 $obm_root = "../..";
 

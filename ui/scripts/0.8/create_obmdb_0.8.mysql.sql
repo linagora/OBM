@@ -21,6 +21,18 @@ use obm;
 -------------------------------------------------------------------------------
 
 --
+-- Table structure for table 'ObmSession'
+--
+CREATE TABLE ObmSession (
+  obmsession_sid         varchar(32) NOT NULL default '',
+  obmsession_timeupdate  timestamp(14),
+  obmsession_name        varchar(32) NOT NULL default '',
+  obmsession_data        text,
+  PRIMARY KEY (obmsession_sid, obmsession_name)
+);
+
+
+--
 -- Table structure for table 'ActiveUserObm'
 --
 CREATE TABLE ActiveUserObm (
@@ -317,8 +329,8 @@ CREATE TABLE ContactCategory1 (
   contactcategory1_timecreate  timestamp(14),
   contactcategory1_userupdate  int(8) default '0',
   contactcategory1_usercreate  int(8) default '0',
-  contactcategory1_code        int(4) NOT NULL 0,  
-  contactcategory1_label       varchar(100) NOT NULL,
+  contactcategory1_code        int(8) default '0',
+  contactcategory1_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory1_id)
 );
 
@@ -342,8 +354,8 @@ CREATE TABLE ContactCategory2 (
   contactcategory2_timecreate  timestamp(14),
   contactcategory2_userupdate  int(8) default '0',
   contactcategory2_usercreate  int(8) default '0',
-  contactcategory2_code        int(4) NOT NULL 0,  
-  contactcategory2_label       varchar(100) NOT NULL,
+  contactcategory2_code        int(8) default '0',
+  contactcategory2_label       varchar(100) NOT NULL default '',
   PRIMARY KEY (contactcategory2_id)
 );
 
@@ -486,7 +498,7 @@ CREATE TABLE CalendarSegment (
   calendarsegment_date        timestamp(14) NOT NULL default '0',
   calendarsegment_flag        varchar(5) NOT NULL default '',
   calendarsegment_type        varchar(5) NOT NULL default '',
-  calendarsegment_state       char(1) NOT NULL default '''',
+  calendarsegment_state       char(1) NOT NULL default '',
   PRIMARY KEY (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
 );
 
@@ -508,7 +520,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_length       int(4) NOT NULL default '',
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
-  calendarevent_endrepeat    timestamp(14) NOT NULL '0',
+  calendarevent_endrepeat    timestamp(14) NOT NULL default '0',
   PRIMARY KEY (calendarevent_id)
 );
 

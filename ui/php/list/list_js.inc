@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_js.inc                                                  //
 //     - Desc : List javascript functions File                               //
@@ -186,4 +186,5 @@ function contact_criterion(form,value,i) {
   i++;
   return i;
   }
-</script>" ;
+
+</script>";

@@ -14,10 +14,10 @@ function page_open($feature) {
 
   # enable sess and all dependent features.
   if (isset($feature["sess"])) {
-    global $sess;
+    global $sess, $auth;
     $sess = new $feature["sess"];
     $sess->start();
-    
+
     # the auth feature depends on sess
     if (isset($feature["auth"])) {
       global $auth;
@@ -36,15 +36,6 @@ function page_open($feature) {
         }
       }
 
-      # the user feature depends on auth and sess
-      if (isset($feature["user"])) {
-        global $user;
-        
-        if (!isset($user)) {
-          $user = new $feature["user"];
-        }
-        $user->start($auth->auth["uid"]);
-      }
     }
 
     ## Load the auto_init-File, if one is specified.
@@ -56,10 +47,10 @@ function page_open($feature) {
 }
 
 function page_close() {
-  global $sess, $user,$auth;
+  global $sess, $auth;
   $base_session = NEW OBM_User_Sql;
   $base_session->ac_start();
-  $base_session->ac_store($sess->id,"OBM_User_Active",$auth->auth["uid"]);
+  $base_session->ac_store($sess->id,$sess->cookie_name,$auth->auth["uid"]);
 }
 
 

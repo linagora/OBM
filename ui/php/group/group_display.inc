@@ -606,13 +606,17 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
 //   - $id : group id
 ///////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($id) {
-  global $display, $l_warn_delete, $l_delete, $l_back;
+  global $display, $l_warn_delete, $l_delete, $l_back, $l_cant_delete_system;
 
-  $nb_u = get_group_nb_user($id);
-  $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
+  $lgroup = get_group_info($id);
+  if ($lgroup["system"] != "0") {
+    $display["msg"] .= display_warn_msg($l_cant_delete_system);
+    $dis_delete = "";
+  } else {
+    $nb_u = get_group_nb_user($id);
+    $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
 
-  $block = "
-  <div class=\"detailButton\">
+    $dis_delete = "
     <p class=\"detailButtons\">
       <form method=\"get\" name=\"form_delete\"
       action=\"" .url_prepare("group_index.php") . "\">
@@ -620,7 +624,10 @@ function dis_warn_delete($id) {
       <input type=\"hidden\" name=\"hd_group_id\" value=\"$id\" />
       <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
       </form>
-    </p>
+    </p>";
+  }
+
+  $dis_back = "
     <p class=\"detailButtons\">
       <form name=\"form_back\" method=\"get\"
       action=\"" .url_prepare("group_index.php") . "\">
@@ -628,7 +635,12 @@ function dis_warn_delete($id) {
       <input type=\"hidden\" name=\"param_group\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_back\" />
       </form>
-    </p>
+    </p>";
+
+  $block = "
+  <div class=\"detailButton\">
+    $dis_delete
+    $dis_back
   </div>";
 
   return $block;

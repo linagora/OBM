@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_index.php                                              //
 //     - Desc : Administration (Language, themes,...) management index file  //
@@ -12,7 +12,7 @@
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "ADMIN";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";

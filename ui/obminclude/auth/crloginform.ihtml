@@ -21,7 +21,7 @@ tr.logintable {
 <!--
   function doChallengeResponse() {
     str = document.login.login.value + ":" +
-          document.login.password.value + ":" +
+          MD5(document.login.password.value) + ":" +
           document.login.challenge.value;
 
     document.login.response.value = MD5(str);

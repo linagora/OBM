@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.0pre4";
+$obm_version = "0.8.0pre6";
 $l_obm_title = "O.B.M.";
 
 // Bookmarks default
@@ -52,21 +52,61 @@ $c_task_notvalid = 0;
 $c_task_uservalid = 1;
 $c_task_adminvalid = 2;
 
-// OBM System groups
-$cg_com = 1;
-$cg_prod = 2;
+
+//---------------------------------------------------------------------------//
+// OBM Default configurable Constants : Default values
+// To change site values => change these in obm_conf.inc 
+//---------------------------------------------------------------------------//
+
+// Query limits (for user queries)
+$cql_max_row = 50000;  // Maximum rows to be returned
+$cql_max_cost = 1000;  // Maximum query cost (Postgres)
 
 // Popup Display size
 $popup_width = 620;
 $popup_height = 480;
 $popup_contact_height = 600;
 
-// Query limits (for user queries)
-$cql_max_row = 50000;  // Maximum rows to be returned
-$cql_max_cost = 1000;  // Maximum query cost (Postgres)
+// OBM System groups (groups id)
+$cg_adm = 1;
+$cg_com = 2;
+$cg_prod = 3;
+
+
+//-------------------------//
+// Default Displayed Infos //
+//-------------------------//
+// sections
+$cgp_show["section"]["com"] = true;
+$cgp_show["section"]["prod"] = true;
+$cgp_show["section"]["compta"] = true;
+$cgp_show["section"]["user"] = true;
+$cgp_show["section"]["admin"] = true;
+$cgp_show["section"]["aliamin"] = true;
+
+// modules
+$cgp_show["module"]["company"] = true;
+$cgp_show["module"]["contact"] = true;
+$cgp_show["module"]["deal"] = true;
+$cgp_show["module"]["list"] = true;
+$cgp_show["module"]["agenda"] = true;
+$cgp_show["module"]["todo"] = true;
+$cgp_show["module"]["time"] = true;
+$cgp_show["module"]["project"] = true;
+$cgp_show["module"]["contract"] = true;
+$cgp_show["module"]["incident"] = true;
+$cgp_show["module"]["document"] = true;
+$cgp_show["module"]["account"] = true;
+$cgp_show["module"]["invoice"] = true;
+$cgp_show["module"]["payment"] = true;
+$cgp_show["module"]["settings"] = true;
+$cgp_show["module"]["user"] = true;
+$cgp_show["module"]["group"] = true;
+
 
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
+
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 
@@ -106,7 +146,7 @@ $l_cal_2 = "1/2";  // 1/2 h
 $l_cal_1 = "1";    // 1 h
 
 // Export delimiter constants
-$ccsvd_sc = ";";   // Semi-colon
+$ccsvd_sc = ";";    // Semi-colon
 $ccsvd_tab = "tab"; // Tab
 
 // Perms

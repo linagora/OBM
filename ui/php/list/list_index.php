@@ -539,7 +539,6 @@ function get_list_action() {
    'Condition'=> array ('None') 
                                             );
 
-
 }
 
 </script>

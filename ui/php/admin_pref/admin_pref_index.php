@@ -15,7 +15,7 @@
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "ADMIN_PREF";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");

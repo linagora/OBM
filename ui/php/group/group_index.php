@@ -28,7 +28,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-$section = "USERS";
+$section = "USER";
 $menu = "GROUP";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -431,7 +431,7 @@ function get_group_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/group/group_index.php?action=new",
     'Right'    => $group_write,
-    'Condition'=> array ('search','index','admin','detailconsult','reset','display', 'user_add', 'user_del', 'group_add', 'group_del')
+    'Condition'=> array ('search','index','admin','detailconsult','display', 'user_add', 'user_del', 'group_add', 'group_del')
                                   );
 
 // Detail Consult
@@ -447,7 +447,7 @@ function get_group_action() {
      'Name'     => $l_header_update,
      'Url'      => "$path/group/group_index.php?action=detailupdate&amp;param_group=".$group["id"]."",
      'Right'    => $group_write,
-     'Condition'=> array ('detailconsult', 'reset', 'user_add', 'user_del', 'group_add', 'group_del') 
+     'Condition'=> array ('detailconsult', 'user_add', 'user_del', 'group_add', 'group_del') 
                                      	   );
 
 // Insert
@@ -469,7 +469,7 @@ function get_group_action() {
     'Name'     => $l_header_delete,
     'Url'      => "$path/group/group_index.php?action=check_delete&amp;param_group=".$group["id"]."",
     'Right'    => $group_write,
-    'Condition'=> array ('detailconsult', 'detailupdate', 'reset', 'user_add', 'user_del', 'group_add', 'group_del') 
+    'Condition'=> array ('detailconsult', 'detailupdate', 'user_add', 'user_del', 'group_add', 'group_del') 
                                      	   );
 
 // Delete

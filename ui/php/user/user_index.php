@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_index.php                                               //
 //     - Desc : User Index File                                              //
@@ -23,7 +23,7 @@
 // Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "USERS";
+$section = "USER";
 $menu = "USER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -257,6 +257,7 @@ function get_param_user() {
   if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($tf_login)) $obm_user["login"] = $tf_login;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
+  if (isset ($tf_passwd)) $obm_user["passwd_crypt"] = md5($obm_user["passwd"]);
   if (isset ($sel_perms)) $obm_user["perms"] = $sel_perms;
   if (isset ($tf_email)) $obm_user["email"] = $tf_email;
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;

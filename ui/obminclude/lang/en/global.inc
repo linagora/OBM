@@ -113,6 +113,7 @@ $l_header_prod   = "PRODUCTION";
 $l_header_compta = "ACCOUTANCY";
 $l_header_users  = "USERS";
 $l_header_admins = "ADMINISTRATION";
+$l_header_aliamin = "ALIAMIN";
 
 $l_header_company = "Companies";
 $l_header_contact = "Contacts";

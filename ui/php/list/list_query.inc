@@ -801,4 +801,7 @@ function make_query($list) {
   $query = $query.$where." ORDER BY contact_lastname";
   return trim(addslashes($query));
 }
+
+
 </script>
+

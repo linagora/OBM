@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : user_display.inc                                             //
 //     - Desc : User Display functions File                                  //
@@ -384,7 +384,7 @@ function html_user_form($first_try, $usr_q, $user) {
   if (($action == "detailupdate") && ($first_try == 1)) {
     $id = $usr_q->f("userobm_id");
     $login = $usr_q->f("userobm_login");
-    $passwd = $usr_q->f("userobm_password");
+    $passwd = "";
     $perms = $usr_q->f("userobm_perms");
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");

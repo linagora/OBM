@@ -10,32 +10,22 @@
  */ 
 
 class Session {
-  var $classname = "Session";         ## Needed for object serialization.
-
   ## Define the parameters of your session by either overwriting
   ## these values or by subclassing session (recommended).
 
   var $mode = "";                 ## We propagate session IDs with cookies
-  var $cookiename = "";           ## Name of session cookie default : classname
-
-//  var $cookie_domain = "";      ## If set, the domain for which the
-                                  ## session cookie is set.
+  var $cookie_name = "";          ## Name of session cookie default : classname
+  var $cookie_domain = "";        ## Name of session cookie default : classname
   var $auto_init = "";            ## Name of the autoinit-File, if any.
-  var $secure_auto_init = 1;      ## Set to 0 only, if all pages call
-                                  ## page_close() guaranteed.
-  var $in = false;                ## Marker: Did we already include the autoinit file?
-
   var $allowcache = "passive";    ## "passive", "no", "private", "public"
   var $allowcache_expire = 1440;  ## If you allowcache, data expires in this
                                   ## many minutes.
-//  var $that_class = "";         ## Name of data storage container
   var $lifetime = 7200;           ## 0 = do session cookies, else minutes
 
   ##
   ## End of parameters.
   ##
 
-  var $name;                      ## Session name
   var $id;                        ## Unique Session ID
 
 
@@ -76,45 +66,35 @@ class Session {
   ## Propagate the session id according to mode and lifetime.
   ## Will create a new id if necessary. To take over abandoned sessions,
   ## one may provide the new session id as a parameter (not recommended).
-
   function get_id($id = "") {
     if ("" != $id)
       session_id($id);
   }
 
-  ## put_id():
-  ## 
-  ## Stop using the current session id (unset cookie, ...) and
-  ## abandon a session.
-  function put_id() {
-  }
 
   ## delete():
   ##
   ## Delete the current session record and put the session id.
-  
   function delete() {
     global $HTTP_COOKIE_VARS;
     session_start();
     session_destroy();
     unset($HTTP_COOKIE_VARS[session_name()]);
-    session_start();
-
+    //    session_start();
   }
 
   ## url($url):
   ##
   ## Helper function: returns $url concatenated with the current 
   ## session $id.
-   
   function url($url){
     $url=ereg_replace("[&?]+$", "", $url);
 
     switch ($this->mode) {
       case "get":
-        if ( strpos($url, urlencode($this->name)) == false ) { 
+        if ( strpos($url, urlencode($this->cookie_name)) == false ) { 
           $url .= ( strpos($url, "?") != false ?  "&amp;" : "?" ).
-                urlencode($this->name)."=".$this->id;
+                urlencode($this->cookie_name)."=".$this->id;
         }
  
       break;
@@ -191,19 +171,16 @@ class Session {
     global $lifetime, $session_cookie;
 
     if ($session_cookie) {
-      setcookie(session_name(), session_id(), 0, "/",".jaguar.aliacom-local");
+      setcookie($this->cookie_name, session_id(), 0, "/", $this->cookie_domain);
     } else {
       if ($lifetime == 0) {
         $lifetime = $this->lifetime_default;
       }
-      // Use setcookie() as session_set_cookie_params() doesn't seem to work!
-      setcookie(session_name(), session_id(), time()+$lifetime, "/",".jaguar.aliacom-local");
-      //   session_set_cookie_params($lifetime);
+      setcookie($this->cookie_name, session_id(), time()+$lifetime, "/", $this->cookie_domain);
     }
   }
 
   function start($sid = "") {
-    global $HTTP_COOKIE_VARS;
     global $action, $login_action;
 
     if ($action == "logout") {
@@ -212,17 +189,9 @@ class Session {
 
     $this->put_headers();
     $this->get_id($sid);
-    $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
-    session_name($this->name);
-    $HTTP_COOKIE_VARS[$this->name] = "OBM_Session";
-    if (isset($HTTP_COOKIE_VARS[$this->name])) {
-      $this->mode = "cookie";
-    } else {
-      $this->mode = "get";
-    }
+    session_name($this->cookie_name);
     session_start();
     $this->id = session_id();
-
    }
 }
 ?>

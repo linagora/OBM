@@ -30,7 +30,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
-$section = "ADMINS";
+$section = "ADMIN";
 $menu = "IMPORT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -46,7 +46,7 @@ if (file_exists("$path/../".$lang_file)) {
 }
 
 // Specific site company lang file
-if ($gp_site_include) {
+if ($cgp_site_include) {
   $lang_file = "$obminclude/site/lang/$set_lang/company.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");
@@ -59,7 +59,7 @@ if (file_exists("$path/../".$lang_file)) {
 }
 
 // Specific site contact lang file
-if ($gp_site_include) {
+if ($cgp_site_include) {
   $lang_file = "$obminclude/site/lang/$set_lang/contact.inc";
   if (file_exists("$path/../".$lang_file)) {
     include("$lang_file");

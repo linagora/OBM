@@ -24,6 +24,10 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
   $user = $group["user"];
 
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
 
   if ($user != '') {
     $where .= " and C.userobm_lastname like '$user%'";
@@ -32,9 +36,10 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
     $where .= " and group_email like '%$email%'";
   }
   
+
   $query = "select distinct UGroup.*, group_id as Id,
-      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
-      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
+      $timecreate,
+      $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
@@ -74,6 +79,10 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
   $parents = get_group_parents($id);
 
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
 
   // WHERE Clause
 
@@ -88,8 +97,8 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
   }
     
   $query = "select distinct UGroup.*, group_id as Id,
-      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
-      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
+      $timecreate,
+      $timeupdate,
       A.userobm_login as usercreate,
       B.userobm_login as userupdate
     from 
@@ -121,15 +130,20 @@ function run_query_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
+
   $query = "select *,
-      UNIX_TIMESTAMP(UGroup.group_timecreate) as timecreate,
-      UNIX_TIMESTAMP(UGroup.group_timeupdate) as timeupdate,
+      $timecreate,
+      $timeupdate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate
     from UGroup
          left join UserObm as c on group_usercreate=c.userobm_id
          left join UserObm as u on group_userupdate=u.userobm_id
- where group_id = '$id'";
+    where group_id = '$id'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query) ;
   $obm_q->next_record();
@@ -150,11 +164,13 @@ function run_query_insert($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
+  $system = ($group["system"] == 1) ? 1 : 0;
 
   $query = "insert into UGroup (group_timeupdate,
     group_timecreate,
     group_userupdate,
     group_usercreate,
+    group_system,
     group_name,
     group_desc,
     group_email)
@@ -162,6 +178,7 @@ function run_query_insert($group) {
     '" . date("Y-m-d H:i:s") ."',
     null,
     '" . $auth->auth["uid"] . "',
+    '$system',
     '$name',
     '$desc',
     '$email')";
@@ -186,9 +203,11 @@ function run_query_update($group) {
   $name = $group["name"];
   $desc = $group["desc"];
   $email = $group["email"];
+  $system = ($group["system"] == 1) ? 1 : 0;
   
   $query = "update UGroup set group_timeupdate='". date("Y-m-d H:i:s")."',
     group_userupdate='".$auth->auth["uid"]."',
+    group_system='$system',
     group_name='$name',
     group_desc='$desc',
     group_email='$email'
@@ -325,7 +344,7 @@ function run_query_groupgroup_insert($group) {
          && (! in_array($g_id, $parents))
          && ($id != $g_id)
        ) {
-      $query = "insert into GroupGroup (groupgroup_parentid,
+        $query = "insert into GroupGroup (groupgroup_parentid,
         groupgroup_childid) values ($id, $g_id)";
 
       display_debug_msg($query, $cdg_sql);
@@ -474,6 +493,31 @@ function get_group_nb_user($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Return the group infos
+// Parameters:
+//   - $id : group id
+///////////////////////////////////////////////////////////////////////////////
+function get_group_info($id) {
+  global $cdg_sql;
+
+  if ($id == "") {
+    return false;
+  }
+
+  $query = "select * from UGroup where group_id='$id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $g["name"] = $obm_q->f("group_name");
+  $g["system"] = $obm_q->f("group_system");
+
+  return $g;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Check if a group (except with id given) with the name given already exists
 // Parameters:
 //   - $name : name to search for
@@ -484,9 +528,13 @@ function get_group_nb_user($id) {
 function get_group_name_exists($name, $id="") {
   global $cdg_sql;
 
+  if ($id != "") {
+    $where_id = "group_id!='$id' and";
+  }
+
   $query = "select group_id, group_name
     from UGroup
-    where group_id!='$id' and group_name='$name'";
+    where $where_id group_name='$name'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

@@ -14,12 +14,22 @@ $obmdb_dbtype = "MYSQL"; // (MYSQL || PGSQL)
 //$obmdb_dbtype = "PGSQL"; // (MYSQL || PGSQL)
 $obmdb_db = "obm";
 $obmdb_user = "obm";
-$obmdb_password = "obm";
+$obmdb_password = "20cel28";
 
 // Use specific site includes
-$gp_site_include = true;
+//$cgp_site_include = true;
 
 // is Mail enabled ? (agenda)
-$gp_mail_enabled = false;
+$cgp_mail_enabled = false;
+
+//-----------------//
+// Displayed Infos //
+//-----------------//
+// sections -- Default is true
+//$cgp_show["section"]["compta"] = false;
+
+// modules -- Default is true
+//$cgp_show["module"]["user"] = false;
+//$cgp_show["module"]["group"] = false;
 
 </script>

@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : user_js.inc                                                 //
 //     - Desc  : User javascript functions File                              //
