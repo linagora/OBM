@@ -117,6 +117,7 @@ $l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun','jul',
 			      'aug','sep','oct','nov','dec');
 
 // Messages
+$l_sendamail = "Notify customers by mail.";
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
 $l_select_repeat_day = "Vous devez s&eacute;lectionner le ou les jours de r&eacute;p&eacute;tition.";
 $l_conflict_events = "Le ou les cr&eacute;neaux horaires choisis sont occup&eacute;s pour "; 
@@ -133,11 +134,20 @@ $l_err_end_repeat3 = "The max duration of a repetition is ten years when the rep
 $l_err_days_repeat = "You must check one or more repeatition day.";
 $l_err_weekly_repeat = "For weekly repeatition, the end of the repeatition must at least be seven day after the end of the event.";
 
-
 $l_unknown="Inconnu";
 
-$l_event_mail_head = "A new event has been define for you on the obm application. This event title is :";
-$l_event_mail_subject = "New event on obm";
+//Mail
+$l_add_event_mail_head = "A new event has been set for you on the obm application.\nThis event title is :";
+$l_update_event_mail_head = "A event has been updated for you on the obm application.\nThis event title is :";
+$l_delete_event_mail_head = "A event has been deleted for you on the obm application.\nThis event title was :";
+
+$l_event_mail_body = "This event will take place : ";
+$l_update_event_mail_body = "Instade of :";
+$l_delete_event_mail_body = "This event should have take place : ";
+$l_confirm_mail = "Confirm+send a mail";
+$l_add_event_mail_subject = "New event on obm";
+$l_update_event_mail_subject = "Updated event on obm";
+$l_delete_event_mail_subject = "Deleted event on obm";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";

@@ -1248,7 +1248,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
-  global $l_none,$l_insert,$l_force,$l_repeat_update;
+  global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail;
   
   if($action == "detailupdate") {
     $title = $obm_q_event->f("calendarevent_title");
@@ -1480,7 +1480,11 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     <tr>
      <td class=\"detailLabel\">$l_title</td>
      <td><input type=\"text\" id=\"tf_title\" name=\"tf_title\" maxlength=\"50\" size=\"25\" value=\"$title\" /></td>
-    </tr>  
+    </tr> 
+    <tr>
+     <td class=\"detailLabel\">$l_sendamail</td>
+     <td><input type=\"checkbox\" id=\"cb_mail\" value=\"1\" name=\"cb_mail\" checked=\"checked\" /></td>
+    </tr>       
     <tr>
      <td class=\"detailLabel\">$l_force</td>
      <td>$dis_force</td>
@@ -1868,18 +1872,24 @@ function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
 function html_dis_delete($agenda) {
   global $set_theme;
   // -- Labels
-  global $ico_validate, $ico_cancel;
-  global $l_confirm_delete,$l_confirm,$l_cancel;
+  global $ico_validate, $ico_cancel,$ico_confirm_mail;
+  global $l_confirm_delete,$l_confirm,$l_cancel,$l_confirm_mail
+;
   
   $event_id = $agenda["id"];
   $getdate = $agenda["date"];
   echo "
   <table class=\"details\">
    <tr>
-    <td colspan=\"8\" class=\"detailHead\">$l_confirm_delete</td>
+    <td colspan=\"10\" class=\"detailHead\">$l_confirm_delete</td>
     <tr>
-    <td colspan=\"3\" style=\"text-align: right;width: 40%\">
-     <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"/images/$set_theme/$ico_validate\" alt=\"[Validate]\" /></a></a>
+    <td colspan=\"3\" style=\"text-align: right;width: 35%\">
+     <a href=\"agenda_index.php?action=delete&param_event=$event_id&cb_mail=1\"><img src=\"/images/$set_theme/$ico_confirm_mail\" alt=\"[ValidateMail]\" /></a>
+    <td colspan=\"1\" class=\"detailHead\" style=\"text-align: left\">
+     $l_confirm_mail
+    </td>     
+    <td colspan=\"1\" style=\"text-align: right;\">
+     <a href=\"agenda_index.php?action=delete&param_event=$event_id\"><img src=\"/images/$set_theme/$ico_validate\" alt=\"[Validate]\" /></a>
     <td colspan=\"1\" class=\"detailHead\" style=\"text-align: left\">
      $l_confirm
     </td>

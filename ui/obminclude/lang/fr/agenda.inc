@@ -88,6 +88,7 @@ $l_update_warning = "Attention des conflits ont été détectés";
 $l_insert_warning = "Attention des conflits ont été détectés";
 $l_update_error = "Des conflits ont été détectés, mise à jour annulée";
 $l_insert_error = "Des conflits ont été détectés, insertion annulée";
+$l_sendamail = "Notifier les participants par mail";
 
 // Messages 
 $l_select_contacts = "Vous devez choisir au moins un contact ou un groupe.";
@@ -148,8 +149,23 @@ $l_short_thursday="Jeu";
 $l_short_friday="Ven";
 $l_short_saturday="Sam";
 $l_short_sunday="Dim";
-$l_event_mail_head = "Un nouvel évenement à été programmé pour vous sur Obm. Cet événement à pour titre :";
-$l_event_mail_subject = "Nouvel événement sur Obm";
+
+//MAIL
+
+$l_add_event_mail_head = "Un nouvel évenement a été programmé pour vous sur Obm.\nIl a pour titre : ";
+$l_update_event_mail_head = "Un événement vous concernant a été mis à jour sur Obm.\nIl a pour titre : ";
+$l_delete_event_mail_head = "Un événement vous concernant a été supprimé sur Obm.\nIl avait pour titre : ";
+
+$l_add_event_mail_subject = "Nouvel evenement sur Obm";
+$l_update_event_mail_subject = "Mise a jour d'un evenement sur Obm";
+$l_delete_event_mail_subject = "Suppression d'un evenement sur Obm";
+
+$l_event_mail_body = "Il aura lieu : ";
+$l_update_event_mail_body = "\nAu lieu de :";
+$l_delete_event_mail_body = "Il aurait du avoir lieu : ";
+$l_confirm_mail = "Confirmer+envoie de mail";
+
+
 $l_unknown="Inconnu";
 $l_user_calendar = "Vue Multi-utilisateurs";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

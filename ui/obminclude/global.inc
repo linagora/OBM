@@ -70,7 +70,8 @@ $perms_user = "user" ;
 $perms_editor = "editor" ;
 $perms_admin = "admin" ;
 
-
+// Mail.
+$activate_mail = 0;
 // Perms and Profil
 ///////////////////////////////////////////////////////////////////////////////
 //                         COMMERCIAL RIGTHS                                 //

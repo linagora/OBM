@@ -398,7 +398,7 @@ function get_param_agenda() {
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
-  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end;
+  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail;
 
 	
   // Deal fields
@@ -417,6 +417,7 @@ function get_param_agenda() {
   if (is_array($hd_conflict_end)) $agenda["conflict_end"] = $hd_conflict_end;
   if (isset($hd_old_begin)) $agenda["old_begin"] = $hd_old_begin;
   if (isset($hd_old_end)) $agenda["old_end"] = $hd_old_end;
+  if (isset($cb_mail)) $agenda["mail"] = $cb_mail;
   
   if (isset($tf_repeat_end)){
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_repeat_end , $day_array1);

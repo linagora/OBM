@@ -105,6 +105,7 @@ $ico_forbidden      = "forbidden.gif";
 $ico_warning        = "warning.gif";
 
 //Agenda Icons
+$ico_confirm_mail   = "ico_confirmmail.gif";
 $ico_new_event      = "ico_calendar_new.gif";
 $ico_event          = "ico_calendar_evt.gif";
 $ico_left_day       = "left_day.gif";
