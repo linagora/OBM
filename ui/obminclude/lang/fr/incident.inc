@@ -22,15 +22,15 @@ $l_contract_date_init = "Date Debut";
 $l_contract_date_expir = "Date Expiration";
 $l_to = "Au"; 
 $l_from = "Du";
-$l_manager = "Responsables";
-$l_client_manager = "Responsables Client";
+$l_manager = "Responsable";
+$l_client_manager = "Responsable Client";
 $l_date_before ="Date Avant";
 $l_date_after ="Date Apr&egrave;s";
 $l_archive_new = "Archiver";
 $l_archive = "Voir les archives";
 $l_archive_consult = "Archivé";
 $l_incident_company = "Société";
-
+$l_incident = "Incident";
 //Title 
 $l_incident_select_contract = "Sélectionner le Contrat de l'Incident.";
 $l_redhot = "Très Urgent";
@@ -69,7 +69,7 @@ $l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
 $l_found = "incident(s) trouv&eacute;(s).";
 $l_no_found = "Aucun Incident ne correspond &agrave; ces crit&egrave;res !";
 $l_insert_ok = "L'insertion de l'incident a été correctement effectuée.";
-$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir la liste des contrats de support correspondants.";
+$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur &lt; Chercher &gt; pour obtenir la liste des contrats de support correspondants.";
 // For the display preferences modification screen 
 
 $l_incident_display = "Options d'affichage des Incidents";

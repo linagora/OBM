@@ -284,7 +284,11 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
       <input type=\"hidden\" name=\"action\" value=\"delete\" />
       <input type=\"hidden\" name=\"param_contract\" value=\"$id\" />
       <input type=\"submit\" value=\"$l_delete\" />
-      </form>";
+          </td>
+        </tr>
+      </table>
+      </form>
+";
   } else {
     $dis_sub = "<input type=\"hidden\" name=\"hd_soc\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp_name\" />
@@ -343,12 +347,13 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
     <td>$dis_sel_respt</td>    
    </tr><tr>   
     <td class=\"detailLabel\">
-      $l_deal_label <a href=\"".$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$c_id")."\"></a>
-      $c_name
+      $l_deal_label 
       <input type=\"hidden\" name=\"param_deal\" value=\"$param_deal\" />
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$c_new_id\" />
     </td>
     <td>
+      <a href=\"".$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$c_id")."\">
+      $c_name</a>
       <a href=\"\" onclick=\"window.open('../deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contract_select_deal)."&amp;comp_id=$comp_id','contract','height=$popup_height,width=$popup_width'); return false;\">
       <img src=\"/images/$set_theme/$ico_deal\" alt=\"[Choose Deal]\" /></a>
       <input type=\"text\" name=\"deal_name\" value=\"$c_new_name\" size =\"40\" readonly=\"readonly\" onfocus=\"this.blur();\" />

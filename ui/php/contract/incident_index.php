@@ -20,17 +20,6 @@
 // - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
-$www ="   <p class=\"messageInfo\">
-    	<a href=\"http://validator.w3.org/check/referer\"><img
-        src=\"http://www.w3.org/Icons/valid-xhtml10\"
-        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
-	<a href=\"http://jigsaw.w3.org/css-validator/\">
- 	 <img style=\"border:0;width:88px;height:31px\"
-       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />
-	 </a>
-  	</p>";
-
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
@@ -86,7 +75,7 @@ if ($action == "index" || $action == "") {
   if ($set_display == "yes") {
     dis_incident_search_list($incident);
   } else {
-    display_ok_msg($l_no_display);
+    display_info_msg($l_no_display);
   }
 
 } elseif ($action == "search")  {
@@ -128,6 +117,7 @@ if ($action == "index" || $action == "") {
       html_incident_search_form(run_query_userobm(),$incident);
     }
   }
+
 
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -179,6 +169,7 @@ if ($action == "index" || $action == "") {
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q = run_query_display_pref($uid, "incident", 1);
   dis_incident_display_pref($pref_q);
+
 }
 
 ///////////////////////////////////////////////////////////////////////////////

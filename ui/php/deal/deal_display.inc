@@ -821,7 +821,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
        <tr>
          <td colspan=\"2\" class=\"detailHead\">$l_company</td>
        </tr><tr>
-         <td class=\"detailLabel\"><span class=\"messageWarning\">$comp&nbsp;</span>
+         <td class=\"detailLabel\">$comp&nbsp;
         <a href=\"" . $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
          <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
          <td class=\"detailText\">

@@ -6,7 +6,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -70,6 +70,6 @@ function auto_archive(form) {
   else
     form.cb_archive.checked = 0;
 } 
-
-</SCRIPT>
+-->
+</script>
 ";

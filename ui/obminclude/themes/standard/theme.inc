@@ -67,14 +67,15 @@ $ico_contact="contact.gif";            // Contact Icon
 $ico_obm="obm.jpg";                    // OBM icon
 
 // Menus Icons
-$ico_contact="contact_list.gif";
-$ico_contact_list="contact_list.gif";  // Contact List Icon
-$ico_contact_new="contact_new.gif";    // New Contact Icon
-$ico_deal="ico_mail.gif";
-$ico_deal_list="contact_list.gif";     // Contact List Icon
-$ico_deal_new="contact_new.gif";       // New Contact Icon
-$ico_company="ico_change_company.gif";  // Company Icon
-$ico_change_company="ico_change_company.gif";       // Company Icon
+$ico_contact="ico_contact.gif";
+$ico_contact_list="ico_contact.gif";  // Contact List Icon
+$ico_contact_new="ico_contact_new.gif";    // New Contact Icon
+$ico_deal="ico_deal.gif";
+$ico_deal_list="ico_deal.gif";     // Contact List Icon
+$ico_deal_new="ico_deal_new.gif";       // New Contact Icon
+$ico_company="ico_company.gif";  // Company Icon
+$ico_change_company="ico_change_company.gif";       // Contract Icon
+$ico_contract="ico_deal.gif";
 $ico_web="ico_web.gif";                    // WWW Icon
 $ico_mail="ico_mail.gif";                  // Mail Icon
 $ico_arrow_up="arrow_up.gif";          // The up arrow

@@ -31,6 +31,7 @@ $l_archive_new = "To File";
 $l_archive = "Include Files";
 $l_archive_consult = "Filed";
 $l_incident_company = "Company";
+$l_incident = "Incident";
 
 
 //Title 
@@ -72,7 +73,7 @@ $l_error_permission = "You doesn't have the rights to access this page";
 $l_found = "incidents found";
 $l_no_found = "No incident found matching the query !";
 $l_insert_ok = "The incident has been inserted successfully.";
-$l_no_display = "Fill the search fields and press < Find > to retrieve the Incidents";
+$l_no_display = "Fill the search fields and press &lt; Find &gt; to retrieve the Incidents";
 $l_incident_select_contract = "Select the contract of the Incident";
 
 // For the display preferences modification screen 

@@ -672,27 +672,12 @@ class OBM_DISPLAY {
 	// For the incidentss 
 	//------------------------------
         else if ($fieldname == "incident_label") {
-	  if($special_col_table==$col_inc_redhot) {
-	   $name = "<FONT COLOR=\"#$col_text_redhot\">".$this->data_set->f("incident_label")."</FONT>";
-          }elseif ($special_col_table==$col_inc_hot) {
-           $name = "<FONT COLOR=\"#$col_text_hot\">".$this->data_set->f("incident_label")."</FONT>";
-          }
 	  $url = "../contract/incident_index.php?action=detailconsult&amp;param_incident=".$this->data_set->f("incident_id");
 	}
        	else if ($fieldname == "incident_owner_lastname") {
-	  if($special_col_table==$col_inc_redhot) {
-	   $name = "<FONT COLOR=\"#$col_text_redhot\">".$this->data_set->f("incident_owner_lastname")."</FONT>";
-          }elseif ($special_col_table==$col_inc_hot) {
-           $name = "<FONT COLOR=\"#$col_text_hot\">".$this->data_set->f("incident_owner_lastname")."</FONT>";
-          }
 	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_owner");
 	}
        	else if ($fieldname == "incident_logger_lastname") {
-	  if($special_col_table==$col_inc_redhot) {
-	   $name = "<FONT COLOR=\"#$col_text_redhot\">".$this->data_set->f("incident_logger_lastname")."</FONT>";
-          }elseif ($special_col_table==$col_inc_hot) {
-           $name = "<FONT COLOR=\"#$col_text_hot\">".$this->data_set->f("incident_logger_lastname")."</FONT>";
-          }
 	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("incident_logger");
 	}
         else if ($fieldname == "incident_date") {
