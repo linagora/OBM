@@ -223,7 +223,7 @@ function run_query_insert($deal) {
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
-  $archive = $deal["archive"];
+  $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $add_comment = $deal["add_comment"];
   if ($add_comment != "") {
@@ -325,7 +325,7 @@ function run_query_update($deal) {
   $con2 = ($deal["contact2"] ? $deal["contact2"] : "null");
   $datealarm = ($deal["datealarm"] ? $deal["datealarm"] : "null");
   $status = $deal["state"];
-  $archive = $deal["archive"];
+  $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
   $comment = $deal["com"];
   $add_comment = $deal["add_comment"];
@@ -403,7 +403,7 @@ function run_query_deal_id($deal) {
   $status = $deal["state"];
   $archive = $deal["archive"];
   $todo = $deal["todo"];
-  $comment = $deal["com"];
+  // comment not serached because processed before stored in db
 
   $query = "select deal_id from Deal Where 
     deal_number='$num' and
@@ -421,7 +421,6 @@ function run_query_deal_id($deal) {
     deal_hitrate='$hitrate' and
     deal_status_id='$status' and
     deal_datealarm='$datealarm' and
-    deal_comment='$comment' and
     deal_archive='$archive' and
     deal_visibility='$vis' and
     deal_todo='$todo'";
@@ -430,6 +429,7 @@ function run_query_deal_id($deal) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
+  echo "nb=" .$obm_q->num_rows();
   return  $obm_q->f("deal_id");
 }
 

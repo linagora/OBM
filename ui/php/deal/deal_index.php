@@ -601,8 +601,6 @@ function get_param_deal() {
   if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($cb_archive)) {
     $deal["archive"] = $cb_archive;
-  } else {
-    $deal["archive"] = "0";
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
   $deal["vis"] = ($cb_vis == 1 ? 1 : 0);
