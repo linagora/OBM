@@ -276,7 +276,6 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Deal search result                                            //
 // Parameters:
@@ -821,6 +820,15 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }
   $sel_usercomment .= "</select>";
 
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_comment = "
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+    ";
+  }
 
   if($contr_q == 0) 
     $ch_add_contr = "<input type=\"checkbox\" name=\"ch_contrat\" />";
@@ -835,7 +843,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $dis_visibility .= " /></td></tr><tr>";
   }
 
- if ($action == "detailupdate") {
+  if ($action == "detailupdate") {
     $dis_contact_2 = "<a href=\"".url_prepare("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2")."\">
              <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" />
              </a>";
@@ -864,10 +872,9 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <input type=\"submit\" value=\"$l_delete\" />
         </td></tr>
         </table>
-
         </form>";
   } else {
-     $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+    $dis_button1 = "<input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"param_parent\" value=\"$pid\" />
       <input type=\"hidden\" name=\"tf_company_name\" value=\"$comp\" />
@@ -876,6 +883,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
       <input type=\"hidden\" name=\"hd_company_town\" value=\"$town\" />
       <input type=\"submit\" value=\"$l_insert\" />";
   }
+
 
 
   echo "
@@ -957,11 +965,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
       </tr><tr>
         <td colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
-      </tr><tr>
-        <td class=\"detailLabel\">$l_upd_comment</td>
-        <td>&nbsp;</td>
-      </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
+        $dis_comment
       </tr>
      </table>
     <table class =\"details\">

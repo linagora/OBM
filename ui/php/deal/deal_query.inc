@@ -223,7 +223,12 @@ function run_query_insert($deal) {
   $status = $deal["state"];
   $archive = ($deal["archive"] ? "1" : "0");
   $todo = $deal["todo"];
-  $comment = $deal["com"];
+  $add_comment = $deal["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $deal["datecomment"];
+    $usercomment = $deal["usercomment"];
+    $comment = "$datecomment:$usercomment:$add_comment";
+  }
 
   $query = "insert into Deal (deal_timeupdate,
     deal_timecreate,
