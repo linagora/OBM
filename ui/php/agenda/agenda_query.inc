@@ -1214,12 +1214,11 @@ function get_category_label($agenda) {
 function run_query_category_links($p_id) {
   global $cdg_sql;
 
-  $query = "select count(*) as numlink from CalendarEvent where calendarevent_category_id = '$p_id'";
+  $query = "select count(*) as numlink from CalendarEvent where calendarevent_category_id = $p_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
   return $obm_q;
 }
   

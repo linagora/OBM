@@ -266,7 +266,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
       $num = date('w', strtotime($set_weekstart_default));
       $delta_thursday = date("w",strtotime("-$num days",strtotime("thursday")))-date("w",strtotime("-$num days",$sunday));
       $week_num = date("W",strtotime("$delta_thursday days",$sunday));
-      $dis_month_cal .= "<td>$week_num</td>";
+      $dis_month_cal .= "<td class=\"agendaHead\" style=\"vertical-align:middle;\"><a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=".$daylink)."\" >$week_num</a></td>";
     }
     $dis_month_cal .= "<td $bgclass width=\"105\" height=\"105\">\n";
     $dis_month_cal .= "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
@@ -1176,7 +1176,11 @@ echo "
         </td>
        </tr>
        <tr>
-	<td class=\"agendaHead\">$week_num</td>
+	<td class=\"agendaHead\" style=\"vertical-align:middle;\">
+	 <a href=\"".url_prepare("agenda_index.php?action=view_week&amp;param_date=$getdate")."\" class=\"agendaLink\">
+	  $week_num
+ 	 </a>
+  	</td>
 	<td colspan=\"2\" class=\"agendaHead\">
 	 <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /> </a>
 	</td>
@@ -2782,14 +2786,14 @@ function dis_category_delete_form($agenda) {
 // Parameters:
 //   - $label : category label
 ///////////////////////////////////////////////////////////////////////////////
-function dis_category_links($id) {
+function dis_category_links($agenda) {
   global $l_category_link_agenda, $l_category_link_agenda_no;
   global $l_category_can_delete, $l_category_cant_delete;
   global $l_back;
 
-  $label = get_category_label($id);
-  $obm_q = run_query_category_links($id);
-  $del_form = dis_category_delete_form($id);
+  $label = get_category_label($agenda["category_id"]);
+  $obm_q = run_query_category_links($agenda["category_id"]);
+  $del_form = dis_category_delete_form($agenda["category_id"]);
   $obm_q->next_record();
   if ($obm_q->f("numlink") > 0) {
     $dis_link = "
