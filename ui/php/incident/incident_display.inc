@@ -239,8 +239,9 @@ function html_incident_consult($inc_q,$con_q) {
   $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
   $dis_market = $con_q->f("lname1") . " " . $con_q->f("fname1");
   $dis_tech = $con_q->f("lname2") . " " . $con_q->f("fname2");
-  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1");
-  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2");
+  
+  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1") . " - " . $con_q->f("phone_c1");
+  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2") . " - " . $con_q->f("phone_c2");
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";

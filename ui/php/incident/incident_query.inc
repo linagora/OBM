@@ -158,6 +158,7 @@ function run_query_incident_contract($cid) {
       u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
       u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
       c1.contact_lastname as lname_c1, c1.contact_firstname as fname_c1,
+      c1.contact_phone as phone_c1, c2.contact_phone as phone_c2,
       c2.contact_lastname as lname_c2, c2.contact_firstname as fname_c2,
       company_name,
       company_address1,
