@@ -69,12 +69,13 @@ if ($action == "index" || $action == "") {
     $nb_comp = run_query_nb_company();
   }
   else {
-    $query = run_query_get_list_query($statistic["list"]);
+    $obm_q = run_query_get_list($statistic["list"]);
+    $query = $obm_q->f("list_query");
     $com_q = run_query_get_selected_company($query,$statistic["list"]);
     $cat_q = run_query_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
   }
-  $display["title"] = display_title($l_header_comp_stats);
+  $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
 }

@@ -614,21 +614,15 @@ function run_query_contact_update($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  $query = "delete
-  from ContactCategory1Link
-  where contactcategory1link_contact_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
-    
-    
-  $query = "delete
-  from ContactCategory2Link
-  where contactcategory2link_contact_id='$id'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query);
+
 
     
   if ($retour && is_array($cat1)) {
+    $query = "delete
+    from ContactCategory1Link
+    where contactcategory1link_contact_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);    
     foreach($cat1 as $categoryid) {
       $query = "insert into ContactCategory1Link (
 	  contactcategory1link_contact_id,
@@ -642,6 +636,11 @@ function run_query_contact_update($contact) {
   }
 
   if ($retour && is_array($cat2)) {
+    $query = "delete
+    from ContactCategory2Link
+    where contactcategory2link_contact_id='$id'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);    
     foreach($cat2 as $categoryid) {
       $query = "insert into ContactCategory2Link (
 	  contactcategory2link_contact_id,

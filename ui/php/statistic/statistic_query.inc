@@ -127,16 +127,16 @@ function run_query_get_lists() {
 // return the list query
 // Parametes:
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_list_query($id) {
+function run_query_get_list($id) {
   global $cdg_sql;
  
-  $query = "Select list_query from List where list_id = '$id'";
+  $query = "Select * from List where list_id = '$id'";
   
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  return $obm_q->f("list_query");
+  return $obm_q;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

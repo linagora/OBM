@@ -135,7 +135,7 @@ function dis_list_select($list_q) {
   <input type=\"button\" 
   onclick=\"window.open('$url','$l_statistc','height=$popup_height,width=$popup_width,scrollbars=yes'); return false; \" value=\"$l_select_list\" />
   <input type=\"hidden\" name=\"action\" value=\"company_statistic\" />
-  <input type=\"hidden\" name=\"$sel_list\" value=\"$c_all\" />
+  <input type=\"hidden\" name=\"sel_list\" value=\"$c_all\" />
   <input type=\"submit\" value=\"$l_generate_stats\" />
   </p>
   </div>

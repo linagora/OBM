@@ -432,6 +432,8 @@ function get_param_contact() {
   }
 
   if (isset ($view)) $contact["view"] = $view;
+  var_dump($sel_cat1);
+  var_dump($HTTP_GET_VARS);
   if (isset ($sel_cat1)) $contact["category1"] = $sel_cat1;
   if (isset ($sel_cat2)) $contact["category2"] = $sel_cat2;
   if (isset ($tf_cat1)) $contact["cat1_label"] = $tf_cat1;

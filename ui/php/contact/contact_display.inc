@@ -1059,7 +1059,7 @@ function dis_contact_form($action, $co_q, $contact) {
 //                : phone, hpone, mphone, fax, email, com, priv, id, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $func_q, $usr_q, $ctry_q, $contact) {
-  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add;
+  global $set_dsrc, $cgp_mailing_default, $set_theme, $ico_company, $l_company,$ico_add,$ico_crow;
   global $l_lastname,$l_firstname,$l_kind,$l_function,$l_title, $l_letter;
   global $l_phone, $l_hphone,$l_mphone,$l_fax,$l_postcode,$l_expresspostal;
   global $l_market, $l_address, $l_town, $l_country,$l_email,$l_mailing_ok;
@@ -1273,58 +1273,71 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
 
   // Category 1 select field
   if ($show_cat1) {
-    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
     while ($cat1_q->next_record()) {
       $c1_id = $cat1_q->f("contactcategory1_id");
       $sel_cat1 .= "\n<option value=\"$c1_id\"";
-      if (in_array($c1_id, $cat1)) { $sel_cat1 .= " selected=\"selected\""; }
-      $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
+      if (in_array($c1_id, $cat1)) {
+	$sel_cat1 .= "<div class=\"elementRow\" id=\"data$c1_id\">
+      <a href=\"javascript: remove_element('data$c1_id','sel_cat1');\">
+      <img src=\"/images/$set_theme/$ico_crow\">
+      </a>
+      ".$cat1_q->f("contactcategory1_label")."
+      <input value=\"$c1_id\" name=\"sel_cat1[]\" type=\"hidden\" />
+      </div>";
+      }
     }
     $sel_cat1 .= "</select>";
     $url = "contact_index.php?action=ext_get_cat1_ids&amp;popup=1&amp;ext_target=sel_cat1";
+
     $block_cat1 = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailForm\">
-       <table>
-	<tr><td>
-	  $sel_cat1
-	</td><td>
-	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"/images/$set_theme/$ico_add\" /></a>
-	</td></tr>
-       </table>      
-      </td>";
+    <td class=\"detailLabel\">
+    <a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"/images/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>
+      $l_category1
+     </td>    
+     <td class=\"detailForm\" id=\"sel_cat1\">
+       $sel_cat1
+     </td>
+     ";
   }
 
   // Category 2 select field
   if ($show_cat2) {
-    $sel_cat2 = "<select id=\"sel_cat2\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
     while ($cat2_q->next_record()) {
       $c2_id = $cat2_q->f("contactcategory2_id");
       $sel_cat2 .= "\n<option value=\"$c2_id\"";
-      if (in_array($c2_id, $cat2)) { $sel_cat2 .= " selected=\"selected\""; }
-      $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
+      if (in_array($c2_id, $cat2)) {
+	$sel_cat2 .= "<div class=\"elementRow\" id=\"data$c2_id\">
+      <a href=\"javascript: remove_element('data$c2_id','sel_cat2');\">
+      <img src=\"/images/$set_theme/$ico_crow\">
+      </a>
+      ".$cat2_q->f("contactcategory2_label")."
+      <input value=\"$c2_id\" name=\"sel_cat2[]\" type=\"hidden\" />
+      </div>";
+      }
     }
     $sel_cat2 .= "</select>";
     $url = "contact_index.php?action=ext_get_cat2_ids&amp;popup=1&amp;ext_target=sel_cat2";
+
     $block_cat2 = "
     </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailForm\">
-      <table>
-	<tr><td>
-	  $sel_cat2
-	</td><td>
-	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"/images/$set_theme/$ico_add\" /></a>
-	</td></tr>
-       </table>      
-       </td>";
+     <td class=\"detailLabel\">
+     <a href=\"javascript: return false;\" style=\"float:right;\"
+      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes');
+      return false;\">
+       <img src=\"/images/$set_theme/$ico_add\" alt=\"[Add]\" />
+      </a>
+      $l_category2      
+     </td>    
+     <td class=\"detailForm\" id=\"sel_cat2\">
+       $sel_cat2
+     </td>
+     ";
   }
-
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
   onchange=\"fill_select_label(this)\">
