@@ -270,6 +270,7 @@ function html_company_consult($co_q, $kind_q) {
   // --- HTML Template --------------------------------------------------------
   echo "
    <p>
+    $links
     <table class=\"detail\">
     <tr>
       <td class=\"detailHead\" colspan=\"2\">$l_company</td>
