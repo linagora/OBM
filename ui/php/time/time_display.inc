@@ -18,7 +18,9 @@ function debug_array($a) {
 
   echo "<br>BEGIN----- debug_array ------<br>";
   foreach($a as $key => $val) {
-	  if (is_array($val)) {
+	  if (is_null($val))
+		echo "clé $key val -- NULL -- <br>";
+	  else if (is_array($val)) {
       echo "clé $key val ";
 	  print_r($val);
       echo " <br>";

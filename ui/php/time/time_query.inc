@@ -352,16 +352,19 @@ function run_query_insert($task) {
   global $auth;
   global $cdg_sql;
 
+  
+  //  if (debug_level_isset($cdg_param))
+  //	debug_array($task);
+
   $valid_date = run_query_valid_search($task);
   $date = $task["sel_date"];
   $ttype = $task["tasktype"];
-  $project = $task["project"];
+  $project = ($task["project"] == 0) ? 'null' : $task["project"];
   $time = $task["time"];
   $label = $task["label"];
   $user_id = $task["user_id"][0];
     
-  if (debug_level_isset($cdg_param))
-	debug_array($time);
+
   if ( $ttype != 0 ) //for navigators wich doesn't support HTML 4 => <option disabled>
   { 
      if(is_array($date)){
@@ -383,7 +386,7 @@ function run_query_insert($task) {
        '" . $auth->auth["uid"] . "',
        '$user_id',
        '$key',
-       '$project',
+       $project,
        '$time',
        '$ttype',
        '$label',
@@ -412,7 +415,7 @@ function run_query_insert($task) {
        '" . $auth->auth["uid"] . "',
        '$user_id',
        '$date',
-       '$project',
+       $project,
        '$time',
        '$ttype',
        '$label',
