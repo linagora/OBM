@@ -5,7 +5,7 @@
 <BODY BGCOLOR="#FFFFFF">
 <CENTER>
 <H1>les sessions OBM</H1>
-Version 0.5.2
+Version 0.5.3
 </CENTER>
 
 <br>
@@ -218,7 +218,9 @@ Il faut donc veiller à ce que la configuration de PHP (dans php.ini: session.gc_
       <li> L'outil d'archivage "clear_sess" utilise $lifetime pour déterminer les sessions utilisateurs expirées.
     </ul>
 
-    Une valeur de <b>$lifetime = 0</b> supprime l'expiration des sessions (expiration à la date maximale). L'expiration s'effectuera, à la fermeture du navigateur pour le client, selon la configuration de PHP pour le serveur (sessions web).
+    Une valeur de <b>$lifetime = 0</b> supprime l'expiration des sessions (expiration à la date maximale en prenant comme valeur $sesion->lifetime_default qui vaut 0x7fffffff).
+     <br>
+     Pour les sessions Web : l'expiration s'effectuera, à la fermeture du navigateur par le client ou selon la configuration de PHP par le serveur.
     <br>
      Pour les sessions utilisateurs...
     <ul>
