@@ -466,7 +466,8 @@ function run_query_get_type_mime_by_mime($mime) {
 
 function run_query_delete_file($path,$name) {
   global $document_path;
-  unlink($document_path.'/'.$path.'/'.$name);
+  @unlink($document_path.'/'.$path.'/'.$name);
+  return true;
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -675,13 +676,14 @@ function run_query_update($did, &$document) {
   else {
     $final_path = $document_path.'/'.$path.$name;
   }
-
+  $obm_q = run_query_detail($document);
+  $old_path = $document_path.$obm_q->f("document_path").$obm_q->f("document_name");
   if($kind == "link") {
     $name = $url;
     $document["name"]=$name;
     $file_kind = 2;
   }
-  elseif(file_exists($final_path) && $file_update=="yes") {
+  elseif(file_exists($final_path) && $file_update=="yes" && realpath($final_path) != realpath($old_path)) {
     $err_msg = $l_already_exist_error;
     return false;
   }
@@ -697,7 +699,6 @@ function run_query_update($did, &$document) {
 
   if($kind == "new_file" && $file_update=="yes") {
     $file_kind = 1;
-    $obm_q = run_query_detail($document);
     if(!run_query_delete_file($obm_q->f("document_path"),$obm_q->f("document_name"))){ 
       $err_msg = $l_creation_error;
       return false;
@@ -707,7 +708,6 @@ function run_query_update($did, &$document) {
       return false;
     }
   }
-  
   //////
   
 

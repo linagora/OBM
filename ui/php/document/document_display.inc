@@ -314,7 +314,6 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
 
   if ($fi_path =="") $fi_path = $default_path;
 
-echo $proto."skdlmqsdk";
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
   while($cat1_q->next_record()) {

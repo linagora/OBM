@@ -325,6 +325,7 @@ CREATE TABLE Document (
   document_id int(8) NOT NULL auto_increment,
   document_title varchar(255) default NULL,
   document_name varchar(255) default NULL,
+  document_kind int(2) default NULL,
   document_mimetype varchar(255) default NULL,
   document_category1 varchar(255) default NULL,
   document_category2 varchar(255) default NULL,
@@ -879,3 +880,24 @@ CREATE TABLE GroupGroup (
    groupgroup_parentid int(8) DEFAULT '0' NOT NULL,
    groupgroup_childid int(8) DEFAULT '0' NOT NULL
 );
+
+-------------------------------------------------------------------------------
+-- Todo
+-------------------------------------------------------------------------------
+-- Create new table
+CREATE TABLE Todo (
+  todo_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  todo_timeupdate timestamp(14),
+  todo_timecreate timestamp(14),
+  todo_userupdate int(8),
+  todo_usercreate int(8),
+  todo_user int(8),
+  todo_date timestamp(14) default NULL,
+  todo_deadline timestamp(14) default NULL,
+  todo_priority int(8) default NULL,
+  todo_title Varchar(80) default NULL,
+  todo_content text default NULL,
+  PRIMARY KEY (todo_id)
+);
+
+

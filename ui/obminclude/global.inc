@@ -258,7 +258,7 @@ $users_admin_write	= 32768;
 			// USER   //
 			////////////
 $user_read		= $users_read;
-$user_write	 	= $users_read + $users_write;
+$user_write	 	= $users_read + $users_admin_write;
 $user_admin_read 	= $users_admin_read;
 $user_admin_write	= $users_admin_read + $users_admin_write;
 			////////////

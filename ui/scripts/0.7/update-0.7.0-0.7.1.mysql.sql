@@ -34,6 +34,14 @@ insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_4_id','0');
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_5_id','0');
 
+-- module 'todo'
+
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_title', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_priority', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_todo', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_deadline', 4, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_id', 5, 2);
+
 -------------------------------------------------------------------------------
 -- Document
 -------------------------------------------------------------------------------
@@ -46,13 +54,7 @@ ALTER TABLE Document ADD document_kind int(2) AFTER document_name;
 -- CSV Export separator
 insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','set_csv_sep',';');
 
--- module 'todo'
 
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_title', 1, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_priority', 2, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_todo', 3, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'date_deadline', 4, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (0,'todo', 'todo_id', 5, 2);
 
 -------------------------------------------------------------------------------
 -- ProjectStat

@@ -429,7 +429,6 @@ function run_query_deal_id($deal) {
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   $obm_q->next_record();
-  echo "nb=" .$obm_q->num_rows();
   return  $obm_q->f("deal_id");
 }
 

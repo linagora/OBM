@@ -86,11 +86,11 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
     $deadline = $todo_q->f("date_deadline");
-    $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
+    $deadline = ($deadline != 0) ?$deadline : $l_no_deadline;
   } else {
     $uid = $todo["uid"];
     $priority = intval(($max_priority+1)/2);
-    $deadline = date("$set_date");
+    $deadline = date("Y-m-d");
   }
   // User select
   $sel_user = "<select id=\"sel_user\" name=\"sel_user\">";

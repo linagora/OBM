@@ -222,7 +222,6 @@ elseif (($action == "index") || ($action == "")) {
 
     // If deal archived, we look about archiving the parentdeal ?????
     if ($cb_arc_aff == "archives") {
-      echo "update<br>";
       $obm_q = run_query_detail($deal["id"]);
       $obm_q->next_record();
       $param_parent = $obm_q->f("deal_parentdeal_id");

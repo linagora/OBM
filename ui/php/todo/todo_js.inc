@@ -92,4 +92,5 @@ function killCalendar()
 }
 ";
 
-echo "</script>\n\n";
+echo "
+--></script>\n\n";

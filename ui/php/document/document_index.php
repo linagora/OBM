@@ -173,7 +173,7 @@ elseif ($action == "insert")  {
     if ($retour) {
       $display["msg"] .= display_ok_msg($l_update_ok);
     } else {
-      $display["msg"] .= display_err_msg($l_update_error);
+      $display["msg"] .= display_err_msg($l_update_error."  ".$err_msg);
     }
     $doc_q = run_query_detail($document);
     $display["detailInfo"] .= display_record_info($doc_q->f("document_usercreate"),$doc_q->f("document_userupdate"),$doc_q->f("timecreate"),$doc_q->f("timeupdate")); 
