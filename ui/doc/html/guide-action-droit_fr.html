@@ -182,6 +182,7 @@ Ce système definit pour chaque module 4 droits :
 
 <H2> Principe du système de gestion des droits d'OBM : </H2>
 <p>
+<H3> Definission des droits au niveau d'une section : </H3>
 Les droits sont définis grâce à des variables globales définient dans le fichier <b>global.inc</b>.
 Ces variables sont de la forme <b>$sec_type_droit</b> où <i>sec</i> est le nom de la section pour
 laquelle le droit est définit, et <i>type_droit</i> est le droit définit (<i>_read</i>, <i>_write</i>,
@@ -192,27 +193,30 @@ laquelle le droit est définit, et <i>type_droit</i> est le droit définit (<i>_re
 //////////////////////////////////////////////////////////////////////////////
 // Production section rights
 //////////////////////////////////////////////////////////////////////////////
-$prod_read        = 000100000000;
-$prod_write       = 001000000000;
-$prod_admin_read  = 010000000000;
-$prod_admin_write = 100000000000;
+$prod_read        = 256;
+$prod_write       = 512;
+$prod_admin_read  = 1024;
+$prod_admin_write = 2048;
 
 
 </pre>
 </td></tr>
 </table>
+
+<H3> Definission des droits au niveau d'un module : </H3>
+
 <p>
 Les droits d'un module seront définis en fonction des droits de la section à laquelle il appartient.
 <table bgcolor="C0C0C0">
 <tr><td>
 <pre>
 //////////////////////////////////////////////////////////////////////////////
-// Contrat rights
+// Contract rights
 //////////////////////////////////////////////////////////////////////////////
-$contrat_read        = $prod_read;
-$contrat_write       = $prod_admin_write;
-$contrat_admin_read  = $prod_admin_read;
-$contrat_admin_write = $prod_admin_write;
+$contract_read        = $prod_read;
+$contract_write       = $prod_admin_write;
+$contract_admin_read  = $prod_admin_read;
+$contract_admin_write = $prod_admin_write;
 
 //////////////////////////////////////////////////////////////////////////////
 // Incident rights
@@ -225,24 +229,64 @@ $incident_admin_write = $prod_admin_write;
 </pre>
 </td></tr>
 </table>
+
+Les droits sont testés par la fonction <b>have_perms</b>. 
+
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+//////////////////////////////////////////////////////////////////////////////
+// Rights test
+//////////////////////////////////////////////////////////////////////////////
+  if(have_perms($contract_read) ) {
+    display_detail($contract_id);
+  }
+</pre>
+</td></tr>
+</table>
+
+<H3> Definission des droits au niveau d'un utilisateur : </H3>
+<table border=1>
+<tr>
+  <th colspan=3 align=center>Description des droits des utilisateurs</th>
+</tr><tr>
+  <td align=center>Droits</td>
+  <td align=center>Opération</td>
+  <td align=center>Description</td>
+</tr><tr>
+</tr><tr>
+  <td>$droit_profile</td>
+  <td nowrap>$droit_profile_sec_1 | $droit_profile_sec_2 | $droit_profile_sec_3 |...</td>
+  <td>Droits du profile sur l'ensemble de l'application.avec <i>sec_n</i> les sections d l'application.
+     Cette valeur sera celle stockée en base de donnée.</td>
+</tr><tr>
+  <td>$droit_profile_sec</td>
+  <td>$droit_profile_sec_read | $droit_profile_sec_write | $droit_profile_sec_admin_read | $droit_profile_sec_admin_write</td>
+  <td>Droit d'un profile sur la section <i>sec</i>.</td>
+</tr>
+</tr><tr>
+  <td>$droit_profile_sec_act</td>
+  <td><i>$droit_profile_sec_act</i> sera égale à <i>$sect_act</i> si le profile à le droit de faire l'action <i>act</i>, 0 sinon.</td>
+  <td><i>act</i> peut prendre <i>read</i>, <i>write</i>, <i>admin_read</i>, <i>admin_write</i>.</td>
+</tr>
+</table>
+
 <p>
-Les droits d'un utilisateur seront définis en fonction du profil utilisateur auquel il 
-a été lié.
+Les droits d'un utilisateur seront définis en fonction de son profil.
 Les profils utilisateur sont définis dans la base de données.
 <p>
-Les droits d'un profil sera un <i>ou logique</i> de ses droits sur chaque module.
+Les droits d'un profil seront une combinaison de ses droits sur chaque module.
 Par exemple les droits d'un utilisateur ayant un profil de <b>comptable</b> pour le module
-<i>compta</i> seront : <br><i>$compta_read | $compta_write | $compta_admin_read | $compta_admin_write</i>.
-<br>Pour un technicien ils seront :<br> <i>$compta_read | $compta_write</i>.
+<i>compta</i> seront : <br>
+<i>$droit_profile_compta</i> = <i>$compta_read | $compta_write | $compta_admin_read | $compta_admin_write</i>.
+<br>Pour un technicien ils seront :<br>
+<i>$droit_profile_compta</i> = <i>$compta_read | $compta_write</i>.
 <p>
-Les droits sur l'ensemble de l'application seront  : <br><i>$droit_com | $droit_prod | $droit_admin | droit_compta</i>.
+Les droits sur l'ensemble de l'application seront  : <br>
+<i>$droit_profile</i> = <i>$droit_com | $droit_prod | $droit_admin | droit_compta</i>.
 <p>
 
 <A HREF="index.html">back</A>
 
 </BODY>
 </HTML>
-
-
-
-
