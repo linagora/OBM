@@ -31,10 +31,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
   
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $dateexp = sql_date_format($type, "contract_dateexp", "contract_dateexp");
+  $dateexp = sql_date_format($db_type, "contract_dateexp", "contract_dateexp");
 
   $query = "select contract_label,
       contract_id,

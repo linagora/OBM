@@ -26,8 +26,8 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $archive = $invoice["archive"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $order=(strcmp($p_new_order,"") != 0) ? $p_new_order : "invoice_date";
   
@@ -309,8 +309,8 @@ function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
     
   if (is_object ($q_invoice)) {
     // list all deals of this invoice

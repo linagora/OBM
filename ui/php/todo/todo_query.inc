@@ -24,10 +24,10 @@ function run_query_todolist($todo, $p_new_order, $p_order_dir) {
   $p_order_dir = (strcmp($p_order_dir,"") != 0) ? $p_order_dir : "desc";
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $date = sql_date_format($type, "todo_date", "date_todo");
-  $deadline = sql_date_format($type, "todo_deadline", "date_deadline");
+  $date = sql_date_format($db_type, "todo_date", "date_todo");
+  $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
 
   $query = "select
     todo_id,
@@ -57,12 +57,12 @@ function run_query_detail($todo) {
 
   $t_id = $todo["id"];
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "todo_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "todo_timecreate", "timecreate");
-  $date = sql_date_format($type, "todo_date", "date_todo");
-  $deadline = sql_date_format($type, "todo_deadline", "date_deadline");
+  $timeupdate = sql_date_format($db_type, "todo_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "todo_timecreate", "timecreate");
+  $date = sql_date_format($db_type, "todo_date", "date_todo");
+  $deadline = sql_date_format($db_type, "todo_deadline", "date_deadline");
 
   $query = "
   select

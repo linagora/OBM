@@ -27,8 +27,8 @@ function run_query_search($p_payment, $p_new_order="") {
   $checked = $p_payment["checked"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $order = (strcmp($p_new_order,"")!=0) ? $p_new_order : "payment_label";
   // attention : 
@@ -314,8 +314,8 @@ function run_query_search_connectable_invoices ($payment) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   // we must exclude every invoice already connected 
   // to that payment if they are paid :

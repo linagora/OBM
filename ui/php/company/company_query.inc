@@ -38,8 +38,8 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $req = "select
       company_id as Id,
@@ -158,13 +158,13 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
 //   - $p_id  : company id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($p_id) {
-  global $db_type_mysql, $db_type_pgsql, $cdg_sql;
+  global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "company_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "company_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, "company_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "company_timecreate", "timecreate");
 
   $query = "select *,
       $timeupdate,
@@ -543,8 +543,8 @@ function run_query_check_company($p_id, $name, $zip) {
     $where_id = "and company_id!='$p_id'";
   }
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $query = "select distinct company_id, company_name, company_zipcode 
             from Company

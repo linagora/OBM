@@ -38,10 +38,10 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $datebefore = $deal["datebefore"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $datealarm = sql_date_format($type, "deal_datealarm", "deal_datealarm");
-  $like = sql_casei_like($type);
+  $datealarm = sql_date_format($db_type, "deal_datealarm", "deal_datealarm");
+  $like = sql_casei_like($db_type);
 
   $query = "select 
       deal_id as Id,
@@ -140,13 +140,13 @@ function run_query_detail($id) {
   global $cdg_sql, $db_type_mysql,$db_type_pgsql;  
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $datebegin = sql_date_format($type, "deal_datebegin", "datebegin");
-  $dateproposal = sql_date_format($type, "deal_dateproposal", "dateproposal");
-  $datealarm = sql_date_format($type, "deal_datealarm", "datealarm");
-  $timeupdate = sql_date_format($type, "deal_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "deal_timecreate", "timecreate");
+  $datebegin = sql_date_format($db_type, "deal_datebegin", "datebegin");
+  $dateproposal = sql_date_format($db_type, "deal_dateproposal", "dateproposal");
+  $datealarm = sql_date_format($db_type, "deal_datealarm", "datealarm");
+  $timeupdate = sql_date_format($db_type, "deal_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "deal_timecreate", "timecreate");
 
   $query = "select Deal.*,
       dealtype_label,
@@ -1020,8 +1020,8 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   $parchive = $deal["parchive"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $query = "select
       parentdeal_id as Id,

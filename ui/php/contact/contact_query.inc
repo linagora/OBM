@@ -8,40 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category 1 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory1() {
-  global $cdg_sql;
-
-  $query = "select * from ContactCategory1 order by contactcategory1_code"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Category 2 query execution
-// Return:
-//   Database Object
-///////////////////////////////////////////////////////////////////////////////
-function run_query_contactcategory2() {
-  global $cdg_sql;
-
-  $query = "select * from ContactCategory2 order by contactcategory2_code"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Contact search query execution                                            //
 // Parametes:
 //   - $contact[]    : contact search criteria
@@ -54,16 +20,20 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
 
   $company_id = $contact["company_id"];
   $lname = $contact["lname"];
+  $fname = $contact["fname"];
   $phone = stripslashes($contact["phone"]);
   $email = $contact["email"];
   $company = $contact["company"];
   $market = $contact["marketing_manager"];
   $func = $contact["function"];
+  $zip = stripslashes($contact["zip"]);
+  $town = stripslashes($contact["town"]);
+  $ctry = $contact["country"];
   $archive = $contact["archive"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $query = "select
       contact_id as Id,
@@ -83,17 +53,23 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       contact_visibility,
       company_name as contact_company_name,
       company_phone,
-      function_label as contact_function
+      function_label as contact_function,
+      country_name
     from Contact
         left join Company on contact_company_id=company_id 
         left join Function on contact_function_id=function_id
+        left join Country on contact_country_id=country_id
     where";
 
-  // If a contact indication has been specified, get it 
+  // If a lastname has been specified, get it 
   if ($lname != "") {
     $query .= " contact_lastname $like '$lname%' and";
   }
-  // If a phone number hes been specified, get it 
+  // If a firstname has been specified, get it 
+  if ($fname != "") {
+    $query .= " contact_firstname $like '$fname%' and";
+  }
+  // If a phone number has been specified, get it 
   if ($phone != "") {
     $query .= " (contact_phone $like '$phone%' or
                  contact_homephone $like '$phone%' or
@@ -111,13 +87,25 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   if ($company_id != "") {
     $query .= " company_id='$company_id' and";
   }
+  // If a post code has been specified, get it 
+  if ($zip != "") {
+    $query .= " contact_zipcode $like '$zip%' and";
+  }
+  // If a town has been specified, get it 
+  if ($town != "") {
+    $query .= " contact_town $like '$town%' and";
+  }
+  // If a country has been set
+  if (($ctry != $c_all) && ($ctry != "")) { 
+    $query .= " contact_country_id='$ctry' and";
+  }
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
-    $query .= " $and contact_marketingmanager_id='$market' and";
+    $query .= " contact_marketingmanager_id='$market' and";
   }
   // If a function has been set
   if (($func != $c_all) && ($func != "")) { 
-    $query .= " $and contact_function_id='$func' and";
+    $query .= " contact_function_id='$func' and";
   }
   // Get only not archived by default
   if ($archive != "1") {
@@ -196,6 +184,40 @@ function run_query_function() {
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;
   $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category 1 query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contactcategory1() {
+  global $cdg_sql;
+
+  $query = "select * from ContactCategory1 order by contactcategory1_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Category 2 query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_contactcategory2() {
+  global $cdg_sql;
+
+  $query = "select * from ContactCategory2 order by contactcategory2_code"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
 
   return $obm_q;
 }
@@ -287,7 +309,7 @@ function run_query_insert($contact) {
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
-  $ctry = $contact["ctry"];
+  $ctry = $contact["country"];
   $func = $contact["function"];
   $title = $contact["title"];
   $phone = $contact["phone"];
@@ -438,7 +460,7 @@ function run_query_update($contact) {
   $zip = $contact["zip"];
   $town = $contact["town"];
   $cdx = $contact["cdx"];
-  $ctry = $contact["ctry"];
+  $ctry = $contact["country"];
   $func = $contact["function"];
   $title = $contact["title"];
   $phone = $contact["phone"];

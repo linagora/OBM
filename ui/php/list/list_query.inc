@@ -25,11 +25,11 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   $contact = $list["contact"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "list_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "list_timecreate", "timecreate");
-  $like = sql_casei_like($type);
+  $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
+  $like = sql_casei_like($db_type);
 
   if ($contact != '') {
     $where .= " and contact_lastname $like '$contact%'";
@@ -71,10 +71,10 @@ function run_query_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "list_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "list_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, "list_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "list_timecreate", "timecreate");
 
   $query = "select *,
       $timecreate,
@@ -399,8 +399,8 @@ function run_query_check_list($id, $name, $subject) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($id != "") {
     $where_id = "list_id != '$id' and";
@@ -600,9 +600,9 @@ function sql_query_resource_high($query) {
   global $cql_max_row, $cql_max_cost;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  if ($type == $db_type_mysql) {
+  if ($db_type == $db_type_mysql) {
     $q = "explain $query";
     $obm_q->query($q);
     $cpt = 1;
@@ -620,7 +620,7 @@ function sql_query_resource_high($query) {
     }
 
     // Postgres Estimate
-  } elseif ($type == $db_type_pgsql) {
+  } elseif ($db_type == $db_type_pgsql) {
     $q = "explain $query";
     $obm_q->query($q, 1);
     // We read the first row of explain command
@@ -729,8 +729,8 @@ function make_query($list) {
   $logical_criterion = $list["criteria"]["logical"]["AND"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $query = "
         SELECT DISTINCT

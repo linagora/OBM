@@ -76,19 +76,43 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact search Form                                              //
+// Display Contact search form                                               //
+// Parameters:
+//   - $contact[] : hash with contact values
+///////////////////////////////////////////////////////////////////////////////
+function dis_contact_search_form($contact="") {
+
+  $usr_q = run_query_userobm_active();
+  $func_q = run_query_function();
+  $ctry_q = run_query_country();
+  $block .= html_contact_search_form($contact, $usr_q, $func_q, $ctry_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: XHTML Contact search Form                                        //
 // Parameters:
 //   - $contact[] : default form values
 //     keys used  : name, company
+//   - $usr_q     : database object with userobm list
+//   - $func_q    : database object with function list
+//   - $ctry_q    : database object with country list
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_form ($contact, $usr_q, $func_q) {
-  global $l_contact_name, $l_phone, $l_from_company, $l_email, $l_archive;
+function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
+  global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
   global $l_function, $l_market, $l_find, $popup, $display, $c_all, $l_all;
+  global $l_town, $l_postcode, $l_country, $l_archive;
 
   $lname = stripslashes($contact["lname"]);
+  $fname = stripslashes($contact["fname"]);
   $phone = stripslashes($contact["phone"]);
   $company = stripslashes($contact["company"]);
   $email = stripslashes($contact["email"]);
+  $zip = stripslashes($contact["zip"]);
+  $town = stripslashes($contact["town"]);
+  $ctry = $contact["country"];
   $func = $contact["function"];
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -117,6 +141,16 @@ function html_contact_search_form ($contact, $usr_q, $func_q) {
   }
   $sel_market .= "</select>";
 
+  // Country select
+  $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($ctry_q->next_record()) {
+    $ctry_id = $ctry_q->f("country_id");
+    $sel_ctry .= "\n<option value=\"$ctry_id\"";
+    if ($ctry_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
+    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+  }
+  $sel_ctry .= "</select>";
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -138,16 +172,30 @@ function html_contact_search_form ($contact, $usr_q, $func_q) {
   <div class=\"search\">
 
     <div class=\"searchLabel\">$l_contact_name<br />
-      <input type=\"text\" name=\"tf_lname\" size=\"16\" value=\"$lname\" />
+      <input type=\"text\" name=\"tf_lname\" size=\"12\" value=\"$lname\" />
+    </div>
+    <div class=\"searchLabel\">$l_firstname<br />
+      <input type=\"text\" name=\"tf_fname\" size=\"12\" value=\"$fname\" />
     </div>
     <div class=\"searchLabel\">$l_phone<br />
-      <input type=\"text\" name=\"tf_phone\" size=\"14\" maxlength=\"16\" value=\"$phone\" />
+      <input type=\"text\" name=\"tf_phone\" size=\"12\" maxlength=\"16\" value=\"$phone\" />
     </div>
     <div class=\"searchLabel\">$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"16\" value=\"$email\" />
     </div>
     <div class=\"searchLabel\">$l_from_company<br />
       <input type=\"text\" name=\"tf_company\" size=\"16\" value=\"$company\" />
+    </div>
+    <div class=\"searchLabel\">$l_postcode<br />
+      <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
+      value=\"$zip\" />
+    </div>
+    <div class=\"searchLabel\">$l_town<br />
+      <input type=\"text\" name=\"tf_town\" id=\"tf_town\" size=\"8\"
+      value=\"$town\" />
+    </div>
+    <div class=\"searchLabel\">$l_country<br />
+      $sel_ctry
     </div>
     <div class=\"searchLabel\">$l_function<br />
       $sel_func
@@ -222,12 +270,18 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   // we urlencode to avoid breakage for space char
   $archive = $contact["archive"];
   $lname = urlencode(stripslashes($contact["lname"]));
+  $fname = stripslashes($contact["fname"]);
   $phone = urlencode(stripslashes($contact["phone"]));
+  $email = stripslashes($contact["email"]);
+  $zip = stripslashes($contact["zip"]);
+  $town = stripslashes($contact["town"]);
+  $ctry = $contact["country"];
   $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
+  $func = $contact["function"];
   $mark = $contact["marketing_manager"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_market=$mark$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_fname=$fname&amp;tf_phone=$phone&amp;tf_email=$email&amp;tf_zip=$zip&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;tf_company=$company&amp;cb_archive=$archive&amp;param_company=$company_id&amp;sel_func=$func&amp;sel_market=$mark$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA", $pref_q, "contact");
   if ($popup) {
@@ -689,7 +743,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
   if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
   if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }
-  if (isset($contact["ctry"])) { $ctry = $contact["ctry"]; }
+  if (isset($contact["ctry"])) { $ctry = $contact["country"]; }
   if (isset($contact["function"])) { $func = $contact["function"]; }
   if (isset($contact["title"])) { $title = stripslashes($contact["title"]); }
   if (isset($contact["phone"])) { $phone = stripslashes($contact["phone"]); }
@@ -1014,7 +1068,7 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
   $zip = stripslashes($contact["zip"]);
   $town = stripslashes($contact["town"]);
   $cdx = stripslashes($contact["cdx"]);
-  $ctry = $contact["ctry"];
+  $ctry = $contact["country"];
   $func = $contact["function"];
   $title = stripslashes($contact["title"]);
   $phone = stripslashes($contact["phone"]);

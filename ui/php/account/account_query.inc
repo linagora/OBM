@@ -26,8 +26,8 @@ function run_query_search ($account, $p_new_order, $p_order_dir) {
   $number = $account["number"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "account_bank";
   

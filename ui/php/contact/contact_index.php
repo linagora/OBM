@@ -74,9 +74,7 @@ if (! $contact["popup"]) {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  $usr_q = run_query_userobm_active();
-  $func_q = run_query_function();
-  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+  $display["search"] = dis_contact_search_form($contact);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
   } else {
@@ -90,9 +88,7 @@ if ($action == "ext_get_ids") {
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
-  $usr_q = run_query_userobm_active();
-  $func_q = run_query_function();
-  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+  $display["search"] = dis_contact_search_form($contact);
   if ($set_display == "yes") {
     $display["result"] = dis_contact_search_list($contact);
   } else {
@@ -101,9 +97,7 @@ if ($action == "index" || $action == "") {
   
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $usr_q = run_query_userobm_active();
-  $func_q = run_query_function();
-  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+  $display["search"] = dis_contact_search_form($contact);
   $display["result"] = dis_contact_search_list($contact);
   
 } elseif ($action == "new")  {
@@ -174,9 +168,7 @@ if ($action == "index" || $action == "") {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $usr_q = run_query_userobm_active();
-      $func_q = run_query_function();
-      $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+      $display["search"] = dis_contact_search_form($contact);
 
     // If it is the first try, we warn the user if some contacts seem similar
     } else {
@@ -191,9 +183,7 @@ if ($action == "index" || $action == "") {
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-	$usr_q = run_query_userobm_active();
-	$func_q = run_query_function();
-        $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+        $display["search"] = dis_contact_search_form($contact);
       }
     }
 
@@ -237,9 +227,7 @@ if ($action == "index" || $action == "") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $usr_q = run_query_userobm_active();
-  $func_q = run_query_function();
-  $display["search"] = html_contact_search_form($contact, $usr_q, $func_q);
+  $display["search"] = dis_contact_search_form($contact);
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -507,7 +495,7 @@ function get_param_contact() {
   if (isset ($tf_zip)) $contact["zip"] = $tf_zip;
   if (isset ($tf_town)) $contact["town"] = $tf_town;
   if (isset ($tf_cdx)) $contact["cdx"] = $tf_cdx;
-  if (isset ($sel_ctry)) $contact["ctry"] = $sel_ctry;
+  if (isset ($sel_ctry)) $contact["country"] = $sel_ctry;
   if (isset ($sel_func)) $contact["function"] = $sel_func;
   if (isset ($tf_title)) $contact["title"] = $tf_title;
   if (isset ($tf_phone)) $contact["phone"] = trim($tf_phone);

@@ -29,8 +29,8 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $date = $project["datebegin"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $query = "select distinct
       project_id,
@@ -118,12 +118,12 @@ function run_query_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $datebegin = sql_date_format($type, "project_datebegin", "datebegin");
-  $dateend = sql_date_format($type, "project_dateend", "dateend");
-  $timeupdate = sql_date_format($type, "project_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "project_timecreate", "timecreate");
+  $datebegin = sql_date_format($db_type, "project_datebegin", "datebegin");
+  $dateend = sql_date_format($db_type, "project_dateend", "dateend");
+  $timeupdate = sql_date_format($db_type, "project_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "project_timecreate", "timecreate");
 
   $query = "select
       project_id,

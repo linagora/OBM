@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_ref_query.inc                                          //
 //     - Desc : Referential Data Query File                                  //
@@ -452,8 +452,8 @@ function run_query_tasktype_timetask_links($tt) {
   $id = $tt["tasktype"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $timedate = sql_date_format($type, "timetask_date", "date");
+  $db_type = $obm_q->type;
+  $timedate = sql_date_format($db_type, "timetask_date", "date");
 
   $query = "select timetask_id,
       timetask_user_id,

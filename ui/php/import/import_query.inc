@@ -23,11 +23,11 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
   $contact = $list["contact"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $timeupdate = sql_date_format($type, "import_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "import_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
 
   if ($email != '') {
     $where .= " and list_email $like '%$email%'";
@@ -70,10 +70,10 @@ function run_query_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "import_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "import_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
 
   $query = "select *,
       $timecreate,
@@ -233,8 +233,8 @@ function run_query_check_import($import) {
   $dsrc = $import["datasource"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($id != "") {
     $where_id = "import_id != '$id' and ";

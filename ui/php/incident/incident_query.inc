@@ -31,8 +31,8 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $archive = $incident["archive"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   $req = "select
       Incident.incident_id as Id,

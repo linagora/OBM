@@ -24,10 +24,10 @@ function run_query_search($user, $p_new_order, $p_order_dir) {
   $archive = $user["archive"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
+  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "userobm_timelastaccess");
 
   $select = "select UserObm.*,
       userobm_id as Id,
@@ -89,10 +89,10 @@ function run_query_get_search($user, $p_new_order, $p_order_dir) {
   $uid = $auth->auth["uid"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $lastaccess = sql_date_format($type, "userobm_timelastaccess", "userobm_timelastaccess");
+  $lastaccess = sql_date_format($db_type, "userobm_timelastaccess", "userobm_timelastaccess");
 
   $select = "select u.*,
       userobm_id as Id,
@@ -148,11 +148,11 @@ function run_query_detail($p_id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "UserObm.userobm_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "UserObm.userobm_timecreate", "timecreate");
-  $lastaccess = sql_date_format($type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
+  $timeupdate = sql_date_format($db_type, "UserObm.userobm_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "UserObm.userobm_timecreate", "timecreate");
+  $lastaccess = sql_date_format($db_type, "UserObm.userobm_timelastaccess", "userobm_timelastaccess");
 
   //      UNIX_TIMESTAMP(UserObm.userobm_timeupdate) as timeupdate,
 
@@ -328,8 +328,8 @@ function run_query_check_user($p_id, $login) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($p_id) {
     $where_user = "and userobm_id != '$p_id'";

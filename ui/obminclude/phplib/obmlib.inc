@@ -253,8 +253,8 @@ class OBM_Perm {
     $this->mod_pos["GROUP"] = $this->mod_pos["USER"] + $mod_length;
     $this->mod_pos["ADMIN"] = $this->mod_pos["GROUP"] + $mod_length;
     $this->mod_pos["ADMIN_CODE"] = $this->mod_pos["ADMIN"] + $mod_length;
-    $this->mod_pos["ADMIN_PREFS"] = $this->mod_pos["ADMIN_CODE"] + $mod_length;
-    $this->mod_pos["ADMIN_DATA"] = $this->mod_pos["ADMIN_PREFS"] + $mod_length;
+    $this->mod_pos["ADMIN_PREF"] = $this->mod_pos["ADMIN_CODE"] + $mod_length;
+    $this->mod_pos["ADMIN_DATA"] = $this->mod_pos["ADMIN_PREF"] + $mod_length;
     $this->mod_pos["ADMIN_LANG"] = $this->mod_pos["ADMIN_DATA"] + $mod_length;
     $this->mod_pos["ADMIN_REF"] = $this->mod_pos["ADMIN_LANG"] + $mod_length;
     $this->mod_pos["IMPORT"] = $this->mod_pos["ADMIN_REF"] + $mod_length;

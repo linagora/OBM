@@ -78,8 +78,8 @@ function run_query_search($document, $p_new_order, $p_order_dir) {
   $entity_id = $document["entity_id"];  
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($entity != "") {
     $leftjoin = "LEFT JOIN DocumentEntity on document_id = documententity_documentid";

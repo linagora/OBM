@@ -132,12 +132,11 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Deal index page                                                   //
+// Display Company search form                                               //
 // Parameters:
-//   - $deal[] : hash with deal and parent deal values
+//   - $company[] : hash with company values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_company_search_form($company="") {
-  global $display;
 
   $type_q = run_query_companytype();
   $act_q = run_query_companyactivity();
@@ -344,12 +343,15 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $archive = $company["archive"];
   $name = urlencode(stripslashes($company["name"]));
   $phone = urlencode(stripslashes($company["phone"]));
+  $town = stripslashes($company["town"]);
+  $ctry = $company["country"];
   $kind = $company["kind"];
   $act = $company["activity"];
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
+
   
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry");
 
   $comp_q->seek($first_row);
 

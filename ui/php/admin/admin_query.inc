@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : admin_query.inc                                              //
 //     - Desc : Admin Query File                                             //
@@ -69,10 +69,10 @@ function run_query_active_user($delay) {
     $date_limit = 0;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type, "activeuserobm_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type, "activeuserobm_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type, "activeuserobm_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type, "activeuserobm_timecreate", "timecreate");
 
   $query = "select UserObm.userobm_login,
       UserObm.userobm_timelastaccess,

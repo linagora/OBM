@@ -24,11 +24,11 @@ function run_query_search($group, $p_new_order, $p_order_dir) {
   $user = $group["user"];
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
 
   if ($user != '') {
     $where .= " and C.userobm_lastname $like '$user%'";
@@ -80,11 +80,11 @@ function run_query_search_possible_children($group, $p_new_order, $p_order_dir) 
   $parents = get_group_parents($id);
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
-  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
 
   // WHERE Clause
 
@@ -132,10 +132,10 @@ function run_query_detail($id) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
+  $db_type = $obm_q->type;
 
-  $timeupdate = sql_date_format($type,"UGroup.group_timeupdate", "timeupdate");
-  $timecreate = sql_date_format($type,"UGroup.group_timecreate", "timecreate");
+  $timeupdate = sql_date_format($db_type,"UGroup.group_timeupdate", "timeupdate");
+  $timecreate = sql_date_format($db_type,"UGroup.group_timecreate", "timecreate");
 
   $query = "select *,
       $timecreate,
@@ -570,8 +570,8 @@ function run_query_check_group($id, $name, $desc) {
   global $cdg_sql;
 
   $obm_q = new DB_OBM;
-  $type = $obm_q->type;
-  $like = sql_casei_like($type);
+  $db_type = $obm_q->type;
+  $like = sql_casei_like($db_type);
 
   if ($id != "") {
     $where_id = "group_id!='$id' and";
