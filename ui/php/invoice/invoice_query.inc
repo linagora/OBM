@@ -131,7 +131,7 @@ function run_query_detail($p_invoice_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Insertion query construction
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_insert($invoice, $p_deal_linked="") {
+function run_query_insert($invoice) {
   global $auth, $cdg_sql, $new_order, $order_dir;
 
   $label = $invoice["label"];
@@ -177,7 +177,7 @@ function run_query_insert($invoice, $p_deal_linked="") {
   $obm_q=new DB_OBM;
   $obm_q->query($query);
   // following code is only when creating an invoice from a deal :
-  if ($p_deal_linked != "") {
+  if (isset($invoice["param_deal"]) && $invoice["param_deal"] != "") {
     // we need to re-get the id of the invoice freshly inserted
     $new_invoice = run_query_search ($invoice, $new_order, $order_dir);
     $new_invoice->next_record();
@@ -189,7 +189,7 @@ function run_query_insert($invoice, $p_deal_linked="") {
        "dealinvoice_timecreate,".
        "dealinvoice_usercreate)".
        "values ".
-       "('".$p_deal_linked."',".
+       "('".$invoice["param_deal"]."',".
        "'".$new_invoice_id."',".
        "'".date("Y-m-d H:i:s")."',".
        "'".$auth->auth["uid"]."')";

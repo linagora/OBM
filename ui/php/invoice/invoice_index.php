@@ -84,14 +84,14 @@ if ($action == "index" || $action == "") {
 // FIXME permissions 
   if ($auth->auth["perm"] != $perms_user) {
     require("invoice_js.inc"); 
-    $display["detail"] = html_invoice_form("", $action, run_query_invoicestatus(),0, $deal_linked);
+    $display["detail"] = html_invoice_form("", $action, run_query_invoicestatus(),0, $param_deal);
   } else {
     $display["msg"] .= display_err_msg($l_error_permission);
   }
 
 } elseif ($action == "insert")  {
 ///////////////////////h//////////////////////////////////////////////////////
-  run_query_insert($invoice, $hd_deal_linked);
+  run_query_insert($invoice);
   $display["msg"] .= display_ok_msg($l_insert_ok);
   require("invoice_js.inc");
   $display["search"] = html_invoice_search_form($action, run_query_invoicestatus(), $invoice);
@@ -455,24 +455,25 @@ function get_param_invoice() {
   global $tf_label, $tf_number, $tf_amount_HT, $tf_amount_TTC;
   global $ta_comment, $sel_status, $param_invoice, $tf_date;
   global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
-  global $tf_deal, $tf_company, $cb_archive;
+  global $tf_deal, $tf_company, $cb_archive, $hd_param_deal;
   global $set_debug, $cdg_param, $action;
 
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
   if (isset ($tf_number)) $invoice["number"] = $tf_number;
-  if (isset ($tf_amount_HT)) $invoice["HT"] = $tf_amount_HT ;
-  if (isset ($tf_amount_TTC)) $invoice["TTC"] = $tf_amount_TTC ;
-  if (isset ($sel_status)) $invoice["status"] = $sel_status ;
-  if (isset ($tf_date)) $invoice["date"] = $tf_date ;
-  if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after ;
-  if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before ;
-  if (isset ($rd_inout)) $invoice["inout"] = $rd_inout ;
-  if (isset ($hd_inout)) $invoice["inout"] = $hd_inout ;
+  if (isset ($tf_amount_HT)) $invoice["HT"] = $tf_amount_HT;
+  if (isset ($tf_amount_TTC)) $invoice["TTC"] = $tf_amount_TTC;
+  if (isset ($sel_status)) $invoice["status"] = $sel_status;
+  if (isset ($tf_date)) $invoice["date"] = $tf_date;
+  if (isset ($tf_date_after)) $invoice["date_after"] = $tf_date_after;
+  if (isset ($tf_date_before)) $invoice["date_before"] = $tf_date_before;
+  if (isset ($rd_inout)) $invoice["inout"] = $rd_inout;
+  if (isset ($hd_inout)) $invoice["inout"] = $hd_inout;
   if (isset ($param_invoice)) $invoice["invoice"] = $param_invoice;
   if (isset ($tf_balance)) $invoice["balance"] = $tf_balance;
   if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
   if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
+  if (isset ($hd_param_deal)) $invoice["param_deal"]= $hd_param_deal;
   if (isset ($tf_company)) $invoice["company"] = $tf_company;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
 

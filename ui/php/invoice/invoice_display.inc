@@ -305,19 +305,29 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
   // Buttons
   $dis_button = "<input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">";
 
-  if (($action=="update") || ($action =="detailupdate"))
-    $dis_button .= "<input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">";
-
-  if ($action=="detailupdate")
+  if (($action == "update") || ($action == "detailupdate")){
+    $dis_button .="<input type=\"hidden\" name=\"action\" value=\"update\"/>
+    <input type=\"hidden\" name=\"param_invoice\" value=\"$invoice\" />
+    <input type=\"hidden\" name=\"hd_rd_inout\" value=\"$inout\">"; 
     $dis_button .= "
       <input type=\"submit\" value=\"$l_update\"
         onClick=\"if (check_invoice (this.form)) return true; else return false;\" />";
+  }elseif ($action == "new" || $action =="insert"){
+    $dis_button .= "
+      <input type=\"submit\" value=\"$l_insert\" 
+        onClick=\"if(check_invoice(this.form)) return true ; else return false;\" />";
+    $dis_button .="
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />";
+    $dis_button .= "
+      <input type=\"hidden\" name=\"hd_nb_deals\" value=\"$p_nb_deals\">
+      <input type=\"hidden\" name=\"hd_param_deal\" value=\"".$p_deal_linked."\">";
+  }
 
   if ($action != "new") 
     $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
 
   $block = "
-    <form method=\"post\" action=\"invoice_index.php?action=update&amp;param_invoice=$invoice\">
+    <form method=\"post\" action=\"invoice_index.php\">
 
     <table class=\"detail\">
      <tr>
@@ -376,7 +386,7 @@ function html_invoice_form($q_invoice, $action, $q_status, $p_nb_deals = 0, $p_d
 
     </form>";
 
-  // bcontins : ancienne verions de nico
+  // bcontins : ancienne version de nico
   // "
   // -----------------------------------------------------
   // <center>
