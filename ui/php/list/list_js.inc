@@ -434,6 +434,7 @@ function publication_criterion(form,labels,values,i) {
   else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_publication_year[]\" value=\"\" />';
   }
+  
 
   if(form.tf_subscription_renewal.value != '') {
     cell = labels.insertCell(i);
@@ -456,7 +457,7 @@ function publication_criterion(form,labels,values,i) {
     i++;  
   } else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_reception_id[]\" value=\"\" />';
-  }  
+  }
   
   return i;
 }

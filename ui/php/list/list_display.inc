@@ -812,7 +812,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "subscription_publication_id"  => "sel",
       "publication_lang"  => "tf",
       "publication_year"  => "tf",
-      "subscriptionreception_id"  => "sel",
+      "subscription_reception_id"  => "sel",
       "subscription_renewal"  => "tf"      
   );
   $fields_label["company_name"] = $l_company; 
