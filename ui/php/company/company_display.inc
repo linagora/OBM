@@ -149,7 +149,8 @@ function dis_company_search_form($company="") {
   $act_q = run_query_companyactivity();
   $usr_q = run_query_userobm_active();
   $ctry_q = run_query_country();
-  $block .= html_company_search_form($type_q, $act_q, $usr_q, $ctry_q, $company);
+  $dsrc_q = run_query_datasource();
+  $block .= html_company_search_form($type_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $company);
 
   return $block;
 }
@@ -162,13 +163,14 @@ function dis_company_search_form($company="") {
 //   - $act_q     : database object with activity list
 //   - $usr_q     : database object with userobm list
 //   - $ctry_q    : database object with country list
+//   - $dsrc_q    : database object with datasource list
 //   - $company[] : default form values
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
+function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $dsrc_q, $company) {
   global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find, $l_fuzzy;
+  global $l_all, $l_find, $l_fuzzy, $l_datasource;
   global $c_all, $cgp_hide;
 
   $popup = $company["popup"];
@@ -180,6 +182,7 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   $act = $company["activity"];
   $ctry = $company["country"];
   $mark = $company["marketing_manager"];
+  $dsrc = $company["datasource"];
   $zip = stripslashes($company["zip"]);
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
@@ -246,8 +249,19 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   }
   $sel_market .= "</select>";
 
-  $url = url_prepare("company_index.php");
+  // Data source select
+  $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($dsrc_q->next_record()) {
+    $d_id = $dsrc_q->f("datasource_id");
+    $sel_dsrc .= "\n<option value=\"$d_id\"";
+    if ($d_id == $dsrc) { $sel_dsrc .= " selected=\"selected\""; }
+    $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
+  }
+  $sel_dsrc .= "</select>";
 
+
+  $url = url_prepare("company_index.php");
 
   if ($popup) {
     $ext_action = $contact["ext_action"];
@@ -290,6 +304,9 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
     </div>
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
+    </div>
+    <div class=\"searchLabel\">$l_datasource<br />
+      $sel_dsrc
     </div>
     <div class=\"searchLabel\">$l_after<br />
       <input name=\"tf_dateafter\" size=\"10\" maxlength=\"10\"
@@ -373,9 +390,10 @@ function html_company_search_list($comp_q, $pref_q, $nb_company,$company,$popup)
   $act = $company["activity"];
   $zip = urlencode(stripslashes($company["zip"]));
   $market = $company["marketing_manager"];
+  $dsrc = $company["datasource"];
 
   
-  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry");
+  $url = url_prepare("company_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_kind=$kind&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext&amp;tf_town=$town&amp;sel_ctry=$ctry&amp;sel_dsrc=$dsrc");
 
   $comp_q->seek($first_row);
 

@@ -34,9 +34,9 @@ $l_timeupdate = "Date de mise à jour";
 $l_market = "Responsable";
 $l_contact_cat1 = "Categorie 1";
 $l_contact_cat2 = "Categorie 2";
-$l_category = "Categorie";
 $l_expert_mode = "Mode Expert";
 $l_normal_mode = "Mode Normal";
+
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";

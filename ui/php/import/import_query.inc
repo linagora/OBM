@@ -17,10 +17,11 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($import, $p_new_order, $p_order_dir) {
-  global $cdg_sql;
+  global $cdg_sql, $c_all;
   
   $name = $import["name"];
-  $contact = $list["contact"];
+  $dsrc = $import["datasource"];
+  $market = $import["market"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -29,8 +30,11 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
   $timeupdate = sql_date_format($db_type, "import_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "import_timecreate", "timecreate");
 
-  if ($email != '') {
-    $where .= " and list_email $like '%$email%'";
+  if (($dsrc != $c_all) && ($dsrc != "")) { 
+    $where .= " and import_datasource_id='$dsrc'";
+  }
+  if (($market != $c_all) && ($market != "")) { 
+    $where .= " and import_marketingmanager_id='$market'";
   }
 
   $query = "select distinct import_id as Id,
@@ -42,11 +46,14 @@ function run_query_search($import, $p_new_order, $p_order_dir) {
     $timeupdate,
     A.userobm_login as usercreate,
     B.userobm_login as userupdate,
-    datasource_name as import_datasource
+    datasource_name as import_datasource,
+    C.userobm_lastname as market_lastname,
+    C.userobm_firstname as market_firstname
   from 
     Import LEFT JOIN DataSource ON import_datasource_id=datasource_id
     LEFT JOIN UserObm as A ON Import.import_usercreate=A.userobm_id
     LEFT JOIN UserObm as B ON Import.import_userupdate=B.userobm_id
+    LEFT JOIN UserObm as C ON Import.import_marketingmanager_id=C.userobm_id
   where import_name $like '$name%'
     $where";
 
@@ -80,11 +87,14 @@ function run_query_detail($id) {
       $timeupdate,
       c.userobm_login as usercreate,
       u.userobm_login as userupdate,
-      datasource_name
+      datasource_name,
+      m.userobm_lastname as market_lastname,
+      m.userobm_firstname as market_firstname
   from Import
        LEFT JOIN DataSource on import_datasource_id = datasource_id
        LEFT JOIN UserObm as c on import_usercreate=c.userobm_id
        LEFT JOIN UserObm as u on import_userupdate=u.userobm_id
+       LEFT JOIN UserObm as m on import_marketingmanager_id=m.userobm_id
   where import_id = '$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -106,6 +116,7 @@ function run_query_insert($import) {
   $id = $import["id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
+  $market = $import["market"];
   $sep = $import["sep"];
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
@@ -116,6 +127,7 @@ function run_query_insert($import) {
     import_usercreate,
     import_name,
     import_datasource_id,
+    import_marketingmanager_id,
     import_separator,
     import_enclosed,
     import_desc)
@@ -125,6 +137,7 @@ function run_query_insert($import) {
     '" . $auth->auth["uid"] . "',
     '$name',
     '$dsrc',
+    '$market',
     '$sep',
     '$enc',
     '$desc')";
@@ -148,6 +161,7 @@ function run_query_update($import) {
   $id = $import["id"];
   $name = $import["name"];
   $dsrc = $import["datasource"];
+  $market = $import["market"];
   $sep = $import["sep"];
   $enc = $import["enclosed"];
   $desc = get_import_desc($import);
@@ -156,6 +170,7 @@ function run_query_update($import) {
     import_userupdate='".$auth->auth["uid"]."',
     import_name='$name',
     import_datasource_id='$dsrc',
+    import_marketingmanager_id='$market',
     import_separator='$sep',
     import_enclosed='$enc',
     import_desc='$desc'
@@ -319,8 +334,8 @@ function check_data_form($id, $import) {
 //        : $map[1]["field"] = comp_name
 ///////////////////////////////////////////////////////////////////////////////
 function get_import_field_mapping($import_q) {
-  global $l_company, $l_number, $l_address, $l_postcode, $l_town;
-  global $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
+  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
 
   $desc = $import_q->f("import_desc");
@@ -337,6 +352,9 @@ function get_import_field_mapping($import_q) {
       $map["$value"]["label"] = $label;
       $map["$value"]["field"] = $field;
     }
+    if ($default != "") {
+      $map["default"][$field] = $default;
+    }
   }
 
   while (list($field, $el) = each($con)) {
@@ -344,9 +362,11 @@ function get_import_field_mapping($import_q) {
     $value = $el["value"];
     $default = $el["default"];
     if (($label != "") && ($value != "")) {
-      if ($value != "") {
-	$map["$value"] = $field;
-      }
+      $map["$value"]["label"] = $label;
+      $map["$value"]["field"] = $field;
+    }
+    if ($default != "") {
+      $map["default"][$field] = $default;
     }
   }
 
@@ -427,6 +447,23 @@ function is_row_valid($fields) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Check if an import row has a contact
+// Parameters:
+//   - $fields : row fields content
+// Returns:
+//   true if valid
+///////////////////////////////////////////////////////////////////////////////
+function row_has_contact($fields) {
+
+  if ( (isset($fields["con_ln"])) && ($fields["con_ln"] != "") ) {
+    return true;
+  } else {
+    return false;
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Return the existing companies similar to the one given
 // Parameters:
 //   - $fields : company Id not to return
@@ -457,6 +494,364 @@ function get_similar_company($fields) {
   }
 
   return $comps;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Company Insertion query execution
+// Parameters:
+//   - $import_q    : Import database result 
+//   - $fields[]    : Company and Contact Entry's values
+//   - $defaults[]  : Default values hash
+//   - $countries[] : Country hash
+//   - $cats[]      : CompanyCategory hash
+// Returns
+//   Id of the company inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_import_company_insert(&$import_q, $fields, $defaults, &$countries, &$cats) {
+  global $auth, $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+
+  // Set default values when needed
+  while (list($field, $value) = each ($defaults)) {
+    if ($fields[$field] == "") {
+      $fields[$field] = $value;
+    }
+  }
+
+  $num = $fields["comp_num"];
+  $archive = "0";
+  $name = $fields["comp_name"];
+  $auto_aka = reduce_name($name);
+  $aka = $auto_aka;
+  $sound = phonetic_key($name);
+
+  $dsrc = $import_q->f("import_datasource_id");
+  $market = $import_q->f("import_marketingmanager_id");
+
+  $ad1 = $fields["comp_ad1"];
+  $ad2 = $fields["comp_ad2"];
+  $ad3 = $fields["comp_ad3"];
+  $zip = $fields["comp_zip"];
+  $town = $fields["comp_town"];
+  $ctry = $countries[$fields["comp_ctry"]];
+  $phone = $fields["comp_pho"];
+  $fax = $fields["comp_fax"];
+  $web = $fields["comp_web"];
+  $email = $fields["comp_mail"];
+  $com = $fields["comp_com"];
+
+  $query = "insert into Company (company_timeupdate,
+    company_timecreate,
+    company_userupdate,
+    company_usercreate,
+    company_datasource_id,
+    company_number,
+    company_archive,
+    company_name,
+    company_aka,
+    company_sound,
+    company_marketingmanager_id,
+    company_address1,
+    company_address2,
+    company_address3,
+    company_zipcode,
+    company_town,
+    company_country_id,
+    company_phone,
+    company_fax,
+    company_web,
+    company_email,
+    company_comment)
+  values (null,
+    '" . date("Y-m-d H:i:s") . "',
+    null,
+    '$uid',
+    '$dsrc',
+    '$num',
+    '$archive',
+    '$name',
+    '$aka',
+    '$sound',
+    '$market',
+    '$ad1',
+    '$ad2',
+    '$ad3',
+    '$zip',
+    '$town',
+    '$ctry',
+    '$phone',
+    '$fax',
+    '$web',
+    '$email',
+    '$com')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  // Get the company Id
+  $query = "select company_id as id
+      from Company
+      where company_name = '$name'
+        and company_phone = '$phone'
+        and company_zipcode = '$zip'";
+  
+  display_debug_msg($query, $cdg_sql);
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $id = $obm_q->f("id");
+
+  // Set the category if given
+  $cat = $cats[$fields["comp_cat"]];
+  if ($cat != "") {
+
+    $query = "insert into CompanyCategoryLink (
+        companycategorylink_company_id,
+	companycategorylink_category_id)
+      values (
+        '$id',
+        '$cat')";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+  
+  return $id;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Company Update query execution
+// Parameters:
+//   - $import_q    : Import database result 
+//   - $fields[]    : Company and Contact Entry's values
+//   - $defaults[]  : Default values hash
+//   - $countries[] : Country hash
+//   - $cats[]      : CompanyCategory hash
+//   - $company_id  : Company id to update
+///////////////////////////////////////////////////////////////////////////////
+function run_query_import_company_update(&$import_q, $fields, $defaults, &$countries, &$cats, $company_id) {
+  global $auth, $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+
+  // Set default values when needed
+  while (list($field, $value) = each ($defaults)) {
+    if ($fields[$field] == "") {
+      $fields[$field] = $value;
+    }
+  }
+
+  $num = $fields["comp_num"];
+  // Name should be the same (expect case), so we don't update aka or sound
+  $name = $fields["comp_name"];
+
+  $dsrc = $import_q->f("import_datasource_id");
+  $market = $import_q->f("import_marketingmanager_id");
+
+  $ad1 = $fields["comp_ad1"];
+  $ad2 = $fields["comp_ad2"];
+  $ad3 = $fields["comp_ad3"];
+  $zip = $fields["comp_zip"];
+  $town = $fields["comp_town"];
+  $ctry = $countries[$fields["comp_ctry"]];
+  $phone = $fields["comp_pho"];
+  $fax = $fields["comp_fax"];
+  $web = $fields["comp_web"];
+  $email = $fields["comp_mail"];
+  $com = $fields["comp_com"];
+
+  $query = "update Company set
+    company_timeupdate='". date("Y-m-d H:i:s") ."',
+    company_userupdate='$uid',
+    company_datasource_id='$dsrc',
+    company_marketingmanager_id='$market',
+    company_number='$num',
+    company_name='$name',
+    company_address1='$ad1',
+    company_address2='$ad2',
+    company_address3='$ad3',
+    company_zipcode='$zip',
+    company_town='$town',
+    company_country_id='$ctry',
+    company_phone='$phone',
+    company_fax='$fax',
+    company_web='$web',
+    company_email='$email',
+    company_comment='$com'
+  where company_id='$company_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  // Set the category if given
+  $cat = $cats[$fields["comp_cat"]];
+  if ($cat != "") {
+
+    $query = "delete
+      from CompanyCategoryLink
+      where companycategorylink_company_id='$company_id'
+        and companycategorylink_category_id='$cat'";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  
+    $query = "insert into CompanyCategoryLink (
+        companycategorylink_company_id,
+        companycategorylink_category_id)
+      values (
+          '$company_id',
+          '$cat')";
+    display_debug_msg($query, $cdg_sql);
+    $obm_q->query($query);
+  }
+  
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Contact Insertion query execution
+// Parameters:
+//   - $import_q    : Import database result 
+//   - $comp_id     : Company Id
+//   - $fields[]    : Company and Contact Entry's values
+//   - $defaults[]  : Default values hash
+//   - $countries[] : Country hash
+///////////////////////////////////////////////////////////////////////////////
+function run_query_import_contact_insert(&$import_q, $comp_id, $fields, $defaults, &$countries) {
+  global $auth, $cdg_sql;
+
+  $uid = $auth->auth["uid"];
+
+  // Set default values when needed
+  while (list($field, $value) = each ($defaults)) {
+    if ($fields[$field] == "") {
+      $fields[$field] = $value;
+    }
+  }
+
+  $dsrc = $import_q->f("import_datasource_id");
+  $market = $import_q->f("import_marketingmanager_id");
+  $lname = $fields["con_ln"];
+  $fname = $fields["con_fn"];
+  $ad1 = $fields["con_ad1"];
+  $ad2 = $fields["con_ad2"];
+  $ad3 = $fields["con_ad3"];
+  $zip = $fields["con_zip"];
+  $town = $fields["con_town"];
+  $ctry = $fields["con_ctry"];
+  $title = $fiedls["con_tit"];
+  $phone = $fields["con_pho"];
+  $hphone = $fields["con_hpho"];
+  $mphone = $fields["con_mpho"];
+  $fax = $fields["con_fax"];
+  $email = $fields["con_mail"];
+  $mailok = "0";
+  $com = $fields["con_com"];
+  $arch = '0';
+  $vis = '0';
+
+  $query = "insert into Contact (contact_timeupdate,
+    contact_timecreate,
+    contact_userupdate,
+    contact_usercreate,
+    contact_datasource_id,
+    contact_company_id,
+    contact_marketingmanager_id,
+    contact_lastname,
+    contact_firstname,
+    contact_address1,
+    contact_address2,
+    contact_address3,
+    contact_zipcode,
+    contact_town,
+    contact_country_id,
+    contact_title,
+    contact_phone,
+    contact_homephone,
+    contact_mobilephone,
+    contact_fax,
+    contact_email,
+    contact_mailing_ok,
+    contact_archive,
+    contact_visibility,
+    contact_comment)
+  values (null,
+    '" . date("Y-m-d H:i:s") . "',
+    null,
+    '$uid',
+    '$dsrc',
+    '$comp_id',
+    '$market',
+    '$lname',
+    '$fname',
+    '$ad1',
+    '$ad2',
+    '$ad3',
+    '$zip',
+    '$town',
+    '$ctry',
+    '$title',
+    '$phone',
+    '$hphone',
+    '$mphone',
+    '$fax',
+    '$email',
+    '$mailok',
+    '$arch',
+    '$vis',
+    '$com')";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+
+  
+  if ($retour) {
+    run_query_company_contact_inc($comp_id);
+  }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the country hash : countries["name"] = id
+///////////////////////////////////////////////////////////////////////////////
+function get_import_country_hash() {
+  global $cdg_sql;
+
+  $ctry_q = run_query_country();
+
+  while ($ctry_q->next_record()) {
+    $id = $ctry_q->f("country_id");
+    $name = $ctry_q->f("country_name");
+    $countries[$name] = $id;
+  }
+
+  return $countries;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Return the companycategory hash : cats["code"] = id
+///////////////////////////////////////////////////////////////////////////////
+function get_import_companycategory_hash() {
+  global $cdg_sql;
+
+  $cat_q = run_query_companycategory();
+
+  while ($cat_q->next_record()) {
+    $id = $cat_q->f("companycategory_id");
+    $code = $cat_q->f("companycategory_code");
+    $label = $cat_q->f("companycategory_label");
+    $cats[$code] = $id;
+    $cats[$label] = $id;
+  }
+
+  return $cats;
 }
 
 

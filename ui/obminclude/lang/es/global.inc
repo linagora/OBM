@@ -38,6 +38,7 @@ $l_address = "Dirección";
 $l_postcode = "Código Postal";
 $l_town = "Ciudad";
 $l_datasource = "Fuente de Datos";
+$l_cat = "Categoría";
 $l_document_added = " documentos adicionados";
 $l_no_document_added = "No hay documentos adicionados";
 

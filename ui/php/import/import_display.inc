@@ -14,6 +14,7 @@
 // Direct fields
 $fieldnames["import_name"] = $l_name;
 $fieldnames["import_datasource"] = $l_datasource;
+$fieldnames["import_market"] = $l_market;
 $fieldnames["import_separator"] = $l_csv_sep;
 $fieldnames["import_enclosed"] = $l_enclosed;
 
@@ -35,11 +36,26 @@ function dis_data_import(&$OD, $fieldname, $link_ok) {
   }
   
   // For contacts urls (link):
-  else if ($fieldname == "contact_lastname") {
-    $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
+  else if ($fieldname == "import_market") {
+    $res["name"] = $OD->data_set->f("market_lastname") . " " . $OD->data_set->f("market_firstname");
   }
 
   return $res;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Import search Form
+// Parameters:
+//   - $import[] : hash with import values
+///////////////////////////////////////////////////////////////////////////////
+function dis_import_search_form($import="") {
+
+  $dsrc_q = run_query_datasource();
+  $usr_q = run_query_userobm_active();
+  $block = html_import_search_form($import, $dsrc_q, $usr_q);
+
+  return $block;
 }
 
 
@@ -49,18 +65,20 @@ function dis_data_import(&$OD, $fieldname, $link_ok) {
 //   - $import[] : default form values
 //     keys used : name
 //   - $dsrc_q   : database object with datasource list
+//   - $usr_q    : database object with userobm list from Com group
 ///////////////////////////////////////////////////////////////////////////////
-function html_import_search_form ($import, $dsrc_q) {
-  global $l_name, $l_datasource, $l_find, $l_none;
+function html_import_search_form ($import, $dsrc_q, $usr_q) {
+  global $l_name, $l_datasource, $l_market, $l_find, $l_none, $c_all, $l_all;
 
   // --- Var preparation ------------------------------------------------------
 
   $name = stripslashes($import["name"]);
   $dsrc = stripslashes($import["datasource"]);
+  $market = $import["market"];
 
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
-    <option value=\"0\">$l_none</option>";
+    <option value=\"$c_all\">$l_all</option>";
   while ($dsrc_q->next_record()) {
     $d_id = $dsrc_q->f("datasource_id");
     $sel_dsrc .= "\n<option value=\"$d_id\"";
@@ -68,6 +86,17 @@ function html_import_search_form ($import, $dsrc_q) {
     $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
   }
   $sel_dsrc .= "</select>";
+
+  // Marketing manager select
+  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $market) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+  }
+  $sel_market .= "</select>";
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -81,6 +110,9 @@ function html_import_search_form ($import, $dsrc_q) {
     </div>
     <div class=\"searchLabel\">$l_datasource<br />
       $sel_dsrc
+    </div>
+    <div class=\"searchLabel\">$l_market<br />
+      $sel_market
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />
@@ -155,14 +187,13 @@ function html_import_search_list($obm_q, $pref_q, $nb, $import, $popup) {
 //   - $import_q : Import database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_consult($import_q) {
-  global $l_import, $l_name, $l_datasource,$l_csv_sep, $l_enclosed;
-  global $l_file, $l_sample_file, $l_test_file;
+  global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $l_mapping, $l_field_num, $l_field, $l_default;
-  global $l_company, $l_number, $l_address, $l_postcode, $l_town;
-  global $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
+  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
-  global $display, $perm, $action;
+  global $display;
 
   $id = $import_q->f("import_id");
   $usercreate = $import_q->f("import_usercreate");
@@ -172,6 +203,7 @@ function html_import_consult($import_q) {
   $name = $import_q->f("import_name");
   $dsrc = $import_q->f("import_datasource_id");
   $datasource = $import_q->f("datasource_name");
+  $market = $import_q->f("market_lastname") . " " . $import_q->f("market_firstname");
   $csv_sep = $import_q->f("import_separator");
   $enclosed = $import_q->f("import_enclosed");
   $desc = $import_q->f("import_desc");
@@ -216,7 +248,6 @@ function html_import_consult($import_q) {
     }
   }
 
-  $url = url_prepare("import_index.php");
   $display["detailInfo"] = display_record_info($import_q);
   $display["title"] = "<div class=\"title\">$l_import : $name</div>";
 
@@ -229,6 +260,9 @@ function html_import_consult($import_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td>
       <td class=\"detailText\">$datasource</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_market</td>
+      <td class=\"detailText\">$market</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_csv_sep</td>
       <td class=\"detailText\">$csv_sep</td>
@@ -249,8 +283,31 @@ function html_import_consult($import_q) {
     <td class=\"detailHead\" colspan=\"3\">$l_company</td>
   </tr>
   $mapping
-  </table>
+  </table>";
 
+  $block .= html_import_consult_file($import_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display Import Consultation File block
+// Parameters:
+//   - $import_q : Import database result 
+///////////////////////////////////////////////////////////////////////////////
+function html_import_consult_file($import_q) {
+  global $l_import, $l_file, $l_sample_file, $l_check_file, $l_test_file;
+  global $l_import_file;
+  global $display;
+
+  $id = $import_q->f("import_id");
+  $name = $import_q->f("import_name");
+
+  $url = url_prepare("import_index.php");
+  $display["title"] = "<div class=\"title\">$l_import : $name</div>";
+
+  $block = "
     <div class=\"detailHead\">$l_file</div>
     <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
       <input type=\"hidden\" name=\"action\" value=\"file_sample\" />
@@ -261,7 +318,7 @@ function html_import_consult($import_q) {
       <td class=\"detailForm\">
         <input type=\"file\" name=\"sample_file\" id=\"sample_file\" size=\"30\" value=\"\" />
         <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
-        <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
+        <input type=\"submit\" name=\"submit\" value=\"$l_check_file\" /></td>
     </tr>
     </table>
     </form>
@@ -278,6 +335,20 @@ function html_import_consult($import_q) {
         <input type=\"submit\" name=\"submit\" value=\"$l_test_file\" /></td>
     </tr>
     </table>
+    </form>
+
+    <form method=\"post\" enctype=\"multipart/form-data\" name=\"f_file\" action=\"$url\">
+      <input type=\"hidden\" name=\"action\" value=\"file_import\" />
+      <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_import_file</td>
+      <td class=\"detailForm\">
+        <input type=\"file\" name=\"import_file\" id=\"import_file\" size=\"30\" value=\"\" />
+        <input type=\"hidden\" name=\"MAX_FILE_SIZE\" value=\"300000\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_import_file\" /></td>
+    </tr>
+    </table>
     </form>";
 
   return $block;
@@ -292,10 +363,8 @@ function html_import_consult($import_q) {
 //   - $max_rows : max rows displayed from test file
 ///////////////////////////////////////////////////////////////////////////////
 function html_import_file_sample($import_q, $import, $max_rows) {
-  global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
-  global $l_mapping, $l_field_num, $l_field, $l_default;
-  global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
-  global $display, $perm, $action;
+  global $l_sample_file, $l_file_error;
+  global $display;
 
   $file = $import["file"];
   $file_name = $import["file_name"];
@@ -308,12 +377,18 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   // Sample header
   $mapping_head .= "<tr>";
   while (list($num, $el) = each($map)) {
-    $label = $el["label"];
-    $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
+    if ($num != "default") {
+      $label = $el["label"];
+      $mapping_head .= "<td class=\"detailLabel\">$num-$label</td>";
+    }
   }
   $mapping_head .= "</tr>";
 
   // Sample file display
+  if (! file_exists($file)) {
+    $display["msg"] .= display_err_msg("$file : $l_file_error");
+    return;
+  }
   $r = file($file);
   while ( (list($num_line, $line) = each($r)) && ($num_line < $max_rows) ) {
     $row = get_file_row_fields($line, $csv_sep, $enclosed);
@@ -328,7 +403,7 @@ function html_import_file_sample($import_q, $import, $max_rows) {
   }
 
   $block = "
-    <div class=\"detailHead\">$file_name</div>
+    <div class=\"detailHead\">$l_sample_file : $file_name</div>
     <table class=\"detail\">
     <tr>
       $mapping_head
@@ -342,25 +417,160 @@ function html_import_file_sample($import_q, $import, $max_rows) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Import Test File block
+// HTML Display Import File Core
 // Parameters:
 //   - $import_q : Import database result 
 //   - $import[] : import hash values
 ///////////////////////////////////////////////////////////////////////////////
-function html_import_file_test($import_q, $import) {
-  global $l_import, $l_name, $l_datasource, $l_file, $l_test_file, $l_csv_sep;
-  global $l_mapping, $l_field_num, $l_field, $l_default;
+function html_import_file_import($import_q, $import) {
+  global $l_test_file, $l_import_file;
   global $l_company, $l_contact, $l_info, $l_result;
-  global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
-  global $display, $perm, $action;
+  global $l_similar_company, $l_similar_contact, $l_invalid_row;
+  global $l_invalid_rows, $l_conflict_rows;
+  global $l_import_end,$l_file_error, $l_lines_processed, $l_conflict_detected;
+  global $display;
 
-  $file = $import["file"];
+  $file = $import["file_saved"];
+  if ($file == "") {
+    $file = $import["file"];
+  }
   $file_name = $import["file_name"];
   $file_size = $import["file_size"];
   $csv_sep = $import_q->f("import_separator");
   $enclosed = trim($import_q->f("import_enclosed"));
+  $run_mode = $import["run_mode"];
+  $row_start = ($import["row_start"] ? $import["row_start"] : 0);
+  $conflict_action = $import["conflict_action"];
+  $company_id = $import["company_id"];
 
+  if ($run_mode == "test") {
+    $title = "$l_test_file : $file_name";
+  } else {
+    $title = "$l_import_file : $file_name";
+    // Get the country hash : countries["name"] = $id
+    $countries = get_import_country_hash();
+    $cats = get_import_companycategory_hash();
+  }
+    
   $map = get_import_field_mapping($import_q);
+
+  // File processing
+  $stop = false;
+  $nb_line = 0;
+  $nb_line_err = 0;
+  $nb_line_conf = 0;
+  if (! file_exists($file)) {
+    $display["msg"] .= display_err_msg("$file : $l_file_error");
+    return;
+  }
+  $r = file($file);
+  $cpt = 0;
+  // Go to the starting row
+  while ($cpt < $row_start) {
+    $cpt++;
+    next($r);
+  }
+
+  // Conflict Management ------------------------------------------------------
+  if ($conflict_action != "") {
+    $nb_line++;
+
+    // Skip this row, go to next one
+    if ($conflict_action == "nothing") {
+      next($r);
+
+      // XXX test for contact ?
+
+      // Insert the new company
+    } else if ($conflict_action == "company_insert") {
+      list($num_line, $line) = each($r);
+      $row = get_file_row_fields($line, $csv_sep, $enclosed);
+      $fields = get_import_row_mapping($row, $map);
+      run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
+
+      // Update the existing company
+    } else if ($conflict_action == "company_update") {
+      list($num_line, $line) = each($r);
+      $row = get_file_row_fields($line, $csv_sep, $enclosed);
+      $fields = get_import_row_mapping($row, $map);
+      run_query_import_company_update($import_q, $fields, $map["default"], $countries, $cats, $company_id);
+
+      // XXX test for contact ?
+
+    }
+
+  }
+
+  // Loop through the file ----------------------------------------------------
+  while ((list($num_line, $line) = each($r)) && ($stop == false)) {
+    $log = "";
+    $log["num_line"] = $num_line;
+    $nb_line++;
+
+    $row = get_file_row_fields($line, $csv_sep, $enclosed);
+    $fields = get_import_row_mapping($row, $map);
+
+    // Test if company is valid
+    if (is_row_valid($fields)) {
+
+      // Test if similar companies exist --------------------------------------
+      $comps = get_similar_company($fields);
+      if (is_array($comps)) {
+	$nb_line_conf++;
+	$log["display"] = true;
+	$log["res"] = $l_similar_company;
+
+	// Automatic mode
+	if ($run_mode == "auto") {
+
+	  // Test mode (no database updates) Do nothing : only log
+	} else if ($run_mode == "test") {
+
+	  // Normal mode (Interactive)
+	} else {
+	  $stop = true;
+	  $conflict_block = display_import_conflict_block($import, $log, $log_head, $fields, $comps);
+	  $display["msg"] .= display_warn_msg($l_conflict_detected);
+	}
+	
+	// No similar companies exists ----------------------------------------
+      } else {
+
+	// Test mode (no database updates) Do nothing : only log
+	if ($run_mode == "test") {
+
+	  // Auto or Normal mode (Interactive)
+	} else {
+	  // Insert the company
+	  $cid = run_query_import_company_insert($import_q, $fields, $map["default"], $countries, $cats);
+	  if (row_has_contact($fields)) {
+	    echo "insert contact :" . $fields["con_ln"] . " " . $fields["con_fn"];
+	    run_query_import_contact_insert($import_q, $cid, $fields, $map["default"], $countries);
+	  }
+	}
+      }
+
+      // Company row not valid
+    } else {
+      $nb_line_err++;
+      $log["res"] = $l_invalid_row;
+    }
+
+    $log_block .= display_import_log_line($log, $fields, $comps);
+  }
+
+  $msg = "$nb_line $l_lines_processed";
+  if (isset($log["num_line"])) {
+    $msg .= " ($row_start - " . $log["num_line"] .")";
+  }
+  if (! $stop) {
+    $msg .= ". $l_import_end";
+  }
+
+  $display["msg"] .= display_ok_msg("$msg");
+  if (($nb_line_err > 0) || ($nb_line_conf > 0)) {
+    $display["msg"] .= display_info_msg("$nb_line_err $l_invalid_rows, $nb_line_conf $l_conflict_rows");
+  }
 
   // Test header
   $log_head .= "<tr>
@@ -372,56 +582,16 @@ function html_import_file_test($import_q, $import) {
     <td class=\"detailLabel\">$l_result</td>
   </tr>";
 
-  // Sample file display
-  $r = file($file);
-  while (list($num_line, $line) = each($r)) {
-    $log = "";
-    $log["num_line"] = $num_line;
-
-    $row = get_file_row_fields($line, $csv_sep, $enclosed);
-    $fields = get_import_row_mapping($row, $map);
-
-    // Test if company is valid
-    if (is_row_valid($fields)) {
-
-      // Test if similar companies exist
-      $comps = get_similar_company($fields);
-      if (is_array($comps)) {
-	$log["display"] = true;
-
-	// Automatic mode
-	if ($run_mode == "auto") {
-
-	  // Check mode (no database updates) Do nothing : only log
-	} else if ($run_mode == "check") {
-
-	  // Normal mode
-	} else {
-	  
-	}
-	
-	// No similar companies exists
-      } else {
-	// Insert the company
-      }
-
-      // Company row not valid
-    } else {
-      $log["res"] = "Invalid row!";
-    }
-
-    $log_block .= display_import_check_log_line($log, $fields, $comps);
-  }
-
   $block = "
-    <div class=\"detailHead\">$file_name</div>
+    $conflict_block
+
+    <div class=\"detailHead\">$title</div>
     <table class=\"detail\">
     <tr>
       $log_head
     </tr>
       $log_block
-    </table>
-    </form>";
+    </table>";
 
   return $block;
 }
@@ -430,11 +600,93 @@ function html_import_file_test($import_q, $import) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Import Form                                                       //
 // Parameters :
+//   - $log      : log line info array
+//   - $log_head : log line header
+//   - $fields   : company row info array
+//   - $comps    : similar company info array
+///////////////////////////////////////////////////////////////////////////////
+function display_import_conflict_block($import, $log, &$log_head, $fields, $comps) {
+  global $path, $l_conflict, $l_comp_nothing, $l_comp_insert, $l_comp_update, $l_validate;
+
+  $id = $import["id"];
+  $file = $import["file"];
+  $file_name = $import["file_name"];
+  $file_saved = $import["file_saved"];
+
+  $num_line = $log["num_line"];
+
+  $name = $fields["comp_name"];
+  $info = $fields["comp_zip"] . " " . $fields["comp_town"];
+  $con = $fields["con_ln"] . " " . $fields["con_fn"];
+  $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
+  $res = $log["res"];
+  $line_log .= "<tr>
+      <td class=\"detailForm\">$num_line</td>
+      <td class=\"detailForm\">$name</td>
+      <td class=\"detailForm\">$info</td>
+      <td class=\"detailForm\">$con</td>
+      <td class=\"detailForm\">$con_info</td>
+      <td class=\"detailForm\">$res";
+
+  if (is_array($comps)) {
+    while ( list($num, $comp) = each($comps) ) {
+      $cid = $comp["comp_id"];
+      $url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid");
+      $line_log .= "<br />";
+      $line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
+    }
+    $line_log .= "</td>
+      </tr>";
+  }
+
+  $url = url_prepare("import_index.php");
+
+  $block = "
+    <div class=\"detailHead\">$l_conflict</div>
+    <table class=\"detail\">
+    <tr>
+      $log_head
+    </tr>
+      $line_log
+    </table>
+
+    <form method=\"post\" name=\"f_file\" action=\"$url\">
+
+    <table class=\"detail\">
+    <tr>    
+      <td class=\"detailLabel\">
+        <input type=\"radio\" name=\"rd_conflict\" value=\"nothing\" checked />$l_comp_nothing
+        <input type=\"radio\" name=\"rd_conflict\" value=\"company_insert\" />$l_comp_insert
+        <input type=\"radio\" name=\"rd_conflict\" value=\"company_update\" />$l_comp_update
+      </td>
+    </tr>
+    <tr colspan=\"3\">
+      <td class=\"detailLabel\">
+        <input type=\"hidden\" name=\"import_file\" value=\"$file\" />
+        <input type=\"hidden\" name=\"import_file_name\" value=\"$file_name\" />
+        <input type=\"hidden\" name=\"file_saved\" value=\"$file_saved\" />
+        <input type=\"hidden\" name=\"param_import\" value=\"$id\" />
+        <input type=\"hidden\" name=\"row_start\" value=\"$num_line\" />
+        <input type=\"hidden\" name=\"company_id\" value=\"$cid\" />
+        <input type=\"hidden\" name=\"action\" value=\"file_import\" />
+        <input type=\"submit\" name=\"submit\" value=\"$l_validate\" />
+      </td> 
+    </table>
+    </form>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Import log line
+// Parameters :
 //   - $log    : log line info array
 //   - $fields : company row info array
 //   - $comps  : similar company info array
 ///////////////////////////////////////////////////////////////////////////////
-function display_import_check_log_line($log, $fields, $comps) {
+function display_import_log_line($log, $fields, $comps) {
+  global $path;
 
   $step = 1;
   $num_line = $log["num_line"];
@@ -447,20 +699,24 @@ function display_import_check_log_line($log, $fields, $comps) {
 
   if ($display_log) {
     $name = $fields["comp_name"];
-    $info = $fields["comp_zip"];
+    $info = $fields["comp_zip"] . " " . $fields["comp_town"];
+    $con = $fields["con_ln"] . " " . $fields["con_fn"];
+    $con_info = $fields["con_tit"] . " " . $fields["con_pho"];
     $res = $log["res"];
     $line_log .= "<tr>
       <td class=\"detailForm\">$num_line</td>
       <td class=\"detailForm\">$name</td>
       <td class=\"detailForm\">$info</td>
-      <td class=\"detailForm\">Contact</td>
-      <td class=\"detailForm\">C info</td>
+      <td class=\"detailForm\">$con</td>
+      <td class=\"detailForm\">$con_info</td>
       <td class=\"detailForm\">$res";
 
     if (is_array($comps)) {
       while ( list($num, $comp) = each($comps) ) {
+	$cid = $comp["comp_id"];
+	$url = url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$cid");
 	$line_log .= "<br />";
-	$line_log .= $comp["comp_name"] . " - " . $comp["comp_zip"];
+	$line_log .= "<a target=\"New\" href=\"$url\">".$comp["comp_name"] . "</a> - " . $comp["comp_zip"];
       }
       $line_log .= "</td>
       </tr>";
@@ -479,22 +735,24 @@ function display_import_check_log_line($log, $fields, $comps) {
 //     keys used : name, subject, usercreate
 //   - $import_q : DBO : information about the import (null for new import)
 //   - $dsrc_q   : database object with datasource list
+//   - $usr_q    : database object with userobm list
 ///////////////////////////////////////////////////////////////////////////////
-function html_import_form($action, $import, $import_q, $dsrc_q) {
+function html_import_form($action, $import, $import_q, $dsrc_q, $usr_q) {
   global $display, $l_none, $l_insert, $l_update, $l_back;
-  global $l_import, $l_name, $l_file, $l_datasource, $l_csv_sep, $l_enclosed;
+  global $l_import, $l_name, $l_datasource, $l_market, $l_csv_sep, $l_enclosed;
   global $ccsvd_sc, $ccsvd_tab, $l_csvd_sc, $l_csvd_tab;
   global $l_mapping, $l_field_num, $l_field, $l_default;
-  global $l_company, $l_number, $l_address, $l_postcode, $l_town;
-  global $l_phone, $l_fax, $l_web, $l_email, $l_comment;
+  global $l_company, $l_number, $l_cat, $l_address, $l_postcode, $l_town;
+  global $l_country, $l_phone, $l_fax, $l_web, $l_email, $l_comment;
   global $l_contact, $l_lastname, $l_firstname, $l_title, $l_hphone, $l_mphone;
-  
+
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $import_q->f("import_id");
     $usercreate = $import_q->f("list_usercreate");
     $name = $import_q->f("import_name");
     $dsrc = $import_q->f("import_datasource_id");
+    $market = $import_q->f("import_marketingmanager_id");
     $sep = $import_q->f("import_separator");
     $enc = $import_q->f("import_enclosed");
     $desc = $import_q->f("import_desc");
@@ -504,6 +762,7 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
   if (isset($import["id"])) { $id = $import["id"]; }
   if (isset($import["name"])) { $name = stripslashes($import["name"]); }
   if (isset($import["datasource"])) { $dsrc = $import["datasource"]; }
+  if (isset($import["market"])) { $market = $import["market"]; }
   if (isset($import["sep"])) { $sep = $import["sep"]; }
   if (isset($import["enclosed"])) { $enc = $import["enclosed"]; }
 
@@ -520,6 +779,17 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
     $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
   }
   $sel_dsrc .= "</select>";
+
+  // Marketing manager select
+  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+    <option value=\"0\">$l_none</option>";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $market) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+  }
+  $sel_market .= "</select>";
 
   if ($sep == $ccsvd_sc) $csvd_sc = "checked";
   if ($sep == $ccsvd_tab) $csvd_tab = "checked";
@@ -541,6 +811,10 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
   <tr>
     <td class=\"detailLabel\">$l_datasource</td>
     <td class=\"detailForm\">$sel_dsrc</td>
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_market</td>
+    <td class=\"detailForm\">$sel_market</td>
   </tr>
   <tr>
     <td class=\"detailLabel\">$l_csv_sep</td>
@@ -581,6 +855,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
   </tr>
   <tr>
     <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_comp_cat\" value=\"$comp_cat\" /></td>
+    <td class=\"detailLabel\">$l_cat</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_comp_cat_d\" value=\"$comp_cat_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
       <input type=\"text\" size=\"3\" name=\"tf_comp_ad1\" value=\"$comp_ad1\" /></td>
     <td class=\"detailLabel\">$l_address 1</td>
     <td class=\"detailForm\">
@@ -613,6 +894,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
     <td class=\"detailLabel\">$l_town</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_comp_town_d\" value=\"$comp_town_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_comp_ctry\" value=\"$comp_ctry\" /></td>
+    <td class=\"detailLabel\">$l_country</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_comp_ctry_d\" value=\"$comp_ctry_d\" /></td>
   </tr>
   <tr>
     <td class=\"detailForm\">
@@ -707,6 +995,13 @@ function html_import_form($action, $import, $import_q, $dsrc_q) {
     <td class=\"detailLabel\">$l_town</td>
     <td class=\"detailForm\">
       <input type=\"text\" name=\"tf_con_town_d\" value=\"$con_town_d\" /></td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+      <input type=\"text\" size=\"3\" name=\"tf_con_ctry\" value=\"$con_ctry\" /></td>
+    <td class=\"detailLabel\">$l_country</td>
+    <td class=\"detailForm\">
+      <input type=\"text\" name=\"tf_con_ctry_d\" value=\"$con_ctry_d\" /></td>
   </tr>
   <tr>
     <td class=\"detailForm\">

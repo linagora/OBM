@@ -1091,16 +1091,17 @@ CREATE TABLE GroupGroup (
 -- Table structure for table 'Import'
 --
 CREATE TABLE Import (
-  import_id             serial,
-  import_timeupdate     timestamp,
-  import_timecreate     timestamp,
-  import_userupdate     integer,
-  import_usercreate     integer,
-  import_name           varchar(64) NOT NULL,
-  import_datasource_id  integer,
-  import_separator      varchar(3),
-  import_enclosed       char(1),
-  import_desc           text,
+  import_id                   serial,
+  import_timeupdate           timestamp,
+  import_timecreate           timestamp,
+  import_userupdate           integer,
+  import_usercreate           integer,
+  import_name                 varchar(64) NOT NULL,
+  import_datasource_id        integer,
+  import_marketingmanager_id  integer,
+  import_separator            varchar(3),
+  import_enclosed             char(1),
+  import_desc                 text,
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
 );

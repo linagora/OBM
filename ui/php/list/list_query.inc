@@ -768,21 +768,9 @@ function run_query_function() {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// get all the companycategories
-// Parameters:
-///////////////////////////////////////////////////////////////////////////////
-function run_query_companycategory() {
-  global $cdg_sql;  
-  $query = "select * from CompanyCategory order by  companycategory_code"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-  
-  return $obm_q;  
-}
-///////////////////////////////////////////////////////////////////////////////
-// Make an SQL Query with the list of criteria.        //
+// Make an SQL Query with the list of criteria
 // Parameters:
 //   - $list[]       : list search criteria
 //     keys used     : $criteria.

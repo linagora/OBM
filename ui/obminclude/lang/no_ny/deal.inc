@@ -22,7 +22,6 @@ $l_potential = "Weighted Potential";
 $l_label = "Namn";
 $l_label_start = "namnet starter med";
 $l_kind = "Type";
-$l_category = "Kategori";
 $l_state = "Status";
 $l_project_manager = "Prosjektleiar";
 $l_origin = "Opprinnelse";

@@ -18,7 +18,6 @@ $l_label = "Nome";
 $l_date_init = "Data inizio";
 $l_parentdeal="Impegno";
 $l_kind = "Tipo";
-$l_category = "Categoria";
 $l_company = "Azienda";
 $l_contacts = "Contatti";
 $l_marketing_manager = "Resp. Marketing";

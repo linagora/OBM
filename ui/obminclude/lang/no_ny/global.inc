@@ -28,6 +28,7 @@ $l_phone = "Telefon";
 $l_invalid_data = "Ugyldig data";
 $l_priority = "Priority";
 $l_datasource = "Data source";
+$l_cat = "Kategori";
 
 // OBM_DISPLAY
 $l_entries = "Entries";

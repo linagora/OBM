@@ -17,7 +17,6 @@ $l_label = "Label";
 $l_date_init = "Date Debut";
 $l_parentdeal = "SurAffaire";
 $l_kind = "Type";
-$l_category = "Catégorie";
 $l_company = "Société";
 $l_contact = "Contact";
 $l_marketing_manager = "Resp Commercial";

@@ -24,7 +24,7 @@ $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
 $fieldnames["dealstatus_label"] = $l_state;
 $fieldnames["dealtype_label"] = $l_kind;
-$fieldnames["tasktype_label"] = $l_category;
+$fieldnames["tasktype_label"] = $l_cat;
 $fieldnames["deal_company_name"] = $l_company;
 $fieldnames["deal_company_zipcode"] = $l_zipcode;
 $fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
@@ -153,7 +153,7 @@ function dis_deal_index($deal="") {
 //   - $obm_q_manager : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $obm_q_manager) {
-  global $l_deal, $l_label_start, $l_company, $l_kind, $l_category, $l_state;
+  global $l_deal, $l_label_start, $l_company, $l_kind, $l_cat, $l_state;
   global $l_after, $l_before, $l_manager, $l_show_archive, $l_zipcode;
   global $l_all, $l_all_f, $l_find, $c_all;
 
@@ -253,7 +253,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
     <div class=\"searchLabel\">$l_kind<br />
       $sel_kind
     </div>
-    <div class=\"searchLabel\">$l_category<br />
+    <div class=\"searchLabel\">$l_cat<br />
       $sel_cat
     </div>
     <div class=\"searchLabel\">$l_state<br />
@@ -374,9 +374,7 @@ function dis_deal_search_list($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Labels
-  global $l_archive_first,$l_label,$l_company,$l_kind,$l_category,$l_state;
-  global $l_date_alarm, $l_archive_update, $l_found;
-  global $display;
+  global $display, $l_found;
 
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
@@ -638,7 +636,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $set_theme,$ico_company, $ico_contact, $display;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
-  global $l_company, $l_contact, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
+  global $l_company, $l_contact, $l_label,$l_date_init,$l_kind,$l_cat,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal;
   global $l_invoice, $l_no_invoice, $l_see_archived_invoices, $incl_arch;
@@ -713,7 +711,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         <td class=\"detailLabel\">$l_kind</td>
         <td class=\"detailText\">$kind</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_category</td>
+        <td class=\"detailLabel\">$l_cat</td>
         <td class=\"detailText\">$cat</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_marketing_manager</td>
@@ -848,7 +846,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usrc_q,$usrp_q,$comp_q,$
   global $set_theme,$ico_company,$ico_contact,$l_company;
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
-  global $l_category,$l_marketing_manager,$l_technical_manager,$l_private;
+  global $l_cat,$l_marketing_manager,$l_technical_manager,$l_private;
   global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state;
   global $l_last_update,$l_archive,$l_comment,$l_add_comment,$l_upd_comment;
   global $l_at,$l_todo;
@@ -1154,7 +1152,7 @@ function auto_set_hitrate(select, targetField, pos) {
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_category</td>
+      <td class=\"detailLabel\">$l_cat</td>
       <td class=\"detailForm\">$sel_cat</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>

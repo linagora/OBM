@@ -42,6 +42,7 @@ $l_datasource = "Data source";
 $l_after = "After";
 $l_before = "Before";
 $l_fuzzy = "Advanced";
+$l_cat = "Category";
 
 // Global display
 $l_last_visit = "Bookmarks";

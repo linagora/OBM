@@ -1094,16 +1094,17 @@ CREATE TABLE GroupGroup (
 -- Table structure for table 'Import'
 --
 CREATE TABLE Import (
-  import_id             int(8) DEFAULT '0' NOT NULL auto_increment,
-  import_timeupdate     timestamp(14),
-  import_timecreate     timestamp(14),
-  import_userupdate     int(8),
-  import_usercreate     int(8),
-  import_name           varchar(64) NOT NULL,
-  import_datasource_id  int(8),
-  import_separator      varchar(3),
-  import_enclosed       char(1),
-  import_desc           text,
+  import_id                   int(8) DEFAULT '0' NOT NULL auto_increment,
+  import_timeupdate           timestamp(14),
+  import_timecreate           timestamp(14),
+  import_userupdate           int(8),
+  import_usercreate           int(8),
+  import_name                 varchar(64) NOT NULL,
+  import_datasource_id        int(8),
+  import_marketingmanager_id  int(8),
+  import_separator            varchar(3),
+  import_enclosed             char(1),
+  import_desc                 text,
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
 );

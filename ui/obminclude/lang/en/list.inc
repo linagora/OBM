@@ -33,9 +33,9 @@ $l_timecreate = "Time create";
 $l_market = "Responsible";
 $l_contact_cat1 = "Category 1";
 $l_contact_cat2 = "Category 2";
-$l_category = "Category";
 $l_expert_mode = "Expert Mode";
 $l_normal_mode = "Normal Mode";
+
 // Contact
 $l_lastname = "Lastname";
 $l_firstname = "Fisrtname";

@@ -519,7 +519,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeupdate,$l_timecreate,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
-  global $l_contact_cat2,$l_function,$l_category;
+  global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete;
 
@@ -586,7 +586,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["company_timeupdate"] = "$l_company: $l_timeupdate"; 
   $fields_label["company_timecreate"] = "$l_company: $l_timecreate"; 
   $fields_label["company_marketingmanager_id"] = "$l_company: $l_market";
-  $fields_label["companycategory_code"] = "$l_company: $l_category";   
+  $fields_label["companycategory_code"] = "$l_company: $l_cat";   
   $fields_label["company_datasource_id"] = "$l_company: $l_datasource";
   $fields_label["contact_lastname"] = "$l_contact: $l_lastname";    
   $fields_label["contact_firstname"] = "$l_contact: $l_firstname";      
@@ -753,7 +753,7 @@ function dis_add_criterion_form($list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   global $l_company,$l_country,$l_postcode,$l_town,$l_timecreate,$l_timeupdate;
-  global $l_all,$l_market,$l_datasource,$l_category;
+  global $l_all,$l_market,$l_datasource,$l_cat;
   global $set_theme,$ico_mini_cal,$ico_add,$popup_height,$popup_width;
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
@@ -814,7 +814,7 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
   </tr>
   <tr>   
     <td class=\"detailLabel\">$l_town</td>
-    <td class=\"detailLabel\">$l_category</td>    
+    <td class=\"detailLabel\">$l_cat</td>    
     <td class=\"detailLabel\">$l_datasource</td>
   </tr>
   <tr>    

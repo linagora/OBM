@@ -28,13 +28,19 @@ $l_field = "Champ";
 $l_default = "Valeur par défaut";
 $l_result = "Résultat";
 $l_info = "Information";
+$l_sample_file = "Vérifier avec fichier exemple";
+$l_conflict = "Conflit";
 
 // Actions
 $l_insert = "Enregistrer l'import";
 $l_update = "Modifier l'import";
 $l_delete = "Supprimer l'import";
-$l_sample_file = "Vérifier avec fichier exemple";
+$l_check_file = "Vérifier ce fichier";
 $l_test_file = "Tester ce fichier";
+$l_import_file = "Importer ce fichier";
+$l_comp_nothing = "Ne pas modifier";
+$l_comp_insert = "Insérer la société";
+$l_comp_update = "Modifier la société existante";
 
 // Messages
 $l_insert_ok = "L'insertion de l'import a été correctement effectuée.";
@@ -47,12 +53,21 @@ $l_name_import_nomatch = "Le nom de l'import n'est pas valide";
 $l_import_exists = "Cet import existe déjà !";
 $l_check_sameimport = "Ces imports sembles similaires au nouveau !";
 $l_warn_delete = "Effacer cet import ?";
+$l_file_error = "Le fichier est introuvable (ou non saisi) !";
+$l_import_end = "Import terminé";
+$l_lines_processed = "lignes traitées";
+$l_conflict_detected = "Conflit détecté";
+$l_invalid_row = "Ligne invalide !";
+$l_invalid_rows = "Lignes invalides";
+$l_conflict_rows = "Lignes en conflit";
 
 $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > pour obtenir les imports correspondants.";
 $l_found = "imports trouvés.";
 $l_no_found = "Aucun import ne correspond à ces critères !";
 
 $l_fill_name = "Le nom d'Import doit être saisi !";
+$l_similar_company = "Société similaire";
+$l_similar_contact = "Contact similaire";
 
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";

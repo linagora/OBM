@@ -16,7 +16,6 @@ $l_priority = "Prioridad";
 $l_private = "Privado";
 $l_private_description = "Este evento es privado y no puede ver mas información";
 $l_public  = "Público";
-$l_category = "Categoría";
 $l_description = "Descripción";
 $l_state = "Estado";
 $l_high = "Alta";

@@ -18,7 +18,6 @@ $l_label = "Label";
 $l_date_init = "Init Date";
 $l_parentdeal="Parent Deal";
 $l_kind = "Kind";
-$l_category = "Category";
 $l_company = "Company";
 $l_contact = "Contact";
 $l_marketing_manager = "Marketing manager";

@@ -174,6 +174,42 @@ function get_user_id($login) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// CompanyCategory query execution
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_companycategory() {
+  global $cdg_sql;
+
+  $query = "select * from CompanyCategory order by companycategory_code"; 
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;  
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Company contact number increment                        //
+// Parameters:
+//   - $comp_id : company id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_company_contact_inc($comp_id) {
+  global $cdg_sql;
+
+  $query = "update Company
+              set company_contact_number=company_contact_number+1
+              where company_id='$comp_id'";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $retour = $obm_q->query($query);
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Data Source query execution                                               //
 // Return:
 //   Database Object

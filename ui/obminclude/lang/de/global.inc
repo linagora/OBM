@@ -39,6 +39,7 @@ $l_postcode = "Postleitzahl";
 $l_town = "Ort";
 $l_priority = "Priority";
 $l_datasource = "Data source";
+$l_cat = "Kategorie";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

@@ -38,6 +38,7 @@ $l_postcode = "CAP";
 $l_town = "Citta";
 $l_priority = "Priorita";
 $l_datasource = "Data sorgente";
+$l_cat = "Categoria";
 
 // OBM_DISPLAY
 $l_entries = "Resultati";

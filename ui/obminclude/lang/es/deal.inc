@@ -17,7 +17,6 @@ $l_label = "Referencia";
 $l_date_init = "Fecha de inicio";
 $l_parentdeal="Negocio original (Padre)";
 $l_kind = "Tipo";
-$l_category = "Categoría";
 $l_company = "Compañía";
 $l_contact = "Contacto";
 $l_marketing_manager = "Gerente de Mercadeo";

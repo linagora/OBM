@@ -36,7 +36,6 @@ $l_update = "Modifier";
 $l_fill= "compléter";
 $l_intern = "Interne";
 
-$l_cat = "Catégorie";
 $l_task = "Tache";
 $l_label = "Label";
 $l_duration = "Durée";

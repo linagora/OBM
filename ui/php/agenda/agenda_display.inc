@@ -1506,7 +1506,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
   global $ico_add_user, $ico_add_group;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$popup_height,$popup_width;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$path;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
@@ -1793,7 +1793,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\">$dis_privacy</td>
     </tr> 
     <tr>
-     <td class=\"detailLabel\">$l_category</td>
+     <td class=\"detailLabel\">$l_cat</td>
      <td class=\"detailForm\">$sel_cat</td>
     </tr>    
     <tr>
@@ -1893,7 +1893,7 @@ function dis_waiting_events($obm_wait) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
-  global $l_users, $l_title, $l_priority, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -1912,7 +1912,7 @@ function html_waiting_events($obm_wait) {
       <table class=\"detail\">
        <tr>
         <td class=\"detailText\">$l_title</td>
-        <td class=\"detailText\">$l_category</td>
+        <td class=\"detailText\">$l_cat</td>
         <td class=\"detailText\">$l_priority</td>
         <td class=\"detailText\">$l_repeatkind</td>
 	<td class=\"detailText\">$l_repeatdays2</td>
@@ -1993,7 +1993,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   global $display;
   global $set_theme,$set_weekstart_default;
   // -- Labels
-  global $l_users, $l_title, $l_priority, $l_private, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
+  global $l_users, $l_title, $l_priority, $l_private, $l_cat, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
   global $l_dateend,$l_timebegin,$l_timeend,$l_insert,$l_update,$l_repeat,$auth,$l_change_state,$l_groups;
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait,$l_none;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
@@ -2075,7 +2075,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
      <td class=\"detailText\">$privacy</td>
     </tr> 
     <tr>
-     <td class=\"detailLabel\">$l_category</td>
+     <td class=\"detailLabel\">$l_cat</td>
      <td class=\"detailText\">$category</td>
     </tr>    
     <tr>
@@ -2816,6 +2816,7 @@ return $block;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_category_delete_form($agenda) {
   global $l_category_delete;
+
   $id = $agenda["category_id"];
   $r = "<form name=\"form_category_delete\"
           method=post action=\"" . url_prepare("agenda_index.php") . "\">

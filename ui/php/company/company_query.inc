@@ -28,6 +28,7 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $kind = $company["kind"];
   $act = $company["activity"];
   $market = $company["marketing_manager"];
+  $dsrc = $company["datasource"];
   $zip = $company["zip"];
   $dateafter = $company["dateafter"];
   $datebefore = $company["datebefore"];
@@ -87,6 +88,10 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   }
   if (($market != $c_all) && ($market != "")) { 
     $where .= " $and company_marketingmanager_id='$market'";
+    $and = "and";
+  }
+  if (($dsrc != $c_all) && ($dsrc != "")) { 
+    $where .= " $and company_datasource_id='$dsrc'";
     $and = "and";
   }
   if ($phone != "") {
@@ -209,6 +214,8 @@ function run_query_detail($p_id) {
 function run_query_insert($company) {
   global $auth, $cdg_sql;
 
+  $uid = $auth->auth["uid"];
+
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');
   $name = $company["name"];
@@ -265,7 +272,7 @@ function run_query_insert($company) {
   values (null,
     '" . date("Y-m-d H:i:s") . "',
     null,
-    " . $auth->auth["uid"] . ",
+    '$uid',
     '$dsrc',
     '$num',
     '$archive',
@@ -274,7 +281,7 @@ function run_query_insert($company) {
     '$sound',
     '$kind',
     '$act',
-    $market,
+    '$market',
     '$ad1',
     '$ad2',
     '$ad3',
@@ -341,7 +348,7 @@ function run_query_insert($company) {
 //                : ctry, phone, fax, web, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($cid, $company) {
-  global $auth, $cdg_sq, $cgp_hide;
+  global $auth, $cdg_sql, $cgp_hide;
 
   $num = $company["num"];
   $archive = (isset($company["archive"]) ? $company["archive"] : '0');

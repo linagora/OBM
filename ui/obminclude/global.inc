@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-$obm_version = "0.8.1pre2";
+$obm_version = "0.8.1pre3";
 $l_obm_title = "O.B.M.";
 
 // Document constants 
@@ -17,11 +17,14 @@ $link_to = "Link : "; // Deprecated but necessary for update from older version
 $default_mime = "application/octet-stream"; // Default Mime Type
 $default_path = "/Default"; // Default repository
 
+// Import constants
+$tmp_path = "/tmp";
+
 // Agenda constants
 $set_weekstart_default = "monday + 2 hours"; // First day of the week, 
-                                             //english The +2 hours is a quick fix
-					     //for a bug php 
-					     //(see dst bug in bugzilla.aliacom.fr)
+//english The +2 hours is a quick fix
+//for a bug php (see dst bug in bugzilla.aliacom.fr)
+
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
@@ -61,8 +64,8 @@ $popup_contact_height = 600;
 
 // OBM System groups (groups id)
 $cg_adm = 1;
-$cg_com = 3;
-$cg_prod = 3;
+$cg_com = 1;
+$cg_prod = 2;
 
 
 //-------------------------//

@@ -17,6 +17,8 @@
 // - delete          -- $param_list    -- delete the list
 // - file_sample     -- 
 // - file_test       -- 
+// - file_import     -- 
+// - file_conflict   -- 
 // - contact_del     -- 
 // - display         --                -- display and set display parameters
 // - dispref_display --                -- update one field display value
@@ -82,7 +84,6 @@ $perm->check_permissions($menu, $action);
 
 require("import_js.inc");
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -93,8 +94,7 @@ if (! $popup) {
 
 if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $dsrc_q = run_query_datasource();
-  $display["search"] = html_import_search_form($import, $dsrc_q);
+  $display["search"] = dis_import_search_form($import);
   if ($set_display == "yes") {
     $display["result"] = dis_import_search_list("", $popup);
   } else {
@@ -103,14 +103,14 @@ if (($action == "index") || ($action == "")) {
 
 } else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $dsrc_q = run_query_datasource();
-  $display["search"] = html_import_search_form($import, $dsrc_q);
+  $display["search"] = dis_import_search_form($import);
   $display["result"] = dis_import_search_list($import, $popup);
 
 } else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $dsrc_q = run_query_datasource();
-  $display["detail"] = html_import_form($action, $import, "", $dsrc_q);
+  $usr_q = run_query_all_users_from_group($cg_com);
+  $display["detail"] = html_import_form($action, $import, "", $dsrc_q, $usr_q);
 
 } else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -121,7 +121,8 @@ if (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
   $obm_q = run_query_detail($import["id"]);
   $dsrc_q = run_query_datasource();
-  $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q);
+  $usr_q = run_query_all_users_from_group($cg_com);
+  $display["detail"] = html_import_form($action, $import, $obm_q, $dsrc_q, $usr_q);
 
 } else if ($action == "insert") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -135,8 +136,7 @@ if (($action == "index") || ($action == "")) {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $dsrc_q = run_query_datasource();
-      $display["search"] = html_import_search_form($import, $dsrc_q);
+      $display["search"] = dis_import_search_form($import_q);
 
     // If it is the first try, we warn the user if some imports seem similar
     } else {
@@ -150,8 +150,7 @@ if (($action == "index") || ($action == "")) {
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-	$dsrc_q = run_query_datasource();
-        $display["search"] = html_import_search_form($import, $dsrc_q);
+        $display["search"] = dis_import_search_form($import);
       }
     }
 
@@ -159,7 +158,8 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_warn_msg($err_msg);
     $dsrc_q = run_query_datasource();
-    $display["detail"] = html_import_form($action, $import, "", $dsrc_q);
+    $usr_q = run_query_all_users_from_group($cg_com);
+    $display["detail"] = html_import_form($action, $import, "", $dsrc_q, $usr_q);
   }
 
 } elseif ($action == "update")  {
@@ -177,7 +177,8 @@ if (($action == "index") || ($action == "")) {
     $display["msg"] .= display_warn_msg($err_msg);
     $import_q = run_query_detail($import["id"]);
     $dsrc_q = run_query_datasource();
-    $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q);
+    $usr_q = run_query_all_users_from_group($cg_com);
+    $display["detail"] = html_import_form($action, $import, $import_q, $dsrc_q, $usr_q);
   }
 
 } elseif ($action == "check_delete")  {
@@ -192,20 +193,26 @@ if (($action == "index") || ($action == "")) {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $dsrc_q = run_query_datasource();
-  $display["search"] = html_import_search_form($import, $dsrc_q);
+  $display["search"] = dis_import_search_form($import);
 
 } elseif ($action == "file_sample")  {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_detail($import["id"]);
-  $display["detail"] = html_import_consult($import_q);
+  $display["detail"] = html_import_consult_file($import_q);
   $display["detail"] .= html_import_file_sample($import_q, $import, 5);
 
 } elseif ($action == "file_test")  {
 ///////////////////////////////////////////////////////////////////////////////
   $import_q = run_query_detail($import["id"]);
-  $display["detail"] = html_import_consult($import_q);
-  $display["detail"] .= html_import_file_test($import_q, $import);
+  $display["detail"] = html_import_consult_file($import_q);
+  $display["detail"] .= html_import_file_import($import_q, $import);
+
+} elseif ($action == "file_import")  {
+///////////////////////////////////////////////////////////////////////////////
+  $import_q = run_query_detail($import["id"]);
+  $display["detail"] = html_import_consult_file($import_q);
+  $display["detail"] .= html_import_file_import($import_q, $import);
+
 }
 
 
@@ -229,6 +236,8 @@ function get_import_desc($import) {
   $desc .= '\$comp_name_d="'.$import["comp_name_d"] . '";';
   $desc .= '\$comp_num="'.$import["comp_num"] . '";';
   $desc .= '\$comp_num_d="'.$import["comp_num_d"] . '";';
+  $desc .= '\$comp_cat="'.$import["comp_cat"] . '";';
+  $desc .= '\$comp_cat_d="'.$import["comp_cat_d"] . '";';
   $desc .= '\$comp_ad1="'.$import["comp_ad1"] . '";';
   $desc .= '\$comp_ad1_d="'.$import["comp_ad1_d"] . '";';
   $desc .= '\$comp_ad2="'.$import["comp_ad2"] . '";';
@@ -239,6 +248,8 @@ function get_import_desc($import) {
   $desc .= '\$comp_zip_d="'.$import["comp_zip_d"] . '";';
   $desc .= '\$comp_town="'.$import["comp_town"] . '";';
   $desc .= '\$comp_town_d="'.$import["comp_town_d"] . '";';
+  $desc .= '\$comp_ctry="'.$import["comp_ctry"] . '";';
+  $desc .= '\$comp_ctry_d="'.$import["comp_ctry_d"] . '";';
   $desc .= '\$comp_pho="'.$import["comp_pho"] . '";';
   $desc .= '\$comp_pho_d="'.$import["comp_pho_d"] . '";';
   $desc .= '\$comp_fax="'.$import["comp_fax"] . '";';
@@ -265,6 +276,8 @@ function get_import_desc($import) {
   $desc .= '\$con_zip_d="'.$import["con_zip_d"] . '";';
   $desc .= '\$con_town="'.$import["con_town"] . '";';
   $desc .= '\$con_town_d="'.$import["con_town_d"] . '";';
+  $desc .= '\$con_ctry="'.$import["con_ctry"] . '";';
+  $desc .= '\$con_ctry_d="'.$import["con_ctry_d"] . '";';
   $desc .= '\$con_pho="'.$import["con_pho"] . '";';
   $desc .= '\$con_pho_d="'.$import["con_pho_d"] . '";';
   $desc .= '\$con_hpho="'.$import["con_hpho"] . '";';
@@ -284,6 +297,9 @@ function get_import_desc($import) {
   $desc .= '\$comp["comp_num"]["value"] ="'.$import["comp_num"] . '";';
   $desc .= '\$comp["comp_num"]["label"] ="l_number";';
   $desc .= '\$comp["comp_num"]["default"]="'.$import["comp_num_d"] . '";';
+  $desc .= '\$comp["comp_cat"]["value"] ="'.$import["comp_cat"] . '";';
+  $desc .= '\$comp["comp_cat"]["label"] ="l_cat";';
+  $desc .= '\$comp["comp_cat"]["default"]="'.$import["comp_cat_d"] . '";';
   $desc .= '\$comp["comp_ad1"]["value"] ="'.$import["comp_ad1"] . '";';
   $desc .= '\$comp["comp_ad1"]["label"] ="l_address";';
   $desc .= '\$comp["comp_ad1"]["default"]="'.$import["comp_ad1_d"] . '";';
@@ -299,6 +315,9 @@ function get_import_desc($import) {
   $desc .= '\$comp["comp_town"]["value"] ="'.$import["comp_town"] . '";';
   $desc .= '\$comp["comp_town"]["label"] ="l_town";';
   $desc .= '\$comp["comp_town"]["default"]="'.$import["comp_town_d"] . '";';
+  $desc .= '\$comp["comp_ctry"]["value"] ="'.$import["comp_ctry"] . '";';
+  $desc .= '\$comp["comp_ctry"]["label"] ="l_country";';
+  $desc .= '\$comp["comp_ctry"]["default"]="'.$import["comp_ctry_d"] . '";';
   $desc .= '\$comp["comp_pho"]["value"] ="'.$import["comp_pho"] . '";';
   $desc .= '\$comp["comp_pho"]["label"] ="l_phone";';
   $desc .= '\$comp["comp_pho"]["default"]="'.$import["comp_pho_d"] . '";';
@@ -339,6 +358,9 @@ function get_import_desc($import) {
   $desc .= '\$con["con_town"]["value"] ="'.$import["con_town"] . '";';
   $desc .= '\$con["con_town"]["label"] ="l_town";';
   $desc .= '\$con["con_town"]["default"]="'.$import["con_town_d"] . '";';
+  $desc .= '\$con["con_ctry"]["value"] ="'.$import["con_ctry"] . '";';
+  $desc .= '\$con["con_ctry"]["label"] ="l_country";';
+  $desc .= '\$con["con_ctry"]["default"]="'.$import["con_ctry_d"] . '";';
   $desc .= '\$con["con_pho"]["value"] ="'.$import["con_pho"] . '";';
   $desc .= '\$con["con_pho"]["label"] ="l_phone";';
   $desc .= '\$con["con_pho"]["default"]="'.$import["con_pho_d"] . '";';
@@ -367,42 +389,49 @@ function get_import_desc($import) {
 // returns : $list hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_import() {
-  global $tf_name, $sel_dsrc, $rd_sep, $tf_enclosed;
+  global $tf_name, $sel_dsrc, $sel_market, $rd_sep, $tf_enclosed,$cb_auto_mode;
   global $param_import, $cdg_param;
-  global $action, $new_order, $order_dir;
+  global $tmp_path, $action, $new_order, $order_dir;
   global $tf_comp_name, $tf_comp_name_d, $tf_comp_num, $tf_comp_num_d;
+  global $tf_comp_cat, $tf_comp_cat_d;
   global $tf_comp_ad1, $tf_comp_ad1_d, $tf_comp_ad2, $tf_comp_ad2_d;
   global $tf_comp_ad3, $tf_comp_ad3_d, $tf_comp_zip, $tf_comp_zip_d;
-  global $tf_comp_town, $tf_comp_town_d, $tf_comp_pho, $tf_comp_pho_d;
-  global $tf_comp_fax, $tf_comp_fax_d, $tf_comp_web, $tf_comp_web_d;
-  global $tf_comp_mail, $tf_comp_mail_d, $tf_comp_com, $tf_comp_com_d;
+  global $tf_comp_town, $tf_comp_town_d, $tf_comp_ctry, $tf_comp_ctry_d;
+  global $tf_comp_pho, $tf_comp_pho_d, $tf_comp_fax, $tf_comp_fax_d;
+  global $tf_comp_web, $tf_comp_web_d, $tf_comp_mail, $tf_comp_mail_d;
+  global $tf_comp_com, $tf_comp_com_d;
   global $tf_con_ln, $tf_con_ln_d, $tf_con_fn, $tf_con_fn_d;
   global $tf_con_tit, $tf_con_tit_d;
   global $tf_con_ad1, $tf_con_ad1_d, $tf_con_ad2, $tf_con_ad2_d;
   global $tf_con_ad3, $tf_con_ad3_d, $tf_con_zip, $tf_con_zip_d;
-  global $tf_con_town, $tf_con_town_d, $tf_con_pho, $tf_con_pho_d;
-  global $tf_con_hpho, $tf_con_hpho_d, $tf_con_mpho, $tf_con_mpho_d;
-  global $tf_con_fax, $tf_con_fax_d, $tf_con_mail, $tf_con_mail_d;
-  global $tf_con_com, $tf_con_com_d;
+  global $tf_con_town, $tf_con_town_d, $tf_con_ctry, $tf_con_ctry_d;
+  global $tf_con_pho, $tf_con_pho_d, $tf_con_hpho, $tf_con_hpho_d;
+  global $tf_con_mpho, $tf_con_mpho_d, $tf_con_fax, $tf_con_fax_d;
+  global $tf_con_mail, $tf_con_mail_d, $tf_con_com, $tf_con_com_d;
   global $sample_file, $sample_file_name, $sample_file_size;
   global $test_file, $test_file_name, $test_file_size;
-  global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
+  global $import_file, $import_file_name, $import_file_size, $file_saved;
+  global $row_start, $rd_conflict, $company_id;
 
   // Import fields
   if (isset ($param_import)) $import["id"] = $param_import;
   if (isset ($tf_name)) $import["name"] = trim($tf_name);
   if (isset ($sel_dsrc)) $import["datasource"] = $sel_dsrc;
+  if (isset ($sel_market)) $import["market"] = $sel_market;
   if (isset ($rd_sep)) $import["sep"] = $rd_sep;
   if (isset ($tf_enclosed)) $import["enclosed"] = $tf_enclosed;
 
-  if (isset ($new_order)) $list["new_order"] = $new_order;
-  if (isset ($order_dir)) $list["order_dir"] = $order_dir;
+  if (isset ($row_start)) $import["row_start"] = $row_start;
+  if (isset ($rd_conflict)) $import["conflict_action"] = $rd_conflict;
+  if (isset ($company_id)) $import["company_id"] = $company_id;
 
   // Mapping : company
   if (isset ($tf_comp_name)) $import["comp_name"] = trim($tf_comp_name);
   if (isset ($tf_comp_name_d)) $import["comp_name_d"] = trim($tf_comp_name_d);
   if (isset ($tf_comp_num)) $import["comp_num"] = trim($tf_comp_num);
   if (isset ($tf_comp_num_d)) $import["comp_num_d"] = trim($tf_comp_num_d);
+  if (isset ($tf_comp_cat)) $import["comp_cat"] = trim($tf_comp_cat);
+  if (isset ($tf_comp_cat_d)) $import["comp_cat_d"] = trim($tf_comp_cat_d);
   if (isset ($tf_comp_ad1)) $import["comp_ad1"] = trim($tf_comp_ad1);
   if (isset ($tf_comp_ad1_d)) $import["comp_ad1_d"] = trim($tf_comp_ad1_d);
   if (isset ($tf_comp_ad2)) $import["comp_ad2"] = trim($tf_comp_ad2);
@@ -413,6 +442,8 @@ function get_param_import() {
   if (isset ($tf_comp_zip_d)) $import["comp_zip_d"] = trim($tf_comp_zip_d);
   if (isset ($tf_comp_town)) $import["comp_town"] = trim($tf_comp_town);
   if (isset ($tf_comp_town_d)) $import["comp_town_d"] = trim($tf_comp_town_d);
+  if (isset ($tf_comp_ctry)) $import["comp_ctry"] = trim($tf_comp_ctry);
+  if (isset ($tf_comp_ctry_d)) $import["comp_ctry_d"] = trim($tf_comp_ctry_d);
   if (isset ($tf_comp_pho)) $import["comp_pho"] = trim($tf_comp_pho);
   if (isset ($tf_comp_pho_d)) $import["comp_pho_d"] = trim($tf_comp_pho_d);
   if (isset ($tf_comp_fax)) $import["comp_fax"] = trim($tf_comp_fax);
@@ -426,8 +457,8 @@ function get_param_import() {
   // Mapping : contact
   if (isset ($tf_con_ln)) $import["con_ln"] = trim($tf_con_ln);
   if (isset ($tf_con_ln_d)) $import["con_ln_d"] = trim($tf_con_ln_d);
-  if (isset ($tf_con_fn)) $import["con_fname"] = trim($tf_con_fn);
-  if (isset ($tf_con_fn_d)) $import["con_fname_d"] = trim($tf_con_fn_d);
+  if (isset ($tf_con_fn)) $import["con_fn"] = trim($tf_con_fn);
+  if (isset ($tf_con_fn_d)) $import["con_fn_d"] = trim($tf_con_fn_d);
   if (isset ($tf_con_tit)) $import["con_tit"] = trim($tf_con_tit);
   if (isset ($tf_con_tit_d)) $import["con_tit_d"] = trim($tf_con_tit_d);
   if (isset ($tf_con_ad1)) $import["con_ad1"] = trim($tf_con_ad1);
@@ -440,6 +471,8 @@ function get_param_import() {
   if (isset ($tf_con_zip_d)) $import["con_zip_d"] = trim($tf_con_zip_d);
   if (isset ($tf_con_town)) $import["con_town"] = trim($tf_con_town);
   if (isset ($tf_con_town_d)) $import["con_town_d"] = trim($tf_con_town_d);
+  if (isset ($tf_con_ctry)) $import["con_ctry"] = trim($tf_con_ctry);
+  if (isset ($tf_con_ctry_d)) $import["con_ctry_d"] = trim($tf_con_ctry_d);
   if (isset ($tf_con_pho)) $import["con_pho"] = trim($tf_con_pho);
   if (isset ($tf_con_pho_d)) $import["con_pho_d"] = trim($tf_con_pho_d);
   if (isset ($tf_con_hpho)) $import["con_hpho"] = trim($tf_con_hpho);
@@ -461,33 +494,28 @@ function get_param_import() {
   if (isset ($test_file)) $import["file"] = $test_file;
   if (isset ($test_file_name)) $import["file_name"] = $test_file_name;
   if (isset ($test_file_size)) $import["file_size"] = $test_file_size;
-  
 
+  if (isset ($import_file)) $import["file"] = $import_file;
+  if (isset ($import_file_name)) $import["file_name"] = $import_file_name;
+  if (isset ($import_file_size)) $import["file_size"] = $import_file_size;
+  if (isset ($file_saved)) $import["file_saved"] = $file_saved;
 
-  if ((is_array ($HTTP_POST_VARS)) && (count($HTTP_POST_VARS) > 0)) {
-    $http_obm_vars = $HTTP_POST_VARS;
-  } elseif ((is_array ($HTTP_GET_VARS)) && (count($HTTP_GET_VARS) > 0)) {
-    $http_obm_vars = $HTTP_GET_VARS;
+  if (($action == "file_import")  && ($import["file"] != "")
+      && ($import["file_saved"] == "")) {
+    $file_saved = $tmp_path . '/' . $import["file_name"];
+    copy ($import["file"], $file_saved);
+    $import["file_saved"] = $file_saved;
   }
 
-  if (isset ($http_obm_vars)) {
-    $nb_con = 0;
-    $nb_list = 0;
-    while ( list( $key ) = each( $http_obm_vars ) ) {
-      if (strcmp(substr($key, 0, 6),"cb_con") == 0) {
-	$nb_con++;
-        $con_num = substr($key, 6);
-        $list["con$nb_con"] = $con_num;
-      } elseif (strcmp(substr($key, 0, 7),"cb_list") == 0) {
-	$nb_list++;
-        $list_num = substr($key, 7);
-        $list["list_$nb_list"] = $list_num;
-	// register the list in the list session array
-	$ses_list[$list_num] = $list_num;
-      }
+  // Run mode
+  if ($action == "file_test") {
+    $import["run_mode"] = "test";
+  } else if ($action == "file_import") {
+    if (isset ($cb_auto_mode)) {
+      $import["run_mode"] = "auto";
+    } else {
+      $import["run_mode"] = "run";
     }
-    $list["con_nb"] = $nb_con;
-    $list["list_nb"] = $nb_list;
   }
 
   if (debug_level_isset($cdg_param)) {
@@ -541,7 +569,7 @@ function get_import_action() {
      'Name'     => $l_header_consult,
      'Url'      => "$path/import/import_index.php?action=detailconsult&amp;param_import=".$import["id"]."",
     'Right'    => $cright_read_admin,
-    'Condition'=> array ('detailupdate') 
+    'Condition'=> array ('detailupdate', 'file_sample', 'file_test', 'file_import') 
                                       );
 
 // Detail Update
@@ -595,29 +623,16 @@ function get_import_action() {
     'Condition'=> array ('detailconsult') 
                                       );
 
-
-
-
-// Contact ADD
-  $actions["LIST"]["contact_add"] = array (
-    'Url'      => "$path/list/list_index.php?action=contact_add",
+// Import File
+  $actions["IMPORT"]["file_import"] = array (
+    'Url'      => "$path/import/import_index.php?action=file_import&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                          );
-// Contact Del
-  $actions["LIST"]["contact_del"] = array (
-    'Url'      => "$path/list/list_index.php?action=contact_del",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('None') 
-                                          );
+    'Condition'=> array ('detailconsult') 
+                                      );
 
-// Export ADD
-  $actions["LIST"]["export_add"] = array (
-    'Name'     => $l_header_export,
-    'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
-    'Right'    => $cright_write_admin,
-    'Condition'=> array ('detailconsult','contact_add','contact_del') 
-                                     	 );
+
+
+
 
 // Display
   $actions["LIST"]["display"] = array (

@@ -14,7 +14,6 @@ $l_title = "Title";
 $l_private = "Private";
 $l_private_description = "This is a private event, you cannot see the details";
 $l_public  = "Public";
-$l_category = "Category";
 $l_description = "Description";
 $l_state = "Status";
 $l_back_mono = "Back to your own view";

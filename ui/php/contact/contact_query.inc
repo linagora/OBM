@@ -781,25 +781,6 @@ function run_query_delete_contact_subscription($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query Execution - Company contact number increment                        //
-// Parameters:
-//   - $comp_id : company id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_company_contact_inc($comp_id) {
-  global $cdg_sql;
-
-  $query = "update Company
-              set company_contact_number=company_contact_number+1
-              where company_id='$comp_id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $retour = $obm_q->query($query);
-  return $retour;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Company contact number decrement                        //
 // Parameters:
 //   - $comp_id : company id
