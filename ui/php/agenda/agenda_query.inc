@@ -72,7 +72,6 @@ function run_query_event_customers($param_event) {
   return $obm_db;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Return events users
 // Parameters: 
@@ -112,29 +111,6 @@ function run_query_event_customers_array($param_event) {
     $p_arrayuserobm_id[] = $obm_db->f("userobm_id");
   }
   return $p_arrayuserobm_id;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Return events groups array
-// Parameters: 
-//   - $param_event
-///////////////////////////////////////////////////////////////////////////////
-function run_query_event_groups_array($param_event,$getdate) {
-  $obm_db = new DB_OBM;
-  $getdate = format_to_iso($db_type,$getdate);
-  $query = "SELECT DISTINCT group_id
-            FROM UGroup, CalendarSegment
-            WHERE  calendarsegment_eventid = '$param_event'
-            AND calendarsegment_date LIKE '$getdate%'
-	    AND calendarsegment_customerid = group_id
-	    AND calendarsegment_type = 'group'";
-  display_debug_msg($query, $cdg_sql);
-  $obm_db->query($query);
-  while($obm_db->next_record()) {
-    $p_arraygroup_id[] = $obm_db->f("group_id");
-  }
-  return $p_arraygroup_id;
 }
 
 

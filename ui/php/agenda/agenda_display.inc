@@ -152,7 +152,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $sel_group .= "selected=\"selected\"";
   }
   $sel_group .= ">$l_all</option>
-    <option disabled=\"disabled\">$l_private</option>\n";
+  <optgroup label=\"$l_private\">";
   $first_public = true;
   while ($group_q->next_record()) {
     $g_id = $group_q->f("group_id");
@@ -160,17 +160,19 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user, $group_q
     $g_name = $group_q->f("group_name");
 
     if ($first_public && $g_priv != "1") {
-      $sel_group .= "<option disabled=\"disabled\">$l_public</option>\n";
+      $sel_group .= "</optgroup>
+      <optgroup label=\"$l_public\">\n";
       $first_public = false;
     }
     if ($g_id == $this_group) {
-      $selected_s = "selected=\"selected";
+      $selected_s = "selected=\"selected\"";
     } else {
       $selected_s = "";
     }
-    $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$g_id")."\" $selected_s\">&nbsp;&nbsp;$g_name</option>\n";
+    $sel_group .= "<option value=\"".url_prepare("agenda_index.php?action=$new_action&amp;param_date=".$getdate."&amp;param_group=$g_id")."\" $selected_s>$g_name</option>\n";
   }
-
+  $sel_group .= "</optgroup>
+  </select>";
   // Minicalendar Head
   for ($i=0; $i<7; $i++) {
     $day_num = date("w", $start_week_day);

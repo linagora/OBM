@@ -16,8 +16,8 @@ $set_weekstart_default = "monday + 2 hours"; // First day of the week,
 //english The +2 hours is a quick fix
 //for a bug php (see dst bug in bugzilla.aliacom.fr)
 
-$set_start_time = '8'; // first hour of the day
-$set_stop_time = '20'; // last hour of the day
+$set_start_time = '6'; // first hour of the day
+$set_stop_time = '22'; // last hour of the day
 
 // Id of the Publication reception type dedicated to the auto subscription.
 $c_focsys = 3;
