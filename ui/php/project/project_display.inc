@@ -602,7 +602,6 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   $pid = $project["id"];
   $cpt_t = 0;
   $cpt_m = 0;
-  $nb_tsk = $tasks_q->nf();
 
   // retrieve project related infos
   $name = $project_q->f("project_label");
@@ -646,9 +645,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
   $has_tasks = ($tasks_q != 0) && ($tasks_q->num_rows() != 0);
   $has_members = ($members_q != 0) && ($members_q->num_rows() != 0);
 
+  $nb_tsk = ($has_tasks) ? $tasks_q->nf() : 0;
+
   // we don't have informations about time allocation
   //  if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
-    if (!($has_tasks) or !($has_members)) {
+  if (!($has_tasks) or !($has_members)) {
 
     $action = "consultnoadv";
     $tab_style = "class=\"detail\"";
@@ -1433,7 +1434,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
 //   - $display_newpref_q    : DBO : Field list to display
 //   - $display_searchpref_q : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////
-function dis_project_display_pref($display_newpref_q, $display_searchpref_q) {
+function dis_project_display_pref($display_searchpref_q) {
   global $l_searchproject_display;
 
   $dis_pref = new OBM_DISPLAY("PREFERENCES", $display_searchpref_q);

@@ -119,16 +119,10 @@ if ($action == "index" || $action == "") {
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
 
       $display["msg"] = display_warn_msg($l_no_tasks);
-      $display["detail"]  = html_project_taskadd_form(0, $project);
-      $display["detail"] .= html_project_tasklist(0, $project);
 
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
 
       $display["msg"] = display_warn_msg($l_no_members);
-      $display["detail"]  = html_project_memberadd_form($project);
-      $display["detail"] .= html_project_member_form($members_q, $project );
-
-      $action = "member_fill";
 
     } else {
 
@@ -170,10 +164,6 @@ if ($action == "index" || $action == "") {
       // this project's page has "private" access
       $display["msg"] .= display_err_msg($l_error_visibility);
     }
- 	
-    //  } else {
-    
-    //}
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,9 +178,6 @@ if ($action == "index" || $action == "") {
 	$display["msg"] .= display_ok_msg($l_insert_ok);
 	
 	$project_q = run_query_detail($param_project);
-	$tasks_q = run_query_tasks($param_project);
-	$members_q = run_query_members($param_project);
-	$membertime_q = run_query_membertime($param_project);
 	
       $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
@@ -214,9 +201,8 @@ if ($action == "index" || $action == "") {
 	$project["id"] = $param_project;
 	
 	$project_q = run_query_detail($param_project);
-	$tasks_q = run_query_tasks($param_project);
-
-      $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
+	
+	$display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"),$project_q->f("timecreate"),$project_q->f("timeupdate"));
 	$display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $project);
       }
       else {
@@ -305,16 +291,6 @@ if ($action == "index" || $action == "") {
     }
   }
   
-// } elseif ($action == "close")  {
-// ///////////////////////////////////////////////////////////////////////////////
-//   $retour = run_query_close($param_project);
-
-//   if ($retour) {
-//     $display["msg"] .= display_ok_msg($l_close_ok);
-//   } else {
-//     $display["msg"] .= display_err_msg($l_close_error);
-//   }
-
 } elseif ($action == "advanceupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_project > 0) {
@@ -326,21 +302,14 @@ if ($action == "index" || $action == "") {
     if (($tasks_q == 0) or ($tasks_q->num_rows() == 0)) {
 
       $display["msg"] = display_warn_msg($l_no_tasks);
-      $display["detail"]  = html_project_taskadd_form(0, $project);
-      $display["detail"] .= html_project_tasklist(0, $project);
 
     } else if (($members_q == 0) or ($members_q->num_rows() == 0)) {
 
       $display["msg"] = display_warn_msg($l_no_members);
-      $display["detail"]  = html_project_memberadd_form($project);
-      $display["detail"] .= html_project_member_form($members_q, $project );
-
-      $action = "member_fill";
 
     } else if (($membertime_q == 0) or ($membertime_q->num_rows() == 0)) {
 
       $display["msg"] = display_warn_msg($l_no_membertime);
-      $display["detail"] = html_project_membertime_form($tasks_q, $members_q, $membertime_q, $project); 
 
     } else {
    
@@ -383,12 +352,6 @@ if ($action == "index" || $action == "") {
       $display["msg"] .= display_err_msg($l_error_visibility);
     } 	
   }
-
-// } elseif ($action == "check_delete")  {
-// ///////////////////////////////////////////////////////////////////////////////
-
-// } elseif ($action == "delete")  {
-// ///////////////////////////////////////////////////////////////////////////////
 
 } elseif ($action == "task_add")  {
   ///////////////////////////////////////////////////////////////////////////////
@@ -509,28 +472,25 @@ if ($action == "index" || $action == "") {
 
 }  elseif ($action == "display") {
 /////////////////////////////////////////////////////////////////////////
-  $pref_new_q = run_query_display_pref($auth->auth["uid"], "project_new", 1);
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
 
-  $display["detail"] = dis_project_display_pref($pref_new_q, $pref_search_q);
+  $display["detail"] = dis_project_display_pref($pref_search_q);
 
 } else if ($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
 
-  $pref_new_q = run_query_display_pref($auth->auth["uid"], "project_new", 1);
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
 
-  $display["detail"] = dis_project_display_pref($pref_new_q, $pref_search_q);
+  $display["detail"] = dis_project_display_pref($pref_search_q);
 
 } else if ($action == "dispref_level") {
 /////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
 
-  $pref_new_q = run_query_display_pref($auth->auth["uid"], "project_new", 1);
   $pref_search_q = run_query_display_pref($auth->auth["uid"], "project", 1);
 
-  $display["detail"] = dis_project_display_pref($pref_new_q, $pref_search_q);
+  $display["detail"] = dis_project_display_pref($pref_search_q);
 }
 
 

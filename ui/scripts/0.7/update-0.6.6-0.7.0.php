@@ -247,75 +247,75 @@ function fill_projectuser() {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - User list                                               //
 ///////////////////////////////////////////////////////////////////////////////
-function fill_preferences() {
-  global $nreq;
+// function fill_preferences() {
+//   global $nreq;
 
-  // Retrieve userobm ids
+//   // Retrieve userobm ids
   
-  echo "retrieving informations from the userobm table\n";
-  echo "-> begin\n";
+//   echo "retrieving informations from the userobm table\n";
+//   echo "-> begin\n";
 
-  $query = "
-    select 
-      userobm_id as id
-    from UserObm";
+//   $query = "
+//     select 
+//       userobm_id as id
+//     from UserObm";
   
-  //echo "$query \n ---------------------------------------------\n";
+//   //echo "$query \n ---------------------------------------------\n";
 
-  $users_q = new DB_OBM;
-  $users_q->query($query);
-  $nreq ++;
+//   $users_q = new DB_OBM;
+//   $users_q->query($query);
+//   $nreq ++;
 
-  echo "-> end\n\n";
-  echo "filling display pref table\n";
-  echo "-> begin\n";
+//   echo "-> end\n\n";
+//   echo "filling display pref table\n";
+//   echo "-> begin\n";
 
-  $prefs_q = new DB_OBM;
+//   $prefs_q = new DB_OBM;
   
-  while($users_q->next_record()) {
+//   while($users_q->next_record()) {
   
-    $id = $users_q->f("id");
+//     $id = $users_q->f("id");
     
-    // fill the DisplayPref table
+//     // fill the DisplayPref table
 
-    $query = "
-      insert into DisplayPref (
-        display_user_id,
-        display_entity,
-        display_fieldname,
-        display_fieldorder,
-        display_display )
-      values
-        ($id,'project','project_label',1,2),
-        ($id,'project','project_company_name',2,1),
-        ($id,'project','project_tasktype',3,1),
-        ($id,'project','project_status',4,1),
-        ($id,'project','project_archive',5,1),
-        ($id,'time','date_task',1,2),
-        ($id,'time','timetask_deal_label',2,2),
-        ($id,'time','timetask_company_name',3,1),
-        ($id,'time','timetask_label',4,1),
-        ($id,'time','tasktype_label',5,1),
-        ($id,'time','timetask_length',6,2),
-        ($id,'time','timetask_id',7,2),
-        ($id,'time_proj','deal_label',1,2),
-        ($id,'time_proj','company_name',2,2),
-        ($id,'time_proj','total_length',3,1),
-        ($id,'time_proj','total_before',4,1),
-        ($id,'time_proj','total_after',5,1),
-        ($id,'time_tt','tasktype_label',1,2),
-        ($id,'time_tt','total_length',2,1),
-        ($id,'time_tt','total_before',3,1),
-        ($id,'time_tt','total_after',4,1)
-    ";
+//     $query = "
+//       insert into DisplayPref (
+//         display_user_id,
+//         display_entity,
+//         display_fieldname,
+//         display_fieldorder,
+//         display_display )
+//       values
+//         ($id,'project','project_label',1,2),
+//         ($id,'project','project_company_name',2,1),
+//         ($id,'project','project_tasktype',3,1),
+//         ($id,'project','project_status',4,1),
+//         ($id,'project','project_archive',5,1),
+//         ($id,'time','date_task',1,2),
+//         ($id,'time','timetask_deal_label',2,2),
+//         ($id,'time','timetask_company_name',3,1),
+//         ($id,'time','timetask_label',4,1),
+//         ($id,'time','tasktype_label',5,1),
+//         ($id,'time','timetask_length',6,2),
+//         ($id,'time','timetask_id',7,2),
+//         ($id,'time_proj','deal_label',1,2),
+//         ($id,'time_proj','company_name',2,2),
+//         ($id,'time_proj','total_length',3,1),
+//         ($id,'time_proj','total_before',4,1),
+//         ($id,'time_proj','total_after',5,1),
+//         ($id,'time_tt','tasktype_label',1,2),
+//         ($id,'time_tt','total_length',2,1),
+//         ($id,'time_tt','total_before',3,1),
+//         ($id,'time_tt','total_after',4,1)
+//     ";
 
-    //echo "$query \n ---------------------------------------------\n";
+//     //echo "$query \n ---------------------------------------------\n";
     
-    $prefs_q->query($query);
-    $nreq ++;
-  }
+//     $prefs_q->query($query);
+//     $nreq ++;
+//   }
 
-  echo "-> end\n\n";
-}
+//   echo "-> end\n\n";
+// }
 
 </script>

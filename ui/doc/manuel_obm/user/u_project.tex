@@ -1,0 +1,74 @@
+\subsection{Le module Gestion des temps}
+
+Ce module permet.\\
+
+Les principales entités du module \timemanager sont décrites ci-dessous :
+
+\subsubsection{Description d'une tâche}
+
+
+
+\subsubsection{Les sous-menus de la section DIOR}
+
+Le module \timemanager comporte 15 sous-menus :
+
+\begin{itemize}
+\item Créer, qui permet de créer un nouvel accord.
+\item Chercher, qui permet de chercher des accords suivant plusieurs critères.
+\item Chercher par Activité, qui permet de chercher des accords par activités,
+de chercher, consulter et modifier l'arborescence des activités de DIOR. 
+\item Segmentation, qui permet de consulter, modifier, supprimer et de chercher
+les segments d'après leur libellé et département.
+\item Créer Segment, qui permet la création d'un nouveau segment.
+\item Organisme, qui permet de consulter, modifier, supprimer et de chercher
+les organismes d'après leur nom, numéro ou adresse.
+\item Créer Organisme, qui permet la création d'un nouvel organisme.
+\item Rep. Géo., qui permet de consulter, modifier, supprimer et de chercher
+les entrées du répertoire géographique d'après leur département,
+arrondissement, lieu et organisme.
+\item Créer Rep. Géo., qui permet la création d'une nouvelle entrée dans le
+répertoire géographique.
+\item Activité Agri., qui permet de consulter, modifier, supprimer et de
+chercher les activités agricoles d'après leur libellé.
+\item Créer Act. Agri., qui permet la création d'une nouvelle activité
+agricole.
+\item Rep. Agri., qui permet de consulter, modifier, supprimer et de chercher
+les entrées du répertoire agricole d'après leur département, commune, organisme
+et activité agricole.
+\item Créer Rep. Agri., qui permet la création d'une nouvelle entrée dans le
+répertoire agricole.
+\item Cat. Dior, qui permet de consulter les catégories Dior.
+\item Créer Cat. Dior, qui permet la création d'une nouvelle catégorie Dior.
+
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Créer}
+
+Ce menu permet de créer un nouvel accord.
+Un formulaire vierge d'accord propose la saisie des champs :
+
+\begin{itemize}
+\item Titre,
+\item Numéro,
+\item Indicateur de message,
+\item Type,
+\item Départements,
+\item Segment,
+\item Texte lié au régime supplémentaire,
+\item Indicateur du tableau ARRCO libre,
+\item Texte du tableau ARRCO libre,
+\item du Tableau ARRCO,
+\item du Tableau AGIRC.
+\end{itemize}
+
+L'insertion du nouvel accord s'effectue en validant le formulaire par
+le bouton ``Enregistrer l'Accord''.
+
+Pour être valide un nouvel accord doit avoir un numéro non déjà utilisé par
+un autre accord.
+
+Si l'accord est valide, il est inséré dans la base de données et un message
+d'acceptation est affiché;
+sinon le formulaire de saisie de nouvel accord est affiché de nouveau
+avec un message indiquant la cause de non validité.
