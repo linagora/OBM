@@ -474,7 +474,7 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   global $set_theme,$ico_web,$ico_mail;
   // -- Labels
   global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town;
-  global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
+  global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
   global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
   global $sess;
 
@@ -611,43 +611,40 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
       <td class=\"detailLabel\">$l_kind</td>
       <td>$sel_kind </font></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_contact_list</td>
-      <td bgcolor=\"#$col_table_3\">$font_data $con_num </font></td>
-    </tr><tr>
-      <td colspan=2 align=center bgcolor=\"#$col_table_3\">
+      <td colspan=2 class=\"detailHead\">
         $font_label<b>$l_coord</b></font></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table\">$font_label<b>$l_address 1</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_address 1</b></font></td>
       <td><input NAME=tf_ad1 maxlength=30 size=30 value=\"$ad1\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_address 2</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_address 2</b></font></td>
       <td><input NAME=tf_ad2 maxlength=30 size=30 value=\"$ad2\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table\">$font_label<b>$l_postcode</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_postcode</b></font></td>
       <td><input NAME=tf_zip maxlength=14 size=6 value=\"$zip\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_expresspostal</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_expresspostal</b></font></td>
       <td><input NAME=tf_cdx maxlength=8 size=8 value=\"$cdx\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table\">$font_label<b>$l_town</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_town</b></font></td>
       <td><input NAME=tf_town maxlength=24 size=24 value=\"$town\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_country</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_country</b></font></td>
       <td><input NAME=tf_ctry maxlength=24 size=24 value=\"$ctry\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table\">$font_label<b>$l_phone</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_phone</b></font></td>
       <td><INPUT NAME=tf_phone maxlength=16 size=16 value=\"$phone\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_fax</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_fax</b></font></td>
       <td><input NAME=tf_fax maxlength=16 size=16 value=\"$fax\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table\">$font_label<b>$l_email</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_email</b></font></td>
       <td><input NAME=tf_email maxlength=64 size=45 value=\"$email\"></td>
     </tr><tr>
-      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_web</b></font></td>
+      <td class=\"detailLabel\">$font_label<b>$l_web</b></font></td>
       <td><input NAME=tf_web maxlength=52 size=45 value=\"$web\"></td>
     </tr><tr>
-      <td colspan=2 align=center bgcolor=\"#$col_table_3\">
+      <td class=\"detailHead\" colspan=2 >
         $font_label<b>$l_comment</b></font></td>
     </tr><tr>
       <td colspan=2><textarea NAME=ta_com ROWS=8 COLS=80>$com</textarea></td>
