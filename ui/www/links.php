@@ -15,7 +15,9 @@
   <ul>
     <li><a href="http://dbmjui.sf.net/index.html">DBMJUI</a> - A java database manager for SAPDB
       
-    <li><a href="http://monkey-bubble.tuxfamily.org/">Monkey Bubble</a> - A great Puzzle Bobble clone to use between obm contibutions
+    <li><a href="http://home.gna.org/monkeybubble/">Monkey Bubble</a> - A great Puzzle Bobble clone to use between obm contibutions
+
+    <li><a href="http://animelamp.coldwire.net/">Animelamp</a> - An anime collection manager
       
   </ul>
 </div>
