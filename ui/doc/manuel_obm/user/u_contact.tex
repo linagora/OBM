@@ -1,0 +1,201 @@
+% Manuel d'utilisation d'OBM : module Contact
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\clearpage
+\section{Le module \contact}
+
+\subsection{Présentation du module \contact}
+
+Ce module est une gestion de contacts, souvent appelée \textbf{pages blanches} permettant de gérer les personnes...\\
+
+C'est un module important dans OBM car de nombreux autres modules utilisent \contact (comme \company, \deal,..).
+
+De nombreux attribus permettent de décrire un contact ou une personne.
+Afin de couvrir des utilisations diverses plusieurs attribus peuvent être désactivés et ne pas apparaître dans l'application.
+
+\subsection{Description d'un contact}
+
+Composantes d'un contact :\\
+
+\begin{tabular}{|p{3cm}|p{10cm}|}
+\hline
+\textbf{Nom} & \textbf{Description} \\
+\hline
+Nom & Nom de la personne\\
+\hline
+Prénom & Prénom de la personne\\
+\hline
+Genre & Langue, genre et en-tête de lettre utilisés pour la personne.\\
+\hline
+Source de données & Identification de l'origine de l'information.\\
+\hline
+Archive & Etat d'archivage du contact. Un contact archivé n'apparaît plus en utilisation (recherche,...) normale de l'application.\\
+\hline
+Société & Société ou institution de la personne (il est possible de créer des sociétés virtuelles du type ``amis'', ``freelance'' pour enregistrer des contacts indépendants,...).\\
+\hline
+Fonction & Fonction du contact (dans une liste prédéfinie).\\
+\hline
+Titre & Titre de la personne (texte libre, contrairement à fonction).\\
+\hline
+Responsable & Responsable interne de cette personne (commercial, responsable de compte).\\
+\hline
+Catégorie 1 & 1ère classification du contact par Catégories. Voir la description des catégories.\\
+\hline
+Catégorie 2 & 2ème classification du contact par Catégories. Voir la description des catégories.\\
+\hline
+Coordonnées & Adresse, service, code postal, cedex, ville et pays.\\
+\hline
+Tel et Fax & Téléphone et fax.\\
+\hline
+Email & Adresse e-mail du contact (2 adresses sont possibles).\\
+\hline
+Activé pour mailing & Prise en compte autorisée dans les diffusions ou publipostages.\\
+\hline
+Commentaire & Commentaire sur le contact.\\
+\hline
+\end{tabular}
+\vspace{0.3cm}
+
+
+Les attribus suivant peuvent être désactivés si non utiles dans une installation d'OBM, et ainsi ne pas apparaître dans l'application :
+
+\begin{itemize}
+\item Fonction
+\item Titre
+\item Catégories 1
+\item Catégories 2
+\item Service
+\item Ligne Adresse 3
+\end{itemize}
+
+
+\subsubsection{Catégories d'un contact}
+Les catégories d'un contact permettent de classifier et organiser les contacts.
+
+OBM gère 2 familles de catégories de personnes.
+
+Un contact peut référencer plusieurs catégories dans chacune des 2 familles.
+
+Les catégories sont administrables par la menu ``Administration'' du module \contact, et il est donc possible de les définir selon les besoins.
+
+Par exemple : des compétences, des classifications internes (selon les domaines, les revenus, les centres d'intérêts...).
+
+
+\subsubsection{Les liens d'un contact}
+
+Le module \contact étant central à OBM de nombreux liens sont disponibles depuis un contact et permettent d'accéder directement aux entités liées à cette personne :\\
+
+\begin{itemize}
+\item Société du contact
+\item Document
+\item Abonnements aux publications
+\end{itemize}
+
+\subsection{Les sous-menus du module \contact}
+
+Le module \contact comporte 7 sous-menus (accessibles selon les droits d'accès et le contexte) :\\
+
+\begin{tabular}{|p{2.5cm}|p{9.5cm}|}
+\hline
+\textbf{Nom} & \textbf{Action / Description} \\
+\hline
+Chercher & Recherche multicritères des contacts \\
+\hline
+Nouveau & Créer un nouveau contact.\\
+\hline
+Consulter & Consulter les informations d'un contact.\\
+\hline
+Modifier & Modifier les informations d'un contact.\\
+\hline
+Supprimer & Vérifier les liens puis si besoin Supprimer un contact.\\
+\hline
+Administrer & Administration des informations annexes (genres, fonctions, catégories 1 et catégories 2).\\
+\hline
+Affichage & Personnalisation de l'affichage de la liste des contacts.\\
+\hline
+\end{tabular}
+
+
+\subsubsection{Le sous-menu : Chercher}
+
+Ce menu permet d'effectuer une recherche selon différents critères :
+
+\begin{itemize}
+\item Nom et prénom du contact
+\item Téléphone
+\item Mail
+\item Société
+\item Code postal
+\item Ville
+\item Pays
+\item Fonction
+\item Catégorie 1
+\item Catégorie 2
+\item Responsable du compte
+\item Etat d'archivage
+\end{itemize}
+
+Il est possible d'inclure les contacts archivés dans les résultats de recherche.
+
+
+\subsubsection{Le sous-menu : Nouveau}
+
+Ce menu permet de créer un contact.
+
+Pour insérer le contact saisi il faut cliquer sur le bouton ``Enregistrer le contact''.
+
+Si des contacts similaires existent déjà (personnes de même nom et prénom, ou de même nom dans la même société), avant d'insérer la nouvelle personne, \obm affiche une page d'alerte présentant les contacts similaires et permet de continuer l'insertion ou de l'annuler.
+Ceci est particulièrement utile lorsque un contact déjà existant est créée à nouveau, et permet d'éviter la saisie de doublons.
+
+\subsubsection{Le sous-menu : Consulter}
+
+Ce menu permet de consulter la fiche d'un contact (accessible uniquement depuis la fiche du contact en mode mise à jour ou suppression).
+Cet écran est aussi accessible depuis les résultats de recherche ou les liens depuis d'autres modules en cliquant sur le contact sélectionné.
+
+\subsubsection{Le sous-menu : Modifier}
+
+L'écran de modification affiche les informations du contact dans un formulaire.
+Toutes les informations sont modifiables.
+
+L'association de catégories au contact courant s'effectue via une fenêtre popup listant les catégories et permettant de les sélectionner ou en les sélectionnant directement dans la liste affichée.\\
+
+Pour valider les modifications effectuées il faut cliquer sur le bouton ``Modifier le Contact''.
+
+
+\subsubsection{Le sous-menu : Supprimer}
+Ce menu permet la vérification des liens du contact et d'indiquer si celui-ci est supprimable.
+Si le contact peut être supprimé, un bouton ``Supprimer le contact'' est alors affiché.
+
+\paragraph{Pour être supprimé} un contact doit pas :\\
+
+\begin{itemize}
+\item Etre référencé dans les affaires
+\item Etre référencé dans les contrats
+\item Etre référencé dans les listes (statiquement)
+\item Etre abonné à des publications.
+\end{itemize}
+
+\subsubsection{Le sous-menu : Administrer}
+
+Ce menu permet l'administration des informations annexes des contacts :\\
+
+\begin{itemize}
+\item Genres (avec la langue, le label et l'en-tête de lettre)
+\item Fonctions
+\item Catégories 1
+\item Catégories 2
+\end{itemize}
+
+\paragraph{Gestion des genres : } Le genre d'un contact est défini par 3 informations liées :\\
+
+\begin{itemize}
+\item La langue du contact, qui une fois choisie donnera accès aux genres labels de cette langue
+\item Le label du genre qui peut être ``M., Mme., Mlle. ou autres'', qui une fois choisi donnera accès aux en-têtes de lettre (ou formule de politesse ou présentation) de ce label 
+\item L'en-tête de lettre, utilisé par exemple dans les diffusions ou publipostages.
+\end{itemize}
+
+
+\subsubsection{Le sous-menu : Affichage}
+
+Ce menu permet de paramétrer l'affichage de la liste des contacts. Il est possible de choisir les champs à afficher et de régler leur ordre d'affichage.

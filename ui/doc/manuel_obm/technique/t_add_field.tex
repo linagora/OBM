@@ -1,0 +1,50 @@
+% Documentation technique d'OBM : Etendre OBM : Ajouter un champ
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+%%\clearpage
+\subsection{Ajouter un champ dans un module}
+
+Différentes étapes sont nécessaires pour ajouter un champ dans un module. Selon l'utilisation du nouveau champ, certaines étapes peuvent êtres ignorées (ex: inclusion dans moteur de recherche, affichage dans résultat,...).\\
+
+\begin{itemize}
+ \item Modifier les scripts de création de base de données pour inclure le nouveau champ.
+   \begin{verbatim}
+emacs scripts/0.8/create_obmdb_0.8.mysql.sql
+emacs scripts/0.8/create_obmdb_0.8.pgsql.sql
+   \end{verbatim}
+ \item Modifier (ou créer) les scripts de mise à jour de base de données pour inclure le nouveau champ.
+   \begin{verbatim}
+emacs scripts/0.8/update_0.8.1-0.8.2.mysql.sql
+emacs scripts/0.8/update_0.8.1-0.8.2.pgsql.sql
+   \end{verbatim}
+ \item (module\_index.php) Récolter le paramètre issu du formulaire (get\_param\_module)\\
+ \item Si champ sélection d'une liste déroulante :
+    \begin{itemize}
+     \item[*] Créer la table associée (scripts création et mise à jour bases de données)\\
+     \item[*] (module\_index.php) Appeler la liste de valeurs run\_query\_fieldname() pour la passer aux fonctions formulaire (mise à jour voire recherche).\\
+     \item[*] (module\_display.inc) Modifier la définition des fonctions formulaire afin d'inclure la liste de valeur (html\_module\_form(), html\_module\_search\_form()).\\
+     \item[*] (module\_query.php) Implémenter les fonctions run\_query\_fieldname(), run\_query\_fieldname\_insert(), run\_query\_fieldname\_update(), run\_query\_fieldname\_delete(), run\_query\_fieldname\_links().
+      \begin{verbatim}
+function run_query_companynafcode()
+function run_query_nafcode_insert()
+function run_query_nafcode_update()
+function run_query_nafcode_delete()
+function run_query_nafcode_links()
+      \end{verbatim}
+     \item[*] (module\_display.inc) Implémenter les fonctions de gestion et visualisation : html\_module\_field\_form(), dis\_field\_links().
+      \begin{verbatim}
+function html_company_nafcode_form()
+function dis_nafcode_links()
+      \end{verbatim}
+     \item[*] (module\_index.php) Définir les actions avec les droits associés (get\_module\_action()) et les implémenter dans le branchement global du module (if \$action ==...) avec la traduction des messages (insert\_ok, insert\_error,...).\\
+     \item[*] (module\_js.inc) Implémenter les actions Javascript de vérification des formulaire de gestion (check\_field\_upd(), check\_field\_new(), check\_field\_checkdel()).\\
+    \end{itemize}
+ \item (lang/*/module.inc) Créer les variables de langues (au moins pour le français et l'anglais).\\
+ \item Si le champ peut être masqué, indiquer l'option dans obminclude/global.inc et obm\_conf.inc et mettre la doc à jour (manuel\_obm/technique/t\_site.tex).\\
+ \item (module\_display.inc) Prendre en compte le nouveau champ dans les fonctions d'affichage (html\_module\_form(), html\_module\_consult(), dis\_module\_warn\_insert()).\\
+ \item Si le champ peut être recherché l'implémenter dans les fonctions html\_module\_search\_form(), html\_module\_search\_list() pour propagation du résultat, et dans la fonction de recherche run\_query\_search().\\
+ \item (module\_query.inc) Prendre en compte le nouveau champ dans les fonctions base de données : run\_query\_detail(), run\_query\_insert(), run\_query\_update(), dis\_module\_warn\_insert()).\\
+ \item Si le champ doit figuré dans les résultats de recherche, il faut l'ajouter au module correspondant dans les préférences par défaut (scripts/0.8/obmdb\_default\_values\_0.8.sql).
+\end{itemize}

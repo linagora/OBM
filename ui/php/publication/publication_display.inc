@@ -20,7 +20,7 @@ $fieldnames["publicationtype_label"] = $l_type;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Publication specific dataset fields                                   //
+// Display Publication specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -134,7 +134,7 @@ function html_publication_search_form ($type_q,$publication) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Publication search result                                         //
+// Display the Publication search result
 // Parameters:
 //   - $publication[] : publication search criteria
 //     keys used  : name, type, zip
@@ -179,15 +179,12 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
   }
 
   // we urlencode to avoid breakage for space char
-  $archive = $publication["archive"];
-  $title = urlencode(stripslashes($publication["name"]));
-  $phone = urlencode(stripslashes($publication["phone"]));
+  $title = urlencode(stripslashes($publication["title"]));
   $type = $publication["type"];
-  $act = $publication["activity"];
-  $zip = urlencode(stripslashes($publication["zip"]));
-  $market = $publication["marketing_manager"];
-  
-  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
+  $year = $publication["year"]; 
+  $lang = $publication["lang"];
+ 
+  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;sel_type=$type&amp;tf_year=$year&amp;tf_lang=$lang$url_ext");
 
   $comp_q->seek($first_row);
 
@@ -572,7 +569,7 @@ function html_subscription_form($action,$sub_q, $recept_q, $publication) {
     </tr><tr>
       <td class=\"detailLabel\">$l_renew</td>
       <td class=\"detailForm\">
-      <input type=\"checkbox\" $renew name=\"ch_renewal\" value=\"1\" />
+      <input type=\"checkbox\" $renew name=\"cb_renewal\" value=\"1\" />
       </td>      
     </tr><tr>
       <td class=\"detailLabel\">$l_recept</td>

@@ -24,9 +24,6 @@ CREATE TABLE CompanyNafCode (
   PRIMARY KEY (companynafcode_id)
 );
 
--- Add column : comapny_nafcode_id
-ALTER TABLE Company ADD column company_nafcode integer;
-
 
 -------------------------------------------------------------------------------
 -- Update List table

@@ -653,9 +653,9 @@ function run_query_default_preferences_insert($user_id) {
     $entity = $obm_q->f("display_entity");
     $fieldname = $obm_q->f("display_fieldname");
     $fieldorder = $obm_q->f("display_fieldorder");
-    $display = $obm_q->f("display_display");
+    $disstatus = $obm_q->f("display_display");
 
-    $query = "insert into DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values ('$user_id', '$entity', '$fieldname', '$fieldorder', '$display')";
+    $query = "insert into DisplayPref (display_user_id, display_entity, display_fieldname, display_fieldorder, display_display) values ('$user_id', '$entity', '$fieldname', '$fieldorder', '$disstatus')";
     display_debug_msg($query, $cdg_sql);
     $line_q->query($query);
   }
@@ -696,14 +696,18 @@ function run_query_display_pref($u_id, $entity, $all=0)  {
 // Parameters:
 //   - $entity    : entity affected
 //   - $fieldname : fieldname to change the display value
-//   - $display   : current display value
+//   - $disstatus : current display value
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_display_pref_update($entity, $fieldname, $display) {
+function run_query_display_pref_update($entity, $fieldname, $disstatus) {
   global $auth, $cdg_sql;
 
   // Invert the display value (0,1)  
-  $new_display = ($display == 0) ? 1 : 0;
-  $query = "update DisplayPref set display_display='$new_display' where display_user_id='" . $auth->auth["uid"] . "' and display_entity='$entity' and display_fieldname='$fieldname'";
+  $new_display = ($disstatus == 0) ? 1 : 0;
+  $query = "update DisplayPref set
+      display_display='$new_display'
+    where display_user_id='" . $auth->auth["uid"] . "'
+      and display_entity='$entity'
+      and display_fieldname='$fieldname'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM ; 
@@ -714,19 +718,23 @@ function run_query_display_pref_update($entity, $fieldname, $display) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Update the level of the field in the entity given       //
 // Parameters:
-//   - $entity    : entity affected
-//   - $fieldname : fieldname to change the display value
-//   - $display   : current display value
+//   - $entity     : entity affected
+//   - $fieldname  : fieldname to change the display value
+//   - $fieldorder : position of field
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
   global $auth, $cdg_sql;
 
   $num_new_level = ($new_level == "up") ? $fieldorder-1 : $fieldorder+1;
-  
+  $uid = $auth->auth["uid"];
   $obm_q = new DB_OBM;
   
   //Aim: To know which fieldname  will be changed
-  $query = "select display_fieldname from DisplayPref where display_user_id='" . $auth->auth["uid"] . "' and display_entity='$entity' and display_fieldorder='$num_new_level'";
+  $query = "select display_fieldname
+    from DisplayPref
+    where display_user_id='$uid'
+      and display_entity='$entity'
+      and display_fieldorder='$num_new_level'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
@@ -734,12 +742,20 @@ function run_query_display_pref_level_update($entity, $new_level,$fieldorder) {
   $fieldname_near_change = $obm_q->f("display_fieldname");
 
   //Aim: To change the first field's level
-  $query = "update DisplayPref set display_fieldorder='$num_new_level' where display_user_id='" . $auth->auth["uid"] . "' and display_entity='$entity' and display_fieldorder='$fieldorder'";
+  $query = "update DisplayPref
+    set display_fieldorder='$num_new_level'
+    where display_user_id='$uid'
+      and display_entity='$entity'
+      and display_fieldorder='$fieldorder'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 
   //Aim: To change the second field's level of $fieldname_near_change
-  $query = "update DisplayPref set display_fieldorder='$fieldorder' where display_user_id='" . $auth->auth["uid"] . "' and display_entity='$entity' and display_fieldname='$fieldname_near_change'";
+  $query = "update DisplayPref
+    set display_fieldorder='$fieldorder'
+    where display_user_id='$uid'
+      and display_entity='$entity'
+      and display_fieldname='$fieldname_near_change'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
 }

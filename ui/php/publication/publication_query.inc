@@ -183,13 +183,14 @@ function run_query_insert($publication) {
   }
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Auto Subscription Insertion query execution                                 
 // Parameters:
 //   - $auto_sub[] : List of contact_type to subscribe
 //   -p_id :  Id of the subscription
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_auto_insert($publication){
   global $auth, $cdg_sql;
   
@@ -241,6 +242,7 @@ function run_query_auto_insert($publication){
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_auto_subscription($publication,$p_id){
   global $auth, $cdg_sql, $c_focsys;
+
   $auto_sub =   $publication["auto_sub"];
   $recept =   $c_focsys;
   $lang = $publication["lang"];
@@ -511,15 +513,19 @@ function run_query_publicationtype() {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Reception mode subscription query execution                                 //
+// Reception mode subscription query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_subscriptionreception() {
   global $cdg_sql,$c_focsys;
 
-  $query = "select * from SubscriptionReception where subscriptionreception_id != $c_focsys order by subscriptionreception_label DESC "; 
+  $query = "select *
+    from SubscriptionReception
+    where subscriptionreception_id != '$c_focsys'
+    order by subscriptionreception_label DESC "; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);

@@ -244,7 +244,6 @@ function get_param_user() {
 
   if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
-  if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($tf_login)) $obm_user["login"] = $tf_login;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
   if (isset ($tf_passwd)) $obm_user["passwd_crypt"] = md5($obm_user["passwd"]);
@@ -256,6 +255,7 @@ function get_param_user() {
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
 
   // External param
+  if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($popup)) $obm_user["popup"] = $popup;
   if (isset ($ext_title)) $obm_user["ext_title"] = $ext_title;
   if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;

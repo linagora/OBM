@@ -879,11 +879,15 @@ function run_query_check_contact($cid, $comp_id, $lname, $fname) {
   if ($cid != "") {
     $where_id = "and contact_id!='$cid'";
   }
-  $query = "select distinct contact_id, contact_company_id, contact_lastname, contact_firstname, company_name 
-      from Contact, Company
-      where contact_company_id=company_id
-        $where_id
-        and ((contact_lastname='$lname' and contact_firstname='$fname')
+  $query = "select distinct contact_id,
+      contact_company_id,
+      contact_lastname,
+      contact_firstname,
+      company_name 
+    from Contact, Company
+    where contact_company_id=company_id
+      $where_id
+      and ((contact_lastname='$lname' and contact_firstname='$fname')
           or (contact_company_id='$comp_id' and contact_lastname='$lname'))";
 
   display_debug_msg($query, $cdg_sql);

@@ -1,0 +1,62 @@
+% Documentation technique d'OBM : Gestion des entités privées
+% ALIACOM Pierre Baudracco
+% $Id$
+
+
+%%\clearpage
+\subsection{Gestion des entités privées et visibilité}
+
+La gestion des entités privées est standardisée afin de permettre une évolution possible des règles de visibilité des entités.
+
+
+\subsubsection{Spécifications de la notion de visibilité}
+
+Une api très simple (1 fonction définie dans global.inc) est disponible :\\
+
+\shadowbox{
+\begin{minipage}{13cm}
+\begin{verbatim}
+is_entity_visible($entity, $obm_q, $uid='''')
+\end{verbatim}
+\end{minipage}
+}
+\begin{itemize}
+ \item \textbf{\$entity} : entité à vérifier.\\
+Exemple : ``company'', ``contact''... Attention ce n'est pas toujours le module (ex: parendeal dans module deal)
+ \item \textbf{\$obm\_q} : Objet base de données contenant l'entité\\
+Exemple : souvent l'objet associé à la requete : run\_query\_detail()
+ \item \textbf{\$uid} (optionnel) : uid de l'utilisateur pour lequel le droit de visibilité doit être vérifié.
+Si non donné, l'utilisateur courant est utilisé.
+\end{itemize}
+
+\vspace{0.4cm}
+
+Actuellement une entité est visible par un utilisateur si l'entité est publique (visibility == 0) ou que l'utilisateur en est le créateur.
+
+Implémentation du test de visibilité :
+\begin{verbatim}
+  $field_vis = "${entity}_visibility";
+  $field_uc = "${entity}_usercreate";
+
+  if ( ($q->f("$field_vis") == 0)
+    || ($q->f("$field_uc") == $uid) ) {
+    return true;
+  } else {
+    return false;
+  }
+\end{verbatim}
+
+
+\subsubsection{Modules gérant la notion de visibilité}
+
+\begin{tabular}{|p{5cm}|c|}
+\hline
+\textbf{Module} & \textbf{Depuis version OBM} \\
+\hline
+contact & 0.4.0 \\
+\hline
+deal & 0.4.0 \\
+\hline
+list & 0.8.2 \\
+\hline
+\end{tabular}

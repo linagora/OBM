@@ -431,7 +431,7 @@ de manipulation de la table des préférences.
 
 <ul>
 <li><b>run_query_display_pref($u_id, $all=0)</b>, qui retourne les préférences de l'utilisateur (à fournir comme second argument au contructeur OBM_DISPLAY)
-<li><b>run_query_display_pref_update($entity, $fieldname, $display)</b>, qui modifie la propriété d'affichage (affiché oui | non) d'un champ
+<li><b>run_query_display_pref_update($entity, $fieldname, $disstatus)</b>, qui modifie la propriété d'affichage (affiché oui | non) d'un champ
 <li><b>run_query_display_pref_level_update($entity, $new_level, $fieldorder)</b>, qui modifie la position d'affichage d'un champ
 </ul>
 
@@ -496,7 +496,7 @@ A la suppression d'un utilisateur, les entrées de la table DisplayPref de cet ut
 
 } else if ($action == "dispref_display") {
 /////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($auth->auth["uid"],1);
   dis_company_display_pref($pref_q);
 

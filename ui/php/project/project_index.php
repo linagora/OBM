@@ -328,7 +328,7 @@ if ($action == "index" || $action == "") {
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_search_q = run_query_display_pref($uid, "project", 1);
   $display["detail"] = dis_project_display_pref($pref_search_q);
 

@@ -248,7 +248,7 @@ else if ($action == "detailupdate") {
 
 else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_display_pref_update($entity, $fieldname, $display);
+  run_query_display_pref_update($entity, $fieldname, $disstatus);
   $pref_q = run_query_display_pref($uid, "group", 1);
   $pref_u_q = run_query_display_pref($uid, "group_user", 1);
   $display["detail"] = dis_group_display_pref($pref_q, $pref_u_q);
