@@ -85,7 +85,8 @@ function dis_todo_form($todo, $user_q, $todo_q = 0) {
     $title = $todo_q->f("todo_title");
     $content = $todo_q->f("todo_content");
     $priority = $todo_q->f("todo_priority");
-    $deadline = ($todo_q->f("date_deadline")) ? date_format($todo_q->f("todo_deadline")) : "";
+    $deadline = $todo_q->f("date_deadline");
+    $deadline = ($deadline != 0) ? date_format($deadline) : $l_no_deadline;
   } else {
     $uid = $todo["uid"];
     $priority = intval(($max_priority+1)/2);

@@ -717,14 +717,14 @@ function run_query_update($did, &$document) {
     document_userupdate='". $auth->auth["uid"] ."',
     document_title='$title',
     document_author='$author',
+    document_category1='$cat1',
+    document_category2='$cat2',
     document_private='$privacy'
 ";
   if($file_update=="yes") {
     $query .=" ,document_path='$path',
     document_size='$size',
     document_name='$name',
-    document_category1='$cat1',
-    document_category2='$cat2',
     document_mimetype='$mime'
     ";
   }

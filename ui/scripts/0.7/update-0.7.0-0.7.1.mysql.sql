@@ -24,6 +24,15 @@ CREATE TABLE Todo (
   PRIMARY KEY (todo_id)
 );
 
+-- Day the week start 
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_order','todo_priority');
+
+-- Todo top list
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_1_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_2_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_3_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_4_id','0');
+insert into UserObmPref(userobmpref_user_id,userobmpref_option,userobmpref_value) values ('0','todo_5_id','0');
 
 -------------------------------------------------------------------------------
 -- Document
