@@ -172,15 +172,15 @@ $l_noone = "N'autoriser personne";
 $l_list = "Autoriser les personnes de la liste";
 $l_authorize = "&lt;&lt;&lt;&lt;";
 $l_deny = "&gt;&gt;&gt;&gt;";
+
 //MAIL
+$l_add_event_mail_head = "Nouvel événement dans Obm : ";
+$l_update_event_mail_head = "Modification événement : ";
+$l_delete_event_mail_head = "Suppression événement : ";
 
-$l_add_event_mail_head = "Nouvel evenement dans Obm : ";
-$l_update_event_mail_head = "Evenement mis à jour dans Obm : ";
-$l_delete_event_mail_head = "Evenement supprime dans Obm : ";
-
-$l_add_event_mail_subject = "Nouvel événement sur Obm";
-$l_update_event_mail_subject = "Mise a jour d'un événement sur Obm";
-$l_delete_event_mail_subject = "Suppression d'un événement sur Obm";
+$l_add_event_mail_subject = "Nouvel événement sur Obm : ";
+$l_update_event_mail_subject = "Modification événement sur Obm : ";
+$l_delete_event_mail_subject = "Suppression événement sur Obm : ";
 
 $l_event_mail_body = "Date : ";
 $l_update_event_mail_body = "\nAu lieu de :";

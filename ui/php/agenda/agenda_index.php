@@ -246,7 +246,7 @@ elseif ($action == "insert") {
       $display["result"] .= dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
       $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
-    else{
+    else {
       require("agenda_js.inc");      
       require("$obminclude/calendar.js");
       $display["msg"] .= display_err_msg($l_insert_error);
