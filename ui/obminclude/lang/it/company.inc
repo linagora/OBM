@@ -56,6 +56,8 @@ $l_act_insert = "Inserisci Activita";
 $l_select_company = "Seleziona Azienda";
 
 // Messages
+$l_err_act_empty = "Scrivi azienda activita !";
+
 $l_no_display = "Riempi i  campi  e premi < Trova> per la ricerca";
 $l_found = "Aziende Trovate.";
 $l_no_found = "Nessuna  Azienda trovata !";

@@ -11,6 +11,7 @@ $l_group = "Groupe";
 
 // Database fields
 $l_name = "Nom";
+$l_system = "Systeme";
 $l_desc = "Description";
 $l_email = "E-mail";
 $l_creator = "Créateur";

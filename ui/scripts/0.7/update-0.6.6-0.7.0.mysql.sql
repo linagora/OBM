@@ -223,6 +223,13 @@ CREATE TABLE UGroup (
    UNIQUE group_name (group_name)
 );
 
+-- Add new column : group_system
+ALTER TABLE UGroup ADD group_system int(1) DEFAULT 0 AFTER group_usercreate;
+
+-- Add systems Groups
+INSERT INTO UGroup (group_system, group_name, group_desc, group_email) VALUES
+(1, 'Commercial', 'Commercial system group', ''),
+(1, 'Production', 'Production system group', '');
 
 --
 -- Table structure for table 'UserObmGroup'

@@ -866,6 +866,7 @@ CREATE TABLE UGroup (
    group_timecreate timestamp(14),
    group_userupdate int(8),
    group_usercreate int(8),
+   group_system int(1) DEFAULT '0',
    group_name varchar(32) NOT NULL,
    group_desc varchar(128),
    group_email varchar(128),

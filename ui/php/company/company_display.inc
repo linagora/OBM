@@ -404,12 +404,14 @@ function html_company_consult($co_q) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
-  global $display;
+  global $display, $auth, $l_none;
   global $set_theme,$ico_web,$ico_mail;
   global $l_name,$l_kind,$l_activity,$l_archive,$l_phone,$l_fax,$l_address;
   global $l_postcode,$l_expresspostal,$l_town;
   global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market, $l_coord;
   global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
+
+  $mark = $auth->auth["uid"];
 
   // if update mode and first display values are taken from database
   if ($action == "detailupdate") {
@@ -466,7 +468,8 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
   $sel_kind .= "</select>";
 
   // activity select
-  $sel_act = "<select name=\"sel_act\" id=\"sel_act\">";
+  $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
+    <option value=\"0\">$l_none</option>";
   while($act_q->next_record()) {
     $a_id = $act_q->f("companyactivity_id");
     $sel_act .= "\n<option value=\"$a_id\"";
@@ -741,10 +744,10 @@ function dis_company_warn_insert($cid, $co_q, $company) {
     $samename = $co_q->f("company_name");
     $samezip = $co_q->f("company_zip");
     $dis_same_comp .= "
-          <tr><td colspan =\"2\" class=\"detailText\">
-             <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
-              $samename ($samezip)</a>
-          </td></tr>";
+      <tr><td colspan =\"2\" class=\"detailText\">
+         <a class=\"detail\" href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$id") . "\">
+          $samename ($samezip)</a>
+      </td></tr>";
   }
 
   $block = "

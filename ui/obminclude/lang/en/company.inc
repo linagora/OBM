@@ -59,6 +59,8 @@ $l_act_insert = "Insert Activity";
 $l_select_company = "Select the Company";
 
 // Messages
+$l_err_act_empty = "You must fill the company activity !";
+
 $l_no_display = "Fill the search fields and press < Find > to retrieve the companies";
 $l_found = "companies found.";
 $l_no_found = "No company found matching the query !";

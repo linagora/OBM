@@ -145,7 +145,7 @@ else if ($action == "insert") {
       } else {
 	$obm_q = check_group_context("", $group);
 	if ($obm_q->num_rows() > 0) {
-	  dis_group_warn_insert("", $obm_q, $group);
+	  $display["detail"] = dis_group_warn_insert("", $obm_q, $group);
 	} else {
 	  $retour = run_query_insert($group);
 	  if ($retour) {
@@ -194,7 +194,7 @@ else if ($action == "insert") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($perm->have_perm("editor")) {
-    dis_warn_delete($param_group);
+    $dislpay["detail"] = dis_warn_delete($param_group);
   } else {
     $display["msg"] .= display_error_permission();
   }

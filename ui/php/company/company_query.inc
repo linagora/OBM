@@ -698,12 +698,13 @@ function check_company_context($cid, $company) {
 ///////////////////////////////////////////////////////////////////////////////
 function check_data_form($cid, $company) {
   global $l_fill_name, $l_j_check_phone, $l_j_check_zip, $l_j_check_fax;
-  global $l_j_check_email, $l_j_check_web;
+  global $l_j_check_email, $l_j_check_web, $l_err_act_empty;
   global $err_msg;
   global $php_regexp_zip,$php_regexp_phone,$php_regexp_fax,$php_regexp_email,$php_regexp_web;
 
   $num = $company["num"];
   $name = $company["name"];
+  $act = $company["activity"];
   $zip = $company["zip"];
   $phone = $company["phone"];
   $fax = $company["fax"];
@@ -715,6 +716,13 @@ function check_data_form($cid, $company) {
     $err_msg = $l_fill_name;
     return false;
   }
+
+  // Company activity filled
+  if ($company["act"] < 1) {
+    $err_msg = $l_err_act_empty;
+    return false;
+  }
+
 
   // Company Zip code
   if (($zip != "") && (ereg($php_regexp_zip, $zip) == false)) {

@@ -12,6 +12,7 @@
 //------------------------------------//
 // Direct fields
 $fieldnames["group_name"] = $l_name;
+$fieldnames["group_system"] = $l_system;
 $fieldnames["group_desc"] = $l_desc;
 $fieldnames["group_email"] = $l_email;
 $fieldnames["usercreate"] = $l_creator;
@@ -41,6 +42,20 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
 
   if (($fieldname == "group_name") && $link_ok) {
     $res["url"] = "$path/group/group_index.php?action=detailconsult&amp;param_group=".$OD->data_set->f("group_id");
+  }
+
+  else if ($fieldname == "group_system") {
+    $res["align"] = "center";
+  }
+
+  else if ($fieldname == "group_nb_user") {
+    $nb_q = new DB_OBM;
+    $id = $OD->data_set->f("group_id");
+    $query = "select count(*) from UserObmGroup where userobmgroup_groupid='$id'";
+    $nb_q->query($query);
+    $nb_q->next_record();
+    $res["name"] = $nb_q->f(0);
+    $res["align"] = "center";
   }
 
   // For User member lists
@@ -425,22 +440,24 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
   $dis_pref->pref_title = $l_group_display;
   $dis_pref->pref_dis_help = 0;
 
-  echo "<center>
-    <table><tr><td valign=top>";
-  $dis_pref->display();
+  $block = "
+    <table class=\"detail\">
+    <tr>
+      <td>" . $dis_pref->display() . "</td>";
 
   $dis_pref->display_pref = $pref_u_q;
   $dis_pref->display_module = "group";
   $dis_pref->display_entity = "group_user";
   $dis_pref->pref_title = $l_user_display;
 
-  echo "</td>
-    <td valign=top>";
-  $dis_pref->display();
+  $block .= "<td>" . $dis_pref->display() . "</td>
+      </td>
+    </tr>
+    </table>";
 
-  echo "</td></tr></table>";
-  $dis_pref->dis_pref_help();
-  echo "</center>";
+  $block .= $dis_pref->dis_pref_help();
+
+  return $block;
 }
 
 
@@ -449,31 +466,35 @@ function dis_group_display_pref($pref_group_q, $pref_u_q) {
 // We ask confirmation or cancel
 // Parameters:
 //   - $l_id : group id
-/////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 function dis_warn_delete($l_id) {
-  global $l_warn_delete, $l_delete, $l_back;
+  global $display, $l_warn_delete, $l_delete, $l_back;
 
   $nb_u = get_group_nb_user($l_id);
-  echo "<center><P>$font_msg $nb_u $l_warn_delete</font>";
+  $display["msg"] .= display_warn_msg("$nb_u $l_warn_delete");
 
-  echo "<P>
-    <TABLE><TR><TD>
-    <FORM METHOD=GET NAME=form_delete
-    ACTION=\"" .url_prepare("group_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=delete>
-    <INPUT TYPE=hidden NAME=hd_group_id VALUE=\"$l_id\">
-    <INPUT TYPE=submit NAME=submit VALUE=\"$l_delete\">
-    </FORM>
-    </TD><TD>
-    <FORM NAME=form_back METHOD=GET
-    ACTION=\"" .url_prepare("group_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=detailconsult>
-    <INPUT TYPE=hidden NAME=param_group VALUE=\"$l_id\">
-    <INPUT TYPE=submit VALUE=\"$l_back\">
-    </FORM>
-    </TD></TR>
-    </TABLE>
-    </center>";
+  $block = "
+  <p class=\"detailButton\">
+    <p class=\"detailButtons\">
+      <form method=\"get\" name=\"form_delete\"
+      action=\"" .url_prepare("group_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"delete\" />
+      <input type=\"hidden\" name=\"hd_group_id\" value=\"$l_id\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_delete\" />
+      </form>
+    </p>
+    <p class=\"detailButtons\">
+      <form name=\"form_back\" method=\"get\"
+      action=\"" .url_prepare("group_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
+      <input type=\"hidden\" name=\"param_group\" value=\"$l_id\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </p>";
+
+  return $block;
+
 }
 
 
@@ -487,41 +508,51 @@ function dis_warn_delete($l_id) {
 //     keys used : name, desc
 /////////////////////////////////////////////////////////////////////////////
 function dis_group_warn_insert($l_id, $l_q, $group) {
-  global $l_check_samegroup, $l_confirm, $l_back;
+  global $display, $l_check_samegroup, $l_confirm, $l_back;
   global $c_yes, $c_no;
 
   $name = $group["name"];
   $desc = $group["desc"];
 
-  echo "<center>$l_check_samegroup";
+  $display["msg"] .= display_warn_msg($l_check_samegroup)
+;
   while ($l_q->next_record()) {
     $id = $l_q->f("group_id");
     $samename = $l_q->f("group_name");
     $samedesc = $l_q->f("group_desc");
-    echo "<br><a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;param_group=$id") . "\">$samename ($samedesc)</a>";
+    $dis_same_group .= "
+      <tr><td class=\"detailLabel\">
+        <a href=\"" .url_prepare("group_index.php?action=detailconsult&amp;param_group=$id") . "\">$samename ($samedesc)</a>
+      </td></tr>";
   }
 
-  echo "<p>
-    <TABLE><TR><TD>
-    <FORM METHOD=POST NAME=form_insert
-    ACTION=\"" .url_prepare("group_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=insert>
-    <INPUT TYPE=hidden NAME=hd_confirm VALUE=\"$c_yes\">
-    <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
-    <INPUT TYPE=hidden NAME=tf_desc VALUE=\"$desc\">
-    <INPUT TYPE=submit NAME=submit VALUE=\"$l_confirm\">
-    </FORM>
-    </TD><TD>
-    <FORM NAME=form_back METHOD=POST
-    ACTION=\"" .url_prepare("group_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=new>
-    <INPUT TYPE=hidden NAME=tf_name VALUE=\"$name\">
-    <INPUT TYPE=hidden NAME=tf_desc VALUE=\"$desc\">
-    <INPUT TYPE=submit VALUE=\"$l_back\">
-    </FORM>
-    </TD></TR>
-    </TABLE>
-    </center>";
+  $block = "
+  <table class=\"detail\">
+    $dis_same_group
+  </table>
+  <div class=\"detailButton\">
+    <p class=\"detailButtons\">
+      <form method=\"post\" name=\"form_insert\"
+      action=\"" .url_prepare("group_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+      <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
+      </form>
+    </p>
+    <p class=\"detailButtons\">
+      <form name=\"form_back\" method=\"get\"
+      action=\"" .url_prepare("group_index.php") . "\">
+      <input type=\"hidden\" name=\"action\" value=\"new\" />
+      <input type=\"hidden\" name=\"tf_name\" value=\"$name\" />
+      <input type=\"hidden\" name=\"tf_desc\" value=\"$desc\" />
+      <input type=\"submit\" value=\"$l_back\" />
+      </form>
+    </p>
+  </div>";
+
+  return $block;
 }
 
 
