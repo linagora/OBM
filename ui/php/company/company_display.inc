@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : company_display.inc                                          //
 //     - Desc : Company Display File                                         //
@@ -205,9 +205,10 @@ function html_company_consult($co_q, $kind_q) {
   global $ico_contact_list,$ico_contact_new,$ico_web,$ico_mail;
   // - Labels
   global $l_contact_list,$l_contact_new,$l_deal_list,$l_deal_new;
-  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
-  global $l_insert,$l_update,$l_delete;
-  global $perms_user,$l_perms_user;
+  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
+  global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
+  global $l_insert,$l_update,$l_delete, $l_company;
+  global $perms_user,$l_perms_user,$l_coord;
   global $auth, $sess;
 
   $id = $co_q->f("company_id");
@@ -243,20 +244,20 @@ function html_company_consult($co_q, $kind_q) {
 
   // Email link
   if ($email != "") {
-    $link_email = "<A HREF=\"mailto:$email\">
-      <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_mail\"
-      ALT=\"$email\"></A>";
+    $link_email = "<a href=\"mailto:$email\">
+      <img border=\"0\" src=\"/images/$set_theme/$ico_mail\"
+      alt=\"$email\"></a>";
   } else {
     $link_email = "&nbsp;";
   }
 
   // Web link
   if ($web != "") {
-    $link_web = "<A TARGET=_blank HREF=\"";
+    $link_web = "<a target=\"_blank\" href=\"";
     if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
     $link_web .= "$web\">
-      <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_web\"
-      ALT=\"$web\"></A>";
+      <img border=\"0\" src=\"/images/$set_theme/$ico_web\"
+      alt=\"$web\"></a>";
   } else {
     $link_web = "&nbsp;";
   }
@@ -264,18 +265,67 @@ function html_company_consult($co_q, $kind_q) {
   $links = html_company_links($id, $name, $con_num, $deal_num);
   $lcom = nl2br($com);
 
-  if ($auth->auth["perm"] != $perms_user) {
-    // -------| BITBTN - Update Mode 
-    $dis_update = "<form method=get name=f_mod_societe
-                         action=\"".$sess->url("company_index.php")."\">
-      <input type=hidden name=param_company value=\"$id\">
-      <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
-      <input type=\"submit\" value=\"$l_update\">
-      </form>";
-  }
+
 
   // --- HTML Template --------------------------------------------------------
+  echo "
+   <p>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailHead\" colspan=\"2\">$l_company</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td class=\"detailText\">$name</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$num</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$lkind</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_contact_list</td>
+      <td class=\"detailText\">$con_num</td>
+    </tr><tr>
+      <td class=\"detailHead\" colspan=\"2\">$l_coord</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 1</td>
+      <td class=\"detailText\">$ad1</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 2</td>
+      <td class=\"detailText\">$ad2</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_postcode</td>
+      <td class=\"detailText\">$zip</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailText\">$cdx</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_town</td>
+      <td class=\"detailText\">$town</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_country</td>
+      <td class=\"detailText\">$ctry</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_phone</td>
+      <td class=\"detailText\">$phone</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td class=\"detailText\">$fax</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_email</td>
+      <td class=\"detailText\"> $email $link_email</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_web</td>
+      <td class=\"detailText\">$web $link_web</font></td>
+    </tr><tr>
+      <td class=\"detailHead\" colspan=\"2\">$l_comment</td>
+    </tr><tr>
+      <td class=\"detailText\" colspan=\"2\">".nl2br($com)."</td>
+    </tr>
+    </table>
+   </p>";
 
+/*
   echo "<center>
     <table border=0>
     <tr>
@@ -403,7 +453,7 @@ function html_company_consult($co_q, $kind_q) {
     </tr>
     </table>
     </center>";
-
+*/
 }
 
 
@@ -422,8 +472,9 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
   // -- Themes
   global $set_theme,$ico_web,$ico_mail;
   // -- Labels
-  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town,$l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
-  global $l_insert,$l_update,$l_checkdelete,$l_internal;
+  global $l_name,$l_kind,$l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal,$l_town;
+  global $l_country,$l_email,$l_web,$l_comment,$l_number, $l_market;
+  global $l_insert,$l_update,$l_checkdelete,$l_internal, $l_company;
   global $sess;
 
   // if update mode and first display values are taken from database
@@ -540,7 +591,83 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
 
 
   // --- HTML Template --------------------------------------------------------
+  echo "<CENTER>
+    <FORM METHOD=POST NAME=f_mod_societe
+      onSubmit=\"if (check_company(this)) return true; else return false;\"
+      ACTION=\"".$sess->url("company_index.php")."\">";
 
+  echo "
+    <table class=\"detail\">
+    <tr>
+      <td colspan=\"2\" class=\"detailHead\">$l_company</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_name</td>
+      <td><input type=\"text\" name=\"tf_name\" maxlength=\"50\" size=\"30\" value=\"$name\"></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td><input type=\"text\" name=tf_num value=\"$num\" size=\"30\" maxlength=\"32\"></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td>$sel_kind </font></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_contact_list</td>
+      <td bgcolor=\"#$col_table_3\">$font_data $con_num </font></td>
+    </tr><tr>
+      <td colspan=2 align=center bgcolor=\"#$col_table_3\">
+        $font_label<b>$l_coord</b></font></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table\">$font_label<b>$l_address 1</b></font></td>
+      <td><input NAME=tf_ad1 maxlength=30 size=30 value=\"$ad1\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_address 2</b></font></td>
+      <td><input NAME=tf_ad2 maxlength=30 size=30 value=\"$ad2\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table\">$font_label<b>$l_postcode</b></font></td>
+      <td><input NAME=tf_zip maxlength=14 size=6 value=\"$zip\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_expresspostal</b></font></td>
+      <td><input NAME=tf_cdx maxlength=8 size=8 value=\"$cdx\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table\">$font_label<b>$l_town</b></font></td>
+      <td><input NAME=tf_town maxlength=24 size=24 value=\"$town\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_country</b></font></td>
+      <td><input NAME=tf_ctry maxlength=24 size=24 value=\"$ctry\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table\">$font_label<b>$l_phone</b></font></td>
+      <td><INPUT NAME=tf_phone maxlength=16 size=16 value=\"$phone\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_fax</b></font></td>
+      <td><input NAME=tf_fax maxlength=16 size=16 value=\"$fax\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table\">$font_label<b>$l_email</b></font></td>
+      <td><input NAME=tf_email maxlength=64 size=45 value=\"$email\"></td>
+    </tr><tr>
+      <td bgcolor=\"#$col_table_2\">$font_label<b>$l_web</b></font></td>
+      <td><input NAME=tf_web maxlength=52 size=45 value=\"$web\"></td>
+    </tr><tr>
+      <td colspan=2 align=center bgcolor=\"#$col_table_3\">
+        $font_label<b>$l_comment</b></font></td>
+    </tr><tr>
+      <td colspan=2><textarea NAME=ta_com ROWS=8 COLS=80>$com</textarea></td>
+    </tr>
+    </table>";
+
+  
+  if (($action == "detailupdate") || ($action == "update")) {
+    // -------| BITBTN 1 - VALIDER LES CHANGEMENTS
+    echo "<INPUT TYPE=hidden NAME=param_company VALUE=\"$id\">
+      <INPUT TYPE=\"hidden\" name=\"action\" value=\"update\">
+      <INPUT TYPE=\"submit\" value=\"$l_update\">";
+
+  } elseif (($action == "new") || ($action == "insert")) {
+    echo "<INPUT TYPE=hidden name=\"action\" value=\"insert\">
+      <INPUT TYPE=submit value=\"$l_insert\">";
+  }
+
+  echo "</FORM>
+  </center>";
+/*
   echo "<center>
     <form method=post name=f_mod_societe
       onSubmit=\"if (check_company(this)) return true; else return false;\"
@@ -665,6 +792,7 @@ function html_company_form($action, $co_q, $kind_q, $usr_q, $company) {
     </tr>
     </table>
   </center>";
+*/
 }
 
 

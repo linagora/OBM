@@ -47,7 +47,7 @@ switch ($mode) {
    display_head("Admin_Pref");
    if($action == "") $action = "index";
    get_admin_pref_action();
-   //   $pref->check();
+   $perm->check();
    generate_menu($menu, $section);
    break;
  default:

@@ -301,14 +301,19 @@ require_once("$obminclude/global_display.inc");
 function display_head($l_module) { 
   global $l_title;
   global $col_text,$col_bg,$col_link,$img_bg;
-  global $set_theme;
+  global $set_theme, $obminclude;
 
-  echo "<html><head><title>$l_title - $l_module</title></head>
+  echo "
+  <html>
+    <head>
+     <title>$l_title - $l_module</title>
+     <link rel=stylesheet type=\"text/css\" href=\"/images/$set_theme/style.css\">
+    </head>
     <body TEXT=\"#$col_text\" ";
-     if ($img_bg != "") {echo "BACKGROUND=\"/images/$set_theme/$img_bg\" ";}
-     if ($col_bg != "") {echo "BGCOLOR=\"#$col_bg\" ";}
-     if ($col_link != "") {echo "LINK=\"#$col_link\" ";}
-     if ($col_link != "") {echo "VLINK=\"#$col_link\"";}
+     if ($img_bg != "") {echo "background=\"/images/$set_theme/$img_bg\" ";}
+     if ($col_bg != "") {echo "bgcolor=\"#$col_bg\" ";}
+     if ($col_link != "") {echo "link=\"#$col_link\" ";}
+     if ($col_link != "") {echo "vlink=\"#$col_link\"";}
   echo " marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
 }
 

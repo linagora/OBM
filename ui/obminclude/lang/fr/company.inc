@@ -24,6 +24,7 @@ $l_phone = "Tel";
 $l_fax = "Fax";
 $l_web = "W";
 $l_email = "@M";
+$l_coord = "Coordonnées";
 
 // Labels et textes
 $l_mailing_first = "M";

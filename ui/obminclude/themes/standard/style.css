@@ -1,0 +1,110 @@
+/*Style Cheet of the obm standard theme.*/
+
+.textLabel 		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#000000;
+}
+
+.textLabelForm	 	{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#000000;
+}
+
+.textContent 		{
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#000000;
+}
+
+.bookmark 		{
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#000000;
+}
+
+.menus			{
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#000000;
+}
+
+.modules		{
+	font-family:		sans-serif;
+	font-size:		12px;
+	color:			#ffffff;
+	font-weight:		bold;
+}
+
+.sectionsActive		{
+	font-family:		sans-serif;
+	font-size:		16px;
+	color:			#ffffff;
+	font-weight:		bold;
+}
+
+.sectionsInactive	{
+	font-family:		sans-serif;
+	font-size:		16px;
+	color:			#555555;
+	font-weight:		bold;
+}
+
+.message_ok		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#d2e46a;
+}
+
+.message_error		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#f42742
+}
+
+.message_warning	{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#ee9b00;
+}
+
+.message_info		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#d2e46a;
+}
+
+td.detailHead		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	font-weight:		bold;
+	color:			#59519e;
+	text-align:		center;
+	background-color:	#d7dfe7;
+}
+
+td.detailLabel		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	font-weight:		bold;
+	color:			#59519e;
+	background-color:	#ffffff;
+	
+}
+
+td.detailText		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	color:			#000000;
+	background-color:	#ffffff;
+	
+}
+
+table.detail		{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			auto;
+}
+	
+/*dict ou reference*/
