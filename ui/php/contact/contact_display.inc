@@ -603,21 +603,77 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
     $sel_dsrc .= ">". $dsrc_q->f("datasource_name") . "</option>\n";
   }
   $sel_dsrc .= "</select>";
-
-  // kind select
-  $sel_kind = "<select name=\"sel_kind\">
-    <option value=\"0\">$l_none</option>";
-  while ($kind_q->next_record()) {
-    $k_id = $kind_q->f("kind_id");
-    $k_lang = $kind_q->f("kind_lang");
-    $k_label = $kind_q->f("kind_minilabel");
-    $k_header = $kind_q->f("kind_header");
-    $sel_kind .= "\n<option value=\"$k_id\"";
-    if ($k_id == $kind) { $sel_kind .= "selected = \"selected\""; }
-    $sel_kind .= ">$k_lang-$k_label-$k_header</option>";
+  if($kind_q->nf()>0) {
+    $i=0;
+    $j=0;
+    $k=0;
+    $k_kind_js .= "lang_array = new Array ();\n";
+  //  $k_header_js = "header_array = new Array ();"
+  //  $k_label_js = "label_array = new Array ();"
+    while ($kind_q->next_record()) {      
+      $k_id = $kind_q->f("kind_id");
+      $k_lang = $kind_q->f("kind_lang");
+      $k_label = $kind_q->f("kind_minilabel");
+      $k_header = $kind_q->f("kind_header");
+      if($k_lang != $k_old_lang) {
+	$k_kind_js .= "lang_array['$k_lang'] = new Array ();\n";
+	$k_old_lang = $k_lang;
+      }     
+      if($k_label != $k_old_label) {
+	$k_kind_js .= "lang_array['$k_lang']['$k_label'] = new Array ();\n";
+	$k_old_label = $k_label;
+      }
+      $k_kind_js .= "lang_array['$k_lang']['$k_label']['$k_header'] = '$k_id';\n";
+      $k_kind[$k_lang][$k_label][$k_header] = $k_id;
+      if($k_id == $kind){
+	$kind_lang = $k_lang;
+	$kind_label = $k_label;
+	$kind_header = $k_header;
+      }
+    }
   }
-  $sel_kind .= "</select>";
+  // kind select
+  $sel_kind_header = "<select name=\"sel_header\">";
+  $sel_kind_lang = "<select name=\"sel_lang\">";
+  $sel_kind_label = "<select name=\"sel_label\">";
 
+  $i=0;
+  $sel_kind_lang = "<select name=\"sel_kind_lang\"
+  onchange=\"fill_select_label(this)\">
+  <option value=\"0\">$l_none</option>";
+  $sel_kind_label = "<select name=\"sel_kind_label\" 
+  onchange=\"fill_select_header(this)\">
+  <option value=\"0\">$l_none</option>";
+  $sel_kind_header = "<select name=\"sel_kind\">
+  <option value=\"0\">$l_none</option>";
+  foreach( $k_kind as $k_lang =>  $k_kind_label){
+    $sel_kind_lang .= "\n<option value=\"$k_lang\"";
+    if($k_lang == $kind_lang) {
+      foreach($k_kind_label as $k_label =>  $k_kind_header) {
+	$sel_kind_label .= "\n<option value=\"$k_label\"";
+	if($k_label == $kind_label) {
+	  foreach($k_kind_header as $k_header => $k_id) {
+	    $sel_kind_header .= "\n<option value=\"$k_header\"";
+	    if ($k_id == $kind) { 
+	      $sel_kind_lang .= "selected = \"selected\"";
+	      $sel_kind_label .= "selected = \"selected\"";
+	      $sel_kind_header .= "selected = \"selected\""; 
+	    }
+	    $sel_kind_header .= ">$k_header</option>";
+	  }
+	}
+	$sel_kind_label .= ">$k_label</option>";
+      }
+    }
+    $sel_kind_lang .= ">$k_lang</option>";
+  }
+  $sel_kind_label .= "</select>";
+  $sel_kind_lang .= "</select>";
+  $sel_kind_header .= "</select>";
+  $script = "
+    <script type=\"text/javascript\">
+      $k_kind_js
+    </script>\n";
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
     <option value=\"0\">$l_none</option>";
@@ -680,9 +736,10 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
   // --- HTML Template --------------------------------------------------------
+  $block = "$script";
 
-  $block = "
-    <form method=\"post\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
+  $block .= "
+    <form method=\"get\" name=\"form_mod_contact\" onsubmit=\"if (check_contact(this)) return true; else return false;\" action=\"".url_prepare("contact_index.php")."\">
 
     <div class=\"detailHead\">$l_contact</div>
 
@@ -695,7 +752,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
       <td class=\"detailForm\"><input type=\"text\" name=\"tf_fname\" size=\"30\" value=\"$fname\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$sel_kind</td>
+      <td class=\"detailForm\"> $sel_kind_lang $sel_kind_label $sel_kind_header </td>
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td> 
       <td class=\"detailForm\">$sel_dsrc</td>

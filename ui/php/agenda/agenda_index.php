@@ -306,7 +306,7 @@ elseif ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
 if ($param_event > 0) {  
   $sel_user_id = slice_user($sel_user_id);
-  require("agenda_js.inc");
+  require("$obminclude/calendar.js");
   $user_obm = run_query_userobm_writable();
   $grp_obm = run_query_group_writable();
   $cat_event = run_query_get_eventcategories();
@@ -336,7 +336,6 @@ elseif ($action == "update") {
       require("agenda_js.inc");
       $display["msg"] .= display_warn_msg($l_update_warning);      
       $display["result"] = html_dis_conflict($agenda,$conflict,$event_id,0);
-      require("agenda_js.inc");
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);

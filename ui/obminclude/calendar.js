@@ -1,4 +1,5 @@
-<script type="text/javascript">
+<?
+$extra_js .= "<script type=\"text/javascript\">
 <!--
 var calendarWindow = null;
 var calendarColors = new Array();
@@ -32,7 +33,7 @@ function getCalendar(in_dateField,url)
     var cal_width = 284;
     var cal_height = 264;
 
-    if ((document.all) && (navigator.userAgent.indexOf("Konqueror") == -1)) {
+    if ((document.all) && (navigator.userAgent.indexOf(\"Konqueror\") == -1)) {
         cal_width = 284;
     }
 
@@ -51,4 +52,5 @@ function killCalendar()
 }
 -->
 </script>
-
+";
+?>

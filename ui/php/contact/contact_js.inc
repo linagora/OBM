@@ -163,7 +163,57 @@ function check_kind_new(form)
       return true;
    }
 }
+///////////////////////////////////////////////////////////////////////////////
+// Fill the Kind's mini label select.
+///////////////////////////////////////////////////////////////////////////////
+var lang_array;
 
+function fill_select_label(source) 
+{
+  destination = source.form.sel_kind_label;
+  kind = source.form.sel_kind;
+  destIndex = source.options[source.selectedIndex].value;
+  for (i = destination.options.length-1; i >= 0; i--) {
+    destination.options[i] = null; 
+  }  
+  for (i = kind.options.length-1; i >= 0; i--) {
+    kind.options[i] = null; 
+  }
+  kind.options[0]=new Option('$l_none');
+  destination.options[0]=new Option('$l_none');
+  i=1;
+  for (var destValue in lang_array[destIndex]) {
+    destination.options[i]= new Option(destValue,destValue);
+    i++;
+  }
+  destination.selectedIndex=0;
+  kind.selectedIndex=0;
+  
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Fill the Kind's header select.
+///////////////////////////////////////////////////////////////////////////////
+
+function fill_select_header(source) 
+{
+  destination = source.form.sel_kind;
+  lang = source.form.sel_kind_lang;
+  destIndex = source.options[source.selectedIndex].value;
+  for (i = destination.options.length-1; i >= 0; i--) {
+    destination.options[i] = null; 
+  }  
+  kind.options[0]=new Option('$l_none');
+  destination.options[0]=new Option('$l_none');
+  i=1;
+  for (var destValue in lang_array[lang.options[lang.selectedIndex].value][destIndex]) {
+    destination.options[i]= new Option(destValue,lang_array[lang.options[lang.selectedIndex].value][destIndex][destValue]);
+    i++;
+  }
+  destination.selectedIndex=0;
+  kind.selectedIndex=0;
+  
+}
 // -->
 </script>
 ";
