@@ -324,7 +324,15 @@ function show ( name ) {
   }
 }
 
-
+function get_elem(doc, name ) {
+  if (W3C) {
+    return doc.getElementById(name);
+  } else if (NS4) {
+    return doc.layers[name]  
+  } else {
+    return doc.all[name];
+  }
+}
 ";
 
 if (isset($ext_target) && $ext_target!="") {
@@ -337,7 +345,7 @@ if (isset($ext_target) && $ext_target!="") {
   
   function fill_ext_form2(int_form) {
    size = int_form.length;
-   ext_field = window.opener.document.getElementById('$ext_target');
+   ext_field = get_elem(window.opener.document, '$ext_target' );
    for(i=0; i <size; i++) {
      if(int_form.elements[i].type == 'checkbox'){
        if(int_form.elements[i].checked == true) {
@@ -350,10 +358,12 @@ if (isset($ext_target) && $ext_target!="") {
 	   }
 	 }
 	 if(bool==false) {
-	    cat_name = document.getElementById('data'+int_form.elements[i].name);
-	    cat_name = cat_name.innerHTML;
-	    ext_field.options[ext_size] = new Option(cat_name);
-            ext_field.options[ext_size].value = int_form.elements[i].name;
+	    cat_name = get_elem(document,'data'+int_form.elements[i].name);
+	    cat_name_text = cat_name.innerHTML;
+	    //IE Hack!
+	    ext_field.length = ext_size + 1;
+	    ext_field.options[ext_size].value = int_form.elements[i].name;
+	    ext_field.options[ext_size].text = cat_name_text
 	    ext_field.options[ext_size].selected =true;
 	 }
        }

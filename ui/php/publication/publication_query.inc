@@ -828,7 +828,7 @@ function check_data_form($cid, $publication) {
     return false;
   }
 
-  if (($year != "") && ($year < 1900 || $year > 2200)) {
+  if (($year == "") || ($year < 1900 || $year > 2200)) {
     $err_msg = $l_j_check_year. " : $year";
     return false;
   }

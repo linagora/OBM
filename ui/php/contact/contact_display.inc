@@ -2210,7 +2210,7 @@ function html_contact_kind_form($kind_q) {
         <tr>
           <td class=\"adminLabel\">$l_label : </td>
           <td>
-            <input type=\"text\" name=\"tf_label\" size=\"5\" maxlength=\"5\" />
+            <input type=\"text\" name=\"tf_label\" />
 	  </td>
         </tr>
         <tr>

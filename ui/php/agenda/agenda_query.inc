@@ -67,7 +67,8 @@ function run_query_detail($param_event,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_event_customers($param_event,$getdate) {
   $obm_db = new DB_OBM;
-  $getdate = format_to_iso($getdate);
+  $db_type = $obm_db->type;
+  $getdate = format_to_iso($db_type,$getdate);
   $query = "SELECT DISTINCT userobm_lastname,userobm_firstname,userobm_id,calendarsegment_state,userobm_id
             FROM UserObm, CalendarSegment
             WHERE  calendarsegment_eventid = '$param_event'
@@ -86,7 +87,8 @@ function run_query_event_customers($param_event,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_event_groups($param_event,$getdate) {
   $obm_db = new DB_OBM;
-  $getdate = format_to_iso($getdate);
+  $db_type = $obm_db->type;
+  $getdate = format_to_iso($db_type,$getdate);
   $query = "SELECT DISTINCT group_id, group_name,calendarsegment_state
             FROM UGroup, CalendarSegment
             WHERE  calendarsegment_eventid = '$param_event'
@@ -106,7 +108,8 @@ function run_query_event_groups($param_event,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_event_customers_array($param_event,$getdate) {
   $obm_db = new DB_OBM;
-  $getdate = format_to_iso($getdate);
+  $db_typ = $obm_db->type;
+  $getdate = format_to_iso($db_type,$getdate);
   $query = "SELECT DISTINCT userobm_id
             FROM UserObm, CalendarSegment
             WHERE  calendarsegment_eventid = '$param_event'
@@ -128,7 +131,7 @@ function run_query_event_customers_array($param_event,$getdate) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_event_groups_array($param_event,$getdate) {
   $obm_db = new DB_OBM;
-  $getdate = format_to_iso($getdate);
+  $getdate = format_to_iso($db_type,$getdate);
   $query = "SELECT DISTINCT group_id
             FROM UGroup, CalendarSegment
             WHERE  calendarsegment_eventid = '$param_event'
@@ -663,8 +666,7 @@ function run_query_update_occurence_state($event_id, $date_begin,$date_end,$user
   $obm_db = new DB_OBM;
    $db_type = $obm_db->type;
   $calendarsegment_date_l = sql_date_format($db_type,"calendarsegment_date","calendarsegment_date");    
-  $calendarsegment_date = sql_date_format($db_type,"calendarsegment_date","calendarsegment_date");     
-
+  $calendarsegment_date = sql_date_format($db_type,"calendarsegment_date");     
   $date_begin_time = mktime(substr($date_begin,8,2), substr($date_begin,10,2), "00", substr($date_begin,4,2), substr($date_begin,6,2), substr($date_begin,0,4));
   $date_end_time = mktime(substr($date_end,8,2), substr($date_end,10,2), "00", substr($date_end,4,2), substr($date_end,6,2), substr($date_end,0,4));
   
@@ -2240,9 +2242,15 @@ function slice_user($sel_user_id) {
 // ---------
 //     - $date
 ///////////////////////////////////////////////////////////////////////////////
-function format_to_iso($date) {
- ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$date , $day_array);
- return $day_array[1]."-".$day_array[2]."-".$day_array[3];
+function format_to_iso($db_type,$date) {
+  global $db_type_mysql, $db_type_pgsql;
+
+  if ($db_type == $db_type_pgsql) {
+    ereg ("([0-9]{4})([0-9]{2})([0-9]{2})",$date , $day_array);
+    return $day_array[1]."-".$day_array[2]."-".$day_array[3];
+  } elseif ($db_type == $db_type_mysql) {
+    return $date;
+  }
 }
 
  

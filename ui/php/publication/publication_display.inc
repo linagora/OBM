@@ -437,13 +437,12 @@ function html_publication_form($action, $pub_q,$type_q, $publication) {
   if (isset($publication["id"])) { $id = $publication["id"]; }
   if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
   if (isset($publication["type"])) { $type = $publication["type"]; }
-  if (isset($publication["year"])) { $ad3 = stripslashes($publication["year"]); }
-  if (isset($publication["lang"])) { $zip = stripslashes($publication["lang"]); }
-  if (isset($publication["desc"])) { $com = stripslashes($publication["desc"]); }
+  if (isset($publication["year"])) { $year = stripslashes($publication["year"]); }
+  if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
+  if (isset($publication["desc"])) { $desc = stripslashes($publication["desc"]); }
 
   // type select
-  $sel_type = "<select name=\"sel_type\" id=\"sel_type\">
-    <option value=\"0\">$l_none</option>";
+  $sel_type = "<select name=\"sel_type\" id=\"sel_type\">";
   while ($type_q->next_record()) {
     $k_id = $type_q->f("publicationtype_id");
     $sel_type .= "\n<option value=\"$k_id\"";
@@ -602,7 +601,7 @@ function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication
   $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
 
   // --- HTML Template --------------------------------------------------------
-
+  if(!isset($quantity)) $quantity = 1;
   $block = "
     $js_ctry
 

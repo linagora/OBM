@@ -438,6 +438,13 @@ function get_document_action() {
     'Condition'=> array ('all') 
                                      		 );
 
+// Display Level
+  $actions["DOCUMENT"]["ext_get_path"]  = array (
+    'Url'      => "$path/document/document_index.php?action=ext_get_path",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+
 // Index  
   $actions["DOCUMENT"]["index"] = array (
     'Name'     => $l_header_find,

@@ -1963,13 +1963,13 @@ function html_waiting_events($obm_wait) {
      <td class=\"detailForm\">$date_begin</td>
      <td class=\"detailForm\">$date_end</td>
      <td class=\"detailForm\">
-      <form method=\"get\">
+      <form method=\"get\" action=\"agenda_index.php\">
        <input type=\"hidden\" name=\"action\" value=\"decision\" />      
        <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
        <input type=\"hidden\" name=\"param_user\" value=\"$current_user\" />
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onchange=\"this.form.submit()\" />$l_accept
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onchange=\"this.form.submit()\" />$l_wait
-       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onclick=\"this.form.submit()\" />$l_accept
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onclick=\"this.form.submit()\" />$l_wait
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
       </form>
      </td>
     </tr>";
@@ -2003,6 +2003,8 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
   $priority = $obm_q_event->f("calendarevent_priority"); 
   $description = $obm_q_event->f("calendarevent_description");
   $datebegin = datetime_format($obm_q_event->f("datebegin"));
+  $hdbegin = date("YmdHis",$obm_q_event->f("datebegin"));
+  $hdend = date("YmdHis",$obm_q_event->f("dateend"));
   $dateend =  datetime_format($obm_q_event->f("dateend"));
   $privacy = $obm_q_event->f("calendarevent_privacy");
   $occupied_day = $obm_q_event->f("calendarevent_occupied_day");
@@ -2045,11 +2047,11 @@ function html_calendar_consult($obm_q_event,$obm_q_cust,$obm_q_grp) {
       <tr><td colspan=\"2\" class=\"detailText\">
 	<input type=\"hidden\" name=\"action\" value=\"update_decision\" />
 	<input type=\"hidden\" name=\"param_event\" value=\"$id\" />
-	<input type=\"hidden\" name=\"hd_date_begin\" value=\"".$day_array[0]."\" />
-	<input type=\"hidden\" name=\"hd_date_end\" value=\"".$day_array2[0]."\" />
-	<input type=\"radio\" $A name=\"rd_decision_event\" value=\"A\" onchange=\"this.form.submit()\" />$l_accept
-	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onchange=\"this.form.submit()\" />$l_wait
-	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse
+	<input type=\"hidden\" name=\"hd_date_begin\" value=\"$hdbegin\" />
+	<input type=\"hidden\" name=\"hd_date_end\" value=\"$hdend\" />
+	<input type=\"radio\" $A name=\"rd_decision_event\" value=\"A\" onclick=\"this.form.submit()\" />$l_accept
+	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onclick=\"this.form.submit()\" />$l_wait
+	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onclick=\"this.form.submit()\" />$l_refuse
       </td></tr>";
     }
     $dis_user_list .= $obm_q_cust->f("userobm_lastname")." ". $obm_q_cust->f("userobm_firstname")."(".$obm_q_cust->f("calendarsegment_state").")<br />";

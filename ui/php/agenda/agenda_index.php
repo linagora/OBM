@@ -224,7 +224,8 @@ elseif ($action == "insert") {
     $conflict = run_query_add_event($agenda,$sel_user_id,$event_id);
     if (count($conflict) == 0) {
       require("agenda_js.inc");
-      $p_user_array = array($auth->auth["uid"]);
+      $sel_user_id = array($auth->auth["uid"]);      
+      $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $display["msg"] .= display_ok_msg($l_insert_ok);
       $user_q = store_users(run_query_get_user_name($p_user_array));
@@ -463,7 +464,9 @@ elseif ($action == "rights_admin") {
   require("agenda_js.inc");
   $display["detail"] = dis_admin_index();
 }
-
+if (count($sel_user_id) != 0 ) {
+  $agenda_user_view = $sel_user_id;
+}
 $display["head"] = display_head($l_agenda);
 $display["header"] = generate_menu($menu,$section);      
 $display["end"] = display_end();
