@@ -320,10 +320,10 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
-
+  $param_comp = $deal["company"];
   $obm_q_deals->seek($first_row);
   
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
 
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q);
   $dis_deals_list->data_set = $obm_q_deals;
