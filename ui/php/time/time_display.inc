@@ -1294,8 +1294,8 @@ function dis_table_title($message) {
 function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
                           $day_q, $fraction_t, $time, $validate_days) {
 
-  global $auth,$time ,$l_addtask_start, $l_addtask_end, $fraction_jour ,$task_id_modify;
-  global $l_add, $task_list, $l_none;
+  global $auth, $time, $fraction_jour ,$task_id_modify;
+  global $l_addtask_start, $l_addtask_end, $l_add, $task_list, $l_none;
   global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   //for list classement of task
   global $l_task_fac,$l_task_div,$l_task_int, $l_intern;
@@ -1329,10 +1329,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
     $is_day = substr($task_to_be_modify->f("timetask_date"),0,8);
     $is_tt = $task_to_be_modify->f("timetask_tasktype_id");
     $is_proj = $task_to_be_modify->f("timetask_project_id");
+    $is_projtask = $task_to_be_modify->f("timetask_projecttask_id");
     $is_time = $task_to_be_modify->f("timetask_length");
   }
 
-  
 //   // Day check construction
   if ($action == "update") {
     for ($day=0;$day< sizeof($day_q);  $day++) {
@@ -1464,10 +1464,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   $sel_projtask .= "</select>";
 
   // Project Label
-//   if ($action == "update")
-//     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\" />";
-//   else
-//     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
+   if ($action == "update")
+     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_to_be_modify->f("task_label")."\" />";
+   else
+     $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
 
   // Project time length
   $sel_time="<select name=sel_time>";
@@ -1522,6 +1522,9 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
      <td colspan=2>".col_table($col_textem, $l_project)."<br>$sel_proj</td>
      <td>".col_table($col_textem, $l_label)."<br>$sel_projtask</td>
     </tr>
+    <tr class=\"timeHeader\">
+     <td colspan=\"4\">".col_table($col_textem, $l_label)."<br>$tf_label</td>
+    </tr>
   </table>";
 
   if ($action == "insert") {
@@ -1538,8 +1541,13 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   
   if ($action == "update"){
     echo "<script language=\"JavaScript\">\n";
-    echo "fill_project(document.form_add_task.sel_project, document.form_add_task.sel_tasktype.value)\n";
-    echo "select_default(document.form_add_task.sel_project, $is_proj)";
+//     echo "alert(document.form_add_task.sel_tasktype.value);";
+    echo "fill_project(document.form_add_task.sel_project,";
+    echo " document.form_add_task.sel_tasktype.value,";
+    echo " document.form_add_task.sel_projecttask);\n";
+    echo "fill_projecttask(document.form_add_task.sel_projecttask, $is_proj);";
+    echo "select_default(document.form_add_task.sel_project, $is_proj);\n";
+    echo "select_default(document.form_add_task.sel_projecttask, $is_projtask);\n";
     echo "</script>\n";
   }
   

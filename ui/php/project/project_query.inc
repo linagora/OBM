@@ -83,7 +83,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Detail query execution                                                    //
+// Detail query execution (retrieve the main infos about the project)        //
 // Parameters :
 //   - $p_id  : project id
 ///////////////////////////////////////////////////////////////////////////////
@@ -204,7 +204,7 @@ function run_query_create($project) {
 // Parameters:
 //   - $pid       : project id
 //   - $project[] : Entry's values
-//     keys used  : name, soldtime, tt, state
+//     keys used  : name, soldtime, tt, status
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_update($pid, $project) {
   global $auth, $cdg_sql;
@@ -256,10 +256,10 @@ function run_query_close($pid) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : ContactList conditionnal insertion                      //
+// Query execution : UserList conditionnal insertion                         //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
-// Return: number of contact inserted
+//   - $project[] : Entry's values
+//     keys used  : id, ptask, tasklabel
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tasklist_insert($project) {
   global $auth, $cdg_sql;
@@ -295,9 +295,9 @@ function run_query_tasklist_insert($project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : ContactList deletion                                    //
+// Query execution : Tasklist deletion                                       //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
+//   - $project[] : deal hash info : keys used : id, task_nb, tskX
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tasklist_delete($project) {
   global $auth, $cdg_sql;
@@ -329,10 +329,10 @@ function run_query_tasklist_delete($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : ContactList conditionnal insertion                      //
+// Query execution : UserList conditionnal insertion                         //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
-// Return: number of contact inserted
+//   - $project[] : deal hash info : keys used : id, mem_nb, memX
+// Return: number of users inserted
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_memberlist_insert($project) {
   global $auth, $cdg_sql;
@@ -396,7 +396,7 @@ function run_query_memberlist_insert($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : ContactList deletion                                    //
 // Parameters:
-//   - $list[] : deal hash info : keys used : id, con_nb, conX
+//   - $project[] : deal hash info : keys used : id, mem_nb, memX
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_memberlist_delete($project, $all = 0) {
   global $auth, $cdg_sql;
@@ -466,11 +466,9 @@ function run_query_memberlist_delete($project, $all = 0) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Advance Update query execution                                            //
+// Project Update query execution                                            //
 // Parameters:
-//   - $p_id      : project id
-//   - $u_id      : user id
-//   - $missing   : new missing time
+//   - $project[] : deal hash info : keys used : projected
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_projectupdate($project) {
   global $auth, $cdg_sql;
@@ -518,9 +516,7 @@ function run_query_projectupdate($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // Advance Update query execution                                            //
 // Parameters:
-//   - $p_id      : project id
-//   - $u_id      : user id
-//   - $missing   : new missing time
+//   - $project[] : deal hash info : keys used : missing
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_advanceupdate($project) {
   global $auth, $cdg_sql;
@@ -618,11 +614,15 @@ function run_query_statlog($p_id) {
     insert into ProjectStat (
       projectstat_deal_id,
       projectstat_date,
+      projectstat_timecreate,
+      projectstat_usercreate,
       projectstat_useddays,
       projectstat_remainingdays)
     values (
       $p_id,
       '". date("Y-m-d H:i:s") ."',
+      '". date("Y-m-d H:i:s") ."',
+      ". $auth->auth["uid"] .",
       $time_used,
       $time_left
     )";
@@ -634,7 +634,7 @@ function run_query_statlog($p_id) {
   return $retour;
 }
 
-
+// bcontins : pour les projets internes ?
 ///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution                                                  //
 // Parameters:
@@ -681,8 +681,9 @@ function run_query_newprojects() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the project that are still in commercial state
+// Project tasks query
 // Parameters :
+//   - $pid : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_tasks($pid) {
   global $cdg_sql;
@@ -709,25 +710,8 @@ function run_query_tasks($pid) {
 // Project members query
 // Parameters :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_members() { //$p_id = 0) {
+function run_query_members() {
   global $cdg_sql;
-
-//   if ($p_id) {
-
-//   $query = "
-//     select
-//       userobm_id,
-//       userobm_lastname,
-//       userobm_firstname,
-//       projectuser_manager
-//     from UserObm, ProjectUser, ProjectTask
-//     where projecttask_deal_id = $p_id
-//       and projecttask_id = projectuser_projecttask_id
-//       and projectuser_user_id = userobm_id
-//     group by userobm_id
-//     order by projectuser_manager desc, userobm_lastname, userobm_firstname
-//     ";
-//   } else {
 
   $query = "
     select userobm_id as member_id,
@@ -739,7 +723,6 @@ function run_query_members() { //$p_id = 0) {
     group by member_id
     order by member_firstname
     ";
-//   }
 
   display_debug_msg($query, $cdg_sql, "run_query_members");
   $obm_q = new DB_OBM;
@@ -751,7 +734,7 @@ function run_query_members() { //$p_id = 0) {
 ///////////////////////////////////////////////////////////////////////////////
 // Members time informations query
 // Parameters :
-//   - $pid      : project id
+//   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_memberstime($p_id) {
   global $cdg_sql, $c_day_fraction;
@@ -791,6 +774,7 @@ function run_query_memberstime($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Project managers query
 // Parameters :
+//   - $p_id      : project id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_managers($p_id = 0) {
   global $cdg_sql;
@@ -847,11 +831,11 @@ function run_query_projecttype($type = 'all') {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Form Data checking and formatting                                 //
+// New Project Form Data checking and formatting                             //
 // Parameters:
-//   - $cid   : company id
-//   - $company[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : name, tt, soldtime
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
@@ -891,11 +875,11 @@ function check_new_form($pid, $project) {
   return true; 
 }
 ///////////////////////////////////////////////////////////////////////////////
-// Company Form Data checking and formatting                                 //
+// Project Init Form Data checking and formatting                                 //
 // Parameters:
-//   - $cid   : company id
-//   - $company[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : tt, soldtime
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
@@ -922,11 +906,11 @@ function check_init_form($pid, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Form Data checking and formatting                                 //
+// Project Task Form Data checking and formatting                            //
 // Parameters:
-//   - $cid   : company id
-//   - $company[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : tasklabel
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
@@ -946,11 +930,11 @@ function check_taskadd_form($pid, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Company Form Data checking and formatting                                 //
+// Advance Form Data checking and formatting                                 //
 // Parameters:
-//   - $cid   : company id
-//   - $company[] : values checked
-//     keys used  : num, name, zip, phone, fax, web, email
+//   - $pid   : project id
+//   - $project[] : values checked
+//     keys used  : missing
 // Returns:
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////

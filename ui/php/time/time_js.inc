@@ -35,6 +35,7 @@ function uncheck_days(data) {
 ////////////////////////
 // Deal Form checking //
 ////////////////////////
+//bcontins sert-ce ?
 echo "
 function check_form(f_aff) {
 

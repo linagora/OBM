@@ -172,7 +172,9 @@ if ($action == "index" || $action == "") {
  } elseif ($action == "validate")  {
 ///////////////////////////////////////////////////////////////////////////////
 //  if (check_member_form($param_project, $project)) {
-   $del_err = run_query_memberlist_delete($project, 1);
+
+   //smlp renvoie le tableau des missings
+   $project["missing"] = run_query_memberlist_delete($project, 1);
    $ins_err = run_query_projectupdate($project);
 
    // Create an entry in the ProjectStat log
@@ -668,6 +670,20 @@ function get_project_action() {
                                     	  );
 
 // Display
+  $actions["PROJECT"]["task_add"] = array (
+    'Url'      => "$path/project/project_index.php?action=task_add",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                       );
+
+// Display
+  $actions["PROJECT"]["task_del"] = array (
+    'Url'      => "$path/project/project_index.php?action=task_del",
+    'Right'    => $project_write,
+    'Condition'=> array ('None') 
+                                       );
+
+// Display
   $actions["PROJECT"]["member_add"] = array (
     'Url'      => "$path/project/project_index.php?action=member_add",
     'Right'    => $project_write,
@@ -676,26 +692,26 @@ function get_project_action() {
 
 // Display
   $actions["PROJECT"]["member_del"] = array (
-    'Url'      => "$path/project/project_index.php?action=member_del&amp;param_project=".$project["id"]."",
+    'Url'      => "$path/project/project_index.php?action=member_del",
     'Right'    => $project_write,
     'Condition'=> array ('None') 
                                        );
 
 // Admin
-  $actions["PROJECT"]["admin"] = array (
-    'Name'     => $l_header_admin,
-    'Url'      => "$path/project/project_index.php?action=admin",
-    'Right'    => $project_admin_read,
-    'Condition'=> array ('all') 
-                                       );
+//   $actions["PROJECT"]["admin"] = array (
+//     'Name'     => $l_header_admin,
+//     'Url'      => "$path/project/project_index.php?action=admin",
+//     'Right'    => $project_admin_read,
+//     'Condition'=> array ('all') 
+//                                        );
 
 // Display
-  $actions["PROJECT"]["display"] = array (
-    'Name'     => $l_header_display,
-    'Url'      => "$path/project/project_index.php?action=display",
-    'Right'    => $project_read,
-    'Condition'=> array ('all') 
-                                      	 );
+   $actions["PROJECT"]["display"] = array (
+     'Name'     => $l_header_display,
+     'Url'      => "$path/project/project_index.php?action=display",
+     'Right'    => $project_read,
+     'Condition'=> array ('all') 
+                                       	 );
 
 // Display Préférences
   $actions["PROJECT"]["dispref_display"] = array (

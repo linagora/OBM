@@ -35,7 +35,6 @@ require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 include("$obminclude/global_pref.inc");
 
-//require("../agenda/agenda_functions.inc");
 require("time_display.inc");
 require("time_query.inc");
 
@@ -104,8 +103,6 @@ $perm->check("user");
 
 ///////////////////////////////////////////////////////////////////////////////
 //perms for manage task ??? To update when access rights model will change
-// $project_managers = array( '6' , '7' , '8','23' ) ;
-// $stats_users = array( '6' , '7' , '8','23' ) ;
 $project_managers = run_query_managers();
 $stats_users = run_query_managers();
 ///////////////////////////////////////////////////////////////////////////////
@@ -396,18 +393,12 @@ function get_param_time() {
   if (isset ($sel_time)) $task["time"] = $sel_time;
   if (isset ($tf_label)) $task["label"] = $tf_label;
   if (isset ($f_time)) $task["f_time"] = $f_time;
-//   if (isset ($user_id)) $task["user_id"] = $user_id;
+  //   if (isset ($user_id)) $task["user_id"] = $user_id;
   if (isset ($sel_user_id)) $task["user_id"] = $sel_user_id;
   if (isset ($cb_allusers)) $task["allusers"] = $cb_allusers;
   if (isset ($submit)) $task["submit"] = $submit;
   if (isset ($wbegin)) $task["date"] = $wbegin;
   if (isset ($task_id)) $task["task_id"] = $task_id;
-
-  // bcontins : obsolete
-  //  if (! empty($st_detail)) 
-  //   $task["show_task_detail"] = true;
-  //else
-  //   $task["show_task_detail"] = false;
 
   if (is_array($cb_day)) $task["sel_date"] = $cb_day;
   elseif (isset ($rd_day)) $task["sel_date"] = $rd_day;
@@ -418,11 +409,11 @@ function get_param_time() {
     if ( $task ) {
       echo "<br>get_param_time() : ";
       while ( list( $key, $val ) = each( $task ) ) {
-		if (is_array($val)) {
+	if (is_array($val)) {
           echo "<br>task[$key]=";
-	      print_r($val);
-        }
-        else
+	  print_r($val);
+	}
+	else
           echo "<br>task[$key]=$val";
       }
     }

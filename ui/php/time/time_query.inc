@@ -382,7 +382,13 @@ function run_query_valid_search($time) {
 function run_query_get_task($id) {
   global $cdg_sql;
 
-  $query = "select * from TimeTask where timetask_id = '$id'";
+  $query = "
+    select
+       TimeTask.*,
+       projecttask_deal_id as timetask_project_id  
+     from TimeTask, ProjectTask
+     where timetask_id = '$id'
+       and timetask_projecttask_id = projecttask_id";
   
   display_debug_msg($query, $cdg_sql, "run_query_get_task");
 

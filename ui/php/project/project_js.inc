@@ -60,7 +60,7 @@ function check_project(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the kind check or deletion is possible                           //
+// Check if the init project form                                            //
 ///////////////////////////////////////////////////////////////////////////////
 
 function check_init_project(form) {
@@ -83,7 +83,7 @@ function check_init_project(form) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Select the appropriate action for the form                                //
+// Select the task add form                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function check_taskadd(form)
 {
@@ -110,6 +110,11 @@ function submit_memberdel(form)
   form.action = \"project_index.php?action=member_del\"
   form.submit();
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Select the project members form                                           //
+///////////////////////////////////////////////////////////////////////////////
+// each member should be assigned to at least one task
 
 function check_membervalid(form, nb_mem)
 {
@@ -157,6 +162,10 @@ function check_membervalid(form, nb_mem)
   }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Select the advance update form                                            //
+///////////////////////////////////////////////////////////////////////////////
+
 function check_advancevalid(form)
 {
   error = 0;
@@ -186,6 +195,10 @@ function check_advancevalid(form)
     return true;
   }
 }
+
+///////////////////////////////////////////////////////////////////////////////
+// Open the userobm list form window                                         //
+///////////////////////////////////////////////////////////////////////////////
 
 function submit_memberadd(form, p_id)
 {

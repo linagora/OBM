@@ -47,13 +47,13 @@ function dis_data_project(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Project search Form                                               //
 // Parameters:
-//   - $kind_q    : database object with kind list
-//   - $act_q     : database object with activity list
-//   - $usr_q     : database object with userobm list
-//   - $company[] : default form values
-//     keys used  : status, name, kind, zip, mm
+//   - $tt_q      : database object with tasktype list
+//   - $manager_q : database object with project manager list
+//   - $member_q  : database object with project member list
+//   - $project[] : default form values
+//     keys used  : name, company_name, tt, manager, member,
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
   global $l_name, $l_company_name, $l_tasktype, $l_manager, $l_member;
@@ -144,7 +144,13 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display New Project Form                                                  //
+// Parameters:
+//   - $action    : 
+//   - $project_q : database object with project infos
+//   - $tt_q      : database object with tasktype list
+//   - $project[] : default form values
+//     keys used  : name, id, tt, soldtime
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_form($action, $project_q, $tt_q, $project) {
   global $l_dealinfos, $l_projectinfos, $l_interninfos, $l_insert, $l_update;
@@ -221,7 +227,12 @@ function html_project_form($action, $project_q, $tt_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Init Project Form                                                 //
+// Parameters:
+//   - $action    : 
+//   - $project_q : database object with project infos
+//   - $project[] : default form values
+//     keys used  : id, soldtime
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_init_form($action, $project_q, $project) {
   global $l_dealinfos, $l_projectinfos, $l_member_add, $l_insert, $l_update;
@@ -288,7 +299,11 @@ function html_project_init_form($action, $project_q, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Task Add Form                                                     //
+// Parameters:
+//   - $ptask_q   : database object with project parent tasks list
+//   - $project[] : default form values
+//     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_taskadd_form($ptask_q, $project) {
   global $l_none, $l_taskname, $l_parent, $l_task_add;
@@ -354,7 +369,10 @@ function html_project_taskadd_form($ptask_q, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company search Form                                               //
+// Display Member Add Window                                                 //
+// Parameters:
+//   - $project[] : default form values
+//     keys used  : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_memberadd_form($project) {
   
@@ -400,7 +418,7 @@ function dis_project_new_list($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Search result                                                //
+// HTML Display new Projects search result                                   //
 // Parameters : 
 //   - $obm_q_comp : list of companies
 //   - $pref_q     : the fields which have to be displayed
@@ -426,8 +444,8 @@ function html_project_new_list($obm_q_comp, $pref_q, $nb_newprojects, $project) 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Project search result                                         //
 // Parameters:
-//   - $deal[]    : deal search criteria
-//     keys used  : company_id, name, company
+//   - $project[] : project search criteria
+//     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_search_list($project) {
   global $l_no_found;
@@ -448,12 +466,11 @@ function dis_project_search_list($project) {
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Project Search result                                    //
 // Parameters:
-//   - $obm_q_deals : list of deals
-//   - $pref_q      : fields to display in the list of deals 
-//   - $nb_deal     : nb deals found
-//   - $deal[]      : deal search criteria
-//     keys used    : parent, label, company_name, archive, kind, cat, status,
-//                    manager, dateafter, datebefore
+//   - $obm_q_projects : list of projects
+//   - $pref_q      : fields to display in the list of projects 
+//   - $nb_deal     : nb projects found
+//   - $project[]   : project search criteria
+//     keys used    : name, company_name, tt, manager, member
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $project) {
   //-- Labels
@@ -482,11 +499,11 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// HTML Display Project Infos (main informations)                            //
 // Parameters :
-//   -  $deal_q    : DBO : information about the deal
-//   -  $con_q     : DBO : list of contact from the company 
-//   -  $comp_id   : id of the company concerned by the deal
+//   - $project_q   : DBO : information about the project
+//   - $project[]   : project search criteria
+//     keys used    : 
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_infos($project_q, $project) {
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime;
@@ -531,11 +548,13 @@ function html_project_infos($project_q, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// HTML Display Project Consult (main infos, advance infos, members infos)   //
 // Parameters :
-//   -  $deal_q    : DBO : information about the deal
-//   -  $con_q     : DBO : list of contact from the company 
-//   -  $comp_id   : id of the company concerned by the deal
+//   -  $project_q : DBO : information about the project
+//   -  $tasks_q   : DBO : list of tasks in the project 
+//   -  $members_q : DBO : list of members and related time infos
+//   - $project[]  : project search criteria
+//     keys used   : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_consult($project_q, $tasks_q, $members_q, $project) {
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
@@ -791,13 +810,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
     
   $span = $cpt_m + 2;
 
-
-//   else {
-//     $dis_members .= "<tr><td class=\"detailText\" colspan=5>$l_no_members</td></tr>";
-//   }
-
-
-   $dis_button = "<form method=\"post\" name=\"form_advance\"
+  $dis_button = "<form method=\"post\" name=\"form_advance\"
                    action=\"".url_prepare("project_index.php")."\">
                    <table class=\"details\">
                     <tr>
@@ -854,10 +867,11 @@ function html_project_consult($project_q, $tasks_q, $members_q, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// HTML Display Project Tasklist                                             //
 // Parameters :
-//   -  $deal_q    : DBO : information about the deal
-//   -  $comp_id   : id of the company concerned by the deal
+//   - $tasks_q     : DBO : list of tasks related to the deal
+//   - $project[]   : project search criteria
+//     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_tasklist($tasks_q, $project) {
   global $l_tasksinfos, $l_del_task_sel, $l_valid_task, $l_task_add;
@@ -920,10 +934,12 @@ function html_project_tasklist($tasks_q, $project) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// HTML Display Project Member List                                          //
 // Parameters :
-//   -  $deal_q    : DBO : information about the deal
-//   -  $comp_id   : id of the company concerned by the deal
+//   - $tasks_q     : DBO : list of tasks related to the deal
+//   - $members_q   : DBO : list of members
+//   - $project[]   : project search criteria
+//     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_membertime_form($tasks_q, $members_q, $project) {
   global $l_membersinfos, $l_del_member_sel, $l_valid_member, $l_member_add;
@@ -1080,11 +1096,12 @@ function html_project_membertime_form($tasks_q, $members_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Contact Consult                                              //
+// HTML Display Project Advance Form                                         //
 // Parameters :
-//   -  $deal_q    : DBO : information about the deal
-//   -  $con_q     : DBO : list of contact from the company 
-//   -  $comp_id   : id of the company concerned by the deal
+//   - $members_q  : DBO : list of members
+//   - $tasks_q    : DBO : list of tasks related to the deal
+//   - $project[]   : project search criteria
+//     keys used    : id
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_advance($members_q, $tasks_q, $project) {
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime;
@@ -1232,9 +1249,10 @@ function html_project_advance($members_q, $tasks_q, $project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Company Display preference screen                             //
+// Display the Project Display preference screen                             //
 // Parameters:
-//   - $display_pref_q : DBO : Field list to display
+//   - $display_newpref_q    : DBO : Field list to display
+//   - $display_searchpref_q : DBO : Field list to display
 ///////////////////////////////////////////////////////////////////////////////
 function dis_project_display_pref($display_newpref_q, $display_searchpref_q) {
   global $l_newproject_display, $l_searchproject_display;
