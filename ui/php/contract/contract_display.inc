@@ -55,6 +55,9 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   $dis_resp_tec .="</select>";
 
 
+  // --- HTML Template --------------------------------------------------------
+
+
 echo "<CENTER>" .
      "<FORM METHOD=POST NAME=form_contract " .
      "onSubmit=\"if (check_form(this) == false) return false; " .
@@ -341,6 +344,8 @@ function html_contract_form($action,$contract_q,$deal_q,$type_q,$usr_q,$comp_q,$
       <INPUT TYPE=\"submit\" value=\"$l_insert\">";
   }
 
+  // --- HTML Template --------------------------------------------------------
+
   echo "<center>
     <FORM METHOD=POST NAME=form_contract_update onSubmit=\"if (verifier_aff(this)) return true; else return false;\" ACTION=\"".$sess->url("contract_index.php")."\">
 
@@ -509,6 +514,8 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
 
 }
 
+  // --- HTML Template --------------------------------------------------------
+
   echo "<center>
   <table border=0>
   <tr>";
@@ -517,16 +524,17 @@ function html_contract_consult($contract_q, $type_q, $comp_q,$contact_q,$p_compa
 //////////////////
 echo "
     <td valign=top> 
-      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\"><img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-      <font SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_list</A></font>";
-
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<BR>
-      <A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\"><IMG BORDER=0
-        SRC=\"/images/$set_theme/$ico_contact_new\"></A>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_new</A></FONT>";
-  }
-  echo "<BR>
+      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\">
+      <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
+      <font SIZE=-1>
+      <A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      $l_incident_list</A></font>
+      <BR>
+      <A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      <IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\"></A>
+      <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">
+      $l_incident_new</A></FONT>
+      <BR>
       <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
       <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A></FONT>
       <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
@@ -693,8 +701,6 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
   $sel_tech = $contract["tech"];
   $p_num = $contract["number"]; 
 
-  echo "<font color=\"#$col_textem\">$nb_contract $l_found</font>";
-
   $url = $sess->url("contract_index.php?action=search&amp;tf_label=$p_label&amp;tf_soc=$p_company&amp;sel_market=$sel_market&amp;sel_type=$p_type_id&amp;tf_num=$p_num&amp;sel_tech=$sel_tech&amp;tf_dateapres=$p_dateafter&amp;tf_dateavant=$p_datebefore");
   echo "<br>";
 
@@ -704,6 +710,10 @@ function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contra
    $dis_contracts_list->data_set = $contract_q;
    $dis_contracts_list->data_url = $url;
    $dis_contracts_list->data_header = "both";
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<font color=\"#$col_textem\">$nb_contract $l_found</font>";
    $dis_contracts_list->display() ;
 
 }
@@ -734,6 +744,8 @@ function html_contract_admin_form($type_q) {
            "</OPTION>";
   }
   $dis_sel_type .= "</SELECT>";
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<center>
     <FORM name=\"form_admin_type_delete\" METHOD=post action=\"".$sess->url("contract_index.php")."\">
@@ -827,6 +839,8 @@ function dis_contract_display_pref($pref_q) {
   $dis_pref->pref_title = $l_contract_display;
   $dis_pref->pref_dis_help = 1;
 
+  // --- HTML Template --------------------------------------------------------
+
   echo "<center>";
   $dis_pref->display();
   echo "<br></center>";
@@ -850,22 +864,25 @@ function html_select_contract($contr_q, $title, $url="") {
     $jsfunc = "check_get_id(this)";
   }
 
-  echo "<CENTER>
-    <FORM METHOD=GET NAME=form_contr
-          onSubmit=\"if ($jsfunc) return true; else return false;\"
-          ACTION=\"\">";
 
-  echo "$title
+  $display_cont = "$title
     <P><font size=2 face=Courier>
     <SELECT name=\"param_contract\" size=10 style=\"font-family:fixed,courier\">";
 
   while($contr_q->next_record()) {
     $id = $contr_q->f("contract_id");
     $name = $contr_q->f("contract_label");
-    echo "\n<OPTION value=\"$id\">$name ";
+    $display_cont .= "\n<OPTION value=\"$id\">$name ";
   }
+  // --- HTML Template --------------------------------------------------------
 
-  echo "</SELECT></font>
+  echo "
+    <CENTER>
+    <FORM METHOD=GET NAME=form_contr
+          onSubmit=\"if ($jsfunc) return true; else return false;\"
+          ACTION=\"\">
+    $display_cont
+    </SELECT></font>
     <P>
     <INPUT TYPE=\"hidden\" name=\"action\" value=\"new\">
     <INPUT TYPE=submit value=\"$l_select_contract\">

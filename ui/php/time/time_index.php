@@ -379,6 +379,13 @@ global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
     'Condition'=> array ('None') 
                                     );
 
+//Search
+
+  $actions["TIME"]["search"] = array (
+    'Url'      => "$path/time/time_index.php?action=search",
+    'Right'    => $time_read,
+    'Condition'=> array ('None') 
+                                    );
 
 
 //Validate
@@ -400,6 +407,27 @@ global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
   $actions["TIME"]["stats"] = array (
     'Url'      => "$path/time/time_index.php?action=stats",
+    'Right'    => $time_write,
+    'Condition'=> array ('None') 
+                                    );
+//Insert 
+
+  $actions["TIME"]["insert"] = array (
+    'Url'      => "$path/time/time_index.php?action=insert",
+    'Right'    => $time_write,
+    'Condition'=> array ('None') 
+                                    );
+//Show Detail
+
+  $actions["TIME"]["show_detail"] = array (
+    'Url'      => "$path/time/time_index.php?action=show_detail",
+    'Right'    => $time_read,
+    'Condition'=> array ('None') 
+                                    );
+//Delete 
+
+  $actions["TIME"]["delete"] = array (
+    'Url'      => "$path/time/time_index.php?action=delete",
     'Right'    => $time_write,
     'Condition'=> array ('None') 
                                     );

@@ -356,7 +356,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["dispref_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=dispref_display",
-    'Right'    => $account_write,
+    'Right'    => $account_read,
     'Condition'=> array ('None') 
                                       	 );
 
@@ -365,7 +365,7 @@ function get_account_action() {
   $actions["ACCOUNT"]["level_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/treso/account_index.php?action=level_display",
-    'Right'    => $account_write,
+    'Right'    => $account_read,
     'Condition'=> array ('None') 
                                       	 );
 

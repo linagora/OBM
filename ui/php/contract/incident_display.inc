@@ -76,6 +76,8 @@ function html_incident_search_form ($usr_q, $incident) {
    $dis_sel_stat.=" selected";
   $dis_sel_stat.=">$l_closed</OPTION>\n</SELECT>";
  
+  // --- HTML Template --------------------------------------------------------
+
   echo "<CENTER>
      <FORM METHOD=GET NAME=f_incident ACTION=\"" .
      $sess->url("incident_index.php") . " \" onSubmit=\"if (verifier_inc(this)) return true; else return false;\">
@@ -173,10 +175,6 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  echo "<FONT color=\"#$col_textem\">";
-  echo "$nb_incident $l_found";
-  echo "</FONT><BR>";
-
   $url = $sess->url("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
 
   $obm_q_comp->seek($first_row);
@@ -185,6 +183,12 @@ function html_incident_search_list($obm_q_comp,$obm_q_display,$nb_incident,$inci
   $dis_incidents_list->data_set = $obm_q_comp;
   $dis_incidents_list->data_url = $url;
   $dis_incidents_list->data_header = "both";
+
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<FONT color=\"#$col_textem\">";
+  echo "$nb_incident $l_found";
+  echo "</FONT><BR>";
 
   $dis_incidents_list->display();
  
@@ -207,6 +211,8 @@ function html_new_incident_contract($contr_q) {
     $dis_param_contract .= "\n<OPTION value=\"$id\">$label";
   }
   $dis_param_contract .= " \n</SELECT>";
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<CENTER>
     <FORM METHOD=POST NAME=form_contr
@@ -342,6 +348,8 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $incident) {
     $dis_submit .="<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"insert\">\n";
     $dis_submit .="<INPUT TYPE=submit value=\"$l_insert\">\n";
   }
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<CENTER>
     <TABLE BORDER=0>
@@ -520,6 +528,8 @@ function html_incident_consult($inc_q,$con_q,$obm_q_company,$contact_q) {
       </FORM>";
   }
 
+  // --- HTML Template --------------------------------------------------------
+
   echo "<center>
   <table border=0>
   <tr>
@@ -643,6 +653,8 @@ function dis_incident_display_pref($display_pref_q) {
   $dis_pref->display_entity = "incident";
   $dis_pref->pref_title = $l_incident_display;
   $dis_pref->pref_dis_help = 1;
+ 
+ // --- HTML Template --------------------------------------------------------
 
   echo "<center>";
   $dis_pref->display();

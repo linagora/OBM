@@ -74,3 +74,73 @@ $l_short_september="Sep";
 $l_short_october="Oct";
 $l_short_november="Nov";
 $l_short_december="Dec";
+$l_invalid_perm = "Word to define";
+
+////////////////////////////////////////////////////////
+////// Theme headers lang files ////////////////////////
+////////////////////////////////////////////////////////
+$l_header_com    = "Word to define";
+$l_header_prod   = "Word to define";
+$l_header_compta = "Word to define";
+$l_header_users  = "Word to define";
+$l_header_admins = "Word to define";
+
+
+$l_header_settings = "Einstellungen";
+$l_header_company = "Firmen";
+$l_header_contact = "Kontakte";
+$l_header_deal = "Verträge";
+$l_header_list = "Maillisten";
+$l_header_user = "Benutzer";
+$l_header_admin = "Administration";
+$l_header_computer = "Computer";
+$l_header_contract =  "Word to define";
+$l_header_incident = "Word to define";
+$l_header_account = "Word to define";
+$l_header_invoice = "Word to define";
+$l_header_payment = "Word to define";
+$l_header_time = "Word to define";
+$l_header_agenda = "Word to define";
+
+$l_header_title_computer = "Computer" ;
+$l_header_title_settings = "Einstellungen";
+$l_header_title_company = "Firma";
+$l_header_title_contact = "Kontakt";
+$l_header_title_deal = "Vertrag";
+$l_header_title_list = "Liste";
+$l_header_title_user = "Benutzer";
+$l_header_title_admin = "Administration";
+$l_header_title_contract =  "Word to define";
+$l_header_title_account = "Word to define";
+$l_header_title_incident = "Word to define";
+$l_header_title_invoice = "Word to define";
+$l_header_title_payment = "Word to define";
+$l_header_title_time = "Word to define";
+$l_header_title_agenda = "Word to define";
+
+$l_header_new_f = "Neu";
+$l_header_new = "Neu";
+$l_header_find = "Suche";
+$l_header_delete =  "Word to define";
+
+$l_header_new_parent = "Neuer Hauptvertrag";
+$l_header_find_parent = "Suche Hauptvertrag";
+$l_header_reconcile =  "Word to define";
+$l_header_dupplicate =  "Word to define";
+$l_header_compute_balance =  "Word to define";
+
+
+$l_header_add_contact = "Word to define";
+
+$l_header_reset = "Word to define";
+
+$l_header_amp	= "Word to define";
+$l_header_clear_sess = "Word to define";
+$l_header_index     =  "Word to define";
+
+$l_header_agenda = "Agenda";
+$l_header_title_agenda = "AGENDA";
+$l_header_day = "Jour";
+$l_header_week = "Semaine";
+$l_header_month = "Mois";
+$l_header_new_event = "Nouveau rdv";

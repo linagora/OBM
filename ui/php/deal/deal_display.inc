@@ -104,7 +104,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   }
   $sel_manager .= "</select>";
 
-  // --- HTML Page display ----------------------------------------------------
+  // --- HTML Template --------------------------------------------------------
 
   echo "<center>
     <form method=get name=form_deal
@@ -203,7 +203,7 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   }
   $sel_pmanager .= "</select>";
 
-  // --- HTML Page display ----------------------------------------------------
+  // --- HTML Template --------------------------------------------------------
 
   echo "<CENTER><FORM METHOD=GET NAME=\"form_search_parentdeal\"
     ACTION=\"" . $sess->url("deal_index.php") . "\">
@@ -289,10 +289,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
 
-  echo "<FONT color=\"#$col_textem\">$nb_deal $l_found</FONT><BR>";
-
-  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
-
   $obm_q_deals->seek($first_row);
   
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q);
@@ -300,6 +296,11 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $dis_deals_list->data_url = $url;
   $dis_deals_list->data_header = "both";
 
+  // --- HTML Template --------------------------------------------------------
+
+  echo "<FONT color=\"#$col_textem\">$nb_deal $l_found</FONT><BR>";
+
+  $url = $sess->url("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
   $dis_deals_list->display();
 
 }

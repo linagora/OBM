@@ -838,26 +838,32 @@ function get_deal_action() {
     'Right'    => $deal_admin_write,
     'Condition'=> array ('None') 
                                           );
+  // Cat Delete
+  $actions["DEAL"]["cat_delete"] = array (
+    'Url'      => "$path/deal/deal_index.php?action=cat_checkdelete",
+    'Right'    => $deal_admin_write,
+    'Condition'=> array ('None') 
+                                          );
 
   // Display
   $actions["DEAL"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/deal/deal_index.php?action=display",
-    'Right'    => $deal_read,
+    'Right'    => $deal_read, 
     'Condition'=> array ('all') 
                                       );
 
   // Display Preference
   $actions["DEAL"]["dispref_display"] = array (
     'Url'      => "$path/deal/deal_index.php?action=dispref_display",
-    'Right'    => $deal_write,
+    'Right'    => $deal_read, 
     'Condition'=> array ('None') 
                                       );
 
   // Display Level
   $actions["DEAL"]["dispref_level"] = array (
     'Url'      => "$path/deal/deal_index.php?action=dispref_level",
-    'Right'    => $deal_write,
+    'Right'    => $deal_read, 
     'Condition'=> array ('None') 
                                       );
 

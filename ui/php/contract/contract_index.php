@@ -319,7 +319,7 @@ function get_contract_action() {
   global $l_header_display,$l_header_admin;
   global $contract_read, $contract_write, $contract_admin_read, $contract_admin_write;
 
-//Search
+//Ext Get Id
 
   $actions["CONTRACT"]["ext_get_id"] = array (
     'Url'      => "$path/contract/contract_index.php?action=ext_get_id",

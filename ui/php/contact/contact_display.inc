@@ -25,10 +25,11 @@ function html_contact_search_form ($contact) {
     $ext_url = $contact["ext_url"];
     $ext_id = $contact["ext_id"];
     $ext = "<INPUT NAME=ext_action TYPE=hidden VALUE=\"$ext_action\">
-      <INPUT NAME=ext_id TYPE=hidden VALUE=\"$ext_id\">
-      <INPUT NAME=ext_url TYPE=hidden VALUE=\"$ext_url\">";
+            <INPUT NAME=ext_id TYPE=hidden VALUE=\"$ext_id\">
+            <INPUT NAME=ext_url TYPE=hidden VALUE=\"$ext_url\">";
   }
 
+  // --- HTML Template --------------------------------------------------------
   echo "<CENTER>
      <FORM METHOD=GET NAME=f_contact ACTION=\"" .
      $sess->url("contact_index.php") . "\">
@@ -103,7 +104,6 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   $company = stripslashes($contact["company"]);
   $company_id = $contact["company_id"];
 
-  echo "<center><font color=\"#$col_textem\">$nb_con $l_found</font><br>";
 
   $url = $sess->url("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
 
@@ -113,23 +113,26 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
     $dis_contact_list->data_cb_text = "X";
     $dis_contact_list->data_idfield = "contact_id";
     $dis_contact_list->data_cb_name = "cb_con";
-    echo "\n<FORM TARGET=root METHOD=POST action=\"$ext_url\">";
-  }
-  $dis_contact_list->data_set = $obm_q;
-  $dis_contact_list->data_header = "both";
-  $dis_contact_list->data_url = $url;
-  $dis_contact_list->display();
-
-  if ($popup) {
-    echo "<INPUT TYPE=submit value=\"$l_add\">
+    $display_popup_head = "\n<FORM TARGET=root METHOD=POST action=\"$ext_url\">";
+    $display_popup_end = "<INPUT TYPE=submit value=\"$l_add\">
       <INPUT TYPE=hidden name=param_list value=\"$ext_id\">
       <INPUT TYPE=hidden name=action value=\"$ext_action\">
       </FORM>
       <p align=right>
       <a href=\"\" onclick='window.close();'>$l_close</a>";
   }
+  $dis_contact_list->data_set = $obm_q;
+  $dis_contact_list->data_header = "both";
+  $dis_contact_list->data_url = $url;
 
-  echo "</center>";
+  // --- HTML Template --------------------------------------------------------
+
+  echo "
+  <center><font color=\"#$col_textem\">$nb_con $l_found</font><br>
+  $display_popup_head".
+  $dis_contact_list->display();
+  echo "$display_popup_end
+  </center>";
 }
 
 
@@ -170,6 +173,8 @@ function html_contact_consult($co_q) {
   $email = $co_q->f("contact_email");
   $com = $co_q->f("contact_comment");
   $vis = $co_q->f("contact_visibility");
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<CENTER>
     <TABLE BORDER=0>
@@ -262,27 +267,16 @@ function html_contact_consult($co_q) {
   </TR>
   </TABLE>
   </TD></TR>
-
-  <TR><TD align=middle>";
-
-  echo "<CENTER>
+  <TR><TD align=middle>
+  <CENTER>
   <TABLE BORDER=0>
-  <TR><TD valign=top>";
-
-  if ($auth->auth["perm"] != $perms_user) {
-    echo "<FORM METHOD=GET NAME=form_mod_contact 
-        ACTION=\"".$sess->url("contact_index.php")."\">
-      <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"detailupdate\">
-      <INPUT TYPE=\"hidden\" NAME=\"param_contact\" VALUE=$id>
-      <INPUT TYPE=submit value=\"$l_update\">
-       </FORM>";
-  }
-
-  echo "&nbsp;</TD></TR></TABLE>
+  &nbsp;</TD></TR></TABLE>
   </CENTER>
   </FORM>
   </TD></TR></TABLE>
-  </CENTER>";
+  </CENTER>
+  <TR><TD valign=top>";
+
 }
 
 
@@ -375,6 +369,44 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   }
   $sel_kind .= "</SELECT>";
 
+  // If new contact or contact update and user is owner, display visibility
+  if ( ($action == "new") || ($action == "insert") ||
+       ( (($action=="detailupdate") || ($action=="update")) &&
+         ($usercreate == $auth->auth["uid"]) ) ) {
+      $display_private = "<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
+     			  <TD>
+    			  <TABLE border=2 bgcolor=\"#$col_table\">
+    			  <TR><TD>&nbsp; $l_private &nbsp;
+    			  <INPUT NAME=cb_vis TYPE=\"checkbox\" value=\"1\" ";
+      if ($vis == '1') echo " checked";
+       $display_private .= "></TD></TR></TABLE></TD>";
+  }
+
+  // UPDATE 
+  if (($action=="detailupdate") || ($action=="update")) {
+    $display_update = "<INPUT TYPE=hidden NAME=action VALUE=update>
+      <INPUT TYPE=hidden NAME=param_contact VALUE=\"$id\">
+      <INPUT TYPE=hidden NAME=hd_usercreate VALUE=\"$usercreate\">
+      <INPUT TYPE=submit value=\"$l_update\">
+      </FORM></TD>";
+
+  // CHECK DELETE
+  $display_update .= "<TD valign=top>
+        <FORM METHOD=GET NAME=f_del_con  
+        ACTION=\"" . $sess->url("contact_index.php") . "\">
+    <INPUT TYPE=hidden NAME=action VALUE=check_delete>
+    <INPUT TYPE=hidden NAME=param_contact VALUE=$id>
+    <INPUT TYPE=submit value=\"$l_checkdelete\">\n";
+
+  // INSERT
+  } elseif (($action=="new") || ($action=="insert")) {
+    $display_update = "<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"insert\">
+    <INPUT TYPE=submit value=\"$l_insert\">";
+  }
+
+
+  // --- HTML Template --------------------------------------------------------
+
   echo "<CENTER>
     <TABLE BORDER=0>
     <FORM METHOD=GET NAME=form_mod_contact onSubmit=\"if (check_contact(this)) return true; else return false;\" ACTION=\"".$sess->url("contact_index.php")."\">
@@ -395,9 +427,10 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     <TD><INPUT NAME=tf_func size=30 value=\"$func\"></TD>
     </TR><TR>
     <TD><FONT SIZE=-2>$l_company</FONT> </TD>
-    <TD><A HREF=\"".
-      $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">$c_name";
-  echo "</A><INPUT TYPE=hidden NAME=param_company value=\"$c_id\">
+    <TD>
+      <A HREF=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+      $c_name
+      </A><INPUT TYPE=hidden NAME=param_company value=\"$c_id\">
       <INPUT TYPE=hidden NAME=company_name value=\"$c_name\">
       <INPUT TYPE=hidden NAME=company_new_id value=\"$c_new_id\">
       <a href=\"\" onclick=\"window.open('../company/company_index.php?action=ext_get_id&amp;popup=1&amp;title=".urlencode($l_contact_select_company)."','Company','height=$popup_height,width=$popup_width'); return false;\">
@@ -448,29 +481,14 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     </TR></TABLE>
   </TD>
   </TR></TABLE>
-
-</TD></TR>
-<TR><TD>
+  </TD></TR>
+  <TR><TD>
   <TABLE BORDER=0>
   <TR>
   <TD><FONT SIZE=-2>$l_email&nbsp;&nbsp;&nbsp;</FONT></TD>
-  <TD><INPUT NAME=tf_email size=52 value=\"$email\"></TD>";
-  
-  // If new contact or contact update and user is owner, display visibility
-  if ( ($action == "new") || ($action == "insert") ||
-       ( (($action=="detailupdate") || ($action=="update")) &&
-         ($usercreate == $auth->auth["uid"]) ) ) {
-    echo "<TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD><TD>&nbsp;&nbsp;&nbsp;&nbsp;</TD>
-      <TD>
-      <TABLE border=2 bgcolor=\"#$col_table\">
-      <TR><TD>&nbsp; $l_private &nbsp;
-      <INPUT NAME=cb_vis TYPE=\"checkbox\" value=\"1\" ";
-    if ($vis == '1') echo " checked";
-    echo "></TD></TR></TABLE>
-      </TD>";
-  }
-
-  echo "</TR>
+  <TD><INPUT NAME=tf_email size=52 value=\"$email\"></TD>
+   $display_private
+  </TR>
   </TABLE>
   <TABLE BORDER=0>
   <TR>
@@ -479,40 +497,16 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   </TR>
   </TABLE>
   </TD></TR>
-
-  <TR><TD align=middle>";
-  echo "<CENTER><TABLE BORDER=0>
-  <TR><TD valign=top>";
-
-  // UPDATE 
-  if (($action=="detailupdate") || ($action=="update")) {
-    echo "<INPUT TYPE=hidden NAME=action VALUE=update>
-      <INPUT TYPE=hidden NAME=param_contact VALUE=\"$id\">
-      <INPUT TYPE=hidden NAME=hd_usercreate VALUE=\"$usercreate\">
-      <INPUT TYPE=submit value=\"$l_update\">
-    </FORM></TD>";
-
-  // CHECK DELETE
-  echo "<TD valign=top>
-        <FORM METHOD=GET NAME=f_del_con  
-        ACTION=\"" . $sess->url("contact_index.php") . "\">
-    <INPUT TYPE=hidden NAME=action VALUE=check_delete>
-    <INPUT TYPE=hidden NAME=param_contact VALUE=$id>
-    <INPUT TYPE=submit value=\"$l_checkdelete\">\n";
-
-  // INSERT
-  } elseif (($action=="new") || ($action=="insert")) {
-    echo "<INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"insert\">
-    <INPUT TYPE=submit value=\"$l_insert\">";
-  }
-
-  echo "
-    </TD></TR>
-    </TABLE>
-    </CENTER>
-    </FORM>
-    </TD></TR></TABLE>
-    </CENTER>";
+  <TR><TD align=middle>
+  <CENTER><TABLE BORDER=0>
+  <TR><TD valign=top>
+  $display_update
+  </TD></TR>
+  </TABLE>
+  </CENTER>
+  </FORM>
+  </TD></TR></TABLE>
+  </CENTER>";
 
 }
 
@@ -557,6 +551,8 @@ function dis_contact_warn_insert($cid, $co_q, $contact) {
     $company = $co_q->f("company_name");
     echo "<BR><A HREF=\"" .$sess->url("contact_index.php?action=detailconsult&amp;param_contact=$id") . "\">$samename ($company)</A>";
   }
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<P>
     <TABLE><TR><TD>
@@ -629,51 +625,55 @@ function dis_check_links($p_id) {
   $obm_q = run_query_contact_deal_links($p_id);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    echo "$l_link_deal";
+    $display_link_d = "$l_link_deal";
     while ($obm_q->next_record()) {
       $did = $obm_q->f("deal_id");
       $dlabel = $obm_q->f("deal_label");
-      echo "<BR><A HREF=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</A>\n";
+      $display_link_d .= "<BR><A HREF=\"" .$sess->url("../deal/deal_index.php?action=detailconsult&amp;param_deal=$did") . "\">$dlabel</A>\n";
     }
-    echo "<P>";
+    $display_link_d .=  "<P>";
   } else {
-    echo  $l_link_deal_no . "<P>";
+    $display_link_d =   $l_link_deal_no . "<P>";
   }
 
   // Links from lists
   $obm_q = run_query_contact_list_links($p_id);
   if ($obm_q->num_rows() > 0) {
     $delete_ok = false;
-    echo "$l_link_list";
+    $display_link_l = "$l_link_list";
     while ($obm_q->next_record()) {
       $lid = $obm_q->f("list_id");
       $lname = $obm_q->f("list_name");
-      echo "<BR><A HREF=\"" .$sess->url("../list/list_index.php?action=detailconsult&amp;param_list=$lid") . "\">$lname</A>\n";
+      $display_link_l .= "<BR><A HREF=\"" .$sess->url("../list/list_index.php?action=detailconsult&amp;param_list=$lid") . "\">$lname</A>\n";
     }
-    echo "<P>";
+    $display_link_l .= "<P>";
   } else {
-    echo  $l_link_list_no . "<P>";
+    $display_link_l =  $l_link_list_no . "<P>";
   }
 
   if ($delete_ok == true) {
     display_ok_msg($l_can_delete);
-    echo "<TABLE><TR><TD>";
-    dis_delete_form($p_id);
-    echo "</TD>";
+    $display_delete = "<TABLE><TR><TD>";
+    $display_delete .= dis_delete_form($p_id);
+    $display_delete .=  "</TD>";
   } else {
-    echo "<P>";
-    display_warn_msg($l_cant_delete);
-    echo "<TABLE><TR>";
+     $display_delete =  "<P>".$l_cant_delete;
+     $display_delete .=  "<TABLE><TR>";
   }
 
-  echo "<TD>";
-  echo "<FORM NAME=form_back METHOD=POST
+  // --- HTML Template --------------------------------------------------------
+  echo "
+   $display_link_d
+   $display_link_l
+   $display_delete
+   <TD>
+   <FORM NAME=form_back METHOD=POST
    ACTION=\"" . $sess->url("contact_index.php") ."\">
    <INPUT TYPE=hidden NAME=action VALUE=detailupdate>
    <INPUT TYPE=hidden NAME=param_contact VALUE=\"$p_id\">
    <INPUT TYPE=submit VALUE=\"$l_back\">
-   </FORM>";
-  echo "</TR></TABLE>";
+   </FORM>
+   </TD></TR></TABLE>";
 }
 
 
@@ -686,13 +686,15 @@ function dis_delete_form($p_id) {
   global $l_delete;
   global $sess;
 
-  echo "\n<FORM name=\"form_delete\" " .
+  // --- HTML Template --------------------------------------------------------
+
+  return "\n<FORM name=\"form_delete\" " .
       "METHOD=post action=\"" . $sess->url("contact_index.php") . "\">
     <INPUT TYPE=\"hidden\" name=\"action\" value=\"delete\">
     <INPUT TYPE=\"hidden\" name=\"param_contact\" value=\"$p_id\">
     <INPUT TYPE=\"submit\" value=\"$l_delete\"
-    onClick=\"if (confirm_del(this.form)) return true; else return false;\">";
-  echo "</FORM>\n";
+    onClick=\"if (confirm_del(this.form)) return true; else return false;\">
+  </FORM>\n";
 }
 
 
@@ -708,6 +710,8 @@ function dis_contact_display_pref($display_pref_q) {
   $dis_pref->display_entity = "contact";
   $dis_pref->pref_title = $l_contact_display;
   $dis_pref->pref_dis_help = 1;
+
+  // --- HTML Template --------------------------------------------------------
 
   echo "<center>";
   $dis_pref->display();

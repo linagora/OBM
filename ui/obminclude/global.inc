@@ -7,7 +7,7 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.6.0pre1";
+$obm_version = "0.6.0";
 //$set_debug=0;
 $l_title = "O.B.M.";
 
@@ -154,8 +154,8 @@ $users_admin_write	= 32768;
 			////////////
 			//USER    //
 			////////////
-$user_read		= $users_read;
-$user_write	 	= $users_read + $users_write;
+$user_read		= $users_admin_read;
+$user_write	 	= $users_admin_read + $users_admin_write;
 $user_admin_read 	= $users_admin_read;
 $user_admin_write	= $users_admin_read + $users_admin_write;
 			////////////
@@ -212,9 +212,9 @@ $admin_pref_admin_write	= $admins_admin_read + $admins_admin_write;
 //////////////////////////PROFILS/////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////
 
-$perm_user   =  $com_read + $prod_read + $user_read ;
-$perm_editor =  $com_read + $prod_read + $user_read + $com_write +
-	        $prod_write + $user_write;
+$perm_user   =  $com_read + $prod_read + $users_read ;
+$perm_editor =  $com_read + $prod_read + $users_read + $com_write +
+	        $prod_write + $users_write;
 $perm_admin  =  $com_read + $prod_read + $compta_read + $users_read +
   	        $com_write + $prod_write + $compta_write + $users_write +
   	        $com_admin_read + $prod_admin_read + $compta_admin_read +

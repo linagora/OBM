@@ -139,12 +139,14 @@ $l_header_add_contact = "Ajouter contact";
 
 $l_header_reset = "Préférence par défaut";
 
+$l_header_amp	= "Afficher les esperluettes";
 $l_header_clear_sess = "Nettoyer les sessions";
 $l_header_index     = "Accueil";
 $l_header_help = "Aide";
-$l_header_day = "Jour";
+$l_header_pref_update = "Réinitialiser les préférences utilisateur";
+
+	$l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";
 $l_header_new_event = "Nouveau rdv";
-$l_header_amp	= "Afficher les esperluettes";
-$l_header_pref_update = "Réinitialiser les préférences utilisateur";
+

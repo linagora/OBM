@@ -128,6 +128,9 @@ $l_header_export = "Export";
 $l_header_modify = "Modify";
 $l_header_delete = "Delete";
 
+$l_header_new_parent = "New ParentDeal";
+$l_header_find_parent = "Find ParentDeal";
+
 $l_header_add_contact = "Add contact";
 
 $l_header_reconcile = "Reconcile";
@@ -136,8 +139,9 @@ $l_header_dupplicate = "Dupplicate";
 
 $l_header_reset = "Défault Préferences";
 
-$l_header_new_parent = "New ParentDeal";
-$l_header_find_parent = "Find ParentDeal";
+$l_header_amp	= "Show amp";
+$l_header_clear_sess = "Clear sessions";
+$l_header_pref_update  = "Reset users preferences";
 
 $l_header_help = "Aide";
 
@@ -145,8 +149,6 @@ $l_header_day = "Day";
 $l_header_week = "Week";
 $l_header_month = "Month";
 $l_header_new_event = "New appointment";
-$l_header_clear_sess = "Clear sessions";
 $l_header_index     = "Main";
-$l_header_amp	= "Show amp";
-$l_header_pref_update  = "Reset users preferences";
+
 

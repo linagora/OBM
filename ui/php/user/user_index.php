@@ -319,7 +319,7 @@ function get_user_action() {
   $actions["USER"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/user/user_index.php?action=admin",
-    'Right'    => $contract_admin_read,
+    'Right'    => $user_admin_read,
     'Condition'=> array ('all') 
                                     );
 

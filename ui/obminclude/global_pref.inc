@@ -95,7 +95,7 @@ $menus["COMPTA"] =	array('Name' => $l_header_compta,
 			      'Url'  => "$path/treso/account_index.php",
 			      'Right'=> $compta_read);
 $menus["USERS"]   =	array('Name' => $l_header_users,
-			      'Url'  => "$path/user/user_index.php",
+			      'Url'  => "$path/time/time_index.php",
 			      'Right'=> $users_read);
 $menus["ADMINS"]  =	array('Name' => $l_header_admins,
 		              'Url'  => "$path/admin/admin_index.php?mode=html",
@@ -161,12 +161,12 @@ if($section == "PROD") {
 
 }elseif($section == "USERS") {
 
-  $menus["USERS"]["USER"]     = array('Name'=> $l_header_user,
-			              'Url' => "$path/user/user_index.php",
-			              'Right'=> $user_read);
   $menus["USERS"]["TIME"]     = array('Name'=> $l_header_time,
 			              'Url' => "$path/time/time_index.php",
 			              'Right'=> $time_read);
+  $menus["USERS"]["USER"]     = array('Name'=> $l_header_user,
+			              'Url' => "$path/user/user_index.php",
+			              'Right'=> $user_read);
   $menus["USERS"]["SETTINGS"] = array('Name'=> $l_header_settings,
 			              'Url' => "$path/settings/settings_index.php",
 			              'Right'=> $settings_read);

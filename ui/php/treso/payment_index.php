@@ -858,7 +858,7 @@ function get_payment_action() {
 
   $actions["PAYMENT"]["display_dispref"] = array (
     'Url'      => "$path/treso/payment_index.php?action=display_dispref",
-    'Right'    => $payment_write,
+    'Right'    => $payment_read, 
     'Condition'=> array ('None') 
                                       	 );
 
@@ -866,7 +866,7 @@ function get_payment_action() {
 
   $actions["PAYMENT"]["display_level"] = array (
     'Url'      => "$path/treso/payment_index.php?action=display_level",
-    'Right'    => $payment_write,
+    'Right'    => $payment_read, 
     'Condition'=> array ('None') 
                                       	        );
 

@@ -652,7 +652,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["dispref_display"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_display",
-    'Right'    => $incident_write,
+    'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
 
@@ -660,7 +660,7 @@ function get_invoice_action() {
 
   $actions["INVOICE"]["dispref_level"] = array (
     'Url'      => "$path/treso/invoice_index.php?action=dispref_level",
-    'Right'    => $incident_write,
+    'Right'    => $incident_read,
     'Condition'=> array ('None') 
                                         );
 

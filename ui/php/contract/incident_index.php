@@ -296,7 +296,7 @@ function get_incident_action() {
 
   $actions["INCIDENT"]["dispref_display"] = array (
      'Url'      => "$path/contract/incident_index.php?action=dispref_display",
-     'Right'    => $incident_write,
+     'Right'    => $incident_read,
      'Condition'=> array ('None') 
                                       	   );
 
@@ -304,7 +304,7 @@ function get_incident_action() {
 
   $actions["INCIDENT"]["dispref_level"] = array (
      'Url'      => "$path/contract/incident_index.php?action=dispref_level",
-     'Right'    => $incident_write,
+     'Right'    => $incident_read,
      'Condition'=> array ('None') 
                                       	   );
 
