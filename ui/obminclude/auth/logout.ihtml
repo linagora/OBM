@@ -4,6 +4,8 @@
 //     - Desc  : OBM Logout Page                                             //
 // 1999-03-19 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 -->
 
 <html>
@@ -19,7 +21,6 @@
 </head>
 
 <?php 
-$obminclude = getenv("OBM_INCLUDE_VAR");
 require_once("$obminclude/global.inc"); ?>
 
 <BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCCC" VLINK="#00CCCC">

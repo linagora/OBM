@@ -18,7 +18,7 @@ $themes = get_themes_array();
 // Return : $langs : array of langs
 ///////////////////////////////////////////////////////////////////////////////
 function get_langs_array() {
-$obminclude = getenv("OBM_INCLUDE_VAR");
+  global $obminclude;
 
   // Lang dirs to exclude
   $exclude = array('.', '..', 'CVS');
@@ -41,7 +41,7 @@ $obminclude = getenv("OBM_INCLUDE_VAR");
 // Return : $themes : array of themes
 ///////////////////////////////////////////////////////////////////////////////
 function get_themes_array() {
-$obminclude = getenv("OBM_INCLUDE_VAR");
+  global $obminclude;
 
   // Themes dirs to exclude
   $exclude = array('.', '..', 'CVS');
@@ -198,7 +198,7 @@ function get_src_used_vars($module) {
 //   - $theme : theme where to get the menu file
 ///////////////////////////////////////////////////////////////////////////////
 function get_src_header_vars($theme) {
-  global $debug;
+  global $debug, $obminclude;
 
   $path = "..";
 
@@ -209,6 +209,7 @@ function get_src_header_vars($theme) {
   $tableau = array();
   $contents = array();
   $file = "$path/../$obminclude/themes/$theme/menu.inc";
+
   if (file_exists($file)) {
     $contents = file($file);
     if ($debug > 0) { echo "file=$file\n"; }
@@ -259,12 +260,13 @@ function get_src_header_vars($theme) {
 // Return : $tableau[var]=value
 ///////////////////////////////////////////////////////////////////////////////
 function get_lang_vars($module, $lang) {
-  global $debug;
+  global $debug, $obminclude;
 
   $path = "..";
 
   $tableau = array();
   $file = "$path/../$obminclude/lang/$lang/${module}.inc";
+
   if (file_exists($file)) {
     $contents = file($file);
   } else {

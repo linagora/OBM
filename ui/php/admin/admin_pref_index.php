@@ -14,6 +14,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 require("admin_pref_display.inc");
 require("$obminclude/global_query.inc");
 
@@ -70,7 +71,6 @@ switch ($mode) {
    display_end();
    break;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////

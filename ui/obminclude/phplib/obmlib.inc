@@ -4,12 +4,13 @@
 //     - Desc  : Local PHPLIB file for OBM                                   //
 // 1999-03-18 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////////
 // Required packages                                                        //
 //////////////////////////////////////////////////////////////////////////////
 //require("$obminclude/phplib/db_pgsql.inc");       //Postgres
-$obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/db_mysql.inc");     //Mysql
 require("$obminclude/phplib/ct_sql.inc");
 require("$obminclude/phplib/session4.inc");
@@ -60,7 +61,7 @@ class OBM_User_Sql extends CT_Sql {
     $module_name = substr($module_name,0,strlen($module_name)-10);
   //  $module_name = substr(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),0,strpos(strrchr("/",$HTTP_SERVER_VARS['SCRIPT_NAME']),"_"));
     $now = date("YmdHis", time());
-    $uquery = sprintf("update %s set activeuserobm_user_obm_id='%d', activeuserobm_timeupdate='%s', 
+    $uquery = sprintf("update %s set activeuserobm_userobm_id='%d', activeuserobm_timeupdate='%s', 
 		       activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1, activeuserobm_lastpage= '%s'
 	               where activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
       $this->database_table,
@@ -69,14 +70,14 @@ class OBM_User_Sql extends CT_Sql {
       ucfirst($module_name).":".ucfirst($action),
       $id,
       $name);
-    $squery = sprintf("select count(*) from %s where activeuserobm_user_obm_id ='%s' and activeuserobm_timeupdate='%s' 
+    $squery = sprintf("select count(*) from %s where activeuserobm_userobm_id ='%s' and activeuserobm_timeupdate='%s' 
 		       and activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
       $this->database_table,
       $str,
       $now,
       $id,
       $name);
-    $iquery = sprintf("insert into %s ( activeuserobm_sid, activeuserobm_session_name, activeuserobm_user_obm_id,
+    $iquery = sprintf("insert into %s ( activeuserobm_sid, activeuserobm_session_name, activeuserobm_userobm_id,
 				        activeuserobm_timeupdate, activeuserobm_timecreate, activeuserobm_nb_connexions,
 				        activeuserobm_lastpage, activeuserobm_ip ) 
 	                               values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
@@ -219,10 +220,9 @@ class OBM_Challenge_Auth extends Auth {
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $sess;
+    global $sess, $obminclude;
     global $challenge;
     global $_PHPLIB;
-   $obminclude = getenv("OBM_INCLUDE_VAR"); 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
     $sess->register("challenge");
@@ -349,10 +349,9 @@ class OBM_Perm extends Perm {
                           );
 
   function perm_invalid($does_have, $must_have) {
-    global $perm, $auth, $sess;
+    global $perm, $auth, $sess, $obminclude;
 #    global $_PHPLIB;
     global $perm_invalid;
-    $obminclude = getenv("OBM_INCLUDE_VAR");
     $perm_invalid = "$obminclude/auth/perminvalid.ihtml";
     include($perm_invalid);
     

@@ -7,6 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 
 $debug = 1;
 require("admin_query.inc");

@@ -102,7 +102,7 @@ if ($set_debug > 0) {
   echo "last_contact=$last_contact<br>";
 }
 	*/ 
-$obminclude = getenv("OBM_INCLUDE_VAR");
+
 //include("$obminclude/global_query.inc");
 
 //$config_var = run_query_get_config_var();

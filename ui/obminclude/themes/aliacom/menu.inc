@@ -15,17 +15,15 @@
 // de l'entete.                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 function generate_menu($menu) {
-  global $set_lang, $set_theme, $set_lang_default, $set_theme_default;
+  global $obminclude, $set_lang, $set_theme, $set_lang_default, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
   global $auth, $sess, $obm_version; 
-  global $l_deal_select_company;
-  global $l_select_company;
+  global $l_deal_select_company, $l_select_company;
   if ($menu == "")
     $path = "";
   else 
     $path = "../";
-$obminclude = getenv("OBM_INCLUDE_VAR");
 
   //Ici j'ai ajouté des feuilles de styles, à changer d'endroit...
   /*  echo "

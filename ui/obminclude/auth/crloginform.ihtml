@@ -34,7 +34,6 @@
   -->
   </style>
 <? 
-$obminclude = getenv("OBM_INCLUDE_VAR");
 include("$obminclude/auth/md5.js"); ?>
 <script language="javascript">
 <!--

@@ -63,7 +63,7 @@ function run_query_active_user($delay) {
                    UserObm.userobm_timelastaccess,
                    ActiveUserObm.*
             from UserObm, ActiveUserObm
-            where ActiveUserObm.activeuserobm_user_obm_id = UserObm.userobm_id
+            where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
               and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
   display_debug_msg($query,$cdg_sql);
   $obm_q = new DB_OBM;
@@ -87,7 +87,7 @@ function run_query_passive_user($delay) {
                    UserObm.userobm_timelastaccess,
                    ActiveUserObm.*
             from UserObm, ActiveUserObm
-            where ActiveUserObm.activeuserobm_user_obm_id = UserObm.userobm_id
+            where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
               and ActiveUserObm.activeuserobm_timeupdate < '$date_limit'";
   display_debug_msg($query,$cdg_sql);
   $obm_q = new DB_OBM;

@@ -375,52 +375,53 @@ function run_query_logout() {
 
 }
 
-//////////////////////////////////////////////////////////////////////////////
-// Query Execution - Insertion or update of the Session logs		    //
-// during the logout						  	    //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Query Execution - Insertion or update of the Session logs		     //
+// during the logout						  	     //
+///////////////////////////////////////////////////////////////////////////////
 function run_query_store($obm_q) {
 
-$uquery = sprintf("
-update UserObm_SessionLog set 
- userobm_sessionlog_session_name = '%s', 
- userobm_sessionlog_user_obm_id = '%s', userobm_sessionlog_timeupdate = '%s',
- userobm_sessionlog_timecreate = '%s', 
- userobm_sessionlog_nb_connexions = userobm_sessionlog_nb_connexions + %d,
- userobm_sessionlog_lastpage = '%s', userobm_sessionlog_ip  = '%s' where
- userobm_sessionlog_sid='%s'",
- $obm_q->f('activeuserobm_session_name'), 
- $obm_q->f('activeuserobm_user_obm_id'), $obm_q->f('activeuserobm_timeupdate'),
- $obm_q->f('activeuserobm_timecreate'), 
- $obm_q->f('activeuserobm_nb_connexions'),
- $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'),
- $obm_q->f('activeuserobm_sid'));
+  $uquery = sprintf("
+    update UserObm_SessionLog set 
+    userobm_sessionlog_session_name = '%s', 
+    userobm_sessionlog_userobm_id = '%s', userobm_sessionlog_timeupdate = '%s',
+    userobm_sessionlog_timecreate = '%s', 
+    userobm_sessionlog_nb_connexions = userobm_sessionlog_nb_connexions + %d,
+    userobm_sessionlog_lastpage = '%s', userobm_sessionlog_ip  = '%s' where
+    userobm_sessionlog_sid='%s'",
+    $obm_q->f('activeuserobm_session_name'), 
+    $obm_q->f('activeuserobm_userobm_id'), $obm_q->f('activeuserobm_timeupdate'),
+    $obm_q->f('activeuserobm_timecreate'), 
+    $obm_q->f('activeuserobm_nb_connexions'),
+    $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'),
+    $obm_q->f('activeuserobm_sid'));
 
-$squery = sprintf("
-select count(*) from UserObm_SessionLog where userobm_sessionlog_sid='%s'",
-$obm_q->f('activeuserobm_sid'));
+  $squery = sprintf("
+    select count(*) from UserObm_SessionLog where userobm_sessionlog_sid='%s'",
+    $obm_q->f('activeuserobm_sid'));
 
-$iquery = sprintf("
-insert into UserObm_SessionLog ( userobm_sessionlog_sid,
- userobm_sessionlog_session_name, 
- userobm_sessionlog_user_obm_id, userobm_sessionlog_timeupdate,
- userobm_sessionlog_timecreate, userobm_sessionlog_nb_connexions,
- userobm_sessionlog_lastpage, userobm_sessionlog_ip ) 
- values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
- $obm_q->f('activeuserobm_sid'), $obm_q->f('activeuserobm_session_name'), 
- $obm_q->f('activeuserobm_user_obm_id'), $obm_q->f('activeuserobm_timeupdate'),
- $obm_q->f('activeuserobm_timecreate'), 
- $obm_q->f('activeuserobm_nb_connexions'),
- $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'));
+  $iquery = sprintf("
+    insert into UserObm_SessionLog ( userobm_sessionlog_sid,
+    userobm_sessionlog_session_name, 
+    userobm_sessionlog_userobm_id, userobm_sessionlog_timeupdate,
+    userobm_sessionlog_timecreate, userobm_sessionlog_nb_connexions,
+    userobm_sessionlog_lastpage, userobm_sessionlog_ip ) 
+    values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
+    $obm_q->f('activeuserobm_sid'), $obm_q->f('activeuserobm_session_name'), 
+    $obm_q->f('activeuserobm_userobm_id'), $obm_q->f('activeuserobm_timeupdate'),
+    $obm_q->f('activeuserobm_timecreate'), 
+    $obm_q->f('activeuserobm_nb_connexions'),
+    $obm_q->f('activeuserobm_lastpage'), $obm_q->f('activeuserobm_ip'));
 
-$obm_q2 = new DB_OBM ;
-$obm_q2->query($uquery);
-if ( $obm_q2->affected_rows() == 0
+  $obm_q2 = new DB_OBM ;
+  $obm_q2->query($uquery);
+  if ( $obm_q2->affected_rows() == 0
      && $obm_q2->query($squery)
      && $obm_q2->next_record() && $obm_q2->f(0) == 0
      && !$obm_q2->query($iquery)) {
-    }
+  }
 }
+
 
 ////////////////////////////////////////////////////////////////////////////
 // A GARDER ?????

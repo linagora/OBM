@@ -29,7 +29,7 @@ CREATE TABLE ActiveSessions (
 CREATE TABLE ActiveUserObm (
   activeuserobm_sid		varchar(32) NOT NULL default '',
   activeuserobm_session_name	varchar(32) NOT NULL default '',
-  activeuserobm_user_obm_id	int(11) default NULL,
+  activeuserobm_userobm_id	int(11) default NULL,
   activeuserobm_timeupdate	varchar(14) NOT NULL default '',
   activeuserobm_timecreate	varchar(14) NOT NULL default '0',
   activeuserobm_nb_connexions	int(11) NOT NULL default '0',
@@ -45,7 +45,7 @@ CREATE TABLE ActiveUserObm (
 CREATE TABLE UserObm_SessionLog (
   userobm_sessionlog_sid varchar(32) NOT NULL default '',
   userobm_sessionlog_session_name varchar(32) NOT NULL default '',
-  userobm_sessionlog_user_obm_id int(11) default NULL,
+  userobm_sessionlog_userobm_id int(11) default NULL,
   userobm_sessionlog_timeupdate varchar(14) NOT NULL default '',
   userobm_sessionlog_timecreate varchar(14) NOT NULL default '0',
   userobm_sessionlog_nb_connexions int(11) NOT NULL default '0',
