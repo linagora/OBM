@@ -893,19 +893,23 @@ function html_company_kind_form($kind_q) {
 <!-- Kind Check Delete Section -->
         <table>
         <tr>
+         <td colspan=\"3\">
+        <form name=\"form_admin_kind_delete\"
+      method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
+         <table>
+          <tr>
           <td class=\"adminLabel\">$l_kind_exist</td>
           <td class=\"adminLabel\">$sel_kind</td>
           <td>
-    <form name=\"form_admin_kind_delete\"
-      method=\"post\" action=\"" . $sess->url("company_index.php") . "\">
             <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
             <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
               onclick=\"if (check_kind_checkdel(this.form)) return true;
               else return false;\" />
-    </form>
           </td>
         </tr>
-
+        </table>
+    </form>
+        </td></tr>
 <!-- Kind Update Section -->
 
         <tr>
@@ -919,6 +923,7 @@ function html_company_kind_form($kind_q) {
               onclick=\"if (check_kind_upd(this.form,document.form_admin_kind_delete)) return true; else return false;\" />
     </form>
           </td>
+          <td>&nbsp;</td>
         </tr>
 
         </table>
@@ -985,16 +990,18 @@ function dis_kind_links($label) {
   $del_form = dis_kind_delete_form($label);
 
   if ($obm_q->num_rows() > 0) {
-    $dis_link = "<p>$l_kind_link_company $label";
+    $dis_link = "<table class=\"details\"><tr><td class=\"detailHead\">$l_kind_link_company $label</td></tr>";
     while ($obm_q->next_record()) {
       $cid = $obm_q->f("company_id");
       $cname = $obm_q->f("company_name");
-      $dis_link .="<br /><a href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>\n";
+      $dis_link .="<tr><td class=\"detailText\">
+                   <a href=\"" .$sess->url("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname
+                   </a></td></tr>\n";
     }
-    $dis_link .= "$label : $l_kind_cant_delete </p>";
+    $dis_link .= "<tr><td class=\"messageWarning\">$label : $l_kind_cant_delete</td></tr>";
   } else {
-    $dis_link = "$l_kind_link_company_no '$label' : $l_kind_can_delete
-      <table>
+    $dis_link = "<table class=\"details\"><tr><td colspan=\"2\" class=\"messageOk\">
+    $l_kind_link_company_no '$label' : $l_kind_can_delete</td></tr>
       <tr>
         <td>
         $del_form
@@ -1003,12 +1010,13 @@ function dis_kind_links($label) {
         <form name=\"form_back\" method=\"get\"
         action=\"" .$sess->url("company_index.php") . "\">
         <input type=\"hidden\" name=\"action\" value=\"admin\" />
-        <input type=\"submit\" value=\"$l_back\">
+        <input type=\"submit\" value=\"$l_back\" />
         </form>
         </td>
       </tr>
       </table>";
   }
+ echo "$dis_link";
 }
 
 

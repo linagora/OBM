@@ -41,16 +41,6 @@
 // - parent_update        -- form fields    -- update the parent
 // - parent_delete        -- $param_parent  -- delete the parent
 ///////////////////////////////////////////////////////////////////////////////
-$www ="   <p class=\"messageInfo\">
-    	<a href=\"http://validator.w3.org/check/referer\"><img
-        src=\"http://www.w3.org/Icons/valid-xhtml10\"
-        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
-	<a href=\"http://jigsaw.w3.org/css-validator/\">
- 	 <img style=\"border:0;width:88px;height:31px\"
-       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
-       alt=\"Valid CSS!\" />
-	 </a>
-  	</p>";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
@@ -134,21 +124,21 @@ if (($action == "index") || ($action == "")) {
   } else {
     display_info_msg($l_no_display);
   }
- echo $www;
+ 
 } elseif ($action == "search")  { // tester si hd_parent mis ??? pour form :oui
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm();
   html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
   dis_deal_search_list($deal);
-  echo $www;
+  
 
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $usr_q = run_query_userobm();
   html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, run_query_company_info($param_company), run_query_contact_deal($param_company), run_query_dealstatus(), $param_company, run_query_linked_contract($param_deal), $deal);
-  echo $www;
+  
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_deal > 0) {
@@ -168,7 +158,7 @@ if (($action == "index") || ($action == "")) {
       display_error_visibility();  
     } 	
   }
-  echo $www;
+  
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_deal > 0) {
@@ -179,7 +169,7 @@ if (($action == "index") || ($action == "")) {
     $usr_q = run_query_userobm();
     html_deal_form($action, $deal_q, run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
   }
-  echo $www;
+  
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
@@ -204,7 +194,7 @@ if (($action == "index") || ($action == "")) {
     $usr_q = run_query_userobm();
     html_deal_form($action, "", run_query_dealtype(), run_query_deal_tasktype(), $usr_q, "", run_query_contact_deal($param_company), run_query_dealstatus(), $param_company,run_query_linked_contract($param_deal), $deal);
   }
-  echo $www;
+  
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_deal_form("", $deal)) {
@@ -244,7 +234,7 @@ if (($action == "index") || ($action == "")) {
       run_query_update_archive($param_deal,$param_parent);
     }
   }
-  echo $www;
+  
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_delete($param_deal);
@@ -254,7 +244,7 @@ if (($action == "index") || ($action == "")) {
     display_err_msg($l_delete_error);
   }
   dis_deal_index();
-  echo $www;
+  
 
 } elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -262,7 +252,7 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
-  echo $www;
+  
 
 } else if ($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -271,7 +261,7 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
-  echo $www;
+  
 
 } else if ($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -280,16 +270,13 @@ if (($action == "index") || ($action == "")) {
   $pref_parent_q = run_query_display_pref($uid,"parentdeal",1);
   $pref_invoice = run_query_display_pref ($uid,"invoice",1);
   dis_deal_display_pref($pref_q, $pref_parent_q, $pref_invoice);
-  echo $www;
+  
 
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
     require("deal_js.inc");
     html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
-  } else {
-    display_error_permission();
-  }
+  
 
 } elseif ($action == "kind_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -301,6 +288,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "kind_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -312,12 +300,14 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_kind_links($deal["kind"]);
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -329,6 +319,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "status_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -340,7 +331,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
-
+  
 } elseif ($action == "status_update")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_update($deal);
@@ -351,13 +342,14 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "status_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_status_links($deal["state"]);
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
-
+  
 } elseif ($action == "status_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   $retour = run_query_status_delete($deal["state"]);
@@ -368,6 +360,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "cat_insert")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -379,6 +372,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "cat_update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -390,12 +384,14 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "cat_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   dis_cat_links($deal["cat"]);
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 } elseif ($action == "cat_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -407,6 +403,7 @@ if (($action == "index") || ($action == "")) {
   }
   require("deal_js.inc");
   html_deal_admin_form(run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus());
+  
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -420,19 +417,14 @@ if (($action == "index") || ($action == "")) {
   $usr_q = run_query_userobm();
   html_parentdeal_search_form($deal, $usr_q);
   dis_parentdeal_search_list($deal);
-  echo $www;
+  
 
 } elseif ($action == "parent_new") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
     require("deal_js.inc");
     $obm_q = new DB_OBM;
     $usr_q = run_query_userobm();
     html_parentdeal_form($action,$obm_q, $usr_q,'');
-  }
-  else {
-    display_error_permission();
-  }
 
 } elseif ($action == "parent_detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -442,10 +434,10 @@ if (($action == "index") || ($action == "")) {
   $num_rows = $deal_q->num_rows();
 
   html_parentdeal_consult($obm_q,$deal_q,$deal,$obm_q_options,$num_rows,run_query_dealtype(),run_query_deal_tasktype(),run_query_dealstatus(),run_query_userobm());
+  
 
 } elseif ($action == "parent_detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {	
     if ($param_parent > 0) {
       require("deal_js.inc");
       $obm_q = run_query_detail_parentdeal($param_parent);
@@ -453,10 +445,7 @@ if (($action == "index") || ($action == "")) {
       display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
       html_parentdeal_form($action,$obm_q, $usr_q, $deal);
     } 
-  } else {
-    display_error_permission();
-  }
-
+  
 } elseif ($action == "parent_insert") {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_parent_form("", $deal)) {
@@ -472,7 +461,7 @@ if (($action == "index") || ($action == "")) {
     display_warn_msg($err_msg);
     html_parentdeal_search_form($deal, run_query_userobm());
   }
-
+  
 } elseif ($action == "parent_delete") {
 /////////////////////////////////////////////////////////////////////
   if (check_parent_has_deal($param_parent)) {
@@ -487,6 +476,7 @@ if (($action == "index") || ($action == "")) {
     require("deal_js.inc");
     html_parentdeal_search_form($deal, run_query_userobm());
   }    
+  
 
 } elseif  ($action == "parent_update") {
 /////////////////////////////////////////////////////////////////////
@@ -510,12 +500,14 @@ if (($action == "index") || ($action == "")) {
     display_record_info($obm_q->f("parentdeal_usercreate"),$obm_q->f("parentdeal_userupdate"),$obm_q->f("parentdeal_timecreate"),$obm_q->f("timeupdate"));
     html_parentdeal_form($action,$obm_q, $usr_q, $deal);
   }
+  
 
 } elseif ($action=="affect") {
 ///////////////////////////////////////////////////////////////////////////////
   require("deal_js.inc");
   $list_parent_q = run_query_search_parentdeal('');
   html_deal_affect($list_parent_q, $param_deal);
+  
 
 } elseif ($action == "affect_update") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -537,6 +529,7 @@ if (($action == "index") || ($action == "")) {
   } else {
     display_err_msg($l_query_error);
   }
+  
 
 }
 

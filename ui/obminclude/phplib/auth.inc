@@ -54,39 +54,10 @@ class Auth {
     ## This is for performance, I guess but I'm not sure if it could
     ## be safely removed -- negro
 
-    $this->auth = array("uid" => 23, "perm" => "admin","uname"=> "mehdi", "exp" => time()+12222, "refresh" => time());
-    $this->classname = "OBM_Challenge_Auth";
-    $this->lifetime = 14400;
-    $this->persistent_slots = array("auth");
-    $this->classename = "OBM_Challenge_Auth";
-    $this->lifetime = 14400;
-    $this->magic = "Simsalabim";
-    $this->database_class = "DB_OBM";
-    $this->database_table = "UserObm";
-    $this->refresh = 0;
-    $this->mode = "log";
-    $this->nobody = 0;
-    $this->cancel_login = "cancel_login";
-    $this->in = 1;
-    $this->db_obm->Host = "localhost";   
-    $this->db_obm->Database = "obm";
-    $this->db_obm->type = "MYSQL";
-    $this->db_obm->User =  "root";
-    $this->db_obm->Password = "";
-    $this->db_obm->Auto_Free = 0;
-    $this->db_obm->Debug = 0;
-    $this->db_obm->Halt_On_Error = "yes";
-
     if (! $this->in) {
       $sess->register("auth");
       $this->in = true;
     }
-  //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
- 
-
-/*
-auth|O:18:"obm_challenge_auth":13:{s:9:"classname";s:18:"OBM_Challenge_Auth";s:8:"lifetime";s:5:"14400";s:5:"magic";s:10:"Simsalabim";s:14:"database_class";s:6:"DB_OBM";s:14:"database_table";s:7:"UserObm";s:16:"persistent_slots";a:1:{i:0;s:4:"auth";}s:7:"refresh";i:0;s:4:"mode";s:3:"log";s:6:"nobody";b:0;s:12:"cancel_login";s:12:"cancel_login";s:4:"auth";a:5:{s:3:"uid";s:2:"23";s:4:"perm";s:5:"admin";s:3:"exp";i:1034269893;s:7:"refresh";i:1034255491;s:5:"uname";s:5:"mehdi";}s:2:"in";b:1;s:2:"db";O:6:"db_obm":16:{s:4:"Host";s:9:"localhost";s:8:"Database";s:3:"obm";s:4:"type";s:5:"MYSQL";s:4:"User";s:4:"root";s:8:"Password";s:0:"";s:9:"Auto_Free";i:0;s:5:"Debug";i:0;s:13:"Halt_On_Error";s:3:"yes";s:9:"Seq_Table";s:11:"db_sequence";s:6:"Record";a:0:{}s:3:"Row";N;s:5:"Errno";i:0;s:5:"Error";s:0:"";s:8:"revision";s:3:"1.2";s:7:"Link_ID";i:0;s:8:"Query_ID";i:0;}}challenge|s:32:"5d60372111c4ecb7caf55dea4bec762d";lifetime|s:5:"14400";session_cookie|s:1:"1";set_lang|s:2:"fr";set_display|s:2:"no";set_rows|s:2:"12";set_day_weekstart|s:6:"monday";last_payment|s:1:"0";last_invoice|s:1:"0";last_account|s:1:"0";last_incident|s:2:"14";last_contract|s:1:"2";last_user|s:1:"0";last_list|s:1:"0";last_deal|s:1:"0";set_theme|s:8:"standard";last_contact|s:4:"1132";last_company|s:3:"620";set_debug|s:1:"0";last_company_name|s:15:"01 INFORMATIQUE";last_contact_name|s:5:"ADELL";last_deal_name|N;last_list_name|N;last_account_name|N;last_invoice_name|N;last_payment_name|N;last_contract_name|s:33:"Support IO Box pour leurs clients";last_incident_name|s:34:"prb io : aucune connexion possible";*/
- //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
 
     ## back compatibility: if d_c is set, create db object
     if(isset($this->database_class)) {
