@@ -419,20 +419,23 @@ function html_company_consult($co_q, $cat_q) {
   } else {
     $link_email = "&nbsp;";
   }
-
   $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  $i = 0;
-  while($cat_q->next_record()) {
-    if ($i==0) {
-      $cat_disp .= "<tr>";
+  if($cat_q->nf() >0) {
+    $cat_a = run_query_ordered_category($cat_q);
+    $i = 0;
+    foreach($cat_a as $cat_info) {
+      if ($i==0) {
+	$cat_disp .= "<tr>";
+      }
+      $label = $cat_info["code"];
+      $label .= "-".$cat_info["label"];    
+      $i++;
+      $cat_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+      if ($i==3) {
+	$cat_disp .= "</tr>";
+	$i = 0;
+      }    
     }
-    $label = $cat_q->f("companycategory_code");
-    $label .= "-".$cat_q->f("companycategory_label");    
-    $i++;
-    $cat_disp .= "<td class=\"detailText\"> $label </td>";
-    if ($i==3) {
-      $cat_disp .= "</tr>";
-    }    
   }
 
   // Web link
@@ -556,31 +559,33 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
   }
   $sel_kind .= "</select>";
-
+  $cat_a = run_query_ordered_category($cat_q); 
+  
   // cat select
   $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
    $j =0;
-  while($cat_q->next_record()) {
-    $c_id = $cat_q->f("companycategory_id");
-    $c_code = $cat_q->f("companycategory_code");
-    $c_label = $cat_q->f("companycategory_label");
-    if ($compcat[$j] == $c_id) { 
-    $sel_cat .= "\n<option value=\"$c_id\"";
-//    if ($compcat[$j] == $c_id) { 
+  foreach($cat_a as $cat_info) {
+    $c_id = $cat_info["id"];
+    $c_code = $cat_info["code"];
+    $c_label = $cat_info["label"];
+    if ($compcat[$j]["id"] == $c_id) { 
+      $sel_cat .= "\n<option value=\"$c_id\"";
       $sel_cat .= " selected=\"selected\""; 
       $j++;
-//    }
-    $length = 8 - strlen($c_code);
-    $label = $c_code;
-    for($i=0;$i<$length;$i++) {
-      $label .= "&nbsp;";
-    }
-    $label .= "$c_label";
-    $sel_cat .= ">$label</option>";
+      $length = 8 - strlen($c_code);
+      $label = $c_code;
+      for($i=0;$i<$length;$i++) {
+	$label .= "&nbsp;";
+      }
+      $label .= "$c_label";
+      $sel_cat .= ">$label</option>";
     }
   }
   $sel_kind .= "</select>";
- 
+
+
+
+  
   // activity select
   $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
     <option value=\"0\">$l_none</option>";
@@ -1176,16 +1181,17 @@ function html_company_cat_form($cat_q) {
     forms.form_cat_update.tf_cat_code.value=ext;\"
     size=\"10\" style=\"font-family:monospace;font-weight:400;\">";
   if($cat_q->nf()>0) {
-    while ($cat_q->next_record()) {
-      $id = $cat_q->f("companycategory_id");
-      $code = $cat_q->f("companycategory_code");
-      $label = $cat_q->f("companycategory_label");
-      $length = 8 - strlen($cat_q->f("companycategory_code"));
-      $label2 = $cat_q->f("companycategory_code");
+    $cat_a = run_query_ordered_category($cat_q);
+    foreach($cat_a as $cat_info) {
+      $id = $cat_info["id"];
+      $code = $cat_info["code"];
+      $label = $cat_info["label"];
+      $length = 8 - strlen($code);
+      $label2 = $code;
       for($i=0;$i<$length;$i++) {
         $label2 .= "&nbsp;";
       }
-      $label2 .= " ".$cat_q->f("companycategory_label");    
+      $label2 .= " ".$label;    
       $sel_cat .= "\n<option value=\"$id\">$label2</option>";
     }
     $sel_cat .= "</select>";
@@ -1724,25 +1730,19 @@ function html_category_tree($category) {
   <div class=\"categoryTree\">
    <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
    ";
-   
-   while($obm_d->next_record()) {
-     $id = $obm_d->f("companycategory_id");
-     $code = $obm_d->f("companycategory_code");
-     $doc_info = array(
-     "id" =>$id,
-     "label" =>$obm_d->f("companycategory_label"),
-     "code" => $code);
-     $hash_code = explode(".",$code);
+   $cat_a = run_query_ordered_category($obm_d);
+   foreach($cat_a as $cat_info) {
+     $hash_code = explode(".",$cat_info["code"]);
      $deep = count($hash_code);
      switch ($deep) {
        	case 1:
-	  $tree[$hash_code[0]] = $doc_info;
+	  $tree[$hash_code[0]] = $cat_info;
 	  break;
 	case 2:
-	  $tree[$hash_code[0]][$hash_code[1]] = $doc_info;
+	  $tree[$hash_code[0]][$hash_code[1]] = $cat_info;
 	  break;
 	case 3:
-	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $doc_info;
+	  $tree[$hash_code[0]][$hash_code[1]][$hash_code[2]] = $cat_info;
 	  break;
     }
   }

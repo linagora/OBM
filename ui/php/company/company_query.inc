@@ -646,11 +646,10 @@ function run_query_kind_links($p_id) {
 function run_query_companycat() {
   global $cdg_sql;
 
-  $query = "select * from CompanyCategory order by  companycategory_code"; 
+  $query = "select * from CompanyCategory"; 
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
-
   return $obm_q;
 }
 
@@ -663,7 +662,7 @@ function run_query_companycat() {
 function run_query_get_companycat($id) { 
   global $cdg_sql;
 
-  $query = "select *
+  $query = "select CompanyCategory.*
     from CompanyCategoryLink, CompanyCategory
     where companycategorylink_company_id = '$id' 
       and companycategorylink_category_id = companycategory_id
@@ -673,9 +672,7 @@ function run_query_get_companycat($id) {
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
   $i=0;
-  while ($obm_q->next_record()) {
-    $links[$i++] = $obm_q->f("companycategorylink_category_id");
-  }
+  $links = run_query_ordered_category($obm_q);
   return $links;
 }
 
@@ -1084,8 +1081,56 @@ function run_query_get_tree() {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
+
   return $obm_q;  
 
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// place Category in the correct order
+// Parameters: DB object of categories.
+///////////////////////////////////////////////////////////////////////////////
+function run_query_ordered_category($cat_q) {
+  $wc =0; 
+  while($cat_q->next_record()) {
+    $id = $cat_q->f("companycategory_id");
+    $code = $cat_q->f("companycategory_code");
+    $label = $cat_q->f("companycategory_label");
+    $doc_info = array(
+      "id" =>$id,
+      "label" =>$cat_q->f("companycategory_label"),
+      "code" => $code);
+    $categories[] = $doc_info;
+  }
+
+  usort($categories,"category_compare");
+  return $categories;  
+
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Compare 2 categories with their code
+// Parameters: 
+//   - $cats   : categories array
+//   - $m      : index of first category
+//   - $n      : index of second category
+///////////////////////////////////////////////////////////////////////////////
+
+function category_compare($m, $n) {
+  global $wc;
+  $wc++;
+  $code_1 = explode(".",$m["code"]);
+  $code_2 = explode(".",$n["code"]);
+  $i=0;
+  while(isset($code_1[$i]) || isset($code_2[$i])) {
+    if($code_1[$i] > $code_2[$i]){
+      return 1;
+    }
+    elseif($code_1[$i] < $code_2[$i]) {
+      return -1;
+    }
+    $i++;
+  }
+  return 0;
+}
 </script>
