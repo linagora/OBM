@@ -290,7 +290,7 @@ function get_param_list() {
   global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id,$sel_contact_function_id;
   
-  global $tf_publication_title,$tf_publication_lang,$tf_publication_year;
+  global $sel_subscription_publication_id,$tf_publication_lang,$tf_publication_year;
   global $sel_subscription_reception_id,$tf_subscription_renewal;
   
   global $sel_log_and,$sel_log_not;
@@ -354,7 +354,7 @@ function get_param_list() {
   if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
   
   //Publication
-  if (isset ($tf_publication_title)) $list["criteria"]["modules"]["publication"]["publication_title"] = $tf_publication_title;
+  if (isset ($sel_subscription_publication_id)) $list["criteria"]["modules"]["publication"]["subscription_publication_id"] = $sel_subscription_publication_id;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
   if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
   if (isset ($sel_subscription_reception_id)) $list["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;

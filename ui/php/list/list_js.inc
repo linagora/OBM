@@ -72,22 +72,13 @@ function add_criterion(form,index) {
   cell = labels.insertCell(3); 
   values.insertCell(0);
   cell = values.insertCell(1);
-  if(index > 1) {
-    cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
-  }   
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"delete_img\" onclick=\"del_row(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_crow\" alt=\"Delete\" /></a>';
   cell = values.insertCell(2);  
   cell.style.borderRight = '1px solid #7B9EAD';
   cell.style.paddingRight = '5px';
-  if(index > 1) {
-    cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
-  }
+  cell.innerHTML = '<a href=\"javascript:void(0);\" id=\"update_img\" onclick=\"open_window(this.parentNode.parentNode);return false;\"><img src=\"/images/$set_theme/$ico_updated\" alt=\"Update\" /></a>';
   cell = values.insertCell(3);
-  if(index > 1) {
-    cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
-  } 
-  else {
-    cell.innerHTML = '<input type=\"hidden\" name=\"sel_log_and[]\" value=\"\" />';
-  }
+  cell.innerHTML = '<select name=\"sel_log_and[]\"><option value=\"OR\" selected=\"true\">$l_or</option><option value=\"AND\">$l_and</option></select>';
   cell.innerHTML += '<select name=\"sel_log_not[]\"><option value=\"\" selected=\"true\">$l_empty</option><option value=\"NOT\">$l_not</option></select>';
   i=company_criterion(form,labels,values,4);
   i=contact_criterion(form,labels,values,i);
@@ -111,7 +102,7 @@ function del_row(row) {
 
 function open_window(row) {
   i = row.rowIndex-1;
-  window.open(window.location+my_url+i,'','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes');
+  window.open(window.location+my_url+i,'','height=650,width=$popup_width,scrollbars=yes,status=yes');
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -417,17 +408,21 @@ function contact_criterion(form,labels,values,i) {
 function publication_criterion(form,labels,values,i) {
   values.className = 'detailForm';
   defaultCell = values.cells[0];
-  if(form.tf_publication_title.value != '') {    
+
+  if(form.sel_subscription_publication_id.value != '') {  
     cell = labels.insertCell(i);
-    cell.innerHTML = '$l_publication: $l_title';    
+    cell.innerHTML = '$l_publication: $l_title'; 
     cell = values.insertCell(i);
-    cell.innerHTML = '<input type=\"text\" name=\"tf_publication_title[]\" readonly=\"readonly\" style=\"background-color:#B9C7CA;\" value=\"'+form.tf_publication_title.value+'\" />';
-    i++;
+    field = form.sel_subscription_publication_id;
+    cell.innerHTML = '<select name=\"sel_subscription_publication_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
   }
   else {
-    defaultCell.innerHTML += '<input type=\"hidden\" name=\"tf_publication_title[]\" value=\"\" />';
-  }
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_publication_id[]\" value=\"\" />';
+  }  
 
+
+  
   if(form.tf_publication_lang.value != '') {
     cell = labels.insertCell(i);
     cell.innerHTML = '$l_publication: $l_lang';      

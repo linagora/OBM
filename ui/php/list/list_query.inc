@@ -787,6 +787,22 @@ function run_query_language() {
 }
 
 
+///////////////////////////////////////////////////////////////////////////////
+// Publication: publication select query 
+// Returns:
+//   DB object result with all publication
+///////////////////////////////////////////////////////////////////////////////
+function run_query_publication() {
+  global $cdg_sql;
+
+  $query = "select publication_title, publication_id from Publication";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Reception mode subscription query execution                                 //
@@ -856,7 +872,7 @@ function make_query($list) {
     "contactcategory1link_category_id" => $common_equal,
     "contactcategory2link_category_id" => $common_equal,
     "contact_function_id" => $common_equal,
-    "publication_title"  => $common_like,
+    "subscription_publication_id"  => $common_equal,
     "publication_lang"  => $pub_lang_like,
     "publication_year"  => $common_like,
     "subscription_renewal"  => $common_equal,
@@ -873,9 +889,120 @@ function make_query($list) {
     "contactcategory_2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
     "kind_lang" => " left join Kind on contact_kind_id = kind_id "
   );
+  $add_select = array (
+    "publication" => ", SUM(subscription_quantity) as subscription_quantity"
+  );
+  $add_group = array (
+  );  
+  $select = "
+        contact_id,
+        contact_lastname,
+        contact_firstname,
+        contact_phone,
+        contact_homephone,
+        contact_email,
+        company_id,
+        company_name,
+        company_address1,
+        company_address2,
+        company_address3,
+        company_zipcode,
+        company_expresspostal,
+        company_town";
+  $group = "
+        contact_id,
+        contact_lastname,
+        contact_firstname,
+        contact_phone,
+        contact_homephone,
+        contact_email,
+        company_id,
+        company_name,
+        company_address1,
+        company_address2,
+        company_address3,
+        company_zipcode,
+        company_expresspostal,
+        company_town";
+	
+  $join = " Contact left join Company on contact_company_id=company_id ";  
+	     
+  if(is_array($criteria)) {
+    foreach($criteria as $module => $module_criteria) {
+      if(is_array($module_criteria)) {
+        foreach($module_criteria as $field => $criterion) {
+          if(is_array($criterion)) {
+            foreach($criterion as $line => $value) {
+              if($value != "") {
+		$field_fill = 1;
+		$module_fill = 1;
+		$operation = $operateurs[$field];
+		$operation = str_replace('%f',$field,$operation);
+		$operation = str_replace('%v',$value,$operation);
+		$condition[$line] .= $and[$line]." ". $operation;
+		$and[$line] = " AND";
+	      }	
+	      else {
+		$condition[$line] .= "";
+	      }
+            }
+	    if($field_fill == 1) { 
+	      $join .= $add_join[$field];
+    	      $select .= $add_select[$field];
+    	      $group .= $add_group[$field];	      
+	      $field_fill = 0;
+	    }
+          }  
+        } 
+       	if($module_fill == 1) { 
+      	  $join .= $add_join[$module];
+	  $select .= $add_select[$module];
+	  $group .= $add_group[$module];
+	  $module_fill = 0;
+	}
+      }
+    }
+    foreach($condition as $line=>$value) {
+      if($line == 0) {
+	$logical_criterion[$line] = "";
+      }
+      $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
+    }    
+  }
 
-  $query = "
-        SELECT DISTINCT
+
+
+  
+  
+  if($where != "") {
+    $where = " WHERE $where";
+  }
+  $query = "SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname";
+  return trim(addslashes($query));
+}
+
+///////////////////////////////////////////////////////////////////////////////
+//  Make a query with the dynamic and static contact.
+// Parameters:
+//   - $query       : Dynamic query
+//   - $cont_q      : Statics users
+///////////////////////////////////////////////////////////////////////////////
+function make_final_query($query,$con_q) {
+  global $db_type_mysql,$db_type_pgsql, $auth, $cdg_sql;
+
+  $nb_con = $con_q->num_rows();
+  if ($nb_con == 0) {
+    return $query;  
+  } 
+
+  return $query;
+  // Dead Code? no... but it need MySQL 4.x 
+  // and Obm must keep the compatibility with
+  // the Debian Stable Mysql Version...
+  // So w&s
+  $final_query = "($query)";
+  $final_query .= " UNION 
+        (SELECT      
         contact_id,
         contact_lastname,
         contact_firstname,
@@ -897,68 +1024,19 @@ function make_query($list) {
         company_zipcode,
         company_expresspostal,
         contact_town,
-        company_town
-        FROM
-	Contact  
-             left join Company on contact_company_id=company_id
-
-	     ";  
-  
-/*left join CompanyCategoryLink on company_id = companycategorylink_company_id 
-	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
-	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id
-	     left join ContactCategory2Link on contact_id = contactcategory2link_contact_id
-	     left join Subscription on subscription_contact_id = contact_id
-	     left join Publication on subscription_publication_id = publication_id*/
-
-  if(is_array($criteria)) {
-    foreach($criteria as $module => $module_criteria) {
-      if(is_array($module_criteria)) {
-        foreach($module_criteria as $field => $criterion) {
-          if(is_array($criterion)) {
-            foreach($criterion as $line => $value) {
-              if($value != "") {
-		$field_fill = 1;
-		$module_fill = 1;
-		$operation = $operateurs[$field];
-		$operation = str_replace('%f',$field,$operation);
-		$operation = str_replace('%v',$value,$operation);
-		$condition[$line] .= $and[$line]." ". $operation;
-		$and[$line] = " AND";
-	      }	
-	      else {
-		$condition[$line] .= "";
-	      }
-            }
-	    if($field_fill == 1) { 
-	      $join .= $add_join[$field];	
-	      $field_fill = 0;
-	    }
-          }  
-        } 
-       	if($module_fill == 1) { 
-      	  $join .= $add_join[$module];
-	  $module_fill = 0;
-	}
-      }
-    }
-    foreach($condition as $line=>$value) {
-      if($line == 0) {
-	$logical_criterion[$line] = "";
-      }
-      $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
-    }    
+        company_town 
+	FROM 
+	Contact
+             left join Company on contact_company_id=company_id 
+	WHERE 
+	contact_id IN (";
+	
+  while($con_q->next_record()) {
+    $final_query .= "$coma ".$con_q->f("contact_id");
+    $coma = ",";
   }
-
-
-  
-  if($where != "") {
-    $where = " WHERE $where";
-  }
-  $query = $query.$join.$where." ORDER BY contact_lastname";
-  return trim(addslashes($query));
+  $final_query .= " ) ) GROUP BY contact_lastname";
+  return $final_query; 
 }
-
-
 </script>
 

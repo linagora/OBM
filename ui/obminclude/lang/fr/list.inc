@@ -36,6 +36,8 @@ $l_contact_cat1 = "Categorie 1";
 $l_contact_cat2 = "Categorie 2";
 $l_expert_mode = "Mode Expert";
 $l_normal_mode = "Mode Normal";
+$l_renew = "Renouvellement auto";
+$l_recept = "Mode de réception";
 
 // Contact
 $l_lastname = "Nom";
@@ -51,6 +53,7 @@ $l_publication = "Publication";
 $l_title = "Titre";
 $l_year = "Année";
 $l_lang = "Langue";
+$l_quantity = "Quantité";
 
 //Logical
 $l_or = "OU";

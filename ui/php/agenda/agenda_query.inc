@@ -2162,6 +2162,9 @@ function run_query_get_vevent_norepeat($agenda) {
 
   $uid = $auth->auth["uid"];
   $obm_db = new DB_OBM;
+  $db_type = $obm_db->type;    
+  $calendarsegment_date = sql_date_format($db_type, "calendarsegment_date","calendarsegment_date"); 
+  
   $query = "SELECT calendarevent_id,
                    calendarevent_timeupdate,
                    calendarevent_title,
@@ -2171,7 +2174,7 @@ function run_query_get_vevent_norepeat($agenda) {
 		   calendarevent_length,
 		   calendarcategory_label,
 		   calendarsegment_customerid,
-		   calendarsegment_date,
+		   $calendarsegment_date,
 		   calendarsegment_flag
 	    FROM CalendarEvent,CalendarCategory, CalendarSegment
 	    WHERE calendarsegment_customerid = '$uid'
@@ -2210,7 +2213,7 @@ function run_query_get_vevent_repeat($agenda) {
                    calendarevent_privacy,
 		   calendarevent_description,
 		   calendarevent_repeatkind,
-		   $calendarevent_endrepeat,
+		   $calendarsegment_endrepeat,
 		   calendarevent_repeatdays,
 		   calendarevent_length,
 		   calendarcategory_label,
@@ -2224,8 +2227,20 @@ function run_query_get_vevent_repeat($agenda) {
 	    AND calendarevent_repeatkind != 'none'
 	    AND calendarsegment_state = 'A'";
 
-  $query.="GROUP BY calendarevent_id,
-  calendarsegment_flag 
+  $query.="GROUP BY
+  calendarevent_id,
+  calendarsegment_flag,
+  calendarevent_timeupdate,
+  calendarevent_title,
+  calendarevent_priority,
+  calendarevent_privacy,
+  calendarevent_description,
+  calendarevent_repeatkind,
+  calendarevent_endrepeat,
+  calendarevent_repeatdays,
+  calendarevent_length,
+  calendarcategory_label,
+  calendarsegment_customerid
   ORDER BY calendarevent_id,calendarsegment_date";
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);

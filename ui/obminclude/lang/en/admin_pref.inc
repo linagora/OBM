@@ -11,7 +11,7 @@ $l_user_pref = "Users preferences";
 $l_global_pref = "Global preferences";
 $l_session_lifetime = "User session lifetime (max idle time before a user is deconnected) in seconds";
 $l_session_cookie = "Do session cookie (cookie expires when the client close the browser). This should avoid problem with date differences between client and server. Recommended.";
-
+$l_document_path = "Set the root path in the file system Document module tree";
 // Actions
 $l_execute = "Execute action";
 $l_help = "Help";

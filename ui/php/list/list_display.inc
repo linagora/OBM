@@ -32,6 +32,7 @@ $fieldnames["company_town"] = $l_town;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_mobilephone"] = $l_hphone;
 $fieldnames["contact_email"] = $l_email;
+$fieldnames["subscription_quantity"] = $l_quantity;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -278,7 +279,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
-  $query = $list_q->f("list_query");
+  
+  $crit_q = $list_q->f("list_structure");
+  $query = make_final_query($list_q->f("list_query"),$con_q);
   $dis_query = nl2br($query);
   $query_nb = get_query_num_rows($query);
   if ($query_nb >= 0) {
@@ -286,7 +289,12 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   } else {
     $query_nb = $l_invalid_query;
   }
-
+  if($crit_q == "") {
+    $disp_query = "<tr>
+      <td class=\"detailLabel\">$l_query</td>
+      <td class=\"detailText\">$query</td>
+    </tr>";
+  }
   $display["detailInfo"] = display_record_info($list_q);
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
@@ -302,10 +310,9 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_query</td>
-      <td class=\"detailText\">$query</td>
-    </tr><tr>
+    </tr>
+    $disp_query
+    <tr>
       <td class=\"detailLabel\">$l_query $l_nb_contact</td>
       <td class=\"detailText\">$query_nb</td>
     </tr>
@@ -390,17 +397,18 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_form($action, $list_q, $list) {
   global $l_insert, $l_update, $l_back;
-  if(is_object($list_q)){
-    $crit_q = $list_q->f("list_structure");
-  }
+//  if(is_object($list_q)){
+//    $crit_q = $list_q->f("list_structure");
+//  }
   $url = url_prepare("list_index.php");
   $block = "<form method=\"post\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
 
   $block .= html_list_form($action, $list_q, $list);
-  if($action == "insert" || $action == "new" || $list["criteria"] != "" ||  $crit_q !="") {
+//  if($action == "insert" || $action == "new" || $list["criteria"] != "" || 
+//     $crit_q !="" || ($crit_q =="" && $list_q->f("list_query") == "")) {
      $block .= html_list_graphical_form($action, $list_q, $list);
-  }
+//  }
 
   if (($action == "detailupdate") || ($action == "update")) {
      $dis_but .= "
@@ -453,7 +461,14 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
-
+  if($crit_q =="" && $query != "") {
+    $query_checked = " checked=\"checked\" ";
+    $dis_query = "";
+  }
+  else {
+    $criterion_checked = " checked=\"checked\" ";
+    $dis_query = "style=\"display:none;\"";
+  }
   $block = "
   <div class=\"detailHead\">$l_list</div>
   <table class=\"detail\">
@@ -474,33 +489,19 @@ function html_list_form($action, $list_q, $list) {
   </tr>
   </table>
   <div class=\"detailHead\">$l_query</div>  
-  ";
-  if($action == "insert" || $action == "new" || ($list["criteria"]["modules"] == "" &&  unserialize($crit_q) =="")) {
-    $block .=  "
     <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">
-       <input type=\"radio\" name=\"js_query\" value=\"1\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
-       <input type=\"radio\" name=\"js_query\" value=\"-1\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
+       <input type=\"radio\" $query_checked name=\"js_query\" value=\"1\" onclick=\"return show_query_field('','none',this);\" />$l_expert_mode
+       <input type=\"radio\" $criterion_checked name=\"js_query\" value=\"-1\" onclick=\"return show_query_field('none','',this);\" />$l_normal_mode
       </td>
      </tr>
      <tr>
      <td class=\"detailLabel\">
-      <textarea id=\"ta_query\" style=\"display:none;\" name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
+      <textarea id=\"ta_query\" $dis_query name=\"ta_query\" cols=\"68\" rows=\"8\">$query</textarea>
       </td>
     </tr>
-    ";
-  }
-  else {
- $block .=  "
-    <tr>
-      <td id=\"query_show\" class=\"detailLabel\"></td>
-      <td id=\"ta_query\" class=\"detailForm\"></td>
-    </tr>
-    ";
-  }    
-
-  $block .= " </table>";
+  </table>";
   if (($action == "detailupdate") || ($action == "update")) {
     $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
   }
@@ -517,7 +518,7 @@ function html_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
+  global $l_add_criterion;
   global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_postcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_timeafter,$l_timebefore,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
@@ -529,10 +530,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $list_q->f("list_id");
-    $usercreate = $list_q->f("list_usercreate");
-    $name = $list_q->f("list_name");
-    $subject = $list_q->f("list_subject");
-    $email = $list_q->f("list_email");
+    $query = $list_q->f("list_query");
     $criteria = unserialize($list_q->f("list_structure"));
     $bollean_criterion = $criteria["logical"]["NOT"];
     $logical_criterion = $criteria["logical"]["AND"];      
@@ -542,9 +540,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 
   // If parameters have been given, they supercede the default action value
   if (isset($list["id"])) { $id = $list["id"]; }
-  if (isset($list["name"])) { $name = stripslashes($list["name"]); }
-  if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
-  if (isset($list["email"])) { $email = stripslashes($list["email"]); }
+  if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   if (isset($list["criteria"])) { 
     $criteria = $list["criteria"];
     if(!is_array($criteria)) {
@@ -577,7 +573,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
       "kind_lang" => "sel",
-      "publication_title"  => "tf",
+      "subscription_publication_id"  => "sel",
       "publication_lang"  => "tf",
       "publication_year"  => "tf",
       "subscriptionreception_id"  => "sel",
@@ -605,7 +601,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
   $fields_label["kind_lang"] = "$l_contact: $l_lang";  
   $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
-  $fields_label["publication_title"] = "$l_publication: $l_title"; 
+  $fields_label["subscription_publication_id"] = "$l_publication: $l_title"; 
   $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
   $fields_label["publication_year"] = "$l_publication: $l_year"; 
   $fields_label["subscription_reception_id"] = "$l_publication: $l_recept"; 
@@ -621,6 +617,7 @@ function html_list_graphical_form($action, $list_q, $list) {
     $cat_q = run_query_companycategory();       
     $rec_q = run_query_subscriptionreception();  
     $lag_q = run_query_language();
+    $pub_q = run_query_publication();
 
     $field_data = array(
       "company_country_id" => array($cty_q,"country_id","country_name"),
@@ -634,6 +631,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory2link_category_id" => array($cat2_q,"contactcategory2_id","contactcategory2_label"),
       "contact_function_id" => array($fct_q,"function_id","function_label"),
       "kind_lang" => array($lag_q,"kind_lang","kind_lang"),
+      "subscription_publication_id" => array($pub_q,"publication_id","publication_title"),
       "subscription_reception_id" => array($rec_q,"subscriptionreception_id","subscriptionreception_label")
     );    
     foreach($criteria as $module)
@@ -682,26 +680,20 @@ function html_list_graphical_form($action, $list_q, $list) {
       $logical_criterion;      
       $dis_no_boolean = "<select name=\"sel_log_not[]\"><option value=\"\" $empty >$l_empty</option><option value=\"NOT\" $not>$l_not</option></select></td>";
       $dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
-      if($key == 0) {
-        $dis_logical = "<td><input type=\"hidden\" name=\"sel_log_and[]\" value=\"OR\" />";	
-	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td><td></td><td></td> $dis_logical $dis_no_boolean $line</tr>";
-      }else {
-	if($logical_criterion[$key] == "AND") {
-	  $and = "selected =\"true\"";
-	  $or = "";
-	}
-	else {
-	  $or = "selected =\"true\"";
-	  $and = "";
-	}	
-        $dis_logical = "<td><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
-	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";
+      if($logical_criterion[$key] == "AND") {
+	$and = "selected =\"true\"";
+	$or = "";
       }
-      
+      else {
+	$or = "selected =\"true\"";
+	$and = "";
+      }	
+      $dis_logical = "<td><select name=\"sel_log_and[]\"><option value=\"OR\" $or>$l_or</option><option value=\"AND\" $and>$l_and</option></select>";
+      $dis_criteria .="<tr><td>".$hid_cell[$key]."</td>$del_cell $upd_cell $dis_logical $dis_no_boolean $line</tr>";      
     }
   }
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  if($action == "insert" || $action == "new" || $criteria == "") { 
+  if($criteria =="" && $query != "") { 
     $display = "style=\"display:none\"";
   }
   $block = "
@@ -738,11 +730,12 @@ function dis_add_criterion_form($list) {
   $cat_q = run_query_companycategory();
   $rec_q = run_query_subscriptionreception();
   $lag_q = run_query_language();
-  
+  $pub_q = run_query_publication();
+    
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
   $block .= html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
   $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
-  $block .= html_publication_criterion($rec_q);
+  $block .= html_publication_criterion($rec_q,$pub_q);
   $block .= "
   <div class=\"detailButton\">
   <p class=\"detailButtons\">
@@ -971,7 +964,7 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag
 // Display the Contact Criterion Form //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_criterion($rec_q){
+function html_publication_criterion($rec_q,$pub_q){
   global $l_publication,$l_title,$l_lang,$l_year;
   global $l_renew,$l_recept,$l_all,$l_none,$l_yes,$l_no;
   if($rec_q->nf()!=0) 
@@ -979,7 +972,14 @@ function html_publication_criterion($rec_q){
   $sel_rec .= "\n<option value=\"\">$l_all</option>";
   while($rec_q->next_record()) {
     $sel_rec .= "\n<option value=\"".$rec_q->f("subscriptionreception_id")."\">".$rec_q->f("subscriptionreception_label")."</option>";
+  }  
+  if($pub_q->nf()!=0) 
+    $pub_q->seek(0);
+  $sel_pub .= "\n<option value=\"\">$l_all</option>";
+  while($pub_q->next_record()) {
+    $sel_pub .= "\n<option value=\"".$pub_q->f("publication_id")."\">".$pub_q->f("publication_title")."</option>";
   }   
+  
   $block = "
   <div class=\"detailHead\">$l_publication</div>    
   <table class=\"search\">
@@ -989,7 +989,7 @@ function html_publication_criterion($rec_q){
     <td class=\"detailLabel\">$l_year</td>
   </tr>
   <tr>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_title\" value=\"\" /></td>
+    <td class=\"detailForm\"><select name=\"sel_subscription_publication_id\">$sel_pub</select></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_lang\" value=\"\" /></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_year\" value=\"\" /></td>  
   </tr>

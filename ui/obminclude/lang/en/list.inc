@@ -52,7 +52,7 @@ $l_publication = "Publication";
 $l_title = "Title";
 $l_year = "Year";
 $l_lang = "Language";
-
+$l_quantity = "Quantity";
 
 // Actions
 $l_insert = "Insert";
