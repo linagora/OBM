@@ -26,7 +26,6 @@ $col_balance_pos = "00FF00";  // when the balance is >  0  (green)
 ////////////
 // Images //
 ////////////
-//$img_bg="bgvert.jpg";                  // Background Picture
 $ico_principal      = "aliacom.jpg";  // BIG LOG
 $ico_contact        = "contact.gif";            // Contact Icon
 $ico_obm            = "obm.jpg";                    // OBM icon
@@ -42,10 +41,8 @@ $ico_company        = "ico_company.gif";         // Company Icon
 $ico_change_company = "ico_change_company.gif";  // Contract Icon
 $ico_list           = "ico_list.gif";            // List Icon
 $ico_agenda         = "ico_agenda.gif";          // Agenda Icon
-
 $ico_contract       = "ico_phone.gif";
 $ico_incident       = "ico_incident.gif";
-
 $ico_account        = "ico_account.gif";
 $ico_invoice        = "ico_invoice.gif";
 $ico_payment        = "ico_payment.gif";
@@ -60,6 +57,12 @@ $ico_code           = "ico_code.gif";
 $ico_pref           = "ico_pref.gif";
 $ico_data           = "ico_data.gif";
 $ico_lang           = "ico_lang.gif";
+
+// OBM DISPLAY Icons
+$ico_export         = "ico_export.gif";
+$ico_export_all     = "ico_export_all.gif";
+$ico_begin          = "ico_begin.gif";
+$ico_end            = "ico_end.gif";
 
 $ico_web            = "ico_web.gif";        // WWW Icon
 $ico_mail           = "ico_mail.gif";       // Mail Icon

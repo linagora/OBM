@@ -30,12 +30,8 @@ class DB_OBM extends DB_Sql {
   var $Database = "obm";             
   var $type = "MYSQL" ;
 //  var $type     = "PGSQL";
-  //var $User     = "postgres";
-  //var $Password = "postgres";
     var $User     = "root";
     var $Password = "";
-  //    var $User     = "web";
-  //    var $Password = "web";
 }
 
 

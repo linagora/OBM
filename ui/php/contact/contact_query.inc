@@ -354,9 +354,7 @@ function run_query_contact_deal_links($p_id) {
   $query = "select distinct deal_id, deal_label 
             from Deal, Contact
             where deal_contact1_id='$p_id'
-              or deal_contact2_id='$p_id'
-              or deal_marketingmanager_id='$p_id'
-              or deal_technicalmanager_id='$p_id'";
+              or deal_contact2_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

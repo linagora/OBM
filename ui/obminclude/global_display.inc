@@ -426,8 +426,12 @@ class OBM_DISPLAY {
   //   - $url : URL with search fields to link to index pages
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_index($url) {
-    global $page, $new_order;
-    global $set_rows, $set_rows_default;
+    global $path, $page, $new_order;
+    global $set_theme, $set_rows, $set_rows_default;
+    global $l_page_res, $l_export, $l_export_all;
+    global $ico_export, $ico_export_all, $ico_begin, $ico_end;
+
+    $nb_page_dis = 10;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
@@ -436,36 +440,75 @@ class OBM_DISPLAY {
 
     // Page display management
     if (!isset($page)) {
-      $page=0;
+      $page = 1;
     }
+
+
     if ($set_rows < 1) $set_rows = $set_rows_default;
-    $nb_list = $this->data_set->num_rows();
-    // If we delete all contacts of the last page, we must go to $page-1
-    if($page != 0) {
-      if($nb_list < ($page*$set_rows)+1) {
+    $nb_rows = $this->data_set->num_rows();
+    // If we delete all contacts of the last page, we must go to $page-1 (list)
+    if ($page > 1) {
+      if ($nb_rows < (($page-1)*$set_rows)+1) {
          $page-- ;
       }
     }
 
-    $nb_page = floor(($nb_list-1) / $set_rows);
-    $first_row = $page * $set_rows;
-    // skip if display possible on a single page if nb_page==0
-    if ($nb_page > 0) {
-    echo "<p class=\"messageInfo\">";
-      // Table of content (pages)
-      $i=0;
-      while ($i <= ($nb_page)) {
-        if ($i != 0) echo " | ";
-        if ($i != $page) {
-          echo "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">\n";
-	}
-	echo ($i + 1);
-	if ($i != $page) echo "</a>\n";
-	$i++;
-      }
-      echo "</p>";
-      $this->data_set->seek($first_row);
+    $nb_page = floor(($nb_rows-1) / $set_rows) + 1;
+    $first_row = ($page - 1) * $set_rows;
+    $start_page =  (floor(($page - 1) / $nb_page_dis) * $nb_page_dis) + 1;
+    $end_page = $start_page + $nb_page_dis - 1;
+    $end_page = min ($end_page, $nb_page); 
+
+    $content = "<div class=\"indexPage\">$l_page_res : ($nb_page) &nbsp;&nbsp;&nbsp;&nbsp;";
+
+    // Rewind to 1st page
+    if ($page > 1) {
+      $content .= "<a href=\"$url&amp;page=1&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_begin\" class=\"indexIcon\" alt=\"|<\"></a>&nbsp;&nbsp;&nbsp;";
     }
+
+    // Rewind nb_page_dis page
+    if ($start_page > 1) {
+      $i = $start_page - $nb_page_dis;
+      $content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">-$nb_page_dis</a>&nbsp;&nbsp;&nbsp;";
+    }
+
+    $i = $start_page;
+    // Pages display
+    while ($i <= $end_page) {
+      if ($i != $page) {
+	$content .= "<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">$i</a> | \n";
+      } else {
+	$content .= "$i | \n";
+      }
+      $i++;
+    }
+
+    // Go to next $nb_page_dis pages
+    if ($end_page < $nb_page) {
+      $i = $end_page + 1;
+      $content .= "&nbsp;&nbsp;&nbsp;<a href=\"$url&amp;page=$i&amp;new_order=$new_order\">+$nb_page_dis</a>";
+    }
+
+    // Go to last page
+    if ($page < $nb_page) {
+      $content .= "&nbsp;&nbsp;
+      <a href=\"$url&amp;page=$nb_page&amp;new_order=$new_order\"><img src=\"/images/$set_theme/$ico_end\" class=\"indexIcon\" alt=\">| $nb_page\"></a>";
+    }
+
+    // Export
+    $query = urlencode($this->data_set->obm_query);
+    $query_pref = urlencode($this->display_pref->obm_query);
+    $export_page_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;first_row=$first_row&amp;nb_rows=$set_rows&amp;query=$query&amp;query_pref=$query_pref";
+    $export_all_url = "$path/exportcsv/exportcsv_index.php?action=export_page&amp;first_row=$first_row&amp;nb_rows=$nb_rows&amp;query=$query&amp;query_pref=$query_pref";
+
+    $content .= "&nbsp;&nbsp;&nbsp;&nbsp;
+      <a href=\"$export_page_url\"><img src=\"/images/$set_theme/$ico_export\" class=\"indexIcon\" alt=\"$l_export\"/></a>
+      <a href=\"$export_all_url\"><img src=\"/images/$set_theme/$ico_export_all\" class=\"indexIcon\" alt=\"$l_export_all\"/></a>
+    </div>
+";
+
+    echo $content;
+    $this->data_set->seek($first_row);
   }
 
 
@@ -496,7 +539,7 @@ class OBM_DISPLAY {
       echo "<td class=\"OBMDisplayHead\">".$this->data_cb_text."</td>";
     }
 
-    while($this->display_pref->next_record()) {
+    while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
       $label = $fieldnames[$fieldname];
       $order = ($order_dir == "ASC" ? "DESC" : "ASC");
@@ -524,6 +567,7 @@ class OBM_DISPLAY {
     echo "</tr>";
   }
 
+
   /////////////////////////////////////////////////////////////////////////////
   // Function that display the dataset headers (col names)
   //   for result in a file (as .csv)
@@ -535,9 +579,10 @@ class OBM_DISPLAY {
     
     while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
+      // Can not be used as module.inc is not included for now in export_index
       $label = $fieldnames[$fieldname];
 
-      echo " $label $sep ";
+      echo "$fieldname$sep";
     }
     echo "\n";
   }
@@ -547,32 +592,31 @@ class OBM_DISPLAY {
   // Function that display the dataset
   //   for result in a file (as .csv)
   /////////////////////////////////////////////////////////////////////////////
-  function dis_data_file($sep) {
+  function dis_data_file($first_row, $nb_rows, $sep) {
     global $cdg_id, $set_debug;
 
     $this->dis_data_header_file($sep);
 
-    //    echo "nb lignes : ". $this->data_set->num_rows() . "\n";
+    $this->data_set->seek($first_row);
+
     // Iteration on each data row of dataset
-    while ($this->data_set->next_record()) {
-      $this->display_pref->seek(0);
+    $cpt = 0;
+    while (($this->data_set->next_record()) && ($cpt < $nb_rows)) {
 
       // For each field in the data row we walk through the pref dbo ordered
       // and for each entry (field) we set special parameters and display it
+      $this->display_pref->seek(0);
       while ($this->display_pref->next_record()) {
 	$fieldname = $this->display_pref->f("display_fieldname");
         echo $this->data_set->f($fieldname) . $sep;
       }
 
       echo "\n";
+      $cpt++;
     }
-    echo "\n\n\n";
-    
+    echo "\n\n";
   }
 
-
-} // End of the object OBM_DISPLAY
-
-
+}
 
 ?>

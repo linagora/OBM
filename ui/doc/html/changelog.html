@@ -20,7 +20,6 @@ To do<br>
 <UL>
 <LI> When deleting a user, move all his calendarevents from private to public ?
 <LI> Look at the display_record() implementation.
-<LI> Improve OBM_DISPLAY and its way to implement special field case. If possible no update of the dis_data() function should be needed when adding a module.
 <LI> how to detect doublons ?
 <LI> Pour les listes : listes dynamiques ? supprimer les listes dans export ? trier requete exports ?
 </UL>
@@ -29,8 +28,10 @@ To do<br>
 2003-08-15 : version 0.7.0<br>
 
 <ul>
+<li> BUG#195 : fixes a specific condition where a contact couldn't be deleted
 <li> BUG#194 : All dictionnary data (admin menus) now prefilled when updated
 <li> BUG#193 : Added color indication field to IncidentPriority table
+<li> BUG#191 : OBM_DISPLAY clean up ! No more specific module data in class
 <li> BUG#189 : User selection from external entity implemented
 </ul>
 

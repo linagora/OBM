@@ -256,12 +256,12 @@ function html_company_search_list($obm_q_comp, $pref_q, $nb_company,$company) {
 
   $obm_q_comp->seek($first_row);
 
-  $dis_companies_list = new OBM_DISPLAY("DATA", $pref_q);
-  $dis_companies_list->data_set = $obm_q_comp;
-  $dis_companies_list->data_url = $url;
-  $dis_companies_list->data_header = "both";
+  $comp_d = new OBM_DISPLAY("DATA", $pref_q);
+  $comp_d->data_set = $obm_q_comp;
+  $comp_d->data_url = $url;
+  $comp_d->data_header = "both";
   display_info_msg("$nb_company $l_found");
-  $dis_companies_list->display("dis_data_company");
+  $comp_d->display("dis_data_company");
 }
 
 

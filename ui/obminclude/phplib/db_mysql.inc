@@ -27,6 +27,9 @@ class DB_Sql {
   var $Record   = array();
   var $Row;
 
+  /* public: last query string : added PB Aliacom */
+  var $obm_query;
+
   /* public: current error number and error text */
   var $Errno    = 0;
   var $Error    = "";
@@ -103,6 +106,9 @@ class DB_Sql {
     if (!$this->connect()) {
       return 0; /* we already complained in connect() about that. */
     };
+
+    // Store the query string - PB Aliacom
+    $this->obm_query = $Query_String;
 
     # New query, discard previous result.
     if ($this->Query_ID) {

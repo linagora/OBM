@@ -32,6 +32,9 @@ $l_datetime_format = "%m-%d-%Y %H:%i:%s"; // Complete Date + Time
 $l_date_text_format = "%a %d %M"; // Date only (text mode eg : Mon 10 Jul)
 
 // OBM_DISPLAY
+$l_page_res = "Result pages";
+$l_export = "Export";
+$l_export_all = "Export All";
 $l_field = "Field";
 $l_displayed = "Displayed";
 $l_order = "Order";

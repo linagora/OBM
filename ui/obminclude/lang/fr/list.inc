@@ -46,7 +46,6 @@ $l_delete = "Supprimer la liste";
 $l_confirm = "Confirmer l'action";
 $l_add = "Ajouter ces listes";
 $l_mail = "Mailer les membres";
-$l_export = "Exporter";
 
 // Messages
 $l_insert_ok = "L'insertion de la liste a été correctement effectuée.";

@@ -28,6 +28,9 @@ $l_error_visibility = "Le informazioni della pagina sono private - Non consultab
 $l_color = "Colore";
 
 // OBM_DISPLAY
+$l_page_res = "Pagine resultati";
+$l_export = "Esporta";
+$l_export_all = "Esporta tuto";
 $l_field = "Campo";
 $l_displayed = "Vista";
 $l_order = "Ordine vista";

@@ -47,7 +47,6 @@ $l_change_auth = "Change auth";
 $l_confirm = "Confirm the action";
 $l_add = "Add these lists";
 $l_mail = "Send mail to members" ;
-$l_export = "Export";
 
 // Messages
 $l_insert_ok = "The list has been inserted successfully.";

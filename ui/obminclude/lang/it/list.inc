@@ -50,7 +50,6 @@ $l_change_auth = "Cambia auth";
 $l_confirm = "Conferma azione";
 $l_add = "Aggiungi queste liste";
 $l_mail = "Invia email alla lista" ;
-$l_export = "Esporta";
 
 // Messages
 $l_insert_ok = "Lista inserita.";
