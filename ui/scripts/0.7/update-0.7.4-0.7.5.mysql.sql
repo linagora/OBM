@@ -118,3 +118,12 @@ ALTER table Contact change column contact_function contact_title varchar(64);
 -- Add new column : contact_function_id
 ALTER table Contact add column contact_function_id int(8) after contact_country_id;
 
+
+-------------------------------------------------------------------------------
+-- Update structure for table 'Kind'
+-------------------------------------------------------------------------------
+-- Add new column : kind_lang
+ALTER table Kind add column kind_lang char(2) after kind_label;
+
+-- Change column : contact_label to contact_header
+ALTER table Kind change column kind_label kind_header varchar(64);

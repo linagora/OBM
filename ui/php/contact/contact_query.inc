@@ -45,7 +45,7 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
       contact_visibility,
       company_name as contact_company_name,
       company_phone,
-      function_label
+      function_label as contact_function
     from Contact
         left join Function on contact_function_id=function_id,
       Company
@@ -132,7 +132,9 @@ function run_query_contact_company($c_id) {
 function run_query_kind() {
   global $cdg_sql;
 
-  $query = "select kind_id, kind_minilabel, kind_label from Kind";
+  $query = "select kind_id, kind_minilabel, kind_header, kind_lang
+    from Kind
+    order by kind_lang, kind_minilabel, kind_header";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q= new DB_OBM;

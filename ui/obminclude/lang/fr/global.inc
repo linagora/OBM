@@ -27,6 +27,7 @@ $l_archive = "Archive";
 $l_archive_first = "Arc";
 $l_date = "Date";
 $l_name = "Nom";
+$l_label = "Label";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";

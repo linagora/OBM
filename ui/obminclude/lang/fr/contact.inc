@@ -40,6 +40,8 @@ $l_func_new = "Nouvelle Fonction";
 $l_kind_manage = "Gestion des Genre";
 $l_kind_exist = "Genre existants";
 $l_kind_new = "Nouveau Genre";
+$l_lang = "Langue";
+$l_header = "En-tête";
 
 // Titres
 $l_contact = "Contact";
@@ -117,6 +119,10 @@ $l_j_check_email = "L'adresse email n'est pas valide. Vérifiez le domaine.";
 $l_j_func_delete = "Sélectionnez une fonction pour la vérifier ou supprimer !";
 $l_j_func_update = "Vous devez sélectionner une fonction et entrer une modification avant de valider !";
 $l_j_func_create = "Vous devez saisir un label de fonction pour la créer !";
+// JavaScript Messages - Kind
+$l_j_kind_delete = "Sélectionnez un genre pour le vérifier ou supprimer !";
+$l_j_kind_update = "Vous devez sélectionner un genre et entrer une modification avant de valider !";
+$l_j_kind_create = "Vous devez saisir un genre pour le créer !";
 
 // For the display preferences modification screen 
 $l_contact_display = "Options d'affichage des listes de contacts";

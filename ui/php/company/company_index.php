@@ -648,8 +648,6 @@ function get_company_action() {
     'Condition'=> array ('None') 
                                      	       );
 
-
-					       
 // Activity Insert
   $actions["COMPANY"]["activity_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_insert",

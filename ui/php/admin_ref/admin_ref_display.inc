@@ -305,7 +305,6 @@ function dis_country_links($ref) {
       </div>";
   }
 
-
   return $block;
 }
 

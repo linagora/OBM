@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contact_index.php                                            //
 //     - Desc : Contact Index File                                           //
@@ -17,14 +17,14 @@
 // - check_delete       -- $param_contact -- check links before delete
 // - delete             -- $param_contact -- delete the company
 // - admin              --                -- admin index (kind)
-// - kind_insert        -- form fields    -- insert the kind
-// - kind_update        -- form fields    -- update the kind
-// - kind_checklink     --                -- check if kind is used
-// - kind_delete     	-- $sel_kind      -- delete the kind
 // - function_insert    -- form fields    -- insert the function
 // - function_update    -- form fields    -- update the function
 // - function_checklink --                -- check if function is used
 // - function_delete    -- $sel_func      -- delete the function
+// - kind_insert        -- form fields    -- insert the kind
+// - kind_update        -- form fields    -- update the kind
+// - kind_checklink     --                -- check if kind is used
+// - kind_delete     	-- $sel_kind      -- delete the kind
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -266,6 +266,45 @@ if ($action == "index" || $action == "") {
   require("contact_js.inc");
   $display["detail"] .= dis_admin_index();
 
+} elseif ($action == "kind_insert")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_kind_insert($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_kind_insert_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_kind_insert_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "kind_update")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_kind_update($contact);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_kind_update_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_kind_update_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "kind_checklink")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] .= dis_kind_links($contact);
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
+} elseif ($action == "kind_delete")  {
+///////////////////////////////////////////////////////////////////////////////
+  $retour = run_query_kind_delete($contact["kind"]);
+  if ($retour) {
+    $display["msg"] .= display_ok_msg($l_kind_delete_ok);
+  } else {
+    $display["msg"] .= display_err_msg($l_kind_delete_error);
+  }
+  require("contact_js.inc");
+  $display["detail"] .= dis_admin_index();
+
 }  elseif ($action == "display") {
 ///////////////////////////////////////////////////////////////////////////////
   $pref_q = run_query_display_pref($uid, "contact", 1);
@@ -326,7 +365,7 @@ function get_param_contact() {
   global $sel_market, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $tf_func;
+  global $tf_func, $tf_label, $tf_lang, $tf_header;
   global $popup, $ext_action, $ext_url, $ext_id, $ext_target, $ext_title;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
 
@@ -379,9 +418,14 @@ function get_param_contact() {
   if (isset ($cb_mailok)) $contact["mailok"] = ($cb_mailok == 1 ? 1 : 0);
   if (isset ($ta_com)) $contact["com"] = $ta_com;
 
-  // Admin - Kind fields
+  // Admin - Function fields
   // $sel_func -> "function" is already set
   if (isset ($tf_func)) $contact["func_label"] = $tf_func;
+
+  // Admin - Kind fields
+  if (isset ($tf_label)) $contact["kind_label"] = $tf_label;
+  if (isset ($tf_lang)) $contact["kind_lang"] = $tf_lang;
+  if (isset ($tf_header)) $contact["kind_header"] = $tf_header;
 
   // External param
   if (isset ($popup)) $contact["popup"] = $popup;
@@ -490,6 +534,62 @@ function get_contact_action() {
     'Condition'=> array ('all') 
                                       		 );
 
+// Function Insert
+  $actions["CONTACT"]["function_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=function_insert",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Function Update
+  $actions["CONTACT"]["function_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=function_update",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Function Check Link
+  $actions["CONTACT"]["function_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=function_checklink",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Function Delete
+  $actions["CONTACT"]["function_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=function_delete",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+// Kind Insert
+  $actions["CONTACT"]["kind_insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=kind_insert",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// Kind Update
+  $actions["CONTACT"]["kind_update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=kind_update",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// Kind Check Link
+  $actions["CONTACT"]["kind_checklink"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=kind_checklink",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Kind Delete
+  $actions["CONTACT"]["kind_delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=kind_delete",
+    'Right'    => $contact_admin_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
 // Dispay
   $actions["CONTACT"]["display"] = array (
     'Name'     => $l_header_display,
@@ -514,4 +614,4 @@ function get_contact_action() {
 
 }
 
-</SCRIPT>
+</script>

@@ -39,6 +39,12 @@ $l_func_manage = "Contact Function Management";
 $l_func_exist = "Existing Functions";
 $l_func_no = "No functions defined";
 $l_func_new = "New Function";
+$l_kind_manage = "Contact Kind Management";
+$l_kind_exist = "Existing Kinds";
+$l_kind_no = "No kind defined";
+$l_kind_new = "New Kind";
+$l_lang = "Lang";
+$l_header = "Header";
 
 // Titles
 $l_contact = "Contact";
@@ -115,6 +121,10 @@ $l_j_check_email = "The email adress is not valid.";
 $l_j_func_delete = "You have to select a function to check or delete it !";
 $l_j_func_update = "You have to select a function and enter a new name to update it !";
 $l_j_func_create = "You have to enter a new function label to create it !";
+// JavaScript messages - Kind
+$l_j_kind_delete = "You have to select a kind to check or delete it !";
+$l_j_kind_update = "You have to select a kind and enter a new name to update it !";
+$l_j_kind_create = "You have to enter a new kind to create it !";
 $l_j_select_company = "You have to select a company !";
 
 // For the display parameters modification screen

@@ -1037,7 +1037,9 @@ function dis_delete_form($p_id) {
 function dis_admin_index() {
 
   $func_q = run_query_function();
-  $block = html_contact_function_form($func_q);
+  $kind_q = run_query_kind();
+  $block = html_contact_kind_form($kind_q);
+  $block .= html_contact_function_form($func_q);
 
   return $block;
 }
@@ -1219,6 +1221,271 @@ function dis_function_links($contact) {
   }
 
   $block .= "<p>&nbsp;</p>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Kind section
+// Parameters:
+//   - $kind_q : Kind list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_contact_kind_form($kind_q) {
+  global $l_kind_manage, $l_kind_exist, $l_kind_no;
+  global $l_kind_checkdelete, $l_kind_update, $l_kind_new, $l_kind_insert;
+  global $l_label, $l_lang, $l_header;
+
+  if ($kind_q->num_rows() > 0) {
+
+    // Kind select construction
+    $sel_kind = "<select name=\"sel_kind\" onChange=\"
+      mytext = this.options[this.selectedIndex].text;
+
+      // Get Lang
+      pos = mytext.indexOf('-');
+      lang = mytext.substr(0, pos);
+
+      // Get Label
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf('-');
+      label = mytext.substr(0,pos);
+
+      // Get header
+      mytext = mytext.substr(pos+1);
+      pos = mytext.indexOf('-');
+      header = mytext.substr(0,pos);
+
+      forms.form_kind_update.tf_lang.value=lang;
+      forms.form_kind_update.tf_label.value=label;
+      forms.form_kind_update.tf_header.value=header;\"
+      size=\"12\">";
+    while ($kind_q->next_record()) {
+      $id = $kind_q->f("kind_id");
+      $lang = $kind_q->f("kind_lang");
+      $mlabel = $kind_q->f("kind_minilabel");
+      $header = $kind_q->f("kind_header");
+      $sel_kind .= "\n<option value=\"$id\">$lang-$mlabel-$header</option>";
+    }
+    $sel_kind .= "</select>";
+
+    $dis_update_delete = "
+<!-- Kind Check Delete Section -->
+
+    <table>
+    <tr>
+      <td colspan=\"3\">
+      <form name=\"form_kind_delete\" method=\"post\"
+        action=\"" . url_prepare("admin_ref_index.php") . "\">
+      <table>
+      <tr>
+        <td class=\"adminLabel\">$l_kind_exist</td>
+        <td class=\"adminLabel\">$sel_kind</td>
+        <td>
+          <input type=\"hidden\" name=\"action\" value=\"kind_checklink\" />
+          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_checkdelete\"
+            onclick=\"if (check_kind_checkdel(this.form.sel_kind)) return true;
+            else return false;\" />
+        </td>
+      </tr>
+      </table>
+      </form>
+      </td>
+    </tr>
+
+<!-- Kind Update Section -->
+
+    <tr>
+      <td colspan=\"2\">
+        <form name=\"form_kind_update\" method=\"get\"
+          action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"sel_kind\" value=\"\" />
+        <input type=\"hidden\" name=\"action\" value=\"kind_update\" />
+
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_lang : </td>
+          <td><input type=\"text\" name=\"tf_lang\" size=\"2\" maxlength=\"2\"/></td>
+          <td rowspan=\"3\">
+          <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_update\"
+            onclick=\"if (check_kind_upd(this.form,document.form_kind_delete.sel_kind)) return true; else return false;\" />
+          </td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_label : </td>
+          <td>
+            <input type=\"text\" name=\"tf_label\" size=\"5\" maxlength=\"5\" />
+	  </td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_header : </td>
+          <td>
+            <input type=\"text\" name=\"tf_header\" size=\"24\" maxlength=\"64\" />
+          </td>
+        </tr>
+        </table>
+
+        </form>
+      </td>
+      <td>&nbsp;</td>
+    </tr>
+    </table>";
+    
+  } else {
+    $dis_update_delete = $l_kind_no;
+  }
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">$l_kind_manage</td>
+    </tr>
+    <tr>
+      <td>
+      $dis_update_delete
+
+      </td>
+      <td>
+
+<!-- New Kind Section -->
+
+        <form name=\"form_kind_new\" method=\"get\"
+          action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <table>
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">$l_kind_new</td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_lang : </td>
+          <td><input name=\"tf_lang\" size=\"2\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_label : </td>
+          <td><input type=\"text\" name=\"tf_label\" size=\"5\" maxlength=\"5\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_header : </td>
+          <td><input type=\"text\" name=\"tf_header\" size=\"24\" maxlength=\"64\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"kind_insert\" />
+            <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_insert\"
+              onclick=\"if (check_kind_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Kind links                                                //
+// Parameters:
+//   - $ref : kind hash info : keys used : id, name
+///////////////////////////////////////////////////////////////////////////////
+function dis_kind_links($ref) {
+  global $display, $l_back, $l_kind_link_company, $l_kind_link_company_no;
+  global $l_kind_link_contact, $l_kind_link_contact_no;
+  global $l_kind_delete, $l_kind_can_delete, $l_kind_cant_delete;
+
+  $delete_ok = true;
+  $id = $ref["kind"];
+  $name = get_kind_name($id);
+
+  // Company Links
+  $obm_q = run_query_kind_company_links($id);
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link_comp = "
+    <tr>
+      <td class=\"detailHead\">$name : $l_kind_link_company</td>
+    </tr>";
+
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("company_id");
+      $cname = $obm_q->f("company_name");
+      $dis_link_comp .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("company_index.php?action=detailconsult&amp;param_company=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_comp = "
+    <tr>
+      <td class=\"detailHead\">$l_kind_link_company_no</td>
+    </tr>";
+  }
+
+  // Contacts Links
+  $obm_q = run_query_kind_contact_links($id);
+  if ($obm_q->num_rows() > 0) {
+    $delete_ok = false;
+    $dis_link_cont = "
+    <tr>
+      <td class=\"detailHead\">$name : $l_kind_link_contact</td>
+    </tr>";
+
+    while ($obm_q->next_record()) {
+      $cid = $obm_q->f("contact_id");
+      $cname = $obm_q->f("contact_lastname")." ".$obm_q->f("contact_firstname");
+      $dis_link_cont .= "
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("contact_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link_cont = "
+    <tr>
+      <td class=\"detailHead\">$l_kind_link_contact_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link_comp
+    $dis_link_cont
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_kind_can_delete);
+    $dis_del = "<form name=\"form_act_delete\".
+          method=\"post\" action=\"" . url_prepare("admin_ref_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"kind_delete\" />
+        <input type=\"hidden\" name=\"sel_kind\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_kind\" value=\"$l_kind_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_kind_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
 
   return $block;
 }

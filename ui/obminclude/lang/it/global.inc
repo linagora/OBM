@@ -27,6 +27,7 @@ $l_archive = "Archivio";
 $l_archive_first = "A";
 $l_date = "Data";
 $l_name = "Nome";
+$l_label = "Nome";
 $l_invalid_data = "Dati non valida";
 $l_error_permission = "Non hai i permessi di accesso alla pagina.";
 $l_error_visibility = "Le informazioni della pagina sono private - Non consultabili";
