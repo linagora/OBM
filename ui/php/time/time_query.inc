@@ -16,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_datetime_format, $l_date_text_format, $c_day_fraction, $cdg_sql;
+  global $auth, $c_day_fraction, $cdg_sql;
 
   $date = $time["date"];
   //debug_array($time);
@@ -43,9 +43,9 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
   $query = "select Task.*,
       task_id,
       Task.task_id as Id,
-      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
-      DATE_FORMAT(task_timeupdate,'$l_datetime_format') as timeupdate,
-      DATE_FORMAT(task_timecreate,'$l_datetime_format') as timecreate,
+      UNIX_TIMESTAMP(task_date) as date_task,
+      UNIX_TIMESTAMP(task_timeupdate) as date_timeupdate,
+      UNIX_TIMESTAMP(task_timecreate) as date_timecreate,
       concat(task_length,concat('/',$c_day_fraction)) as task_length,
       TaskType.*,
       deal_label as task_deal_label,
@@ -104,7 +104,7 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_by_day($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
+  global $auth, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
   $user_id = $time["user_id"];
@@ -114,7 +114,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
   // task_valid 0 if checkbox not to be shown
   $query = "select
       concat(sum(task_length),concat('/',$c_day_fraction)) as task_totallength,
-      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      UNIX_TIMESTAMP(task_date) as date_task,
       (1=sum(task_length)/$c_day_fraction and task_status<>2) as task_valid,
       task_status
     from Task
@@ -130,7 +130,7 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
   }
 
   // group and order
-  $query .=   "  group by task_date order by Task.task_date";
+  $query .=   "  group by task_date order by task_date ";
   
   display_debug_msg($query, $cdg_sql, "run_query_by_day");
 //  echo "$query <br>";
@@ -139,59 +139,9 @@ function run_query_by_day($time, $p_new_order, $p_order_dir) {
   return $obm_db;
 }
 
-///////////////////////////////////////////////////////////////////////////////
-// Task grouped by deal                                                      //
-// Parameters:
-//   - $time[]       : time search criteria
-//     keys used       contac_id, date, date_end
-//   - $p_new_order  : infos for order clause
-//   - $p_order_dir  : direction for order clause (asc, desc)
-///////////////////////////////////////////////////////////////////////////////
-/* OLD
-function run_query_by_deal($time, $p_new_order, $p_order_dir) {
-  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
-
-  $week = $time["week"];
-  $week_start = $time["date"];
-  $week_end = $time["date_end"];
-  //  $time["all_users"] = true;
-
-  $query="select 
-      FORMAT(sum(task_length)/ $c_day_fraction,3) as task_totallength,
-      deal_label as task_deal_label, 
-      tasktype_internal, tasktype_label,
-      if(tasktype_internal=1, 'interne', company_name) as task_company_name 
-    from Task, Deal, TaskType, Company 
-    where tasktype_id=task_tasktype_id 
-      and task_deal_id = deal_id 
-      and task_date>='$week_start' 
-      and task_date<='$week_end' 
-      and deal_company_id = company_id ";
-
-  //if (tasktype_internal=0, NULL,deal_label) as task_deal_label
-  if (isset($time) && $time["all_users"])
-	$where_users = "";
-  else if (sizeof($time["user_id"]) == 1)
-	  $where_users = " and task_user_id = ". $time["user_id"]["0"];
-  else {
-	$users_list = array_to_list($time["user_id"]);
-	$where_users = " and task_user_id in $users_list";
-  }
-  // order
-  $query .= $where_users. " group by task_deal_id order by tasktype_internal, tasktype_label";
-  
-  display_debug_msg($query, $cdg_sql, "run_query_by_deal");
-
-  $obm_db = new DB_OBM;
-  $obm_db->query($query);
-
-  return $obm_db;
-}
-
-*/
 
 function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
-  global $auth, $l_date_text_format, $c_day_fraction, $cdg_sql;
+  global $auth, $c_day_fraction, $cdg_sql;
 
   $week = $time["week"];
   $week_start = $time["date"];
@@ -251,7 +201,7 @@ function run_query_by_deal($time, $p_new_order, $p_order_dir, $alltask=0) {
 //     keys used : user_id, date, date_end
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_admin($time) {
-  global $l_date_text_format,$c_day_fraction, $cdg_sql;
+  global $c_day_fraction, $cdg_sql;
 
   $user_id = $time["user_id"][0];
   $week_start = $time["date"];
@@ -259,14 +209,14 @@ function run_query_admin($time) {
  
   $query = "select
       FORMAT(concat(sum(task_length),concat('/',$c_day_fraction)),3) as task_totallength,
-      DATE_FORMAT(task_date,'$l_date_text_format') as task_date,
+      UNIX_TIMESTAMP(task_date) as date_task,
       task_status=2 as task_status
     from Task
     where task_user_id='$user_id'
       and task_date>='$week_start'
       and task_date<='$week_end'
       and task_status!=0
-    group by task_date";
+    group by date_task ";
 
    //order
    $query .= " order by Task.task_date";
@@ -489,7 +439,6 @@ function run_query_delete($parms) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_validate($parms,$time,$who) {
 
-  global $l_date_text_format;
   global $uid;
   global $cdg_sql, $cdg_param;
 
@@ -528,7 +477,7 @@ function run_query_validate($parms,$time,$who) {
       $d_task = substr($d_task, 1);  
       if($val == "on"){ 
         $d_task = str_replace("_"," ",$d_task); 
-        $query = "UPDATE Task SET task_status=$status where DATE_FORMAT(task_date,'$l_date_text_format') = '$d_task' and task_user_id='". $time["user_id"]["0"]."'";
+        $query = "UPDATE Task SET task_status=$status where UNIX_TIMESTAMP(task_date) = '$d_task' and task_user_id='". $time["user_id"]["0"]."'";
 		display_debug_msg($query, $cdg_sql, "run_query_validate");
 
         $delete_query = new DB_OBM;

@@ -12,7 +12,7 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
-$fieldnames["task_date"] = $l_taskdate;
+$fieldnames["date_task"] = $l_date_task;
 $fieldnames["task_label"] = $l_tasklabel;
 $fieldnames["task_deal_label"] = $l_deallabel;
 $fieldnames["task_company_name"] = $l_company;
@@ -923,7 +923,7 @@ function dis_form_uservalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days)
   $dis_task_list->data_set = $obm_dq;
 
   $dis_task_list->data_cb_text = "$l_validate_task";;
-  $dis_task_list->data_idfield = "task_date"; 
+  $dis_task_list->data_idfield = "date_task"; 
   $dis_task_list->data_cb_field = "task_status";
   $dis_task_list->data_cb_side = "left";
   $dis_task_list->data_cb_name = "validate_";
@@ -996,7 +996,7 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
    $dis_task_list->data_set = $admin_db;
 
    $dis_task_list->data_cb_text = "$l_validate_task";;
-   $dis_task_list->data_idfield = "task_date";
+   $dis_task_list->data_idfield = "date_task";
    $dis_task_list->data_cb_field = "task_status"; 
    $dis_task_list->data_cb_side = "left";
    $dis_task_list->data_cb_name = "validate_";
