@@ -91,56 +91,6 @@ class Session {
   function get_id($id = "") {
     if ("" != $id)
       session_id($id);
-/*
-    global $HTTP_COOKIE_VARS, $HTTP_GET_VARS, $HTTP_POST_VARS, $QUERY_STRING;
-    $newid=true;
- 
-    $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
- 
-    if ( "" == $id ) {
-      $newid=false;
-      switch ($this->mode) {
-        case "get":
-          if ("" == ($id = isset($HTTP_GET_VARS[$this->name]) ? $HTTP_GET_VARS[$this->name] : ""))
-            $id = isset($HTTP_POST_VARS[$this->name]) ? $HTTP_POST_VARS[$this->name] : "";
-        break;
-        case "cookie":
-          $id = isset($HTTP_COOKIE_VARS[$this->name]) ? $HTTP_COOKIE_VARS[$this->name] : "";
-        break;
-        default:
-          die("This has not been coded yet.");
-        break;
-      }
-    }
- 
-    if ( "" == $id ) {
-      $newid=true;
-      $id = $this->that->ac_newid(md5(uniqid($this->magic)), $this->name);
-    }
- 
-    switch ($this->mode) {
-      case "cookie":
-        if ( $newid && ( 0 == $this->lifetime ) ) {
-          SetCookie($this->name, $id, 0, "/", $this->cookie_domain);
-        }
-        if ( 0 < $this->lifetime ) {
-          SetCookie($this->name, $id, time()+$this->lifetime*60, "/", $this->cookie_domain);
-        }
-      break;
-      case "get":
-        if ( isset($QUERY_STRING) ) {
-          $QUERY_STRING = ereg_replace(
-            "(^|&)".quotemeta(urlencode($this->name))."=".$id."(&|$)",
-            "\\1", $QUERY_STRING);
-        }
-      break;
-      default:
-        ;
-      break;
-    }
- 
-    $this->id = $id;
-*/
   }
 
   ## put_id():
@@ -148,26 +98,6 @@ class Session {
   ## Stop using the current session id (unset cookie, ...) and
   ## abandon a session.
   function put_id() {
-/*
-    global $HTTP_COOKIE_VARS;
- 
-    $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
- 
-    switch ($this->mode) {
-      case "inline":
-        die("This has not been coded yet.");
-      break;
- 
-      case "get":
-        die("This has not been coded yet.");
-      break;
- 
-      default:
-            SetCookie($this->name, "", 0, "/", $this->cookie_domain);
-            $HTTP_COOKIE_VARS[$this->name] = "";
-      break;
-    }
-*/
   }
 
   ## delete():
@@ -181,11 +111,6 @@ class Session {
     unset($HTTP_COOKIE_VARS[session_name()]);
     session_start();
 
-
-/*
-      $this->that->ac_delete($this->id, $this->name);
-      $this->put_id();
-*/
   }
 
   ## url($url):
@@ -195,9 +120,7 @@ class Session {
    
   function url($url){
     $url=ereg_replace("[&?]+$", "", $url);
-//A VIRER
-    $this->mode = "get";
-// A VIRER
+
     switch ($this->mode) {
       case "get":
         if ( strpos($url, urlencode($this->name)) == false ) { 
@@ -230,7 +153,6 @@ class Session {
   
   function hidden_session()
   {
-//    printf("<input type=\"hidden\" name=\"%s\" value=\"%s\">\n", $this->name, $this->id);
     printf("<input type=\"hidden\" name=\"%s\" value=\"%s\">\n", session_name(), session_id());
   }
 
@@ -309,11 +231,9 @@ class Session {
   }
 
   function get_lock() {
-//      $this->that->ac_get_lock();
   }
 
   function release_lock() {
-//      $this->that->ac_release_lock();
   }
 
   ## freeze():
@@ -322,24 +242,6 @@ class Session {
   ## a database table
 
   function freeze() {
-/*
-    $str="";
-
-    $this->serialize("this->in",&$str);
-    $this->serialize("this->pt",&$str);
-
-    reset($this->pt);
-    while ( list($thing) = each($this->pt) ) {
-      $thing=trim($thing);
-      if ( $thing ) {
-        $this->serialize("GLOBALS['".$thing."']",&$str);
-      }
-    }
-    echo "amjkfmodfkmsldfklzeeoprfdfksdlmfjzerjbhgrjkehterké";    
-    $r = $this->that->ac_store($this->id, $this->name, $str);
-    $this->release_lock();
-    if(!$r) $this->that->ac_halt("Session: freeze() failed.");
-*/
   }
 
   ## thaw:
@@ -347,13 +249,6 @@ class Session {
   ## Reload frozen variables from the database and microwave them.
 
   function thaw() {
-/*
-    $this->get_lock();
-
-    $vals = $this->that->ac_get_value($this->id, $this->name);
-
-    eval(sprintf(";%s",$vals));
-*/
   }
 
   ##
@@ -362,7 +257,6 @@ class Session {
   ## Destroy all session data older than this
   ##
   function gc() {
-//      $this->that->ac_gc($this->gc_time, $this->name);
   }
 
   ##
@@ -397,42 +291,12 @@ class Session {
   ##
 
   function set_container() {
-/*
-    $name = $this->that_class;
-    $this->that = new $name;
-
-    $this->that->ac_start();
-*/
   }
 
   function set_tokenname(){
-//    $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
   }
 
   function release_token(){ 
-/*
-    global $HTTP_COOKIE_VARS, $HTTP_GET_VARS, $HTTP_HOST, $HTTPS;
-    if (   isset($this->fallback_mode)
-    && ( "get" == $this->fallback_mode ) 
-    && ( "cookie" == $this->mode )
-    && ( ! isset($HTTP_COOKIE_VARS[$this->name]) ) ) {
-      if ( isset($HTTP_GET_VARS[$this->name]) ) {
-        $this->mode = $this->fallback_mode;
-      } else {
-        header("Status: 302 Moved Temporarily");
-        $this->get_id($sid);
-	$this->mode = $this->fallback_mode;
-        if( isset($HTTPS) && $HTTPS == 'on' ){
-        ## You will need to fix suexec as well, if you use Apache and CGI PHP
-          $PROTOCOL='https';
-        } else {
-          $PROTOCOL='http';
-        }
-        header("Location: ". $PROTOCOL. "://".$HTTP_HOST.$this->self_url());
-        exit;
-      }
-    }
-*/
   }   
 
   function put_headers() {
@@ -490,12 +354,6 @@ class Session {
   ## Destroy all session data older than this
   ##
   function gc() {
-/*
-    srand(time());
-    if ((rand()%100) < $this->gc_probability) {
-      $this->that->ac_gc($this->gc_time, $this->name);
-    }
-*/
   }
 
   ##
@@ -521,13 +379,9 @@ class Session {
 
   function start($sid = "") {
     global $HTTP_COOKIE_VARS;
-//    $this->set_container();
-//    $this->set_tokenname(); 
-//    $this->release_token($sid);
+
     $this->put_headers();
     $this->get_id($sid);
-//    $this->thaw();
-//    $this->gc();
     $this->name = $this->cookiename==""?$this->classname:$this->cookiename;
     session_name($this->name);
     $HTTP_COOKIE_VARS[$this->name] = "OBM_Session";
@@ -536,19 +390,7 @@ class Session {
     } else {
       $this->mode = "get";
     }
-// A VIRER les COMMENTAIRE   session_start();
     $this->id = session_id();
- //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
-
-    global $set_theme,$last_contact,$last_contact_name,$last_contract,$last_contract_name,$set_debug,$set_lang;
-    $set_theme = "standard";
-    $last_contact = "1132";
-    $last_contact_name = "ADELL";
-    $last_contract = "2";
-    $last_contract_name = "Support IO Box pour leurs clients";
-    $set_debug = "0";
-    $set_lang = "fr";	
- //	A VIRER!!!!!!! Pour tester les pages dans le validateur W3C Offline.
 
    }
 }

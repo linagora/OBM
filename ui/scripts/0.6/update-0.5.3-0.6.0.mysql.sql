@@ -45,10 +45,11 @@ ALTER table Deal add column deal_hitrate char(3) default 0 AFTER deal_amount;
 -- Calendar module tables
 -------------------------------------------------------------------------------
 
-DROP TABLE CalendarEvent;
-DROP TABLE CalendarLayer;
-DROP TABLE EventUser;
-DROP TABLE CalendarCategory;
+DROP TABLE IF EXISTS CalendarEvent;
+DROP TABLE IF EXISTS CalendarLayer;
+DROP TABLE IF EXISTS EventUser;
+DROP TABLE IF EXISTS CalendarCategory;
+
 --
 -- Table structure for the table  'CalendarSegment'
 --
@@ -60,42 +61,42 @@ CREATE TABLE CalendarSegment (
   calendarsegment_type varchar(5) 	NOT NULL default '',
   calendarsegment_state char(1) 	NOT NULL default '''',
   PRIMARY KEY  (calendarsegment_eventid,calendarsegment_customerid,calendarsegment_date,calendarsegment_flag,calendarsegment_type)
-) 
+);
 
 --
 -- Table structure for the table  'CalendarEvent'
 --
 CREATE TABLE CalendarEvent (
-  calendarevent_id int(8)	NOT NULL auto_increment,
-  calendarevent_timeupdate 	timestamp(14) NOT NULL,
-  calendarevent_timecreate 	timestamp(14) NOT NULL,
-  calendarevent_userupdate 	int(8) default NULL,
-  calendarevent_usercreate 	int(8) default NULL,
-  calendarevent_title 		varchar(255) default NULL,
-  calendarevent_description 	text,
-  calendarevent_category_id 	int(8) default NULL,
-  calendarevent_priority 	int(2) default NULL,
-  calendarevent_privacy 	int(2) default NULL,
-  calendarevent_length 		varchar(14) NOT NULL default '',
-  calendarevent_repeatkind 	varchar(20) default NULL,
-  calendarevent_repeatdays 	varchar(7) default NULL,
-  calendarevent_endrepeat 	timestamp(14) NOT NULL,
-  PRIMARY KEY  (calendarevent_id)
-)
+  calendarevent_id int(8)   NOT NULL auto_increment,
+  calendarevent_timeupdate  timestamp(14) NOT NULL,
+  calendarevent_timecreate  timestamp(14) NOT NULL,
+  calendarevent_userupdate  int(8) default NULL,
+  calendarevent_usercreate  int(8) default NULL,
+  calendarevent_title       varchar(255) default NULL,
+  calendarevent_description text,
+  calendarevent_category_id int(8) default NULL,
+  calendarevent_priority    int(2) default NULL,
+  calendarevent_privacy     int(2) default NULL,
+  calendarevent_length      varchar(14) NOT NULL default '',
+  calendarevent_repeatkind  varchar(20) default NULL,
+  calendarevent_repeatdays  varchar(7) default NULL,
+  calendarevent_endrepeat   timestamp(14) NOT NULL,
+  PRIMARY KEY (calendarevent_id)
+);
 
     
 --
 -- Table structure for the table  'CalendarCategory'
 --
 CREATE TABLE CalendarCategory (
-  calendarcategory_id int(8) NOT NULL auto_increment,
+  calendarcategory_id         int(8) NOT NULL auto_increment,
   calendarcategory_timeupdate timestamp(14) NOT NULL,
   calendarcategory_timecreate timestamp(14) NOT NULL,
   calendarcategory_userupdate int(8) default NULL,
   calendarcategory_usercreate int(8) default NULL,
-  calendarcategory_label varchar(128) default NULL,
-  PRIMARY KEY  (calendarcategory_id)
-)
+  calendarcategory_label      varchar(128) default NULL,
+  PRIMARY KEY (calendarcategory_id)
+);
 
 --
 -- dump for table 'CalendarCategory'
