@@ -2331,66 +2331,6 @@ function dis_select_companynafcode($naf_q, $line1, $selected) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Company Select Form                                               //
-// Parameters:
-//   - $comp_q  : company database result
-//   - $company : company hash info : keys used : ext_title, ext_url
-///////////////////////////////////////////////////////////////////////////////
-function html_select_company($comp_q, $company) {
-  global $display, $l_select_company, $l_close;
-
-  $url = $company["ext_url"];
-  $title = $company["ext_title"];
-
-  if ($url != "") {
-    $jsfunc = "check_get_id_url(this, '$url')";
-  } else {
-    $jsfunc = "check_get_id(this)";
-  }
-
-  // Company Select
-  $sel_company = "
-    <select name=\"param_company\" size=\"20\" style=\"font-family:fixed,courier\">";
-  while($comp_q->next_record()) {
-    $id = $comp_q->f("company_id");
-    $name = $comp_q->f("company_name");
-    $name = str_pad($name, 40, ".");
-    $town = $comp_q->f("company_town");
-    $sel_company .= "\n<option value=\"$id\">".htmlspecialchars($name)." | ".htmlspecialchars($town)."</option>";
-  }
-  $sel_company .= "</select>";
-  
-  $display["title"] = "<div class=\"title\">$title</div>";
-
-  // --- HTML Template --------------------------------------------------------
-
-  $block = "
-  <form method=\"get\" name=\"form_comp\"
-    onsubmit=\"if ($jsfunc) return true; else return false;\" action=\"\">
-
-  <table class=\"detail\">
-  <tr>
-    <td class=\"detailLabel\">
-       $sel_company
-    </td>
-  </tr>
-  </table>
-
-  <div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    <input type=\"hidden\" name=\"action\" value=\"new\" /><br />
-    <input type=\"submit\" value=\"$l_select_company\" />
-    </p>
-  </div>
-  </form>
-
-  <a href=\"\" onclick='window.close();'>$l_close</a>";
-
-  return $block;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Display: category Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
