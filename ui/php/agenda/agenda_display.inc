@@ -331,6 +331,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
       $repeat_end = date("Y-m-d",$obm_q_event->f("calendarevent_endrepeat"));
     }
     $id = $obm_q_event->f("calendarevent_id");
+
   }
 
   // If parameters have been given, they supercede the default action value
@@ -427,7 +428,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   }
   $sel_cat .= "</select>";
 
-  // Repetition days
+ // Repetition days
   $start_week_day = strtotime($set_weekstart_default);
 
   for ($i=0; $i<7; $i++) {
@@ -441,26 +442,24 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
 
     $start_week_day = strtotime("+1 day", $start_week_day); 
   }
-
   // userobm select
-  while ($usr_q->next_record()) {
-    $u_id = $usr_q->f("userobm_id");
-    $u_lname = $usr_q->f("userobm_lastname");
-    $u_fname = $usr_q->f("userobm_firstname");
-    if (in_array($u_id, $p_user_array)) {
-      $dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
+    while ($usr_q->next_record()) {
+      $u_id = $usr_q->f("userobm_id");
+      $u_lname = $usr_q->f("userobm_lastname");
+      $u_fname = $usr_q->f("userobm_firstname");
+      if (in_array($u_id, $p_user_array)) {
+	$dis_sel_user .= "<div class=\"elementRow\" id=\"sel_user_id$u_id\">
       <a href=\"javascript: remove_element('sel_user_id$u_id','sel_user_id');\">
       <img src=\"".C_IMAGE_PATH."/$set_theme/$ico_delete\">
       </a>
       $u_lname $u_fname
       <input value=\"$u_id\" name=\"sel_user_id[]\" type=\"hidden\" />
       </div>";
+      }
     }
-  }
-  
-  $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_user_id";
    
-  $block_user = "
+    $block_user = "
     <td class=\"detailLabel\">
     $l_users
     <a href=\"javascript: return false;\" 
@@ -474,9 +473,9 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      </td>
      ";
 
-  $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
+    $url = "$path/group/group_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_group_id";
 
-  $block_group = "
+    $block_group = "
     <td class=\"detailLabel\">
     $l_groups
     <a href=\"javascript: return false;\" 
@@ -488,7 +487,6 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
      <td class=\"detailForm\" id=\"sel_group_id\">
      </td>
      ";
-
   if ($force == 1){
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
   } else {
@@ -500,6 +498,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
   } else {
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";
   }
+
   
   $dis_hour_b = "<select name=\"sel_time_begin\">";
   for ($i=$set_start_time;$i<$set_stop_time;$i++) {
@@ -1053,7 +1052,7 @@ function html_userwritable_bar($writable_user,$user_id) {
 function html_dis_right_admin($user_q,$user_id) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
   global $l_everyone,  $l_list,$l_authorize,$l_deny,$set_theme, $ico_delete;
-  global $ico_add_user,$popup_height,$popup_width,$l_users;
+  global $ico_add_user,$popup_height,$popup_width,$l_users,$path;
   
   while ($user_q->next_record()) {
     $u_id = $user_q->f("userobm_id");
@@ -1940,12 +1939,13 @@ function dis_year_planning($agenda,$calendar_user,$usr_q) {
 	$dayObj = $events[$current_time];
 	$dis_event_cal ="<table class=\"agendaEventYear\"><tr>";
 	$tr_users =0;
-	foreach($calendar_user as $id => $data ) {
+	foreach($calendar_user as $id => $data ) {  
 	  $events_data = $dayObj->get_events($id);
+	  $days_events =  $dayObj->day_events;
 	  if($tr_users == 3) {
 	    $dis_event_cal .= "</tr><tr>";   
 	  }
-	  if(is_array($events_data)) {
+	  if(is_array($events_data) || is_array($days_events[$id])) {
 	    $dis_event_cal .= "<td class=\"agendaEventYear\">";
 	    $dis_event_cal .= "<img src=\"".C_IMAGE_PATH."/$set_theme/".$data["image"]."\" alt=\"\"/></td>";
 	  }else {
@@ -2116,8 +2116,18 @@ function dis_month_planning($agenda,$calendar_user,$usr_q) {
       $dis_month_cal .= "<table style=\"heigth:100%;width:100%;\"><tr>";
       $day = $events[$current_day];
       $user_indice = 0;
+      $days_events =  $day->day_events;
       foreach($calendar_user as $id => $properties) {
-	$dis_month_cal .= "<td><table style=\"heigth:100%;width:$td_width;\">";	
+	$dis_month_cal .= "<td><table style=\"heigth:100%;width:$td_width;\">";
+        $list_events = $days_events[$id];
+	if($list_events != null)  {
+	  $have_day_events = true;
+	  $dis_month_cal .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
+	  foreach($list_events as $event) {
+	    $dis_month_cal .= allday_event_display(&$hidden_div,$event,$nb_user,$properties);	
+	  }
+	  $dis_month_cal .=  "</td>";
+	}	
 	$events_data = $day->get_events($id);
 	if(is_array($events_data)) {
 	  $list_events = $events_data["events"];
@@ -2277,7 +2287,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
      </td>";
     $day = $events[date("Ymd",$i)];
     if(is_object($day) && is_array($day->day_events)) {
-       $days_events =  $day->day_events;
+      $days_events =  $day->day_events;
       foreach($calendar_user as $id => $properties) {
 	$user_indice ++;
 	$list_events = $days_events[$id];
@@ -2285,7 +2295,7 @@ function dis_week_planning($agenda,$calendar_user,$usr_q) {
 	  $have_day_events = true;
 	  $days_cal .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	  foreach($list_events as $event) {
-	    week_event_display(&$hour_day_list,&$hidden_div,$event,$nb_user,$properties);	
+	    $days_cal .= allday_event_display(&$hidden_div,$event,$nb_user,$properties);	
 	  }
 	  $days_cal .=  "</td>";
 	} else {
@@ -2472,7 +2482,7 @@ function dis_day_planning($agenda,$calendar_user,$usr_q) {
       if($list_events != null)  {
 	$hour_day_list .=  "<td  class=\"".$properties["class"]."\" style=\"width:$td_width;\">";
 	foreach($list_events as $event) {
-	  day_event_display(&$hour_day_list,&$hidden_div,$event,$nb_user,$properties);	
+	  $hour_day_list .= allday_event_display(&$hidden_div,$event,$nb_user,$properties);	
 	}
 	$hour_day_list .=  "</td>";
       } else {
@@ -2604,3 +2614,45 @@ function day_event_display(&$week_cal,&$hidden_div,$event,$nb_user,$properties) 
    </ul>
   </div>  ";	   
 }
+///////////////////////////////////////////////////////////////////////////////
+// Make the event display 
+// Parameters:
+//    - $agenda         : agenda parameters
+//    - $obm_q_events   : list of event's records 
+//    - $contacts_array : array of selected contacts 
+//    - $groups_array   : array of selected groups 
+///////////////////////////////////////////////////////////////////////////////
+function allday_event_display(&$hidden_div,$event,$nb_user,$properties) {
+  global $l_duration, $path, $l_private, $set_theme,$ico_calendar_day;
+  
+  global $auth,$l_begin,$l_end;
+  $id = $event->id;
+  $usr_id = $properties["id"];
+  if($event->privacy == 1 && $auth->auth["uid"] != $properties["id"]) {
+    $title = $l_private;
+    $description = $l_private_description;
+    $link = "javascript:return false;";
+    $category = $l_private;    
+  }else {
+    $title = $event->title;
+    $link = "$path/agenda/agenda_index.php?action=detailconsult&param_event=$id";
+    $description = $event->description;
+    $category = $event->category;
+  }    
+  $event_head_display = "<img class=\"agendaEvent\" src=\"".C_IMAGE_PATH."/$set_theme/$ico_calendar_day\" alt=\"[D]\" />";
+  $dis_calendar .=  "<a class=\"agendaLink\" 
+  onMouseOver=\"show(event,'$id-$usr_id'); return true;\"
+  onMouseOut=\"hide('$id-$usr_id'); return true;\"		
+  href=\"$link\">$event_head_display</a><br />";
+  $hidden_div .= "
+  <div id=\"$id-$usr_id\" class=\"last\" style=\"display:none;\"> 
+   <div class=\"lastTitle\">:: $title</div>
+   <ul class=\"lastList\">  
+    <li class=\"lastList\">$category</li>
+    <li class=\"lastList\">$description</li>
+   </ul>
+  </div>  ";	   
+
+  return $dis_calendar;
+}
+
