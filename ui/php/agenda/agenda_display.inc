@@ -687,7 +687,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q,$grp_q, $category_
     <tr>
      <td class=\"detailLabel\">$l_all_day</td>
      <td class=\"detailForm\">
-      <input onchange=\"show_hide_dates(this)\" type=\"checkbox\" name=\"ch_all_day\" value=\"1\" $all_day_checked />
+      <input onchange=\"show_hide_dates(this)\" onclick=\"show_hide_dates(this)\" type=\"checkbox\" name=\"ch_all_day\" value=\"1\" $all_day_checked />
      </td>
     </tr>   
     <tr>
