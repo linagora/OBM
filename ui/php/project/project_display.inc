@@ -277,9 +277,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
   global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
   global $l_deal, $l_project, $l_progress, $l_progressinfos;
-  global $l_projected, $l_used, $l_missing, $l_sold;
+  global $l_used, $l_missing, $l_sold, $l_estimated;
   global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
-  global $l_allosold, $l_usedsold, $l_progeval, $l_tasks;
+  global $l_alloestimated, $l_usedestimated, $l_progeval, $l_tasks;
   global $l_members, $l_task_list, $l_members_info, $l_archive, $l_yes, $l_no;
   global $l_alloproj, $l_usedproj, $l_no_tasks;
 
@@ -296,18 +296,17 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   $deal_label = $project_q->f("deal_label");
   $arc_status = ($project_q->f("project_archive")) ? "$l_yes" : "$l_no";
   $soldtime = $project_q->f("project_soldtime");
+  $estimated = $project_q->f("project_estimatedtime");
   $datebegin = date_format($project_q->f("datebegin"));
   $dateend = date_format($project_q->f("dateend"));
 
   // Labels are different for sales and R&D projects
-  if ($company != "") {
-    $text_time = $l_sold;
-    $text_allotime = $l_allosold;
-    $text_usedtime = $l_usedsold;
+  if ($company > 0) {
+    $text_time = "$l_sold / $l_estimated";
+    $value_time = "$soldtime / $estimated";
   } else {
-    $text_time = $l_projected;
-    $text_allotime = $l_alloproj;
-    $text_usedtime = $l_usedproj;
+    $text_time = $l_estimated;
+    $value_time = $estimated;
   }
 
   // Company name
@@ -358,8 +357,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
     $tab_style = "class=\"detail\"";
     $dis_advance = "
      <tr>
-       <td class=\"detailLabel\">&nbsp;$l_sold&nbsp;</td>
-       <td class=\"detailText\" align=\"right\">$soldtime</td>
+       <td class=\"detailLabel\">&nbsp;$l_sold / $l_estimated&nbsp;</td>
+       <td class=\"detailText\" align=\"right\">$soldtime / $estimated</td>
        <td width=\"10%\">&nbsp;&nbsp;</td>
        <td class=\"detailLabel\">&nbsp;$l_allosold&nbsp;</td>
        <td class=\"detailText\" align=\"right\">0 %</td>
@@ -590,12 +589,12 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
 
 
     // ratios
-    $ratio_allosold = intval(($allotted/$soldtime)*100);
-    $ratio_usedsold = intval(($usedtime/$soldtime)*100);
+    $ratio_alloestimated = intval(($allotted/$estimated)*100);
+    $ratio_usedestimated = intval(($usedtime/$estimated)*100);
 
     $ratio_progress = (($usedtime + $missingtime) == 0) ? 0 : intval(($usedtime/($usedtime + $missingtime))*100);
   
-    $ratio_progeval = intval((($usedtime + $missingtime)/$soldtime)*100);
+    $ratio_progeval = intval((($usedtime + $missingtime)/$estimated)*100);
 
     if ($ratio_progeval < 70)
       $symbol_progeval = "++";
@@ -609,22 +608,23 @@ function html_project_consult($project_q, $tasks_q, $members_q, $times) {
       $symbol_progeval = "=";
 
     $span = $cpt_m + 2;
-  
+
+
     //advance array
     $dis_advance = "
     <tr>
      <td class=\"detailLabel\">&nbsp;$text_time&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$soldtime</td>
+     <td class=\"detailText\" align=\"right\">$value_time</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$text_allotime&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_allosold %</td>
+     <td class=\"detailLabel\">&nbsp;$l_alloestimated&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$ratio_alloestimated %</td>
     </tr>
     <tr>
      <td class=\"detailLabel\">&nbsp;$l_allotted&nbsp;</td>
      <td class=\"detailText\" align=\"right\">$allotted</td>
      <td>&nbsp;&nbsp;</td>
-     <td class=\"detailLabel\">&nbsp;$text_usedtime&nbsp;</td>
-     <td class=\"detailText\" align=\"right\">$ratio_usedsold %</td>
+     <td class=\"detailLabel\">&nbsp;$l_usedestimated&nbsp;</td>
+     <td class=\"detailText\" align=\"right\">$ratio_usedestimated %</td>
     </tr>
     <tr>
      <td class=\"detailLabel\">&nbsp;$l_used&nbsp;</td>

@@ -18,15 +18,14 @@ $l_datebegin = "Date de début";
 $l_dateend = "Date de fin";
 
 $l_sold = "Vendu";
+$l_estimated = "Estimé";
 $l_allotted = "Attribué";
 $l_projected = "Prévu";
 $l_used = "Utilisé";
 $l_missing = "Estimé restant";
 
-$l_allosold = "Attribution du temps vendu";
-$l_usedsold = "Utilisation du temps vendu";
-$l_alloproj = "Attribution du temps prévu";
-$l_usedproj = "Utilisation du temps prévu";
+$l_alloestimated = "Attribution du temps prévu";
+$l_usedestimated = "Utilisation du temps prévu";
 $l_progress = "Avancement";
 $l_progeval = "Evaluation de l'avance/retard";
 

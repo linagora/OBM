@@ -1284,6 +1284,7 @@ function check_project_form($pid, $project) {
   global $err_msg, $php_regexp_number;
 
   $name = $project["name"];
+  $company = $project["company"];
   $tt = $project["tt"];
   $soldtime = $project["soldtime"];
   $estimated = $project["estimated"];
@@ -1302,7 +1303,7 @@ function check_project_form($pid, $project) {
   }
 
   // MANDATORY: Soldtime
-  if (trim($soldtime) == "") {
+  if (($company > 0) && (trim($soldtime) == "")) {
     $err_msg = $l_fill_soldtime;
     return false;
   }
