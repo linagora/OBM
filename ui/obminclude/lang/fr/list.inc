@@ -28,6 +28,7 @@ $l_desc = "Description";
 $l_export_intro = "Sélectionner le format d'export souhaité";
 $l_select_list = "Sélectionner les listes cibles de l'export";
 $l_list_wizard = "Recherche global";
+$l_criterion = "Critères de recherche";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";

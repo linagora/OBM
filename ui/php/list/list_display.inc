@@ -357,15 +357,37 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function dis_list_form($action, $list_q, $list) {
+  global $l_insert, $l_update, $l_back;
   if(is_object($list_q)){
     $crit_q = $list_q->f("list_structure");
   }
-  if($list["criteria"] == "" && $crit_q =="") {
-    return html_list_form($action, $list_q, $list);
+  $url = url_prepare("list_index.php");
+  $block = "<form method=\"get\" name=\"f_new\" action=\"$url\"
+    onSubmit=\"if (check_name_list(this)) return true; else return false;\">";
+
+  $block = html_list_form($action, $list_q, $list);
+  if($action == "insert" || $action == "new" || $list["criteria"] != "" ||  $crit_q !="") {
+     $block .= html_list_graphical_form($action, $list_q, $list);
   }
-  else {
-    return html_list_graphical_form($action, $list_q, $list);
+
+  if (($action == "detailupdate") || ($action == "update")) {
+     $dis_but .= "
+      <input type=\"hidden\" name=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update\" />";
+
+   } else {
+    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
+      <input type=\"submit\" value=\"$l_insert\"/>";
   }
+
+  $block .= "<div class=\"detailButton\">
+    <p class=\"detailButtons\">
+    $dis_but 
+    </p>
+    </div>
+    </form>";
+  $block .= "</form>";
+  return $block; 
 }
 ///////////////////////////////////////////////////////////////////////////////
 // Display List Form                                                         //
@@ -376,7 +398,7 @@ function dis_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back;
+  global $l_name, $l_subject, $l_email, $l_query,$l_list,$display;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -395,11 +417,12 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
   $url = url_prepare("list_index.php");
+  $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
   $block = "
   <form method=\"get\" name=\"f_new\" action=\"$url\"
     onSubmit=\"if (check_name_list(this)) return true; else return false;\">
-
+  <div class=\"detailHead\">$l_list</div>
   <table class=\"detail\">
   <tr>
     <td class=\"detailLabel\">$l_name</td>
@@ -424,29 +447,8 @@ function html_list_form($action, $list_q, $list) {
   </table>";
 
   if (($action == "detailupdate") || ($action == "update")) {
-     $dis_but .= "
-      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-      <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />";
-
-       $dis_back = "<form method=\"get\" name=\"f_back\"
-        action=\"".url_prepare("list_index.php")."\">
-      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>";
-   } else {
-    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\" />";
+    $block .= "<input type=\"hidden\" name=\"param_list\" value=\"$id\" />";
   }
-
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    $dis_but
-    </p>
-    </div>
-    </form>";
-
   return $block;
 }
 
@@ -461,7 +463,7 @@ function html_list_form($action, $list_q, $list) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_graphical_form($action, $list_q, $list) {
   global $l_name, $l_subject, $l_email, $l_query,$l_insert, $l_update, $l_back,$l_add_criterion;
-  global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow;
+  global $popup_height,$popup_width,$set_theme,$ico_updated,$ico_crow,$l_criterion;
   global $l_company, $l_country,$l_zipcode,$l_town,$l_contact,$l_lastname,$l_firstname;
   global $l_update,$l_delete;
 
@@ -514,25 +516,9 @@ function html_list_graphical_form($action, $list_q, $list) {
   }
 
   $url2 = "list_index.php?action=new_criterion&amp;popup=1&amp;ext_target=forms[0].elements[5]"; 
-  $url = url_prepare("list_index.php");
 
   $block = "
-  <form method=\"post\" name=\"f_new action=\"$url\"
-    onSubmit=\"if (check_name_list(this)) return true; else return false;\">
-
-  <table class=\"detail\">
-    <tr>
-    <td class=\"detailLabel\">$l_name</td>
-    <td class=\"detailForm\">
-      <input type=\"text\" name=\"tf_name\" value=\"$name\" /></td>
-  </tr>
-  <tr>
-    <td class=\"detailLabel\">$l_subject</td>
-    <td class=\"detailForm\">
-      <input name=\"tf_subject\" size=\"30\" value=\"$subject\" /></td>
-    </tr>
-  </table>
-  
+   <div class=\"detailHead\">$l_criterion</div> 
   <table class=\"search\" id=\"list_criterion\">
   <tr>
     <td class=\"detailLabel\" style=\"width:5%;\" >$l_delete</td>
@@ -551,32 +537,8 @@ function html_list_graphical_form($action, $list_q, $list) {
   </table>
   ";
 
-  $dis_but .= "<input type=\"submit\" value=\"$l_add_criterion\" 
+  $block .= "<input type=\"submit\" value=\"$l_add_criterion\" 
   onclick=\"window.open('$url2','','height=$popup_height,width=$popup_width,scrollbars=yes,status=yes'); return false;\"/>";
-
-  if (($action == "detailupdate") || ($action == "update")) {
-     $dis_but .= "
-      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-      <input type=\"hidden\" name=\"action\" value=\"update\" />
-      <input type=\"submit\" value=\"$l_update\" />";
-
-       $dis_back = "<form method=\"get\" name=\"f_back\"
-        action=\"".url_prepare("list_index.php")."\">
-      <input type=\"hidden\" name=\"action\" value=\"detailconsult\" />
-      <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_back\" />
-      </form>";
-   } else {
-    $dis_but .= "<input type=\"hidden\" name=\"action\" value=\"insert\" />
-      <input type=\"submit\" value=\"$l_insert\"/>";
-  }
-
-  $block .= "<div class=\"detailButton\">
-    <p class=\"detailButtons\">
-    $dis_but
-    </p>
-    </div>
-    </form>";
 
   return $block;
 }

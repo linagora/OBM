@@ -26,6 +26,7 @@ $l_list_set = "List Set";
 $l_export_format = "Available export formats";
 $l_desc = "Description";
 $l_export_intro = "Select the export format needed";
+$l_criterion = "Searching criteria";
 $l_select_list = "Select the lists to be exported";
 
 // Contact
