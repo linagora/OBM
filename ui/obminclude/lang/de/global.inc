@@ -18,6 +18,7 @@ $l_validate = "Validate";
 $l_all = "Alle";
 $l_all_f = "Alle";
 $l_none = "---";
+$l_comment = "Comment";
 $l_archive = "Archiv";
 $l_archive_first = "A";
 $l_invalid_data = "Falsche Daten";

@@ -17,9 +17,10 @@ $l_validate = "Validate";
 // Common messages
 $l_all = "Alle";
 $l_all_f = "Alle";
+$l_none = "---";
+$l_comment = "Kommentar";
 $l_archive = "Arkiv";
 $l_archive_first = "A";
-$l_none = "---";
 $l_invalid_data = "Ugyldig data";
 
 // OBM_DISPLAY

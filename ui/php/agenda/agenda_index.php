@@ -424,9 +424,10 @@ function get_agenda_action() {
     'Name'     => $l_header_new_event,
     'Url'      => "$path/agenda/agenda_index.php?action=new",
     'Right'    => $agenda_write,
-    'Condition'=> array ('index','detailconsult','
-                         view_month','view_week','view_day','view_year','view_month','insert',
-		         'insert_conflict','decision') 
+    'Condition'=> array ('index','detailconsult',
+                  'view_month','view_week','view_day','view_year',
+                  'insert','insert_conflict','cancel_insert','confirm_insert',
+		  'update_decision','decision') 
                                     );
 
 

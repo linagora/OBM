@@ -356,7 +356,7 @@ function beautify_deal_comment($com) {
   $col0 = "FFFFFF";
   $col1 = "BBBBBB";
 
-  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:[A-Z]{2}:)/";
+  $pattern = "/(^|\n)([12][0-9]{3}-[0-1][0-9]-[0-3][0-9]:.*:)/";
   $replace = "</td>
     </tr>
     <tr>
@@ -627,14 +627,17 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$contr_q,$deal) {
-  // - Themes
   global $set_theme,$ico_company,$ico_contact,$l_company;
-  // -- Labels
-  global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none, $l_deal,$l_infos,$l_company;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_private;
-  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
+  global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
+  global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
+  global $l_category,$l_marketing_manager,$l_technical_manager,$l_private;
+  global $l_proposition,$l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state;
+  global $l_last_update,$l_archive,$l_comment,$l_add_comment,$l_upd_comment;
+  global $l_at,$l_todo;
   global $action, $auth,$c_all,$l_all,$l_add_contrat;
-  
+
+  $uid = $auth->auth["uid"];
+
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
     $id = $deal_q->f("deal_id");
@@ -662,6 +665,8 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $ad1 = $deal_q->f("company_address1");
     $zip = $deal_q->f("company_zipcode");
     $town = $deal_q->f("company_town");
+    $usercomment = $uid;
+    $datecomment = isodate_format();
   } else {
     // Values are taken from parameters
     $id = $deal["id"];
@@ -686,6 +691,9 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $archive = ($deal["archive"] == 1 ? "checked" : "");
     $todo = stripslashes($deal["todo"]);
     $comment = stripslashes($deal["com"]);
+    $add_comment = stripslashes($deal["add_comment"]);
+    $usercomment = ($deal["usercomment"] ? $deal["usercomment"] : $uid);
+    $datecomment = ($deal["datecomment"] ? $deal["datecomment"] : isodate_format());
     if ($action == "new") {
       $comp = $comp_q->f("company_name");
       $ad1 = $comp_q->f("company_address1");
@@ -799,12 +807,27 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   }
   $sel_state .= "</select>";
   
+  // User comment select construction
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+  $sel_usercomment = "<select name=\"sel_usercomment\">";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
+    $sel_usercomment .= "<option value=\"$cname\"";
+    if ($usercomment == $cid) $sel_usercomment .= " selected = \"selected\""; 
+    $sel_usercomment .= ">$cname</option>\n";
+  }
+  $sel_usercomment .= "</select>";
+
+
   if($contr_q == 0) 
     $ch_add_contr = "<input type=\"checkbox\" name=\"ch_contrat\" />";
 
   if ( ($action=="new") ||
        ( (($action=="detailupdate") || ($action=="update")) && 
-         ($usercreate == $auth->auth["uid"]) ) ) {
+         ($usercreate == $uid) ) ) {
     $dis_visibility = "
              <td class=\"detailLabel\">$l_private</td>
              <td><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
@@ -928,9 +951,17 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td class=\"detailLabel\">$l_add_contrat</td>
         <td>$ch_add_contr</td>
       </tr><tr>
-      <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
+        <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
       </tr><tr>
-        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
+        <td class=\"detailLabel\">$l_add_comment</td>
+        <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+      </tr><tr>
+        <td colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_upd_comment</td>
+        <td>&nbsp;</td>
+      </tr><tr>
+        <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
       </tr>
      </table>
     <table class =\"details\">

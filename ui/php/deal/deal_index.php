@@ -546,8 +546,8 @@ function get_param_deal() {
   global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_cat;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
   global $tf_dateprop, $tf_amount, $sel_state, $tf_datealarm, $ta_com;
-  global $cb_archive, $tf_todo, $cb_vis;
-  global $tf_plabel, $sel_pmanager, $cb_parchive;
+  global $tf_datecomment, $sel_usercomment, $ta_add_comment;
+  global $tf_plabel, $sel_pmanager, $cb_parchive, $cb_archive,$tf_todo,$cb_vis;
   global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
   global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent, $ch_contrat;
@@ -580,7 +580,9 @@ function get_param_deal() {
   }
   if (isset ($tf_todo)) $deal["todo"] = $tf_todo;
   if (isset ($cb_vis)) $deal["vis"] = $cb_vis;
-
+  if (isset ($tf_datecomment)) $deal["datecomment"] = $tf_datecomment;
+  if (isset ($sel_usercomment)) $deal["usercomment"] = $sel_usercomment;
+  if (isset ($ta_add_comment)) $deal["add_comment"] = trim($ta_add_comment);
   if (isset ($hd_usercreate)) $deal["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $deal["timeupdate"] = $hd_timeupdate;
   if (isset ($ch_contrat)) $deal["add_contract"] = $ch_contrat;

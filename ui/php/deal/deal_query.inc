@@ -321,6 +321,12 @@ function run_query_update($deal) {
   $archive = $deal["archive"];
   $todo = $deal["todo"];
   $comment = $deal["com"];
+  $add_comment = $deal["add_comment"];
+  if ($add_comment != "") {
+    $datecomment = $deal["datecomment"];
+    $usercomment = $deal["usercomment"];
+    $comment .= "\n$datecomment:$usercomment:$add_comment";
+  }
   
   $query = "update Deal set deal_timeupdate='". date("Y-m-d H:i:s")."',
     deal_userupdate='".$auth->auth["uid"]."',
