@@ -25,6 +25,16 @@
 // - dispref_level   --                -- update one field display position 
 ///////////////////////////////////////////////////////////////////////////////
 
+$www ="   <p class=\"messageInfo\">
+    	<a href=\"http://validator.w3.org/check/referer\"><img
+        src=\"http://www.w3.org/Icons/valid-xhtml10\"
+        alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\" /></a>
+	<a href=\"http://jigsaw.w3.org/css-validator/\">
+ 	 <img style=\"border:0;width:88px;height:31px\"
+       src=\"http://jigsaw.w3.org/css-validator/images/vcss\" 
+       alt=\"Valid CSS!\" />
+	 </a>
+  	</p>";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms Management                                             //
@@ -103,42 +113,40 @@ if ($action == "index" || $action == "") {
   if ($set_display == "yes") {
     dis_contract_search_list($contract);
   } else {
-    display_ok_msg($l_no_display);
+    display_info_msg($l_no_display);
   }
+  
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
   dis_contract_search_list($contract);
-
+  
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    require("contract_js.inc");
-    display_ok_msg(stripslashes($ok_message)."<br>".$l_add_contract_deal);
-    html_contract_form($action,new DB_OBM,"",run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
-  } else {
-    display_error_permission();
-  }
-
+   require("contract_js.inc");
+   if($param_deal != "") 
+   display_ok_msg(stripslashes($ok_message)."<br />".$l_add_contract_deal);
+   html_contract_form($action,new DB_OBM,"",run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company), $contract);
+  
 } elseif ($action == "display") {
 //OK///////////////////////////////////////////////////////////////////////////
   $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
   dis_contract_display_pref($pref_q);
-
+  
 }else if($action == "dispref_display") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_update($entity, $fieldname, $display);
   $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
   dis_contract_display_pref($pref_q);
-
+  
 } else if($action == "dispref_level") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_display_pref_level_update($entity, $new_level, $fieldorder);
   $pref_q=run_query_display_pref($auth->auth["uid"], "contract",1);
   dis_contract_display_pref($pref_q);
-
+  
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($param_contract > 0) {
@@ -146,7 +154,7 @@ if ($action == "index" || $action == "") {
     display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
     html_contract_consult($contract_q,run_query_contracttype(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")),$contract_q->f("contract_company_id"),run_query_deal($contract_q->f("contract_deal_id")));
   }
-
+  
 } elseif ($action == "detailupdate")  {
 ///////////////////////h//////////////////////////////////////////////////////
   if ($param_contract > 0) {
@@ -156,7 +164,7 @@ if ($action == "index" || $action == "") {
 
     html_contract_form($action,$contract_q,run_query_deal($contract_q->f("contract_deal_id")),run_query_contracttype(),run_query_userobm(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")), $contract);
   }
-
+  
 } elseif ($action == "insert")  {
 //OK///////////////////////////////////////////////////////////////////////////
 
@@ -169,6 +177,7 @@ if ($action == "index" || $action == "") {
   require("contract_js.inc");
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
+  
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $contract)) {  
@@ -178,23 +187,19 @@ if ($action == "index" || $action == "") {
   require("contract_js.inc");
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
-
+  
 } elseif ($action == "delete")  {
 ///OK//////////////////////////////////////////////////////////////////////////
   run_query_delete($param_contract);
   display_ok_msg($l_delete_ok);
   $usr_q = run_query_userobm();
   html_contract_search_form($contract, $usr_q, run_query_contracttype());
-
+  
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////
-  if ($auth->auth["perm"] != $perms_user) {
-    require("contract_js.inc");
-    html_contract_admin_form(run_query_contracttype());
-  } else {
-    display_error_permission();
-  }
-
+  require("contract_js.inc");
+  html_contract_admin_form(run_query_contracttype());
+  
 } elseif ($action == "admintypeinsert")  {
 ///////////////////////////////////////////////////////////////////////////////
   $query = query_type_insert();
@@ -207,7 +212,7 @@ if ($action == "index" || $action == "") {
   }
   require("contract_js.inc");
   html_contract_admin_form(run_query_contracttype());
-  
+    
 } elseif ($action == "admintypedelete")  {
   ///////////////////////////////////////////////////////////////////////////////
   $obm_q = new DB_OBM;
@@ -216,10 +221,7 @@ if ($action == "index" || $action == "") {
   if ($obm_q->num_rows() > 0) {
     //Font?
     display_err_msg($l_type_delete_error);
-    echo $obm_q->num_rows() . " " . $l_deal . $l_type_del_verif_error . "<P>\n"; 
-    while ($obm_q->next_record()) {
-      echo "<A HREF=\"contract_index.php?action=detailconsult&amp;param_contract=" . $obm_q->f("contract_id") ."\">" . $obm_q->f("contract_label") . "</A><BR>\n";
-    }
+    dis_type_links($obm_q);
   } else {
     $query = query_type_delete(); 
     if ($obm_q->query($query)) {
@@ -241,9 +243,9 @@ if ($action == "index" || $action == "") {
   } else {
     display_err_msg($l_type_update_error);
   }
-  
   require("contract_js.inc");
   html_contract_admin_form(run_query_contracttype());
+  
 }
 
 

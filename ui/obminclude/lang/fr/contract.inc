@@ -19,7 +19,7 @@ $l_after = "Date Expiration Apr&egrave;s";
 $l_before = "Date Expiration Avant";
 $l_incident_list = "Liste des incidents";
 $l_incident_new = "Ajouter un incident";
-
+$l_contract ="Contrat";
 $fieldnames["contract_label"] = $l_contract_label;
 $fieldnames["contract_company_name"] = $l_contract_company;
 $fieldnames["contract_number"] = $l_contract_num;
@@ -93,7 +93,7 @@ $l_select_contract = "Selectionner le contrat";
 
 $l_error_permission = "Vous n'avez pas les droits d'acces à cette page.";
 $l_error_visibility = "Les informations contenues dans cette page sont priv&eacute;es. Vous ne pouvez pas les consulter";
-$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir la liste des contrats de support correspondants.";
+$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur &lt; Chercher &gt; pour obtenir la liste des contrats de support correspondants.";
 $l_found = "contrat(s) trouv&eacute;(s).";
 $l_no_found = "Aucun Contrat ne correspond &agrave; ces crit&egrave;res !";
 $l_delete_ok = "La suppression du Contrat a &eacute;t&eacute; correctement effectu&eacute;e.";

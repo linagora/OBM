@@ -9,7 +9,7 @@
 
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -355,6 +355,6 @@ function fill_minilabel_upd(form)
 
 echo "
 // -->
-</SCRIPT>
+</script>
 ";
 

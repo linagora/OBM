@@ -347,12 +347,12 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
-  global $l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
+  global $l_amount,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
-  global $l_invoices_connected,$l_no_invoices_connected, $l_header_company;
+  global $l_invoices_connected,$l_no_invoices_connected;
   global $l_create_invoice, $l_archived_invoices_connected;
   global $l_see_archived_invoices, $incl_arch;
-  global $perms_user,$l_perms_user, $perms_admin,$l_contract_list;
+  global $l_contract_list;
   global $auth, $sess, $c_yes, $c_no;
 
   $id = $deal_q->f("deal_id");
@@ -446,7 +446,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   echo "
       <table class=\"details\">
         <tr>
-          <td colspan=\"2\" class=\"detailHead\">$l_header_company</td>
+          <td colspan=\"2\" class=\"detailHead\">$l_company</td>
         </tr><tr>
           <td class=\"detailLabel\">$comp&nbsp;&nbsp;          
           <a href=\"". $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
@@ -454,13 +454,13 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
           </td>
           <td class=\"detailText\">$ad1<br/>$zip $town</td>
         </tr><tr>
-          <td class=\"detailLabel\">$l_contacts 1&nbsp;&nbsp;
+          <td class=\"detailLabel\">$l_contact 1&nbsp;&nbsp;
           <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con1") . "\">
           <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
           <td class=\"detailText\">$dis_con1&nbsp;&nbsp;
           </td>
         </tr><tr>
-          <td class=\"detailLabel\">$l_contacts 2&nbsp;&nbsp;
+          <td class=\"detailLabel\">$l_contact 2&nbsp;&nbsp;
           <a href=\"".$sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=$con2") . "\">
           <img src=\"/images/$set_theme/$ico_contact\" alt=\"[details]\" /></a></td>
           <td class=\"detailText\">$dis_con2
@@ -579,11 +579,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$contr_q,$deal) {
   // - Themes
-  global $set_theme,$ico_company,$ico_contact,$l_header_company;
+  global $set_theme,$ico_company,$ico_contact,$l_company;
   // -- Labels
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none, $l_deal,$l_infos,$l_company;
   global $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_private;
-  global $l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
+  global $l_proposition,$l_amount,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number,$l_todo;
   global $action, $sess, $auth,$c_all,$l_all,$l_add_contrat;
   
   // if update mode and first time, values are taken from db
@@ -811,12 +811,25 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".$sess->url("deal_index.php")."\">
-
-    <table class=\"details\">
-     <tr>
-      <td>
-      <table class=\"details\">
-      <tr>
+     <table class=\"details\">
+       <tr>
+         <td colspan=\"2\" class=\"detailHead\">$l_company</td>
+       </tr><tr>
+         <td class=\"detailLabel\"><span class=\"messageWarning\">$comp&nbsp;</span>
+        <a href=\"" . $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
+         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a></td>
+         <td class=\"detailText\">
+          $ad1
+          <br />$zip $town 
+        </td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_contact 1</td>
+        <td>$sel_con1 $dis_contact_1</td>
+      </tr><tr>
+        </tr><tr>
+        <td class=\"detailLabel\">$l_contact 2</td>
+        <td>$sel_con2 $dis_contact_2</td>
+      </tr><tr>
         <td colspan=\"2\" class=\"detailHead\">$l_deal</td>
       </tr><tr>
         $dis_visibility
@@ -869,31 +882,6 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"72\">$comment</textarea></td>
       </tr>
      </table>
-     </td>
-     <td>
-  <!-- company and contact block -->
-      <table  class=\"details\">
-       <tr>
-         <td class=\"detailHead\">$l_header_company</td>
-       </tr><tr>
-         <td class=\"detailText\">
-         <span class=\"messageInfo\">$comp&nbsp;</span>
-        <a href=\"" . $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$comp_id") . "\">
-         <img src=\"/images/$set_theme/$ico_company\" alt=\"[details]\" /></a>
-        <br />$ad1
-        <br />$zip $town
-        </td>
-      </tr><tr>
-        <td class=\"detailHead\">$l_contacts</td>
-      </tr><tr>
-        <td>$sel_con1 $dis_contact_1</td>
-      </tr><tr>
-        <td>$sel_con2 $dis_contact_2</td>
-      </tr>
-      </table>
-    </td> 
-    </tr>
-    </table>
     <table class =\"details\">
       <tr><td class=\"detailHead\">$dis_button1</td></tr>
     </table>
@@ -1714,7 +1702,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   //-----> deal list
   // if no record found, display it and stop
   if ($nb_deals == 0) {
-     display_info_msg($l_no_found)";
+     display_info_msg($l_no_found);
     return;
   }
 

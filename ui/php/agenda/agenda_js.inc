@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 echo "
-<SCRIPT LANGUAGE=\"JavaScript\">
+<script type=\"text/javascript\">
 <!--
 ";
 
@@ -196,7 +196,7 @@ champ.checked = 0;
 ";
 echo "
 //-->
-</SCRIPT>
+</script>
 ";
 
 

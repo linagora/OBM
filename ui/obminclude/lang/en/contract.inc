@@ -19,7 +19,7 @@ $l_after = "Expiration date After";
 $l_before = "Expiration date Before";
 $l_incident_list = "List of the Incidents";
 $l_incident_new = "Add a new Incident";
-
+$l_contract ="Contract";
 //------------------------------------//
 // Fields that appear in result lists //
 //------------------------------------//

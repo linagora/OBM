@@ -84,7 +84,7 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     }
   } 
 
-  // UserObm Select
+  // userobm select
   $sel_user = "<select name=\"sel_user_id[]\" size=6 multiple>";
   while ($usr_q->next_record()) {
     $u_id = $usr_q->f("userobm_id");
@@ -107,10 +107,10 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   } 
   $sel_user .= "</select>";
 
-  // Group Select
+  // group select
   $sel_group = "<select name=\"sel_group_id[]\" size=6 multiple>";
   while ($group_list->next_record()) {
-    $g_id = $group_list->f("list_id");      // To become group_id... XXXXXX
+    $g_id = $group_list->f("list_id");      // to become group_id... xxxxxx
     $g_name = $group_list->f("list_name");
     $sel_group .= "\n<option value=\"$g_id\"";
 
@@ -127,7 +127,7 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   }
   $sel_group .= "</select>";
 
-  // EventCategory Select
+  // eventcategory select
   $sel_cat = "<select name=\"sel_category_id\">"; 
   while ($category_list->next_record()) {
     $c_id = $category_list->f("eventcategory_id");
@@ -142,9 +142,9 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
 
 
   // current, last and next years
-  $current_year=date("Y");
-  $last_year=date("Y",mktime(0,0,0,1,1,$current_year-1));
-  $next_year=date("Y",mktime(0,0,0,1,1,$current_year+1));
+  $current_year=date("y");
+  $last_year=date("y",mktime(0,0,0,1,1,$current_year-1));
+  $next_year=date("y",mktime(0,0,0,1,1,$current_year+1));
   // day, month and year of the date of begin
   $yearbegin=substr($datebegin,0,4);
   $monthbegin=substr($datebegin,4,2);
@@ -163,27 +163,43 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
   // hour and minutes of the time of end
   $hour_end=substr($timeend,0,2);
   $minute_end=substr($timeend,2,2);
+  // priorities 
+  if ($priority != '') {
+    $tag_low="";
+    $tag_medium="";
+    $tag_high="";
+    switch($priority) {
+     case 0 : $tag_low="selected=\"selected\""; break;
+     case 1 : $tag_medium="selected=\"selected\""; break;
+     case 2 : $tag_high="selected=\"selected\""; break; 
+     default :
+       $tag_low="";
+       $tag_medium="";
+       $tag_high=""; 
+       break;
+    }
+  }
   
-  echo "<form name=\"form_event\" method=post onSubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->url("agenda_index.php")."\" onSubmit=\"\"> 
+  echo "<form name=\"form_event\" method=post onsubmit=\"if (check_insert_event(this)) return true; else return false;\" action=\"".$sess->url("agenda_index.php")."\" onsubmit=\"\"> 
     <table border=0 width=80%>       
     <tr>
       <td align=center>
         <table border=0>
         <tr>
           <td colspan=2>
-<!--  // Title // -->
+<!--   title  -->
             <font color=\"#$col_label\">$l_title</font><br>
             <input type=text name=\"tf_event_title\" value=\"$title\" size=50>
           </td>
         </tr>
         <tr>
           <td>
-<!--  // Available UserObm -->
+<!--  available userobm -->
             <font color=\"#$col_label\">$l_users</font>
             <br>$sel_user
           </td>
           <td>
-<!--  // Available Groups  --> 
+<!--  available groups  --> 
             <font color=\"#$col_label\">$l_groups</font>
             <br>$sel_group
           </td>
@@ -193,143 +209,120 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
             <table border=0 width=100%>
             <tr>
               <td>
-<!--  // Available Event Categories  --> 
+<!--  available event categories  --> 
                 <font color=\"#$col_label\">$l_category</font>
                 <br>$sel_cat
               </td>
-              <td>";
-  
-  // Priorities 
-  if ($priority != '') {
-    $tag_low="";
-    $tag_medium="";
-    $tag_high="";
-    switch($priority) {
-     case 0 : $tag_low="selected"; break;
-     case 1 : $tag_medium="selected"; break;
-     case 2 : $tag_high="selected"; break; 
-     default :
-       $tag_low="";
-       $tag_medium="";
-       $tag_high=""; 
-       break;
-    }
-  }
-  echo "<FONT COLOR=\"#$col_label\">".$l_priority."</FONT><BR>
-        <SELECT name=\"sel_priority\">
-        \n<OPTION value=1 ".$tag_medium.">".$l_medium."</OPTION>
-        \n<OPTION value=0 ".$tag_low.">".$l_low."</OPTION>
-        \n<OPTION value=2 ".$tag_high.">".$l_high."</OPTION>
-        \n</SELECT>";
-
-   echo "</TD><TD>";		    
-  
-  // Privacy 
-  echo "<TABLE border=2><TR><TD>".
-  "<FONT COLOR=\"#$col_label\">$l_private</FONT><INPUT type=checkbox name=\"cb_private_event\" value=1";
+              <td>
+        <font color=\"#$col_label\">$l_priority</font><br>
+        <select name=\"sel_priority\">
+          <option value=1 ".$tag_medium.">".$l_medium."</option>
+          <option value=0 ".$tag_low.">".$l_low."</option>
+          <option value=2 ".$tag_high.">".$l_high."</option>
+        </select>
+         </td><td>		    
+     <table border=2><tr><td>
+   <font color=\"#$col_label\">$l_private</font><input type=checkbox name=\"cb_private_event\" value=1";
   if ($privacy==1) {
-     echo " checked";
+     echo "checked=\"checked\"";
   }
-  echo "></TD></TR></TABLE>";
-
-  echo "</TD></TR>
-      </TABLE>";
-
-  echo "</TD></TR>
-     <TR><TD colspan=2>";
+  echo "></td></tr></table>
+         </td></tr>
+      </table>
+     </td></tr>
+     <tr><td colspan=2>";
   
   //-------------
-  // Dates & Times
-  echo "<TABLE border=0>";
+  // dates & times
+  echo "<table border=0>";
  
-  // Date begin
-  echo "<TR><TD>"; 
-  echo "<FONT COLOR=\"#$col_label\">$l_datebegin</FONT>";
-  echo "</TD><TD>";
-  echo "<SELECT name=\"sel_day_begin\" OnChange=\"SynchronizeDay(this.form)\">";
+  echo "<tr><td>"; 
+  echo "<font color=\"#$col_label\">$l_datebegin</font>";
+  echo "</td><td>";
+  echo "<select name=\"sel_day_begin\" onchange=\"synchronizeday(this.form)\">";
   for ($num_day=1 ; $num_day<32 ; $num_day++) {
     if ($num_day<10) {
       $num_day_value="0".$num_day;
     } else {
       $num_day_value=$num_day;
     }
-    echo "\n<OPTION value=\"$num_day_value\"";
+    echo "\n<option value=\"$num_day_value\"";
     if ($daybegin==$num_day_value) {
       echo " selected";
     }
     echo ">$num_day</option>";
   }
-  echo "</SELECT>";
-  echo "</TD><TD>";
-  echo "<SELECT name=\"sel_month_begin\" OnChange=\"SynchronizeMonth(this.form)\">";
+  echo "</select>";
+  echo "</td><td>";
+  echo "<select name=\"sel_month_begin\" onchange=\"synchronizemonth(this.form)\">";
   for ($num_month=1 ; $num_month<13 ; $num_month++) {
     if ($num_month<10) {
       $num_month_value="0".$num_month;
     } else {
       $num_month_value=$num_month;
     }
-    echo "\n<OPTION value=\"$num_month_value\"";
+    echo "\n<option value=\"$num_month_value\"";
     if ($monthbegin==$num_month_value) {
       echo " selected";
     }
-    echo ">".month_short_name($num_month)."</OPTION>";
+    echo ">".month_short_name($num_month)."</option>";
   }
-  echo "\n</SELECT>";
-  echo "</TD><TD>";
+  echo "\n</select>";
+  echo "</td><td>";
   switch ($yearbegin) {
      case $last_year : $tag_last = "selected"; break;
      case $current_year : $tag_current = "selected"; break;
      case $next_year : $tag_next = "selected"; break;
   }
-  echo "<select name=\"sel_year_begin\" OnChange=\"SynchronizeYear(this.form)\">
+  echo "<select name=\"sel_year_begin\" onchange=\"synchronizeyear(this.form)\">
     <option value=\"$current_year\" $tag_current>$current_year</option>
     <option value=\"$last_year\" $tag_last>$last_year</option>
     <option value=\"$next_year\" $tag_next>$next_year</option>
   </select>"; 
-  echo "</TD></TR>";
+  echo "</td></tr>";
      
-  // Time begin
-  echo "<TR><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_timebegin."</FONT>";
-  echo "</TD><TD colspan=3>";
-  echo "<INPUT type=text name=\"tf_hour_begin\" size=3 maxlength=2 value=\"".$hour_begin."\">&nbsp; <b>:</b> &nbsp;";
-  echo "<INPUT type=text name=\"tf_minute_begin\" size=3 maxlength=2 value=\"".$minute_begin."\">";
-  echo "</TD></TR>";
+  // time begin
+  echo "<tr><td>";
+  echo "<font color=\"#$col_label\">".$l_timebegin."</font>";
+  echo "</td><td colspan=3>";
+  echo "<input type=text name=\"tf_hour_begin\" size=3 maxlength=2 value=\"".$hour_begin."\">&nbsp; <b>:</b> &nbsp;";
+  echo "<input type=text name=\"tf_minute_begin\" size=3 maxlength=2 value=\"".$minute_begin."\">";
+  echo "</td></tr>";
        
-  // Date end
-  echo "<TR><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_dateend."</FONT>";
-  echo "</TD><TD>";
-  echo "<SELECT name=\"sel_day_end\">";
+  // date end
+  echo "<tr><td>";
+  echo "<font color=\"#$col_label\">".$l_dateend."</font>";
+  echo "</td><td>";
+  echo "<select name=\"sel_day_end\">";
   for ($num_day=1 ; $num_day<32 ; $num_day++) {
     if ($num_day<10) {
       $num_day_value="0".$num_day;
     } else {
       $num_day_value=$num_day;
     }
-    echo "\n<OPTION value=\"$num_day_value\"";
+    echo "\n<option value=\"$num_day_value\"";
     if ($dayend==$num_day_value) {
       echo " selected";
     }
     echo ">$num_day</option>";
   }
-  echo "</SELECT>";
-  echo "</TD><TD>";
-  echo "<SELECT name=\"sel_month_end\">";
+  echo "</select>";
+  echo "</td><td>";
+  echo "<select name=\"sel_month_end\">";
   for ($num_month=1 ; $num_month<13 ; $num_month++) {
     if ($num_month<10) {
       $num_month_value="0".$num_month;
     } else {
       $num_month_value=$num_month;
     }
-    echo "\n<OPTION value=\"$num_month_value\"";
+    echo "\n<option value=\"$num_month_value\"";
     if ($monthend==$num_month_value) {
       echo " selected";
     }
     echo ">".month_short_name($num_month)."</option>";
   }
-  echo "</SELECT>";
-  echo "</TD><TD>";
+  echo "</select>";
+  echo "</td><td>";
   $tag_last="";
   $tag_next="";
   $tag_current="";
@@ -343,42 +336,42 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     <option value=\"$last_year\" $tag_last>$last_year</option>
     <option value=\"$next_year\" $tag_next>$next_year</option>
   </select>"; 
-  echo "</TD></TR>";
+  echo "</td></tr>";
 
-  // Time end
-  echo "<TR><TD>";
+  // time end
+  echo "<tr><td>";
   echo "<font color=\"#$col_label\">$l_timeend</font>";
-  echo "</TD><TD colspan=3>";
-  echo "<INPUT type=text name=\"tf_hour_end\" size=3 maxlength=2 value=\"".$hour_end."\">&nbsp; <b>:</b> &nbsp;";
-  echo "<INPUT type=text name=\"tf_minute_end\" size=3 maxlength=2 value=\"".$minute_end."\">";
-  echo "</TD></TR>";
-  echo "<TR><TD>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_occupied_day." ?</FONT>";
-  echo "</TD><TD colspan=3>";
-  echo "<INPUT type=checkbox name=\"cb_occupied_day\" value=1";
+  echo "</td><td colspan=3>";
+  echo "<input type=text name=\"tf_hour_end\" size=3 maxlength=2 value=\"".$hour_end."\">&nbsp; <b>:</b> &nbsp;";
+  echo "<input type=text name=\"tf_minute_end\" size=3 maxlength=2 value=\"".$minute_end."\">";
+  echo "</td></tr>";
+  echo "<tr><td>";
+  echo "<font color=\"#$col_label\">".$l_occupied_day." ?</font>";
+  echo "</td><td colspan=3>";
+  echo "<input type=checkbox name=\"cb_occupied_day\" value=1";
   if ($occupied_day==1) {  
     echo " checked";
   } 
-  echo "></TD></TR>
-         </TABLE>";
+  echo "></td></tr>
+         </table>";
 
-  echo "</TD></TR>
-        </TABLE>";
+  echo "</td></tr>
+        </table>";
 
 
-  echo "</TD><TD align=right valign=center>";
+  echo "</td><td align=right valign=center>";
 
   //---------------
-  // Repetiton Rules 
-  echo "<TABLE border=1 bgcolor=\"#$col_table\">
-        <TR><TD align=center>";
+  // repetiton rules 
+  echo "<table border=1 bgcolor=\"#$col_table\">
+        <tr><td align=center>";
 
-  echo "<B><FONT color=\"#$col_textem\">" . $l_repeat .
-        "</FONT></B>";
+  echo "<b><font color=\"#$col_textem\">" . $l_repeat .
+        "</font></b>";
 
-  echo "</TD></TR><TR><TD>";
-  // Repeat kind  
-  echo "<FONT COLOR=\"#$col_label\"> ".$l_repeatkind." : </FONT>";
+  echo "</td></tr><tr><td>";
+  // repeat kind  
+  echo "<font color=\"#$col_label\"> ".$l_repeatkind." : </font>";
   if ($action == "new") {
     $tag_daily="";
     $tag_weekly="";
@@ -394,14 +387,14 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
       default : 
         $tag_daily="";$tag_weekly="";$tag_monthlybyday="";$tag_monthlybydate="";$tag_yearly=""; break;
     } 
-    echo "<SELECT name=\"sel_repeat_kind\">
-        \n<OPTION value=\"0\">aucune</OPTION>
-        \n<OPTION value=\"daily\"".$tag_daily.">".$l_daily."</OPTION>
-        \n<OPTION value=\"weekly\"".$tag_weekly.">".$l_weekly."</OPTION>
-        \n<OPTION value=\"monthlybydate\"".$tag_monthlybydate.">".$l_monthlybydate."</OPTION> 
-        \n<OPTION value=\"monthlybyday\"".$tag_monthlybyday.">".$l_monthlybyday."</OPTION> 
-        \n<OPTION value=\"yearly\"".$tag_yearly.">".$l_yearly."</OPTION> 
-        \n</SELECT>";
+    echo "<select name=\"sel_repeat_kind\">
+        \n<option value=\"0\">aucune</option>
+        \n<option value=\"daily\"".$tag_daily.">".$l_daily."</option>
+        \n<option value=\"weekly\"".$tag_weekly.">".$l_weekly."</option>
+        \n<option value=\"monthlybydate\"".$tag_monthlybydate.">".$l_monthlybydate."</option> 
+        \n<option value=\"monthlybyday\"".$tag_monthlybyday.">".$l_monthlybyday."</option> 
+        \n<option value=\"yearly\"".$tag_yearly.">".$l_yearly."</option> 
+        \n</select>";
   } else {
     switch ($repeat_kind) {
       case "0" : $label=$l_none; break;
@@ -414,37 +407,37 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     echo $label;
   }
   
-  echo "</TD></TR>
-        <TR><TD>";
-  // Repeat Interval 
-  echo  "<FONT COLOR=\"#$col_label\"> ".$l_interval." </FONT>";
+  echo "</td></tr>
+        <tr><td>";
+  // repeat interval 
+  echo  "<font color=\"#$col_label\"> ".$l_interval." </font>";
   if ($action=="new") {
     // when create
-    echo "<INPUT type=text name=\"tf_repeat_interval\" size=3 maxlength=2 value=\"".$repeat_interval."\">";
+    echo "<input type=text name=\"tf_repeat_interval\" size=3 maxlength=2 value=\"".$repeat_interval."\">";
   } else {
     // when update
     echo " : ".$repeat_interval;
   }
-  echo "</TD></TR>
-        <TR><TD>";
+  echo "</td></tr>
+        <tr><td>";
 
-  echo "<TABLE border=0>
-        <TR><TD>";
-  // Repeat days (for a weekly repetition)
-  echo "<FONT COLOR=\"#$col_label\"> ".$l_repeatdays.": </FONT>";
-  echo "</TD></TR>
-        <TR><TD>";
+  echo "<table border=0>
+        <tr><td>";
+  // repeat days (for a weekly repetition)
+  echo "<font color=\"#$col_label\"> ".$l_repeatdays.": </font>";
+  echo "</td></tr>
+        <tr><td>";
   if ($action=="new") {
     // when create
     for ($i=0;$i<5;$i++) {
-      echo weekday_short_name($i)." \n<INPUT type=checkbox name=\"cb_repeatday_".$i."\" value=1";
+      echo weekday_short_name($i)." \n<input type=checkbox name=\"cb_repeatday_".$i."\" value=1";
       if (strcmp(substr($repeat_days,$i,1),"1")==0) {
 	echo " checked";
       }
       echo ">";
     }
     for ($i;$i<7;$i++) {
-      echo weekday_short_name($i)." \n<INPUT type=checkbox name=\"cb_repeatday_".$i."\" value=1";
+      echo weekday_short_name($i)." \n<input type=checkbox name=\"cb_repeatday_".$i."\" value=1";
       if (strcmp(substr($repeat_days,$i,1),"1")==0) {
 	echo " checked";
       }
@@ -457,22 +450,22 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     }
   }
     
-  echo "</TD></TR></TABLE>";
+  echo "</td></tr></table>";
 
-  echo "</TD></TR>
-       <TR><TD>";
-  // End repeat Date
-  echo "<TABLE border=0>";
-  echo "<TR><TD colspan=3>";
-  echo "<FONT COLOR=\"#$col_label\">".$l_use_endrepeat."</FONT>"; 
-  echo "</TD></TR>";    
+  echo "</td></tr>
+       <tr><td>";
+  // end repeat date
+  echo "<table border=0>";
+  echo "<tr><td colspan=3>";
+  echo "<font color=\"#$col_label\">".$l_use_endrepeat."</font>"; 
+  echo "</td></tr>";    
   if ($action=="new") {
     // when create ...
-    echo "<TR><TD>";
-    echo "<SELECT name=\"sel_day_repeatend\">";
-    echo "\n<OPTION value=\"0\">--</OPTION>";
+    echo "<tr><td>";
+    echo "<select name=\"sel_day_repeatend\">";
+    echo "\n<option value=\"0\">--</option>";
     for ($num_day=1 ; $num_day<32 ; $num_day++) {
-      echo "\n<OPTION value=";
+      echo "\n<option value=";
       if ($num_day<10) {
 	$num_day_value="0".$num_day;
       } else {
@@ -482,14 +475,14 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
       if ($day_repeatend==$num_day_value) {
 	echo " selected";
       }
-      echo ">".$num_day."</OPTION>";
+      echo ">".$num_day."</option>";
     }
-    echo "</SELECT>";
-    echo "</TD><TD>";
-    echo "<SELECT name=\"sel_month_repeatend\">";
-    echo "\n<OPTION value=\"0\">--</OPTION>";
+    echo "</select>";
+    echo "</td><td>";
+    echo "<select name=\"sel_month_repeatend\">";
+    echo "\n<option value=\"0\">--</option>";
     for ($num_month=1 ; $num_month<13 ; $num_month++) {
-      echo "\n<OPTION value=";
+      echo "\n<option value=";
       if ($num_month<10) {
 	$num_month_value="0".$num_month;
       } else {
@@ -499,10 +492,10 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
       if ($month_repeatend==$num_month_value) {
 	echo " selected";
       }
-      echo ">".month_short_name($num_month)."</OPTION>";
+      echo ">".month_short_name($num_month)."</option>";
     }
-    echo "</SELECT>";
-    echo "</TD><TD>";
+    echo "</select>";
+    echo "</td><td>";
     $tag_last="";
     $tag_next="";
     $tag_current="";
@@ -511,15 +504,15 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
     case $current_year : $tag_current = "selected"; break;
     case $next_year : $tag_next = "selected"; break;
     }
-    echo "<SELECT name=\"sel_year_repeatend\">
-         <OPTION value=\"0\">----</OPTION>
-         <OPTION value=\"$current_year $tag_current\">$current_year</OPTION>
-         <OPTION value=\"$last_year $tag_last\">$last_year</OPTION>
-         <OPTION value=\"$next_year $tag_next\">$next_year</OPTION>
-         </SELECT>"; 
+    echo "<select name=\"sel_year_repeatend\">
+         <option value=\"0\">----</option>
+         <option value=\"$current_year $tag_current\">$current_year</option>
+         <option value=\"$last_year $tag_last\">$last_year</option>
+         <option value=\"$next_year $tag_next\">$next_year</option>
+         </select>"; 
   } else {
     // when update ...
-    echo "<TR><TD colspan=3>";
+    echo "<tr><td colspan=3>";
     echo $year_repeatend."-".$month_repeatend."-".$day_repeatend." &nbsp;";
   }
   
@@ -535,47 +528,47 @@ function dis_event_form($action, $obm_q_event, $obm_q_affected_contacts, $obm_q_
       </table>
       <br>
 
-<!--  Event Description -->
+<!--  event description -->
 
       <table border=0>
       <tr>
         <td>
-          <font COLOR=\"#$col_label\">$l_description</font>
+          <font color=\"#$col_label\">$l_description</font>
           <br>
-          <textarea NAME=\"ta_event_description\" rows=6 cols=72>$description</textarea>
+          <textarea name=\"ta_event_description\" rows=6 cols=72>$description</textarea>
         </td>
         <td>&nbsp;</td>
         <td valign=center align=right>";
   
-  // Actions : 
+  // actions : 
   if ($action == "detailupdate") { 
-    echo "<table border=0><TR><TD align=center>
-	  <INPUT type=submit name=\"sub_update_event\" value=\"$l_update\">
-	  <INPUT type=hidden name=\"action\" value=\"update\">
-	  <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
-          </FORM>
-        </td>
-      </tr><tr>
-        <td align=center>
-          <form name=\"form_delete_event\" onSubmit=\"if (deletion_valid()) return true; else return false;\" method=POST action=\"".$sess->url("agenda_index.php")."\">
-          <INPUT type=submit name=\"sub_delete_event\" value=\"$l_delete\">
-          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
-          <INPUT type=hidden name=\"action\" value=\"delete\">
+    echo "<table border=0><tr><td align=center>
+	  <input type=submit name=\"sub_update_event\" value=\"$l_update\">
+	  <input type=hidden name=\"action\" value=\"update\">
+	  <input type=hidden name=\"param_event\" value=\"$param_event\">
           </form>
         </td>
       </tr><tr>
         <td align=center>
-          <FORM name=\"form_delete_event_all\"onSubmit=\"if (deletion_all_valid()) return true; else return false;\" method=POST action=\"".$sess->url("agenda_index.php")."\">
-          <INPUT type=submit name=\"sub_delete_event_all\" value=\"".$l_delete_all."\">
-          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
-          <INPUT type=hidden name=\"action\" value=\"delete_all\">
+          <form name=\"form_delete_event\" onsubmit=\"if (deletion_valid()) return true; else return false;\" method=post action=\"".$sess->url("agenda_index.php")."\">
+          <input type=submit name=\"sub_delete_event\" value=\"$l_delete\">
+          <input type=hidden name=\"param_event\" value=\"$param_event\">
+          <input type=hidden name=\"action\" value=\"delete\">
+          </form>
+        </td>
+      </tr><tr>
+        <td align=center>
+          <form name=\"form_delete_event_all\"onsubmit=\"if (deletion_all_valid()) return true; else return false;\" method=post action=\"".$sess->url("agenda_index.php")."\">
+          <input type=submit name=\"sub_delete_event_all\" value=\"".$l_delete_all."\">
+          <input type=hidden name=\"param_event\" value=\"$param_event\">
+          <input type=hidden name=\"action\" value=\"delete_all\">
         </td>
       </tr>
       </table>";
   } else { 
-    echo "<INPUT type=submit name=\"sub_new_event\" value=\"$l_insert\">
-          <INPUT type=hidden name=\"param_event\" value=\"$param_event\">
-          <INPUT type=hidden name=\"action\" value=\"insert\">";
+    echo "<input type=submit name=\"sub_new_event\" value=\"$l_insert\">
+          <input type=hidden name=\"param_event\" value=\"$param_event\">
+          <input type=hidden name=\"action\" value=\"insert\">";
   }
    
   echo "</td>
@@ -884,42 +877,39 @@ function dis_event_consult($obm_q_event,$obm_q_eventcategories,$obm_q_eventconta
 ///////////////////////////////////////////////////////////////////////////////
 function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,$groups_array,$color_attend,$color_not_attend) {
   
-  // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$col_a_table;
-  // - Labels 
   global $l_private;
-  // - Session variables
   global $sess,$auth;
   
-  $year=substr($p_start_date,0,4);
-  $month=substr($p_start_date,4,2);
-  $day=substr($p_start_date,6,2);
+  $year	= substr($p_start_date,0,4);
+  $month= substr($p_start_date,4,2);
+  $day 	= substr($p_start_date,6,2);
   
-  $p_start_time=mktime(0,0,0,$month,$day,$year);
-  $p_end_time=mktime(0,0,0,$month,$day+6,$year);
+  $p_start_time	 = mktime(0,0,0,$month,$day,$year);
+  $p_end_time	 = mktime(0,0,0,$month,$day+6,$year);
   
-  // Sunday=0 but we begin with Monday=1 
   for ($i=0;$i<7;$i++) {
-    $days[]=$p_start_time + 24 * 3600 * $i;
+    $days[] = $p_start_time + 24 * 3600 * $i;
   }
 
   $num_rows = $obm_q_events->nf();
   $cpt_rows = 0;
   $obm_q_events->next_record();
- 
-  $end_occupied_time=0;          // time used to know when the colored cells end  
-  $end_occupied_attend=0;        // flag used to know if the current user attend to the event which is the last to finish
 
-  $datebegin = $obm_q_events->f("calendarevent_datebegin");
-  $dateend = $obm_q_events->f("calendarevent_dateend");
-  $eu_user_id = $obm_q_events->f("eventuser_user_id");
+// time used to know when the colored cells end 
+  $end_occupied_time 	= 0;
+  $end_occupied_attend	= 0;
 
-  // some event could have begun the day before and not be finished 
-  while ( ($cpt_rows < $num_rows)
-          && ($datebegin < date("YmdHis",$p_start_time))
-          && ($dateend > $p_start_time) ) {
+  $datebegin	 = $obm_q_events->f("calendarevent_datebegin");
+  $dateend	 = $obm_q_events->f("calendarevent_dateend");
+  $eu_user_id	 = $obm_q_events->f("eventuser_user_id");
 
-    $current_end_time = mktime(substr($dateend,8,2), substr($dateend,10,2), 0, substr($dateend,4,2), substr($dateend,6,2), substr($dateend,0,4));
+// some event could have begun the day before and not be finished 
+  while ( ($cpt_rows < $num_rows)&& 
+          ($datebegin < date("YmdHis",$p_start_time))&& 
+          ($dateend > $p_start_time) ) {
+    $current_end_time = mktime(substr($dateend,8,2), substr($dateend,10,2), 0, substr($dateend,4,2),
+                               substr($dateend,6,2), substr($dateend,0,4));
     if ($current_end_time > $end_occupied_time) {
       $end_occupied_time = $current_end_time;
       if ($user_id == $eu_user_id) {
@@ -929,32 +919,32 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,
       }
     }
     $obm_q_events->next_record();
-    $datebegin = $obm_q_events->f("calendarevent_datebegin");
-    $dateend = $obm_q_events->f("calendarevent_dateend");
+    $datebegin	= $obm_q_events->f("calendarevent_datebegin");
+    $dateend 	= $obm_q_events->f("calendarevent_dateend");
     $eu_user_id = $obm_q_events->f("eventuser_user_id");
     $cpt_rows++;
   } 
 
-  // events are sorted by day and by hours 
+// events are sorted by day and by hours 
   if ($num_rows > 0) {
     for ($d=0; $d<7; $d++) {
       for ($h=8 ; $h<20 ; $h++) { 
-	$attend=0;
-	$current_time = $p_start_time + $d * 86400 + $h * 3600; 
+	$attend		   =0;
+	$current_time	   = $p_start_time + $d * 86400 + $h * 3600; 
 	$current_time_next = $p_start_time + $d * 86400 + $h * 3600 + 3600; 
-	$flag_event = 0;
-	while ( ($cpt_rows < $num_rows)
-                && ($datebegin >= date("YmdHis",$current_time))
-                && ($datebegin < date("YmdHis",$current_time_next)) ) {
+	$flag_event 	   = 0;
+	while ( ($cpt_rows < $num_rows )&&
+		($datebegin >= date("YmdHis",$current_time))&&
+                ($datebegin < date("YmdHis",$current_time_next)) ) {
 	  $flag_event = 1;
 	  if ($user_id == $eu_user_id) {
 	      $attend = 1;
 	  }
-	  $events_array[$d][]=$cpt_rows; // number of the record 
-	  $current_end_time = mktime(substr($dateend,8,2), substr($dateend,10,2), 0, substr($dateend,4,2), substr($dateend,6,2), substr($dateend,0,4));
+	  $events_array[$d][]=$cpt_rows;  
+	  $current_end_time = mktime(substr($dateend,8,2), substr($dateend,10,2), 0, substr($dateend,4,2),
+                                     substr($dateend,6,2), substr($dateend,0,4));
 	  if ($current_end_time > $end_occupied_time) {
-	    $end_occupied_time=$current_end_time;
-	    // is the user attend to the event ? 
+	    $end_occupied_time=$current_end_time; 
 	    if ($user_id == $eu_user_id) {
 	      $end_occupied_attend = 1;
 	    } else {
@@ -967,19 +957,14 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,
 	  $eu_user_id = $obm_q_events->f("eventuser_user_id");
 	  $cpt_rows++;      
 	}
-	// cell color : 
 	if ($attend==1) {
-	  // the current user attend to the event 
 	  $color_array[$d][$h]=$color_attend;
 	} elseif ($flag_event==1) {
 	  $color_array[$d][$h]=$color_not_attend;
 	} else {
-	  // is there at least an event for this hour ?
 	  if (!$flag_event) { 
 	    if ($current_time < $end_occupied_time) {
-	      // a previous event continue in this time zone
 	      if ($end_occupied_attend == 1) {
-		// the user attend to this event 
 		$color_array[$d][$h] = $color_attend; 
 	      } else {
 		$color_array[$d][$h] = $color_not_attend; 
@@ -1000,6 +985,7 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,
       $param_contacts.="&amp;contact_$i=".$contacts_array[$i];
     }
   }
+
   // groups id used as GET vars
   $param_groups="";
   if ($groups_array) {
@@ -1009,56 +995,45 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,
   }
 
   // links to the previous and weeks 
-  echo "<CENTER><TABLE border=0><TR><TD align=left>";
   //previous week
-  $url="agenda_index.php?action=view_week&amp;param_begin_date=".date("YmdHis",$p_start_time-7*86400);
-  if ($param_contacts!="") $url.=$param_contacts;
-  if ($param_groups!="") $url.=$param_groups;
-  echo "\n<A href=\"".$sess->url($url)."\"> << </A>&nbsp;&nbsp;&nbsp;&nbsp;";
-
-  echo "\n</TD><TD align=center><FONT size=+1 color=\"#$col_ok\"><B>".date("d",$p_start_time)." ".month_name(date("m",$p_start_time))." ".date("Y",$p_start_time)." - ".date("d",$p_end_time)." ".month_name(date("m",$p_end_time))." ".date("Y",$p_end_time)."</B></FONT></TD><TD align=right>";
+  $url_p="agenda_index.php?action=view_week&amp;param_begin_date=".date("YmdHis",$p_start_time-7*86400);
+  if ($param_contacts!="") $url_p.=$param_contacts;
+  if ($param_groups!="") $url_p.=$param_groups;
   // next week 
-  $url="agenda_index.php?action=view_week&amp;param_begin_date=".date("YmdHis",$p_start_time+7*86400);
-  if ($param_contacts!="") $url.=$param_contacts;
-  if ($param_groups!="") $url.=$param_groups;
-  echo "\n<A href=\"".$sess->url($url)."\"> >> </A>";  
-
-  echo "</TD></TR></TABLE></CENTER>";
-  
-  echo "<BR>";
-  echo "<TABLE border=1 width=100% bgcolor=\"#$col_table\">
-        \n<TR>
-        <TD width=9%>&nbsp;</TD>";
-
-
+  $url_n="agenda_index.php?action=view_week&amp;param_begin_date=".date("YmdHis",$p_start_time+7*86400);
+  if ($param_contacts!="") $url_n.=$param_contacts;
+  if ($param_groups!="") $url_n.=$param_groups;
+ 
   // days 
   for ($d=0;$d<7;$d++) {
     $current_month=date("m",$days[$d]);
     $current_day=date("d",$days[$d]);
     $current_year=date("Y",$days[$d]);
     $current_weekday=date("w",$days[$d]);
-    echo "<TD width=13% align=center>".weekday_name($current_weekday)."<br>";
-    echo "<A href=\"".$sess->url("agenda_index.php?action=view_month&amp;param_begin_date=".date("YmdHis",mktime(0,0,0,$current_month,1,$current_year)))."\">".month_short_name($current_month)."</A>&nbsp;";
-    echo "<A href=\"".$sess->url("agenda_index.php?action=view_day&amp;param_begin_date=".date("YmdHis",mktime(0,0,0,$current_month,$current_day,$current_year)))."\">".$current_day."</A></TD>";
+    $day_disp .= "<td width=13% align=center>".weekday_name($current_weekday)."<br>
+                  <a href=\"".$sess->url("agenda_index.php?action=view_month&amp;param_begin_date=
+                                         ".date("ymdhis",mktime(0,0,0,$current_month,1,$current_year)))."\">
+                  ".month_short_name($current_month)."</a>&nbsp;
+                  <a href=\"".$sess->url("agenda_index.php?action=view_day&amp;param_begin_date=
+                                         ".date("ymdhis",mktime(0,0,0,$current_month,$current_day,$current_year)))."\">
+                  $current_day</a></td>";
   }  
-
-  echo "</TR>";
   $last_event_id=0;
 
   // hours 
   for ($h=8 ; $h<20 ; $h++) {
     $current_time = $p_start_time + 3600 * $h;
     $current_time_next = $current_time + 3600;
-    echo "\n<TR><TD width=9% align=center>".date("H:i",$current_time)."</TD>";
+    $hour_disp .= "\n<tr><td width=9% align=center>".date("h:i",$current_time)."</td>";
     for ($d=0;$d<7;$d++) {
       $current_time = $p_start_time + 86400 * $d + 3600 * $h;
       $current_time_next = $current_time + 3599;
-      echo "<TD width=13%";
+      $hour_disp .= "<td class=\"agendaText\" width=13%";
       // occupied time is colored 
       if ($color_array[$d][$h]!="") {
-	echo " bgcolor=\"#".$color_array[$d][$h]."\""; 
+	$hour_disp .=  " bgcolor=\"#".$color_array[$d][$h]."\""; 
       }
-      echo ">";
+      $hour_disp .= ">";
       if ($events_array) {
       // event(s) assigned to the current time 
       for ($i=0 ; $i< count($events_array[$d]) ; $i++) {
@@ -1077,32 +1052,52 @@ function dis_week_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,
 	  // the begin date match the current time 
 	  if ($e_id != $last_event_id) {
 	    // we don't want the same event twice for two different contacts
-	    echo substr($datebegin,8,2).":".substr($datebegin,10,2)."-".substr($dateend,8,2).":".substr($dateend,10,2)."- ";
-	    echo "<a href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=$e_id")."\">";
+	    $hour_disp .=  substr($datebegin,8,2).":".substr($datebegin,10,2)."-".substr($dateend,8,2).":".substr($dateend,10,2)."- ";
+	    $hour_disp .=  "<a href=\"".$sess->url("agenda_index.php?action=detailconsult&amp;param_event=$e_id")."\">";
 	    // private event's title doesn't appear
 	    if ($privacy == 1) {
 	      if ( ($user_id == $eu_user_id)
                    || ($auth->auth["uid"] == $usercreate) ) {
-		echo "$title</a><br>";
+		$hour_disp .=  "$title</a><br>";
 	      } else {
-		echo "$l_private</a><br>";
+		$hour_disp .=  "$l_private</a><br>";
 	      }
 	    } else {
-	      echo "$title</a><br>";
+	      $hour_disp .=  "$title</a><br>";
 	    }
 	    $last_event_id = $e_id;
 	  }
 	}
       }
       }
-      echo "&nbsp;</TD>";
+     $hour_disp .=  "&nbsp;</td>";
     }
-    echo "</TR>";
+    $hour_disp .=  "</tr>";
   }
   
-  echo "</table>
-    <br><br>";
 
+  echo "
+   <center><table border=0><tr><td align=left>  
+   <a href=\"".$sess->url($url_p)."\"> << </a>&nbsp;&nbsp;&nbsp;&nbsp;  
+   </td><td align=center>
+   <font size=+1 color=\"#$col_ok\"><b>
+    ".date("d",$p_start_time)." 
+    ".month_name(date("m",$p_start_time))." 
+    ".date("y",$p_start_time)." - ".date("d",$p_end_time)." 
+    ".month_name(date("m",$p_end_time))." 
+    ".date("y",$p_end_time)."
+   </b></font></td><td align=right>
+   <a href=\"".$sess->url($url_n)."\"> >> </a> 
+   </td></tr></table></center>
+   <br>
+   <table class=\"agenda\" width=100%>
+   <tr>
+   <td class=\"agendaHead\">&nbsp;</td>
+   $day_disp
+   </tr>
+   $hour_disp
+    </table>
+    <br><br>";
 }
 
 
@@ -1256,14 +1251,14 @@ function dis_day_planning($p_start_date,$obm_q_events,$user_id,$contacts_array,$
   }
   
 
-  echo "<TABLE border=1 width=80% bgcolor=\"#$col_table\">";
+  echo "<TABLE class=\"agenda\" border=1 width=80% bgcolor=\"#$col_table\">";
   // Planning of the day from 8:00 to 20:00
 
    for ($h=8 ; $h<20 ; $h++) {
     $current_time = $p_start_time + 3600 * $h;
     $current_time_next = $current_time + 3600;
-    echo "\n<TR><TD width=20% align=center>".date("H:i",$current_time)."</TD>";
-    echo "<TD width=80% valign=top";
+    echo "\n<TR><TD class=\"agendaHead\" width=20% align=center>".date("H:i",$current_time)."</TD>";
+    echo "<TD class=\"agendaText\" width=80% valign=top";
     // occupied time is colored 
     if ($color_array[$h]!="") {
       echo " bgcolor=\"#".$color_array[$h]."\""; 
@@ -1482,12 +1477,12 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_id,$contacts_arra
 
  
 
-  echo "<TABLE border=1 width=100% bgcolor=\"#$col_table\">
+  echo "<TABLE border=1 width=100% class=\"agenda\">
         \n<TR>";
 
   // week days 
   for ($d=0;$d<7;$d++) {
-    echo "\n<TD width=13% align=center>".weekday_name($days[$d])."</TD>";
+    echo "\n<TD width=13% class=\"agendaHead\" align=center>".weekday_name($days[$d])."</TD>";
   }  
   echo "</TR>";
 
@@ -1500,7 +1495,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_id,$contacts_arra
   // Other days of the week which are not belonging to the month
   // Cells will remain blank
   while ($start_week_time < $p_start_time) {
-    echo "<TD>&nbsp;</TD>";
+    echo "<TD class=\"agendaVide\">&nbsp;</TD>";
     $start_week_time += 86400;
   } 
   
@@ -1513,7 +1508,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_id,$contacts_arra
       echo "<TR>";
     }  
     // number of the day 
-    echo "\n<TD width=9% valign=top"; 
+    echo "\n<TD width=9% valign=top  class=\"agendaText\""; 
     // occupied time is colored 
     if ($color_array[$d]!="") {
       echo " bgcolor=\"#".$color_array[$d]."\""; 
@@ -1521,8 +1516,8 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_id,$contacts_arra
     echo ">";
     
     echo "<TABLE border=0>
-         <TR><TD align=left>";
-    echo "<FONT size=-1><A href=\"".$sess->url("agenda_index.php?action=view_day&amp;param_begin_date=".date("YmdHis",$current_time))."\">".date("d",$current_time)."</A></FONT>";
+         <TR><TD align=left class=\"agendaHead\">";
+    echo "<FONT size=-1><A class=\"agendaHead\" href=\"".$sess->url("agenda_index.php?action=view_day&amp;param_begin_date=".date("YmdHis",$current_time))."\">".date("d",$current_time)."</A></FONT>";
     echo "</TD></TR><TR><TD>";
    
 
@@ -1561,7 +1556,7 @@ function dis_month_planning ($p_start_date,$obm_q_events,$user_id,$contacts_arra
 
    // Other days of the week which are not belonging to the month
   while ($current_time < $end_week_time) {
-    echo "<TD>&nbsp;</TD>";
+    echo "<TD class=\"agendaVide\">&nbsp;</TD>";
     $current_time += 86400;
   } 
   echo "</TR>";

@@ -361,7 +361,7 @@ function debug_level_isset($debug) {
 // Display an error message
 /////////////////////////////////////////////////////////////////////////////
 function display_err_msg($msg) {
-  echo "<p class=\"messageError\">".htmlspecialchars($msg)."</p>";
+  echo "<p class=\"messageError\">$msg</p>";
 }
 
 
@@ -369,7 +369,7 @@ function display_err_msg($msg) {
 // Display a warnig message
 /////////////////////////////////////////////////////////////////////////////
 function display_warn_msg($msg) {
-  echo "<p class=\"messageWarning\">".htmlspecialchars($msg)."</p>";
+  echo "<p class=\"messageWarning\">$msg</p>";
 }
 
 
@@ -377,14 +377,14 @@ function display_warn_msg($msg) {
 // Display an OK message
 ////////////////////////////////////////////////////////////////////////////
 function display_ok_msg($msg) {
-  echo "<p class=\"messageOk\">".htmlspecialchars($msg)."</p>";
+  echo "<p class=\"messageOk\">$msg</p>";
 }
 
 ////////////////////////////////////////////////////////////////////////////
 // Display an Info message
 ////////////////////////////////////////////////////////////////////////////
 function display_info_msg($msg) {
-  echo "<p class=\"messageInfo\">".htmlspecialchars($msg)."</p>";
+  echo "<p class=\"messageInfo\">$msg</p>";
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -519,3 +519,45 @@ td.adminLabel		{
 	background-color:	transparent;
 }
 
+/* //////////////////AGENDA////////////////// */
+/* ////// Agenda table style definition ///// */
+/* ////////////////////////////////////////// */
+
+table.agenda		{
+        margin-left:		auto;
+	margin-right:		auto;
+	border:			3px outset blue;
+	background-color:	#93919c;
+	color:			#ffff00;
+}
+
+
+td.agendaHead		{
+	font-family:		sans-serif;
+	color:			#ffff00;
+	background-color:	#93919c;
+}
+
+td.agendaText	{
+	font-family:		sans-serif;
+	font-size:		14px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+	background-color:	#ffffff;
+}
+
+td.agendaVide	{
+	font-family:		sans-serif;
+	font-size:		14px;
+	font-weight:		bold;
+	color:			#000000;
+	text-align:		center;
+	background-color:	#bbbbbb;
+}
+
+a.agendaHead:link { color: #ffff00; background-color: transparent;}
+a.agendaHead:active { color: #ffff00; background-color: transparent;}
+a.agendaHead:visited { color: #ffff00; background-color: transparent;}
+
+

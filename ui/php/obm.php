@@ -46,16 +46,16 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-echo "<html>
-<head>
-<title>$l_title - O.B.M.</title>
-</head>";
+echo "   <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
+    \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
+   <html xmlns=\"http://www.w3.org/1999/xhtml\"> 
+    <head>
+     <meta http-equiv=\"Content-Type\" content=\"text/html; charset=iso-8859-1\"/>
+     <title>$l_title - OBM Version 0.6.pre</title>
+     <link rel=\"stylesheet\" type=\"text/css\" href=\"/images/$set_theme/style.css\" />
+    </head>
+    <body >";
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Main Program                                                              //
-///////////////////////////////////////////////////////////////////////////////
-echo "<BODY TEXT=\"#$col_text\" BACKGROUND=\"/images/$set_theme/$img_bg\" BGCOLOR=\"#$col_bg\" LINK=\"#$col_link\" VLINK=\"#$col_link\" marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
 
 generate_menu("","");
 display_bookmarks(".");
