@@ -142,6 +142,7 @@ function dis_time_links (&$time, $type="all") {
   $d_end_prev = date("Ymd", mktime(0,0,0,$month,0,$year));
   $d_start_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
   $d_end_next = date("Ymd", mktime(0,0,0,$month+2,0,$year));
+  $this_month_sec = mktime(0,0,0,$month,1,$year);
 
   if (debug_level_isset($cdg_param)) {
     echo "previous $d_start_prev, $d_end_prev next 
@@ -150,10 +151,12 @@ function dis_time_links (&$time, $type="all") {
 
   //Daylight Savings Time
   // nothing to do for this
-
    echo "
       <CENTER> <FONT SIZE=-2>
          <TABLE BORDER=1>
+            <TR>
+              <TD colspan=2 align=center><font size=+1> Mois de ". month_name($month) ." </TD>
+            </TR>
             <TR><TD>
                <A HREF=\"" .
                url_prepare("time_index.php?action=".$time["action"].
@@ -161,9 +164,9 @@ function dis_time_links (&$time, $type="all") {
 						  //		   "&amp;user_id=".$time["user_id"].
            "&amp;st_detail=".$time["show_task_detail"])."\">
                ".$l_month_prev."
-               </A>
+               </A>&nbsp;
             </TD>  
-            <TD>
+            <TD>&nbsp;
                <A HREF=\"" .
             url_prepare("time_index.php?action=".$time["action"].
                 "&amp;param_begin=".
@@ -520,20 +523,24 @@ function dis_time_index($time) {
   // Display the total by day for a month
   //echo "IN dis_time_list <br>";
   // obm_q contains the time events for a user and an interval
-  $obm_q = run_query_search($time, $new_order, $order_dir);
-  $nb_task = $obm_q->num_rows();
+  // $obm_q = run_query_search($time, $new_order, $order_dir);
+  // $nb_task = $obm_q->num_rows();
 
-  $pref_day_q = run_query_display_pref($auth->auth["uid"], "time_day");
-  $obm_day_q = run_query_by_day($time, $new_order, $order_dir);
+  //  $pref_day_q = run_query_display_pref($auth->auth["uid"], "time_day");
+  //  $obm_day_q = run_query_by_day($time, $new_order, $order_dir);
 
   $pref_month_task_q = run_query_display_pref($auth->auth["uid"], "time_task_month");
-  $obm_month_task_q = run_query_task_one_month($time, $new_order, $order_dir);
 
+  // If $action=globalview, show all users
+  if ($time['action'] == "globalview")
+     $obm_month_task_q = run_query_task_one_month($time, 'all');
+  else
+     $obm_month_task_q = run_query_task_one_month($time, '');
   // Get elements for insertion of new task
   // TaskType
-  $obm_tasktype_q = run_query_tasktype();
+  //  $obm_tasktype_q = run_query_tasktype();
   // Project
-  $obm_project_q = run_query_project();
+  //  $obm_project_q = run_query_project();
 
   //get the current start and end of week
   $d_start_week = first_day_week($time);   
@@ -545,8 +552,10 @@ function dis_time_index($time) {
   $hum_date_end = dis_human_date($date_end);
 
   // Task for the month
-  dis_time_one_month($obm_month_task_q, $pref_month_task_q, $time);
-
+  if ($time['action'] == "globalview")
+    dis_time_one_month($obm_month_task_q, $pref_month_task_q, $time, true);
+  else
+    dis_time_one_month($obm_month_task_q, $pref_month_task_q, $time);
 
 }
 
@@ -1000,64 +1009,6 @@ function dis_form_adminvalid_day($obm_dq,$pref_dq,$nb_task,$time, $validate_days
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Time Deal  result                                        //
-// Parameters : 
-//   - $obm_q    : tasks list to display 
-//   - $pref_q   : the fields which have to be displayed
-//   - $nb_task  : nb tasks returned by the search query 
-//     keys used : week
-///////////////////////////////////////////////////////////////////////////////
-/* OLD
-function dis_time_deal_list($obm_dq,$pref_dq,$nb_task, $time) {
-  //-- Themes
-  global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
-  //-- Labels
-  global $l_found, $_task_del, $l_delete, $l_total_deal;
-
-
-  dis_table_title($l_total_deal);  
-
-  $url = url_prepare("time_index.php?action=search&amp;tf_week=".urlencode($week));
-
-  // Calculate the task length grand total 
-  echo "avant seek (1) <br>";
-  if ($obm_dq->nf()) {
-    while ($obm_dq->next_record()) {
-	  $res += $obm_dq->f("task_totallength");
-	}
-	// Rewind the table
-	$obm_dq->seek();
-  }
-
-  // Number of users we grand total
-  $nb_users = sizeof($time["user_id"]);
-
-  $dis_task_list = new OBM_DISPLAY("DATA",$pref_dq);
-  $dis_task_list->data_set = $obm_dq;
-  $dis_task_list->data_order = false;
-  $dis_task_list->data_page = false;
-  $dis_task_list->data_header = "top";
-  $dis_task_list->data_url = $url;
-  
-// display in another table to limit size
-  echo "<table border=0 width=50%><tr><td>";
-  $dis_task_list->display();
-  echo "</td></tr>";
-
-  if ($time["interval"] == "month") {
-    echo "<tr><td>";
-	echo "Total jours pour $nb_users users : $res sur ".
-		get_nb_working_days($time["date"]) * $nb_users. " à remplir";
-	echo "</td></tr>";
-	echo "<tr><td>";
-	echo "jours ouvrés : ".get_nb_working_days($time["date"]);
-	echo "</td></tr>";
-  }
-  echo "       </table>";
-
-}
-*/
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display the Time Deal  result                                        //
@@ -1179,7 +1130,7 @@ function dis_time_deal_export($obm_dq,$pref_dq,$time) {
 //   - $nb_task  : nb tasks returned by the search query 
 //     keys used : week
 ///////////////////////////////////////////////////////////////////////////////
-function dis_time_one_month($obm_dq,$pref_dq,$time) {
+function dis_time_one_month($obm_dq,$pref_dq,$time, $shortview=false) {
   //-- Themes
   global $sess, $set_theme,$col_tableh,$col_textem,$col_table;
   //-- Labels
@@ -1188,6 +1139,15 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 
 
   dis_table_title($l_total_month);  
+
+  $obm_user_q = run_query_userobm();
+
+  while($obm_user_q->next_record()) {
+	$userid = $obm_user_q->f("userobm_id");
+	$f_name = $obm_user_q->f("userobm_firstname");
+	$l_name = $obm_user_q->f("userobm_lastname");
+    $array_users[$userid] = $f_name . " " . $l_name;
+  }
 
   $year=substr($time["date"],0,4);
   $month=substr($time["date"],4,2);
@@ -1208,50 +1168,106 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
   while ($obm_dq->next_record())  {
 	  //echo "day $day, weekday $wday, \$i $day_in_sec  " .
 	  //" day_in_month " . intval($obm_dq->f("day_in_month")) ."<br>";
+	$user_id = $obm_dq->f("userid");
+
+    if (isset($prev_id) && $user_id != $prev_id) {   
+	  // the user changed 1. finish previous array, 2.start new one
+      // we ends the array
+      while ($day_in_sec < $last_day_sec) {
+	    $array_res[$prev_id][$day]["length"] = 0;
+		$array_res[$prev_id][$day]["wday"] = $wday;
+		$day++;        
+		$day_in_sec = mktime(0,0,0,$month, $day, $year);
+		$wday =date("w", $day_in_sec);
+	  }
+      // we initialyse new one
+      $day_in_sec = $first_day_sec;
+	  $wday =date("w", $day_in_sec);
+      $day = 1;
+	  
+	}
+	
 	while (($day_in_sec < $last_day_sec) && 
 			 ($day <= intval($obm_dq->f("day_in_month")))) {
 		//      echo "day $day loop ". $obm_dq->f("day_in_month") . " length ". 
 		//		  $obm_dq->f("total_length") . "<br>";
       if (intval($obm_dq->f("day_in_month")) != $day)
-		$array_res[$day]["length"] = 0;
+		$array_res[$user_id][$day]["length"] = 0;
       else {
-		$array_res[$day]["length"] = $obm_dq->f("total_length");
-        $length_tot += $array_res[$day]["length"];
+		$array_res[$user_id][$day]["length"] = $obm_dq->f("total_length");
+        $length_tot[$user_id] += $array_res[$user_id][$day]["length"];
 	  }
-      $array_res[$day]["wday"] = $wday;
+      $array_res[$user_id][$day]["wday"] = $wday;
 	  $day++;        
 	  $day_in_sec = mktime(0,0,0,$month, $day, $year);
 	  $wday =date("w", $day_in_sec);
 	}
 
-  }
-  // we ends the array
-  while ($day_in_sec < $last_day_sec) {
-	$array_res[$day]["length"] = 0;
-	$array_res[$day]["wday"] = $wday;
-	$day++;        
-	$day_in_sec = mktime(0,0,0,$month, $day, $year);
-	$wday =date("w", $day_in_sec);
+  $prev_id=$user_id;
   }
 
-  /*
-  echo "<br> res ";
-  print_r($array_res);
-  */
+      // we ends the last array
+      while ($day_in_sec < $last_day_sec) {
+	    $array_res[$prev_id][$day]["length"] = 0;
+		$array_res[$prev_id][$day]["wday"] = $wday;
+		$day++;        
+		$day_in_sec = mktime(0,0,0,$month, $day, $year);
+		$wday =date("w", $day_in_sec);
+	  }
+ 
+
+	  // Loop among all users...
+  while (list($uid) = each($array_res)) {
+	if ($shortview) {
+      display_monthview($time, $array_res[$uid], $length_tot[$uid], $array_users[$uid], true);
+      echo "<br>\n";
+	}
+	else
+      display_monthview($time, $array_res[$uid], $length_tot[$uid], $array_users[$uid], false);
+  }
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+// HTML Display the Month View for one user :                               //
+//  | 01 | 02 | 03 | 04
+//    OK   OK        5/8
+// Parameters : 
+//   - $array_res : an associative array build by XXXXX 
+//      $array_res[$day_in_month][string]
+//     where
+//        $day_in_month : [1-31]
+//        string : length = total filled for this day [1-$c_day_fraction]
+//                 wday   = number of the day in the week
+//   - $total : the amount of task filled for the month
+//////////////////////////////////////////////////////////////////////////////
+
+function display_monthview($time, $array_res, $total, $title, $shortview=false) {
+  global $working_days;  // array of the days in a week where we are supposed to work
+  global $c_day_fraction, $c_days_in_a_week;
+  global $col_orange, $col_grey, $col_blue;
+  global $l_total;
+  
+  //  $col = "b2ebe8";
+  //  $col_red="a00000";
+  /*  echo "<br> res ";
+  print_r($array_res); */
+  $col_width=25;
 
   // Display the array
   while (list($key,$val) = each($array_res)) {
-	if ($val["wday"] == 0 ||$val["wday"] == 6) {
-      $line1 .= "<td bgcolor=\"#b2ebe8\">$key</td>";
-	  $line2 .= "<td bgcolor=\"#b2ebe8\">&nbsp;</td>";
-	  $line3 .= "<td bgcolor=\"#b2ebe8\">&nbsp;</td>";
+	if ($working_days[$val["wday"]] == 0) {
+      $line1 .= "<td width=15 bgcolor=\"#$col_grey\" align=center>$key</td>\n";
+	  $line2 .= "<td bgcolor=\"#$col_grey\">&nbsp;</td>\n";
+	  $line3 .= "<td bgcolor=\"#$col_grey\">&nbsp;</td>\n";
 	}
 	else {
-      $line1 .= "<td>$key</td>";
+      $cell_1 = "<td width=$col_width align=center>$key</td>";
+      $cell_1_short = $cell_1;
       if ($val["length"] == $c_day_fraction)
         $line2 .= "<td>OK</td>";
       else
-  	    $line2 .= "<td bgcolor=\"#a00000\">".$val["length"]."/$c_day_fraction</td>";
+  	    $line2 .= "<td bgcolor=\"#$col_orange\">".$val["length"]."/$c_day_fraction</td>";
 
       // first day of the week 
 	  if ($val["wday"] == 1) {
@@ -1264,6 +1280,7 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
 						  //        "&amp;user_id=".$time["user_id"].
 		   "&amp;st_detail=".$time["show_task_detail"]);
         $line3.="<td colspan=\"$c_days_in_a_week\"><a href=\"$url\">compléter</a></td>";
+        $cell_1_short="<td width=$col_width align=center><a href=\"$url\">$key</a></td>";
 	  }
 	  //or first day of the month
 	  else if ($key == 1) {
@@ -1277,33 +1294,57 @@ function dis_time_one_month($obm_dq,$pref_dq,$time) {
         // This week is not $c_days_in_a_week long
         $week_length = $c_days_in_a_week - $val["wday"] +1;
         $line3.="<td colspan=\"$week_length\"><a href=\"$url\">compléter</a></td>";
+        $cell_1_short="<td width=$col_width align=center><a href=\"$url\">$key</a></td>";
 	  }
+    if ($shortview)
+	  $line1.=$cell_1_short;
+    else
+	  $line1.=$cell_1;
 	}
   }
 
-  echo "<table border=1>
-           <tr>";
-  print $line1;
-  echo "</tr><tr>";
-  print $line2;
-  echo "</tr><tr>";
-  print $line3;
-  echo "  </tr>
-        </table>";
 
-
-// display in another table to limit size
-  echo "<table border=0 align=center width=80%><tr><td>";
-  echo "</td></tr>";
+  // we display a recap for this user
+  // shortview
 
   if ($time["interval"] == "month") {
-    echo "<tr><td>";
-	echo "Total jours pour cet utilisateur : ".$length_tot/$c_day_fraction." sur ".
-		get_nb_working_days($time["date"]). "(jours ouvrés) à remplir";
-	echo "</td></tr>";
-  }
-  echo "       </table>";
+	$fract = $total/$c_day_fraction;
+    $tot_workingdays = get_nb_working_days($time["date"]);
+    if($shortview) {
+	   $last_cell_1 = "<td>&nbsp;&nbsp;</td><td width=60 align=center>$l_total</td>";
+       $bg_color= $fract != $tot_workingdays ? "bgcolor=\"#$col_blue\"" : "";
+       $dis_tot= $fract != $tot_workingdays ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
+	   $last_cell_2 = "<td>&nbsp;&nbsp;</td><td $bg_color>$dis_tot</td>";
+	   $line1.=$last_cell_1;
+	   $line2.=$last_cell_2;
+    }
+	else {
+    $tab_total = "<table border=0 align=center width=80%><tr><td>\n";
+    $tab_total .= "</td></tr>\n";
 
+    $tab_total .= "<tr><td>\n";
+	$tab_total .= "Total jours pour cet utilisateur : $fract sur ".
+		"$tot_workingdays (jours ouvrés) à remplir";
+	$tab_total .= "</td></tr>\n";
+	$tab_total .= "</table>\n";
+  }
+
+  }
+
+  echo "<div align=left><table border=1>
+           <tr><td width=200 align=left rowspan=3>&nbsp;&nbsp;<b>&nbsp;$title</b></td>
+  $line1
+  </tr><tr>
+  $line2
+  </tr>";
+  if (! $shortview)
+    echo "<tr>
+  $line3
+    </tr>";
+
+  echo "       </table></div>";
+
+  echo "$tab_total";
 }
 
 
@@ -1524,5 +1565,40 @@ function dis_time_search($time) {
     html_contact_search_list($obm_q,$pref_q,$nb_contact,$contact);
   }
 }
+
+
+//////////////////////////////////////////////////////////////////////////
+// Show a date in human format
+//  params : $p_date : date in yyyymmdd format
+//////////////////////////////////////////////////////////////////////////
+function dis_human_date($p_date) {
+  global $cdg_sql;
+    
+    $p_year=substr($p_date,0,4);
+    $p_month=substr($p_date,4,2);
+    $p_day=substr($p_date,6,2);
+
+   
+    $mois = month_name($p_month);
+
+    return "$p_day $mois $p_year";
+
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Show a date in mysql format (for query)
+//  params : $p_date : date in yyyymmdd format
+//////////////////////////////////////////////////////////////////////////
+function dis_mysql_date($p_date) {
+  global $cdg_sql;
+    
+    $p_year=substr($p_date,0,4);
+    $p_month=substr($p_date,4,2);
+    $p_day=substr($p_date,6,2);
+
+    return "'$p_year-$mois-$p_day'";
+
+}
+
 
 </SCRIPT>

@@ -225,6 +225,19 @@ elseif ($action == "search") {
   
   dis_time_list($time);  // INDEX SEARCH
 } 
+if ($action == "globalview") {
+//////////////////////////////////////////////////////////////////////////////
+  $time["interval"] = "month";
+
+  // display links to previous and next week
+  dis_time_links($time,"month");
+
+
+  dis_time_index($time);
+  // display user Search Form
+  
+} 
+
 elseif ($action == "show_details") {
 //////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
@@ -434,12 +447,12 @@ function get_param_time() {
 //////////////////////////////////////////////////////////////////////////////
 function get_time_actions() {
   global $time, $path;
-  global $l_header_stats, $l_header_month;
+  global $l_header_stats, $l_header_view, $l_header_globalview;
   global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
 // Index
   $actions["TIME"]["index"] = array (
-	'Name'     => "$l_header_month",
+	'Name'     => "$l_header_view",
     'Url'      => "$path/time/time_index.php?action=index&amp;param_begin=".
 	       $time["month_first"],
     'Right'    => $time_read,
@@ -467,12 +480,20 @@ function get_time_actions() {
     'Condition'=> array ('None') 
                                     );
 
-// Stats Update
+// Stats
   $actions["TIME"]["stats"] = array (
 	'Name'     => "$l_header_stats",
     'Url'      => "$path/time/time_index.php?action=stats",
     'Right'    => $time_write,
-    'Condition'=> array ('index', 'admin') 
+    'Condition'=> array ('index', 'admin', 'globalview') 
+                                    );
+
+// General Monthly View
+  $actions["TIME"]["globalview"] = array (
+	'Name'     => "$l_header_globalview",
+    'Url'      => "$path/time/time_index.php?action=globalview",
+    'Right'    => $time_admin_write,
+    'Condition'=> array ('index', 'stats', 'admin') 
                                     );
 
 // Insert 

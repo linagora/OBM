@@ -536,28 +536,33 @@ function run_query_validate($parms,$time,$who) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// Timemanager: qet tasks for given user and month                        
+// Timemanager: qet tasks for given user and month                 
+//   - $option : 'all' allow a request for all users
 // Returns : DB object result
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_task_one_month($time) {
-global $cdg_sql;
+function run_query_task_one_month($time, $option='') {
+global $cdg_sql, $cdg_param;
 
   $user_id = $time["user_id"];
   //  echo "Run_query_valid_search<br>";
   //  print_r($time);
-  $query = "select sum(task_length) as total_length, substring(task_date,7,2) as day_in_month from Task where  
+  $query = "select sum(task_length) as total_length, substring(task_date,7,2) as day_in_month, 
+        task_user_id as userid from Task where  
          task_date >= '". $time["date"] ."' 
         and task_date <= '". $time["date_end"] ."' ";
 
   // user_id : array -> size 1 or more 
-  if (sizeof($time["user_id"]) == 1)
+  if (empty($option) && (sizeof($time["user_id"]) == 1))
 	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+  elseif ($option == 'all')
+	  display_debug_msg("\$option='all', select for all users", $cdg_param,
+						"run_query_task_one_month");
   else {
       die("run_query_task_one_month : This function works only for one user");
   }
 
   // Group
-  $query .= " group by day_in_month order by day_in_month ";
+  $query .= " group by task_user_id, day_in_month order by task_user_id, day_in_month ";
   
   display_debug_msg($query, $cdg_sql, "run_query_task_one_month");
   $obm_db = new DB_OBM;
@@ -613,7 +618,8 @@ function run_query_get_obmusers() {
   global $cdg_sql;
  
   $obm_db=new DB_OBM;
-  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm order by userobm_lastname";
+  $query="select userobm_id,userobm_lastname,userobm_firstname from UserObm 
+          where userobm_archive!=1 order by userobm_lastname";
   display_debug_msg($query, $cdg_sql, "run_query_get_obmusers");
 
   $obm_db->query($query);
@@ -730,39 +736,6 @@ function get_week_point($sel_date) {
 	
 }
 
-
-//////////////////////////////////////////////////////////////////////////
-// Show a date in human format
-//  params : $p_date : date in yyyymmdd format
-//////////////////////////////////////////////////////////////////////////
-function dis_human_date($p_date) {
-  global $cdg_sql;
-    
-    $p_year=substr($p_date,0,4);
-    $p_month=substr($p_date,4,2);
-    $p_day=substr($p_date,6,2);
-
-   
-    $mois = month_name($p_month);
-
-    return "$p_day $mois $p_year";
-
-}
-
-//////////////////////////////////////////////////////////////////////////
-// Show a date in mysql format (for query)
-//  params : $p_date : date in yyyymmdd format
-//////////////////////////////////////////////////////////////////////////
-function dis_mysql_date($p_date) {
-  global $cdg_sql;
-    
-    $p_year=substr($p_date,0,4);
-    $p_month=substr($p_date,4,2);
-    $p_day=substr($p_date,6,2);
-
-    return "'$p_year-$mois-$p_day'";
-
-}
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -910,14 +883,79 @@ function array_to_list($array) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
+// Test if the given day is an "Open days" (jours ouvrables)               //
+//   we mean by "open day" $c_days_in_a_week, starting on Monday
+//    $c_days_in_a_week = 5 : Mon to Fri
+//    $c_days_in_a_week = 6 : Mon to Sat
+//    $c_days_in_a_week = 7 : Mon to Sun !
+//Parameters :
+// - $date = a date in 20020917 format 
+//Return :
+//  true or false
+///////////////////////////////////////////////////////////////////////////
+function in_workingdays($date) {
+   global $working_days, $cdg_param;
+
+  $year=substr($date,0,4);
+  $month=substr($date,4,2);
+  $day=substr($date,6,2);
+
+  // day of the month in second
+  $day_sec = mktime(0,0,0,$month, $day, $year);
+  // Weekday
+  $wday =date("w", $day_sec);
+
+  if ($working_days[$wday] == 1) 
+	return true;
+  else
+	return false;
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Return number of "Open days" (jours ouvrables) in a month     //
 //   for a given date in this month
-// THIS SHOULD BE IMPROVED TO COPE WITH 5 or 6 (or 7) working days
+// THIS COPE WITH 5 or 6 (or 7) working days
 //  IN A MONTH (if we work on saturday or sunday) 
+//  (based on a global array, $working_days)
 //Parameters :
 // - $date = a date in 20020917 format 
 ///////////////////////////////////////////////////////////////////////////
 function get_nb_working_days($date) {
+    global $cdg_param;
+
+
+  $year=substr($date,0,4);
+  $month=substr($date,4,2);
+  $this_day=substr($date,6,2);
+  $day =1;
+  $workingdays = 0;
+
+  /*
+  if (debug_level_isset($cdg_param))
+	echo "jour $day mois $month an $year <br>";
+  */
+  // set this to 12h
+  $day_sec = mktime(12,0,0,$month, $day, $year);
+  // set this to 00h
+  $first_next_month = mktime(0,0,0,$month+1, 1, $year);
+  while ($day_sec < $first_next_month) {
+    if (in_workingdays($year.$month.$day))
+      $workingdays++;
+  $day++;	  
+  $day_sec = mktime(12,0,0,$month, $day, $year);
+  }
+
+  /*  if (debug_level_isset($cdg_param))
+  	echo "<br> date $date, working days $workingdays <br>";
+  */
+
+  return $workingdays;
+
+}
+
+
+
+function get_nb_working_days2($date) {
     global $c_days_in_a_week, $cdg_param;
 
 
@@ -999,4 +1037,7 @@ function get_nb_working_days($date) {
   return $workingdays;
 
 }
+
+
+
 </SCRIPT>
