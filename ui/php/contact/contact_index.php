@@ -300,8 +300,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "function_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_function_links($contact);
-  require("contact_js.inc");
-  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "function_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -339,8 +337,6 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_kind_links($contact);
-  require("contact_js.inc");
-  $display["detail"] .= dis_contact_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////

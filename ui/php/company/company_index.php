@@ -29,6 +29,10 @@
 // - nafcode_update     -- form fields    -- update the nafcode
 // - nafcode_checklink  --                -- check if nafcode is used
 // - nafcode_delete     -- $sel_kind      -- delete the nafcode
+// - cat_insert         -- form fields    -- insert the category
+// - cat_update         -- form fields    -- update the category
+// - cat_checklink      --                -- check if category is used
+// - cat_delete         -- $sel_kind      -- delete the category
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
@@ -275,8 +279,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "kind_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_kind_links($company);
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "kind_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -314,8 +316,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "activity_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_activity_links($company);
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "activity_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -353,8 +353,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "nafcode_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_nafcode_links($company);
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "nafcode_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -392,8 +390,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "cat_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_cat_links($company);
-  require("company_js.inc");
-  $display["detail"] .= dis_admin_index();
 
 } elseif ($action == "cat_delete")  {
 ///////////////////////////////////////////////////////////////////////////////

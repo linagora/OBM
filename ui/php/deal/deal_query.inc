@@ -31,7 +31,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $zip = $deal["company_zip"];
   $archive = $deal["archive"];
   $kind = $deal["kind"];
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = $deal["dateafter"];
@@ -85,8 +85,8 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   if (($kind != $c_all) && ($kind != "")) {
     $query .= " and dealtype_id='$kind'";
   }
-  if (($cat != $c_all) && ($cat != "")) {
-    $query .= " and deal_tasktype_id='$cat'";
+  if (($tt != $c_all) && ($tt != "")) {
+    $query .= " and deal_tasktype_id='$tt'";
   }
   if ($name != "") {
     $query .= " and company_name $like '$name%'";
@@ -207,7 +207,7 @@ function run_query_insert($deal) {
   $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $comp = $deal["company"];
   $market = ($deal["market"] ? "'".$deal["market"]."'" : "null");
   $tech = ($deal["tech"] ? "'".$deal["tech"]."'" : "null");
@@ -220,7 +220,7 @@ function run_query_insert($deal) {
   $status = $deal["state"];
   $archive = ($deal["archive"] == 1 ? "1" : "0");
   $todo = $deal["todo"];
-  $cat1 = $deal["category"];
+  $cats = $deal["category"];
 
   $add_comment = $deal["add_comment"];
   
@@ -262,7 +262,7 @@ function run_query_insert($deal) {
     '$label',
     $datebegin,
     '$kind',
-    '$cat',
+    '$tt',
     '$comp',
     '$con1',
     '$con2',
@@ -285,8 +285,8 @@ function run_query_insert($deal) {
 
   $d_id = run_query_deal_id($deal);
 
-  if ($retour && is_array($cat1)) {
-    foreach($cat1 as $categoryid) {
+  if ($retour && is_array($cats)) {
+    foreach ($cats as $categoryid) {
       $query = "insert into DealCategoryLink (
 	  dealcategorylink_deal_id,
 	  dealcategorylink_category_id)
@@ -326,7 +326,7 @@ function run_query_update($deal) {
   $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? "'".$deal["datebegin"]."'" : "null");
   $kind = $deal["kind"]; 
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $comp = $deal["company"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
@@ -356,7 +356,7 @@ function run_query_update($deal) {
     deal_label='$label',
     deal_datebegin=$datebegin,
     deal_type_id='$kind',
-    deal_tasktype_id='$cat',
+    deal_tasktype_id='$tt',
     deal_company_id='$comp',
     deal_contact1_id=$con1,
     deal_contact2_id=$con2,
@@ -379,17 +379,14 @@ function run_query_update($deal) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-  if($cat_m != "") { 
+  if (($retour) && (is_array($cat_m))) {
     $query = "delete
     from DealCategoryLink
     where dealcategorylink_deal_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);
-  }
-   
 
-  if ($retour && is_array($cat_m)) {
-    foreach($cat_m as $categoryid) {
+    foreach ($cat_m as $categoryid) {
       $query = "insert into DealCategoryLink (
 	  dealcategorylink_deal_id,
 	  dealcategorylink_category_id)
@@ -430,7 +427,7 @@ function run_query_deal_id($deal) {
   $vis = $deal["vis"];
   $datebegin = ($deal["datebegin"] ? "='".$deal["datebegin"]."'" : "is null");
   $kind = $deal["kind"]; 
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $comp = $deal["company"];
   $market = ($deal["market"] ? $deal["market"] : "null");
   $tech = ($deal["tech"] ? $deal["tech"] : "null");
@@ -450,7 +447,7 @@ function run_query_deal_id($deal) {
     deal_label='$label' and
     deal_datebegin $datebegin and
     deal_type_id='$kind' and
-    deal_tasktype_id='$cat' and
+    deal_tasktype_id='$tt' and
     deal_company_id='$comp' and
     deal_contact1_id='$con1' and
     deal_contact2_id='$con2' and
@@ -535,11 +532,11 @@ function run_query_cat_update($deal) {
   $timeupdate = date("Y-m-d H:i:s");
   $userupdate = $auth->auth["uid"];
   $id = $deal["category"];
-  $cat = $deal["cat_label"];
+  $cat_label = $deal["cat_label"];
   $cat_code = $deal["cat_code"];
   
   $query = "update DealCategory set
-      dealcategory_label='$cat',
+      dealcategory_label='$cat_label',
       dealcategory_code='$cat_code',
       dealcategory_timeupdate='$timeupdate',
       dealcategory_userupdate='$userupdate'
@@ -551,8 +548,10 @@ function run_query_cat_update($deal) {
   $retour = $obm_q->query($query);
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Get the label of an Category from its id                                  //
+// Get the label of an Category from its id
 // Parameters:
 //   - $id : id
 ///////////////////////////////////////////////////////////////////////////////
@@ -574,41 +573,43 @@ function get_cat_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Return all the categories attached to the contact
+// Return all the categories attached to the deal
 // Parameters:
-//   - $c_id : contact Id
+//   - $d_id : deal Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_get_dealcategory($c_id) {
-    global $cdg_sql;
+function run_query_get_dealcategory($d_id) {
+  global $cdg_sql;
 
   $query = "select dealcategory_id
     from DealCategoryLink, DealCategory
     where dealcategorylink_category_id = dealcategory_id
-      and dealcategorylink_deal_id = '$c_id'
+      and dealcategorylink_deal_id = '$d_id'
     order by dealcategory_code";     
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  while($obm_q->next_record()) {
+  while ($obm_q->next_record()) {
     $id = $obm_q->f("dealcategory_id");
     $categories[] = $id;
   }
+
   return $categories;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Contact links query execution
+// DealCategory - Deal links query execution
 // Parameters:
-//   - $p_id : activity id
+//   - $c_id : dealcategory id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_cat_links($p_id) {
+function run_query_cat_links($c_id) {
   global $cdg_sql;
 
-  $query = "select deal_title, deal_id, '$p_id' as deal_category
-    from Deal,DealCategoryLink
+  $query = "select deal_label, deal_id
+    from Deal, DealCategoryLink
     where deal_id = dealcategorylink_deal_id
-      and dealcategorylink_category_id = '$p_id'";
+      and dealcategorylink_category_id = '$c_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -616,26 +617,6 @@ function run_query_cat_links($p_id) {
 
   return $obm_q;
 }
-
-///////////////////////////////////////////////////////////////////////////////
-// Activity - Deal links query execution                                  //
-// Parameters:
-//   - $p_id : activity id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_activity_links($p_id) {
-  global $cdg_sql;
-
-  $query = "select dealcategory_id, dealcategory_label, dealcategory_code
-    from DealCategory ";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-///////////////////////////////////////////////////////////////////////////////
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -654,7 +635,7 @@ function run_query_cat_delete($id) {
     $retour = $obm_q->query($query);
   }
   else 
-  $retour = 1;
+    $retour = 1;
   
   return $retour;
 }
@@ -748,7 +729,7 @@ function run_query_cat_insert($deal) {
 
   $timecreate = date("Y-m-d H:i:s");
   $usercreate = $auth->auth["uid"];
-  $cat = $deal["cat_label"];
+  $cat_label = $deal["cat_label"];
   $cat_code = $deal["cat_code"];
 
   $query = "insert into DealCategory (
@@ -759,7 +740,7 @@ function run_query_cat_insert($deal) {
   values (
     '$timecreate',
     '$usercreate',
-    '$cat',
+    '$cat_label',
     '$cat_code')";
 
   display_debug_msg($query, $cdg_sql);
@@ -1200,7 +1181,7 @@ function check_deal_form($did, $deal) {
   }
 
   // Check if the tasktype is filled
-  if ($deal["cat"] < 1) {
+  if ($deal["tasktype"] < 1) {
     $err_msg = $l_err_task_empty;
     return false;
   }

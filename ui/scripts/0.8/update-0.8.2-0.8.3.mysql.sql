@@ -29,10 +29,12 @@ ALTER TABLE List ADD column list_mailing_ok int(1) after list_email;
 -- Update Contract table
 -------------------------------------------------------------------------------
 -- Add column : contract_archive
-ALTER TABLE Contact ADD column contract_archive int(1) after contact_comment;
+ALTER TABLE Contract ADD column contract_archive int(1) after contract_marketmanager_id;
 
-------------------------------------------------------------------------------
--
+-------------------------------------------------------------------------------
+-- New table DealCategory
+-------------------------------------------------------------------------------
+--
 -- Table structure for table 'DealCategory'
 --
 CREATE TABLE DealCategory (
@@ -46,11 +48,11 @@ CREATE TABLE DealCategory (
   PRIMARY KEY (dealcategory_id)
 );
 
-
+--
 -- Table structure for table 'DealCategoryLink'
 --
 CREATE TABLE DealCategoryLink (
   dealcategorylink_category_id  int(8) NOT NULL default '0',
-  dealcategorylink_deal_id   int(8) NOT NULL default '0',
+  dealcategorylink_deal_id      int(8) NOT NULL default '0',
   PRIMARY KEY (dealcategorylink_category_id,dealcategorylink_deal_id)
 );

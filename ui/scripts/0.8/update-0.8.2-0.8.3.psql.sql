@@ -31,7 +31,11 @@ ALTER TABLE List ADD column list_mailing_ok integer;
 -- Update Contract table
 -------------------------------------------------------------------------------
 -- Add column : contract_archive
-ALTER TABLE Contact ADD column contract_archive integer; -------------------------------------------------------------------------------
+ALTER TABLE Contract ADD column contract_archive integer;
+
+-------------------------------------------------------------------------------
+-- New table DealCategory
+-------------------------------------------------------------------------------
 --
 -- Table structure for table 'DealCategory'
 --
@@ -46,6 +50,7 @@ CREATE TABLE DealCategory (
   PRIMARY KEY (dealcategory_id)
 );
 
+--
 -- Table structure for table 'DealCategoryLink'
 --
 CREATE TABLE DealCategoryLink (

@@ -7,9 +7,6 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//for list
-//$l_task_fac = "Taches Facturées";
-//$l_task_int = "Taches Internes";
 
 // Database fields
 $l_number = "Numéro";
@@ -17,6 +14,7 @@ $l_label = "Label";
 $l_date_init = "Date Debut";
 $l_parentdeal = "SurAffaire";
 $l_kind = "Type";
+$l_tt = "Type de tâche";
 $l_company = "Société";
 $l_contact = "Contact";
 $l_marketing_manager = "Resp Commercial";
@@ -31,6 +29,7 @@ $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";
 $l_todo = "A faire";
 $l_category = "Categorie";
+$l_code = "Code";
 
 // Labels et textes
 $l_infos = "Informations";
@@ -41,12 +40,11 @@ $l_amount_in = "Montant des entrées";
 $l_amount_out = "Montant des sorties";
 $l_potential = "Potentiel pondéré";
 $l_label_start = "Nom Affaire";
-$l_manager= "Responsable";
+$l_manager = "Responsable";
 $l_proposition = "Proposition";
 $l_show_archive = "Voir les archives";
 $l_date_alarm_after = "Date Alarme Après";
 $l_date_alarm_before = "Date Alarme Avant";
-$l_zipcode = "Code Postal";
 $l_last_update = "Dernière modification le";
 $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
@@ -63,43 +61,23 @@ $l_kind_new = "Nouveau Type";
 $l_status_manage = "Gestion des Etats d'Affaires";
 $l_status_exist = "Etats existants";
 $l_status_new = "Nouvel Etat";
+$l_cat_manage = "Gestion des catégories";
+$l_cat_exist = "Catégories existantes";
+$l_cat_new = "Nouvelle catégorie";
 $l_invoice_number = "Numéro";
 $l_invoice_label = "Label";
 $l_invoice_HT = "Montant HT";
 $l_invoice_TTC = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
+$l_parentdeal_deals = "Affaires appartenant à la SurAffaire";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
 $l_contract_new = "Nouveau contrat";
 
-$l_code = "Code";
-$l_label = "Label";
-$l_category = "Categorie";
-
-
-
 // Titres
 $l_deal = "Affaire";
-$l_parentdeal_deals = "Affaires appartenant a la SurAffaire";
-
-
 
 // Actions
-$l_cat_delete_ok = "La suppression de la categorie a été correctement effectuée.";
-$l_cat_delete_error = "La suppression de la categorie a échoué !";
-$l_cat_insert_ok = "L'insertion de la categorie a été correctement effectuée.";
-$l_cat_insert_error = "L'insertion de la categorie a échoué !";
-$l_cat_update_ok = "La modification de la categorie a été correctement effectuée";
-$l_cat_update_error = "La modification de la categorie a &eacute;chou&eacute;e !";
-$l_cat_link_contact = "La catégorie est référencée par ces contacts";
-$l_cat_link_contact_no = "La catégorie n'est référencée dans aucun contacts";
-$l_cat_can_delete = " La catégorie peut être supprimée"; 
-$l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
-$l_j_cat_create = "Vous devez renseigner le label de la categorie";
-$l_j_cat_update = "Vous devez renseigner le label de la categorie";
-$l_j_cat_delete = "Vous devez sélectionner une categorie";
-$l_add_cats = "Ajouter ces categories";
-
 $l_select_deal = "Sélectionner l'Affaire";
 $l_insert = "Enregistrer l'Affaire";
 $l_update = "Modifier l'Affaire";
@@ -120,19 +98,13 @@ $l_status_checkdelete = "Vérifier ou Supprimer l'état";
 $l_status_delete = "Supprimer l'état";
 $l_status_update = "Modifier l'état";
 $l_status_insert = "Créer l'état";
-
-
-
-// Messages
-
-$l_cat_manage = "Gestion des catégories";
-$l_cat_exist = "Categories existantes";
-$l_cat_new = "Nouvelle categorie";
-$l_cat_delete =  "Supprimer";
 $l_cat_checkdelete = "Vérifier ou supprimer la catégorie"; 
+$l_cat_delete = "Supprimer";
 $l_cat_update = "Mettre à jour la catégorie"; 
 $l_cat_insert = "Insérer une catégorie"; 
+$l_add_cats = "Ajouter ces categories";
 
+// Messages
 $l_link_contract = "L'affaire est référencée par ces contrats";
 $l_link_contract_no = "L'affaire n'est pas référencée dans les contrats";
 $l_link_project = "L'affaire est référencée par ces projets";
@@ -184,6 +156,16 @@ $l_status_can_delete = "L'état peut être supprimé";
 $l_status_cant_delete = "L'état ne peut être supprimé";
 $l_status_link_deal = "L'état est référencé par ces affaires";
 $l_status_link_deal_no = "L'état n'est pas référencé dans les affaires";
+$l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée.";
+$l_cat_delete_error = "La suppression de la catégorie a échoué !";
+$l_cat_insert_ok = "L'insertion de la catégorie a été correctement effectuée.";
+$l_cat_insert_error = "L'insertion de la catégorie a échoué !";
+$l_cat_update_ok = "La modification de la catégorie a été correctement effectuée";
+$l_cat_update_error = "La modification de la catégorie a &eacute;chou&eacute;e !";
+$l_cat_link_deal = "La catégorie est référencée par ces affaires";
+$l_cat_link_deal_no = "La catégorie n'est référencée par aucune affaire";
+$l_cat_can_delete = " La catégorie peut être supprimée"; 
+$l_cat_cant_delete = " La catégorie ne peut pas etre supprimée";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_parentdeal = "Vous devez sélectionner une surAffaire avant de valider.";
@@ -196,12 +178,15 @@ $l_j_select_company = "Vous devez sélectionner une société !";
 $l_invalid_date = "Format de date invalide (JJ/MM/AAAA ou AAAA-MM-JJ).";
 $l_delete_confirm = "Confirmer la suppression de l'affaire ?";
 
-$l_j_kind_delete = "Vous devez sélectionner un type pour vérifier ou supprimer !";
-$l_j_status_delete = "Vous devez sélectionner un état pour le vérifier ou supprimer !";
-$l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
-$l_j_status_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
 $l_j_kind_create = "Vous devez saisir un nom de type pour le créer !";
+$l_j_kind_update = "Vous devez sélectionner un type et entrer une modification avant de valider !";
+$l_j_kind_delete = "Vous devez sélectionner un type pour vérifier ou supprimer !";
 $l_j_status_create = "Vous devez saisir un nom d'état pour le créer !";
+$l_j_status_update = "Vous devez sélectionner un état et entrer une modification avant de valider !";
+$l_j_status_delete = "Vous devez sélectionner un état pour le vérifier ou supprimer !";
+$l_j_cat_create = "Vous devez renseigner le label de la catégorie";
+$l_j_cat_update = "Vous devez renseigner le label de la catégorie";
+$l_j_cat_delete = "Vous devez sélectionner une catégorie";
 
 // For the display preferences modification screen 
 $l_deal_display = "Options d'affichage des listes d'affaires";

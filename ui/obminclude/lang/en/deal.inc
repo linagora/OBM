@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : English                                                  //
 //     - File     : deal.inc                                                 //
@@ -8,16 +8,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-//for list
-//$l_task_fac = "Factured Tasks";
-//$l_task_int = "Internal Tasks";
-
 // Database fields
 $l_number = "Number";
 $l_label = "Label";
 $l_date_init = "Init Date";
 $l_parentdeal="Parent Deal";
 $l_kind = "Kind";
+$l_tt = "Task Type";
 $l_company = "Company";
 $l_contact = "Contact";
 $l_marketing_manager = "Marketing manager";
@@ -32,23 +29,7 @@ $l_upd_comment = "Update comment";
 $l_todo = "To Do";
 $l_category = "Category";
 $l_code = "Code";
-$l_label = "Label";
-$l_category = "Category";
 $l_add_cats = "Add these categories";
-
-
-
-
-
-// JavaScript Messages (specials charcaters must be escaped whith \ -> \\)
-
-$l_j_cat_delete = "You have to select a category1";
-$l_j_cat_update = "You have to fill the label before submitting.";
-$l_j_cat_create = "You have to fill the label before submitting.";
-
-
-
-
 
 // Labels and texts
 $l_infos = "Informations";
@@ -64,7 +45,6 @@ $l_proposition = "Proposal";
 $l_show_archive = "Show archives";
 $l_date_alarm_after = "Alarm Date after";
 $l_date_alarm_before = "Alarm Date before";
-$l_zipcode = "Zip Code";
 $l_last_update = "Last updated on";
 $l_at = "at";
 $l_deal_select_company = "Select the company which whom the deal must be filled";
@@ -81,6 +61,9 @@ $l_kind_new = "New Kind";
 $l_status_manage = "Deal Status Management";
 $l_status_exist = "Existing States";
 $l_status_new = "New State";
+$l_cat_manage = "Category management";
+$l_cat_exist = "Existing Category";
+$l_cat_new = "New category";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
 $l_add_contrat = "Add a contract";
 $l_contract_new = "New contract";
@@ -95,10 +78,11 @@ $l_update = "Update the  Deal";
 $l_delete = "Delete the Deal";
 $l_archive_update = "Update Archives";
 $l_select_company = "Select the Company";
+$l_affect = "Affect";
+
 $l_insert_parent = "Insert the ParentDeal";
 $l_update_parent = "Update the ParentDeal";
 $l_delete_parent = "Delete the ParentDeal";
-$l_affect = "Affect";
 
 $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
@@ -108,6 +92,10 @@ $l_status_update = "Update State";
 $l_status_checkdelete = "Check or Delete State";
 $l_status_delete = "Delete State";
 $l_status_insert = "Insert State";
+$l_cat_delete = "Delete";
+$l_cat_checkdelete = "Check or delete Category"; 
+$l_cat_update = "Update category"; 
+$l_cat_insert = "Insert a category";
 
 // Messages
 $l_link_contract = "The deal is involved in these contracts";
@@ -124,11 +112,13 @@ $l_err_task_empty = "You must fill the deal category !";
 $l_err_market_empty = "You must fill the marketing manager !";
 $l_err_tech_empty = "You must fill the technical manager !";
 $l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
-
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
 $l_no_display = "Fill the search fields and press < Find > to retrieve the deals";
 $l_found = "deals found.";
 $l_no_found = "No deal found matching the query !";
+$l_found_parent = "parentdeals found";
+$l_no_found_parent ="No parentdeal found matching the query !";
+
 $l_delete_ok = "The deal has been deleted successfully.";
 $l_delete_error = "The deletion of the deal has failed !";
 $l_insert_ok = "The deal has been inserted successfully.";
@@ -139,9 +129,7 @@ $l_query_error = "Probl&egrave;me en executant la requete";
 $l_archive_ok = "The archives have been updated successfully.";
 $l_archive_error = "The update of the archives has failed !";
 $l_archive_number = "deals inserted in the archives.";
-$l_found_parent = "parentdeals found";
 $l_no_display_parent ="Fill the search fields and press < Find > to retrieve the parentdeals"; 
-$l_no_found_parent ="No parentdeal found matching the query !";
 
 $l_kind_insert_ok = "The kind has been inserted successfully.";
 $l_kind_insert_error = "The insertion of the kind has failed !";
@@ -164,21 +152,14 @@ $l_status_cant_delete = "The Status can't be deleted";
 $l_status_link_deal = "The Status is involved in these deals";
 $l_status_link_deal_no = "The Status is not involved in any deals";
 
-$l_cat_manage = "Category management";
-$l_cat_exist = "Existing Category";
-$l_cat_new = "New category";
-$l_cat_delete = "Delete";
-$l_cat_checkdelete = "Check or delete Category"; 
-$l_cat_update = "Update category"; 
-$l_cat_insert = "Insert a category";
 $l_cat_insert_ok = "The category has been inserted successfully.";
 $l_cat_insert_error = "The insertion of the category has failed !";
 $l_cat_delete_ok = "The category has been deleted successfully.";
 $l_cat_delete_error = "The deletion of the category has failed !";
 $l_cat_update_ok = "The category has been updated successfully.";
 $l_cat_update_error = "The category has been updated has failed !";
-$l_cat_link_contact = "These category are referenced as";
-$l_cat_link_contact_no = "No contacts referenced as";
+$l_cat_link_deal = "These deals are referenced as";
+$l_cat_link_deal_no = "No deals referenced as";
 $l_cat_cant_delete = "The category can't be deleted !";
 $l_cat_can_delete = "The category can be deleted.";     
 
@@ -192,12 +173,15 @@ $l_confirm_datealarm = "Date Alarm is in the past ! Confirm the action ?";
 $l_j_select_company = "You must select a company !";
 $l_invalid_date = "Invalid Date Format (MM/JJ/AAAA or AAAA-MM-JJ).";
 $l_delete_confirm = "Confirm the deal deletion ?";
-$l_j_kind_delete = "You have to select a kind to check or delete it !";
-$l_j_status_delete = "You have to select a state to check or delete it !";
-$l_j_kind_update = "You have to select a kind and enter a new name to update it !";
-$l_j_status_update = "You have to select a state and enter a new name to update it !";
 $l_j_kind_create = "You have to enter a new kind name to create it !";
+$l_j_kind_update = "You have to select a kind and enter a new name to update it !";
+$l_j_kind_delete = "You have to select a kind to check or delete it !";
 $l_j_status_create = "You have to enter a new state name to create it !";
+$l_j_status_update = "You have to select a state and enter a new name to update it !";
+$l_j_status_delete = "You have to select a state to check or delete it !";
+$l_j_cat_create = "You have to fill the label before submitting.";
+$l_j_cat_update = "You have to fill the label before submitting.";
+$l_j_cat_delete = "You have to select a category";
 
 // For the display parameters modification screen
 $l_deal_display = "Display options for deals list";

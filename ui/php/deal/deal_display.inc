@@ -24,9 +24,9 @@ $fieldnames["parentdeal_comment"] = $l_comment;
 // Calculated or indirect fields
 $fieldnames["dealstatus_label"] = $l_state;
 $fieldnames["dealtype_label"] = $l_kind;
-$fieldnames["tasktype_label"] = $l_cat;
+$fieldnames["tasktype_label"] = $l_tt;
 $fieldnames["deal_company_name"] = $l_company;
-$fieldnames["deal_company_zipcode"] = $l_zipcode;
+$fieldnames["deal_company_zipcode"] = $l_postcode;
 $fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
 $fieldnames["parentdeal_technical_lastname"] = $l_technical_manager;
 $fieldnames["parentdeal_status"] = $l_state;
@@ -144,18 +144,18 @@ function dis_deal_index($deal="") {
 ///////////////////////////////////////////////////////////////////////////////
 // Display Deal search form                                                  //
 // Parameters : 
-//   - $deal[]        : default form values
-//     keys used      : parent, label, company_name, archive, kind, cat, state,
-//                      manager, dateafter, datebefore
-//   - $obm_q_type    : DB result object (deal kind list)
-//   - $obm_q_cat     : DB result object (deal categories list)
-//   - $obm_q_state   : DB result object (deal status list)
-//   - $obm_q_manager : DB result object (userobm list)
+//   - $deal[]     : default form values
+//     keys used   : parent, label, company_name, archive, kind, cat, state,
+//                   manager, dateafter, datebefore
+//   - $kind_q     : DB result object (deal kind list)
+//   - $tt_q       : DB result object (deal task type list)
+//   - $stat_q     : DB result object (deal status list)
+//   - $manager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $obm_q_manager) {
-  global $l_deal, $l_label_start, $l_company, $l_kind, $l_cat, $l_state;
-  global $l_after, $l_before, $l_manager, $l_show_archive, $l_zipcode;
-  global $l_all, $l_all_f, $l_find, $c_all,$l_category;
+function html_deal_search_form($deal, $kind_q, $tt_q, $stat_q, $manager_q) {
+  global $l_deal, $l_label_start, $l_company, $l_kind, $l_tt, $l_state;
+  global $l_after, $l_before, $l_manager, $l_show_archive, $l_postcode;
+  global $l_all, $l_all_f, $l_find, $c_all, $l_category;
 
   // --- Var preparation ------------------------------------------------------
 
@@ -165,49 +165,46 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   $zip = stripslashes($deal["company_zip"]);
   $archive = ($deal["archive"] == "1" ? "checked = \"checked\"" : "");
   $kind = $deal["kind"];
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
   $company_id = $deal["company"];
 
-  
   $show_cat = (! $cgp_hide["deal"]["category1"]);
-
 
   // Kind select construction
   $sel_kind = "<select name=\"sel_kind\">
      <option value=\"$c_all\">$l_all</option>";  
-  while($obm_q_type->next_record()) {
-    $id = $obm_q_type->f("dealtype_id");
-    $klabel = $obm_q_type->f("dealtype_label");
+  while ($kind_q->next_record()) {
+    $id = $kind_q->f("dealtype_id");
+    $klabel = $kind_q->f("dealtype_label");
     $sel_kind .= "<option value=\"$id\"";
     if ($kind == $id) $sel_kind .= " selected = \"selected\"";
     $sel_kind .= ">$klabel</option>";
   }
   $sel_kind .= "</select>";
 
-
-  //TaskType select construction
-  $sel_cat = "<select name=\"sel_cat\">
+  // TaskType select construction
+  $sel_tt = "<select name=\"sel_tt\">
               <option value=\"$c_all\">$l_all</option>";
-  while ($obm_q_cat->next_record()) {
+  while ($tt_q->next_record()) {
     //put menu titles
-    $id = $obm_q_cat->f("tasktype_id");
-    $tt_label = $obm_q_cat->f("tasktype_label");
-    $sel_cat .= "\n<option value=\"$id\"";
-    if ($cat == $id) $sel_cat .= "selected =\"selected\"";
-    $sel_cat .= ">$tt_label</option>\n";
+    $id = $tt_q->f("tasktype_id");
+    $tt_label = $tt_q->f("tasktype_label");
+    $sel_tt .= "\n<option value=\"$id\"";
+    if ($tt == $id) $sel_tt .= "selected =\"selected\"";
+    $sel_tt .= ">$tt_label</option>\n";
   }
-  $sel_cat .= "</select>";
+  $sel_tt .= "</select>";
 
   // State select construction
   $sel_state = "<select name=\"sel_state\">
      <option value=\"$c_all\">$l_all</option>";
-  while($obm_q_state->next_record()) {
-    $id = $obm_q_state->f("dealstatus_id");
-    $slabel = $obm_q_state->f("dealstatus_label");
+  while ($stat_q->next_record()) {
+    $id = $stat_q->f("dealstatus_id");
+    $slabel = $stat_q->f("dealstatus_label");
     $sel_state .= "<option value=\"$id\"";
     if ($state == $id) $sel_state .= "selected =\" selected\"";
     $sel_state .= ">$slabel</option>";
@@ -215,14 +212,14 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   $sel_state .= "</select>";
 
   // Manager select construction
-  if ($obm_q_manager->num_rows() > 0) {
-    $obm_q_manager->seek(0);
+  if ($manager_q->num_rows() > 0) {
+    $manager_q->seek(0);
   }
   $sel_manager = "<select name=\"sel_manager\">
      <option value=\"$c_all\">$l_all</option>";
-  while($obm_q_manager->next_record()) {
-    $id = $obm_q_manager->f("userobm_id");
-    $lname = $obm_q_manager->f("userobm_lastname");
+  while ($manager_q->next_record()) {
+    $id = $manager_q->f("userobm_id");
+    $lname = $manager_q->f("userobm_lastname");
     $sel_manager .= "<option value=\"$id\"";
     if ($manager == $id) $sel_manager .= "selected =\"selected\"";
     $sel_manager .= ">$lname</option>";
@@ -243,7 +240,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
     <div class=\"searchLabel\">$l_company<br />
       <input name=\"tf_company_name\" size=\"12\" maxlength=\"16\" value=\"$name\" />
     </div>
-    <div class=\"searchLabel\">$l_zipcode<br />
+    <div class=\"searchLabel\">$l_postcode<br />
       <input name=\"tf_zip\" size=\"14\" value=\"$zip\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
@@ -257,8 +254,8 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
     <div class=\"searchLabel\">$l_kind<br />
       $sel_kind
     </div>
-    <div class=\"searchLabel\">$l_cat<br />
-      $sel_cat
+    <div class=\"searchLabel\">$l_tt<br />
+      $sel_tt
     </div>
     <div class=\"searchLabel\">$l_state<br />
       $sel_state
@@ -286,12 +283,12 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 ///////////////////////////////////////////////////////////////////////////////
 // Display Parent Deal search form                                           //
 // Parameters : 
-//   - $deal[]         : default form values
-//     keys used       plabel, parchive, pmanager
-//   - $obm_q_pmanager : DB result object (userobm list)
+//   - $deal[]      : default form values
+//     keys used    plabel, parchive, pmanager
+//   - $pmanager_q  : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_search_form($deal, $obm_q_pmanager) {
-  global $l_parentdeal, $l_label_start,$l_all,$l_all_f,$l_manager;
+function html_parentdeal_search_form($deal, $pmanager_q) {
+  global $l_parentdeal, $l_label_start, $l_all, $l_all_f, $l_manager;
   global $l_find,$l_show_archive; 
 
   // --- Var preparation ------------------------------------------------------
@@ -301,14 +298,14 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   $pmanager = $deal["pmanager"];
 
   // Manager select construction
-  if ($obm_q_pmanager->num_rows() > 0) {
-    $obm_q_pmanager->seek(0);
+  if ($pmanager_q->num_rows() > 0) {
+    $pmanager_q->seek(0);
   }
   $sel_pmanager = "<select name=\"sel_pmanager\">
      <option value=\"$c_all\">$l_all</option>";
-  while($obm_q_pmanager->next_record()) {
-    $id = $obm_q_pmanager->f("userobm_id");
-    $lname = $obm_q_pmanager->f("userobm_lastname");
+  while($pmanager_q->next_record()) {
+    $id = $pmanager_q->f("userobm_id");
+    $lname = $pmanager_q->f("userobm_lastname");
     $sel_pmanager .= "<option value=\"$id\"";
     if ($pmanager == $id) $sel_pmanager .= "selected = \"selected\"";
     $sel_pmanager .= ">$lname</option>";
@@ -373,12 +370,12 @@ function dis_deal_search_list($deal) {
 //   - $pref_q      : fields to display in the list of deals 
 //   - $nb_deal     : nb deals found
 //   - $deal[]      : deal search criteria
-//     keys used    : parent, label, company_name, archive, kind, cat, state,
+//     keys used    : parent, label, company_name, archive, kind, tt, state,
 //                    manager, dateafter, datebefore
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   //-- Labels
-  global $display, $l_found,$popup;
+  global $display, $l_found, $popup;
 
   $parent = $deal["parent"];
   $label = urlencode(stripslashes($deal["label"]));
@@ -386,7 +383,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $zip = urlencode(stripslashes($deal["company_zip"]));
   $archive = $deal["archive"];
   $kind = $deal["kind"];
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
@@ -394,8 +391,6 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   $param_comp = $deal["company"];
   $obm_q_deals->seek($first_row);
   
-
-
   if ($popup) {
     $ext_action = $deal["ext_action"];
     $ext_url = $deal["ext_url"];
@@ -404,8 +399,7 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
     $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target";
   }
 
-
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent&param_company=$param_comp");
 
   $dis_deals_list=new OBM_DISPLAY("DATA", $pref_q, "deal");
   $dis_deals_list->data_set = $obm_q_deals;
@@ -651,7 +645,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   global $set_theme,$ico_company, $ico_contact, $display;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
-  global $l_company, $l_contact, $l_label,$l_date_init,$l_kind,$l_cat,$l_marketing_manager,$l_technical_manager,$l_proposition;
+  global $l_company, $l_contact, $l_label,$l_date_init,$l_kind,$l_tt,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_parentdeal,$l_todo, $l_deal,$l_category;
   global $l_invoice, $l_no_invoice, $l_see_archived_invoices, $incl_arch, $param_deal;
@@ -664,7 +658,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   $num = $deal_q->f("deal_number");
   $datebegin = date_format($deal_q->f("datebegin"));
   $kind = $deal_q->f("dealtype_label");
-  $cat = $deal_q->f("tasktype_label");
+  $tt_label = $deal_q->f("tasktype_label");
   $lvis = ($deal_q->f("deal_visibility") == 0 ? $l_public : $l_private);
   $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
   $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
@@ -722,7 +716,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 	$i = 0;
       }    
     }
-    $block_cat11 = "
+    $block_cat = "
     <div class=\"detailHead\">$l_category</div>
     <table class=\"detail\">
     $dis_cat
@@ -753,8 +747,8 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
         <td class=\"detailLabel\">$l_kind</td>
         <td class=\"detailText\">$kind</td>
       </tr><tr>
-        <td class=\"detailLabel\">$l_cat</td>
-        <td class=\"detailText\">$cat</td>
+        <td class=\"detailLabel\">$l_tt</td>
+        <td class=\"detailText\">$tt_label</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_marketing_manager</td>
         <td class=\"detailText\">$market</td>
@@ -826,7 +820,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     </tr><tr>
    <td colspan=\"2\">
       
-      $block_cat11
+      $block_cat
       
       <tr>
     <td colspan=\"2\">
@@ -846,7 +840,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   // we display invoices list
   if ($inv_nb != 0) {
     $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
-    
+
     $dis_invoice_list = new OBM_DISPLAY("DATA", $invoices_options, "deal");
     $dis_invoice_list->display_entity = "invoice";
     $dis_invoice_list->data_set = $q_invoices;
@@ -879,12 +873,13 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 ///////////////////////////////////////////////////////////////////////////////
 function html_category_list($deal) {
   global $l_close,$l_add_cats,$l_cat_no;
+
   $popup = $deal["popup"];
   $cat_q = run_query_dealcategory();
   $ext_target = $deal["ext_target"];
   $block.= "
   <div class=\"categoryTree\">
-   <form onsubmit=\"fill_ext_form2(this);window.close();return false;\">
+   <form onsubmit=\"fill_ext_form2(this);window.close(); return false;\">
    ";
   while ($cat_q->next_record()) {
     $label = $cat_q->f("dealcategory_label");
@@ -914,7 +909,7 @@ function html_category_list($deal) {
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
-//   - $cat_q     : DBO : deal category list (task type)
+//   - $tt_q      : DBO : deal task type list
 //   - $cat1_q    : DBO : deal category list
 //   - $usrc_q    : DBO : list of userobm from system group Commercial
 //   - $usrp_q    : DBO : list of userobm from system group Production
@@ -925,7 +920,7 @@ function html_category_list($deal) {
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$cat_q,$cat1_q, $usrc_q,$usrp_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
+function html_deal_form($action,$deal_q,$kind_q,$tt_q,$cat1_q, $usrc_q,$usrp_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
   global $set_theme,$ico_company,$ico_contact,$l_company,$ico_add;
   global $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_deal, $l_infos, $l_company,$l_label,$l_number,$l_date_init,$l_kind;
@@ -947,7 +942,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$cat1_q, $usrc_q,$usrp_q,
     $num = $deal_q->f("deal_number");
     $datebegin = isodate_format($deal_q->f("datebegin"), 1);
     $kind = $deal_q->f("deal_type_id");
-    $cat = $deal_q->f("deal_tasktype_id");
+    $tt = $deal_q->f("deal_tasktype_id");
     $vis = ($deal_q->f("deal_visibility") == 0 ? "0" : "1");
     $market = $deal_q->f("deal_marketingmanager_id");
     $tech = $deal_q->f("deal_technicalmanager_id");
@@ -993,7 +988,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$cat1_q, $usrc_q,$usrp_q,
   if (isset($deal["vis"])) { $vis = $deal["vis"]; }
   if (isset($deal["datebegin"])) { $datebegin = stripslashes($deal["datebegin"]); }
   if (isset($deal["kind"])) { $kind = $deal["kind"]; }
-  if (isset($deal["cat"])) { $cat = $deal["cat"]; }
+  if (isset($deal["tasktype"])) { $tt = $deal["tasktype"]; }
   if (isset($deal["category"])) { $cat_m = $deal["category"]; }
   if (isset($deal["market"])) { $market = $deal["market"]; }
   if (isset($deal["tech"])) { $tech = $deal["tech"]; }
@@ -1032,17 +1027,17 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$cat1_q, $usrc_q,$usrp_q,
   }
   $sel_kind .= "</select>";
 
-  // Category (task type) select construction
-  $sel_cat = "<select name=\"sel_cat\">
+  // Task type select construction
+  $sel_tt = "<select name=\"sel_tt\">
     <option value=\"0\">$l_none</option>";
-  while ($cat_q->next_record()) {
-    $cid = $cat_q->f("tasktype_id");
-    $tt_label = $cat_q->f("tasktype_label");
-    $sel_cat .= "\n<option value=\"$cid\"";
-    if ($cat == $cid) $sel_cat .= "selected = \"selected\""; 
-    $sel_cat .= ">$tt_label</option>";
+  while ($tt_q->next_record()) {
+    $tt_id = $tt_q->f("tasktype_id");
+    $tt_label = $tt_q->f("tasktype_label");
+    $sel_tt .= "\n<option value=\"$tt_id\"";
+    if ($tt == $tt_id) $sel_tt .= "selected = \"selected\""; 
+    $sel_tt .= ">$tt_label</option>";
   }
-  $sel_cat .= "</select>";
+  $sel_tt .= "</select>";
  
   // Marketing manager select construction
   $sel_market = "<select name=\"sel_market\">
@@ -1107,24 +1102,24 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$cat1_q, $usrc_q,$usrp_q,
 
   // Category select field
   if ($show_cat) {
-    $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font1-weight:400;\">";
+    $sel_cat = "<select id=\"sel_cat\" name=\"sel_cat[]\"  multiple=\"multiple\" style=\"font-family:monospace;font1-weight:400;\">";
     if (is_object($cat1_q)) {
       while($cat1_q->next_record()) {
         $c_id = $cat1_q->f("dealcategory_id");
-        $sel_cat1 .= "\n<option value=\"$c_id\"";
-        if (in_array($c_id, $cat_m)) { $sel_cat1 .= " selected=\"selected\"";}
-        $sel_cat1 .= ">". $cat1_q->f("dealcategory_label") . "</option>\n";
+        $sel_cat .= "\n<option value=\"$c_id\"";
+        if (in_array($c_id, $cat_m)) { $sel_cat .= " selected=\"selected\"";}
+        $sel_cat .= ">". $cat1_q->f("dealcategory_label") . "</option>\n";
       }
     }
-    $sel_cat1 .= "</select>";
-    $url = "deal_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=sel_cat1";
+    $sel_cat .= "</select>";
+    $url = "deal_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=sel_cat";
     $block_cat = "
     </tr><tr>
       <td class=\"detailLabel\">$l_category</td>
       <td class=\"detailForm\">
        <table>
 	<tr><td>
-	  $sel_cat1
+	  $sel_cat
 	</td><td>
 	  <a href=\"javascript: return false;\" style=\"float:right;\"
 	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
@@ -1286,7 +1281,7 @@ function auto_set_hitrate(select, targetField, pos) {
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
       <td class=\"detailLabel\"> $l_cat</td>
-      <td class=\"detailForm\">$sel_cat</td>
+      <td class=\"detailForm\">$sel_tt</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
       <td class=\"detailForm\">$sel_market</td>
@@ -1765,7 +1760,7 @@ function html_deal_admin_form($kind_q, $status_q) {
 ///////////////////////////////////////////////////////////////////////////////
 // Display: Deal Category section
 // Parameters:
-//   - $cat1_q : Category1 list database object
+//   - $cat1_q : DealCategory list database object
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_cat_form($cat_q) {
   global $l_cat_manage,$l_cat_exist,$l_code,$l_label ;
@@ -1878,37 +1873,36 @@ function html_deal_cat_form($cat_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: the cat links                                               //
+// Display: the cat links
 // Parameters:
-//   - $contact : contact hash info : keys used : cat
+//   - $deal : deal hash info : keys used : cat
 ///////////////////////////////////////////////////////////////////////////////
 function dis_cat_links($deal) {
-  global $l_cat_link_contact, $l_cat_link_contact_no;
+  global $l_cat_link_deal, $l_cat_link_deal_no;
   global $l_cat_delete, $l_cat_can_delete, $l_cat_cant_delete;
-  global $l_back,$display;
+  global $l_back, $display;
 
   $id = $deal["category"];
   $label = get_cat_label($id);
   $obm_q = run_query_cat_links($id);
-  $obm_q11 = run_query_activity_links($id);
   $nb_cat = $obm_q->num_rows();
   if ($nb_cat > 0) {
     $display["msg"] .= display_warn_msg($l_cat_cant_delete);
     $dis_link = "
     <table class=\"detail\">
     <tr>
-      <td class=\"detailHead\">$label : $l_cat_link_contact ($nb_cat)</td>
+      <td class=\"detailHead\">$label : $l_cat_link_deal ($nb_cat)</td>
     </tr>";
 
     $cpt = 0;
-    while ( ($obm_q11->next_record()) && ($cpt < 10) ) {
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
       $cpt++;
-      $cid = $obm_q11->f("dealcategory_id");
-      $cname = $obm_q11->f("dealcategory_label");
+      $d_id = $obm_q->f("deal_id");
+      $d_label = $obm_q->f("deal_label");
       $dis_link .= "
     <tr>
       <td class=\"detailLabel\">
-        <a  href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_contact=$cid") . "\">$cname</a>
+        <a  href=\"" .url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$d_id") . "\">$d_label</a>
       </td>
     </tr>"; 
     }
@@ -1919,7 +1913,7 @@ function dis_cat_links($deal) {
       <td class=\"detailLabel\">...</td>
     </tr>";
     }
-    $dis_link .="
+    $dis_link .= "
     </table>
       <div class=\"detailButton\">
         <p class=\"detailButtons\">
@@ -1938,7 +1932,7 @@ function dis_cat_links($deal) {
     <table class=\"detail\">
     <tr>
       <td colspan=\"2\" class=\"detailHead\">
-        $label : $l_cat_link_contact_no </td>
+        $label : $l_cat_link_deal_no </td>
     </tr>
     </table>
   <div class=\"detailButton\">
@@ -2087,7 +2081,7 @@ function dis_status_links($id) {
     }
 
   } else {
-    $dis_link = "cat
+    $dis_link = "
     <tr>
       <td class=\"detailHead\">$l_status_link_deal_no</td>
     </tr>";
@@ -2241,9 +2235,6 @@ function html_parentdeal_search_list($obm_q, $pref_q, $nb_parentdeals, $deal) {
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
-  // -- Themes
-  global $ico_company,$ico_contact;
-  // -- Labels
   global $l_update_parent,$l_delete_parent,$l_insert_parent,$l_label,$l_marketing_manager;
   global $l_parentdeal,$l_technical_manager,$l_comment;
 
@@ -2340,11 +2331,11 @@ function html_parentdeal_form($action, $deal_q, $usrc_q, $usrp_q, $deal) {
 //   - $nbdeals  : number of deals in the list
 //     //---> used by the deal search form :
 //   - $kind_q   : list of deal types available
-//   - $cat_q    : list of deal categories available
+//   - $tt_q     : list of deal tasktype available
 //   - $state_q  : list of deal status available 
 //   - $usr_q    : DBO : list of userobm
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$tt_q,$state_q,$usr_q) {
   global $display, $path;
   global $l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
@@ -2433,7 +2424,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $block .= display_info_msg($l_parentdeal_deals);
 
   //----- deal search form 
-  $block .= html_deal_search_form($deal, $kind_q, $cat_q, $state_q, $usr_q);
+  $block .= html_deal_search_form($deal, $kind_q, $tt_q, $state_q, $usr_q);
 
   //-----> deal list
   // if no record found, display it and stop
@@ -2445,13 +2436,13 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $name = urlencode(stripslashes($deal["company_name"]));
   $archive = $deal["archive"];
   $kind = $deal["kind"];
-  $cat = $deal["cat"];
+  $tt = $deal["tasktype"];
   $state = $deal["state"];
   $manager = $deal["manager"];
   $dateafter = stripslashes($deal["dateafter"]);
   $datebefore = stripslashes($deal["datebefore"]);
 
-  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_cat=$cat&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
+  $url = url_prepare("deal_index.php?action=search&amp;tf_label=$label&amp;tf_company_name=$name&amp;cb_archive=$archive&amp;sel_kind=$kind&amp;sel_state=$state&amp;sel_tt=$tt&amp;sel_manager=$manager&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;param_parent=$parent");
 
   // Display the list of deals attached to the parentdeal
   $dis_list_deal = new OBM_DISPLAY("DATA", $pref_q, "deal");

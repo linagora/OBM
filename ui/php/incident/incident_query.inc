@@ -355,19 +355,21 @@ function run_query_status() {
 function run_query_priority_insert($incident) {
   global $auth, $cdg_sql;
 	
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
   $order = $incident["pri_order"];
   $color = $incident["pri_color"];
   $label = $incident["pri_label"];
 
-  $query = "insert into IncidentPriority (incidentpriority_timeupdate,
+  $query = "insert into IncidentPriority (
     incidentpriority_timecreate,
     incidentpriority_usercreate,
     incidentpriority_order,
     incidentpriority_color,
     incidentpriority_label)
-  values ('null',
-    '".date("Y-m-d H:i:s")."',
-    ".$auth->auth["uid"].",
+  values (
+    '$timecreate',
+    '$usercreate',
     '$order',
     '$color',
     '$label')";
@@ -389,14 +391,16 @@ function run_query_priority_insert($incident) {
 function run_query_priority_update($incident) {
   global $auth, $cdg_sql;
 
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
   $priority = $incident["priority"];
   $order = $incident["pri_order"];
   $color = $incident["pri_color"];
   $label = $incident["pri_label"];
 
   $query = "update IncidentPriority set incidentpriority_label='$label',
-    incidentpriority_timeupdate='".date("Y-m-d H:i:s")."',
-    incidentpriority_userupdate='".$auth->auth["uid"]."',
+    incidentpriority_timeupdate='$timeupdate',
+    incidentpriority_userupdate='$userupdate',
     incidentpriority_order='$order',
     incidentpriority_color='$color'
   where incidentpriority_id='$priority'";
@@ -453,18 +457,20 @@ function run_query_priority_links($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_insert($incident) {
   global $auth, $cdg_sql;
-	
+
+  $timecreate = date("Y-m-d H:i:s");
+  $usercreate = $auth->auth["uid"];
   $label = $incident["sta_label"];
   $order = $incident["sta_order"];
 
-  $query = "insert into IncidentStatus (incidentstatus_timeupdate,
+  $query = "insert into IncidentStatus (
     incidentstatus_timecreate,
     incidentstatus_usercreate,
     incidentstatus_label,
     incidentstatus_order)
-  values ('null',
-    '".date("Y-m-d H:i:s")."',
-    ".$auth->auth["uid"].",
+  values (
+    '$timecreate',
+    '$usercreate',
     '$label',
     '$order')";
 
@@ -485,13 +491,15 @@ function run_query_status_insert($incident) {
 function run_query_status_update($incident) {
   global $auth, $cdg_sql;
 
+  $timeupdate = date("Y-m-d H:i:s");
+  $userupdate = $auth->auth["uid"];
   $status = $incident["status"];
   $label = $incident["sta_label"];
   $order = $incident["sta_order"];
 
   $query = "update IncidentStatus set incidentstatus_label='$label',
-    incidentstatus_timeupdate='".date("Y-m-d H:i:s")."',
-    incidentstatus_userupdate='".$auth->auth["uid"]."',
+    incidentstatus_timeupdate='$timeupdate',
+    incidentstatus_userupdate='$userupdate',
     incidentstatus_order='$order'
   where incidentstatus_id='$status'";
 

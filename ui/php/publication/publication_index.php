@@ -323,8 +323,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "type_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_type_links($publication);
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
 
 } elseif ($action == "type_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -362,8 +360,6 @@ if ($action == "ext_get_id") {
 } elseif ($action == "recept_checklink")  {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] .= dis_recept_links($publication);
-  require("publication_js.inc");
-  $display["detail"] .= dis_publication_admin_index();
 
 } elseif ($action == "recept_delete")  {
 ///////////////////////////////////////////////////////////////////////////////

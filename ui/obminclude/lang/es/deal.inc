@@ -45,7 +45,6 @@ $l_proposition = "Propuesta";
 $l_show_archive = "Mostrar archivos";
 $l_date_alarm_after = "Fecha de Alarma posterior";
 $l_date_alarm_before = "Fecha de Alarma anterior";
-$l_zipcode = "Código Postal";
 $l_after = "Después";
 $l_before = "Antes";
 $l_last_update = "Última actualización en";

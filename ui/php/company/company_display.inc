@@ -1633,7 +1633,11 @@ function html_company_cat_form($cats) {
   if (is_array($cats)) {
     foreach ($cats as $one_cat) {
       $c_id = $one_cat["id"];
-      $c_code = str_pad($one_cat["code"], 8, ".");
+      $code_length = strlen($one_cat["code"]);
+      $c_code = $one_cat["code"];
+      for ($i=$code_length; $i<8; $i++) {
+        $c_code .= "&nbsp;";
+      }
       $c_label = $one_cat["label"];
       $sel_cat .= "\n<option value=\"$c_id\"";
       if ($c_id == $cat) { $sel_cat .= " selected=\"selected\""; }

@@ -902,11 +902,14 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   global $l_category1, $l_category2;
   global $display, $path, $auth, $cgp_hide, $l_none;
 
+  $cat1 = array();
+  $cat2 = array();
+
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
+    $id = $co_q->f("contact_id");
     $c_id = $co_q->f("contact_company_id");
     $c_name = $co_q->f("company_name");
-    $id = $co_q->f("contact_id");
     $usercreate = $co_q->f("contact_usercreate");
     $dsrc = $co_q->f("contact_datasource_id");
     $kind = $co_q->f("contact_kind_id");
@@ -960,9 +963,6 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
       $c_new_name = $c_name;
       $mark = $contact["marketing_manager"];
     }
-  } elseif ( ($action == "insert") || ($action == "update") ) {
-    $cat1 = array();
-    $cat2 = array();
   }
 
   // If parameters have been given, they supercede the default action value
@@ -1082,7 +1082,6 @@ function html_contact_form($action, $cat1_q, $cat2_q, $co_q, $dsrc_q, $kind_q, $
   $sel_kind_header = "<select name=\"sel_header\">";
   $sel_kind_lang = "<select name=\"sel_lang\">";
   $sel_kind_label = "<select name=\"sel_label\">";
-
 
   // Category 1 select field
   if ($show_cat1) {

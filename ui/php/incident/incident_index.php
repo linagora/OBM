@@ -380,6 +380,62 @@ function get_incident_action() {
     'Condition'=> array ('all') 
                                        );
 
+// Priority insert
+  $actions["INCIDENT"]["priority_insert"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=priority_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Priority update
+  $actions["INCIDENT"]["priority_update"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=priority_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Priority Check Link
+  $actions["INCIDENT"]["priority_checklink"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=priority_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Priority delete
+  $actions["INCIDENT"]["priority_delete"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=priority_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Status insert
+  $actions["INCIDENT"]["status_insert"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=status_insert",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Status update
+  $actions["INCIDENT"]["status_update"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=status_update",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Status Check Link
+  $actions["INCIDENT"]["status_checklink"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=status_checklink",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
+// Status delete
+  $actions["INCIDENT"]["status_delete"] = array (
+    'Url'      => "$path/incident/incident_index.php?action=status_delete",
+    'Right'    => $cright_write_admin,
+    'Condition'=> array ('None') 
+                                     		);
+
 // Display
   $actions["INCIDENT"]["display"] = array (
      'Name'     => $l_header_display,

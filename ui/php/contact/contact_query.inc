@@ -609,7 +609,9 @@ function run_query_contact_update($contact) {
 //   - $c_id : contact Id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_get_contactcategory1($c_id) {
-    global $cdg_sql;
+  global $cdg_sql;
+
+  $cats = array();
 
   $query = "select contactcategory1_id
     from ContactCategory1Link, ContactCategory1
@@ -620,11 +622,12 @@ function run_query_get_contactcategory1($c_id) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  while($obm_q->next_record()) {
+  while ($obm_q->next_record()) {
     $id = $obm_q->f("contactcategory1_id");
-    $categories[] = $id;
+    $cats[] = $id;
   }
-  return $categories;
+
+  return $cats;
 }
 
 
@@ -647,6 +650,7 @@ function run_query_get_contactcategory1_label($c_id) {
   $obm_q->query($query);
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the categories attached to the contact
@@ -677,6 +681,8 @@ function run_query_get_contactcategory2_label($c_id) {
 function run_query_get_contactcategory2($c_id) {
   global $cdg_sql;
 
+  $cats = array();
+
   $query = "select contactcategory2_id
     from ContactCategory2Link, ContactCategory2
     where contactcategory2link_category_id = contactcategory2_id
@@ -688,9 +694,10 @@ function run_query_get_contactcategory2($c_id) {
   $obm_q->query($query);
   while($obm_q->next_record()) {
     $id = $obm_q->f("contactcategory2_id");
-    $categories[] = $id;
+    $cats[] = $id;
   }
-  return $categories;
+
+  return $cats;
 }
 
 

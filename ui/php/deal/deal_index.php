@@ -560,17 +560,18 @@ display_page($display);
 // returns : $deal hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_deal() {
-  global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_cat;
+  global $tf_num, $tf_label, $tf_datebegin, $param_parent, $sel_kind, $sel_tt;
   global $param_company, $sel_contact1, $sel_contact2, $sel_market, $sel_tech;
   global $tf_dateprop, $tf_amount, $sel_state, $tf_datealarm, $ta_com;
   global $tf_datecomment, $sel_usercomment, $ta_add_comment;
   global $tf_plabel, $sel_pmanager, $cb_parchive, $cb_archive,$tf_todo,$cb_vis;
-  global $hd_company_ad1, $hd_company_zip, $hd_company_town,$tf_code,$tf_cat;
+  global $hd_company_ad1, $hd_company_zip, $hd_company_town;
   global $tf_company_name, $tf_zip,$sel_manager, $tf_dateafter, $tf_datebefore;
-  global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent,$sel_cat1;
+  global $sel_pmarket, $sel_ptech, $ta_pcom, $sel_parent;
+  global $sel_cat, $tf_code, $tf_cat;
   global $param_deal, $hd_usercreate, $hd_timeupdate, $set_debug;
   global $tf_kind, $rd_kind_inout, $tf_status, $tf_order, $tf_hitrate;
-  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target,$sel_cat,$tf_cat,$tf_code;
+  global $ext_action, $ext_url, $ext_id, $ext_title, $ext_target;
   global $HTTP_POST_VARS,$HTTP_GET_VARS;
  
   if (isset ($ext_action)) $deal["ext_action"] = $ext_action;
@@ -605,7 +606,7 @@ function get_param_deal() {
   if (isset ($tf_datebegin)) $deal["datebegin"] = $tf_datebegin;
   if (isset ($param_parent)) $deal["parent"] = $param_parent;
   if (isset ($sel_kind)) $deal["kind"] = $sel_kind;
-  if (isset ($sel_cat)) $deal["cat"] = $sel_cat;
+  if (isset ($sel_tt)) $deal["tasktype"] = $sel_tt;
   if (isset ($param_company)) $deal["company"] = $param_company;
   if (isset ($sel_contact1)) $deal["contact1"] = $sel_contact1;
   if (isset ($sel_contact2)) $deal["contact2"] = $sel_contact2;
@@ -619,7 +620,7 @@ function get_param_deal() {
   if (isset ($ta_com)) $deal["com"] = $ta_com;
   if (isset ($tf_cat)) $deal["cat_label"] = $tf_cat;
   if (isset ($tf_code)) $deal["cat_code"] = $tf_code;
-  if (isset ($sel_cat1)) $deal["category"] = $sel_cat1;
+  if (isset ($sel_cat)) $deal["category"] = $sel_cat;
   if (isset ($cb_archive)) {
     $deal["archive"] = $cb_archive;
   }
@@ -722,7 +723,6 @@ function get_deal_action() {
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      );
-
 
   // Category Check Link
   $actions["DEAL"]["cat_checklink"] = array (
@@ -979,8 +979,7 @@ function get_deal_action() {
     'Condition'=> array ('None') 
                                       );
 
-
-// Category Select 
+  // Category Select 
   $actions["DEAL"]["ext_get_cat_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
