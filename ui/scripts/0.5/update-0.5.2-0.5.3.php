@@ -59,9 +59,10 @@ while (list ($cid, $uid) = each ($users)) {
 //update_contract_managers();
 // Update contract managers
 //update_incident_managers();
-// No need to update Time management as userobm id where already stored
+// Update Time management contcts
+update_task_contact();
 // Update Eventuser
-update_eventuser_contact();
+//update_eventuser_contact();
 // No need to update CalendarLayer : empty
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -191,6 +192,22 @@ function get_eventuser_list() {
   global $cdg_sql;
 
   $query = "select * from EventUser";
+
+  display_debug_msg($query, $cdg_sql);
+
+  $d_q = new DB_OBM;
+  $d_q->query($query);
+  return $d_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution - Task list                                               //
+///////////////////////////////////////////////////////////////////////////////
+function get_task_list() {
+  global $cdg_sql;
+
+  $query = "select * from Task";
 
   display_debug_msg($query, $cdg_sql);
 
@@ -339,6 +356,33 @@ function update_eventuser_contact() {
 		set eventuser_user_id='$new_user'
 		where eventuser_event_id = '$id'
                   and eventuser_user_id = '$con'";
+
+    display_debug_msg($query, $cdg_sql);
+  
+    $d2_q = new DB_OBM;
+    $d2_q->query($query);
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Update task Contact                                                       //
+///////////////////////////////////////////////////////////////////////////////
+function update_task_contact() {
+  global $cdg_sql, $users;
+
+  $d_q = get_task_list();
+  $nb = $d_q->num_rows();
+  echo "Migrating Task Contact : #Task : $nb\n";
+
+  while($d_q->next_record()) {
+    $id = $d_q->f("task_id");
+    $user = $d_q->f("task_user_id");
+    $new_user = $users["$user"]; 
+
+    $query = "update Task
+		set task_user_id='$new_user'
+		where task_id = '$id'";
 
     display_debug_msg($query, $cdg_sql);
   
