@@ -27,7 +27,7 @@ $l_nextmissing = "Nouvelle estimation";
 $l_diff = "Avance/Retard";
 
 $l_allosold = "Attribution du temps vendu";
-$l_usedsold = "Utilisation deu temps vendu";
+$l_usedsold = "Utilisation du temps vendu";
 $l_progress = "Avancement du projet";
 $l_progeval = "Evaluation de l'avance retard";
 
@@ -38,9 +38,12 @@ $l_task_int = "Tâches R&D";
 
 // Labels et textes
 $l_list = "Liste";
+$l_taskname = "Nom";
+$l_parent = "Tâche parent";
 $l_manager = "Chef de projet";
 $l_member = "Participant";
 $l_soldtime = "Temps vendu";
+$l_total = "Total";
 
 // Titres
 $l_dealinfos = "Partie affaire";
@@ -48,6 +51,7 @@ $l_projectinfos = "Partie Projet";
 $l_externinfos = "Projet commercial";
 $l_interninfos = "Projet interne";
 $l_advanceinfos = "Avancement du projet";
+$l_tasksinfos = "Sous-tâches du projet";
 $l_membersinfos = "Participants au projet";
 
 // Actions
@@ -72,9 +76,10 @@ $l_no_display = "Renseigner les critères souhaités et cliquer sur < Chercher > p
 $l_new_projects = "Liste des projets non initialisés";
 $l_found = "projets trouvés.";
 $l_no_found = "Aucun projet ne correspond à ces critères !";
+$l_no_tasks = "Il n'y a pas encore de sous-tâches définies";
 $l_no_members = "Il n'y a pas de renseignements sur les participants au projet";
 $l_delete_ok = "La suppression de la société a été correctement effectuée.";
-$l_state_error = "Ce n'est pas un projet valide";
+$l_status_error = "Ce n'est pas un projet valide";
 $l_delete_error = "La suppression de la société a échoué !";
 $l_insert_ok = "La création du projet a été correctement effectuée.";
 $l_insert_error = "La création du projet a échoué !";
@@ -88,9 +93,18 @@ $l_query_error = "Problème en executant la requete";
 $l_cant_delete = "La société ne peut être supprimée !";
 $l_can_delete = "La société peut être supprimée.";
 $l_member_add = "Ajouter des participants";
+$l_task_add = "Ajouter une tâche";
+$l_del_task_sel = "Enlever des tâches";
+$l_task_added = "une tâche ajoutée";
+$l_task_removed = "tâche(s) enlevé(s)";
+$l_no_task_add = "Aucune tâche à ajouter";
+$l_no_task_del = "Aucune tâche à effacer";
+$l_valid_task = "Confirmer";
 $l_del_member_sel = "Enlever ces participants";
 $l_member_added = "participant(s) ajouté(s)";
 $l_member_removed = "participant(s) enlevé(s)";
+$l_no_member_add = "Aucun participant à ajouter";
+$l_no_member_del = "Aucun participant à effacer";
 $l_valid_member = "Confirmer";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
@@ -98,9 +112,11 @@ $l_delete_confirm = "Really delete the company ?";
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
 $l_fill_tt = "Vous devez indiquer le type de tâche avant de valider.";
 $l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
+$l_fill_tasklabel = "Vous devez donner un nom à cette tâche.";
 $l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";
 $l_fill_member = "Vous devez renseigner les participants au projet.";
-$l_fill_projected = "Vous devez indiquer le temps prévu pour chaque participant avant de valider.";
+$l_fill_projected = "Chaque participant avant doit être affecté à au moins une tâche";
+$l_fill_projnumber = "Le temps prévu doit être un nombre entier de jours.";
 $l_delete_confirm = "Confirmer la suppression de la Société ?";
 $l_j_check_zip = "Le code postal n'est pas correct.";
 $l_j_check_phone = "Le numéro de téléphone n'est pas correct.";

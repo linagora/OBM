@@ -24,15 +24,15 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   $manager = $project["manager"];
   $member = $project["member"];
 
-  $query = "select 
+  $query = "select distinct
       deal_id as project_id,
       deal_label as project_label,
       deal_soldtime as project_soldtime,
       deal_archive as project_archive,
-      deal_state as project_state,
+      deal_project_status as project_status,
       company_name as project_company_name,
       tasktype_label as project_tasktype
-    from Deal, TaskType";
+    from Deal, ProjectTask, TaskType";
 
   if ($member != $c_all)
   $query .= ", ProjectUser Member";
@@ -42,7 +42,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   
   $query .= " left join Company on deal_company_id=company_id";
   $query .= " where tasktype_id=deal_tasktype_id
-              and ((deal_state = 1) or (deal_state = 2))
+              and ((deal_project_status = 1) or (deal_project_status = 2))
               and deal_archive = 0";
 
   if ($name != "") {
@@ -58,14 +58,16 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
   }
 
   if ($manager != $c_all) {
-    $query .= " and deal_id = Manager.projectuser_deal_id
+    $query .= " and deal_id = projecttask_deal_id
+                and projecttask_id = Manager.projectuser_projecttask_id
                 and Manager.projectuser_manager = 1
-                and Manager.projectuser_userobm_id = $manager";
+                and Manager.projectuser_user_id = $manager";
   }
 
   if ($member != $c_all) {
-    $query .= " and deal_id = Member.projectuser_deal_id
-                and Member.projectuser_userobm_id = $member";
+    $query .= " and deal_id = projecttask_deal_id
+                and projecttask_id = Member.projectuser_projecttask_id
+                and Member.projectuser_user_id = $member";
   }
 
   // Order by clause
@@ -91,7 +93,7 @@ function run_query_detail($p_id) {
   $query = "select
       deal_id as project_id,
       deal_label as project_label,
-      deal_state as project_state,
+      deal_project_status as project_status,
       deal_visibility as project_visibility,
       company_name as project_company_name,
       tasktype_id as project_tasktype_id,
@@ -136,7 +138,7 @@ function run_query_insert($project) {
     deal_label,
     deal_tasktype_id,
     deal_soldtime,
-    deal_state)
+    deal_project_status)
   values (null,
     '" . date("Y-m-d H:i:s") ."',
     null,
@@ -186,7 +188,7 @@ function run_query_create($project) {
       deal_timeupdate='". date("Y-m-d H:i:s") ."',
       deal_userupdate='". $auth->auth["uid"] ."',
       deal_soldtime = $soldtime,
-      deal_state = 1
+      deal_project_status = 1
     where deal_id = $p_id";
 
   display_debug_msg($query, $cdg_sql);
@@ -243,7 +245,7 @@ function run_query_close($pid) {
     set
       deal_timeupdate='". date("Y-m-d H:i:s") ."',
       deal_userupdate='". $auth->auth["uid"] ."',
-      deal_state=3
+      deal_project_status=3
     where deal_id='$pid'";
 
   display_debug_msg($query, $cdg_sql);
@@ -251,6 +253,78 @@ function run_query_close($pid) {
   $obm_q->query($query);
 
   return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : ContactList conditionnal insertion                      //
+// Parameters:
+//   - $list[] : deal hash info : keys used : id, con_nb, conX
+// Return: number of contact inserted
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasklist_insert($project) {
+  global $auth, $cdg_sql;
+
+  $pid = $project["id"];
+  $ptask = $project["ptask"];
+  $tasklabel = $project["tasklabel"];
+
+  if (!(isset($ptask))) $ptask = 0;
+
+  $query = "
+    insert into ProjectTask (
+      projecttask_deal_id,
+      projecttask_timecreate,
+      projecttask_usercreate,
+      projecttask_label,
+      projecttask_parenttask_id,
+      projecttask_rank)
+    values (
+      $pid,
+      '". date("Y-m-d H:i:s") ."',
+      '". $auth->auth["uid"] ."',
+      '$tasklabel',
+      $ptask,
+      1)
+    ";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Query execution : ContactList deletion                                    //
+// Parameters:
+//   - $list[] : deal hash info : keys used : id, con_nb, conX
+///////////////////////////////////////////////////////////////////////////////
+function run_query_tasklist_delete($project) {
+  global $auth, $cdg_sql;
+
+  $id = $project["id"];
+  $cpt = 0;
+  $cpt_del = 0;
+  while ($cpt < $project["tsk_nb"]) {
+    $cpt++;
+    $tsk_id = $project["tsk$cpt"];
+
+    $query = "
+      delete
+      from ProjectTask
+      where projecttask_id = $tsk_id
+        or  projecttask_parenttask_id = $tsk_id
+      ";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $retour = $obm_q->query($query);
+    if ($retour) {
+      $cpt_del++;
+    }
+  }
+
+  return $cpt_del;
 }
 
 
@@ -266,6 +340,19 @@ function run_query_memberlist_insert($project) {
   $id = $project["id"];
   $cpt = 0;
   $cpt_ins = 0;
+  
+  $query = "
+    select projecttask_id as pt_id
+    from ProjectTask
+    where projecttask_deal_id = $id";
+
+  display_debug_msg($query, $cdg_sql);
+  $ptask_q = new DB_OBM;
+  $ptask_q->query($query);
+  $ptask_q->next_record();
+
+  $pt_id = $ptask_q->f("pt_id");
+
   while ($cpt < $project["mem_nb"]) {
     $cpt++;
     $mem_id = $project["mem$cpt"];
@@ -273,8 +360,8 @@ function run_query_memberlist_insert($project) {
     $query = "
       select *
       from ProjectUser
-      where projectuser_deal_id = $id
-        and projectuser_userobm_id = $mem_id";
+      where projectuser_projecttask_id = $pt_id
+        and projectuser_user_id = $mem_id";
 
     display_debug_msg($query, $cdg_sql);
     $test_q = new DB_OBM;
@@ -284,14 +371,14 @@ function run_query_memberlist_insert($project) {
     if ($test_q->num_rows() == 0) {
       $query = "
         insert into ProjectUser 
-          (projectuser_userobm_id,
-           projectuser_deal_id,
+          (projectuser_user_id,
+           projectuser_projecttask_id,
            projectuser_timecreate,
            projectuser_usercreate
           )
         values
           ($mem_id,
-          $id,
+          $pt_id,
           '".date("Y-m-d H:i:s")."',
           ". $auth->auth["uid"] .")";
 
@@ -311,26 +398,67 @@ function run_query_memberlist_insert($project) {
 // Parameters:
 //   - $list[] : deal hash info : keys used : id, con_nb, conX
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_memberlist_delete($project) {
+function run_query_memberlist_delete($project, $all = 0) {
   global $auth, $cdg_sql;
 
   $id = $project["id"];
   $cpt = 0;
   $cpt_del = 0;
-  while ($cpt < $project["mem_nb"]) {
-    $cpt++;
-    $mem_id = $project["mem$cpt"];
 
-    $query = "delete
-      from ProjectUser
-      where projectuser_deal_id = $id
-        and projectuser_userobm_id = '$mem_id'";
+  // WIll change to a sub subselect when running with mysql 4.1
+  
+  $query = "
+    select projecttask_id as pt_id
+    from ProjectTask
+    where projecttask_deal_id = $id";
+
+  display_debug_msg($query, $cdg_sql);
+  $ptask_q = new DB_OBM;
+  $ptask_q->query($query);
+
+  $ptask_q->next_record();
+  $pt_id = $ptask_q->f("pt_id");
+  $pt_tab = "($pt_id";
+
+  $obm_q = new DB_OBM;
+
+  while($ptask_q->next_record()) {
+    $pt_id = $ptask_q->f("pt_id");
+    $pt_tab .= ", $pt_id";  
+  }
+
+  $pt_tab .= ")";
+
+  if ($all == 1) {
+    $query = "
+        delete
+        from ProjectUser
+        where projectuser_projecttask_id in $pt_tab
+        ";
+
     display_debug_msg($query, $cdg_sql);
-    $obm_q = new DB_OBM;
     $retour = $obm_q->query($query);
-    if ($retour) {
-      $cpt_del++;
+    
+  } else {
+    
+    while ($cpt < $project["mem_nb"]) {
+      $cpt++;
+      $mem_id = $project["mem$cpt"];
+
+      $query = "
+        delete
+        from ProjectUser
+        where projectuser_projecttask_id in $pt_tab
+          and projectuser_user_id = '$mem_id'
+        ";
+
+      display_debug_msg($query, $cdg_sql);
+      $retour = $obm_q->query($query);
+      if ($retour) {
+	$cpt_del++;
+      }
     }
+
   }
 
   return $cpt_del;
@@ -347,30 +475,51 @@ function run_query_memberlist_delete($project) {
 function run_query_projectupdate($project) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["id"];
+  //  $p_id = $project["id"];
   $obm_q = new DB_OBM;
 
   // Update project estimated missing times
-  while ( list($m_id, $projtime) = each($project["projected"]) ) {
-    if ($projtime != "") {
+  while ( list($t_id, $projtab) = each($project["projected"]) ) {
+    while ( list($m_id, $proj) = each($projtab) ) {
+      if ($proj != "") {
 
-      $query = "update ProjectUser set
-          projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
-          projectuser_userupdate='". $auth->auth["uid"] ."',
-          projectuser_missingtime =  $projtime,
-          projectuser_projectedtime =  $projtime
-        where projectuser_deal_id = $p_id
-          and projectuser_userobm_id = $m_id
-      ";
-      
-      display_debug_msg($query, $cdg_sql);
-      $retour = $obm_q->query($query);
-      
-      if (!($retour))
-	$ins_err = 1;
+ 	$query = "	
+          insert into ProjectUser 
+            (projectuser_user_id,
+             projectuser_projecttask_id,
+             projectuser_timecreate,
+             projectuser_usercreate,
+             projectuser_missingtime,
+             projectuser_projectedtime
+            )
+          values
+            ($m_id,
+             $t_id,
+             '".date("Y-m-d H:i:s")."',
+             ". $auth->auth["uid"] .",
+             $proj,
+             $proj
+            )";
+	
+
+// 	$query = "
+//           update ProjectUser set
+//             projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
+//             projectuser_userupdate='". $auth->auth["uid"] ."',
+//             projectuser_missingtime =  $proj,
+//             projectuser_projectedtime =  $proj
+//           where projectuser_projecttask_id = $t_id
+//             and projectuser_user_id = $m_id
+//         ";
+	
+	display_debug_msg($query, $cdg_sql);
+	$retour = $obm_q->query($query);
+	
+	if (!($retour))
+	  $ins_err = 1;
+      }
     }
   }
-
 
   return $ins_err;
 }
@@ -386,30 +535,32 @@ function run_query_projectupdate($project) {
 function run_query_advanceupdate($project) {
   global $auth, $cdg_sql;
 
-  $p_id = $project["id"];
   $obm_q = new DB_OBM;
-
+  
   // Update project estimated missing times
-  while ( list($m_id, $misstime) = each($project["missing"]) ) {
-    if ($misstime != "") {
-      
-      $query = "update ProjectUser set
-          projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
-          projectuser_userupdate='". $auth->auth["uid"] ."',
-          projectuser_missingtime =  $misstime
-        where projectuser_deal_id = $p_id
-          and projectuser_userobm_id = $m_id
-      ";
-      
-      display_debug_msg($query, $cdg_sql);
-      $retour = $obm_q->query($query);
-      
-      if (!($retour))
-	$ins_err = 1;
+  while ( list($t_id, $misstab) = each($project["missing"]) ) {
+    while ( list($m_id, $misstime) = each($misstab) ) {
+      if ($misstime != "") {
+	
+	$query = "
+          update ProjectUser set
+            projectuser_timeupdate='". date("Y-m-d H:i:s") ."',
+            projectuser_userupdate='". $auth->auth["uid"] ."',
+            projectuser_validity='". date("Y-m-d H:i:s") ."',
+            projectuser_missingtime =  $misstime
+          where projectuser_projecttask_id = $t_id
+            and projectuser_user_id = $m_id
+          ";
+	
+	display_debug_msg($query, $cdg_sql);
+	$retour = $obm_q->query($query);
+	
+	if (!($retour))
+	  $ins_err = 1;
+      }
     }
   }
-
-
+  
   return $ins_err;
 }
 
@@ -424,10 +575,34 @@ function run_query_statlog($p_id) {
 
   $frac = $c_day_fraction;
 
-  $query = "select (sum(task_length)/$frac) as time_used
-            from Task
-            where task_deal_id=$p_id
-            group by task_deal_id";
+  // Will change to a sub subselect when running with mysql 4.1
+  
+  $query = "
+    select projecttask_id as pt_id
+    from ProjectTask
+    where projecttask_deal_id = $p_id";
+
+  display_debug_msg($query, $cdg_sql);
+  $ptask_q = new DB_OBM;
+  $ptask_q->query($query);
+
+  $ptask_q->next_record();
+  $pt_id = $ptask_q->f("pt_id");
+  $pt_tab = "($pt_id";
+
+  $obm_q = new DB_OBM;
+
+  while($ptask_q->next_record()) {
+    $pt_id = $ptask_q->f("pt_id");
+    $pt_tab .= ", $pt_id";  
+  }
+
+  $pt_tab .= ")";
+
+  $query = "select (sum(timetask_length)/$frac) as time_used
+            from TimeTask
+            where timetask_projecttask_id in $pt_tab
+            group by timetask_projecttask_id, timetask_user_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -439,8 +614,8 @@ function run_query_statlog($p_id) {
 
   $query = "select sum(projectuser_missingtime) as time_left
             from ProjectUser
-            where projectuser_deal_id=$p_id
-            group by projectuser_deal_id";
+            where projectuser_projecttask_id in $pt_tab
+            group by projectuser_projecttask_id, projectuser_user_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -478,7 +653,7 @@ function run_query_statlog($p_id) {
 // function run_query_delete($p_id) {
 //   global $cdg_sql;
 
-//   $query = "delete from Company where company_id='$p_id'";
+//   $query = "delete from  where ";
 
 //   display_debug_msg($query, $cdg_sql);
 //   $obm_q = new DB_OBM;
@@ -496,14 +671,14 @@ function run_query_newprojects() {
   global $cdg_sql;
 
   $query = "select deal_id as project_id,
-              deal_state as project_state,
+              deal_project_status as project_status,
               deal_label as project_initlabel,
               company_name as project_company_name,
               tasktype_label as project_tasktype
             from Deal, Company, TaskType
             where deal_company_id = company_id
               and deal_tasktype_id = tasktype_id
-              and deal_state = 0
+              and deal_project_status = 0
               and deal_hitrate = '100'
               and deal_archive = 0
             order by project_initlabel";
@@ -515,57 +690,27 @@ function run_query_newprojects() {
   return $obm_q;
 }
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Return all the project that are still in commercial state
 // Parameters :
-//   $type : categories of tasktype
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_projecttype($type = 'all') {
+function run_query_tasks($pid) {
   global $cdg_sql;
 
-  $query = "select tasktype_id, tasktype_label, tasktype_internal
-            from TaskType ";
-
-  if ($type == 'all')
-    $query .= "where (tasktype_internal = 0 or tasktype_internal = 1)";
-  elseif ($type == 'billable')
-    $query .= "where tasktype_internal = 0";
-  else
-    $query .= "where tasktype_internal = 1";
-
-  $query .= " order by tasktype_internal";
+  $query = "select
+      projecttask_id,
+      projecttask_label,
+      projecttask_parenttask_id as projecttask_parent,
+      projecttask_rank
+    from ProjectTask
+    where projecttask_deal_id = $pid
+    order by projecttask_parent, projecttask_rank
+  ";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  return $obm_q;
-}
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Project managers query
-// Parameters :
-///////////////////////////////////////////////////////////////////////////////
-function run_query_manager($p_id = 0) {
-  global $cdg_sql;
-
-  $query = "select userobm_id as manager_id,
-                   userobm_firstname as manager_firstname,
-                   userobm_lastname as manager_lastname
-            from ProjectUser, UserObm
-            where projectuser_userobm_id = userobm_id
-            and   projectuser_manager = 1 ";
-  
-  if ($p_id)
-    $query .= "and projectuser_deal_id = $p_id ";
-
-  $query .= "group by manager_id
-             order by manager_firstname";
-
-  display_debug_msg($query, $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
   return $obm_q;
 }
 
@@ -574,20 +719,37 @@ function run_query_manager($p_id = 0) {
 // Project members query
 // Parameters :
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_member($p_id = 0) {
+function run_query_members() { //$p_id = 0) {
   global $cdg_sql;
 
-  $query = "select userobm_id as member_id,
-                   userobm_firstname as member_firstname,
-                   userobm_lastname as member_lastname
-            from ProjectUser, UserObm
-            where projectuser_userobm_id = userobm_id ";
-  
-  if ($p_id)
-    $query .= "and projectuser_deal_id = $p_id ";
+//   if ($p_id) {
 
-  $query .= "group by member_id
-             order by member_firstname";
+//   $query = "
+//     select
+//       userobm_id,
+//       userobm_lastname,
+//       userobm_firstname,
+//       projectuser_manager
+//     from UserObm, ProjectUser, ProjectTask
+//     where projecttask_deal_id = $p_id
+//       and projecttask_id = projectuser_projecttask_id
+//       and projectuser_user_id = userobm_id
+//     group by userobm_id
+//     order by projectuser_manager desc, userobm_lastname, userobm_firstname
+//     ";
+//   } else {
+
+  $query = "
+    select userobm_id as member_id,
+      userobm_firstname as member_firstname,
+      userobm_lastname as member_lastname
+    from UserObm, ProjectUser
+    where projectuser_user_id = userobm_id
+      and userobm_archive = 0
+    group by member_id
+    order by member_firstname
+    ";
+//   }
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -606,22 +768,26 @@ function run_query_memberstime($p_id) {
 
   $frac = $c_day_fraction;
 
-  $query = "select
+  $query = "
+    select
       userobm_id,
       userobm_lastname,
       userobm_firstname,
-      sum((task_length)/$frac) as used_time,
+      projectuser_user_id,
+      projectuser_projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
       projectuser_projectedtime as projected_time,
       projectuser_missingtime as missing_time,
       projectuser_manager
-    from UserObm, ProjectUser
-    left join Task 
-      on  task_deal_id = $p_id
-      and task_user_id = userobm_id
-    where projectuser_deal_id = $p_id
-      and projectuser_userobm_id = userobm_id
-    group by userobm_id, task_user_id
-    order by projectuser_manager desc, userobm_lastname, userobm_firstname
+    from UserObm, ProjectUser, ProjectTask
+    left join TimeTask 
+      on  timetask_projecttask_id = projecttask_id
+      and timetask_user_id = userobm_id
+    where projecttask_deal_id = $p_id
+      and projecttask_id = projectuser_projecttask_id
+      and projectuser_user_id = userobm_id
+    group by userobm_id, projecttask_id
+    order by projectuser_manager desc,userobm_lastname, userobm_firstname
     ";
 
   display_debug_msg($query, $cdg_sql);
@@ -630,6 +796,64 @@ function run_query_memberstime($p_id) {
 
   return $obm_q;
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Project managers query
+// Parameters :
+///////////////////////////////////////////////////////////////////////////////
+function run_query_managers($p_id = 0) {
+  global $cdg_sql;
+
+  $query = "select userobm_id as manager_id,
+                   userobm_firstname as manager_firstname,
+                   userobm_lastname as manager_lastname
+            from ProjectUser, UserObm
+            where projectuser_user_id = userobm_id
+            and   projectuser_manager = 1 ";
+  
+  if ($p_id)
+    $query .= "and projectuser_deal_id = $p_id ";
+
+  $query .= "group by manager_id
+             order by manager_firstname";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Return all the project that are still in commercial state
+// Parameters :
+//   $type : categories of tasktype
+///////////////////////////////////////////////////////////////////////////////
+function run_query_projecttype($type = 'all') {
+  global $cdg_sql;
+
+  $query = "
+    select
+      tasktype_id,
+      tasktype_label, 
+      tasktype_internal
+    from TaskType ";
+
+  if ($type == 'all')
+    $query .= "where (tasktype_internal = 0 or tasktype_internal = 1)";
+  elseif ($type == 'billable')
+    $query .= "where tasktype_internal = 0";
+  else
+    $query .= "where tasktype_internal = 1";
+
+  $query .= " order by tasktype_internal";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  return $obm_q;
+}
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -705,6 +929,32 @@ function check_init_form($pid, $project) {
 //    }
 
   return true; 
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Company Form Data checking and formatting                                 //
+// Parameters:
+//   - $cid   : company id
+//   - $company[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_taskadd_form($pid, $project) {
+  return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Company Form Data checking and formatting                                 //
+// Parameters:
+//   - $cid   : company id
+//   - $company[] : values checked
+//     keys used  : num, name, zip, phone, fax, web, email
+// Returns:
+//   - (true | false) : true if data are ok, else false 
+///////////////////////////////////////////////////////////////////////////////
+function check_advance_form($pid, $project) {
+  return true;
 }
 
 </SCRIPT>

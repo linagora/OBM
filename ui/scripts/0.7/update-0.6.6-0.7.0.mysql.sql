@@ -34,6 +34,24 @@ ALTER TABLE Deal ADD deal_project_status int(1) DEFAULT 0 AFTER deal_soldtime;
 -- Add query field
 ALTER table List ADD list_query text AFTER list_email;
 
+-------------------------------------------------------------------------------
+-- Task -> TimeTask
+-------------------------------------------------------------------------------
+alter table Task
+  change task_id timetask_id int(8) NOT NULL auto_increment,
+  change task_timeupdate timetask_timeupdate timestamp(14) NOT NULL,
+  change task_timecreate timetask_timecreate timestamp(14) NOT NULL,
+  change task_userupdate timetask_userupdate int(8) default NULL,
+  change task_usercreate timetask_usercreate int(8) default NULL,
+  change task_user_id timetask_user_id int(8) default NULL,
+  change task_date timetask_date timestamp(14) NOT NULL,
+  change task_deal_id timetask_projecttask_id int(8) default NULL,
+  change task_length timetask_length int(2) default NULL,
+  change task_tasktype_id timetask_tasktype_id int(8) default NULL,
+  change task_label timetask_label varchar(255) default NULL,
+  change task_status timetask_status int(1) default NULL;
+
+alter table Task rename to TimeTask;
 
 -------------------------------------------------------------------------------
 -- ProjectStat
@@ -50,13 +68,28 @@ CREATE TABLE ProjectStat (
   PRIMARY KEY (projectstat_deal_id, projectstat_date)
 );
 
+-------------------------------------------------------------------------------
+-- ProjectTask
+-------------------------------------------------------------------------------
+CREATE TABLE ProjectTask (
+  projecttask_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  projecttask_deal_id int(8) NOT NULL,
+  projecttask_timeupdate timestamp(14) NOT NULL,
+  projecttask_timecreate timestamp(14) NOT NULL,
+  projecttask_userupdate int(8) default NULL,
+  projecttask_usercreate int(8) default NULL,
+  projecttask_label varchar(255) default NULL,
+  projecttask_parenttask_id int(8) default 0,
+  projecttask_rank int(8) default NULL,
+  PRIMARY KEY (projecttask_id)
+);
 
 -------------------------------------------------------------------------------
 -- ProjectUser
 -------------------------------------------------------------------------------
 CREATE TABLE ProjectUser (
-  projectuser_deal_id int(8) NOT NULL,
-  projectuser_userobm_id int(8) NOT NULL,
+  projectuser_projecttask_id int(8) NOT NULL,
+  projectuser_user_id int(8) NOT NULL,
   projectuser_timeupdate timestamp(14) NOT NULL,
   projectuser_timecreate timestamp(14) NOT NULL,
   projectuser_userupdate int(8) default NULL,
@@ -66,7 +99,7 @@ CREATE TABLE ProjectUser (
   projectuser_validity timestamp(14) default NULL,
   projectuser_soldprice int(8) default NULL,
   projectuser_manager int(1) default NULL,
-  PRIMARY KEY (projectuser_deal_id, projectuser_userobm_id)
+  PRIMARY KEY (projectuser_projecttask_id, projectuser_user_id)
 );
 
 -------------------------------------------------------------------------------

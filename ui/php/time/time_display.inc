@@ -112,60 +112,35 @@ function dis_time_links (&$time, $type="all") {
 
   if ($type == "week") {
 
-  //get the current start and end of week
-  $d_start_week = first_day_week($time);
-  $d_end_week = $d_start_week+6*86400;
+    //get the current start and end of week
+    $d_start_week = first_day_week($time);
+    $d_end_week = $d_start_week+6*86400;
 
-  // get the previous and next beginning of week
-  $d_start_prev = $d_start_week-7*86400;
-  $d_start_next = $d_start_week+7*86400; 
+    // get the previous and next beginning of week
+    $d_start_prev = $d_start_week-7*86400;
+    $d_start_next = $d_start_week+7*86400; 
      
-  // bcontins : sert pas à grand chose ici (seuls les jours comptent)
-  //Daylight Savings Time
-  //if ( date('I',$d_start_week) == '0' and  date('I',$d_start_prev) == '1' ) {
-    //winter to summer
-    //$d_start_prev -= 3600;   
-  //}
-  //else if ( date('I',$d_start_week) == '1' and date('I',$d_start_prev) == '0' ) {
-    //summer to winter
-    //$d_start_prev += 3600;
-  //}
-  //if ( date('I',$d_start_week) == '0' and  date('I',$d_start_next) == '1' ) {
-    //winter to summer
-    //$d_start_next -= 3600;
-  //}
-  //else if ( date('I',$d_start_week) == '1' and date('I',$d_start_next) == '0' ) {
-    //summer to winter
-    //$d_start_next += 3600;
-  //}
+    // bcontins ???
+    $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
+    $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
 
-  // bcontins : obsolete on garde que le debut de semaine
-  //set end of week
-  //$d_end_next = $d_start_next + 5*86400;
-  //$d_end_prev = $d_start_prev + 5*86400;
- 
-  // bcontins ???
-  $hum_date_start = dis_human_date(date("Ymd", $d_start_week));
-  $hum_date_end = dis_human_date(date("Ymd", $d_end_week));
-
-  echo "
+    echo "
       <center> <font size=-2>
-         <table border=1 width=50%>
+         <table border=1>
             <tr><td class=\"timeLinks\" align=\"left\">
                <a href=\"" .
-               url_prepare("time_index.php?action=".$time["action"].
-               "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
+                  url_prepare("time_index.php?action=".$time["action"].
+		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
                &lt;&nbsp;".$l_week_prev."
                </a>
             </td>
-            <td class=\"timePeriod\">&nbsp;&nbsp;&nbsp;
-	      $l_week $l_from $hum_date_start &nbsp;&nbsp;&nbsp;<BR> 
-              $l_to $hum_date_end
-            </td>
+            <td class=\"timePeriod\">&nbsp;
+	      $l_week $l_from $hum_date_start $l_to $hum_date_end
+              &nbsp;</td>
             <td class=\"timeLinks\" align=\"right\">
                <a href=\"" .
-               url_prepare("time_index.php?action=".$time["action"].
-               "&amp;wbegin=".date("Ymd",$d_start_next))."\">
+                  url_prepare("time_index.php?action=".$time["action"].
+		  "&amp;wbegin=".date("Ymd",$d_start_next))."\">
                ".$l_week_next."&gt;&nbsp;
                </a>
             </td></tr>
@@ -173,48 +148,38 @@ function dis_time_links (&$time, $type="all") {
       </font> </center>    
         ";
 
- } else if ($type == "month") {
-  if (debug_level_isset($cdg_param)) {
-    echo "dis_time_links \$time <br>";
-	debug_array($time);
-  }
+  } else if ($type == "month") {
+    if (debug_level_isset($cdg_param)) {
+      echo "dis_time_links \$time <br>";
+      debug_array($time);
+    }
 
-  // bcontins inutile
-  //get the current start and end of month
-  // $d_start_month = first_day_month($time);
+    if (debug_level_isset($cdg_param)) {
+      echo "DIS_TIME_LINKS <br>";
+      echo "date ". $time["date"] . " <br>";
+    }
 
-  if (debug_level_isset($cdg_param)) {
-    echo "DIS_TIME_LINKS <br>";
-	echo "date ". $time["date"] . " <br>";
-  }
+    // This should work for january also (month 0 = december) 
+    $month=substr($time["date"],4,2);
+    $year=substr($time["date"],0,4);
 
-  // bcontins date_end supprimé
-  // THIS SHOULD BE SET
-  //if ( ! isset($time["date_end"]) ) 
-  //  echo "date_end not set !!! <br>";
-  //    $time["date_end"] = date("Ymd",$d_start_week+6*86400);
+    $d_start_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
+    $d_start_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
 
-  // This should work for january also (month 0 = december) 
-  $month=substr($time["date"],4,2);
-  $year=substr($time["date"],0,4);
+    if (debug_level_isset($cdg_param)) {
+      echo "previous $d_start_prev, next $d_start_next, <br>";
+    }
 
-  $d_start_prev = date("Ymd", mktime(0,0,0,$month-1,1,$year));
-  $d_start_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
+    //Daylight Savings Time
+    // nothing to do for this
 
-  if (debug_level_isset($cdg_param)) {
-    echo "previous $d_start_prev, next $d_start_next, <br>";
-  }
-
-  //Daylight Savings Time
-  // nothing to do for this
-
-  echo "
+    echo "
       <center> <font size=-2>
          <table border=1>
             <tr><td class=\"timeLinks\" align=\"left\">
                <a href=\"" .
-               url_prepare("time_index.php?action=".$time["action"].
-               "&amp;wbegin=$d_start_prev")."\">
+                  url_prepare("time_index.php?action=".$time["action"].
+		  "&amp;wbegin=$d_start_prev")."\">
                &lt;&nbsp;".$l_month_prev."
                </a>
             </td>
@@ -223,50 +188,16 @@ function dis_time_links (&$time, $type="all") {
             </td>
             <td class=\"timeLinks\" align=\"right\">
                <a href=\"" .
-               url_prepare("time_index.php?action=".$time["action"].
-               "&amp;wbegin=$d_start_next")."\">
+                  url_prepare("time_index.php?action=".$time["action"].
+		  "&amp;wbegin=$d_start_next")."\">
                ".$l_month_next."&gt;&nbsp;
                </a>
             </td></tr>
          </table>    
       </font> </center>    
         ";
-
-  // bcontins obsolete
-//    echo "
-//       <CENTER> <FONT SIZE=-2>
-//          <TABLE BORDER=1>
-//             <TR>
-//               <TD colspan=2 align=center><font size=+1> $l_month2 ". month_name($month) ." </TD>
-//             </TR>
-//             <TR><TD>
-//                <A HREF=\"" .
-//                url_prepare("time_index.php?action=".$time["action"].
-//            "&amp;param_begin=$d_start_prev&amp;param_end=$d_end_prev".
-// 						  //		   "&amp;user_id=".$time["user_id"].
-//            "&amp;st_detail=".$time["show_task_detail"])."\">
-//                ".$l_month_prev."
-//                </A>&nbsp;
-//             </TD>  
-//             <TD>&nbsp;
-//                <A HREF=\"" .
-//             url_prepare("time_index.php?action=".$time["action"].
-//                 "&amp;param_begin=".
-//                 $d_start_next.
-//                 "&amp;param_end=".
-//                 $d_end_next.
-// 					   //                "&amp;user_id=".
-// 					   //                $time["user_id"].
-//                 "&amp;st_detail=".
-//                 $time["show_task_detail"]).
-//                 "\">".
-//                 $l_month_next.
-//                 "</A>
-//             </TD></TR>
-//          </TABLE>    
-//       </FONT> </CENTER>    
-//         ";     
-   }
+  
+  }
 }
 
  
@@ -444,41 +375,6 @@ function dis_selectusers_form ($time, $usr_q, $uid) {
     echo "<br>$l_week du $hum_date_start au $hum_date_end<br><br>";
 }
 
-// bcontins probablement obsolete
-///////////////////////////////////////////////////////////////////////////////
-// Display Time Period                                      //
-// Parameters:
-//   - $time[] : default form values
-//     keys used  : week
-//   - $usr_q  : DBO : UserObm list
-//   - $uid    : current user id
-///////////////////////////////////////////////////////////////////////////////
-// function dis_time_period ($time) {
-//   global $l_see, $l_week, $l_month, $project_managers;
-//   global $l_user;
-//   global $uid;
-
-//   $hum_date_start = dis_human_date($time["date"]);
-//   $hum_date_end = dis_human_date($time["date_end"]);
-
-//   if ($time["interval"] == "week")
-// 	$l_period = $l_week;
-//   else if ($time["interval"] == "month")
-// 	$l_period = $l_month;
-
-//     echo "<br>
-//       <center>
-//       <table border=1>
-//       <tr>
-//         <td><font size=-2>$l_period</font></td>
-//         <td><font size=-1>Du $hum_date_start au $hum_date_end</font></td>
-//       </tr>
-//       <tr>
-//       </table>
-//       <hr>
-//       </center>";
-// }
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the full TimeManager result page                                 //
@@ -493,34 +389,16 @@ function dis_time_list($time) {
   global $c_day_fraction; // nbre de fraction possible d'une journée
   global $c_days_in_a_week; // how many days in a week have to be filled (5)
 
-
+  //bcontins task list is no more a display
   //$pref_q = run_query_display_pref($auth->auth["uid"], "time");
   
   //echo "IN dis_time_list <br>";
   // obm_q contains the time events for a user and an interval
+  // bcontins what's that for ?
   $task_q = run_query_search($time, $new_order, $order_dir);
   $nb_task = $task_q->num_rows();
 
   $pref_day_q = run_query_display_pref($auth->auth["uid"], "time_day");
-
-  // bcontins obsolete
-  // $obm_day_q = run_query_by_day($time, $new_order, $order_dir);
-  
-  //OLD
-  //  $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
-  //  $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
-
-  // bcontins vraiment OLD
-  //   $pref_deal_q = run_query_display_pref($auth->auth["uid"], "time_deal");
-  //   $obm_deal_q = run_query_by_deal($time, $new_order, $order_dir);
-
-  // bcontins obsolete semaine affichée dasn le time links
-  //get the current start and end of week
-  //$d_start_week = first_day_week($time);  
-  //$date_start = date("Ymd",$d_start_week);
-  //$date_end = date("Ymd",$d_start_week + (6*86400)); 
-  //$hum_date_start = dis_human_date($date_start);
-  //$hum_date_end = dis_human_date($date_end);
 
   // array of validated days
   $val_days = run_query_valid_search($time);
@@ -529,10 +407,6 @@ function dis_time_list($time) {
     print_r($val_days);
   }
 
-  // bcontins probablement inutile menu show detail
-  // dis_time_menu($time);
-
-  
   // Creating the dates for the selected (or current) date
   // format "Mon 25 May"
   $d_start_week = first_day_week($time);  
@@ -573,14 +447,6 @@ function dis_time_list($time) {
     // bcontins display task list
    dis_time_list_result($task_q, $pref_q, $time);
   }
-
-  // bcontins obsolete remplace par une liste unique de taches
-  //if($nb_task != 0) {
-  //  dis_form_uservalid_day($obm_day_q,$pref_day_q,$nb_task,$time, $val_days);
-  //  dis_form_adminvalid_day($obm_day_q,$pref_day_q,$nb_task,$time, $val_days);
-  //
-  //	dis_time_deal_list($obm_deal_q,$pref_deal_q,$nb_task,$time);
-  //}
   
 }
 

@@ -41,12 +41,6 @@ require("time_query.inc");
 
 $time = get_param_time();
 
-// bcontins akoicasert
-// We need to have first day of the month 
-//  Maybe should be set other way...
-// $time["month_first"] = first_day_month($time, false);
-//echo "action $action, show_task_detail $st_detail <br>";
-
 $uid = $auth->auth["uid"]; //current user uid
 
 if (debug_level_isset($cdg_param)) {
@@ -69,7 +63,12 @@ if (! empty($time["user_id"])) {
 }
 else if (isset($s_users)) {
   // $s_users is a session variable
-  $time["user_id"] = $s_users;
+
+  //  if (count($s_users) == 1)
+  //$time["user_id"] = $s_users[0];
+    //else
+    $time["user_id"] = $s_users;
+
   if (debug_level_isset($cdg_param)) {
 	echo "variable de session \$s_users is set : ". $s_users ." <br>";
     if (is_array($s_users)) {
@@ -83,7 +82,7 @@ else if (isset($s_users)) {
 }
 
 else {
-  $s_users = array($uid);
+  $s_users = $uid;
   $time["user_id"] = $s_users;
   $sess->register("s_users");
   if (debug_level_isset($cdg_param)) {
@@ -150,12 +149,6 @@ if (! isset($time["user_id"]))
 if (! isset($time["date"]))
   $time["date"]=date("Ymd");
 
-// bcontins : ne devrait plus servir
-//set $show_task_detail flag
-// ?? THIS CAN BE A USER PREFERENCE ??
-//if( ! isset($time["show_task_detail"]) )
-//  $time["show_task_detail"] = true;
-
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
@@ -182,11 +175,7 @@ if ($action == "index" || $action == "") {
   // display links to previous and next week
   dis_time_links($time,"week");
 
-  // bcontins ckoica
-  // run_query_contactid_user
-  //  -- THIS SHOULD CHANGE TO USE THE User TABLE --
-
-  // bcontins planning hebdomadaire
+  // week planning display
   dis_time_index($time);
 
   // display addtask form if necessary and full task list

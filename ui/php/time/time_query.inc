@@ -28,68 +28,77 @@ function run_query_search($time, $p_new_order, $p_order_dir) {
   if ($time["interval"] == "week") {
       $array_date = get_week_point($date);
   }
-  //  else {
-  //    echo "week ". $time["interval"] ." !!<br>";
-  //    die ("interval != 'week' not fonctionnal"); 
-  //}
 
-  // Query to get any time event for the given User
-  //  Optional parameters :
-  //   - $array_date with begin and end date
-  //   - $company : a company name (not used at this time)
-  //   - $company_id : a company id (not used at this time)
+  //bcontins virer les doublons des id
+//   $query = "select TimeTask.*,
+//       timetask_id,
+//       TimeTask.timetask_id as Id,
+//       UNIX_TIMESTAMP(timetask_date) as date_task,
+//       UNIX_TIMESTAMP(timetask_timeupdate) as date_timeupdate,
+//       UNIX_TIMESTAMP(timetask_timecreate) as date_timecreate,
+//       concat(task_length,concat('/',$c_day_fraction)) as task_length,
+//       TaskType.*,
+//       deal_label as task_deal_label,
+//       company_name as task_company_name,
+//       task_status as test_status
+//     from (TimeTask left join Deal on timetask_projecttask_id = deal_id) 
+//       left join Company on deal_company_id = company_id,
+//       TaskType
+//     where task_tasktype_id = tasktype_id ";
 
-  // bcontins vire pas compris l'utilite
-  // 0 = task_status renamed as test_status : if =0, check box visible
-  //    if <> 0 (i.e. validated), checkbox not visible
-  $query = "select Task.*,
-      task_id,
-      Task.task_id as Id,
-      UNIX_TIMESTAMP(task_date) as date_task,
-      UNIX_TIMESTAMP(task_timeupdate) as date_timeupdate,
-      UNIX_TIMESTAMP(task_timecreate) as date_timecreate,
-      concat(task_length,concat('/',$c_day_fraction)) as task_length,
-      TaskType.*,
-      deal_label as task_deal_label,
-      company_name as task_company_name,
-      task_status as test_status
-    from (Task left join Deal on task_deal_id = deal_id) 
-      left join Company on deal_company_id = company_id,
-      TaskType
-    where task_tasktype_id = tasktype_id ";
-
+  $query = "
+    select timetask_id as Id,
+      UNIX_TIMESTAMP(timetask_date) as date_task,
+      UNIX_TIMESTAMP(timetask_timeupdate) as date_timeupdate,
+      UNIX_TIMESTAMP(timetask_timecreate) as date_timecreate,
+      concat(timetask_length,concat('/',8)) as timetask_length,
+      tasktype_label,
+      deal_label as timetask_deal_label,
+      projecttask_label as timetask_projecttask_label,
+      company_name as timetask_company_name,
+      timetask_status as test_status 
+    from ((TimeTask left join ProjectTask on timetask_projecttask_id = projecttask_id)
+      left join Deal on projecttask_deal_id = deal_id)
+      left join Company on deal_company_id = company_id, TaskType 
+    where timetask_tasktype_id = tasktype_id
+      and timetask_date >='". $array_date[0] ."' 
+      and timetask_date <'". $array_date[1] ."'
+      and timetask_user_id = ". $time["user_id"] ."
+    order by timetask_date
+    ";
  
+  //bcontins les parametres de recherche servent ils ?
   // If a time interval has been specified, get it 
-  if (is_array($array_date)) {
-    $query .= "and task_date  >='" . $array_date[0] . "' and " .
-              "task_date  <'" . $array_date[1] . "'";
-  }
+//   if (is_array($array_date)) {
+//     $query .= "and task_date  >='" . $array_date[0] . "' and " .
+//               "task_date  <'" . $array_date[1] . "'";
+//   }
 
   // If a company indication has been specified, get it 
-  if ($company != "") {
-    $query .= " and company_name like '" . $company . "%'";
-  }
+//   if ($company != "") {
+//     $query .= " and company_name like '" . $company . "%'";
+//   }
 
   // If a company was sent as parameter, get it
-  if ($company_id != "") {
-    $query .= " and company_id =" . $company_id ;
-  }
+//   if ($company_id != "") {
+//     $query .= " and company_id =" . $company_id ;
+//   }
 
   // user_id : array -> size 1 or more 
-  if (sizeof($time["user_id"]) == 1)
-	  $query .= " and task_user_id = ". $time["user_id"]["0"];
-  else {
-	$users_list = array_to_list($time["user_id"]);
-	$query .= " and task_user_id in $users_list";
-  }
+//   if (sizeof($time["user_id"]) == 1)
+// 	  $query .= " and task_user_id = ". $time["user_id"];
+//   else {
+// 	$users_list = array_to_list($time["user_id"]);
+// 	$query .= " and task_user_id in $users_list";
+//   }
 
   // order
-  if (strcmp($p_new_order,"") != 0)
-    $order = $p_new_order;
-  else
-    $order = "Task.task_date";
+//   if (strcmp($p_new_order,"") != 0)
+//     $order = $p_new_order;
+//   else
+//     $order = "Task.task_date";
 
-  $query .= " order by $order $p_order_dir";
+//   $query .= " order by $order $p_order_dir";
    
   display_debug_msg($query, $cdg_sql,"run_query_search");
   $obm_db = new DB_OBM;
@@ -349,22 +358,22 @@ function run_query_valid_search($time) {
   $user_id = $time["user_id"];
   //  echo "Run_query_valid_search<br>";
   //  print_r($time);
-  $query = "select task_date, task_status 
-      from Task 
-      where task_status != 0 
-        and task_date >= '$week_span[0]' 
-        and task_date <= '$week_span[1]'";
+  $query = "select timetask_date, timetask_status 
+      from TimeTask 
+      where timetask_status != 0 
+        and timetask_date >= '". $week_span[0] ."' 
+        and timetask_date <= '". $week_span[1]. "'";
 
   // user_id : array -> size 1 or more 
   if (sizeof($time["user_id"]) == 1)
-	  $query .= " and task_user_id = ". $time["user_id"]["0"];
+	  $query .= " and timetask_user_id = ". $time["user_id"];
   else {
 	  $users_list = array_to_list($time["user_id"]);
-	  $query .= " and task_user_id in $users_list";
+	  $query .= " and timetask_user_id in $users_list";
   }
 
   // Group
-  $query .= " group by task_date ";
+  $query .= " group by timetask_date ";
   
   display_debug_msg($query, $cdg_sql, "run_query_valid_search");
   $obm_db = new DB_OBM;
@@ -377,7 +386,7 @@ function run_query_valid_search($time) {
   }
    
   return $valid_array; 
-}  
+}
 
 
 
@@ -679,14 +688,15 @@ global $cdg_sql, $cdg_param;
 
   $week = get_week_point($time["date"]);
 
-  $user_id = $time["user_id"]["0"];
+  $user_id = $time["user_id"];
+
   //  echo "Run_query_valid_search<br>";
   //  print_r($time);
-  $query = "select sum(task_length) as total_length, substring(task_date,1,8) as day_in_week
-        from Task
-        where  task_date >= '$week[0]' 
-        and task_date <= '$week[1]'
-        and task_user_id = $user_id";
+  $query = "select sum(timetask_length) as total_length, substring(timetask_date,1,8) as day_in_week
+        from TimeTask
+        where  timetask_date >= '$week[0]' 
+        and timetask_date <= '$week[1]'
+        and timetask_user_id = $user_id";
 
   // Group
   $query .= " group by day_in_week";
@@ -712,9 +722,10 @@ function run_query_tasktype($uid = 0) {
     $query = "
       select distinct TaskType.*
       from TaskType
-        left join Deal on tasktype_id=deal_tasktype_id
-        left join ProjectUser on (deal_id=projectuser_deal_id and projectuser_userobm_id=$uid)
-      where (tasktype_internal in (0,1) and (projectuser_userobm_id=$uid))
+        left join Deal on (tasktype_id = deal_tasktype_id and deal_archive = 0 and deal_project_status != 0)
+        left join ProjectTask on (deal_id = projecttask_deal_id)
+        left join ProjectUser on (projecttask_id=projectuser_projecttask_id and projectuser_user_id=$uid)
+      where (tasktype_internal in (0,1) and (projectuser_user_id=$uid))
         or tasktype_internal=2
       order by tasktype_internal, tasktype_label";
   } else {
@@ -744,15 +755,16 @@ function run_query_project($time) {
   $uid = $time["user_id"];
 
   $query = "
-    select
+    select distinct
       deal_id, deal_label, company_name, deal_tasktype_id
-    from Deal, ProjectUser
+    from Deal, ProjectTask, ProjectUser
       left join Company on company_id = deal_company_id
-    where deal_state in (1,2)
+    where deal_project_status in (1,2)
       and deal_archive=0
-      and projectuser_deal_id=deal_id
-      and projectuser_userobm_id=$uid
-      order by deal_tasktype_id, company_name";
+      and projectuser_projecttask_id = projecttask_id
+      and projecttask_deal_id = deal_id
+      and projectuser_user_id = $uid
+      order by deal_tasktype_id, company_name, deal_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_project");
   $obm_q= new DB_OBM;
@@ -771,7 +783,7 @@ function run_query_managers() {
   // should use union (mysql 4.0.0 and further)
 
   $manager=new DB_OBM;
-  $query="select projectuser_userobm_id as manager_id from ProjectUser where projectuser_manager = 1";
+  $query="select projectuser_user_id as manager_id from ProjectUser where projectuser_manager = 1";
   display_debug_msg($query, $cdg_sql, "run_query_managers(manager)");
   $manager->query($query);
 
@@ -811,37 +823,6 @@ function run_query_get_obmusers() {
   $obm_db->query($query);
   return $obm_db;
 }
-
-
-//////////////////////////////////////////////////////////////////////////
-// return contact_id 
-// Param : $user_id
-//////////////////////////////////////////////////////////////////////////
-// function run_query_get_contact_id($user_id) {
-//   global $cdg_sql;
-
-//   $obm_db = new DB_OBM;
-//   $query="select userobm_contact_id from UserObm where $user_id  = userobm_id";
-//   display_debug_msg($query, $cdg_sql);
-//   $obm_db->query($query);
-//   $obm_db->next_record(); 
-//   return $obm_db->f("userobm_contact_id");
-// }
-
-//////////////////////////////////////////////////////////////////////////
-// return contact_id 
-// Param : $contact_id
-//////////////////////////////////////////////////////////////////////////
-// function run_query_get_names($contact) { 
-//   global $cdg_sql;
-
-//   $obm_db = new DB_OBM;
-//   $query = "select contact_lastname,contact_firstname from Contact where $contact=contact_id";
-//   display_debug_msg($query, $cdg_sql);
-
-//   $obm_db->query($query);
-//   return $obm_db;
-// }
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -908,23 +889,6 @@ function get_week_point($sel_date) {
   // beginning and end of week (Ymd format)
   $weekend=date("Ymd",$weekstart + 6 * 86400);
   $weekstart=date("Ymd",$weekstart);
-
-  // bcontins obsolete
-  // Weekstart :
-  //if ($dow == 0) {
-  //  $weekstart=mktime(0,0,0,$p_month,$p_day - 6,$p_year);
-  //} elseif ( $dow == 1 ) {
-  //  $weekstart=mktime(0,0,0,$p_month,$p_day,$p_year); 
-  //} else {
-  //  $weekstart=mktime(0,0,0,$p_month,$p_day - ($dow-1),$p_year);
-  //}
-  //$weekend=date("Ymd",$weekstart + 6 * 86400);
-  //$weekstart=date("Ymd",$weekstart);  
-    
-  // Date Couple in an array
-  // if ($debug > 0)
-  //      echo "dates debut $weekstart fin $weekend<br>";
-  
   return array($weekstart, $weekend);
 }
 
