@@ -97,7 +97,12 @@ INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_valu
 INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_company',0); 
 INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_deal',0); 
 INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_contact',0); 
-INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'order_contactlist','list_contact_lastname'); 
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_contract', '0');
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_incident', '0');
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_account',0); 
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_invoice', '0');
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'last_payment', '0');
+INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'order_contactlist','list_contact_lastname');
 INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'order_servicecomputer','service_port');
 INSERT INTO UserObmPref (userobmpref_user_id,userobmpref_option,userobmpref_value) VALUES (1,'set_day_weekstart','monday');
 
@@ -243,6 +248,23 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time_deal','task_totallength',4,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time_deal','task_deal_label',3,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time_deal','task_company_name',2,1);
+
+--module 'contract'
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_label', 1, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_numero', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_company_name', 3, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contracttype_label', 4, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_expiration', 5, 1);
+
+--module 'incident'
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_label', 1, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_company_name', 2, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_priority', 5, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_etat', 6, 2);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_date', 7, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_owner_lastname', 3, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_logger_lastname', 4, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'timeupdate', 8, 1);
 
 -------------------------------------------------------------------------------
 -- Company module tables
@@ -791,22 +813,6 @@ CREATE TABLE Incident (
   PRIMARY KEY  (incident_id)
 ) TYPE=MyISAM;
 
---module 'contract'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_label', 1, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_numero', 2, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_company_name', 3, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contracttype_label', 4, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_expiration', 5, 1);
-
---module 'incident'
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_label', 1, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_company_name', 2, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_priority', 5, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_etat', 6, 2);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_date', 7, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_owner_lastname', 3, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_logger_lastname', 4, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'timeupdate', 8, 1);
 
 
 --
