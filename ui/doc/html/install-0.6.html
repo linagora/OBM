@@ -4,11 +4,11 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2
+<p />These docs are valid for OBM 0.6.0, 0.6.1, 0.6.2, 0.6.3, 0.6.4
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
-<h1>Basic steps to build and install OBM 0.6.2</h1>
+<h1>Basic steps to build and install OBM 0.6.4</h1>
 
 <h2> Assumptions</h2>
 
@@ -31,7 +31,7 @@ And uncompress it in /var/www (or where your document root will be located).
 <tr>
   <td><pre>
 cd /var/www
-tar -xzvf obm-0.6.2.tar.gz
+tar -xzvf obm-0.6.4.tar.gz
 </pre>
   </td>
 </tr>
@@ -436,6 +436,21 @@ mysql -u web -pweb obm < scripts/0.6/obmdb_default_values_0.6.sql
 <br /><br />
 <a href="javascript:back();">back</a>
 
+
+<p />
+<a name="upgrade-0.6.4"><h1>UPGRADE OBM DATABASE 0.6.3 to 0.6.4</h1></a>
+<p />
+# Database hasn't evolved from 0.6.3 to 0.6.4, just minor corrections
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/update-0.6.3-0.6.4.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+<br /><br />
+<a href="javascript:back();">back</a>
 
 </body>
 </html>
