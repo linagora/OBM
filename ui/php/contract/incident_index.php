@@ -25,6 +25,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "PROD";
 $menu="INCIDENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -59,7 +60,7 @@ $incident=get_param_incident();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_incident);     // Head & Body
-generate_menu($menu);      // Menu
+generate_menu($menu,$section);      // Menu
 display_bookmarks();
 
 
@@ -67,7 +68,7 @@ display_bookmarks();
 // Programe principal                                                        //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 //////////////////////h////////////////////////////////////////////////////////
   require("incident_js.inc");
   html_incident_search_form(run_query_userobm(),$incident);

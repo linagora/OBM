@@ -32,6 +32,7 @@
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "COM";
 $menu = "CONTACT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -61,14 +62,14 @@ page_close();
 
 
 $contact = get_param_contact();
-
+get_contact_action();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_contact);     // Head & Body
 
 if (! $popup) {
-  generate_menu($menu);         // Menu
+  generate_menu($menu,$section);         // Menu
   display_bookmarks();
 }
 
@@ -83,12 +84,12 @@ if ($action == "ext_get_ids") {
     display_ok_msg($l_no_display);
   }
 }
-
+if($action == "") $action = "index";
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
   if ($set_display == "yes") {
@@ -300,6 +301,127 @@ function get_param_contact() {
   return $contact;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+//  Contact Action 
+///////////////////////////////////////////////////////////////////////////////
+
+function get_contact_action() {
+  global $cocontact,$actions;
+  global $l_header_find,$l_header_new,$l_header_modify,$l_header_delete;
+  global $l_header_display,$l_header_admin;
+
+//Index
+
+  $actions["CONTACT"]["index"] = array (
+    'Name'     => $l_header_find,
+    'Url'      => "$path/contact/contact_index.php?action=index",
+    'Right'    => $contact_read,
+    'Condition'=> array ('all') 
+                                        );
+
+//Search
+
+  $actions["CONTACT"]["search"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=search",
+    'Right'    => $contact_write,
+    'Condition'=> array ('None') 
+                                    	);
+
+//New
+
+  $actions["CONTACT"]["new"] = array (
+    'Name'     => $l_header_new,
+    'Url'      => "$path/contact/contact_index.php?action=new",
+    'Right'    => $contact_write,
+    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+                                     );
+
+//Detail Consult
+ 
+ $actions["CONTACT"]["detailconsult"]   = array (
+    'Url'      => "$path/contact/contact_index.php?action=detailconsult",
+    'Right'    => $contact_write,
+    'Condition'=> array ('None') 
+                                    		 );
+
+//Detail Update
+
+  $actions["CONTACT"]["detailupdate"] = array (
+    'Name'     => $l_header_modify,
+    'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
+    'Right'    => $contact_write,
+    'Condition'=> array ('detailconsult') 
+                                     		 );
+
+//Insert
+
+  $actions["CONTACT"]["insert"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=insert",
+    'Right'    => $contact_write,
+    'Condition'=> array ('None') 
+                                     	);
+
+//Update
+
+  $actions["CONTACT"]["update"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=update",
+    'Right'    => $contact_write,
+    'Condition'=> array ('None') 
+                                     	);
+
+//Check Delete
+
+  $actions["CONTACT"]["check_delete"] = array (
+    'Name'     => $l_header_delete,
+    'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
+    'Right'    => $company_write,
+    'Condition'=> array ('detailconsult') 
+                                     	      );
+
+//Delete
+
+  $actions["CONTACT"]["delete"] = array (
+    'Url'      => "$path/contact/contact_index.php?action=delete",
+    'Right'    => $contact_write,
+    'Condition'=> array ('None') 
+                                     	);
+
+//Admin
+
+  $actions["CONTACT"]["admin"] = array (
+    'Name'     => $l_header_admin,
+    'Url'      => "$path/contact/contact_index.php?action=admin",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('all') 
+                                      		 );
+
+//Dispay
+
+  $actions["CONTACT"]["display"] = array (
+    'Name'     => $l_header_display,
+    'Url'      => "$path/contact/contact_index.php?action=display",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('all') 
+                                      	 );
+
+//Dispay Preferences
+
+  $actions["CONTACT"]["displref_level"]	= array (
+    'Url'      => "$path/contact/contact_index.php?action=dispref_display",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                      	        );
+
+//Dispay Level
+
+  $actions["CONTACT"]["displref_level"]= array (
+    'Url'      => "$path/contact/contact_index.php?action=dispref_level",
+    'Right'    => $company_admin_write,
+    'Condition'=> array ('None') 
+                                      		 );
+
+
+}
 
 </SCRIPT>
 

@@ -30,6 +30,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "PROD";
 $menu="CONTRACT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -83,7 +84,7 @@ if ($popup) {
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-generate_menu($menu);      // Menu
+generate_menu($menu,$section);      // Menu
 display_bookmarks();
 
 
@@ -92,7 +93,7 @@ display_bookmarks();
 ///////////////////////////////////////////////////////////////////////////////
 
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   $usr_q = run_query_userobm();

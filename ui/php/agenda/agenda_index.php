@@ -11,6 +11,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "COM";
 $menu="AGENDA";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -33,7 +34,7 @@ include("agenda_functions.inc");
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_deal);     // Head & Body
-generate_menu($menu);      // Menu
+generate_menu($menu,$section);      // Menu
 display_bookmarks();       // Links to last visited contact,and company
 //////////////////////////////////////////////////////////////////////////////
 
@@ -41,7 +42,7 @@ require("agenda_js.inc");
 $uid = $auth->auth["uid"];
 
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   
   $obm_q_waiting_events = run_query_get_waiting_events($uid);

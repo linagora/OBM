@@ -23,6 +23,7 @@
 // Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "USERS";
 $menu="USER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -44,10 +45,10 @@ $obm_user = get_param_user();  // $user is used by phplib
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_user);        // Head & Body
-generate_menu($menu);         // Menu
+generate_menu($menu,$section);         // Menu
 display_bookmarks();
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   html_user_search_form($obm_user);
   if ($set_display == "yes") {

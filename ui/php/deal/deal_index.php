@@ -45,6 +45,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "COM";
 $menu = "DEAL";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -99,7 +100,7 @@ if ($popup) {
 }
 
 
-generate_menu($menu);      // Menu
+generate_menu($menu,$section);      // Menu
 display_bookmarks();
 
 

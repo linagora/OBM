@@ -1,32 +1,36 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : admin_data_index.php                                         //
-//     - Desc : Update static database data (company contact number,...)     //
-// 2002-06-28 - Pierre Baudracco                                             //
+// OBM - File : admin_code_index.php                                         //
+//     - Desc : code admin index File                                        //
+// 2001-12-17 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-// Actions
-// - index
-// - data_show
-// - data_update
-///////////////////////////////////////////////////////////////////////////////
-// Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
-///////////////////////////////////////////////////////////////////////////////
 
+$path = "..";
+$section = "ADMIN";
+$menu = "ADMIN_CODE";
+
+// $obminclude not used in txt mode
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-
-require("$obminclude/phplib/obmlib.inc");
-include("$obminclude/global.inc"); 
-require("admin_query.inc");
-require("admin_data_display.inc");
-
 $debug=1;
+$obm_root = "../..";
+$cpt_line = 0;
 
-$modules = array ('company');
-//$modules = get_modules_array();
-$actions = array ('help', 'index', 'data_show', 'data_update','clear_sess');
+require("admin_code_display.inc");
+
+$actions = array ('help', 'index', 'show_amp');
+$words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
+$exclude = array('.', '..', 'CVS', 'doc', 'scripts');
+
+list($key, $val) = each ($words);
+$regexp = "&(?!($val";
+while (list($key, $val) = each ($words)) {
+  $regexp .= "|$val";
+}
+$regexp .= '))';
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -35,20 +39,18 @@ if ($mode == "") $mode = "txt";
 
 switch ($mode) {
  case "txt":
-
-   include("$obminclude/global_pref.inc"); 
    $retour = parse_arg($argv);
    if (! $retour) { end; }
    break;
  case "html":
-   $debug = $set_debug;
-   $menu = "ADMIN";
+   require("$obminclude/phplib/obmlib.inc");
+   include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-   include("$obminclude/global_pref.inc"); 
-   if($action!="clear_sess") {
-    display_head("Admin_Data");
-    generate_menu($menu);
-   }
+   include("$obminclude/global_pref.inc");
+   //   $debug = $set_debug;
+   display_head("Admin_Code");
+   generate_menu($menu, $section);
+   if($action == "") $action = "index";
    break;
 }
 
@@ -58,16 +60,10 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_data_index($mode, $actions, $modules, $langs, $themes);
+    dis_code_index($mode, $actions, $words);
     break;
-  case "data_show":
-    dis_data($action, $mode, $module);
-    break;
-  case "data_update":
-    dis_data($action, $mode, $module);
-    break;
-  case "clear_sess":
-    dis_clear_sess($mode);
+  case "show_amp":
+    dis_amp($mode, $words);
     break;
   default:
     echo "No action specified !";
@@ -86,50 +82,11 @@ switch ($mode) {
 }
 
 
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution - company list                                            //
-///////////////////////////////////////////////////////////////////////////////
-function get_company_list() {
-  global $cdg_sql;
-
-  $query = "select company_id, company_contact_number, company_deal_number
-          from Company";
-
-  display_debug_msg($query, $cdg_sql);
-
-  $c_q = new DB_OBM;
-  $c_q->query($query);
-  return $c_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Query execution - Company Update
-// Parametres:
-//   - $id       : company id
-//   - $con_num  : contact number
-//   - $deal_num : deal number
-///////////////////////////////////////////////////////////////////////////////
-function update_one_company($id, $con_num, $deal_num) {
-  global $cdg_sql;
-
-  $query = "update Company set company_contact_number='$con_num',
-                 company_deal_number='$deal_num'
-            where company_id='$id'";
-
-  display_debug_msg($query, $cdg_sql);
-  $u_q = new DB_OBM;
-  $retour = $u_q->query($query);
-  return $retour;
-}
-
-
 ///////////////////////////////////////////////////////////////////////////////
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_command_use($msg="") {
-  global $actions, $modules;
+  global $actions, $modules, $langs, $themes;
 
   while (list($nb, $val) = each ($actions)) {
     if ($nb == 0) $lactions .= "$val";
@@ -145,9 +102,8 @@ Usage: $argv[0] [Options]
 where Options:
 -h, --help help screen
 -a action  ($lactions)
--m module  ($lmodules)
 
-Ex: php4 admin_data_index.php -a data_show -m company
+Ex: php4 admin_code_index.php -a show_amp
 ";
 }
 
@@ -193,9 +149,6 @@ function parse_arg($argv) {
     }
   }
 
-  if (! $module) $module = "company";
-  if (! $action) $action = "data_show";
+  if (! $module) $module = "contact";
+  if (! $action) $action = "show_amp";
 }
-
-</SCRIPT>
-

@@ -11,7 +11,8 @@ $path="..";
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
-$menu="SETTINGS";
+$section = "USERS";
+$menu = "SETTINGS";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
@@ -66,7 +67,7 @@ if (($set_debug & $cdg_sql) == $cdg_sql) $dg_sql = "checked";
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_title . $set_lang);     // Head & Body
-generate_menu($menu);                   // Menu
+generate_menu($menu, $section);                   // Menu
 display_bookmarks();
 
 

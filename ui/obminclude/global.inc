@@ -76,7 +76,6 @@ if ($path == "") {
     $path = "..";
 }
 
-
 //those functions must be defined before the global_query and global display
 //includes.
 ///////////////////////////////////////////////////////////////////////////////

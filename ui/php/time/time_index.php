@@ -24,6 +24,7 @@
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "USERS";
 $menu = "TIME";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -68,7 +69,7 @@ if (debug_level_isset($cdg_param)) {
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_time);     // Head & Body
 if (! $popup) {
-  generate_menu($menu);         // Menu
+  generate_menu($menu,$section);         // Menu
   display_bookmarks();
 }
 
@@ -83,7 +84,7 @@ if ( ! isset($time["user_id"]) )
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index" or $action == "search") {
+if ($action == "index" || $action == "search" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   // interval is week -- see if we may need to use others intervals
   $time['interval'] = "week";

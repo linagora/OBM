@@ -13,8 +13,10 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
+$path = "..";
+$section = "ADMIN";
+$menu = "ADMIN_PREF";
 
-$menu = "ADMIN";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -43,7 +45,8 @@ switch ($mode) {
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc"); 
    display_head("Admin_Pref");
-   generate_menu($menu);
+   if($action == "") $action = "index";
+   generate_menu($menu, $section);
    break;
  default:
    echo "No mode specified !";

@@ -7,6 +7,16 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////
+////// Theme headers lang files ////////////////////////
+////////////////////////////////////////////////////////
+
+$l_header_com    = "COMMERCIAL";
+$l_header_prod   = "PRODUCTION";
+$l_header_compta = "COMPTABILITE";
+$l_header_users  = "UTILISATEUR";
+$l_header_admins = "ADMINISTRATION";
+
 $l_header_settings = "Configuration";
 $l_header_company = "Soci&eacute;t&eacute;s";
 $l_header_contact = "Contacts";
@@ -25,6 +35,7 @@ $l_header_account = "Comptes";
 $l_header_invoice = "Factures";
 $l_header_payment = "Paiements";
 $l_header_time = "Gestion des temps" ;
+$l_header_agenda = "Agenda";
 
 $l_header_title_settings = "CONFIGURATION";
 $l_header_title_company = "SOCIETE";
@@ -39,18 +50,27 @@ $l_header_title_admin = "ADMINISTRATION";
 $l_header_title_account = "COMPTES";
 $l_header_title_invoice = "FACTURES";
 $l_header_title_payment = "PAIEMENTS";
+$l_header_title_agenda = "AGENDA";
 
 $l_header_new_f = "Nouvelle";
 $l_header_new = "Nouveau";
 $l_header_find = "Chercher";
+$l_header_modify = "Modifier";
+$l_header_display = "Affichage";
+$l_header_delete = "Supprimer";
+
 $l_header_new_parent = "Nouvelle SurAffaire";
 $l_header_find_parent = "Chercher SurAffaire";
-$l_header_display = "Affichage";
+
 $l_header_export = "Exporter";
 $l_header_reconcile = "Rapprocher";
+$l_header_dupplicate = "Dupliquer";
+$l_header_compute_balance = "Calculez solde";
 
-$l_header_agenda = "Agenda";
-$l_header_title_agenda = "AGENDA";
+$l_header_add_contact = "Ajouter contact";
+
+$l_header_reset = "Préférence par défaut";
+
 $l_header_day = "Jour";
 $l_header_week = "Semaine";
 $l_header_month = "Mois";

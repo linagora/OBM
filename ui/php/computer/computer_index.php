@@ -12,7 +12,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session,Auth,Perms  Management                                            //
 ///////////////////////////////////////////////////////////////////////////////
-$menu="COMPUTER";
+$path = "..";
+$section = "";
+$menu = "COMPUTER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");

@@ -1,32 +1,21 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : admin_code_index.php                                         //
-//     - Desc : code admin index File                                        //
+// OBM - File : admin_lang_index.php                                         //
+//     - Desc : lang admin index File                                        //
 // 2001-12-17 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
-
-// $obminclude not used in txt mode
+$path = "..";
+$section = "ADMIN";
+$menu = "ADMIN_LANG";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-$debug=1;
-$obm_root = "../..";
-$cpt_line = 0;
 
-require("admin_query.inc");
-require("admin_code_display.inc");
-
-$actions = array ('help', 'index', 'show_amp');
-$words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
-$exclude = array('.', '..', 'CVS', 'doc', 'scripts');
-
-list($key, $val) = each ($words);
-$regexp = "&(?!($val";
-while (list($key, $val) = each ($words)) {
-  $regexp .= "|$val";
-}
-$regexp .= '))';
+$debug = 1;
+//require("admin_query.inc");
+require("admin_lang_query.inc");
+require("admin_lang_display.inc");
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,14 +29,14 @@ switch ($mode) {
    if (! $retour) { end; }
    break;
  case "html":
-   $menu = "ADMIN";
+   $debug = $set_debug;
    require("$obminclude/phplib/obmlib.inc");
    include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
-   //   $debug = $set_debug;
-   display_head("Admin_Code");
-   generate_menu($menu);
+   if($action == "") $action = "index";
+   display_head("Admin_Lang");
+   generate_menu($menu, $section);
    break;
 }
 
@@ -57,10 +46,19 @@ switch ($action) {
     dis_help($mode);
     break;
   case "index":
-    dis_code_index($mode, $actions, $words);
+    dis_lang_index($mode, $actions, $modules, $langs, $themes);
     break;
-  case "show_amp":
-    dis_amp($mode, $words);
+  case "show_src":
+    dis_src_vars($mode, $module);
+    break;
+  case "show_lang":
+    dis_lang_vars($mode, $module, $lang);
+    break;
+  case "comp_lang":
+    dis_comp_lang_vars($mode, $module, $lang, $lang2);
+    break;
+  case "comp_header_lang":
+    dis_comp_header_lang_vars($mode, $theme, $lang, $lang2);
     break;
   default:
     echo "No action specified !";
@@ -93,14 +91,25 @@ function dis_command_use($msg="") {
     if ($nb == 0) $lmodules .= "$val";
     else $lmodules .= ", $val";
   }
+  while (list($nb, $val) = each ($langs)) {
+    if ($nb == 0) $llangs .= "$val";
+    else $llangs .= ", $val";
+  }
+  while (list($nb, $val) = each ($themes)) {
+    if ($nb == 0) $lthemes .= "$val";
+    else $lthemes .= ", $val";
+  }
 
   echo "$msg
 Usage: $argv[0] [Options]
 where Options:
 -h, --help help screen
 -a action  ($lactions)
+-m module  ($lmodules)
+-l lang    ($llangs)
+-t theme   ($lthemes)
 
-Ex: php4 admin_code_index.php -a show_amp
+Ex: php4 admin_lang.php -a show_lang -m deal -l fr
 ";
 }
 
@@ -109,8 +118,8 @@ Ex: php4 admin_code_index.php -a show_amp
 // Agrgument parsing                                                         //
 ///////////////////////////////////////////////////////////////////////////////
 function parse_arg($argv) {
-  global $debug, $actions, $modules;
-  global $action, $module;
+  global $debug, $actions, $modules, $langs, $themes;
+  global $action, $module, $lang, $theme;
 
   // We skip the program name [0]
   next($argv);
@@ -132,6 +141,17 @@ function parse_arg($argv) {
 	return false;
       }
       break;
+    case '-l':
+      list($nb2, $val2) = each ($argv);
+      if (in_array($val2, $langs)) {
+        $lang = $val2;
+        if ($debug > 0) { echo "-l -> \$lang=$val2\n"; }
+      }
+      else {
+	dis_command_use("Invalid language ($val2)");
+	return false;
+      }
+      break;
     case '-a':
       list($nb2, $val2) = each ($argv);
       if (in_array($val2, $actions)) {
@@ -143,9 +163,22 @@ function parse_arg($argv) {
 	return false;
       }
       break;
+    case '-t':
+      list($nb2, $val2) = each ($argv);
+      if (in_array($val2, $themes)) {
+        $theme = $val2;
+        if ($debug > 0) { echo "-t -> \$theme=$val2\n"; }
+      }
+      else {
+	dis_command_use("Invalid theme ($val2)");
+	return false;
+      }
+      break;
     }
   }
 
   if (! $module) $module = "contact";
-  if (! $action) $action = "show_amp";
+  if (! $lang) $lang = "fr";
+  if (! $action) $action = "show_src";
+  if (! $theme) $theme = "standard";
 }

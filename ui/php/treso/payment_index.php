@@ -10,7 +10,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session Management                                                        //
 ///////////////////////////////////////////////////////////////////////////////
-$menu="PAYMENT";
+$path = "..";
+$section = "COMPTA";
+$menu = "PAYMENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
@@ -43,7 +45,7 @@ $payment = get_param_payment();
 ///////////////////////////////////////////////////////////////////////////////
 display_head ($l_treso);
 require("payment_js.inc");
-generate_menu ($menu);
+generate_menu ($menu,$section);
 display_bookmarks();
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,7 +108,7 @@ if ($action =="new") {
   html_payment_search_form($action,run_query_paymentkind(), run_query_account (), $payment); 
 
 ///////////////////////////////////////////////////////////////////////////////
-} elseif ($action == "index") {
+} elseif ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   html_payment_search_form($p_action, run_query_paymentkind(), run_query_account(), $payment);
   if ($set_display == "yes") {

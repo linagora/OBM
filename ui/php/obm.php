@@ -7,7 +7,7 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
+$section="";
 $menu="";
 $path = ".";
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ echo "<html>
 ///////////////////////////////////////////////////////////////////////////////
 echo "<BODY TEXT=\"#$col_text\" BACKGROUND=\"/images/$set_theme/$img_bg\" BGCOLOR=\"#$col_bg\" LINK=\"#$col_link\" VLINK=\"#$col_link\" marginwidth=0 marginheight=0 topmargin=0 leftmargin=0>";
 
-generate_menu("");
+generate_menu("","");
 display_bookmarks(".");
 
 echo "<b>OBM</b> version $obm_version - " . date("Y-m-d H:i:s");

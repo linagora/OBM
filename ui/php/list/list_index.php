@@ -28,6 +28,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "COM";
 $menu = "LIST";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -59,7 +60,7 @@ page_close();
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_list);  // Head & Body
 if (! $popup) {
-  generate_menu($menu);   // Menu
+  generate_menu($menu,$section);   // Menu
   display_bookmarks();    // links to the last visited companie, contact, deal
 }
 

@@ -11,6 +11,7 @@
 // Session,Auth,Perms Management                                             //
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
+$section = "COMPTA";
 $menu = "ACCOUNT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -44,14 +45,14 @@ $account = get_param_account();
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_account);  // Head & Body
-generate_menu($menu);      // Menu
+generate_menu($menu,$section);      // Menu
 display_bookmarks();
 
 ///////////////////////////////////////////////////////////////////////////////
 // Programme principal                                                       //
 ///////////////////////////////////////////////////////////////////////////////
 
-if ($action == "index") {
+if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   require("account_js.inc");
   html_account_search_form ($action, $account);
