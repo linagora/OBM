@@ -21,18 +21,6 @@ $l_check_usercreate = " entries owned by this user.";
 $l_check_userupdate = " entries last updated by this user.";
 $l_no_user = "No user fields in this table";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["userobm_login"] = $l_login;
-$fieldnames["userobm_perms"] = $l_user_perms;
-$fieldnames["userobm_archive"] = $l_archive;
-$fieldnames["userobm_lastname"] = $l_lastname;
-$fieldnames["userobm_firstname"] = $l_firstname;
-$fieldnames["userobm_timelastaccess"] = $l_lastaccess;
-$fieldnames["userobm_email"] = $l_email;
-
 // Titres
 $l_user = "User";
 

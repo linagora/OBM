@@ -29,20 +29,6 @@ $l_comment = "Commentaire";
 $l_visibility ="Accès";
 $l_coord = "Coordonnées";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["contact_lastname"] = $l_lastname;
-$fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["contact_function"] = $l_function;
-$fieldnames["contact_phone"] = $l_phone;
-$fieldnames["contact_homephone"] = $l_hphone;
-$fieldnames["contact_mobilephone"] = $l_mphone;
-$fieldnames["contact_email"] = $l_email;
-// Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
-
 $l_contact_name = "Nom Contact";
 $l_from_company = "&nbsp;&nbsp;Société";
 $l_telother = "Autres tel";

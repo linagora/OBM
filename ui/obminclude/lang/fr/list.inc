@@ -38,28 +38,6 @@ $l_phone = "Tél";
 $l_hphone = "Tél perso";
 $l_town = "Ville";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["list_name"] = $l_name;
-$fieldnames["list_subject"] = $l_subject;
-$fieldnames["list_email"] = $l_email;
-$fieldnames["usercreate"] = $l_creator;
-$fieldnames["userupdate"] = $l_updater;
-$fieldnames["timecreate"] = $l_date_creation;
-$fieldnames["timeupdate"] = $l_date_last_update;
-// Calculated fields
-$fieldnames["list_nb_contact"] = $l_nb_contact;
-$fieldnames["list_contact_lastname"] = $l_lastname;
-$fieldnames["list_contact_firstname"] = $l_firstname;
-$fieldnames["list_contact_function"] = $l_function;
-$fieldnames["list_contact_company"] = $l_company;
-$fieldnames["list_contact_town"] = $l_town;
-$fieldnames["list_contact_phone"] = $l_phone;
-$fieldnames["list_contact_mobilephone"] = $l_hphone;
-$fieldnames["list_contact_email"] = $l_email;
-
 // Actions
 $l_insert = "Enregistrer la liste";
 $l_update = "Modifier la liste";

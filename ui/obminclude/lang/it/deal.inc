@@ -69,31 +69,6 @@ $l_category_label="Nome";
 $l_category_minilabel="Nome corto";
 $l_parentdeal_deals = "Impegni appartengono a questo Sub-impegno";
 
-//----------------------------------------------------------//
-// Fields that appear in result lists (used by OBM_DISPLAY) //
-//----------------------------------------------------------//
-// Direct fields
-$fieldnames["deal_label"] = $l_label;
-$fieldnames["deal_datealarm"] = $l_date_alarm;
-$fieldnames["deal_todo"] = $l_todo;
-$fieldnames["deal_marketingmanager"] = $l_marketing_manager;
-$fieldnames["deal_amount"] = $l_amount;
-$fieldnames["deal_hitrate"] = $l_hitrate;
-$fieldnames["parentdeal_label"] = $l_label;
-$fieldnames["parentdeal_comment"] = $l_comment;
-// Calculated or indirect fields
-$fieldnames["dealstatus_label"] = $l_state;
-$fieldnames["dealtype_label"] = $l_kind;
-$fieldnames["tasktype_label"] = $l_category;
-$fieldnames["deal_company_name"] = $l_company;
-$fieldnames["parentdeal_marketing_lastname"] = $l_marketing_manager;
-$fieldnames["parentdeal_technical_lastname"] = $l_technical_manager;
-$fieldnames["parentdeal_status"] = $l_state;
-$fieldnames["parentdeal_dateproposal"] = $l_date_proposal;
-$fieldnames["parentdeal_datealarm"] = $l_date_alarm;
-$fieldnames["parentdeal_amountprovider"] = $l_amount_out;
-$fieldnames["parentdeal_amountcustomer"] = $l_amount_in;
-
 // Titles
 $l_deal = "Impegni";
 

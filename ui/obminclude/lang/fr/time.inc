@@ -12,11 +12,9 @@ $l_header_stats = "Statistiques";
 $l_header_view = "Vue mensuelle";
 $l_header_globalview = "Vue générale";
 
-
-//for list
+// for list
 $l_task_fac = "Taches Facturées";
 $l_task_int = "Taches Internes";
-
 
 // Database fields
 $l_taskdate="Date tâche";
@@ -45,26 +43,6 @@ $l_valid = "Valider";
 $l_add = "Ajouter";
 $l_update = "Modifier";
 $l_fill= "compléter";
-
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["task_date"] = $l_taskdate;
-$fieldnames["task_label"] = $l_tasklabel;
-$fieldnames["task_deal_label"] = $l_deallabel;
-$fieldnames["task_company_name"] = $l_company;
-$fieldnames["task_length"] = $l_length;
-$fieldnames["task_totallength"] = $l_total_length;
-$fieldnames["task_totalbefore"] = $l_total_before;
-$fieldnames["task_totalperiod"] = $l_total_period;
-$fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["task_id"] = $l_update;
-$fieldnames["total_length"] = $l_total;
-$fieldnames["day_in_month"] = $l_day;
-// Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
-
 
 $l_week_next = "Semaine suivante";
 $l_week_prev = "Semaine précédente";

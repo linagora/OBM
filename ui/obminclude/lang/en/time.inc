@@ -43,27 +43,6 @@ $l_add = "Add";
 $l_update = "Update";
 $l_period="Period";
 $l_fill= "Fill";
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["task_date"] = $l_taskdate;
-$fieldnames["task_label"] = $l_tasklabel;
-$fieldnames["task_deal_label"] = $l_deallabel;
-$fieldnames["task_company_name"] = $l_company;
-$fieldnames["task_length"] = $l_length;
-$fieldnames["task_totallength"] = $l_total_length;
-$fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["task_totalbefore"] = $l_total_before;
-$fieldnames["task_totalperiod"] = $l_total_period;
-$fieldnames["task_id"] = $l_update;
-$fieldnames["contact_function"] = $l_function;
-$fieldnames["contact_phone"] = $l_phone;
-$fieldnames["contact_homephone"] = $l_hphone;
-$fieldnames["contact_mobilephone"] = $l_mphone;
-$fieldnames["contact_email"] = $l_email;
-// Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
 
 $l_week_prev = "Previous week";
 $l_week_next = "Next week";

@@ -454,10 +454,10 @@ class OBM_DISPLAY {
 	  $url = "../deal/deal_index.php?action=parent_detailconsult&amp;param_parent=".$this->data_set->f("parentdeal_id");
 	}
         else if ($fieldname == "parentdeal_marketing_lastname") {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("parentdeal_marketingmanager_id");
+	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_marketingmanager_id");
 	}
         else if ($fieldname == "parentdeal_technical_lastname") {
-	  $url = "../contact/contact_index.php?action=detailconsult&amp;param_contact=".$this->data_set->f("parentdeal_technicalmanager_id");
+	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("parentdeal_technicalmanager_id");
 	} 
 	else if ($fieldname == "deal_label") {
 	  $name="";
@@ -674,6 +674,14 @@ class OBM_DISPLAY {
        	}
         else if ($fieldname == "contract_dateexp") {
 	  $name = $this->data_set->f("dateexp");
+	}
+        else if ($fieldname == "contract_marketmanager") {
+	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_techmanager_id");
+	  $name = $this->data_set->f("lmarket") . " " . $this->data_set->f("fmarket");
+	}
+        else if ($fieldname == "contract_techmanager") {
+	  $url = "../user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("contract_marketmanager_id");
+	  $name = $this->data_set->f("ltech") . " " . $this->data_set->f("ftech");
 	}
 	//------------------------------
 	// For the incidentss 

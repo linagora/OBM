@@ -103,7 +103,6 @@ $l_category_update = "Update Category";
 $l_category_insert = "Insert Category";
 
 // Messages
-
 $l_parentdeal_del_verif_error = " deal(s) are attached to this parentDeal : it can't be deleted";
 $l_updateaffect_ok = "The deal has been successfully affected to a parentdeal";
 $l_error_visibility = "You can't consult this page : the information is private.";
@@ -148,8 +147,6 @@ $l_category_update_error = "The category of the deal has failed !";
 $l_category_delete_error = "The deletion of the category has failed !";
 $l_category_del_verif_error = "(ies) of this categorie exist.";
 $l_category_delete_ok = "The category has been deleted successfully.";
-
-
 
 
 // JavaScript Messages (characters like \ have to be backslashed -> \\)

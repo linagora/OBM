@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-
 $l_label = "Label";
 $l_label_start = "Label start";
 $l_last_invoice = "Last invoice";

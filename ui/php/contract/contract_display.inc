@@ -8,6 +8,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+//---------------------------------------------------------------------------//
+// Fields that appear in result lists                                        //
+//---------------------------------------------------------------------------//
+$fieldnames["contract_label"] = $l_contract_label;
+$fieldnames["contract_company_name"] = $l_contract_company;
+$fieldnames["contract_number"] = $l_contract_num;
+$fieldnames["contract_dateexp"] = $l_contract_exp ;
+$fieldnames["contracttype_label"] = $l_contract_contracttype;
+$fieldnames["contract_techmanager"] = $l_technical_manager;
+$fieldnames["contract_marketmanager"] = $l_marketing_manager;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contract search form                                              //
 // Parameters : 
@@ -28,6 +40,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
   $p_datebefore = $contract["datebefore"];
   $sel_market = $contract["market"];
   $sel_tech = $contract["tech"];
+  $sel_manager = $contract["manager"];
   $p_num = $contract["number"]; 
  
   $dis_cont_typ  = "<select name=\"sel_type\">
@@ -44,11 +57,11 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type) {
     $usr_q->seek(0);
   }
 
-  $dis_resp_tec = "<select name=\"sel_tech\">
+  $dis_resp_tec = "<select name=\"sel_manager\">
     <option value=\"$c_all\">$l_all</option>";
   while($usr_q->next_record()) {
-    $dis_resp_tec .= "\n<option value=\"".$usr_q->f("contact_id")."\"";
-    if ($usr_q->f("contact_id") == $sel_tech) 
+    $dis_resp_tec .= "\n<option value=\"".$usr_q->f("userobm_id")."\"";
+    if ($usr_q->f("userobm_id") == $sel_manager) 
       $dis_resp_tec .= " selected=\"selected\"";
     $dis_resp_tec .= ">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")." </option>";
   }

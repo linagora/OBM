@@ -157,30 +157,3 @@ $default_invoice_numbering = "Y"; // we use only year
 // default tax rate 
 // used like that : TTC = HT * $default_tax
 $default_tax= 1.196;
- 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["invoice_number"] = $l_number;
-$fieldnames["invoice_deal"] = $l_deal;
-$fieldnames["invoice_company"] = $l_company;
-$fieldnames["invoice_label"] = $l_label;
-$fieldnames["invoice_amount_HT"] = $l_amount_HT;
-$fieldnames["invoice_amount_TTC"] = $l_amount_TTC;
-$fieldnames["invoice_status"] = $l_status;
-$fieldnames["invoice_date"] = $l_date;
-$fieldnames["invoice_paid"] = $l_paid;
-$fieldnames["deal_label"] = $l_invoice_deal_label;
-$fieldnames["deal_number"] = $l_invoice_deal_number;
-$fieldnames["tasktype_label"] = $l_invoice_deal_category_label;
-$fieldnames["deal_company_name"] = $l_invoice_company;
-$fieldnames["deal_todo"] = $l_invoice_dealtodo;
-$fieldnames["dealtype_label"] = $l_invoice_dealtype_label;
-$fieldnames["dealstatus_label"] = $l_invoice_dealstatus ;
-$fieldnames["deal_datealarm"] = $l_invoice_deal_datealarm;
-$fieldnames["payment_label"] = $l_invoice_payment_label;
-$fieldnames["payment_number"] = $l_invoice_payment_number;
-$fieldnames["payment_expect_date"] = $l_invoice_payment_expect_date;
-$fieldnames["payment_date"] = $l_invoice_payment_date;
-$fieldnames["payment_amount"] = $l_invoice_payment_amount;

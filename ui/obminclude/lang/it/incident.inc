@@ -1,13 +1,13 @@
 <SCRIPT LANGUAGE="PHP">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                   //
+// OBM - Language : Italian                                                  //
 //     - File     : incident.inc                                             //
 // 2001-08-20 Pierre Baudracco                                               //
 ///////////////////////////////////////////////////////////////////////////////
-//   $Id   //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-//Fields Label
+// Fields Label
 $l_incident_label = "Label";
 $l_incident_priority = "Priority";
 $l_incident_status = "Status";
@@ -44,29 +44,13 @@ $l_waitcall = "Wait Call";
 $l_paused = "Paused";
 $l_closed = "Closed";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["incident_etat"] = $l_incident_status;
-$fieldnames["incident_label"] = $l_incident_label;
-$fieldnames["incident_priority"] = $l_incident_priority;
-$fieldnames["incident_date"] = $l_incident_date;
-// Calculate fields
-$fieldnames["timeupdate"] = $l_incident_lastupdate;
-$fieldnames["incident_owner_lastname"] = $l_incident_owner;
-$fieldnames["incident_logger_lastname"] = $l_incident_logger;
-$fieldnames["incident_company_name"] = $l_incident_company;
-
 // Action
-
 $l_select_contract = "Selct the Contract";
 $l_insert = "Record the Incident";
 $l_update = "Modify the Incident";
 $l_checkdelete = "Delete the Incident";
 
 //Message
-
 $l_error_permission = "You doesn't have the rights to access this page";
 $l_found = "incidents found";
 $l_no_found = "No incident found matching the query !";

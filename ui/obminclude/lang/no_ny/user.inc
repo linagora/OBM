@@ -18,17 +18,6 @@ $l_perms_user = "Brukar";
 $l_perms_editor = "Redigere";
 $l_perms_admin = "Administrator";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["userobm_login"] = $l_login;
-$fieldnames["userobm_perms"] = $l_user_perms;
-$fieldnames["userobm_lastname"] = $l_lastname;
-$fieldnames["userobm_firstname"] = $l_firstname;
-$fieldnames["userobm_timelastaccess"] = $l_lastaccess;
-$fieldnames["userobm_email"] = $l_email;
-
 // Titres
 $l_user = "Brukar";
 $l_user_detail = "Brukardetaljar";

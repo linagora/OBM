@@ -20,15 +20,6 @@ $l_before = "Expiration date Before";
 $l_incident_list = "List of the Incidents";
 $l_incident_new = "Add a new Incident";
 $l_contract ="Contract";
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-$fieldnames["contract_label"] = $l_contract_label;
-$fieldnames["contract_company_name"] = $l_contract_company;
-$fieldnames["contract_number"] = $l_contract_num;
-$fieldnames["contract_dateexp"] = $l_contract_exp;
-$fieldnames["contracttype_label"] = $l_contract_contracttype;
-
 
 $l_contract_select_deal = "Select the Deal.";
 $l_deal_label = "Deal";

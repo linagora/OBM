@@ -21,18 +21,6 @@ $l_check_usercreate = " entrées créées par cet utilisateur.";
 $l_check_userupdate = " entrées modifiées par cet utilisateur.";
 $l_no_user = "Pas de champs utilisateurs dans cette table";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["userobm_login"] = $l_login;
-$fieldnames["userobm_perms"] = $l_user_perms;
-$fieldnames["userobm_archive"] = $l_archive;
-$fieldnames["userobm_lastname"] = $l_lastname;
-$fieldnames["userobm_firstname"] = $l_firstname;
-$fieldnames["userobm_timelastaccess"] = $l_lastaccess;
-$fieldnames["userobm_email"] = $l_email;
-
 // Titres
 $l_user = "Utilisateur";
 

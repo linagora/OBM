@@ -21,13 +21,6 @@ $l_after = "Scadenza data Dopo";
 $l_before = "Scadenza data Prima";
 $l_incident_list = "List di the Incidents";
 $l_incident_new = "Aggiungi a nuovo Incident";
-
-$fieldnames["contract_label"] = $l_contract_label;
-$fieldnames["contract_company_name"] = $l_contract_company;
-$fieldnames["contract_number"] = $l_contract_num;
-$fieldnames["contract_expiration"] = $l_contract_expiration;
-$fieldnames["contracttype_label"] = $l_contract_contracttype;
-
 $l_minus="-";
 $l_plus="+";
 $l_order="Ordrer";

@@ -8,6 +8,26 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
+//---------------------------------------------------------------------------//
+// Fields that appear in result lists                                        //
+//---------------------------------------------------------------------------//
+// Direct fields
+$fieldnames["task_date"] = $l_taskdate;
+$fieldnames["task_label"] = $l_tasklabel;
+$fieldnames["task_deal_label"] = $l_deallabel;
+$fieldnames["task_company_name"] = $l_company;
+$fieldnames["task_length"] = $l_length;
+$fieldnames["task_totallength"] = $l_total_length;
+$fieldnames["task_totalbefore"] = $l_total_before;
+$fieldnames["task_totalperiod"] = $l_total_period;
+$fieldnames["tasktype_label"] = $l_tasktype;
+$fieldnames["task_id"] = $l_update;
+$fieldnames["total_length"] = $l_total;
+$fieldnames["day_in_month"] = $l_day;
+// Calculated fields
+$fieldnames["contact_company_name"] = $l_company;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Array content
 // Parameters:

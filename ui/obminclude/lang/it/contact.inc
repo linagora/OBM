@@ -4,7 +4,7 @@
 //     - File     : contact.inc                                              //
 // 1999-01-24 Augusto Fagili                                                 //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id //
+// $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Database fields
@@ -37,20 +37,6 @@ $l_telother = "Altro Tel";
 $l_private = "Privato";
 $l_public = "Pubblico";
 $l_contact_select_company = "Scegli l'azienda per il contatto.";
-
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["contact_lastname"] = $l_lastname;
-$fieldnames["contact_firstname"] = $l_firstname;
-$fieldnames["contact_function"] = $l_function;
-$fieldnames["contact_phone"] = $l_phone;
-$fieldnames["contact_homephone"] = $l_hphone;
-$fieldnames["contact_mobilephone"] = $l_mphone;
-$fieldnames["contact_email"] = $l_email;
-// Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
 
 // Titles
 $l_contact = "Contatto";

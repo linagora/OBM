@@ -54,7 +54,6 @@ require("contract_query.inc");
 require("contract_display.inc");
 
 
-
 // Updating the "last contract" bookmark 
 if ( ($param_contract == $last_contract) && (strcmp($action,"delete")==0) ) {
   $last_contract=$last_contract_default;

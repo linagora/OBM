@@ -23,15 +23,6 @@ $l_last_deal="Ultimo deal";
 $l_last_company = "Ultima azienda";
 $l_last_contact = "Ultimo contatto";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["userobm_username"] = $l_user_name;
-$fieldnames["userobm_perms"] = $l_user_perms;
-$fieldnames["userobm_timelastaccess"] = $l_lastaccess;
-$fieldnames["userobm_email"] = $l_email;
-
 // Titres
 $l_user = "Utente";
 

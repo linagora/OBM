@@ -25,8 +25,7 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $p_datebefore = $contract["datebefore"];
   $comp = $contract["company_name"];
   $p_num = $contract["number"];
-  $p_tech = $contract["tech"];
-  $p_com = $contract["market"];
+  $manager = $contract["manager"];
   $p_deal = $contract["deal_id"];
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
@@ -36,13 +35,22 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $query = "select contract_label,
       contract_id,
       contract_id as Id,
+      contract_deal_id,
       contract_number,
       contract_company_id,
       company_name as contract_company_name,
       contracttype_label,
       contract_dateexp,
+      contract_type_id,
+      contract_techmanager_id,
+      contract_marketmanager_id,
+      u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
+      u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
       DATE_FORMAT(contract_dateexp,'$l_date_format') as dateexp
-    from Contract, Company, ContractType
+    from ((Contract
+      left join UserObm u1 on contract_techmanager_id=u1.userobm_id)
+      left join UserObm u2 on contract_marketmanager_id=u2.userobm_id),
+      Company, ContractType
     where contract_company_id=company_id
       and contracttype_id=contract_type_id";
 
@@ -64,12 +72,10 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   if ($p_label != "")
     $query .= " and (contract_label like '%$p_label%')";
   
-  if (($p_tech != $c_all) && ($p_tech != ""))
-    $query .= " and (contract_techmanager_id = '$p_tech')";
-
-  if (($p_com != $c_all) && ($p_com != ""))
-    $query .= " and (contract_marketmanager_id = '$p_com')";
-
+  if (($manager != $c_all) && ($manager != "")) {
+    $query .= " and (contract_techmanager_id='$manager'
+                    or contract_marketmanager_id='$manager') ";
+  } 
   if ($p_deal != "")
     $query .= " and (contract_deal_id = '$p_deal')";
 

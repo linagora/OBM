@@ -43,24 +43,6 @@ $l_act_manage = "Company Activity Management";
 $l_act_exist = "Existing Activities";
 $l_act_new = "New Activity";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["company_name"] = $l_name;
-$fieldnames["company_address1"] = $l_address;
-$fieldnames["company_address2"] = $l_address;
-$fieldnames["company_phone"] = $l_phone;
-$fieldnames["company_fax"] = $l_fax;
-$fieldnames["company_email"] = $l_email;
-$fieldnames["company_web"] = $l_web;
-// Calculated or indirect fields
-$fieldnames["companytype_label"] = $l_kind;
-$fieldnames["companyactivity_label"] = $l_activity;
-$fieldnames["company_contact_number"] = "<img src=\"/images/$set_theme/$ico_contact_list\" alt=\"C\" />";
-$fieldnames["company_new_contact"] = "<img src=\"/images/$set_theme/$ico_contact_new\" alt=\"NC\" />";
-$fieldnames["company_deal_number"] = "<img src=\"/images/$set_theme/$ico_deal_list\" alt=\"D\" />";
-
 // Titres
 $l_company = "Company";
 

@@ -1,6 +1,6 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Frenc                                                    //
+// OBM - Language : French                                                   //
 //     - File     : account.inc                                              //
 // 2001-07-31 Nicolas Roman                                                  //
 ///////////////////////////////////////////////////////////////////////////////
@@ -73,18 +73,3 @@ $l_fill_date = "\\n Vous devez fournir une date.";
 $l_account_options = "Options d'affichage pour les listes de Comptes"; 
 $l_payment_options = "Options d'affichage pour les listes de Paiements"; 
 $l_options_dis = "Options d'affichage" ;
-
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["account_bank"] = $l_bank;
-$fieldnames["account_number"] = $l_number;
-$fieldnames["account_label"] = $l_label;
-$fieldnames["account_balance"] = $l_initial_balance;
-$fieldnames["account_today"] = $l_balance;
-$fieldnames["payment_label"] = $l_label;
-$fieldnames["payment_number"] = $l_number;
-$fieldnames["payment_date"] = $l_date;
-$fieldnames["payment_expect_date"] = $l_expected_date;
-$fieldnames["payment_amount"] = $l_amount;

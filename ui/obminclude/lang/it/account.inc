@@ -4,6 +4,8 @@
 //     - File     : account.inc                                              //
 // 01/08/2002 Augusto Fagioli                                                //
 ///////////////////////////////////////////////////////////////////////////////
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_label = "Etichetta";
@@ -17,7 +19,6 @@ $l_choose_balance_date = "Data Saldo";
 $l_date = "Data";
 $l_expected_date = "Data Prevista";
 $l_amount = "Totale";
-
 
 $l_include_expected = "Inserisci le operazioni richieste?";
 $l_in_total ="Nel  Totale";

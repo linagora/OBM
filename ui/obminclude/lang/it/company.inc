@@ -44,24 +44,6 @@ $l_act_exist = "Activita esistente";
 $l_act_new = "Nuova Activita";
 $l_internal = "Interno";
 
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["company_name"] = $l_name;
-$fieldnames["company_address1"] = $l_address;
-$fieldnames["company_address2"] = $l_address;
-$fieldnames["company_phone"] = $l_phone;
-$fieldnames["company_fax"] = $l_fax;
-$fieldnames["company_email"] = $l_email;
-$fieldnames["company_web"] = $l_web;
-// Calculated or indirect fields
-$fieldnames["companytype_label"] = $l_kind;
-$fieldnames["companyactivity_label"] = $l_activity;
-$fieldnames["company_contact_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_list\" ALT=C>";
-$fieldnames["company_new_contact"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_contact_new\" ALT=NC>";
-$fieldnames["company_deal_number"] = "<IMG BORDER=0 SRC=\"/images/$set_theme/$ico_deal_list\" ALT=D>";
-
 // Titres
 $l_company = "Azienda";
 

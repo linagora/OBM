@@ -7,6 +7,22 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
+
+//---------------------------------------------------------------------------//
+// Fields that appear in result lists                                        //
+//---------------------------------------------------------------------------//
+// Direct fields
+$fieldnames["incident_state"] = $l_incident_status;
+$fieldnames["incident_label"] = $l_incident_label;
+$fieldnames["incident_priority"] = $l_incident_priority;
+$fieldnames["incident_date"] = $l_incident_date;
+// Calculate fields
+$fieldnames["timeupdate"] = $l_incident_lastupdate;
+$fieldnames["incident_owner_lastname"] = $l_incident_owner;
+$fieldnames["incident_logger_lastname"] = $l_incident_logger;
+$fieldnames["incident_company_name"] = $l_incident_company;
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company search Form                                               //
 // Parameters:

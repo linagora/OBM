@@ -7,11 +7,9 @@
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
-
-//for list
+// for list
 $l_task_fac = "Factured Tasks";
 $l_task_int = "Internal Tasks";
-
 
 // Database fields
 $l_taskdate="Data Task";
@@ -48,27 +46,6 @@ $l_expresspostal = "Cedex";
 $l_town = "Città";
 $l_country = "Stato";
 $l_visibility ="Accesso";
-
-//------------------------------------//
-// Fields that appear in result lists //
-//------------------------------------//
-// Direct fields
-$fieldnames["task_date"] = $l_taskdate;
-$fieldnames["task_label"] = $l_tasklabel;
-$fieldnames["task_deal_label"] = $l_deallabel;
-$fieldnames["task_company_name"] = $l_company;
-$fieldnames["task_length"] = $l_length;
-$fieldnames["task_totallength"] = $l_total_length;
-$fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["task_id"] = $l_modify;
-$fieldnames["contact_function"] = $l_function;
-$fieldnames["contact_phone"] = $l_phone;
-$fieldnames["contact_homephone"] = $l_hphone;
-$fieldnames["contact_mobilephone"] = $l_mphone;
-$fieldnames["contact_email"] = $l_email;
-// Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
-
 
 $l_last_contact = "Ultimo Contatto";
 $l_last_company = "Ultima Azienda";

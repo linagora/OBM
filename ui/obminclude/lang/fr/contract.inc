@@ -2,9 +2,9 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : French                                                   //
 //     - File     : contract.inc                                             //
-// 2001-08-20  Richard FILIPPI                                               //
+// 2001-08-20 : Pierre Baudracco                                             //
 ///////////////////////////////////////////////////////////////////////////////
-//  $Id  //
+//  $Id$  //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
@@ -20,11 +20,6 @@ $l_before = "Date Expiration Avant";
 $l_incident_list = "Liste des incidents";
 $l_incident_new = "Ajouter un incident";
 $l_contract ="Contrat";
-$fieldnames["contract_label"] = $l_contract_label;
-$fieldnames["contract_company_name"] = $l_contract_company;
-$fieldnames["contract_number"] = $l_contract_num;
-$fieldnames["contract_dateexp"] = $l_contract_exp ;
-$fieldnames["contracttype_label"] = $l_contract_contracttype;
 
 $l_minus="-";
 $l_plus="+";
@@ -64,6 +59,7 @@ $l_type_new = "Nouveau Type";
 $l_category_label="Label";
 $l_category_minilabel="Mini Label";
 $l_add_contract_deal = "Veuillez à présent remplire les champs du contrat lié à l'affaire";
+
 // Titres
 $l_deal = "Contrat de Support";
 $l_deal_detail = "Detail Contrat";
