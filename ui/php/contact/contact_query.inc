@@ -80,7 +80,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
   // If a country has been set
   if (($ctry != $c_all) && ($ctry != "")) { 
-    $where .= " and contact_country_iso3166='$ctry'";
+    $where .= " and (contact_country_iso3166='$ctry' or
+       contact_country_iso3166='' and company_country_iso3166='$ctry')";
+    $join_comp = "left join Company on contact_company_id=company_id";
   }
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
@@ -117,6 +119,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   if (strcmp($p_new_order,"contact_address") == 0) {
     $order = "contact_address1";
     $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town";
+  } else if (strcmp($p_new_order,"country_name") == 0) {
+    $order = "country_name";
+    $order_next = ", company_country";
   }
 
   $orderq = " order by $order $p_order_dir $order_next";

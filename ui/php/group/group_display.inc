@@ -13,6 +13,8 @@
 // Direct fields
 $fieldnames["group_name"] = $l_name;
 $fieldnames["group_system"] = $l_system;
+$fieldnames["group_local"] = $l_local;
+$fieldnames["group_ext_id"] = $l_ext_id;
 $fieldnames["group_desc"] = $l_desc;
 $fieldnames["group_email"] = $l_email;
 $fieldnames["usercreate"] = $l_creator;
@@ -47,8 +49,25 @@ function dis_data_group(&$OD, $fieldname, $link_ok) {
     $res["name"] = "<span id=\"data".$OD->data_set->f("group_id")."\" style=\"display:none;\">".
     $OD->data_set->f("group_name")."</span>";
   }  
+
   else if ($fieldname == "group_system") {
     $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
+  else if ($fieldname == "group_local") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
   }
 
   else if ($fieldname == "group_nb_user") {
@@ -174,7 +193,7 @@ function dis_group_search_group($group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the Group search result                                      //
+// HTML Display the Group search result
 // Parameters : 
 //   - $obm_q     : list of the groups to display 
 //   - $pref_q    : the fields which have to be displayed
@@ -250,7 +269,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Group Form                                                        //
+// Display Group Form
 // Parameters :
 //   - $action    : action called
 //   - $group_q   : DBO : information about the group (null for new group)
@@ -344,15 +363,16 @@ function dis_group_consult($group, $uid) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display Group Consultation                                           //
+// HTML Display Group Consultation
 // Parameters:
 //   - $group_q  : group database result 
 //   - $pref_u_q : group user preference display 
 //   - $u_q      : user database result 
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
-  global $ico_mail;
+  global $c_yes, $c_no, $ico_mail;
   global $l_group, $l_name, $l_desc, $l_email, $l_no_user, $l_no_group_group;
+  global $l_system, $l_local, $l_ext_id;
   global $l_del_user_sel, $l_user_member, $l_del_group_sel, $l_group_member;
   global $display, $perm, $module, $action, $cright_write;
 
@@ -361,6 +381,9 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
   $userupdate = $group_q->f("group_userupdate");
   $timecreate = $group_q->f("timecreate");
   $timeupdate = $group_q->f("timeupdate");
+  $system = ($group_q->f("group_system") == 1 ? $c_yes : $c_no);
+  $local = ($group_q->f("group_local") == 1 ? $c_yes : $c_no);
+  $ext_id = $group_q->f("group_ext_id");
   $name = $group_q->f("group_name");
   $desc = $group_q->f("group_desc");
   $email = $group_q->f("group_email");
@@ -378,6 +401,15 @@ function html_group_consult($group_q, $pref_u_q, $u_q, $pref_g_q, $g_q) {
     <tr>
       <td class=\"detailLabel\">$l_name</td>
       <td class=\"detailText\">$name</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_system</td>
+      <td class=\"detailText\">$system</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_local</td>
+      <td class=\"detailText\">$local</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_ext_id</td>
+      <td class=\"detailText\">$ext_id</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_desc</td>
       <td class=\"detailText\">$desc</td>

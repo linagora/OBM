@@ -149,6 +149,9 @@ function run_query_insert($user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $phone = $user["phone"];
+  $phone2 = $user["phone2"];
+  $fax = $user["fax"];
+  $fax2 = $user["fax2"];
   $email = $user["email"];
   $datebegin = ($user["datebegin"] ? "'".$user["datebegin"]."'" : "null");
 
@@ -164,6 +167,9 @@ function run_query_insert($user) {
     userobm_lastname,
     userobm_firstname,
     userobm_phone,
+    userobm_phone2,
+    userobm_fax,
+    userobm_fax2,
     userobm_email,
     userobm_timelastaccess)
   values (
@@ -179,6 +185,9 @@ function run_query_insert($user) {
     '$lname',
     '$fname',
     '$phone',
+    '$phone2',
+    '$fax',
+    '$fax2',
     '$email',
     null)";
 
@@ -212,6 +221,9 @@ function run_query_update($p_id, $user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $phone = $user["phone"];
+  $phone2 = $user["phone2"];
+  $fax = $user["fax"];
+  $fax2 = $user["fax2"];
   $email = $user["email"];
 
   $query = "update UserObm set
@@ -225,6 +237,9 @@ function run_query_update($p_id, $user) {
     userobm_lastname='$lname',
     userobm_firstname='$fname',
     userobm_phone='$phone',
+    userobm_phone2='$phone2',
+    userobm_fax='$fax',
+    userobm_fax2='$fax2',
     userobm_email='$email'
   where userobm_id='$p_id'";
 

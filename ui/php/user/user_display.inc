@@ -13,18 +13,23 @@
 //---------------------------------------------------------------------------//
 // Direct fields
 $fieldnames["userobm_login"] = $l_login;
+$fieldnames["userobm_local"] = $l_local;
+$fieldnames["userobm_ext_id"] = $l_ext_id;
 $fieldnames["userobm_perms"] = $l_user_perms;
 $fieldnames["userobm_archive"] = $l_archive;
 $fieldnames["userobm_lastname"] = $l_lastname;
 $fieldnames["userobm_firstname"] = $l_firstname;
 $fieldnames["userobm_phone"] = $l_phone;
+$fieldnames["userobm_phone2"] = $l_phone2;
+$fieldnames["userobm_fax"] = $l_fax;
+$fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display User specific dataset fields                                      //
+// Display User specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -34,6 +39,7 @@ $fieldnames["userobm_email"] = $l_email;
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_user(&$OD, $fieldname, $link_ok) {
   global $path, $set_theme, $ico_mail,$ext_element;
+
   if (($fieldname == "userobm_login") && $link_ok) {
     $res["url"] = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$OD->data_set->f("userobm_id");
   }
@@ -42,6 +48,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
     $OD->data_set->f("userobm_lastname")." ".$OD->data_set->f("userobm_firstname").
     "</span>";
   }  
+
   else if ($fieldname == "userobm_email") {
     $email = $OD->data_set->f("userobm_email");
     if (strcmp($email ,"") != 0) {
@@ -50,6 +57,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
       $res["txt_name"] = $email;
     }
   } 
+
   else if ($fieldname == "userobm_archive") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) {
@@ -59,6 +67,17 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
       $res["txt_name"] = " ";
     }
   }
+
+  else if ($fieldname == "userobm_local") {
+    $res["align"] = "center";
+    if ($OD->data_set->f($fieldname)) {
+      $res["name"] = "X";
+    } else {
+      $res["name"] = "&nbsp;";
+      $res["txt_name"] = " ";
+    }
+  }
+
   else if ($fieldname == "timelastaccess") {
     $date = $OD->data_set->f($fieldname);
     $res["name"] = datetime_format($date, 1);
@@ -73,7 +92,7 @@ function dis_data_user(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display User search form                                                  //
+// Display User search form
 // Parameters:
 //   - $user[]   : default form values
 //     keys used : login, lastname, perms, archive, popup
@@ -155,7 +174,7 @@ function html_user_search_form($user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the User search result                                            //
+// Display the User search result
 // Parameters:
 //   - $user[]   : user search criteria
 //     keys used : name, perms
@@ -180,7 +199,7 @@ function dis_user_search_list($user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display the User Search result                                       //
+// HTML Display the User Search result
 // Parameters:
 //   - $obm_q    : database result (user list)
 //   - $pref_q   : the fields which have to be displayed
@@ -256,7 +275,7 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display User Form                                                         //
+// Display User Form
 // Parameters:
 //   - $usr_q     : user database result
 //   - $user      : default values or updated values (if error)
@@ -264,7 +283,8 @@ function html_user_search_list($obm_q, $pref_q, $nb_user, $user, $popup) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_form($usr_q, $user) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_phone, $l_user, $l_email, $l_archive, $l_insert, $l_update;
+  global $l_user, $l_email, $l_archive, $l_insert, $l_update;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2;
   global $l_datebegin;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $action;
@@ -278,6 +298,9 @@ function html_user_form($usr_q, $user) {
     $lname = $usr_q->f("userobm_lastname");
     $fname = $usr_q->f("userobm_firstname");
     $phone = $usr_q->f("userobm_phone");
+    $phone2 = $usr_q->f("userobm_phone2");
+    $fax = $usr_q->f("userobm_fax");
+    $fax2 = $usr_q->f("userobm_fax2");
     $email = $usr_q->f("userobm_email");
     $datebegin = $usr_q->f("userobm_datebegin");
     $archive = ($usr_q->f("userobm_archive") == "1" ? " checked" : "");
@@ -291,6 +314,9 @@ function html_user_form($usr_q, $user) {
   if (isset($user["lastname"])) { $lname = stripslashes($user["lastname"]); }
   if (isset($user["firstname"])) { $fname = stripslashes($user["firstname"]); }
   if (isset($user["phone"])) { $phone = $user["phone"]; }
+  if (isset($user["phone2"])) { $phone2 = $user["phone2"]; }
+  if (isset($user["fax"])) { $fax = $user["fax"]; }
+  if (isset($user["fax2"])) { $fax2 = $user["fax2"]; }
   if (isset($user["email"])) { $email = $user["email"]; }
   if (isset($user["datebegin"])) { $datebegin = $user["datebegin"]; }
   if (isset($user["archive"])) { $archive = ($user["archive"] == 1 ? "checked" : ""); }
@@ -348,6 +374,15 @@ function html_user_form($usr_q, $user) {
       <td class=\"detailLabel\">$l_phone</td>
       <td class=\"detailForm\"><input name=\"tf_phone\" size=\"20\" maxlength=\"20\" value=\"$phone\" /></td>
     </tr><tr>
+      <td class=\"detailLabel\">$l_phone2</td>
+      <td class=\"detailForm\"><input name=\"tf_phone2\" size=\"20\" maxlength=\"20\" value=\"$phone2\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td class=\"detailForm\"><input name=\"tf_fax\" size=\"20\" maxlength=\"20\" value=\"$fax\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax2</td>
+      <td class=\"detailForm\"><input name=\"tf_fax2\" size=\"20\" maxlength=\"20\" value=\"$fax2\" /></td>
+    </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailForm\"><input name=\"tf_email\" size=\"32\" maxlength=\"64\" value=\"$email\" /></td>
     </tr><tr>
@@ -387,24 +422,29 @@ function dis_user_consult($user) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display User Consultation                                            //
+// HTML Display User Consultation
 // Parameters:
 //   - $obm_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
 function html_user_consult($obm_q) {
   global $l_login, $l_password, $l_user_perms, $l_lastname, $l_firstname;
-  global $l_user, $l_phone, $l_email, $l_lastaccess, $l_archive, $l_datebegin;
-  global $l_group_member, $l_group;
+  global $l_user, $l_email, $l_lastaccess, $l_archive, $l_datebegin;
+  global $l_phone, $l_phone2, $l_fax, $l_fax2;
+  global $l_group_member, $l_group, $l_local, $l_ext_id;
   global $perms_user,$perms_editor,$perms_admin,$l_perms_user,$l_perms_editor,$l_perms_admin ;
   global $path, $display, $c_yes, $c_no;
 
   $id = $obm_q->f("userobm_id");
   $login = $obm_q->f("userobm_login");
-  $paswd = $obm_q->f("userobm_password");
+  $local = ($obm_q->f("userobm_local") == 1 ? $c_yes : $c_no);
+  $ext_id = $obm_q->f("userobm_ext_id");
   $perms = $obm_q->f("userobm_perms");
   $lname = $obm_q->f("userobm_lastname");
   $fname = $obm_q->f("userobm_firstname");
   $phone = $obm_q->f("userobm_phone");
+  $phone2 = $obm_q->f("userobm_phone2");
+  $fax = $obm_q->f("userobm_fax");
+  $fax2 = $obm_q->f("userobm_fax2");
   $email = $obm_q->f("userobm_email");
   $datebegin = $obm_q->f("userobm_datebegin");
   $lastaccess = datetime_format($obm_q->f("userobm_timelastaccess"), 1);
@@ -448,8 +488,11 @@ function html_user_consult($obm_q) {
       <td class=\"detailLabel\">$l_login</td>
       <td class=\"detailText\">$login</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_password</td>
-      <td class=\"detailText\">$passwd</td>
+      <td class=\"detailLabel\">$l_local</td>
+      <td class=\"detailText\">$local</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_ext_id</td>
+      <td class=\"detailText\">$ext_id</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_user_perms</td>
       <td class=\"detailText\">$l_perms</td>
@@ -462,6 +505,15 @@ function html_user_consult($obm_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_phone</td>
       <td class=\"detailText\">$phone</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_phone2</td>
+      <td class=\"detailText\">$phone2</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax</td>
+      <td class=\"detailText\">$fax</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_fax2</td>
+      <td class=\"detailText\">$fax2</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_email</td>
       <td class=\"detailText\">$email</td>
@@ -482,7 +534,7 @@ function html_user_consult($obm_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// HTML Display User Group form                                              //
+// HTML Display User Group form
 // Parameters:
 //   - $usr_q : user database result
 ///////////////////////////////////////////////////////////////////////////////
@@ -540,7 +592,7 @@ function html_user_group_consult($usr_q) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the context about a user insertion or update                      //
+// Display the context about a user insertion or update
 // When similar users exists we show these and ask confirmation
 // Parameters:
 //   - $p_id     : user id
@@ -558,6 +610,9 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
   $lname = $user["lastname"];
   $fname = $user["firstname"];
   $phone = $user["phone"];
+  $phone2 = $user["phone2"];
+  $fax = $user["fax"];
+  $fax2 = $user["fax2"];
   $email = $user["email"];
   $archive = $user["archive"];
 
@@ -571,6 +626,19 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
         </td></tr>";
   }
 
+  $hidden_fields = "
+    <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
+    <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
+    <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
+    <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
+    <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
+    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
+    <input type=\"hidden\" name=\"tf_phone2\" value=\"$phone2\" />
+    <input type=\"hidden\" name=\"tf_fax\" value=\"$fax\" />
+    <input type=\"hidden\" name=\"tf_fax2\" value=\"$fax2\" />
+    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
+    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />";
+
   $block = "
   <table class=\"detail\">
     $dis_same_user
@@ -579,31 +647,17 @@ function dis_user_warn_insert($p_id, $usr_q, $user) {
     <p class=\"detailButtons\">
     <form method=\"post\" name=\"form_insert\"
     action=\"" . url_prepare("user_index.php") . "\">
+    $hidden_fields
     <input type=\"hidden\" name=\"action\" value=\"insert\" />
     <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-    <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
-    <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
-    <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
-    <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
-    <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" name=\"submit\" value=\"$l_confirm\" />
     </form>
     </p>
     <p class=\"detailButtons\">
     <form name=\"form_back\" method=\"post\"
     action=\"" . url_prepare("user_index.php") . "\">
+    $hidden_fields
     <input type=\"hidden\" name=\"action\" value=\"new\" />
-    <input type=\"hidden\" name=\"tf_login\" value=\"$login\" />
-    <input type=\"hidden\" name=\"tf_passwd\" value=\"$passwd\" />
-    <input type=\"hidden\" name=\"sel_perms\" value=\"$perms\" />
-    <input type=\"hidden\" name=\"tf_lastname\" value=\"$lname\" />
-    <input type=\"hidden\" name=\"tf_firstname\" value=\"$fname\" />
-    <input type=\"hidden\" name=\"tf_phone\" value=\"$phone\" />
-    <input type=\"hidden\" name=\"tf_email\" value=\"$email\" />
-    <input type=\"hidden\" name=\"cb_archive\" value=\"$archive\" />
     <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>

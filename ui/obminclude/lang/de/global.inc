@@ -51,6 +51,8 @@ $l_cat = "Kategorie";
 $l_visibility = "Zugriff";
 $l_private = "Privat";
 $l_public = "Öffentlich";
+$l_local = "Local";
+$l_ext_id = "Id ext";
 
 // OBM_DISPLAY
 $l_entries = "Einträge";

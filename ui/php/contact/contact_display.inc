@@ -277,7 +277,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       // else we get the contact Company address
     } else {
       if ($OD->data_set->f("company_country") != "") {
-	$res["name"] .= $OD->data_set->f("company_country");
+	$res["name"] .= "(".$OD->data_set->f("company_country").")";
       }
     }
   }
