@@ -25,7 +25,8 @@ function check_calendar(form) {
 
     return true;
   
-} 
+}
+  
 function check_all_force(form) {
   var i='';
   for(i=0;i<form.length;i++) {
@@ -188,9 +189,6 @@ function check_category_upd(form,formd)
     return false;
   }
 }
-";
-
-echo "
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the category creation is possible                                    //
 ///////////////////////////////////////////////////////////////////////////////
@@ -203,7 +201,28 @@ function check_category_new(form)
       alert(\"$l_j_category_create\");
       return false;
    }
-}
+ }
+///////////////////////////////////////////////////////////////////////////////
+// Check if the meeting perform is possible                                //
+///////////////////////////////////////////////////////////////////////////////
+ 
+function check_meeting(form) {
+  
+  if (trim(form.sel_min_duration.options[form.sel_min_duration.selectedIndex].value) == \"00\" 
+       && trim(form.sel_time_duration.options[form.sel_time_duration.selectedIndex].value) == \"00\") {
+    alert (\"$l_interval_null\");
+    return false;
+  }
+  else if (check_date(form.tf_date_begin, \"$l_err_datebegin\") == false) {
+    return false;
+  }
+  else if (check_date(form.tf_date_end, \"$l_err_dateend\") == false) {
+    return false;
+  }
+
+    return true;
+  
+} 
 
 -->
 </script>

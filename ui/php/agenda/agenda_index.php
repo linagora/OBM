@@ -187,7 +187,11 @@ elseif ($action == "new") {
   require("$obminclude/calendar.js");
   $user_obm = run_query_userobm_writable();
   $cat_event = run_query_get_eventcategories();
-  $p_user_array = array($auth->auth["uid"]);
+  if($p_user_meeting==1) {
+    $p_user_array = $sel_user_id;
+  }else {
+    $p_user_array = array($auth->auth["uid"]);
+  }
   dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $p_user_array);
 }
 elseif ($action == "insert") {
@@ -377,7 +381,27 @@ elseif ($action == "perform_right") {
 ///////////////////////////////////////////////////////////////////////////////
   run_query_update_right($agenda);
   $user_obm = run_query_userobm_right();
-  html_dis_right_model($user_obm); 
+  html_dis_right_model($user_obm);
+} elseif ($action == "new_meeting")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
+  require("$obminclude/calendar.js");
+  $user_obm = run_query_userobm_writable();
+  $p_user_array = array($auth->auth["uid"]);
+  dis_meeting_form($agenda, $user_obm, $p_user_array);
+} elseif ($action == "perform_meeting")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("agenda_js.inc");
+  if (count($sel_user_id) != 0) {
+    $p_user_array =  $sel_user_id;
+  }
+  else {
+    $p_user_array =  array($auth->auth["uid"]);
+  }
+  $obm_q = run_query_week_event_list($agenda,$p_user_array);
+  $user_q = run_query_get_user_name($p_user_array);
+  $user_obm = run_query_userobm_writable();  
+  dis_free_interval($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("agenda_js.inc");
@@ -433,8 +457,8 @@ function get_param_agenda() {
   global $tf_date_end,$sel_repeat_kind,$hd_conflict_end,$hd_old_end,$hd_old_begin,$action;
   global $cdg_param,$cb_repeatday_0,$cb_repeatday_1,$cb_repeatday_2,$cb_repeatday_3,$cb_repeatday_4,$cb_repeatday_5;
   global $cb_repeatday_6,$cb_repeatday_7,$tf_repeat_end,$cb_force,$cb_privacy,$cb_repeat_update,$rd_conflict_event;
-  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail;
-  global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read;
+  global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
+  global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
 	
   // Deal fields
   if (isset ($param_date))
@@ -457,7 +481,13 @@ function get_param_agenda() {
   if (is_array($sel_deny_write)) $agenda["deny_w"] = $sel_deny_write;
   if (is_array($sel_deny_read)) $agenda["deny_raccept_r"] = $sel_deny_read;
   if (is_array($sel_accept_read)) $agenda["accept_r"] = $sel_accept_read;
-  
+  if (isset($sel_time_duration)) {
+    $agenda["duration"] = $sel_time_duration;
+    if(isset($sel_min_duration)) {
+      $agenda["duration"] +=  $sel_min_duration/60;
+    }
+  }
+  if(isset($param_duration)) $agenda["duration"] = $param_duration;
   if (isset($tf_repeat_end)){
     ereg ("([0-9]{4}).([0-9]{2}).([0-9]{2})",$tf_repeat_end , $day_array1);
     $agenda["repeat_end"] =  $day_array1[1].$day_array1[2].$day_array1[3];
@@ -652,6 +682,21 @@ function get_agenda_action() {
 
   $actions["AGENDA"]["update_decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('None') 
+                                         );
+					 
+//Meeting managment.					 
+  $actions["AGENDA"]["new_meeting"] = array (
+    'Name'     => $l_header_meeting,
+    'Url'      => "$path/agenda/agenda_index.php?action=new_meeting",
+    'Right'    => $agenda_write,
+    'Condition'=> array ('all') 
+                                         );
+
+//Meeting managment.					 
+  $actions["AGENDA"]["perform_meeting"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=perform_meeting",
     'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );

@@ -30,7 +30,7 @@ $l_timebegin2 = "Heure de début";
 $l_timeend = "Heure de fin (HH:MM)";
 $l_timeend2 = "Heure de fin";
 $l_occupied_day = "Journée entière";
-
+$l_event_duration = "Durée de la réunion";
 $l_format = "(AAAA-MM-JJ)";
 $l_repeat = "Répétition";
 $l_periodicity = "Fréquence";
@@ -66,6 +66,7 @@ $l_date = "Date";
 $l_user = "Utilisateur";
 $l_back_mono = "Revenir à votre vue";
 // actions 
+$l_meeting_perform = "Rechercher les créneaux libres";
 $l_insert = "Enregistrer le rdv";
 $l_update = "Modifier le rdv";
 $l_accept = "Accepter";
@@ -167,6 +168,7 @@ $l_short_sunday="Dim";
 
 $l_category_manage = "Gestion des Categories d'évenements";
 $l_category_exist = "Categories existantes";
+$l_header_meeting = "Nouvelle réunion";
 $l_category_new = "Nouvelle Categorie";
 $l_header_right = "Gestion des droits";
 $l_header_admin = "Administration";
@@ -198,6 +200,7 @@ $l_confirm_mail = "Confirmer+envoie de mail";
 $l_unknown="Inconnu";
 $l_user_calendar = "Vue Multi-utilisateurs";
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
+$l_interval_null = "La durée ne peux pas etre nulle";
 $mj_fill_title_event = "\\n Vous devez saisir un titre pour le rdv.";
 $mj_fill_time_begin = "\\n Vous devez saisir une heure de debut.";
 $mj_fill_time_end = "\\n Vous devez saisir une heure de fin.";

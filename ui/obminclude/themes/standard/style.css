@@ -761,7 +761,36 @@ td.agendaEventYear {
 	padding:		0;
 	border:			0;	
 	}
-			
+td.agendaPossible 	{ 
+    background-color: 		#97d993;  
+    vertical-align:		top;
+    border : 			1px #6aad6a dashed;    
+}
+
+td.agendaPossible:hover 	{ 
+    background-color: 		#a9ff54;  
+    vertical-align:		top;
+    border : 			1px #6aad6a dashed;    
+}	
+
+td.agendaFree 	{ 
+    background-color: 		#bddf92;  
+    vertical-align:		top;
+    border : 			1px #9dbf74 dashed;    
+}
+
+td.agendaFree:hover 	{ 
+    background-color: 		#def0a2;  
+    vertical-align:		top;
+    border : 			1px #9dbf74 dashed;    
+}
+
+td.agendaOccupied 	{ 
+    background-color: 		#e0e4e9;  
+    vertical-align:		top;
+    border : 			1px #9ca1aa dashed;    
+}	
+
 select.agendaQuery 	{ 
 	font-size:		11px; 
 	font-family: 		sans-serif;

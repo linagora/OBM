@@ -1331,6 +1331,7 @@ function store_events($obm_q,&$current_event,&$event_data,$p_date_begin,$p_date_
     $current_event[$current_time][$db_customer_id] = -1;
     $event_data[$db_id]["end"] = substr($db_date,8,2).":".substr($db_date,10,2);
   }while($obm_q->next_record());
+  ksort($current_event);
 }
 /////////////////////////////////////////////////////////////////////////////
 // Return tables of hashed events and of data event.(hashed by day for year
@@ -1417,6 +1418,114 @@ function store_users($user_q) {
   }
   return $user_tab;
 }
+/////////////////////////////////////////////////////////////////////////////
+// Hash a event table a perform where it's free for all, and when the 
+// meeting could take place.
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    - $current_event : Week event table 
+//    - $duration : duration of the event
+/////////////////////////////////////////////////////////////////////////////
+function store_meeting_cell($current_events,$duration,$calendar_user) {
+  global $set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval;
+
+  $time_unit = 60 / $set_cal_interval;
+  $start_week_time = strtotime(dateOfWeek($getdate, $set_weekstart_default));
+  $end_week_time = $start_week_time + ((6 * 24) * 60 * 60);
+  $start_week_time = strtotime("+$set_start_time hours",$start_week_time);
+  $end_week_time = strtotime("+$set_stop_time hours",$end_week_time);
+  $unix_time=$start_week_time;
+  $current_time=date("YmdHi",$unix_time);
+  for($unix_time=$start_week_time;$unix_time<=$end_week_time;$current_time=date("YmdHi",$unix_time)) {
+    $row_free = 0;
+    $row_meeting = 0;
+    if(is_array($current_events[$current_time])) {
+      
+      $isvalid = FALSE;
+      foreach($calendar_user as $id => $user_data ) {
+	if(is_array($current_events[$current_time][$id])){
+	  do{
+	    $isvalid = TRUE;
+	    $meeting_event[$current_time] = 2;
+	    $temp_array = $current_events[$current_time][$id];
+	    $unix_time = strtotime("+$time_unit minutes",$unix_time);
+	    $current_time = date("YmdHi",$unix_time);
+	    $hour_time = substr($current_time,8,2);
+	  }while(is_array($current_events[$current_time][$id]) 
+	  && count(array_intersect($temp_array,$current_events[$current_time][$id])) != 0  && $hour_time < $set_stop_time);
+	}
+      }
+      if(!$isvalid)
+      {
+	$is_free = TRUE;
+	$hour_time = substr($current_time,8,2);
+	$temp_unix_time = $unix_time;
+	while($is_free == TRUE &&  $hour_time < $set_stop_time){
+	  $temp_unix_time = strtotime("+$time_unit minutes",$temp_unix_time);
+	  $temp_current_time = date("YmdHi",$temp_unix_time);
+	  if($row_meeting == $duration) {
+	    $row_free ++;
+	  }else{
+	    $row_meeting ++;
+	  }
+	  $hour_time = substr($temp_current_time,8,2);
+	  foreach($calendar_user as $id => $user_data ) {
+	    $is_free = FALSE;
+	    if(is_array($current_events[$temp_current_time][$id]))
+	      break;
+	    $is_free = TRUE;
+	  }	     
+	}
+	for($count = 0;$count < $row_free; $count++) {
+	  $meeting_event[$current_time] = 0;
+	  $unix_time = strtotime("+$time_unit minutes",$unix_time);
+	  $current_time = date("YmdHi",$unix_time);	    
+	}	    
+	for($count = 0;$count < $row_meeting; $count++) {	    
+	  $meeting_event[$current_time] = 1;
+	  $unix_time = strtotime("+$time_unit minutes",$unix_time);
+	  $current_time = date("YmdHi",$unix_time);	
+	}
+      }
+    }else {
+      $is_free = TRUE;
+      $hour_time = substr($current_time,8,2);
+      $temp_unix_time = $unix_time;
+      while($is_free == TRUE &&  $hour_time < $set_stop_time){
+	$temp_unix_time = strtotime("+$time_unit minutes",$temp_unix_time);
+	$temp_current_time = date("YmdHi",$temp_unix_time);
+	if($row_meeting == $duration) {
+	  $row_free ++;
+	}else{
+	  $row_meeting ++;
+	}
+	$hour_time = substr($temp_current_time,8,2);
+	foreach($calendar_user as $id => $user_data ) {
+	  $is_free = FALSE;
+	  if(is_array($current_events[$temp_current_time][$id]))
+	    break;
+	  $is_free = TRUE;
+	}	     
+      }
+      for($count = 0;$count < $row_free; $count++) {
+	$meeting_event[$current_time] = 0;
+	$unix_time = strtotime("+$time_unit minutes",$unix_time);
+	$current_time = date("YmdHi",$unix_time);	    
+      }	   
+      for($count = 0;$count < $row_meeting; $count++) {	    
+	$meeting_event[$current_time] = 1;
+	$unix_time = strtotime("+$time_unit minutes",$unix_time);
+	$current_time = date("YmdHi",$unix_time);	
+      }
+    }
+    if(date("G",$unix_time) >= $set_stop_time){
+      $tonextday = $set_start_time - $set_stop_time;
+      $unix_time = strtotime("+1 day $tonextday hours",$unix_time);
+    }     
+  }
+  return $meeting_event;
+}
 ///////////////////////////////////////////////////////////////////////////////
 // Agenda Form Data checking and formatting                                 //
 // Parameters:
@@ -1447,7 +1556,7 @@ function check_data_form($agenda) {
   $this_day_r = $day_array3[3]; 
   $this_month_r = $day_array3[2];
   $this_year_r = $day_array3[1];
-  $category = $agenda["category"];
+  $kind = $agenda["kind"];
   $repeat_days = $agenda["repeat_days"];
 
   if (trim($title) == "") {
@@ -1473,7 +1582,7 @@ function check_data_form($agenda) {
     return false;
   }  
   
-  if (trim($repeat_end) != "" && $category != "none") {
+  if (trim($repeat_end) != "" && $kind != "none") {
     if(!checkdate($this_month_r,$this_day_r,$this_year_r)) {    
       $err_msg = $l_err_repeat;
       return false;
@@ -1485,33 +1594,33 @@ function check_data_form($agenda) {
     return false;
   } 
   
-  if(trim($repeat_end) != "" && $dateend>$repeat_end && $category != "none") {
+  if(trim($repeat_end) != "" && $dateend>$repeat_end && $kind != "none") {
     $err_msg =  $l_err_end_repeat;
     return false;
   }
   
-  if($category == "weekly" && $repeat_days == "0000000") {
+  if($kind == "weekly" && $repeat_days == "0000000") {
     $err_msg =  $l_err_days_repeat;
     return false;
   }  
 
-  if($category == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
+  if($kind == "weekly" && strtotime("+ 1 week",strtotime($dateend)) > strtotime($repeat_end)) {
     $err_msg =  $l_err_weekly_repeat;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $category == "yearly") {
+  if(trim($repeat_end) != "" && (($dateend+100000) < $repeat_end) && $kind == "yearly") {
     $err_msg =  $l_err_end_repeat3;
     return false;
   }  
   
-  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $category != "none" &&  $category != "yearly") {
+  if(trim($repeat_end) != "" && (($dateend+10000) < $repeat_end) && $kind != "none" &&  $kind != "yearly") {
     $err_msg =  $l_err_end_repeat2;
     return false;
   }  
 
   
-  if($category != "none" && $dateend > $datebegin) {
+  if($kind != "none" && $dateend > $datebegin) {
     $err_msg =  $l_err_repeat;
     return false;
   }  
@@ -1534,7 +1643,7 @@ function check_data_form($agenda) {
 function get_event_repetition_dates($agenda) {
   global $set_weekstart_default;
 
-  $repeat_category = $agenda["category"];
+  $repeat_kind = $agenda["kind"];
   $repeat_days =$agenda["repeat_days"]; 
   $repeat_end = $agenda["repeat_end"];
   
@@ -1564,17 +1673,17 @@ function get_event_repetition_dates($agenda) {
   }
   $time_b=strtotime("+$this_hour_b hours +$this_min_b minutes",strtotime($this_year_b.$this_month_b.$this_day_b));
   $time_e=strtotime("+$this_hour_e hours +$this_min_e minutes",strtotime($this_year_e.$this_month_e.$this_day_e));
-  if ($repeat_category=="none") {
+  if ($repeat_kind=="none") {
     $event_dates[] = array("date_begin" => date("YmdHi",$time_b),"date_end" => date("YmdHi",$time_e));
   }    
-  elseif ($repeat_category=="daily") {
+  elseif ($repeat_kind=="daily") {
     for($var_time_b=$time_b, $var_time_e=$time_e;
     $var_time_b <= $time_end_repeat;
     $var_time_b = strtotime("+1 day",$var_time_b), $var_time_e = strtotime("+1 day",$var_time_e)){
       $event_dates[]= array("date_begin" => date("YmdHi",$var_time_b),"date_end" => date("YmdHi",$var_time_e));
     }
   }
-  elseif ($repeat_category=="weekly") {
+  elseif ($repeat_kind=="weekly") {
     $start_week_day = strtotime($set_weekstart_default);
     $first_day = (date("w",$time_b) - date("w",$start_week_day)+7)%7;
     for($var_time_b = strtotime("-$first_day days",$time_b), 
@@ -1590,7 +1699,7 @@ function get_event_repetition_dates($agenda) {
       }
     }  
   }  
-  else if ($repeat_category=="monthlybydate") {
+  else if ($repeat_kind=="monthlybydate") {
     $var_time_e = $time_e;
     $i = 0;
     while(($var_time_t = strtotime("+$i month",$time_b)) <= $time_end_repeat) {
@@ -1600,7 +1709,7 @@ function get_event_repetition_dates($agenda) {
       $i++;
     }
   }
-  else if ($repeat_category=="monthlybyday") {
+  else if ($repeat_kind=="monthlybyday") {
     $start_of_month = strtotime($this_year_b.$this_month_b."01");
     $time_rb = $time_b;
     $time_re = $time_e;
@@ -1633,7 +1742,7 @@ function get_event_repetition_dates($agenda) {
       }
       $i ++;
     }
-  } else if ($repeat_category=="yearly") {  
+  } else if ($repeat_kind=="yearly") {  
     for($var_time_b=$time_b, $var_time_e=$time_e;
     $var_time_b <= $time_end_repeat;
     $var_time_b = strtotime("+1 year",$var_time_b), $var_time_e = strtotime("+1 year",$var_time_e)){  
