@@ -27,8 +27,27 @@ function run_query_search($company, $p_new_order, $p_order_dir) {
   $market = $company["marketing_manager"];
   $zip = $company["zip"];
 
-  $req = "select Company.*,
+  $req = "select
       company_id as Id,
+      company_id,
+      company_name,
+      company_state,
+      company_type_id,
+      company_activity_id,
+      company_marketingmanager_id,
+      company_address1,
+      company_address2,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
+      company_country,
+      company_phone,
+      company_fax,
+      company_web,
+      company_email,
+      company_contact_number,
+      company_deal_number,
+      company_deal_total,
       companytype_label,
       companyactivity_label
     from (Company

@@ -23,9 +23,23 @@ function run_query_search($contact, $p_new_order, $p_order_dir) {
   $phone = stripslashes($contact["phone"]);
   $company = $contact["company"];
 
-  $query = "select Contact.*, contact_id as Id,
-                   company_name as contact_company_name, company_phone
-            from Contact, Company where";
+  $query = "select
+      contact_id as Id,
+      contact_id,
+      contact_usercreate,
+      contact_company_id,
+      contact_kind_id,
+      contact_lastname,
+      contact_firstname,
+      contact_function,
+      contact_phone,
+      contact_homephone,
+      contact_mobilephone,
+      contact_email,
+      contact_visibility,
+      company_name as contact_company_name, company_phone
+    from Contact, Company
+    where";
 
   // If a contact indication has been specified, get it 
   if ($lname != "") {

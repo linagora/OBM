@@ -29,8 +29,18 @@ function run_query_search($incident, $p_new_order, $p_order_dir) {
   $datebefore = $incident["date_before"];
   $archive = ($incident["archive"] ? "1" : "0");
 
-  $req = "select Incident.*,
+  $req = "select
       Incident.incident_id as Id,
+      incident_id,
+      incident_timeupdate,
+      incident_contract_id,
+      incident_label,
+      incident_date,
+      incident_priority,
+      incident_state,
+      incident_logger,
+      incident_owner,
+      incident_archive,
       DATE_FORMAT(incident_date,'$l_date_format') as date,
       DATE_FORMAT(incident_timeupdate,'$l_datetime_format') as timeupdate,
       u1.userobm_lastname as incident_logger_lastname,

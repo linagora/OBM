@@ -1050,6 +1050,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
       method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
 
 <!-- kind delete section -->
+
        <table>
         <tr>
           <td class=\"adminLabel\">$l_kind_exist</td>
@@ -1067,6 +1068,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
         </tr>
 
 <!-- kind update section -->
+
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
     <form name=\"form_kind_update\"
@@ -1095,12 +1097,11 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
           <td>&nbsp;</td>
       </tr>
      </table>
-
-<!-- new kind section -->
       </td>
-      <td>
 
 <!-- New Kind Section -->
+
+      <td>
     <form name=\"form_kind_new\"
       method=\"post\" action=\"" . url_prepare("deal_index.php") . "\">
       <table>
@@ -1123,7 +1124,6 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
     </tr>
     </table>
 
-
 <!-- status section -->
 
     <hr />
@@ -1136,6 +1136,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
       <td>
 
 <!-- status delete section -->
+
         <table>
         <tr>
          <td colspan=\"3\">
@@ -1519,7 +1520,7 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $plabel = stripslashes($deal["plabel"]);
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
-  display_info_msg($nb_parentdeals." ".$l_found_paren);
+  display_info_msg($nb_parentdeals." ".$l_found_parent);
 
   $url = url_prepare("deal_index.php?action=parent_search&amp;tf_plabel=$plabel&amp;sel_pmanager=$pmanager&amp;cb_parchive=$parchive");
 
@@ -1530,7 +1531,6 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
   $obm_dis_list_parentdeal->data_idfield = "parentdeal_id"; 
   $obm_dis_list_parentdeal->data_set->seek($first_row);
   $obm_dis_list_parentdeal->display();
-
 }
 
 

@@ -241,10 +241,13 @@ function html_contact_consult($co_q) {
       <td class=\"detailText\">$ad2</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
-      <td class=\"detailText\">$l_expresspostal</td>
+      <td class=\"detailText\">$zip</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
       <td class=\"detailText\">$town</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailText\">$cdx</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td class=\"detailText\">$ctry</td>
@@ -448,11 +451,11 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
     <td class=\"detailLabel\">$l_postcode</td>
     <td><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_expresspostal</td>
-    <td><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
-    </tr><tr>
     <td class=\"detailLabel\">$l_town</td>
     <td><input type=\"text\" name=\"tf_town\" size=\"24\" value=\"$town\" /></td>
+    </tr><tr>
+    <td class=\"detailLabel\">$l_expresspostal</td>
+    <td><input type=\"text\" name=\"tf_cdx\" size=\"8\" value=\"$cdx\" /></td>
     </tr><tr>
     <td class=\"detailLabel\">$l_country</td>
     <td><input type=\"text\" name=\"tf_ctry\" size=\"20\" value=\"$ctry\" /></td>

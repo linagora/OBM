@@ -197,7 +197,7 @@ $l_cat_update_ok = "La modification de la catégorie a été correctement effectuée
 $l_cat_update_error = "La modification de la catégorie a échoué !";
 $l_cat_delete_ok = "La suppression de la catégorie a été correctement effectuée !";
 $l_cat_delete_error = "La suppression de la catégorie a échoué !";
-$l_found_parent = "SurAffaires trouvees";
+$l_found_parent = "SurAffaires trouvées";
 $l_no_found_parent = "Aucune SurAffaire ne correspond à ces critères !";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)

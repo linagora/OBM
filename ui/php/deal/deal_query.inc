@@ -37,16 +37,32 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
   $dateafter = $deal["dateafter"];
   $datebefore = $deal["datebefore"];
 
-  $query = "select Deal.*, deal_id as Id,
-     dealtype_label,
-     company_name as deal_company_name,
-     company_zipcode as deal_company_zipcode,
-     tasktype_label,
-     dealstatus_label,
-     userobm_lastname as deal_marketingmanager,
-     DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
-  from Deal, DealType, TaskType, Company, DealStatus, UserObm
-  where deal_type_id=dealtype_id
+  $query = "select 
+      deal_id as Id,
+      deal_id,
+      deal_label,
+      deal_datebegin,
+      deal_parentdeal_id,
+      deal_type_id,
+      deal_tasktype_id,
+      deal_company_id,
+      deal_marketingmanager_id,
+      deal_technicalmanager_id,
+      deal_amount,
+      deal_status_id,
+      deal_datealarm,
+      deal_archive,
+      deal_todo,
+      deal_visibility,
+      dealtype_label,
+      company_name as deal_company_name,
+      company_zipcode as deal_company_zipcode,
+      tasktype_label,
+      dealstatus_label,
+      userobm_lastname as deal_marketingmanager,
+      DATE_FORMAT(deal_datealarm,'$l_date_format') as datealarm
+    from Deal, DealType, TaskType, Company, DealStatus, UserObm
+    where deal_type_id=dealtype_id
      and tasktype_id=deal_tasktype_id
      and deal_company_id=company_id
      and deal_status_id=dealstatus_id
@@ -1038,7 +1054,13 @@ function run_query_search_parentdeal($deal, $p_new_order="", $p_order_dir="") {
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
 
-  $query = "select ParentDeal.*, parentdeal_id as Id,
+  $query = "select
+      parentdeal_id as Id,
+      parentdeal_id,
+      parentdeal_label,
+      parentdeal_marketingmanager_id,
+      parentdeal_technicalmanager_id,
+      parentdeal_archive,
       Marketing.userobm_lastname as parentdeal_marketing_lastname,
       Technical.userobm_lastname as parentdeal_technical_lastname
     from ParentDeal,
