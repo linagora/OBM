@@ -282,6 +282,9 @@ function session_load_global_prefs() {
 ///////////////////////////////////////////////////////////////////////////////
 function session_load_user_prefs() {
   global $sess, $auth;
+  global $last_company_name,$last_contact_name,$last_deal_name,$last_list_name;
+  global $last_contract_name, $last_incident_name;
+  global $last_account_name, $last_invoice_name, $last_payment_name;
 
   $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
   while ($obm_q_name_var->next_record()) {
@@ -297,6 +300,8 @@ function session_load_user_prefs() {
   $sess->register("last_contact_name");
   $last_deal_name = run_query_global_deal_label($last_deal);
   $sess->register("last_deal_name");
+  $last_list_name = run_query_global_list_name ($last_list); 
+  $sess->register("last_list_name");
   $last_account_name = run_query_global_account_label($last_account);
   $sess->register("last_account_name");
   $last_invoice_name = run_query_global_invoice_label ($last_invoice);
@@ -308,8 +313,8 @@ function session_load_user_prefs() {
   $last_incident_name = run_query_global_incident_label ($last_incident); 
   $sess->register("last_incident_name");
 
-
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Query Execution - Action on ActiveUserObm and UserObm_Session Log during  //
@@ -391,15 +396,16 @@ function run_query_log_session($obm_q) {
 }
 
 
-////////////////////////////////////////////////////////////////////////////
-// A GARDER ?????
-////////////////////////////////////////////////////////////////////////////
-function run_query_global_company_name($p_company_id) {
+///////////////////////////////////////////////////////////////////////////////
+// Get the company name from the company Id
+// Parameters:
+//   - $c_id : company id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_company_name($c_id) {
   global $cdg_sql;
   
-  $query = "select company_name from Company where company_id='$p_company_id'";
+  $query = "select company_name from Company where company_id='$c_id'";
   $obm_db = new DB_OBM;
-  // Problem because called before include global.inc in setting module
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $obm_db->next_record();
@@ -407,11 +413,15 @@ function run_query_global_company_name($p_company_id) {
 }
 
 
-function run_query_global_contact_name($p_contact_id) {
+///////////////////////////////////////////////////////////////////////////////
+// Get the contact name from the contact Id
+// Parameters:
+//   - $c_id : contact id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_contact_name($c_id) {
   global $cdg_sql;
   
-  $query = "select contact_lastname from Contact where contact_id='$p_contact_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select contact_lastname from Contact where contact_id='$c_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -420,11 +430,15 @@ function run_query_global_contact_name($p_contact_id) {
 }
 
 
-function run_query_global_deal_label($p_deal_id) {
+///////////////////////////////////////////////////////////////////////////////
+// Get the deal label from the deal Id
+// Parameters:
+//   - $d_id : deal id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_deal_label($d_id) {
   global $cdg_sql;
 
-  $query = "select deal_label from Deal where deal_id='$p_deal_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select deal_label from Deal where deal_id='$d_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -432,11 +446,33 @@ function run_query_global_deal_label($p_deal_id) {
   return $obm_db->f("deal_label");
 }
 
-function run_query_global_account_label($p_account_id) {
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the list name from the list Id
+// Parameters:
+//   - $l_id : list id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_list_name($l_id) {
+  global $cdg_sql;
+  
+  $query = "select list_name from List where list_id='$l_id'";
+  display_debug_msg($query, $cdg_sql);
+  $obm_db = new DB_OBM;
+  $obm_db->query($query);
+  $obm_db->next_record();
+  return $obm_db->f("list_name");
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the account label from the account Id
+// Parameters:
+//   - $a_id : account id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_account_label($a_id) {
   global $cdg_sql;
 
-  $query = "select account_label from Account where account_id='$p_account_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select account_label from Account where account_id='$a_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -444,11 +480,16 @@ function run_query_global_account_label($p_account_id) {
   return $obm_db->f("account_label");
 }
 
-function run_query_global_invoice_label($p_invoice_id) {
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the invoice label from the invoice Id
+// Parameters:
+//   - $a_id : invoice id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_invoice_label($i_id) {
   global $cdg_sql;
   
-  $query = "select invoice_label from Invoice where invoice_id='$p_invoice_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select invoice_label from Invoice where invoice_id='$i_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -456,11 +497,16 @@ function run_query_global_invoice_label($p_invoice_id) {
   return $obm_db->f("invoice_label");
 }
 
-function run_query_global_payment_label($p_payment_id) {
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the payment label from the payment Id
+// Parameters:
+//   - $p_id : payment id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_payment_label($p_id) {
   global $cdg_sql;
   
-  $query="select payment_label from Payment where payment_id='$p_payment_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select payment_label from Payment where payment_id='$p_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -468,11 +514,16 @@ function run_query_global_payment_label($p_payment_id) {
   return $obm_db->f("payment_label");
 }
 
-function run_query_global_contract_label($p_contract_id) {
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the contract label from the contract Id
+// Parameters:
+//   - $c_id : contract id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_contract_label($c_id) {
   global $cdg_sql;
   
-  $query="select contract_label from Contract where contract_id='$p_contract_id'";
-  // Problem because called before include global.inc in setting module
+  $query = "select contract_label from Contract where contract_id='$c_id'";
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;
   $obm_db->query($query);
@@ -480,10 +531,16 @@ function run_query_global_contract_label($p_contract_id) {
   return $obm_db->f("contract_label");
 }
 
-function run_query_global_incident_label($p_incident_id) {
+
+///////////////////////////////////////////////////////////////////////////////
+// Get the incident label from the incident Id
+// Parameters:
+//   - $i_id : incident id 
+///////////////////////////////////////////////////////////////////////////////
+function run_query_global_incident_label($i_id) {
   global $cdg_sql;
   
-  $query="select incident_label from Incident where incident_id='$p_incident_id'";
+  $query = "select incident_label from Incident where incident_id='$i_id'";
   // Problem because called before include global.inc in setting module
   display_debug_msg($query, $cdg_sql);
   $obm_db = new DB_OBM;

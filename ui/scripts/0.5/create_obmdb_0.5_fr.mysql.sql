@@ -110,6 +110,6 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (14
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (15,'Auto-Formations,Veille',1);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (16,'Garantie contractuelle projets',1);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (17,'Divers(direction,autres)',1);
-INSERT INTO (tasktype_id, tasktype_label, tasktype_internal) TaskType VALUES (18,'Congés , absences , maladie',1);
+INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (18,'Congés , absences , maladie',1);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (19,'Déplacements',1);
 INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (20,'Infographie/Communication',1);

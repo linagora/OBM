@@ -40,7 +40,7 @@ $col_tableh = $col_grey;         // Table header background color
 $col_tableh_text = $col_white;   // Table header texte
 
 // Fontes
-$font_version = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_dark_grey\" size=3>";
+$font_version = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_dark_grey\" size=2>";
 $font_fonction = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_white\" size=1>";
 $font_menu = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_menu\" size=-2>";
 $font_label = "<font face=\"verdana,arial,helvetica,sand-serif\" color=\"#$col_label\" size=-2>";

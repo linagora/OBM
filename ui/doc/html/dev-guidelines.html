@@ -567,25 +567,31 @@ Each language global.inc can hence define its version:
 <p>
 
 <!-- ---------------------------------------------------------------------- -->
-<h2>Expressions régulières</h2>
+<h2>Regular Expressions</h2>
 
-PHP propose 2 types d'expressions régulières :
+PHP provides 2 kind of regular expression :
 <p>
 <table border=1>
 <tr>
-  <th>Type</th>
-  <th>Préfixe des fonctions</th>
+  <th>Kind</th>
+  <th>Function prefix</th>
+  <th>Pattern syntax</th>
+  <th>OBM use</th>
 </tr><tr>
   <td>PCRE (Perl compatible regular expression)</td>
   <td>preg_</td>
+  <td>"/^[a-z]$/"</td>
+  <td align=center>Yes</td>
 </tr><tr>
   <td>Regexps (Posix extended)</td>
   <td>ereg_ ou eregi_</td>
+  <td>"^[a-z]$"</td>
+  <td align=center>No</td>
 </tr>
 </table>
 <p>
-Dans OBM, les expressions régulières utilisées doivent être de type <b>PCRE</b>
-pour des raisons de fonctionnalités et performances.
+
+In OBM for performance and functionality, only <b>PCRE</b> regexps must be use.
 
 
 <!-- ---------------------------------------------------------------------- -->

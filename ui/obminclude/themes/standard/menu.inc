@@ -17,7 +17,7 @@ function generate_menu($menu, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
-  global $auth, $sess, $securinet_version; 
+  global $auth, $sess, $securinet_version, $obminclude; 
   global $cong_app, $cong_usr, $cong_adm;
   global $col_clear_grey, $col_dark_grey, $col_white;
   global $font_version, $font_fonction,$obm_version;
@@ -27,18 +27,18 @@ function generate_menu($menu, $section) {
   else 
     $path = "..";
 
-  $lang_file = "secinclude/lang/$set_lang/header.inc";
+  $lang_file = "$obminclude/lang/$set_lang/header.inc";
   if (file_exists("$path/../$lang_file")) {
     include ($lang_file);
   } else {
-    include ("secinclude/lang/$set_lang_default/header.inc");
+    include ("$obminclude/lang/$set_lang_default/header.inc");
   }
 
-  $theme_file = "secinclude/themes/$set_theme/theme.inc";
+  $theme_file = "$obminclude/themes/$set_theme/theme.inc";
   if (file_exists("$path/../$theme_file")) {
     include ($theme_file);
   } else {
-    include ("secinclude/themes/$set_theme_default/theme.inc");
+    include ("$obminclude/themes/$set_theme_default/theme.inc");
   }
 
   $uid = $auth->auth["uid"];
