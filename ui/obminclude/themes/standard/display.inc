@@ -273,8 +273,11 @@ function display_sections($section) {
   $ret = "<div class='section'>\n";
   foreach ($menus as $key => $value) {
     if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
-      if ($key == $section)     $ret .= "<p class='actif'>".$value["Name"]."</p>\n";
-      else      $ret .= "<p class='inactif'><a href='".$value["Url"]."'>".$value["Name"]."</a></p>\n";
+      if ($key == $section) {
+	$ret .= "<p class='actif'>".$value["Name"]."</p>\n";
+      }	else {
+	$ret .= "<p class='inactif'><a href='".$value["Url"]."'>".$value["Name"]."</a></p>\n";
+      }
     }
   }
   $ret .= "</div>";

@@ -9,8 +9,6 @@
 
 // Database fields
 $l_date_task="Task date";
-$l_tasklabel="Task label";
-$l_tasktype = "Tasktype";
 $l_project = "Project";
 $l_task_del="Remove ?";
 $l_company = "Company";
@@ -22,9 +20,6 @@ $l_total_period="Total for this period";
 $l_total_spent="Time spent";
 $l_total_before="Total before period";
 $l_total_after="Total after period";
-$l_day="Day";
-$l_period="Period";
-
 
 $l_task_del="Remove.";
 $l_from = "from";
@@ -33,9 +28,7 @@ $l_week="Week";
 $l_month="Month";
 $l_month2=" ";
 $l_user="User";
-$l_all_users="All ?";
 $l_see = "See";
-$l_validate_task = "Validate";
 $l_valid = "Validation";
 $l_unvalid = "Cancel";
 $l_add = "Add";
@@ -43,24 +36,16 @@ $l_update = "Update";
 $l_fill= "Fill";
 $l_intern = "Intern";
 
-$l_week_prev = "Previous week";
-$l_week_next = "Next week";
-$l_month_next = "Next month";
-$l_month_prev = "Previous month";
-$l_date = "Date";
 $l_cat = "Category";
 $l_task = "Task";
 $l_label = "Label";
 $l_duration = "Duration";
 
-//$show_events="See details";
 $l_searchtime_display = "Display options for tasks list";
 $total_menu="Summary";
 $total_tasks="Task total";
 $total_companies="Total per company";
 $total_projects="Total per project/deal";
-$l_workingdays ="Working days";
-$l_workingdays2 ="working days";
 
 // short names for days
 $l_daysofweekshort = array (	'Sun',
@@ -71,8 +56,6 @@ $l_daysofweekshort = array (	'Sun',
 				'Fri',
 				'Sat');
 
-// Titres
-$l_time = "Time management";
 
 // Messages
 $l_projects_manager = "Projects managers can validate tasks here:";
@@ -81,7 +64,6 @@ $l_found = "found tasks.";
 $l_no_found = "No task for this user";
 $l_fill_addtask = "Fill the tasks for this week.";
 $l_task_list = "List of current week tasks";
-$l_update_task = "You can uodate the following task :";
 
 $l_admin_valid = "Admin validation screen";
 $l_admin_empty = "No informations are available for this month";
@@ -90,12 +72,6 @@ $l_proj_stats = "Taking part in actual projects";
 $l_no_proj_stats = "This person(s) is/are currently not taking part in projects";
 $l_tt_stats = "Distribution of the time spent on different task types";
 $l_no_tt_stats = "This person(s) is/are not using the time management";
-
-// Type de tâches à rechercher
-//$l_tasktype = "Task type";
-//$l_task_all = "All";
-//$l_task_uservalid = "Validated by an admin or a user";
-//$l_task_adminvalid= "Validated by an admin only";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_j_select_day = "You must select a day.";

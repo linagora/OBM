@@ -198,7 +198,7 @@ function run_query_allocation_and_time($p_id) {
     group by userobm_id, projecttask_id
     ";
 
-  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+  display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 

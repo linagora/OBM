@@ -3,7 +3,7 @@
 //     - Desc : CSS style file (standard theme)                              //
 // 2003-08-27 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 */
 
@@ -19,14 +19,14 @@ div.timeBar {
 /* Time browsing panel */
 
 table.timeLinks			{
-	border-spacing:		1;
+	border-spacing:		1px;
 	margin:			auto;
 	}
 
 table.timeMonth			{
-	border-spacing:		1;
+	border-spacing:		1px;
 	margin:			auto;
-	padding:		2;
+	padding:		2px;
 	}
 
 td.timePeriod			{
@@ -39,9 +39,9 @@ td.timePeriod			{
 
 table.timeValid			{
 	border:			1px #4f7091 solid;
-	border-spacing:		1;
+	border-spacing:		1px;
 	margin:			auto;
-	padding:		2;
+	padding:		2px;
 	text-align:		left;
 	font-size:		12px;
 	}
@@ -54,7 +54,7 @@ table.timeDetail		{
 	font-weight: 		600;
 	text-align:		left;
 	background-color:	#a5bace;
-	border-spacing:		1;
+	border-spacing:		1px;
 	margin:			auto;
 	}
 
@@ -65,7 +65,7 @@ td.timeForm			{
 	text-align:		left;
 	color:			#4f7091;
 	background-color:	#e7ebef;
-	padding:		3;
+	padding:		3px;
 	}
 
 /* Week panel */

@@ -12,20 +12,23 @@
 // Fields that appear in result lists                                        //
 //---------------------------------------------------------------------------//
 // Direct fields
+// Stat entries
 $fieldnames["project_name"] = $l_project;
-$fieldnames["tasktype_label"] = $l_tasktype;
-$fieldnames["timetask_label"] = $l_tasklabel;
+$fieldnames["tasktype_label"] = $l_cat;
+$fieldnames["projecttask_label"] = $l_task;
+$fieldnames["timetask_label"] = $l_comment;
 $fieldnames["company_name"] = $l_company;
 $fieldnames["total_length"] = $l_total_period;
 $fieldnames["total_spent"] = $l_total_spent;
 $fieldnames["total_before"] = $l_total_before;
 $fieldnames["total_after"] = $l_total_after;
 
+// TimeTask entries
 $fieldnames["date_task"] = $l_date_task;
 $fieldnames["timetask_project_name"] = $l_project;
 $fieldnames["timetask_company_name"] = $l_company;
 $fieldnames["timetask_length"] = $l_length;
-
+$fieldnames["timetask_id"] = "";
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Time specific dataset fields                                      //
@@ -120,7 +123,7 @@ function debug_array($a) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_links ($time, $type="all") {
   global $cdg_param, $auth, $set_theme; 
-  global $l_week, $l_week_prev,$l_week_next, $l_month_prev,$l_month_next;
+  global $l_week;
   global $hum_date, $l_month2, $l_from, $l_to;
   // WEEK
 
@@ -513,7 +516,7 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   //-- Themes
   global $set_theme,$set_date,$ico_mail;
   //-- Labels
-  global $l_date_task, $l_company, $l_tasklabel, $l_tasktype;
+  global $l_date_task, $l_company;
   global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
   global $l_update, $l_length, $l_task_list;
 
@@ -572,7 +575,7 @@ function dis_time_one_month($obm_dq, $time) {
   //-- Themes
   global $set_theme;
   //-- Labels
-  global $l_found, $_task_del, $l_delete, $l_total_deal;
+  global $l_found, $_task_del, $l_delete;
   global $c_day_fraction, $c_days_in_a_week;
 
   $uid = $time["user_id"];
@@ -641,7 +644,6 @@ function display_monthview($time, $array_res, $total, $status) {
   global $c_day_fraction, $c_days_in_a_week;
   global $col_orange, $col_blue;
   global $l_total, $l_fill, $l_see;
-  global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   $col_width=20;
   $time_length = 0;
@@ -855,7 +857,7 @@ function display_shortview($time, $array_res) { //, $order) {
 ///////////////////////////////////////////////////////////////////////////////
 function dis_time_one_week($obm_dq, $time) {
   //-- Themes
-  global $l_found, $_task_del, $l_delete, $l_total_deal;
+  global $l_found, $_task_del, $l_delete;
   global $c_day_fraction, $c_days_in_a_week;
 
   $obm_user_q = run_query_userobm($time["user_id"]);
@@ -906,7 +908,6 @@ function display_weekview($time, $result, $total, $title) {
   global $c_day_fraction, $c_days_in_a_week;
   global $col_orange,$col_blue;
   global $l_total, $l_fill, $l_daysofweekshort;
-  global $l_workingdays2, $l_total_user_msg1, $l_total_days_msg3, $l_total_days_msg4; 
 
   $tot_width = 500;
   $col_width = $tot_width / $c_days_in_a_week;
@@ -969,8 +970,8 @@ function display_weekview($time, $result, $total, $title) {
 function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
                           $day_q, $fraction_t, $time, $validate_days) {
   global $auth, $time, $fraction_jour ,$task_id_modify;
-  global $l_addtask_start, $l_addtask_end, $l_add, $l_none;
-  global $l_label,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
+  global $l_add, $l_none;
+  global $l_comment,$l_date,$l_project,$l_duration,$l_task, $l_update, $l_close;
   global $l_fill_addtask, $l_daysofweekshort;
   //for list classement of task
   global $l_task_fac,$l_task_div,$l_task_int, $l_intern, $l_cat, $l_comment;
@@ -1268,7 +1269,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
     </tr>
     <tr>
-     <td class=\"timeForm\">$l_label :</td>
+     <td class=\"timeForm\">$l_comment :</td>
      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
      $dis_button
     </tr>
@@ -1305,7 +1306,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   //      <td class=\"timeForm\" colspan=\"3\">$sel_projtask</td>
   //     </tr>
   //     <tr>
-  //      <td class=\"timeForm\">$l_label :</td>
+  //      <td class=\"timeForm\">$l_comment :</td>
   //      <td class=\"timeForm\" colspan=\"3\">$tf_label</td>
   //     </tr>
   //    </table>

@@ -455,7 +455,7 @@ function get_param_time() {
 function get_time_actions() {
   global $time, $path;
   global $l_header_weeklyview, $l_header_monthlyview, $l_header_globalview;
-  global $l_header_stats, $l_header_admin, $l_header_display;
+  global $l_header_stats, $l_header_display;
   global $actions, $time_read, $time_write, $time_admin_read, $time_admin_write;
 
 // Index

@@ -1,7 +1,7 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM   - Language : Norwegian                                              //
-//       - File     : check_date_js.inc                                      //
+// OBM - Language : Norwegian                                                //
+//     - File     : check_date_js.inc                                        //
 // 2000-07-20 Magni Onsoien                                                  //
 ///////////////////////////////////////////////////////////////////////////////
 // JAVASCRIPT function that check the validity of a given date               //
@@ -10,7 +10,8 @@
 // An incorrect or empty date returns false and displays an alert            //
 // The field given as argument receive the correct date in the ISO format    //
 ///////////////////////////////////////////////////////////////////////////////
-echo "
+
+$extra_js .= "
 function check_date(champ_date, nom_date) {
   var day = \"\";
   var month = \"\";
@@ -79,4 +80,4 @@ function check_date(champ_date, nom_date) {
 
   return true;  
 }  
-"; // End of the initial echo
+";

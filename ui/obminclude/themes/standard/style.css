@@ -3,12 +3,44 @@
 //     - Desc : CSS style file (standard theme)                              //
 // 2003-07-30 Mehdi Rande                                               //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
 /* ------------------------------------------------------------------------- */
 /* Global display layout */
 /* ------------------------------------------------------------------------- */
+
+body 			{
+/*	background-color: #d6dfe7;*/
+	background-color: 	#d7dfe7;
+	color:			#000000;
+        border:                 0px;
+        margin:                 0px;
+        padding:                0px;
+}
+
+a:link 		{ color: #000000; background-color: transparent;}
+a:active 	{ color: #000000; background-color: transparent;}
+a:visited 	{ color: #000000; background-color: transparent;}
+
+td			{
+	margin:			0;
+	border:			0;
+	padding:		0;
+	border-spacing:		0;
+}
+
+img			{
+	margin:			0;
+	border:			0;
+	padding:		0;
+}
+
+p			{
+        margin-left:		auto;
+	margin-right:		auto;
+}	
+
 
 .leftpanel {
 	position: absolute;
@@ -56,21 +88,157 @@
 /*	background-color: #00FF00;*/
 }
 
+
 /* ------------------------------------------------------------------------- */
 /* header */
 /* ------------------------------------------------------------------------- */
+
+.header		{
+	background-image: url('/images/standard/header_bg.png');
+	background-repeat: repeat-x;
+	background-color: #fff;
+	height: 80px;
+	font-size: 0.7em;
+	margin-bottom: 10px;
+}
+
+.header #logo	{
+	float: left;
+}
+
+.header #version	{
+	color: #fff;
+	font-weight: bold;
+	float: right;
+	margin: 5px;
+}
+
+.header ul	{
+	margin: 0px;
+}
+
+.header li	{
+	display: inline;
+	list-style-type: none;
+}
+
+.header .login, .header .login a	{
+	font-weight: bold;
+	color: #fff;
+}
+
+.header .login li	{
+	margin-right: 5px;
+}
+
+.header .login li img	{
+	vertical-align: bottom;
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* section */
 /* ------------------------------------------------------------------------- */
 
+.header .section	{
+	position:		absolute;
+	top: 			27px;
+	left: 			178px;
+	text-align: 		center;
+	font-family: 		arial,sans-serif;
+	font-weight: 		bold;
+	backgound-color:	transparent;
+}
+
+.header .section p	{
+	height: 		27px;
+	margin: 		0px 5px 0px 0px;
+	float:			left;
+	display:		inline;
+	padding-top:		10px;
+	width:			138px;
+	background-repeat:	no-repeat;
+}
+
+.header .section p.inactif	{
+	background-image: 	url("/images/standard/onglet_inactif_bg.png");
+}
+
+.header .section p.inactif a	{
+	color: 			#d7d6e0;
+}
+
+.header .section p.actif	{
+	background-image: 	url("/images/standard/onglet_actif_bg.png");
+}
+
 /* ------------------------------------------------------------------------- */
 /* menu */
 /* ------------------------------------------------------------------------- */
 
+.header .menu	{
+	position:		absolute;
+	top:			60px;
+	left: 			188px;
+	padding:		0px;
+	font-family: 		arial,sans-serif;
+}
+
+.header .menu li {
+	margin-right:		 13px;
+}
+
+
 /* ------------------------------------------------------------------------- */
 /* action */
 /* ------------------------------------------------------------------------- */
+
+table.menuBar		{
+        margin-left:		auto;
+	margin-right:		auto;
+	width:			90%;
+	border-spacing:		0;
+	padding:		50;
+	background-color:	transparent;	
+}
+		
+td.menuBarLabel		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	font-weight:		bold;
+	color:			#ffffff;
+	background-color:	#93919c;
+}
+
+td.menuBarText		{
+	font-family:		sans-serif;
+	font-size:		10px;
+	font-weight:		bold;
+	color:			#ffffff;
+	background-color:	#93919c;
+	text-align:		right;
+}
+
+img.menuBarIconG	{
+	float:			right;
+	border:			0;
+	text-align:		right;
+	margin:			0;
+	padding:		0;
+}
+
+img.menuBarIconD	{
+	float:			left;
+	border:			0;
+	text-align:		left;
+	margin:			0;
+	padding:		0;
+}
+
+a.menuBar:link { color: #ffffff; background-color: transparent;}
+a.menuBar:active { color: #ffffff; background-color: transparent;}
+a.menuBar:visited { color: #ffffff; background-color: transparent;}
+
 
 /* ------------------------------------------------------------------------- */
 /* last */
@@ -123,6 +291,47 @@
 /* ------------------------------------------------------------------------- */
 /* msg */
 /* ------------------------------------------------------------------------- */
+
+.messageOk		{
+        margin-left:		auto;
+	margin-right:		auto;
+	font-family:		sans-serif;
+	font-size:		14px;
+	color:			#47c134;
+	text-align:		center;
+	background-color:	transparent;	
+}
+
+.messageError		{
+        margin-left:		auto;
+	margin-right:		auto;
+	font-family:		sans-serif;
+	font-size:		14px;
+	color:			#f42742;
+	text-align:		center;
+	background-color:	transparent;	
+}
+
+.messageWarning		{
+        margin-left:		auto;
+	margin-right:		auto;
+	font-family:		sans-serif;
+	font-size:		14px;
+	color:			#ee9b00;
+	text-align:		center;
+	background-color:	transparent;	
+}
+
+.messageInfo		{
+        margin-left:		auto;
+	margin-right:		auto;
+	font-family:		sans-serif;
+	font-size:		14px;
+	color:			#0052e0;
+	text-align:		center;
+	background-color:	transparent;	
+}
+
 
 /* ------------------------------------------------------------------------- */
 /* search */
@@ -382,104 +591,6 @@ a.resultText:visited 	{ color: #0ba589; background-color: transparent;}
 /* ------------------------------------------------------------------------- */
 
 
-
-
-/* //////////////////GLOBALS///////////////// */
-/* ///// Globals items style definition ///// */
-/* ////////////////////////////////////////// */
-body 			{
-/*	background-color: #d6dfe7;*/
-	background-color: 	#d7dfe7;
-	color:			#000000;
-        border:                 0px;
-        margin:                 0px;
-        padding:                0px;
-font-family: arial, sans-serif;
-}
-
-a:link 		{ color: #000000; background-color: transparent;}
-a:active 	{ color: #000000; background-color: transparent;}
-a:visited 	{ color: #000000; background-color: transparent;}
-
-td			{
-	margin:			0;
-	border:			0;
-	padding:		0;
-	border-spacing:		0;
-}
-
-img			{
-	margin:			0;
-	border:			0;
-	padding:		0;
-}
-
-p			{
-        margin-left:		auto;
-	margin-right:		auto;
-}	
-
-
-/*System Message*/
-.messageOk		{
-        margin-left:		auto;
-	margin-right:		auto;
-	font-family:		sans-serif;
-	font-size:		14px;
-	color:			#47c134;
-	text-align:		center;
-	background-color:	transparent;	
-}
-
-.messageError		{
-        margin-left:		auto;
-	margin-right:		auto;
-	font-family:		sans-serif;
-	font-size:		14px;
-	color:			#f42742;
-	text-align:		center;
-	background-color:	transparent;	
-}
-
-.messageWarning		{
-        margin-left:		auto;
-	margin-right:		auto;
-	font-family:		sans-serif;
-	font-size:		14px;
-	color:			#ee9b00;
-	text-align:		center;
-	background-color:	transparent;	
-}
-
-.messageInfo		{
-        margin-left:		auto;
-	margin-right:		auto;
-	font-family:		sans-serif;
-	font-size:		14px;
-	color:			#0052e0;
-	text-align:		center;
-	background-color:	transparent;	
-}
-
-
-/* ////////////////GLOBAL MENU/////////////// */
-/* /// Global menu items style definition /// */
-/* ////////////////////////////////////////// */
-
-td.globalLogo		{
-	vertical-align:		top;
-	width:			180px;
-	padding:		0;
-	margin:			0;
-}
-
-td.globalHeader		{
-	vertical-align:		top;
-	width:			100%;
-	padding:		0;
-	margin:			0;
-}
-
 /* ////////////////LOGO MENU///////////////// */
 /* //// Logo menu items style definition //// */
 /* ////////////////////////////////////////// */
@@ -519,159 +630,6 @@ td.logoVersion		{
 	margin:			0;		
 }
 
-/* ////////////////HEADER MENU/////////////// */
-/* /// Header menu items style definition /// */
-/* ////////////////////////////////////////// */
-
-.header
-{
-background-image: url('/images/standard/header_bg.png');
-background-repeat: repeat-x;
-background-color: #fff;
-height: 80px;
-font-size: 0.7em;
-margin-bottom: 10px;
-}
-
-.header #logo
-{
-float: left;
-}
-
-.header #version
-{
-color: #fff;
-font-weight: bold;
-float: right;
-margin: 5px;
-}
-
-.header ul
-{
-margin: 0px;
-}
-
-.header li
-{
-display: inline;
-list-style-type: none;
-}
-
-.header .login, .header .login a
-{
-font-weight: bold;
-color: #fff;
-}
-
-.header .login li
-{
-margin-right: 5px;
-}
-
-.header .login li img 
-{
-vertical-align: bottom;
-}
-
-.header .section
-{
-position: absolute;
-top: 27px;
-left: 178px;
-text-align: center;
-font-weight: bold;
-backgound-color: transparent;
-}
-
-.header .section p 
-{
-height: 27px;
-margin: 0px 5px 0px 0px;
-float: left;
-display: inline;
-padding-top: 10px;
-width: 138px;
-background-repeat: no-repeat;
-}
-
-.header .section p.inactif
-{
-background-image: url("/images/standard/onglet_inactif_bg.png");
-}
-
-.header .section p.inactif a
-{
-color: #d7d6e0;
-}
-
-.header .section p.actif
-{
-background-image: url("/images/standard/onglet_actif_bg.png");
-}
-
-.header .menu
-{
-position: absolute;
-top: 60px;
-left: 188px;
-padding: 0px;
-}
-
-.header .menu li 
-{
-margin-right: 13px;
-}
-
-
-/* ////////////////MENU BARRE//////////////// */
-/* /// Menu barre items style definition //// */
-/* ////////////////////////////////////////// */
-
-table.menuBar		{
-        margin-left:		auto;
-	margin-right:		auto;
-	width:			90%;
-	border-spacing:		0;
-	padding:		0;
-	background-color:	transparent;	
-}
-		
-td.menuBarLabel		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		bold;
-	color:			#ffffff;
-	background-color:	#93919c;
-}
-
-td.menuBarText		{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		bold;
-	color:			#ffffff;
-	background-color:	#93919c;
-	text-align:		right;
-}
-
-img.menuBarIconG	{
-	float:			right;
-	border:			0;
-	text-align:		right;
-	margin:			0;
-	padding:		0;
-}
-
-img.menuBarIconD	{
-	float:			left;
-	border:			0;
-	text-align:		left;
-	margin:			0;
-	padding:		0;
-}
-
-a.menuBar:link { color: #ffffff; background-color: transparent;}
-a.menuBar:active { color: #ffffff; background-color: transparent;}
-a.menuBar:visited { color: #ffffff; background-color: transparent;}
 
 /* ///////////////////MENUS////////////////// */
 /* /////// Menu item style definition /////// */
@@ -707,77 +665,6 @@ td.menusText		{
 a.menus:link { color: #000000; background-color: transparent;}
 a.menus:active { color: #000000; background-color: transparent;}
 a.menus:visited { color: #000000; background-color: transparent;}
-
-/* /////////////////SECTIONS///////////////// */
-/* //// The tabs sections style definition/// */
-/* ////////////////////////////////////////// */
-
-table.sections		{
-	width:			auto;
-	border-spacing:		0;
-	margin:			0;
-	padding:		0;
-	border:			0;
-	color:			#ffffff;
-	background-color:	#009fc2;
-}
-
-td.sectionsActifLabel	{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		bold;
-	text-align:		center;
-	color:			#000000;
-	background-color:	#ffffff;
-	margin:			0;
-	border:			0;
-	padding:		0;
-}
-
-td.sectionsInactifLabel	{
-	font-family:		sans-serif;
-	font-size:		10px;
-	font-weight:		bold;
-	text-align:		center;
-	color:			#ffffff;
-	background-color:	#93919c;
-	margin:			0;
-	border:			0;
-	padding:		0;
-}
-
-td.sectionsLine		{
-	color:			#ffffff;
-	background-color:	#d2e46a;
-	height:			1px;
-	margin:			0;
-	border:			0;
-	padding:		0;
-}
-
-td.sectionsfilling	{
-	border-spacing:		0;
-	height:			100%;
-	width:			100%;
-	margin:			0;
-	border:			0;
-	padding:		0;
-		
-}
-
-table.sectionsfilling	{
-	border-spacing:		0;
-	height:			100%;
-	width:			100%;
-	margin:			0;
-	border:			0;
-	padding:		0;
-		
-}
-
-a.sections:link 	{ color: #d7d6e0; background-color: transparent;}
-a.sections:active	{ color: #d7d6e0; background-color: transparent;}
-a.sections:visited 	{ color: #d7d6e0; background-color: transparent;}
 
 
 /* //////////////////DIVERS////////////////// */

@@ -14,7 +14,6 @@ $l_task_int = "Internal Tasks";
 // Database fields
 $l_taskdate="Data Task";
 $l_tasktype = "Tipo Task";
-$l_tasklabel="Etichetta Task";
 $l_project = "Progetto:";
 $l_task_del="Elimina ?";
 $l_company = "Azienda";

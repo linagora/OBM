@@ -363,61 +363,61 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
        <td class=\"detailText\" align=\"right\">0 %</td>
       </tr>";    
 
-      // we display the task list
-      if ($has_tasks) { 
+    // we display the task list
+    if ($has_tasks) { 
 
-	$dis_member .= "
+      $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_task_list :</td>
        </tr>";
 
-	while ($tasks_q->next_record()) {
-	  $tsk_name = $tasks_q->f("projecttask_label");
-
-	  $img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
-
-	  $dis_member .= "
+      while ($tasks_q->next_record()) {
+	$tsk_name = $tasks_q->f("projecttask_label");
+	
+	$img = ($tasks_q->f("parent_id")) ? "<img border=\"0\" src=\"/images/$set_theme/hierarchy.png\" alt=\"\" />" : "";
+	
+	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
         <td class=\"detailText\">$img $tsk_name</td>
        </tr>";
 	}
       
-      } else {
-	$dis_member .= "
+    } else {
+      $dis_member .= "
         <tr>
          <td class=\"detailLabel\" colspan=\"2\">$l_no_tasks</td>
         </tr>";
-      }
-    
-      $dis_member .= "
+    }
+      
+    $dis_member .= "
      <tr>
       <td>&nbsp;</td>
      <tr>";
 
-      if ($has_members){
-     
-	$dis_member .= "
+    if ($has_members) {
+      
+      $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_members_info :</td>
        </tr>";
-
-	while (list($key,$val) = each($array_mem)) {
-	  $mem_name = $val["firstname"] ." ". $val["name"];
-
-	  $dis_member .= "
+      
+      while (list($key,$val) = each($array_mem)) {
+	$mem_name = $val["firstname"] ." ". $val["name"];
+	
+	$dis_member .= "
        <tr>
         <td class=\"detailLabel\">&nbsp;</td>
         <td class=\"detailText\">- $mem_name</td>
        </tr>";
-	}
+      }
 
-      } else {
-	$dis_member .= "
+    } else {
+      $dis_member .= "
        <tr>
         <td class=\"detailLabel\" colspan=\"2\">$l_no_members</td>
        </tr>";
-      }
+    }
 
     // Display the detailled advance array
   } else {
@@ -425,7 +425,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
     $allotted = 0;
     $usedtime = 0;
     $missingtime = 0;
-
+    
     $tab_style = "class=\"projectDetail\"";
 
     while ($tasks_q->next_record()) {
@@ -523,7 +523,12 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 	$tm_miss = $array_time["miss"][$t_id][$m_id];
 	$tm_used = $array_time["used"][$t_id][$m_id];
 
-	$tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+	// We write the cell only if not 0/0/0
+	if (($tm_used != "0") || ($tm_miss != "0") || ($tm_proj != "0")) {
+	  $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
+	} else {
+	  $tm_label = "";
+	}
 
 	if ($t_haschild) {
 	  $dis_member .= "<td class=\"projectPtime\">&nbsp;</td>\n";
@@ -560,7 +565,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
       $dis_member .= "</tr>\n";
     }
 
-    //display the last line (totals by members)
+    // display the last line (totals by members)
     $dis_member .= "<tr>\n <td class=\"projectPtask\">$l_total</td>\n";
 
     for ($cpt_e=0; $cpt_e<$cpt_m; $cpt_e++) {

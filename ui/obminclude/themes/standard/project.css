@@ -3,7 +3,7 @@
 //     - Desc : CSS style file (standard theme)                              //
 // 2003-08-27 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id$
 ///////////////////////////////////////////////////////////////////////////////
 */
 
@@ -14,10 +14,10 @@
 /* Progress Tables */
 
 table.projectDetail		{
-	border-spacing:		1;
+	border-spacing:		1px;
 	margin:			auto;
 	background-color:	#a5bace;
-	margin-top: 10px;
+	margin-top:		10px;
 	}
 
 td.projectHead 	 	 	{
@@ -27,7 +27,7 @@ td.projectHead 	 	 	{
 	color:			#486789;
 	text-align:		center;
 	background-color:	#a5bace;
-	padding : 4;
+	padding:		4px;
 }
 
 /* Parent task styles */
@@ -38,7 +38,7 @@ td.projectPtask 	 	 {
 	color:			#486786;
 	text-align:		left;
 	background-color:	#e9f7fe;
-	padding : 3;
+	padding:		3px;
 }
 
 td.projectPtime 	 	 {
@@ -47,7 +47,7 @@ td.projectPtime 	 	 {
 	color:			#486786;
 	text-align:		center;
 	background-color:	#e9f7fe;
-	padding : 3;
+	padding:		3px;
 }
 
 td.projectPlate 	 	 {
@@ -56,7 +56,7 @@ td.projectPlate 	 	 {
 	color:			#cc0000;
 	text-align:		center;
 	background-color:	#e9f7fe;
-	padding : 3;
+	padding:		3px;
 }
 
 td.projectPearly 	 	 {
@@ -65,7 +65,7 @@ td.projectPearly 	 	 {
 	color:			#006600;
 	text-align:		center;
 	background-color:	#e9f7fe;
-	padding : 3;
+	padding:		3px;
 }
 
 /* Children task styles */
@@ -76,7 +76,7 @@ td.projectCtask 	 	 {
 	color:			#666666;
 	text-align:		left;
 	background-color:	#ffffff;
-	padding : 3;
+	padding:		3px;
 }
 
 td.projectCtime 	 	 {
@@ -85,7 +85,7 @@ td.projectCtime 	 	 {
 	color:			#666666;
 	text-align:		center;
 	background-color:	#ffffff;
-	padding : 3;
+	padding:		3px;
 }
 
 /* Member list style */
