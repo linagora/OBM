@@ -116,24 +116,29 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
   if (check_contract_form("", $contract)) {
-     // If the context (same contracts) was confirmed ok, we proceed
+    // If the context (same contracts) was confirmed ok, we proceed
     if ($hd_confirm == $c_yes) {
       $contract["id"] = run_query_insert($contract);
       $display["detail"] = dis_contract_consult($contract);
-     // If it is the first try, we warn the user if some contracts seem similar
+      // If first try, we warn the user if some contracts seem similar
     } else {
-        $obm_q = check_contract_context("", $contract);
-        if ($obm_q->num_rows() > 0) {
-          $display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
-        } else {
-            $contract["id"] = run_query_insert($contract);
-            $display["detail"] = dis_contract_consult($contract);
-          }
-     }
-  } else {
-      $display["msg"] .= display_err_msg($err_msg);
-      $display["detail"] = dis_contract_form($action, $contract,"");
+      $obm_q = check_contract_context("", $contract);
+      if ($obm_q->num_rows() > 0) {
+	$display["detail"] = dis_contract_warn_insert("", $obm_q, $contract);
+      } else {
+	$contract["id"] = run_query_insert($contract);
+	if ($contract["id"]) {
+	  $display["msg"] .= display_ok_msg($l_insert_ok);
+	  $display["detail"] = dis_contract_consult($contract);
+	} else {
+	  $display["msg"] .= display_err_msg($l_insert_error);
+	}
+      }
     }
+  } else {
+    $display["msg"] .= display_err_msg($err_msg);
+    $display["detail"] = dis_contract_form($action, $contract,"");
+  }
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -320,7 +325,7 @@ display_page($display);
 // returns : $contract hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contract() {
-  global $tf_label,$tf_company_name,$sel_type, $tf_type, $rd_kind,$autorenewal1;
+  global $tf_label,$tf_company,$sel_type, $tf_type,$rd_kind,$cb_autorenew;
   global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
   global $param_contract,$tf_num,$sel_market, $sel_tech;
   global $ta_clause,$ta_com,$sel_con1, $sel_con2;
@@ -329,8 +334,8 @@ function get_param_contract() {
   global $hd_company_ad1, $hd_company_zip, $hd_company_town,$l_header_export;
   global $ext_title;
   global $cdg_param, $action,$sel_priority,$sel_status,$param_contract;
-  global $tf_pri,$tf_order, $tf_status, $tf_color,$tf_no_ticket;
-  global $tf_supportduration, $rd_format, $cb_vis;
+  global $tf_pri,$tf_order, $tf_status, $tf_color, $tf_ticket_nb;
+  global $tf_duration, $rd_format, $cb_vis;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
   if (isset ($param_company)) $contract["company_id"] = $param_company;
@@ -338,8 +343,8 @@ function get_param_contract() {
   if (isset ($sel_status)) $contract["status"] = $sel_status;
   if (isset( $cb_vis)) $contract["privacy"] = $cb_vis; 
   if (isset ($rd_kind)) $contract["kind"] = $rd_kind;
-  if (isset ($tf_no_ticket)) $contract["ticketnumber"] = $tf_no_ticket;
-  if (isset ($tf_supportduration)) $contract["duration"] = $tf_supportduration;
+  if (isset ($tf_ticket_nb)) $contract["ticketnumber"] = $tf_ticket_nb;
+  if (isset ($tf_duration)) $contract["duration"] = $tf_duration;
   if (isset ($rd_format)) $contract["format"] = $rd_format;
   if (isset ($tf_label)) $contract["label"] = $tf_label;
   if (isset ($tf_datebegin)) $contract["datebegin"] = $tf_datebegin;
@@ -359,7 +364,7 @@ function get_param_contract() {
   if (isset ($ta_com)) $contract["comment"] = $ta_com;  
   if (isset ($hd_usercreate)) $contract["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $contract["timeupdate"] = $hd_timeupdate;
-  if (isset ($autorenewal1)) $contract["autorenewal"] = $autorenewal1;
+  if (isset ($cb_autorenew)) $contract["autorenewal"] = $autorenewal;
 
   // Admin - Priority fields
   // $sel_priority -> "priority" is already set

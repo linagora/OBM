@@ -90,7 +90,6 @@ function dis_time_index($time) {
   $display["result"] = dis_time_nav_date($time);
   $display["result"] .= dis_time_planning($time);
 
-  // dis_form_addtask does not display anything if days are full and validated
   $val_days = run_query_valid_search($time);
   $display["result"] .= dis_form_addtask($time, $val_days); 
 
@@ -117,7 +116,11 @@ function dis_time_nav_date($time) {
     $user_id = $time["user_id"];
     $u = get_user_info($user_id);
     $user = $u["firstname"]. " " . $u["lastname"] . " :";
-    $link_action = "index";
+    if ($action == "viewmonth") {
+      $link_action = "viewmonth";
+    } else {
+      $link_action = "index";
+    }
   }
 
   if ($interval == "week") {
@@ -549,11 +552,6 @@ function dis_form_addtask($time, $validate_days) {
   $d_start_week = first_day_week($time["date"]);  
   $work_day_dates = get_week_working_days_dates($d_start_week);
 
-  if (sizeof($validate_days) == $nb_worked_days) {
-    $block .= "<p></p>";
-    return;
-  }
-  
   $task_list  = array($l_task_fac, $l_task_int, $l_task_div);
   $cpt_end = $c_week_first_day + 7;
   

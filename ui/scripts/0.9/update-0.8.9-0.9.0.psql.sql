@@ -22,17 +22,17 @@ DROP TABLE GlobalPref;
 -------------------------------------------------------------------------------
 -- Update Contract table
 
-ALTER TABLE Contract ADD COLUMN contract_datesignature date DEFAULT 'NULL'; 
-ALTER TABLE Contract ADD COLUMN contract_daterenew date DEFAULT 'NULL';
-ALTER TABLE Contract ADD COLUMN contract_datecancel date DEFAULT 'NULL';
-ALTER TABLE Contract ADD COLUMN contract_priority_id integer DEFAULT '0' NOT NULL;
-ALTER TABLE Contract ADD COLUMN contract_status_id integer DEFAULT '0' NOT NULL;
-ALTER TABLE Contract ADD COLUMN contract_kind integer DEFAULT '0' NULL;
-ALTER TABLE Contract ADD COLUMN contract_format integer DEFAULT '0' NULL;
-ALTER TABLE Contract ADD COLUMN contract_ticketnumber integer DEFAULT '0' NULL;
-ALTER TABLE Contract ADD COLUMN contract_duration integer DEFAULT '0' NULL;
-ALTER TABLE Contract ADD COLUMN contract_autorenewal integer DEFAULT '0' NULL;
-ALTER TABLE Contract ADD COLUMN contract_privacy integer DEFAULT '0' NULL;
+ALTER TABLE Contract ADD COLUMN contract_datesignature date DEFAULT NULL; 
+ALTER TABLE Contract ADD COLUMN contract_daterenew date DEFAULT NULL;
+ALTER TABLE Contract ADD COLUMN contract_datecancel date DEFAULT NULL;
+ALTER TABLE Contract ADD COLUMN contract_priority_id integer DEFAULT 0 NOT NULL;
+ALTER TABLE Contract ADD COLUMN contract_status_id integer DEFAULT 0 NOT NULL;
+ALTER TABLE Contract ADD COLUMN contract_kind integer DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_format integer DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_ticketnumber integer DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_duration float DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_autorenewal integer DEFAULT 0 NULL;
+ALTER TABLE Contract ADD COLUMN contract_privacy integer DEFAULT 0 NULL;
 
 
 --
@@ -89,6 +89,9 @@ ALTER TABLE Incident ADD COLUMN incident_comment text;
 ALTER TABLE Incident ALTER COLUMN incident_comment SET DEFAULT NULL;
 UPDATE Incident set incident_comment = incident_description;
 ALTER TABLE Incident DROP COLUMN incident_description;
+
+ALTER TABLE Incident DROP COLUMN incident_duration;
+ALTER TABLE Incident ADD COLUMN incident_duration float;
 
 --
 -- New table 'IncidentCategory1'

@@ -58,6 +58,7 @@ $l_supplier = "Fornitore";
 $l_total = "Total";
 $l_active = "Active";
 $l_new = "Nuovo";
+$l_last = "Ultimo";
 
 // Entities
 $l_company = "Azienda";

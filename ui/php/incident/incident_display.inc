@@ -261,59 +261,39 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Incident consult
 // Parameters:
 //   - $incident[]    
 ///////////////////////////////////////////////////////////////////////////////
-function dis_incident_consult($incident,$uid) {
-  global $l_consult_error;
+function dis_incident_consult($incident) {
+  global $display;
 
-  $param_incident = $incident["id"];
+  $id = $incident["id"];
 
-  if ($param_incident > 0) {
-    $inc1_q = run_query_detail1($param_incident);
-    $contract_id = $inc1_q->f("incident_contract_id");
-    $incident_visibility = $inc1_q->f("incident_visibility");
-    $inc2_q = run_query_incident_contract($contract_id);
-    $incident_visibility = $inc2_q->f("contract_privacy");
-    $contract_usercreate = $inc2_q->f("contract_usercreate");
-    if ( $incident_visibility == 0 or $uid == $contract_usercreate){
-      $inc_q = run_query_detail($param_incident);
-      if ($inc_q->num_rows() == 1) {
-        $con_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
-      } else {
-          $display["msg"] = display_err_msg($l_query_error . " - " . $inc_q->query . " !");
-        }
-
-    }
+  if ($id > 0) {
+    $inc_q = run_query_detail($id);
+    $display["detailInfo"] = display_record_info($inc_q);
+    $block = html_incident_consult($inc_q);
   }
-
-  $display["detailInfo"] = display_record_info($inc_q);
-  $block = html_incident_consult($inc_q, $con_q);
 
   return $block;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Consult                                                  //
+// Display HTML Incident Consult
 // Parameters:
 //   - $inc_q : DBO : incident result
-//   - $con_q : DBO : contract result
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_consult($inc_q,$con_q) {
-  global $display;
-  // -- Themes
+function html_incident_consult($inc_q) {
+  global $display, $path, $l_yes, $l_no;
   global $set_theme,$ico_contract,$ico_company;
-  // - Labels
-  global $l_incident, $l_label, $l_status, $l_company, $l_num;
-  global $l_logger, $l_owner, $l_priority;
-  global $l_duration,$l_solution,$l_date, $l_to, $l_from;
-  global $l_from,$l_manager,$l_client_manager,$l_archive_consult,$l_contract,$l_cat1;
-  global $path,$l_historic;
+  global $l_incident, $l_contract, $l_company;
+  global $l_label, $l_logger, $l_owner, $l_priority, $l_status, $l_archive;
+  global $l_duration,$l_solution,$l_date;
+  global $l_client_manager,$l_cat1;
+  global $l_comment;
 
   $com = beautify_comment(nl2br($inc_q->f("incident_comment")));
   $label = $inc_q->f("incident_label");
@@ -324,25 +304,19 @@ function html_incident_consult($inc_q,$con_q) {
   $inc_id = $inc_q->f("incident_id");
   $inc_dur = nl2br($inc_q->f("incident_duration"));
   $inc_reso = nl2br(htmlentities($inc_q->f("incident_resolution")));
-  $con_id = $con_q->f("contract_id");
-  $comp_id = $con_q->f("contract_company_id");
-  $con_status = $con_q->f("contractstatus_label");
-  $con_label = $con_q->f("contract_label");
-  $con_num = $con_q->f("contract_numero");
-  $con_debut = $con_q->f("contract_datebegin");
-  $con_exp = $con_q->f("contract_dateexp");
-  $tech = $con_q->f("contract_techmanager_id");
-  $market = $con_q->f("contract_marketmanager_id");
-  $comp_name = $con_q->f("company_name");
-  $comp_ad1 = $con_q->f("company_address1");
-  $comp_zip = $con_q->f("company_zipcode");
-  $comp_town = $con_q->f("company_town");
+  $con_id = $inc_q->f("contract_id");
+  $comp_id = $inc_q->f("contract_company_id");
+  $comp_name = $inc_q->f("company_name");
+  $con_status = $inc_q->f("contractstatus_label");
+  $con_label = $inc_q->f("contract_label");
+  $con_num = $inc_q->f("contract_number");
+  $con_debut = date_format($inc_q->f("datebegin"));
+  $con_exp = date_format($inc_q->f("dateexp"));
   $logger = $inc_q->f("lname1") . " " . $inc_q->f("fname1");
   $owner = $inc_q->f("lname2") . " " . $inc_q->f("fname2");
-  $dis_market = $con_q->f("lname1") . " " . $con_q->f("fname1");
-  $dis_tech = $con_q->f("lname2") . " " . $con_q->f("fname2");
-  $dis_con1 = $con_q->f("lname_c1") . " " . $con_q->f("fname_c1") . " - " . $con_q->f("phone_c1");
-  $dis_con2 = $con_q->f("lname_c2") . " " . $con_q->f("fname_c2") . " - " . $con_q->f("phone_c2");
+  $dis_con1 = $inc_q->f("lname_c1") . " " . $inc_q->f("fname_c1") . " - " . $inc_q->f("phone_c1");
+  $dis_con2 = $inc_q->f("lname_c2") . " " . $inc_q->f("fname_c2") . " - " . $inc_q->f("phone_c2");
+  $archive = ($inc_q->f("incident_archive") == 1 ? $l_yes : $l_no);
 
   if ($inc_q->f("incident_archive") == 1) {
     $dis_lab_archive ="<tr><td class=\"detailLabel\" colspan=\"2\">$l_archive_consult</td></tr>";
@@ -351,85 +325,80 @@ function html_incident_consult($inc_q,$con_q) {
   // --- HTML Template --------------------------------------------------------
 
   $block = "
-    <div class=\"detailHead\">$l_contract</div>
-      <table class=\"detail\">
-        <tr>
-          <td class=\"detailLabel\">$l_company
-            <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-            <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-          </td>
-          <td class=\"detailText\">$comp_name</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_client_manager 1</td>
-          <td class=\"detailText\">$dis_con1</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_client_manager 2</td>
-          <td class=\"detailText\">$dis_con2</td>
-        </tr><tr>
-          <td class=\"detailLabel\">
-            <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"></a> 
-            $con_label
-            <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
-            <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
-          </td>
-          <td class=\"detailText\">
-            $l_num : $con_num <br />
-            $l_from $con_debut $l_to $con_exp
-          </td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_manager 1</td>
-          <td class=\"detailText\">$dis_market</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_manager 2</td>
-          <td class=\"detailText\">$dis_tech</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_status</td>
-          <td class=\"detailText\">$con_status</td>
-      </table>
-    <div class=\"detailHead\">$l_incident</div>
-      <table class=\"detail\"> 
-        <tr>
-          <td class=\"detailLabel\">$l_label</td>
-          <td class=\"detailText\">$label</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_logger</td>
-          <td class=\"detailText\">$logger</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_owner</td>
-          <td class=\"detailText\">$owner</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_priority</td>
-          <td class=\"detailText\">$priority</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_status</td>
-          <td class=\"detailText\">$status</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_date</td>
-          <td class=\"detailText\">$date</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_cat1</td>
-          <td class=\"detailText\">$cat1</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_duration</td>
-          <td class=\"detailText\">$inc_dur</td>
-        </tr>
-          $dis_lab_archive
-      </table>
-    <div class=\"detailHead\">$l_solution</div>
-      <table class=\"detail\"> 
-        <tr>
-          <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
-        </tr>
-      </table>
-    <td colspan=\"2\">
-    <div class=\"detailHead\">$l_historic</div>
-      <table class=\"detail\">
-        <tr>
-          <td colspan=\"2\" class=\"detailText\">$com</td>
-        </tr>
-      </table>
+  <div class=\"detailHead\">$l_contract</div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailLabel\">$l_company
+      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+      <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
     </td>
-    </tr>
+    <td class=\"detailText\">$comp_name</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_client_manager 1</td>
+    <td class=\"detailText\">$dis_con1</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_client_manager 2</td>
+    <td class=\"detailText\">$dis_con2</td>
+  </tr><tr>
+    <td class=\"detailLabel\">
+      <a href=\"". url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con_cli2")."\"></a> 
+      $con_label
+      <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$con_id") . "\">
+      <img src=\"/images/$set_theme/$ico_contract\" alt=\"[Contract]\" /></a>&nbsp;&nbsp;
+    </td>
+    <td class=\"detailText\">
+      # $con_num ($con_debut - $con_exp)
+    </td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_status</td>
+    <td class=\"detailText\">$con_status</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_incident</div>
+  <table class=\"detail\"> 
+  <tr>
+    <td class=\"detailLabel\">$l_label</td>
+    <td class=\"detailText\">$label</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_logger</td>
+    <td class=\"detailText\">$logger</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_owner</td>
+    <td class=\"detailText\">$owner</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_priority</td>
+    <td class=\"detailText\">$priority</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_status</td>
+    <td class=\"detailText\">$status</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_date</td>
+    <td class=\"detailText\">$date</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_cat1</td>
+    <td class=\"detailText\">$cat1</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_duration</td>
+    <td class=\"detailText\">$inc_dur</td>
+  </tr><tr>
+    <td class=\"detailLabel\">$l_archive</td>
+    <td class=\"detailText\">$archive</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_solution</div>
+  <table class=\"detail\"> 
+  <tr>
+    <td colspan=\"2\" class=\"detailText\">$inc_reso</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+  <table class=\"detail\">
+  <tr>
+    <td colspan=\"2\" class=\"detailText\">$com</td>
+  </tr>
   </table>
 ";
 
@@ -437,9 +406,8 @@ function html_incident_consult($inc_q,$con_q) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Form                                                     //
+// Display Incident Form
 // Parameters:
 //   - $action    : action called
 //   - $incident[] : default values
@@ -447,67 +415,58 @@ function html_incident_consult($inc_q,$con_q) {
 function dis_incident_form($action,$incident) {
   global $display, $cg_com, $cg_prod;
 
-  $param_incident = $incident ["id"];
-  if ($action == "new") { $inc_q = ""; $contr_q= ""; $users="";}
+  $id = $incident ["id"];
+  if ($action == "new") {
+    $inc_q = "";
+    $users="";
+  }
   if ($action == "detailupdate") {
-  if ($param_incident > 0) {
-    $inc1_q = run_query_detail1($param_incident);
-    $contract_id = $inc1_q->f("incident_contract_id");
-    $inc2_q = run_query_incident_contract($contract_id);
-    $contract_usercreate = $inc2_q->f("contract_usercreate");
-    $inc_q = run_query_detail($param_incident,$contract_usercreate);
-    if ($inc_q->num_rows() == 1) {
-      $contr_q = run_query_incident_contract($inc_q->f("incident_contract_id"));
+    if ($id > 0) {
+      $inc_q = run_query_detail($id);
       $users = array($inc_q->f("incident_owner"),$inc_q->f("incident_logger"));
       $display["detailInfo"] = display_record_info($inc_q);
     }
-    
   }
-}
 
-if ($action == "insert") {
+  if ($action == "insert") {
     $users = array($incident["owner"], $incident["logger"]);
-    $inc_q = ""; $contr_q= "";
-}
+    $inc_q = "";
+  }
 
-if ($action == "update") {
-   $users = array($incident["owner"], $incident["logger"]);
-   $inc_q = ""; $contr_q= "";
-}
+  if ($action == "update") {
+    $users = array($incident["owner"], $incident["logger"]);
+    $inc_q = "";
+  }
   $usr_q = run_query_userobm_active($users);
-  $usrc_q = run_query_all_users_from_group($cg_com,$users);
   $usrp_q = run_query_all_users_from_group($cg_prod,$users);
   $prio_q = run_query_priority();
   $stat_q = run_query_status();
-  $type_q = run_query_cat1();
+  $cat1_q = run_query_cat1();
 
-  $block = html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $prio_q, $stat_q, $incident, $type_q, $usrc_q);
+  $block = html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $prio_q, $stat_q, $cat1_q);
 
   return $block;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Incident Form                                                     //
+// Display Incident Form
 // Parameters:
 //   - $action    : action called
+//   - $incident[]: default values
 //   - $inc_q     : incident database result 
-//   - $contr_q   : contract database result 
 //   - $usr_q     : userobm database result 
 //   - $usrp_q    : userobm list from system group Production
-//   - $incident[]: default values
-//     keys used  : kind, lname, fname, ad1, ad2, zip, town, cdx, ctry, func
 ///////////////////////////////////////////////////////////////////////////////
-function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, $sta_q, $incident,$cat1_q,$usrc_q) {
-  global $display;
-  global $path, $uid, $set_theme, $ico_contract, $c_php_isodate_format;
+function html_incident_form($action, $incident, $inc_q, $usr_q, $usrp_q, $pri_q, $sta_q, $cat1_q) {
+  global $display, $path, $uid, $set_theme, $ico_contract;
+  global $c_php_isodate_format;
   global $l_label,$l_contract,$l_status,$l_cat1, $l_find;
   global $l_redhot,$l_hot,$l_normal,$l_low,$l_open,$l_call,$l_waitcall,$l_paused,$l_closed;
   global $l_logger,$l_owner,$l_priority,$l_incident;
-  global $l_num, $l_update, $l_checkdelete, $l_insert;
+  global $l_update, $l_checkdelete, $l_insert;
   global $l_duration,$l_solution,$l_date, $l_archive_new,$l_res_duration;
-  global $popup_height, $popup_width, $l_select_contract,$l_historic,$l_upd_comment,$l_add_comment;
+  global $popup_height, $popup_width, $l_select_contract,$l_comment,$l_upd_comment,$l_add_comment;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -526,7 +485,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
     $hour = get_hour($inc_q->f("date"));
     $archive = ($inc_q->f("incident_archive") == "1" ? "checked=\"checked\"" : "");
     $param_incident = $inc_q->f("incident_id");
-    $c_name = $contr_q->f("contract_label");
+    $c_label = $inc_q->f("contract_label");
   } elseif ($action == "new") {
     // We pre-fill date with current date
     $date = date($c_php_isodate_format);
@@ -546,7 +505,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
   if (isset($incident["date"])) { $date = $incident["date"]; }
   if (isset($incident["hour"])) { $hour = $incident["hour"]; }
   if (isset($incident["archive"])) { $archive = ($incident["archive"] == 1 ? "checked" : ""); }
-  if (isset($incident["lcontract"])) { $c_name = stripslashes($incident["lcontract"]); }
+  if (isset($incident["lcontract"])) { $c_label = stripslashes($incident["lcontract"]); }
   if (isset($incident["com"])) { $comment = stripslashes($incident["com"]); }
   if (isset($incident["add_comment"])) { $add_comment = stripslashes($incident["add_comment"]); }
   if (isset($incident["usercomment"])) { $usercomment = $incident["usercomment"]; }
@@ -621,33 +580,29 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
   }
   $sel_hour .= "</select>";
 
-  // Duration select
-  $sel_dur = "<input type=\"text\" name=\"sel_dur\" size=\"6\" maxlength=\"6\" value=\"$duration\" />";
-   
   // Duration select 2
-  $res_duration = "<select name=\"res_duration\">";
+  $sel_dur = "<select name=\"sel_dur\">";
   for ($cpt = 0.25; $cpt < 2; $cpt += 0.25) {
-    $res_duration .= "\n<option value=\"$cpt\"";
-    $res_duration .= ">$cpt</option>";
+    $sel_dur .= "\n<option value=\"$cpt\"";
+    $sel_dur .= ">$cpt</option>";
   }
   for ($cpt = 2; $cpt < 17; $cpt += 1) {
-    $res_duration .= "\n<option value=\"$cpt\"";
-    $res_duration .= ">$cpt</option>";
+    $sel_dur .= "\n<option value=\"$cpt\"";
+    $sel_dur .= ">$cpt</option>";
   }
-  $res_duration .= "</select>";
-
+  $sel_dur .= "</select>";
 
   // User comment select construction
-  if ($usrc_q->nf()>0) {
-    $usrc_q->seek(0);
+  if ($usr_q->nf()>0 ) {
+    $usr_q->seek(0);
   }
+  if (! isset($usercomment)) { $usercomment = $uid; }
   $sel_usercomment = "<select name=\"sel_usercomment\">";
-  while ($usrc_q->next_record()) {
-    $cid = $usrc_q->f("userobm_id");
-    $cname = $usrc_q->f("userobm_lastname")." ".$usrc_q->f("userobm_firstname");
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname");
     $sel_usercomment .= "<option value=\"$cname\"";
-    // First time default to uid of connected user (uid) then set to name
-    if ( ($usercomment == $cid) || ($usercomment == $cname) ) {
+    if ($usercomment == $cid) {
       $sel_usercomment .= " selected = \"selected\"";
     }
     $sel_usercomment .= ">$cname</option>\n";
@@ -663,7 +618,6 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
         <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_com\" rows=\"6\" cols=\"78\">$comment</textarea></td>
     ";
   }
-
 
   // update 
   if (($action=="detailupdate") || ($action=="update")) {
@@ -700,7 +654,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
           </tr><tr>
             <td class=\"detailLabel\">$l_contract</td>
             <td class=\"detailForm\">
-              <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_name</a>
+              <a href=\"". url_prepare("$path/contract/contract_index.php?action=detailconsult&amp;param_contract=$param_contract")."\">$c_label</a>
               <input type=\"hidden\" name=\"param_contract\" value=\"$param_contract\" />
               <input type=\"hidden\" name=\"contract_new_id\" value=\"$c_new_id\" />
               <a href=\"\" onclick=\"window.open('$path/contract/contract_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_contract)."','contract','height=$popup_height,width=$popup_width'); return false;\">
@@ -724,7 +678,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
             </td>
           </tr><tr>
             <td class=\"detailLabel\">$l_duration</td>
-            <td class=\"detailForm\">$sel_dur H</td>
+            <td class=\"detailForm\"><input type=\"text\" name=\"tf_duration\" size=\"6\" maxlength=\"6\" value=\"$duration\" readonly=\"readonly\" />H</td>
           </tr>
         </table>
       <div class=\"detailHead\">$l_solution</div>
@@ -733,7 +687,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
             <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_solu\" rows=\"6\" cols=\"60\">$solu</textarea></td>
           </tr>
         </table>
-      <div class=\"detailHead\">$l_historic</div>
+      <div class=\"detailHead\">$l_comment</div>
         <table class=\"detail\">
           <tr>
             <td class=\"detailLabel\">$l_add_comment</td>
@@ -742,7 +696,7 @@ function html_incident_form($action, $inc_q, $contr_q, $usr_q, $usrp_q, $pri_q, 
             </td> 
           </tr><tr>
             <td class=\"detailLabel\">$l_res_duration</td>
-            <td class=\"detailForm\">$res_duration</td> 
+            <td class=\"detailForm\">$sel_dur</td> 
           </tr><tr>
             <td class=\"detailForm\" colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
               $dis_comment

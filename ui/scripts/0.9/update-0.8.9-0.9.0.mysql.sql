@@ -30,7 +30,7 @@ ALTER TABLE Contract ADD COLUMN contract_status_id int(8) NOT NULL DEFAULT 0 aft
 ALTER TABLE Contract ADD COLUMN contract_kind int(2) NULL DEFAULT 0 after contract_status_id;
 ALTER TABLE Contract ADD COLUMN contract_format int(2) NULL DEFAULT 0 after contract_kind;
 ALTER TABLE Contract ADD COLUMN contract_ticketnumber int(8) NULL DEFAULT 0 after contract_format;
-ALTER TABLE Contract ADD COLUMN contract_duration int(8) NULL DEFAULT 0 after contract_ticketnumber;
+ALTER TABLE Contract ADD COLUMN contract_duration float NULL DEFAULT 0 after contract_ticketnumber;
 ALTER TABLE Contract ADD COLUMN contract_autorenewal int(2) NULL DEFAULT 0 after contract_duration;
 ALTER TABLE Contract ADD COLUMN contract_privacy int(2) NULL DEFAULT 0 after contract_marketmanager_id;
 
@@ -82,6 +82,7 @@ INSERT INTO ContractStatus (contractstatus_order, contractstatus_label) VALUES (
 -- Update Incident tables
 -------------------------------------------------------------------------------
 ALTER TABLE Incident ADD COLUMN incident_cat1_id int(8) DEFAULT NULL after incident_status_id;
+ALTER TABLE Incident CHANGE incident_duration incident_duration float DEFAULT 0;
 ALTER TABLE Incident CHANGE incident_description incident_comment TEXT DEFAULT NULL;
 
 --

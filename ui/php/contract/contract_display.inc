@@ -19,7 +19,7 @@ $fieldnames["contract_priority"] = $l_priority;
 $fieldnames["contract_kind"] = $l_contract_kind;
 $fieldnames["contract_format"] = $l_format;
 $fieldnames["contract_datebegin"] = $l_begin;
-$fieldnames["contract_dateexp"] = $l_dateexp;
+$fieldnames["contract_dateexp"] = $l_exp;
 $fieldnames["contract_status"] = $l_status;
 $fieldnames["contract_techmanager"] = $l_technical_manager;
 $fieldnames["contract_marketmanager"] = $l_marketing_manager;
@@ -27,7 +27,7 @@ $fieldnames["contract_archive"] = $l_archive_first;
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract specific dataset fields                                  //
+// Display Contract specific dataset fields
 // Parameters:
 //   - $OD        : OBM_DISPLAY object (passed by reference)
 //   - $fieldname : field to display
@@ -107,7 +107,7 @@ function dis_data_contract(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract search form                                              //
+// Display Contract search form
 // Parameters:
 //   - $contract[] 
 ///////////////////////////////////////////////////////////////////////////////
@@ -124,16 +124,15 @@ function dis_contract_search_form($contract) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract search form                                              //
+// Display Contract search form
 // Parameters : 
 //   - $contract[] : default form values
 //     keys used      : 
 //   - $usr_q      : DB result object (userobm list)
-//   - $obm_q_type : DB result object (contract kind list)
+//   - $type_q : DB result object (contract kind list)
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_form($contract, $usr_q, $obm_q_type,$pri_q,$sta_q) {
+function html_contract_search_form($contract, $usr_q, $type_q,$pri_q,$sta_q) {
   global $l_number,$l_label_libelle,$l_company,$l_type,$l_after,$l_before;
   global $l_find,$l_manager,$l_priority, $l_archive, $l_status;
   global $cck_customer, $cck_supplier, $l_contract_kind,$l_cck_customer,$l_cck_supplier;
@@ -141,25 +140,25 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type,$pri_q,$sta_q)
  
   $status = $contract["status"];
   $priority = $contract["priority"];
-  $p_label = $contract["label"];
+  $label = $contract["label"];
   $comp = $contract["company_name"];
-  $p_type_id = $contract["type"];
-  $p_dateafter = $contract["dateafter"];
-  $p_datebefore = $contract["datebefore"];
+  $type_id = $contract["type"];
+  $dateafter = $contract["dateafter"];
+  $datebefore = $contract["datebefore"];
   $sel_market = $contract["market"];
   $sel_tech = $contract["tech"];
   $sel_manager = $contract["manager"];
-  $p_num = $contract["number"]; 
+  $num = $contract["number"]; 
   $archive = ($contract["archive"] == "1" ? "checked = \"checked\"" : ""); 
   $kind = $contract["kind"]; 
   
   $dis_cont_typ  = "<select name=\"sel_type\">
     <option value=\"$c_all\">$l_all</option>";
-  while($obm_q_type->next_record()) {
-    $dis_cont_typ .= "\n<option value=\"".$obm_q_type->f("contracttype_id")."\"";
-    if ($p_type_id == $obm_q_type->f("contracttype_id")) 
+  while($type_q->next_record()) {
+    $dis_cont_typ .= "\n<option value=\"".$type_q->f("contracttype_id")."\"";
+    if ($type_id == $type_q->f("contracttype_id")) 
       $dis_cont_typ .= " selected=\"selected\"";
-    $dis_cont_typ .= ">" . $obm_q_type->f("contracttype_label")."</option>";
+    $dis_cont_typ .= ">" . $type_q->f("contracttype_label")."</option>";
     }
     $dis_cont_typ .= "</select>";
 
@@ -224,19 +223,19 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type,$pri_q,$sta_q)
 
   <div class=\"search\">
     <div class=\"searchLabel\">$l_number<br />
-      <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$p_num\" />
+      <input type=\"text\" name=\"tf_num\" size=\"20\" value=\"$num\" />
     </div>
     <div class=\"searchLabel\">$l_company<br />
       <input name=\"tf_company\" size=\"20\" maxlength=\"20\" value=\"$comp\" />
     </div>
     <div class=\"searchLabel\">$l_after<br />
-      <input name=\"tf_dateafter\" size=\"10\" value=\"$p_dateafter\" />
+      <input name=\"tf_dateafter\" size=\"10\" value=\"$dateafter\" />
    </div>
     <div class=\"searchLabel\">$l_before<br />
-      <input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$p_datebefore\" />
+      <input type=\"text\" name=\"tf_datebefore\" size=\"10\" value=\"$datebefore\" />
     </div>
     <div class=\"searchLabel\">$l_label_libelle<br />
-      <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$p_label\" />
+      <input type=\"text\" name=\"tf_label\" size=\"20\" value=\"$label\" />
     </div>
     <div class=\"searchLabel\">$l_type<br />
       $dis_cont_typ
@@ -272,7 +271,7 @@ function html_contract_search_form($contract, $usr_q, $obm_q_type,$pri_q,$sta_q)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// display the contract search result                                        //
+// display the contract search result
 // parameters:
 //   - $contract[] : contract search criteria
 //     keys used   : label,...
@@ -292,7 +291,6 @@ function dis_contract_search_list($contract) {
 
   return $block;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -338,71 +336,63 @@ function html_contract_search_list($contract_q, $pref_q, $nb_con, $contract) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contract links menu                                              //
+// Display: Contract links menu
 // Parameters:
 //   - $id         : contract id
+//   - $con_label  : contract label
 //   - $deal_id    : deal id
-//   - $deal_label : deal label
+//   - $inc_nb     : incident number
+//   - $last       : last incident id
 // Returns:
 //   $r : string with HTML code
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_links($id, $con_label, $deal_id, $deal_label,$n_incident,$duration_used,$no_ticket,$ticket_type,$inc_coup_duration,$no_supportduration,$max) {
-  // -- Themes
-  global $set_theme, $ico_incident, $ico_deal,$l_yes;
-  // -- Labels
-  global $l_header_incident, $l_incident_list, $l_incident_new, $l_header_deal;
-  global $l_total_ticket,$l_disp_ticket;
-  global $l_ticket_final,$l_total_duration,$l_disp_supportduration;
-  global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
-  global $l_header_document,$l_contract;
+function html_contract_links($id, $con_label, $deal_id, $inc_nb, $last) {
+  global $set_theme, $ico_incident, $ico_deal, $ico_document,$ico_document_new;
+  global $l_header_incident, $l_incident_list, $l_incident_new, $l_last;
+  global $l_header_deal, $l_header_document, $l_contract;
   global $l_document_new,$l_document_add,$l_add_document,$l_deal;
-  global $l_duration_final,$l_ticket_final_coupon,$l_final_duration;
-  global $path, $auth, $cgp_show, $popup_height,$popup_width;
+  global $path, $auth, $cgp_show;
 
-
-  $coupon_disp = ($no_ticket-$duration_used);
-  $supportduration_disp = ($no_supportduration-$duration_used);
-  
   $url_inc = url_prepare("$path/incident/incident_index.php?action=search&amp;param_contract=$id");
-  $url_inc_final = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_contract=$id&amp;param_incident=$max");
   $url_inc_new = url_prepare("$path/incident/incident_index.php?action=new&amp;param_contract=$id&amp;tf_lcontract=$con_label");
   
   $url_deal = url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$deal_id");
 
+  if ($last > 0) {
+    $url_inc_last = url_prepare("$path/incident/incident_index.php?action=detailconsult&amp;param_contract=$id&amp;param_incident=$last");
+    $dis_last = "<li>
+    <a href=\"$url_inc_last\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_last\">$l_last</a></li>";
+  }
+
   $block = "<div class=\"link\">
   <div class=\"linkTitle\">:: $l_header_incident</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inc\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
-        <a href=\"$url_inc\">$l_incident_list ($n_incident)</a></li>
-    <li><a href=\"$url_inc_new\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
-        <a href=\"$url_inc_new\">$l_incident_new</a></li>";
+  <li>
+    <a href=\"$url_inc\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc\">$l_incident_list ($inc_nb)</a>
+  </li>
+    $dis_last
+  <li>
+    <a href=\"$url_inc_new\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
+    <a href=\"$url_inc_new\">$l_incident_new</a></li>
+  </ul>
 
-  if($ticket_type == $l_yes) { 
-    $cc = $l_ticket_final;
-    $dd= $l_ticket_final_coupon;
-  } else {
-    $cc = $l_duration_final;
-    $dd= $l_final_duration;
-  }
-
-  if ($n_incident > 0){
-    $block .="<li>
-              <a href=\"$url_inc_final\"><img src=\"/images/$set_theme/$ico_incident\" /></a>
-              <a href=\"$url_inc_final\">$cc:($inc_coup_duration $dd)</a></li>";
-  }
-  $block.="</ul><div class=\"linkTitle\">:: $l_header_deal</div>
-           <ul class=\"linkList\"><li>
-           <a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
-           <a href=\"$url_deal\">$l_deal</a></li>
-           </ul>";
-
+  <div class=\"linkTitle\">:: $l_header_deal</div>
+  <ul class=\"linkList\">
+  <li>
+    <a href=\"$url_deal\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+    <a href=\"$url_deal\">$l_deal</a>
+  </li>
+  </ul>";
 
   // Document  
   if ($cgp_show["module"]["document"]) {
     $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contract");
     $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contract");
     $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contract/contract_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contract";
-   // $nb_document = run_query_document_nb ($id,"Contact");
+
+    $nb_document = run_query_document_nb ($id,"Contract");
     $block .= "
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
@@ -430,31 +420,20 @@ function html_contract_links($id, $con_label, $deal_id, $deal_label,$n_incident,
 function dis_contract_consult($contract) {
   global $display, $l_consult_error;
 
-  if ($contract["id"] > 0) {
-    $contract_q = run_query_detail($contract["id"]);
+  $id = $contract["id"];
+  if ($id > 0) {
+    $contract_q = run_query_detail($id);
     $display["detailInfo"] = display_record_info($contract_q);
-    $inc_coup_fin = run_query_coupon_final($contract["id"]);
-    $inc_coup_final = $inc_coup_fin->f("incident_id");
-    $max = $inc_coup_final;
-    $n_incident = 0; 
+    $inc_q = run_query_contract_incident($id);
+    $inc_nb = $inc_q->num_rows();
     $duration_used = 0;
-    if ($inc_coup_final){ $n_incident = 1;}
-    $min = $inc_coup_final;
-    while ($inc_coup_fin->next_record()) {
-      $inc_coup_final = $inc_coup_fin->f("incident_id");
-      $dur = $inc_coup_fin->f("incident_duration");
-      $n_incident = $n_incident + 1;
-      $duration_used = $duration_used + $dur;
-      if ($inc_coup_final < $min || $inc_coup_final = $min) {$min = $inc_coup_final;}
-      if ($inc_coup_final > $max || $inc_coup_final = $max) {$max = $inc_coup_final;}
+    while ($inc_q->next_record()) {
+      $last_inc = $inc_q->f("incident_id");
+      $dur = $inc_q->f("incident_duration");
+      $duration_used += $dur;
     }
-    $inc_coup_durat = run_query_coupon_final_duration($max);
-    $inc_coup_duration = $inc_coup_durat->f("incident_duration");
-    $inc_coup_durat_min = run_query_coupon_final_duration($min);
-    $inc_coup_duration_min = $inc_coup_durat->f("incident_duration");
-    $duration_used = $duration_used + $inc_coup_duration_min;
-
-    $block = html_contract_consult($contract_q,$inc_coup_duration,$max,$contract,$n_incident,$duration_used);
+    
+    $block = html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, $last_inc);
   }
 
   return $block;
@@ -462,29 +441,29 @@ function dis_contract_consult($contract) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract Consult                                                  //
+// Display Contract Consult
 // Parameters:
-//   - $contract_q : information about the contract
+//   - $contract_q    : information about the contract
+//   - $contract      : Contract hash infos
+//   - $inc_nb        : Incident number
+//   - $duration_used : duration spent on this contract
+//   - $last_inc      : Last incident id created
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_consult($contract_q,$inc_coup_duration,$max,$contract,$n_incident,$duration_used) {
-  global $path, $set_theme, $display,$l_private,$l_public,$l_autorenewal;
-  global $ico_company,$ico_contact, $ico_deal;
-  global $l_update,$l_delete,$l_insert;
-  global $l_label,$l_begin,$l_clause,$l_marketing_manager,$l_technical_manager;
-  global $l_last_update,$l_comment,$l_at,$l_number,$l_dateexp,$l_client_manager;
-  global $l_date_renew,$l_date_cancel,$l_date_signature,$l_priority,$l_status;
-  global $l_contract, $l_company, $l_deal, $l_archive, $l_yes, $l_no, $l_type;
-  global $l_visibility,$l_supportduration,$l_duration_final;
-  global $l_disp_ticket,$l_total_ticket,$l_ticket_final,$l_total_duration,$l_disp_supportduration;
-  global $l_contract_kind,$l_format,$l_no_ticket;
+function html_contract_consult($contract_q, $contract, $inc_nb, $duration_used, $last_inc) {
+  global $path, $display, $set_theme, $ico_company,$ico_contact, $ico_deal;
+  global $l_yes, $l_no, $l_contract, $l_company, $l_deal, $l_private,$l_public;
+  global $l_client_manager,$l_marketing_manager,$l_technical_manager;
+  global $l_manager, $l_label, $l_comment, $l_number, $l_clause, $l_archive;
+  global $l_date, $l_signature,$l_begin,$l_exp,$l_renew,$l_date_cancel;
+  global $l_autorenewal, $l_type, $l_priority, $l_status, $l_contract_kind;
+  global $l_format,$l_ticket_nb, $l_duration, $l_duration_used;
   global $cck_customer, $cck_supplier, $l_cck_customer, $l_cck_supplier;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
-  global $l_type,$l_responsable,$l_date;
   
   $usercreate = $contract_q->f("contract_usercreate");
   $cvis = ($contract_q->f("contract_privacy") == 0 ? $l_no : $l_yes);
-  $autorenewal1 = $contract_q->f("contract_autorenewal");
+  $autorenewal = ($contract_q->f("contract_autorenewal")==0 ? $l_no : $l_yes);
   $priority = $contract_q->f("contractpriority_label");
   $status = $contract_q->f("contractstatus_label");
   $id = $contract_q->f("contract_id");
@@ -503,9 +482,9 @@ function html_contract_consult($contract_q,$inc_coup_duration,$max,$contract,$n_
   $deal_id = $contract_q->f("contract_deal_id");
   $deal_label = $contract_q->f("deal_label");
   $type = $contract_q->f("contracttype_label");
-  $no_ticket = $contract_q->f("contract_ticketnumber");
+  $ticket_nb = $contract_q->f("contract_ticketnumber");
   $format = $contract_q->f("contract_format");
-  $no_supportduration = $contract_q->f("contract_duration");
+  $duration = $contract_q->f("contract_duration");
   $comp_name = $contract_q->f("company_name");
   $comp_address1 = $contract_q->f("company_address1");
   $comp_zip = $contract_q->f("company_zipcode");
@@ -514,17 +493,6 @@ function html_contract_consult($contract_q,$inc_coup_duration,$max,$contract,$n_
   $con2_id = $contract_q->f("contract_contact2_id");
   $archive = $contract_q->f("contract_archive");
   $kind = $contract_q->f("contract_kind");
-
-  if ($cvis == 1) { $cvis == $l_yes;} 
-  if ($cvis == $l_yes){
- $privacy="<tr>
-      <td class=\"detailLabel\">$l_private</td>
-      <td class=\"detailText\">$cvis</td>
-     </tr>";
-  }
-  if ($autorenewal1 == 1) { $autorenewal1 = $l_yes;
-  }
-  else $autorenewal1 = $l_no;
 
   if ($archive == 1) {
     $archive = $l_yes;
@@ -543,61 +511,37 @@ function html_contract_consult($contract_q,$inc_coup_duration,$max,$contract,$n_
     $format_data = "";
   } else if ($format == $ccf_ticket) {
     $label_format = $l_ccf_ticket;
-    $format_data = "<td class=\"detailLabel\">$l_no_ticket</td>
-      <td class=\"detailText\">$no_ticket</td>";
+    $format_data = "<td class=\"detailLabel\">$l_ticket_nb</td>
+      <td class=\"detailText\">$ticket_nb</td>";
   } else {
     $label_format = $l_ccf_duration;
-    $format_data = "<td class=\"detailLabel\">$l_supportduration</td>
-      <td class=\"detailText\">$no_supportduration</td>";
+    $format_data = "<td class=\"detailLabel\">$l_duration</td>
+      <td class=\"detailText\">$duration</td>";
   }
   
   $dis_format = "
       <td class=\"detailLabel\">$l_format</td>
       <td class=\"detailText\">$label_format</td>
     </tr><tr>
-      $format_data
-";
+      $format_data";
 
   $con1 = $contract_q->f("clname1") . " " . $contract_q->f("cfname1") .
           " - " . $contract_q->f("cphone1"); 
-$con2 = $contract_q->f("clname2") . " " . $contract_q->f("cfname2") .
+  $con2 = $contract_q->f("clname2") . " " . $contract_q->f("cfname2") .
           " - " . $contract_q->f("cphone2"); 
 
 
-$dis_update = "<form method=\"get\" name=\"form_contract_update\"
+  $dis_update = "<form method=\"get\" name=\"form_contract_update\"
       action=\"".url_prepare("contract_index.php")."\">
     <input type=\"hidden\" name=\"action\" value=\"detailupdate\">
     <input type=\"hidden\" name=\"param_contract\" value=\"$id\">
     <input type=\"submit\" value=\"$l_update\">
-</form>";
-
-
-$coupon_disp = ($no_ticket-$duration_used);
-$supportduration_disp = ($no_supportduration-$duration_used);
-
-if($ticket_type == $l_yes) { 
-  $aa = $l_total_ticket;
-  $bb = $l_disp_ticket;
-}
-  else {
-    $aa = $l_total_duration;
-    $bb = $l_disp_supportduration;
-  }
-$aaa = "<td class=\"detailLabel\">$aa</td>
-        <td class=\"detailText\">$duration_used</td>";
-
-if ($bb == $l_disp_ticket){ 
-  $bbb  = "<td class=\"detailLabel\">$bb</td>
-          <td class=\"detailText\">$coupon_disp</td>";
-}
-  else{ 
-    $bbb = "<td class=\"detailLabel\">$bb</td>
-           <td class=\"detailText\">$supportduration_disp</td>";}
+  </form>";
 
 
   // --- HTML Template --------------------------------------------------------
 
-  $display["link"] = html_contract_links($id, $label, $deal_id, $deal_label,$n_incident,$duration_used,$no_ticket,$ticket_type,$inc_coup_duration,$no_supportduration,$max);
+  $display["link"] = html_contract_links($id, $label, $deal_id, $inc_nb, $last_inc);
   $display["title"] = "<div class=\"title\">$l_contract : $label</div>";
 
 
@@ -605,46 +549,54 @@ if ($bb == $l_disp_ticket){
   <table width=\"100%\">
   <tr>
     <td valign=\"top\" width=\"50%\">
+
       <div class=\"detailHead\">$dis_kind</div>
       <table class=\"detail\">
-        <tr>
-          <td class=\"detailLabel\">$l_company
-            <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
-            <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
-          </td>
-          <td class=\"detailText\">$comp_name</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_client_manager 1
-            <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
-            <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
-          </td>
-          <td class=\"detailText\">$con1</td> 
-        </tr><tr>
-          <td class=\"detailLabel\">$l_client_manager 2
-            <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
-            <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
-          </td>
-          <td class=\"detailText\">$con2</td>
-        </tr>
+      <tr>
+        <td class=\"detailLabel\">$l_company
+          <a href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$comp_id")."\">
+          <img src=\"/images/$set_theme/$ico_company\" alt=\"[Company]\" /></a>
+        </td>
+        <td class=\"detailText\">$comp_name</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_client_manager 1
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con1_id") . "\">
+          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+        </td>
+        <td class=\"detailText\">$con1</td> 
+      </tr><tr>
+        <td class=\"detailLabel\">$l_client_manager 2
+          <a href=\"".url_prepare("$path/contact/contact_index.php?action=detailconsult&amp;param_contact=$con2_id") . "\">
+          <img src=\"/images/$set_theme/$ico_contact\" alt=\"[Contact]\" /></a>
+        </td>
+        <td class=\"detailText\">$con2</td>
+      </tr>
       </table>   
+
     </td>
     <td valign=\"top\" width=\"50%\">
-      <div class=\"detailHead\">$l_responsable</div>
+
+      <div class=\"detailHead\">$l_manager</div>
       <table class=\"detail\">
-        <tr>
-          <td class=\"detailLabel\">$l_marketing_manager</td>
-          <td class=\"detailText\">$market</td>
-        </tr><tr>
-          <td class=\"detailLabel\">$l_technical_manager</td>
-          <td class=\"detailText\">$tech</td>
+      <tr>
+        <td class=\"detailLabel\">$l_marketing_manager</td>
+        <td class=\"detailText\">$market</td>
+      </tr><tr>
+        <td class=\"detailLabel\">$l_technical_manager</td>
+        <td class=\"detailText\">$tech</td>
+      </tr>
       </table>
+
     </td>
+  </tr>
   </table>
+
   <table width=\"100%\">
-    <tr>
-      <td valign=\"top\" width=\"50%\">
-      <div class=\"detailHead\">$l_contract</div>
-  <table class=\"detail\">
+  <tr>
+    <td valign=\"top\" width=\"50%\">
+
+    <div class=\"detailHead\">$l_contract</div>
+    <table class=\"detail\">
     <tr>
       <td class=\"detailLabel\">$l_label</td>
       <td class=\"detailText\">$label</td>
@@ -660,68 +612,75 @@ if ($bb == $l_disp_ticket){
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailText\">$archive</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_private</td>
+      <td class=\"detailText\">$cvis</td>
     </tr>
-      $privacy
-  </table>
+    </table>
+
     </td>
     <td valign=\"top\" width = 50%>
+
     <div class=\"detailHead\">$l_date</div>
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">$l_autorenewal</td>
+      <td class=\"detailText\">$autorenewal</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_signature</td>
+      <td class=\"detailText\">$datesignature</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_begin</td>
+      <td class=\"detailText\">$datebegin</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_exp</td>
+      <td class=\"detailText\">$dateexp</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_renew</td>
+      <td class=\"detailText\">$daterenew</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_date_cancel</td>
+      <td class=\"detailText\">$datecancel</td>
+    </tr>
+    </table>
+
+    </td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_status</div>
   <table class=\"detail\">
-     <tr>
-       <td class=\"detailLabel\">$l_autorenewal</td>
-       <td class=\"detailText\">$autorenewal1</td>
-     </tr><tr>
-       <td class=\"detailLabel\">$l_date_signature</td>
-       <td class=\"detailText\">$datesignature</td>
-     </tr><tr>
-       <td class=\"detailLabel\">$l_begin</td>
-       <td class=\"detailText\">$datebegin</td>
-     </tr><tr>
-       <td class=\"detailLabel\">$l_dateexp</td>
-       <td class=\"detailText\">$dateexp</td>
-     </tr><tr>
-       <td class=\"detailLabel\">$l_date_renew</td>
-       <td class=\"detailText\">$daterenew</td>
-     </tr><tr>
-       <td class=\"detailLabel\">$l_date_cancel</td>
-       <td class=\"detailText\">$datecancel</td>
-     </tr>
-   </table>
-      </td>
-   </table>
-     <div class=\"detailHead\">$l_status</div>
-     <table class=\"detail\">
-       <tr>
-         <td class=\"detailLabel\">$l_status</td>
-         <td class=\"detailText\">$status</td>
-       </tr><tr>
-         $dis_format
-       </tr><tr>
-         $aaa 
-       </tr><tr>
-         $bbb
-       </tr>
-   </table>
-     <div class=\"detailHead\">$l_comment</div>
-       <table class=\"detail\">
-         <tr>
-           <td class=\"detailText\" colspan=\"2\">$com</td>
-         </tr>
-       </table>
-     <div class=\"detailHead\">$l_clause</div>
-   <table class=\"detail\">
-     <tr>
-       <td class=\"detailText\" colspan=\"2\">$clause</td>
-     </tr> 
-   </table>";
+  <tr>
+    <td class=\"detailLabel\">$l_status</td>
+    <td class=\"detailText\">$status</td>
+  </tr><tr>
+    $dis_format
+  </tr><tr>
+    <td class=\"detailLabel\">$l_duration_used</td>
+    <td class=\"detailText\">$duration_used</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_comment</div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailText\" colspan=\"2\">$com</td>
+  </tr>
+  </table>
+
+  <div class=\"detailHead\">$l_clause</div>
+  <table class=\"detail\">
+  <tr>
+    <td class=\"detailText\" colspan=\"2\">$clause</td>
+  </tr> 
+  </table>";
 
    return $block;
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Display Contract Form                                                     //
+// Display Contract Form
 // Parameters:
 //   - $action    : action called
 //   - $contract[] : default values
@@ -767,7 +726,6 @@ function dis_contract_form($action,$contract,$param_company) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contract Form                                                     //
 // Parameters :
@@ -786,13 +744,13 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_begin,$l_type, $l_marketing_manager, $l_archive;
-  global $l_date_renew,$l_date_cancel,$l_date_signature;
-  global $l_technical_manager,$l_last_update;
-  global $popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause;
-  global $l_dateexp,$l_priority,$l_status;
+  global $l_signature, $l_begin, $l_exp, $l_renew,$l_date_cancel;
+  global $l_technical_manager;
+  global $popup_height,$popup_width,$l_comment,$l_number,$l_clause;
+  global $l_priority,$l_status;
   global $l_contract_select_deal,$l_client_manager,$l_deal,$l_contract,$l_company;
   global $l_contract_kind,$l_format,$l_autorenewal;
-  global $l_no_ticket,$l_private,$uid,$l_supportduration; 
+  global $l_ticket_nb,$l_private,$uid,$l_duration; 
   global $cck_customer, $cck_supplier, $l_cck_customer,$l_cck_supplier;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
@@ -807,11 +765,11 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $vis = ($contract_q->f("contract_privacy") == 0 ? "0" : "1");
     $usercreate = $contract_q->f("contract_usercreate");
     $status = $contract_q->f("contract_status_id");
-    $kind= $contract_q->f("contract_kind");
-    $no_ticket = $contract_q->f("contract_ticketnumber");
-    $no_supportduration = $contract_q->f("contract_duration");
+    $kind = $contract_q->f("contract_kind");
+    $ticket_nb = $contract_q->f("contract_ticketnumber");
+    $duration = $contract_q->f("contract_duration");
     $format = $contract_q->f("contract_format");
-    $autorenewal1 = $contract_q->f("contract_autorenewal");
+    $autorenewal = $contract_q->f("contract_autorenewal");
     $datebegin = isodate_format($contract_q->f("datebegin"), 1);
     $dateexp = isodate_format($contract_q->f("dateexp"), 1);
     $daterenew = isodate_format($contract_q->f("daterenew"), 1);
@@ -841,8 +799,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $zip = $comp_q->f("company_zipcode");
     $town = $comp_q->f("company_town");
     $market = $comp_q->f("company_marketingmanager_id");
+    $format = $ccf_period;
+    $kind = $cck_customer;
         
-// We pre-fill date with current date     
+    // We pre-fill date with current date     
     $datebegin = date($c_php_isodate_format);
     $dateexp = date($c_php_isodate_format, time() + 31536000);
   }
@@ -863,10 +823,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["datecancel"])) { $datecancel = $contract["datecancel"]; }
   if (isset($contract["datesignature"])) { $datesignature = $contract["datesignature"]; } 
   if (isset($contract["type"])) { $type_id = $contract["type"]; }
-  if (isset($contract["autorenewal"])) { $autorenewal1 = $contract["autorenewal"]; }
+  if (isset($contract["autorenewal"])) { $autorenewal = $contract["autorenewal"]; }
   if (isset($contract["format"])) { $format = $contract["format"]; }
-  if (isset($contract["ticketnumber"])) { $no_ticket = $contract["ticketnumber"]; }
-  if (isset($contract["duration"])) { $no_supportduration = $contract["duration"]; }
+  if (isset($contract["ticketnumber"])) { $ticket_nb = $contract["ticketnumber"]; }
+  if (isset($contract["duration"])) { $duration = $contract["duration"]; }
   if (isset($contract["kind"])) { $kind = $contract["kind"]; }
   if (isset($contract["contact1"])) { $con1_id = $contract["contact1"]; }
   if (isset($contract["contact2"])) { $con2_id = $contract["contact2"]; }
@@ -886,13 +846,12 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if ( ($action == "new") || ($action == "insert") ||
        ( (($action == "detailupdate") || ($action == "update")) && 
          ($usercreate == $uid) ) ) {
-    $dis_vis = "
+    $dis_vis = "<tr>
       <td class=\"detailLabel\">$l_private</td>
       <td class=\"detailForm\"><input name=\"cb_vis\" type=\"checkbox\" value=\"1\" ";
     if ($vis == 1) $dis_vis .= "checked = \"checked\"";
-      $dis_vis .= " /></td></tr><tr>";
+      $dis_vis .= " /></td></tr>";
   }
-
 
   // Priority select
   $sel_pri = "<select name=\"sel_priority\">";
@@ -905,7 +864,6 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     $sel_pri .= ">$label_p</option>";
   }
   $sel_pri .= "</select>";
-
 
   // Status select
   $sel_sta = "<select name=\"sel_status\">";
@@ -949,14 +907,12 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $sel_tech .= "</select>";
 
-  if ($autorenewal1 == 1) { 
-    $kind_autorenewal = "checked";
+  if ($autorenewal == 1) { 
+    $autorenew_c = "checked";
   }
- 
-  $autorenewal_display = "<input type=\"checkbox\" name=\"autorenewal1\" value=\"1\" $kind_autorenewal/>";
+  $autorenewal_display = "<input type=\"checkbox\" name=\"cb_autorenew\" value=\"1\" $autorenew_c />";
 
- /// gestion du type du contrat : client ou fournisseur
-
+  // gestion du type du contrat : client ou fournisseur
   if ($kind == "$cck_customer") {
     $kind_customer_c = "checked";
   } else {
@@ -965,46 +921,55 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   
   $radio_kind = "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_customer\" $kind_customer_c/> $l_cck_customer ";
   $radio_kind .= "<input type=\"radio\" name=\"rd_kind\" value=\"$cck_supplier\" $kind_supplier_c/> $l_cck_supplier<br /> ";
- 
+
   if ($format == $ccf_period) {
     $cb_period_c = "checked";
+    $style_ticket = "style=\"display:none;\"";
+    $style_duration = "style=\"display:none;\"";
   } else if ($format == $ccf_ticket) {
     $cb_ticket_c = "checked";
+    $style_ticket = "style=\"display:block;\"";
+    $style_duration = "style=\"display:none;\"";
   } else {
     $cb_duration_c = "checked";
+    $style_ticket = "style=\"display:none;\"";
+    $style_duration = "style=\"display:block;\"";
   }
 
   $dis_format = "
-    <input type=\"radio\" name=\"rd_format\" value=\"$ccf_period\" $cb_period_c onclick=\"
-          this.form.tf_no_ticket.style.display = 'none';
-	  this.form.tf_supportduration.style.display = 'none';
-        \" /> $l_ccf_period
+    <input type=\"radio\" name=\"rd_format\" value=\"$ccf_period\" $cb_period_c
+      onclick=\"
+          this.form.tf_ticket_nb.style.display = 'none';
+          this.form.tf_duration.style.display = 'none';
+	  document.getElementById('label_ticket').style.display = 'none';
+	  document.getElementById('label_duration').style.display = 'none';
+      \" /> $l_ccf_period
 
-    <input type=\"radio\" name=\"rd_format\" value=\"$ccf_duration\" $cb_duration_c onclick=\"
-         this.form.tf_no_ticket.style.display = 'none';
-	  document.getElementById('field1').style.display = 'none';
-	  document.getElementById('field2').style.display = 'block';
-	  this.form.tf_supportduration.style.display = 'block';
+    <input type=\"radio\" name=\"rd_format\" value=\"$ccf_duration\" $cb_duration_c onclick=\"this.form.tf_ticket_nb.style.display = 'none';
+	  document.getElementById('label_ticket').style.display = 'none';
+	  document.getElementById('label_duration').style.display = 'block';
+	  this.form.tf_duration.style.display = 'block';
         \" /> $l_ccf_duration
 
     <input type=\"radio\" name=\"rd_format\" value=\"$ccf_ticket\" $cb_ticket_c onclick=\"
-          this.form.tf_no_ticket.style.display = 'block';
-          document.getElementById('field1').style.display = 'block';
-          document.getElementById('field2').style.display = 'none';
-          this.form.tf_supportduration.style.display = 'none';
+          this.form.tf_ticket_nb.style.display = 'block';
+          document.getElementById('label_ticket').style.display = 'block';
+          document.getElementById('label_duration').style.display = 'none';
+          this.form.tf_duration.style.display = 'none';
          \" /> $l_ccf_ticket";
 
-  if ($format == $ccf_ticket) {
-    $style_tick = "id=\"field1\"";
-    $input_tick = "<input type=\"textbox\" name=\"tf_no_ticket\" value =\"$no_ticket\" />";
-    $style_duration = "id=\"field2\" style=\"display:none;\"";
-    $input_duration = "<input type=\"textbox\" style=\"display:none;\" name=\"tf_supportduration\" />";
-  } else {
-    $style_tick = "id=\"field1\" style=\"display:none;\"";
-    $input_tick = "<input type=\"textbox\" style=\"display:none;\" name=\"tf_no_ticket\"/>";
-    $style_duration = " id=\"field2\""; 
-    $input_duration = "<input type=\"textbox\"; name=\"tf_supportduration\" value =\"$no_supportduration\" />";
-  }
+  $dis_format_detail = "
+    <tr>
+      <td class=\"detailLabel\">
+        <div id=\"label_ticket\" $style_ticket>$l_ticket_nb</div>
+        <div id=\"label_duration\" $style_duration>$l_duration</div>
+      </td>
+      <td class=\"detailForm\">
+        <input type=\"textbox\" $style_ticket name=\"tf_ticket_nb\" value =\"$ticket_nb\" />
+        <input type=\"textbox\" $style_duration name=\"tf_duration\" value =\"$duration\" />
+      </td>
+    </tr>
+";
 
   if ($contact_q->nf()>0) {
     $contact_q->seek(0);
@@ -1115,16 +1080,16 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input name=\"tf_num\" type=\"text\" size=\"20\" maxlength=\"40\" value=\"$number\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_date_signature</td>
+      <td class=\"detailLabel\">$l_signature</td>
       <td class=\"detailForm\"><input name=\"tf_datesignature\" type=\"text\" size=\"10\" value=\"$datesignature\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_begin</td>
       <td class=\"detailForm\"><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_dateexp</td>
+      <td class=\"detailLabel\">$l_exp</td>
       <td class=\"detailForm\"><input name=\"tf_dateexp\" type=\"text\" size=\"10\" value=\"$dateexp\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_date_renew</td>
+      <td class=\"detailLabel\">$l_renew</td>
       <td class=\"detailForm\"><input name=\"tf_daterenew\" type=\"text\" size=\"10\" value=\"$daterenew\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_date_cancel</td>
@@ -1150,7 +1115,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input name=\"cb_archive\" type=\"checkbox\"  size=\"40\" value=\"1\" $archive_display/></td>
-    </tr><tr>
+    </tr>
       $dis_vis
     <tr>
       <td class=\"detailLabel\">$l_contract_kind</td>
@@ -1158,13 +1123,10 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
     </tr><tr>
       <td class=\"detailLabel\">$l_format</td>
       <td class=\"detailForm\">$dis_format</td>
-    </tr><tr>
-      <td class=\"detailLabel\">
-        <div $style_tick>$l_no_ticket</div>
-        <div $style_duration>$l_supportduration</div></td>
-      <td class=\"detailForm\">$input_tick $input_duration</td>
     </tr>
+$dis_format_detail
     </table>
+
   <div class=\"detailHead\">$l_comment</div>
     <table class=\"detail\">
     <tr>
@@ -1199,13 +1161,12 @@ function dis_contract_export($param_contract) {
 
   $con_q = run_query_detail($param_contract);
   $company_id = $con_q->f("company_id");
-  $com_q = run_query_detail_company($company_id);
 
   if ($con_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
   }
 
-  export_contract($con_q,$com_q);
+  export_contract($con_q);
 }
 
 
@@ -1214,16 +1175,16 @@ function dis_contract_export($param_contract) {
 // Parameters:
 //   - $con_q : : DBO : information about the contact
 ///////////////////////////////////////////////////////////////////////////////
-function export_contract($co_q,$com_q) {
+function export_contract($co_q) {
   global $obm_version,$set_weekstart_default;
   global $ccf_period, $ccf_ticket, $ccf_duration;
   global $l_ccf_period, $l_ccf_ticket, $l_ccf_duration;
   global $cck_customer, $cck_supplier;
-  global $l_date, $l_begin, $l_dateexp, $l_date_renew, $l_date_cancel;
-  global $l_date_signature,$l_label,$l_number,$l_clause,$l_comment;
+  global $l_date, $l_signature, $l_begin, $l_exp, $l_renew, $l_date_cancel;
+  global $l_label,$l_number,$l_clause,$l_comment;
   global $l_company,$l_status,$l_priority,$l_type,$l_cck_customer;
-  global $l_cck_supplier,$l_no_ticket,$l_total_ticket;
-  global $l_disp_ticket, $l_supportduration, $l_disp_supportduration; 
+  global $l_cck_supplier,$l_ticket_nb,$l_total_ticket;
+  global $l_disp_ticket, $l_duration; 
   global $l_company_town,$l_company_zipcode,$l_company_expresspostalcode,$l_company_phonenumber;
   global $l_company_fax,$l_company_web,$l_company_email;
 
@@ -1234,16 +1195,16 @@ function export_contract($co_q,$com_q) {
   $datecancel = $co_q->f("contract_datecancel");
   $datesignature = $co_q->f("contract_datesignature");
   $export_contractdate = "Contract $l_date: \n";
+  if ($datesignature)
+    $export_contractdate .= "$l_signature: $datesignature\n";
   if ($datebegin)
     $export_contractdate .= "$l_begin: $datebegin\n";
   if ($dateexp)
-    $export_contractdate .= "$l_dateexp: $dateexp\n";
+    $export_contractdate .= "$l_exp: $dateexp\n";
   if ($daterenew)
-    $export_contractdate .= "$l_date_renew: $daterenew\n";
+    $export_contractdate .= "$l_renew: $daterenew\n";
   if ($datecancel)
-    $export_contractdate .= "$l_date_cancel: $datecancel\n";
-  if ($datesignature)
-    $export_contractdate .= "$l_date_signature: $datesignature\n";
+    $export_contractdate .= "$l_cancel: $datecancel\n";
   $export_contract= "CONTRACT \n"; 
   $label = $co_q->f("contract_label");
   $export_contract .= "$l_label: $label\n";
@@ -1260,30 +1221,24 @@ function export_contract($co_q,$com_q) {
   if ($comment != "")
     $export_comment .= "$l_comment: $comment\n"; 
   $export_company = "COMPANY \n";
-  $companyname = $com_q->f("company_name");
+  $companyname = $co_q->f("company_name");
   if ($companyname != "")
     $export_company .= "$l_company: $companyname\n";
-  $companytown = $com_q->f("company_town");
+  $companytown = $co_q->f("company_town");
   if ($companytown != "")
     $export_company .= "$l_company_town: $companytown\n";
-  $companyzipcode = $com_q->f("company_zipcode");
+  $companyzipcode = $co_q->f("company_zipcode");
   if ($companyzipcode != "")
     $export_company .= "$l_company_zipcode: $companyzipcode\n";
-  $companyexpresspostal = $com_q->f("company_expresspostal");
+  $companyexpresspostal = $co_q->f("company_expresspostal");
   if ($companyexpresspostal != "")
     $export_company .= "$l_company_expresspostalcode: $companyexpresspostal\n";
-  $companyphone = $com_q->f("company_phone");
+  $companyphone = $co_q->f("company_phone");
   if ($companyphone != "")
     $export_company .= "$l_company_phonenumber: $companyphone\n";
-  $companyfax = $com_q->f("company_fax");
+  $companyfax = $co_q->f("company_fax");
   if ($companyfax != "")
     $export_company .= "$l_company_fax: $companyfax\n";
-  $companyweb = $com_q->f("company_web");
-  if ($companyweb != "")
-    $export_company .= "$l_company_web: $companyweb\n";
-  $companyemail =  $com_q->f("company_email");
-  if ($companyemail != "")
-    $export_company .= "$l_company_email: $companyemail\n";
   $export_status .= "STATUS \n";
   $status = $co_q->f("contractstatus_label");
   if ($status != "")
@@ -1305,11 +1260,11 @@ function export_contract($co_q,$com_q) {
   } elseif ($format == $ccf_ticket) {
     $export_status .= "Format: $l_ccf_ticket\n";
     $ticketnumber = $co_q->f("contract_ticketnumber");
-    $export_status .= "$l_no_ticket: $ticketnumber\n";
+    $export_status .= "$l_ticket_nb: $ticketnumber\n";
   } else {
     $export_status .= "Format: $l_ccf_duration\n";
-    $supportduration = $co_q->f("contract_duration");
-    $export_status .= "$l_supportduration: $supportduration h\n";
+    $duration = $co_q->f("contract_duration");
+    $export_status .= "$l_duration: $duration h\n";
   }
 
   header("Content-Type: text/x-vCard");
@@ -1344,20 +1299,20 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
 
   $name = $contract["label"];
   $comp_id = $contract["company_id"];
-  $p_num = $contract["number"];
+  $num = $contract["number"];
   $ta_clause = $contract["clause"];
-  $p_datebegin = $contract["datebegin"];
-  $p_dateexp = $contract["dateexp"];
+  $datebegin = $contract["datebegin"];
+  $dateexp = $contract["dateexp"];
   $priority = $contract["priority"];
   $status = $contract["status"];
   $kind = $contract["kind"];
   $format =$contract["format"];
-  $p_tf_no_ticket =$contract["ticketnumber"];
-  $p_tf_supportduration = $contract["duration"];
-  $p_autorenewal =$contract["autorenewal"];
-  $p_daterenew = $contract["daterenew"];
-  $p_datecancel = $contract["datecancel"];
-  $p_datesignature = $contract["datesignature"];
+  $ticket_nb =$contract["ticketnumber"];
+  $duration = $contract["duration"];
+  $autorenewal =$contract["autorenewal"];
+  $daterenew = $contract["daterenew"];
+  $datecancel = $contract["datecancel"];
+  $datesignature = $contract["datesignature"];
   $sel_type = $contract["type"];
   $ta_com = $contract["comment"];
   $con1 = ($contract["contact1"] ? $contract["contact1"] : "0");
@@ -1367,7 +1322,6 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
   $deal_id = ($contract["deal_new_id"] ? $contract["deal_new_id"] : "0");
   $deal_label = $contract["deal_label"];
   $archiv = ($contract["archive"] ? $contract["archive"] : "0");
-  $connect_db = new DB_OBM;
   $vis = $contract["privacy"];
 
   $display["msg"] .= display_warn_msg($l_check_samecontract);
@@ -1382,7 +1336,34 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
           $samename </a>
       </td></tr>";
   }
- 
+
+  $hidden_fields = "<input type=\"hidden\" name=\"tf_label\" value=\"$name\" />
+      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
+      <input type=\"hidden\" name=\"tf_num\" value=\"$num\" />
+      <input type=\"hidden\" name=\"ta_clause\" value=\"$ta_clause\" />
+      <input type=\"hidden\" name=\"tf_datebegin\" value=\"$datebegin\" />
+      <input type=\"hidden\" name=\"tf_dateexp\" value=\"$dateexp\" />
+      <input type=\"hidden\" name=\"sel_priority\" value=\"$priority\" />
+      <input type=\"hidden\" name=\"sel_status\" value=\"$status\" />
+      <input type=\"hidden\" name=\"rd_kind\" value=\"$kind\" />
+      <input type=\"hidden\" name=\"rd_format\" value=\"$format\" />      
+      <input type=\"hidden\" name=\"tf_ticket_nb\" value=\"$ticket_nb\" />
+      <input type=\"hidden\" name=\"tf_duration\" value=\"$duration\" />
+      <input type=\"hidden\" name=\"cb_autorenew\" value=\"$autorenewal\" /> 
+      <input type=\"hidden\" name=\"tf_daterenew\" value=\"$daterenew\" />
+      <input type=\"hidden\" name=\"tf_datecancel\" value=\"$datecancel\" />
+      <input type=\"hidden\" name=\"tf_datesignature\" value=\"$datesignature\" />
+      <input type=\"hidden\" name=\"sel_type\" value=\"$sel_type\" />
+      <input type=\"hidden\" name=\"ta_com\" value=\"$ta_com\" />
+      <input type=\"hidden\" name=\"sel_con1\" value=\"$con1\" />
+      <input type=\"hidden\" name=\"sel_con2\" value=\"$con2\" />
+      <input type=\"hidden\" name=\"sel_tech\" value=\"$sel_tech\" />
+      <input type=\"hidden\" name=\"sel_market\" value=\"$sel_market\" />
+      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
+      <input type=\"hidden\" name=\"deal_label\" value=\"$deal_label\" />
+      <input type=\"hidden\" name=\"cb_archive\" value=\"$archiv\" />
+      <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+";
 
   $block = "
   <table class=\"detail\">
@@ -1394,32 +1375,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
     action=\"" .url_prepare("contract_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"insert\" />
       <input type=\"hidden\" name=\"hd_confirm\" value=\"$c_yes\" />
-      <input type=\"hidden\" name=\"tf_label\" value=\"$name\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-      <input type=\"hidden\" name=\"tf_num\" value=\"$p_num\" />
-      <input type=\"hidden\" name=\"ta_clause\" value=\"$ta_clause\" />
-      <input type=\"hidden\" name=\"tf_datebegin\" value=\"$p_datebegin\" />
-      <input type=\"hidden\" name=\"tf_dateexp\" value=\"$p_dateexp\" />
-      <input type=\"hidden\" name=\"sel_priority\" value=\"$priority\" />
-      <input type=\"hidden\" name=\"sel_status\" value=\"$status\" />
-      <input type=\"hidden\" name=\"rd_kind\" value=\"$kind\" />
-      <input type=\"hidden\" name=\"rd_format\" value=\"$format\" />      
-      <input type=\"hidden\" name=\"tf_no_ticket\" value=\"$p_tf_no_ticket\" />
-      <input type=\"hidden\" name=\"tf_supportduration\" value=\"$p_tf_supportduration\" />
-      <input type=\"hidden\" name=\"autorenewal1\" value=\"$p_autorenewal\" /> 
-      <input type=\"hidden\" name=\"tf_daterenew\" value=\"$p_daterenew\" />
-      <input type=\"hidden\" name=\"tf_datecancel\" value=\"$p_datecancel\" />
-      <input type=\"hidden\" name=\"tf_datesignature\" value=\"$p_datesignature\" />
-      <input type=\"hidden\" name=\"sel_type\" value=\"$sel_type\" />
-      <input type=\"hidden\" name=\"ta_com\" value=\"$ta_com\" />
-      <input type=\"hidden\" name=\"sel_con1\" value=\"$con1\" />
-      <input type=\"hidden\" name=\"sel_con2\" value=\"$con2\" />
-      <input type=\"hidden\" name=\"sel_tech\" value=\"$sel_tech\" />
-      <input type=\"hidden\" name=\"sel_market\" value=\"$sel_market\" />
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-      <input type=\"hidden\" name=\"deal_label\" value=\"$deal_label\" />
-      <input type=\"hidden\" name=\"cb_archive\" value=\"$archiv\" />
-      <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+      $hidden_fields
       <input type=\"submit\"  value=\"$l_confirm\" />
     </form>
     </p>
@@ -1427,32 +1383,7 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
     <form name=\"form_back\" method=\"post\"
     action=\"" .url_prepare("contract_index.php") . "\">
       <input type=\"hidden\" name=\"action\" value=\"new\" />
-      <input type=\"hidden\" name=\"tf_label\" value=\"$name\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$comp_id\" />
-      <input type=\"hidden\" name=\"tf_num\" value=\"$p_num\" />
-      <input type=\"hidden\" name=\"ta_clause\" value=\"$ta_clause\" />
-      <input type=\"hidden\" name=\"tf_datebegin\" value=\"$p_datebegin\" />
-      <input type=\"hidden\" name=\"tf_dateexp\" value=\"$p_dateexp\" />
-      <input type=\"hidden\" name=\"sel_priority\" value=\"$priority\" />
-      <input type=\"hidden\" name=\"sel_status\" value=\"$status\" />
-      <input type=\"hidden\" name=\"rd_kind\" value=\"$kind\" />
-      <input type=\"hidden\" name=\"rd_format\" value=\"$format\" />      
-      <input type=\"hidden\" name=\"tf_no_ticket\" value=\"$p_tf_no_ticket\" />
-      <input type=\"hidden\" name=\"tf_supportduration\" value=\"$p_tf_supportduration\" />
-      <input type=\"hidden\" name=\"autorenewal1\" value=\"$p_autorenewal\" /> 
-      <input type=\"hidden\" name=\"tf_daterenew\" value=\"$p_daterenew\" />
-      <input type=\"hidden\" name=\"tf_datecancel\" value=\"$p_datecancel\" />
-      <input type=\"hidden\" name=\"tf_datesignature\" value=\"$p_datesignature\" />
-      <input type=\"hidden\" name=\"sel_type\" value=\"$sel_type\" />
-      <input type=\"hidden\" name=\"ta_com\" value=\"$ta_com\" />
-      <input type=\"hidden\" name=\"sel_con1\" value=\"$con1\" />
-      <input type=\"hidden\" name=\"sel_con2\" value=\"$con2\" />
-      <input type=\"hidden\" name=\"sel_tech\" value=\"$sel_tech\" />
-      <input type=\"hidden\" name=\"sel_market\" value=\"$sel_market\" />
-      <input type=\"hidden\" name=\"param_deal\" value=\"$deal_id\" />
-      <input type=\"hidden\" name=\"deal_label\" value=\"$deal_label\" />
-      <input type=\"hidden\" name=\"cb_archive\" value=\"$archiv\" />
-      <input type=\"hidden\" name=\"cb_vis\" value=\"$vis\" />
+      $hidden_fields
       <input type=\"submit\" value=\"$l_back\" />
     </form>
     </p>
@@ -1460,7 +1391,6 @@ function dis_contract_warn_insert($c_id, $co_q, $contract) {
 
   return $block;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1970,7 +1900,7 @@ function dis_delete_form($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Contract admin index                                                //
+// Display the Contract admin index                                          //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
 
@@ -2078,7 +2008,6 @@ function html_contract_admin_form($type_q) {
 
   return $block;
 }
-
 
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -67,7 +67,7 @@ function run_query_search($deal, $all="", $p_new_order="", $p_order_dir) {
     $join_comp = "left join Company on deal_company_id=company_id";
   }
   if (($state != $c_all) && ($state != "")) {
-    $where .= " and dealstatus_id='$state'";
+    $where .= " and deal_status_id='$state'";
   }
   if ($dateafter != "") {
     $where .= " and deal_datealarm > '$dateafter'";

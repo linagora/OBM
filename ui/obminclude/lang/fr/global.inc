@@ -38,6 +38,7 @@ $l_number = "Numéro";
 $l_invalid_data = "Données invalides";
 $l_error_permission = "Vous n'avez pas les droits d'accès pour cette action.";
 $l_error_visibility = "Les informations contenues dans cette page sont privées. Vous ne pouvez pas y accéder.";
+$l_err_fill = "Le champ doit être rempli";
 $l_query_error = "Problème en executant la requete";
 $l_color = "Couleur";
 $l_phone = "Tel.";
@@ -64,6 +65,7 @@ $l_active = "En cours";
 $l_new = "Créer";
 $l_document_added = " documents ajoutés";
 $l_no_document_added = "Aucun documents ajoutés";
+$l_last = "Dernier";
 
 // Entities
 $l_company = "Société";

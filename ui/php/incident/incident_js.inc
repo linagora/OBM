@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File  : contact_js.inc                                              //
 //     - Desc  : Contact javascript functions File                           //
@@ -152,53 +152,51 @@ function check_status_new(form)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the Deal Solution type deletion is possible                      //
+// Check if the Incident Category 1 deletion is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_solutiontype_checkdel(form)
+function check_cat1_checkdel(form)
 {  
-   if (form.sel_solutiontype.selectedIndex >= 0)
+   if (form.sel_cat1.selectedIndex >= 0)
    { 
      return true;
    }
    else
    {
-     alert(\"$l_j_soltype_delete\");
+     alert(\"$l_j_cat1_delete\");
      return false;
    }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the solutiontype update is possible                              //
+// Check if the Category 1 update is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_solutiontype_upd(form,formd)
+function check_cat1_upd(form,formd)
 {
-  solutiontype_pos = formd.sel_solutiontype.selectedIndex;
-  if ((solutiontype_pos >= 0) && (form.tf_solutiontype.value != \"\")) {
-    form.sel_solutiontype.value=formd.sel_solutiontype.options[solutiontype_pos].value;
+  cat1_pos = formd.sel_cat1.selectedIndex;
+  if ((cat1_pos >= 0) && (form.tf_cat1.value != \"\")) {
+    form.sel_cat1.value=formd.sel_cat1.options[cat1_pos].value;
     return true;
   } else {
-    alert(\"$l_j_soltype_update\");
+    alert(\"$l_j_cat1_update\");
     return false;
   }
 }
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Check if the solutiontype creation is possible                            //
+// Check if the Category 1 creation is possible
 ///////////////////////////////////////////////////////////////////////////////
-function check_solutiontype_new(form)
+function check_cat1_new(form)
 {
-   if (form.tf_solutiontype.value != \"\")
+   if (form.tf_cat1.value != \"\")
       return true;
    else
    {
-      alert(\"$l_j_soltype_create\");
+      alert(\"$l_j_cat1_create\");
       return false;
    }
 }
-
-
 
 
 -->

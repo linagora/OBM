@@ -36,10 +36,10 @@ function check_contract(f_con) {
     alert (\"$l_fill_label\");
     return false;
   }
-  else if (check_date(f_con.tf_datebegin, \"$l_date_init\") == false) {
+  else if (check_date(f_con.tf_datebegin, \"$l_begin\") == false) {
     return false;
   }
-  else if (check_date(f_con.tf_dateexp, \"$l_dateexp\") == false) {
+  else if (check_date(f_con.tf_dateexp, \"$l_exp\") == false) {
     return false;
   }
 
