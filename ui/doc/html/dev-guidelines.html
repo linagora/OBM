@@ -230,8 +230,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 <P>
 
 <h3>Included files : how to, order</h3>
-<i></i>
- There is 3 global files which are include in all OBM module :
+There is 3 global files which are included in all OBM module :
 <p>
 <ul type=disc>
          <li> <b>(1)</b> obmlib.inc
@@ -239,29 +238,29 @@ if ($obminclude == "") $obminclude = "obminclude";
          <li> <b>(3)</b> global_pref.inc
 </ul>
 <p>
-This order must be respeced in all module.<br><br>
+This order must be respected in all module.<br><br>
 <table border=1>
 <tr>
   <th>Global file</th>
   <th>Description</th>
 </tr><tr>
   <td>obmlib.inc</td>
-  <td>This file define the library objects like OBM_Sess, or OBM_DB. It must be include <i><u>before</u></i>
+  <td>This file define the library objects like OBM_Sess, or OBM_DB. It must be included <i><u>before</u></i>
       the call of page_open() in any case.
   </td>
 </tr><tr>
   <td>global.inc</td>
-  <td>This file define the global variables. In the settings module and in obm.php it must be include <i><u>before</u></i>
-      the call of page_open(). In the other case it could be define before or after page_open().
-      For more homogenity we decide to include it before the call of page_open() in any case.
+  <td>This file define the global variables. In the settings module and in obm.php it must be included <i><u>before</u></i>
+      the call of page_open(). In the other case it could be defined before or after page_open().
+      For more homogenity we decided to include it before the call of page_open() in any case.
   </td>
 </tr><tr>
   <td>global_pref.inc</td>
-  <td>This file contain the application of the global settings. It use some session variable so it must be include 
+  <td>This file sets up the global settings. It use some session variable so it must be included
       <i><u>after</u></i> the call of page_open() in any case.
   </td>
 </tr>
-</table>
+</table>    
 
 <p>
 Here is a correct module_index.php includes bloc :
