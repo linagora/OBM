@@ -391,7 +391,7 @@ class OBM_DISPLAY {
 	
 	// Pre cell display (open popup, link)
 	if ($popup) {
-	  $content = "<a class=\"resultText\" href=\"\" OnClick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	  $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
 	} else if ($url != "") {
 	  $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
 	}

@@ -1412,9 +1412,10 @@ function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
 	  $dis_back_monoview
 	 </form>
         </td>
+	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
        </tr>              
       </table>
-     </div>	
+     </div>
      
      <div class=\"agendaBar\">
       <table cellpadding=\"0\" cellspacing=\"0\" class=\"agendaCal\">

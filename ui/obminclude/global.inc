@@ -503,12 +503,12 @@ function display_record_info($uc_id, $uu_id, $tc, $tu) {
   if ($uc_id != "") {
     $obm_q->query($query_created);
     $obm_q->next_record();
-    $created = "<img src=\"/images/$set_theme/$ico_created\"> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
+    $created = "<img src=\"/images/$set_theme/$ico_created\" alt=\"\" /> ".$obm_q->f("userobm_login")." : ".datetime_format($tc);
   }
   if ($uu_id != "") {
     $obm_q->query($query_updated);
     $obm_q->next_record();
-    $updated = "<img src=\"/images/$set_theme/$ico_updated\"> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
+    $updated = "<img src=\"/images/$set_theme/$ico_updated\" alt=\"\" /> " . $obm_q->f("userobm_login") . " : ". datetime_format($tu);
   }
 
   $block = "<div class=\"detailInfo\">$created<br />$updated

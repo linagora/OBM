@@ -84,30 +84,30 @@ function dis_data_time(&$OD, $fieldname, $link_ok) {
 function debug_array($a) {
   global $_POST;
 
-  echo "<br>BEGIN----- debug_array ------<br>";
+  echo "<br />BEGIN----- debug_array ------<br />";
   foreach($a as $key => $val) {
     if (is_null($val))
-      echo "clé $key val -- NULL -- <br>";
+      echo "clé $key val -- NULL -- <br />";
     else if (is_array($val)) {
       echo "clé $key val ";
       print_r($val);
-      echo " <br>";
+      echo " <br />";
     }
     else
-      echo "clé $key val --$val-- <br>";
+      echo "clé $key val --$val-- <br />";
   }
-  echo "_POST<br>";
+  echo "_POST<br />";
   foreach($_POST as $key => $val) {
     if (is_array($val)) {
       echo "clé $key val ";
       print_r($val);
-      echo " <br>";
+      echo " <br />";
     }
     else
-      echo "clé $key val --$val-- <br>";
+      echo "clé $key val --$val-- <br />";
   }
 
-  echo "----- debug_array ------END<br>";
+  echo "----- debug_array ------END<br />";
 }
 
 
@@ -167,7 +167,7 @@ function dis_time_links ($time, $type="all") {
           <a href=\"" .
       url_prepare("time_index.php?action=".$time["action"].
 		  "&amp;wbegin=".date("Ymd",$d_start_prev))."\">
-           <img border=0 src=\"/images/$set_theme/previous.png\" alt=\"\" />
+           <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
           </a>
          </td>
          <td class=\"timePeriod\">
@@ -177,7 +177,7 @@ function dis_time_links ($time, $type="all") {
           <a href=\"" .
       url_prepare("time_index.php?action=".$time["action"].
 		  "&amp;wbegin=".date("Ymd",$d_start_next))."\">
-           <img border=0 src=\"/images/$set_theme/next.png\" alt=\"\" />
+           <img border=\"0\" src=\"/images/$set_theme/next.png\" alt=\"\" />
           </a>
          </td>
         </tr>
@@ -187,13 +187,13 @@ function dis_time_links ($time, $type="all") {
 
   } else if ($type == "month") {
     if (debug_level_isset($cdg_param)) {
-      echo "dis_time_links \$time <br>";
+      echo "dis_time_links \$time <br />";
       debug_array($time);
     }
 
     if (debug_level_isset($cdg_param)) {
-      echo "DIS_TIME_LINKS <br>";
-      echo "date ". $time["date"] . " <br>";
+      echo "DIS_TIME_LINKS <br />";
+      echo "date ". $time["date"] . " <br />";
     }
 
     $tot_width = (in_array($action, $no_name)) ? 200 : 400;
@@ -206,7 +206,7 @@ function dis_time_links ($time, $type="all") {
     $d_start_next = date("Ymd", mktime(0,0,0,$month+1,1,$year));
 
     if (debug_level_isset($cdg_param)) {
-      echo "previous $d_start_prev, next $d_start_next, <br>";
+      echo "previous $d_start_prev, next $d_start_next, <br />";
     }
 
     //Daylight Savings Time
@@ -219,7 +219,7 @@ function dis_time_links ($time, $type="all") {
          <a href=\"" .
       url_prepare("time_index.php?action=".$time["action"].
 		  "&amp;wbegin=$d_start_prev")."\">
-           <img border=0 src=\"/images/$set_theme/previous.png\" alt=\"\" />
+           <img border=\"0\" src=\"/images/$set_theme/previous.png\" alt=\"\" />
          </a>
         </td>
         <td class=\"timePeriod\">
@@ -229,7 +229,7 @@ function dis_time_links ($time, $type="all") {
          <a href=\"" .
       url_prepare("time_index.php?action=".$time["action"].
 		  "&amp;wbegin=$d_start_next")."\">
-           <img border=0 src=\"/images/$set_theme/next.png\" alt=\"\" />
+           <img border=\"0\" src=\"/images/$set_theme/next.png\" alt=\"\" />
          </a>
         </td></tr>
        </table>    
@@ -283,13 +283,13 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
 
       if ($multi) {
 	if (in_array($u_id,$sel_user_id))
-	  $sel_user .= "selected";
+	  $sel_user .= "selected=\"selected\"";
       } else {
 	if ($sel_user_id == $u_id)
-	  $sel_user .= "selected";
+	  $sel_user .= "selected=\"selected\"";
       };
 
-      $sel_user .= ">$lname $fname</option>";
+      $sel_user .= " >$lname $fname</option>";
     }
     $sel_user .= "</select>";
 
@@ -305,9 +305,9 @@ function dis_time_search_form ($time, $usr_q, $uid, $multi=0) {
       $dis_button_all = "<input type=\"submit\" name=\"submit\" value=\"$l_all\"
                                 onclick=\"select_all(f_time)\" />";
 
-    $block = "<br>
+    $block = "<br />
       <div class=\"timeBar\">
-     <form method=post name=\"f_time\" action=\"" .
+     <form method=\"post\" name=\"f_time\" action=\"" .
       url_prepare("time_index.php") . "\">
 
        <table class=\"timeUser\">
@@ -354,7 +354,7 @@ function dis_time_list($time) {
   // array of validated days
   $val_days = run_query_valid_search($time);
   if (debug_level_isset($cdg_param)) {
-    echo "validated days : ".sizeof($val_days)." <br>";
+    echo "validated days : ".sizeof($val_days)." <br />";
     print_r($val_days);
   }
 
@@ -364,7 +364,7 @@ function dis_time_list($time) {
   $day_q = get_this_week($d_start_week, $c_days_in_a_week);
   
   if (debug_level_isset($cdg_param)) {
-    echo "list of days <br>";
+    echo "list of days <br />";
     print_r($day_q);
   }
 
@@ -524,8 +524,8 @@ function dis_time_list_result($task_q,$pref_q,$time) {
   //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
  
   $block .= "
-     <form method=post name=\"f_task_del\" action=\"".url_prepare("time_index.php").
-    "\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >
+     <form method=\"post\" name=\"f_task_del\" action=\"".url_prepare("time_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
      ";
 
   $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
@@ -550,9 +550,9 @@ function dis_time_list_result($task_q,$pref_q,$time) {
     <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
 
   $block .= "
-     <p class=\"detailButton\">
+     <div class=\"detailButton\">
       <p class=\"detailButtons\">$dis_button</p>
-     </p>
+     </div>
 
      </form>
      ";
@@ -928,7 +928,7 @@ function display_weekview($time, $result, $total, $title) {
       $result[$wday]=0;
 
     if ($working_days[$wday] != 0) {
-      $line1 .= "<td width=$col_width class=\"timeWeekhead\" >";
+      $line1 .= "<td width=\"$col_width\" class=\"timeWeekhead\" >";
       $line1 .= "$hum_wday</td>\n";
       
       if ($result[$wday] == $c_day_fraction)
@@ -986,12 +986,12 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   //   => form not to be shown
   if (debug_level_isset($cdg_param)) {
     debug_array($time);
-    echo "<br>day_q <br>";
+    echo "<br />day_q <br />";
     print_r($day_q);
-    echo "<br>validate_days  <br>";
+    echo "<br />validate_days  <br />";
     print_r($validate_days);
     if (is_array($validate_days))
-      echo "<br>sum validate_days " .array_sum($validate_days)."<br>";
+      echo "<br />sum validate_days " .array_sum($validate_days)."<br />";
 
   }
 
@@ -1020,7 +1020,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $rd_day .= "<input type=\"radio\" name=\"rd_day\" value=\"".$day_q[$day][1]."\"";
       
       if ($day_q[$day][1] == $is_day)
-	$rd_day .= " checked";
+	$rd_day .= " checked=\"checked\"";
       
       $rd_day .= " />$dlabel\n";
     }
@@ -1049,10 +1049,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       if ($disabled)
 	$ch_day .= " disabled";
       else if ($day_checked == -1) {
-	$ch_day .= " checked";
+	$ch_day .= " checked=\"checked\"";
 	$day_checked = $day;
       } else if ($day == $day_checked)
-	$ch_day .= " checked";
+	$ch_day .= " checked=\"checked\"";
       
       $ch_day .= " />$dlabel\n";
     }
@@ -1071,7 +1071,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
       if ($company == "") $company = $l_intern;
 
-      $proj_name = addslashes($project_q->f("deal_label"));
+      $proj_name = htmlspecialchars(addslashes($project_q->f("deal_label")));
       $proj_name = (strlen($proj_name) > 35) ? substr($proj_name,0,35)."..." : $proj_name;
 
       $proj_label = "\" $company -- ". $proj_name. "\"";
@@ -1100,7 +1100,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $projtask_dl  = $projecttask_q->f("projecttask_deal_id");
       $projtask_id = $projecttask_q->f("projecttask_id");
     
-      $projtask_name = addslashes($projecttask_q->f("projecttask_label"));
+      $projtask_name = htmlspecialchars(addslashes($projecttask_q->f("projecttask_label")));
       $projtask_name = (strlen($projtask_name) > 35) ? substr($projtask_name,0,35)."..." : $projtask_name;
 
       $projtask_label = "\"". $projtask_name ."\"";
@@ -1121,7 +1121,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   }
 
   $script = "
-    <script language=\"JavaScript\">
+    <script type=\"text/javascript\">
       project = new Array (
         $proj_data
       )
@@ -1134,7 +1134,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<select name=sel_tasktype ";
+  $sel_tt = "<select name=\"sel_tasktype\" ";
   $sel_tt .= "  onchange=\"fill_project(this.form.sel_project, this.form.sel_tasktype.value,";
   $sel_tt .= "             this.form.sel_projecttask, -1) \">";
   $sel_tt .= "<option value=\"0\">$l_none</option>";
@@ -1151,7 +1151,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       $tt_id = $tt_q->f("tasktype_id");
       $tt_label = $tt_q->f("tasktype_label");
       $sel_tt .= "\n<option value=\"$tt_id\"";
-      if ($is_tt == $tt_id) $sel_tt .= " selected"; 
+      if ($is_tt == $tt_id) $sel_tt .= " selected=\"selected\""; 
       $sel_tt .= ">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$tt_label</option>\n";
     }
   }
@@ -1160,30 +1160,31 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
   // Project select construction
   $sel_proj = "
-    <select name=sel_project
+    <select name=\"sel_project\"
             onchange=\"fill_tasktype(this.form.sel_tasktype, this.form.sel_project.value);
                        fill_project(this.form.sel_project, this.form.sel_tasktype.value,
-                                    this.form.sel_projecttask, this.form.sel_project.value);return true;\"
+                                    this.form.sel_projecttask, this.form.sel_project.value);return true;\">
+    <option value=\"0\">$l_none</option>
     </select>";
 
   // ProjectTask select construction
   $sel_projtask = "
-    <select name=sel_projecttask>
+    <select name=\"sel_projecttask\">
     <option value=\"0\">$l_none</option>
     </select>";
 
   // Project Label
   if ($action == "detailupdate")
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 value=\"".$task_q->f("timetask_label")."\" />";
+    $tf_label ="<input type=\"text\" name=\"tf_label\" size=\"30\" value=\"".$task_q->f("timetask_label")."\" />";
   else
-    $tf_label ="<input type=\"text\" name=\"tf_label\" size=30 />";
+    $tf_label ="<input type=\"text\" name=\"tf_label\" size=\"30\" />";
 
   // Project time length
-  $sel_time="<select name=sel_time>";
+  $sel_time="<select name=\"sel_time\">";
   for ($t=1;$t<=$fraction_t;  $t++) {
     $dlabel = $t.'/'.$fraction_t;
     $sel_time .= "<option value=\"$t\"";
-    if ($is_time == $t) $sel_time .= " selected"; 
+    if ($is_time == $t) $sel_time .= " selected=\"selected\""; 
     $sel_time .= ">$dlabel</option>\n";
   }
   $sel_time .= "</select>";
@@ -1196,16 +1197,16 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
 
   if ($action == "insert") {
     $block .= "
-      <form method=post name=\"f_add_task\"
-        onSubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
+      <form method=\"post\" name=\"f_add_task\"
+        onsubmit=\"if (check_addtaskform(this)) return true; else return false;\" 
         action=\"".url_prepare("time_index.php")."\">\n
       <input type=\"hidden\" name=\"action\" value=\"$action\" />\n
       <input type=\"hidden\" name=\"popup\" value=\"0\" />\n";
   }
   else {
     $block .= "
-      <form method=post  name=\"f_add_task\" 
-        onSubmit=\"if (check_addtaskform(this)) return true; else return false;\"
+      <form method=\"post\"  name=\"f_add_task\" 
+        onsubmit=\"if (check_addtaskform(this)) return true; else return false;\"
         action=\"".url_prepare("time_index.php")."\">
       <input type=\"hidden\" name=\"action\" value=\"detailupdate\" />
       <input type=\"hidden\" name=\"popup\" value=\"0\" />";
@@ -1221,23 +1222,26 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // mise en page bouton integre au formulaire
   // (sinon, ca vire et on decommente en bas)
 
-  $dis_button .= "
-    <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />\n";
-
   if ($action == "insert") {
-    $dis_button .= "<td class=\"timeForm\"><input type=\"submit\" value=\"$l_add\" /></td>";
+    $dis_button .= "
+      <td class=\"timeForm\">
+       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+       <input type=\"submit\" value=\"$l_add\" />
+      </td>";
   } 
   else {
-    $dis_button .= "<td class=\"timeForm\">
-     <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
-     <input type=\"submit\" value=\"$l_update\" />
-     </td>";
+    $dis_button .= "
+      <td class=\"timeForm\">
+       <input type=\"hidden\" name=\"wbegin\" value=\"".$time["date"]."\" />
+       <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
+       <input type=\"submit\" value=\"$l_update\" />
+      </td>";
   }
   
   if ($action == "detailupdate"){
     $dis_script .= "
       <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />
-      <script language=\"JavaScript\">
+      <script type=\"text/javascript\">
         fill_project(document.f_add_task.sel_project,
           document.f_add_task.sel_tasktype.value,
           document.f_add_task.sel_projecttask);
@@ -1247,7 +1251,7 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
       </script>";
   } else {
     $dis_script .= "
-      <script language=\"JavaScript\">
+      <script type=\"javascript\">
         fill_projectall(document.f_add_task.sel_project);
       </script>";
   }
@@ -1322,10 +1326,10 @@ function dis_form_addtask($action, $project_q, $projecttask_q, $taskt_q,
   // a décommenter si on sort le bouton du formulaire
 
   //   if ($action == "insert") {
-  //     $block .= "<br><input type=\"submit\" value=\"$l_add\" />";
+  //     $block .= "<br /><input type=\"submit\" value=\"$l_add\" />";
   //   } 
   //   else {
-  //     $block .= "<br>
+  //     $block .= "<br />
   //      <input type=\"hidden\" name=\"task_id\" value=\"$task_id\" />
   //      <input type=\"submit\" value=\"$l_update\" />
   //      <input type=\"submit\" value=\"$l_close\" onclick=\"window.close();\" />";
@@ -1432,4 +1436,4 @@ function dis_mysql_date($p_date) {
 
 }
 
-</SCRIPT>
+</script>

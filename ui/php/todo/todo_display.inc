@@ -95,7 +95,7 @@ function dis_todo_form($todo, $user_q) {
   $sel_priority = "<select id=\"sel_priority\" name=\"sel_priority\">";
 
   for ($i=1; $i<=$max_priority; $i++) {
-    $selected = ($i == intval(($max_priority+1)/2)) ? "\"selected\"" : "";
+    $selected = ($i == intval(($max_priority+1)/2)) ? "selected=\"selected\"" : "";
     $sel_priority .= "<option value=\"$i\" $selected>$i</option>";
   }
 
@@ -168,8 +168,8 @@ function dis_todo_list($todo, $todo_q) {
   $todo_q->seek($first_row);
 
   $block .= "
-     <form method=post name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
-    "\" \"onSubmit=\"if (confirm_del()) return true; else return false\" >
+     <form method=\"post\" name=\"f_todo_del\" action=\"".url_prepare("todo_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
      ";
 
   $todo_d = new OBM_DISPLAY("DATA", $pref_q);
@@ -185,12 +185,12 @@ function dis_todo_list($todo, $todo_q) {
   $block .= $todo_d->display("dis_data_todo");
 
   $block .= "
-    <p class=\"detailButton\">
-    <p class=\"detailButtons\">
-     <input type=\"hidden\" name=\"action\" value=\"delete\" />
-     <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
-    </p>
-    </p>
+    <div class=\"detailButton\">
+     <p class=\"detailButtons\">
+      <input type=\"hidden\" name=\"action\" value=\"delete\" />
+      <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />
+     </p>
+    </div>
     </form>
     ";
 

@@ -91,7 +91,7 @@ function html_account_search_form ($p_action, $account) {
 
   $block .= "
   <form method=\"get\" name=\"form_account\"
-    onSubmit=\"if (check_form(this) == false) return false; else return true;\"
+    onsubmit=\"if (check_form(this) == false) return false; else return true;\"
     action=\"$url\">
   <div class=\"search\">
    <div class=\"searchLabel\">$l_label_start<br />
@@ -158,6 +158,7 @@ function html_account_search_list ($acc_q, $pref_q, $nb_account, $account) {
   $dis_account = new OBM_DISPLAY("DATA", $pref_q, "account");
   $dis_account->data_set = $acc_q;
   $dis_account->data_url = $url;
+  $dis_account->data_header = "both";
 
   $display["msg"] = display_info_msg("$nb_account $l_found");
   return $dis_account->display("dis_data_account");
@@ -357,7 +358,7 @@ function html_account_form($obm_q_account, $action) {
 
   $block .= "
    <form method=\"post\" action=\"account_index.php\"
-         onSubmit=\"if (check_cpte(this)) return true; else return false;\" >
+         onsubmit=\"if (check_cpte(this)) return true; else return false;\" >
     <table class=\"detail\">
      <tr>
       <td class=\"detailLabel\">$l_label</td>
@@ -496,7 +497,7 @@ function html_compute_balance ($p_account, $payments_options, $p_date) {
 <center>
  <table border=\"$border\" cellspacing=\"$cellspacing\">
   <form method=\"post\" action=\"$url\"
-  onSubmit=\"return check_balance_form (this);\">
+  onsubmit=\"return check_balance_form (this);\">
    <tr><td>
     <font size=-2 color=\"#$col_label\">$l_choose_balance_date</font><br>
     <input type=text name=\"tf_balance_date\" value=\"".$p_date."\">

@@ -11,46 +11,48 @@
 /* ------------------------------------------------------------------------- */
 
 .leftpanel {
-	width: 180px;
-	margin: 0px;
-	padding: 10px 5px;
-	float: left;
-	clear: left;
+	width:			180px;
+	margin:			0px;
+	padding:		10px 5px;
+	float:			left;
+	clear:			left;
 /*	padding: 2px;*/
 }
 
 .rightpanel {
-	width: 180px;
-	clear: right;
-	float: right;
+	width:			180px;
+/*	clear:			right;*/
+	float:			right;
+/*	margin-right: 		20px;*/
 /*	border: 1px solid #000000;*/
 /*	padding: 2px;*/
 }
 
 .middlepanel {
-	margin-right: 20px;
-/*	background-color: #0000FF;*/
+	width: auto;
+	margin-right:		196px;
+/*	background-color: 	#0000FF;*/
 }
 
 .detailpanel {
-	padding: 0px;
-	margin-top: 10px;
-	margin-right: 20px;
-	margin-left: 200px;
-	width: auto;
-	height: 100%;
-/*	background-color: #00FF00;*/
+	padding: 		0px;
+	margin-top: 		10px;
+	margin-right: 		10px;
+	margin-left: 		200px;
+	width: 			auto;
+	height: 		100%;
+/*	background-color: 	#00FF00;*/
 }
 
 .detailpanelalone {
-	position: absolute;
-	left: 2px;
-	right: 2px;
-	width: auto;
-/*	border: 1px solid #000000;*/
-	padding: 0px;
-	margin-top: 10px;
-/*	background-color: #00FF00;*/
+	position: 		absolute;
+	left: 			2px;
+	right: 			2px;
+	width: 			auto;
+/*	border: 		1px solid #000000;*/
+	padding: 		0px;
+	margin-top: 		10px;
+/*	background-color: 	#00FF00;*/
 }
 /* ------------------------------------------------------------------------- */
 /* header */
@@ -69,56 +71,56 @@
 /* ------------------------------------------------------------------------- */
 
 .action {
-	width: 180px;
-	margin-top: 0px;
-	margin-right: 0px;
-	margin-bottom: 20px;
-	margin-left: 0px;
-	padding: 0px;
-	border-right-width: 2px;
-	border-bottom-width: 2px;
-	border-left-width: 2px;
-	border-right-style: solid;
-	border-bottom-style: solid;
-	border-left-style: solid;
-	border-right-color: #394D5A;
-	border-bottom-color: #394D5A;
-	border-left-color: #394D5A;
-	background-color: #ADAEB5;
+	width: 			180px;
+	margin-top: 		0px;
+	margin-right: 		0px;
+	margin-bottom: 		20px;
+	margin-left: 		0px;
+	padding: 		0px;
+	border-right-width: 	2px;
+	border-bottom-width: 	2px;
+	border-left-width: 	2px;
+	border-right-style: 	solid;
+	border-bottom-style: 	solid;
+	border-left-style: 	solid;
+	border-right-color: 	#394D5A;
+	border-bottom-color: 	#394D5A;
+	border-left-color: 	#394D5A;
+	background-color: 	#ADAEB5;
 }
 
 .actionTitle {
-	font-size: 13px;
-	color: #FFFFFF;
-	font-weight: bold;
-	background-color: #39495A;
-	padding: 2px 0px;
-	margin: 0px;
-	text-transform: uppercase;
-	width: 100%;
-	background-image: url(/images/grey/fond_bandeau02.png);
+	font-size: 		13px;
+	color: 			#FFFFFF;
+	font-weight:		bold;
+	background-color: 	#39495A;
+	padding: 		2px 0px;
+	margin: 		0px;
+	text-transform: 	uppercase;
+	width: 			100%;
+	background-image: 	url(fond_bandeau02.png);
 }
 
 
 .actionLine {
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-	border-bottom-width: 1px;
-	border-bottom-style: solid;
-	border-bottom-color: #848694;
-	font-size: 10px;
-	width: 100%;
-	margin: 0px;
-	font-weight: bold;
-	text-transform: uppercase;
-	border-top-width: 1px;
-	border-top-style: solid;
-	border-top-color: #CED3D6;
+	padding-top: 		0px;
+	padding-right: 		0px;
+	padding-bottom: 	0px;
+	padding-left: 		0px;
+	border-bottom-width: 	1px;
+	border-bottom-style: 	solid;
+	border-bottom-color: 	#848694;
+	font-size: 		10px;
+	width: 			100%;
+	margin: 		0px;
+	font-weight: 		bold;
+	text-transform: 	uppercase;
+	border-top-width: 	1px;
+	border-top-style: 	solid;
+	border-top-color: 	#CED3D6;
 }
 
- .action a {	border: 0px;	font-weight: bold;	text-decoration: none;} 
+ .action a {border: 0px;	font-weight: bold;	text-decoration: none;} 
  .action a:link { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
  .action a:active { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
  .action a:visited { color: #FFFFFF;	border: 0px; font-weight: bold; text-decoration: none;} 
@@ -128,45 +130,45 @@
 /* ------------------------------------------------------------------------- */
 
 .last {
-	width: 180px;
-	padding: 0px;
-	font-size: 10px;
-	font-weight: normal;
-	margin: 0px 0px 15px;
-	background-color: #ADAEB5;
-	border-right: 2px solid #394D5A;
-	border-bottom: 2px solid #394D5A;
-	border-left: 2px solid #394D5A;
+	width: 			180px;
+	padding: 		0px;
+	font-size: 		10px;
+	font-weight: 		normal;
+	margin: 		0px 0px 15px;
+	background-color: 	#ADAEB5;
+	border-right: 		2px solid #394D5A;
+	border-bottom: 		2px solid #394D5A;
+	border-left: 		2px solid #394D5A;
 }
 
 .lastTitle {
-	font-size: 13px;
-	color: #FFFFFF;
-	font-weight: bold;
-	background-color: #39495A;
-	padding: 2px 0px;
-	margin: 0px;
-	text-transform: uppercase;
-	width: 100%;
-	background-image: url(/images/grey/fond_bandeau02.png);
+	font-size: 		13px;
+	color: 			#FFFFFF;
+	font-weight: 		bold;
+	background-color: 	#39495A;
+	padding: 		2px 0px;
+	margin: 		0px;
+	text-transform: 	uppercase;
+	width: 			100%;
+	background-image: 	url(fond_bandeau02.png);
 }
 
 .lastList {
-	list-style-type: none;
-	margin: 0px;
-	width: 100%;
-	padding-top: 0px;
-	padding-right: 0px;
-	padding-bottom: 0px;
-	padding-left: 0px;
-	font-size: 10px;
-	text-transform: uppercase;
-	border-top-width: 1px;
-	border-bottom-width: 1px;
-	border-top-style: solid;
-	border-bottom-style: solid;
-	border-top-color: #CFD0D3;
-	border-bottom-color: #868791;
+	list-style-type: 	none;
+	margin: 		0px;
+	width: 			100%;
+	padding-top: 		0px;
+	padding-right: 		0px;
+	padding-bottom: 	0px;
+	padding-left: 		0px;
+	font-size: 		10px;
+	text-transform: 	uppercase;
+	border-top-width: 	1px;
+	border-bottom-width: 	1px;
+	border-top-style: 	solid;
+	border-bottom-style: 	solid;
+	border-top-color: 	#CFD0D3;
+	border-bottom-color: 	#868791;
 }
 
  .lastList a {	border: 0px;	text-decoration: none;} 
@@ -179,14 +181,14 @@
 /* ------------------------------------------------------------------------- */
 
 .title {
-	font-size: 18px;
-	font-weight: bold;
-	color: #FFCC00;
-	border-bottom-width: 2px;
-	border-bottom-style: dashed;
-	border-bottom-color: #CECFCE;
-	margin-bottom: 16px;
-	text-align: left;
+	font-size: 		18px;
+	font-weight: 		bold;
+	color: 			#FFCC00;
+	border-bottom-width: 	2px;
+	border-bottom-style: 	dashed;
+	border-bottom-color: 	#CECFCE;
+	margin-bottom: 		16px;
+	text-align: 		left;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -198,44 +200,42 @@
 /* ------------------------------------------------------------------------- */
 
 input {
-	font-size: 10px;
-	border: 1px solid #7B9EAD;
+	font-size: 		10px;
+	border: 		1px solid #7B9EAD;
 }
 
 select {
-	font-size: 10px;
-	border: 1px solid #7B9EAD;
+	font-size: 		10px;
+	border: 		1px solid #7B9EAD;
 }
 
 .search {
-	clear: both;
-	font-size: 10px;
-	border: 1px solid #009EC6;
-	height: 100%;
-	width: auto;
-/*	margin-top: 10px;*/
-	margin-bottom: 20px;
-	font-style: italic;
-	color: #7B9EAD;
-/*	background-color: #FFFFFF;*/
+	clear: 			both;
+	font-size: 		10px;
+	border: 		1px solid #009EC6;
+	width: 			auto;
+	margin-bottom: 		20px;
+	font-style: 		italic;
+	color: 			#7B9EAD;
+	background-color: 	#FFFFFF;
 }
 
 .searchLabel {
-	float: left;
-	margin: 0px;
-	padding: 3px;
-/*	background-color: #FF0000;*/
+	float: 			left;
+	margin: 		0px;
+	padding: 		3px;
+/*	background-color: 	#FF0000;*/
 }
 
 .searchButton {
-	float: left;
-	margin: 0px;
-	padding: 3px;
-/*	background-color: #FF0000;*/
+	float: 			left;
+	margin: 		0px;
+	padding: 		3px;
+/*	background-color: 	#FF0000;*/
 }
 
 .searchEnd {
-	clear: both;
+	clear: 			both;
 }
 
 /* ------------------------------------------------------------------------- */
@@ -361,7 +361,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	margin: 0px;
 	text-transform: uppercase;
 	width: 100%;
-	background-image: url(/images/grey/fond_bandeau02.png);
+	background-image: url(fond_bandeau02.png);
 }
 
 .linkList {
@@ -398,21 +398,24 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 	height: 100%;
 	width: auto;
 	margin-top: 0px;
-	font-style: italic;
 	color: #7B9EAD;
 	clear: both;
 }
 
 table.resultTable	 {
-	background-color:	#93919c;
-	color:			#000000;
+	background-color:	#ADAEB5;
+	color:			#333333;
 	width:			100%;
-	border:			0;
+	border-top: 2px solid #CED3D6;
+	border-right: 3px solid #bdc3ce;
+	border-bottom: 3px solid #bdc3ce;
+	border-left: 3px solid #394D5A;
+
 }
 
 .resultIndex {
-	color: #56545C;
-	background-color: #94929C;
+	color: #E2E2E2;
+	background-color: #ADAEB5;
 	width: 100%;
 	text-align: center;
 	padding-top: 4px;
@@ -421,8 +424,15 @@ table.resultTable	 {
 	font-weight: bold;
 	font-family: Arial, Helvetica, sans-serif;
 	vertical-align: middle;
-	border-top: 1px solid black;
-	border-bottom: 1px solid black;
+	border-top: 3px solid #394D5A;
+	border-bottom: 2px solid #848694;
+	border-right-width: 3px;
+	border-left-width: 3px;
+	border-right-style: solid;
+	border-left-style: solid;
+	border-right-color: #bdc3ce;
+	border-left-color: #394D5A;
+
 }
 
 .resultIndexIcon {
@@ -434,9 +444,9 @@ td.resultHead	 {
 	font-family:		sans-serif;
 	font-size:		12px;
 	font-weight:		bold;
-	color:			#ffff00;
+	color:			#394D5A;
 	text-align:		center;
-	background-color:	#93919c;
+	background-color:	#ADAEB5;
 }
 
 td.resultLabel	 {
@@ -472,15 +482,13 @@ table.resultPref	 {
 	border:			3px outset green;
 }
 
-a.resultHead:link	 { color: #ffff00; background-color: transparent;}
-a.resultHead:active	 { color: #ffff00; background-color: transparent;}
-a.resultHead:visited { color: #ffff00; background-color: transparent;}
+a.resultHead:link	 { color: #394D5A; background-color: transparent;}
+a.resultHead:active	 { color: #394D5A; background-color: transparent;}
+a.resultHead:visited { color: #394D5A; background-color: transparent;}
 
-a.resultText:link 	 { color: #0ba589; background-color: transparent;}
-a.resultText:active  { color: #0ba589; background-color: transparent;}
-a.resultText:visited { color: #0ba589; background-color: transparent;}
-
-
+a.resultText:link 	 { color: #336A93; background-color: transparent;}
+a.resultText:active  { color: #316994; background-color: transparent;}
+a.resultText:visited { color: #316994; background-color: transparent;}
 
 /* ------------------------------------------------------------------------- */
 /* admin */
@@ -504,7 +512,7 @@ a.resultText:visited { color: #0ba589; background-color: transparent;}
 
 body 			{
 	font-family: sans-serif;
-	background-image: url(/images/grey/fond_bandeau01.png);
+	background-image: url(fond_bandeau01.png);
 	color:			#000000;
 	border:                 0px;
 	margin:                 0px;
@@ -544,45 +552,100 @@ p			{
 
 /*System Message*/
 .messageOk		{
-        margin-left:		auto;
+	margin-left:		auto;
 	margin-right:		auto;
 	font-family:		sans-serif;
 	font-size:		14px;
-	color:			#47c134;
+	color:			#339933;
 	text-align:		center;
-	background-color:	transparent;	
+	background-color:	#FFFFFF;
+	border-top-width: 	2px;
+	border-right-width: 	2px;
+	border-bottom-width: 	2px;
+	border-left-width: 	2px;
+	border-top-style: 	solid;
+	border-right-style: 	solid;
+	border-bottom-style: 	solid;
+	border-left-style: 	solid;
+	border-top-color: 	#394d5a;
+	border-right-color: 	#bdc3ce;
+	border-bottom-color: 	#bdc3ce;
+	border-left-color: 	#394d5a;
+	background-image: 	url(fond_tablo03.png);
+	font-style: italic;
 }
 
 .messageError		{
-        margin-left:		auto;
+	margin-left:		auto;
 	margin-right:		auto;
 	font-family:		sans-serif;
 	font-size:		14px;
 	color:			#f42742;
 	text-align:		center;
-	background-color:	transparent;	
+	background-color:	#FFFFFF;
+	border-top-width: 2px;
+	border-right-width: 2px;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #394d5a;
+	border-right-color: #bdc3ce;
+	border-bottom-color: #bdc3ce;
+	border-left-color: #394d5a;
+	background-image: url(fond_tablo03.png);
+	font-style: italic;
 }
 
 .messageWarning		{
-        margin-left:		auto;
+	margin-left:		auto;
 	margin-right:		auto;
 	font-family:		sans-serif;
 	font-size:		14px;
-	color:			#ee9b00;
+	color:		#ee9b00;
 	text-align:		center;
-	background-color:	transparent;	
+	background-color:	#FFFFFF;
+	border-top-width: 2px;
+	border-right-width: 2px;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #394d5a;
+	border-right-color: #bdc3ce;
+	border-bottom-color: #bdc3ce;
+	border-left-color: #394d5a;
+	background-image: url(fond_tablo03.png);
+	font-style: italic;
 }
 
 .messageInfo		{
-        margin-left:		auto;
+	margin-left:		auto;
 	margin-right:		auto;
 	font-family:		sans-serif;
 	font-size:		14px;
-	color:			#0052e0;
+	color:			#0066CC;
 	text-align:		center;
-	background-color:	transparent;	
+	background-color:	#FFFFFF;
+	border-top-width: 2px;
+	border-right-width: 2px;
+	border-bottom-width: 2px;
+	border-left-width: 2px;
+	border-top-style: solid;
+	border-right-style: solid;
+	border-bottom-style: solid;
+	border-left-style: solid;
+	border-top-color: #394d5a;
+	border-right-color: #bdc3ce;
+	border-bottom-color: #bdc3ce;
+	border-left-color: #394d5a;
+	background-image: url(fond_tablo03.png);
+	font-style: italic;
 }
-
 
 /* ////////////////GLOBAL MENU/////////////// */
 /* /// Global menu items style definition /// */
@@ -968,7 +1031,7 @@ div.documentBox {
 */
 .header {
 	background-color: #858F9D;
-	background-image: url(/images/grey/fond_bandeau01.png);
+	background-image: url(fond_bandeau01.png);
 	background-position: left top;
 	border-top-width: 1px;
 	border-bottom-width: 1px;
@@ -986,7 +1049,7 @@ div.documentBox {
 
 .logo {
 	float: left;
-	background-image: url(/images/grey/logo.png);
+	background-image: url(logo.png);
 	height: 55px;
 	width: 350px;
 	background-repeat: no-repeat;
@@ -995,7 +1058,7 @@ div.documentBox {
 
 .section {
 	background-color: #3D4C5C;
-	background-image: url(/images/grey/fond_bandeau02.png);
+	background-image: url(fond_bandeau02.png);
 	background-repeat: repeat-x;
 	background-position: top;
 	color: #999999;
@@ -1013,7 +1076,7 @@ div.documentBox {
 	text-align: center;
 	font-size: 11px;
 	background-color: #AEAEB1;
-	background-image: url(/images/grey/fond_bandeau03.png);
+	background-image: url(fond_bandeau03.png);
 	background-repeat: repeat-x;
 	background-position: top;
 	padding-top: 5px;

@@ -322,7 +322,7 @@ function html_contact_consult($co_q) {
     <div class=\"detailHead\">$l_coord</div>
 
     <table class=\"detail\">
-    </tr><tr>
+    <tr>
       <td class=\"detailLabel\">$l_phone</td>
       <td class=\"detailText\">$phone</td>
     </tr><tr>
@@ -401,13 +401,13 @@ function html_deal_links($id) {
   $block = "<div class=\"link\">
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>

@@ -423,7 +423,7 @@ function html_user_form($first_try, $usr_q, $user) {
   // --- HTML Template --------------------------------------------------------
   $block = "
     <form method=\"post\" name=\"form_user\"
-      onSubmit=\"if (check_user(this)) return true; else return false;\"
+      onsubmit=\"if (check_user(this)) return true; else return false;\"
       action=\"" . url_prepare("user_index.php") . "\">
 
     <div class=\"detailHead\">$l_user</div>

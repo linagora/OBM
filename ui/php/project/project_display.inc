@@ -95,7 +95,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
 
   // TaskType select construction
   $type_prec = -1;
-  $sel_tt = "<select name=sel_tt>";
+  $sel_tt = "<select name=\"sel_tt\">";
   $sel_tt .= "<option value=\"$c_all\">$l_all</option>";
   while($tt_q->next_record()) {
     //put menu titles
@@ -145,7 +145,7 @@ function html_project_search_form ($tt_q, $manager_q, $member_q, $project) {
     <form method=\"get\" name=\"f_project\" id=\"f_project\" action=\"" . url_prepare("project_index.php") . "\">
 
     <div class=\"search\">
-      <div class=\"searchLabel\">$l_name<br>
+      <div class=\"searchLabel\">$l_name<br />
         <input type=\"text\" name=\"tf_name\" id=\"tf_name\" size=\"40\" value=\"$name\" />
       </div>
       <div class=\"searchLabel\">$l_company_name<br />
@@ -912,8 +912,10 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q, $
 
     <div class=\"projectCenter\">
     <table $tab_style>
+     <tr>
       $dis_memhead
-      $dis_member
+     </tr>
+     $dis_member
     </table>
     </div>
     ";

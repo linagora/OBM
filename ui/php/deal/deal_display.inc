@@ -523,7 +523,7 @@ function html_deal_links($deal_q, $inv_nb) {
     $plabel = get_parent_label($pid);
     $url_pdeal = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$pid");
     $dis_pdeal = "
-    <li><a href=\"$url_pdeal\"><img src=\"/images/$set_theme/$ico_pdeal\" /></a>
+    <li><a href=\"$url_pdeal\"><img src=\"/images/$set_theme/$ico_pdeal\" alt=\"\" /></a>
         <a href=\"$url_pdeal\">$l_parentdeal ($plabel)</a></li>";
   }
   $url_pdeal_upd = url_prepare("$path/deal/deal_index.php?action=affect&amp;param_parent=$pid&amp;param_deal=$id");
@@ -541,7 +541,7 @@ function html_deal_links($deal_q, $inv_nb) {
     $dis_project_link ="
      <div class=\"linkTitle\">:: $l_project</div>
      <ul class=\"linkList\">
-      <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" /></a>
+      <li><a href=\"$url_project\"><img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
           <a href=\"$url_project\">$l_text_project</a></li>
      </ul>";
   }
@@ -565,35 +565,35 @@ function html_deal_links($deal_q, $inv_nb) {
   <div class=\"linkTitle\">:: $l_parentdeal</div>
   <ul class=\"linkList\">
     $dis_pdeal
-    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_deal\" /></a>
+    <li><a href=\"$url_pdeal_upd\"><img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
         <a href=\"$url_pdeal_upd\">$l_affect_deal</a></li>
   </ul>
   $dis_project_link
   <div class=\"linkTitle\">:: $l_header_contract</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" /></a>
+    <li><a href=\"$url_contract\"><img src=\"/images/$set_theme/$ico_contract\" alt=\"\" /></a>
         <a href=\"$url_contract\">$l_header_contract ($contract_nb)</a></li>
-    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract_new\" /></a>
+    <li><a href=\"$url_contract_new\"><img src=\"/images/$set_theme/$ico_contract_new\" alt=\"\" /></a>
         <a href=\"$url_contract_new\">$l_contract_new</a></li>
   </ul>
   <div class=\"linkTitle\">:: $l_header_invoice</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv\">$l_header_invoice ($inv_nb)</a></li>
-    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" /></a>
+    <li><a href=\"$url_inv\"><img src=\"/images/$set_theme/$ico_invoice\" alt=\"\" /></a>
         <a href=\"$url_inv\">$l_archived_invoices ($nb_inv_arch)</a></li>
-    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice_new\" /></a>
+    <li><a href=\"$url_inv_new\"><img src=\"/images/$set_theme/$ico_invoice_new\" alt=\"\" /></a>
         <a href=\"$url_inv_new\">$l_invoice_new</a></li>
   </ul>
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
-    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" /></a>
+    <li><a href=\"$url_doc\"><img src=\"/images/$set_theme/$ico_document\" alt=\"\" /></a>
         <a href=\"$url_doc\">$l_header_document ($nb_document)</a></li>
-    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+    <li><a href=\"$url_doc_new\"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
         <a href=\"$url_doc_new\">$l_document_new</a></li>
 	<li><a href=\"\" 
 	 onclick=\"window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;
-	 \"><img src=\"/images/$set_theme/$ico_document_new\" /></a>
+	 \"><img src=\"/images/$set_theme/$ico_document_new\" alt=\"\" /></a>
 	<a href=\"\" onclick=\"window.name='$l_deal'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>

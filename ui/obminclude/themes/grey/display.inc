@@ -4,7 +4,7 @@
 //     - Desc : Standard global display File                                 //
 // 2003-09-18 Bastien Continsouzas                                           //
 ///////////////////////////////////////////////////////////////////////////////
-// $Id
+// $Id:
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -54,26 +54,33 @@ function display_page(&$display) {
  
   if ($right_panel) {
     echo "
-    <!-- right panel -->  <div class=\"rightpanel\">
+    <!-- right panel -->
+    <div class=\"rightpanel\">
      ". $display["detailInfo"] . "<p /> 
      ". $display["features"] ."
-    <!-- right panel end --> </div>
+    </div>
+    <!-- right panel end --> 
 
-    <!-- center zone --> <div class=\"middlepanel\">";
+    <!-- center zone --> 
+    <div class=\"middlepanel\">";
   }
-
-  echo
+  
+  echo 
     $display["msg"] .
     $display["title"] .
     $display["search"] .
     $display["result"] .
     $display["detail"] . "
     
-    <!-- center zone end --> </div>
-  ";
-
+    <!-- center zone end -->
+    </div>
+    ";
+  
+  if ($right_panel)
+    echo "</div>";
+  
   echo
-    $display["end"];
+  $display["end"];
 
 }
 
@@ -91,6 +98,7 @@ function display_head($p_module) {
    <!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"
     \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">
    <html xmlns=\"http://www.w3.org/1999/xhtml\"> ";
+
   $headers_et = "<html>";
 
   return "
@@ -163,54 +171,6 @@ function generate_menu($menu, $section) {
 
     ";
 
-//   $block = "
-// <table cellpadding=\"0\" cellspacing=\"0\" class=\"global\">
-// <tr>
-// <!-- Logo OBM -->
-//   <td class=\"globalLogo\">
-//     <img src=\"/images/$set_theme/logo_obm.png\" alt=\"\" />
-//   </td>
-
-// <!-- Tableau partie droite du bandeau (Login, Onglets, menus) -->
-
-//   <td class=\"globalHeader\">
-//     <table cellpadding=\"0\" cellspacing=\"0\" class=\"header\">
-//     <tr>
-//     <!-- zone Login -->
-
-//       <td class=\"header\">
-//         <img class=\"header\" src=\"/images/$set_theme/login.gif\" alt=\"\" />
-//         Login&nbsp;: $login&nbsp;&nbsp;
-//         <img class=\"header\" src=\"/images/$set_theme/profil.gif\" alt=\"\" />
-//         Profil&nbsp;: $profil&nbsp;
-//         <img class=\"header\" src=\"/images/$set_theme/logout.gif\" alt=\"\" />
-//         <a class=\"header\" href=\"$path/obm.php?action=logout\">Logout</a>
-//       </td>
-//       <td class=\"headerRight\">OBM v.  &nbsp;
-//         Société Aliacom
-//       </td>
-//       <td>&nbsp;</td>
-//     <!-- Fin zone Login -->
-//     </tr><tr>
-
-//     <!-- zone Onglets -->
-//       <td colspan=\"2\">" . $display["section"] ."
-//       </td>
-//     <!-- Fin zone Onglets -->
-
-//     </tr><tr>
-//     <!-- zone Menu -->
-//       <td colspan=\"2\" class=\"headerMenu\">" . $display["menu"] ."
-//       </td>
-//     <!-- Fin zone Menu -->
-//     </tr>
-//     </table>
-//   </td>
-// </tr>
-// </table>
-// <p>
-// </p>" . $display["action"];
-
   return $block;
 }
 
@@ -237,13 +197,6 @@ function display_menu_bar($section, $menu) {
      <div class=\"actionTitle\">&nbsp;:: Action</div>
     ";
 
-//   $ret = "
-//   <table cellpadding=\"0\" cellspacing=\"0\" class=\"menuBar\">
-//    <tr>
-//     <td><img class=\"menuBarIconG\" src=\"/images/$set_theme/barre_g.gif\" alt=\"\" /></td>
-//     <td class=\"menuBarLabel\">$dico$name</td>
-//     <td class=\"menuBarText\">";
-
    if (is_array($actions[$menu])) {
      foreach ($actions[$menu] as $key => $value){
        if (in_array("all",$value["Condition"])
@@ -263,7 +216,6 @@ function display_menu_bar($section, $menu) {
                 <a href=\"".$value["Url"]."\"> 
                    ".$value["Name"]."</a></div> 
                 ";
-//                <a class=\"menuBar\" href=\"".$value["Url"]."\">".$value["Name"]."</a> &nbsp;";
            }
          }
        }
@@ -273,13 +225,6 @@ function display_menu_bar($section, $menu) {
    $block .= "
      </div>
      ";
-
-//    $ret .= "
-//     </td>
-//     <td><img class=\"menuBarIconD\" src=\"/images/$set_theme/barre_d.gif\" alt=\"\" /></td>
-//   </tr>
-//   </table>
-// ";
 
    return $block;
 }
@@ -302,11 +247,6 @@ function display_menus($section) {
     $ftext = true;
   else $ftext = false;
 
-//   $block = "
-//     <table cellpadding=\"0\" cellspacing=\"0\"  class=\"menus\">
-//       <tr>
-//     ";
-
   if (is_array($menus[$section])) {
     foreach ($menus[$section] as $key => $value) {
       if (($key != "Name" && $key != "Url" && $key != "Right") 
@@ -325,21 +265,9 @@ function display_menus($section) {
 	}
 
 	$block .= "$dis_ico $dis_text";
-
-//         $block .= "
-//           <td>&nbsp;&nbsp;</td>
-//           <td class=\"menusLabel\">&nbsp; $dis_ico $dis_text
-//           </td>
-//         ";
       }
     }
   }
-
-//   $block .= "
-//           <td>&nbsp;&nbsp;&nbsp;&nbsp;</td>
-//           <td class=\"menusText\"></td>
-//         </tr>  
-//       </table>";
 
   return $block;
 }
@@ -354,10 +282,6 @@ function display_sections($section) {
   global $menus, $auth, $perm;
   global $perm_admin;
 
-//   $ret = "
-//         <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
-//         <tr>
-//           ";
   foreach ($menus as $key => $value) {
     if (($perm->permissions[$auth->auth["perm"]] & $value["Right"]) == $value["Right"]) {
       if ($key == $section) {
@@ -367,20 +291,6 @@ function display_sections($section) {
       }
     }
   }
-//   $ret .= "
-//         <!-- Remplissage apres tabs -->
-// 	  <td class=\"sectionsfilling\">
-//           <table cellpadding=\"0\" cellspacing=\"0\" class=\"sectionsfilling\">
-//           <tr>
-//             <td></td>
-// 	  </tr><tr>
-//             <td class=\"sectionsLine\"></td>  
-//           </tr>	 
-//           </table>
-//         </td>
-//       </tr>
-//       </table>
-// ";
 
   return $block;
 }
@@ -397,22 +307,8 @@ function display_active_tab($tab) {
   $block = "
     <font color=\"#FFCF00\">".$tab["Name"]."</font>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" />
+    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
     &nbsp;&nbsp;&nbsp;&nbsp;";
-
-//   $block = "
-//     <table cellpadding=\"0\" cellspacing=\"0\" class=\"sections\">
-//       <tr>
-//         <td><img src=\"/images/$set_theme/tab_actif_hg.gif\" alt=\"\" /></td>
-//         <td><img src=\"/images/$set_theme/tab_actif_h.gif\" alt=\"\" /></td>
-//         <td><img src=\"/images/$set_theme/tab_actif_hd.gif\" alt=\"\" /></td>
-//       </tr><tr>
-//         <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_g.gif\" alt=\"\" /></td>  
-//         <td class=\"sectionsActifLabel\">".$tab["Name"]."</td>
-//         <td><img class=\"sections\" src=\"/images/$set_theme/tab_actif_d.gif\" alt=\"\" /></td>  
-//       </tr>	 
-//     </table>	 
-// ";
 
   return $block;
 }
@@ -429,24 +325,8 @@ function display_inactive_tab($tab) {
   $block = "
     <a class=\"sections\" href=\"".$tab["Url"]."\">".$tab["Name"]."</a>
     &nbsp;&nbsp;&nbsp;&nbsp;
-    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" />
+    <img src=\"/images/$set_theme/barre_verti.png\" width=\"2\" height=\"14\" alt=\"\" />
     &nbsp;&nbsp;&nbsp;&nbsp;";
-
-//   $block = "
-//     <table cellpadding=\"0\" cellspacing=\"0\"  class=\"sections\">
-//       <tr>
-//         <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hg.gif\" alt=\"\" /></td>
-//         <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_h.gif\" alt=\"\" /></td>
-//         <td><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_hd.gif\" alt=\"\" /></td>
-//       </tr><tr>
-//         <td rowspan=\"2\"><img src=\"/images/$set_theme/tab_inactif_g.gif\" alt=\"\" /></td>
-//         <td class=\"sectionsInactifLabel\"><a class=\"sections\" href=\"".$tab["Url"]."\">".$tab["Name"]."</a></td>
-//         <td rowspan=\"2\"><img class=\"sections\" src=\"/images/$set_theme/tab_inactif_d.gif\" alt=\"\" /></td>
-//       </tr><tr>
-//         <td class=\"sectionsLine\"></td>
-//       </tr>  
-//     </table>
-// ";
 
   return $block;
 }

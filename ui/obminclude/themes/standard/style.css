@@ -36,7 +36,7 @@
 .detailpanel {
 	position: absolute;
 	left: 196px;
-	right: 0px;
+/*	right: 0px;*/
 	width: auto;
 /*	border: 1px solid #000000;*/
 	padding: 0px;
@@ -276,7 +276,7 @@ a.detail:visited 	{ color: #000000; background-color: transparent;}
 .result {
 	float: left;
 	font-size: 10px;
-	background-color: #FF0000;
+/*	background-color: #FF0000;*/
 	height: 100%;
 	width: auto;
 	margin-top: 0px;
