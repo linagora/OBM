@@ -754,23 +754,38 @@ function run_query_project($time) {
 
 ///////////////////////////////////////////////////////////////////////////////
 // Timemanager: ProjectTask select query execution                           //
-// Returns : DB object result with project satisfying criteria
+// Returns : DB object result with project satisfying criteria               //
+// This function does return the task_label, and, in case a parenttask_label //
+//   exists, it returns "parenttask_label --- task_label".                   //
+//  Used for update and insert task form                                     //
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_projecttask($time) {
   global $cdg_sql;
 
   $uid = $time["user_id"];
 
+  $obm_q= new DB_OBM;
+  $db_type = $obm_q->type;
+	// array of the sql concataneted strings
+	$a_concat[]=array("type"=>"field", "value"=>"b.projecttask_label");
+  $a_concat[]=array("type"=>"string", "value"=>" --- ");
+  $a_concat[]=array("type"=>"field", "value"=>"a.projecttask_label");
+  $concat = sql_string_concat($db_type, $a_concat);
+  display_debug_msg($concat, $cdg_sql, "run_query_projecttask : $db_type concat : ");
+  $sql_if = sql_if($db_type, "a.projecttask_parenttask_id = 0", "a.projecttask_label", $concat);
+
   $query = "
     select
-      projecttask_id,
-      projecttask_label,
-      projecttask_project_id
-    from ProjectTask, ProjectUser
-    where projectuser_projecttask_id = projecttask_id
+      a.projecttask_id,
+      $sql_if as projecttask_label,
+      a.projecttask_project_id
+    from ProjectTask a left join ProjectTask b 
+       on a.projecttask_parenttask_id = b.projecttask_id,
+       ProjectUser
+    where projectuser_projecttask_id = a.projecttask_id
       and projectuser_user_id = $uid
       and projectuser_projectedtime != 0
-      order by projecttask_project_id, projecttask_label";
+      order by a.projecttask_project_id, a.projecttask_label";
 
   display_debug_msg($query, $cdg_sql, "run_query_projecttask");
   $obm_q= new DB_OBM;
