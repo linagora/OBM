@@ -29,7 +29,7 @@
 
 $path = "..";
 $section = "ADMIN";
-$menu = "IMPORT";
+$module = "import";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
@@ -75,7 +75,7 @@ if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $import = get_param_import();
 get_import_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 $field_size = get_import_field_size();
 
 require("import_js.inc");
@@ -84,7 +84,7 @@ require("import_js.inc");
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
-  $display["header"] = generate_menu($menu, $section); // Menu
+  $display["header"] = generate_menu($module, $section); // Menu
 }
 
 
@@ -615,7 +615,7 @@ function get_import_action() {
   global $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["IMPORT"]["index"] = array (
+  $actions["import"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/import/import_index.php?action=index",
     'Right'    => $cright_read_admin,
@@ -623,21 +623,21 @@ function get_import_action() {
                                     );
 
 // Search
-  $actions["IMPORT"]["search"] = array (
+  $actions["import"]["search"] = array (
     'Url'      => "$path/import/import_index.php?action=search",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('None') 
                                       );
 
 // New
-  $actions["IMPORT"]["new"] = array (
+  $actions["import"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/import/import_index.php?action=new",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('','search','index','detailconsult','admin','display') 
                                   );
 // Detail Consult
-  $actions["IMPORT"]["detailconsult"] = array (
+  $actions["import"]["detailconsult"] = array (
      'Name'     => $l_header_consult,
      'Url'      => "$path/import/import_index.php?action=detailconsult&amp;param_import=".$import["id"]."",
     'Right'    => $cright_read_admin,
@@ -645,7 +645,7 @@ function get_import_action() {
                                       );
 
 // Detail Update
-  $actions["IMPORT"]["detailupdate"] = array (
+  $actions["import"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/import/import_index.php?action=detailupdate&amp;param_import=".$import["id"]."",
      'Right'    => $cright_write_admin,
@@ -653,21 +653,21 @@ function get_import_action() {
                                            );
 
 // Insert
-  $actions["IMPORT"]["insert"] = array (
+  $actions["import"]["insert"] = array (
     'Url'      => "$path/import/import_index.php?action=insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
 // Update
-  $actions["IMPORT"]["update"] = array (
+  $actions["import"]["update"] = array (
     'Url'      => "$path/import/import_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
 // Check Delete
-  $actions["IMPORT"]["check_delete"] = array (
+  $actions["import"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/import/import_index.php?action=check_delete&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
@@ -675,28 +675,28 @@ function get_import_action() {
                                            );
 
 // Delete
-  $actions["IMPORT"]["delete"] = array (
+  $actions["import"]["delete"] = array (
     'Url'      => "$path/import/import_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                       );
 
 // Sample File
-  $actions["IMPORT"]["file_sample"] = array (
+  $actions["import"]["file_sample"] = array (
     'Url'      => "$path/import/import_index.php?action=file_sample&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
 
 // Test File
-  $actions["IMPORT"]["file_test"] = array (
+  $actions["import"]["file_test"] = array (
     'Url'      => "$path/import/import_index.php?action=file_test&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 
                                       );
 
 // Import File
-  $actions["IMPORT"]["file_import"] = array (
+  $actions["import"]["file_import"] = array (
     'Url'      => "$path/import/import_index.php?action=file_import&amp;param_import=".$import["id"]."",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('detailconsult') 

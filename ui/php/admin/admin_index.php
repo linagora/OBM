@@ -13,7 +13,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "ADMIN";
-$menu = "ADMIN";
+$module = "admin";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 
@@ -39,9 +39,9 @@ switch ($mode) {
    include("$obminclude/global_pref.inc");
    if ($action == "") $action = "index";
    get_admin_action();
-   $perm->check_permissions($menu, $action);
-   $display["head"] = display_head("Admin");
-   $display["header"] = generate_menu($menu, $section);
+   $perm->check_permissions($module, $action);
+   $display["head"] = display_head("$module");
+   $display["header"] = generate_menu($module, $section);
    echo $display["head"] . $display["header"];
    break;
 }
@@ -141,33 +141,33 @@ function get_admin_action() {
   global $cright_read_admin, $cright_write_admin;
 
   // Index 
-  $actions["ADMIN"]["index"] = array (
+  $actions["admin"]["index"] = array (
     'Name'     => $l_header_index,   
     'Url'      => "$path/admin/admin_index.php?action=index&amp;mode=html",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('all') 
                                      );
   // data_show 
-  $actions["ADMIN"]["data_show"] = array (
+  $actions["admin"]["data_show"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_show&amp;mode=html",
     'Right'    => $cright_read_admin,
     'Condition'=> array ('None') 
                                      );
   // Data Update 
-  $actions["ADMIN"]["data_update"] = array (
+  $actions["admin"]["data_update"] = array (
     'Url'      => "$path/admin/admin_index.php?action=data_update&amp;mode=html",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
   // Help
-  $actions["ADMIN"]["help"] = array (
+  $actions["admin"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin/admin_index.php?action=help&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     );
   // Clear Session
-  $actions["ADMIN"]["clear_sess"] = array (
+  $actions["admin"]["clear_sess"] = array (
      'Name'     => $l_header_clear_sess,
      'Url'      => "$path/admin/admin_index.php?action=clear_sess&amp;mode=html",
      'Right'    => $cright_write_admin,

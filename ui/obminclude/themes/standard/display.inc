@@ -114,10 +114,10 @@ function display_head($p_module) {
 ///////////////////////////////////////////////////////////////////////////////
 // Function which perform the menu
 // Parametres:
-//   - $tab  : active tab 
-//   - $menu : menu selected
+//   - $tab    : active tab 
+//   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
-function generate_menu($menu, $section) {
+function generate_menu($module, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $popup_width, $popup_height;
   global $auth, $obminclude, $display; 
@@ -129,7 +129,7 @@ function generate_menu($menu, $section) {
 
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section);
-  $display["action"] = display_menu_bar($section, $menu);
+  $display["action"] = display_menu_bar($section, $module);
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
@@ -210,18 +210,18 @@ function display_menus($section) {
     $block .= "<ul class='menu'>\n";
 
     foreach ($menus[$section] as $module => $value) {
-      $menu_name = $value["Name"];
+      $module_name = $value["Name"];
       $module_right = $perm->get_module_rights($module); 
       if (($module_right & $value["Right"]) == $value["Right"]) {
         $block .= "<li>";
 	if ($fico) {
 	  $ico = $value["Ico"];
 	  if ($ico) {
-	    $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$menu_name' /></a> ";
+	    $block .= "<a href='".$value["Url"]."' class='ico'><img src='/images/".$set_theme."/".$ico."' alt='$module_name' /></a> ";
 	  }
 	}
 	$block .= "<a href='".$value["Url"]."'>";
-	if ($ftext) $block .= $menu_name;
+	if ($ftext) $block .= $module_name;
         $block .= "</a></li>\n";
       }
     }
@@ -233,17 +233,17 @@ function display_menus($section) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display : Returns the action display block of the selected module         //
+// Display : Returns the action display block of the selected module
 // Parameters:
 //   - $section : selected section
-//   - $menu    : selected menu (module)
+//   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_menu_bar($section, $menu) {
+function display_menu_bar($section, $module) {
   global $set_theme, $menus, $action, $popup_height;
   global $actions, $popup_width, $perm;
 
-  $name = $menus[$section][$menu]["Name"];
-  $ico = $menus[$section][$menu]["Ico"];
+  $name = $menus[$section][$module]["Name"];
+  $ico = $menus[$section][$module]["Ico"];
   if ($ico != "")
     $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else
@@ -256,10 +256,10 @@ function display_menu_bar($section, $menu) {
     <td class=\"menuBarLabel\">$dico$name</td>
     <td class=\"menuBarText\">";
 
-  if (is_array($actions[$menu])) {
-    $module_right = $perm->get_module_rights($menu); 
+  if (is_array($actions[$module])) {
+    $module_right = $perm->get_module_rights($module); 
     
-    foreach ($actions[$menu] as $key => $value) {
+    foreach ($actions[$module] as $key => $value) {
 
       // If the current action has this action in target
       if (in_array("all", $value["Condition"])

@@ -20,7 +20,7 @@ $obmdb_password = "obm";
 $cgp_host = "http://obm/";
 
 // Use specific site includes
-$cgp_site_include = true;
+//$cgp_site_include = true;
 
 // Use Database sessions
 //$cgp_sess_db = true;

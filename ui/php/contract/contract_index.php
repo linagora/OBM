@@ -33,7 +33,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "PROD";
-$menu="CONTRACT";
+$module = "contract";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -48,9 +48,9 @@ $uid = $auth->auth["uid"];
 if ($action == "") $action = "index";
 $contract = get_param_contract();
 get_contract_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
-if (! check_privacy($menu, "Contract", $action, $contract["id"], $uid)) {
+if (! check_privacy($module, "Contract", $action, $contract["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -63,7 +63,7 @@ page_close();
 // Main Program                                                              //
 ///////////////////////////////////////////////////////////////////////////////
 if (! $popup) {
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -306,7 +306,7 @@ if ($action == "ext_get_id") {
 ///////////////////////////////////////////////////////////////////////////////
 update_contract_action_url();
 if (! $popup) {
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 
 $display["head"] = display_head($l_contract);
@@ -408,14 +408,14 @@ function get_contract_action() {
 
 
 // Ext Get Id
-  $actions["CONTRACT"]["ext_get_id"] = array (
+  $actions["contract"]["ext_get_id"] = array (
     'Url'      => "$path/contract/contract_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
-
                                     	);
+
 // Index
-  $actions["CONTRACT"]["index"] = array (
+  $actions["contract"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contract/contract_index.php?action=index",
     'Right'    => $cright_read,
@@ -423,14 +423,14 @@ function get_contract_action() {
                                     	);
 
 // Search
-  $actions["CONTRACT"]["search"] = array (
+  $actions["contract"]["search"] = array (
     'Url'      => "$path/contract/contract_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	);
 
 // New
-  $actions["CONTRACT"]["new"] = array (
+  $actions["contract"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_select_company)."&amp;ext_url=".urlencode("$path/contract/contract_index.php?action=new&amp;param_company=")."",
     'Right'    => $cright_write,
@@ -439,14 +439,14 @@ function get_contract_action() {
                                       );
 
 // Insert
-  $actions["CONTRACT"]["insert"] = array (
+  $actions["contract"]["insert"] = array (
     'Url'      => "$path/contract/contract_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                     	);
 
 // Detail Consult
-  $actions["CONTRACT"]["detailconsult"] = array (
+  $actions["contract"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/contract/contract_index.php?action=detailconsult&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_read, 
@@ -455,7 +455,7 @@ function get_contract_action() {
                                     	);
 
 // Detail Update
-  $actions["CONTRACT"]["detailupdate"] = array (
+  $actions["contract"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
@@ -464,7 +464,7 @@ function get_contract_action() {
                                      	 );
 
 // Update
-  $actions["CONTRACT"]["update"] = array (
+  $actions["contract"]["update"] = array (
     'Url'      => "$path/contract/contract_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -472,7 +472,7 @@ function get_contract_action() {
                                     	);
 
 // Check Delete
-  $actions["CONTRACT"]["check_delete"] = array (
+  $actions["contract"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
@@ -481,7 +481,7 @@ function get_contract_action() {
                                      	 );
 
 // Delete
-  $actions["CONTRACT"]["delete"] = array (
+  $actions["contract"]["delete"] = array (
     'Url'      => "$path/contract/contract_index.php?action=delete&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -489,7 +489,7 @@ function get_contract_action() {
                                      	 );
 
 // Document add
-  $actions["CONTRACT"]["document_add"] = array (
+  $actions["contract"]["document_add"] = array (
     'Url'      => "$path/contract/contract_index.php?action=document_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -497,7 +497,7 @@ function get_contract_action() {
   					);
   
 // Contract export
-  $actions["CONTRACT"]["export"] = array (
+  $actions["contract"]["export"] = array (
     'Name'     => $l_header_export,
     'Url'      => "$path/contract/contract_index.php?action=export&amp;popup=1&amp;param_contract=".$contract["id"]."",
     'Right'    => $cright_read,
@@ -506,7 +506,7 @@ function get_contract_action() {
                                        );
 
 // Admin
-  $actions["CONTRACT"]["admin"] = array (
+  $actions["contract"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contract/contract_index.php?action=admin",
     'Right'    => $cright_read_admin, 
@@ -514,89 +514,89 @@ function get_contract_action() {
                                       	);
 
 // Admin Priority Insert
-  $actions["CONTRACT"]["priority_insert"] = array (
+  $actions["contract"]["priority_insert"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Priority Update
-  $actions["CONTRACT"]["priority_update"] = array (
+  $actions["contract"]["priority_update"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type Priority link
-  $actions["CONTRACT"]["priority_checklink"] = array (
+  $actions["contract"]["priority_checklink"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Priority Delete
-  $actions["CONTRACT"]["priority_delete"] = array (
+  $actions["contract"]["priority_delete"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Status insert
-  $actions["CONTRACT"]["status_insert"] = array (
+  $actions["contract"]["status_insert"] = array (
     'Url'      => "$path/incident/contract_index.php?action=status_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Status update
-  $actions["CONTRACT"]["status_update"] = array (
+  $actions["contract"]["status_update"] = array (
     'Url'      => "$path/incident/contract_index.php?action=status_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Status Check Link
-  $actions["CONTRACT"]["status_checklink"] = array (
+  $actions["contract"]["status_checklink"] = array (
     'Url'      => "$path/incident/contract_index.php?action=status_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Status delete
-  $actions["CONTRACT"]["status_delete"] = array (
+  $actions["contract"]["status_delete"] = array (
     'Url'      => "$path/incident/contract_index.php?action=status_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Admin Type Insert
-  $actions["CONTRACT"]["type_insert"] = array (
+  $actions["contract"]["type_insert"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type Update
-  $actions["CONTRACT"]["type_update"] = array (
+  $actions["contract"]["type_update"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type check link
-  $actions["CONTRACT"]["type_checklink"] = array (
+  $actions["contract"]["type_checklink"] = array (
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Admin Type Delete
-  $actions["CONTRACT"]["type_delete"] = array (
+  $actions["contract"]["type_delete"] = array (
     'Url'      => "$path/contract/contract_index.php?action=type_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                     	);
 
 // Display
-  $actions["CONTRACT"]["display"] = array (
+  $actions["contract"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contract/contract_index.php?action=display",
     'Right'    => $cright_read,
@@ -604,14 +604,14 @@ function get_contract_action() {
                                       	  );
 
 // Display Préférence
-  $actions["CONTRACT"]["dispref_display"] = array (
+  $actions["contract"]["dispref_display"] = array (
     'Url'      => "$path/contract/contract_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         	  );
 
 // Display Level
-  $actions["CONTRACT"]["dispref_level"] = array (
+  $actions["contract"]["dispref_level"] = array (
     'Url'      => "$path/contract/contract_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
@@ -628,10 +628,10 @@ function update_contract_action_url() {
 
   // Detail Update
                
-  $actions["CONTRACT"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."";
+  $actions["contract"]["detailupdate"]['Url'] = "$path/contract/contract_index.php?action=detailupdate&amp;param_contract=".$contract["id"]."";
 
   // Check Delete
-  $actions["CONTRACT"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."";
+  $actions["contract"]["check_delete"]['Url'] = "$path/contract/contract_index.php?action=check_delete&amp;param_contract=".$contract["id"]."";
 
 }
 

@@ -217,8 +217,8 @@ the_index.php file must define :
   <td>$section</td>
   <td>Id of the section (COM, PROD,...), module name capitalized</td>
 </tr><tr>
-  <td>$menu</td>
-  <td>Id of the module (USER, CONTACT,...), module name capitalized</td>
+  <td>$module</td>
+  <td>Id of the module (user, contact,...), module name</td>
 </tr><tr>
   <td>$obminclude</td>
   <td>get from the ENV var : $OBM_INCLUDE_VAR or default to "obminclude"</td>
@@ -233,7 +233,7 @@ Here is a correct module_index.php variable definition :
 <pre>
 $path = "..";
 $section = "COM";
-$menu = "COMPANY";
+$module = "company";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 </pre>
@@ -280,7 +280,7 @@ Here is a correct module_index.php includes bloc :
 <tr><td>
 <pre>
 $path = "..";
-$menu = "COMPANY";
+$module = "company";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -306,7 +306,7 @@ Parameters are retrieved and stored in the module hash, actions are defined and 
 if ($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 </pre>
 </td></tr>
 </table>

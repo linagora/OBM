@@ -16,7 +16,7 @@
 function dis_menu_stats() {
   global $path, $set_theme;
   global $set_theme, $action;
-  global $actions,$menu, $perm;
+  global $actions, $module, $perm;
   global $l_statistic;
 
   $ret = "
@@ -26,9 +26,9 @@ function dis_menu_stats() {
   <ul class=\"lastList\">";
 
 
-  if (is_array($actions[$menu])) {
-    $module_right = $perm->get_module_rights($menu); 
-    foreach ($actions[$menu] as $key => $value) {
+  if (is_array($actions[$module])) {
+    $module_right = $perm->get_module_rights($module); 
+    foreach ($actions[$module] as $key => $value) {
       if (in_array("content", $value["Condition"])) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {
 	    $ret .= "

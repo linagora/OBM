@@ -18,7 +18,7 @@
 $debug = 0;
 $path = "..";
 $section = "ADMIN";
-$menu = "ADMIN_DATA";
+$module = "admin_data";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -58,9 +58,9 @@ switch ($mode) {
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
    get_admin_data_action();
-   $perm->check_permissions($menu, $action);
+   $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Data");
-   $display["header"] = generate_menu($menu, $section);
+   $display["header"] = generate_menu($module, $section);
    echo $display["head"] . $display["header"];
    break;
 }
@@ -182,33 +182,33 @@ function get_admin_data_action() {
   global $cright_read_admin, $cright_write_admin;
 
   // index
-  $actions["ADMIN_DATA"]["index"] = array (
+  $actions["admin_data"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_data/admin_data_index.php?action=index&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all')
                                     	  );
 
- $actions["ADMIN_DATA"]["help"] = array (
+ $actions["admin_data"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_data/admin_data_index.php?action=help&amp;mode=html",
      'Right' 	=> $cright_read_admin,
      'Condition'=> array ('all')
                                     	);
 
- $actions["ADMIN_DATA"]["data_show"] = array (
+ $actions["admin_data"]["data_show"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=data_show&amp;mode=html",
      'Right' 	=> $cright_read_admin,
      'Condition'=> array ('None')
                                     	);
 
- $actions["ADMIN_DATA"]["data_update"] = array (
+ $actions["admin_data"]["data_update"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=data_update&amp;mode=html",
      'Right' 	=> $cright_write_admin,
      'Condition'=> array ('None')
                                     	);
 
- $actions["ADMIN_DATA"]["sound_aka_update"] = array (
+ $actions["admin_data"]["sound_aka_update"] = array (
      'Url'      => "$path/admin_data/admin_data_index.php?action=sound_search_update&amp;mode=html",
      'Right' 	=> $cright_write_admin,
      'Condition'=> array ('None')

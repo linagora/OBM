@@ -8,11 +8,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
-///////////////////////////////////////////////////////////////////////////////
-// Session Management                                                        //
-///////////////////////////////////////////////////////////////////////////////
 $section = "USER";
-$menu = "SETTINGS";
+$module = "settings";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude="obminclude";
 include("$obminclude/global.inc");
@@ -135,12 +132,12 @@ if ($set_csv_sep == $ccsvd_tab) $csvd_tab = "checked";
 
 if ($action == "") $action = "index";
 get_settings_actions();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-$display["header"] = generate_menu($menu, $section);
+$display["header"] = generate_menu($module, $section);
 
 // Todo Order select
 if ($set_todo == $cts_pri) { $todo_pri = "selected=\"selected\" "; }
@@ -166,7 +163,7 @@ $sel_dsrc .= "</select>";
 ///////////////////////////////////////////////////////////////////////////////
 // Debug block (admin only)
 ///////////////////////////////////////////////////////////////////////////////
-//if ($perm->check_right($menu, $cright_write_admin)) {
+//if ($perm->check_right($module, $cright_write_admin)) {
 
   $dis_debug = "
   <tr>
@@ -370,7 +367,7 @@ display_page($display);
 function get_settings_actions() {
   global $actions, $cright_read;
 
-  $actions["SETTINGS"]["index"] = array (
+  $actions["settings"]["index"] = array (
     'Url'      => "$path/settings/settings_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

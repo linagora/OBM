@@ -13,7 +13,7 @@
 
 $path = "..";
 $section = "PROD";
-$menu = "DOCUMENT";
+$module = "document";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 $extra_css = "document.css";
 if ($obminclude == "") $obminclude = "obminclude";
@@ -26,8 +26,8 @@ require("document_display.inc");
 if ($action == "") $action = "index";
 $document = get_param_document();
 get_document_action();
-$perm->check_permissions($menu, $action);
-if (! check_privacy($menu, "Document", $action, $document["id"], $uid)) {
+$perm->check_permissions($module, $action);
+if (! check_privacy($module, "Document", $action, $document["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -358,7 +358,7 @@ if ($document["id"] > 0) {
 
 $display["head"] = display_head($l_document);
 if (! $document["popup"]) {
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 $display["end"] = display_end();
 
@@ -436,7 +436,7 @@ function get_document_action() {
 
 
 // Index  
-  $actions["DOCUMENT"]["index"] = array (
+  $actions["document"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/document/document_index.php?action=index",
     'Right'    => $cright_read,
@@ -444,7 +444,7 @@ function get_document_action() {
                                     	 );
 
 // Tree view
-  $actions["DOCUMENT"]["tree"]  = array (
+  $actions["document"]["tree"]  = array (
     'Name'     => $l_header_tree,
     'Url'      => "$path/document/document_index.php?action=tree",
     'Right'    => $cright_read,
@@ -452,14 +452,14 @@ function get_document_action() {
                                      		 );
 
 // Search
-  $actions["DOCUMENT"]["search"] = array (
+  $actions["document"]["search"] = array (
     'Url'      => "$path/document/document_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // New
-  $actions["DOCUMENT"]["new"] = array (
+  $actions["document"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/document/document_index.php?action=new",
     'Right'    => $cright_write,
@@ -467,7 +467,7 @@ function get_document_action() {
                                      );
 
 // New Repository
-  $actions["DOCUMENT"]["new_repository"] = array (
+  $actions["document"]["new_repository"] = array (
     'Name'     => $l_header_new_repository,
     'Url'      => "$path/document/document_index.php?action=new_repository",
     'Right'    => $cright_write,
@@ -476,7 +476,7 @@ function get_document_action() {
                                      );
 
 // Detail Consult
-  $actions["DOCUMENT"]["detailconsult"]  = array (
+  $actions["document"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/document/document_index.php?action=detailconsult&amp;param_document=".$document["id"]."",
     'Right'    => $cright_read,
@@ -485,7 +485,7 @@ function get_document_action() {
                                      		 );
 
 // Access Document
-  $actions["DOCUMENT"]["accessfile"]  = array (
+  $actions["document"]["accessfile"]  = array (
     'Url'      => "$path/document/document_index.php?action=accessfile&amp;param_document=".$document["id"]."",
     'Right'    => $cright_read,
     'Privacy'  => true,
@@ -493,7 +493,7 @@ function get_document_action() {
                                      		 );
 
 // Detail Update
-  $actions["DOCUMENT"]["detailupdate"] = array (
+  $actions["document"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/document/document_index.php?action=detailupdate&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
@@ -501,7 +501,7 @@ function get_document_action() {
     'Condition'=> array ('detailconsult', 'update') 
                                      	      );
 // Update
-  $actions["DOCUMENT"]["update"] = array (
+  $actions["document"]["update"] = array (
     'Url'      => "$path/document/document_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -509,7 +509,7 @@ function get_document_action() {
                                      	      );
 
 // CheckDelete
-  $actions["DOCUMENT"]["check_delete"] = array (
+  $actions["document"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/document/document_index.php?action=check_delete&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
@@ -518,7 +518,7 @@ function get_document_action() {
                                      	      );
 
 // Delete
-  $actions["DOCUMENT"]["delete"] = array (
+  $actions["document"]["delete"] = array (
     'Url'      => "$path/document/document_index.php?action=delete",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -526,7 +526,7 @@ function get_document_action() {
                                      	      );
 
 // Folder Check Delete
-  $actions["DOCUMENT"]["folder_check_delete"] = array (
+  $actions["document"]["folder_check_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=folder_check_delete&amp;param_document=".$document["id"]."",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -534,20 +534,20 @@ function get_document_action() {
                                      	      );
 
 // Insert
-  $actions["DOCUMENT"]["insert"] = array (
+  $actions["document"]["insert"] = array (
     'Url'      => "$path/document/document_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  
 
 // Repository Insert
-  $actions["DOCUMENT"]["insert_repository"] = array (
+  $actions["document"]["insert_repository"] = array (
     'Url'      => "$path/document/document_index.php?action=insert_repository",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );  
 // Admin
-  $actions["DOCUMENT"]["admin"] = array (
+  $actions["document"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/document/document_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -555,90 +555,90 @@ function get_document_action() {
    					);
 
 // Category Insert
-  $actions["DOCUMENT"]["cat1_insert"] = array (
+  $actions["document"]["cat1_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["DOCUMENT"]["cat1_update"] = array (
+  $actions["document"]["cat1_update"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["DOCUMENT"]["cat1_checklink"] = array (
+  $actions["document"]["cat1_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["DOCUMENT"]["cat1_delete"] = array (
+  $actions["document"]["cat1_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=cat1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["DOCUMENT"]["cat2_insert"] = array (
+  $actions["document"]["cat2_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["DOCUMENT"]["cat2_update"] = array (
+  $actions["document"]["cat2_update"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["DOCUMENT"]["cat2_checklink"] = array (
+  $actions["document"]["cat2_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["DOCUMENT"]["cat2_delete"] = array (
+  $actions["document"]["cat2_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=cat2_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Mime Insert
-  $actions["DOCUMENT"]["mime_insert"] = array (
+  $actions["document"]["mime_insert"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Mime Update
-  $actions["DOCUMENT"]["mime_update"] = array (
+  $actions["document"]["mime_update"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Mime Check Link
-  $actions["DOCUMENT"]["mime_checklink"] = array (
+  $actions["document"]["mime_checklink"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Mime Delete
-  $actions["DOCUMENT"]["mime_delete"] = array (
+  $actions["document"]["mime_delete"] = array (
     'Url'      => "$path/document/document_index.php?action=mime_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
   // Display
-  $actions["DOCUMENT"]["display"] = array (
+  $actions["document"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/document/document_index.php?action=display",
     'Right'    => $cright_read,
@@ -646,28 +646,28 @@ function get_document_action() {
                                       	 );
 
 // Display Preferences
-  $actions["DOCUMENT"]["dispref_display"] = array (
+  $actions["document"]["dispref_display"] = array (
     'Url'      => "$path/document/document_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
-  $actions["DOCUMENT"]["dispref_level"]  = array (
+  $actions["document"]["dispref_level"]  = array (
     'Url'      => "$path/document/document_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // External path view
-  $actions["DOCUMENT"]["ext_get_path"]  = array (
+  $actions["document"]["ext_get_path"]  = array (
     'Url'      => "$path/document/document_index.php?action=ext_get_path",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // External view
-  $actions["DOCUMENT"]["ext_get_ids"]  = array (
+  $actions["document"]["ext_get_ids"]  = array (
     'Url'      => "$path/document/document_index.php?action=ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

@@ -19,7 +19,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu = "TODO";
+$module = "todo";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -36,7 +36,7 @@ $uid = $auth->auth["uid"];
 
 $todo = get_param_todo();
 get_todo_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 
 if ($action == "index" || $action == "") {
@@ -162,7 +162,7 @@ if (in_array($action, array("add", "detailupdate", "delete", "delete_unique")))
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 if (($action != "update") or (!($popup)))
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 $display["head"] = display_head($l_todo);
 $display["end"] = display_end();
      
@@ -205,7 +205,7 @@ function get_todo_action() {
   global $l_header_admin, $l_header_display;
 
 // Index
-  $actions["TODO"]["index"] = array (
+  $actions["todo"]["index"] = array (
     'Name'     => $l_header_todo_list,
     'Url'      => "$path/todo/todo_index.php?action=index",
     'Right'    => $cright_read,
@@ -213,28 +213,28 @@ function get_todo_action() {
                                     	 );
 
 // Search
-  $actions["TODO"]["detailconsult"] = array (
+  $actions["todo"]["detailconsult"] = array (
     'Url'      => "$path/todo/todo_index.php?action=add",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // Add a todo
-  $actions["TODO"]["add"] = array (
+  $actions["todo"]["add"] = array (
     'Url'      => "$path/todo/todo_index.php?action=add",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // Delete a list of todo
-  $actions["TODO"]["delete"] = array (
+  $actions["todo"]["delete"] = array (
     'Url'      => "$path/todo/todo_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      );
 
 // Update
-  $actions["TODO"]["update"]  = array (
+  $actions["todo"]["update"]  = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/todo/todo_index.php?action=update&amp;param_todo=". $todo["id"],
     'Right'    => $cright_write,
@@ -242,14 +242,14 @@ function get_todo_action() {
                                       );
 
 // Update
-  $actions["TODO"]["detailupdate"]  = array (
+  $actions["todo"]["detailupdate"]  = array (
     'Url'      => "$path/todo/todo_index.php?action=detailupdate&amp;param_todo=". $todo["id"],
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
 // Delete a todo
-  $actions["TODO"]["delete_unique"] = array (
+  $actions["todo"]["delete_unique"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/todo/todo_index.php?action=delete_unique&amp;param_todo=". $todo["id"],
     'Right'    => $cright_write,
@@ -258,7 +258,7 @@ function get_todo_action() {
                                      );
 
 // Display
-   $actions["TODO"]["display"] = array (
+   $actions["todo"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/todo/todo_index.php?action=display",
      'Right'    => $cright_read,
@@ -266,14 +266,14 @@ function get_todo_action() {
                                        	 );
 
 // Display Préférences
-   $actions["TODO"]["dispref_display"] = array (
+   $actions["todo"]["dispref_display"] = array (
     'Url'      => "$path/todo/todo_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
-   $actions["TODO"]["dispref_level"]  = array (
+   $actions["todo"]["dispref_level"]  = array (
     'Url'      => "$path/todo/todo_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

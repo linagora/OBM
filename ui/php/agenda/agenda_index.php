@@ -40,7 +40,7 @@ $www = "   <p class=\"messageInfo\">
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu = "AGENDA";
+$module = "agenda";
 $extra_css = "calendar.css";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -60,7 +60,7 @@ $sel_user_id = $agenda_user_view;
 if ($action == "") $action = "index";
 $agenda = get_param_agenda();
 get_agenda_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -468,7 +468,7 @@ if (count($sel_user_id) != 0 ) {
   $agenda_user_view = $sel_user_id;
 }
 $display["head"] = display_head($l_agenda);
-$display["header"] = generate_menu($menu,$section);      
+$display["header"] = generate_menu($module,$section);      
 $display["end"] = display_end();
 
 display_page($display);
@@ -596,27 +596,27 @@ function get_agenda_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
   // Index
-  $actions["AGENDA"]["index"] = array (
+  $actions["agenda"]["index"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
   );
   
   // Decision
-  $actions["AGENDA"]["decision"] = array (
+  $actions["agenda"]["decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=decision",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                          );
 
   // Decision
-  $actions["AGENDA"]["calendar"] = array (
+  $actions["agenda"]["calendar"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=calendar",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                          );
   // New   
-  $actions["AGENDA"]["new"] = array (
+  $actions["agenda"]["new"] = array (
     'Name'     => $l_header_new_event,
     'Url'      => "$path/agenda/agenda_index.php?action=new",
     'Right'    => $cright_write,
@@ -628,7 +628,7 @@ function get_agenda_action() {
 		
 //Detail Update
 
-  $actions["AGENDA"]["detailconsult"] = array (
+  $actions["agenda"]["detailconsult"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/agenda/agenda_index.php?action=detailconsult&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $cright_read,
@@ -638,7 +638,7 @@ function get_agenda_action() {
 		
 //Detail Update
 
-  $actions["AGENDA"]["detailupdate"] = array (
+  $actions["agenda"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/agenda/agenda_index.php?action=detailupdate&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $cright_write,
@@ -647,7 +647,7 @@ function get_agenda_action() {
 
 //Check Delete
 
-  $actions["AGENDA"]["check_delete"] = array (
+  $actions["agenda"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/agenda/agenda_index.php?action=check_delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $cright_write_admin,
@@ -656,7 +656,7 @@ function get_agenda_action() {
 
 
 //Delete
-  $actions["AGENDA"]["delete"] = array (
+  $actions["agenda"]["delete"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."&amp;param_date=$param_date",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
@@ -665,7 +665,7 @@ function get_agenda_action() {
 						 
 //Insert
 
-  $actions["AGENDA"]["insert"] = array (
+  $actions["agenda"]["insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
@@ -674,7 +674,7 @@ function get_agenda_action() {
 
 //View Year
 
-  $actions["AGENDA"]["view_year"] = array (
+  $actions["agenda"]["view_year"] = array (
     'Name'     => $l_header_year,
     'Url'      => "$path/agenda/agenda_index.php?action=view_year",
     'Right'    => $cright_read,  
@@ -683,7 +683,7 @@ function get_agenda_action() {
 
 //View Month
 
-  $actions["AGENDA"]["view_month"] = array (
+  $actions["agenda"]["view_month"] = array (
     'Name'     => $l_header_month,
     'Url'      => "$path/agenda/agenda_index.php?action=view_month",
     'Right'    => $cright_read,  
@@ -692,7 +692,7 @@ function get_agenda_action() {
 
 //View Week
 
-  $actions["AGENDA"]["view_week"] = array (
+  $actions["agenda"]["view_week"] = array (
     'Name'     => $l_header_week,
     'Url'      => "$path/agenda/agenda_index.php?action=view_week",
     'Right'    => $cright_read, 
@@ -701,7 +701,7 @@ function get_agenda_action() {
 
 //View Day
 
-  $actions["AGENDA"]["view_day"] = array (
+  $actions["agenda"]["view_day"] = array (
     'Name'     => $l_header_day,
     'Url'      => "$path/agenda/agenda_index.php?action=view_day",
     'Right'    => $cright_read, 
@@ -710,7 +710,7 @@ function get_agenda_action() {
 
 //Update
 
-  $actions["AGENDA"]["update"] = array (
+  $actions["agenda"]["update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
@@ -718,14 +718,14 @@ function get_agenda_action() {
 					 
 //Update
 
-  $actions["AGENDA"]["update_decision"] = array (
+  $actions["agenda"]["update_decision"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
 					 
 //Meeting managment.					 
-  $actions["AGENDA"]["new_meeting"] = array (
+  $actions["agenda"]["new_meeting"] = array (
     'Name'     => $l_header_meeting,
     'Url'      => "$path/agenda/agenda_index.php?action=new_meeting",
     'Right'    => $cright_write,
@@ -733,14 +733,14 @@ function get_agenda_action() {
                                          );
 
 //Meeting managment.					 
-  $actions["AGENDA"]["perform_meeting"] = array (
+  $actions["agenda"]["perform_meeting"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=perform_meeting",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
 
   // Right admin.					 
-  $actions["AGENDA"]["rights_admin"] = array (
+  $actions["agenda"]["rights_admin"] = array (
     'Name'     => $l_header_right,
     'Url'      => "$path/agenda/agenda_index.php?action=rights_admin",
     'Right'    => $cright_write,
@@ -748,14 +748,14 @@ function get_agenda_action() {
                                          );
 
   // Update Right
-  $actions["AGENDA"]["rights_update"] = array (
+  $actions["agenda"]["rights_update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=rights_update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                          );
 
 // Admin
-  $actions["AGENDA"]["admin"] = array (
+  $actions["agenda"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/agenda/agenda_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -763,35 +763,35 @@ function get_agenda_action() {
                                        );
 				       
 // Kind Insert
-  $actions["AGENDA"]["category_insert"] = array (
+  $actions["agenda"]["category_insert"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
-  $actions["AGENDA"]["category_update"] = array (
+  $actions["agenda"]["category_update"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
-  $actions["AGENDA"]["category_checklink"] = array (
+  $actions["agenda"]["category_checklink"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
-  $actions["AGENDA"]["category_delete"] = array (
+  $actions["agenda"]["category_delete"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=category_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 					       
 // Export
-  $actions["AGENDA"]["export"] = array (
+  $actions["agenda"]["export"] = array (
     'Name'     => $l_header_export,
     'Url'      => "$path/agenda/agenda_index.php?action=export&amp;popup=1",
     'Right'    => $cright_read,

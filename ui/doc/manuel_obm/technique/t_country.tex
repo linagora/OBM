@@ -37,13 +37,13 @@ Une api très simple (1 fonction définie dans global.inc) est disponible :\\
 \shadowbox{
 \begin{minipage}{13cm}
 \begin{verbatim}
-function check_privacy($menu, $table, $action, $id, $p_uid="") {
+function check_privacy($module, $table, $action, $id, $p_uid="") {
 \end{verbatim}
 \end{minipage}
 }
 \begin{itemize}
- \item \textbf{\$menu} : menu (module) à vérifier.\\
-Exemple : ``CONTACT'', mais \$menu peut être utilisé. Indispensable pour récupérer l'information dans le tableau global \$actions
+ \item \textbf{\$module} : menu (module) à vérifier.\\
+Exemple : ``CONTACT'', mais \$module peut être utilisé. Indispensable pour récupérer l'information dans le tableau global \$actions
  \item \textbf{\$table} : table ou entité à vérifier.\\
 Exemple : ``Contact''... Attention ce n'est pas toujours le module (ex: ParenDeal dans module deal). L'entité (pour nom des colonnes) est tiré de cette chaîne (lowercase)
  \item \textbf{\$action} : Action à vérifier
@@ -75,7 +75,7 @@ Pour cette raison et pour éviter la répétition de ce test dans un module, le tes
 
 Test pour le module \contact :
 \begin{verbatim}
-if (! check_privacy($menu, "Contact", $action, $contact["id"], $uid)) {
+if (! check_privacy($module, "Contact", $action, $contact["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {

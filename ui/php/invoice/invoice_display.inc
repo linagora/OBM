@@ -284,7 +284,7 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
   global $col_frs, $col_client;
   global $l_found, $l_deal;
   global $l_label, $l_number, $l_amount_ht, $l_amount_ttc, $l_date, $l_status;
-  global $display, $perm, $menu, $cright_write_admin;
+  global $display;
 
   $label = urlencode($invoice["label"]);
   $number = urlencode($invoice["number"]);
@@ -365,7 +365,6 @@ function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
   global $display, $set_theme;
   global $l_delete, $l_invoice_infos;
   global $l_list_payment, $l_no_payment, $l_payments_todel;
-  global $perm, $menu, $cright_write_admin;
 
   $i_id = $inv_q->f('invoice_id');
 

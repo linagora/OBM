@@ -26,7 +26,7 @@
 
 $path = "..";
 $section = "PROD";
-$menu = "INCIDENT";
+$module = "incident";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -44,7 +44,7 @@ page_close();
 if($action == "") $action = "index";
 $incident = get_param_incident();
 get_incident_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program
@@ -264,7 +264,7 @@ if ($action == "index" || $action == "") {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_incident);
-$display["header"] = generate_menu($menu,$section);
+$display["header"] = generate_menu($module,$section);
 $display["end"] = display_end();
 display_page($display);
 
@@ -337,7 +337,7 @@ function get_incident_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 //  Index
-  $actions["INCIDENT"]["index"] = array (
+  $actions["incident"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/incident/incident_index.php?action=index",
     'Right'    => $cright_read,
@@ -345,14 +345,14 @@ function get_incident_action() {
                                 	);
 
 //  Search
-  $actions["INCIDENT"]["search"] = array (
+  $actions["incident"]["search"] = array (
     'Url'      => "$path/incident/incident_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                 	);
 
 //  New
-  $actions["INCIDENT"]["new"] = array (
+  $actions["incident"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/incident/incident_index.php?action=new",
     'Right'    => $cright_write,
@@ -360,7 +360,7 @@ function get_incident_action() {
                     		       );
 
 //  Detail Consult
-  $actions["INCIDENT"]["detailconsult"] = array (
+  $actions["incident"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/incident/incident_index.php?action=detailconsult&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_read,
@@ -368,7 +368,7 @@ function get_incident_action() {
                                 	       );
 
 //  Detail Update
-  $actions["INCIDENT"]["detailupdate"] = array (
+  $actions["incident"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/incident/incident_index.php?action=detailupdate&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_write,
@@ -376,28 +376,28 @@ function get_incident_action() {
                                      	        );
 
 //  Insert
-  $actions["INCIDENT"]["insert"] = array (
+  $actions["incident"]["insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 //  Update
-  $actions["INCIDENT"]["update"] = array (
+  $actions["incident"]["update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 //  Delete
-  $actions["INCIDENT"]["delete"] = array (
+  $actions["incident"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/incident/incident_index.php?action=delete&amp;param_incident=".$incident["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('detailconsult') 
                                      	 );
 //  Admin
-  $actions["INCIDENT"]["admin"] = array (
+  $actions["incident"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/incident/incident_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -405,91 +405,91 @@ function get_incident_action() {
                                        );
 
 //  Priority insert
-  $actions["INCIDENT"]["priority_insert"] = array (
+  $actions["incident"]["priority_insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=priority_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Priority update
-  $actions["INCIDENT"]["priority_update"] = array (
+  $actions["incident"]["priority_update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=priority_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Priority Check Link
-  $actions["INCIDENT"]["priority_checklink"] = array (
+  $actions["incident"]["priority_checklink"] = array (
     'Url'      => "$path/incident/incident_index.php?action=priority_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Priority delete
-  $actions["INCIDENT"]["priority_delete"] = array (
+  $actions["incident"]["priority_delete"] = array (
     'Url'      => "$path/incident/incident_index.php?action=priority_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Status insert
-  $actions["INCIDENT"]["status_insert"] = array (
+  $actions["incident"]["status_insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=status_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Status update
-  $actions["INCIDENT"]["status_update"] = array (
+  $actions["incident"]["status_update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=status_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Status Check Link
-  $actions["INCIDENT"]["status_checklink"] = array (
+  $actions["incident"]["status_checklink"] = array (
     'Url'      => "$path/incident/incident_index.php?action=status_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Status delete
-  $actions["INCIDENT"]["status_delete"] = array (
+  $actions["incident"]["status_delete"] = array (
     'Url'      => "$path/incident/incident_index.php?action=status_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Cat1 insert
-  $actions["INCIDENT"]["cat1_insert"] = array (
+  $actions["incident"]["cat1_insert"] = array (
     'Url'      => "$path/incident/incident_index.php?action=cat1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Cat1 update
-  $actions["INCIDENT"]["cat1_update"] = array (
+  $actions["incident"]["cat1_update"] = array (
     'Url'      => "$path/incident/incident_index.php?action=cat1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Cat1 Check Link
-  $actions["INCIDENT"]["cat1_checklink"] = array (
+  $actions["incident"]["cat1_checklink"] = array (
     'Url'      => "$path/incident/incident_index.php?action=cat1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Cat1 delete
-  $actions["INCIDENT"]["cat1_delete"] = array (
+  $actions["incident"]["cat1_delete"] = array (
     'Url'      => "$path/incident/incident_index.php?action=cat1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 //  Display
-  $actions["INCIDENT"]["display"] = array (
+  $actions["incident"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/incident/incident_index.php?action=display",
      'Right'    => $cright_read,
@@ -497,14 +497,14 @@ function get_incident_action() {
                                       	   );
 
 //  Display Préférence
-  $actions["INCIDENT"]["dispref_display"] = array (
+  $actions["incident"]["dispref_display"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_display",
      'Right'    => $cright_read,
      'Condition'=> array ('None') 
                                       	   );
 
 //  Display level
-  $actions["INCIDENT"]["dispref_level"] = array (
+  $actions["incident"]["dispref_level"] = array (
      'Url'      => "$path/incident/incident_index.php?action=dispref_level",
      'Right'    => $cright_read,
      'Condition'=> array ('None') 

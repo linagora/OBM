@@ -25,7 +25,7 @@
 
 $path = "..";
 $section = "USER";
-$menu = "USER";
+$module = "user";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -39,7 +39,7 @@ require("user_js.inc");
 if ($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 $uid = $auth->auth["uid"];
 
 update_last_visit("user", $param_user, $action);
@@ -210,7 +210,7 @@ if ($action == "ext_get_ids") {
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_user);
 if (! $obm_user["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
+  $display["header"] = generate_menu($module,$section);
 }
 $display["end"] = display_end();
 
@@ -285,7 +285,7 @@ function get_user_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["USER"]["index"] = array (
+  $actions["user"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/user/user_index.php?action=index",
     'Right'    => $cright_read,
@@ -293,7 +293,7 @@ function get_user_action() {
                                     );
 
 // Get Ids
-  $actions["USER"]["ext_get_ids"] = array (
+  $actions["user"]["ext_get_ids"] = array (
     'Url'      => "$path/user/user_index.php?action=ext_get_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('none'),
@@ -301,7 +301,7 @@ function get_user_action() {
                                     );
 
 // New
-  $actions["USER"]["new"] = array (
+  $actions["user"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/user/user_index.php?action=new",
     'Right'    => $cright_write_admin,
@@ -309,20 +309,20 @@ function get_user_action() {
                                   );
 
 // Search
-  $actions["USER"]["search"] = array (
+  $actions["user"]["search"] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   );
   
 // Get user id from external window (js)
-  $actions["USER"]["getsearch"] = array (
+  $actions["user"]["getsearch"] = array (
     'Url'      => "$path/user/user_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                   );
 // Detail Consult
-  $actions["USER"]["detailconsult"] = array (
+  $actions["user"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/user/user_index.php?action=detailconsult&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_read,
@@ -330,7 +330,7 @@ function get_user_action() {
                                   );
 
 // Detail Update
-  $actions["USER"]["detailupdate"] = array (
+  $actions["user"]["detailupdate"] = array (
      'Name'     => $l_header_update,
      'Url'      => "$path/user/user_index.php?action=detailupdate&amp;param_user=".$obm_user["id"]."",
      'Right'    => $cright_write_admin,
@@ -338,21 +338,21 @@ function get_user_action() {
                                      	   );
 
 // Insert
-  $actions["USER"]["insert"] = array (
+  $actions["user"]["insert"] = array (
     'Url'      => "$path/user/user_index.php?action=insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Update
-  $actions["USER"]["update"] = array (
+  $actions["user"]["update"] = array (
     'Url'      => "$path/user/user_index.php?action=update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Group Consult
-  $actions["USER"]["group_consult"] = array (
+  $actions["user"]["group_consult"] = array (
     'Name'     => $l_header_upd_group,
     'Url'      => "$path/user/user_index.php?action=group_consult&amp;param_user=".$obm_user["id"],
     'Right'    => $cright_read,
@@ -360,14 +360,14 @@ function get_user_action() {
                                      );
 
 // Group Update
-  $actions["USER"]["group_update"] = array (
+  $actions["user"]["group_update"] = array (
     'Url'      => "$path/user/user_index.php?action=group_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Reset
-  $actions["USER"]["reset"] = array (
+  $actions["user"]["reset"] = array (
     'Name'     => $l_header_reset,
     'Url'      => "$path/user/user_index.php?action=reset&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_write_admin,
@@ -375,7 +375,7 @@ function get_user_action() {
                                     );
 
 // Check Delete
-  $actions["USER"]["check_delete"] = array (
+  $actions["user"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/user/user_index.php?action=check_delete&amp;param_user=".$obm_user["id"]."",
     'Right'    => $cright_write_admin,
@@ -383,14 +383,14 @@ function get_user_action() {
                                      	   );
 
 // Delete
-  $actions["USER"]["delete"] = array (
+  $actions["user"]["delete"] = array (
     'Url'      => "$path/user/user_index.php?action=delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      );
 
 // Admin
-  $actions["USER"]["admin"] = array (
+  $actions["user"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/user/user_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -398,7 +398,7 @@ function get_user_action() {
                                     );
 
 // Dispay
-  $actions["USER"]["display"] = array (
+  $actions["user"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/user/user_index.php?action=display",
     'Right'    => $cright_read,
@@ -406,13 +406,13 @@ function get_user_action() {
                                       	 );
 
 // Dispay
-  $actions["USER"]["dispref_display"] = array (
+  $actions["user"]["dispref_display"] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	 );
 // Dispay
-  $actions["USER"]["dispref_level"] = array (
+  $actions["user"]["dispref_level"] = array (
     'Url'      => "$path/user/user_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

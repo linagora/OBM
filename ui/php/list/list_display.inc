@@ -489,7 +489,7 @@ function dis_list_consult($list) {
 function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $l_list, $l_name, $l_subject, $l_email, $l_query, $l_static;
   global $l_visibility, $l_public, $l_private,$l_no,$l_yes;
-  global $display, $perm, $menu, $cright_write, $ctu_sql_limit, $cdg_sql;
+  global $display, $perm, $module, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
   global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
@@ -609,7 +609,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
     $dis_infos->display_entity = "list_contact";
     $dis_infos->data_header = "both";
 
-    if ($perm->check_right($menu, $cright_write)) {
+    if ($perm->check_right($module, $cright_write)) {
       $dis_infos->data_cb_text = "X";
       $dis_infos->data_idfield = "contact_id";
       $dis_infos->data_cb_name = "cb_con";
@@ -619,7 +619,7 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     $block .= $dis_infos->display("dis_data_list");
 
-    if ($perm->check_right($menu, $cright_write)) {
+    if ($perm->check_right($module, $cright_write)) {
       $block .= "
       <p class=\"detailButton\">
         <p class=\"detailButtons\">

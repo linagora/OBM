@@ -16,7 +16,7 @@
 
 $path = "..";
 $section = "ADMIN";
-$menu = "ADMIN_PREF";
+$module = "admin_pref";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
@@ -46,9 +46,9 @@ switch ($mode) {
    include("$obminclude/global_pref.inc"); 
    if ($action == "") $action = "index";
    get_admin_pref_action();
-   $perm->check_permissions($menu, $action);
+   $perm->check_permissions($module, $action);
    $display["head"] = display_head("Admin_Pref");
-   $display["header"] = generate_menu($menu, $section);
+   $display["header"] = generate_menu($module, $section);
    echo $display["head"] . $display["header"];
    break;
  default:
@@ -211,28 +211,28 @@ function get_admin_pref_action() {
   global $cright_read_admin, $cright_write_admin;
 
   // index : lauch forms
-  $actions["ADMIN_PREF"]["index"] = array (
+  $actions["admin_pref"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=index&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     	 );
   // help
-  $actions["ADMIN_PREF"]["help"] = array (
+  $actions["admin_pref"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=help&amp;mode=html",
      'Right' 	=> $cright_read_admin,
      'Condition'=> array ('all') 
                                     	);
   // user_pref_update : update (set to default) all users prefs
-  $actions["ADMIN_PREF"]["user_pref_update"] = array (
+  $actions["admin_pref"]["user_pref_update"] = array (
      'Name'     => $l_header_pref_update,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update&amp;mode=html",
      'Right' 	=> $cright_write_admin,
      'Condition'=> array ('index') 
                                     	);
   // user_pref_update_one : update (set to default) one pref for all users
-  $actions["ADMIN_PREF"]["user_pref_update_one"] = array (
+  $actions["admin_pref"]["user_pref_update_one"] = array (
      'Name'     => $l_header_pref_update,
      'Url'      => "$path/admin_pref/admin_pref_index.php?action=user_pref_update_one&amp;mode=html",
      'Right' 	=> $cright_write_admin,

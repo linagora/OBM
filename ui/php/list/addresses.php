@@ -12,13 +12,13 @@
    A class fmtXXX must be written for each physical output format  */
 
 // light OBM environment (no menu in the exported files)
-global $perm, $menu;
-$menu="LIST";
+global $perm, $module;
+$module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 require("$obminclude/global.inc");
 
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 page_close(); //?usefull?
 
 include("$obminclude/global_pref.inc");

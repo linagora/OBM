@@ -1348,9 +1348,9 @@ function html_subscription_list_result($sub_q,$nb_subscription) {
   global $l_yes,$l_no, $l_timecreate, $l_timeupdate,$l_publication_title;
   global $l_year, $l_renewal,$l_recept,$l_quantity,$l_lang;
   global $path, $auth, $popup_height, $popup_width;
-  global $cright_write, $menu, $perm;
+  global $cright_write, $module, $perm;
 
-  if ($perm->check_right($menu, $cright_write)) {  
+  if ($perm->check_right($module, $cright_write)) {  
     $has_write_right = true;
     $display_write .= "<td class=\"resultHead\"></td>
     <td class=\"resultHead\"></td>";

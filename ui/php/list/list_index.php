@@ -37,7 +37,7 @@ $clist_mode_expert = "expert";
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu = "LIST";
+$module = "list";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
@@ -50,8 +50,8 @@ if ($action == "") $action = "index";
 $uid = $auth->auth["uid"];
 $list = get_param_list();
 get_list_action();
-$perm->check_permissions($menu, $action);
-if (! check_privacy($menu, "List", $action, $list["id"], $uid)) {
+$perm->check_permissions($module, $action);
+if (! check_privacy($module, "List", $action, $list["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -257,7 +257,7 @@ update_list_action_url();
 $display["head"] = display_head($l_list);
 $display["end"] = display_end();
 if (! $popup) {
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 
 display_page($display);
@@ -394,7 +394,7 @@ function get_param_list() {
 
 
 //////////////////////////////////////////////////////////////////////////////
-// LIST actions
+// list actions
 //////////////////////////////////////////////////////////////////////////////
 function get_list_action() {
   global $list, $actions, $path;
@@ -405,7 +405,7 @@ function get_list_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["LIST"]["index"] = array (
+  $actions["list"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/list/list_index.php?action=index",
     'Right'    => $cright_read,
@@ -413,14 +413,14 @@ function get_list_action() {
                                     );
 
 // Search
-  $actions["LIST"]["search"] = array (
+  $actions["list"]["search"] = array (
     'Url'      => "$path/list/list_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       );
 
 // New
-  $actions["LIST"]["new"] = array (
+  $actions["list"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/list/list_index.php?action=new",
     'Right'    => $cright_write,
@@ -428,14 +428,14 @@ function get_list_action() {
                                   );
 
 // New
-  $actions["LIST"]["new_criterion"] = array (
+  $actions["list"]["new_criterion"] = array (
     'Url'      => "$path/list/list_index.php?action=new_criterion",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                   );				  
 
   // Detail Consult
-  $actions["LIST"]["detailconsult"] = array (
+  $actions["list"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"]."",
     'Right'    => $cright_read,
@@ -444,7 +444,7 @@ function get_list_action() {
                                       );
 
 // Detail Update
-  $actions["LIST"]["detailupdate"] = array (
+  $actions["list"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
@@ -453,14 +453,14 @@ function get_list_action() {
                                            );
 
 // Insert
-  $actions["LIST"]["insert"] = array (
+  $actions["list"]["insert"] = array (
     'Url'      => "$path/list/list_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                       );
 
 // Update
-  $actions["LIST"]["update"] = array (
+  $actions["list"]["update"] = array (
     'Url'      => "$path/list/list_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -468,7 +468,7 @@ function get_list_action() {
                                       );
 
 // Check Delete
-  $actions["LIST"]["check_delete"] = array (
+  $actions["list"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"]."",
     'Right'    => $cright_write,
@@ -477,7 +477,7 @@ function get_list_action() {
                                            );
 
 // Delete
-  $actions["LIST"]["delete"] = array (
+  $actions["list"]["delete"] = array (
     'Url'      => "$path/list/list_index.php?action=delete",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -485,7 +485,7 @@ function get_list_action() {
                                       );
 
 // Sel list contacts : Contacts selection
-  $actions["LIST"]["sel_list_contact"] = array (
+  $actions["list"]["sel_list_contact"] = array (
     'Name'     => $l_header_add_contact,
     'Url'      => "$path/contact/contact_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_contact)."&amp;ext_action=contact_add&amp;ext_url=".urlencode($path."/list/list_index.php")."&amp;ext_id=".$list["id"]."&amp;ext_target=$l_list",
     'Right'    => $cright_write,
@@ -495,14 +495,14 @@ function get_list_action() {
                                           );
 
 // Contact ADD
-  $actions["LIST"]["contact_add"] = array (
+  $actions["list"]["contact_add"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_add",
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                           );
 // Contact Del
-  $actions["LIST"]["contact_del"] = array (
+  $actions["list"]["contact_del"] = array (
     'Url'      => "$path/list/list_index.php?action=contact_del",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -510,7 +510,7 @@ function get_list_action() {
                                           );
 
 // Export ADD
-  $actions["LIST"]["export_add"] = array (
+  $actions["list"]["export_add"] = array (
     'Name'     => $l_header_export,
     'Url'      => "$path/list/list_index.php?action=export_add&amp;cb_list".$list["id"]."=".$list["id"]."",
     'Right'    => $cright_write,
@@ -518,7 +518,7 @@ function get_list_action() {
                                      	 );
 
 // Export
-  $actions["LIST"]["export"] = array (
+  $actions["list"]["export"] = array (
     'Name'     => $l_header_global_export,
     'Url'      => "$path/list/list_index.php?action=ext_get_ids&amp;popup=1&amp;title=".urlencode($l_select_list)."&amp;ext_action=export_add&amp;ext_target=$l_list&amp;ext_url=".urlencode("$path/list/list_index.php"),
     'Right'    => $cright_write,
@@ -528,7 +528,7 @@ function get_list_action() {
                                      	 );
 
 // Display
-  $actions["LIST"]["display"] = array (
+  $actions["list"]["display"] = array (
    'Name'     => $l_header_display,
    'Url'      => "$path/list/list_index.php?action=display",
    'Right'    => $cright_read,
@@ -536,21 +536,21 @@ function get_list_action() {
                                       );
 
 // Display Préférence
-  $actions["LIST"]["dispref_display"] = array (
+  $actions["list"]["dispref_display"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_display",
    'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                                );
 
 // Display level
-  $actions["LIST"]["dispref_level"] = array (
+  $actions["list"]["dispref_level"] = array (
    'Url'      => "$path/list/list_index.php?action=dispref_level",
    'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                             );
 
 // Company Select 
-  $actions["LIST"]["ext_get_id"]  = array (
+  $actions["list"]["ext_get_id"]  = array (
     'Url'      => "$path/list/list_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
@@ -567,16 +567,16 @@ function update_list_action_url() {
 
   if ($list["id"] > 0) {
     // Detail Consult
-    $actions["LIST"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"];
-    $actions["LIST"]["detailconsult"]['Condition'] = array ('detailupdate', 'insert');
+    $actions["list"]["detailconsult"]['Url'] = "$path/list/list_index.php?action=detailconsult&amp;param_list=".$list["id"];
+    $actions["list"]["detailconsult"]['Condition'] = array ('detailupdate', 'insert');
 
     // Detail Update
-    $actions["LIST"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"];
-    $actions["LIST"]["detailupdate"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+    $actions["list"]["detailupdate"]['Url'] = "$path/list/list_index.php?action=detailupdate&amp;param_list=".$list["id"];
+    $actions["list"]["detailupdate"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
 
     // Check Delete
-    $actions["LIST"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"];
-    $actions["LIST"]["check_delete"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
+    $actions["list"]["check_delete"]['Url'] = "$path/list/list_index.php?action=check_delete&amp;param_list=".$list["id"];
+    $actions["list"]["check_delete"]['Condition'] = array ('detailconsult','contact_add','contact_del', 'update', 'insert');
   }
 
 }

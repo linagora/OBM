@@ -39,7 +39,7 @@
 
 $path = "..";
 $section = "PROD";
-$menu = "PROJECT";
+$module = "project";
 $extra_css = "project.css";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
@@ -61,7 +61,7 @@ page_close();
 if ($action == "") $action = "index";
 $project = get_param_project();
 get_project_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -383,7 +383,7 @@ if ($action == "ext_get_id") {
 // XXXXX to optimize here (update_project_action) with only needed action
 get_project_action();
 if (! $project["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
+  $display["header"] = generate_menu($module,$section);
 }
 
 $display["head"] = display_head($l_project);
@@ -496,14 +496,14 @@ function get_project_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // External call : select one deal
-  $actions["PROJECT"]["ext_get_id"] = array (
+  $actions["project"]["ext_get_id"] = array (
     'Url'      => "$path/project/project_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      );
 
 // Index
-  $actions["PROJECT"]["index"] = array (
+  $actions["project"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/project/project_index.php?action=index",
     'Right'    => $cright_read,
@@ -511,14 +511,14 @@ function get_project_action() {
                                     	 );
 
 // Search
-  $actions["PROJECT"]["search"] = array (
+  $actions["project"]["search"] = array (
     'Url'      => "$path/project/project_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // New
-  $actions["PROJECT"]["new"] = array (
+  $actions["project"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/project/project_index.php?action=new",
     'Right'    => $cright_write,
@@ -526,7 +526,7 @@ function get_project_action() {
     );
 
 // Detail Consult
-  $actions["PROJECT"]["detailconsult"]  = array (
+  $actions["project"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/project/project_index.php?action=detailconsult&amp;param_project=".$project["id"]."",
     'Right'    => $cright_read,
@@ -534,7 +534,7 @@ function get_project_action() {
     );
 
 // Detail Update
-  $actions["PROJECT"]["detailupdate"] = array (
+  $actions["project"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/project/project_index.php?action=detailupdate&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -542,21 +542,21 @@ function get_project_action() {
     );
 
 // Insert
-  $actions["PROJECT"]["insert"] = array (
+  $actions["project"]["insert"] = array (
     'Url'      => "$path/project/project_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
-  $actions["PROJECT"]["update"] = array (
+  $actions["project"]["update"] = array (
     'Url'      => "$path/project/project_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None')  
                                     	 );
 
 // Check Delete
-  $actions["PROJECT"]["check_delete"] = array (
+  $actions["project"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/project/project_index.php?action=check_delete&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -564,14 +564,14 @@ function get_project_action() {
                                      	      );
 
 // Delete
-  $actions["PROJECT"]["delete"] = array (
+  $actions["project"]["delete"] = array (
     'Url'      => "$path/project/project_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Task list
-  $actions["PROJECT"]["task"] = array (
+  $actions["project"]["task"] = array (
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -579,28 +579,28 @@ function get_project_action() {
     );
 
 // Add a task
-  $actions["PROJECT"]["task_add"] = array (
+  $actions["project"]["task_add"] = array (
     'Url'      => "$path/project/project_index.php?action=task_add",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                        );
 
 // Update a task
-  $actions["PROJECT"]["task_update"] = array (
+  $actions["project"]["task_update"] = array (
     'Url'      => "$path/project/project_index.php?action=task_update",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                        );
 
 // Remove a task
-  $actions["PROJECT"]["task_del"] = array (
+  $actions["project"]["task_del"] = array (
     'Url'      => "$path/project/project_index.php?action=task_del",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Member list
-  $actions["PROJECT"]["member"] = array (
+  $actions["project"]["member"] = array (
     'Name'     => $l_header_man_member,
     'Url'      => "$path/project/project_index.php?action=member&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -608,7 +608,7 @@ function get_project_action() {
                                      );
 
 // Select members : Lists selection
-  $actions["PROJECT"]["sel_member"] = array (
+  $actions["project"]["sel_member"] = array (
     'Name'     => $l_header_add_member,
     'Url'      => "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_member)."&amp;ext_action=member_add&amp;ext_url=".urlencode($path."/project/project_index.php")."&amp;ext_id=".$project["id"]."&amp;ext_target=$l_project",
     'Right'    => $cright_write,
@@ -618,28 +618,28 @@ function get_project_action() {
                                     	  );
 
 // Add a member
-  $actions["PROJECT"]["member_add"] = array (
+  $actions["project"]["member_add"] = array (
     'Url'      => "$path/project/project_index.php?action=member_add",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Remove a member
-  $actions["PROJECT"]["member_del"] = array (
+  $actions["project"]["member_del"] = array (
     'Url'      => "$path/project/project_index.php?action=member_del",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Update member status
-  $actions["PROJECT"]["member_update"] = array (
+  $actions["project"]["member_update"] = array (
     'Url'      => "$path/project/project_index.php?action=member_del",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Time Allocation
-  $actions["PROJECT"]["allocate"] = array (
+  $actions["project"]["allocate"] = array (
     'Name'     => $l_header_man_affect,
     'Url'      => "$path/project/project_index.php?action=allocate&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -647,14 +647,14 @@ function get_project_action() {
                                      );
 
 // Time allocation Update
-  $actions["PROJECT"]["allocate_update"] = array (
+  $actions["project"]["allocate_update"] = array (
     'Url'      => "$path/project/project_index.php?action=allocate_update&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                         );
 
 // Progress detail update
-  $actions["PROJECT"]["progress"] = array (
+  $actions["project"]["progress"] = array (
     'Name'     => $l_header_man_advance,
     'Url'      => "$path/project/project_index.php?action=progress&amp;param_project=".$project["id"]."",
     'Right'    => $cright_write,
@@ -662,14 +662,14 @@ function get_project_action() {
                                      	 );
 
 // Update progress
-  $actions["PROJECT"]["progress_update"] = array (
+  $actions["project"]["progress_update"] = array (
     'Url'      => "$path/project/project_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Display
-   $actions["PROJECT"]["display"] = array (
+   $actions["project"]["display"] = array (
      'Name'     => $l_header_display,
      'Url'      => "$path/project/project_index.php?action=display",
      'Right'    => $cright_read,
@@ -677,21 +677,21 @@ function get_project_action() {
                                        	 );
 
 // Display Préférences
-  $actions["PROJECT"]["dispref_display"] = array (
+  $actions["project"]["dispref_display"] = array (
     'Url'      => "$path/project/project_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
-  $actions["PROJECT"]["dispref_level"]  = array (
+  $actions["project"]["dispref_level"]  = array (
     'Url'      => "$path/project/project_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Document add
-  $actions["PROJECT"]["document_add"] = array (
+  $actions["project"]["document_add"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     

@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "ADMIN";
-$menu = "ADMIN_LANG";
+$module = "admin_lang";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -34,9 +34,9 @@ switch ($mode) {
    include("$obminclude/global_pref.inc");
    if($action == "") $action = "index";
    get_admin_lang_action();
-   $perm->check_permissions($menu, $action);
-   $display["head"] = display_head("Admin_Lang");
-   $display["header"] = generate_menu($menu, $section);
+   $perm->check_permissions($module, $action);
+   $display["head"] = display_head("$module");
+   $display["header"] = generate_menu($module, $section);
    echo $display["head"] . $display["header"];
    break;
 }
@@ -195,39 +195,39 @@ function get_admin_lang_action() {
   global $cright_read_admin, $cright_write_admin;
 
   // index : launch forms
-  $actions["ADMIN_LANG"]["index"] = array (
+  $actions["admin_lang"]["index"] = array (
      'Name'     => $l_header_index,
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=index&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all') 
                                     	 ); 
   // help
-  $actions["ADMIN_LANG"]["help"] = array (
+  $actions["admin_lang"]["help"] = array (
      'Name'     => $l_header_help,
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=help&amp;mode=html",
      'Right'    => $cright_read_admin,
      'Condition'=> array ('all')
                                     	);
   // show_src : show variables referenced in module sources
-  $actions["ADMIN_LANG"]["show_src"] = array (
+  $actions["admin_lang"]["show_src"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_src&amp;mode=html",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('None')
                                     	);
   // show_lang : compare vars referenced in source and defined in lang files
-  $actions["ADMIN_LANG"]["show_lang"] = array (
+  $actions["admin_lang"]["show_lang"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=show_lang&amp;mode=html",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('None') 
                                     	);
   // comp_lang : compare vars from 2 langs
-  $actions["ADMIN_LANG"]["comp_lang"] = array (
+  $actions["admin_lang"]["comp_lang"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_lang&amp;mode=html",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('None')
                                     	);
   // comp_global_lang : 
-  $actions["ADMIN_LANG"]["comp_global_lang"] = array (
+  $actions["admin_lang"]["comp_global_lang"] = array (
      'Url'      => "$path/admin_lang/admin_lang_index.php?action=comp_global_lang&amp;mode=html",
      'Right'    => $cright_write_admin,
      'Condition'=> array ('None')

@@ -34,7 +34,7 @@
 
 $path = "..";
 $section = "COM";
-$menu = "CONTACT";
+$module = "contact";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -48,8 +48,8 @@ $uid = $auth->auth["uid"];
 if ($action == "") $action = "index";
 $contact = get_param_contact();
 get_contact_action();
-$perm->check_permissions($menu, $action);
-if (! check_privacy($menu, "Contact", $action, $contact["id"], $uid)) {
+$perm->check_permissions($module, $action);
+if (! check_privacy($module, "Contact", $action, $contact["id"], $uid)) {
   $display["msg"] = display_err_msg($l_error_visibility);
   $action = "index";
 } else {
@@ -389,7 +389,7 @@ if ($action == "ext_get_ids") {
 $display["head"] = display_head($l_contact);
 $display["end"] = display_end();
 if (! $contact["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
+  $display["header"] = generate_menu($module,$section);
 }
 
 display_page($display);
@@ -492,22 +492,22 @@ function get_contact_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // ext_get_ids
-  $actions["CONTACT"]["ext_get_ids"] = array (
+  $actions["contact"]["ext_get_ids"] = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
 // Category1 Select 
-  $actions["CONTACT"]["ext_get_cat1_ids"]  = array (
+  $actions["contact"]["ext_get_cat1_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 // Category2 Select 
-  $actions["CONTACT"]["ext_get_cat2_ids"]  = array (
+  $actions["contact"]["ext_get_cat2_ids"]  = array (
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );						 
 // Index
-  $actions["CONTACT"]["index"] = array (
+  $actions["contact"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/contact/contact_index.php?action=index",
     'Right'    => $cright_read,
@@ -515,14 +515,14 @@ function get_contact_action() {
                                         );
 
 // Search
-  $actions["CONTACT"]["search"] = array (
+  $actions["contact"]["search"] = array (
     'Url'      => "$path/contact/contact_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	);
 
 // New
-  $actions["CONTACT"]["new"] = array (
+  $actions["contact"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/contact/contact_index.php?action=new",
     'Right'    => $cright_write,
@@ -530,7 +530,7 @@ function get_contact_action() {
                                      );
 
 // Detail Consult
- $actions["CONTACT"]["detailconsult"]   = array (
+ $actions["contact"]["detailconsult"]   = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
@@ -539,7 +539,7 @@ function get_contact_action() {
                                     		 );
 
 // Vcard Export
-  $actions["CONTACT"]["vcard"] = array (
+  $actions["contact"]["vcard"] = array (
     'Name'     => $l_header_vcard,
     'Url'      => "$path/contact/contact_index.php?action=vcard&amp;popup=1&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_read,
@@ -548,7 +548,7 @@ function get_contact_action() {
                                        );
 
 // Detail Update
-  $actions["CONTACT"]["detailupdate"] = array (
+  $actions["contact"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/contact/contact_index.php?action=detailupdate&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
@@ -557,14 +557,14 @@ function get_contact_action() {
                                      		 );
 
 // Insert
-  $actions["CONTACT"]["insert"] = array (
+  $actions["contact"]["insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	);
 
 // Update
-  $actions["CONTACT"]["update"] = array (
+  $actions["contact"]["update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=update",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -572,14 +572,14 @@ function get_contact_action() {
                                      	);
 					
 // Update
-  $actions["CONTACT"]["document_add"] = array (
+  $actions["contact"]["document_add"] = array (
     'Right'    => $cright_write,
     'Privacy'  => true,
     'Condition'=> array ('None') 
                                      	);
 
 // Check Delete
-  $actions["CONTACT"]["check_delete"] = array (
+  $actions["contact"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/contact/contact_index.php?action=check_delete&amp;param_contact=".$contact["id"]."",
     'Right'    => $cright_write,
@@ -588,7 +588,7 @@ function get_contact_action() {
                                      	      );
 
 // Delete
-  $actions["CONTACT"]["delete"] = array (
+  $actions["contact"]["delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=delete",
     'Right'    => $cright_write,
     'Privacy'  => true,
@@ -596,7 +596,7 @@ function get_contact_action() {
                                      	);
 
 // Admin
-  $actions["CONTACT"]["admin"] = array (
+  $actions["contact"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/contact/contact_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -604,119 +604,119 @@ function get_contact_action() {
                                       		 );
 
 // Function Insert
-  $actions["CONTACT"]["function_insert"] = array (
+  $actions["contact"]["function_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Function Update
-  $actions["CONTACT"]["function_update"] = array (
+  $actions["contact"]["function_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Function Check Link
-  $actions["CONTACT"]["function_checklink"] = array (
+  $actions["contact"]["function_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Function Delete
-  $actions["CONTACT"]["function_delete"] = array (
+  $actions["contact"]["function_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=function_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Kind Insert
-  $actions["CONTACT"]["kind_insert"] = array (
+  $actions["contact"]["kind_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
-  $actions["CONTACT"]["kind_update"] = array (
+  $actions["contact"]["kind_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
-  $actions["CONTACT"]["kind_checklink"] = array (
+  $actions["contact"]["kind_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
-  $actions["CONTACT"]["kind_delete"] = array (
+  $actions["contact"]["kind_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=kind_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["CONTACT"]["cat1_insert"] = array (
+  $actions["contact"]["cat1_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["CONTACT"]["cat1_update"] = array (
+  $actions["contact"]["cat1_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["CONTACT"]["cat1_checklink"] = array (
+  $actions["contact"]["cat1_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["CONTACT"]["cat1_delete"] = array (
+  $actions["contact"]["cat1_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat1_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["CONTACT"]["cat2_insert"] = array (
+  $actions["contact"]["cat2_insert"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["CONTACT"]["cat2_update"] = array (
+  $actions["contact"]["cat2_update"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["CONTACT"]["cat2_checklink"] = array (
+  $actions["contact"]["cat2_checklink"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["CONTACT"]["cat2_delete"] = array (
+  $actions["contact"]["cat2_delete"] = array (
     'Url'      => "$path/contact/contact_index.php?action=cat2_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Dispay
-  $actions["CONTACT"]["display"] = array (
+  $actions["contact"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/contact/contact_index.php?action=display",
     'Right'    => $cright_read,
@@ -724,14 +724,14 @@ function get_contact_action() {
                                       	 );
 
 // Dispay Preferences
-  $actions["CONTACT"]["dispref_display"]	= array (
+  $actions["contact"]["dispref_display"]	= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                       	        );
 
 // Dispay Level
-  $actions["CONTACT"]["dispref_level"]= array (
+  $actions["contact"]["dispref_level"]= array (
     'Url'      => "$path/contact/contact_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 

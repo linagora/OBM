@@ -15,7 +15,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu = "STATISTIC";
+$module = "statistic";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -32,11 +32,11 @@ page_close();
 if ($action == "") $action = "index";
 $statistic = get_param_statistic();
 get_statistic_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 
 if (! $statistic["popup"]) {
-  $display["header"] = generate_menu($menu,$section);
+  $display["header"] = generate_menu($module,$section);
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -125,15 +125,16 @@ function get_statistic_action() {
   global $path,$actions,$statistic;
   global $ico_contact,$ico_company;
   global $l_header_resp_stats,$l_header_comp_stats,$l_header_index,$l_header_export;
+
 // Index
-  $actions["STATISTIC"]["index"] = array (
+  $actions["statistic"]["index"] = array (
     'Name'     => $l_header_index,
     'Url'      => "$path/statistic/statistic_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                         );
 // Index
-  $actions["STATISTIC"]["responsible"] = array (
+  $actions["statistic"]["responsible"] = array (
     'Name'     => $l_header_resp_stats,
     'Url'      => "$path/statistic/statistic_index.php?action=responsible",
     'Ico'      => $ico_contact,
@@ -142,7 +143,7 @@ function get_statistic_action() {
                                         );
 					
 // 
-  $actions["STATISTIC"]["company"] = array (
+  $actions["statistic"]["company"] = array (
     'Name'     => $l_header_comp_stats,
     'Url'      => "$path/statistic/statistic_index.php?action=company",
     'Ico'      => $ico_company,
@@ -151,13 +152,13 @@ function get_statistic_action() {
                                         );
 
 // 
-  $actions["STATISTIC"]["company_statistic"] = array (
+  $actions["statistic"]["company_statistic"] = array (
     'Url'      => "$path/statistic/statistic_index.php?action=company_statistic",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                         );
 					
-  $actions["STATISTIC"]["company_statistic_export"] = array (
+  $actions["statistic"]["company_statistic_export"] = array (
     'Name'     => $l_header_export,    
     'Url'      => "$path/statistic/statistic_index.php?action=company_statistic_export&amp;popup=1&amp;sel_list=".$statistic["list"]."",
     'Right'    => $cright_read,
@@ -166,14 +167,5 @@ function get_statistic_action() {
     'Condition'=> array ('company_statistic') 
                                         );					
 					
-// Sel user add : Users selection
-  $actions["GROUP"]["sel_statistic"] = array (
-    'Url'      => "$path/list/list_index?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=company_statistic",
-    'Right'    => $cright_read,    
-    'Popup'    => 1,
-    'Target'   => $l_statistic,
-    'Condition'=> array ('None')     
-  );
-
 }
 </script>

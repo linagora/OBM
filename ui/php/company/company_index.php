@@ -42,7 +42,7 @@
 
 $path = "..";
 $section = "COM";
-$menu = "COMPANY";
+$module = "company";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -57,7 +57,7 @@ page_close();
 if ($action == "") $action = "index";
 $company = get_param_company();
 get_company_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -437,7 +437,7 @@ $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
 if (! $company["popup"]) {
   update_company_action_url();
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 
 display_page($display);
@@ -539,7 +539,7 @@ function get_company_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["COMPANY"]["index"] = array (
+  $actions["company"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/company/company_index.php?action=index",
     'Right'    => $cright_read,
@@ -547,14 +547,14 @@ function get_company_action() {
                                     	 );
 
 // Search
-  $actions["COMPANY"]["search"] = array (
+  $actions["company"]["search"] = array (
     'Url'      => "$path/company/company_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // New
-  $actions["COMPANY"]["new"] = array (
+  $actions["company"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/company/company_index.php?action=new",
     'Right'    => $cright_write,
@@ -562,7 +562,7 @@ function get_company_action() {
                                      );
 
 // Detail Consult
-  $actions["COMPANY"]["detailconsult"]  = array (
+  $actions["company"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"]."",
     'Right'    => $cright_read,
@@ -570,7 +570,7 @@ function get_company_action() {
                                      		 );
 
 // Detail Update
-  $actions["COMPANY"]["detailupdate"] = array (
+  $actions["company"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
@@ -578,21 +578,21 @@ function get_company_action() {
                                      	      );
 
 // Insert
-  $actions["COMPANY"]["insert"] = array (
+  $actions["company"]["insert"] = array (
     'Url'      => "$path/company/company_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Update
-  $actions["COMPANY"]["update"] = array (
+  $actions["company"]["update"] = array (
     'Url'      => "$path/company/company_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Check Delete
-  $actions["COMPANY"]["check_delete"] = array (
+  $actions["company"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"]."",
     'Right'    => $cright_write,
@@ -600,14 +600,14 @@ function get_company_action() {
                                      	      );
 
 // Delete
-  $actions["COMPANY"]["delete"] = array (
+  $actions["company"]["delete"] = array (
     'Url'      => "$path/company/company_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Admin
-  $actions["COMPANY"]["admin"] = array (
+  $actions["company"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/company/company_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -615,119 +615,119 @@ function get_company_action() {
                                        );
 
 // Kind Insert
-  $actions["COMPANY"]["kind_insert"] = array (
+  $actions["company"]["kind_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
-  $actions["COMPANY"]["kind_update"] = array (
+  $actions["company"]["kind_update"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
-  $actions["COMPANY"]["kind_checklink"] = array (
+  $actions["company"]["kind_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
-  $actions["COMPANY"]["kind_delete"] = array (
+  $actions["company"]["kind_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=kind_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Category Insert
-  $actions["COMPANY"]["cat_insert"] = array (
+  $actions["company"]["cat_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Category Update
-  $actions["COMPANY"]["cat_update"] = array (
+  $actions["company"]["cat_update"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Category Check Link
-  $actions["COMPANY"]["cat_checklink"] = array (
+  $actions["company"]["cat_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Category Delete
-  $actions["COMPANY"]["cat_delete"] = array (
+  $actions["company"]["cat_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=cat_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Activity Insert
-  $actions["COMPANY"]["activity_insert"] = array (
+  $actions["company"]["activity_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Activity Update
-  $actions["COMPANY"]["activity_update"] = array (
+  $actions["company"]["activity_update"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Activity Check Link
-  $actions["COMPANY"]["activity_checklink"] = array (
+  $actions["company"]["activity_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Activity Delete
-  $actions["COMPANY"]["activity_delete"] = array (
+  $actions["company"]["activity_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=activity_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Naf Code Insert
-  $actions["COMPANY"]["nafcode_insert"] = array (
+  $actions["company"]["nafcode_insert"] = array (
     'Url'      => "$path/company/company_index.php?action=nafcode_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Naf Code Update
-  $actions["COMPANY"]["nafcode_update"] = array (
+  $actions["company"]["nafcode_update"] = array (
     'Url'      => "$path/company/company_index.php?action=nafcode_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Naf Code Check Link
-  $actions["COMPANY"]["nafcode_checklink"] = array (
+  $actions["company"]["nafcode_checklink"] = array (
     'Url'      => "$path/company/company_index.php?action=nafcode_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Naf Code Delete
-  $actions["COMPANY"]["nafcode_delete"] = array (
+  $actions["company"]["nafcode_delete"] = array (
     'Url'      => "$path/company/company_index.php?action=nafcode_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
 // Display
-  $actions["COMPANY"]["display"] = array (
+  $actions["company"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/company/company_index.php?action=display",
     'Right'    => $cright_read,
@@ -735,40 +735,40 @@ function get_company_action() {
                                       	 );
 
 // Display Préférences
-  $actions["COMPANY"]["dispref_display"] = array (
+  $actions["company"]["dispref_display"] = array (
     'Url'      => "$path/company/company_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
-  $actions["COMPANY"]["dispref_level"]  = array (
+  $actions["company"]["dispref_level"]  = array (
     'Url'      => "$path/company/company_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Category Select 
-  $actions["COMPANY"]["ext_get_cat_ids"]  = array (
+  $actions["company"]["ext_get_cat_ids"]  = array (
     'Url'      => "$path/company/company_index.php?action=ext_get_cat_ids",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 // Category Select 
-  $actions["COMPANY"]["ext_get_cat_code"]  = array (
+  $actions["company"]["ext_get_cat_code"]  = array (
     'Url'      => "$path/company/company_index.php?action=ext_get_cat_code",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 // Company Select 
-  $actions["COMPANY"]["ext_get_id"]  = array (
+  $actions["company"]["ext_get_id"]  = array (
     'Url'      => "$path/company/company_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Document add
-  $actions["COMPANY"]["document_add"] = array (
+  $actions["company"]["document_add"] = array (
     'Right'    => $cright_write,
     'Condition'=> array ('None')
   );     
@@ -782,13 +782,13 @@ function update_company_action_url() {
   global $company, $actions, $path;
 
   // Detail Consult
-  $actions["COMPANY"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"];
+  $actions["company"]["detailconsult"]["Url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$company["id"];
 
   // Detail Update
-  $actions["COMPANY"]["detailupdate"]['Url'] = "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"];
+  $actions["company"]["detailupdate"]['Url'] = "$path/company/company_index.php?action=detailupdate&amp;param_company=".$company["id"];
 
   // Check Delete
-  $actions["COMPANY"]["check_delete"]['Url'] = "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"];
+  $actions["company"]["check_delete"]['Url'] = "$path/company/company_index.php?action=check_delete&amp;param_company=".$company["id"];
 
 }
 

@@ -120,17 +120,17 @@ function display_head($p_module) {
 ///////////////////////////////////////////////////////////////////////////////
 // Fonction which perform the menu
 // Parametres:
-//   - $tab  : active tab 
-//   - $menu : menu selected
+//   - $tab    : active tab 
+//   - $module : module selected
 ///////////////////////////////////////////////////////////////////////////////
-function generate_menu($menu, $section) {
+function generate_menu($module, $section) {
   global $set_lang, $set_lang_default, $set_theme, $set_theme_default;
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
   global $auth, $obminclude, $display; 
   global $obm_version;
 
-  if ($menu == "")
+  if ($module == "")
     $path = "";
   else 
     $path = "..";
@@ -141,7 +141,7 @@ function generate_menu($menu, $section) {
 
   $display["section"] = display_sections($section);
   $display["menu"] = display_menus($section);
-  $display["action"] = display_menu_bar($section, $menu);
+  $display["action"] = display_menu_bar($section, $module);
   $display["last"] = display_last_visited();
   $display["todo"] = display_todo_toplist();
 
@@ -288,14 +288,14 @@ function display_menus($section) {
 // Display : Returns the action display block of the selected module         //
 // Parameters:
 //   - $section : selected section
-//   - $menu    : selected menu (module)
+//   - $module  : selected module
 ///////////////////////////////////////////////////////////////////////////////
-function display_menu_bar($section, $menu) {
+function display_menu_bar($section, $module) {
   global $set_theme, $menus, $action, $popup_height, $perm;
   global $actions, $popup_width;
 
-  $name = $menus[$section][$menu]["Name"];
-  $ico = $menus[$section][$menu]["Ico"];
+  $name = $menus[$section][$module]["Name"];
+  $ico = $menus[$section][$module]["Ico"];
   if ($ico != "")
     $dico = "<img src=\"/images/$set_theme/$ico\" alt=\"\" />&nbsp;";
   else
@@ -306,10 +306,10 @@ function display_menu_bar($section, $menu) {
      <div class=\"actionTitle\">&nbsp;:: Action</div>
     ";
 
-   if (is_array($actions[$menu])) {
-    $module_right = $perm->get_module_rights($menu); 
+   if (is_array($actions[$module])) {
+    $module_right = $perm->get_module_rights($module); 
 
-    foreach ($actions[$menu] as $key => $value){
+    foreach ($actions[$module] as $key => $value){
       if (in_array("all",$value["Condition"])
            || in_array($action,$value["Condition"])) {
 	if (($module_right & $value["Right"]) == $value["Right"]) {

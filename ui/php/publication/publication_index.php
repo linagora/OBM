@@ -37,7 +37,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COM";
-$menu = "PUBLICATION";
+$module = "publication";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -52,7 +52,7 @@ page_close();
 if ($action == "") $action = "index";
 $publication = get_param_publication();
 get_publication_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -423,7 +423,7 @@ $display["end"] = display_end();
 // Update actions url in case some values have been updated (id after insert) 
 if (! $publication["popup"]) {
   update_publication_action_url();
-  $display["header"] = generate_menu($menu, $section);
+  $display["header"] = generate_menu($module, $section);
 }
 
 display_page($display);
@@ -485,35 +485,35 @@ function get_publication_action() {
   global $l_subscription;
 
 // Index
-  $actions["PUBLICATION"]["index"] = array (
+  $actions["publication"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/publication/publication_index.php?action=index",
     'Right'    => $cright_read,
     'Condition'=> array ('all') 
                                     	 );
 // Index
-  $actions["PUBLICATION"]["ext_get_id"] = array (
+  $actions["publication"]["ext_get_id"] = array (
     'Url'      => "$path/publication/publication_index.php?action=ext_get_id",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                 	 );
 					 
 // Search
-  $actions["PUBLICATION"]["search"] = array (
+  $actions["publication"]["search"] = array (
     'Url'      => "$path/publication/publication_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                     	 );
 
 // New
-  $actions["PUBLICATION"]["new"] = array (
+  $actions["publication"]["new"] = array (
     'Name'     => $l_header_new_f,
     'Url'      => "$path/publication/publication_index.php?action=new",
     'Right'    => $cright_write,
     'Condition'=> array ('all') 
                                      );
 // New Publication from an other one.
-  $actions["PUBLICATION"]["new_auto"] = array (
+  $actions["publication"]["new_auto"] = array (
     'Name'     => $l_header_new_auto,
     'Url'      => "$path/publication/publication_index.php?action=new_auto&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
@@ -521,7 +521,7 @@ function get_publication_action() {
                                      );
 	     
 // Detail Consult
-  $actions["PUBLICATION"]["detailconsult"]  = array (
+  $actions["publication"]["detailconsult"]  = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_read,
@@ -529,7 +529,7 @@ function get_publication_action() {
                                      		 );
 
 // Detail Update
-  $actions["PUBLICATION"]["detailupdate"] = array (
+  $actions["publication"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
@@ -537,46 +537,46 @@ function get_publication_action() {
                                      	      );
 
 // Subscribe a group of contact to a publication.
-  $actions["PUBLICATION"]["new_group_subscription"] = array (
+  $actions["publication"]["new_group_subscription"] = array (
     'Name'     => $l_subscription,
     'Url'      => "$path/publication/publication_index.php?action=new_group_subscription&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
     'Condition'=> array ('insert_group_subscription','new_group_subscription','detailconsult', 'update','insert_auto')
                                      );		
 // Subscribe a group of contact to a publication.
-  $actions["PUBLICATION"]["insert_group_subscription"] = array (
+  $actions["publication"]["insert_group_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert_group_subscription",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                      );						     
 // Subscription Update
-  $actions["PUBLICATION"]["detailupdate_subscription"] = array (
+  $actions["publication"]["detailupdate_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=detailupdate_subscription",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	      );
 // Insert
-  $actions["PUBLICATION"]["insert"] = array (
+  $actions["publication"]["insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 // Insert
-  $actions["PUBLICATION"]["insert_auto"] = array (
+  $actions["publication"]["insert_auto"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert_auto",
     'Right'    => $cright_write,
     'Condition'=> array ('None')
                                          );
 
 // Update
-  $actions["PUBLICATION"]["update"] = array (
+  $actions["publication"]["update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Check Delete
-  $actions["PUBLICATION"]["check_delete"] = array (
+  $actions["publication"]["check_delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"]."",
     'Right'    => $cright_write,
@@ -584,21 +584,21 @@ function get_publication_action() {
                                      	      );
 
 // Delete
-  $actions["PUBLICATION"]["delete"] = array (
+  $actions["publication"]["delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=delete",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Delete
-  $actions["PUBLICATION"]["delete_subscription"] = array (
+  $actions["publication"]["delete_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=delete_subscription",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                      	 );
 
 // Admin
-  $actions["PUBLICATION"]["admin"] = array (
+  $actions["publication"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/publication/publication_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -606,80 +606,80 @@ function get_publication_action() {
                                        );
 
 // Kind Insert
-  $actions["PUBLICATION"]["type_insert"] = array (
+  $actions["publication"]["type_insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Kind Update
-  $actions["PUBLICATION"]["type_update"] = array (
+  $actions["publication"]["type_update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Kind Check Link
-  $actions["PUBLICATION"]["type_checklink"] = array (
+  $actions["publication"]["type_checklink"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Kind Delete
-  $actions["PUBLICATION"]["type_delete"] = array (
+  $actions["publication"]["type_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=type_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 // Reception Insert
-  $actions["PUBLICATION"]["recept_insert"] = array (
+  $actions["publication"]["recept_insert"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Reception Update
-  $actions["PUBLICATION"]["recept_update"] = array (
+  $actions["publication"]["recept_update"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Reception Check Link
-  $actions["PUBLICATION"]["recept_checklink"] = array (
+  $actions["publication"]["recept_checklink"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Reception Delete
-  $actions["PUBLICATION"]["recept_delete"] = array (
+  $actions["publication"]["recept_delete"] = array (
     'Url'      => "$path/publication/publication_index.php?action=recept_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 // New Subscription
-  $actions["PUBLICATION"]["new_subscription"] = array (
+  $actions["publication"]["new_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=new_subscription",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      	       );
 // Insert Subscription
-  $actions["PUBLICATION"]["insert_subscription"] = array (
+  $actions["publication"]["insert_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=insert_subscription",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      	       );
 // Update Subscription
-  $actions["PUBLICATION"]["update_subscription"] = array (
+  $actions["publication"]["update_subscription"] = array (
     'Url'      => "$path/publication/publication_index.php?action=update_subscription",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      	       );
 					       
 // Display
-  $actions["PUBLICATION"]["display"] = array (
+  $actions["publication"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/publication/publication_index.php?action=display",
     'Right'    => $cright_read,
@@ -687,14 +687,14 @@ function get_publication_action() {
                                       	 );
 
 // Display Préférences
-  $actions["PUBLICATION"]["dispref_display"] = array (
+  $actions["publication"]["dispref_display"] = array (
     'Url'      => "$path/publication/publication_index.php?action=dispref_display",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                      		 );
 
 // Display Level
-  $actions["PUBLICATION"]["dispref_level"]  = array (
+  $actions["publication"]["dispref_level"]  = array (
     'Url'      => "$path/publication/publication_index.php?action=dispref_level",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
@@ -710,13 +710,13 @@ function update_publication_action_url() {
   global $publication, $actions, $path;
 
   // Detail Consult
-  $actions["PUBLICATION"]["detailconsult"]["Url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"];
+  $actions["publication"]["detailconsult"]["Url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$publication["id"];
 
   // Detail Update
-  $actions["PUBLICATION"]["detailupdate"]['Url'] = "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"];
+  $actions["publication"]["detailupdate"]['Url'] = "$path/publication/publication_index.php?action=detailupdate&amp;param_publication=".$publication["id"];
 
   // Check Delete
-  $actions["PUBLICATION"]["check_delete"]['Url'] = "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"];
+  $actions["publication"]["check_delete"]['Url'] = "$path/publication/publication_index.php?action=check_delete&amp;param_publication=".$publication["id"];
 
 }
 

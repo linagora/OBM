@@ -267,7 +267,7 @@ $js_regexp_money = "/^[0-9]+(\\.[0-9][0-9]?)?$/"; // numbers and at most one '.'
 
 // Path to the OBM php root (if not set)
 if ($path == "") {
-  if ($menu == "")
+  if ($module == "")
     $path = "";
   else 
     $path = "..";
@@ -652,18 +652,18 @@ function display_record_info($obm_q) {
 // Check Privacy access
 // if action has privacy enable, check if entity is visible by the user
 // Parameters:
-//   - $menu   : menu to check (get $actions from)
+//   - $module : module to check (get $actions from)
 //   - $table  : table (entity) to check (can be parentdeal for DEAL menu)
 //   - $action : action to check
 //   - $id     : entity id
 //   - $p_uid  : user id to check access
 // Returns true if entity is visible, else false
 ///////////////////////////////////////////////////////////////////////////////
-function check_privacy($menu, $table, $action, $id, $p_uid="") {
+function check_privacy($module, $table, $action, $id, $p_uid="") {
   global $actions, $auth, $cdg_sql;
 
   // If action does not require privacy, grant access
-  if (! $actions[$menu][$action]["Privacy"]) {
+  if (! $actions[$module][$action]["Privacy"]) {
     return true;
   }
  

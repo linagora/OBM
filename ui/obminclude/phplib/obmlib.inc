@@ -69,39 +69,32 @@ class OBM_User_Sql extends CT_Sql {
   var $database_class = "DB_OBM";         // Which database to connect...
   var $database_table = "ActiveUserObm";  // our session data in this table.
 
-  function ac_store($id, $name, $str) {
+  function ac_store($id, $name, $u_id) {
+    global $module, $REMOTE_ADDR, $action;
+
     $ret = true;
     $name = addslashes($name);
+    $now = date("Y-m-d H:i:s", time());
+    $table = $this->database_table;
+    $lastpage = "$module:$action";
 
     // update duration of visit
-    global $HTTP_REFERER, $HTTP_SERVER_VARS, $HTTP_USER_AGENT, $REMOTE_ADDR, $action;
-    $module_name = substr(strrchr($HTTP_SERVER_VARS['SCRIPT_NAME'],"/"),1);
-    $module_name = substr($module_name,0,strlen($module_name)-10);
-    $now = date("Y-m-d H:i:s", time());
-    $uquery = sprintf("update %s
-      set activeuserobm_userobm_id='%d',
-        activeuserobm_timeupdate='%s',
+    $uquery = "UPDATE $table SET
+        activeuserobm_userobm_id = '$u_id',
+        activeuserobm_timeupdate = '$now',
         activeuserobm_nb_connexions = activeuserobm_nb_connexions + 1,
-        activeuserobm_lastpage= '%s'
-      where activeuserobm_sid='%s' and activeuserobm_session_name='%s'",
-        $this->database_table,
-        $str,
-        $now,
-        ucfirst($module_name).":".ucfirst($action),
-        $id,
-        $name);
-    $squery = sprintf("select count(*)
-      from %s
-      where activeuserobm_userobm_id='%s'
-        and activeuserobm_timeupdate='%s'
-        and activeuserobm_sid='%s'
-        and activeuserobm_session_name='%s'",
-      $this->database_table,
-      $str,
-      $now,
-      $id,
-      $name);
-    $iquery = sprintf("insert into %s (
+        activeuserobm_lastpage = '$lastpage'
+      WHERE activeuserobm_sid = '$id'
+        and activeuserobm_session_name = '$name'";
+
+    $squery = "SELECT count(*)
+      FROM $table
+      WHERE activeuserobm_userobm_id = '$u_id'
+        and activeuserobm_timeupdate = '$now'
+        and activeuserobm_sid = '$id'
+        and activeuserobm_session_name = '$name'";
+
+    $iquery = "INSERT INTO $table (
         activeuserobm_sid,
         activeuserobm_session_name,
         activeuserobm_userobm_id,
@@ -110,16 +103,7 @@ class OBM_User_Sql extends CT_Sql {
         activeuserobm_nb_connexions,
         activeuserobm_lastpage,
         activeuserobm_ip
-      ) values ('%s', '%s', '%d', '%s','%s', '%d', '%s', '%s')",
-      $this->database_table,
-      $id,
-      $name,
-      $str,
-      $now,
-      $now,
-      1, 
-      ucfirst($module_name).":".ucfirst($action),
-      $REMOTE_ADDR);
+      ) VALUES ('$id', '$name', '$u_id', '$now', '$now', 1, '$lastpage', '$REMOTE_ADDR')";
 
     $this->db->query($uquery);
 
@@ -160,7 +144,7 @@ class OBM_Challenge_Auth extends Auth {
   var $database_table = "UserObm";
 
   function auth_loginform() {
-    global $sess, $obminclude, $obm_version, $menu, $path, $challenge, $login_action;
+    global $sess, $obminclude, $obm_version, $module, $path, $challenge, $login_action;
 
     $login_form = "$obminclude/auth/crloginform.ihtml";
     $challenge = md5(uniqid($this->magic));
@@ -237,33 +221,33 @@ class OBM_Perm {
     $mod_length = $this->mod_length;
 
     // Module position in profile -------------------------------------------//
-    $this->mod_pos["COMPANY"] = 6;
-    $this->mod_pos["CONTACT"] = $this->mod_pos["COMPANY"] + $mod_length;
-    $this->mod_pos["DEAL"] = $this->mod_pos["CONTACT"] + $mod_length;
-    $this->mod_pos["LIST"] = $this->mod_pos["DEAL"] + $mod_length;
-    $this->mod_pos["AGENDA"] = $this->mod_pos["LIST"] + $mod_length;
-    $this->mod_pos["TODO"] = $this->mod_pos["AGENDA"] + $mod_length;
-    $this->mod_pos["PUBLICATION"] = $this->mod_pos["TODO"] + $mod_length;
-    $this->mod_pos["STATISTIC"] = $this->mod_pos["PUBLICATION"] + $mod_length;
-    $this->mod_pos["TIME"] = $this->mod_pos["STATISTIC"] + $mod_length;
-    $this->mod_pos["PROJECT"] = $this->mod_pos["TIME"] + $mod_length;
-    $this->mod_pos["CONTRACT"] = $this->mod_pos["PROJECT"] + $mod_length;
-    $this->mod_pos["INCIDENT"] = $this->mod_pos["CONTRACT"] + $mod_length;
-    $this->mod_pos["DOCUMENT"] = $this->mod_pos["INCIDENT"] + $mod_length;
-    $this->mod_pos["ACCOUNT"] = $this->mod_pos["DOCUMENT"] + $mod_length;
-    $this->mod_pos["INVOICE"] = $this->mod_pos["ACCOUNT"] + $mod_length;
-    $this->mod_pos["PAYMENT"] = $this->mod_pos["INVOICE"] + $mod_length;
-    $this->mod_pos["SETTINGS"] = $this->mod_pos["PAYMENT"] + $mod_length;
-    $this->mod_pos["USER"] = $this->mod_pos["SETTINGS"] + $mod_length;
-    $this->mod_pos["GROUP"] = $this->mod_pos["USER"] + $mod_length;
-    $this->mod_pos["ADMIN"] = $this->mod_pos["GROUP"] + $mod_length;
-    $this->mod_pos["ADMIN_CODE"] = $this->mod_pos["ADMIN"] + $mod_length;
-    $this->mod_pos["ADMIN_PREF"] = $this->mod_pos["ADMIN_CODE"] + $mod_length;
-    $this->mod_pos["ADMIN_DATA"] = $this->mod_pos["ADMIN_PREF"] + $mod_length;
-    $this->mod_pos["ADMIN_LANG"] = $this->mod_pos["ADMIN_DATA"] + $mod_length;
-    $this->mod_pos["ADMIN_REF"] = $this->mod_pos["ADMIN_LANG"] + $mod_length;
-    $this->mod_pos["IMPORT"] = $this->mod_pos["ADMIN_REF"] + $mod_length;
-    $profile_length = $this->mod_pos["IMPORT"] + $mod_length;
+    $this->mod_pos["company"] = 6;
+    $this->mod_pos["contact"] = $this->mod_pos["company"] + $mod_length;
+    $this->mod_pos["deal"] = $this->mod_pos["contact"] + $mod_length;
+    $this->mod_pos["list"] = $this->mod_pos["deal"] + $mod_length;
+    $this->mod_pos["agenda"] = $this->mod_pos["list"] + $mod_length;
+    $this->mod_pos["todo"] = $this->mod_pos["agenda"] + $mod_length;
+    $this->mod_pos["publication"] = $this->mod_pos["todo"] + $mod_length;
+    $this->mod_pos["statistic"] = $this->mod_pos["publication"] + $mod_length;
+    $this->mod_pos["time"] = $this->mod_pos["statistic"] + $mod_length;
+    $this->mod_pos["project"] = $this->mod_pos["time"] + $mod_length;
+    $this->mod_pos["contract"] = $this->mod_pos["project"] + $mod_length;
+    $this->mod_pos["incident"] = $this->mod_pos["contract"] + $mod_length;
+    $this->mod_pos["document"] = $this->mod_pos["incident"] + $mod_length;
+    $this->mod_pos["account"] = $this->mod_pos["document"] + $mod_length;
+    $this->mod_pos["invoice"] = $this->mod_pos["account"] + $mod_length;
+    $this->mod_pos["payment"] = $this->mod_pos["invoice"] + $mod_length;
+    $this->mod_pos["settings"] = $this->mod_pos["payment"] + $mod_length;
+    $this->mod_pos["user"] = $this->mod_pos["settings"] + $mod_length;
+    $this->mod_pos["group"] = $this->mod_pos["user"] + $mod_length;
+    $this->mod_pos["admin"] = $this->mod_pos["group"] + $mod_length;
+    $this->mod_pos["admin_code"] = $this->mod_pos["admin"] + $mod_length;
+    $this->mod_pos["admin_pref"] = $this->mod_pos["admin_code"] + $mod_length;
+    $this->mod_pos["admin_data"] = $this->mod_pos["admin_pref"] + $mod_length;
+    $this->mod_pos["admin_lang"] = $this->mod_pos["admin_data"] + $mod_length;
+    $this->mod_pos["admin_ref"] = $this->mod_pos["admin_lang"] + $mod_length;
+    $this->mod_pos["import"] = $this->mod_pos["admin_ref"] + $mod_length;
+    $profile_length = $this->mod_pos["import"] + $mod_length;
 
     // reader : 01 (bit 0) : can see data
     // user   : 03 (bits 0+1) : can see data + insert or update his own data
@@ -307,14 +291,14 @@ class OBM_Perm {
   //-------------------------------------------------------------------------//
   // Return the profile access right of the module given as parameter        //
   // Parameters:
-  //   - $menu : module to return the right
+  //   - $module : module to return the right
   //-------------------------------------------------------------------------//
-  function get_module_rights($menu) {
+  function get_module_rights($module) {
     global $profiles, $auth;
 
     $profile = $auth->auth["perm"];
     $rights = $profiles["$profile"];
-    $right_start = $this->mod_pos["$menu"];
+    $right_start = $this->mod_pos["$module"];
     $module_right = hexdec(substr($rights, $right_start, $this->mod_length));
 
     return $module_right;
@@ -323,14 +307,14 @@ class OBM_Perm {
   //-------------------------------------------------------------------------//
   // Check profile permissions for the module and action given as parameters //
   // Parameters:
-  //   - $menu   : module to check
+  //   - $module : module to check
   //   - $action : action right to check in the module
   //-------------------------------------------------------------------------//
-  function check_permissions($menu, $action) {
+  function check_permissions($module, $action) {
     global $actions;
 
-    $module_right = $this->get_module_rights($menu);
-    $action_right = $actions[$menu][$action]["Right"];
+    $module_right = $this->get_module_rights($module);
+    $action_right = $actions[$module][$action]["Right"];
 
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $action_right) != $action_right)
@@ -343,13 +327,13 @@ class OBM_Perm {
   //-------------------------------------------------------------------------//
   // Check if the current profile has the module right given as parameter    //
   // Parameters:
-  //   - $menu  : module to check
-  //   - $right : right to check in the module
+  //   - $module : module to check
+  //   - $right  : right to check in the module
   //-------------------------------------------------------------------------//
-  function check_right($menu, $right) {
+  function check_right($module, $right) {
     global $actions;
 
-    $module_right = $this->get_module_rights($menu);
+    $module_right = $this->get_module_rights($module);
 
     // If action right not defined or user has not access rights
     if ( ( ($module_right & $right) != $right)

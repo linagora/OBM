@@ -27,7 +27,7 @@
 
 $path = "..";
 $section = "ADMIN";
-$menu = "ADMIN_REF";
+$module = "admin_ref";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc"); 
@@ -40,7 +40,7 @@ require("admin_ref_query.inc");
 if ( ($action == "") || ($action == "index")) $action = "country";
 $ref = get_param_ref();
 get_admin_ref_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 ///////////////////////////////////////////////////////////////////////////////
 // Main Program                                                              //
@@ -187,7 +187,7 @@ if ($action == "index")  {
 // Display
 ///////////////////////////////////////////////////////////////////////////////
 $display["head"] = display_head($l_header_admin_ref);
-$display["header"] = generate_menu($menu, $section); // Menu
+$display["header"] = generate_menu($module, $section); // Menu
 $display["end"] = display_end();
 
 display_page($display);
@@ -248,7 +248,7 @@ function get_admin_ref_action() {
 
 
   // Country index
-  $actions["ADMIN_REF"]["country"] = array (
+  $actions["admin_ref"]["country"] = array (
      'Name'     => $l_header_country,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=country&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -256,35 +256,35 @@ function get_admin_ref_action() {
                                     	  );
 
 // Country Insert
-  $actions["ADMIN_REF"]["country_insert"] = array (
+  $actions["admin_ref"]["country_insert"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Country Update
-  $actions["ADMIN_REF"]["country_update"] = array (
+  $actions["admin_ref"]["country_update"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Country Check Link
-  $actions["ADMIN_REF"]["country_checklink"] = array (
+  $actions["admin_ref"]["country_checklink"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Country Delete
-  $actions["ADMIN_REF"]["country_delete"] = array (
+  $actions["admin_ref"]["country_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
   // DataSource index
-  $actions["ADMIN_REF"]["datasource"] = array (
+  $actions["admin_ref"]["datasource"] = array (
      'Name'     => $l_header_datasource,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -292,35 +292,35 @@ function get_admin_ref_action() {
                                     	  );
 
 // DataSource Insert
-  $actions["ADMIN_REF"]["datasource_insert"] = array (
+  $actions["admin_ref"]["datasource_insert"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // DataSource Update
-  $actions["ADMIN_REF"]["datasource_update"] = array (
+  $actions["admin_ref"]["datasource_update"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // DataSource Check Link
-  $actions["ADMIN_REF"]["datasource_checklink"] = array (
+  $actions["admin_ref"]["datasource_checklink"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // DataSource Delete
-  $actions["ADMIN_REF"]["datasource_delete"] = array (
+  $actions["admin_ref"]["datasource_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	       );
 
   // Tasktype index
-  $actions["ADMIN_REF"]["tasktype"] = array (
+  $actions["admin_ref"]["tasktype"] = array (
      'Name'     => $l_header_tasktype,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype&amp;mode=html",
      'Right'    => $cright_read_admin,
@@ -328,28 +328,28 @@ function get_admin_ref_action() {
                                     	  );
 
 // Tasktype Insert
-  $actions["ADMIN_REF"]["tasktype_insert"] = array (
+  $actions["admin_ref"]["tasktype_insert"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_insert",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	     );
 
 // Tasktype Update
-  $actions["ADMIN_REF"]["tasktype_update"] = array (
+  $actions["admin_ref"]["tasktype_update"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_update",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      	      );
 
 // Tasktype Check Link
-  $actions["ADMIN_REF"]["tasktype_checklink"] = array (
+  $actions["admin_ref"]["tasktype_checklink"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_checklink",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 
                                      		);
 
 // Tasktype Delete
-  $actions["ADMIN_REF"]["tasktype_delete"] = array (
+  $actions["admin_ref"]["tasktype_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=tasktype_delete",
     'Right'    => $cright_write_admin,
     'Condition'=> array ('None') 

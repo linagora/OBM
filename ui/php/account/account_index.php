@@ -12,7 +12,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 $path = "..";
 $section = "COMPTA";
-$menu = "ACCOUNT";
+$module = "account";
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
 include("$obminclude/global.inc");
@@ -30,7 +30,7 @@ page_close();
 if ($action == "") $action = "index";
 $account = get_param_account();
 get_account_action();
-$perm->check_permissions($menu, $action);
+$perm->check_permissions($module, $action);
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -188,7 +188,7 @@ $q_account = run_query_detail ($account["account"]);
 ///////////////////////////////////////////////////////////////////////////////
 // Display HTML page
 ///////////////////////////////////////////////////////////////////////////////
-$display["header"] = generate_menu($menu, $section);
+$display["header"] = generate_menu($module, $section);
 
 $display["head"] = display_head("$l_account");
 $display["end"] = display_end();
@@ -228,7 +228,7 @@ function get_account_action() {
   global $cright_read, $cright_write, $cright_read_admin, $cright_write_admin;
 
 // Index
-  $actions["ACCOUNT"]["index"] = array (
+  $actions["account"]["index"] = array (
     'Name'     => $l_header_find,
     'Url'      => "$path/account/account_index.php?action=index",
     'Right'    => $cright_read,
@@ -236,14 +236,14 @@ function get_account_action() {
                                        );
 
 // Search
-  $actions["ACCOUNT"]["search"] = array (
+  $actions["account"]["search"] = array (
     'Url'      => "$path/account/account_index.php?action=search",
     'Right'    => $cright_read,
     'Condition'=> array ('None') 
                                        );
 
 // New
-  $actions["ACCOUNT"]["new"] = array (
+  $actions["account"]["new"] = array (
     'Name'     => $l_header_new,
     'Url'      => "$path/account/account_index.php?action=new",
     'Right'    => $cright_write,
@@ -251,14 +251,14 @@ function get_account_action() {
      		                     );
 
 // Insert
-  $actions["ACCOUNT"]["insert"] = array (
+  $actions["account"]["insert"] = array (
     'Url'      => "$path/account/account_index.php?action=insert",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Detail Consult
-  $actions["ACCOUNT"]["detailconsult"] = array (
+  $actions["account"]["detailconsult"] = array (
     'Name'     => $l_header_consult,
     'Url'      => "$path/account/account_index.php?action=detailconsult&amp;param_account=".$account["account"]."",
     'Right'    => $cright_read,
@@ -266,7 +266,7 @@ function get_account_action() {
                                        );
 
 // Compute Balance
-  $actions["ACCOUNT"]["compute_balance"] = array (
+  $actions["account"]["compute_balance"] = array (
     'Name'     => $l_header_compute_balance,
     'Url'      => "$path/account/account_index.php?action=compute_balance&amp;param_account=".$account["account"]."",
     'Right'    => $cright_write,
@@ -274,7 +274,7 @@ function get_account_action() {
                                      		 );
 
 // Detail Update
-  $actions["ACCOUNT"]["detailupdate"] = array (
+  $actions["account"]["detailupdate"] = array (
     'Name'     => $l_header_update,
     'Url'      => "$path/account/account_index.php?action=detailupdate&amp;param_account=".$account["account"]."",
     'Right'    => $cright_write,
@@ -282,14 +282,14 @@ function get_account_action() {
                                      	      );
 
 // Update
-  $actions["ACCOUNT"]["update"] = array (
+  $actions["account"]["update"] = array (
     'Url'      => "$path/account/account_index.php?action=update",
     'Right'    => $cright_write,
     'Condition'=> array ('None') 
                                        );
 
 // Delete
-  $actions["ACCOUNT"]["delete"] = array (
+  $actions["account"]["delete"] = array (
     'Name'     => $l_header_delete,
     'Url'      => "$path/account/account_index.php?action=delete&amp;param_account=".$account["account"]."",
     'Right'    => $cright_write,
@@ -297,7 +297,7 @@ function get_account_action() {
                                      	);
 
 // Admin
-  $actions["ACCOUNT"]["admin"] = array (
+  $actions["account"]["admin"] = array (
     'Name'     => $l_header_admin,
     'Url'      => "$path/account/account_index.php?action=admin",
     'Right'    => $cright_read_admin,
@@ -305,7 +305,7 @@ function get_account_action() {
                                       );
 
 // Display
-  $actions["ACCOUNT"]["display"] = array (
+  $actions["account"]["display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=display",
     'Right'    => $cright_read,
@@ -313,7 +313,7 @@ function get_account_action() {
                                       	 );
 
 // Display Preferences
-  $actions["ACCOUNT"]["dispref_display"] = array (
+  $actions["account"]["dispref_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=dispref_display",
     'Right'    => $cright_read,
@@ -321,7 +321,7 @@ function get_account_action() {
                                       	 );
 
 // Display Preferences
-  $actions["ACCOUNT"]["level_display"] = array (
+  $actions["account"]["level_display"] = array (
     'Name'     => $l_header_display,
     'Url'      => "$path/account/account_index.php?action=level_display",
     'Right'    => $cright_read,
