@@ -126,7 +126,7 @@ elseif ($action == "index" || $action == "") {
       if ($retour) {
         $display["msg"] .= display_ok_msg($l_insert_ok);
         // insertion of his default preferences : 
-        $user_id = run_query_id_user($obm_user["login"]);
+        $user_id = get_user_id($obm_user["login"]);
         run_query_default_preferences_insert($user_id);
       } else {
       $display["msg"] .= display_err_msg($l_insert_error);
@@ -142,7 +142,7 @@ elseif ($action == "index" || $action == "") {
         $retour = run_query_insert($obm_user);
         if ($retour) {
           // insertion of his default preferences :
-          $user_id = run_query_id_user($obm_user["login"]);
+          $user_id = get_user_id($obm_user["login"]);
           run_query_default_preferences_insert($user_id);
           $display["msg"] .= display_ok_msg($l_insert_ok);
         } else {

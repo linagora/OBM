@@ -18,11 +18,12 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_search($list, $p_new_order, $p_order_dir) {
-  global $cdg_sql;
+  global $c_all, $cdg_sql;
   
   $name = $list["name"];
   $email = $list["email"];
   $contact = $list["contact"];
+  $market = $list["marketing_manager"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -36,6 +37,9 @@ function run_query_search($list, $p_new_order, $p_order_dir) {
   }
   if ($email != '') {
     $where .= " and list_email $like '%$email%'";
+  }
+  if (($market != $c_all) && ($market != "")) { 
+    $where .= " and (list_usercreate='$market' or list_userupdate='$market')";
   }
 
   $query = "select distinct List.*, list_id as Id,

@@ -315,8 +315,9 @@ function display_last_visited($path="..") {
 	$l_ico = "ico_parentdeal";
 	global ${$l_ico};
 	$parentdeal_url = url_prepare("$path/deal/deal_index.php?action=parent_detailconsult&amp;param_parent=$id");
-	$block .= "<li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
-        <a href=\"$parentdeal_url\">$text</a></li>";
+	$block .= "
+          <li class=\"lastList\"><a href=\"$parentdeal_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+            <a href=\"$parentdeal_url\">$text</a></li>";
       }
     }
 
@@ -326,8 +327,9 @@ function display_last_visited($path="..") {
       $l_ico = "ico_$module";
       global ${$l_ico};
       $mod_url = url_prepare("$path/$module/${module}_index.php?action=detailconsult&amp;param_${module}=$id");
-      $block .= "<li class=\"lastList\"><a href=\"$mod_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
-        <a href=\"$mod_url\">$text</a></li>";
+      $block .= "
+        <li class=\"lastList\"><a href=\"$mod_url\"><img src=\"/images/$set_theme/${$l_ico}\" alt=\"\" /></a>
+          <a href=\"$mod_url\">$text</a></li>";
     }
   }
 

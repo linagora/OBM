@@ -86,13 +86,28 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display List search Form                                                  //
-// Parameters : 
-//   - $list[]        : default form values
-//     keys used      : name, contact
+// Display List search form
+// Parameters:
+//   - $list[] : hash with list values
 ///////////////////////////////////////////////////////////////////////////////
-function html_list_search_form ($list) {
-  global $l_name, $l_list_contact, $l_email, $l_find;
+function dis_list_search_form($list="") {
+
+  $usr_q = run_query_userobm_active();
+  $block .= html_list_search_form($list, $usr_q);
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display List search Form
+// Parameters : 
+//   - $list[]    : default form values
+//     keys used  : name, contact
+//   - $usr_q     : database object with userobm list
+///////////////////////////////////////////////////////////////////////////////
+function html_list_search_form ($list, $usr_q) {
+  global $c_all, $l_all, $l_name, $l_list_contact, $l_email, $l_market,$l_find;
   global $popup;
 
   if ($popup) {
@@ -112,6 +127,18 @@ function html_list_search_form ($list) {
   $name = stripslashes($list["name"]);
   $email = stripslashes($list["email"]);
   $contact = stripslashes($list["contact"]);
+  $mark = $list["marketing_manager"];
+
+  // Marketing manager select
+  $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
+    <option value=\"$c_all\">$l_all</option>";
+  while ($usr_q->next_record()) {
+    $u_id = $usr_q->f("userobm_id");
+    $sel_market .= "\n<option value=\"$u_id\"";
+    if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+  }
+  $sel_market .= "</select>";
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -128,6 +155,9 @@ function html_list_search_form ($list) {
     </div>
     <div class=\"searchLabel\">$l_email<br />
       <input type=\"text\" name=\"tf_email\" size=\"20\" value=\"$email\" />
+    </div>
+    <div class=\"searchLabel\">$l_market<br />
+      $sel_market
     </div>
     <div class=\"searchLabel\">&nbsp;<br />
       <input name=\"action\" type=\"hidden\" value=\"search\" />

@@ -166,8 +166,8 @@ $sel_dsrc .= "</select>";
 ///////////////////////////////////////////////////////////////////////////////
 // Debug block (admin only)
 ///////////////////////////////////////////////////////////////////////////////
-// Conditionne a Admin !
 //if ($perm->check_right($menu, $cright_write_admin)) {
+
   $dis_debug = "
   <tr>
     <td class=\"adminLabel\">$l_set_debug ($set_debug)</td>

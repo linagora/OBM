@@ -47,7 +47,6 @@ if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 require("$obminclude/global_pref.inc");
-
 include("list_display.inc");
 include("list_query.inc");
 
@@ -86,7 +85,7 @@ if ($action == "new_criterion") {
 }
 elseif (($action == "index") || ($action == "")) {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_list_search_form($list);
+  $display["search"] = dis_list_search_form($list);
   if ($set_display == "yes") {
     $display["result"] = dis_list_search_list("", $popup);
   } else {
@@ -96,7 +95,7 @@ elseif (($action == "index") || ($action == "")) {
 
 else if ($action == "search") {
 ///////////////////////////////////////////////////////////////////////////////
-  $display["search"] = html_list_search_form($list);
+  $display["search"] = dis_list_search_form($list);
   $display["result"] = dis_list_search_list($list, $popup);
 }
 
@@ -132,7 +131,7 @@ else if ($action == "insert") {
       } else {
         $display["msg"] .= display_err_msg($l_insert_error);
       }
-      $display["search"] = html_list_search_form($list);
+      $display["search"] = dis_list_search_form($list);
 
     // If it is the first try, we warn the user if some lists seem similar
     } else {
@@ -146,7 +145,7 @@ else if ($action == "insert") {
         } else {
           $display["msg"] .= display_err_msg($l_insert_error);
         }
-        $display["search"] = html_list_search_form($list);
+        $display["search"] = dis_list_search_form($list);
       }
     }
 
@@ -191,7 +190,7 @@ else if ($action == "insert") {
   } else {
     $display["msg"] .= display_err_msg($l_delete_error);
   }
-  $display["search"] = html_list_search_form("");
+  $display["search"] = dis_list_search_form("");
 
 } elseif ($action == "contact_add")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,7 +250,7 @@ else if($action == "export_add") {
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
 if ($action == "ext_get_ids") {
-  $display["search"] = html_list_search_form($list);
+  $display["search"] = dis_list_search_form($list);
   if ($set_display == "yes") {
     $display["detail"] = dis_list_search_list($list, $popup);
   } else {
@@ -274,7 +273,7 @@ exit(0);
 // returns : $list hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
-  global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact;
+  global $tf_name, $tf_subject, $tf_email, $ta_query, $tf_contact, $sel_market;
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $new_order, $order_dir,$popup,$row_index;
@@ -304,6 +303,7 @@ function get_param_list() {
   if (isset ($tf_email)) $list["email"] = $tf_email;
   if (isset ($ta_query)) $list["query"] = trim($ta_query);
   if (isset ($tf_contact)) $list["contact"] = trim($tf_contact);
+  if (isset ($sel_market)) $list["marketing_manager"] = $sel_market;
   if (isset ($row_index)) $list["row_index"] = $row_index;
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
@@ -421,7 +421,7 @@ function get_list_action() {
     'Name'     => $l_header_new,
     'Url'      => "$path/list/list_index.php?action=new",
     'Right'    => $cright_write,
-    'Condition'=> array ('','search','index','detailconsult','admin','display') 
+    'Condition'=> array ('','search','index','detailconsult','insert','update','admin','display') 
                                   );
 
 // New

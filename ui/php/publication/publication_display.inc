@@ -1,7 +1,7 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : publication_display.inc                                          //
-//     - Desc : Publication Display File                                         //
+// OBM - File : publication_display.inc                                      //
+//     - Desc : Publication Display File                                     //
 // 2004-01-28 Rande Mehdi                                                    //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //

@@ -92,10 +92,20 @@ $cgp_show["module"]["settings"] = true;
 $cgp_show["module"]["user"] = true;
 $cgp_show["module"]["group"] = true;
 
-
 require_once("$obminclude/obm_conf.inc");
 require_once("$obminclude/phplib/obmlib.inc");
 
+//----------------------------//
+// Calculated Displayed Infos //
+//----------------------------//
+if (! $cgp_show["module"]["deal"]) {
+  $cgp_hide["company"]["company_deal_number"] = true;
+}
+
+if (! $cgp_show["module"]["contact"]) {
+  $cgp_hide["company"]["company_contact_number"] = true;
+  $cgp_hide["company"]["company_new_contact"] = true;
+}
 
 //---------------------------------------------------------------------------//
 // OBM internal Constants : Do not change 

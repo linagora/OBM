@@ -67,16 +67,16 @@ function sql_casei_like($db_type) {
 // Returns:
 //   - user's Id
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_id_user($login) {
+function get_user_id($login) {
   global $cdg_sql;
 
-  $connect_db = new DB_OBM ;
+  $obm_q = new DB_OBM ;
   if (isset($login)) {
-    $query = "select userobm_id from UserObm where userobm_login='$login'" ;
+    $query = "select userobm_id from UserObm where userobm_login='$login'";
     display_debug_msg($query, $cdg_sql);
-    $connect_db->query($query) ;
-    $connect_db->next_record() ;
-    return $connect_db->f("userobm_id") ;
+    $obm_q->query($query) ;
+    $obm_q->next_record() ;
+    return $obm_q->f("userobm_id") ;
   } else {
     return "" ;
   }
@@ -684,16 +684,16 @@ function run_query_get_global_prefs() {
 function session_load_global_prefs() {
   global $sess;
 
-  $obm_q_name_var = run_query_get_global_prefs();
-  while ($obm_q_name_var->next_record()) {
-    $tab[0]=$obm_q_name_var->f("globalpref_option");
-    $tab[1]=$obm_q_name_var->f("globalpref_value");
+  $obm_q = run_query_get_global_prefs();
+  while ($obm_q->next_record()) {
+    $option = $obm_q->f("globalpref_option");
+    $value = $obm_q->f("globalpref_value");
 
     // Define the variable in the database as global ($tab[0] contain the
     // variable name so ${$tab[0]} will define the var
-    global ${$tab[0]};
-    ${$tab[0]}=$tab[1];
-    $sess->register("$tab[0]");
+    global $$option;
+    $$option = $value;
+    $sess->register("$option");
   }
 }
 
@@ -708,43 +708,21 @@ function session_load_user_prefs() {
   global $todo_3_id, $todo_3_title, $todo_4_id, $todo_4_title;
   global $todo_5_id, $todo_5_title;
 
-  $obm_q_name_var = run_query_get_user_prefs($auth->auth["uid"]);
-  while ($obm_q_name_var->next_record()) {
-    $tab[0]=$obm_q_name_var->f("userobmpref_option");
-    $tab[1]=$obm_q_name_var->f("userobmpref_value");
-    global ${$tab[0]};
-    $$tab[0]=$tab[1];
-    $sess->register("$tab[0]");
+  $obm_q = run_query_get_user_prefs($auth->auth["uid"]);
+  while ($obm_q->next_record()) {
+    $option = $obm_q->f("userobmpref_option");
+    $value = $obm_q->f("userobmpref_value");
+    global $$option;
+    $$option = $value;
+    $sess->register("$option");
+    // Last visit management (if last_visit entry, get the associated text)
+    if (substr($option, 0, 5) == "last_") {
+      $entity = substr($option, 5);
+      $function_get_last_text = "get_last_${entity}_text";
+      $last_v[$entity]["id"] = $$option;
+      $last_v[$entity]["text"] = $function_get_last_text($$option);
+    }
   }
-
-  $last_v["company"]["id"] = $last_company;
-  $last_v["company"]["text"] = get_last_company_text($last_company);
-  $last_v["contact"]["id"] = $last_contact;
-  $last_v["contact"]["text"] = get_last_contact_text($last_contact);
-  $last_v["deal"]["id"] = $last_deal;
-  $last_v["deal"]["text"] = get_last_deal_text($last_deal);
-  $last_v["parentdeal"]["id"] = $last_parentdeal;
-  $last_v["parentdeal"]["text"] = get_last_parentdeal_text($last_parentdeal);
-  $last_v["list"]["id"] = $last_list;
-  $last_v["list"]["text"] = get_last_list_text($last_list);
-  $last_v["publication"]["id"] = $last_publication;
-  $last_v["publication"]["text"] = get_last_publication_text($last_publication);
-  $last_v["project"]["id"] = $last_project;
-  $last_v["project"]["text"] = get_last_project_text($last_project);
-  $last_v["contract"]["id"] = $last_contract;
-  $last_v["contract"]["text"] = get_last_contract_text($last_contract);
-  $last_v["incident"]["id"] = $last_incident;
-  $last_v["incident"]["text"] = get_last_incident_text($last_incident);
-  $last_v["account"]["id"] = $last_account;
-  $last_v["account"]["text"] = get_last_account_text($last_account);
-  $last_v["invoice"]["id"] = $last_invoice;
-  $last_v["invoice"]["text"] = get_last_invoice_text($last_invoice);
-  $last_v["payment"]["id"] = $last_payment;
-  $last_v["payment"]["text"] = get_last_payment_text($last_payment);
-  $last_v["user"]["id"] = $last_user;
-  $last_v["user"]["text"] = get_last_user_text($last_user);
-  $last_v["group"]["id"] = $last_group;
-  $last_v["group"]["text"] = get_last_group_text($last_group);
 
   $sess->register("last_v");
 
@@ -909,7 +887,7 @@ function get_last_contact_text($id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Get the deal label from the deal Id
 // Parameters:
-//   - $d_id : deal id 
+//   - $id : deal id 
 ///////////////////////////////////////////////////////////////////////////////
 function get_last_deal_text($id) {
   global $cdg_sql;
@@ -940,11 +918,12 @@ function get_last_parentdeal_text($id) {
     from ParentDeal
     where parentdeal_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("parentdeal_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("parentdeal_label");
   }
+
   return;
 }
 
@@ -965,6 +944,7 @@ function get_last_list_text($id) {
     $obm_db->next_record();
     return $obm_db->f("list_name");
   }
+
   return;
 }
 
@@ -1001,10 +981,10 @@ function get_last_project_text($id) {
   if ($id > 0) {
     $query = "select project_name from Project where project_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("project_name");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("project_name");
   }
   return;
 }
@@ -1021,10 +1001,10 @@ function get_last_contract_text($id) {
   if ($id > 0) {
     $query = "select contract_label from Contract where contract_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("contract_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("contract_label");
   }
   return;
 }
@@ -1041,10 +1021,10 @@ function get_last_incident_text($id) {
   if ($id > 0) {
     $query = "select incident_label from Incident where incident_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("incident_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("incident_label");
   }
   return;
 }
@@ -1061,9 +1041,9 @@ function get_last_account_text($id) {
   if ($id > 0) {
     $query = "select account_label from Account where account_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
     return $obm_db->f("account_label");
   }
   return;
@@ -1081,10 +1061,10 @@ function get_last_invoice_text($id) {
   if ($id > 0) {
     $query = "select invoice_label from Invoice where invoice_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("invoice_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("invoice_label");
   }
   return;
 }
@@ -1101,10 +1081,10 @@ function get_last_payment_text($id) {
   if ($id > 0) {
     $query = "select payment_label from Payment where payment_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("payment_label");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("payment_label");
   }
   return;
 }
@@ -1117,14 +1097,14 @@ function get_last_payment_text($id) {
 ///////////////////////////////////////////////////////////////////////////////
 function get_last_user_text($id) {
   global $cdg_sql;
-  
+
   if ($id > 0) {
     $query = "select userobm_login from UserObm where userobm_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("userobm_login");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("userobm_login");
   }
   return;
 }
@@ -1141,10 +1121,10 @@ function get_last_group_text($id) {
   if ($id > 0) {
     $query = "select group_name from UGroup where group_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_db = new DB_OBM;
-    $obm_db->query($query);
-    $obm_db->next_record();
-    return $obm_db->f("group_name");
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    return $obm_q->f("group_name");
   }
   return;
 }
