@@ -1009,7 +1009,6 @@ function make_query($list) {
     $where = " WHERE $where";
   }
   $query = "SELECT $select FROM $join $where GROUP BY $group ORDER BY contact_lastname";
-  echo $query;
   return trim(addslashes($query));
 }
 
