@@ -41,7 +41,8 @@ $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_mobilephone"] = $l_hphone;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["subscription_quantity"] = $l_quantity;
-
+$fieldnames["publication_title"] = $l_publication." ".$l_title;
+$fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display List specific dataset fields                                      //

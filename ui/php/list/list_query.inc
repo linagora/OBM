@@ -907,9 +907,14 @@ function make_query($list) {
     "kind_lang" => " left join Kind on contact_kind_id = kind_id "
   );
   $add_select = array (
-    "publication" => ", SUM(subscription_quantity) as subscription_quantity"
+    "publication" => ", SUM(subscription_quantity) as subscription_quantity
+    		      ,publication_lang
+		      ,publication_title"
+    			
   );
   $add_group = array (
+    "publication" => ",publication_lang
+    		      ,publication_title"
   );  
   $select = "
         contact_id,
