@@ -1596,9 +1596,12 @@ function get_email_used($id="", $gid="", $lid="") {
   global $cdg_sql, $php_regexp_email_name;
 
   $mails = array();
-  $query = "select userobm_lastname, userobm_firstname, userobm_email
-    from UserObm
-    where userobm_id != '$id'";
+  if ($id != "") {
+    $where_id = "WHERE userobm_id != '$id'";
+  }
+  $query = "SELECT userobm_lastname, userobm_firstname, userobm_email
+    FROM UserObm
+    $where_id";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -1614,9 +1617,12 @@ function get_email_used($id="", $gid="", $lid="") {
     }
   }
 
-  $query = "select group_name, group_email
-    from UGroup
-    where group_id != '$gid'";
+  if ($gid != "") {
+    $where_gid = "WHERE group_id != '$gid'";
+  }
+  $query = "SELECT group_name, group_email
+    FROM UGroup
+    $where_gid";
 
   display_debug_msg($query, $cdg_sql);
   $g_q = new DB_OBM;
@@ -1628,10 +1634,12 @@ function get_email_used($id="", $gid="", $lid="") {
     $mails["$email"] = "$name";
   }
 
-
-  $query = "select list_name, list_email
-    from List
-    where list_id != '$lid'";
+  if ($lid != "") {
+    $where_lid = "WHERE list_id != '$lid'";
+  }
+  $query = "SELECT list_name, list_email
+    FROM List
+    $where_lid";
 
   display_debug_msg($query, $cdg_sql);
   $l_q = new DB_OBM;

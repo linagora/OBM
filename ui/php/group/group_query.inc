@@ -162,7 +162,7 @@ function run_query_detail($id) {
          left join UserObm as u on group_userupdate=u.userobm_id
     where group_id = '$id'";
   display_debug_msg($query, $cdg_sql);
-  $obm_q->query($query) ;
+  $obm_q->query($query);
   $obm_q->next_record();
 
   return $obm_q;
@@ -170,7 +170,7 @@ function run_query_detail($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Query execution : group insertion                                         //
+// Query execution : group insertion
 // Parameters:
 //   - $group[] : group hash info : keys used : all
 ///////////////////////////////////////////////////////////////////////////////

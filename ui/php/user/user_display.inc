@@ -26,7 +26,7 @@ $fieldnames["userobm_fax2"] = $l_fax2;
 $fieldnames["datebegin"] = $l_datebegin;
 $fieldnames["timelastaccess"] = $l_lastaccess;
 $fieldnames["userobm_email"] = $l_email;
-$fieldnames["userobm_email"] = $l_desc;
+$fieldnames["userobm_description"] = $l_desc;
 
 
 ///////////////////////////////////////////////////////////////////////////////

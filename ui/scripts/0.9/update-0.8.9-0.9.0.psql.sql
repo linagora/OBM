@@ -30,6 +30,7 @@ DROP TABLE RepeatKind;
 ALTER TABLE UserObm ADD COLUMN userobm_local integer DEFAULT 1;
 ALTER TABLE UGroup ADD COLUMN group_local integer DEFAULT 1;
 ALTER TABLE UGroup ADD COLUMN group_privacy integer;
+ALTER TABLE UGroup ALTER COLUMN group_privacy SET DEFAULT 0;
 
 -- Add column _ext_id
 ALTER TABLE UserObm ADD COLUMN userobm_ext_id varchar(16);

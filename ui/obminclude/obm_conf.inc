@@ -43,7 +43,7 @@ $ctu_sql_limit = true;
 $cgp_mail_enabled = true;
 
 // Session Cookie lifetime (in seconds, 0=session cookie)
-$cs_lifetime = 7200;
+$cs_lifetime = 0;
 
 // Use Database sessions
 //$cgp_sess_db = true;

@@ -63,10 +63,12 @@ function run_query_active_user($delay) {
   global $cdg_sql;
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
-  if ($delay > 0)
+  if ($delay > 0) {
     $date_limit = date("Y-m-d H:i:s",time() - $delay);
-  else
+    $where_date = "and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
+  } else {
     $date_limit = 0;
+  }
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -81,7 +83,7 @@ function run_query_active_user($delay) {
       $timeupdate
     from UserObm, ActiveUserObm
     where ActiveUserObm.activeuserobm_userobm_id = UserObm.userobm_id
-      and ActiveUserObm.activeuserobm_timeupdate >= '$date_limit'";
+      $where_date";
   display_debug_msg($query,$cdg_sql);
   $obm_q->query($query);
   return $obm_q;

@@ -277,7 +277,7 @@ function html_group_search_group($obm_q, $pref_q, $nb_group, $group) {
 //     keys used  : name, desc, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_group_form($action, $group_q, $group) {
-  global $l_group, $l_name, $l_desc, $l_email, $l_visibility, $l_insert, $l_update, $l_back;
+  global $l_group, $l_name, $l_desc, $l_email, $l_private, $l_insert, $l_update, $l_back;
   
   // if update mode and first time, values are taken from db
   if ($action == "detailupdate") {
@@ -329,7 +329,7 @@ function html_group_form($action, $group_q, $group) {
       <input name=\"tf_email\" maxlength=\"64\" size=\"32\" value=\"$email\" />@</td>
   </tr>
   </tr><tr>
-    <td class=\"detailLabel\">$l_visibility</td>
+    <td class=\"detailLabel\">$l_private</td>
     <td class=\"detailForm\"><input name=\"cb_priv\" type=\"checkbox\" value=\"1\" $private_c /></td>
   </tr>
   </table>";
