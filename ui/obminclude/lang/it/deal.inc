@@ -34,6 +34,8 @@ $l_add_comment = "Nuovo commento";
 $l_upd_comment = "Modifica commento";
 
 // Labels and texts
+$l_private = "Privato";
+$l_public = "Pubblico";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Ordine";
@@ -54,10 +56,14 @@ $l_before = "Prima";
 $l_last_update = "Ultimo aggiornamento al ";
 $l_at = "a";
 $l_deal_select_company = "Scegli l'azienda relativa al impegno";
-$l_private = "Privato";
-$l_public = "Pubblico";
-$l_affect_deal= "Cambia Sub-Impegno ";
 $l_deal_select_parentdeal = "Scegli il Sub-impegno al quale l'impegno deve essere collegato";
+$l_affect_deal= "Cambia Sub-Impegno ";
+// about invoice...
+$l_create_invoice = "Inserisci Fattura";
+$l_invoices = "Fatture collegate";
+$l_archived_invoices = "Fatture in archivio";
+$l_no_invoices = "Non sono presenti fatture collegate";
+$l_see_archived_invoices = "Vedi Elenco fatture in archivio";
 $l_kind_manage = "Gestione Tipo Impegno ";
 $l_kind_exist = "Tipo esistenti";
 $l_kind_new = "Nuovo Tipo";
@@ -70,6 +76,8 @@ $l_category_new = "Nuova Categoria";
 $l_category_label="Nome";
 $l_category_minilabel="Nome corto";
 $l_parentdeal_deals = "Impegni appartengono a questo Sub-impegno";
+$l_add_contrat = "Add a contract";
+$l_contract_list = "Contracts";
 
 // Titles
 $l_deal = "Impegni";
@@ -184,10 +192,3 @@ $l_parentdeal_display = "Visualizza opzioni per la lista di Sub-Impegni";
 $l_invoice_display = "Visualizza opzioni per la lista di fatture";
 
 
-//about invoice...
-
-$l_create_invoice = "Inserisci Fattura";
-$l_invoices_connected = "Fatture collegate";
-$l_archived_invoices_connected ="Fatture in archivio collegate";
-$l_no_invoices_connected = "Non sono presenti fatture collegate";
-$l_see_archived_invoices = "Vedi Elenco fatture in archivio";

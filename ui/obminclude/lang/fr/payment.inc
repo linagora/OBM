@@ -50,7 +50,6 @@ $l_invoice_inout = "Type";
 $l_invoice_paid = "Montant déjà payé";
 $l_already_used_share = "Montant du paiement déjà utilisé ";
 $l_invoice_company = "reliée à la Companie" ;
-$l_invoice_deal = "Affaire";
 $l_deal = "Affaire";
 $l_company = "Société";
 

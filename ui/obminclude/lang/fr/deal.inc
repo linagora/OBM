@@ -32,10 +32,10 @@ $l_add_comment = "Ajouter un commentaire";
 $l_upd_comment = "Modifier le commentaire";
 $l_todo = "A faire";
 $l_visibility ="Accès";
-$l_invoice_deal = "Affaire";
-$l_archived_invoices_connected = " Facture(s) archivée(s) connectée(s) à cette Affaire";
-$l_see_archived_invoices = "Voir aussi les factures archivées";
+
 // Labels et textes
+$l_private = "Privé";
+$l_public = "Publique";
 $l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";
@@ -56,12 +56,12 @@ $l_last_update = "Dernière modification le";
 $l_at = "à";
 $l_deal_select_company = "Sélectionner la société avec laquelle l'affaire doit être renseignée.";
 $l_deal_select_parentdeal = "Sélectionner la surAffaire à laquelle l'affaire doit être affectée";
-$l_private = "Privé";
-$l_public = "Publique";
 $l_affect_deal = "Affecter à une surAffaire";
-$l_invoices_connected = "Facture(s) connectée(s) à cette Affaire";
-$l_no_invoices_connected = "Aucune Facture connectée à cette Affaire";
-$l_create_invoice = "Créer une facture liée à cette affaire";
+$l_invoices = "Facture(s)";
+$l_no_invoice = "Aucune Facture en cours associée";
+$l_create_invoice = "Créer une facture";
+$l_archived_invoices = " Facture(s) archivée(s)";
+$l_see_archived_invoices = "Voir aussi les factures archivées";
 $l_kind_manage = "Gestion des Types d'Affaires";
 $l_kind_exist = "Types existants";
 $l_kind_new = "Nouveau Type";
@@ -80,7 +80,7 @@ $l_invoice_TTC = "Montant TTC";
 $l_invoice_status = "Etat";
 $l_invoice_date = "Date";
 $l_add_contrat = "Ajouter un contrat lié à cette affaire";
-$l_contract_list = "Liste des contrats lié à cette affaire";
+$l_contract_list = "Contrats";
 
 // Titres
 $l_deal = "Affaire";

@@ -777,23 +777,27 @@ function run_query_kind_links($k_id) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Status insert                                           //
 // Parameters:
-//   - $deal[] : deal hash info : keys used : status_label, status_order
+//   - $deal[] : deal hash info, keys used : status_label, status_order hitrate
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_insert($deal) {
   global $auth, $cdg_sql;
 	
   $label = $deal["status_label"];
   $order = $deal["status_order"];
+  $hitrate = $deal["hitrate"];
 
   $query = "insert into DealStatus (dealstatus_timeupdate,
     dealstatus_timecreate,
     dealstatus_usercreate,
-    dealstatus_label,dealstatus_order)
+    dealstatus_label,
+    dealstatus_order,
+    dealstatus_hitrate)
   values ('null',
     '".date("Y-m-d H:i:s")."',
     ".$auth->auth["uid"].",
     '$label',
-    '$order')";
+    '$order',
+    '$hitrate')";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
@@ -806,7 +810,7 @@ function run_query_status_insert($deal) {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution : Status update                                           //
 // Parameters:
-//   - $deal[] : deal hash info : keys used : state, status_label, status_order
+//   - $deal[] : deal hash info, keys used : status_label, status_order hitrate
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_status_update($deal) {
   global $auth, $cdg_sql;
@@ -814,11 +818,13 @@ function run_query_status_update($deal) {
   $status = $deal["state"];
   $label = $deal["status_label"];
   $order = $deal["status_order"];
+  $hitrate = $deal["hitrate"];
 
   $query = "update DealStatus set dealstatus_label='$label',
     dealstatus_timeupdate='".date("Y-m-d H:i:s")."',
     dealstatus_userupdate='".$auth->auth["uid"]."',
-    dealstatus_order='$order'
+    dealstatus_order='$order',
+    dealstatus_hitrate='$hitrate'
   where dealstatus_id='$status'";
 
   display_debug_msg($query, $cdg_sql);

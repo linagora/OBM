@@ -41,7 +41,7 @@ $fieldnames["invoice_label"] = $l_invoice_label;
 $fieldnames["invoice_amount_HT"] = $l_invoice_HT;
 $fieldnames["invoice_amount_TTC"] = $l_invoice_TTC;
 $fieldnames["invoice_status"] = $l_invoice_status;
-$fieldnames["invoice_deal"] = $l_invoice_deal;
+$fieldnames["invoice_deal"] = $l_deal;
 $fieldnames["invoice_company"] = $l_company;
 
 
@@ -389,14 +389,13 @@ function beautify_deal_comment($com) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
-  global $set_theme,$ico_company,$ico_contact;
+  global $set_theme,$ico_company, $ico_contact, $ico_contract;
   // - Labels
   global $l_update,$l_delete,$l_insert,$l_infos;
   global $l_company, $l_label,$l_date_init,$l_kind,$l_category,$l_marketing_manager,$l_technical_manager,$l_proposition;
   global $l_amount,$l_hitrate,$l_contact,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number;
   global $l_visibility,$l_public,$l_private,$l_affect_deal,$l_parentdeal,$l_todo, $l_deal;
-  global $l_invoices_connected,$l_no_invoices_connected;
-  global $l_create_invoice, $l_archived_invoices_connected;
+  global $l_invoices, $l_no_invoice, $l_create_invoice, $l_archived_invoices;
   global $l_see_archived_invoices, $incl_arch;
   global $l_contract_list;
   global $path, $auth, $c_yes, $c_no;
@@ -460,17 +459,17 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
   }
   echo "
   <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
-  <img border=0  src=\"/images/$set_theme/$ico_contact\"></a>
+  <img border=0  src=\"/images/$set_theme/$ico_contract\"></a>
   <a href=\"". url_prepare("$path/contract/contract_index.php?action=search&amp;param_deal=".$id)."\">
   $l_contract_list</a><br><br>";
   // to create an invoice connected to this deal
   if ($auth->auth["perm"] != $perms_user) {
     echo "<a href=\"".url_prepare("$path/invoice/invoice_index.php?action=new&amp;deal_linked=".$id)."\"> $l_create_invoice </a><br /><br />";
     // this is displayed close to links so we use that color too
-    echo "$nb_invoices $l_invoices_connected.";
+    echo "$nb_invoices $l_invoices";
     // how many archived invoices connected :
     $nb_arch_invoices = run_query_nb_archived_invoices ($id);
-    echo "<br /><br />$nb_arch_invoices $l_archived_invoices_connected.";
+    echo "<br /><br />$nb_arch_invoices $l_archived_invoices.";
   } else {
     echo "probleme...";
   }
@@ -574,16 +573,11 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
 
   // we display invoices list
   if ($nb_invoices == 0) {
-    display_info_msg ($l_no_invoices_connected);
+    display_info_msg ($l_no_invoice);
   } else {
-    display_info_msg ($nb_invoices." ".$l_invoices_connected);
+    display_info_msg ($nb_invoices." ".$l_invoice);
 
-    
-    $url = url_prepare("deal_index.php?".
-		      "action=detailconsult".
-		      "&amp;param_deal=".
-		      $deal_q->f("deal_id").
-		      "&amp;incl_arch=".$incl_arch);
+    $url = url_prepare("deal_index.php?action=detailconsult&amp;param_deal=$id&amp;incl_arch=$incl_arch");
     
     $dis_invoice_list = new OBM_DISPLAY("DATA", $invoices_options);
     $dis_invoice_list->display_entity = "invoice";
@@ -595,7 +589,7 @@ function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_optio
     $dis_invoice_list->display();
     // and a button to allow displaying archived invoices :
     $url = url_prepare ("deal_index.php?action=detailconsult".
-		       "&amp;param_deal=".$id.
+		       "&amp;param_deal=$id".
 		       "&amp;incl_arch=1");
     echo "
        <form method=\"post\" action=\"$url\">
@@ -733,7 +727,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $tt_label = $cat_q->f("tasktype_label");
     $sel_cat .= "\n<option value=\"$cid\"";
     if ($cat == $cid) $sel_cat .= "selected = \"selected\""; 
-    $sel_cat .= ">$tt_label</option>\n";
+    $sel_cat .= ">$tt_label</option>";
   }
   $sel_cat .= "</select>";
  
@@ -744,9 +738,9 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $cid = $usr_q->f("userobm_id");
     $cname = $usr_q->f("userobm_lastname") . " " .
              $usr_q->f("userobm_firstname");
-    $sel_market .= "<option value=\"$cid\"";
+    $sel_market .= "\n<option value=\"$cid\"";
     if ($market == $cid) $sel_market .= " selected = \"selected\""; 
-    $sel_market .= ">$cname</option>\n";
+    $sel_market .= ">$cname</option>";
   }
   $sel_market .= "</select>";
 
@@ -796,7 +790,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
   $sel_con2 .= "</select>";
 
   // state select construction
-  $sel_state = "<select name=\"sel_state\">";
+  $sel_state = "<select name=\"sel_state\" onChange=\"auto_set_hitrate(this, this.form.tf_hitrate,this.selectedIndex);\">";
   while ($sta_q->next_record()) {
     $sid = $sta_q->f("dealstatus_id");
     $slabel = $sta_q->f("dealstatus_label");
@@ -805,6 +799,31 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
     $sel_state .= ">$slabel</option>\n";
   }
   $sel_state .= "</select>";
+
+  $js_state = "
+<script type=\"text/javascript\">
+<!--
+
+function auto_set_hitrate(select, targetField, pos) {
+";
+
+  $sta_q->seek(0);
+  while ($sta_q->next_record()) {
+    $sid = $sta_q->f("dealstatus_id");
+    $shitrate = $sta_q->f("dealstatus_hitrate");
+    if (($shitrate != "") && (($shitrate >= 0) && ($shitrate <= 100))) {
+      $js_state .= "
+        if (select.options[pos].value == $sid) {
+          targetField.value = $shitrate;
+        }";
+    }
+  }
+
+  $js_state .= "  return true;
+}
+-->
+</script>
+";
   
   // User comment select construction
   if ($usr_q->nf()>0) {
@@ -886,6 +905,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
 
 
   echo "
+    $js_state
     <form method=\"post\" name=\"form_deal_update\" 
       onsubmit=\"if (check_form(this)) return true; else return false;\"
       action=\"".url_prepare("deal_index.php")."\">
@@ -1123,6 +1143,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
   global $l_kind_checkdelete, $l_kind_update, $l_kind_insert;
   global $l_cat_checkdelete,$l_cat_update,$l_cat_insert;
   global $l_status_checkdelete,$l_status_update,$l_status_insert;
+  global $l_hitrate;
 
   // Kind Select construction
   $sel_kind = "<select name=\"sel_kind\" size=\"4\">";
@@ -1140,7 +1161,8 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
      $id = $status_q->f("dealstatus_id");
      $order = $status_q->f("dealstatus_order");
      $label = $status_q->f("dealstatus_label");
-     $sel_sta .= "<option value=\"$id\">$order-$label</option>\n";
+     $hitrate = $status_q->f("dealstatus_hitrate");
+     $sel_sta .= "<option value=\"$id\">$order-$label ($hitrate)</option>\n";
   }
   $sel_sta .= "</select>";
 
@@ -1286,7 +1308,7 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
           <tr>
             <td class=\"adminLabel\">$l_label : </td>
             <td><input type=\"text\" name=\"tf_status\" /></td>
-            <td rowspan=\"2\">
+            <td rowspan=\"3\">
               <input type=\"submit\" name=\"sub_status\" value=\"$l_status_update\"
               onclick=\"if (check_status_upd(this.form, document.form_status_delete)) return true; else return false;\" />
             </td>
@@ -1295,6 +1317,12 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
             <td class=\"adminLabel\">$l_order : </td>
             <td>
 	      <input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" />
+	    </td>
+          </tr>
+          <tr>
+            <td class=\"adminLabel\">$l_hitrate : </td>
+            <td>
+	      <input type=\"text\" name=\"tf_hitrate\" size=\"3\" maxlength=\"3\" />
 	    </td>
           </tr>
           </table>
@@ -1318,6 +1346,10 @@ function html_deal_admin_form($kind_q, $cat_q, $status_q) {
         <tr>
           <td class=\"adminLabel\">$l_order : </td>
           <td><input type=\"text\" name=\"tf_order\" size=\"3\" maxlength=\"2\" /></td>
+        </tr>
+        <tr>
+          <td class=\"adminLabel\">$l_hitrate : </td>
+          <td><input type=\"text\" name=\"tf_hitrate\" size=\"3\" maxlength=\"3\" /></td>
         </tr>
         <tr>
           <td colspan=\"2\" class=\"adminLabel\">
@@ -1819,7 +1851,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   global $path,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager;
   global $l_parentdeal,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_potential,$l_comment,$l_marketing_manager,$l_state;
-  global $l_invoices_connected,$l_no_invoices_connected, $l_infos;
+  global $l_infos;
   global $popup_width, $popup_height, $l_deal_select_company;
 
   $parent = $parent_q->f("parentdeal_id");

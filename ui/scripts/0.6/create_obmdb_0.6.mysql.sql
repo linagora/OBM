@@ -286,6 +286,7 @@ CREATE TABLE DealStatus (
   dealstatus_usercreate int(8),
   dealstatus_label varchar(20),
   dealstatus_order int(2),
+  dealstatus_hitrate char(3),
   PRIMARY KEY (dealstatus_id)
 );
 

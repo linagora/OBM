@@ -18,10 +18,16 @@ CREATE TABLE CalendarRight (
 
 
 -------------------------------------------------------------------------------
--- Update deal hitrate values according to state
+-- Update deal hitrate values according to status
 -------------------------------------------------------------------------------
 -- Set hitrate = 100 where status = SIGNED,DONE,INVOICE,PAYED
 UPDATE Deal set deal_hitrate = '100' where deal_status_id = '1' or deal_status_id = '7' or deal_status_id = '8' or deal_status_id = '9';
+
+-------------------------------------------------------------------------------
+-- Update table DealStatus
+-------------------------------------------------------------------------------
+-- Add new column : dealstatus_hitrate
+ALTER table DealStatus add column dealstatus_hitrate char(3) AFTER dealstatus_order;
 
 
 -------------------------------------------------------------------------------

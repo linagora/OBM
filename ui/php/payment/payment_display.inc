@@ -29,7 +29,7 @@ $fieldnames["invoice_number"] = $l_invoice_number;
 $fieldnames["invoice_paid"] = $l_invoice_paid;
 $fieldnames["invoice_company"] = $l_invoice_company;
 $fieldnames["invoice_status"] = $l_invoice_status;
-$fieldnames["invoice_deal"] = $l_invoice_deal;
+$fieldnames["invoice_deal"] = $l_deal;
 // for the temp. entries :
 $fieldnames["entrytemp_date"] = $l_entrytemp_date ;
 $fieldnames["entrytemp_type"] = $l_entrytemp_type ;

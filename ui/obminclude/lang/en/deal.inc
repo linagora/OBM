@@ -32,9 +32,11 @@ $l_add_comment = "Add a comment";
 $l_upd_comment = "Update comment";
 $l_todo = "To Do";
 $l_visibility = "Access";
-$l_infos = "Informations";
 
 // Labels and texts
+$l_private = "Private";
+$l_public = "Public";
+$l_infos = "Informations";
 $l_minus = "-";
 $l_plus = "+";
 $l_order = "Order";
@@ -53,10 +55,13 @@ $l_before = "Before";
 $l_last_update = "Last updated on";
 $l_at = "at";
 $l_deal_select_company = "Select the company which whom the deal must be filled";
-$l_private = "Private";
-$l_public = "Public";
-$l_affect_deal= "Change Parent Deal";
 $l_deal_select_parentdeal = "Select the parentdeal to which the deal must be affected";
+$l_affect_deal= "Change Parent Deal";
+$l_invoices = "Invoice(s)";
+$l_no_invoice = "No invoice connected";
+$l_create_invoice = "Create an invoice";
+$l_archived_invoices = " Archived Invoices";
+$l_see_archived_invoices = "See archived invoices too";
 $l_kind_manage = "Deal Kind Management";
 $l_kind_exist = "Existing Kinds";
 $l_kind_new = "New Kind";
@@ -69,8 +74,8 @@ $l_category_new = "New Category";
 $l_category_label="Label";
 $l_category_minilabel="Mini Label";
 $l_parentdeal_deals = "Deals belonging to this parentdeal";
-$l_add_contrat = "Add a contract link whith this deal.";
-$l_contract_list = "Contracts belonging to this Deal";
+$l_add_contrat = "Add a contract";
+$l_contract_list = "Contracts";
 
 // Titles
 $l_deal = "Deal";
