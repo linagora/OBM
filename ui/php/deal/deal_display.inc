@@ -1802,7 +1802,7 @@ function html_select_deal($deal_q, $title, $url="") {
 
   echo "$title
     <P><font size=2 face=Courier>
-    <SELECT name=\"param_deal\" size=10>";
+    <SELECT name=\"param_deal\" size=10 style=\"font-family:fixed,courier\">";
 
   while($deal_q->next_record()) {
     $id = $deal_q->f("deal_id");

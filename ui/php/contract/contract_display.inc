@@ -527,8 +527,10 @@ echo "
       <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_new</A></FONT>";
   }
   echo "<BR>
-      <A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
-      ".$deal_q->f("deal_label")."</A>
+      <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
+      <img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A></FONT>
+      <FONT SIZE=-1><A HREF=\"" . $sess->url("../deal/deal_index.php?action=detailconsult&param_deal=".$deal_q->f("deal_id")."") . "\">
+      ".$deal_q->f("deal_label")."</A></FONT>
       </TD>";
 //////////////////////
 //Fin Liens Externes//
@@ -855,7 +857,7 @@ function html_select_contract($contr_q, $title, $url="") {
 
   echo "$title
     <P><font size=2 face=Courier>
-    <SELECT name=\"param_contract\" size=10>";
+    <SELECT name=\"param_contract\" size=10 style=\"font-family:fixed,courier\">";
 
   while($contr_q->next_record()) {
     $id = $contr_q->f("contract_id");

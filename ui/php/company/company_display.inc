@@ -982,16 +982,15 @@ function html_select_company($comp_q, $title, $url="") {
           onSubmit=\"if ($jsfunc) return true; else return false;\"
           ACTION=\"\">";
 
-  echo "$title
-    <P><font size=2 face=Courier>
-    <SELECT name=\"param_company\" size=10>";
-
+  echo " $title
+    <P><font size=2 face=courier>
+    <SELECT name=\"param_company\" size=10 style=\"font-family:fixed,courier\">";
   while($comp_q->next_record()) {
     $id = $comp_q->f("company_id");
     $name = $comp_q->f("company_name");
     $name = str_pad($name, 40, ".");
     $town = $comp_q->f("company_town");
-    echo "\n<OPTION value=\"$id\">$name | $town";
+    echo "\n<OPTION value=\"$id\">$name | $town</OPTION>";
   }
 
   echo "</SELECT></font>
