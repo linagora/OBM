@@ -104,6 +104,9 @@ $l_header_tree = "Tree";
 $invalid_link_file = "Cannot create a alias over a link";
 $l_have_link = "This document is linked with various objects";
 $l_have_no_link = "This document isn't linked and can be deleted";
+$l_rep_have_link = "This repository might be a system repository, or contains others documents";
+$l_rep_have_no_link = "This repository can be deleted";
+
 $l_no_document = "Document not found";
 $l_invalid_url = "Incorrect URL";
 $l_already_exist_error = "This file already exist";
@@ -127,6 +130,7 @@ $l_j_mime_update = "You have to fill all the fields before submitting.";
 $l_j_mime_delete = "You have to select a mime-type";
 $l_j_cat1_delete = "You have to select a category1";
 $l_j_cat2_delete = "You have to select a category2";
+$l_j_repo_delete = "Do you want to delete this répository?";
 $l_fill_repository_name = "You have to fill the name of the directory";
 $l_invalid_repository_path = "Incorrect path for the directory";
 $l_invalid_file = "Incorrect file";

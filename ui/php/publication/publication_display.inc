@@ -33,7 +33,7 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
 
   if ($fieldname == "publication_title") {
     if($OD->data_specialfield == "ext_get_id") {
-      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".$OD->data_set->f("publication_title")."');";
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("publication_id").",'".addslashes($OD->data_set->f("publication_title"))."');";
     }
     else {    
       $res["url"] = "$path/publication/publication_index.php?action=detailconsult&amp;param_publication=".$OD->data_set->f("publication_id");
@@ -53,9 +53,9 @@ function dis_data_publication(&$OD, $fieldname, $link_ok) {
 //   - $publication[] : default form values
 //     keys used  : archive, name, type, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_search_form ($type_q, $publication) {
+function html_publication_search_form ($type_q,$publication) {
   global $l_publication_title, $l_publication_type, $l_lang, $l_year;
-  global $l_all, $l_find; 
+  global $l_all, $l_find,$popup; 
   global $c_all;
   
   $title = stripslashes($publication["title"]);
@@ -63,8 +63,42 @@ function html_publication_search_form ($type_q, $publication) {
   $type = $publication["type"];
   $year = $publication["year"];
 
+  if(!$popup) {
+    $dis_title = "
+    <div class=\"searchLabel\">$l_publication_title<br />
+      <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"24\" value=\"$title\" />
+    </div>";
+
+    $dis_year = "
+    <div class=\"searchLabel\">$l_year<br />
+      <input type=\"text\" name=\"tf_year\" id=\"tf_year\" size=\"4\" value=\"$year\" />
+    </div>";
+
+    $dis_button = "    
+    <div class=\"searchLabel\">&nbsp;<br />
+      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
+      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
+      </div>";
+  }
+  else {
+    $sel_js = " onchange=\"this.form.submit();\" ";
+    $ext_action = $publication["ext_action"];
+    $ext_url = $publication["ext_url"];
+    $ext_id = $publication["ext_id"];
+    $ext_title = $publication["ext_title"];
+    $ext_target = $publication["ext_target"];
+    $dis_button = "<input name=\"ext_action\" type=\"hidden\" value=\"$ext_action\">
+            <input name=\"ext_id\" type=\"hidden\" value=\"$ext_id\">
+	    <input name=\"popup\" type=\"hidden\" value=\"$popup\">
+            <input name=\"ext_title\" type=\"hidden\" value=\"$ext_title\">
+            <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\">
+            <input name=\"ext_url\" type=\"hidden\" value=\"$ext_url\">
+	    <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />";
+    $display["title"] = "<div class=\"title\">$ext_title</div>";
+  }
+    
   // type select
-  $sel_type = "<select id=\"sel_type\" name=\"sel_type\">
+  $sel_type = "<select id=\"sel_type\" name=\"sel_type\" $sel_js>
     <option value=\"$c_all\">$l_all</option>";
   while ($type_q->next_record()) {
     $t_id = $type_q->f("publicationtype_id");
@@ -75,31 +109,22 @@ function html_publication_search_form ($type_q, $publication) {
   $sel_type .= "</select>";
 
   $url = url_prepare("publication_index.php");
-
+  
   // --- HTML Template --------------------------------------------------------
 
   $block = "
   <form method=\"get\" name=\"f_publication\" id=\"f_publication\" action=\"$url\">
   <div class=\"search\">
-    <div class=\"searchLabel\">$l_publication_title<br />
-      <input type=\"text\" name=\"tf_title\" id=\"tf_title\" size=\"24\"
-      value=\"$title\" />
-    </div>
+    $dis_title
     <div class=\"searchLabel\">$l_publication_type<br />
       $sel_type
     </div>
-    <div class=\"searchLabel\">$l_year<br />
-      <input type=\"text\" name=\"tf_year\" id=\"tf_year\" size=\"4\" 
-      value=\"$year\" />
-    </div>
+    $dis_year
     <div class=\"searchLabel\">$l_lang<br />
       <input type=\"text\" name=\"tf_lang\" id=\"tf_lang\" size=\"4\" 
       value=\"$lang\" />
     </div>
-    <div class=\"searchLabel\">&nbsp;<br />
-      <input name=\"action\" id=\"action\" type=\"hidden\" value=\"search\" />
-      <input name=\"submit\" id=\"submit\" type=\"submit\" value=\"$l_find\" />
-    </div>
+    $dis_button
     <div class=\"searchEnd\"></div>
   </div>
   </form>";
@@ -145,14 +170,15 @@ function html_publication_search_list($comp_q, $pref_q, $nb_publication,$publica
 
   // we urlencode to avoid breakage for space char
   $archive = $publication["archive"];
-  $name = urlencode(stripslashes($publication["name"]));
+  $title = urlencode(stripslashes($publication["name"]));
   $phone = urlencode(stripslashes($publication["phone"]));
   $type = $publication["type"];
   $act = $publication["activity"];
   $zip = urlencode(stripslashes($publication["zip"]));
   $market = $publication["marketing_manager"];
+  $popup = $publication["popup"]; 
   
-  $url = url_prepare("publication_index.php?action=search&amp;tf_name=$name&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
+  $url = url_prepare("publication_index.php?action=search&amp;tf_title=$title&amp;tf_phone=$phone&amp;sel_type=$type&amp;sel_act=$act&amp;tf_zip=$zip&amp;cb_archive=$archive&amp;sel_market=$market$url_ext");
 
   $comp_q->seek($first_row);
 
@@ -191,14 +217,14 @@ function html_publication_links($pub_q) {
   global $perms_user,$l_publication, $path, $auth,$popup_height,$popup_width;
 
   $id = $pub_q->f("publication_id");
-  $name = $pub_q->f("publication_name");
+  $title = $pub_q->f("publication_title");
   $market = $pub_q->f("publication_marketingmanager_id");
   $ctry = $pub_q->f("publication_country_id");
   $con_num = $pub_q->f("publication_contact_number");
   $deal_num = $pub_q->f("publication_deal_number");
   $deal_total = $pub_q->f("publication_deal_total");
 
-  $uname = urlencode($name);
+  $uname = urlencode($title);
   $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_publication=$id&amp;tf_publication=$uname");
   $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_publication=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
   $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_publication=$id&amp;tf_publication_name=$uname");
@@ -275,7 +301,7 @@ function html_publication_links($pub_q) {
 function html_publication_consult($pub_q) {
   // - Themes
   global $l_publication_title, $l_type, $l_year, $l_lang, $l_publication;
-  global $display, $c_yes, $c_no;
+  global $display, $c_yes, $c_no,$l_desc;
 
   $id = $pub_q->f("publication_id");
   $title = $pub_q->f("publication_title");
@@ -354,7 +380,7 @@ function html_publication_form($action, $pub_q,$type_q, $publication) {
 
   // If parameters have been given, they supercede the default action value
   if (isset($publication["id"])) { $id = $publication["id"]; }
-  if (isset($publication["title"])) { $name = stripslashes($publication["title"]); }
+  if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
   if (isset($publication["type"])) { $type = $publication["type"]; }
   if (isset($publication["year"])) { $ad3 = stripslashes($publication["year"]); }
   if (isset($publication["lang"])) { $zip = stripslashes($publication["lang"]); }
@@ -388,7 +414,7 @@ function html_publication_form($action, $pub_q,$type_q, $publication) {
 
   $url = "publication_index.php?action=ext_get_cat_ids&amp;popup=1&amp;ext_target=forms[0].elements[6]"; 
 
-  $display["title"] = "<div class=\"title\">$l_publication : $name</div>";
+  $display["title"] = "<div class=\"title\">$l_publication : $title</div>";
 
   // --- HTML Template --------------------------------------------------------
 
@@ -425,6 +451,140 @@ function html_publication_form($action, $pub_q,$type_q, $publication) {
     </tr>
     </table>
 
+    <div class=\"detailButton\">
+    <p class=\"detailButtons\">$dis_button</p>
+    </div>
+    </form>";
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display Subscription Form                                                      //
+// Parameters:
+//   - $action    : action called
+//   - $pub_q      : publication database result 
+//   - $dsrc_q    : datasource database result 
+//   - $type_q    : type database result 
+//   - $usr_q     : userobm database result 
+//   - $ctry_q    : country database result 
+//   - $publication[] : default values
+//     keys used  : id, num, archive, name, type, ad1, ad2, ad3, zip, town, cdx
+//                : ctry, phone, fax, web, email ,com
+///////////////////////////////////////////////////////////////////////////////
+function html_subscription_form($action,$sub_q, $renew_q,$recept_q, $publication) {
+  global $display, $authd;
+  global $set_theme,$ico_publication_new,$popup_height,$popup_width;
+  global $l_subscription,$l_quantity, $l_renew, $l_recept, $l_lang, $l_desc;
+  global $l_insert_sub,$l_update_sub,$l_checkdelete_sub, $l_publication;
+
+
+
+  if($action == "detailupdate_subscription") {
+   $pub_id = $sub_q->f("subscritpion_publication_id"); 
+   $title = $sub_q->f("publication_title"); 
+   $cont_id = $sub_q->f("subscritpion_contact_id"); 
+   $quantity = $sub_q->f("subscritpion_quantity"); 
+   $renew = $sub_q->f("subscritpion_renewal_id"); 
+   $reception = $sub_q->f("subscritpion_reception_id"); 
+   $lang = $sub_q->f("publication_lang"); 
+  }
+  // If parameters have been given, they supercede the default action value
+  if (isset($publication["id"])) { $pub_id = $publication["id"]; }
+  if (isset($publication["title"])) { $title = stripslashes($publication["title"]); }
+  if (isset($publication["quantity"])) { $quantity = $publication["quantity"]; }
+  if (isset($publication["contact_id"])) { $cont_id = $publication["contact_id"]; }
+  if (isset($publication["renew"])) { $renew = stripslashes($publication["renew"]); }
+  if (isset($publication["lang"])) { $lang = stripslashes($publication["lang"]); }
+  if (isset($publication["recept"])) { $recept = stripslashes($publication["recept"]); }
+  
+  // renewal mode select
+  $sel_renew = "<select name=\"sel_renew\" id=\"sel_renew\">";
+  while ($renew_q->next_record()) {
+    $n_id = $renew_q->f("subscriptionrenewal_id");
+    $sel_renew .= "\n<option value=\"$n_id\"";
+    if ($n_id == $renew) { $sel_renew .= " selected=\"selected\""; }
+    $sel_renew .= ">". $renew_q->f("subscriptionrenewal_label") . "</option>\n";
+  }
+  $sel_type .= "</select>";
+
+  // reception mode select
+  $sel_recept = "<select name=\"sel_recept\" id=\"sel_recept\">";
+  while ($recept_q->next_record()) {
+    $k_id = $recept_q->f("subscriptionreception_id");
+    $sel_recept .= "\n<option value=\"$k_id\"";
+    if ($k_id == $recept) { $sel_recept .= " selected=\"selected\""; }
+    $sel_recept .= ">". $recept_q->f("subscriptionreception_label") . "</option>\n";
+  }
+  $sel_recept .= "</select>";
+  
+  if (($action == "detailupdate") || ($action == "update")) {
+    $dis_button = "
+      <!-- Update button -->
+      <input type=\"hidden\" name=\"param_contact\" id=\"param_publication\" value=\"$id\" />
+      <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
+      <input type=\"submit\" value=\"$l_update_sub\" /> 
+      ";
+  } elseif (($action == "new_subscription") || ($action == "insert_subscription")) {
+    $dis_button = "
+      <input type=\"hidden\" id=\"param_contact\" name=\"param_contact\" value=\"$cont_id\" />
+      <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert_subscription\" />
+      <input type=\"submit\" value=\"$l_insert_sub\" />
+      ";
+  }
+
+  $url = "publication_index.php?action=ext_get_id&amp;popup=1&amp;ext_target=forms[0]&amp;tf_lang=$lang"; 
+
+  $display["title"] = "<div class=\"title\">$l_subscription : $contact_firstname  $pub_title</div>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    $js_ctry
+
+    <form method=\"get\" name=\"form_subscription\"
+      onsubmit=\"if (check_subscription(this)) return true; else return false;\"
+      action=\"".url_prepare("publication_index.php")."\">
+
+    <div class=\"detailHead\">$l_subscription</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\">
+      $l_publication 
+      </td>
+      <td class=\"detailForm\">
+       <a href=\"\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+       <img src=\"/images/$set_theme/$ico_publication_new\" alt=\"[New Publication]\" /> 
+       </a>
+        <input type=\"hidden\" name=\"param_publication\" id=\"param_publication\" value=\"$id\" />
+        <input readonly=\"true\" type=\"text\" name=\"tf_title\" id=\"tf_title\" value=\"$title\" />
+      </td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_quantity</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_quantity\" name=\"tf_quantity\" maxlength=\"8\" size=\"4\" value=\"$quantity\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_renew</td>
+      <td class=\"detailForm\">$sel_renew</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_recept</td>
+      <td class=\"detailForm\">$sel_recept</td>
+    </tr>
+    </table>
+   <!-- 
+    <div class=\"detailHead\" style=\"display:none;\">$l_subscription_dates</div>
+
+    <table class=\"detail\">
+    <tr>
+      <td class=\"detailLabel\"></td>
+      <td class=\"detailForm\"></td>
+    </tr>
+    <tr>
+      <td class=\"detailLabel\">$</td>
+      <td class=\"detailForm\"></td>
+    </tr>    
+    </table>
+   -->
     <div class=\"detailButton\">
     <p class=\"detailButtons\">$dis_button</p>
     </div>
@@ -672,7 +832,12 @@ function dis_admin_index() {
 
   $type_q = run_query_publicationtype();
   $block = html_publication_type_form($type_q);
-
+  $block .= "<hr />";
+  $renew_q = run_query_subscriptionrenewal();
+  $block .= html_subscription_renewal_form($renew_q);
+  $block .= "<hr />";
+  $recept_q = run_query_subscriptionreception();
+  $block .= html_subscription_reception_form($recept_q);  
   return $block;
 }
 
@@ -845,6 +1010,362 @@ function dis_type_links($publication) {
       </div>";
   } else {
     $display["msg"] .= display_warn_msg($l_type_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Subscription Renewal section                                     //
+// Parameters:
+//   - $renew_q : Renewal list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_subscription_renewal_form($renew_q) {
+  global $l_renew_manage,$l_renew_exist;
+  global $l_renew_checkdelete,$l_renew_update,$l_renew_new,$l_renew_insert;
+
+  $sel_renew = "<select name=\"sel_renew\" onChange=\"
+    forms.form_renew_update.tf_renew.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
+  while ($renew_q->next_record()) {
+    $id = $renew_q->f("subscriptionrenewal_id");
+    $label = $renew_q->f("subscriptionrenewal_label");
+    $sel_renew .= "\n<option value=\"$id\">$label</option>";
+  }
+  $sel_renew .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_renew_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Kind Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_renew_delete\" method=\"post\"
+              action=\"" . url_prepare("publication_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_renew_exist</td>
+              <td class=\"adminLabel\">$sel_renew</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"renew_checklink\" />
+              <input type=\"submit\" name=\"sub_renew\" value=\"$l_renew_checkdelete\" onclick=\"if (check_renew_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Kind Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_renew_update\" method=\"get\"
+              action=\"" . url_prepare("publication_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_renew\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"renew_update\" />
+            <input type=\"text\" name=\"tf_renew\" />
+            <input type=\"submit\" name=\"sub_renew\" value=\"$l_renew_update\"
+              onclick=\"if (check_renew_upd(this.form,document.form_renew_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Kind Section -->
+
+        <form name=\"form_renew_new\" method=\"get\"
+          action=\"" . url_prepare("publication_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_renew_new :
+            <input name=\"tf_renew\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"renew_insert\" />
+            <input type=\"submit\" name=\"sub_renew\" value=\"$l_renew_insert\"
+              onclick=\"if (check_renew_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the renew links                                                   //
+// Parameters:
+//   - $publication : publication hash info : keys used : renew
+///////////////////////////////////////////////////////////////////////////////
+function dis_renew_links($publication) {
+  global $display, $l_back, $l_renew_link_publication, $l_renew_link_publication_no;
+  global $l_renew_delete, $l_renew_can_delete, $l_renew_cant_delete;
+
+  $delete_ok = true;
+  $id = $publication["renew"];
+  $label = get_renew_label($id);
+  $obm_q = run_query_renew_links($id);
+
+  $nb_renew = $obm_q->num_rows();
+  if ($nb_renew > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_renew_link_publication ($nb_renew)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("publication_id");
+      $cname = $obm_q->f("publication_title");
+      $dis_link .="
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;param_publication=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_renew) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_renew_link_publication_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("publication_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_renew_can_delete);
+    $dis_del = "<form name=\"form_renew_delete\".
+          method=\"post\" action=\"" . url_prepare("publication_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"renew_delete\" />
+        <input type=\"hidden\" name=\"sel_renew\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_renew\" value=\"$l_renew_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_renew_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Display: Subscription Renewal section                                     //
+// Parameters:
+//   - $recept_q : Renewal list database object
+///////////////////////////////////////////////////////////////////////////////
+function html_subscription_reception_form($recept_q) {
+  global $l_recept_manage,$l_recept_exist;
+  global $l_recept_checkdelete,$l_recept_update,$l_recept_new,$l_recept_insert;
+
+  $sel_recept = "<select name=\"sel_recept\" onChange=\"
+    forms.form_recept_update.tf_recept.value=this.options[this.selectedIndex].text;\"
+    size=\"4\" >";
+  while ($recept_q->next_record()) {
+    $id = $recept_q->f("subscriptionreception_id");
+    $label = $recept_q->f("subscriptionreception_label");
+    $sel_recept .= "\n<option value=\"$id\">$label</option>";
+  }
+  $sel_recept .= "</select>";
+
+  // --- HTML Template --------------------------------------------------------
+
+  $block = "
+    <table class=\"admin\">
+    <tr>
+      <td colspan=\"5\" class=\"adminHead\">
+        $l_recept_manage
+      </td>
+    </tr><tr>
+      <td>
+
+<!-- Kind Check Delete Section -->
+
+        <table>
+        <tr>
+          <td colspan=\"3\">
+            <form name=\"form_recept_delete\" method=\"post\"
+              action=\"" . url_prepare("publication_index.php") . "\">
+            <table>
+            <tr>
+              <td class=\"adminLabel\">$l_recept_exist</td>
+              <td class=\"adminLabel\">$sel_recept</td>
+              <td>
+              <input type=\"hidden\" name=\"action\" value=\"recept_checklink\" />
+              <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_checkdelete\" onclick=\"if (check_recept_checkdel(this.form)) return true; else return false;\" />
+              </td>
+            </tr>
+            </table>
+            </form>
+          </td>
+        </tr>
+
+<!-- Kind Update Section -->
+
+        <tr>
+          <td colspan=\"2\" class=\"adminLabel\">
+            <form name=\"form_recept_update\" method=\"get\"
+              action=\"" . url_prepare("publication_index.php") . "\">
+            <input type=\"hidden\" name=\"sel_recept\" value=\"\" />
+            <input type=\"hidden\" name=\"action\" value=\"recept_update\" />
+            <input type=\"text\" name=\"tf_recept\" />
+            <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_update\"
+              onclick=\"if (check_recept_upd(this.form,document.form_recept_delete)) return true; else return false;\" />
+            </form>
+          </td>
+          <td>&nbsp;</td>
+        </tr>
+        </table>
+      </td>
+      <td>
+
+<!-- New Kind Section -->
+
+        <form name=\"form_recept_new\" method=\"get\"
+          action=\"" . url_prepare("publication_index.php") . "\">
+        <table>
+        <tr>
+          <td class=\"adminLabel\">$l_recept_new :
+            <input name=\"tf_recept\" /></td>
+        </tr><tr>
+          <td class=\"adminLabel\">
+            <input type=\"hidden\" name=\"action\" value=\"recept_insert\" />
+            <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_insert\"
+              onclick=\"if (check_recept_new(this.form)) return true; else return false;\" />
+          </td>
+        </tr>
+        </table>
+        </form>
+      </td>
+    </tr>
+    </table>";
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Displays the recept links                                                   //
+// Parameters:
+//   - $publication : publication hash info : keys used : recept
+///////////////////////////////////////////////////////////////////////////////
+function dis_recept_links($publication) {
+  global $display, $l_back, $l_recept_link_publication, $l_recept_link_publication_no;
+  global $l_recept_delete, $l_recept_can_delete, $l_recept_cant_delete;
+
+  $delete_ok = true;
+  $id = $publication["recept"];
+  $label = get_recept_label($id);
+  $obm_q = run_query_recept_links($id);
+
+  $nb_recept = $obm_q->num_rows();
+  if ($nb_recept > 0) {
+    $delete_ok = false;
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_recept_link_publication ($nb_recept)</td>
+    </tr>";
+
+    $cpt = 0;
+    while ( ($obm_q->next_record()) && ($cpt < 10) ) {
+      $cpt++;
+      $cid = $obm_q->f("publication_id");
+      $cname = $obm_q->f("publication_title");
+      $dis_link .="
+    <tr>
+      <td class=\"detailLabel\">
+        <a href=\"" .url_prepare("publication_index.php?action=detailconsult&amp;param_publication=$cid") . "\">$cname</a>
+      </td>
+    </tr>";
+    }
+    if ($cpt < $nb_recept) {
+      $dis_link .= "
+    <tr>
+      <td class=\"detailLabel\">...</td>
+    </tr>";
+    }
+
+  } else {
+    $dis_link = "
+    <tr>
+      <td class=\"detailHead\">$label : $l_recept_link_publication_no</td>
+    </tr>";
+  }
+
+  $block .= "<table class=\"detail\">
+    $dis_link
+    </table>";
+
+  $dis_back = "<form name=\"form_back\" method=\"get\"
+          action=\"" .url_prepare("publication_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"admin\" />
+        <input type=\"submit\" value=\"$l_back\" />
+        </form>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_recept_can_delete);
+    $dis_del = "<form name=\"form_recept_delete\".
+          method=\"post\" action=\"" . url_prepare("publication_index.php") . "\">
+        <input type=\"hidden\" name=\"action\" value=\"recept_delete\" />
+        <input type=\"hidden\" name=\"sel_recept\" value=\"$id\" />
+        <input type=\"submit\" name=\"sub_recept\" value=\"$l_recept_delete\" />
+        </form>";
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_del</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_recept_cant_delete);
     $block .= "
       <div class=\"detailButton\">
         <p class=\"detailButtons\">$dis_back</p>

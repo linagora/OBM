@@ -57,7 +57,8 @@ $l_kind_no = "No kind defined";
 $l_kind_new = "New Kind";
 $l_lang = "Lang";
 $l_header = "Header";
-
+$l_subscription = "Subscriptions";
+$l_subscription_new= "New subscription";
 // Titles
 $l_contact = "Contact";
 

@@ -124,13 +124,7 @@ $l_daysofweekshort = array (	'Sun',
 
 $l_daysofweekreallyshort = array ('S','M','T','W','T','F','S');
 
-$l_monthsofyear = array (	'January','February',
-				'March','April','May',
-				'June','July','August',
-				'September','October','November',
-				'December');
-$l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun',
-			      'jul','aug','sep','oct','nov','dec');
+
 
 $l_accept = "Accept";
 $l_wait = "Waiting";

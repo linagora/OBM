@@ -667,49 +667,18 @@ function phonetic_key($name) {
 //functions used by many modules
 function month_name ($num_month) {
  
-  global $l_january,$l_february,$l_march,$l_april,$l_may,$l_june,$l_july,$l_august,$l_september,$l_october,$l_november,$l_december,$l_unknown;
+  global $l_monthsofyear;
 
-  switch($num_month) {
-    case 1 : $month_name=$l_january;     break; 
-    case 2 : $month_name=$l_february;    break; 
-    case 3 : $month_name=$l_march;       break;
-    case 4 : $month_name=$l_april;       break;
-    case 5 : $month_name=$l_may;         break;
-    case 6 : $month_name=$l_june;        break;
-    case 7 : $month_name=$l_july;        break;
-    case 8 : $month_name=$l_august;      break;
-    case 9 : $month_name=$l_september;   break; 
-    case 10 : $month_name=$l_october;    break;
-    case 11 : $month_name=$l_november;   break;
-    case 12 : $month_name=$l_december;   break;
-    default : $month_name=$l_unknown;    break;    
-  }
-
-  return $month_name;
+  return $l_monthsofyear[$num_month-1];
+  
 }
 
 
 function month_short_name ($num_month) {
  
-  global $l_short_january,$l_short_february,$l_short_march,$l_short_april,$l_short_may,$l_short_june,$l_short_july,$l_short_august,$l_short_september,$l_short_october,$l_short_november,$l_short_december,$l_unknown;
-  
-  switch($num_month) {
-  case 1 : $month_name=$l_short_january;      break;
-    case 2 : $month_name=$l_short_february;   break;
-    case 3 : $month_name=$l_short_march;      break;
-    case 4 : $month_name=$l_short_april;      break;
-    case 5 : $month_name=$l_short_may;        break;
-    case 6 : $month_name=$l_short_june;       break;
-    case 7 : $month_name=$l_short_july;       break;
-    case 8 : $month_name=$l_short_august;     break;
-    case 9 : $month_name=$l_short_september;  break; 
-    case 10 : $month_name=$l_short_october;   break;
-    case 11 : $month_name=$l_short_november;  break;
-    case 12 : $month_name=$l_short_december;  break;
-    default : $month_name=$l_unknown;         break;    
-  }
+  global $l_monthsofyearshort;
 
-  return $month_name;
+  return $l_monthsofyearshor[$num_month-1];
 }
 
 

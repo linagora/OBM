@@ -64,7 +64,7 @@ function dis_year_planning($agenda,$obm_q,$calendar_user,$usr_q) {
     $dis_calendar .= "<td width=\"210\">
     <table border=\"0\" width=\"210\" cellspacing=\"0\" cellpadding=\"0\" class=\"agendaCal\">
     <tr>
-      <td colspan=\"7\" esz$dfsqdsqdqsdis_data_filedis_data_fileclass=\"agendaHead2\">
+      <td colspan=\"7\" class=\"agendaHead2\">
       <a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_month&amp;param_date=$monthlink")."\">" . localizeDate ("month", $startYear) . "</a>
       </td>
     </tr>

@@ -656,6 +656,63 @@ function dis_check_links($p_id) {
   return $block;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Display: Display and check the repository links (and delete form if ok)
+// Parameters:
+//   - $p_id : document id
+///////////////////////////////////////////////////////////////////////////////
+function dis_check_repository_links($p_id) {
+  global $l_can_delete, $l_cant_delete, $l_back;
+  global $l_rep_have_link,$l_rep_have_no_link;
+  global $path, $display;
+
+  $delete_ok = true;
+
+  // Links from Contact
+  $obm_q = run_query_repository_links($p_id);
+
+  if ($obm_q > 0) {
+    $delete_ok = false;
+    $display_linkc ="
+      <tr>
+        <td class=\"detailHead\">$l_rep_have_link</td>
+      </tr>";
+  } else {
+    $display_linkc = "
+      <tr>
+        <td class=\"detailHead\">$l_rep_have_no_link</td>
+      </tr>";
+  }
+
+ 
+  $dis_back = "<form name=\"form_back\" method=\"post\"
+    action=\"".url_prepare("document_index.php") ."\">
+    <input type=\"hidden\" name=\"action\" value=\"index\" />
+    <input type=\"submit\" value=\"$l_back\" />
+    </form>";
+
+  $block .= "<table class=\"detail\">
+   $display_linkc
+   $display_linkd
+   </table>";
+
+  if ($delete_ok == true) {
+    $display["msg"] .= display_ok_msg($l_can_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">" . dis_delete_form($p_id) . "</p>
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  } else {
+    $display["msg"] .= display_warn_msg($l_cant_delete);
+    $block .= "
+      <div class=\"detailButton\">
+        <p class=\"detailButtons\">$dis_back</p>
+      </div>";
+  }
+
+  return $block;
+}
 
 ///////////////////////////////////////////////////////////////////////////////
 // Displays the delete form (button)                                         //
@@ -1336,7 +1393,7 @@ function html_documents_tree($document,$display_file) {
     }
   }
   if($display_file == "true") {
-    $block .= @display_tree($tree,'/','/',0);
+    $block .= @display_tree($tree,'/','/',0,0);
   }
   else {
     $block .= @display_popup_tree($tree,'/','/',0);
@@ -1351,14 +1408,14 @@ $block.= "
 // Display: Document Tree
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function display_tree($tree,$current_directory,$name,$indent) {
+function display_tree($tree,$current_directory,$name,$indent,$d_id) {
   global $ico_file,$ico_directory_close,$ico_directory_open,$ico_directory,$set_theme;
-  global $popup;
+  global $ico_del_directory,$popup,$l_j_repo_delete;
   $directories = $tree[$current_directory][0];
   $files = $tree[$current_directory][1];
   $indent_file = $indent + 15;
   foreach($directories as $id => $info) {
-    $content.= display_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file);
+    $content.= display_tree($tree,$current_directory.$info["name"].'/',$info["name"],$indent_file,$id);
     $bool = true;
   }
   foreach($files as $id => $info) {
@@ -1406,7 +1463,9 @@ function display_tree($tree,$current_directory,$name,$indent) {
     "<table class=\"document\">
        <tr>
 	<td class=\"documentRepository\" style=\"padding-left:".$indent."px;text-align:left;\">
-	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_directory\" alt=\"[File]\"/>
+	 <a href=\"document_index.php?action=check_delete_repository&amp;param_document=$d_id\" onclick=\"return confirm('$l_j_repo_delete');\"> 
+	  <img id=\"img_$current_directory\"  src=\"/images/$set_theme/$ico_del_directory\" alt=\"[File]\"/>
+	 </a>
 	 ".$name."
 	</td>
 	<td class=\"documentInfo\">&nbsp;</td>

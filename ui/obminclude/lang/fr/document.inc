@@ -107,7 +107,9 @@ $l_already_exist_error = "Ce fichier existe déjà";
 $l_creation_error = "Une erreur est survenue pendant la création du fichier";
 
 $l_have_link = "Ce document est lié à divers éléments d'obm";
+$l_rep_have_link = "Ce répertoire soit est un répertoire system, soit contient des documents";
 $l_have_no_link = "Ce document n'est lié à aucun éléments et peut être supprimé";
+$l_rep_have_no_link = "Ce répertoire n'est lié à aucun éléments et peut être supprimé";
 $l_no_document = "Document introuvable";
 // Actions
 $l_checkdelete = "Vérifier ou Supprimer le document";
@@ -128,6 +130,7 @@ $l_j_mime_update = "Vous devez renseigner tous les champ du type MIME";
 $l_j_mime_delete = "Vous devez sélectionner un type MIME";
 $l_j_cat1_delete = "Vous devez sélectionner une categorie 1";
 $l_j_cat2_delete = "Vous devez sélectionner une categorie 2";
+$l_j_repo_delete = "Voulez vous supprimer ce répertoire?";
 $l_fill_repository_name = "Vous devez donner un nom à vote répertoire";
 $l_invalid_repository_path = "Le chemin spécifié est invalide";
 $l_invalid_file = "Fichier incorrect";

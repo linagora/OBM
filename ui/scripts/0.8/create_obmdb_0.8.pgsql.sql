@@ -1138,5 +1138,55 @@ CREATE TABLE PublicationType (
   publicationtype_label       char(12),
   PRIMARY KEY (publicationtype_id)
 );
+
+
+--
+-- Subscription Tables
+--
+
+--
+-- Table structure for table 'Subscription'
+--
+CREATE TABLE Subscription (
+  subscription_publication_id 	integer NOT NULL,
+  subscription_contact_id       integer NOT NULL,
+  subscription_timeupdate       timestamp,
+  subscription_timecreate       timestamp,
+  subscription_userupdate       integer,
+  subscription_usercreate       integer,
+  subscription_quantity       	integer,
+  subscription_renewal_id       integer NOT NULL,
+  subscription_reception_id     integer NOT NULL,
+  subscription_date_begin       timestamp,
+  subscription_date_end         timestamp,
+  PRIMARY KEY (subscription_publication_id,subscription_contact_id)
+);
+
+--
+-- Table structure for table 'SubscriptionRenewal'
+--
+CREATE TABLE SubscriptionRenewal (
+  subscriptionrenewal_id          serial,
+  subscriptionrenewal_timeupdate  timestamp,
+  subscriptionrenewal_timecreate  timestamp,
+  subscriptionrenewal_userupdate  integer,
+  subscriptionrenewal_usercreate  integer,
+  subscriptionrenewal_label       char(12),
+  PRIMARY KEY (subscriptionrenewal_id)
+);
+
+--
+-- Table structure for table 'SubscriptionReception'
+--
+CREATE TABLE SubscriptionReception ( 
+  subscriptionreception_id          serial,
+  subscriptionreception_timeupdate  timestamp,
+  subscriptionreception_timecreate  timestamp,
+  subscriptionreception_userupdate  integer,
+  subscriptionreception_usercreate  integer,
+  subscriptionreception_label       char(12),
+  PRIMARY KEY (subscriptionreception_id)
+);
+
 COMMIT;
 

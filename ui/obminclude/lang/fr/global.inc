@@ -77,31 +77,14 @@ $l_task_int = "Projets Internes";
 $l_task_div = "Tâches Non Facturées";
 
 // days and months
-$l_january="Janvier";
-$l_february="Février";
-$l_march="Mars";
-$l_april="Avril";
-$l_may="Mai";
-$l_june="Juin";
-$l_july="Juillet";
-$l_august="Aout";
-$l_september="Septembre";
-$l_october="Octobre";
-$l_november="Novembre";
-$l_december="Decembre";
-
-$l_short_january="Jan";
-$l_short_february="Fev";
-$l_short_march="Mar";
-$l_short_april="Avr";
-$l_short_may="Mai";
-$l_short_june="Jun";
-$l_short_july="Jul";
-$l_short_august="Aou";
-$l_short_september="Sep";
-$l_short_october="Oct";
-$l_short_november="Nov";
-$l_short_december="Dec";
+$l_monthsofyear = array (	'Janvier','Février',
+				'Mars','Avril','Mai',
+				'Juin','Juillet','Août',
+				'Septembre','Octobre','Novembre',
+				'Décembre');
+$l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
+			      'juil','aoû','sep','oct','nov','déc');
+			      
 $l_invalid_perm = "Vous n'avez pas les permissions pour éxecuter cette action";
 
 ////////////////////////////////////////////////////////

@@ -201,6 +201,10 @@ elseif ($action == "insert")  {
   $mime_q = run_query_documentmime();
   $display["search"] = html_document_search_form($cat1_q, $cat2_q,$mime_q, $document);
   $display["result"] = dis_document_search_list($document);
+}elseif ($action == "check_delete_repository")  {
+///////////////////////////////////////////////////////////////////////////////
+  require("document_js.inc");
+  $display["detail"] = dis_check_repository_links($param_document);
 } elseif ($action == "admin")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("document_js.inc");

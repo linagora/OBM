@@ -446,12 +446,37 @@ function run_query_delete($p_id) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_document_links($document_id) {
   $obm_q = new DB_OBM;
-  $obm_q2 = new DB_OBM;
 
   $query = "select * from DocumentEntity where documententity_documentid =
            '$document_id'";
   $obm_q->query($query);
   return $obm_q->nf();
+
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Get if the document can be deleted
+// Parameters:
+//   - $document_id : Id of the Document
+///////////////////////////////////////////////////////////////////////////////
+function run_query_repository_links($document_id) {
+  global $cdg_sql,$default_path;
+  $obm_q = new DB_OBM;
+  $query = "select * from Document where document_id = $document_id";
+  $obm_q->query($query);
+  $obm_q->next_record();
+  $doc_type = $obm_q->f("document_type");
+  $path = $obm_q->f("document_path").$obm_q->f("document_name");
+  
+  if($path == $default_path || $doc_type == 1) {
+    return 1;
+  }
+  $query = "select count(document_id) as nb from Document 
+  where document_path LIKE  '$path%'";
+  $obm_q->query($query);
+  $obm_q->next_record();  
+  return $obm_q->f("nb");
 
 }
 
@@ -546,6 +571,7 @@ function run_query_get_type_mime_by_mime($mime) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_delete_file($path,$name) {
   global $document_path;
+  @rmdir($document_path.'/'.$path.'/'.$name);
   @unlink($document_path.'/'.$path.'/'.$name);
   return true;
 }

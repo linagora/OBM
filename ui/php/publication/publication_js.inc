@@ -14,41 +14,25 @@ $extra_js .= "
 
 require("$obminclude/javascript/check_js.inc");
 
+
+if (isset($publication["ext_target"]) && $publication["ext_target"]!="") {
+  $extra_js .= "
+
+  function check_get_id(valeur,text) {
+    if ((valeur < 1) || (valeur == null)) {
+      alert (\"$l_j_select_publication\");
+      return false;
+    } else {
+      window.opener.document.".$publication["ext_target"].".param_publication.value=valeur;
+      window.opener.document.".$publication["ext_target"].".tf_title.value=text;
+      window.close();
+      return true;
+    }
+  }
+
+";
+}
 $extra_js .= "
-
-function check_get_id(valeur,text) {
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_publication\");
-    return false;
-  } else {
-    window.opener.document.form_mod_contact.publication_new_id.value=valeur;
-    window.opener.document.form_mod_contact.publication_new_name.value=text;
-    window.close();
-    return true;
-  }
-}
-
-
-function check_get_id_url(form, p_url) {
-  comp_pos = form.param_publication.selectedIndex;
-  if (! (comp_pos >= 0)) {
-    alert (\"$l_j_select_publication\");
-    return false;
-  }
-  valeur = form.param_publication.options[comp_pos].value;
-  text = form.param_publication.options[comp_pos].text;
-  if ((valeur < 1) || (valeur == null)) {
-    alert (\"$l_j_select_publication\");
-    return false;
-  } else {
-    new_url = p_url + valeur;
-    window.opener.location.href=new_url;
-    window.close();
-    return true;
-  }
-}
-
-
 function confirm_del() {
   if (confirm (\"$l_delete_confirm\"))
     return true;
@@ -104,6 +88,25 @@ function check_publication(form) {
 } 
 
 
+function check_subscription(form) {
+  // MANDATORY : Check that the Company name is not empty
+  if (form.sel_publi.selectedIndex != 0 || !(form.sel_publi.options[form.sel_publi.selectIndex].value > 0)) {
+    alert (\"$l_j_select_publication\");
+    return false;
+  }
+
+  // Check the zip code
+  quantity = form.tf_quantity.value;
+  if (quantity == \"\") {
+    alert (\"$l_j_fill_quantity\");
+    return false;
+  }
+
+
+    return true;
+} 
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Check if the type check or deletion is possible                           //
 ///////////////////////////////////////////////////////////////////////////////
@@ -149,6 +152,101 @@ function check_type_new(form)
       return false;
    }
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the renew check or deletion is possible                           //
+///////////////////////////////////////////////////////////////////////////////
+function check_renew_checkdel(form)
+{
+   if (form.sel_renew.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_renew_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the renew update is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_renew_upd(form,formd)
+{
+  renew_pos = formd.sel_renew.selectedIndex;
+  if ((renew_pos >= 0) && (form.tf_renew.value != \"\")) {
+    form.sel_renew.value=formd.sel_renew.options[renew_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_renew_update\");
+    return false;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the renew creation is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_renew_new(form)
+{
+   if (form.tf_renew.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_renew_create\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the recept check or deletion is possible                           //
+///////////////////////////////////////////////////////////////////////////////
+function check_recept_checkdel(form)
+{
+   if (form.sel_recept.selectedIndex >= 0)
+   {
+      return true;
+   }
+   else
+   {
+      alert(\"$l_j_recept_delete\");
+      return false;
+   }
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the recept update is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_recept_upd(form,formd)
+{
+  recept_pos = formd.sel_recept.selectedIndex;
+  if ((recept_pos >= 0) && (form.tf_recept.value != \"\")) {
+    form.sel_recept.value=formd.sel_recept.options[recept_pos].value;
+    return true;
+  } else {
+    alert(\"$l_j_recept_update\");
+    return false;
+  }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// Check if the cat creation is possible                                    //
+///////////////////////////////////////////////////////////////////////////////
+function check_recept_new(form)
+{
+   if (form.tf_recept.value != \"\")
+      return true;
+   else
+   {
+      alert(\"$l_j_recept_create\");
+      return false;
+   }
+}
+
 
 -->
 </script>

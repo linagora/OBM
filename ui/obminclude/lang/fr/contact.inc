@@ -103,7 +103,8 @@ $l_kind_checkdelete = "Vérifier ou Supprimer le Genre";
 $l_kind_delete = "Supprimer le Genre";
 $l_kind_insert = "Créer le Genre";
 $l_add = "Ajouter ces contacts";
-
+$l_subscription = "Abonnements";
+$l_subscription_new= "Nouvel abonnement";
 // Messages
 $l_check_samecontact = "Ces contacts semblent similaires à cette nouvelle entrée !";
 $l_link_deal = "Le contact est référencé par ces affaires";

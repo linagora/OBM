@@ -477,17 +477,22 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_links($id) {
   // -- Themes
-  global $set_theme,$ico_document,$ico_document_new;
+  global $set_theme,$ico_document,$ico_document_new,$ico_publication,$ico_publication_new;
   // -- Labels
   global $l_header_document,$l_contact;
   global $l_document_new,$l_document_add,$l_add_document;
+  global $l_subscription_new,$l_subscription;  
   global $perms_user, $path, $auth,$popup_height,$popup_width;
 
   $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
   $url_doc_new = url_prepare("$path/document/document_index.php?action=new&amp;param_entity=$id&amp;entity=Contact");
   $url_doc_add = "$path/document/document_index.php?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_document)."&amp;ext_action=document_add&amp;ext_url=".urlencode($path."/contact/contact_index.php")."&amp;ext_id=$id&amp;ext_target=$l_contact";
   $nb_document = run_query_document_nb ($id,"Contact");
+ // $nb_subscription = run_query_subscription_nb ($id);
+  $url_subscription = url_prepare("$path/publication/distribution_index.php?action=search&amp;param_entity=$id&amp;entity=Contact");
+  $url_subscription_new = url_prepare("$path/publication/publication_index.php?action=new_subscription&amp;param_contact=$id");
 
+  
   $block = "<div class=\"link\">
   <div class=\"linkTitle\">:: $l_header_document</div>
   <ul class=\"linkList\">
@@ -501,8 +506,15 @@ function html_contact_links($id) {
 	<a href=\"\" onclick=\"window.name='$l_contact'; window.open('$url_doc_add','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	 $l_document_add</a></li>
   </ul>
-       
- </div>";
+  <!-- <div class=\"linkTitle\">:: $l_subscription</div>
+  <ul class=\"linkList\">
+    <li><a href=\"$url_subscription\"><img src=\"/images/$set_theme/$ico_publication\" alt=\"\" /></a>
+        <a href=\"$url_subscription\">$l_subscription ($nb_subscription)</a></li>
+    <li><a href=\"$url_subscription_new\"><img src=\"/images/$set_theme/$ico_publication_new\" alt=\"\" /></a>
+        <a href=\"$url_subscription_new\">$l_subscription_new</a></li>
+  </ul> -->
+ </div>
+ ";
 
   return $block;
 }
@@ -2052,6 +2064,65 @@ function dis_contact_display_pref($display_pref_q) {
   // --- HTML Template --------------------------------------------------------
 
   $block = $dis_pref->display();
+
+  return $block;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// HTML Display the Time Task  result                                        //
+// Parameters : 
+//   - $obm_q    : list of tasks to be displayed
+//   - $pref_q   : the fields which have to be displayed
+//   - $nb_task  : nb tasks returned by the search query 
+//   - $time[]   : time search criteria
+//     keys used : week
+///////////////////////////////////////////////////////////////////////////////
+function dis_time_list_result($sub_q,$pref_q,$contact) {
+  //-- Themes
+  global $set_theme,$set_date,$ico_mail;
+  //-- Labels
+  global $l_date_task, $l_company;
+  global $l_found, $_task_del, $l_delete, $l_task_del, $l_found_task;
+  global $l_update, $l_length, $l_task_list;
+
+  //  dis_table_title($l_found_task) ;
+
+  //oldstart
+  //  $url = url_prepare("time_index.php?action=index&amp;wbegin=".$time["date"]);
+ 
+  $block .= "
+     <form method=\"post\" name=\"f_task_del\" action=\"".url_prepare("time_index.php").
+    "\" \"onsubmit=\"if (confirm_del()) return true; else return false\" >
+     ";
+
+  $dis_task_list = new OBM_DISPLAY("DATA",$pref_q);
+  $dis_task_list->data_set = $task_q;
+  $dis_task_list->data_header = "top";
+  $dis_task_list->data_page = false;
+  //  $dis_task_list->data_url = $url; 
+  $dis_task_list->data_cb_text = $l_task_del;
+  $dis_task_list->data_idfield = "timetask_id"; 
+  $dis_task_list->data_order = false; 
+  $dis_task_list->data_cb_side = "left";
+  $dis_task_list->data_cb_name = "delete_";
+  $dis_task_list->data_cb_show = "test_status";
+
+  $block .= "<div class=\"detailHead\">$l_subscription_list</div>\n";
+  $block .= $dis_task_list->display("dis_data_time");
+
+  $dis_button = "
+    <input type=\"hidden\" name=\"user_id\" value=\"".$contact["user_id"]."\" />
+    <input type=\"hidden\" name=\"wbegin\" value=\"".$contact["date"]."\" />
+    <input type=\"hidden\" name=\"action\" value=\"delete\" />
+    <input name=\"submit\" type=\"submit\" value=\"".$l_delete."\" />";
+
+  $block .= "
+     <p class=\"detailButton\">
+      <p class=\"detailButtons\">$dis_button</p>
+     </p>
+
+     </form>
+     ";
 
   return $block;
 }

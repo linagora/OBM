@@ -40,7 +40,8 @@ function display_page(&$display) {
     <!-- left panel -->
     <div class=\"leftpanel\">" .
       $display["last"] . "<p />" .
-      $display["todo"] . "
+      $display["todo"] . 
+      $display["features"] ."
     </div>
     <!-- left panel end -->
 
@@ -51,8 +52,7 @@ function display_page(&$display) {
     <!-- right panel -->
     <div class=\"rightpanel\">" .
       $display["detailInfo"] . "<p />" .
-      $display["link"] . "<p />" .
-      $display["features"] ."
+      $display["link"] . "<p />
     </div>
     <!-- right panel end -->
 
@@ -152,7 +152,7 @@ function generate_menu($menu, $section) {
 <!-- Fin Menu -->
 </div>
 </div>
-<p style=\"clear:both\" >
+<p style=\"clear:both\" />
 <!-- Fin Bandeau -->
 
 " . $display["action"];

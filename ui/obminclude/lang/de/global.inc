@@ -77,31 +77,13 @@ $l_task_int = "interne Aufgaben";
 $l_task_div = "nicht abrechenbare Aufgaben";
 
 // days and months
-$l_january = "Januar";
-$l_february = "Februar";
-$l_march = "März";
-$l_april = "April";
-$l_may = "Mai";
-$l_june = "Juni";
-$l_july = "Juli";
-$l_august = "August";
-$l_september = "September";
-$l_october = "Oktober";
-$l_november = "November";
-$l_december = "Dezember";
-
-$l_short_january = "Jan";
-$l_short_february = "Feb";
-$l_short_march = "Mär";
-$l_short_april = "Apr";
-$l_short_may = "Mai";
-$l_short_june = "Jun";
-$l_short_july = "Jul";
-$l_short_august = "Aug";
-$l_short_september = "Sep";
-$l_short_october = "Okt";
-$l_short_november = "Nov";
-$l_short_december = "Dez";
+$l_monthsofyear = array (	'January','February',
+				'March','April','May',
+				'June','July','August',
+				'September','October','November',
+				'December');
+$l_monthsofyearshort = array ('jan','feb','mar','apr','may','jun',
+			      'jul','aug','sep','oct','nov','dec');
 $l_invalid_perm = "keine Berechtigung";
 
 ////////////////////////////////////////////////////////

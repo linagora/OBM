@@ -1389,6 +1389,27 @@ function run_query_cat2_delete($id) {
   return $retour;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Count the number of subscription
+// Parameters:
+//   - $id : contact id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_subscription_nb($id) {
+  global $cdg_sql;
+  if($id != '') {
+
+    $query = "select count(*) as nb from Subscription where subscription_contact_id = '$id'";
+
+    display_debug_msg($query, $cdg_sql);
+    $obm_q = new DB_OBM;
+    $obm_q->query($query);
+    $obm_q->next_record();
+    $retour = $obm_q->f("nb");
+  }
+  else 
+  $retour = 0;
+  return $retour;
+}
 
 
 </script>

@@ -110,12 +110,6 @@ else if ($action == "new") {
 ///////////////////////////////////////////////////////////////////////////////
   $display["detail"] = dis_list_form($action, "", $list);
 }
-
-else if ($action == "new_graphical") {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = html_list_graphical_form($action, "", $list);
-}
-
 else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
   $list_q = run_query_detail($list["id"]);
@@ -419,15 +413,8 @@ function get_list_action() {
                                   );
 
 // New
-  $actions["LIST"]["new_graphical"] = array (
-    'Name'     => "$l_list_wizard",
-    'Url'      => "$path/list/list_index.php?action=new_graphical",
-    'Right'    => $list_write,
-    'Condition'=> array ('','new','update','insert','search','index','detailconsult','admin','display') 
-                                  );
-// New
-  $actions["LIST"]["add_criterion"] = array (
-    'Url'      => "$path/list/list_index.php?action=new_graphical",
+  $actions["LIST"]["new_criterion"] = array (
+    'Url'      => "$path/list/list_index.php?action=new_criterion",
     'Right'    => $list_write,
     'Condition'=> array ('None') 
                                   );				  

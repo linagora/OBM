@@ -31,5 +31,6 @@ $cgp_mail_enabled = false;
 // modules -- Default is true
 //$cgp_show["module"]["user"] = false;
 //$cgp_show["module"]["group"] = false;
+$cgp_show["module"]["publication"] = false;
 
 </script>

@@ -1139,4 +1139,53 @@ CREATE TABLE PublicationType (
   publicationtype_label       char(12),
   PRIMARY KEY (publicationtype_id)
 );
-         
+        
+
+
+--
+-- Subscription Tables
+--
+
+--
+-- Table structure for table 'Subscription'
+--
+CREATE TABLE Subscription (
+  subscription_publication_id 	int(8) NOT NULL,
+  subscription_contact_id       int(8) NOT NULL,
+  subscription_timeupdate       timestamp(14),
+  subscription_timecreate       timestamp(14),
+  subscription_userupdate       int(8),
+  subscription_usercreate       int(8),
+  subscription_quantity       	int(8),
+  subscription_renewal_id       int(8) DEFAULT '0' NOT NULL,
+  subscription_reception_id     int(8) DEFAULT '0' NOT NULL,
+  subscription_date_begin       timestamp(14),
+  subscription_date_end         timestamp(14),
+  PRIMARY KEY (subscription_publication_id,subscription_contact_id)
+);
+
+--
+-- Table structure for table 'SubscriptionRenewal'
+--
+CREATE TABLE SubscriptionRenewal (
+  subscriptionrenewal_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  subscriptionrenewal_timeupdate  timestamp(14),
+  subscriptionrenewal_timecreate  timestamp(14),
+  subscriptionrenewal_userupdate  int(8),
+  subscriptionrenewal_usercreate  int(8),
+  subscriptionrenewal_label       char(12),
+  PRIMARY KEY (subscriptionrenewal_id)
+);
+
+--
+-- Table structure for table 'SubscriptionReception'
+--
+CREATE TABLE SubscriptionReception ( 
+  subscriptionreception_id          int(8) DEFAULT '0' NOT NULL auto_increment,
+  subscriptionreception_timeupdate  timestamp(14),
+  subscriptionreception_timecreate  timestamp(14),
+  subscriptionreception_userupdate  int(8),
+  subscriptionreception_usercreate  int(8),
+  subscriptionreception_label       char(12),
+  PRIMARY KEY (subscriptionreception_id)
+);	

@@ -151,13 +151,6 @@ $l_daysofweekshort = array (	'Dim',
 
 $l_daysofweekreallyshort = array ('D','L','M','M','J','V','S');
 
-$l_monthsofyear = array (	'Janvier','Février',
-				'Mars','Avril','Mai',
-				'Juin','Juillet','Août',
-				'Septembre','Octobre','Novembre',
-				'Décembre');
-$l_monthsofyearshort = array ('jan','fév','mar','avr','mai','juin',
-			      'juil','aoû','sep','oct','nov','déc');
 
 $l_short_monday = "Lun";
 $l_short_tuesday = "Mar";
