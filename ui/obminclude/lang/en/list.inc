@@ -37,6 +37,8 @@ $l_normal_mode = "Normal Mode";
 $l_renew = "Automatic renewal";
 $l_recept = "Reception mode";
 $l_mailing = "Mailing enabled only";
+$l_contact_archive = "Archived contacts";
+$l_info_pub = "Publications informations";
 // Contact
 $l_lastname = "Lastname";
 $l_firstname = "Firstname";

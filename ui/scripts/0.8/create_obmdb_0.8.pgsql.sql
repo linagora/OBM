@@ -522,20 +522,22 @@ CREATE TABLE DealCategoryLink (
 -- Table structure for table 'List'
 --
 CREATE TABLE List (
-  list_id          serial,
-  list_timeupdate  TIMESTAMP,
-  list_timecreate  TIMESTAMP,
-  list_userupdate  integer,
-  list_usercreate  integer,
-  list_privacy     integer DEFAULT '0',
-  list_name        varchar(64) NOT NULL,
-  list_subject     varchar(128),
-  list_email       varchar(128),
-  list_mailing_ok  integer DEFAULT 0,
-  list_static_nb   integer DEFAULT 0,
-  list_query_nb    integer DEFAULT 0,
-  list_query       text,
-  list_structure   text,
+  list_id          	 serial,
+  list_timeupdate  	 TIMESTAMP,
+  list_timecreate  	 TIMESTAMP,
+  list_userupdate  	 integer,
+  list_usercreate  	 integer,
+  list_privacy     	 integer DEFAULT '0',
+  list_name        	 varchar(64) NOT NULL,
+  list_subject     	 varchar(128),
+  list_email       	 varchar(128),
+  list_mailing_ok  	 integer DEFAULT 0,
+  list_contact_archive	 integer DEFAULT 0,
+  list_info_publication  integer DEFAULT 0,
+  list_static_nb   	 integer DEFAULT 0,
+  list_query_nb    	 integer DEFAULT 0,
+  list_query       	 text,
+  list_structure   	 text, 
   PRIMARY KEY (list_id),
   UNIQUE (list_name)
 );
@@ -1172,6 +1174,7 @@ CREATE TABLE Import (
   PRIMARY KEY (import_id),
   UNIQUE (import_name)
 );
+
 
 -------------------------------------------------------------------------------
 -- Publication module tables

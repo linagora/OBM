@@ -533,7 +533,7 @@ function run_query_contact_insert($contact) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact update query execution                                            //
+// Contact update query execution
 // Parameters:
 //   - $contact[] : Entry's values
 //     keys used  : id, company_id, kind, lname, fname ad1, ad2, ad2, zip, town
@@ -619,42 +619,43 @@ function run_query_contact_update($contact) {
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
 
-
-
-    
-  if ($retour && is_array($cat1)) {
+  if ($retour) {
     $query = "delete
     from ContactCategory1Link
     where contactcategory1link_contact_id='$id'";
     display_debug_msg($query, $cdg_sql);
-    $obm_q->query($query);    
-    foreach($cat1 as $categoryid) {
-      $query = "insert into ContactCategory1Link (
+    $obm_q->query($query);
+    if (is_array($cat1)) {
+      foreach($cat1 as $categoryid) {
+	$query = "insert into ContactCategory1Link (
 	  contactcategory1link_contact_id,
 	  contactcategory1link_category_id)
 	values (
           '$id',
           '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+	display_debug_msg($query, $cdg_sql);
+	$obm_q->query($query);
+      }
     }
   }
 
-  if ($retour && is_array($cat2)) {
+  if ($retour) {
     $query = "delete
     from ContactCategory2Link
     where contactcategory2link_contact_id='$id'";
     display_debug_msg($query, $cdg_sql);
     $obm_q->query($query);    
-    foreach($cat2 as $categoryid) {
-      $query = "insert into ContactCategory2Link (
+    if (is_array($cat2)) {
+      foreach($cat2 as $categoryid) {
+	$query = "insert into ContactCategory2Link (
 	  contactcategory2link_contact_id,
 	  contactcategory2link_category_id)
 	values (
           '$id',
           '$categoryid')";
-      display_debug_msg($query, $cdg_sql);
-      $obm_q->query($query);
+	display_debug_msg($query, $cdg_sql);
+	$obm_q->query($query);
+      }
     }
   }
 

@@ -24,10 +24,23 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2005-01-04</b> : version <b>0.8.9</b> released (<b>Clément 1 release</b>) (fixes and minor enhancements)
+        <ol>
+          <li> Time module rewrite, now works on Postgres (except stats)
+          <li> List can now toggle : publication infos, archived contact
+          <li> Enhancements in Invoice archive, comments, expiration date added
+          <li> Enhancements in Admin preferences, Incident, address handling
+          <li> Fixes in modules Company, Contact, Deal, Time, Project, Incident
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-11-03</b> : version <b>0.8.8</b> released (fixes)
         <ol>
           <li> ACCESSKEY support, better focus handling
-          <li> More site config parameters (allow * in searches, allow auto-format some fields, visiblue fields...)
+          <li> More site config parameters (allow * in searches, allow auto-format some fields, visible fields...)
           <li> Reworked Contact category assignments (better ergonomics)
           <li> Enhancement in Company category search, contact email search, contact address handling
           <li> Company Statistics can be based on a given List
@@ -57,22 +70,6 @@
           <li> New Company European VAT field
           <li> New links to Document from Project, Invoice
           <li> Many enahancement and fixes in Company, Deal, List, Document
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-08-16</b> : version <b>0.8.5</b> released (fixes, functionality and architecture enhancements)
-        <br />As Postgres, Privacy handling and Search queries (with limit flag) have been dealt with, it remains only one point to do (allow data from one module to be displayed in an other module) on the architectural side before 0.9 starts. 
-        <ol>
-          <li> Many Postgres improvement (Document, Invoice, incident, Project,...), near on par with mysql support now
-          <li> New functionalities in Deal (quick update), Contact (Vcard export), List, Time (user entry date)
-          <li> Enhancements in Document, Todo, Contact, List
-          <li> Architecture enhancements for privacy handling, Todo, SQL Limit clause can be toggled on / off
-          <li> Performance enhancements : SQL Limit clause can be toggled on / of for all searches, List and Todo
-          <li> Fixes in Export CSV, Contact, Deal, Contract, Incident, Invoice, Project, Time, Admin,...
-          <li> Many fixes and Clean up preparing 0.9
         </ol>
         </div>
         <br />

@@ -65,6 +65,7 @@ function dis_pref_index($mode) {
 function html_pref_index($plifetime, $psession_cookie) {
   global $l_validate, $l_execute, $l_help, $l_user_pref, $l_global_pref;
   global $l_session_lifetime, $l_session_cookie;
+  global $l_user_pref_update, $l_user_pref_update_one;
 
   if ($psession_cookie)
     $sc = "checked";
@@ -90,8 +91,7 @@ function html_pref_index($plifetime, $psession_cookie) {
     </tr>
     <tr>
       <td class=\"adminText\">action : user_pref_update
-        <br />
-        Update all users preferences with default values</td>
+        <br />$l_user_pref_update</td>
       <td class=\"adminLabel\">
         <input type=\"hidden\" name=\"mode\" value=\"html\" />
         <input type=\"hidden\" name=\"action\" value=\"user_pref_update\" />
@@ -113,7 +113,8 @@ function html_pref_index($plifetime, $psession_cookie) {
     </tr>
     <tr>
       <td class=\"adminText\">
-        Update the selected preferences with default values</td>
+        $l_user_pref_update_one
+      </td>
       <td class=\"adminText\">
         $sel_userpref</td>
       <td class=\"adminText\">
@@ -262,10 +263,9 @@ function dis_user_pref_update_one($mode, $pref, $val="") {
   $cpt_u = 0;
   $nb_u = $u_q->num_rows();
 
-  //-- Drop current preference for all users (except 0)
+  //-- Drop current preference for all users and default (0)
   $obm_q = new DB_OBM;
-  $query = "delete from UserObmPref where userobmpref_user_id != '0'
-    and userobmpref_option='$pref'";
+  $query = "delete from UserObmPref where userobmpref_option='$pref'";
   display_debug_msg($query, $cdg_sql);
   $obm_q->query($query);
   
@@ -288,6 +288,9 @@ function dis_user_pref_update_one($mode, $pref, $val="") {
         $update
       </tr>";
   }
+
+  // Insert new default value
+  $retour = run_query_set_user_pref(0, $pref, $val);
 
   while ($u_q->next_record()) {
     $cpt_u++;

@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : list_index.php                                               //
 //     - Desc : List Index File                                              //
-// 1999-03-19 - Aliacom - Vincent MARGUERIT                                  //
+// 1999-03-19 - Aliacom                                                      //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -272,7 +272,7 @@ function get_param_list() {
   global $param_list, $param_ext, $hd_usercreate, $hd_timeupdate;
   global $action, $cb_priv, $ext_action, $ext_url, $ext_id, $ext_target,$title;
   global $new_order, $order_dir, $popup, $row_index;
-  global $cb_mailing_ok;
+  global $cb_mailing_ok, $cb_contact_arch, $cb_info_pub;
 
   global $tf_company_name,$tf_company_zipcode,$tf_company_town;
   global $tf_company_timeafter,$tf_company_timebefore;
@@ -305,6 +305,8 @@ function get_param_list() {
   if (isset ($row_index)) $list["row_index"] = $row_index;
   if (isset( $cb_priv)) $list["priv"] = ($cb_priv == "1") ? 1 : 0;
   if (isset($cb_mailing_ok)) $list["mailing_ok"] = $cb_mailing_ok == 1 ? 1 : 0; 
+  if (isset($cb_contact_arch)) $list["contact_arch"] = $cb_contact_arch == 1 ? 1 : 0; 
+  if (isset($cb_info_pub)) $list["info_pub"] = $cb_info_pub == 1 ? 1 : 0; 
 
   if (isset ($hd_usercreate)) $list["usercreate"] = $hd_usercreate;
   if (isset ($hd_timeupdate)) $list["timeupdate"] = $hd_timeupdate;

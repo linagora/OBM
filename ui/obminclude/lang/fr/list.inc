@@ -38,6 +38,8 @@ $l_normal_mode = "Mode Normal";
 $l_renew = "Renouvellement auto";
 $l_recept = "Mode de réception";
 $l_mailing = "Mailing activé uniquement";
+$l_contact_archive = "Contacts archivés";
+$l_info_pub = "Informations des publications";
 // Contact
 $l_lastname = "Nom";
 $l_firstname = "Prénom";

@@ -158,6 +158,8 @@ function run_query_insert($list) {
   $email = $list["email"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
+  $contact_arch = ($list["contact_arch"]==1)?1:0;
+  $info_pub = ($list["info_pub"]==1)?1:0;
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
     array_walk($ss_criteria, 'stripslashes_array');
@@ -172,6 +174,8 @@ function run_query_insert($list) {
     list_subject,
     list_email,
     list_mailing_ok,
+    list_contact_archive,
+    list_info_publication,
     list_query,
     list_structure)
   values (null,
@@ -183,8 +187,11 @@ function run_query_insert($list) {
     '$subject',
     '$email',
     '$mailing_ok',
+    '$contact_arch',
+    '$info_pub',
     '$list_query',
     '$list_critery')";
+
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
@@ -243,6 +250,8 @@ function run_query_update($list) {
   $email = $list["email"];
   $list_query = addslashes($list["query"]);
   $mailing_ok = ($list["mailing_ok"]==1)?1:0;
+  $contact_arch = ($list["contact_arch"]==1)?1:0;
+  $info_pub = ($list["info_pub"]==1)?1:0;
   if (isset($list["criteria"])) {
     $ss_criteria = $list["criteria"];
     array_walk($ss_criteria, 'stripslashes_array');
@@ -255,9 +264,11 @@ function run_query_update($list) {
     list_name='$name',
     list_subject='$subject',
     list_email='$email',
+    list_mailing_ok='$mailing_ok',
+    list_contact_archive='$contact_arch',
+    list_info_publication='$info_pub',
     list_query='$list_query',
-    list_structure='$list_critery',
-    list_mailing_ok='$mailing_ok'
+    list_structure='$list_critery'
   where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -752,7 +763,9 @@ function get_list_info($id) {
   $query = "select list_id,
       list_name,
       list_structure,
-      list_mailing_ok
+      list_mailing_ok,
+      list_contact_archive,
+      list_info_publication
     from List
     where list_id='$id'";
 
@@ -765,6 +778,8 @@ function get_list_info($id) {
   $res["name"] = $obm_q->f("list_name");
   $res["structure"] = $obm_q->f("list_structure");
   $res["mailing_ok"] = $obm_q->f("list_mailing_ok");
+  $res["contact_arch"] = $obm_q->f("list_contact_archive");
+  $res["info_pub"] = $obm_q->f("list_info_publication");
 
   return $res;
 }
@@ -1009,6 +1024,8 @@ function make_query_from_db(&$list_q) {
     $id = $list_q->f("list_id");
     $structure = $list_q->f("list_structure");
     $mail_ok = $list_q->f("list_mailing_ok");
+    $contact_arch = $list_q->f("list_contact_archive");
+    $info_pub = $list_q->f("list_info_publication");
     
     if ($structure != "") {
       $criteria = unserialize($structure);
@@ -1023,6 +1040,8 @@ function make_query_from_db(&$list_q) {
       $list_info["criteria"] = $as_criteria;
       $list_info["id"] = $id;
       $list_info["mailing_ok"] = $mail_ok;
+      $list_info["contact_arch"] = $contact_arch;
+      $list_info["info_pub"] = $info_pub;
       $query = make_query_from_criteria($list_info);
     }
   }
@@ -1045,6 +1064,8 @@ function make_query_from_criteria($list) {
   $boulean_criterion = $list["criteria"]["logical"]["NOT"];
   $logical_criterion = $list["criteria"]["logical"]["AND"];
   $mailing_ok = $list["mailing_ok"];
+  $contact_arch = $list["contact_arch"];
+  $info_pub = $list["info_pub"];
   $lang = get_lang();
   
   $obm_q = new DB_OBM;
@@ -1098,15 +1119,20 @@ function make_query_from_criteria($list) {
     "contactcategory1link_category_id" => " left join ContactCategory1Link on contact_id = contactcategory1link_contact_id ",
     "contactcategory2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
   );
-  $add_select = array (
-    "publication" => ", SUM(subscription_quantity) as subscription_quantity
-    		      ,publication_lang
-		      ,publication_title"
-  );
-  $add_group = array (
-    "publication" => ",publication_lang
-    		      ,publication_title"
-  );  
+
+  //If publication info must be displayed we add these fields
+  if ($info_pub == 1) {
+    $add_select = array (
+      "publication" => ", SUM(subscription_quantity) as subscription_quantity
+                        ,publication_lang
+                        ,publication_title"
+      );
+  
+    $add_group = array (
+      "publication" => ",publication_lang
+                        ,publication_title"
+      );
+  }
 
   $select = "
         contact_id,
@@ -1130,6 +1156,7 @@ function make_query_from_criteria($list) {
         contact_homephone,
         contact_fax,
         contact_email,
+        contact_archive,
         company_id,
         company_name,
         company_address1,
@@ -1162,6 +1189,7 @@ function make_query_from_criteria($list) {
         contact_homephone,
         contact_fax,
         contact_email,
+        contact_archive,
         company_id,
         company_name,
         company_address1,
@@ -1192,20 +1220,20 @@ function make_query_from_criteria($list) {
 		$operation = str_replace('%v',$value,$operation);
 		$condition[$line] .= $and[$line]." ". $operation;
 		$and[$line] = " AND";
-	      }	
+	      }
 	      else {
 		$condition[$line] .= "";
 	      }
             }
-	    if ($field_fill == 1) { 
+	    if ($field_fill == 1) {
 	      $join .= $add_join[$field];
     	      $select .= $add_select[$field];
-    	      $group .= $add_group[$field];	      
+    	      $group .= $add_group[$field];
 	      $field_fill = 0;
 	    }
-          }  
-        } 
-       	if ($module_fill == 1) { 
+          }
+        }
+       	if ($module_fill == 1) {
       	  $join .= $add_join[$module];
 	  $select .= $add_select[$module];
 	  $group .= $add_group[$module];
@@ -1218,13 +1246,18 @@ function make_query_from_criteria($list) {
 	$logical_criterion[$line] = "";
       }
       $where .= " " . $logical_criterion[$line]." ".$boulean_criterion[$line]." ($value)";
-    }    
+    }
   }
 
 
   // Handle the Mailing enable flag
   if ($mailing_ok == 1) {
-    $where = " ($where) AND contact_mailing_ok = 1 ";
+    $where = " contact_mailing_ok = 1 AND ($where) ";
+  }
+
+  // Handle the contact archive flag
+  if ($contact_arch == 0) {
+    $where = " contact_archive != 1 AND ($where) ";
   }
 
   // If any (not in insert mode), add statics contacts to the query

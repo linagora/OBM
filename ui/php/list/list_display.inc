@@ -492,7 +492,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   global $display, $perm, $menu, $cright_write, $ctu_sql_limit, $cdg_sql;
   global $l_contact, $l_no_static_contact, $l_static_con_found;
   global $l_no_dyn_contact, $l_dyn_con_found, $l_company, $l_invalid_query;
-  global $l_del_contact_sel, $nb_contact_added,$l_mailing, $nb_contact_deleted;
+  global $l_del_contact_sel, $nb_contact_added, $nb_contact_deleted;
+  global $l_mailing, $l_contact_archive, $l_info_pub;
 
   $id = $list_q->f("list_id");
   $usercreate = $list_q->f("list_usercreate");
@@ -501,6 +502,8 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $timeupdate = $list_q->f("timeupdate");
   $lpriv = ($list_q->f("list_privacy") == 0 ? $l_public : $l_private);
   $dis_mailing = ($list_q->f("list_mailing_ok") == 0 ? $l_no : $l_yes);
+  $dis_con_arch = ($list_q->f("list_contact_archive") == 0 ? $l_no : $l_yes);
+  $dis_info_pub = ($list_q->f("list_info_publication") == 0 ? $l_no : $l_yes);
   $name = $list_q->f("list_name");
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
@@ -553,8 +556,14 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
       <td class=\"detailLabel\">$l_visibility</td>
       <td class=\"detailText\">$lpriv</td>
     </tr><tr>
-    <td class=\"detailLabel\">$l_mailing</td>
-    <td class=\"detailText\">$dis_mailing</td>
+      <td class=\"detailLabel\">$l_mailing</td>
+      <td class=\"detailText\">$dis_mailing</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_contact_archive</td>
+      <td class=\"detailText\">$dis_con_arch</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_info_pub</td>
+      <td class=\"detailText\">$dis_info_pub</td>
     </tr> <tr>
       <td class=\"detailLabel\">$l_subject</td>
       <td class=\"detailText\">$subject</td>
@@ -695,7 +704,8 @@ function dis_list_form($action, $list_q, $list) {
 //     keys used  : name, subject, usercreate
 ///////////////////////////////////////////////////////////////////////////////
 function html_list_form($action, $list_q, $list) {
-  global $l_name, $l_subject, $l_email,$l_mailing, $l_query, $l_list, $l_private;
+  global $l_name,$l_subject,$l_email,$l_mailing,$l_contact_archive,$l_info_pub;
+  global $l_query, $l_list, $l_private;
   global $clist_mode_normal, $clist_mode_expert, $l_expert_mode,$l_normal_mode;
   global $action, $display, $uid;
 
@@ -711,6 +721,8 @@ function html_list_form($action, $list_q, $list) {
     $query = $list_q->f("list_query");
     $priv = ($list_q->f("list_privacy") == 0 ? "0" : "1");
     $mailing_ok = ($list_q->f("list_mailing_ok") == 0 ? "0" : "1");
+    $contact_arch = ($list_q->f("list_contact_archive") == 0 ? "0" : "1");
+    $info_pub = ($list_q->f("list_info_publication") == 0 ? "0" : "1");
   }
   
   // If parameters have been given, they supercede the default action value
@@ -720,7 +732,9 @@ function html_list_form($action, $list_q, $list) {
   if (isset($list["subject"])) { $subject = stripslashes($list["subject"]); }
   if (isset($list["email"])) { $email = stripslashes($list["email"]); }
   if (isset($list["query"])) { $query = stripslashes($list["query"]); }
-  if (isset($list["mailing_ok"])) { $mailing_ok = stripslashes($list["mailing_ok"]); }
+  if (isset($list["mailing_ok"])) { $mailing_ok = $list["mailing_ok"]; }
+  if (isset($list["contact_arch"])) { $contact_arch = $list["contact_arch"]; }
+  if (isset($list["info_pub"])) { $info_pub = $list["info_pub"]; }
   if (isset($list["criteria"])) { $criteria = $list["criteria"]; }
 	
   if ( ($action == "new") || ($action == "insert") ||
@@ -735,6 +749,9 @@ function html_list_form($action, $list_q, $list) {
   }
 
   if ($mailing_ok == 1) $dis_mailing .= "checked = \"checked\""; 
+  if ($contact_arch == 1) $dis_con_arch .= "checked = \"checked\""; 
+  if ($info_pub == 1) $dis_info_pub .= "checked = \"checked\""; 
+
   $url = url_prepare("list_index.php");
   $display["title"] = "<div class=\"title\">$l_list : $name</div>";
 
@@ -770,7 +787,17 @@ function html_list_form($action, $list_q, $list) {
   <tr>
     <td class=\"detailLabel\">$l_mailing</td>
     <td class=\"detailForm\">
-      <input type=\"checkbox\" $dis_mailing name=\"cb_mailing_ok\" size=\"30\" value=\"1\" /></td>
+      <input type=\"checkbox\" $dis_mailing name=\"cb_mailing_ok\" value=\"1\" /></td>
+  </tr>  
+  <tr>
+    <td class=\"detailLabel\">$l_contact_archive</td>
+    <td class=\"detailForm\">
+      <input type=\"checkbox\" $dis_con_arch name=\"cb_contact_arch\" value=\"1\" /></td>
+  </tr>  
+  <tr>
+    <td class=\"detailLabel\">$l_info_pub</td>
+    <td class=\"detailForm\">
+      <input type=\"checkbox\" $dis_info_pub name=\"cb_info_pub\" value=\"1\" /></td>
   </tr>  
   </table>
   <div class=\"detailHead\">$l_query</div>  
