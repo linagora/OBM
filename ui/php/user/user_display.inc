@@ -298,7 +298,8 @@ function dis_get_user_search_list($user) {
   $popup = $user["popup"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "user");
-  $obm_q = run_query_get_search($user, $new_order, $order_dir);
+//  $obm_q = run_query_get_search($user, $new_order, $order_dir);
+  $obm_q = run_query_search($user, $new_order, $order_dir);
   $nb_user = $obm_q->num_rows();
   if ($nb_user == 0) {
     $display["msg"] .= display_warn_msg($l_no_found);

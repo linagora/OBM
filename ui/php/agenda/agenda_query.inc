@@ -29,8 +29,8 @@ function run_query_detail($param_event,$getdate) {
 
   $query = "SELECT DISTINCT
       calendarevent_id,
-      calendarevent_usercreate as usercreate,
-      calendarevent_userupdate as userupdate,
+      c.userobm_login as usercreate,
+      u.userobm_login as userupdate,
       $timeupdate,
       $timecreate,
       calendarevent_title, 
@@ -44,7 +44,9 @@ function run_query_detail($param_event,$getdate) {
       $calendarevent_endrepeat,
       $calendarsegment_date_l_1,
       $calendarsegment_date_l_2
-      FROM CalendarEvent, CalendarCategory, CalendarSegment cs1, CalendarSegment cs2
+      FROM  CalendarCategory, CalendarSegment cs1, CalendarSegment cs2, CalendarEvent
+      left join UserObm as c on calendarevent_usercreate=c.userobm_id
+      left join UserObm as u on calendarevent_userupdate=u.userobm_id
     WHERE calendarevent_category_id = calendarcategory_id
       AND calendarevent_id = $param_event
       AND calendarevent_id = cs1.calendarsegment_eventid

@@ -523,7 +523,7 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_timeupdate,$l_timecreate,$l_company,$l_market,$l_company, $l_datasource,$l_contact_cat1;
   global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
-  global $l_update,$l_delete;
+  global $l_update,$l_delete,$l_recept,$l_renew;
 
   
   // if update mode and first time, values are taken from db
@@ -576,9 +576,12 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory1link_category_id" => "sel",
       "contactcategory2link_category_id" => "sel",
       "contact_function_id" => "sel",
+      "kind_lang" => "sel",
       "publication_title"  => "tf",
       "publication_lang"  => "tf",
-      "publication_year"  => "tf"
+      "publication_year"  => "tf",
+      "subscriptionreception_id"  => "sel",
+      "subscription_renewal"  => "tf",      
   );
   $fields_label["company_name"] = $l_company; 
   $fields_label["company_country_id"] = "$l_company: $l_country"; 
@@ -600,10 +603,13 @@ function html_list_graphical_form($action, $list_q, $list) {
   $fields_label["contact_datasource_id"] = "$l_contact: $l_datasourceid"; 
   $fields_label["contactcategory1link_category_id"] = "$l_contact: $l_contact_cat1"; 
   $fields_label["contactcategory2link_category_id"] = "$l_contact: $l_contact_cat2"; 
+  $fields_label["kind_lang"] = "$l_contact: $l_lang";  
   $fields_label["contact_function_id"] = "$l_contact: $l_function"; 
   $fields_label["publication_title"] = "$l_publication: $l_title"; 
   $fields_label["publication_lang"] = "$l_publication: $l_lang"; 
   $fields_label["publication_year"] = "$l_publication: $l_year"; 
+  $fields_label["subscription_reception_id"] = "$l_publication: $l_recept"; 
+  $fields_label["subscription_renewal"] = "$l_publication: $l_renew";
 
   if(is_array($criteria)) {
     $cty_q = run_query_country();
@@ -612,7 +618,10 @@ function html_list_graphical_form($action, $list_q, $list) {
     $usr_q = run_query_userobm_active();  
     $cat2_q = run_query_contactcategory2();
     $fct_q = run_query_function();
-    $cat_q = run_query_companycategory();        
+    $cat_q = run_query_companycategory();       
+    $rec_q = run_query_subscriptionreception();  
+    $lag_q = run_query_language();
+
     $field_data = array(
       "company_country_id" => array($cty_q,"country_id","country_name"),
       "company_marketingmanager_id" => array($usr_q,"userobm_id","userobm_lastname"),
@@ -624,6 +633,8 @@ function html_list_graphical_form($action, $list_q, $list) {
       "contactcategory1link_category_id" => array($cat1_q,"contactcategory1_id","contactcategory1_label"),
       "contactcategory2link_category_id" => array($cat2_q,"contactcategory2_id","contactcategory2_label"),
       "contact_function_id" => array($fct_q,"function_id","function_label"),
+      "kind_lang" => array($lag_q,"kind_lang","kind_lang"),
+      "subscription_reception_id" => array($rec_q,"subscriptionreception_id","subscriptionreception_label")
     );    
     foreach($criteria as $module)
     foreach($module as $field => $criterion) {
@@ -672,7 +683,7 @@ function html_list_graphical_form($action, $list_q, $list) {
       $dis_no_boolean = "<select name=\"sel_log_not[]\"><option value=\"\" $empty >$l_empty</option><option value=\"NOT\" $not>$l_not</option></select></td>";
       $dis_criteria .="<tr><td colspan=\"4\"> </td>".$labels[$key]."</tr>";
       if($key == 0) {
-        $dis_logical = "<td><input type=\"hidden\" name=\"sel_log_and[]\" value=\"\" />";	
+        $dis_logical = "<td><input type=\"hidden\" name=\"sel_log_and[]\" value=\"OR\" />";	
 	$dis_criteria .="<tr><td>".$hid_cell[$key]."</td><td></td><td></td> $dis_logical $dis_no_boolean $line</tr>";
       }else {
 	if($logical_criterion[$key] == "AND") {
@@ -725,11 +736,13 @@ function dis_add_criterion_form($list) {
   $cat2_q = run_query_contactcategory2();
   $fct_q = run_query_function();
   $cat_q = run_query_companycategory();
-
+  $rec_q = run_query_subscriptionreception();
+  $lag_q = run_query_language();
+  
   $block .= "<form method=\"get\" name=\"f_new_criterion\" action=\"$url\" onSubmit=\"add_criterion(this,$row_index);window.close();return false;\">";
   $block .= html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q);
-  $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q);
-  $block .= html_publication_criterion();
+  $block .= html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q);
+  $block .= html_publication_criterion($rec_q);
   $block .= "
   <div class=\"detailButton\">
   <p class=\"detailButtons\">
@@ -838,10 +851,10 @@ function html_company_criterion($cty_q,$usr_q,$dsr_q,$cat_q){
 // Display the Contact Criterion Form //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
+function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q,$lag_q){
   global $l_lastname,$l_firstname,$l_country,$l_postcode,$l_town,$l_contact;
   global $l_all,$l_timecreate,$l_timeupdate,$l_market,$l_datasource;  
-  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_language;
+  global $l_contact_cat1,$l_contact_cat2,$l_function,$l_lang;
   global $set_theme,$ico_mini_cal;  
   $sel_cty .= "\n<option value=\"\">$l_all</option>";
   while($cty_q->next_record()) {
@@ -879,7 +892,14 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
   }   
   if($fct_q->nf()!=0) 
     $fct_q->seek(0);
-  
+    
+  $sel_lag .= "\n<option value=\"\">$l_all</option>";
+  while($lag_q->next_record()) {
+    $sel_lag .= "\n<option value=\"".$lag_q->f("kind_lang")."\">".$lag_q->f("kind_lang")."</option>";
+  }   
+  if($lag_q->nf()!=0) 
+    $lag_q->seek(0);
+ 
   $block = "
   <div class=\"detailHead\">$l_contact</div>    
   <table class=\"search\">
@@ -930,7 +950,18 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
     <td class=\"detailForm\"><select name=\"sel_contactcategory1link_category_id\">$sel_cat1</select></td>    
     <td class=\"detailForm\"><select name=\"sel_contactcategory2link_category_id\">$sel_cat2</select></td>    
     <td class=\"detailForm\"><select name=\"sel_contact_function_id\">$sel_fct</select></td>    
+  </tr>
+  <tr> 
+    <td class=\"detailLabel\">$l_lang</td>
+    <td></td>
+    <td></td>
   </tr> 
+  <tr>  
+    <td class=\"detailForm\"><select name=\"sel_kind_lang\">$sel_lag</select></td>    
+    <td></td>
+    <td></td>
+  </tr>
+
   </table>
   ";
   return $block;
@@ -940,8 +971,15 @@ function html_contact_criterion($cty_q,$usr_q,$dsr_q,$cat1_q,$cat2_q,$fct_q){
 // Display the Contact Criterion Form //
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-function html_publication_criterion(){
+function html_publication_criterion($rec_q){
   global $l_publication,$l_title,$l_lang,$l_year;
+  global $l_renew,$l_recept,$l_all,$l_none,$l_yes,$l_no;
+  if($rec_q->nf()!=0) 
+    $rec_q->seek(0);
+  $sel_rec .= "\n<option value=\"\">$l_all</option>";
+  while($rec_q->next_record()) {
+    $sel_rec .= "\n<option value=\"".$rec_q->f("subscriptionreception_id")."\">".$rec_q->f("subscriptionreception_label")."</option>";
+  }   
   $block = "
   <div class=\"detailHead\">$l_publication</div>    
   <table class=\"search\">
@@ -949,12 +987,27 @@ function html_publication_criterion(){
     <td class=\"detailLabel\">$l_title</td>
     <td class=\"detailLabel\">$l_lang</td>
     <td class=\"detailLabel\">$l_year</td>
-  
   </tr>
   <tr>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_title\" value=\"\" /></td>
     <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_lang\" value=\"\" /></td>
-    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_year\" value=\"\" /></td>  </tr>
+    <td class=\"detailForm\"><input type=\"text\" size=\"17\" name=\"tf_publication_year\" value=\"\" /></td>  
+  </tr>
+  <tr>
+    <td class=\"detailLabel\">$l_renew</td>
+    <td class=\"detailLabel\">$l_recept</td>
+  </tr>
+  <tr>
+    <td class=\"detailForm\">
+    <select name=\"tf_subscription_renewal\">
+     <option value=\"\">$l_none</option>
+     <option value=\"1\">$l_yes</option>
+     <option value=\"0\">$l_no</option>
+    </select>
+   </td>    
+    <td class=\"detailForm\"><select name=\"sel_subscription_reception_id\">$sel_rec</select></td>
+  </tr>
+  
   </table>
   ";
   return $block;

@@ -768,6 +768,43 @@ function run_query_function() {
   return $obm_q;
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// Contact: Kind lang select query 
+// Returns:
+//   DB object result with all kinds
+///////////////////////////////////////////////////////////////////////////////
+function run_query_language() {
+  global $cdg_sql;
+
+  $query = "select kind_lang from Kind
+    group by kind_lang";
+
+  display_debug_msg($query, $cdg_sql);
+  $obm_q= new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Reception mode subscription query execution                                 //
+// Return:
+//   Database Object
+///////////////////////////////////////////////////////////////////////////////
+function run_query_subscriptionreception() {
+  global $cdg_sql;
+
+  $query = "select * from SubscriptionReception order by subscriptionreception_label DESC"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg($query, $cdg_sql);
+
+  return $obm_q;
+}
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Make an SQL Query with the list of criteria
@@ -819,8 +856,21 @@ function make_query($list) {
     "publication_title"  => $common_like,
     "publication_lang"  => $pub_lang_like,
     "publication_year"  => $common_like,
+    "subscription_renewal"  => $common_equal,
+    "subscription_reception_id"  => $common_equal,
+    "kind_lang"  => $common_equal
   );
     
+  $add_join = array (
+    "publication" => " left join Subscription on subscription_contact_id = contact_id
+                       left join Publication on subscription_publication_id = publication_id ",
+    "companycategory_code" => " left join CompanyCategoryLink on company_id = companycategorylink_company_id 
+          	                left join CompanyCategory on companycategory_id = companycategorylink_category_id ",
+    "contactcategory_1link_category_id" => " left join ContactCategory1Link on contact_id = contactcategory1link_contact_id ",
+    "contactcategory_2link_category_id" => " left join ContactCategory2Link on contact_id = contactcategory2link_contact_id ",
+    "kind_lang" => " left join Kind on contact_kind_id = kind_id "
+  );
+
   $query = "
         SELECT DISTINCT
         contact_id,
@@ -848,41 +898,15 @@ function make_query($list) {
         FROM
 	Contact  
              left join Company on contact_company_id=company_id
-	     left join CompanyCategoryLink on company_id = companycategorylink_company_id 
+
+	     ";  
+  
+/*left join CompanyCategoryLink on company_id = companycategorylink_company_id 
 	     left join CompanyCategory on companycategory_id = companycategorylink_category_id
 	     left join ContactCategory1Link on contact_id = contactcategory1link_contact_id
 	     left join ContactCategory2Link on contact_id = contactcategory2link_contact_id
 	     left join Subscription on subscription_contact_id = contact_id
-	     left join Publication on subscription_publication_id = publication_id";  
-  
-/*
-  if(is_array($criteria)) {
-    $and = "";
-    foreach($criteria as $module => $module_criteria) {
-      if(is_array($module_criteria)) {
-        foreach($module_criteria as $field => $criterion) {
-          $begin_condition = "$and ";
-          if(is_array($criterion)) {
-            $begin_condition .= " (";
-            $or = "";
-            $condition = "";
-            foreach($criterion as $value) {
-              if($value != "") {
-                $condition .= "$or $field LIKE '$value%'";
-                $or = " OR";
-              }
-            }
-            $end_condition = ") ";
-            if($condition !="") {
-              $where .= $begin_condition.$condition.$end_condition;
-              $and = " AND";
-            }
-          }        
-        } 
-      }
-    }
-  }
-*/
+	     left join Publication on subscription_publication_id = publication_id*/
 
   if(is_array($criteria)) {
     foreach($criteria as $module => $module_criteria) {
@@ -891,6 +915,8 @@ function make_query($list) {
           if(is_array($criterion)) {
             foreach($criterion as $line => $value) {
               if($value != "") {
+		$field_fill = 1;
+		$module_fill = 1;
 		$operation = $operateurs[$field];
 		$operation = str_replace('%f',$field,$operation);
 		$operation = str_replace('%v',$value,$operation);
@@ -901,24 +927,32 @@ function make_query($list) {
 		$condition[$line] .= "";
 	      }
             }
-          }        
+	    if($field_fill == 1) { 
+	      $join .= $add_join[$field];	
+	      $field_fill = 0;
+	    }
+          }  
         } 
+       	if($module_fill == 1) { 
+      	  $join .= $add_join[$module];
+	  $module_fill = 0;
+	}
       }
     }
-  foreach($condition as $line=>$value) {
-    $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
-  }    
+    foreach($condition as $line=>$value) {
+      if($line == 0) {
+	$logical_criterion[$line] = "";
+      }
+      $where .= $logical_criterion[$line]." ".$bollean_criterion[$line]." ($value)";
+    }    
   }
-
-
-
 
 
   
   if($where != "") {
     $where = " WHERE $where";
   }
-  $query = $query.$where." ORDER BY contact_lastname";
+  $query = $query.$join.$where." ORDER BY contact_lastname";
   return trim(addslashes($query));
 }
 

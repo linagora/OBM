@@ -708,14 +708,6 @@ function get_agenda_action() {
     'Condition'=> array ('all') 
                                     	 );
 
-//Detail Consult
-
-  $actions["AGENDA"]["detail_consult"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=detail_consult",
-    'Right'    => $cright_read,
-    'Condition'=> array ('None') 
-                                         );
-
 //Update
 
   $actions["AGENDA"]["update"] = array (

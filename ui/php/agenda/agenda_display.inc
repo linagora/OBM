@@ -2447,6 +2447,7 @@ function html_dis_right_admin($user_q,$user_id) {
 function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   global $display; 
   global $set_theme,$set_weekstart_default, $set_start_time, $set_stop_time,$set_cal_interval,$ico_mini_cal;
+  global $ico_add_user,$popup_height,$popup_width;
   // -- Labels
   global $l_users,$l_datebegin,$l_dateend,$l_format,$l_header_meeting,$l_event_duration,$l_meeting_perform; 
 
@@ -2505,7 +2506,7 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
   }
   $dis_min_d .= "</select>";  
   $display["title"] = "<div class=\"title\">$l_header_meeting</div>"; 
-      
+  $url = "$path/user/user_index.php?action=ext_get_users&amp;popup=1&amp;ext_target=forms[0].elements[0]"; 
   // --- HTML Template --------------------------------------------------------
   $block = "
   <form method=\"get\" name=\"f_mod_calendar\"
@@ -2514,7 +2515,9 @@ function dis_meeting_form($agenda, $usr_q, $p_user_array) {
    <div class=\"detailHead\">$l_header_meeting</div>
    <table class=\"detail\">
     <tr>
-     <td class=\"detailLabel\">$l_users</td>
+     <td class=\"detailLabel\">$l_users&nbsp;&nbsp;
+      <a href=\"javascript: return false;\" onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"><img src=\"/images/$set_theme/$ico_add_user\"></a>
+     </td>
      <td class=\"detailForm\">$dis_sel_user</td>
     </tr>
     <tr>
@@ -2613,13 +2616,13 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
 	case 0 : 
 	  $hour_day_list .="
 	  <td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	   onmouseover=\"this.style.backgroundColor='#ffde01';this.style.cursor = 'pointer'\"
-	   onmouseout=\"this.style.backgroundColor='#97bdec'\">&nbsp;</td>\n";
+	   onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer'\"
+	   onmouseout=\"this.className='agendaPossible'\">&nbsp;</td>\n";
 	  break;
 	case 1 : 
 	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\" 
-	   onmouseover=\"this.style.backgroundColor='#fdffbf';this.style.cursor = 'pointer'\"
-	   onmouseout=\"this.style.backgroundColor='#cee1ed'\">&nbsp;</td>\n";
+	   onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer'\"
+	   onmouseout=\"this.className ='agendaFree'\">&nbsp;</td>\n";
 	  break;
 	case 2 : 
 	  $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";
@@ -2637,13 +2640,13 @@ function html_meeting_planning($agenda,$usr_q, $meeting,$calendar_user){
 	switch($meeting[$current_time]) {
 	  case 0 : 
 	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaPossible\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.style.backgroundColor='#ffde01';this.style.cursor = 'pointer'\"
-	     onmouseout=\"this.style.backgroundColor='#97bdec'\">&nbsp;</td>\n";
+	    onmouseover=\"this.className='agendaPossibleHover';this.style.cursor = 'pointer'\"
+	    onmouseout=\"this.className='agendaPossible'\">&nbsp;</td>\n";
  	    break;
 	  case 1 : 
 	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaFree\" onclick=\"window.location='$goto'\"
-	     onmouseover=\"this.style.backgroundColor='#fdffbf';this.style.cursor = 'pointer'\"
-	     onmouseout=\"this.style.backgroundColor='#cee1ed'\">&nbsp;</td>\n";
+	     onmouseover=\"this.className='agendaFreeHover';this.style.cursor = 'pointer'\"
+	   onmouseout=\"this.className ='agendaFree'\">&nbsp;</td>\n";
 	    break;
 	  case 2 : 
 	    $hour_day_list .="<td width=\"$td_width\" class=\"agendaOccupied\">&nbsp;</td>\n";

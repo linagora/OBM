@@ -396,7 +396,17 @@ function contact_criterion(form,labels,values,i) {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_contact_function_id[]\" value=\"\" />';
   }   
 
-  
+  if(form.sel_kind_lang.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_contact: $l_lang'; 
+    cell = values.insertCell(i);
+    field = form.sel_kind_lang;
+    cell.innerHTML = '<select name=\"sel_kind_lang[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_kind_lang[]\" value=\"\" />';
+  }     
   return i;
 }
 
@@ -439,6 +449,32 @@ function publication_criterion(form,labels,values,i) {
   else {
     defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_publication_year[]\" value=\"\" />';
   }
+
+  if(form.tf_subscription_renewal.value != '') {
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_publication: $l_renew';      
+    cell = values.insertCell(i);
+    field = form.tf_subscription_renewal;
+    cell.innerHTML = '<select name=\"tf_subscription_renewal[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"tf_subscription_renewal[]\" value=\"\" />';
+  }  
+
+
+  if(form.sel_subscription_reception_id.value != '') {  
+    cell = labels.insertCell(i);
+    cell.innerHTML = '$l_publication: $l_recept'; 
+    cell = values.insertCell(i);
+    field = form.sel_subscription_reception_id;
+    cell.innerHTML = '<select name=\"sel_subscription_reception_id[]\" readonly=\"true\" style=\"background-color:#B9C7CA;\" onFocus=\"this.blur();\"><option value=\"'+ field.options[field.selectedIndex].value+'\">'+ field.options[field.selectedIndex].text+'</option></select>';
+    i++;  
+  }
+  else {
+    defaultCell.innerHTML +=  '<input type=\"hidden\" name=\"sel_subscription_reception_id[]\" value=\"\" />';
+  }  
+  
   return i;
   }
 ///////////////////////////////////////////////////////////////////////////////

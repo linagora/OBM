@@ -284,13 +284,15 @@ function get_param_list() {
   global $sel_company_datasource_id,$sel_companycategory_code;
 
   global $tf_contact_firstname,$tf_contact_lastname;
-  global $tf_contact_zipcode,$tf_contact_town;
+  global $tf_contact_zipcode,$tf_contact_town,$sel_kind_lang;
   global $tf_contact_timeupdate,$tf_contact_timecreate;
   global $sel_contact_country_id,$sel_contact_marketingmanager_id;
   global $sel_contact_datasource_id,$sel_contactcategory1link_category_id;
   global $sel_contactcategory2link_category_id,$sel_contact_function_id;
   
   global $tf_publication_title,$tf_publication_lang,$tf_publication_year;
+  global $sel_subscription_reception_id,$tf_subscription_renewal;
+  
   global $sel_log_and,$sel_log_not;
   global $se_criteria;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
@@ -349,13 +351,18 @@ function get_param_list() {
   if (isset ($sel_contactcategory1link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory1link_category_id"] = $sel_contactcategory1link_category_id;
   if (isset ($sel_contactcategory2link_category_id)) $list["criteria"]["modules"]["contact"]["contactcategory2link_category_id"] = $sel_contactcategory2link_category_id;
   if (isset ($sel_contact_function_id)) $list["criteria"]["modules"]["contact"]["contact_function_id"] = $sel_contact_function_id;  
+  if (isset ($sel_kind_lang)) $list["criteria"]["modules"]["contact"]["kind_lang"] = $sel_kind_lang;  
+  
   //Publication
   if (isset ($tf_publication_title)) $list["criteria"]["modules"]["publication"]["publication_title"] = $tf_publication_title;
   if (isset ($tf_publication_lang)) $list["criteria"]["modules"]["publication"]["publication_lang"] = $tf_publication_lang;
   if (isset ($tf_publication_year)) $list["criteria"]["modules"]["publication"]["publication_year"] = $tf_publication_year;
+  if (isset ($sel_subscription_reception_id)) $list["criteria"]["modules"]["publication"]["subscription_reception_id"] = $sel_subscription_reception_id;
+  if (isset ($tf_subscription_renewal)) $list["criteria"]["modules"]["publication"]["subscription_renewal"] = $tf_subscription_renewal;
+  
+
   if (isset ($sel_log_not)) $list["criteria"]["logical"]["NOT"] = $sel_log_not;
   if (isset ($sel_log_and)) $list["criteria"]["logical"]["AND"] = $sel_log_and;
-
   if (isset ($se_criteria)){$list["criteria"] = unserialize( urldecode($se_criteria)); }
   if (isset ($http_obm_vars)) {
     $nb_con = 0;
