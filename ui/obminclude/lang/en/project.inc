@@ -13,6 +13,7 @@ $l_company = "Company";
 $l_tasktype = "Category";
 $l_task = "Task";
 $l_soldtime = "Sold time";
+$l_estimatedtime = "Estimated time";
 $l_datebegin = "Begin date";
 $l_dateend = "End date";
 
@@ -98,6 +99,7 @@ $l_can_delete = "The project can be deleted.";
 $l_fill_name = "You have to fill the name before submitting.";
 $l_fill_tt = "You have to fill the category before submitting.";
 $l_fill_soldtime = "You have to fill the soldtime before submitting.";
+$l_fill_estimated = "You have to fill the estimated time before submitting.";
 $l_fill_tasklabel = "You have to fill the name for this task.";
 $l_fill_soldnumber = "The sold time number is not valid.";
 $l_fill_projected = "Each member must be assigned to a task";

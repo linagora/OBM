@@ -313,167 +313,6 @@ CREATE TABLE DealType (
 
 
 -------------------------------------------------------------------------------
--- Document module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Document'
---
-CREATE TABLE Document (
-  document_timeupdate timestamp(14) NOT NULL,
-  document_timecreate timestamp(14) NOT NULL,
-  document_userupdate int(8) default NULL,
-  document_usercreate int(8) default NULL,
-  document_id int(8) NOT NULL auto_increment,
-  document_title varchar(255) default NULL,
-  document_name varchar(255) default NULL,
-  document_kind int(2) default NULL,
-  document_mimetype varchar(255) default NULL,
-  document_category1 varchar(255) default NULL,
-  document_category2 varchar(255) default NULL,
-  document_author varchar(255) default NULL,
-  document_private int(1) default NULL,
-  document_path text default NULL,
-  document_size int(15) default NULL,
-  PRIMARY KEY (document_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory1'
---
-CREATE TABLE DocumentCategory1 (
-  documentcategory1_timeupdate timestamp(14) NOT NULL,
-  documentcategory1_timecreate timestamp(14) NOT NULL,
-  documentcategory1_userupdate int(8) default NULL,
-  documentcategory1_usercreate int(8) default NULL,
-  documentcategory1_id int(8) NOT NULL auto_increment,
-  documentcategory1_label varchar(255) default NULL,
-  PRIMARY KEY (documentcategory1_id)
-);
-
-
---
--- Table structure for table 'DocumentCategory2'
---
-CREATE TABLE DocumentCategory2 (
-  documentcategory2_timeupdate timestamp(14) NOT NULL,
-  documentcategory2_timecreate timestamp(14) NOT NULL,
-  documentcategory2_userupdate int(8) default NULL,
-  documentcategory2_usercreate int(8) default NULL,
-  documentcategory2_id int(8) NOT NULL auto_increment,
-  documentcategory2_label varchar(255) default NULL,
-  PRIMARY KEY (documentcategory2_id)
-);
-
-
---
--- Table structure for table 'DocumentMimeType'
---
-CREATE TABLE DocumentMimeType (
-  documentmimetype_timeupdate timestamp(14) NOT NULL,
-  documentmimetype_timecreate timestamp(14) NOT NULL,
-  documentmimetype_userupdate int(8) default NULL,
-  documentmimetype_usercreate int(8) default NULL,
-  documentmimetype_id int(8) NOT NULL auto_increment,
-  documentmimetype_label varchar(255) default NULL,
-  documentmimetype_extension varchar(10) default NULL,
-  documentmimetype_mime varchar(255) default NULL,
-  PRIMARY KEY (documentmimetype_id)
-);
-
-
---
--- Table structure for table 'DocumentEntity'
---
-CREATE TABLE DocumentEntity (
-  documententity_documentid int(8) NOT NULL,
-  documententity_entityid int(8) NOT NULL,
-  documententity_entity varchar(255) NOT NULL,
-  PRIMARY KEY (documententity_documentid,documententity_entityid,documententity_entity)
-);
-
--------------------------------------------------------------------------------
--- Project module tables
--------------------------------------------------------------------------------
---
--- Table structure for table 'Project'
---
-CREATE TABLE Project (
-  project_id int(8) DEFAULT '0' NOT NULL auto_increment,
-  project_timeupdate timestamp(14),
-  project_timecreate timestamp(14),
-  project_userupdate int(8),
-  project_usercreate int(8),
-  project_name varchar(128),
-  project_tasktype_id int(8),
-  project_company_id int(8),
-  project_deal_id int(8),
-  project_soldtime int(8) DEFAULT NULL,
-  project_datebegin date,
-  project_dateend date,
-  project_archive char(1) DEFAULT '0',
-  project_comment text,
-  PRIMARY KEY (project_id),
-  INDEX project_idx_comp (project_company_id),
-  INDEX project_idx_deal (project_deal_id)
-);
-
-
---
--- Table structure for table 'ProjectTask'
---
-CREATE TABLE ProjectTask (
-  projecttask_id int(8) DEFAULT '0' NOT NULL auto_increment,
-  projecttask_project_id int(8) NOT NULL,
-  projecttask_timeupdate timestamp(14) NOT NULL,
-  projecttask_timecreate timestamp(14) NOT NULL,
-  projecttask_userupdate int(8) default NULL,
-  projecttask_usercreate int(8) default NULL,
-  projecttask_label varchar(128) default NULL,
-  projecttask_parenttask_id int(8) default 0,
-  projecttask_rank int(8) default NULL,
-  PRIMARY KEY (projecttask_id),
-  INDEX pt_idx_pro (projecttask_project_id),
-);
-
-
---
--- Table structure for table 'ProjectUser'
---
-CREATE TABLE ProjectUser (
-  projectuser_id int(8) DEFAULT '0' NOT NULL auto_increment,
-  projectuser_project_id int(8) NOT NULL,
-  projectuser_user_id int(8) NOT NULL,
-  projectuser_projecttask_id int(8),
-  projectuser_timeupdate timestamp(14) NOT NULL,
-  projectuser_timecreate timestamp(14) NOT NULL,
-  projectuser_userupdate int(8) default NULL,
-  projectuser_usercreate int(8) default NULL,
-  projectuser_projectedtime int(8) default NULL,
-  projectuser_missingtime int(8) default NULL,
-  projectuser_validity timestamp(14) default NULL,
-  projectuser_soldprice int(8) default NULL,
-  projectuser_manager int(1) default NULL,
-  PRIMARY KEY (projectuser_id),
-  INDEX pu_idx_pro (projectuser_project_id),
-  INDEX pu_idx_user (projectuser_user_id)
-);
-
-
---
--- Table structure for table 'ProjectStat'
---
-CREATE TABLE ProjectStat (
-  projectstat_project_id int(8) NOT NULL,
-  projectstat_usercreate int(8) NOT NULL,
-  projectstat_date timestamp(14) NOT NULL,
-  projectstat_useddays int(8) default NULL,
-  projectstat_remainingdays int(8) default NULL,
-  PRIMARY KEY (projectstat_project_id, projectstat_usercreate, projectstat_date)
-);
-
-
--------------------------------------------------------------------------------
 -- List module tables
 -------------------------------------------------------------------------------
 --
@@ -584,6 +423,170 @@ CREATE TABLE RepeatKind (
 
 
 -------------------------------------------------------------------------------
+-- Document module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Document'
+--
+CREATE TABLE Document (
+  document_timeupdate timestamp(14) NOT NULL,
+  document_timecreate timestamp(14) NOT NULL,
+  document_userupdate int(8) default NULL,
+  document_usercreate int(8) default NULL,
+  document_id int(8) NOT NULL auto_increment,
+  document_title varchar(255) default NULL,
+  document_name varchar(255) default NULL,
+  document_kind int(2) default NULL,
+  document_mimetype varchar(255) default NULL,
+  document_category1 varchar(255) default NULL,
+  document_category2 varchar(255) default NULL,
+  document_author varchar(255) default NULL,
+  document_private int(1) default NULL,
+  document_path text default NULL,
+  document_size int(15) default NULL,
+  PRIMARY KEY (document_id)
+);
+
+
+--
+-- Table structure for table 'DocumentCategory1'
+--
+CREATE TABLE DocumentCategory1 (
+  documentcategory1_timeupdate timestamp(14) NOT NULL,
+  documentcategory1_timecreate timestamp(14) NOT NULL,
+  documentcategory1_userupdate int(8) default NULL,
+  documentcategory1_usercreate int(8) default NULL,
+  documentcategory1_id int(8) NOT NULL auto_increment,
+  documentcategory1_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory1_id)
+);
+
+
+--
+-- Table structure for table 'DocumentCategory2'
+--
+CREATE TABLE DocumentCategory2 (
+  documentcategory2_timeupdate timestamp(14) NOT NULL,
+  documentcategory2_timecreate timestamp(14) NOT NULL,
+  documentcategory2_userupdate int(8) default NULL,
+  documentcategory2_usercreate int(8) default NULL,
+  documentcategory2_id int(8) NOT NULL auto_increment,
+  documentcategory2_label varchar(255) default NULL,
+  PRIMARY KEY (documentcategory2_id)
+);
+
+
+--
+-- Table structure for table 'DocumentMimeType'
+--
+CREATE TABLE DocumentMimeType (
+  documentmimetype_timeupdate timestamp(14) NOT NULL,
+  documentmimetype_timecreate timestamp(14) NOT NULL,
+  documentmimetype_userupdate int(8) default NULL,
+  documentmimetype_usercreate int(8) default NULL,
+  documentmimetype_id int(8) NOT NULL auto_increment,
+  documentmimetype_label varchar(255) default NULL,
+  documentmimetype_extension varchar(10) default NULL,
+  documentmimetype_mime varchar(255) default NULL,
+  PRIMARY KEY (documentmimetype_id)
+);
+
+
+--
+-- Table structure for table 'DocumentEntity'
+--
+CREATE TABLE DocumentEntity (
+  documententity_documentid int(8) NOT NULL,
+  documententity_entityid int(8) NOT NULL,
+  documententity_entity varchar(255) NOT NULL,
+  PRIMARY KEY (documententity_documentid,documententity_entityid,documententity_entity)
+);
+
+
+-------------------------------------------------------------------------------
+-- Project module tables
+-------------------------------------------------------------------------------
+--
+-- Table structure for table 'Project'
+--
+CREATE TABLE Project (
+  project_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  project_timeupdate timestamp(14),
+  project_timecreate timestamp(14),
+  project_userupdate int(8),
+  project_usercreate int(8),
+  project_name varchar(128),
+  project_tasktype_id int(8),
+  project_company_id int(8),
+  project_deal_id int(8),
+  project_soldtime int(8) DEFAULT NULL,
+  project_estimatedtime int(8) DEFAULT NULL,
+  project_datebegin date,
+  project_dateend date,
+  project_archive char(1) DEFAULT '0',
+  project_comment text,
+  PRIMARY KEY (project_id),
+  INDEX project_idx_comp (project_company_id),
+  INDEX project_idx_deal (project_deal_id)
+);
+
+
+--
+-- Table structure for table 'ProjectTask'
+--
+CREATE TABLE ProjectTask (
+  projecttask_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  projecttask_project_id int(8) NOT NULL,
+  projecttask_timeupdate timestamp(14) NOT NULL,
+  projecttask_timecreate timestamp(14) NOT NULL,
+  projecttask_userupdate int(8) default NULL,
+  projecttask_usercreate int(8) default NULL,
+  projecttask_label varchar(128) default NULL,
+  projecttask_parenttask_id int(8) default 0,
+  projecttask_rank int(8) default NULL,
+  PRIMARY KEY (projecttask_id),
+  INDEX pt_idx_pro (projecttask_project_id)
+);
+
+
+--
+-- Table structure for table 'ProjectUser'
+--
+CREATE TABLE ProjectUser (
+  projectuser_id int(8) DEFAULT '0' NOT NULL auto_increment,
+  projectuser_project_id int(8) NOT NULL,
+  projectuser_user_id int(8) NOT NULL,
+  projectuser_projecttask_id int(8),
+  projectuser_timeupdate timestamp(14) NOT NULL,
+  projectuser_timecreate timestamp(14) NOT NULL,
+  projectuser_userupdate int(8) default NULL,
+  projectuser_usercreate int(8) default NULL,
+  projectuser_projectedtime int(8) default NULL,
+  projectuser_missingtime int(8) default NULL,
+  projectuser_validity timestamp(14) default NULL,
+  projectuser_soldprice int(8) default NULL,
+  projectuser_manager int(1) default NULL,
+  PRIMARY KEY (projectuser_id),
+  INDEX pu_idx_pro (projectuser_project_id),
+  INDEX pu_idx_user (projectuser_user_id),
+  INDEX pu_idx_pt (projectuser_projecttask_id)
+);
+
+
+--
+-- Table structure for table 'ProjectStat'
+--
+CREATE TABLE ProjectStat (
+  projectstat_project_id int(8) NOT NULL,
+  projectstat_usercreate int(8) NOT NULL,
+  projectstat_date timestamp(14) NOT NULL,
+  projectstat_useddays int(8) default NULL,
+  projectstat_remainingdays int(8) default NULL,
+  PRIMARY KEY (projectstat_project_id, projectstat_usercreate, projectstat_date)
+);
+
+
+-------------------------------------------------------------------------------
 -- Timemanagement tables
 -------------------------------------------------------------------------------
 --
@@ -602,7 +605,8 @@ CREATE TABLE TimeTask (
   timetask_tasktype_id int(8) default NULL,
   timetask_label varchar(255) default NULL,
   timetask_status int(1) default NULL,
-  PRIMARY KEY  (timetask_id)
+  PRIMARY KEY  (timetask_id),
+  INDEX tt_idx_pt (timetask_projecttask_id),
 ) TYPE=MyISAM;
 
 

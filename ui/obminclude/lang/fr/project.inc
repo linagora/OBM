@@ -13,6 +13,7 @@ $l_company = "Société";
 $l_tasktype = "Catégorie";
 $l_task = "Tâche";
 $l_soldtime = "Temps vendu";
+$l_estimatedtime = "Temps estimé";
 $l_datebegin = "Date de début";
 $l_dateend = "Date de fin";
 
@@ -98,6 +99,7 @@ $l_can_delete = "Le projet peut être supprimé.";
 $l_fill_name = "Vous devez indiquer un nom avant de valider.";
 $l_fill_tt = "Vous devez indiquer la catégorie avant de valider.";
 $l_fill_soldtime = "Vous devez indiquer le temps vendu avant de valider.";
+$l_fill_estimated = "Vous devez indiquer le temps estimé avant de valider.";
 $l_fill_tasklabel = "Vous devez donner un nom à cette tâche.";
 $l_fill_soldnumber = "Le temps vendu doit être un nombre entier de jours.";
 $l_fill_projected = "Chaque participant avant doit être affecté à au moins une tâche";

@@ -634,24 +634,31 @@ function dis_check_links($p_id) {
 
     $obm_qm = new DB_OBM;
     $fields = $obm_qm->metadata($table, false);
-    $fieldsexist = false;
+    $fieldexist_uc = false;
+    $fieldexist_uu = false;
     $j = 0;
     while ($fields[$j]["name"]) {
       if (strtoupper($fields[$j]["name"]) == strtoupper($usercreate)) {
-        $fieldsexist = true;
+        $fieldexist_uc = true;
+      }
+      if (strtoupper($fields[$j]["name"]) == strtoupper($userupdate)) {
+        $fieldexist_uu = true;
       }
       $j++;
     }
-    if ($fieldsexist) {
+    if ($fieldexist_uc) {
       $query = "select count(*) from $table where $usercreate='$p_id'";
       $c_q = new DB_OBM($query);
       $c_q->next_record();
       $nbc = $c_q->f("0");
+    }
+    if ($fieldexist_uu) {
       $query = "select count(*) from $table where $userupdate='$p_id'";
       $c_q = new DB_OBM($query);
       $c_q->next_record();
       $nbu = $c_q->f("0");
-
+    }
+    if ($fieldexist_uc || $fieldexist_uu) {
       $dis_user .= "
       <tr>
         <td class=\"detailHead\" rowspan=\"2\">$table</td>

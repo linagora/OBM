@@ -16,6 +16,7 @@ $fieldnames["project_name"] = $l_name;
 $fieldnames["project_company"] = $l_company;
 $fieldnames["project_tasktype"] = $l_tasktype;
 $fieldnames["project_soldtime"] = $l_soldtime;
+$fieldnames["project_estimatedtime"] = $l_estimatedtime;
 $fieldnames["project_datebegin"] = $l_datebegin;
 $fieldnames["project_dateend"] = $l_dateend;
 $fieldnames["project_archive"] = $l_archive_first;
@@ -59,7 +60,7 @@ function dis_project_consult($pid) {
   $project_q = run_query_detail($pid);
   $tasks_q = run_query_tasks($pid);
   $members_q = run_query_members($pid);
-  $allo_q = run_query_allocation_and_time($pid);
+  $times = run_query_allocation_and_time($pid);
 
   if ($project_q->num_rows() != 1) {
     $display["msg"] .= display_err_msg($l_query_error . " - " . $project_q->query . " !");
@@ -68,7 +69,7 @@ function dis_project_consult($pid) {
   if (($project_q->f("project_visibility") == 0) ||
       ($project_q->f("usercreate") == $uid) ) {
     $display["detailInfo"] = display_record_info($project_q->f("usercreate"),$project_q->f("userupdate"), $project_q->f("timecreate"),$project_q->f("timeupdate"));
-    $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $allo_q);
+    $display["detail"] = html_project_consult($project_q, $tasks_q, $members_q, $times);
   } else {
     // this project's page has "private" access
     $display["msg"] .= display_err_msg($l_error_visibility);
@@ -269,9 +270,10 @@ function html_project_search_list($obm_q_projects, $pref_q, $nb_project, $projec
 //   - $project_q : DBO : information about the project
 //   - $tasks_q   : DBO : list of tasks in the project 
 //   - $members_q : DBO : list of members and related time infos
+//   - $times     : array of hash with uid,task_id,allo,miss,used valued 
 //      keys used : id
 ///////////////////////////////////////////////////////////////////////////////
-function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
+function html_project_consult($project_q, $tasks_q, $members_q, $times) {
   global $path, $set_theme, $display, $action, $ico_company, $ico_deal;
   global $l_name, $l_tasktype, $l_company, $l_total, $l_datebegin, $l_dateend;
   global $l_deal, $l_project, $l_progress, $l_progressinfos;
@@ -438,14 +440,14 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 
       $cpt_t++; 
     }
-  
+
     // list the members of the project
-    while ($allo_q->next_record()) {
-      $m_id = $allo_q->f("userobm_id");
-      $m_task = ($allo_q->f("projecttask_id") ? $allo_q->f("projecttask_id") : 0);
-      $m_proj = ($allo_q->f("projected_time") ? $allo_q->f("projected_time") : 0);
-      $m_miss = ($allo_q->f("missing_time") ? $allo_q->f("missing_time") : 0);
-      $m_used = ($allo_q->f("used_time") ? $allo_q->f("used_time") : 0);
+    while (list($key,$cell) = each($times)) {
+      $m_id = $cell["uid"];
+      $m_task = ($cell["task_id"] ? $cell["task_id"] : 0);
+      $m_proj = ($cell["allo"] ? $cell["allo"] : 0);
+      $m_miss = ($cell["miss"] ? $cell["miss"] : 0);
+      $m_used = ($cell["used"] ? $cell["used"] : 0);
 
       // time (used/missing/projected) for each (task/member) couple
       $array_time["proj"][$m_task][$m_id] = $m_proj;
@@ -517,7 +519,9 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 	$tm_used = $array_time["used"][$t_id][$m_id];
 
 	// We write the cell only if not 0/0/0
-	if (($tm_used != "0") || ($tm_miss != "0") || ($tm_proj != "0")) {
+	if ( ( ($tm_used != "0.0") && ($tm_used != ""))
+	     || ( ($tm_miss != "0") && ($tm_miss != "") )
+             || ( ($tm_proj != "0") && ($tm_proj != "") ) ) {
 	  $tm_label = number_format($tm_used, 1) ."/". $tm_miss ."/". $tm_proj;
 	} else {
 	  $tm_label = "";
@@ -704,8 +708,8 @@ function html_project_consult($project_q, $tasks_q, $members_q, $allo_q) {
 ///////////////////////////////////////////////////////////////////////////////
 function html_project_form($action, $project_q, $project) {
   global $l_company, $l_deal, $l_project, $l_member, $l_insert, $l_update;
-  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_none, $l_archive;
-  global $l_datebegin, $l_dateend;
+  global $l_name, $l_tasktype, $l_task, $l_projtime, $l_soldtime, $l_archive;
+  global $l_datebegin, $l_dateend, $l_none;
   global $ctt_sales, $ctt_research, $c_php_isodate_format;
 
   if ($action == "detailupdate") {
@@ -715,6 +719,7 @@ function html_project_form($action, $project_q, $project) {
     $company = $project_q->f("project_company_id");
     $deal = $project_q->f("project_deal_id");
     $soldtime = $project_q->f("project_soldtime");
+    $estimated = $project_q->f("project_estimatedtime");
     $arc_val = ($project_q->f("project_archive")) ? "checked" : "";
     $company_name = $project_q->f("company_name");
     $deal_label = $project_q->f("deal_label");
@@ -727,6 +732,7 @@ function html_project_form($action, $project_q, $project) {
     $company = $project["company"];
     $deal = $project["deal"];
     $soldtime = $project["soldtime"];
+    $estimated = $project["estimated"];
     $company_name = $project["company_name"];
     $deal_label = $project["deal_label"];
     $task = $project["tasklabel"];
@@ -782,6 +788,12 @@ function html_project_form($action, $project_q, $project) {
     $dis_deal
     </tr>
     </table>";
+
+    $dis_sold = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_soldtime</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>";
+
   } else {
     $tt_q = run_query_tasktype($ctt_research);
     $dis_comp = "";
@@ -849,9 +861,10 @@ function html_project_form($action, $project_q, $project) {
     </tr><tr>
       <td class=\"detailLabel\">$l_tasktype</td>
       <td class=\"detailForm\">$sel_tt</td>
+   $dis_sold
     </tr><tr>
       <td class=\"detailLabel\">$l_projtime</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_soldtime\" size=\"10\" maxlength=\"8\" value=\"$soldtime\" /></td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_estimated\" size=\"10\" maxlength=\"8\" value=\"$estimated\" /></td>
    $dis_task
    $dis_member
    </tr><tr>

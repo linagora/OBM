@@ -393,9 +393,9 @@ display_page($display);
 function get_param_project() {
   global $param_project, $param_user, $param_status, $param_company, $param_deal;
   global $tf_missing, $tf_projected, $tf_datebegin, $tf_dateend;
-  global $tf_name, $tf_company_name, $tf_soldtime, $tf_tasklabel, $cb_archive;
+  global $tf_name, $tf_company_name, $tf_soldtime, $tf_estimated, $tf_tasklabel, $cb_archive;
   global $sel_tt, $sel_manager, $sel_member, $sel_ptask, $param_ext;
-  global $company_name, $deal_label;
+  global $deal_label;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
   global $cdg_param;
@@ -408,6 +408,7 @@ function get_param_project() {
 
   // Project fields
   if (isset ($tf_soldtime)) $project["soldtime"] = $tf_soldtime;
+  if (isset ($tf_estimated)) $project["estimated"] = $tf_estimated;
   if (isset ($sel_ptask)) $project["ptask"] = $sel_ptask;
   if (isset ($tf_tasklabel)) $project["tasklabel"] = $tf_tasklabel;
   if (isset ($tf_missing)) $project["missing"] = $tf_missing;
@@ -561,7 +562,7 @@ function get_project_action() {
     'Name'     => $l_header_man_task,
     'Url'      => "$path/project/project_index.php?action=task&amp;param_project=".$project["id"]."",
     'Right'    => $project_write,
-    'Condition'=> array ('detailconsult', 'update', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
+    'Condition'=> array ('detailconsult', 'insert', 'update', 'progress_update', 'allocate_update', 'member', 'member_add', 'member_del', 'member_update', 'allocate', 'progress') 
     );
 
 // Add a task

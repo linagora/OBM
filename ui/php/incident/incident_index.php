@@ -56,12 +56,6 @@ if($action == "") $action = "index";
 $incident = get_param_incident();
 get_incident_action();
 $perm->check();
-///////////////////////////////////////////////////////////////////////////////
-// Beginning of HTML Page                                                    //
-///////////////////////////////////////////////////////////////////////////////
-$display["head"] = display_head($l_incident);     // Head & Body
-$display["header"] = generate_menu($menu,$section); // Menu
-
 
 ///////////////////////////////////////////////////////////////////////////////
 // Programe principal                                                        //
@@ -254,8 +248,10 @@ if ($action == "index" || $action == "") {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display end of page                                                       //
+// Display
 ///////////////////////////////////////////////////////////////////////////////
+$display["head"] = display_head($l_incident);     // Head & Body
+$display["header"] = generate_menu($menu,$section); // Menu
 $display["end"] = display_end();
 display_page($display);
 

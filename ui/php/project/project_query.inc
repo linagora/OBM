@@ -32,6 +32,7 @@ function run_query_search($project, $p_new_order="", $p_order_dir) {
       project_id,
       project_name,
       project_soldtime,
+      project_estimatedtime,
       company_name as project_company,
       tasktype_label as project_tasktype,
       project_datebegin,
@@ -123,6 +124,7 @@ function run_query_detail($p_id) {
       company_name,
       deal_label,
       project_soldtime,
+      project_estimatedtime,
       project_archive,
       project_userupdate as userupdate,
       project_usercreate as usercreate,
@@ -153,32 +155,13 @@ function run_query_detail($p_id) {
 // anymore assigned to some tasks, must appear in the detailed progress table 
 // Parameters:
 //   - $p_id : project id
-// Optimiser en separant en 2 requetes Projectuser et TimeTask ????XXXXX
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_allocation_and_time($p_id) {
   global $cdg_sql, $c_day_fraction;
 
   $frac = $c_day_fraction;
 
-  $users = get_project_participants($p_id);
-
-  $nb = count($users);
-  $cpt = 0;
-  $user_where = "and (";
-  while (list($key, $u_id) = each ($users)) {
-    $cpt ++;
-    if ($cpt == 1) {
-      $user_where .= "userobm_id='$u_id'";
-    } else {
-      $user_where .= " or userobm_id='$u_id'";
-    }
-  }
-  $user_where .= ")";
-
-  if ($cpt == 0) {
-    $user_where = "";
-  }
-
+  // We first get Times from Allocated Tasks
   $query = "
     select
       userobm_id,
@@ -186,23 +169,68 @@ function run_query_allocation_and_time($p_id) {
       sum((timetask_length)/$frac) as used_time,
       projectuser_projectedtime as projected_time,
       projectuser_missingtime as missing_time
-    from UserObm, ProjectTask
+    from ProjectUser
+      left join ProjectTask
+        on projectuser_projecttask_id = projecttask_id
+      left join UserObm
+        on projectuser_user_id = userobm_id
       left join TimeTask
         on timetask_projecttask_id = projecttask_id
-          and timetask_user_id = userobm_id
-      left join ProjectUser
-        on projecttask_id = projectuser_projecttask_id
-          and projectuser_user_id = userobm_id
-    where projecttask_project_id = '$p_id'
-      $user_where
-    group by userobm_id, projecttask_id
+        and timetask_user_id = userobm_id
+    where projectuser_project_id = '$p_id'
+      and projectuser_projectedtime != '0'
+     group by userobm_id, projecttask_id
     ";
 
   display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
 
-  return $obm_q;
+  $times = array();
+  $cpt = 0;
+  while ($obm_q->next_record()) {
+    $times[$cpt]["uid"] = $obm_q->f("userobm_id");
+    $times[$cpt]["task_id"] = $obm_q->f("projecttask_id");
+    $times[$cpt]["allo"] = $obm_q->f("projected_time");
+    $times[$cpt]["miss"] = $obm_q->f("missing_time");
+    $times[$cpt]["used"] = $obm_q->f("used_time");
+    $cpt++;
+  }
+
+  // We query TimeTask data filled but where no allocation is present anymore
+  // We start by TimeTask and join to ProjectUser but ProjectUser must be empty
+  $query = "
+    select
+      userobm_id,
+      projecttask_id,
+      projecttask_project_id, 
+      sum((timetask_length)/$frac) as used_time
+    from TimeTask
+      left join ProjectTask
+        on timetask_projecttask_id = projecttask_id
+      left join UserObm
+        on timetask_user_id = userobm_id
+      left join ProjectUser
+        on projectuser_projecttask_id = projecttask_id
+        and projectuser_user_id = userobm_id
+    where projecttask_project_id = '$p_id'
+      and projectuser_id is null
+    group by userobm_id, projecttask_id
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_allocation_and_time (2)");
+  $obm_q->query($query);
+
+  while ($obm_q->next_record()) {
+    $times[$cpt]["uid"] = $obm_q->f("userobm_id");
+    $times[$cpt]["task_id"] = $obm_q->f("projecttask_id");
+    $times[$cpt]["allo"] = "0";
+    $times[$cpt]["miss"] = "0";
+    $times[$cpt]["used"] = $obm_q->f("used_time");
+    $cpt++;
+  }
+
+  return $times;
 }
 
 
@@ -220,6 +248,7 @@ function run_query_insert($project) {
 
   $name = $project["name"];
   $soldtime = $project["soldtime"];
+  $estimated = $project["estimated"];
   $tt = $project["tt"];
   $comp = $project["company"];
   $deal = $project["deal"];
@@ -240,6 +269,7 @@ function run_query_insert($project) {
     project_company_id,
     project_deal_id,
     project_soldtime,
+    project_estimatedtime,
     project_datebegin,
     project_dateend,
     project_archive,
@@ -253,6 +283,7 @@ function run_query_insert($project) {
     '$comp',
     '$deal',
     '$soldtime',
+    '$estimated',
     '$datebegin',
     '$dateend',
     '0',
@@ -267,7 +298,8 @@ function run_query_insert($project) {
             from Project
             where project_name = '$name'
               and project_tasktype_id = '$tt'
-              and project_soldtime = '$soldtime'";
+              and project_soldtime = '$soldtime'
+              and project_estimatedtime = '$estimated'";
 
   display_debug_msg($query, $cdg_sql, "run_query_insert (get Id)");
   $obm_q->query($query);
@@ -304,7 +336,7 @@ function run_query_insert($project) {
   }
 
   // If a member has been given, We insert it
-  if ($member != "") {
+  if ($member > 0) {
 
     // We get the projecttask_id if a project task has been filled
     if ($task != "") {
@@ -340,8 +372,8 @@ function run_query_insert($project) {
         $pt_id,
         '$date_now',
         '$uid',
-        '$soldtime',
-        '$soldtime',
+        '$estimated',
+        '$estimated',
         '$date_now',
         '1')";
 
@@ -366,6 +398,7 @@ function run_query_update($pid, $project) {
   $uid = $auth->auth["uid"];
   $name = $project["name"];
   $soldtime = $project["soldtime"];
+  $estimated = $project["estimated"];
   $tt = $project["tt"];
   $datebegin = ($project["datebegin"] ? $project["datebegin"] : "null");
   $dateend = ($project["dateend"] ? $project["dateend"] : "null");
@@ -382,6 +415,7 @@ function run_query_update($pid, $project) {
       project_name='$name',
       project_tasktype_id='$tt',
       project_soldtime='$soldtime',
+      project_estimatedtime='$estimated',
       project_datebegin='$datebegin',
       project_dateend='$dateend',
       project_archive='$arch'
@@ -766,6 +800,44 @@ function run_query_memberstatus_change($project) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Project tasks user allocation
+// Parameters:
+//   - $p_id : project id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_allocation($p_id) {
+  global $cdg_sql, $c_day_fraction;
+
+  $frac = $c_day_fraction;
+
+  $query = "
+    select
+      userobm_id,
+      projectuser_projecttask_id,
+      sum((timetask_length)/$frac) as used_time,
+      projectuser_projectedtime as projected_time,
+      projectuser_missingtime as missing_time
+    from ProjectUser
+      left join ProjectTask
+        on projectuser_projecttask_id = projecttask_id
+      left join UserObm
+        on projectuser_user_id = userobm_id
+      left join TimeTask
+        on timetask_projecttask_id = projecttask_id
+        and timetask_user_id = userobm_id
+    where projectuser_project_id = '$p_id'
+      and projectuser_projectedtime != '0'
+    group by userobm_id, projecttask_id
+    ";
+
+  display_debug_msg($query, $cdg_sql, "run_query_allocation");
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+
+  return $obm_q;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Project Allocation Update query execution                                 //
 // Parameters:
 //   - $project[] : hash info : keys used : projected
@@ -1113,62 +1185,6 @@ function run_query_managers($p_id = 0) {
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Project tasks user allocation
-// Parameters:
-//   - $p_id : project id
-///////////////////////////////////////////////////////////////////////////////
-function run_query_allocation($p_id) {
-  global $cdg_sql, $c_day_fraction;
-
-  $frac = $c_day_fraction;
-
-  $query = "
-    select
-      userobm_id,
-      projectuser_projecttask_id,
-      sum((timetask_length)/$frac) as used_time,
-      projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time
-    from UserObm, ProjectUser, ProjectTask
-    left join TimeTask
-      on  timetask_projecttask_id = projecttask_id
-      and timetask_user_id = userobm_id
-    where projecttask_project_id = '$p_id'
-      and projecttask_id = projectuser_projecttask_id
-      and projectuser_user_id = userobm_id
-      and projectuser_projectedtime != '0'
-    group by userobm_id, projecttask_id
-    ";
-
-  $query = "
-    select
-      userobm_id,
-      projectuser_projecttask_id,
-      sum((timetask_length)/$frac) as used_time,
-      projectuser_projectedtime as projected_time,
-      projectuser_missingtime as missing_time
-    from ProjectUser
-      left join ProjectTask
-        on projectuser_projecttask_id = projecttask_id
-      left join TimeTask
-        on  timetask_projecttask_id = projecttask_id
-        and timetask_user_id = userobm_id
-      left join UserObm
-        on projectuser_user_id = userobm_id
-    where projectuser_project_id = '$p_id'
-      and projectuser_projectedtime != '0'
-    group by userobm_id, projecttask_id
-    ";
-
-  display_debug_msg($query, $cdg_sql, "run_query_allocation");
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-
-  return $obm_q;
-}
-
-
 //////////////////////////////////////////////////////////////////////////
 // Get all the contacts of the companyusing obm
 //  -- THIS SHOULD CHANGE TO USE THE User TABLE --
@@ -1184,6 +1200,7 @@ function run_query_get_obmusers() {
   $obm_db->query($query);
   return $obm_db;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Project TaskType list query
@@ -1263,12 +1280,13 @@ function manager_rights($uid, $project, $project_q) {
 //   - (true | false) : true if data are ok, else false 
 ///////////////////////////////////////////////////////////////////////////////
 function check_project_form($pid, $project) {
-  global $l_fill_name, $l_fill_tt, $l_fill_soldtime;
+  global $l_fill_name, $l_fill_tt, $l_fill_estimated, $l_fill_soldtime;
   global $err_msg, $php_regexp_number;
 
   $name = $project["name"];
   $tt = $project["tt"];
   $soldtime = $project["soldtime"];
+  $estimated = $project["estimated"];
   $member = $project["member"];
 
   // MANDATORY: Project name
@@ -1286,6 +1304,12 @@ function check_project_form($pid, $project) {
   // MANDATORY: Soldtime
   if (trim($soldtime) == "") {
     $err_msg = $l_fill_soldtime;
+    return false;
+  }
+
+  // MANDATORY: Estimated
+  if (trim($estimated) == "") {
+    $err_msg = $l_fill_estimated;
     return false;
   }
 
