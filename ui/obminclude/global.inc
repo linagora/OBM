@@ -35,6 +35,10 @@ $c_day_fraction = 8;
 // 5 : Mon -> Fri; 6 : Mon -> Sat... (not tested for anything else than 5...
 //  and 5 could be hard coded at some places...
 $c_days_in_a_week= 5;
+// We define a working week to cope with all cases of working week 
+//  for us, we are working from Monday to Friday, so : (week start at Sun)
+// $c_days_in_a_week= 5 will become absolete
+$working_days = array(0,1,1,1,1,1,0);
 // task_status flag
 // task not valided by the user : $c_task_notvalid
 // task valided by user : $c_task_uservalid
@@ -223,7 +227,8 @@ $perm_admin  =  $com_read + $prod_read + $compta_read + $users_read +
   	        $com_admin_read + $prod_admin_read + $compta_admin_read +
   	        $users_admin_read + $com_admin_write + $prod_admin_write +
   	        $compta_admin_write + $users_admin_write + $admins_read	+
-  	        $admins_write + $admins_admin_read + $admins_admin_write;
+  	        $admins_write + $admins_admin_read + $admins_admin_write +
+            $time_admin_read + $time_admin_write;
 
 
 // Debug Constants
