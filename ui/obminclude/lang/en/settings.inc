@@ -23,6 +23,8 @@ $l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";
 $l_send_mail = "Accept e-mails";
 
+$l_update_ok = "Settings updated successfully";
+
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";
 $l_dg_sess = "Session";

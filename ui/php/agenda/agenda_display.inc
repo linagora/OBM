@@ -1599,9 +1599,11 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   global $l_repeatkind,$l_repeatdays,$l_use_endrepeat,$l_daily,$l_weekly;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update;
   global $l_none,$l_insert,$l_force,$l_repeat_update,$l_sendamail;
+
   $time_unit = 60 / $set_cal_interval;  
-  if($action == "detailupdate") {
-    $title = $obm_q_event->f("calendarevent_title");
+
+  if ($action == "detailupdate") {
+    $title = htmlspecialchars($obm_q_event->f("calendarevent_title"));
     $category_id = $obm_q_event->f("calendarevent_category_id");
     $priority = $obm_q_event->f("calendarevent_priority");
     $description = $obm_q_event->f("calendarevent_description");
@@ -1654,16 +1656,13 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $force = $agenda["force"];
     $old_begin = $agenda["old_begin"];
     $old_end = $agenda["old_end"];
-    
   }
-
   
   if (($action == "detailupdate") || ($action == "update")) {
     if($repeat_kind == "none") {
       $check_activate = "disabled=\"disabled\"";
-      $check_case_style = "style=\"color:#cccccc; bacgound-color: #999999\"";      
-    }
-    else {
+      $check_case_style = "style=\"color:#cccccc; bacgound-color: #999999\"";
+    } else {
       $check_case_style = "style=\"color:red;\"";      
     }	
     $dis_repeat_update = "<tr><td class=\"detailLabel\" $check_case_style >$l_repeat_update</td>";
@@ -1721,7 +1720,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   }
   $sel_cat .= "</select>";
 
- //Repetition days
+ // Repetition days
   $start_week_day = strtotime($set_weekstart_default);
 
   for ($i=0; $i<7; $i++) {
@@ -1759,62 +1758,58 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   } 
   $dis_sel_user .= "</select>";
   
-  if($force == 1){
+  if ($force == 1){
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" checked=\"checked\" name=\"cb_force\" />";
-  }else{
+  } else {
     $dis_force = "<input type=\"checkbox\" id=\"cb_force\" value=\"1\" name=\"cb_force\" />";
   }
   
-  if($privacy == 1){
+  if ($privacy == 1){
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" checked=\"checked\" name=\"cb_privacy\" />";
-  }else{
+  } else {
     $dis_privacy = "<input type=\"checkbox\" id=\"cb_privacy\" value=\"1\" name=\"cb_privacy\" />";
   }
 
   
   $dis_hour_b = "<select name=\"sel_time_begin\">";
-  for($i=$set_start_time;$i<$set_stop_time;$i++) {
+  for ($i=$set_start_time;$i<$set_stop_time;$i++) {
     $current_hour = substr("0$i",-2,2); 
-    if($current_hour == $hourbegin){
+    if ($current_hour == $hourbegin) {
       $dis_hour_b .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
-    }
-    else{
+    } else {
       $dis_hour_b .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
   $dis_hour_b .= "</select>";  
  
   $dis_hour_e = "<select name=\"sel_time_end\">";
-  for($i=$set_start_time;$i<=$set_stop_time;$i++) {
+  for ($i=$set_start_time;$i<=$set_stop_time;$i++) {
     $current_hour = substr("0$i",-2,2); 
-    if($current_hour == $hourend){
+    if ($current_hour == $hourend) {
       $dis_hour_e .= "<option value=\"$current_hour\" selected=\"selected\">$current_hour</option>";
-    }
-    else{
+    } else {
       $dis_hour_e .= "<option value=\"$current_hour\">$current_hour</option>";
     }
   }
   $dis_hour_e .= "</select>";  
 
   $dis_min_b = "<select name=\"sel_min_begin\">";
-  for($i=4;$i>=1;$i--) {
+  for ($i=4;$i>=1;$i--) {
     $current_min = substr("0".(60 - (15*$i)),-2);
-    if($current_min  == $minbegin) {
+    if ($current_min  == $minbegin) {
       $dis_min_b .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
-    }
-    else{
+    } else {
       $dis_min_b .= "<option value=\"$current_min\">$current_min</option>";
     }
   }
   $dis_min_b .= "</select>";  
 
  $dis_min_e = "<select name=\"sel_min_end\">";
-  for($i=4;$i>=1;$i--) {
+  for ($i=4;$i>=1;$i--) {
     $current_min = substr("0".(60 - (15*$i)),-2);
-    if($current_min  == $minend){
+    if ($current_min  == $minend) {
       $dis_min_e .= "<option value=\"$current_min\" selected=\"selected\">$current_min</option>";
-    }
-    else{
+    } else {
       $dis_min_e .= "<option value=\"$current_min\">$current_min</option>";
     }
   }

@@ -24,6 +24,8 @@ $l_set_cal_interval = "Calendar interval";
 $l_set_menu = "Menu display";
 $l_set_debug = "Debugging level";
 
+$l_update_ok = "Settings updated successfully";
+
 $l_dg_id = "Id";
 $l_dg_param = "Parameters";
 $l_dg_sess = "Session";

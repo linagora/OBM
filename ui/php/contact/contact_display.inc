@@ -144,9 +144,15 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
     $display_popup_head = "
       <form target=\"$ext_target\" method=\"post\" action=\"$ext_url\">";
     $display_popup_end = "
+      <table class=\"details\">
+      <tr>
+        <td>
       <input type=\"submit\" value=\"$l_add\" />
       <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
+        </td>
+      </tr>
+      </table>
       </form>
       <p>
       <a href=\"\" onclick='window.close();'>$l_close</a>

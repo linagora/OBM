@@ -123,7 +123,7 @@ function display_menu_bar($section, $menu) {
 	     }
              echo "
               <a href=\"\" class=\"menuBar\" 
-              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width'); return false;\">
+              onclick=\"$wtarget window.open('".$value['Url']."','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
 	      ".$value["Name"]."</a> &nbsp;";
            } else {
             echo "
@@ -300,12 +300,13 @@ function display_inactive_tab($tab) {
 ///////////////////////////////////////////////////////////////////////////////
 function display_bookmarks($path="..") {
   global $set_theme;
-  global $last_company,$last_contact,$last_deal,$last_parentdeal;
+  global $last_company,$last_contact,$last_deal,$last_parentdeal,$last_list;
   global $last_contract, $last_incident;
   global $last_account,$last_invoice, $last_payment;
   global $last_company_name, $last_contact_name, $last_deal_name;
-  global $last_parentdeal_name, $last_contract_name, $last_payment_name;
-  global $last_account_name, $last_invoice_name,$last_incident_name;
+  global $last_parentdeal_name, $last_list_name, $last_contract_name;
+  global $last_incident_name;
+  global $last_payment_name, $last_account_name, $last_invoice_name;
 
   $book = "
   <table class=\"bookmarks\">
@@ -333,7 +334,13 @@ function display_bookmarks($path="..") {
     $book .= "
     <td class=\"bookmarks\">
       <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
-      <a class=\"bookmarks\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=".$last_deal)."\">".substr($last_deal_name,0,30)."</a></td>";
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/deal/deal_index.php?action=detailconsult&amp;param_deal=$last_deal")."\">".substr($last_deal_name,0,30)."</a></td>";
+
+  if ($last_list_name != "")
+    $book .= "
+    <td class=\"bookmarks\">
+      <img alt=\"\" src=\"/images/$set_theme/puce.gif\" />
+      <a class=\"bookmarks\" href=\"".url_prepare("$path/list/list_index.php?action=detailconsult&amp;param_list=$last_list")."\">".substr($last_list_name,0,30)."</a></td>";
 
   if ($last_account_name != "")
     $book .= "

@@ -371,7 +371,6 @@ function html_company_consult($co_q) {
       <td class=\"detailText\" colspan=\"2\">".nl2br($com)."</td>
     </tr>
     </table>
-    $dis_button
 ";
 }
 

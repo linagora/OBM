@@ -62,7 +62,6 @@ if ($form_user_pref) {
   $sess->register("set_mail");
   run_query_set_user_pref($uid, "set_mail", $set_mail, 1);
 
-
   if ($param_date != "") {
     $set_date = $param_date;
     $sess->register("set_date");
@@ -177,6 +176,10 @@ $theme_dir->close();
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display
 ///////////////////////////////////////////////////////////////////////////////
+if ($form_user_pref) {
+  display_ok_msg($l_update_ok);
+}
+
 echo "
 <!--User preferences current config -->
 

@@ -484,6 +484,7 @@ function get_param_agenda() {
   global $hd_date_begin, $hd_date_end,$rd_decision_event,$param_date_begin,$param_date_end,$cb_mail,$param_duration;
   global $sel_accept_write,$sel_deny_write,$sel_deny_read,$sel_accept_read,$sel_time_duration,$sel_min_duration;
   global $hd_category_label,$tf_category_upd, $sel_category,$tf_category_new;
+
   // Agenda fields
   if (isset($tf_category_new)) $agenda["category_label"] = $tf_category_new;
   if (isset($hd_category_label)) $agenda["category_label"] = $hd_category_label;

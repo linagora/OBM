@@ -22,6 +22,8 @@ $l_set_menu = "Affichage des menus";
 $l_set_debug = "Niveau de debug";
 $l_send_mail = "Accepter les e-mail";
 
+$l_update_ok = "Mise à jour de votre configuration correctement effectuée";
+
 $l_dg_id = "Id";
 $l_dg_param = "Paramètres";
 $l_dg_sess = "Session";

@@ -235,10 +235,16 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
 
     if ($perm->have_perm("editor")) {
       echo "
+      <table class=\"details\">
+      <tr>
+        <td>
         <input type=\"submit\" value=\"$l_del_contact_sel\" />
         <input type=\"hidden\" name=\"param_list\" value=\"$id\" />
         <input type=\"hidden\" name=\"action\" value=\"contact_del\" />
-        </form>";
+        </td>
+      </tr>
+      </table>
+      </form>";
     }
   }
 }
