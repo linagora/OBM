@@ -52,7 +52,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
   // If a phone number has been specified, get it 
   if ($phone != "") {
-    $where .= " and  (contact_phone $like '$phone%' or
+    $where .= " and (contact_phone $like '$phone%' or
                  contact_homephone $like '$phone%' or
                  contact_mobilephone $like '$phone%')";
   }
@@ -158,7 +158,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Contact $whereq");
+    $count = get_query_count("select count(*) from Contact $join_cat1 $join_cat2 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
