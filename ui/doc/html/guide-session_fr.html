@@ -180,6 +180,7 @@ Ceci dans Auth->start()
       <li>Expiration du cookie dans le navigateur web du client.
 A la prochaine requète du client, sans le cookie, le serveur ne fait plus la liaison avec la session web.
 Fin de session.
+      <li>Suppression de la session Web par le garbage collector de PHP (paramétrable via session.gc_maxlifetime, session.gc_probability,...). Voir la note ci-dessous, il faut en général augmenter le session.gc_maxlifetime par défaut à 1440 soit 24 min.
       <li>Expiration de l'authentification (classe Auth, testé par Auth->is_authenticated()). A la prochaine requête du client la fonction Auth->unauth() est appelée et détruit l'authentification.
     </ul>
     Dans les 2 derniers cas, la table des sessions utilisateurs actives n'est pas mise à jour automatiquement (même si cela était fait, cela ne couvrirait que les cas ou le client génère une nouvelle requête après l'expiration).
@@ -194,7 +195,7 @@ il supprime les sessions utilisateurs (ActiveUserObm) ayant dépassé le délai d'i
     A noter :
     <ul>
       <li> Les sessions web ne sont jamais supprimées physiquement par OBM car gérées directement par PHP (la fonction $sess->delete() supprime les données et détruit le cookie (est-ce suffisant ?) et démarre une nouvelle session).
-Il faut donc veiller à ce que la configuration de PHP (dans php.ini: session.gc_maxlifetime = 1440, session.gc_probability = 1) soit cohérente.
+Il faut donc veiller à ce que la configuration de PHP (par défaut dans php.ini: session.gc_maxlifetime = 1440, session.gc_probability = 1) soit cohérente.
       <br>Si politique de suppression des sessions PHP trop aggressive, des sessions OBM seront coupées par la suppression de sessions web.
     </ul>
     <p>
