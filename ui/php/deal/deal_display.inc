@@ -919,7 +919,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td><input type=\"text\" name=\"tf_num\" size=\"40\" maxlength=\"32\" value=\"$num\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_date_init</td>
-        <td><input name=\"tf_datebegin\" type=\"text\" size=\"10\" value=\"$datebegin\" /></td>
+        <td><input name=\"tf_datebegin\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datebegin\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_kind</td>
         <td>$sel_kind</td>
@@ -934,7 +934,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td>$sel_tech</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_proposition date</td>
-        <td><input name=\"tf_dateprop\" type=\"text\" size=\"10\" value=\"$dateprop\" /></td>
+        <td><input name=\"tf_dateprop\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$dateprop\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_proposition $l_amount</td>
         <td><input name=\"tf_amount\" type=\"text\" size=\"10\" value=\"$amount\" /></td>
@@ -945,7 +945,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td colspan=\"2\" class=\"detailHead\">$l_infos</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_date_alarm</td>
-        <td><input name=\"tf_datealarm\" type=\"text\" size=\"10\" value=\"$datealarm\" /></td>
+        <td><input name=\"tf_datealarm\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datealarm\" /></td>
       </tr><tr>
         <td class=\"detailLabel\">$l_state</td>
         <td>$sel_state</td>
@@ -962,7 +962,7 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$st
         <td colspan=\"2\" class=\"detailHead\">$l_comment</td>
       </tr><tr>
         <td class=\"detailLabel\">$l_add_comment</td>
-        <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
+        <td><input name=\"tf_datecomment\" type=\"text\" size=\"10\" maxlength=\"10\" value=\"$datecomment\" />$sel_usercomment</td>
       </tr><tr>
         <td colspan=\"2\"><textarea name=\"ta_add_comment\" rows=\"6\" cols=\"78\">$add_comment</textarea></td>
         $dis_comment

@@ -997,7 +997,7 @@ function check_deal_form($did, $deal) {
   }
 
   // If the amount is filled, Check if the hitrate is between 0 and 100
-  if ($deal["amount"]) {
+  if ( ($deal["amount"]) && !($deal["amount"] == 0)) {
     if ( ($deal["hitrate"] == "")
 	 || !( ($deal["hitrate"] >= 0) && ($deal["hitrate"] <= 100)) ) {
       $err_msg = $l_err_hitrate;

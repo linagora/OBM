@@ -38,13 +38,31 @@ tar -xzvf obm-0.6.2.tar.gz
 </table>
 
 
-<h2>2: Apache and PHP configuration</h3>
+<h2>2: PHP command line configuration</h2>
+
+Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).
+So the command line PHP must be configured : file php.ini for php-cgi (on Debian : /etc/php4/cgi/php.ini).
+<p />
+Only the include_path directive is needed.
+
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+include_path = ".:/php/includes:/var/www/obm"
+</pre>
+  </td>
+</tr>
+</table>
+
+
+<h2>3: Apache and PHP configuration</h2>
 
 OBM sources are in the php directory.
 Included files are in the obminclude directory.
 Since 0.5.2 obminclude is by default outside the document root for <b>security</b> reasons.
 <p />
-All the apache and php configuration is done through the apache <b>httpd.conf</b> file.
+For the OBM web application, all the apache and php configuration is done through the apache <b>httpd.conf</b> file.
+
 
 <h3>Configure apache to process PHP files</h3>
 Edit your httpd.conf or srm.conf file and add:
@@ -172,15 +190,15 @@ We <b>strongly</b> recommend to prevent direct access to .inc files
 </table>
 
 
-<h2>3: Create the OBM database</h2>
+<h2>4: Create the OBM database</h2>
 
-<h3>3.1: MySQL</h3>
+<h3>4.1: MySQL</h3>
 The scripts are in the scripts/0.6 directory.
 <br />From 0.6 a shell script <i>install_obmdb_0.6.sh</i> handle all the database creation steps.
 <p />
 <b>Requisite :</b> you must know (or create) a valid mysql login/password
 
-<h4>3.1.1: MySQL preparation</h3>
+<h4>4.1.1: MySQL preparation</h3>
 
 mysql user creation example (user web / web) (number of "Y" may vary with mysql versions) 
 <table bgcolor="#CCCCCC" border="1">
@@ -209,7 +227,7 @@ delete from user where Host="localhost" and Select_priv="N";
 You have to restart the mysql daemon for the new acces rights to take effect
 or use mysqladmin
 
-<h4>3.1.2 - Create the database</h4>
+<h4>4.1.2 - Create the database</h4>
 
 Open the install_obmdb_0.6.sh and fill the mysql user and password with valid values.
 <table bgcolor="#CCCCCC" border="1">
@@ -235,12 +253,12 @@ cd obm/scripts/0.6
 </table>
 
 
-<h3>3.2: Create the obm database - PostgreSQL</h3>
+<h3>4.2: Create the obm database - PostgreSQL</h3>
 
 Scripts for postgres are not yet available.
 
 
-<h2>4: Select the database (MySQL or PostgreSQL) for OBM</h2>
+<h2>5: Select the database (MySQL or PostgreSQL) for OBM</h2>
 # in obminclude/phplib edit the file <i>obmlib.inc</i> and comment one of these two lines in the DB_OBM class definition (near line 30) :
 <table bgcolor="#CCCCCC" border="1">
 <tr>
@@ -267,7 +285,7 @@ var $Password = "web";
 </table>
 
 
-<h2>5: Configure or check the PHP configuration</h2>
+<h2>6: Configure or check the PHP configuration</h2>
 
 In php.ini file set :
 <table bgcolor="#CCCCCC" border="1">
@@ -289,7 +307,7 @@ safe_mode = Off
 </tr>
 </table>
 
-<h2>6: Run OBM (access the obm.php from your browser)</h2>
+<h2>7: Run OBM (access the obm.php from your browser)</h2>
 # First restart your apache web server
 
 <table bgcolor="#CCCCCC" border="1">
@@ -386,6 +404,38 @@ mysql -u web -pweb obm < scripts/0.6/update-0.6.1-0.6.2.mysql.sql
 </table>
 <br /><br />
 <a href="javascript:back();">back</a>
+
+
+<p/>
+<a name="upgrade-0.6.3"><h1>UPGRADE OBM DATABASE 0.6.2 to 0.6.3</h1></a>
+<p />
+# Database has evolved from 0.6.2 to 0.6.3
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/update-0.6.2-0.6.3.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u web -pweb obm < scripts/0.6/obmdb_default_values_0.6.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p>
+<h3>Propagate new default display values for each user</h3>
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Prefs</b> (or Préférences) module and execute the action <b>user_pref_update</b> (which reload defaut preferences for each user)
+<br /><br />
+<a href="javascript:back();">back</a>
+
 
 </body>
 </html>

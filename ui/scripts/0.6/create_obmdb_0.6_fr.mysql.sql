@@ -6,6 +6,7 @@
 -- $Id$ //
 --/////////////////////////////////////////////////////////////////////////////
 
+
 --
 -- Dumping data for table 'CompanyType'
 --
@@ -15,11 +16,13 @@ INSERT INTO CompanyType (companytype_timeupdate, companytype_timecreate, company
 INSERT INTO CompanyType (companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (null,null,2,null,'Prospect');
 INSERT INTO CompanyType (companytype_timeupdate, companytype_timecreate, companytype_userupdate, companytype_usercreate, companytype_label) VALUES (null,null,2,null,'Media');
 
+
 --
 -- Dumping data for table 'CompanyActivity'
 --
 INSERT INTO CompanyActivity (companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES (null,null,2,null,'Education');
 INSERT INTO CompanyActivity (companyactivity_timeupdate, companyactivity_timecreate, companyactivity_userupdate, companyactivity_usercreate, companyactivity_label) VALUES (null,null,2,null,'Industrie');
+
 
 --
 -- Dumping data for table 'Kind'
@@ -63,8 +66,9 @@ INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_time
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Reunion');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Appel tel.');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Support');
-INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Developpement');
+INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Intervention');
 INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_timecreate, calendarcategory_userupdate, calendarcategory_usercreate, calendarcategory_label) VALUES (null,null,null,1,'Personnel');
+
 
 --
 -- dump for table  InvoiceStatus :
@@ -72,7 +76,7 @@ INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_time
 INSERT INTO InvoiceStatus VALUES(1, 'créée');
 INSERT INTO InvoiceStatus VALUES(2, 'payée');
 INSERT INTO InvoiceStatus VALUES(3, 'vérifiée');
-INSERT INTO InvoiceStatus VALUES(4, 'probleme');
+INSERT INTO InvoiceStatus VALUES(4, 'problème');
  
 
 --
