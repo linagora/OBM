@@ -130,6 +130,6 @@ tr.logintable {
     document.login.password.focus();
   }
 // -->
-</script><
+</script>
 </body>
 </html>
