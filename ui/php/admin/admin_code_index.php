@@ -9,7 +9,7 @@
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 $debug=1;
-$obm_root = "../";
+$obm_root = "../..";
 $cpt_line = 0;
 
 require("admin_query.inc");
@@ -18,7 +18,7 @@ require("admin_code_display.inc");
 
 $actions = array ('help', 'index', 'show_amp');
 $words = array ('amp;', 'nbsp;', ' ', '&', '\(', '\)', '\\n', '\$', '\'', '\|', 'eacute;', 'egrave;', 'agrave;', 'middot;');
-$exclude = array('.', '..', 'CVS', 'images');
+$exclude = array('.', '..', 'CVS', 'doc', 'scripts');
 
 list($key, $val) = each ($words);
 $regexp = "&(?!($val";

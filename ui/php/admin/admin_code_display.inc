@@ -40,7 +40,6 @@ function dis_code_index($mode, $actions, $words) {
   default:
     echo "Invalid Mode ! (txt | html)";
   }
-
 }
 
 
