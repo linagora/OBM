@@ -303,7 +303,6 @@ function fill_select_header(source)
     i++;
   }
   destination.selectedIndex=0;
-  lang.selectedIndex=0;
   
 }
 ";
