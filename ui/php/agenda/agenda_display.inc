@@ -1051,45 +1051,33 @@ function html_userwritable_bar($writable_user,$user_id) {
 function html_dis_right_admin($user_q,$user_id) {
   global $l_authorize_list, $l_denie_list, $l_read_permission, $l_write_permission;
   global $l_everyone,  $l_list,$l_authorize,$l_deny,$set_theme, $ico_delete;
+  global $ico_add_user,$popup_height,$popup_width,$l_users;
   
   while ($user_q->next_record()) {
     $u_id = $user_q->f("userobm_id");
     $lname = $user_q->f("userobm_lastname");
     $fname = $user_q->f("userobm_firstname");
 
-    if ($user_q->f("calendarright_write") == NULL) {
-      $sel_read_no .= "<option value=\"$u_id\">$lname $fname</option>";
-      $sel_write_no .= "<option value=\"$u_id\">$lname $fname</option>";
-    } else {
-      if ($user_q->f("calendarright_write") == 1) {
-	$dis_write_ok .= "<div class=\"elementRow\" id=\"sel_user$u_id\">
-        <a href=\"javascript: remove_element('sel_user$u_id','sel_user');\">
-        <img src=\"/images/$set_theme/$ico_delete\">
-        </a>
-        $lname $fname
-       <input value=\"$u_id\" name=\"sel_user[]\" type=\"hidden\" />
-       </div>";
-	$sel_write_ok .= "<option value=\"$u_id\">$lname $fname</option>";
-      }
-      if ($user_q->f("calendarright_read") == 1) {
-	$dis_read_ok .= "<div class=\"elementRow\" id=\"sel_user$u_id\">
-        <a href=\"javascript: remove_element('sel_user$u_id','sel_user');\">
-        <img src=\"/images/$set_theme/$ico_delete\">
-        </a>
-        $lname $fname
-       <input value=\"$u_id\" name=\"sel_user[]\" type=\"hidden\" />
-       </div>";	
-	$sel_read_ok .= "<option value=\"$u_id\">$lname $fname</option>";
-      }
-      if ($user_q->f("calendarright_read") == 0) { 
-	$sel_read_no .= "<option value=\"$u_id\">$lname $fname</option>";
-      }
-      if ($user_q->f("calendarright_write") == 0) {
-	$sel_write_no .= "<option value=\"$u_id\">$lname $fname</option>";
-      }
+    if ($user_q->f("calendarright_write") == 1) {
+      $dis_write_ok .= "<div class=\"elementRow\" id=\"sel_accept_write$u_id\">
+      <a href=\"javascript: remove_element('sel_accept_write$u_id','sel_accept_write');\">
+      <img src=\"/images/$set_theme/$ico_delete\">
+      </a>
+      $lname $fname
+     <input value=\"$u_id\" name=\"sel_accept_write[]\" type=\"hidden\" />
+     </div>";
+    }
+    if ($user_q->f("calendarright_read") == 1) {
+      $dis_read_ok .= "<div class=\"elementRow\" id=\"sel_accept_read$u_id\">
+      <a href=\"javascript: remove_element('sel_accept_read$u_id','sel_accept_read');\">
+      <img src=\"/images/$set_theme/$ico_delete\">
+      </a>
+      $lname $fname
+     <input value=\"$u_id\" name=\"sel_accept_read[]\" type=\"hidden\" />
+     </div>";	
     }
   }
-
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_read";
     $block_user_read = "
     <td class=\"detailLabel\">
     $l_users
@@ -1099,12 +1087,12 @@ function html_dis_right_admin($user_q,$user_id) {
        <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
-     <td class=\"detailForm\" id=\"sel_user_id\">
+     <td class=\"detailForm\" id=\"sel_accept_read\">
        $dis_read_ok
      </td>
      ";
 
-
+    $url = "$path/user/user_index.php?action=ext_get_ids&amp;popup=1&amp;ext_element=sel_accept_write";
     $block_user_write = "
     <td class=\"detailLabel\">
     $l_users
@@ -1114,125 +1102,35 @@ function html_dis_right_admin($user_q,$user_id) {
        <img src=\"/images/$set_theme/$ico_add_user\" alt=\"[Add]\" />
       </a>
      </td>    
-     <td class=\"detailForm\" id=\"sel_user_id\">
+     <td class=\"detailForm\" id=\"sel_accept_write\">
        $dis_write_ok
      </td>
      ";
      
   $block = "
+  <form method=\"get\" name=\"f_mod_calendar\"
+   action=\"".url_prepare("agenda_index.php")."\">
+  
+   <div class=\"detailHead\">$l_read_permission</div>  
   <table class=\"detail\">  
-   <tr>
-   <td colspan=\"2\" class=\"detailHead\">$l_read_permission</td>
-   </tr>
    </tr>
    $block_user_read
    <tr>
-   <tr>
-   </tr>
-   <td colspan=\"2\" class=\"detailHead\">$l_write_permission</td>
+  </table>
+   
+   <div class=\"detailHead\">$l_write_permission</div>   
+  <table class=\"detail\">  
    <tr>
    $block_user_write
    </tr>
    </table>
-  
-  <table class=\"agendaRight\" >
-   <tr>
-    <td colspan=\"3\" class=\"detailLabel\">
-     &nbsp;
-    </td>
-   </tr>
-   <tr>
-    <td colspan=\"3\" class=\"detailHead\">$l_read_permission</td>
-   </tr>
-   <tr>
-    <td colspan=\"3\" class=\"detailLabel\">
-     &nbsp;
-    </td>
-   </tr>
-   <tr>
-    <td class=\"detailHead\">
-     $l_denie_list
-    </td>
-    <td class=\"detailHead\">
-    </td>
-    <td class=\"detailHead\">
-     $l_authorize_list
-    </td>
-   </tr>
-   <tr>
-    <form method=\"post\" action=\"agenda_index.php\">    
-     <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-      <select name=\"sel_accept_read[]\" multiple=\"multiple\" size=\"15\">
-        $sel_read_no
-      </select>
-     </td>
-     <td class=\"detailHead\">
-      <input type=\"submit\" value=\"$l_deny\" /><br />
-     </form>
-     <form method=\"post\" action=\"agenda_index.php\">        
-      <br /><input type=\"submit\" value=\"$l_authorize\" />
-     </td>
-     <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-      <select name=\"sel_deny_read[]\" multiple=\"multiple\" size=\"15\">
-        $sel_read_ok  
-      </select>
-    </td>  
-    </form>
-   </tr>
-   <tr>
-    <td colspan=\"3\" class=\"detailLabel\">
-     &nbsp;
-    </td>
-   </tr>   
-   <tr>
-    <td colspan=\"3\" class=\"detailHead\">$l_write_permission</td>
-   </tr>
-
-   <tr>
-    <td colspan=\"3\" class=\"detailLabel\">
-     &nbsp;
-    </td>
-   </tr>    
-   <tr>
-    <td class=\"detailHead\">
-     $l_denie_list
-    </td>
-    <td class=\"detailHead\">
-    </td>
-    <td class=\"detailHead\">
-     $l_authorize_list
-    </td>
-   </tr>
-   <tr>
-    <form method=\"post\" action=\"agenda_index.php\">
-     <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-      <select name=\"sel_accept_write[]\" multiple=\"multiple\" size=\"15\">
-        $sel_write_no
-      </select>
-     </td>
-     <td class=\"detailHead\">
-      <input size=\"30\" type=\"submit\" value=\"$l_deny\" /><br />
-     </form>
-     <form method=\"post\" action=\"agenda_index.php\">      
-      <br /><input size=\"30\" type=\"submit\" value=\"$l_authorize\" />
-     </td>
-     <td class=\"detailHead\">
-      <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
-      <input type=\"hidden\" name=\"action\" value=\"rights_update\" />
-      <select name=\"sel_deny_write[]\" multiple=\"multiple\" size=\"15\">
-        $sel_write_ok
-      </select>
-     </td>
-    </form>
-   </tr>   
-  </table>
-  ";
+   <div class=\"detailButton\">   
+    <input type=\"hidden\" name=\"param_user\" value=\"$user_id\" />
+    <input type=\"hidden\" name=\"action\" value=\"rights_update\" /> 
+    <input type=\"submit\" value=\"$l_list\" /> 
+   </div>
+   </form>
+   ";
   return $block;
 }
 

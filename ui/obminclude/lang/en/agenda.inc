@@ -143,7 +143,7 @@ $l_write_permission = "Write access management";
 $l_everyone = "Authorized everybody";
 $l_noone = "Authorized nobody";
 $l_list = "Authorized list people";
-$l_authorize = "&lt;&lt;&lt;&lt;";
+$l_authorize = "Authorize";
 $l_deny = "&gt;&gt;&gt;&gt;";
 
 //Mail
