@@ -314,9 +314,9 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
   global $perms_user,$l_perms_user;
 
   $parent = $deal["parent"];
-  $label = stripslashes($deal["label"]);
-  $name = stripslashes($deal["company_name"]);
-  $zip = stripslashes($deal["company_zip"]);
+  $label = urlencode(stripslashes($deal["label"]));
+  $name = urlencode(stripslashes($deal["company_name"]));
+  $zip = urlencode(stripslashes($deal["company_zip"]));
   $archive = $deal["archive"];
   $kind = $deal["kind"];
   $cat = $deal["cat"];
@@ -1712,7 +1712,7 @@ function dis_parentdeal_search_list($deal) {
 function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $deal) {
   global $l_found_parent; 
 
-  $plabel = stripslashes($deal["plabel"]);
+  $plabel = urlencode(stripslashes($deal["plabel"]));
   $pmanager = $deal["pmanager"];
   $parchive = $deal["parchive"];
   display_info_msg($nb_parentdeals." ".$l_found_parent);

@@ -344,12 +344,12 @@ function html_company_consult($co_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
       <td class=\"detailText\">$zip</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td class=\"detailText\">$cdx</td>
     </tr><tr> 
       <td class=\"detailLabel\">$l_town</td>
       <td class=\"detailText\">$town</td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td class=\"detailText\">$cdx</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td class=\"detailText\">$ctry</td>
@@ -561,11 +561,11 @@ function html_company_form($action, $co_q, $kind_q, $act_q, $usr_q, $company) {
       <td class=\"detailLabel\">$l_postcode</td>
       <td><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_expresspostal</td>
-      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
-    </tr><tr>
       <td class=\"detailLabel\">$l_town</td>
       <td><input type=\"text\" id=\"tf_town\" name=\"tf_town\" maxlength=\"24\" size=\"24\" value=\"$town\" /></td>
+    </tr><tr>
+      <td class=\"detailLabel\">$l_expresspostal</td>
+      <td><input type=\"text\" id=\"tf_cdx\" name=\"tf_cdx\" maxlength=\"8\" size=\"8\" value=\"$cdx\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_country</td>
       <td><input type=\"text\" id=\"tf_ctry\" name=\"tf_ctry\" maxlength=\"24\" size=\"24\" value=\"$ctry\" /></td>

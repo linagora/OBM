@@ -50,7 +50,7 @@ function html_invoice_search_form ($p_action,$q_status, $invoice) {
   global $l_status, $l_deal, $l_date_apres, $l_date_avant, $l_inout;
   global $l_deal, $l_company, $l_include_archive;
   global $l_find, $l_all_f, $l_both, $l_client, $l_fournisseur;
-  global $cellspacing,$border;
+  global $cellspacing, $border;
 
   $cellspacing = 10;
 
@@ -469,16 +469,16 @@ function html_invoice_search_list ($q_invoices, $q_display_options, $nb_invoices
     $l_date, $l_status, $l_deal;
   global $auth, $perms_user,$l_perms_user, $perms_admin;
 
-  $label = $invoice["label"];
-  $number = $invoice["number"];
-  $amount_HT = $invoice["HT"];
-  $amount_TTC = $invoice["TTC"];
+  $label = urlencode($invoice["label"]);
+  $number = urlencode($invoice["number"]);
+  $amount_HT = urlencode($invoice["HT"]);
+  $amount_TTC = urlencode($invoice["TTC"]);
   $status = $invoice["status"];
   $date_after = $invoice["date_after"];
   $date_before = $invoice["date_before"];
   $inout = $invoice["inout"];
-  $deal = $invoice["deal"];
-  $company = $invoice["company"];
+  $deal = urlencode($invoice["deal"]);
+  $company = urlencode($invoice["company"]);
 
   echo "<center><font color=\"#$col_textem\">\n";
   echo "$nb_invoices $l_found\n";

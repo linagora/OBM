@@ -400,7 +400,7 @@ function display_info_msg($msg) {
 function url_prepare($url) {
   global $sess;
 
-  $ret_url = str_replace('%', '%25', $sess->url($url));
+  $ret_url = $sess->url($url);
 
   return $ret_url;
 }

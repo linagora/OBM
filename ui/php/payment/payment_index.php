@@ -593,10 +593,10 @@ function get_param_payment() {
   if (isset ($cb_checked)) $p_payment["checked"] = $cb_checked;
 
   if ($set_debug > 0) {
-    echo "<BR>action = $action";
+    echo "<br />action = $action";
     if ( $p_payment ) {
       while ( list( $key, $val ) = each( $p_payment ) ) {
-        echo "<BR>payment[$key]=$val";
+        echo "<br />payment[$key]=$val";
       }
     }
   }

@@ -283,6 +283,7 @@ echo "
   </center>";   
 }// html_payment_form
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // payment search form
 ///////////////////////////////////////////////////////////////////////////////
@@ -474,9 +475,9 @@ function html_payment_search_list ($q_payment, $payment_options, $nb_payments, $
   global $l_found;
 
   // get payment data :
-  $label = $payment["label"];
-  $number = $payment["number"];
-  $amount = $payment["amount"];
+  $label = urlencode($payment["label"]);
+  $number = urlencode($payment["number"]);
+  $amount = urlencode($payment["amount"]);
   $date_after = $payment["date_after"];
   $date_before = $payment["date_before"];
   $inout = $payment["inout"];

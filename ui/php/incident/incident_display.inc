@@ -177,8 +177,9 @@ function dis_incident_search_list($incident) {
 function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
   global $l_found, $l_no_found;
 
-  $lincident = $incident["lincident"];
-  $lcontract = $incident["lcontract"];
+  $lincident = urlencode($incident["lincident"]);
+  $lcontract = urlencode($incident["lcontract"]);
+  $company = urlencode($incident["company"]);
   $priority = $incident["priority"];
   $status = $incident["status"];
   $param_contract = $incident["contract_id"];
@@ -187,7 +188,7 @@ function html_incident_search_list($in_q, $pref_q, $nb_incident, $incident) {
   $dateafter = $incident["date_after"];
   $datebefore = $incident["date_before"];
 
-  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
+  $url = url_prepare("incident_index.php?action=search&amp;tf_lincident=$lincident&amp;tf_company=$company&amp;tf_lcontract=$lcontract&amp;sel_priority=$priority&amp;sel_status=$status&amp;param_contract=$param_contract&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore&amp;sel_owner=$owner&amp;cb_archive=$archive");
 
   $in_q->seek($first_row);
 

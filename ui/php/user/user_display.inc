@@ -105,8 +105,8 @@ function dis_user_search_list($user) {
 function html_user_search_list($obm_q, $pref_q, $nb_user, $user) {
   global $l_found;
 
-  $login = $user["login"];
-  $lname = $user["lastname"];
+  $login = urlencode($user["login"]);
+  $lname = urlencode($user["lastname"]);
   $perms = $user["perms"];
   $archive = $user["archive"];
 

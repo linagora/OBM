@@ -154,6 +154,7 @@ function html_account_form($obm_q_account, $action){
 </table></form></center>";
 } // html_account_form
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Account Search Form
 // Parameters :
@@ -222,9 +223,9 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
   global $l_found;
   global $perms_user,$l_perms_user;
 
-  $label = $account["label"];
-  $bank = $account["bank"];
-  $number = $account["number"];
+  $label = urlencode($account["label"]);
+  $bank = urlencode($account["bank"]);
+  $number = urlencode($account["number"]);
 
   echo "<CENTER><FONT color=\"#$col_textem\">";
   echo "$nb_accounts $l_found";
@@ -242,6 +243,7 @@ function html_account_search_list ($obm_q_accounts, $obm_q_display_options, $nb_
 
   $dis_account->display ();
 } // html_account_search_list ()
+
 
 //////////////////////////////////////////////////////////////////////////
 // Display the screen used to change the display parameters of accounts

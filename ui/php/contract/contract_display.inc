@@ -154,19 +154,19 @@ function dis_contract_search_list($contract) {
 //   - $pref_q      : fields to display in the contracts list
 //   - $nb_contract : nb contract found
 //   - $contract[]  : contract search criteria
-//     keys used    : label, type, dateafter, datebefore, companyname, market
+//     keys used    : label, type, dateafter, datebefore, company_name, market
 ///////////////////////////////////////////////////////////////////////////////
 function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contract,$contract) {
   global $l_found;
 
-  $label = $contract["label"];
+  $num = urlencode($contract["number"]); 
+  $label = urlencode($contract["label"]);
   $type = $contract["type"];
   $dateafter = $contract["dateafter"];
   $datebefore = $contract["datebefore"];
-  $company = $contract["companyname"];
+  $company = urlencode($contract["company_name"]);
   $market = $contract["market"];
   $tech = $contract["tech"];
-  $num = $contract["number"]; 
 
   $url = url_prepare("contract_index.php?action=search&amp;tf_label=$label&amp;tf_soc=$company&amp;sel_market=$market&amp;sel_type=$type&amp;tf_num=$num&amp;sel_tech=$tech&amp;tf_dateafter=$dateafter&amp;tf_datebefore=$datebefore");
 

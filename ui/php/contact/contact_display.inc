@@ -128,12 +128,12 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   }
 
   // we urlencode to avoid breakage for space char
-  $lname = stripslashes($contact["lname"]);
-  $phone = stripslashes($contact["phone"]);
-  $company = stripslashes($contact["company"]);
+  $lname = urlencode(stripslashes($contact["lname"]));
+  $phone = urlencode(stripslashes($contact["phone"]));
+  $company = urlencode(stripslashes($contact["company"]));
   $company_id = $contact["company_id"];
 
-  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=".urlencode($lname)."&amp;tf_phone=".urlencode($phone)."&amp;tf_company=".urlencode($company)."&amp;param_company=$company_id$url_ext");
+  $url = url_prepare("contact_index.php?action=search&amp;tf_lname=$lname&amp;tf_phone=$phone&amp;tf_company=$company&amp;param_company=$company_id$url_ext");
 
   $dis_contact_list = new OBM_DISPLAY("DATA",$pref_q);
   if ($popup) {
