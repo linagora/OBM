@@ -69,7 +69,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("company_id");
   }
 
-  else if ($fieldname == "company_address") {
+  else if ($fieldname == "company_address1") {
     if ($OD->data_set->f("company_address1") != "") {
       $res["name"] .= $OD->data_set->f("company_address1")."<br />\n";
     }
@@ -420,6 +420,8 @@ function dis_list_form($action, $list_q, $list) {
     </form>";
   return $block; 
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Display List Form                                                         //
 // Parameters :
@@ -522,7 +524,6 @@ function html_list_graphical_form($action, $list_q, $list) {
   global $l_contact_cat2,$l_function,$l_cat;
   global $l_publication,$l_title,$l_lang,$l_year,$l_or,$l_and,$l_empty,$l_not;  
   global $l_update,$l_delete;
-
 
   
   // if update mode and first time, values are taken from db
@@ -703,6 +704,7 @@ function html_list_graphical_form($action, $list_q, $list) {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display the Form to make a Criterion //

@@ -49,7 +49,7 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
   else if ($fieldname == "contact_archive") {
     $res["align"] = "center";
     if ($OD->data_set->f($fieldname)) $res["name"] ="X";
-    else $res["name"] = "&nbsp;";
+    else $res["name"] = " ";
   }
 
   else if ($fieldname == "contact_function") {

@@ -296,11 +296,13 @@ class OBM_DISPLAY {
 
     // We display page management only if enabled and a search url is given
     if (($this->data_page) && ($this->data_url != "")) {
-      $block .= $this->dis_data_index($this->data_url, $dis_data_entity);
+      $block_page = $this->dis_data_index($this->data_url, $dis_data_entity);
+      $block .= $block_page;
     }
 
     $block .= "<table class=\"resultTable\">";
-    $block .= $this->dis_data_header($this->data_url);
+    $block_header = $this->dis_data_header($this->data_url);
+    $block .= $block_header;
 
     $this->display_pref->seek(0);
     $cpt = 0;
@@ -456,10 +458,13 @@ class OBM_DISPLAY {
     // Data Set end : if header set to both, display an header
     //--------------------------------------------------------
     if ($this->data_header == "both") {
-      $block .= $this->dis_data_header($this->data_url);
+      $block .= $block_header;
     }
     $block .= "</table>
       </div>";
+    if ($this->data_header == "both") {
+      $block .= $block_page;
+    }
 
     return $block;
   }

@@ -32,10 +32,7 @@ $cgp_mailing_default = true;
 // Displayed Infos //
 //-----------------//
 // sections -- Urls -- Default is set
-$cgp_show["section"]["prod"] = "$path/document/document_index.php";
-//$cgp_show["section"]["compta"] = false;
 $cgp_show["section"]["aliamin"] = false;
-
 
 // modules -- Default is true
 //$cgp_show["module"]["deal"] = false;
