@@ -755,6 +755,7 @@ CREATE TABLE Contract (
   contract_userupdate int(8) default NULL,
   contract_usercreate int(8) default NULL,
   contract_label varchar(40) default NULL,
+  contract_deal_id int(8) default NULL,
   contract_company_id int(8) default NULL,
   contract_number varchar(20) default NULL,
   contract_datebegin date default NULL,

@@ -84,7 +84,7 @@ ALTER table Contract drop column contract_comment;
 ALTER table Contract change tmp contract_comment text;
 
 -- add a link with the deal table
-ALTER table Contract add column contract_deal_id text after contract_label;
+ALTER table Contract add column contract_deal_id int(8) after contract_label;
 
 -------------------------------------------------------------------------------
 -- Incident Update
