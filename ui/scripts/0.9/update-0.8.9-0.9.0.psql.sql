@@ -23,7 +23,7 @@ DROP TABLE GlobalPref;
 DROP TABLE RepeatKind;
 
 
--------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 -- Update User and Group tables
 -------------------------------------------------------------------------------
 -- Add column _local
@@ -138,3 +138,15 @@ CREATE TABLE IncidentCategory1 (
 --
 INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (1, 'By email / phone');
 INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (2, 'On site');
+
+
+-------------------------------------------------------------------------------
+-- Update Display Prefs
+-------------------------------------------------------------------------------
+UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='contact' AND display_fieldname='contact_company_name';
+
+
+-------------------------------------------------------------------------------
+-- Update Contact table
+-------------------------------------------------------------------------------
+ALTER TABLE Contact ADD COLUMN contact_company varchar(64);

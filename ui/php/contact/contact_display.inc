@@ -33,7 +33,7 @@ $fieldnames["contact_fax"] = $l_fax;
 $fieldnames["contact_email"] = $l_email;
 $fieldnames["contact_archive"] = $l_archive_first;
 // Calculated fields
-$fieldnames["contact_company_name"] = $l_company;
+$fieldnames["company_name"] = $l_company;
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ $fieldnames["contact_company_name"] = $l_company;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_contact(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme, $ico_mail, $l_company;
+  global $path, $cgp_show, $set_theme, $ico_mail;
 
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
@@ -65,8 +65,12 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
     $res["url"] = "$path/contact/contact_index.php?action=detailconsult&amp;param_contact=".$OD->data_set->f("contact_id");
   }
 
-  else if (($fieldname == "contact_company_name") && $link_ok) {
-    $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contact_company_id");
+  else if (($fieldname == "company_name") && $link_ok) {
+    if ($cgp_show["module"]["company"]) {
+      $res["url"] = "$path/company/company_index.php?action=detailconsult&amp;param_company=".$OD->data_set->f("contact_company_id");
+    } else {
+      $res["name"] = $OD->data_set->f("contact_company");
+    }      
   }
 
   else if ($fieldname == "contact_archive") {
@@ -639,11 +643,15 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
   global $l_email_other, $l_service;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
-  global $display, $path, $action, $auth, $cgp_hide;
+  global $display, $path, $action, $auth, $cgp_show, $cgp_hide;
 
   $usercreate = $co_q->f("contact_usercreate");
   $c_id = $co_q->f("contact_company_id");
-  $c_name = $co_q->f("company_name");
+  if ($cgp_show["module"]["company"]) {
+    $c_name = $co_q->f("company_name");
+  } else {
+    $c_name = $co_q->f("contact_company");
+  }
   $c_phone = $co_q->f("company_phone");
   $c_fax = $co_q->f("company_fax");
   $c_ad1 = $co_q->f("company_address1");
@@ -836,6 +844,12 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
     </table>";
   }
 
+  // Company Display
+  if ($cgp_show["module"]["company"]) {
+    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
+  } else {
+    $dis_company = $c_name;
+  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -857,9 +871,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$archive</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">
-      <a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
-      </td>
+      <td class=\"detailText\">$dis_company</td>
     $block_func
     $block_title
     </tr><tr>
@@ -938,7 +950,7 @@ function html_contact_body($co_q,$cat1_q,$cat2_q) {
 function html_contact_header($co_q) {
   global $l_company,$l_lastname,$l_firstname,$l_kind;
   global $l_update,$l_delete,$l_insert,$l_contact;
-  global $c_yes, $c_no, $set_theme;
+  global $cgp_show, $c_yes, $c_no, $set_theme;
   global $display, $path, $action, $auth;
 
   $usercreate = $co_q->f("contact_usercreate");
@@ -955,6 +967,13 @@ function html_contact_header($co_q) {
   $display["link"] = html_contact_links($id);
   
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
+
+  // Company Display
+  if ($cgp_show["module"]["company"]) {
+    $dis_company = "<a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>";
+  } else {
+    $dis_company = $c_name;
+  }
 
   // --- HTML Template --------------------------------------------------------
 
@@ -973,9 +992,7 @@ function html_contact_header($co_q) {
     $l_priv
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailText\">
-      <a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
-      </td>
+      <td class=\"detailText\">$dis_company</td>
     </tr>
     </table>"; 
 
@@ -1101,7 +1118,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $l_category1, $l_category2;
-  global $display, $path, $auth, $cgp_hide, $l_none;
+  global $display, $path, $auth, $cgp_show, $cgp_hide, $l_none;
 
   $cat1 = array();
   $cat2 = array();
@@ -1480,6 +1497,19 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
     ";
   }
 
+  // Company Display
+  if ($cgp_show["module"]["company"]) {
+    $dis_company = "<a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
+      $c_name
+      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
+      <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
+      <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_contact.company_new_id&amp;ext_widget_text=f_contact.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
+      <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
+      <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />";
+  } else {
+    $dis_company = "<input type=\"text\" name=\"tf_company\" size=\"30\" maxlength=\"64\" value=\"$c_name\" />";
+  }
 
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -1537,16 +1567,7 @@ function html_contact_form($action, $co_q, $cat1_q, $cat2_q, $dsrc_q, $kind_q, $
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_company</td>
-      <td class=\"detailForm\">
-      <a href=\"". url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id") . "\">
-      $c_name
-      </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
-      <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
-      <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_contact.company_new_id&amp;ext_widget_text=f_contact.company_new_name','Company','height=$popup_height,width=$popup_width'); return false;\">
-      <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
-      <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
-    </td>
+      <td class=\"detailForm\">$dis_company</td>
     $block_func
     $block_title
     </tr><tr>    

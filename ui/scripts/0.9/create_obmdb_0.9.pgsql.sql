@@ -292,6 +292,7 @@ CREATE TABLE Contact (
   contact_usercreate           integer,
   contact_datasource_id        integer,
   contact_company_id           integer,
+  contact_company              varchar(64),
   contact_kind_id              integer,
   contact_marketingmanager_id  integer,
   contact_lastname             varchar(64) DEFAULT '' NOT NULL,

@@ -41,7 +41,9 @@ ALTER TABLE UserObm ADD COLUMN userobm_fax2 varchar(32) after userobm_fax;
 ALTER TABLE UserObm ADD COLUMN userobm_description varchar(255) after userobm_fax2;
 
 -- Add column _calendar_version
-ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp(14) after group_local;
+ALTER TABLE UserObm ADD COLUMN userobm_calendar_version timestamp(14) after userobm_perms;
+
+
 -------------------------------------------------------------------------------
 -- Update Contract tables
 -------------------------------------------------------------------------------
@@ -129,3 +131,15 @@ PRIMARY KEY (incidentcategory1_id)
 --
 INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (1, 'By email / phone');
 INSERT INTO IncidentCategory1 (incidentcategory1_order, incidentcategory1_label) VALUES (2, 'On site');
+
+
+-------------------------------------------------------------------------------
+-- Update Display Prefs
+-------------------------------------------------------------------------------
+UPDATE DisplayPref SET display_fieldname='company_name' WHERE display_entity='contact' AND display_fieldname='contact_company_name';
+
+
+-------------------------------------------------------------------------------
+-- Update Contact table
+-------------------------------------------------------------------------------
+ALTER TABLE Contact ADD COLUMN contact_company varchar(64) AFTER contact_company_id;

@@ -205,8 +205,9 @@ class CAS_Auth extends Auth {
 
   function auth_loginform() {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
+
     include_once("obmCAS.inc");
-    if(!$lock) {
+    if (!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);
       $lock = true;
     }
@@ -246,6 +247,7 @@ class CAS_Auth extends Auth {
 
   function auth_validatelogin () {
     global $cas_version, $cas_server, $cas_server_port, $cas_server_uri,$lock;
+
     include_once("obmCAS.inc");
     if(!$lock) {
       obmCAS::client($cas_version, $cas_server, $cas_server_port, $cas_server_uri);

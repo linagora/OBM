@@ -16,7 +16,7 @@
 //   - $p_order_dir  : direction for order clause (asc, desc)
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
-  global $cdg_sql, $c_all, $ctu_sql_limit;
+  global $cgp_show, $cdg_sql, $c_all, $ctu_sql_limit;
 
   $company_id = $contact["company_id"];
   $lname = sql_search_text_parse($contact["lname"]);
@@ -42,6 +42,25 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   // only the one which are allowed (ie. publics )
   $where .= sql_obm_entity_privacy("contact");
 
+  if ($cgp_show["module"]["company"]) {
+    $join_comp = "LEFT JOIN Company on contact_company_id=company_id";
+    $join_ctry2 = "LEFT JOIN Country as ctry2 ON
+                  Company.company_country_iso3166 = ctry2.country_iso3166
+                  and ctry2.country_lang='$lang'";
+    $company_fields = "company_name,
+      company_phone,
+      company_fax,
+      company_address1,
+      company_address2,
+      company_address3,
+      company_zipcode,
+      company_town,
+      company_expresspostal,
+      ctry2.country_name as company_country,";
+  } else {
+    $company_fields = "contact_company as company_name,"
+  }
+
   // If a lastname has been specified, get it 
   if ($lname != "") {
     $where .= " and contact_lastname $like '$lname%'";
@@ -63,8 +82,12 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
   }
   // If a company name indication has been specified (without id) get it 
   if (($company != "") && ($company_id == "")) {
-    $where .= " and company_name $like '$company%'";
-    $join_comp = "left join Company on contact_company_id=company_id";
+    if ($cgp_show["module"]["company"]) {
+      $where .= " and company_name $like '$company%'";
+      $join_comp_count = "left join Company on contact_company_id=company_id";
+    } else {
+      $where .= " and contact_company $like '$company%'";
+    }
   }
   // If a company was sent as parameter, get it
   if ($company_id != "") {
@@ -79,11 +102,16 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $where .= " and contact_town $like '$town%'";
   }
   // If a country has been set
-  if (($ctry != $c_all) && ($ctry != "")) { 
-    $where .= " and (contact_country_iso3166='$ctry' or
+  if (($ctry != $c_all) && ($ctry != "")) {
+    if ($cgp_show["module"]["company"]) {
+      $where .= " and (contact_country_iso3166='$ctry' or
        contact_country_iso3166='' and company_country_iso3166='$ctry')";
-    $join_comp = "left join Company on contact_company_id=company_id";
+      $join_comp_count = "left join Company on contact_company_id=company_id";
+    } else {
+      $where .= " and contact_country_iso3166='$ctry'";
+    }
   }
+
   // If a person in charge has been set
   if (($market != $c_all) && ($market != "")) { 
     $where .= " and contact_marketingmanager_id='$market'";
@@ -121,7 +149,9 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $order_next = ", contact_address2, contact_address3, contact_zipcode, contact_town";
   } else if (strcmp($p_new_order,"country_name") == 0) {
     $order = "country_name";
-    $order_next = ", company_country";
+    if ($cgp_show["module"]["company"]) {
+      $order_next = ", company_country";
+    }
   }
 
   $orderq = " order by $order $p_order_dir $order_next";
@@ -153,26 +183,12 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
       contact_email,
       contact_archive,
       contact_privacy,
-      company_name as contact_company_name,
-      company_phone,
-      company_fax,
-      company_address1,
-      company_address2,
-      company_address3,
-      company_zipcode,
-      company_town,
-      company_expresspostal,
+      $company_fields
       function_label as contact_function,
-      ctry2.country_name as company_country
     from Contact
-        left join Company on contact_company_id=company_id 
+        $join_comp
         left join Function on contact_function_id=function_id
-        left join Country as ctry1 ON
-                  contact_country_iso3166 = ctry1.country_iso3166
-                  and ctry1.country_lang='$lang'
-        LEFT JOIN Country as ctry2 ON
-                  Company.company_country_iso3166 = ctry2.country_iso3166
-                  and ctry2.country_lang='$lang'
+        $join_ctry2
         $join_cat1
         $join_cat2
     $whereq
@@ -180,7 +196,7 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
     $limit";
 
   if ($ctu_sql_limit) {
-    $count = get_query_count("select count(*) from Contact $join_comp $join_cat1 $join_cat2 $whereq");
+    $count = get_query_count("select count(*) from Contact $join_comp_count $join_cat1 $join_cat2 $whereq");
     $obm_q->set_num_rows_total($count);
   }
 
@@ -194,12 +210,12 @@ function run_query_contact_search($contact, $p_new_order, $p_order_dir) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact detail query execution                                            //
+// Contact detail query execution
 // Parameters:
 //   - $p_id : contact id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_detail($p_id) {
-  global $cdg_sql;
+  global $cgp_show, $cdg_sql;
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -208,13 +224,30 @@ function run_query_contact_detail($p_id) {
   $timecreate = sql_date_format($db_type, "contact_timecreate", "timecreate");
   $lang = get_lang();
 
-  $query = "select Contact.*,
+  if ($cgp_show["module"]["company"]) {
+    $join_comp = "LEFT JOIN Company on contact_company_id=company_id";
+    $join_ctry2 = "LEFT JOIN Country as C2
+                   on company_country_iso3166=C2.country_iso3166
+                    and C2.country_lang='$lang'";
+    $company_fields = "company_id,
+        company_name,
+        company_phone,
+        company_fax,
+        company_address1,
+        company_address2,
+        company_address3,
+        company_zipcode,
+        company_town,
+        company_expresspostal,
+        company_country_iso3166,
+        C2.country_name as company_country_name,";
+  } else {
+    $company_fields = "contact_company,";
+  }
+
+  $query = "SELECT Contact.*,
         $timeupdate,
         $timecreate,
-        company_id, company_name, company_phone, company_fax,
-        company_address1, company_address2, company_address3, company_zipcode,
-        company_town, company_expresspostal, company_country_iso3166,
-        C2.country_name as company_country_name,
         kind_lang,
         kind_minilabel,
         kind_header,
@@ -225,20 +258,19 @@ function run_query_contact_detail($p_id) {
         datasource_name,
         c.userobm_login as usercreate,
         u.userobm_login as userupdate
-      from
+      FROM
         Contact
-        left join Company on contact_company_id=company_id
-        left join Kind on kind_id=contact_kind_id
-        left join UserObm as m on contact_marketingmanager_id=m.userobm_id
-        left join Function on contact_function_id=function_id
-        left join Country as C1 on contact_country_iso3166=C1.country_iso3166
+        $join_comp
+        LEFT JOIN Kind on kind_id=contact_kind_id
+        LEFT JOIN UserObm as m on contact_marketingmanager_id=m.userobm_id
+        LEFT JOIN Function on contact_function_id=function_id
+        LEFT JOIN Country as C1 on contact_country_iso3166=C1.country_iso3166
                   and C1.country_lang='$lang'
-        left join Country as C2 on company_country_iso3166=C2.country_iso3166
-                  and C2.country_lang='$lang'
-        left join DataSource on contact_datasource_id=datasource_id
-        left join UserObm as c on contact_usercreate=c.userobm_id
-        left join UserObm as u on contact_userupdate=u.userobm_id
-      where
+        $join_ctry2
+        LEFT JOIN DataSource on contact_datasource_id=datasource_id
+        LEFT JOIN UserObm as c on contact_usercreate=c.userobm_id
+        LEFT JOIN UserObm as u on contact_userupdate=u.userobm_id
+      WHERE
         contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
@@ -250,7 +282,7 @@ function run_query_contact_detail($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact Company query execution                                           //
+// Contact Company query execution
 // Parameters:
 //   - $c_id : company id
 // Returns : DB result object with the company's name and id
@@ -287,7 +319,7 @@ function run_query_contact_company($c_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact: Kind select query execution                                      //
+// Contact: Kind select query execution
 // Returns : DB object result with all kinds
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_kind() {
@@ -319,9 +351,9 @@ function run_query_function() {
 
   $show_func = (! $cgp_hide["contact"]["contact_function"]);
   if ($show_func) {
-    $query = "select function_id, function_label
-    from Function
-    order by function_label";
+    $query = "SELECT function_id, function_label
+    FROM Function
+    ORDER by function_label";
 
     display_debug_msg($query, $cdg_sql);
     $obm_q= new DB_OBM;
@@ -377,14 +409,14 @@ function run_query_contactcategory2() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Contact Insertion query execution                                         //
+// Contact Insertion query execution
 // Parameters:
 //   - $contact[]: Entry's values
 //     keys used : company_id, kind, lname, fname ad1, ad2, ad3, zip, town, cdx
 //               : ctry, func, phone, hphone, mphone, fax, email, com, priv
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_insert($contact) {
-  global $auth, $cdg_sql;
+  global $auth, $cgp_show, $cdg_sql;
 
   $now = date("Y-m-d H:i:s");
   $uid = $auth->auth["uid"];
@@ -394,6 +426,7 @@ function run_query_contact_insert($contact) {
     $comp_id = $contact["company_id"];
   }
 
+  $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $market = $contact["marketing_manager"];
@@ -433,6 +466,7 @@ function run_query_contact_insert($contact) {
     contact_usercreate,
     contact_datasource_id,
     contact_company_id,
+    contact_company,
     contact_kind_id,
     contact_marketingmanager_id,
     contact_lastname,
@@ -463,6 +497,7 @@ function run_query_contact_insert($contact) {
     '$uid',
     '$dsrc',
     '$comp_id',
+    '$company',
     '$kind',
     '$market',
     '$lname',
@@ -491,8 +526,8 @@ function run_query_contact_insert($contact) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  
-  if ($retour) {
+
+  if (($cgp_show["module"]["company"]) && ($retour)) {
     run_query_company_contact_inc($comp_id);
   }
 
@@ -547,7 +582,7 @@ function run_query_contact_insert($contact) {
 //                : cdx, ctry, func, phone, hphone, mphone, fax, email, com
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contact_update($contact) {
-  global $auth, $cdg_sql;
+  global $auth, $cgp_show, $cdg_sql;
 
   $id = $contact["id"];
   $comp_old_id = $contact["company_id"];
@@ -557,6 +592,7 @@ function run_query_contact_update($contact) {
   if ($comp_id < 1) {
     $comp_id = $contact["company_id"];
   }
+  $company = $contact["company"];
   $dsrc = $contact["datasource"];
   $kind = $contact["kind"];
   $market = $contact["marketing_manager"];
@@ -596,6 +632,7 @@ function run_query_contact_update($contact) {
     contact_userupdate='".$auth->auth["uid"]."',
     contact_datasource_id='$dsrc',
     contact_company_id='$comp_id',
+    contact_company='$company',
     contact_kind_id='$kind',
     contact_marketingmanager_id='$market',
     contact_lastname='$lname',
@@ -666,11 +703,14 @@ function run_query_contact_update($contact) {
     }
   }
 
-  // If company has changed, update the companies contact number
-  if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
-    run_query_company_contact_inc($comp_new_id);
-    run_query_company_contact_dec($comp_old_id);
+  if ($cgp_show["module"]["company"]) {
+    // If company has changed, update the companies contact number
+    if (($retour) && ($comp_new_id > 0) && ($comp_new_id != $comp_old_id)) {
+      run_query_company_contact_inc($comp_new_id);
+      run_query_company_contact_dec($comp_old_id);
+    }
   }
+
   return $retour;
 }
 
@@ -996,7 +1036,7 @@ function check_contact_context($cid, $contact) {
 //                  company_id, comp_new_id
 ///////////////////////////////////////////////////////////////////////////////
 function check_contact_data_form($cid, $contact) {
-  global $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
+  global $cgp_show, $php_regexp_phone,$php_regexp_fax,$php_regexp_email;
   global $l_fill_lastname, $l_fill_company, $l_j_check_phone;
   global $l_j_check_hphone,$l_j_check_mphone, $l_j_check_fax, $l_j_check_email;
   global $err_msg, $l_exist_error;
@@ -1021,10 +1061,12 @@ function check_contact_data_form($cid, $contact) {
     return false;
   }
 
-  // MANDATORY: a company must be set
-  if (($c_id < 1) && ($c_new_id < 1)) {
-    $err_msg = $l_fill_company;
-    return false;
+  if ($cgp_show["module"]["company"]) {
+    // MANDATORY: a company must be set
+    if (($c_id < 1) && ($c_new_id < 1)) {
+      $err_msg = $l_fill_company;
+      return false;
+    }
   }
 
   // Contact Firstname
