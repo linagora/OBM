@@ -118,15 +118,15 @@ else if ($action == "new") {
 
 else if ($action == "detailconsult") {
 ///////////////////////////////////////////////////////////////////////////////
-  $list_q = run_query_detail($param_list);
+  $list_q = run_query_detail($list["id"]);
   $pref_con_q = run_query_display_pref($uid, "list_contact");
-  $con_q = run_query_contacts_list($param_list, $new_order, $order_dir);
+  $con_q = run_query_contacts_list($list["id"], $new_order, $order_dir);
   html_list_consult($list_q, $pref_con_q, $con_q);
 }
 
 else if ($action == "detailupdate") {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($param_list);
+  $obm_q = run_query_detail($list["id"]);
   html_list_form($action, $obm_q, $list);
 }
 
@@ -168,20 +168,20 @@ else if ($action == "insert") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($param_list, $list)) {
+  if (check_data_form($list["id"], $list)) {
     $retour = run_query_update($list);
     if ($retour) {
       display_ok_msg($l_update_ok);
     } else {
       display_err_msg($l_update_error);
     }
-    $list_q = run_query_detail($param_list);
+    $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($param_list);
+    $con_q = run_query_contacts_list($list["id"]);
     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     display_warn_msg($err_msg);
-    $list_q = run_query_detail($param_list);
+    $list_q = run_query_detail($list["id"]);
     html_list_form($action, $list_q, $list);
   }
 
@@ -212,9 +212,9 @@ else if ($action == "insert") {
     } else {
       display_err_msg("no contact to add");
     }
-    $list_q = run_query_detail($param_list);
+    $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($param_list);
+    $con_q = run_query_contacts_list($list["id"]);
     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     display_err_msg($l_error_authentification);
@@ -229,9 +229,9 @@ else if ($action == "insert") {
     } else {
       display_err_msg("no contact to delete");
     }
-    $list_q = run_query_detail($param_list);
+    $list_q = run_query_detail($list["id"]);
     $pref_con_q = run_query_display_pref($uid, "list_contact");
-    $con_q = run_query_contacts_list($param_list);
+    $con_q = run_query_contacts_list($list["id"]);
     html_list_consult($list_q, $pref_con_q, $con_q);
   } else {
     display_err_msg($l_error_authentification);
@@ -290,11 +290,12 @@ display_end();
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_list() {
   global $tf_name, $tf_subject, $tf_contact, $tf_datebegin, $tf_email, $cb_vis;
-  global $param_list, $hd_usercreate, $hd_timeupdate, $cdg_param;
+  global $param_list, $param_ext,  $hd_usercreate, $hd_timeupdate, $cdg_param;
   global $action, $ext_action, $ext_url, $ext_id, $ext_target, $title;
   global $HTTP_POST_VARS, $HTTP_GET_VARS, $ses_list;
 
   // List fields
+  if (isset ($param_ext)) $list["id"] = $param_ext;
   if (isset ($param_list)) $list["id"] = $param_list;
   if (isset ($tf_name)) $list["name"] = trim($tf_name);
   if (isset ($tf_subject)) $list["subject"] = trim($tf_subject);

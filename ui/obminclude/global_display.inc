@@ -134,7 +134,7 @@ class OBM_DISPLAY {
 
     $i = 0;
     $nb_field_hidden = 0;
-    while($this->display_pref->next_record()) {
+    while ($this->display_pref->next_record()) {
       $entity = $this->display_entity;
       $fieldname = $this->display_pref->f("display_fieldname");
       $display = $this->display_pref->f("display_display");
@@ -148,7 +148,7 @@ class OBM_DISPLAY {
 	$nb_field_hidden++;
 	echo "<a class=\"OBMDisplayTextCentered\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;display=$display")."\">
           <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
-      } else if($display == 2) {
+      } else if ($display == 2) {
 	echo "<img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
       }
       echo "
@@ -545,7 +545,7 @@ class OBM_DISPLAY {
 	//------------------------------
 	// For the users 
 	//------------------------------
-	else if ($fieldname == "userobm_login") {
+	else if (($fieldname == "userobm_login") && $link_ok) {
 	   $url = "$path/user/user_index.php?action=detailconsult&amp;param_user=".$this->data_set->f("userobm_id");
 	}
 	else if ($fieldname == "userobm_email") {

@@ -37,7 +37,7 @@ include("$obminclude/global_pref.inc");
 require("user_display.inc");
 require("user_query.inc");
 
-//There is no page_close()
+//There is no page_close(). yes, at the end
 if($action == "") $action = "index";
 $obm_user = get_param_user();  // $user is used by phplib
 get_user_action();
@@ -45,8 +45,23 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 // Beginning of HTML Page                                                    //
 ///////////////////////////////////////////////////////////////////////////////
-display_head($l_user);        // Head & Body
-generate_menu($menu,$section);         // Menu
+display_head($l_user);           // Head & Body
+
+if (! $obm_user["popup"]) {
+  generate_menu($menu,$section); // Menu
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// External calls (main menu not displayed)                                  //
+///////////////////////////////////////////////////////////////////////////////
+if ($action == "ext_get_ids") {
+  html_user_search_form($obm_user);
+  if ($set_display == "yes") {
+    dis_user_search_list($obm_user);
+  } else {
+    display_ok_msg($l_no_display);
+  }
+}
 
 if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -69,7 +84,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailconsult")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($param_user);
+  $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
     html_user_consult($obm_q);
@@ -79,7 +94,7 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $obm_q = run_query_detail($param_user);
+  $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     include("user_js.inc");
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
@@ -132,10 +147,10 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "reset")  {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_default_preferences_insert($param_user);
+  run_query_default_preferences_insert($obm_user["id"]);
   session_load_user_prefs();
   display_ok_msg($l_reset_ok);
-  $obm_q = run_query_detail($param_user);
+  $obm_q = run_query_detail($obm_user["id"]);
   if ($obm_q->num_rows() == 1) {
     display_record_info($obm_q->f("userobm_usercreate"),$obm_q->f("userobm_userupdate"),$obm_q->f("timecreate"),$obm_q->f("timeupdate")); 
     html_user_consult($obm_q);
@@ -145,8 +160,8 @@ if ($action == "index" || $action == "") {
 
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
-  if (check_data_form($param_user, $obm_user)) {
-    $retour = run_query_update($param_user, $obm_user);
+  if (check_data_form($obm_user["id"], $obm_user)) {
+    $retour = run_query_update($obm_user["id"], $obm_user);
     if ($retour) {
       display_ok_msg($l_update_ok);
     } else {
@@ -160,17 +175,17 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "check_delete")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("user_js.inc");
-  dis_check_links($param_user);
+  dis_check_links($obm_user["id"]);
 
 } elseif ($action == "delete")  {
 ///////////////////////////////////////////////////////////////////////////////
-  $retour = run_query_delete($param_user);
+  $retour = run_query_delete($obm_user["id"]);
   if ($retour) {
     display_ok_msg($l_delete_ok);
   } else {
     display_err_msg($l_delete_error);
   }
-  run_query_delete_profil($param_user);
+  run_query_delete_profil($obm_user["id"]);
   html_user_search_form($obm_user);
 
 } elseif ($action == "admin")  {
@@ -191,10 +206,13 @@ display_end();
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_user() {
   global $cdg_param;
-  global $param_user, $tf_login, $tf_passwd, $sel_perms,$tf_email;
+  global $param_user, $tf_login, $tf_passwd, $sel_perms, $tf_email;
   global $tf_lastname, $tf_firstname, $cb_archive;
+  global $popup, $param_ext, $ext_action, $ext_url, $ext_id, $ext_target;
 
+  if (isset ($param_ext)) $obm_user["id"] = $param_ext;
   if (isset ($param_user)) $obm_user["id"] = $param_user;
+  if (isset ($popup)) $obm_user["popup"] = 1;
   if (isset ($tf_login)) $obm_user["login"] = $tf_login;
   if (isset ($tf_lastname)) $obm_user["lastname"] = $tf_lastname;
   if (isset ($tf_passwd)) $obm_user["passwd"] = $tf_passwd;
@@ -204,10 +222,17 @@ function get_param_user() {
   if (isset ($tf_firstname)) $obm_user["firstname"] = $tf_firstname;
   if (isset ($cb_archive)) $obm_user["archive"] = $cb_archive;
 
+  // External param
+  if (isset ($popup)) $obm_user["popup"] = 1;
+  if (isset ($ext_action)) $obm_user["ext_action"] = $ext_action;
+  if (isset ($ext_url)) $obm_user["ext_url"] = $ext_url;
+  if (isset ($ext_id)) $obm_user["ext_id"] = $ext_id;
+  if (isset ($ext_target)) $obm_user["ext_target"] = $ext_target;
+
   if (debug_level_isset($cdg_param)) {
     if ( $obm_user ) {
       while ( list( $key, $val ) = each( $obm_user ) ) {
-        echo "<BR>user[$key]=$val";
+        echo "<br />user[$key]=$val";
       }
     }
   }

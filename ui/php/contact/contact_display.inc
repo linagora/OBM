@@ -94,11 +94,12 @@ function html_contact_search_form ($contact) {
 // Parameters:
 //   - $contact[] : contact search criteria
 //     keys used  : company_id, name, company
-//   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function dis_contact_search_list($contact, $popup=false) {
+function dis_contact_search_list($contact) {
   global $l_no_found;
   global $auth, $new_order, $order_dir;
+
+  $popup = $contact["popup"];
 
   $pref_q = run_query_display_pref($auth->auth["uid"], "contact");
   $obm_q = run_query_search($contact, $new_order, $order_dir);
@@ -106,7 +107,7 @@ function dis_contact_search_list($contact, $popup=false) {
   if ($nb_contact == 0) {
     display_warn_msg($l_no_found);
   } else {
-    html_contact_search_list($obm_q,$pref_q,$nb_contact,$contact,$popup);
+    html_contact_search_list($obm_q, $pref_q, $nb_contact, $contact, $popup);
   }
 }
 
@@ -121,7 +122,7 @@ function dis_contact_search_list($contact, $popup=false) {
 //     keys used  : company_id, name, company
 //   - $popup     : if true, doesn't display links and display checkbox
 ///////////////////////////////////////////////////////////////////////////////
-function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
+function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
   global $l_found, $l_add, $l_close;
 
   if ($popup) {
@@ -154,7 +155,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
       <tr>
         <td>
       <input type=\"submit\" value=\"$l_add\" />
-      <input type=\"hidden\" name=\"param_list\" value=\"$ext_id\" />
+      <input type=\"hidden\" name=\"param_ext\" value=\"$ext_id\" />
       <input type=\"hidden\" name=\"action\" value=\"$ext_action\" />
         </td>
       </tr>
@@ -169,7 +170,7 @@ function html_contact_search_list($obm_q,$pref_q,$nb_con,$contact,$popup) {
   $dis_contact_list->data_url = $url;
 
   // --- HTML Template --------------------------------------------------------
-  display_info_msg($nb_con." ".$l_found);
+  display_info_msg("$nb_con $l_found");
   echo $display_popup_head;
   $dis_contact_list->display();
   echo $display_popup_end;

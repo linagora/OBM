@@ -67,7 +67,7 @@ $perm->check();
 ///////////////////////////////////////////////////////////////////////////////
 display_head($l_contact);     // Head & Body
 
-if (! $popup) {
+if (! $contact["popup"]) {
   generate_menu($menu,$section);         // Menu
 }
 
@@ -77,7 +77,7 @@ if (! $popup) {
 if ($action == "ext_get_ids") {
   html_contact_search_form($contact);
   if ($set_display == "yes") {
-    dis_contact_search_list($contact, $popup);
+    dis_contact_search_list($contact);
   } else {
     display_ok_msg($l_no_display);
   }
@@ -91,7 +91,7 @@ if ($action == "index" || $action == "") {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
   if ($set_display == "yes") {
-    dis_contact_search_list($contact, $popup);
+    dis_contact_search_list($contact);
   } else {
     display_info_msg($l_no_display);
   }
@@ -99,7 +99,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "search")  {
 ///////////////////////////////////////////////////////////////////////////////
   html_contact_search_form($contact);
-  dis_contact_search_list($contact, $popup);
+  dis_contact_search_list($contact);
   
 } elseif ($action == "new")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -251,7 +251,7 @@ function get_param_contact() {
   global $tf_mphone, $tf_fax, $tf_email, $cb_mailok, $ta_com, $cb_vis, $cb_archive;
   global $param_company, $param_contact, $hd_usercreate, $cdg_param;
   global $company_name, $company_new_name, $company_new_id;
-  global $ext_action, $ext_url, $ext_id, $ext_target;
+  global $popup, $ext_action, $ext_url, $ext_id, $ext_target;
 
   if (isset ($param_contact)) $contact["id"] = $param_contact;
   if (isset ($hd_usercreate)) $contact["usercreate"] = $hd_usercreate;
@@ -281,6 +281,7 @@ function get_param_contact() {
   if (isset ($ta_com)) $contact["com"] = $ta_com;
 
   // External param
+  if (isset ($popup)) $contact["popup"] = $popup;
   if (isset ($ext_action)) $contact["ext_action"] = $ext_action;
   if (isset ($ext_url)) $contact["ext_url"] = $ext_url;
   if (isset ($ext_id)) $contact["ext_id"] = $ext_id;
