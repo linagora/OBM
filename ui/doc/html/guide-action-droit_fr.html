@@ -4,7 +4,7 @@
 </HEAD>
 <BODY BGCOLOR="#FFFFFF">
 <CENTER>
-<H1>les sessions OBM</H1>
+<H1>les actions et droits OBM</H1>
 </CENTER>
 
 <br>
@@ -14,10 +14,11 @@
 
 <H2>Principes des <i>actions</i> : </H2>
 <p>
- Une action à pour but, au sein d'un module, de décrire la fonctionnalité demandée par l'utilisateur sur OBM.
+ Le concept d'action est le concept moteur d'OBM. En effet ce sont par celles-ci que seront générées les pages OBM.
+Elles définissent, au sein d'un module, la fonctionnalité d'OBM appelée par l'utilisateur.
 <p>
-Elles permettent au sein de la page <b>module_index.php</b> d'analyser la requête faite par l'utilisateur et 
-d'appeler la fonction adequate aux attentes de l'utilisateur.  
+ Ainsi la page <b>module_index.php</b> est dans l'attente d'un parametre "action" qui lui permettra d'appeller les
+fonctions adequates.  
 <p>
 Elles sont transmises via les headers html (en POST ou en GET) par le paramètre <b>action</b>, récupéré ensuite dans le code
 php par la variable <b>$action</b>
@@ -43,12 +44,13 @@ if (($action == "index") || ($action == "")) {
 <H2>Gestion des <i>actions</i> : </H2>
 <p>
  Afin d'augmenter la généricité du code, à partir de la version 0.6.0 d'OBM, un certain nombre de paramètres sont associés aus
-actions. Ces paramètres permettent de générer automatiquement le menu du module, suivant l'action actuelle. 
+actions. Ces paramètres permettent de générer automatiquement le menu du module, mais également de définir l'action plus précisement,
+en lui associant des droits, des conditions d'appelle suivant l'action actuelle, et autres éléments. 
 <p>
  Cette gestion est faite grâce à un tableau <b>$actions</b> qui à la structure qui suit :
 <table width="10">
 <tr>
-  <td>$action</td>
+  <td>$actions</td>
   <td>["Module"]</td>
   <td>["Action"]</td>
   <td>["Name"]</td>
@@ -83,31 +85,164 @@ actions. Ces paramètres permettent de générer automatiquement le menu du module,
 <tr>
   <th colspan=2 align=center>Description de la variable <b>$actions</b></th>
 </tr><tr>
-<td>$action</td>
-<td>Tableau contenant des sous tableaux indéxés par les noms des modules.</td>
+  <td>$actions</td>
+  <td>Tableau contenant des sous tableaux indéxés par les noms des modules.</td>
 </tr><tr>
-  <td>$action["Module"]</td>
+  <td>$actions["Module"]</td>
   <td>Tableau contenant des sous tableaux indéxés par les noms des actions propres au module <i>Module</i>.</td>
 </tr><tr>
-  <td>$action["Module"]["Action"]</td>
+  <td>$actions["Module"]["Action"]</td>
   <td>Tableau contenant des sous tableaux indéxés par les noms des paramètres de gestion de l'action <i>Action</i>.</td>
 </tr><tr>
-  <td>$action["Module"]["Action"]["Name"]</td>
-  <td>Cette variable contient le label de l'action qui sera affiché ( contiendra par exemple "Chercher" pour l'action <i>Search</i>).</td>
+  <td>$actions["Module"]["Action"]["Name"]</td>
+  <td>Cette variable contient le label de l'action qui sera affiché ( contiendra par exemple, en français, "Chercher" pour l'action <i>Search</i>).</td>
 </tr><tr>
-  <td>$action["Module"]["Action"]["Url"]</td>
-  <td>Cette variable contient le chemin relative pour acceder à la page traitant cette action.</td>
+  <td>$actions["Module"]["Action"]["Url"]</td>
+  <td>Cette variable contient le chemin relatif pour accéder à la page traitant cette action.</td>
 </tr><tr>
-  <td>$action["Module"]["Action"]["Right"]</td>
-  <td>Cette variable contient les droits necessaire pour éxécuter cette action (pour plus de détail sur les droits consulter le chapitre XXX)</td>
+  <td>$actions["Module"]["Action"]["Right"]</td>
+  <td>Cette variable contient les droits necessaires pour éxécuter cette action (pour plus de détail sur les droits consulter le chapitre XXX)</td>
 </tr><tr>
   <td nowrap>$action["Module"]["Action"]["Condition"]{"Action 1";"Action 2;...}</td>
-  <td>Tableau contenant la liste des actions depuis lesquelles pourra être executée l'action. Cette liste sera inscrite sous forme de tableau ou <i>Action 1</i>, <i>Action 1</i>... sont les noms des actions en question.</td>
+  <td>Tableau contenant la liste des actions depuis lesquelles pourra être appelée l'action. Cette liste sera inscrite sous forme de tableau où <i>Action 1</i>, <i>Action 2</i>... sont les noms des actions en question.</td>
 </tr>
 </table>
 <p>
 La variable est definit au niveau du fichier <b>global.inc</b> et sera utilisée lors de la génération du menu.
 <br>
+<p>
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+//////////////////////////////////////////////////////////////////////////////
+// Company actions
+//////////////////////////////////////////////////////////////////////////////
 
-</body>
-</html>
+$actions["COMPANY"]["index"] = array ('Name'	 => $l_header_index_f,
+            		              'Url' 	 => '$path/company/conmpany_index?action=index',
+                                      'Position' => '1',
+                                      'Right' 	 => $company_read,
+				      'Condition => 'all'; 
+                                      );
+
+$actions["COMPANY"]["new"]   = array ('Name'	 => $l_header_new_f,
+            		              'Url' 	 => '$path/company/conmpany_index?action=new',
+                                      'Position' => '2',
+                                      'Right' 	 => $company_write,
+				      'Condition => array ( 'index', 'detail_consult','admin','display'); 
+                                      );
+
+$actions["COMPANY"]["admin"] = array ('Name'	 => $l_header_admin_f,
+            		              'Url' 	 => '$path/company/conmpany_index?action=admin',
+                                      'Position' => '3',
+                                      'Right' 	 => $company_admin_write,
+				      'Condition => array ( 'index', 'detail_consult','display'); 
+                                      );
+
+</pre>
+</td></tr>
+</table>
+
+
+<h2> Présentation générale du système de gestion des  <i>droits</i> : </h2>
+
+<H2> Introduction au système de gestion des droits d'OBM : </H2>
+<p>
+Jusqu'a la version 0.6.0 d'OBM, les droits était géré via le système implementé dans PhpLib.
+Ce système était géré au niveau de l'objet <b>Perm</b>.
+<p>
+Les limites du système de PhpLib pour une application sont :
+<ul>
+<li> Les droits définis sont définis pour toute l'application, et non au niveau de chaque module. Ainsi un utilisateur ayant les droits
+ d'administrateur possedera ces droits sur l'integralité de l'application, et ne pourra pas l'être pour un module uniquement.
+<li> La difficulté de definir de nouveaux profils de droits.
+</ul>
+<p>
+Afin de remédier à ces contraintes, un nouveau système de droits  a été défini pour OBM, à partir de sa version 0.6.0.
+Ce système definit pour chaque module 4 droits :
+<p>
+<table border=1>
+<tr>
+  <th colspan=2 align=center>Description des droits</th>
+</tr><tr>
+  <td>mod_read</td>
+  <td>Droit de lecture basique du module <i>mod</i>.</td>
+</tr><tr>
+  <td>mod_write</td>
+  <td>Droit d'écriture basique du module <i>mod</i>.</td>
+</tr><tr>
+  <td>mod_admin_read</td>
+  <td>Droit de lecture des parties d'administration du module <i>mod</i>.</td>
+</tr><tr>
+  <td>mod_admin_write</td>
+  <td>Droit d'écriture sur les parties d'administration du module <i>mod</i>.</td>
+</tr>
+</table>
+<p>
+
+<H2> Principe du système de gestion des droits d'OBM : </H2>
+<p>
+Les droits sont définis grâce à des variables globales définient dans le fichier <b>global.inc</b>.
+Ces variables sont de la forme <b>$sec_type_droit</b> où <i>sec</i> est le nom de la section pour
+laquelle le droit est définit, et <i>type_droit</i> est le droit définit (<i>_read</i>, <i>_write</i>,
+<i>_admin_read</i>, <i>_admin_write</i>).
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+//////////////////////////////////////////////////////////////////////////////
+// Production section rights
+//////////////////////////////////////////////////////////////////////////////
+$prod_read        = 000100000000;
+$prod_write       = 001000000000;
+$prod_admin_read  = 010000000000;
+$prod_admin_write = 100000000000;
+
+
+</pre>
+</td></tr>
+</table>
+<p>
+Les droits d'un module seront définis en fonction des droits de la section à laquelle il appartient.
+<table bgcolor="C0C0C0">
+<tr><td>
+<pre>
+//////////////////////////////////////////////////////////////////////////////
+// Contrat rights
+//////////////////////////////////////////////////////////////////////////////
+$contrat_read        = $prod_read;
+$contrat_write       = $prod_admin_write;
+$contrat_admin_read  = $prod_admin_read;
+$contrat_admin_write = $prod_admin_write;
+
+//////////////////////////////////////////////////////////////////////////////
+// Incident rights
+//////////////////////////////////////////////////////////////////////////////
+$incident_read        = $prod_read;
+$incident_write       = $prod_write;
+$incident_admin_read  = $prod_admin_read;
+$incident_admin_write = $prod_admin_write;
+
+</pre>
+</td></tr>
+</table>
+<p>
+Les droits d'un utilisateur seront définis en fonction du profil utilisateur auquel il 
+a été lié.
+Les profils utilisateur sont définis dans la base de données.
+<p>
+Les droits d'un profil sera un <i>ou logique</i> de ses droits sur chaque module.
+Par exemple les droits d'un utilisateur ayant un profil de <b>comptable</b> pour le module
+<i>compta</i> seront : <br><i>$compta_read | $compta_write | $compta_admin_read | $compta_admin_write</i>.
+Pour un technicien ils seront :<br> $compta_read | $compta_write.
+<p>
+Ses droits sur l'ensemble de l'application seront  : <br><i>$droit_com | $droit_prod | $droit_admin | droit_compta</i>.
+<p>
+
+<A HREF="index.html">back</A>
+
+</BODY>
+</HTML>
+
+
+
+
