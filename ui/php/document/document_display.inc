@@ -215,8 +215,14 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
     $author = $doc_q->f("document_author");
     $privacy = ($doc_q->f("document_privacy") == 1 ? " checked" : "");
     $mime = $doc_q->f("document_mimetype");
-    $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
-    $kind = "file";
+        if($doc_q->f("document_name") == "") {
+      $kind = "link";
+      $fi_path = $doc_q->f("document_path").'/';
+    }
+    else {
+      $kind = "file";
+      $fi_path = $doc_q->f("document_path").'/'.$doc_q->f("document_name");
+    }
   }
   // If parameters have been given, they supercede the default action value
   if (isset($document["id"])) { $id = $document["id"]; }
