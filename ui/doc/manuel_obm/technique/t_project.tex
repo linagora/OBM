@@ -175,17 +175,21 @@ Voici la liste des action du module \project, ainsi qu'une description sommaire 
  \hline
   <update> & Mise à jour du projet. \\
  \hline
-  <task\_fill> & Affiche le formulaire permettant l'ajout de tâches au projet et la liste des tâches déjà existantes. \\
+  <check_delete> & Vérification avant suppression du projet. \\
  \hline
-  <member\_fill> & Affiche la liste des participants au projet et leurs statuts respectifs. \\
+  <delete> & Suppression du projet. \\
+ \hline
+  <task> & Affiche le formulaire permettant l'ajout de tâches au projet et la liste des tâches déjà existantes. \\
+ \hline
+  <member> & Affiche la liste des participants au projet et leurs statuts respectifs. \\
  \hline
   <membertime\_fill> & Affiche le formulaire permettant l'affectation des participants aux différentes tâches. \\
  \hline
   <validate> & Valide les modifications faites à l'écran de modification des affectations et affiche l'écran de consultation. \\
  \hline
-  <advanceupdate> & Affiche le formulaire permettant de modifier les informations relatives au projet. \\
+  <progress> & Formulaire de progresion d'un projet. \\
  \hline
-  <a\_update> & Valide les modifications faites à l'écran de modification de l'avancement et affiche l'écran de consultation. \\
+  <progress\_update> & Mise à jour de la progression du projet. \\
  \hline
   <ext\_get\_ids> & affiche une fenêtre permettant d'ajouter des participants au projet (géré par le module \user). \\
  \hline
@@ -197,7 +201,7 @@ Voici la liste des action du module \project, ainsi qu'une description sommaire 
  \hline
   <member\_del> & Enlève in participant et affiche la liste des participants au projet et leurs statuts respectifs. \\
  \hline
-  <member\_change> & Change le statut (chef de projet/simple participant) et affiche la liste des participants au projet et leurs statuts respectifs. \\
+  <member\_update> & Change le statut (chef de projet/simple participant) et affiche la liste des participants au projet et leurs statuts respectifs. \\
  \hline
   <display\_pref> & Affiche l'écran de modification des préférences d'affichage. \\
  \hline
@@ -239,7 +243,7 @@ Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque 
  \hline
   <d\_update> & project\_write & Droits d'Administrateur en ecriture. \\
  \hline
-  <advanceupdate> & project\_write & Droits d'Administrateur en ecriture. \\
+  <progress> & project\_write & Droits d'Administrateur en ecriture. \\
  \hline
   <a\_update> &  project\_write & Droits d'Utilisateur en ecriture. \\
  \hline
@@ -339,13 +343,13 @@ Les
 	     & run\_query\_membertime() \\
              & html\_project\_consult() \\
  \hline
-  <advanceupdate> & run\_query\_projectname() \\
+  <progress> & run\_query\_projectname() \\
  	          & run\_query\_tasks() \\
 	          & run\_query\_members() \\
 	          & run\_query\_membertime() \\
                   & html\_project\_advance() \\
  \hline
- <a\_update> & run\_query\_advanceupdate() \\ 
+ <a\_update> & run\_query\_progress() \\ 
              & run\_query\_statlog() \\ 
              & run\_query\_detail() \\ 
  	     & run\_query\_tasks() \\
@@ -440,5 +444,5 @@ Les
   \item{liste des sous-tâches} : \fonction{run\_query\_tasklist\_insert} ajoute une sous-tâche et \fonction{run\_query\_tasklist\_delete} en enlève.
   \item{liste des participants} : \fonction{run\_query\_memberlist\_insert} ajoute un (ou plusieurs)  participant, \fonction{run\_query\_memberlist\_delete} en enlève et \fonction{run\_query\_memberstatus\_change} modifie le statut (chef de projet/participant).
   \item{liste des affectations} : \fonction{run\_query\_projectupdate} met à jour la liste des affectations.
-  \item{liste des affectations} : \fonction{run\_query\_advanceupdate} met à jour l'état d'avancement des participants.
+  \item{liste des affectations} : \fonction{run\_query\_progress} met à jour l'état d'avancement des participants.
  \end{itemize}

@@ -344,6 +344,42 @@ function run_query_project_timetask_links($p_id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
+// Deletion query execution                                                  //
+// Parameters:
+//   - $p_id : project id
+///////////////////////////////////////////////////////////////////////////////
+function run_query_delete($p_id) {
+  global $cdg_sql;
+
+  // Check that no Links from Time management
+  $obm_q = run_query_project_timetask_links($p_id);
+
+  if ($obm_q->num_rows() > 0) {
+    $retour = false;
+  } else {
+    $obm_q = new DB_OBM;
+
+    // Delete all users associations to the project
+    $query = "delete from ProjectUser where projectuser_project_id='$p_id'";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+
+    // Delete all task assigned to the project
+    $query = "delete from ProjectTask where projecttask_project_id='$p_id'";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+
+    // Delete the project
+    $query = "delete from Project where project_id='$p_id'";
+    display_debug_msg($query, $cdg_sql);
+    $retour = $obm_q->query($query);
+  }
+
+  return $retour;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
 // Query execution : UserList conditionnal insertion                         //
 // Parameters:
 //   - $project[] : Entry's values
@@ -641,9 +677,9 @@ function run_query_projectupdate($project) {
       projectuser_projecttask_id as mt_task,
       projectuser_projectedtime as mt_proj,
       projectuser_missingtime as mt_miss
-  from ProjectUser
-  where projectuser_project_id = '$p_id'
-  order by mt_user, mt_task";
+    from ProjectUser
+    where projectuser_project_id = '$p_id'
+    order by mt_user, mt_task";
 
   $old_q = new DB_OBM;
   display_debug_msg($query, $cdg_sql, "run_query_projectupdate(old)");
@@ -739,7 +775,7 @@ function run_query_projectupdate($project) {
 // Parameters:
 //   - $project[] : hash info : keys used : missing
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_advanceupdate($project) {
+function run_query_progress($project) {
   global $auth, $cdg_sql;
 
   $obm_q = new DB_OBM;
@@ -759,7 +795,7 @@ function run_query_advanceupdate($project) {
             and projectuser_user_id = $m_id
           ";
 	
-	display_debug_msg($query, $cdg_sql, "run_query_advanceupdate");
+	display_debug_msg($query, $cdg_sql, "run_query_progress");
 	$retour = $obm_q->query($query);
 	
 	if (!($retour))

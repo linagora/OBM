@@ -102,7 +102,7 @@ function change_status(user_id, user_status, form)
     else if (i_name == \"param_status\")
       form.elements[i].value = user_status;
     else if (i_name == \"action\")
-      form.elements[i].value = \"member_change\";
+      form.elements[i].value = \"member_update\";
     else
       null;
   }

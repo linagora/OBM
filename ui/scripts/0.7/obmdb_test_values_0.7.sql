@@ -29,4 +29,4 @@ INSERT INTO Company (company_timeupdate, company_timecreate, company_userupdate,
 -------------------------------------------------------------------------------
 -- Default Contact creation
 -------------------------------------------------------------------------------
-INSERT INTO Contact VALUES (1,'','',NULL,1,1,1,'Rabbit','Roger','','','','','','','','','','','','',0,0,0,'comment');
+INSERT INTO Contact (contact_company_id, contact_kind_id, contact_lastname, contact_firstname, contact_address1,contact_address2, contact_zipcode, contact_town, contact_function, contact_phone, contact_email, contact_archive,contact_comment) VALUES (1,1,'Rabbit','Roger','ad1','ad2','31520','Ramonville','Manager','01 01 01 02 03','roger@rabbit.com','0','comment');

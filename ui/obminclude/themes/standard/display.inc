@@ -119,12 +119,7 @@ function generate_menu($menu, $section) {
   global $perms_user, $perms_editor, $perms_admin;
   global $popup_width, $popup_height;
   global $auth, $obminclude, $display; 
-  global $obm_version;
-
-  if ($menu == "")
-    $path = "";
-  else 
-    $path = "..";
+  global $path, $obm_version;
 
   $uid = $auth->auth["uid"];
   $login = $auth->auth["uname"];
@@ -402,7 +397,7 @@ function display_inactive_tab($tab) {
 //   - $path : path to the obm php root (for the first screen after login)
 ///////////////////////////////////////////////////////////////////////////////
 function display_last_visited($path="..") {
-  global $set_theme, $ico_project;
+  global $path, $set_theme, $ico_project;
   global $ico_company, $ico_contact, $ico_parentdeal, $ico_deal, $ico_list;
   global $ico_contract, $ico_incident, $ico_account, $ico_invoice,$ico_payment;
   global $ico_user, $ico_group;

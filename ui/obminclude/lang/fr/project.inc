@@ -47,12 +47,12 @@ $l_tasksinfos = "Tâches du projet";
 $l_membersinfos = "Participants au projet";
 $l_progressinfos = "Détail : (temps : utilisé / estimé restant / total prévu)";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
-$l_advupdateinfos = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
+$l_progress_info = "Renseignez le temps de travail (en jours) estimé pour terminer une tâche";
 
 // Actions
 $l_insert = "Créer le projet";
 $l_update = "Modifier le Projet";
-$l_adv_update = "Mettre à jour les avancements";
+$l_progress_update = "Mettre à jour les avancements";
 $l_delete = "Supprimer le projet";
 
 // Messages
@@ -64,8 +64,8 @@ $l_no_members = "Pas de participants";
 $l_no_membertime = "Participants au projet";
 $l_tasksdef = "Tâches définies";
 $l_membersdef = "Participants au projet";
-$l_delete_ok = "----";
-$l_delete_error = "----";
+$l_delete_ok = "La suppression du projet a été correctement effectuée";
+$l_delete_error = "La suppression du projet a échoué !";
 $l_insert_ok = "La création du projet a été correctement effectuée.";
 $l_insert_error = "Impossible de créer cette tâche ; La tâche principale est utilisée par la gestion de temps";
 $l_taskdelete_error = "Impossible de supprimer une tâche ; Quelqu'un y est affecté";
@@ -74,8 +74,8 @@ $l_update_ok = "La modification du projet a été correctement effectuée";
 $l_update_error = "La modification du projet a échoué !";
 $l_proj_update_ok = "La mise à jour des affectation a été correctement effectuée";
 $l_proj_update_error = "La mise à jour des affectations a échoué !";
-$l_adv_update_ok = "La mise à jour des avancements a été correctement effectuée";
-$l_adv_update_error = "La mise à jour des avancements a échoué !";
+$l_progress_update_ok = "La mise à jour des avancements a été correctement effectuée";
+$l_progress_update_error = "La mise à jour des avancements a échoué !";
 $l_query_error = "Problème en executant la requete";
 $l_member_add = "Ajouter des participants";
 $l_task_add = "Ajouter une tâche";

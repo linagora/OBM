@@ -209,7 +209,7 @@ function html_project_consult($project_q, $tasks_q, $members_q, $membertime_q) {
   global $l_name, $l_tasktype, $l_company_name, $l_soldtime, $l_total;
   global $l_company, $l_deal, $l_project, $l_progress, $l_progressinfos;
   global $l_projected, $l_used, $l_missing, $l_sold;
-  global $l_allotted, $l_no_members, $l_adv_update, $l_project, $l_resume;
+  global $l_allotted, $l_no_members, $l_progress_update, $l_project, $l_resume;
   global $l_allosold, $l_usedsold, $l_progeval, $l_nbtask;
   global $l_nbmem, $l_tasksdef, $l_membersdef, $l_archive, $l_yes, $l_no;
   global $l_projected, $l_alloproj, $l_usedproj, $l_no_tasks;
@@ -779,8 +779,7 @@ function html_project_form($action, $project_q, $project) {
    <div class=\"detailButton\">
    <p class=\"detailButtons\">$dis_button</p>
    </div>
-   </form>
-   ";
+   </form>";
 
   return $block;
 }
@@ -1319,7 +1318,7 @@ function html_project_membertime_form($tasks_q, $members_q, $membertime_q, $proj
 function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
   global $display, $set_theme;
   global $l_project, $l_name, $l_tasktype, $l_company_name, $l_soldtime;
-  global $l_projected, $l_used, $l_advupdateinfos, $l_adv_update;
+  global $l_projected, $l_used, $l_progress_info, $l_progress_update;
 
   $cpt_t=0;
   $cpt_m=0;
@@ -1408,9 +1407,9 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
   }
     
   $dis_button = "
-    <input type=\"hidden\" name=\"action\" value=\"a_update\" />
+    <input type=\"hidden\" name=\"action\" value=\"progress_update\" />
     <input type=\"hidden\" name=\"param_project\" value=\"$pid\" />
-    <input type=\"submit\" value=\"$l_adv_update\" />
+    <input type=\"submit\" value=\"$l_progress_update\" />
     ";
     
   $span = $cpt_m + 1;
@@ -1424,7 +1423,7 @@ function html_project_advance($members_q, $membertime_q, $tasks_q, $project) {
          onsubmit=\"if (check_advancevalid(this)) return true; else return false;\"
          action=\"".url_prepare("project_index.php")."\">
 
-     <div class=\"detailHead\">$l_advupdateinfos</div>
+     <div class=\"detailHead\">$l_progress_info</div>
 
      <table class=\"projectDetail\">
        $dis_memhead
