@@ -19,6 +19,22 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-08-02</b> : version <b>0.8.4</b> released (<b>Guêpe Release</b>) (fixes and minors enhancements)
+        <ol>
+          <li> Many enhancements to the List (Mail merge) module
+          <li> Comments now automatically stamped in Company, Contact
+          <li> Group membership management from User screen
+          <li> Fixes and enhancements in column availability (addresses, order)
+          <li> Search enhancements for Company, Contact, Deal
+          <li> Enhancements in Company, List, Contact, Contract, User
+          <li> Fixes in Install, Company, Deal, Group, Contract
+          <li> Clean up in external modules calls
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-07-13</b> : version <b>0.8.3</b> released (fixes and minors enhancements)
         <ol>
           <li> New multiple categories for deals

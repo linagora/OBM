@@ -24,6 +24,22 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-08-02</b> : version <b>0.8.4</b> released (<b>Guêpe Release</b>) (fixes and minors enhancements)
+        <ol>
+          <li> Many enhancements to the List (Mail merge) module
+          <li> Comments now automatically stamped in Company, Contact
+          <li> Group membership management from User screen
+          <li> Fixes and enhancements in column availability (addresses, order)
+          <li> Search enhancements for Company, Contact, Deal
+          <li> Enhancements in Company, List, Contact, Contract, User
+          <li> Fixes in Install, Company, Deal, Group, Contract
+          <li> Clean up in external modules calls
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-07-13</b> : version <b>0.8.3</b> released (fixes and minors enhancements)
         <ol>
           <li> New multiple categories for deals
@@ -53,38 +69,6 @@
           <li> Enhancements in Company, Project, CSV export, List, Calendar
           <li> Optimizations (hidden data no more fetched from DB)
           <li> Install more mandrake friendly
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-04-22</b> : version <b>0.8.1</b> released (fixes)
-        <ol>
-          <li> Corrected some action rights on deal, document and user modules
-          <li> Corrected problem that prevent inserting Category with IE 6
-          <li> Calendar event users can now be updated again
-          <li> Fixes on Todo, Contact, Calendar, graphical Lists, sort order
-          <li> Postgres Sorts now case insensitive too
-          <li> Enhancements in Company, Contact, Subscriptions, site config, www links...
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-03-19</b> : version <b>0.8.0</b> released (<b>Clément Release</b>) (architectural and functionnality enhancements, fixes)
-        <ol>
-          <li> PostreSQL support (except time and document)
-          <li> Spanish translation added
-          <li> Many Company, Contact enhancements
-          <li> Better configuration (allowing specific site configuration keeping compatibility with generic branch)
-          <li> New module : Publication with subscription management
-          <li> New Access right and profile models (with module granularity)
-          <li> A directory can now be removed in Document
-          <li> Graphical query construction in List
-          <li> Many Fixes and enhancements in Project, Todo, Calendar,...
-          <li> ...
         </ol>
         </div>
         <br />

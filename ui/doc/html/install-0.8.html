@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.3.tar.gz
-tar -C /var/www -xzvf obm-0.8.3.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.4.tar.gz
+tar -C /var/www -xzvf obm-0.8.4.tar.gz
 cd /var/www
-ln -s obm-0.8.3 obm
+ln -s obm-0.8.4 obm
 </pre>
   </td>
 </tr>
@@ -534,6 +534,35 @@ psql -U obm obm < scripts/0.8/update-0.8.2-0.8.3.pgsql.sql
 
 <p />
 # Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+
+<p />
+<a name="upgrade-0.8.4"><h1>UPGRADE OBM DATABASE 0.8.3 to 0.8.4 (MySQL and Postgres)</h1></a>
+<p />
+# MySQL Database has evolved from 0.8.3 to 0.8.4
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/update-0.8.3-0.8.4.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Database has evolved from 0.8.3 to 0.8.4
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/update-0.8.3-0.8.4.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+
 
 <p />
 A naf code dump is available (french naf codes). If you want to insert these reference data :
