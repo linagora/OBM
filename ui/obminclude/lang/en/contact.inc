@@ -74,6 +74,8 @@ $l_kind_checkdelete = "Check or Delete Kind";
 $l_kind_delete = "Delete Kind";
 $l_kind_insert = "Insert Kind";
 $l_add = "Add these contacts";
+$l_add_cats1 = "Add these categories 1";
+$l_add_cats2 = "Add these categories 2";
 
 // Messages
 $l_cat1_checkdelete = "Check or delete Category 1"; 

@@ -2397,7 +2397,7 @@ function dis_kind_links($ref) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category1_list($contact) {
-  global $l_close,$l_add,$l_cat_no;
+  global $l_close,$l_add_cats1,$l_cat_no;
   $popup = $contact["popup"];
   $cat_q = run_query_contactcategory1();
   
@@ -2419,7 +2419,7 @@ function html_category1_list($contact) {
   <br />
   <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
   <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+  <input type=\"submit\" value=\"$l_add_cats1\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
   </form>
   </div>";
 
@@ -2431,7 +2431,7 @@ function html_category1_list($contact) {
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
 function html_category2_list($contact) {
-  global $l_close,$l_add,$l_cat_no;
+  global $l_close,$l_add_cats2,$l_cat_no;
   $popup = $contact["popup"];
   $cat_q = run_query_contactcategory2();
   if($popup) {
@@ -2459,7 +2459,7 @@ function html_category2_list($contact) {
   <br />
   <input name=\"ext_target\" type=\"hidden\" value=\"$ext_target\" />
   <input name=\"popup\" type=\"hidden\" value=\"1\" />
-  <input type=\"submit\" value=\"$l_add\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
+  <input type=\"submit\" value=\"$l_add_cats2\" /> &nbsp;&nbsp;&nbsp; <input type=\"button\" value=\"$l_close\" onclick=\"window.close();\"/>   
   </form>
   </div>";
 
