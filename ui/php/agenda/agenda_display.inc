@@ -298,7 +298,7 @@ function dis_month_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 	       onMouseOver=\"show(event,'$daylink-$event_id'); return true;\" onMouseOut=\"hide('$daylink-$event_id'); return true;\">";
 	       	     
 	     $hidden_div .= "
-	      <div id=\"$daylink-$event_id\" class=\"agendaHidden\">
+	      <div id=\"$daylink-$event_id-$id\" class=\"agendaHidden\">
 		  <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 		  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 		  <tr><td class=\"agendaEventHead\">
@@ -496,14 +496,14 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      $descEvent = $l_private_description;
 		      $linkEvent = "javascript:return false;";
 		      $typeEvent = $l_private;
-		    }  
+		    } 
 		    $event_head_display .= "
 		     <a class=\"agendaLink4\" href=\"$linkEvent\"
-		      onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		      onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		      onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+		      onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		     
 		    $hidden_div .= "
-		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		    <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -540,10 +540,10 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		    }  
 		    $event_head_display .= "
 		     <a class=\"agendaLink4\" href=\"$linkEvent\"
-		      onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		      onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		      onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+		      onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		    $hidden_div .= "
-		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		    <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -633,11 +633,11 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      }  
 		      $event_head_display .= "
 		       <a class=\"agendaLink4\" href=\"$linkEvent\"
-			onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-			onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+			onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+			onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		       
 		      $hidden_div .= "
-		      <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		      <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			   <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			    <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			    <tr><td class=\"agendaEventHead\">
@@ -672,11 +672,11 @@ function dis_week_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		      }  
 		      $event_head_display .= "
 		       <a class=\"agendaLink4\" href=\"$linkEvent\"
-			onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-			onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+			onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+			onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		       
 		      $hidden_div .= "
-		      <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		      <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			   <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			    <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			    <tr><td class=\"agendaEventHead\">
@@ -855,11 +855,11 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		  }  
 		  $event_head_display .= "
 		   <a class=\"agendaLink4\" href=\"$linkEvent\"
-		    onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		    onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		    onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+		    onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		   
 		  $hidden_div .= "
-		  <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		  <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 		       <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			<tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			<tr><td class=\"agendaEventHead\">
@@ -894,11 +894,11 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		  }  
 		  $event_head_display .= "
 		   <a class=\"agendaLink4\" href=\"$linkEvent\"
-		    onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		    onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		    onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+		    onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		   
 		  $hidden_div .= "
-		  <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		  <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 		       <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			<tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			<tr><td class=\"agendaEventHead\">
@@ -979,11 +979,11 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		    }  
 		    $event_head_display .= "
 		     <a class=\"agendaLink4\" href=\"$linkEvent\"
-		      onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		      onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		      onMouseOver=\"show(event,'$tempDate-$idOfEvent--$id'); return true;\"
+		      onMouseOut=\"hide('$tempDate-$idOfEvent--$id'); return true;\">";
 		     
 		    $hidden_div .= "
-		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		    <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -1018,11 +1018,11 @@ function dis_day_planning($agenda,$obm_q,$calendar_user,$usr_q) {
 		    }  
 		    $event_head_display .= "
 		     <a class=\"agendaLink4\" href=\"$linkEvent\"
-		      onMouseOver=\"show(event,'$tempDate-$idOfEvent'); return true;\"
-		      onMouseOut=\"hide('$tempDate-$idOfEvent'); return true;\">";
+		      onMouseOver=\"show(event,'$tempDate-$idOfEvent-$id'); return true;\"
+		      onMouseOut=\"hide('$tempDate-$idOfEvent-$id'); return true;\">";
 		     
 		    $hidden_div .= "
-		    <div id=\"$tempDate-$idOfEvent\" class=\"agendaHidden\">
+		    <div id=\"$tempDate-$idOfEvent-$id\" class=\"agendaHidden\">
 			 <table bgcolor=\"#000000\" border=\"1\" width=\"200\" cellpadding=\"0\" cellspacing=\"1\">
 			  <tr><td  class=\"agendaHead2\">$titleEvent</td></tr>
 			  <tr><td class=\"agendaEventHead\">
@@ -1531,7 +1531,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
   if (isset($agenda["category"])) { $category_id = $agenda["category"]; }
   if (isset($agenda["priority"])) { $priority = $agenda["priority"]; }
   if (isset($agenda["description"])) { $desc = $agenda["description"]; }
-  if (isset($agenda["date_begin"])) {
+  if (isset($agenda["date_begin"]) && !$datebegin) {
     $datebegin = substr($agenda["date_begin"],0,8);    
     ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $datebegin, $day_array);
     $datebegin = $day_array[1]."-".$day_array[2]."-".$day_array[3];
@@ -1539,7 +1539,7 @@ function dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, $
     $minbegin = substr($agenda["date_begin"],10,2);
     $day_array[0] = $agenda["date_begin"];
   }
-  if (isset($agenda["date_end"])) {
+  if (isset($agenda["date_end"]) && !$dateend) {
     $dateend = substr($agenda["date_end"],0,10);
     ereg ("([0-9]{4})([0-9]{2})([0-9]{2})", $dateend, $day_array2);
     $dateend = $day_array2[1]."-".$day_array2[2]."-".$day_array2[3];

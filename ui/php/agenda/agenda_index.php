@@ -229,14 +229,14 @@ elseif ($action == "insert") {
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
       $display["msg"] .= display_warn_msg($l_insert_warning);
-      $display["detail"] = html_dis_conflict($agenda,$conflict,$event_id,0);
+      $display["result"] = html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
-      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["result"] .= dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
       $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     else{
@@ -246,7 +246,7 @@ elseif ($action == "insert") {
       $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
       $user_obm = run_query_userobm_writable();
       $cat_event = run_query_get_eventcategories();
-      $display["detail"] = dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
+      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
     }
   }
   else {
@@ -325,28 +325,24 @@ elseif ($action == "update") {
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
       $display["msg"] .= display_warn_msg($l_update_warning);      
-      $display["detail"] = html_dis_conflict($agenda,$conflict,$event_id,0);
+      $display["result"] = html_dis_conflict($agenda,$conflict,$event_id,0);
       require("agenda_js.inc");
       $sel_user_id = array($auth->auth["uid"]);
       $p_user_array = $sel_user_id ;
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = store_users(run_query_get_user_name($p_user_array));
       $user_obm = run_query_userobm_readable();  
-      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
+      $display["result"] .= dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
       $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
     }
     else{
       require("agenda_js.inc");
-      require("$obminclude/calendar.js");      
-      $display["msg"] .= display_error_msg($l_update_error); 
+      require("$obminclude/calendar.js");    
+      $display["msg"] .= display_err_msg($l_insert_error);
       $display["detail"] = html_dis_conflict($agenda,$conflict,'',0);
-      $sel_user_id = array($auth->auth["uid"]);
-      $p_user_array = $sel_user_id ;
-      $obm_q = run_query_week_event_list($agenda,$p_user_array);
-      $user_q = store_users(run_query_get_user_name($p_user_array));
-      $user_obm = run_query_userobm_readable();  
-      $display["result"] = dis_week_planning($agenda,$obm_q,$user_q,$user_obm);
-      $display["features"] = html_planning_bar($agenda,$user_obm, $p_user_array,$user_q);
+      $user_obm = run_query_userobm_writable();
+      $cat_event = run_query_get_eventcategories();
+      $display["detail"] .= dis_event_form($action, $agenda, NULL, $user_obm, $cat_event, $sel_user_id);
     }
   }
   else {

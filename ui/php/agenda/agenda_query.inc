@@ -717,7 +717,7 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
                    cs2.calendarsegment_date as date_end, calendarevent_title,userobm_lastname,userobm_firstname
             FROM   CalendarEvent, CalendarSegment cs1,CalendarSegment cs2, UserObm 
 	    WHERE cs1.calendarsegment_eventid = calendarevent_id AND userobm_id = cs1.calendarsegment_customerid 
-	          AND cs1.calendarsegment_state = 'A' AND cs2.calendarsegment_state != 'A' 
+	          AND cs1.calendarsegment_state = 'A' AND cs2.calendarsegment_state = 'A' 
 		  AND calendarevent_id != $event_id
 		  AND cs2.calendarsegment_eventid = calendarevent_id AND userobm_id = cs2.calendarsegment_customerid
 	          AND (cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $date_end AND
