@@ -18,6 +18,7 @@ if ($obminclude == "") $obminclude = "obminclude";
 $actions = array ('help', 'index', 'data_show', 'data_update', 'clear_sess');
 
 require("$obminclude/phplib/obmlib.inc");
+include("$obminclude/global.inc");
 require("admin_display.inc");
 require("admin_query.inc");
 require("admin_pref_query.inc");  // for get_global_pref_lifetime()
@@ -30,14 +31,11 @@ if ($mode == "") $mode = "txt";
 switch ($mode) {
  case "txt":
    $retour = parse_arg($argv);
-   include("$obminclude/global.inc");
    include("$obminclude/global_pref.inc");
    if (! $retour) { end; }
    break;
  case "html":
    $menu = "ADMIN";
-
-   include("$obminclude/global.inc");
    page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
    include("$obminclude/global_pref.inc");
    display_head("Admin_Code");

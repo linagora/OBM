@@ -12,12 +12,13 @@
 ///////////////////////////////////////////////////////////////////////////////
 $menu="PAYMENT";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 require("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("admin");
-
 require("$obminclude/global_pref.inc");
+
 require("payment_display.inc");
 require("payment_query.inc");
 

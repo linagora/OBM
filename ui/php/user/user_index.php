@@ -22,17 +22,18 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Session, Auth, Perms Management                                           //
 ///////////////////////////////////////////////////////////////////////////////
+$path = "..";
 $menu="USER";
 $obminclude = getenv("OBM_INCLUDE_VAR");
+if ($obminclude == "") $obminclude = "obminclude";
 require("$obminclude/phplib/obmlib.inc");
 include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
+$perm->check("admin");
+include("$obminclude/global_pref.inc");
 
 // the user MUST be "admin" to access this section
-$perm->check("admin");
 
-
-include("$obminclude/global_pref.inc");
 require("user_display.inc");
 require("user_query.inc");
 

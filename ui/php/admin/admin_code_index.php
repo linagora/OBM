@@ -9,7 +9,7 @@
 
 // $obminclude not used in txt mode
 $obminclude = getenv("OBM_INCLUDE_VAR");
-
+if ($obminclude == "") $obminclude = "obminclude";
 $debug=1;
 $obm_root = "../..";
 $cpt_line = 0;

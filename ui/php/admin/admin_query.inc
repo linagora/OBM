@@ -60,7 +60,7 @@ function run_query_active_user($delay) {
 
   // if lifetime = 0 (or bad:< 0) we consider all session actives.
   if ($delay > 0)
-    $date_limit = time() - $delay;
+    $date_limit = date("YmdHis",time() - $delay);
   else
     $date_limit = 0;
 

@@ -13,9 +13,8 @@ $path="..";
 ///////////////////////////////////////////////////////////////////////////////
 $menu="SETTINGS";
 $obminclude = getenv("OBM_INCLUDE_VAR");
-include("$obminclude/global.inc");
 require("$obminclude/phplib/obmlib.inc");
-
+include("$obminclude/global.inc");
 page_open(array("sess" => "OBM_Session", "auth" => "OBM_Challenge_Auth", "perm" => "OBM_Perm"));
 $perm->check("user");
 $uid = $auth->auth["uid"];
