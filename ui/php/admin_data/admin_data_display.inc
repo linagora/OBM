@@ -462,7 +462,6 @@ at least as much in the file system.
 	  $name = $file_name;
 	  $fpath = $file_path;
 	  if(is_dir($document_path.$file_path.$file_name)) {
-	    echo
 	    $type = "Repository";
 	    $kind = 0;
 	    $author = "";

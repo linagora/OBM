@@ -273,7 +273,6 @@ function run_query_get_mime($document){
   $file = $document["name"];
   $mime = $document["mime_file"];
   $kind = $document["kind"];
-  var_dump($document); 
   if($mime != "") {
     $return = run_query_get_type_by_mime($mime);
     if($return) {
@@ -1249,7 +1248,7 @@ function run_query_get_tree($display_file) {
     $where .= " AND document_kind = '0'";
   }
   $query = "select *  from Document $where 
-  order by CONCAT(document_path,document_name)
+  order by document_name
 ";
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;

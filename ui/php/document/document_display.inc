@@ -304,10 +304,17 @@ function html_document_form($action, $doc_q, $cat1_q, $cat2_q,$mime_q, $document
   if (isset($document["kind"])) { $kind = $document["kind"]; }
   if (isset($document["entity"])) { $entity = $document["entity"]; }
   if (isset($document["entity_id"])) { $entity_id = $document["entity_id"]; }
+  if (isset($document["url"])) {
+    $url = stripslashes($document["url"]); 
+    $url_parse = parse_url($url);
+    $proto = $url_parse["scheme"];
+    $url = $url_parse["host"].$url_parse["path"];
+
+  }
+
   if ($fi_path =="") $fi_path = $default_path;
 
-
-
+echo $proto."skdlmqsdk";
   // category 1 select
   $sel_cat1 = "<select id=\"sel_cat1\" name=\"sel_cat1\">";
   while($cat1_q->next_record()) {
@@ -1275,6 +1282,9 @@ function html_documents_tree($document,$display_file) {
     while($obm_d->next_record()) {
       $id = $obm_d->f("document_id");
       $kind = $obm_d->f("document_kind");
+      if($kind == 2) {
+	$kind =1;
+      }
       $doc_info = array("name" =>$obm_d->f("document_name"),
                       "title" =>$obm_d->f("document_title"),
 		      "author" => $obm_d->f("document_author"));
