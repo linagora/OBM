@@ -72,12 +72,7 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
   }
   
   else if ($fieldname == "list_nb_contact") {
-    $nb_q = new DB_OBM;
-    $id = $OD->data_set->f("list_id");
-    $query = "select count(*) from ContactList where contactlist_list_id='$id'";
-    $nb_q->query($query);
-    $nb_q->next_record();
-    $res["name"] = $nb_q->f(0) . " / " .$OD->data_set->f("list_static_nb"). " / " .$OD->data_set->f("list_query_nb");
+    $res["name"] = $OD->data_set->f("list_static_nb"). " / " .$OD->data_set->f("list_query_nb");
     $res["txt_name"] = $res["name"];
     $res["align"] = "center";
   }
@@ -448,13 +443,18 @@ function html_list_consult($list_q, $pref_con_q, $con_q) {
   $subject = $list_q->f("list_subject");
   $email = $list_q->f("list_email");
   $static_nb = $list_q->f("list_static_nb");
-  
-  $criteria = unserialize($list_q->f("list_structure"));
-  $list_info["criteria"] = $criteria;
-  $list_info["id"] = $id;
-  $list_info["mailing_ok"] = $list_q->f("list_mailing_ok");
+  $structure = $list_q->f("list_structure");  
+
+  if ($structure != "") {
+    $criteria = unserialize($structure);
+  } else {
+    $criteria = "";
+  }
 
   if ($criteria != "") {
+    $list_info["criteria"] = $criteria;
+    $list_info["id"] = $id;
+    $list_info["mailing_ok"] = $list_q->f("list_mailing_ok");
     $query = stripslashes(make_query_from_criteria($list_info));
   } else {
     $query = $list_q->f("list_query");

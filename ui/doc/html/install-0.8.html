@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -15,7 +15,7 @@ Only specific OBM steps are described. To know how to install apache, php, mysql
 
 <h2> Assumptions</h2>
 
-We suppose apache, php and a database server (mysql) are correctly installed and functionnal.
+We suppose apache, php and a database server (mysql or postgres) are correctly installed and functionnal.
 <br>
 For pre-packaged distributions, check in your distribution docs.
 <br>
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.4.tar.gz
-tar -C /var/www -xzvf obm-0.8.4.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.5.tar.gz
+tar -C /var/www -xzvf obm-0.8.5.tar.gz
 cd /var/www
-ln -s obm-0.8.4 obm
+ln -s obm-0.8.5 obm
 </pre>
   </td>
 </tr>
@@ -563,28 +563,35 @@ psql -U obm obm < scripts/0.8/update-0.8.3-0.8.4.pgsql.sql
 # Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
 
 
+<p />
+<a name="upgrade-0.8.5"><h1>UPGRADE OBM DATABASE 0.8.4 to 0.8.5 (MySQL and Postgres)</h1></a>
+<p />
+# MySQL Database has evolved from 0.8.4 to 0.8.5
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/update-0.8.4-0.8.5.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Database has evolved from 0.8.4 to 0.8.5
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/update-0.8.4-0.8.5.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
 
 <p />
-A naf code dump is available (french naf codes). If you want to insert these reference data :
-# MySQL Naf code data
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-mysql -u obm -pobm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
-</pre>
-  </td>
-</tr>
-</table>
+# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
 
-# Postgres Naf code data
-<table bgcolor="#CCCCCC" border="1">
-<tr>
-  <td><pre>
-psql -U obm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
-</pre>
-  </td>
-</tr>
-</table>
+<p />
+# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
+
 
 
 <p />
@@ -616,7 +623,30 @@ psql -U obm obm < scripts/0.8/obmdb_default_values_0.8.sql
 
 <p>
 <h3>Update stored values that are not calculated</h3>
-# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the company module (which update these values)
+# In OBM, from the ADMINISTRATION section (must be connected with an admin user), go to the <b>Data</b> module and execute the action <b>data_update</b> for the selected module (company, deal, list or document) which update these values.
+
+
+<h3>Insert NAF code values</h3>
+A naf code dump is available (french naf codes). If you want to insert these reference data :
+# MySQL Naf code data
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Naf code data
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/obmdb_nafcode_0.8_fr.sql
+</pre>
+  </td>
+</tr>
+</table>
 
 
 <br /><br />

@@ -11,14 +11,15 @@
 <h1>OBM History and Roadmap</h1>
 <i>Why OBM and where does it go </i>
 <br />
-Version 0.8.4 - 2004-08-02<br />
+Version 0.8.5 - 2004-08-16<br />
 Pierre Baudracco
 </center>
 <p />
 
 <h2>Events</h2>
 
-2004-08-02 : version <b>0.8.4</b> released (fixes and enhancements)  <b>Guêpe Release !</b><br />
+2004-08-16 : version <b>0.8.5</b> released (fixes, functionalities and architecture enhancements)<br />
+2004-08-02 : version <b>0.8.4</b> released (fixes and enhancements) <b>Guêpe Release !</b><br />
 2004-07-13 : version <b>0.8.3</b> released (fixes and enhancements)<br />
 2004-06-14 : version <b>0.8.2</b> released (fixes)<br />
 2004-04-22 : version <b>0.8.1</b> released (fixes)<br />
@@ -198,8 +199,11 @@ An interesting work has been done to allow easy specific site configuration whil
 This allow to change language translation, select which modules are to be displayed without losing the changes when updating to new versions.
 
 Each sections, modules and some fields in the Company, Contact and Deal module can be toggle hidden or displayed by this new configuration (obm_conf.inc).
-<p>
-0.8.0-0.8.4 has seen many bugfixes and minor architecturals updates. We hope to start adding new important functionnality from 0.8.5 and after.
+<p />
+0.8.0-0.8.4 has seen many bugfixes and minor architecturals updates.
+<br />0.8.5 dealt with all but one architectural steps to lead to 0.9 (the last being the ability to display some data from one module into another module; eg: displaying the list of contact in one company directly in the company detail screen).
+0.8.5 started adding new functionalities (contcat Vcard export, deal quick update,...)
+We now hope to add new important functionality from 0.8.5 and after.
 
 
 <h3>Actual module status :</h3>
@@ -304,7 +308,7 @@ Each sections, modules and some fields in the Company, Contact and Deal module c
 </tr><tr>
   <td>COMPTA</td>
   <td>Accounting : Invoice</td>
-  <td>alpha : to be reviewed</td>
+  <td>alpha : being reviewed</td>
 </tr><tr>
   <td>COMPTA</td>
   <td>Accounting : Payments</td>
@@ -398,14 +402,13 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
   </td>
 </tr><tr>
   <td><b>0.7</b></td>
-  <td>2003-09-09 - 2003-12-xx</td>
+  <td>2003-09-09 - 2004-03-19</td>
   <td>
     <ul>
     <li> (done - 0.7.0) Gui work on entities detailed view <b>GUI work</b>
     <li> (done) Templates separation : php is already a template language...
     <li> (done - 0.7.0) User Groups
     <li> (partially done - 0.7.0) Security audit
-    <li> Documentation
     <li> (done - 0.7.0) Document module
     <li> (done - 0.7.0) User Groups
     <li> (done - 0.7.1) New theme example (to give at least 2 themes)
@@ -413,29 +416,40 @@ For detailed informations, visit the <a href="http://bugzilla.aliacom.fr/">bugzi
   </td>
 </tr><tr>
   <td>0.8</td>
-  <td>2004-03-xx</td>
+  <td>2004-03-19 - 2004-10-30</td>
   <td>
     <ul>
-    <li> Document generation : latex connection (other word processors ?)
     <li> (done skeleton) OBM global entry page
     <li> (done - 0.7.1) Todo module
     <li> (done - 0.8.0) Finer grained access rights
-    <li> ACL for document access rights
-    <li> (done except time and document) bring PostgreSQL handling up to date 
+    <li> (done - 0.8.5) Privacy handling
+    <li> (done except time module) bring PostgreSQL handling up to date 
     <li> Documentation
     </ul>
   </td>
 </tr><tr>
-  <td>Future</td>
-  <td>2004-xx-xx</td>
+  <td>0.9</td>
+  <td>2004-10-30 - </td>
   <td>
     <ul>
     <li> Planning management based on our calendar with new views
     <li> Resources management (booking,..) based on our calendar
-    <li> Graphical Installation from web (php)
     <li> Light content management ?
     <li> Bill module ?
     <li> Forum module ?
+    <li> Document generation : latex connection (other word processors ?)
+    <li> ACL for document access rights
+    </ul>
+  </td>
+</tr><tr>
+  <td>1.0 and Pro</td>
+  <td>2005 Q1</td>
+  <td>
+    <ul>
+    <li> Outlook connector for the OBM calendar (50 % done)
+    <li> Professionnal packaged version based on 1.0 standard (which remains GPL)
+    <li> Graphical Installation from web (php)
+    <li> OBM professionnal Guides (User guide and Technical guide)
     </ul>
   </td>
 </tr>

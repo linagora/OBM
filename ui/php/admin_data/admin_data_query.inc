@@ -190,16 +190,18 @@ function get_list_list() {
 ///////////////////////////////////////////////////////////////////////////////
 // Query execution - List Update
 // Parametres:
-//   - $id         : list id
-//   - $sta_nb : static contact number
-//   - $dyn_nb : dynamic contact number
+//   - $id        : list id
+//   - $sta_nb    : static contact number
+//   - $dyn_nb    : dynamic contact number
+//   - $new_query : query
 ///////////////////////////////////////////////////////////////////////////////
-function update_one_list($id, $sta_nb, $dyn_nb) {
+function update_one_list($id, $sta_nb, $dyn_nb, $new_query) {
   global $cdg_sql;
 
   $query = "update List set
       list_static_nb='$sta_nb',
-      list_query_nb='$syn_nb'
+      list_query_nb='$dyn_nb',
+      list_query='$new_query'
     where list_id='$id'";
 
   display_debug_msg($query, $cdg_sql);

@@ -655,7 +655,7 @@ CREATE TABLE Document (
   document_category1_id  integer NOT NULL DEFAULT '0',
   document_category2_id  integer NOT NULL DEFAULT '0',
   document_author      	 varchar(255) DEFAULT NULL,
-  document_private     	 integer NOT NULL DEFAULT '0',
+  document_privacy     	 integer NOT NULL DEFAULT '0',
   document_path        	 text DEFAULT NULL,
   document_size        	 integer DEFAULT NULL,
   PRIMARY KEY (document_id)

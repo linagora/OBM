@@ -475,7 +475,7 @@ CREATE TABLE DealType (
 );
 
 
--
+--
 -- Table structure for table 'DealCategory'
 --
 CREATE TABLE DealCategory (

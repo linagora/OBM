@@ -24,6 +24,22 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-08-16</b> : version <b>0.8.5</b> released (fixes, functionality and architecture enhancements)
+        <br />As Postgres, Privacy handling and Search queries (with limit flag) have been dealt with, on the architectural side it remains only one point to do (allow data from one module to be displayed in an other module) before 0.9 starts. 
+        <ol>
+          <li> Many Postgres improvement (Document, Invoice, incident, Project,...), near on par with mysql support now
+          <li> New functionalities in Deal (quick update), Contact (Vcard export), List, Time (user entry date)
+          <li> Enhancements in Document, Todo, Contact, List
+          <li> Architecture enhancements for privacy handling, Todo, SQL Limit clause can be toggled on / off
+          <li> Performance enhancements : SQL Limit clause can be toggled on / of for all searches, List and Todo
+          <li> Fixes in Export CSV, Contact, Deal, Contract, Incident, Invoice, Project, Time, Admin,...
+          <li> Many fixes and Clean up preparing 0.9
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-08-02</b> : version <b>0.8.4</b> released (<b>Guêpe Release</b>) (fixes and minors enhancements)
         <ol>
           <li> Many enhancements to the List (Mail merge) module
@@ -48,27 +64,6 @@
           <li> Fixes in Company, Contact, Project, Incident
           <li> Enhancements in Company, List, Contact, Incident, Contract
           <li> French Company Naf code data provided
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-06-14</b> :  New FAQ section on obm community site</div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-06-14</b> : version <b>0.8.2</b> released (fixes and minors enhancements)
-        <ol>
-          <li> New field NAF code on Company, can be hidden
-          <li> A project task can now be updated
-          <li> Lists can now be private
-          <li> Reporting ans statistics on #companies (by categories, countries and managers)
-          <li> Fixes on List (graphical construction), Deal, Document, Contact
-          <li> Enhancements in Company, Project, CSV export, List, Calendar
-          <li> Optimizations (hidden data no more fetched from DB)
-          <li> Install more mandrake friendly
         </ol>
         </div>
         <br />

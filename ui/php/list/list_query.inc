@@ -709,9 +709,10 @@ function get_list_query_num_rows($query="") {
 
   // Construct count query to optimize performance (instead of counting rows)
   // Get the From ... Where clauses
-  if (preg_match('/(FROM (.*)) (GROUP BY|$)/s', $query, $matches)) {
-     $query_c = "select count(contact_id) " . $matches[1];
-
+  // IF 'Group by' present, take between From and group by (ungreedy)
+  // else get between From and the end
+  if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) {
+    $query_c = "select count(contact_id) " . $matches[1];
     display_debug_msg($query_c, $cdg_sql);
     $obm_q = new DB_OBM;
     $r = $obm_q->query($query_c, 1);

@@ -459,6 +459,7 @@ function dis_data_list($action, $mode) {
     $name = $l_q->f("list_name");
     $sta_nb = $l_q->f("list_static_nb");
     $dyn_nb = $l_q->f("list_query_nb");
+    $query = $l_q->f("list_query");
 
     $criteria = unserialize($l_q->f("list_structure"));
     $list_info["criteria"] = $criteria;
@@ -466,13 +467,13 @@ function dis_data_list($action, $mode) {
     $list_info["mailing_ok"] = $l_q->f("list_mailing_ok");
 
     if ($criteria != "") {
-      $query = stripslashes(make_query_from_criteria($list_info));
+      $new_query = stripslashes(make_query_from_criteria($list_info));
     } else {
-      $query = $l_q->f("list_query");
+      $new_query = $l_q->f("list_query");
     }
 
-    if ($query != "") {
-      $query_nb = get_list_query_num_rows($query);
+    if ($new_query != "") {
+      $query_nb = get_list_query_num_rows($new_query);
       $query_txt = $query_nb;
     } else {
       $query_nb = "0";
@@ -482,7 +483,15 @@ function dis_data_list($action, $mode) {
     $new_sta_nb = get_list_static_contact_nb($id);
     $new_dyn_nb = $query_nb;
 
-    if ( ($sta_nb != $new_sta_nb) || ($dyn_nb != $new_dyn_nb) ) {
+    if ($query != $new_query) {
+      $query_diff = true;
+      $query_diff_txt = "X";
+    } else {
+      $query_diff = false;
+      $query_diff_txt = "OK";
+    }
+
+    if ( ($sta_nb != $new_sta_nb) || ($dyn_nb != $new_dyn_nb) || ($query_diff) ) {
       $cpt_lu++;
       if ($mode == "txt") {
 	echo "\nList (id=$id), Contacts : Statiques ($sta_nb, $new_sta_nb) : Dynamiques ($dyn_nb, $new_dyn_nb)";
@@ -494,11 +503,12 @@ function dis_data_list($action, $mode) {
           <td class=\"adminText\">$new_sta_nb</td>
           <td class=\"adminText\">$dyn_nb</td>
           <td class=\"adminText\">$new_dyn_nb</td>
-          <td class=\"adminText\">Todo</td>";
+          <td class=\"adminText\">$query_diff_txt</td>";
       }
 
       if ($action == "data_update") {
-	$retour = update_one_list($id, $new_sta_nb, $new_dyn_nb);
+	$up_query = addslashes($new_query);
+	$retour = update_one_list($id, $new_sta_nb, $new_dyn_nb, $up_query);
 	if ($retour) {
 	  if ($mode == "txt") {
 	    echo "OK";

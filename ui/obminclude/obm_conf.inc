@@ -34,7 +34,7 @@ $cg_com = 1;
 $cg_prod = 3;
 
 // Tuning constants
-$ctu_sql_limit = true;
+//$ctu_sql_limit = true;
 
 // Todo lines to display
 $cgp_todo_nb = 5;

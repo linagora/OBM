@@ -138,7 +138,7 @@ INSERT INTO TaskType (tasktype_id, tasktype_label, tasktype_internal) VALUES (22
 --
 -- Default Document root
 --
-INSERT INTO Document (document_title, document_name, document_kind, document_private, document_path) VALUES ('Root', 'Default', 0, 0, '/');
+INSERT INTO Document (document_title, document_name, document_kind, document_privacy, document_path) VALUES ('Root', 'Default', 0, 0, '/');
 
 
 --
