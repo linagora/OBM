@@ -67,6 +67,7 @@ if ($action == "index" || $action == "") {
   if($statistic["list"] == $c_all) {
     $cat_q = run_query_company_per_country_per_cat();
     $nb_comp = run_query_nb_company();
+    $display["title"] = display_title($l_header_comp_stats);
   }
   else {
     $obm_q = run_query_get_list($statistic["list"]);
@@ -74,8 +75,8 @@ if ($action == "index" || $action == "") {
     $com_q = run_query_get_selected_company($query,$statistic["list"]);
     $cat_q = run_query_selected_company_per_country_per_cat($com_q);
     $nb_comp = $com_q->nf();
+    $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
   }
-  $display["title"] = display_title("$l_header_comp_stats : ".$obm_q->f("list_name"));
   $display["detail"] = dis_cat_stats($cat_q, $nb_comp);
   $display["features"] = dis_menu_stats(); 
 }
@@ -142,7 +143,13 @@ function get_statistic_action() {
     'Condition'=> array ('None') 
                                         );
 
-
+// 
+  $actions["STATISTIC"]["company_statistic"] = array (
+    'Url'      => "$path/statistic/statistic_index.php?action=company_statistic",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                        );
+					
 // Sel user add : Users selection
   $actions["GROUP"]["sel_statistic"] = array (
     'Url'      => "$path/list/list_index?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=company_statistic",
