@@ -30,7 +30,7 @@ require_once("$obminclude/global.inc"); ?>
 <TD WIDTH="40%" align=center><H1>DEMO</H1></TD>
 <TD WIDTH="18%" align=center>&nbsp;</TD>
 <TD WIDTH="18%" align=right>
-<TABLE BORDER=0><TR><TD ALIGN=center><A HREF="../obm.php" TARGET="_top"><IMG BORDER=0 SRC="/images/standard/obm.jpg"></A></TD>
+<TABLE BORDER=0><TR><TD ALIGN=center><A HREF="../obm.php" TARGET="_top"><IMG BORDER=0 SRC="/images/images/obm.jpg"></A></TD>
 </TR>
 <TR>
 <TD ALIGN=center>&nbsp;</TD></TR>

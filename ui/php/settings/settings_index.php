@@ -118,7 +118,7 @@ echo "<TABLE border=1><TR BGCOLOR=\"#$col_tableh\">
    <TD align=center><FONT COLOR=\"#$col_textem\">$l_cur_theme</TD>
    </TR><TR>
    <TD align=center>
-     <IMG ALIGN=MIDDLE SRC=\"/images/flag-$set_lang.gif\">
+     <IMG ALIGN=MIDDLE SRC=\"/images/images/flag-$set_lang.gif\">
    </TD>
    <TD align=center>
      <IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$set_theme.jpg\">
@@ -148,7 +148,7 @@ while($entry=$lang_dir->read()) {
       && is_dir($lang_dir->path."/".$entry)) {
     echo "<TR><TD><A HREF=\"".
       $sess->url("settings_index.php?param_lang=$entry") . "\">" .
-      "<IMG BORDER=0 ALIGN=MIDDLE SRC=\"/images/flag-" . 
+      "<IMG BORDER=0 ALIGN=MIDDLE SRC=\"/images/images/flag-" . 
       $entry . ".gif\"></A>
       </TD></TR>";
   }

@@ -55,7 +55,7 @@ include("$obminclude/auth/md5.js"); ?>
 
 <BODY TEXT="#FFFFFF" BGCOLOR="#000000" LINK="#00CCCC" VLINK="#00CCCC">
 <CENTER><TABLE Width=100% BORDER=0><TR>
-<TD WIDTH="24%"><A HREF="http://www.aliacom.fr/"><IMG align=middle border=0 SRC="/images/standard/standard.jpg"></A><?php print $obm_version ?></TD>
+<TD WIDTH="24%"><A HREF="http://www.aliacom.fr/"><IMG align=middle border=0 SRC="/images/images/obm.jpg"></A><?php print $obm_version ?></TD>
 
 <TD WIDTH="18%" align=center>&nbsp;</TD>
 <TD WIDTH="40%" align=center><H1>DEMO</H1></TD>
