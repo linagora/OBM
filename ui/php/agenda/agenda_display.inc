@@ -759,32 +759,44 @@ function html_waiting_events($obm_wait) {
   global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate,$l_from;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
-
+   
   while ($obm_wait->next_record()) {
     $current_user = $obm_wait->f("userobm_id");
     $current_lname = $obm_wait->f("userobm_lastname");
     $current_fname = $obm_wait->f("userobm_firstname");
     if($current_user != $old_user) {
       $old_user = $current_user;
-      if($dis_waiting_events!="") {
-	$dis_waiting_events .= "</table>";
+      if($dis_events != "") {
+	if($is_repeat) {
+	  $dis_kind = $l_repeatkind;
+	  $dis_day = $l_repeatdays2;
+	  $dis_end = $l_use_endrepeat;
+	} else {
+	  $dis_kind = "";
+	  $dis_day = ""; 
+	  $dis_end = "";
+	}
+        $block .= "
+	<p/>
+	<div class=\"detailHead\">$current_fname $current_lname :</div>
+	<table class=\"detail\">
+	 <tr>
+	  <td class=\"detailText\">$l_title</td>
+	  <td class=\"detailText\">$l_cat</td>
+	  <td class=\"detailText\">$l_priority</td>
+	  <td class=\"detailText\">$l_from</td>
+	  <td class=\"detailText\">$dis_kind</td>
+	  <td class=\"detailText\">$dis_days</td>
+	  <td class=\"detailText\">$dis_end</td>     
+	  <td class=\"detailText\">$l_datebegin</td>
+	  <td class=\"detailText\">$l_dateend</td>
+	  <td></td>
+	</tr>
+	$dis_events
+	</table>";
       }
-      $dis_waiting_events .= "
-      <p/>
-      <div class=\"detailHead\">$current_fname $current_lname :</div>
-      <table class=\"detail\">
-       <tr>
-        <td class=\"detailText\">$l_title</td>
-        <td class=\"detailText\">$l_cat</td>
-        <td class=\"detailText\">$l_priority</td>
-	<td class=\"detailText\">$l_from</td>
-        <td class=\"detailText\">$l_repeatkind</td>
-	<td class=\"detailText\">$l_repeatdays2</td>
-	<td class=\"detailText\">$l_use_endrepeat</td>     
-	<td class=\"detailText\">$l_datebegin</td>
-	<td class=\"detailText\">$l_dateend</td>
-	<td></td>
-      </tr>";
+      $is_repeat = false;
+      $dis_events = "";
     }
     $kind = ${"l_".$obm_wait->f("calendarevent_repeatkind")};
     switch ($obm_wait->f("calendarevent_priority") ) {
@@ -813,8 +825,8 @@ function html_waiting_events($obm_wait) {
     $date_begin = datetime_format($obm_wait->f("calendarevent_date"));
     $date_end = datetime_format($obm_wait->f("calendarevent_date") + $obm_wait->f("calendarevent_duration"));
     $date_repeat = date_format($obm_wait->f("calendarevent_endrepeat"));
-    
-    $dis_waiting_events .= "
+    if ($kind != "none") {$is_repeat = true;}
+    $dis_events .= "
     <tr>
      <td class=\"detailForm\">".$obm_wait->f("calendarevent_title")."</td>
      <td class=\"detailForm\">".$obm_wait->f("calendarcategory_label")."</td>
@@ -839,11 +851,24 @@ function html_waiting_events($obm_wait) {
   }
   
   // --- HTML Template --------------------------------------------------------
-  $block = "
-    $dis_waiting_events
-   </table>
-  ";
-
+  $block .= "
+  <p/>
+  <div class=\"detailHead\">$current_fname $current_lname :</div>
+  <table class=\"detail\">
+   <tr>
+    <td class=\"detailText\">$l_title</td>
+    <td class=\"detailText\">$l_cat</td>
+    <td class=\"detailText\">$l_priority</td>
+    <td class=\"detailText\">$l_from</td>
+    <td class=\"detailText\">$dis_kind</td>
+    <td class=\"detailText\">$dis_days</td>
+    <td class=\"detailText\">$dis_end</td>     
+    <td class=\"detailText\">$l_datebegin</td>
+    <td class=\"detailText\">$l_dateend</td>
+    <td></td>
+  </tr>
+  $dis_events
+  </table>";
   return $block;
 }
  
