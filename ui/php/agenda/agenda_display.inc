@@ -211,7 +211,7 @@ echo "
 ///////////////////////////////////////////////////////////////////////////////
 function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   global $set_theme,$ico_left_day,$ico_right_day,$ico_spacer,$ico_new_event;
-  global $set_weekstart_default,$l_daysofweek,$l_description,$ico_event;
+  global $set_weekstart_default,$l_daysofweek,$l_description,$ico_event,$set_start_time,$set_stop_time;
 	
   $date = mktime(0,0,0,"$this_month","$this_day","$this_year");	
   $getdate = $agenda["date"];
@@ -264,7 +264,11 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $dis_month_cal .= "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"1\">\n";
     $dis_month_cal .= "<tr>\n";
     $dis_month_cal .= "<td colspan=\"$td_colspan\" class=\"agendaCell2\">\n";
-     $dis_month_cal .= "<a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink&amp;param_date_end=$daylink")."\" ><img align=\"left\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /></a>";
+    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($daylink)));
+    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($daylink)));
+    $dis_month_cal .= "<a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" />
+     <img align=\"left\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+    </a>";
   
     if (($check_month == $this_month)) {
       $dis_month_cal .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$daylink)."\">";
@@ -442,7 +446,15 @@ function dis_week_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     $week_day_list .= "<a class=\"agendaLink\" href=\"".url_prepare("agenda_index.php?action=view_day&amp;param_date=".$this_date)."\"> ";
     $week_day_list .= "$this_date_l</a>\n";
     $week_day_list .= "</td>\n";
-   $under_week_day_list .= "<td colspan=\"$td_colspan\" width=\"70\"  class=\"agendaCell\"><a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$this_date&amp;param_date_end=$this_date")."\" > <img align=\"middle\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /></a></td>";
+    $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($this_date)));
+    $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($this_date)));
+
+    $under_week_day_list .= "
+    <td colspan=\"$td_colspan\" width=\"70\"  class=\"agendaCell\">
+     <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > 
+      <img align=\"middle\" src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" />
+    </a>
+   </td>";
   }
 // Hour of the day
   for($i = $set_start_time; $i < $set_stop_time; $i++) {
@@ -1007,7 +1019,8 @@ function dis_day_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
     }
     $hour_day_list .=   "</tr>";
   }
-  
+  $daylink_begin = date("YmdHi",strtotime("+$set_start_time hours",strtotime($getdate)));
+  $daylink_end = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($getdate)));  
 echo "
 
 <table class=\"agendaMain\">
@@ -1034,7 +1047,7 @@ echo "
        </tr>
        <tr>
 	<td colspan=\"3\" class=\"agendaHead\">
-	 <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$getdate&amp;param_date_end=$getdate")."\" > <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /> </a>
+	 <a href=\"".url_prepare("agenda_index.php?action=new&amp;param_date_begin=$daylink_begin&amp;param_date_end=$daylink_end")."\" > <img src=\"/images/$set_theme/$ico_new_event\" alt=\"[New]\" /> </a>
 	</td>
        </tr>
       </table>

@@ -527,10 +527,10 @@ function get_param_agenda() {
     $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime(date("Ymd"))));
   }
   if (isset($param_date_begin)) { 
-    $agenda["date_begin"] = date("YmdHi",strtotime("+$set_start_time hours",strtotime($param_date_begin)));
+    $agenda["date_begin"] = $param_date_begin;
   }
   if (isset($param_date_end))   
-    $agenda["date_end"] = date("YmdHi",strtotime("+$set_stop_time hours",strtotime($param_date_end)));
+    $agenda["date_end"] = $param_date_end;
   if (isset($sel_repeat_kind)) $agenda["kind"] = $sel_repeat_kind;
   for ($i=0; $i<7; $i++) {
     if (isset(${"cb_repeatday_".$i}))  {
