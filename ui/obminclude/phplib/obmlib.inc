@@ -21,17 +21,26 @@ require("$obminclude/phplib/page4.inc");
 $db_type_mysql="MYSQL";
 
 //$db_type_pgsql="PGSQL";
-//////////////////////////////////////////////////////////////////////////////
-// OBM Classes                                                              //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// OBM Classes                                                               //
+///////////////////////////////////////////////////////////////////////////////
 
 class DB_OBM extends DB_Sql {
-  var $Host     = "localhost" ;
-  var $Database = "obm";             
-  var $type = "MYSQL" ;
-//  var $type     = "PGSQL";
-    var $User     = "root";
-    var $Password = "";
+  var $Host     = "";
+  var $Database = "";
+  var $type     = "";
+  var $User     = "";
+  var $Password = "";
+
+  function DB_OBM () {
+    global $obmdb_host, $obmdb_dbtype, $obmdb_db, $obmdb_user, $obmdb_password;
+
+    $this->Host     = "$obmdb_host";
+    $this->type     = "$obmdb_dbtype";
+    $this->Database = "$obmdb_db";
+    $this->User     = "$obmdb_user";
+    $this->Password = "$obmdb_password";
+  }
 }
 
 
@@ -213,6 +222,7 @@ class OBM_Perm extends Perm {
      display_err_msg($l_invalid_perm);
      display_end();
   }
+
   function check() {
     global $auth;
     global $actions, $action, $menu;
@@ -224,54 +234,5 @@ class OBM_Perm extends Perm {
 
 }
 
-##
-## Example_Menu may extend Menu.
-## If you name this class differently, you must also
-## rename its constructor function - this is a PHP language 
-## design stupidity.
-##
-## To use this, you must enable the require statement for
-## menu.inc in prepend.php3.
-##
-
-# class Example_Menu extends Menu {
-#   var $classname = "Example_Menu";
-#
-#   # Map of PHP_SELF URL strings to menu positions
-#   var $urlmap = array(
-#     "/menu/index.php"   => "",
-#     "/menu/item1.php"   => "/1",
-#     "/menu/item11.php"  => "/1/1",
-#     "/menu/item12.php"  => "/1/2",
-#     "/menu/item13.php"  => "/1/3",
-#     "/menu/item2.php"   => "/2",
-#     "/menu/item21.php"  => "/2/1",
-#     "/menu/item22.php"  => "/2/2",
-#     "/menu/item221.php" => "/2/2/1",
-#     "/menu/item222.php" => "/2/2/2",
-#     "/menu/item23.php"  => "/2/3",
-#     "/menu/item24.php"  => "/2/4"
-#   );
-#   
-#   # Information about each menu item
-#   var $item = array(
-#     ""      => array("title" => "Main"),
-#     "/1"    => array("title" => "Text 1"),
-#     "/1/1"  => array("title" => "Text 1.1"),
-#     "/1/2"  => array("title" => "Text 1.2"),
-#     "/1/3"  => array("title" => "Text 1.3"),
-#     "/2"    => array("title" => "Text 2"),
-#     "/2/1"  => array("title" => "Text 2.1"),
-#     "/2/2"  => array("title" => "Text 2.2"),
-#     "/2/2/1"=> array("title" => "Text 2.2.1"),
-#     "/2/2/2"=> array("title" => "Text 2.2.2"),
-#     "/2/3"  => array("title" => "Text 2.3"),
-#     "/2/4"  => array("title" => "Text 2.4")
-#   );
-#   
-#   function Example_Menu() {
-#     $this->setup();
-#   }
-# }
 
 </SCRIPT>

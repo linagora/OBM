@@ -491,7 +491,7 @@ function html_contact_form($action, $co_q, $kind_q, $contact) {
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }
   if (isset($contact["ad2"])) { $ad2 = stripslashes($contact["ad2"]); }
-  if (isset($contact["ad3"])) { $ad2 = stripslashes($contact["ad3"]); }
+  if (isset($contact["ad3"])) { $ad3 = stripslashes($contact["ad3"]); }
   if (isset($contact["zip"])) { $zip = stripslashes($contact["zip"]); }
   if (isset($contact["town"])) { $town = stripslashes($contact["town"]); }
   if (isset($contact["cdx"])) { $cdx = stripslashes($contact["cdx"]); }

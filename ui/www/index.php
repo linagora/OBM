@@ -27,7 +27,7 @@
         <div align="left"><b>2003-10-13</b> : version <b>0.7.2</b> released (major fixes)
         <ol>
           <li> Major fixes on install script (Todo table)
-          <li> Minor fixes in Contract, Incident
+          <li> Minor fixes in Contract, Incident, Project and Todo
         </ol>
         </div>
         <br />

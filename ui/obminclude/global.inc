@@ -7,7 +7,10 @@
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
 
-$obm_version = "0.7.2";
+
+require_once("$obminclude/obm_conf.inc");
+
+$obm_version = "0.7.3pre1";
 $l_title = "O.B.M.";
 
 // Bookmarks default
@@ -28,7 +31,7 @@ $default_mime = "application/octet-stream"; //Default Mime Type
 $default_path = "/Default"; //Default repository
 
 // Agenda constants
-$set_weekstart_default = "monday"; //First day of the week, in english
+$set_weekstart_default = "monday"; // First day of the week, in english
 $set_start_time = '8'; // first hour of the day
 $set_stop_time = '20'; // last hour of the day
 
@@ -95,9 +98,6 @@ $c_all = "_ALL_";		// Used in Form select
 $c_auto = "_AUTO_";
 $c_yes = "Yes";			// Maybe stored in database
 $c_no = "No";
-
-// Mail.
-$gp_mail_enabled = 0;
 
 // Display size
 $popup_width = 620;

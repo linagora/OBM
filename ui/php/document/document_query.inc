@@ -1,14 +1,14 @@
 <SCRIPT language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM - File : document_query.inc                                            //
-//     - Desc : document query File                                           //
-//  2003-08-21 Mehdi Rande                                               //
+// OBM - File : document_query.inc                                           //
+//     - Desc : document query File                                          //
+//  2003-08-21 Mehdi Rande                                                   //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Category 1 query execution                                              //
+// Category 1 query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -24,7 +24,7 @@ function run_query_documentcategory1() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Category 2 query execution                                              //
+// Category 2 query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -40,7 +40,7 @@ function run_query_documentcategory2() {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-//  Category 2 query execution                                              //
+// Category 2 query execution
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -57,7 +57,7 @@ function run_query_documentmime() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Document search query execution                                            //
+// Document search query execution                                           //
 // Parametes:
 //   - $document[]    : document search criteria
 //     keys used       archive, name, phone, kind, zip
@@ -237,7 +237,8 @@ function run_query_insert(&$document) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-  if($entity != "") {
+
+  if ($entity != "") {
     $document["entity_id"] = "";
     $document["entity"] = "";
     $new_doc = run_query_search ($document, $new_order, $order_dir);
@@ -260,13 +261,13 @@ function run_query_insert(&$document) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of an uploaded file
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_mime($document){
   global $default_mime;
   $path = $document["path"];
@@ -307,13 +308,13 @@ function run_query_get_mime($document){
   return $return ;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a disk file
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_mimetype($path){
   global $default_mime;
   $ext = substr(strrchr($path,'.'),1);
@@ -324,6 +325,7 @@ function run_query_get_mimetype($path){
   $return = run_query_get_type_mime_by_mime($default_mime);
   return $return ;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Deletion query execution                                                  //
@@ -360,12 +362,13 @@ function run_query_delete($p_id) {
 
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
 //   - $type : Mime-Type
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_document_links($document_id) {
   $obm_q = new DB_OBM;
   $obm_q2 = new DB_OBM;
@@ -376,12 +379,13 @@ function run_query_document_links($document_id) {
   return $obm_q->nf();
 
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
 //   - $type : Mime-Type
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_type_by_mime($type) {
   global $auth, $cdg_sql;
 
@@ -396,12 +400,13 @@ function run_query_get_type_by_mime($type) {
   else 
     return false;
 }                   
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
 //   - $ext : Extension 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_type_by_ext($ext) {
   global $auth, $cdg_sql;
 
@@ -417,12 +422,12 @@ function run_query_get_type_by_ext($ext) {
     return false;
 }   
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
 //   - $ext : Extension 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_type_mime_by_ext($ext) {
   global $auth, $cdg_sql;
 
@@ -437,12 +442,13 @@ function run_query_get_type_mime_by_ext($ext) {
   else 
     return false;
 }   
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the Mime Type of a file
 // Parameters:
 //   - $ext : Extension 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_get_type_mime_by_mime($mime) {
   global $auth, $cdg_sql;
 
@@ -460,23 +466,22 @@ function run_query_get_type_mime_by_mime($mime) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Delete File query execution                                                 //
+// Delete File query execution
 // Parameters:
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_delete_file($path,$name) {
   global $document_path;
   @unlink($document_path.'/'.$path.'/'.$name);
   return true;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Create File query execution                                                 //
+// Create File query execution                                               //
 // Parameters:
 //   - $document[] : Entry's values
 //     keys used  : 
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_create_file($document) {
   global $document_path;
   $path = $document["path"];
@@ -506,13 +511,11 @@ function run_query_create_file($document) {
   }
   return true; 
   
-
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Document Form Data checking and formatting                                 //
+// Document Form Data checking and formatting                                //
 // Parameters:
 //   - $cid   : document id
 //   - $document[] : values checked
@@ -589,6 +592,7 @@ function check_data_form($cid, $document) {
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_detail($document) {
   global $db_type_mysql,$db_type_pgsql, $cdg_sql;
+
   $p_id = $document["id"];
   $name = $document["name"];
   $path = $document["path"];
@@ -614,6 +618,7 @@ function run_query_detail($document) {
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Detail query execution                                                    //
@@ -642,6 +647,7 @@ function run_query_detail_by_path($path,$name) {
   }
   return false;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Update query execution                                                    //
@@ -738,7 +744,7 @@ function run_query_update($did, &$document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category1 insertion query construction and execution                           //
+// Category1 insertion query construction and execution
 // Parameters:
 //   - $document : document hash info : keys used : kind_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -767,7 +773,7 @@ function run_query_cat1_insert($document) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Category2 insertion query construction and execution                           //
+// Category2 insertion query construction and execution
 // Parameters:
 //   - $document : document hash info : keys used : kind_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -794,8 +800,9 @@ function run_query_cat2_insert($document) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Mime Type insertion query construction and execution                           //
+// Mime Type insertion query construction and execution
 // Parameters:
 //   - $document : document hash info : keys used : kind_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -829,8 +836,9 @@ function run_query_mime_insert($document) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category 1  update query execution                                           //
+// Category 1  update query execution
 // Parameters:
 //   - $document : document hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -857,9 +865,8 @@ function run_query_cat2_update($document) {
 }
 
 
-
 ///////////////////////////////////////////////////////////////////////////////
-// Category 1 update query execution                                           //
+// Category 1 update query execution
 // Parameters:
 //   - $document : document hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -884,8 +891,9 @@ function run_query_cat1_update($document) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category 2 update query execution                                           //
+// Category 2 update query execution
 // Parameters:
 //   - $document : document hash info : keys used : act, act_label
 ///////////////////////////////////////////////////////////////////////////////
@@ -914,6 +922,7 @@ function run_query_mime_update($document) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Category from its id                                  //
 // Parameters:
@@ -937,7 +946,7 @@ function get_cat1_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Document links query execution                                  //
+// Activity - Document links query execution
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
@@ -953,6 +962,7 @@ function run_query_cat1_links($p_id) {
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Category from its id                                  //
@@ -977,7 +987,7 @@ function get_cat2_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Document links query execution                                  //
+// Activity - Document links query execution                                 //
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
@@ -993,6 +1003,7 @@ function run_query_cat2_links($p_id) {
 
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Get the label of an Category from its id                                  //
@@ -1017,7 +1028,7 @@ function get_mime_label($id) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Activity - Document links query execution                                  //
+// Activity - Document links query execution
 // Parameters:
 //   - $p_id : activity id
 ///////////////////////////////////////////////////////////////////////////////
@@ -1034,8 +1045,9 @@ function run_query_mime_links($p_id) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category1 deletion query execution                                             //
+// Category1 deletion query execution
 // Parameters:
 //   - $id : Category1 id to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -1051,8 +1063,9 @@ function run_query_cat1_delete($id) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category2 deletion query execution                                             //
+// Category2 deletion query execution
 // Parameters:
 //   - $id : Category2 id to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -1068,8 +1081,9 @@ function run_query_cat2_delete($id) {
   return $retour;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Mime Type deletion query execution                                             //
+// Mime Type deletion query execution
 // Parameters:
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
@@ -1084,15 +1098,17 @@ function run_query_mime_delete($id) {
 
   return $retour;
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-//Repository Creation                                             //
+// Repository Creation
 // Parameters:
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_insert_repository($document) {
   global $cdg_sql;  
   global $document_path,$auth;
+
   $path = $document["repository_path"];
   $name = $document["repository_name"];
   if(strrpos($path,'/') != strlen($path) -1) {
@@ -1139,18 +1155,19 @@ function run_query_insert_repository($document) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-  return true;
 
+  return true;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-//Repository Creation                                             //
+// Repository Creation
 // Parameters:
 //   - $id : Mime Type id to delete
 ///////////////////////////////////////////////////////////////////////////////
-
 function run_query_create_repository($document) {
   global $document_path;
+
   $path = $document["repository_path"];
   $name = $document["repository_name"];
   if(strpos($path,'/') === 0) {
@@ -1174,10 +1191,11 @@ function run_query_create_repository($document) {
   if(!@mkdir($directory,0755))
     return false;
   return true; 
-
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
-// Document Form Data checking and formatting                                 //
+// Document Form Data checking and formatting
 // Parameters:
 //   - $document[] : values checked
 //     keys used  : num, name, zip, phone, fax, web, email
@@ -1187,6 +1205,7 @@ function run_query_create_repository($document) {
 function check_repository_data_form($document) {
   global $document_path,$err_msg;
   global $l_invalid_repository_path,$l_fill_repository_name;
+
   $name = $document["repository_name"];
   $path = $document["repository_path"];
   // MANDATORY: Document Title 
@@ -1209,13 +1228,13 @@ function check_repository_data_form($document) {
   }
 
   return true;
-
 }
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Tell if the file is a link or not.
 // return true if it is false else
 ///////////////////////////////////////////////////////////////////////////////
-
 function islink($filename) {
 
   if(substr_count($filename,'/')>0) {
@@ -1224,25 +1243,24 @@ function islink($filename) {
   return false;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Tell if the file is a link or not.
 // return true if it is false else
 ///////////////////////////////////////////////////////////////////////////////
-
 function getlink($name,$path) {
   return $name;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Query to build the file tree                                //
+// Query to build the file tree
 // Parameters:
 //   - $display_file : bolean
-
 ///////////////////////////////////////////////////////////////////////////////
-
-
 function run_query_get_tree($display_file) {
   global $cdg_sql,$auth;
+
   $where = "where (document_private = '0' OR (document_private = '1' AND document_usercreate = ".$auth->auth["uid"]."))";
   if($display_file != "true") {
     $where .= " AND document_kind = '0'";
