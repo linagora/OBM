@@ -1,11 +1,11 @@
-<SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : Italian                                                 //
-//     - File     : settings.inc                                            //
-// 01/08/2002 Augusto Fagioli                                               //
-//////////////////////////////////////////////////////////////////////////////
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italian                                                  //
+//     - File     : settings.inc                                             //
+// 2002-08-01 Augusto Fagioli - augusto@fagioli.biz                          //
+///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
-//////////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
 
 $l_settings = "Impostazioni";
 $l_cur_settings = "Impostazioni Attuali";
@@ -18,18 +18,18 @@ $l_set_lang = "Scegli la lingua";
 $l_set_theme = "Scegli la grafica";
 $l_set_menu = "Menu display";
 $l_set_rows = "Quante righe per pagina?";
-$l_set_date = "Date format";
-$l_set_commentorder = "Comment display";
-$l_set_cal_interval = "Calendar interval";
+$l_set_date = "Formato Data";
+$l_set_commentorder = "Display del  Commento";
+$l_set_cal_interval = "Intervallo del calendario";
 $l_set_csv_sep = "CSV Export separator";
-$l_set_debug = "Debugging level";
-$l_send_mail = "Accept e-mails";
+$l_set_debug = "Livello Degug";
+$l_send_mail = "Accetta e-mail";
 
-$l_update_ok = "Settings updated successfully";
+$l_update_ok = "Modifica eseguita";
 
 $l_dg_id = "Id";
-$l_dg_param = "Parameters";
-$l_dg_sess = "Session";
+$l_dg_param = "Parametri";
+$l_dg_sess = "Sessione";
 $l_dg_sql = "SQL";
 
 $l_da_iso = "yyyy-mm-dd";
@@ -41,8 +41,8 @@ $l_me_txt = "text";
 $l_me_ico = "icon";
 $l_me_both = "text+icon";
 
-$l_co_chro = "Chronological";
-$l_co_rev = "Reverse";
+$l_co_chro = "Cronologico";
+$l_co_rev = "Inverso";
 
 $l_csvd_sc = ";";
 $l_csvd_tab = "tab";

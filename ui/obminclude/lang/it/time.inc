@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : time.inc                                                 //
@@ -8,16 +8,16 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 // for list
-$l_task_fac = "Factured Tasks";
-$l_task_int = "Internal Tasks";
+$l_task_fac = "Operazione Factured";
+$l_task_int = "Operazione Interna";
 
 // Database fields
-$l_taskdate="Data Task";
-$l_tasktype = "Tipo Task";
+$l_taskdate="Data Operazione";
+$l_tasktype = "Tipo Operazione";
 $l_project = "Progetto:";
-$l_task_del="Elimina ?";
+$l_task_del="Elimina?";
 $l_company = "Azienda";
-$l_delete = "Elimina  Tasks";
+$l_delete = "Elimina  Operazioni";
 $l_length="Durata";
 $l_total_length="Durata totale";
 $l_task_del="Elimina.";
@@ -50,11 +50,11 @@ $l_from_company = "&nbsp;&nbsp;Azienda";
 $l_telother = "Altri tel";
 $l_private = "Privato";
 $l_public = "Pubblico";
-$l_contact_select_company = "Séleziona la società del contatto.";
+$l_contact_select_company = "Seleziona la società del contatto.";
 $l_week_prev = "Settimana precedente";
 $l_week_next = "Prossima settimana";
 $l_date = "Data:";
-$l_task = "Task:";
+$l_task = "Operazione:";
 $l_label = "Etichetta:";
 $l_duration = "Durata:";
 
@@ -72,26 +72,26 @@ $l_projects_manager = "Projects managers conferma tasks qui:";
 $l_check_samecontact = "Questi contatti sembrano simili al nuovo !";
 $l_link_deal = "Il Contatto ha questo affari...";
 $l_link_deal_no = "Il contatto non h affari ";
-$l_link_list = "Il contatto è registrato in queste liste ...";
-$l_link_list_no = "il contatto non è presente nelle liste...";
-$l_cant_delete = "Il contatto non può essere eliminato!";
+$l_link_list = "Il contatto è registrato in queste liste:";
+$l_link_list_no = "il contatto non è presente nelle liste:";
+$l_cant_delete = "Il contatto non può essere eliminato";
 $l_can_delete = "Contatto eliminabile.";
 $l_no_display = "Riempi i campi e click su < TROVA > per eseguire la ricerca.";
-$l_found_task = "Tasks della settimana:";
-$l_found = "trovati tasks.";
-$l_no_found = "Nessun task per l'utente";
+$l_found_task = "Operazioni della settimana:";
+$l_found = "trovate operazioni.";
+$l_no_found = "Nessuna operazione per l'utente";
 $l_addtask_start = "Inserisci l'informazione per la settimana corrente. La durata è una frazione di giorno (tra  1/";
 $l_addtask_end = " e 1).";
 $l_modtask = "Modifica task:";
-$l_total_day = "Vista giornaliera. Se il giorno è completo,<BR> Confirm it by selecting complet days and validate form.";
-$l_total_deal = "Summary by task:";
+$l_total_day = "Vista giornaliera. Se il giorno è completo,<BR> conferma qui selezionando i giorni and validate form.";
+$l_total_deal = "Lista per operazione:";
 $l_delete_ok = "Contatto eliminato.";
 $l_delete_error = "Eliminazione contatto fallita!";
 $l_insert_ok = "Contatto creato.";
 $l_insert_error = "Inserimento Contatto fallito !";
 $l_update_ok = "Contatto modificato.";
 $l_update_error = "Modifica contatto fallita!";
-$l_query_error = "Errore di query ...";
+$l_query_error = "Query errata";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
 $l_fill_lastname = "Inserisci prima il nome.";

@@ -1,32 +1,32 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : contract.inc                                             //
-// 02/08/2002  Augusto Fagioli                                               //
+// 2002-08-02  Augusto Fagioli -  augusto@fagioli.biz                        //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
 $l_contract = "Contratto";
-$l_company = "Company";
+$l_company = "Azienda";
 $l_contract_contracttype = "Tipo di contratto";
-$l_contract_exp = "Expiration";
-$l_date_alarm_after = "Scadenza date Dopo";
-$l_date_alarm_before = "Scadenza date Prima";
-$l_after = "Scadenza data Dopo";
-$l_before = "Scadenza data Prima";
-$l_incident_list = "List di the Incidents";
-$l_incident_new = "Aggiungi a nuovo Incident";
+$l_contract_exp = "Scadenza";
+$l_date_alarm_after = "Data Scadenza Dopo";
+$l_date_alarm_before = "Data Scadenza Prima";
+$l_after = "Data Scadenza Dopo";
+$l_before = "Data Scadenza Prima";
+$l_incident_list = "Elenco degli eventi";
+$l_incident_new = "Aggiungi a nuovo evento";
 
-$l_contract_select_deal = "Sélection de l'Affaire liée à un contrat.";
+$l_contract_select_deal = "Scegli un affare per un contratto";
 $l_deal = "Impegno";
-$l_label = "Label";
-$l_label_libelle = "Key-word di the etichetta";
+$l_label = "Etichette";
+$l_label_libelle = "parola chiave etichetta";
 $l_kind = "Tipo";
-$l_marketing_manager = "Marketing Resp.";
-$l_technical_manager = "Tecnico Resp.";
-$l_client_manager = "Client Resp.";
+$l_marketing_manager = "Responsabile Marketing";
+$l_technical_manager = "Responsabile Tecnico";
+$l_client_manager = "Responsabile Client";
 $l_clause = "Clauses";
 $l_date_init = "Data inizio";
 $l_dateexp = "Data scadenza ";
@@ -53,15 +53,15 @@ $l_insert_error = "Inserimento Contratto fallito !";
 $l_update_ok = "Contratto modificato.";
 $l_update_error = "Modifica Contratto fallita !";
 
-$l_link_incident = "The contract has these incidents";
-$l_link_incident_no = "The contract hasn't any incident";
-$l_cant_delete = "The contract can't be deleted !";
-$l_can_delete = "The contract can be deleted.";
+$l_link_incident = "Il contratto ha i seguenti eventi";
+$l_link_incident_no = "Il contratto non ha eventi";
+$l_cant_delete = "Il contratto non può essere eliminato";
+$l_can_delete = "Contratto eliminabile";
 
 $l_type_manage = "Supporto Contratto Tipo management";
 $l_type_exist = "Tipo esistenti";
 $l_type_new = "Nuovo Tipo";
-$l_type_checkdelete = "Check o Cancella Tipo"; 
+$l_type_checkdelete = "Check o Cancella Tipo";
 $l_type_delete = "Cancella Tipo";
 $l_type_update = "Aggiorna Tipo";
 $l_type_insert = "Crea Tipo";
@@ -75,15 +75,15 @@ $l_type_can_delete = "Tipo eliminabile";
 $l_type_cant_delete = "Tipo NON può essere eliminato";
 $l_type_link_contract = "Tipo richiesto per questi Contratti";
 
-$l_err_label_empty = "You must fill the label !";
+$l_err_label_empty = "Inserisci l'etichetta";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_contract = "You have to select a azienda !";
-$l_delete_confirm = "Confermi eliminazione the Contratto ?";
+$l_j_select_contract = "Seleziona una azienda";
+$l_delete_confirm = "Confermi eliminazione del Contratto ?";
 
-$l_j_type_delete = "You have to select a Tipo to eliminazione it !";
-$l_j_type_update = "You have to select a Tipo and enter a modification to submit !";
-$l_j_type_create = "You have to enter a nuovo Tipo name to create it !";
+$l_j_type_delete = "Seleziona il tipo per l'eliminazione";
+$l_j_type_update = "Seleziona un tipo ed inserisci una modifica da inviare";
+$l_j_type_create = "Inserisci un nuovo nome per il TIPO da creare ";
 
 // For the display preferences modification screen
 $l_contract_display = "Opzioni visualizzazione per Supporto contratti";

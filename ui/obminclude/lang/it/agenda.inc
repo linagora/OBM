@@ -1,8 +1,8 @@
-<?php
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : agenda.inc                                               //
-// 2002-08-13 Augusto Fagioli                                                //
+// 2002-08-13 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,12 +12,12 @@ $l_users = "Contatti";
 $l_groups = "Gruppi";
 $l_title = "Titolo";
 $l_private = "Privato";
-$l_private_description = "This is a private event, you cannot see the details";
+$l_private_description = "L'Evento è privato. non è possibile visualizzare i dettagli";
 $l_public  = "Pubblico";
 $l_category = "Categoria";
 $l_description = "Descrizione";
 $l_state = "Stato";
-$l_back_mono = "Back to your own view";
+$l_back_mono = "Torna alla tua impostazione";
 
 $l_high = "Alta";
 $l_low = "Bassa";
@@ -27,12 +27,12 @@ $l_datebegin = "Data di inizio";
 $l_dateend = "Date fine";
 $l_timebegin = "Ora inizio";
 $l_timeend = "Ora fine ";
-$l_occupied_day = "Giorno occupata";
+$l_occupied_day = "Giorno occupato";
 
 $l_repeat = "Ripatizione";
 $l_periodicity = "Frequenza";
 $l_repeatkind = "Tipo di ripetizione";
-$l_repeatdays = "Giorni di ripetizione (type hebdomadaire)";
+$l_repeatdays = "Giorni di ripetizione";
 $l_use_endrepeat = "Data fine ripetizione";
 $l_interval = "Intervallo ";
 
@@ -56,9 +56,9 @@ $l_to = "al";
 
 // actions
 $l_insert = "Registra l'appuntamento ";
-$l_update = "Modifier le appuntamento";
-$l_delete = "Supprimer le appuntamento";
-$l_delete_all = "elimina tutti";
+$l_update = "Modifica l'appuntamento";
+$l_delete = "Elimina l'appuntamento";
+$l_delete_all = "Elimina tutti";
 $l_accept = "Accetta";
 $l_reject = "Respingi";
 $l_select = "Scegli";
@@ -111,7 +111,8 @@ $mj_delete_confirm = "Confirmi eliminazine appuntamento ?";
 $mj_invalid_day = "Giorno non esistente nel mese selezionato.";
 $mj_date_incompatibility = "Data di fine anteriore a quella di inizio.";
 $mj_repeat_date_incompatibility = "Data di fine ripetizione anteriore a quella di inizio.";
-$mj_event_delete_confirm = "Confirmi eliminazione dellappuntamento ?";
-$mj_event_delete_all_confirm = "Confirmi eliminazione dell'appuntamento e delle ripetizioni ?";
+$mj_event_delete_confirm = "Confermi eliminazione dell'appuntamento ?";
+$mj_event_delete_all_confirm = "Confermi eliminazione dell'appuntamento e delle ripetizioni ?";
 
 ?>
+                                                       s

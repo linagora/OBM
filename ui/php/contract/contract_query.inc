@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : contract_query.inc                                           //
 //     - Desc : Contract Support query File                                  //
-// 2002-02-02 : Cedric Bellegarde
+// 2002-02-02 : Aliacom - Cedric Bellegarde
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$
 ///////////////////////////////////////////////////////////////////////////////
@@ -30,8 +30,11 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
 
   $order = (strcmp($p_new_order,"") != 0) ? $p_new_order : "contract_dateexp";
   
-  $connect_db = new DB_OBM;
-  
+  $obm_q = new DB_OBM;
+  $type = $obm_q->type;
+
+  $dateexp = sql_date_format($type, "contract_dateexp", "contract_dateexp");
+
   $query = "select contract_label,
       contract_id,
       contract_id as Id,
@@ -40,13 +43,12 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
       contract_company_id,
       company_name as contract_company_name,
       contracttype_label,
-      contract_dateexp,
       contract_type_id,
       contract_techmanager_id,
       contract_marketmanager_id,
       u1.userobm_lastname as ltech, u1.userobm_firstname as ftech,
       u2.userobm_lastname as lmarket, u2.userobm_firstname as fmarket,
-      UNIX_TIMESTAMP(contract_dateexp) as contract_dateexp
+      $dateexp
     from (((Contract
       left join UserObm u1 on contract_techmanager_id=u1.userobm_id)
       left join UserObm u2 on contract_marketmanager_id=u2.userobm_id)
@@ -82,8 +84,8 @@ function run_query_search($contract, $p_new_order, $p_order_dir) {
   $query .= " order by $order $p_order_dir";
 
   display_debug_msg($query, $cdg_sql);
-  $connect_db->query($query);
-  return($connect_db);
+  $obm_q->query($query);
+  return($obm_q);
 
 }
 

@@ -571,7 +571,7 @@ function html_contact_form($action, $co_q, $dsrc_q, $kind_q, $func_q, $usr_q, $c
   if (isset($contact["usercreate"])) { $usercreate = $contact["usercreate"]; }
   if (isset($contact["datasource"])) { $dsrc = $contact["datasource"]; }
   if (isset($contact["kind"])) { $kind = $contact["kind"]; }
-  if (isset($contact["market"])) { $mark = $contact["market"]; }
+  if (isset($contact["marketing_manager"])) { $mark = $contact["marketing_manager"]; }
   if (isset($contact["lname"])) { $lname = stripslashes($contact["lname"]); }
   if (isset($contact["fname"])) { $fname = stripslashes($contact["fname"]); }
   if (isset($contact["ad1"])) { $ad1 = stripslashes($contact["ad1"]); }

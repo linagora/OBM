@@ -2,7 +2,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : list.inc                                                 //
-// 01-08-2002 Augusto Fagioli                                                //
+// 2002-08-01 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ $l_list_set = "Imposta Lista";
 $l_export_format = "Formati di esportazione";
 $l_desc = "Descrizione";
 $l_export_intro = "Seleziona il formato di esportazione";
-$l_select_list = "Select the lists to be exported";
+$l_select_list = "Seleziona le liste da esportare";
 
 // Contact
 $l_lastname = "Cognome";
@@ -54,10 +54,10 @@ $l_name_list_nomatch = "Nome lista non valido";
 $l_list_exists = "Lista già esistente";
 $l_check_samelist = "Liste simili alla nuova!";
 $l_j_check_email = "Email non valida.";
-$l_warn_delete = "contatti in lista";
+$l_warn_delete = "Contatti in lista";
 
 $l_no_display = "Scrivi i campi e click < TROVA > per la ricerca";
-$l_found = "liste trovate.";
+$l_found = "Liste trovate.";
 $l_no_found = "Nessuna lista trovata." ;
 
 $l_add_contact = "Inserisci contatti" ;
@@ -66,27 +66,27 @@ $l_contact_added = "Contatti inseriti";
 $l_contact_removed = "Contatti eliminati";
 
 $l_fill_subject = "Oggeto non valido";
-$l_invalid_query = "The query is invalid !";
-$l_banned_word = "Banned word";
-$l_hungry_query = "The query need too much resource !";
+$l_invalid_query = "Query non valida";
+$l_banned_word = "Parola bloccata";
+$l_hungry_query = "Questa query richiede troppe risorse";
 
-$l_static_con_found = "Static Contatti registrati";
-$l_no_static_contact = "Non sono presenti static contatti registrati";
-$l_dyn_con_found = "Dynamic Contatti registrati";
-$l_no_dyn_contact = "Non sono presenti dynamic contatti registrati";
+$l_static_con_found = "Contatti staatici registrati";
+$l_no_static_contact = "Non sono presenti contatti statici registrati";
+$l_dyn_con_found = "Contatti dinamici registrati";
+$l_no_dyn_contact = "Non sono presenti contatti dinamici registrati";
 
 //------------------------------------//
 // Export Format informations         //
 //------------------------------------//
 // Format 0 : HTML Stickers
-$c_export_format[0]["name"] = "HTML Stickers";
-$c_export_format[0]["info"] = "HTML Preview for stickers";
+$c_export_format[0]["name"] = "Etichette HTML";
+$c_export_format[0]["info"] = "Anteprima Etichette HTML";
 // Format 1 :
-$c_export_format[1]["name"] = "HTML Table";
-$c_export_format[1]["info"] = "HTML Preview for table";
+$c_export_format[1]["name"] = "Tabella HTML";
+$c_export_format[1]["info"] = "Anteprima tabellla HTML";
 // Format 2 : RTF Stickers
-$c_export_format[2]["name"] = "RTF Stickers";
-$c_export_format[2]["info"] = "RTF Sticker creation";
+$c_export_format[2]["name"] = "Etichette RTF";
+$c_export_format[2]["info"] = "Creazione Etichette RTF";
 // Format 3 : Excel data
-$c_export_format[3]["name"] = "Excel Table";
-$c_export_format[3]["info"] = "Excel table data";
+$c_export_format[3]["name"] = "Tabella Excel";
+$c_export_format[3]["info"] = "Dati Tabella Excel";

@@ -2,63 +2,63 @@
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italian                                                  //
 //     - File     : incident.inc                                             //
-// 2001-08-20 Pierre Baudracco                                               //
+// 2001-08-20 Pierre Baudracco - Augusto Fagioli                             //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
 
 // Fields Label
-$l_label = "Label";
-$l_status = "Status";
-$l_date = "Date";
-$l_owner = "Owner";
-$l_logger = "Technical manager";
-$l_duration = "Resolution duration";
-$l_description = "Description";
-$l_solution = "Solution founded";
-$l_num = "Number of Contract";
-$l_contract = "Label of Contract";
-$l_date_before ="Date Before";
-$l_date_after ="Date After";
-$l_to = "To"; 
-$l_from = "From";
-$l_manager = "Managers";
-$l_client_manager = "Client Managers";
-$l_lastupdate = "Date of last update";
-$l_archive_new = "To File";
-$l_archive_consult = "Filed";
-$l_company = "Company";
+$l_label = "Etichetta";
+$l_status = "Stato";
+$l_date = "Data";
+$l_owner = "Possessore";
+$l_logger = "Resp. Tecnico";
+$l_duration = "Durata";
+$l_description = "Descrizione";
+$l_solution = "Solutione trovata";
+$l_num = "Numero del Contratto ";
+$l_contract = "Etichetta del Contratto";
+$l_date_before ="Data Precedente";
+$l_date_after ="Data Seguente";
+$l_to = "A";
+$l_from = "Da";
+$l_manager = "Responsabile";
+$l_client_manager = "Responsabile Clienti";
+$l_lastupdate = "Data ultima modifica";
+$l_archive_new = "In Archivio";
+$l_archive_consult = "Archiviato";
+$l_company = "Azienda";
 
-// Title 
+// Title
 $l_redhot = "Redhot";
 $l_hot = "Hot";
-$l_normal = "Normal";
-$l_low = "Low";
-$l_open = "Open";
-$l_call = "Call";
-$l_waitcall = "Wait Call";
-$l_paused = "Paused";
-$l_closed = "Closed";
+$l_normal = "Normale";
+$l_low = "Basso";
+$l_open = "Aperto";
+$l_call = "Chiamata";
+$l_waitcall = "Attendi Chiamata";
+$l_paused = "Pausa";
+$l_closed = "Chiuso";
 
 // Action
-$l_select_contract = "Select the Contract";
-$l_insert = "Record the Incident";
-$l_update = "Modify the Incident";
-$l_checkdelete = "Delete the Incident";
+$l_select_contract = "Seleziona il Contratto ";
+$l_insert = "Registra l'operazione";
+$l_update = "Modofica the Operazione";
+$l_checkdelete = "Elimina the Operazione";
 
 // Messages
-$l_found = "incidents found";
-$l_no_found = "No incident found matching the query !";
-$l_insert_ok = "The incident has been inserted successfully.";
-$l_delete_ok = "The incident has been deleted successfully.";
-$l_no_display = "Fill the search fields and press < Find > to retrieve the Incidents";
-$l_select_contract = "Select the contract of the Incident";
+$l_found = "Operazione trovate";
+$l_no_found = "Nessuna Operazione trovata";
+$l_insert_ok = "L'Operazione è stata inserita.";
+$l_delete_ok = "L'Operazione è stata eliminata.";
+$l_no_display = "Riempi i campi di ricerca e premi < Trova > per la lista.";
+$l_select_contract = "Seleziona il contratto dell'operazione";
 
-// For the display preferences modification screen 
-$l_incident_display = "Display options for Incidents";
+// For the display preferences modification screen
+$l_incident_display = "Mostra le opzioni per le Operazioni ";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_length_label = "The Label is too long";
-$l_j_select_contract = "You have to select a contract !";
-$l_delete_confirm="Really delete the Incident ?";
-$l_date_after_js ="Date After";
+$l_length_label = "L'Etichetta è tropo lunga";
+$l_j_select_contract = "Seleziona un contratto";
+$l_delete_confirm="Confermi eliminazione dell'Operazione ?";
+$l_date_after_js ="Data Seguente";

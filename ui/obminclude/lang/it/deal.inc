@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : deal.inc                                                 //
-// 02-08-2002 Augusto Fagioli                                                //
+// 2002-08-02 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -16,7 +16,7 @@ $l_task_int = "Impegni interni";
 $l_number = "Numero";
 $l_label = "Nome";
 $l_date_init = "Data inizio";
-$l_parentdeal="Sub-Impegno";
+$l_parentdeal="Impegno";
 $l_kind = "Tipo";
 $l_category = "Categoria";
 $l_company = "Azienda";
@@ -41,7 +41,7 @@ $l_plus = "+";
 $l_order = "Ordine";
 $l_amount_in = "Totale entrate";
 $l_amount_out = "Totale uscite";
-$l_potential = "Weighted Potential";
+$l_potential = "Potenziale pesato";
 $l_label_start = "Nome inizio";
 $l_manager = "Resp. ";
 $l_proposition = "Proposta";
@@ -70,8 +70,8 @@ $l_category_manage = "Gestione categoria Impegno ";
 $l_category_exist = "Categorie esistenti";
 $l_category_new = "Nuova Categoria";
 $l_category_label="Nome";
-$l_category_minilabel="Nome corto";
-$l_parentdeal_deals = "Impegni appartengono a questo Sub-impegno";
+$l_category_minilabel="Nome breve";
+$l_parentdeal_deals = "Impegni appartengono a questo impegno";
 $l_add_contrat = "Nuovo contratto";
 $l_contract_new = "Nuovo contratto";
 
@@ -84,17 +84,17 @@ $l_update = "Modifica  Impegno";
 $l_delete = "Elimina Impegno";
 $l_archive_update = "Modifica archivi";
 $l_select_company = "Scegli azienda";
-$l_insert_parent = "Inserisci Sub-Impegno";
-$l_update_parent = "Modifica Sub-Impegno";
-$l_delete_parent = "Elimina Sub-Impegno";
+$l_insert_parent = "Inserisci Impegno";
+$l_update_parent = "Modifica Impegno";
+$l_delete_parent = "Elimina Impegno";
 $l_affect = "Affect";
 
-$l_link_contract = "The deal is involved in these contracts";
-$l_link_contract_no = "The deal isn't involved in any contracts";
-$l_link_project = "The deal is involved in these projects";
-$l_link_project_no = "The deal isn't involved in any projects";
-$l_cant_delete = "The deal can't be deleted !";
-$l_can_delete = "The deal can be deleted.";
+$l_link_contract = "L'affare è collegato a questi contratti";
+$l_link_contract_no = "L'affare non è collegato a nessun contratto";
+$l_link_project = "L'affare è collegato a questi progetti";
+$l_link_project_no = "L'affare è non collegato a nessun progetti";
+$l_cant_delete = "L'affare non può essere eliminato";
+$l_can_delete = "L'affare può essere eliminato";
 
 $l_kind_checkdelete = "Controlla o Elimina Tipo";
 $l_kind_delete = "Elimina Tipo";
@@ -105,13 +105,13 @@ $l_kind_link_deal_no = "Tipo no è richiesto in Impegni";
 $l_kind_update = "Modifica Tipo";
 $l_kind_insert = "Inserisci Tipo";
 $l_status_update = "Modifica State";
-$l_status_checkdelete = "Controlla o Elimina Status";
-$l_status_delete = "Elimina Status";
-$l_status_can_delete = "Status può essere eliminato";
-$l_status_cant_delete = "Status non può essere eliminato";
-$l_status_link_deal = "Status necessario in questi Impegni";
-$l_status_link_deal_no = "Status no è richiesto in Impegni";
-$l_status_insert = "Inserisci Status";
+$l_status_checkdelete = "Controlla o Elimina lo Stato";
+$l_status_delete = "Elimina Stato";
+$l_status_can_delete = "Stato può essere eliminato";
+$l_status_cant_delete = "Stato non può essere eliminato";
+$l_status_link_deal = "Stato necessario in questi Impegni";
+$l_status_link_deal_no = "Stato no è richiesto in Impegni";
+$l_status_insert = "Inserisci Stato";
 $l_cat_checkdelete = "Controlla o Elimina Categoria";
 $l_cat_delete = "Elimina Categoria";
 $l_cat_can_delete = "Categoria eliminabile";
@@ -123,15 +123,15 @@ $l_cat_insert = "Inserisci Categoria";
 
 
 // Messages
-$l_err_parent_has_deal = "L'Impegno ha dei  Sub, non può essere eliminato!";
-$l_err_label_empty = "Scrivi nome Sub-impegno!";
+$l_err_parent_has_deal = "L'Impegno ne ha altri collegati, non può essere eliminato!";
+$l_err_label_empty = "Scrivi nome impegno!";
 $l_err_kind_empty = "Scrivi impegno tipo!";
 $l_err_task_empty = "Scrivi impegno categoria!";
 $l_err_market_empty = "Scrivi responsabile marketing!";
 $l_err_tech_empty = "Scrivi responsabile tecnico!";
-$l_err_hitrate = "Hit rate must be in the range 0 - 100 !";
+$l_err_hitrate = "Hit rate deve essere un valore da 0 a 100";
 
-$l_updateaffect_ok = "Impegno collegato al Sub-impegno";
+$l_updateaffect_ok = "Impegno collegato all'impegno";
 $l_no_display = "Scrivi nei campi e click su < TROVA > per la ricerca";
 $l_found = "Impegni trovati.";
 $l_no_found = "Non sono stati trovati impegni!";
@@ -147,7 +147,7 @@ $l_archive_error = "Modifica  archivi fallita!";
 $l_archive_number = "Impegni inserito in archivio.";
 $l_found_parent = "Sub-Impegni trovati";
 $l_no_display_parent ="Scrivi nei campi click su   <TROVA> per la ricerca";
-$l_no_found_parent ="Nessun Sub-impegno trovato!";
+$l_no_found_parent ="Nessun impegno trovato!";
 
 $l_kind_insert_ok = "Tipo inserito.";
 $l_kind_insert_error = "Inserimento  tipo fallito!";
@@ -176,7 +176,7 @@ $l_fill_datealarm = "Scrivi prima Data Avviso.";
 $l_fill_datebegin = "Scrivi prima Data inizio.";
 $l_confirm_datealarm = "Data Avviso e passata ! Valida ?";
 $l_j_select_company = "Scegli una azienda!";
-$l_invalid_date = "Formato data non valido (MM/JJ/AAAA or AAAA-MM-JJ).";
+$l_invalid_date = "Formato data non valido (MM/GG/AAAA or AAAA-MM-GG).";
 $l_delete_confirm = "Confermi impegno Eliminazione ?";
 $l_j_kind_delete = "Inserisci un Tipo per controllo o eliminazione!";
 $l_j_status_delete = "Inserisci uno Stato per controllo o eliminazione!";
@@ -190,7 +190,5 @@ $l_j_category_create = "Inserisci il nome per una  nuova categoria per crearla!"
 
 // For display parameters modification screen
 $l_deal_display = "Visualizza opzioni per la lista di Impegni";
-$l_parentdeal_display = "Visualizza opzioni per la lista di Sub-Impegni";
+$l_parentdeal_display = "Visualizza opzioni per la lista di Impegni";
 $l_invoice_display = "Visualizza opzioni per la lista di fatture";
-
-

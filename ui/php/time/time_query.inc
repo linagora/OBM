@@ -1,4 +1,4 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - File : time_query.inc                                               //
 //     - Desc : time manager query File                                      //
@@ -29,7 +29,7 @@ function run_query_search($time) {
       UNIX_TIMESTAMP(timetask_date) as date_task,
       UNIX_TIMESTAMP(timetask_timeupdate) as date_timeupdate,
       UNIX_TIMESTAMP(timetask_timecreate) as date_timecreate,
-      concat(timetask_length,concat('/',8)) as timetask_length,
+      concat(timetask_length,concat('/', $c_day_fraction)) as timetask_length,
       tasktype_label,
       project_name as timetask_project_name,
       timetask_label,

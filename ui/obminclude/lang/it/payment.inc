@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : payment.inc                                              //
-// 2002-08-01 Augusto Fagioli                                                //
+// 2002-08-01 Augusto Fagioli - augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -52,7 +52,7 @@ $l_update = "Aggiorna pagamento";
 $l_delete = "Elimina pagamento";
 $l_bank = "Banca";
 $l_delete_confirm = "Confermi eliminazione del pagamento ?";
-$l_error_which = "Errore : The which variable is NOT CORRECTLY set... Please Check your administrator" ;
+$l_error_which = "Err.5463b : var non impostata correttamente, ... prego,contattare l'amministratore del sistema" ;
 $l_payment_infos = "Vedi";
 $l_payment_mod = "Modifica";
 $l_search_invoice ="Cerca fattura";

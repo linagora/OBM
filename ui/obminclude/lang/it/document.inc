@@ -1,55 +1,56 @@
-<SCRIPT language="php">
-//////////////////////////////////////////////////////////////////////////////
-// OBM - Language : French                                                  //
+<script language="php">
+///////////////////////////////////////////////////////////////////////////////
+// OBM - Language : Italian                                                  //
 //     - File     : document.inc                                             //
-// 1999-01-24 Pierre Baudracco                                              //
-//////////////////////////////////////////////////////////////////////////////
+// 2004-01-10 Augusto Fagioli - augusto@fagioli.biz                          //
+///////////////////////////////////////////////////////////////////////////////
 
 // Labels et textes
-$l_document = "Letter management";
-$l_document_new = "New document";
-$l_document_insert = "Insert document";
-$l_document_generate= "Create Tex document";
+$l_document = "Gestione lettera";
+$l_document_new = "Nuovo documento";
+$l_document_insert = "Inserisci documento";
+$l_document_generate= "Crea documento Tex";
+$l_descdocument = "Descrizione  Documento";
+$l_namedocument = "La Lettera";
+$l_namesoc = "Azienda";
+$l_typedocument = "Tipo";
+$l_qualdocument = "Qualità";
+$l_destdocument = "Destinatario";
+$l_adddocument = "Indirizzo del destinatario";
+$l_vrefdocument = "Tue referenze";
+$l_nrefdocument = "Nostre referenze";
+$l_objdocument = "Oggetto Documento";
+$l_salutdocument = "Saluti";
+$l_corpsdocument = "Corpo";
+$l_formpdocument = "Formula di cortesia";
+$l_sign1document = "Prima firma";
+$l_sign2document = "Seconda Firma ";
+$l_ccdocument = "Copia carbone";
+$l_pjdocument = "Allegati ";
+$l_psdocument = "P.S.";
 
-$l_descdocument = "Document Description";
-$l_namedocument = "The Letter";
-$l_namesoc = "Society";
-$l_typedocument = "Type";
-$l_qualdocument = "Quality";
-$l_destdocument = "Destinataire";
-$l_adddocument = "Address du destinataire";
-$l_vrefdocument = "Your references";
-$l_nrefdocument = "Our references";
-$l_objdocument = "Document object";
-$l_salutdocument = "Salutations";
-$l_corpsdocument = "Corps";
-$l_formpdocument = "Formule de politesse";
-$l_sign1document = "First Signature";
-$l_sign2document = "2nd Signature";
-$l_ccdocument = "Carbon Copy";
-$l_pjdocument = "Pièces jointes";
-$l_psdocument = "Post Scriptum";
-
-$l_creer = "Créer";
-$l_annuler = "Annuler";
-$l_recup_doc = "Erreur de récupération du document en base...";
-$l_recupsoc_doc = "Erreur de récupération des donnees de la societe en base...";
-$l_generer = "Générer";
+$l_creer = "Crea";
+$l_annuler = "Annulla";
+$l_recup_doc = "Err.35v85 : nel recupero del documento in base...";
+$l_recupsoc_doc = "Err.35v86 nel recupero  des donnees dell'azienda in base...";
+$l_generer = "Genere";
 
 // Messages
-$l_no_display = "Renseigner les crit&egrave;res souhait&eacute;s et cliquer sur < Chercher > pour obtenir la liste des affaires correspondantes.";
-$l_no_found = "Aucune affaire ne correspond &agrave; ces crit&egrave;res !";
-$l_delete_ok = "La suppression de l'affaire a &eacute;t&eacute; correctement effectu&eacute;e.";
-$l_delete_error = "La suppression de l'affaire a &eacute;chou&eacute;e !";
-$l_insert_ok = "L'insertion du document a &eacute;t&eacute; correctement effectu&eacute;e.";
-$l_insert_error = "L'insertion du document  a &eacute;chou&eacute;e !";
-$l_update_ok = "La modification de l'affaire a &eacute;t&eacute; correctement effectu&eacute;e";
-$l_update_error = "La modification de l'affaire a &eacute;chou&eacute;e !";
-$l_query_error = "Probl&egrave;me en executant la requete";
-$l_archive_ok = "La mise &agrave; jour des archives s'est bien effectu&eacute;e.";
-$l_archive_error = "Erreur lors de l'archivage de l'affaire de code ";
-$l_archive_number = "affaires enregistr&eacute;es dans les archives.";
+
+
+$l_no_display = "Riempi i campi di ricerca e premi < TROVA > per la lista degli affari ";
+$l_no_found = "Alcuni affari non corrispondono ai criteri";
+$l_delete_ok = "Eliminazione dei criteri eseguita";
+$l_delete_error = "Err.3v6987d  durante L'Eliminazione dei criteri";
+$l_insert_ok = "Inserimento del documento eseguito";
+$l_insert_error = "Err.3v6987e  durante L'Inserimento del documento...";
+$l_update_ok = "Modifica dell'affare eseguita";
+$l_update_error = "Err.3v6987e  durante la modifica dell'affare";
+$l_query_error = "Err.3v6987f  durante La query ";
+$l_archive_ok = "Archiviazine eseguita";
+$l_archive_error = "Err.3v6987g  nella query ";
+$l_archive_number = "affari registrati negli archivi";
 
 // JavaScript Messages (les caracteres comme \ doivent etre backslashes -> \\)
-$l_j_select_company = "Vous devez sélectionner une société !";
-$l_delete_confirm = "Confirmer la suppression de l'affaire ?";
+$l_j_select_company = "Scegli una azienda";
+$l_delete_confirm = "Confermi l'eliminazione dell'affare?";

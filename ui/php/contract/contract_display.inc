@@ -397,7 +397,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   // - Themes
   global $set_theme,$ico_mail,$ico_company,$ico_deal,$ico_contact;
   // -- Labels
-  global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert;
+  global $path, $c_php_isodate_format, $l_update,$l_delete,$l_insert, $l_none;
   global $l_label,$l_date_init,$l_kind,$l_marketing_manager;
   global $l_technical_manager,$l_last_update;
   global $popup_height,$popup_width,$l_comment,$l_at,$l_number,$l_clause,$l_dateexp;
@@ -460,16 +460,18 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   if (isset($contract["company_zip"])) { $zip = $contract["company_zip"]; }
   if (isset($contract["company_town"])) { $town = stripslashes($contract["company_town"]); }
   
-  $dis_sel_t="<select name=\"sel_type\">";
+  $dis_type="<select name=\"sel_type\">
+    <option value=\"0\">$l_none</option>";
   while($type_q->next_record()) {
-    $dis_sel_t.="\n<option value=\"".$type_q->f("contracttype_id")."\"";
+    $dis_type.="\n<option value=\"".$type_q->f("contracttype_id")."\"";
     if ($type_id==$type_q->f("contracttype_id"))
-       $dis_sel_t.=" selected=\"selected\""; 
-    $dis_sel_t.=">".$type_q->f("contracttype_label")."</option>";
+       $dis_type.=" selected=\"selected\""; 
+    $dis_type.=">".$type_q->f("contracttype_label")."</option>";
   }
-  $dis_sel_t.="</select>";
+  $dis_type.="</select>";
 
-  $sel_market = "<select name=\"sel_market\">";
+  $sel_market = "<select name=\"sel_market\">
+    <option value=\"0\">$l_none</option>";
   while ($u_com_q->next_record()) {
     $sel_market .= "\n<option value=\"".$u_com_q->f("userobm_id")."\"";
     if ($u_com_q->f("userobm_id") == $market_id) 
@@ -478,7 +480,8 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
   }
   $sel_market.="</select>";
  
-  $sel_tech = "<select name=\"sel_tech\">";
+  $sel_tech = "<select name=\"sel_tech\">
+    <option value=\"0\">$l_none</option>";
   while ($u_prod_q->next_record()) {
    $sel_tech .= "\n<option value=\"".$u_prod_q->f("userobm_id")."\"";
    if ($u_prod_q->f("userobm_id") == $tech) 
@@ -599,7 +602,7 @@ function html_contract_form($action,$contract_q,$type_q,$u_com_q,$u_prod_q,$comp
       <td class=\"detailForm\"><input name=\"tf_dateexp\" type=\"text\" size=\"10\" value=\"$dateexp\" /></td>
     </tr><tr>
       <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$dis_sel_t</td>
+      <td class=\"detailForm\">$dis_type</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_marketing_manager</td>
       <td class=\"detailForm\">$sel_market</td>

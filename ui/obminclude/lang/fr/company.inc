@@ -39,7 +39,7 @@ $l_cat_label = "Label";
 $l_cat_code = "Code ";
 $l_internal = "Interne";
 $l_act_manage = "Gestion des secteurs d'activité";
-$l_act_exist = "Secteurs d'activités existants";
+$l_act_exist = "Secteurs d'activité existants";
 $l_act_new = "Nouveau secteur d'activité";
 
 // Titres

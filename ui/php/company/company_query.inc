@@ -688,8 +688,8 @@ function run_query_get_companycat_name($id) {
   $query = "select *
     from CompanyCategoryLink,
       CompanyCategory
-    where companycategorylink_company_id = '$id' 
-      and companycategorylink_category_id = companycategory_id
+    where companycategorylink_companyid = '$id' 
+      and companycategorylink_categoryid = companycategory_id
     order by  companycategory_code"; 
 
   $obm_q = new DB_OBM;

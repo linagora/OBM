@@ -1,8 +1,8 @@
-<SCRIPT language="php">
+<script language="php">
 ///////////////////////////////////////////////////////////////////////////////
 // OBM - Language : Italiano                                                 //
 //     - File     : contact.inc                                              //
-// 1999-01-24 Augusto Fagili                                                 //
+// 1999-01-24 Augusto Fagili -  augusto@fagioli.biz                          //
 ///////////////////////////////////////////////////////////////////////////////
 // $Id$ //
 ///////////////////////////////////////////////////////////////////////////////
@@ -12,14 +12,14 @@ $l_company = "Azienda";
 $l_lastname = "Cognome";
 $l_firstname = "Nome";
 $l_kind = "Tipo";
-$l_market = "Person in charge";
+$l_market = "Responsabile";
 $l_function = "Funzione";
 $l_hphone = "Tel. Casa";
 $l_minihphone = "(casa)";
 $l_mphone = "Cell.";
 $l_minimphone = "(minitel)";
 $l_email = "E-Mail";
-$l_mailing_ok = "Mailing enabled";
+$l_mailing_ok = "Email abilitata";
 $l_fax = "Fax";
 $l_expresspostal = "CAP";
 $l_country = "Nazione";
@@ -44,14 +44,14 @@ $l_delete = "Elimina il ";
 $l_add = "Aggiungi i contatti";
 
 // Messages
-$l_check_samecontact = "Quasti contatti sembrano simili al nuovo  !";
-$l_link_deal = "Questo contatto ha deals in corso";
+$l_check_samecontact = "Quasti contatti sembrano simili al nuovo";
+$l_link_deal = "Questo contatto ha impegni in corso";
 $l_link_deal_no = "Il contatto non ha impegni";
 $l_link_contract = "Questo contatto ha contratti in corso";
 $l_link_contract_no = "Il contatto non ha contratti";
 $l_link_list = "Il contatto è registrato in queste liste";
 $l_link_list_no = "Il Contatto non è registrato in nessuna lista";
-$l_cant_delete = "Il contatto non può essere eliminato!";
+$l_cant_delete = "Il contatto non può essere eliminato";
 $l_can_delete = "Il contatto può essere eliminato.";
 $l_no_display = "Riempi i campi e click <TROVA> per eseguire la ricerca";
 $l_found = "contatti trovati.";
