@@ -118,10 +118,15 @@ function run_query_detail($id) {
          tasktype_label,
          dealstatus_label,
          company_name, company_address1, company_zipcode, company_town,
+         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
          DATE_FORMAT(deal_timeupdate,'$l_date_format') as datemodif,
          DATE_FORMAT(deal_timeupdate,'$l_date_format') as timeupdate,
          DATE_FORMAT(deal_timecreate,'$l_date_format') as timecreate
-       from Deal, DealType, TaskType, DealStatus, Company
+       from
+         (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
+               left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
+          DealType, TaskType, DealStatus, Company
        where deal_id='$id'
          and dealtype_id=deal_type_id
          and tasktype_id=deal_tasktype_id
@@ -129,15 +134,21 @@ function run_query_detail($id) {
          and company_id=deal_company_id";
 
   } else if ($obm_q->type == $db_type_pgsql) {
+    // require at list Postgresql 7.1 (left join)
     $query = "select Deal.*,
          dealtype_label,
          tasktype_label,
          dealstatus_label,
          company_name, company_address1, company_zipcode, company_town,
+         u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+         u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
          deal_timeupdate as datemodif,
          deal_timeupdate as timeupdate,
          deal_timecreate as timecreate
-       from Deal, DealType TaskType, DealStatus, Company
+       from
+         (Deal left join UserObm u1 on deal_marketingmanager_id=u1.userobm_id)
+               left join UserObm u2 on deal_technicalmanager_id=u2.userobm_id,
+          DealType TaskType, DealStatus, Company
        where deal_id='$id'
          and dealtype_id=deal_type_id
          and tasktype_id=deal_tasktype_id
@@ -998,17 +1009,25 @@ function run_query_detail_parentdeal($pid) {
   
   if ($obm_q->type == $db_type_mysql) {
     $query = "select ParentDeal.*,
+        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         DATE_FORMAT(parentdeal_timeupdate,'$l_date_format') as datemodif,
         DATE_FORMAT(parentdeal_timeupdate,'$l_date_format') as timeupdate,
         DATE_FORMAT(parentdeal_timecreate,'$l_date_format') as timecreate
-      from ParentDeal
+      from (ParentDeal
+          left join UserObm u1 on parentdeal_marketingmanager_id=u1.userobm_id)
+          left join UserObm u2 on parentdeal_technicalmanager_id=u2.userobm_id
       where parentdeal_id='$pid'";
   } else if ($obm_q->type == $db_type_pgsql) {
     $query = "select ParentDeal.*,
+        u1.userobm_lastname as lname1, u1.userobm_firstname as fname1,
+        u2.userobm_lastname as lname2, u2.userobm_firstname as fname2,
         parentdeal_timeupdate as datemodif,
         parentdeal_timeupdate as timeupdate,
         parentdeal_timecreate as timecreate
-      from ParentDeal
+      from (ParentDeal
+          left join UserObm u1 on parentdeal_marketingmanager_id=u1.userobm_id)
+          left join UserObm u2 on parentdeal_technicalmanager_id=u2.userobm_id
       where parentdeal_id='$pid'";
   }
 

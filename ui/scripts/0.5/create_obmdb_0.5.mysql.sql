@@ -227,6 +227,7 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'entrytemp','entrytemp_label',5,2);
 
 --modules timemanager
+
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time','task_date',1,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time','task_company_name',2,1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time','task_deal_label',3,1);
@@ -241,13 +242,15 @@ INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,displa
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1,'time_deal','task_company_name',2,1);
 
 --module 'contract'
+
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_label', 1, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_numero', 2, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_number', 2, 1);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_company_name', 3, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contracttype_label', 4, 1);
-INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_expiration', 5, 1);
+INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'contract', 'contract_dateexp', 5, 1);
 
 --module 'incident'
+
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_label', 1, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_company_name', 2, 2);
 INSERT INTO DisplayPref (display_user_id,display_entity,display_fieldname,display_fieldorder,display_display) VALUES (1, 'incident', 'incident_priority', 5, 1);
@@ -753,17 +756,16 @@ CREATE TABLE Contract (
   contract_usercreate int(8) default NULL,
   contract_label varchar(40) default NULL,
   contract_company_id int(8) default NULL,
-  contract_numero varchar(20) default NULL,
-  contract_clause text,
-  contract_debut date default NULL,
-  contract_expiration date default NULL,
+  contract_number varchar(20) default NULL,
+  contract_datebegin date default NULL,
+  contract_dateexp date default NULL,
   contract_type_id int(8) default NULL,
+  contract_contact1_id int(8) default NULL,
+  contract_contact2_id int(8) default NULL,
+  contract_techmanager_id int(8) default NULL,
+  contract_marketmanager_id int(8) default NULL,
+  contract_clause text,
   contract_comment text,
-  contract_responsable_client_id int(8) default NULL,
-  contract_responsable_client2_id int(8) default NULL,
-  contract_responsable_tech_id int(8) default NULL,
-  contract_responsable_com_id int(8) default NULL,
-  contract_typedeal int(8) default NULL,
   PRIMARY KEY  (contract_id)
 ) TYPE=MyISAM;
 
@@ -781,7 +783,6 @@ CREATE TABLE ContractType (
   contracttype_label varchar(40) default NULL,
   PRIMARY KEY  (contracttype_id)
 ) TYPE=MyISAM;
-
 
 
 --

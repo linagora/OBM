@@ -8,78 +8,234 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 
-function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id){
+///////////////////////////////////////////////////////////////////////////////
+// Display Contract search form                                              //
+// Parameters : 
+//   - $contract[] : default form values
+//     keys used      : 
+//   - $usr_q      : DB result object (userobm list)
+//   - $obm_q_type : DB result object (contract kind list)
+///////////////////////////////////////////////////////////////////////////////
+function html_contract_search_form($contract, $usr_q, $obm_q_type) {
+  global $l_label_start,$l_label_libelle,$l_company,$l_kind,$l_after,$l_before,$l_manager;
+  global $l_find,$l_marketing_manager,$l_technical_manager; 
+  global $sess, $c_all, $l_all;
+
+  $p_label = $contract["label"];
+  $p_company = $contract["companyname"];
+  $p_type_id = $contract["type"];
+  $p_dateafter = $contract["dateafter"];
+  $p_datebefore = $contract["datebefore"];
+  $sel_market = $contract["market"];
+  $sel_tech = $contract["tech"];
+  $p_num = $contract["number"]; 
+ 
+  $dis_cont_typ  = "<select name=\"sel_type\">
+    <option value=\"$c_all\">$l_all";
+  while($obm_q_type->next_record()) {
+    $dis_cont_typ .= "\n<option value=".$obm_q_type->f("contracttype_id");
+    if ($p_type_id == $obm_q_type->f("contracttype_id")) 
+      $dis_cont_typ .= " selected";
+    $dis_cont_typ .= ">" . $obm_q_type->f("contracttype_label");
+  }
+  $dis_cont_typ .= "</select>";
+
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
+  }
+
+  $dis_resp_tec = "<select name=\"sel_tech\">
+    <option value=\"$c_all\">" . $l_all;
+  while($usr_q->next_record()) {
+    $dis_resp_tec .= "\n<OPTION value=".$usr_q->f("contact_id");
+    if ($usr_q->f("contact_id") == $sel_tech) 
+      $dis_resp_tec .= " selected";
+    $dis_resp_tec .= ">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")." </option>";
+  }
+  $dis_resp_tec .="</select>";
+
+
+echo "<CENTER>" .
+     "<FORM METHOD=POST NAME=form_contract " .
+     "onSubmit=\"if (check_form(this) == false) return false; " .
+     "else return true;\" ACTION=\"".$sess->url("contract_index.php")."\">";
+
+//---------------------------------------------------------------------------
+echo "<TABLE BORDER=0>" .
+     "<TR>";
+//---------------------------------------------------------------------------
+//---| Numéro du contract |-------------------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>" .
+     $l_label_start . "</FONT><BR>" .
+     "<INPUT TYPE=text NAME=tf_num size=20 value=\"".
+     $p_num.
+     "\"></TD>";
+//---------------------------------------------------------------------------
+echo "<TD>&nbsp;&nbsp;</TD>";
+//---------------------------------------------------------------------------
+//---| Nom de SOCIETE |------------------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>" .
+     $l_company . "</FONT><BR>" .
+     "<INPUT TYPE=text NAME=tf_soc size=20 value=\"" .
+     $p_company.
+     "\"></TD>";
+//---------------------------------------------------------------------------
+echo "<TD>&nbsp;&nbsp;</TD>";
+//---------------------------------------------------------------------------
+//---| DATE EXPIRATION APRES |-----------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>$l_after</FONT><BR>
+    <INPUT NAME=tf_dateapres size=10 value=\"$p_dateafter\"></TD>
+  <TD> &nbsp; </TD>";
+
+//---------------------------------------------------------------------------
+//---| DATE EXPIRATION AVANT |-----------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>" .
+     $l_before . "</FONT><BR>" .
+     "<INPUT TYPE=text NAME=tf_dateavant size=10 value=\"" .
+     $p_datebefore .
+     "\"></TD>";
+//---------------------------------------------------------------------------
+echo "<TD>&nbsp;&nbsp;</TD>";
+echo "</TR>" .
+     "</TABLE>";
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+echo "<TABLE BORDER=0>" .
+     "<TR>";
+//---------------------------------------------------------------------------
+//---| Libellé du contract |-------------------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>" .
+     $l_label_libelle . "</FONT><BR>" .
+     "<INPUT TYPE=text NAME=tf_label size=20 value=\"".
+     $p_label.
+     "\"></TD>";
+//---------------------------------------------------------------------------
+echo "<TD>&nbsp;&nbsp;</TD>";
+//---------------------------------------------------------------------------
+//---| TYPE de CONTRACT |------------------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD><FONT SIZE=-2>&nbsp;&nbsp;" .
+     $l_kind . "</FONT><BR>" .
+     $dis_cont_typ ."
+     </TD>";
+
+
+//---------------------------------------------------------------------------
+//---| Responsable Technique |-----------------------------------------------
+//---------------------------------------------------------------------------
+  echo "</td>
+    <td><font SIZE=-2>$l_technical_manager</FONT><BR>$dis_resp_tec</td>
+    <td>&nbsp;&nbsp;</td>";
+
+//---------------------------------------------------------------------------
+//---| Bouton VALIDER |------------------------------------------------------
+//---------------------------------------------------------------------------
+echo "<TD VALIGN=bottom> 
+     <INPUT NAME=\"action\" TYPE=\"hidden\" VALUE=\"search\">";
+echo "<INPUT NAME=\"submit\" TYPE=\"submit\" VALUE=\"$l_find\">
+     </TD>";
+//---------------------------------------------------------------------------
+echo "</TR>" .
+     "</TABLE>";
+
+//---------------------------------------------------------------------------
+
+echo "</FORM>" .
+     "<HR>";
+}
+
+
+
+
+
+
+
+
+function html_contract_form($contract_q,$action,$obm_q_type,$usr_q,$comp_q,$obm_q_contacts,$p_company_id){
 
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
   global $l_update,$l_delete,$l_insert;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_project_manager,$l_origin,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number_deal,$l_kind_deal,$l_clause,$l_date_expir,$l_client_manager;
+  global $l_label,$l_date_init,$l_kind,$l_category,$l_project_manager,$l_origin,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number_deal,$l_clause,$l_dateexp,$l_client_manager;
  
   global $sess,$auth;
 
-  $number=($p_number ? $p_number : $obm_q_contract->f("contract_numero"));
-  $label=($p_label ? $p_label : $obm_q_contract->f("contract_label"));
-  $datebegin=($p_datebegin ? $p_datebegin : $obm_q_contract->f("contract_debut"));
-  $datefin=($p_datefin ? $p_datefin : $obm_q_contract->f("contract_expiration"));
-  $type_id=($p_type_id ? $p_type_id : $obm_q_contract->f("contract_type_id"));
-  $marketing_id=($p_marketing_id ? $p_marketing_id : $obm_q_contract->f("contract_responsable_com_id"));
-  $technical_id=($p_technical_id ? $p_technical_id : $obm_q_contract->f("contract_responsable_tech_id"));
-  $client_id=($p_client_id ? $p_client_id : $obm_q_contract->f("contract_responsable_client_id"));
-  $type_deal_id=($p_type_deal_id ? $p_type_deal_id : $obm_q_contract->f("contract_typedeal"));
-  $con1_id=($p_con1_id ? $p_con1_id : $obm_q_contract->f("contract_responsable_client_id"));
-  $con2_id=($p_con2_id ? $p_con2_id : $obm_q_contract->f("contract_responsable_client2_id"));
-  $datemodif=($p_datemodif ? $p_datemodif : $obm_q_contract->f("contract_timeupdate"));
-  $comment=($p_comment ? $p_comment : $obm_q_contract->f("contract_comment"));
-  $clause=($p_comment ? $p_clause : $obm_q_contract->f("contract_clause"));
+  $number=($p_number ? $p_number : $contract_q->f("contract_number"));
+  $label=($p_label ? $p_label : $contract_q->f("contract_label"));
+  $datebegin=($p_datebegin ? $p_datebegin : $contract_q->f("contract_datebegin"));
+  $dateexp = ($p_dateexp ? $p_dateexp : $contract_q->f("contract_dateexp"));
+  $type_id=($p_type_id ? $p_type_id : $contract_q->f("contract_type_id"));
+  $con1_id=($p_con1_id ? $p_con1_id : $contract_q->f("contract_contact1_id"));
+  $con2_id=($p_con2_id ? $p_con2_id : $contract_q->f("contract_contact2_id"));
+  $datemodif=($p_datemodif ? $p_datemodif : $contract_q->f("contract_timeupdate"));
+  $comment=($p_comment ? $p_comment : $contract_q->f("contract_comment"));
+  $clause=($p_comment ? $p_clause : $contract_q->f("contract_clause"));
   
-  $obm_q_company->next_record();
-  
-  $dis_sel_taff="<SELECT name=\"sel_type_aff\">";
-  while($obm_q_type->next_record()) {
-    $dis_sel_taff.="\n<OPTION value=".$obm_q_type->f("contracttype_id");
-    if ($type_id==$obm_q_type->f("contracttype_id"))
-       $dis_sel_taff.=" selected"; 
-    $dis_sel_taff.=">".$obm_q_type->f("contracttype_label")."</OPTION>";
-  }
-  $dis_sel_taff.="</SELECT>";
+  $comp_q->next_record();
 
-  $dis_sel_tdeal="<SELECT name=\"sel_typedeal_aff\">";
-  while($obm_q_typedeal->next_record()) {
-    $dis_sel_tdeal.="\n<OPTION value=".$obm_q_typedeal->f("dealtype_id");
-    if ($type_deal_id==$obm_q_typedeal->f("dealtype_id")) 
-        $dis_sel_tdeal.=" selected"; 
-      $dis_sel_tdeal.=">".$obm_q_typedeal->f("dealtype_label")."</OPTION>";
+  
+  // Definitions above this should be integrated below
+  // if update mode and first time, values are taken from db
+  if ($action == "detailupdate") {
+    $id = $contract_q->f("contract_id");
+    $market = $contract_q->f("contract_marketmanager_id");
+    $tech = $contract_q->f("contract_techmanager_id");
+
+  } else {
+    // Values are taken from parameters
+    $id = $contract["id"];
+    if ($action == "new") {
+      $market = $comp_q->f("company_marketingmanager_id");
+    } else {
+      $do_nothing_here_for_future_emplacement = 0;
     }
-    $dis_sel_tdeal.="</SELECT>";
+  }
 
-  $dis_sel_respc="<SELECT name=\"sel_respcomm_aff\">";
-  while($obm_q_contacts_obm->next_record()) {
-    $dis_sel_respc.="\n<OPTION value=".$obm_q_contacts_obm->f("contact_id");
-    if ($obm_q_contacts_obm->f("contact_id") == $marketing_id) 
+  
+  $dis_sel_t="<SELECT name=\"sel_type\">";
+  while($obm_q_type->next_record()) {
+    $dis_sel_t.="\n<OPTION value=".$obm_q_type->f("contracttype_id");
+    if ($type_id==$obm_q_type->f("contracttype_id"))
+       $dis_sel_t.=" selected"; 
+    $dis_sel_t.=">".$obm_q_type->f("contracttype_label")."</OPTION>";
+  }
+  $dis_sel_t.="</SELECT>";
+
+  $dis_sel_respc="<select name=\"sel_market\">";
+  while($usr_q->next_record()) {
+    $dis_sel_respc.="\n<option value=".$usr_q->f("userobm_id");
+    if ($usr_q->f("userobm_id") == $market) 
       $dis_sel_respc.=" selected ";
-    $dis_sel_respc.=">". $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</OPTION>";
+    $dis_sel_respc.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
   }
-  $dis_sel_respc.="</SELECT>";
+  $dis_sel_respc.="</select>";
  
-  if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0);
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
   }
 
-  $dis_sel_respt="<SELECT name=\"sel_resptech_aff\">";
-  while($obm_q_contacts_obm->next_record()) {
-   $dis_sel_respt.="\n<OPTION value=".$obm_q_contacts_obm->f("contact_id");
-   if ($obm_q_contacts_obm->f("contact_id") == $technical_id) 
+  $dis_sel_respt="<select name=\"sel_tech\">";
+  while($usr_q->next_record()) {
+   $dis_sel_respt.="\n<option value=".$usr_q->f("userobm_id");
+   if ($usr_q->f("userobm_id") == $tech) 
       $dis_sel_respt.=" selected";
-   $dis_sel_respt.=">". $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")."</OPTION>";
-  };
-  $dis_sel_respt.="</SELECT>";
+   $dis_sel_respt.=">". $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname")."</option>";
+  }
+  $dis_sel_respt.="</select>";
 
   if ($obm_q_contacts->nf()>0) {
     $obm_q_contacts->seek(0);
   }
    
-  $dis_sel_con1="<SELECT name=\"sel_con1_aff\">";
+  $dis_sel_con1="<SELECT name=\"sel_con1\">";
   while($obm_q_contacts->next_record()) {
     $dis_sel_con1.="\n<OPTION value=".$obm_q_contacts->f("contact_id");
     if ($obm_q_contacts->f("contact_id") == $con1_id) 
@@ -93,13 +249,13 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
     $dis_sel_con1.="<A HREF=\"".
     $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con1_id)."\">";
     $dis_sel_con1.="<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";    
-    };
+    }
 
   if ($obm_q_contacts->nf()>0) {
     $obm_q_contacts->seek(0);
   }
    
-  $dis_sel_con2="<SELECT name=\"sel_con2_aff\">";
+  $dis_sel_con2="<SELECT name=\"sel_con2\">";
   while($obm_q_contacts->next_record()) {
     $dis_sel_con2.="\n<OPTION value=".$obm_q_contacts->f("contact_id");
     if ($obm_q_contacts->f("contact_id") == $con2_id) 
@@ -113,32 +269,32 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
     $dis_sel_con2.="<A HREF=\"".
     $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$con2_id)."\">";
     $dis_sel_con2.="<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A>";    
-    };
+    }
 
   if ($action != "new") {
    $dis_last_update=
    "<TABLE>
    <TR><TD colspan=2>
    <FONT color=\"#$col_label\">$l_last_update </FONT>";
-   $dis_last_update.=timestamp_to_date($obm_q_contract->f("datemodif"));
+   $dis_last_update.=timestamp_to_date($contract_q->f("datemodif"));
    $dis_last_update.="<FONT color=\"#$col_label\"> $l_at </FONT>";
-   $dis_last_update.=timestamp_to_time($obm_q_contract->f("datemodif"));
+   $dis_last_update.=timestamp_to_time($contract_q->f("datemodif"));
    $dis_last_update.="</TD></TR></TABLE>";
   }
 
   if ($action == "detailupdate") {
-    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc_aff VALUE=\"$p_company_id\">
+    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc VALUE=\"$p_company_id\">
       <INPUT TYPE=hidden NAME=action VALUE=\"update\">
-      <INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=hidden NAME=param_contract VALUE=\"$id\">
       <INPUT TYPE=submit value=\"$l_update\">
       </FORM>
       &nbsp;  &nbsp;  &nbsp;  &nbsp;
       <FORM METHOD=GET NAME=form_contract_delete onSubmit=\"if (valider_suppression()) return true; else return false;\" ACTION=\"".$sess->url("contract_index.php")."\">
       <INPUT TYPE=\"hidden\" NAME=\"action\" VALUE=\"delete\">
-      <INPUT TYPE=\"hidden\" NAME=\"param_contract\" VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=\"hidden\" NAME=\"param_contract\" VALUE=\"$id\">
       <INPUT TYPE=submit value=\"$l_delete\">";
   } else {
-    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc_aff VALUE=\"$p_company_id\">
+    $dis_sub = "<INPUT TYPE=hidden NAME=hd_soc VALUE=\"$p_company_id\">
       <INPUT TYPE=\"hidden\" name=\"action\" value=\"insert\">
       <INPUT TYPE=\"submit\" value=\"$l_insert\">";
   }
@@ -153,7 +309,7 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
       <tr>
         <td><font COLOR=\"#$col_label\">$l_label</font>
           <br>
-          <INPUT NAME=tf_label_aff TYPE=text size=40 value=\"$label\">
+          <INPUT NAME=tf_label TYPE=text size=40 value=\"$label\">
         </td>
       </tr>
       </table>
@@ -162,15 +318,15 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
       <tr>
         <td><font COLOR=\"#$col_label\">$l_number_deal</font>
           <br>
-          <INPUT NAME=tf_number_contract TYPE=text size=20 maxlength=40 value=\"$number\">
+          <INPUT NAME=tf_num TYPE=text size=20 maxlength=40 value=\"$number\">
         </td>
         <td><font COLOR=\"#$col_label\">$l_date_init</font>
           <br>
-          <INPUT NAME=tf_datedebut_aff TYPE=text size=10 value=\"$datebegin\">
+          <INPUT NAME=tf_datebegin TYPE=text size=10 value=\"$datebegin\">
         </td>
-        <td><font COLOR=\"#$col_label\">$l_date_expir</font>
+        <td><font COLOR=\"#$col_label\">$l_dateexp</font>
           <br>
-          <INPUT NAME=tf_datefin_aff TYPE=text size=10 value=\"$datefin\">
+          <INPUT NAME=tf_dateexp TYPE=text size=10 value=\"$dateexp\">
         </td>
       </tr>
       </table>
@@ -179,11 +335,7 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
       <tr>
         <td>
           <font COLOR=\"#$col_label\">$l_kind</font>
-          <br>$dis_sel_taff
-        </td>
-        <td> &nbsp; &nbsp;</td>
-        <td><font COLOR=\"#$col_label\">$l_kind_deal</font>
-          <br>$dis_sel_tdeal
+          <br>$dis_sel_t
         </td>
       </tr>
       </table>
@@ -205,9 +357,9 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
       <table bgcolor=\"#$col_label\">
       <tr>
         <td bgcolor=\"#$col_table\">
-          <font color=\"#$col_textem\">".$obm_q_company->f("company_name")."</font>&nbsp;<A HREF=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id"). "\"><IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
-          <br>".$obm_q_company->f("company_address1") ."
-          <br>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
+          <font color=\"#$col_textem\">".$comp_q->f("company_name")."</font>&nbsp;<A HREF=\"".$sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id"). "\"><IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
+          <br>".$comp_q->f("company_address1") ."
+          <br>".$comp_q->f("company_zipcode") . " " . $comp_q->f("company_town") ."
         </td>
       </tr><tr>
         <td valign=center>$l_client_manager
@@ -226,7 +378,7 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
   <tr>
     <td><font COLOR=\"#$col_label\">$l_comment</font>
       <br>
-      <textarea NAME=ta_com_aff ROWS=6 COLS=72>$comment</textarea>
+      <textarea NAME=ta_com ROWS=6 COLS=72>$comment</textarea>
     </td>
     <td align=center colspan=2> &nbsp;  &nbsp;  &nbsp; </td>
   </tr>
@@ -237,7 +389,7 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
   <tr>
     <td><font COLOR=\"#$col_label\">$l_clause</font>
       <br>
-      <textarea NAME=ta_clause_aff ROWS=6 COLS=72>$clause</textarea>
+      <textarea NAME=ta_clause ROWS=6 COLS=72>$clause</textarea>
     </td>
     <td align=center colspan=2> &nbsp;  &nbsp;  &nbsp; $dis_sub
     </td>
@@ -251,75 +403,54 @@ function html_contract_form($obm_q_contract,$action,$obm_q_type,$obm_q_typedeal,
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display Contract Consult                                                  //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// ------------
-//      $obm_q_contract : information about the contract
-//      $obm_q_type : list deal's types
-//      $obm_q_contacts_obm : list of contacts from internal companies 
-//      $obm_q_company : list of companies
+// Parameters:
+//   - $contract_q : information about the contract
+//   - $type_q     : contract type list
+//      $comp_q : list of companies
 //      $obm_q_contact : list of contact from the company 
 //      $p_company_id  : id of the company concerned by the contract
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_consult($obm_q_contract,$obm_q_type,$obm_q_type_deal,$obm_q_contacts_obm,$obm_q_company,$obm_q_contacts,$p_company_id) {
-
+function html_contract_consult($contract_q, $type_q, $comp_q,$obm_q_contacts,$p_company_id) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact,$ico_contact_list,$ico_contact_new;
   // - Labels
   global $l_update,$l_delete,$l_insert;
-  global $l_label,$l_date_init,$l_kind,$l_category,$l_clause,$l_project_manager,$l_origin,$l_marketing_manager,$l_technical_manager,$l_proposition,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number_deal,$l_visibility,$l_public,$l_private,$l_affect_deal,$l_date_expir,$l_client_manager,$l_kind_deal;
+  global $l_label,$l_date_init,$l_kind,$l_clause,$l_project_manager,$l_marketing_manager,$l_technical_manager,$l_amount,$l_contacts,$l_date_alarm,$l_state,$l_last_update,$l_archive,$l_comment,$l_at,$l_number_deal,$l_visibility,$l_public,$l_private,$l_affect_deal,$l_dateexp,$l_client_manager;
   global $l_incident_list,$l_incident_new; 
-
   global $perms_user,$l_perms_user;
   global $auth, $sess;
 
 
-  while($obm_q_type->next_record()) {
-   if ($obm_q_type->f("contracttype_id") == $obm_q_contract->f("contract_type_id")) 
-	$dis_cont_type = $obm_q_type->f("contracttype_label");
-  };
+  $market = $contract_q->f("lname1") . " " . $contract_q->f("fname1");
+  $tech = $contract_q->f("lname2") . " " . $contract_q->f("fname2");
 
-  while($obm_q_type_deal->next_record()) {
-   if ($obm_q_type_deal->f("dealtype_id") == $obm_q_contract->f("contract_typedeal"))
-	$dis_deal_type = $obm_q_type_deal->f("dealtype_label");
+  while($type_q->next_record()) {
+    if ($type_q->f("contracttype_id") == $contract_q->f("contract_type_id"))
+      $dis_cont_type = $type_q->f("contracttype_label");
   }
 
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $obm_q_contract->f("contract_responsable_com_id"))
-	$dis_cont_mark = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
-  }
-
-  if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0); 
-  }
-
-  while($obm_q_contacts_obm->next_record()) {
-    if ($obm_q_contacts_obm->f("contact_id") == $obm_q_contract->f("contract_responsable_tech_id"))
-	$dis_cont_tec = $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname");
-  }
- 
   while($obm_q_contacts->next_record()) {
-    if ($obm_q_contacts->f("contact_id") == $obm_q_contract->f("contract_responsable_client_id")) 
-        $dis_cont_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
+    if ($obm_q_contacts->f("contact_id") == $contract_q->f("contract_contact1_id")) 
+      $dis_cont_cli1 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
     }
  
 
   if ($obm_q_contacts->nf()>0) {
     $obm_q_contacts->seek(0);
   }
-  // 2 ième Responsable Client 
+  // 2 ième contact client
   while($obm_q_contacts->next_record()) {
-   if ($obm_q_contacts->f("contact_id") == $obm_q_contract->f("contract_responsable_client2_id")) 
+   if ($obm_q_contacts->f("contact_id") == $contract_q->f("contract_contact2_id")) 
        $dis_cont_cli2 = "<TD>".$obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") . " - " . $obm_q_contacts->f("contact_phone")."</TD>";
     }
 
-  $dis_date_date = timestamp_to_date($obm_q_contract->f("datemodif"));
-  $dis_date_time = timestamp_to_time($obm_q_contract->f("datemodif"));
+  $dis_date_date = timestamp_to_date($contract_q->f("datemodif"));
+  $dis_date_time = timestamp_to_time($contract_q->f("datemodif"));
 
   if ($auth->auth["perm"] != $perms_user) {
     $dis_update = "<FORM METHOD=GET NAME=form_contract_update ACTION=\"".$sess->url("contract_index.php")."\">
       <INPUT TYPE=hidden NAME=action VALUE=\"detailupdate\">
-      <INPUT TYPE=hidden NAME=param_contract VALUE=\"".$obm_q_contract->f("contract_id")."\">
+      <INPUT TYPE=hidden NAME=param_contract VALUE=\"".$contract_q->f("contract_id")."\">
       <INPUT TYPE=submit value=\"$l_update\">
       </FORM>";
 
@@ -329,14 +460,14 @@ function html_contract_consult($obm_q_contract,$obm_q_type,$obm_q_type_deal,$obm
   <table border=0>
   <tr>
     <td valign=top> 
-      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."")."\"><img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
-      <font SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$obm_q_contract->f("contract_id")."") . "\">$l_incident_list</A></font>";
+      <A HREF=\"".$sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."")."\"><img BORDER=0  SRC=\"/images/$set_theme/$ico_contact_list\"></A>
+      <font SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=search&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_list</A></font>";
 
   if ($auth->auth["perm"] != $perms_user) {
     echo "<BR>
-      <A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$obm_q_contract->f("contract_id")."") . "\"><IMG BORDER=0
+      <A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\"><IMG BORDER=0
         SRC=\"/images/$set_theme/$ico_contact_new\"></A>
-      <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$obm_q_contract->f("contract_id")."") . "\">$l_incident_new</A></FONT>";
+      <FONT SIZE=-1><A HREF=\"" . $sess->url("incident_index.php?action=new&amp;param_contract=".$contract_q->f("contract_id")."") . "\">$l_incident_new</A></FONT>";
   }
 echo "
 </TD><TD>
@@ -347,68 +478,66 @@ echo "
 echo "<TABLE>
 <TR>
    <TD><FONT COLOR=\"#$col_label\">$l_label</FONT></TD><TD>";
-echo $obm_q_contract->f("contract_label");
+echo $contract_q->f("contract_label");
 echo "</TD>
       </TR><TR>
   <TD><FONT COLOR=\"#$col_label\">$l_number_deal</FONT></TD><TD>";
-echo $obm_q_contract->f("contract_numero");
+echo $contract_q->f("contract_number");
 echo "</TD>
 </TR>
 <TR>
   <TD><FONT COLOR=\"#$col_label\">$l_date_init</FONT></TD><TD>";
-echo $obm_q_contract->f("contract_debut");
+echo $contract_q->f("contract_datebegin");
 echo "</TD>
 </TR>
 <TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_date_expir</FONT></TD><TD>";
-echo $obm_q_contract->f("contract_expiration");
+  <TD><FONT COLOR=\"#$col_label\">$l_dateexp</FONT></TD><TD>";
+echo $contract_q->f("contract_dateexp");
 echo "</TD>
 </TR>
 <TR>
   <TD><FONT COLOR=\"#$col_label\">$l_kind</FONT></TD><TD>
 	".$dis_cont_type."
   </TD>
-</TR><TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_kind_deal</FONT></TD><TD>
-  ".$dis_deal_type."
-  </TD>
 </TR>
 </TABLE>
 
-<TABLE border=0>
-<TR>
-  <TD><FONT COLOR=\"#$col_label\">$l_marketing_manager</FONT></TD><TD>
-  ".$dis_cont_mark." 
-  </TD></TR><TR><TD><FONT COLOR=\"#$col_label\">$l_technical_manager</FONT></TD><TD>
-  ".$dis_cont_tec."	 
-  </TD>
-</TR>
-</TABLE>";
+<table border=0>
+<tr>
+  <td>
+    <font color=\"#$col_label\">$l_marketing_manager</font></td>
+  <td>$market</td>
+</tr>
+<tr>
+  <td><font color=\"#$col_label\">$l_technical_manager</font></td>
+  <td>$tech</td>
+</tr>
+</table>";
 
   // Pave Societe, contact
-  $obm_q_company->next_record();
+  $comp_q->next_record();
   echo " </TD><TD valign=top>
   <TABLE bgcolor=\"#$col_label\">
     <TR>
     <TD bgcolor=\"#$col_table\" colspan=2>
-    <FONT color=\"#$col_textem\">".$obm_q_company->f("company_name")."</FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+    <FONT color=\"#$col_textem\">".$comp_q->f("company_name")."</FONT>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
     echo "<A HREF=\"".
       $sess->url("../company/company_index.php?action=detailconsult&amp;param_company=$p_company_id")."\">";
     echo "<IMG ALIGN=MIDDLE SRC=\"/images/$set_theme/$ico_company\"></A>
-    <BR>".$obm_q_company->f("company_address1") ."
-    <BR>".$obm_q_company->f("company_zipcode") . " " . $obm_q_company->f("company_town") ."
+    <BR>".$comp_q->f("company_address1") ."
+    <BR>".$comp_q->f("company_zipcode") . " " . $comp_q->f("company_town") ."
     </TD>
     </TR><TR>
     <TD valign=center colspan=2>$l_client_manager</TD>
     </TR><TR>
     ".$dis_cont_cli1."
     <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$obm_q_contract->f("contract_responsable_client_id"))."\">";
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact1_id"))."\">";
     echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
     echo "</TR><TR>
     ".$dis_cont_cli2."
     <TD><A HREF=\"".
-      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$obm_q_contract->f("contract_responsable_client2_id"))."\">";
+      $sess->url("../contact/contact_index.php?action=detailconsult&amp;param_contact=".$contract_q->f("contract_contact2_id"))."\">";
     echo "<IMG ALIGN=middle SRC=\"/images/$set_theme/$ico_contact\"></A></TD>";
     echo "</TR>
 
@@ -433,9 +562,9 @@ echo "
 <TABLE width=100% border=0>
 <TR>";
 echo "<TD valign=top><FONT COLOR=\"#$col_label\">".$l_comment."</FONT><BR>";
-echo nl2br($obm_q_contract->f("contract_comment")); 
+echo nl2br($contract_q->f("contract_comment")); 
 echo "<BR><BR><TD valign=top><FONT COLOR=\"#$col_label\">".$l_clause."</FONT><BR>";
-echo nl2br($obm_q_contract->f("contract_clause")); 
+echo nl2br($contract_q->f("contract_clause")); 
 echo "</TD></TR><TR>
 <TD align=center><BR>
 ".$dis_update." 
@@ -447,168 +576,6 @@ echo "</CENTER>";
 }
 
 
-///////////////////////////////////////////////////////////////////////////////
-// Formulaire de recherche de contract                                        //
-// Contract Contract search Form                                               //
-///////////////////////////////////////////////////////////////////////////////
-// Parameters : 
-// ------------
-//   $obm_q_type : list of contracts types available
-//   $p_label : value of the "label" field
-//   $p_company : value of the "company name" field
-//   $p_type_id : value of the "deal type" item selected in the combo list
-//   $p_dateafter : value of the "date after" field
-//   $p_datebefore : value of the "date before" field
-//   $p_manager_id : value of the "manager" item selected in the combo list
-/////////////////////////////////////////////////////////////////////////////////
-function html_contract_search_form($obm_q_contacts_obm,$obm_q_type,$contract) {
-
-  global $l_label_start,$l_label_libelle,$l_company,$l_kind ,$l_all,$l_all_f,$l_category,$l_state,$l_after,$l_before,$l_manager;
-  global $l_find,$l_marketing_manager,$l_technical_manager; 
-  global $sess;
-
-  $p_label = $contract["label"];
-  $p_company = $contract["companyname"];
-  $p_type_id = $contract["type"];
-  $p_dateafter = $contract["dateafter"];
-  $p_datebefore = $contract["datebefore"];
-  $sel_com_aff = $contract["comercial"];
-  $sel_tech_aff = $contract["technical"];
-  $p_num_aff = $contract["numero"]; 
- 
-  $dis_cont_typ  = "<SELECT name=\"sel_type_aff\"><OPTION value=\"_TOUT_\">" . $l_all;
-  while($obm_q_type->next_record()) {
-    $dis_cont_typ .=  "\n<OPTION value=".$obm_q_type->f("contracttype_id");
-    if ($p_type_id == $obm_q_type->f("contracttype_id")) 
-     $dis_cont_typ .= " selected";
-    $dis_cont_typ .= ">" . $obm_q_type->f("contracttype_label");
-    }
-    $dis_cont_typ .= "</SELECT>";
-
-    if ($obm_q_contacts_obm->nf()>0) {
-    $obm_q_contacts_obm->seek(0);
-  }
-
-  $dis_resp_tec = "<SELECT name=\"sel_resptech_aff\"><OPTION value=\"_TOUT_\">" . $l_all;
-  while($obm_q_contacts_obm->next_record()) {
-    $dis_resp_tec .= "\n<OPTION value=".$obm_q_contacts_obm->f("contact_id");
-    if ($obm_q_contacts_obm->f("contact_id") == $sel_tech_aff) 
-      $dis_resp_tec .= " selected";
-    $dis_resp_tec .= ">". $obm_q_contacts_obm->f("contact_lastname") . " " . $obm_q_contacts_obm->f("contact_firstname")." </OPTION>";
-  };
-  $dis_resp_tec .="</SELECT>";
-
-
-echo "<CENTER>" .
-     "<FORM METHOD=POST NAME=form_contract " .
-     "onSubmit=\"if (check_form(this) == false) return false; " .
-     "else return true;\" ACTION=\"".$sess->url("contract_index.php")."\">";
-
-//---------------------------------------------------------------------------
-echo "<TABLE BORDER=0>" .
-     "<TR>";
-//---------------------------------------------------------------------------
-//---| Numéro du contract |-------------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>" .
-     $l_label_start . "</FONT><BR>" .
-     "<INPUT TYPE=text NAME=tf_num_aff size=20 value=\"".
-     $p_num_aff.
-     "\"></TD>";
-//---------------------------------------------------------------------------
-echo "<TD>&nbsp;&nbsp;</TD>";
-//---------------------------------------------------------------------------
-//---| Nom de SOCIETE |------------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>" .
-     $l_company . "</FONT><BR>" .
-     "<INPUT TYPE=text NAME=tf_soc_aff size=20 value=\"" .
-     $p_company.
-     "\"></TD>";
-//---------------------------------------------------------------------------
-echo "<TD>&nbsp;&nbsp;</TD>";
-//---------------------------------------------------------------------------
-//---| DATE EXPIRATION APRES |---------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>" .
-     $l_after . "</FONT><BR>" .
-     "<INPUT TYPE=text NAME=tf_dateapres_aff size=10 value=\"" .
-     $p_dateafter .
-     "\"></TD>";
- echo "<TD> &nbsp; </TD>";
-//---------------------------------------------------------------------------
-//---| DATE EXPIRATION AVANT |---------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>" .
-     $l_before . "</FONT><BR>" .
-     "<INPUT TYPE=text NAME=tf_dateavant_aff size=10 value=\"" .
-     $p_datebefore .
-     "\"></TD>";
-//---------------------------------------------------------------------------
-echo "<TD>&nbsp;&nbsp;</TD>";
-echo "</TR>" .
-     "</TABLE>";
-//---------------------------------------------------------------------------
-
-
-//---------------------------------------------------------------------------
-echo "<TABLE BORDER=0>" .
-     "<TR>";
-//---------------------------------------------------------------------------
-//---| Libellé du contract |-------------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>" .
-     $l_label_libelle . "</FONT><BR>" .
-     "<INPUT TYPE=text NAME=tf_label_aff size=20 value=\"".
-     $p_label.
-     "\"></TD>";
-//---------------------------------------------------------------------------
-echo "<TD>&nbsp;&nbsp;</TD>";
-//---------------------------------------------------------------------------
-//---| TYPE de CONTRACT |------------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD><FONT SIZE=-2>&nbsp;&nbsp;" .
-     $l_kind . "</FONT><BR>" .
-     $dis_cont_typ ."
-     </TD>";
-
-
-//---------------------------------------------------------------------------
-//---| Responsable Technique |-----------------------------------------------
-//---------------------------------------------------------------------------
-  echo "</TD><TD><FONT SIZE=-2>  &nbsp; &nbsp; &nbsp; &nbsp;".$l_technical_manager. " </FONT><BR>
-  ".$dis_resp_tec; 
-  //  echo "</TR><TR colspan=2></TD><TD><FONT COLOR=\"#$col_label\">$l_client_manager</FONT><BR><SELECT name=\"sel_respclient_aff\">";
-  //while($obm_q_contacts->next_record()) {
-  //echo "\n<OPTION value=".$obm_q_contacts->f("contact_id");
-  //if ($obm_q_contacts->f("contact_id") == $con2_id) echo " selected";
-  //echo ">". $obm_q_contacts->f("contact_lastname")." ". $obm_q_contacts->f("contact_firstname") .
-  //"</OPTION>";
-  //}
-  
-  //echo "</SELECT></TD>";
-  
-
-
-  echo "<TD>&nbsp;&nbsp;</TD>";
-
-//---------------------------------------------------------------------------
-//---| Bouton VALIDER |------------------------------------------------------
-//---------------------------------------------------------------------------
-echo "<TD VALIGN=bottom> 
-     <INPUT NAME=\"action\" TYPE=\"hidden\" VALUE=\"search\">";
-echo "<INPUT NAME=\"submit\" TYPE=\"submit\" VALUE=\"$l_find\">
-     </TD>";
-//---------------------------------------------------------------------------
-echo "</TR>" .
-     "</TABLE>";
-
-//---------------------------------------------------------------------------
-
-echo "</FORM>" .
-     "<HR>";
-
-}
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -638,10 +605,6 @@ function dis_contract_search_list($contract) {
 ///////////////////////////////////////////////////////////////////////////////
 // Parameters :
 // ------------
-//     $obm_q_deals : list of deals
-//     $obm_q_display_options : fields to display in the list of deals 
-//     $nb_deals : nb deals found
-//
 //     $p_label, 
 //     $p_company,
 //     $p_type_id,
@@ -651,7 +614,7 @@ function dis_contract_search_list($contract) {
 //     $p_datebefore,
 //     $p_manager_id, 
 ///////////////////////////////////////////////////////////////////////////////
-function html_contract_search_list($obm_q_contracts,$obm_q_display_options,$nb_contract,$contract) {
+function html_contract_search_list($contract_q,$obm_q_display_options,$nb_contract,$contract) {
   global $col_textem, $l_found, $sess;
 
   $p_label = $contract["label"];
@@ -659,19 +622,19 @@ function html_contract_search_list($obm_q_contracts,$obm_q_display_options,$nb_c
   $p_dateafter = $contract["dateafter"];
   $p_datebefore = $contract["datebefore"];
   $p_company = $contract["companyname"];
-  $sel_com_aff = $contract["comercial"];
-  $sel_tech_aff = $contract["technical"];
-  $p_num_aff = $contract["numero"]; 
+  $sel_market = $contract["market"];
+  $sel_tech = $contract["tech"];
+  $p_num = $contract["number"]; 
 
   echo "<font color=\"#$col_textem\">$nb_contract $l_found</font>";
 
-  $url = $sess->url("contract_index.php?action=search&amp;tf_label_aff=$p_label&amp;tf_soc_aff=$p_company&amp;sel_respcomm_aff=$sel_com_aff&amp;sel_type_aff=$p_type_id&amp;sel_etat_aff=$p_status_id&amp;tf_number_contract=$p_num_aff&amp;sel_resptech_aff=$sel_tech_aff&amp;tf_dateapres_aff=$p_dateafter&amp;tf_dateavant_aff=$p_datebefore");
+  $url = $sess->url("contract_index.php?action=search&amp;tf_label=$p_label&amp;tf_soc=$p_company&amp;sel_market=$sel_market&amp;sel_type=$p_type_id&amp;tf_num=$p_num&amp;sel_tech=$sel_tech&amp;tf_dateapres=$p_dateafter&amp;tf_dateavant=$p_datebefore");
   echo "<br>";
 
-   $obm_q_contracts->seek($first_row);
+   $contract_q->seek($first_row);
 
    $dis_contracts_list=new OBM_DISPLAY("DATA",$obm_q_display_options);
-   $dis_contracts_list->data_set = $obm_q_contracts;
+   $dis_contracts_list->data_set = $contract_q;
    $dis_contracts_list->data_url = $url;
    $dis_contracts_list->data_header = "both";
    $dis_contracts_list->display() ;

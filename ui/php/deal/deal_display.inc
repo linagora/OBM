@@ -14,9 +14,9 @@
 //   - $deal[] : hash with deal and parent deal values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_deal_index($deal="") {
-  $obm_q_con = run_query_internal_contact();
-  html_parentdeal_search_form($deal, $obm_q_con);
-  html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $obm_q_con);
+  $usr_q = run_query_userobm();
+  html_parentdeal_search_form($deal, $usr_q);
+  html_deal_search_form($deal, run_query_dealtype(), run_query_deal_tasktype(), run_query_dealstatus(), $usr_q);
 }
 
 
@@ -29,7 +29,7 @@ function dis_deal_index($deal="") {
 //   - $obm_q_type    : DB result object (deal kind list)
 //   - $obm_q_cat     : DB result object (deal categories list)
 //   - $obm_q_state   : DB result object (deal status list)
-//   - $obm_q_manager : DB result object (internal contacts list)
+//   - $obm_q_manager : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
 function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $obm_q_manager) {
   global $l_deal, $l_label_start, $l_company, $l_kind, $l_category, $l_state;
@@ -76,7 +76,6 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   }
   $sel_cat .= "</SELECT>";
 
-
   // State select construction
   $sel_state = "<SELECT name=sel_state>
      <OPTION value=\"$c_all\">$l_all";
@@ -93,16 +92,16 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
   if ($obm_q_manager->num_rows() > 0) {
     $obm_q_manager->seek(0);
   }
-  $sel_manager = "<SELECT name=sel_manager>
-     <OPTION value=\"$c_all\">$l_all";
+  $sel_manager = "<select name=sel_manager>
+     <option value=\"$c_all\">$l_all";
   while($obm_q_manager->next_record()) {
-    $id = $obm_q_manager->f("contact_id");
-    $lname = $obm_q_manager->f("contact_lastname");
-    $sel_manager .= "<OPTION value=\"$id\"";
+    $id = $obm_q_manager->f("userobm_id");
+    $lname = $obm_q_manager->f("userobm_lastname");
+    $sel_manager .= "<option value=\"$id\"";
     if ($manager == $id) $sel_manager .= " selected";
     $sel_manager .= ">$lname";
   }
-  $sel_manager .= "</SELECT>";
+  $sel_manager .= "</select>";
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -174,7 +173,7 @@ function html_deal_search_form($deal, $obm_q_type, $obm_q_cat, $obm_q_state, $ob
 // Parameters : 
 //   - $deal[]         : default form values
 //     keys used       plabel, parchive, pmanager
-//   - $obm_q_pmanager : DB result object (Internal contact list)
+//   - $obm_q_pmanager : DB result object (userobm list)
 ///////////////////////////////////////////////////////////////////////////////
 function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   global $l_parentdeal, $l_label_start,$l_all,$l_all_f,$l_manager;
@@ -191,16 +190,16 @@ function html_parentdeal_search_form($deal, $obm_q_pmanager) {
   if ($obm_q_pmanager->num_rows() > 0) {
     $obm_q_pmanager->seek(0);
   }
-  $sel_pmanager = "<SELECT name=sel_pmanager>
-     <OPTION value=\"$c_all\">$l_all";
+  $sel_pmanager = "<select name=sel_pmanager>
+     <option value=\"$c_all\">$l_all";
   while($obm_q_pmanager->next_record()) {
-    $id = $obm_q_pmanager->f("contact_id");
-    $lname = $obm_q_pmanager->f("contact_lastname");
-    $sel_pmanager .= "<OPTION value=\"$id\"";
+    $id = $obm_q_pmanager->f("userobm_id");
+    $lname = $obm_q_pmanager->f("userobm_lastname");
+    $sel_pmanager .= "<option value=\"$id\"";
     if ($pmanager == $id) $sel_pmanager .= " selected";
     $sel_pmanager .= ">$lname";
   }
-  $sel_pmanager .= "</SELECT>";
+  $sel_pmanager .= "</select>";
 
   // --- HTML Page display ----------------------------------------------------
 
@@ -308,11 +307,10 @@ function html_deal_search_list($obm_q_deals, $pref_q, $nb_deal, $deal) {
 // HTML Display Contact Consult                                              //
 // Parameters :
 //   -  $deal_q    : DBO : information about the deal
-//   -  $int_con_q : DBO : list of contacts from internal companies 
 //   -  $con_q     : DBO : list of contact from the company 
 //   -  $comp_id   : id of the company concerned by the deal
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_consult($deal_q,$int_con_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
+function html_deal_consult($deal_q,$con_q,$comp_id, $q_invoices, $invoices_options) {
   // -- Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact, $col_link;
   // - Labels
@@ -333,8 +331,8 @@ function html_deal_consult($deal_q,$int_con_q,$con_q,$comp_id, $q_invoices, $inv
   $kind = $deal_q->f("dealtype_label");
   $cat = $deal_q->f("tasktype_label");
   $lvis = ($deal_q->f("deal_visibility") == 0 ? $l_public : $l_private);
-  $mark = $deal_q->f("deal_marketingmanager_id");
-  $tech = $deal_q->f("deal_technicalmanager_id");
+  $market = $deal_q->f("lname1") . " " . $deal_q->f("fname1");
+  $tech = $deal_q->f("lname2") . " " . $deal_q->f("fname2");
   $datepro = ($deal_q->f("deal_dateproposal") != "0000-00-00" ? $deal_q->f("deal_dateproposal") : "");
   $amount = $deal_q->f("deal_amount");
   $con1 = $deal_q->f("deal_contact1_id");
@@ -407,28 +405,17 @@ function html_deal_consult($deal_q,$int_con_q,$con_q,$comp_id, $q_invoices, $inv
         </TR>
         </TABLE>
 
-        <TABLE border=0>
-        <TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_marketing_manager</FONT></TD>
-          <TD>";
-  while($int_con_q->next_record()) {
-    if ($int_con_q->f("contact_id") == $mark) echo $int_con_q->f("contact_lastname") . " " . $int_con_q->f("contact_firstname");
-  }
-  echo "</TD>
-        </TR><TR>
-          <TD><FONT COLOR=\"#$col_label\">$l_technical_manager</FONT></TD>
-          <TD>";
-  if ($int_con_q->nf()>0) {
-    $int_con_q->seek(0); 
-  }
-  while($int_con_q->next_record()) {
-    if ($int_con_q->f("contact_id") == $tech) echo $int_con_q->f("contact_lastname") . " " . $int_con_q->f("contact_firstname");
-  }
+        <table border=0>
+        <tr>
+          <td><font color=\"#$col_label\">$l_marketing_manager</font></td>
+          <td>$market</td>
+        </tr><tr>
+          <td><font color=\"#$col_label\">$l_technical_manager</font></td>
+          <td>$tech</td>
+        </tr>
+        </table>
 
-echo "</TD>
-        </TR>
-        </TABLE>
-        <BR>
+        <br>
         <TABLE border=2 bgcolor=\"#$col_table\"><TR><TD>
           <TABLE>
           <TR>
@@ -562,11 +549,11 @@ echo "</TD>
 		       "&amp;param_deal=".$id.
 		       "&amp;incl_arch=1");
     echo "
-<center>
- <form method=\"post\" action=\"$url\">
-  <input type=\"submit\" value=\"$l_see_archived_invoices\">
- </form>
-</center>";
+      <center>
+       <form method=\"post\" action=\"$url\">
+	<input type=\"submit\" value=\"$l_see_archived_invoices\">
+       </form>
+      </center>";
   }
 }
 
@@ -578,7 +565,7 @@ echo "</TD>
 //   - $deal_q    : DBO : information about the deal (null for new deal)
 //   - $kind_q    : DBO : deal kind list
 //   - $cat_q     : DBO : deal category list
-//   - $int_con_q : DBO : list of contacts from internal companies 
+//   - $usr_q     : DBO : list of userobm
 //   - $comp_q    : DBO : deal company infos (name, ad1, zip, town when new)
 //   - $con_q     : DBO : list of contact from the company 
 //   - $sta_q     : DBO : list of deal status
@@ -586,7 +573,7 @@ echo "</TD>
 //   - deal[]     : default or transmitted values
 //     keys used  : id, usercreate, num, label
 ///////////////////////////////////////////////////////////////////////////////
-function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
+function html_deal_form($action,$deal_q,$kind_q,$cat_q,$usr_q,$comp_q,$con_q,$sta_q,$comp_id,$deal) {
   // - Themes
   global $set_theme,$col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
@@ -662,57 +649,57 @@ function html_deal_form($action,$deal_q,$kind_q,$cat_q,$int_con_q,$comp_q,$con_q
   }  
 
   // Kind select construction
-  $sel_kind = "<SELECT name=sel_kind>
-    <OPTION value=\"0\">$l_sel_none</OPTION>";
+  $sel_kind = "<select name=sel_kind>
+    <option value=\"0\">$l_sel_none</option>";
   while ($kind_q->next_record()) {
     $kid = $kind_q->f("dealtype_id");
     $klabel = $kind_q->f("dealtype_label");
-    $sel_kind .= "\n<OPTION value=\"$kid\"";
+    $sel_kind .= "\n<option value=\"$kid\"";
     if ($kind == $kid) $sel_kind .= " selected"; 
-    $sel_kind .= ">$klabel</OPTION>";
+    $sel_kind .= ">$klabel</option>";
   }
-  $sel_kind .= "</SELECT>";
+  $sel_kind .= "</select>";
 
   // Category select construction
-  $sel_cat = "<SELECT name=sel_cat>
-    <OPTION value=\"0\">$l_sel_none</OPTION>";
+  $sel_cat = "<select name=sel_cat>
+    <option value=\"0\">$l_sel_none</option>";
   while($cat_q->next_record()) {
     $cid = $cat_q->f("tasktype_id");
     $tt_label = $cat_q->f("tasktype_label");
-    $sel_cat .= "\n<OPTION value=\"$cid\"";
+    $sel_cat .= "\n<option value=\"$cid\"";
     if ($cat == $cid) $sel_cat .= " selected"; 
-    $sel_cat .= ">$tt_label</OPTION>\n";
+    $sel_cat .= ">$tt_label</option>\n";
   }
-  $sel_cat .= "</SELECT>";
+  $sel_cat .= "</select>";
  
   // Marketing manager select construction
-  $sel_market = "<SELECT name=sel_market>
-    <OPTION value=\"0\">$l_sel_none</OPTION>";
-  while ($int_con_q->next_record()) {
-    $cid = $int_con_q->f("contact_id");
-    $cname = $int_con_q->f("contact_lastname") . " " .
-             $int_con_q->f("contact_firstname");
-    $sel_market .= "<OPTION value=\"$cid\"";
+  $sel_market = "<select name=sel_market>
+    <option value=\"0\">$l_sel_none</option>";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname") . " " .
+             $usr_q->f("userobm_firstname");
+    $sel_market .= "<option value=\"$cid\"";
     if ($market == $cid) $sel_market .= " selected"; 
-    $sel_market .= ">$cname</OPTION>\n";
+    $sel_market .= ">$cname</option>\n";
   }
-  $sel_market .= "</SELECT>";
+  $sel_market .= "</select>";
 
   // Technical manager select construction
-  if ($int_con_q->nf()>0) {
-    $int_con_q->seek(0);
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
   }
-  $sel_tech = "<SELECT name=sel_tech>
-    <OPTION value=\"0\">$l_sel_none</OPTION>";
-  while ($int_con_q->next_record()) {
-    $cid = $int_con_q->f("contact_id");
-    $cname = $int_con_q->f("contact_lastname") . " " .
-             $int_con_q->f("contact_firstname");
-    $sel_tech .= "<OPTION value=\"$cid\"";
+  $sel_tech = "<select name=sel_tech>
+    <option value=\"0\">$l_sel_none</option>";
+  while ($usr_q->next_record()) {
+    $cid = $usr_q->f("userobm_id");
+    $cname = $usr_q->f("userobm_lastname") . " " .
+             $usr_q->f("userobm_firstname");
+    $sel_tech .= "<option value=\"$cid\"";
     if ($tech == $cid) $sel_tech .= " selected"; 
-    $sel_tech .= ">$cname</OPTION>\n";
+    $sel_tech .= ">$cname</option>\n";
   }
-  $sel_tech .= "</SELECT>";
+  $sel_tech .= "</select>";
 
   // Contact 1 select construction
   $sel_con1 = "<SELECT name=sel_contact1>";
@@ -1518,11 +1505,11 @@ function html_parentdeal_search_list($obm_q, $option_dis_q, $nb_parentdeals, $de
 // Parameters :
 //   - $action    : action called
 //   - $deal_q    : DBO : information about the parent deal (null for new deal)
-//   - $int_con_q : DBO : list of contacts from internal companies 
+//   - $usr_q : DBO : list of contacts from internal companies 
 //   - deal[]     : default or transmitted values
 //     keys used  : parent_id, plabel, pmarket, ptech, pcom
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_form($action, $deal_q, $int_con_q, $deal) {
+function html_parentdeal_form($action, $deal_q, $usr_q, $deal) {
   // -- Themes
   global $col_label,$col_table,$col_textem,$col_ok,$ico_company,$ico_contact;
   // -- Labels
@@ -1546,89 +1533,89 @@ function html_parentdeal_form($action, $deal_q, $int_con_q, $deal) {
   }  
 
   // Marketing manager select
-  $sel_market = "<SELECT name=\"sel_pmarket\">";
-  while($int_con_q->next_record()) {
-    $sel_market .= "<OPTION value=\"" . $int_con_q->f("contact_id") . "\"";
-    if ($int_con_q->f("contact_id") == $pmarket) $sel_market .= " selected";
-    $sel_market .= ">" . $int_con_q->f("contact_lastname") . " " . $int_con_q->f("contact_firstname");
+  $sel_market = "<select name=\"sel_pmarket\">";
+  while($usr_q->next_record()) {
+    $sel_market .= "<option value=\"" . $usr_q->f("userobm_id") . "\"";
+    if ($usr_q->f("userobm_id") == $pmarket) $sel_market .= " selected";
+    $sel_market .= ">" . $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname");
   }
-  $sel_market .= "</SELECT>";
+  $sel_market .= "</select>";
 
   // Technical manager select
-  if ($int_con_q->nf()>0) {
-    $int_con_q->seek(0);
+  if ($usr_q->nf()>0) {
+    $usr_q->seek(0);
   }
-  $sel_tech = "<SELECT name=\"sel_ptech\">";
-  while($int_con_q->next_record()) {
-    $sel_tech .= "<OPTION value=\"" . $int_con_q->f("contact_id") . "\"";
-    if ($int_con_q->f("contact_id") == $ptech) $sel_tech .= " selected";
-    $sel_tech .= ">" . $int_con_q->f("contact_lastname") . " " . $int_con_q->f("contact_firstname");
+  $sel_tech = "<select name=\"sel_ptech\">";
+  while($usr_q->next_record()) {
+    $sel_tech .= "<option value=\"" . $usr_q->f("userobm_id") . "\"";
+    if ($usr_q->f("userobm_id") == $ptech) $sel_tech .= " selected";
+    $sel_tech .= ">" . $usr_q->f("userobm_lastname") . " " . $usr_q->f("userobm_firstname");
   }
-  $sel_tech .= "</SELECT>";
+  $sel_tech .= "</select>";
 
 
-  echo "<CENTER>
-    <FORM METHOD=POST NAME=form_parentdeal_update
+  echo "<center>
+    <form method=post name=form_parentdeal_update
       onSubmit=\"if (check_parentdeal(this)) return true; else return false;\"
-      ACTION=\"" . $sess->url("deal_index.php") . "\">
+      action=\"" . $sess->url("deal_index.php") . "\">
 
-    <TABLE>
-    <TR>
-      <TD align=center>
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_label</FONT><BR>
-          <INPUT NAME=tf_plabel TYPE=text size=40 value=\"$plabel\">
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    <TR>
-      <TD align=center>
-      <TABLE> 
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_marketing_manager</FONT><BR>
+    <table>
+    <tr>
+      <td align=center>
+      <table>
+      <tr>
+        <td><font color=\"#$col_label\">$l_label</font><br>
+          <input name=tf_plabel type=text size=40 value=\"$plabel\">
+        </td>
+      </tr>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td align=center>
+      <table> 
+      <tr>
+        <td><font color=\"#$col_label\">$l_marketing_manager</font><br>
         $sel_market
-        </TD><TD><FONT COLOR=\"#$col_label\">$l_technical_manager</FONT><BR>
+        </td><td><font color=\"#$col_label\">$l_technical_manager</font><br>
         $sel_tech
-        </TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    <TR>
-      <TD align=center>
-      <TABLE>
-      <TR>
-        <TD><FONT COLOR=\"#$col_label\">$l_comment</FONT><BR>
-          <TEXTAREA NAME=\"ta_pcom\" ROWS=8 COLS=72>$pcomment</TEXTAREA></TD>
-        <TD align=right>";
+        </td>
+      </tr>
+      </table>
+      </td>
+    </tr>
+    <tr>
+      <td align=center>
+      <table>
+      <tr>
+        <td><font color=\"#$col_label\">$l_comment</font><br>
+          <textarea name=\"ta_pcom\" rows=8 cols=72>$pcomment</textarea></td>
+        <td align=right>";
 
   if (($action == "parent_detailupdate") || ($action == "parent_update")) {
-    echo "<INPUT TYPE=hidden NAME=action VALUE=\"parent_update\">
-        <INPUT TYPE=hidden NAME=param_parent VALUE=\"$parent\">
-        <INPUT TYPE=submit value=\"$l_update_parent\">
-      </FORM>
-      <FORM METHOD=POST NAME=form_parentdeal_delete
+    echo "<input type=hidden name=action value=\"parent_update\">
+        <input type=hidden name=param_parent value=\"$parent\">
+        <input type=submit value=\"$l_update_parent\">
+      </form>
+      <form method=post name=form_parentdeal_delete
       onSubmit=\"if (valider_suppression()) return true; else return false;\"
-      ACTION=\"" . $sess->url("deal_index.php") . "\">
-       <INPUT TYPE=hidden NAME=action VALUE=\"parent_delete\">
-       <INPUT TYPE=hidden NAME=param_parent VALUE=\"$parent\">
-       <INPUT TYPE=submit value=\"$l_delete_parent\">";
+      action=\"" . $sess->url("deal_index.php") . "\">
+       <input type=hidden name=action value=\"parent_delete\">
+       <input type=hidden name=param_parent value=\"$parent\">
+       <input type=submit value=\"$l_delete_parent\">";
   } else {
-    echo "<INPUT TYPE=hidden NAME=action value=\"parent_insert\">
-      <INPUT TYPE=submit value=\"$l_insert_parent\">";
+    echo "<input type=hidden name=action value=\"parent_insert\">
+      <input type=submit value=\"$l_insert_parent\">";
   }
 
-  echo "</TD>
-      </TR>
-      </TABLE>
-      </TD>
-    </TR>
-    </TABLE>
-    </FORM>
-  </CENTER>";
+  echo "</td>
+      </tr>
+      </table>
+      </td>
+    </tr>
+    </table>
+    </form>
+  </center>";
 }
 
 
@@ -1645,9 +1632,9 @@ function html_parentdeal_form($action, $deal_q, $int_con_q, $deal) {
 //   - $kind_q        : list of deal types available
 //   - $cat_q         : list of deal categpries available
 //   - $state_q       : list of deal status available 
-//   - $int_con_q     : DBO : list of contacts from internal companies 
+//   - $usr_q     : DBO : list of contacts from internal companies 
 ///////////////////////////////////////////////////////////////////////////////
-function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$int_con_q) {
+function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind_q,$cat_q,$state_q,$usr_q) {
   global $col_textem,$col_label,$col_ok; 
   global $path,$sess,$auth,$perms_user;
   global $l_found,$l_no_found,$l_parentdeal_deal_new,$l_parentdeal_deals,$l_update_parent,$l_label,$l_technical_manager,$l_marketing_manager,$l_date_proposal,$l_date_alarm,$l_amount_in,$l_amount_out,$l_comment,$l_state;
@@ -1660,8 +1647,8 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
   $ptech = $parent_q->f("parentdeal_technicalmanager_id");
   $pcomment = $parent_q->f("parentdeal_comment");
 
-  $pmarket_name = get_contact_name($pmarket);
-  $ptech_name = get_contact_name($ptech);
+  $pmarket_name = $parent_q->f("lname1") . " " . $parent_q->f("fname1");
+  $ptech_name = $parent_q->f("lname2") . " " . $parent_q->f("fname2");
   $p_status = get_parent_status($parent);
   $p_dateproposal = get_parent_dateproposal($parent);
   $p_datealarm = get_parent_datealarm($parent);
@@ -1751,7 +1738,7 @@ function html_parentdeal_consult($parent_q,$deal_q,$deal,$pref_q,$nb_deals,$kind
     <hr>";
 
   //----- DEAL SEARCH FORM 
-  html_deal_search_form($deal, $kind_q, $cat_q, $state_q, $int_con_q);
+  html_deal_search_form($deal, $kind_q, $cat_q, $state_q, $usr_q);
 
   //-----> DEAL LIST
   // If no record found, display it and stop

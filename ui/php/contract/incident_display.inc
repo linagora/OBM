@@ -10,6 +10,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Display Company search Form                                               //
 // Parameters:
+//   - $usr_q      : DB result object (userobm list)
 //   - $incident[] : default form values
 //     keys used  : status, label incident, priority, label contract
 ///////////////////////////////////////////////////////////////////////////////

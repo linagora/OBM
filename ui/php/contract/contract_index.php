@@ -92,7 +92,8 @@ display_bookmarks();
 if ($action == "index") {
 //OK///////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
-  html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
+  $usr_q = run_query_userobm();
+  html_contract_search_form($contract, $usr_q, run_query_contracttype());
   if ($set_display == "yes") {
     dis_contract_search_list($contract);
   } else {
@@ -101,14 +102,15 @@ if ($action == "index") {
 } elseif ($action == "search")  {
 //OK///////////////////////////////////////////////////////////////////////////
   require("contract_js.inc");
-  html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
+  $usr_q = run_query_userobm();
+  html_contract_search_form($contract, $usr_q, run_query_contracttype());
   dis_contract_search_list($contract);
 
 } elseif ($action == "new")  {
 //OK///////////////////////////////////////////////////////////////////////////
   if ($auth->auth["perm"] != $perms_user) {
-  	require("contract_js.inc");
-        html_contract_form(new DB_OBM,$action,run_query_contracttype(),run_query_contract_dealtype(),run_query_contact_company_obm(),run_query_company_contract($param_company),run_query_contact_contract($param_company),$param_company);
+    require("contract_js.inc");
+    html_contract_form(new DB_OBM,$action,run_query_contracttype(),run_query_userobm(),run_query_company_info($param_company),run_query_contact_contract($param_company),$param_company);
   }
   else {
 	display_error_permission();
@@ -135,50 +137,49 @@ if ($action == "index") {
 } elseif ($action == "detailconsult_contract")  {
 ///////////////////////h//////////////////////////////////////////////////////
   if ($param_contract > 0) {
-    $obm_q_contract=run_query_detail($param_contract);
-    $obm_q_contract->next_record();    
-    display_record_info($obm_q_contract->f("contract_usercreate"),$obm_q_contract->f("contract_userupdate"),$obm_q_contract->f("timecreate"),$obm_q_contract->f("timeupdate"));
-    html_contract_consult($obm_q_contract,run_query_contracttype(),run_query_contract_dealtype(),run_query_contact_company_obm(),run_query_company_contract($obm_q_contract->f("contract_company_id")),run_query_contact_contract($obm_q_contract->f("contract_company_id")),$obm_q_contract->f("contract_company_id"));
-  };
+    $contract_q = run_query_detail($param_contract);
+    display_record_info($contract_q->f("contract_usercreate"),$contract_q->f("contract_userupdate"),$contract_q->f("timecreate"),$contract_q->f("timeupdate"));
+    html_contract_consult($contract_q,run_query_contracttype(),run_query_company_info($contract_q->f("contract_company_id")),run_query_contact_contract($contract_q->f("contract_company_id")),$contract_q->f("contract_company_id"));
+  }
 
 } elseif ($action == "detailupdate")  {
 ///////////////////////h//////////////////////////////////////////////////////
   if ($param_contract > 0) {
     $obm_q_contract=run_query_detail($param_contract);
-    $obm_q_contract->next_record();    
     require("contract_js.inc");
     display_record_info($obm_q_contract->f("contract_usercreate"),$obm_q_contract->f("contract_userupdate"),$obm_q_contract->f("timecreate"),$obm_q_contract->f("timeupdate"));
 
-    html_contract_form($obm_q_contract,$action,run_query_contracttype(),run_query_contract_dealtype(),run_query_contact_company_obm(),run_query_company_contract($obm_q_contract->f("contract_company_id")),run_query_contact_contract($obm_q_contract->f("contract_company_id")),$obm_q_contract->f("contract_company_id"));
+    html_contract_form($obm_q_contract,$action,run_query_contracttype(),run_query_userobm(),run_query_company_info($obm_q_contract->f("contract_company_id")),run_query_contact_contract($obm_q_contract->f("contract_company_id")),$obm_q_contract->f("contract_company_id"));
   };
 
 } elseif ($action == "insert")  {
 //OK///////////////////////////////////////////////////////////////////////////
-  //<TITLE>$l_title - $l_deal_insert</TITLE>
  if (check_data_form("", $contract)) {
    run_query_insert($contract);
     display_ok_msg($l_insert_ok);
   } else {
     display_err_msg($l_invalid_data . " : " . $err_msg);
-  };
- require("contract_js.inc");
-  html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
+  }
+  require("contract_js.inc");
+  $usr_q = run_query_userobm();
+  html_contract_search_form($contract, $usr_q, run_query_contracttype());
  
 } elseif ($action == "update")  {
-  ///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   if (check_data_form("", $contract)) {  
     run_query_update($contract);         
     display_ok_msg($l_update_ok);
   } else  display_err_msg($l_invalid_data . " : " . $err_msg);
   require("contract_js.inc");
-  html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
- 
+  $usr_q = run_query_userobm();
+  html_contract_search_form($contract, $usr_q, run_query_contracttype());
 
 } elseif ($action == "delete")  {
 ///OK//////////////////////////////////////////////////////////////////////////
   run_query_delete($param_contract);
   display_ok_msg($l_delete_ok);
-  html_contract_search_form(run_query_contact_company_obm(),run_query_contracttype(),$contract);
+  $usr_q = run_query_userobm();
+  html_contract_search_form($contract, $usr_q, run_query_contracttype());
 
 } elseif ($action == "admin")  {
 //////////////////////////////////////////////////////////////////////////////
@@ -240,48 +241,44 @@ if ($action == "index") {
   html_contract_admin_form(run_query_contracttype());
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Stores Contract parameters transmited in $contract hash
 // returns : $contract hash with parameters set
 ///////////////////////////////////////////////////////////////////////////////
 function get_param_contract() {
-  global $tf_label_aff,$tf_soc_aff,$sel_type_aff,$sel_cat_aff,$sel_etat_aff;
-  global $tf_dateapres_aff,$tf_dateavant_aff,$sel_manager,$cb_arc_aff,$param_company;
-  global $param_contract,$tf_num_aff,$sel_respcomm_aff,$sel_resptech_aff,$hd_soc_aff;
-  global $tf_number_contract,$ta_clause_aff,$ta_com_aff,$sel_typedeal_aff,$sel_con1_aff;
-  global $sel_con2_aff,$tf_datedebut_aff,$tf_datefin_aff;
+  global $tf_label,$tf_soc,$sel_type;
+  global $tf_dateafter,$tf_datebefore,$sel_manager,$cb_arc,$param_company;
+  global $param_contract,$tf_num,$sel_market, $sel_tech, $hd_soc;
+  global $ta_clause,$ta_com,$sel_con1, $sel_con2,$tf_datebegin,$tf_dateexp;
   global $cdg_param;
 
   if (isset ($param_contract)) $contract["id"] = $param_contract;
-  if (isset ($param_marketing)) $contract["marketing_id"] = $param_marketing;
-  if (isset ($param_technical)) $contract["technical_id"] = $param_technical;
   if (isset ($param_company)) $contract["company_id"] = $param_company;
 
-  if (isset ($tf_label_aff)) $contract["label"] = $tf_label_aff;
-  if (isset ($tf_soc_aff)) $contract["companyname"] = $tf_soc_aff;
-  if (isset ($tf_dateapres_aff)) $contract["dateafter"] = $tf_dateapres_aff;
-  if (isset ($tf_dateavant_aff)) $contract["datebefore"] = $tf_dateavant_aff;
-  if (isset ($tf_datedebut_aff)) $contract["datedebut"] = $tf_datedebut_aff;
-  if (isset ($tf_datefin_aff)) $contract["datefin"] = $tf_datefin_aff;
-  if (isset ($tf_num_aff)) $contract["numero"] = $tf_num_aff;
-  if (isset ($tf_number_contract)) $contract["numero"] = $tf_number_contract;
+  if (isset ($tf_label)) $contract["label"] = $tf_label;
+  if (isset ($tf_soc)) $contract["companyname"] = $tf_soc;
+  if (isset ($tf_datebegin)) $contract["datebegin"] = $tf_datebegin;
+  if (isset ($tf_dateexp)) $contract["dateexp"] = $tf_dateexp;
+  if (isset ($tf_num)) $contract["number"] = $tf_num;
 
+  if (isset ($sel_market)) $contract["market"] = $sel_market;
+  if (isset ($sel_tech)) $contract["tech"] = $sel_tech;
+  if (isset ($sel_con1)) $contract["contact1"] = $sel_con1;
+  if (isset ($sel_con2)) $contract["contact2"] = $sel_con2;
+  if (isset ($sel_type)) $contract["type"] = $sel_type;
+
+  if (isset ($cb_arc)) $contract["arc"] = $cb_arc;
+
+  if (isset ($ta_clause)) $contract["clause"] = $ta_clause;  
+  if (isset ($ta_com)) $contract["comment"] = $ta_com;  
+
+  if (isset ($hd_soc)) $contract["company_id"] = $hd_soc;
+
+  // Search fields
+  if (isset ($tf_dateafter)) $contract["dateafter"] = $tf_dateafter;
+  if (isset ($tf_datebefore)) $contract["datebefore"] = $tf_datebefore;
   if (isset ($sel_manager)) $contract["manager"] = $sel_manager;
-  if (isset ($sel_respcomm_aff)) $contract["comercial"] = $sel_respcomm_aff;
-  if (isset ($sel_resptech_aff)) $contract["technical"] = $sel_resptech_aff;
-  if (isset ($sel_typedeal_aff)) $contract["typedeal"] = $sel_typedeal_aff;
-  if (isset ($sel_con1_aff)) $contract["clientel1"] = $sel_con1_aff;
-  if (isset ($sel_con2_aff)) $contract["clientel2"] = $sel_con2_aff;
-  if (isset ($sel_type_aff)) $contract["type"] = $sel_type_aff;
-  if (isset ($sel_cat_aff)) $contract["cat"] = $sel_cat_aff;
-  if (isset ($sel_etat_aff)) $contract["etat"] = $sel_etat_aff;
-
-  if (isset ($cb_arc_aff)) $contract["arc"] = $cb_arc_aff;
-
-  if (isset ($ta_clause_aff)) $contract["clause"] = $ta_clause_aff;  
-  if (isset ($ta_com_aff)) $contract["commentaire"] = $ta_com_aff;  
-
-  if (isset ($hd_soc_aff)) $contract["company_id"] = $hd_soc_aff;
 
 
   if (debug_level_isset($cdg_param)) {

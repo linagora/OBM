@@ -346,23 +346,6 @@ function run_query_companytype() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Userobm query execution                                                   //
-// Return:
-//   - Database Object : userobm list
-///////////////////////////////////////////////////////////////////////////////
-function run_query_userobm() {
-  global $cdg_sql;
-
-  $query = "select * from UserObm order by userobm_lastname"; 
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  display_debug_msg($query, $cdg_sql);
-
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // Kind insertion query construction and execution                           //
 // Parameters:
 //   - $label : Kind label

@@ -17,9 +17,12 @@
 //   - user's Id
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_id_user($login, $passwd) {
+  global $cdg_sql;
+
   $connect_db = new DB_OBM ;
   if (isset($login) && isset($passwd)) {
     $query = "select userobm_id from UserObm where userobm_login='$login' and userobm_password='$passwd' " ;
+    display_debug_msg($query, $cdg_sql);
     $connect_db->query($query) ;
     $connect_db->next_record() ;
     return $connect_db->f("userobm_id") ;
@@ -33,13 +36,35 @@ function run_query_id_user($login, $passwd) {
 // Return the id of the contact assigned to the specified user
 ///////////////////////////////////////////////////////////////////////////////
 function run_query_contactid_user($user_id) {
+  global $cdg_sql;
+
   $obm_db = new DB_OBM;
   $query = "select userobm_contact_id from UserObm where userobm_id=$user_id";
+  display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
   $obm_db->next_record();
   
   return $obm_db->f("userobm_contact_id");
 }
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Userobm query execution                                                   //
+// Return:
+//   - Database Object : userobm list
+///////////////////////////////////////////////////////////////////////////////
+function run_query_userobm() {
+  global $cdg_sql;
+
+  $query = "select * from UserObm order by userobm_lastname"; 
+  $obm_q = new DB_OBM;
+  $obm_q->query($query);
+  display_debug_msg("run_query_userobm() : $query", $cdg_sql);
+
+  return $obm_q;
+}
+
+
 
 
 ///////////////////////////////////////////////////////////////////////////////
