@@ -26,11 +26,27 @@ $cgp_mail_enabled = false;
 // Displayed Infos //
 //-----------------//
 // sections -- Default is true
-//$cgp_show["section"]["compta"] = false;
+$cgp_show["section"]["compta"] = false;
+$cgp_show["section"]["aliamin"] = false;
 
 // modules -- Default is true
+//$cgp_show["module"]["contact"] = false;
 //$cgp_show["module"]["user"] = false;
 //$cgp_show["module"]["group"] = false;
 //$cgp_show["module"]["publication"] = false;
+
+// Company module
+//$cgp_hide["company"]["number"] = true;
+//$cgp_hide["company"]["companytype_label"] = true;
+//$cgp_hide["company"]["companyactivity_label"] = true;
+//$cgp_hide["company"]["category"] = true;
+//$cgp_hide["company"]["address3"] = true;
+
+// Contact module
+$cgp_hide["contact"]["contact_function"] = true;
+$cgp_hide["contact"]["contact_title"] = true;
+//$cgp_hide["contact"]["category1"] = true;
+$cgp_hide["contact"]["category2"] = true;
+$cgp_hide["contact"]["address3"] = true;
 
 </script>

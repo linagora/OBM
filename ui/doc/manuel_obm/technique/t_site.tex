@@ -1,0 +1,121 @@
+% Documentation technique d'OBM : Configuration specifique à un site
+% ALIACOM Pierre Baudracco
+% $Id$
+
+\section{Configuration spécifique d'un site}
+
+Depuis la version 0.8, OBM est pensé pour faciliter la personnalisation d'une mise en oeuvre en restant compatible avec le produit générique.
+
+Pour ce faire les options de configurations et les données spécifiques d'un site sont situées dans un fichier et un répertoire dédiés.\\
+
+\begin{tabular}{|p{7cm}|p{5cm}|}
+\hline
+Fichier de configuration spécifique & obminclude/obm\_conf.inc \\
+\hline
+Répertoire de configuration spécifique & obminclude/site \\
+\hline
+\end{tabular}
+
+\subsection{Le paramétrage des sections visibles}
+
+Le tableau \$cgp\_show[``section''] définit pour chaque section si celle-ci doit être affichée ou non.
+Par défaut toutes les sections sont affichées.
+
+Pour ne pas afficher une section il faut insérer dans le fichier de configuration la ligne :
+
+\begin{verbatim}  
+$cgp_show[``section''][``com''] = false;
+\end{verbatim}  
+\vspace{0.3cm}
+
+Liste des sections disponibles :\\
+\begin{itemize}
+\item com
+\item prod
+\item compta
+\item user
+\item admin
+\item aliamin
+\end{itemize}
+
+
+\subsection{Le paramétrage des modules visibles}
+
+Le tableau \$cgp\_show[``module''] définit pour chaque module si celui-ci doit être affiché ou non.
+Par défaut tous les modules sont affichés.
+
+Pour ne pas afficher un module il faut insérer dans le fichier de configuration la ligne :
+
+\begin{verbatim}  
+$cgp_show[``module''][``deal''] = false;
+\end{verbatim}  
+\vspace{0.3cm}
+
+Liste des modules disponibles :\\
+\begin{itemize}
+\item company
+\item contact
+\item deal
+\item list
+\item agenda
+\item todo
+\item publication
+\item time
+\item project
+\item contract
+\item incident
+\item document
+\item account
+\item invoice
+\item payment
+\item settings
+\item user
+\item group
+\end{itemize}
+
+
+\subsection{Le paramétrage des champs visibles}
+
+Afin de permettre des utilisations d'\obm d'orientations diverses, certains modules peuvent être paramétrés afin de ne pas afficher et gérer tous les champs prévus.
+
+A partir de la version 0.8 d'\obm, les modules \company et \contact ont des champs paramétrables.\\
+
+Le tableau \$cgp\_hide[``module''] définit pour les modules cibles les champs devant être cachés.
+Par défaut tous les champs sont affichés et il faut donc préciser explicitement les champs non souhaités.
+
+Pour ne pas afficher un champ il faut insérer dans le fichier de configuration la ligne :
+
+\begin{verbatim}  
+$cgp_hide[``company][``number] = true;
+\end{verbatim}  
+
+Lorsqu'un champ est caché, il n'est plus disponible dans les critères de recherche, dans les listes de résultats ni dans les fiches de détail.
+
+
+\subsubsection{Les champs paramétrables du module \company}
+
+Liste des champs paramétrables (masquables) du module \company :
+
+\begin{verbatim}
+// Company module
+$cgp_hide["company"]["number"] = true;                 // numéro
+$cgp_hide["company"]["companytype_label"] = true;      // type
+$cgp_hide["company"]["companyactivity_label"] = true;  // secteur d'activité
+$cgp_hide["company"]["category"] = true;               // catégorie
+$cgp_hide["company"]["address3"] = true;               // ligne adresse 3
+\end{verbatim}  
+
+
+\subsubsection{Les champs paramétrables du module \contact}
+
+Liste des champs paramétrables (masquables) du module \contact :
+
+\begin{verbatim}
+// Contact module
+$cgp_hide["contact"]["contact_function"] = true;  // fonction
+$cgp_hide["contact"]["contact_title"] = true;     // titre
+$cgp_hide["contact"]["category1"] = true;         // catégorie 1
+$cgp_hide["contact"]["category2"] = true;         // catégorie 2
+$cgp_hide["contact"]["address3"] = true;          // ligne adresse 3
+\end{verbatim}  
+

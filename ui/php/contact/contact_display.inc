@@ -102,8 +102,8 @@ function dis_contact_search_form($contact="") {
 ///////////////////////////////////////////////////////////////////////////////
 function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
   global $l_contact_name, $l_firstname, $l_phone, $l_from_company, $l_email;
-  global $l_function, $l_market, $l_find, $popup, $display, $c_all, $l_all;
-  global $l_town, $l_postcode, $l_country, $l_archive;
+  global $cgp_hide, $l_find, $popup, $display, $c_all, $l_all;
+  global $l_function, $l_market, $l_town, $l_postcode, $l_country, $l_archive;
 
   $lname = stripslashes($contact["lname"]);
   $fname = stripslashes($contact["fname"]);
@@ -117,17 +117,26 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
   $mark = $contact["marketing_manager"];
   $archive = ($contact["archive"] == "1" ? "checked = \"checked\"" : "");
 
+  $show_func = (! $cgp_hide["contact"]["function"]);
+
   // Function select
-  $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
+  if ($show_func) {
+    $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
     <option value=\"$c_all\">$l_all</option>";
-  while ($func_q->next_record()) {
-    $f_id = $func_q->f("function_id");
-    $f_label = $func_q->f("function_label");
-    $sel_func .= "\n<option value=\"$f_id\"";
-    if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
-    $sel_func .= ">$f_label</option>";
+    while ($func_q->next_record()) {
+      $f_id = $func_q->f("function_id");
+      $f_label = $func_q->f("function_label");
+      $sel_func .= "\n<option value=\"$f_id\"";
+      if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
+      $sel_func .= ">$f_label</option>";
+    }
+    $sel_func .= "</select>";
+
+    $block_func = "
+    <div class=\"searchLabel\">$l_function<br />
+      $sel_func
+    </div>";
   }
-  $sel_func .= "</select>";
 
   // Marketing manager select
   $sel_market = "<select id=\"sel_market\" name=\"sel_market\">
@@ -197,9 +206,7 @@ function html_contact_search_form ($contact, $usr_q, $func_q, $ctry_q) {
     <div class=\"searchLabel\">$l_country<br />
       $sel_ctry
     </div>
-    <div class=\"searchLabel\">$l_function<br />
-      $sel_func
-    </div>
+    $block_func
     <div class=\"searchLabel\">$l_market<br />
       $sel_market
     </div>
@@ -330,7 +337,7 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   global $l_public,$l_private,$l_archive,$l_visibility, $l_comment;
   global $l_update,$l_delete,$l_insert, $l_coord, $l_contact;
   global $c_yes, $c_no, $set_theme, $ico_mail,$l_category1,$l_category2;
-  global $display, $path, $action, $auth;
+  global $display, $path, $action, $auth, $cgp_hide;
   global $perms_user, $l_perms_user;
 
   $usercreate = $co_q->f("contact_usercreate");
@@ -367,6 +374,39 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   $vis = $co_q->f("contact_visibility");
   $archive = ($co_q->f("contact_archive") == 1 ? $c_yes : $c_no);
   $display["link"] = html_contact_links($id);
+
+  // Conditionnal fields
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
+  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  $show_ad3 = (! $cgp_hide["contact"]["address3"]);
+
+  // Function field
+  if ($show_func) {
+    $block_func = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_function</td>
+      <td class=\"detailText\">$function</td>";
+  }
+
+  // Title field
+  if ($show_title) {
+    $block_title = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailText\">$title</td>";
+  }
+
+  // Address3 field
+  if ($show_ad3) {
+    $block_ad3 = "
+    <tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailText\">$ad3</td>
+    </tr>";
+  }
+
   if ($usercreate == $auth->auth["uid"]) {
     if ($vis == 1) 
       $l_priv = $l_private;
@@ -387,36 +427,65 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
   $display["title"] = "<div class=\"title\">$l_contact : $lname $fname</div>";
 
 
-  $cat1_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  $i = 0;
-  while($cat1_q->next_record()) {
-    if ($i==0) {
-      $cat_disp .= "<tr>";
+  // Category 1 field
+  if ($show_cat1) {
+    $nb_col_cat1 = 3;
+    $dis_cat1 = "<tr>";
+    for ($i=0; $i<$nb_col_cat1; $i++) {
+      $dis_cat1 .= "<td>&nbsp;</td>";
     }
-    $label = $cat1_q->f("contactcategory1_label");
- 
-    $i++;
-    $cat1_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-    if ($i==3) {
-      $cat1_disp .= "</tr>";
-      $i = 0;
-    }    
+    $dis_cat1 .= "</tr>";
+    $dis_cat1 = "";
+
+    $i = 0;
+    while($cat1_q->next_record()) {
+      if ($i==0) {
+	$dis_cat1 .= "<tr>";
+      }
+      $label = $cat1_q->f("contactcategory1_label");
+      $i++;
+      $dis_cat1 .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+      if ($i==$nb_col_cat1) {
+	$dis_cat1 .= "</tr>";
+	$i = 0;
+      }    
+    }
+    $block_cat1 = "
+    <div class=\"detailHead\">$l_category1</div>
+    <table class=\"detail\">
+    $dis_cat1
+    </table>";
   }
 
-  $cat2_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
-  $i = 0;
-  while($cat2_q->next_record()) {
-    if ($i==0) {
-      $cat_disp .= "<tr>";
+  // Category 2 field
+  if ($show_cat2) {
+    $nb_col_cat2 = 3;
+    $dis_cat2 = "<tr>";
+    for ($i=0; $i<$nb_col_cat2; $i++) {
+      $dis_cat2 .= "<td>&nbsp;</td>";
     }
-    $label = $cat2_q->f("contactcategory2_label");      
-    $i++;
-    $cat2_disp .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
-    if ($i==3) {
-      $cat2_disp .= "</tr>";
-      $i = 0;
-    }    
+    $dis_cat2 .= "</tr>";
+    $dis_cat2 = "";
+    $i = 0;
+    while($cat2_q->next_record()) {
+      if ($i==0) {
+	$dis_cat2 .= "<tr>";
+      }
+      $label = $cat2_q->f("contactcategory2_label");      
+      $i++;
+      $dis_cat2 .= "<td style=\"border: 1px solid\" class=\"detailText\"> $label </td>";
+      if ($i==$nb_col_cat2) {
+	$dis_cat2 .= "</tr>";
+	$i = 0;
+      }    
+    }
+    $block_cat2 = "
+    <div class=\"detailHead\">$l_category2</div>
+    <table class=\"detail\">
+    $dis_cat2
+    </table>";
   }
+
 
   // --- HTML Template --------------------------------------------------------
 
@@ -441,12 +510,8 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">
       <a class=\"detailText\" href=\"".url_prepare("$path/company/company_index.php?action=detailconsult&amp;param_company=$c_id")."\"> $c_name</a>
       </td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_function</td>
-      <td class=\"detailText\">$function</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailText\">$title</td>
+    $block_func
+    $block_title
     </tr><tr>
       <td class=\"detailLabel\">$l_market</td>
       <td class=\"detailText\">$market</td>
@@ -474,9 +539,7 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
       <td class=\"detailText\">$ad2</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailText\">$ad3</td>
+    $block_ad3
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
       <td class=\"detailText\">$zip</td>
@@ -497,16 +560,10 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
       <td class=\"detailText\">$mailok</td>
     </tr>
     </table>
-    <div class=\"detailHead\">$l_category1</div>
-  
-    <table class=\"detail\">
-    $cat1_disp
-    </table>
-    <div class=\"detailHead\">$l_category2</div>
-    
-    <table class=\"detail\">
-    $cat2_disp
-    </table>
+
+    $block_cat1
+    $block_cat2
+
     <div class=\"detailHead\">$l_comment</div>
 
     <table class=\"detail\">
@@ -519,6 +576,7 @@ function html_contact_consult($co_q,$cat1_q,$cat2_q) {
 
   return $block;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // HTML Display Contact Consultation                                         //
@@ -676,7 +734,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   global $l_update, $l_checkdelete, $l_insert, $l_contact_select_company;
   global $popup_width, $popup_height;
   global $l_category1, $l_category2;
-  global $display, $path, $auth, $l_none;
+  global $display, $path, $auth, $cgp_hide, $l_none;
 
   // if update mode and first time values are taken from database
   if ($action == "detailupdate") {
@@ -759,6 +817,40 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   if (isset($contact["vis"])) { $vis = stripslashes($contact["vis"]); }
   if (isset($contact["archive"])) { $archive = ($contact["archive"] == 1 ? "checked" : ""); }
 
+  // Conditionnal fields
+  $show_func = (! $cgp_hide["contact"]["contact_function"]);
+  $show_title = (! $cgp_hide["contact"]["contact_title"]);
+  $show_cat1 = (! $cgp_hide["contact"]["category1"]);
+  $show_cat2 = (! $cgp_hide["contact"]["category2"]);
+  $show_ad3 = (! $cgp_hide["contact"]["address3"]);
+
+  // Function field
+  if ($show_func) {
+    // Function select
+    $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
+    <option value=\"0\">$l_none</option>";
+    while ($func_q->next_record()) {
+      $f_id = $func_q->f("function_id");
+      $f_label = $func_q->f("function_label");
+      $sel_func .= "\n<option value=\"$f_id\"";
+      if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
+      $sel_func .= ">$f_label</option>";
+    }
+    $sel_func .= "</select>";
+    $block_func = "
+    </tr><tr>    
+      <td class=\"detailLabel\">$l_function</td> 
+      <td class=\"detailForm\">$sel_func</td>";
+  }
+
+  // Title field
+  if ($show_title) {
+    $block_title = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_title</td>
+      <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>";
+  }
+
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
     <option value=\"0\">$l_none</option>";
@@ -802,27 +894,41 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   $sel_kind_label = "<select name=\"sel_label\">";
 
 
-  $i=0; 
-  // category 1 select
-  $sel_cat1 = "<select id=\"sel_cat1[]\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
-  while($cat1_q->next_record()) {
-    $c1_id = $cat1_q->f("contactcategory1_id");
-    $sel_cat1 .= "\n<option value=\"$c1_id\"";
-    if ($c1_id == $cat1[$i]) { $sel_cat1 .= " selected=\"selected\""; $i++;}
-    $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
+  // Category 1 select field
+  if ($show_cat1) {
+    $i=0; 
+    $sel_cat1 = "<select id=\"sel_cat1[]\" name=\"sel_cat1[]\"  multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+    while($cat1_q->next_record()) {
+      $c1_id = $cat1_q->f("contactcategory1_id");
+      $sel_cat1 .= "\n<option value=\"$c1_id\"";
+      if ($c1_id == $cat1[$i]) { $sel_cat1 .= " selected=\"selected\""; $i++;}
+      $sel_cat1 .= ">". $cat1_q->f("contactcategory1_label") . "</option>\n";
+    }
+    $sel_cat1 .= "</select>";
+    
+    $block_cat1 = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category1</td>
+      <td class=\"detailForm\">$sel_cat1</td>";
   }
-  $sel_cat1 .= "</select>";
-  $i=0; 
-  // category 2 select
-  $sel_cat2 = "<select id=\"sel_cat2[]\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
-  while ($cat2_q->next_record()) {
-    $c2_id = $cat2_q->f("contactcategory2_id");
-    $sel_cat2 .= "\n<option value=\"$c2_id\"";
-    if ($c2_id == $cat2[$i]) { $sel_cat2 .= " selected=\"selected\""; $i++; }
-    $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
+
+  // Category 2 select field
+  if ($show_cat2) {
+    $i=0; 
+    $sel_cat2 = "<select id=\"sel_cat2[]\" name=\"sel_cat2[]\" multiple=\"multiple\" style=\"font-family:monospace;font-weight:400;\">";
+    while ($cat2_q->next_record()) {
+      $c2_id = $cat2_q->f("contactcategory2_id");
+      $sel_cat2 .= "\n<option value=\"$c2_id\"";
+      if ($c2_id == $cat2[$i]) { $sel_cat2 .= " selected=\"selected\""; $i++; }
+      $sel_cat2 .= ">". $cat2_q->f("contactcategory2_label") . "</option>\n";
+    }
+    $sel_cat2 .= "</select>";
+
+    $block_cat2 = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category2</td>
+      <td class=\"detailForm\">$sel_cat2</td>";
   }
-  $sel_cat2 .= "</select>";
- 
 
   $i=0;
   $sel_kind_lang = "<select name=\"sel_kind_lang\"
@@ -873,18 +979,6 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
   }
   $sel_market .= "</select>";
 
-  // Function select
-  $sel_func = "<select id=\"sel_func\" name=\"sel_func\">
-    <option value=\"0\">$l_none</option>";
-  while ($func_q->next_record()) {
-    $f_id = $func_q->f("function_id");
-    $f_label = $func_q->f("function_label");
-    $sel_func .= "\n<option value=\"$f_id\"";
-    if ($f_id == $func) { $sel_func .= " selected=\"selected\""; }
-    $sel_func .= ">$f_label</option>";
-  }
-  $sel_func .= "</select>";
-
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">
     <option value=\"0\">$l_none</option>";
@@ -895,6 +989,15 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
   }
   $sel_ctry .= "</select>";
+
+  // Address 3 field
+  if ($show_ad3) {
+    $block_ad3 = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>";
+  }
+
 
   // If new contact or contact update and user is owner, display visibility
   if ( ($action == "new") || ($action == "insert") ||
@@ -962,21 +1065,13 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
-    </tr><tr>    
-      <td class=\"detailLabel\">$l_function</td> 
-      <td class=\"detailForm\">$sel_func</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_title</td>
-      <td class=\"detailForm\"><input type=\"text\" name=\"tf_title\" size=\"30\" maxlength=\"64\" value=\"$title\" /></td>
+    $block_func
+    $block_title
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td class=\"detailForm\">$sel_market</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category1</td>
-      <td class=\"detailForm\">$sel_cat1</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category2</td>
-      <td class=\"detailForm\">$sel_cat2</td>
+    $block_cat1
+    $block_cat2
     </tr>
     </table>
 
@@ -1001,9 +1096,7 @@ function html_contact_form($action,$cat1_q,$cat2_q, $co_q, $dsrc_q, $kind_q, $fu
     </tr><tr>
     <td class=\"detailLabel\">$l_address 2</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad2\" size=\"30\" value=\"$ad2\" /></td>
-    </tr><tr>
-    <td class=\"detailLabel\">$l_address 3</td>
-    <td class=\"detailForm\"><input type=\"text\" name=\"tf_ad3\" size=\"30\" value=\"$ad3\" /></td>
+    $block_ad3
     </tr><tr>
     <td class=\"detailLabel\">$l_postcode</td>
     <td class=\"detailForm\"><input type=\"text\" name=\"tf_zip\" size=\"8\" value=\"$zip\" /></td>
@@ -1304,25 +1397,35 @@ function dis_contact_delete_form($p_id) {
 // Display the contact administration index                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_admin_index() {
+  global $cgp_hide;
 
-  $func_q = run_query_function();
   $kind_q = run_query_kind();
-  $cat1_q = run_query_contactcategory1();
-  $cat2_q = run_query_contactcategory2();
-
-  $block = html_contact_cat1_form($cat1_q);
-  $block .= "<hr />";
-  $block .= html_contact_cat2_form($cat2_q);
-  $block .= "<hr />";  
   $block .= html_contact_kind_form($kind_q);
-  $block .= "<hr />";
-  $block .= html_contact_function_form($func_q);
+
+  if (! $cgp_hide["contact"]["contact_function"]) {
+    $block .= "<hr />";
+    $func_q = run_query_function();
+    $block .= html_contact_function_form($func_q);
+  }
+
+  if (! $cgp_hide["contact"]["category1"]) {
+    $cat1_q = run_query_contactcategory1();
+    $block .= "<hr />";
+    $block .= html_contact_cat1_form($cat1_q);
+  }
+
+  if (! $cgp_hide["contact"]["category2"]) {
+    $cat2_q = run_query_contactcategory2();
+    $block .= "<hr />";  
+    $block .= html_contact_cat2_form($cat2_q);
+  }
 
   return $block;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Display: Contact Category1 section                                             //
+// Display: Contact Category1 section
 // Parameters:
 //   - $cat1_q : Category1 list database object
 ///////////////////////////////////////////////////////////////////////////////

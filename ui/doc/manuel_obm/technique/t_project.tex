@@ -10,7 +10,7 @@ Le module \project \obm.
 
 \subsection{Organisation de la base de données}
 
-Le \project utilise 4 tables :
+Le module \project utilise 4 tables :
 \begin{itemize}
  \item Project
  \item ProjectTask
@@ -147,307 +147,61 @@ Table d'historique des informations relatives à l'avancement des projet.\\
 \end{tabular}
 
 
-\clearpage
+\subsection{Actions et droits}
 
+Voici la liste des actions du module \project, avec le droit d'accès requis ainsi qu'une description sommaire de chacune d'entre elles.\\
 
-\subsection{Actions, droits, et fonctions}
-Dans cette section seront listées et décrites les actions du module, ainsi que les droits qui leurs sont appliqués et l'intitulé des fonctions executées. 
-
-\subsubsection{Actions}
-
-Voici la liste des action du module \project, ainsi qu'une description sommaire de chacune d'entre elles.\\
-
-\begin{tabular}{|l|p{9cm}|}
+\begin{tabular}{|l|c|p{9.5cm}|}
  \hline
- \textbf{Intitulé} & \textbf{Description} \\
+ \textbf{Intitulé} & \textbf{Droit} & \textbf{Description} \\
  \hline
  \hline
-  index & (Défaut) formulaire de recherche de projets. \\ 
+  index & read & (Défaut) formulaire de recherche de projets. \\ 
  \hline
-  search & Résultat de recherche de projets. \\
+  search & read & Résultat de recherche de projets. \\
  \hline
-  new & Formulaire de création d'un projet. \\
+  new & write & Formulaire de création d'un projet. \\
  \hline
-  detailconsult & Fiche détail d'un projet. \\
+  detailconsult & read & Fiche détail d'un projet. \\
  \hline
-  detailupdate & Formulaire de modification d'un projet. \\
+  detailupdate & write & Formulaire de modification d'un projet. \\
  \hline
-  insert & Insertion d'un projet. \\
+  insert & write & Insertion d'un projet. \\
  \hline
-  update & Mise à jour du projet. \\
+  update & write & Mise à jour du projet. \\
  \hline
-  check\_delete & Vérification avant suppression du projet. \\
+  check\_delete & write & Vérification avant suppression du projet. \\
  \hline
-  delete & Suppression du projet. \\
+  delete & write & Suppression du projet. \\
  \hline
-  task & Liste des tâches définies et formulaire de nouvelle tâche. \\
+  task & write & Liste des tâches définies et formulaire de nouvelle tâche. \\
  \hline
-  task\_add & Ajout d'une tâche au projet. \\
+  task\_add & write & Ajout d'une tâche au projet. \\
  \hline
-  task\_del & Suppression de tâches. \\
+  task\_del & write & Suppression de tâches. \\
  \hline
-  member & Liste des participants au projet. \\
+  member & write & Liste des participants au projet. \\
  \hline
-  sel\_member & Appel externe au module \user pour l'ajout de participants).\\
+  sel\_member & write & Appel externe au module \user pour l'ajout de participants).\\
  \hline
-  member\_add & Ajout d'un participant au projet. \\
+  member\_add & write & Ajout d'un participant au projet. \\
  \hline
-  member\_del & Suppression de participants au projet. \\
+  member\_del & write & Suppression de participants au projet. \\
  \hline
-  member\_update & Mise à jour d'un participant (statut, chef de projet). \\
+  member\_update & write & Mise à jour d'un participant (statut, chef de projet). \\
  \hline
-  allocate & Formulaire d'affectation des participants aux tâches. \\
+  allocate & write & Formulaire d'affectation des participants aux tâches. \\
  \hline
-  allocate\_update & Mise à jour de l'affectations des participants. \\
+  allocate\_update & write & Mise à jour de l'affectations des participants. \\
  \hline
-  progress & Formulaire de progresion d'un projet. \\
+  progress & write & Formulaire de progresion d'un projet. \\
  \hline
-  progress\_update & Mise à jour de la progression du projet. \\
+  progress\_update & write & Mise à jour de la progression du projet. \\
  \hline
-  display\_pref & Ecran de modification des préférences d'affichage. \\
+  display & read & Ecran de modification des préférences d'affichage. \\
  \hline
-  dispref\_display & Modifie l'affichage d'un élément. \\
+  dispref\_display & read & Modifie l'affichage d'un élément. \\
  \hline
-  dispref\_level & Modifie l'ordre d'affichage d'un élément. \\
+  dispref\_level & read & Modifie l'ordre d'affichage d'un élément. \\
  \hline
 \end{tabular}
-
-\clearpage
-
-\subsubsection{Droits}
-
-Ci-dessous le tableau présentant les droits necessaires à l'execution de chaque action ainsi que l'intitulé de ce droit. \\
-\begin{tabular}{|c|c|l|}
- \hline
- \textbf{Action} & \textbf{Code du droit} & \textbf{Intitulé du droit}\\
- \hline
- \hline
-  <index> & project\_read & Droits d'Utilisateur en lecture. \\ 
- \hline
-  <search> & project\_read & Droits d'Utilisateur en lecture. \\ 
- \hline
-  <new> & project\_write & Droits d'Utilisateur en écriture. \\ 
- \hline
-  <detailconsult> & project\_read & Droits d'Utilisateur en écriture. \\ 
- \hline
-  <detailupdate> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <insert> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <update> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <check\_delete> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <delete> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <task> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <task\_add> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <task\_del> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <member> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <sel\_member> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <member\_add> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <member\_del> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <member\_update> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <allocate> & project\_write & Droits d'Utilisateur en écriture. \\ 
- \hline
-  <allocate\_update> & project\_write & Droits d'Utilisateur en écriture. \\ 
- \hline
-  <progress> & project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <progress\_update> &  project\_write & Droits d'Utilisateur en écriture. \\
- \hline
-  <display> & project\_read & Droits d'Utilisateur en lecture. \\
- \hline
-  <dispref\_display> & project\_read & Droits d'Utilisateur en lecture. \\
- \hline
-  <dispref\_level> & project\_read & Droits d'Utilisateur en lecture. \\
- \hline
-\end{tabular}
-
-
-\subsubsection{Fonctions}
- Ci-dessous le tableau présentant la ou les fonctions appelées pour chacune des actions. \\
-\begin{tabular}{|c|c|}
- \hline
- \textbf{Action} & \textbf{Fonction(s)}\\
- \hline
- \hline
-  <index> & dis\_project\_search\_form() \\
- \hline
-  <search> & dis\_project\_search\_form() \\
-           & dis\_project\_search\_list() \\
- \hline
-  <new> & run\_query\_projecttype() \\ 
-        & html\_project\_form() \\
- \hline
-  <init> & run\_query\_detail() \\ 
-         & html\_project\_init\_form() \\
- \hline
-  <task> & run\_query\_projectname() \\
- 	       & run\_query\_tasks() \\
-	       & html\_project\_taskadd\_form() \\
-	       & html\_project\_tasklist() \\
- \hline
-  <member> & run\_query\_projectname() \\
- 	         & run\_query\_tasks() \\
-	         & run\_query\_members() \\
-	         & html\_project\_member\_form() \\
- \hline
-  <alloacte> & run\_query\_projectname() \\
- 	     & run\_query\_tasks() \\
-	     & run\_query\_members() \\
-	     & run\_query\_allocation() \\
-             & html\_project\_allocate\_form() \\
- \hline
-  <allocate\_update> & run\_query\_projectupdate() \\
-             	    & run\_query\_detail() \\ 
- 	     	    & run\_query\_tasks() \\
-	     	    & run\_query\_members() \\
-	     	    & run\_query\_allocation() \\
-             	    & html\_project\_consult() \\
- \hline
- \end{tabular}
-
-\begin{tabular}{|c|c|p{3cm}|}
- \hline
- \textbf{Action} & \textbf{Fonction(s)} \\
- \hline
- \hline
-  <detailconsult> & run\_query\_create() \\
-                  & run\_query\_detail() \\ 
-                  & html\_project\_consult() \\
-                  & ou \\
-                  & run\_query\_insert() \\
-                  & run\_query\_detail() \\ 
-                  & html\_project\_consult() \\
-                  & ou \\
-                  & run\_query\_detail() \\ 
- 	          & run\_query\_tasks() \\
-	          & run\_query\_members() \\
-	          & run\_query\_allocate() \\
-                  & html\_project\_consult() \\
- \hline
-  <detailupdate> & run\_query\_detail() \\ 
-                 & html\_project\_init\_form() \\
-                 & ou \\
-                 & run\_query\_projecttype() \\
-                 & html\_project\_form() \\
- \hline
- <d\_update> & run\_query\_update() \\ 
-             & run\_query\_detail() \\ 
- 	     & run\_query\_tasks() \\
-	     & run\_query\_members() \\
-	     & run\_query\_allocate() \\
-             & html\_project\_consult() \\
- \hline
-  <progress> & run\_query\_projectname() \\
- 	     & run\_query\_tasks() \\
-	     & run\_query\_members() \\
-	     & run\_query\_allocate() \\
-             & html\_project\_advance() \\
- \hline
- <progress\_update> & run\_query\_progress() \\ 
-             	  & run\_query\_statlog() \\ 
-             	  & run\_query\_detail() \\ 
- 	     	  & run\_query\_tasks() \\
-	     	  & run\_query\_members() \\
-	     	  & run\_query\_allocation() \\
-             	  & html\_project\_consult() \\
- \hline
-\end{tabular}
-
-\begin{tabular}{|c|c|p{3cm}|}
- \hline
- \textbf{Action} & \textbf{Fonction(s)} \\
- \hline
- \hline
- <task\_add> & run\_query\_tasklist\_insert()\\ 
-             & run\_projectname() \\
-             & run\_query\_tasks() \\
-	     & html\_project\_taskadd\_form() \\
-	     & html\_project\_tasklist() \\
- \hline 
- <task\_del> & run\_query\_tasklist\_delete()\\ 
-             & run\_projectname() \\
-             & run\_query\_tasks() \\
-	     & html\_project\_taskadd\_form() \\
-	     & html\_project\_tasklist() \\
- \hline
- <member\_add> & run\_query\_projectname() \\
-               & run\_query\_memberlist\_insert()\\ 
- 	       & run\_query\_tasks() \\
-	       & run\_query\_members() \\
-	       & html\_project\_member\_form() \\
- \hline 
- <member\_del> & run\_query\_projectname() \\
-               & run\_query\_memberlist\_delete()\\ 
- 	       & run\_query\_tasks() \\
-	       & run\_query\_members() \\
-	       & html\_project\_member\_form() \\
- \hline 
- <member\_change> & run\_query\_projectname() \\
-                  & run\_query\_memberstatus\_change()\\ 
- 	          & run\_query\_tasks() \\
-	          & run\_query\_members() \\
-	          & html\_project\_member\_form() \\
- \hline
-  <display> & run\_query\_display\_pref() \\
-            & dis\_project\_display\_pref() \\
- \hline
-  <dispref\_display> & run\_query\_display\_pref\_update() \\
-                     & run\_query\_display\_pref() \\
-                     & dis\_project\_display\_pref() \\
- \hline
-  <dispref\_level> & run\_query\_display\_pref\_level\_update() \\
-                   & run\_query\_display\_pref() \\
-                   & dis\_project\_display\_pref() \\
- \hline
-\end{tabular}
-
-\subsection{Fonctionalité}
- Dans cette partie seront abordées les fonctionnalités du module \project. Ces fonctionnalités seront étudiés d'un point de vue technique et non utilisateur. Il va donc plus être sujet du fonctionnement que de l'utilité et de l'utilisation du module.
-
-\subsubsection{Création du projet}
-
- Deux cas de figure sont possibles :
- \begin{description}
-  \item{Projet relié à une affaire} : on modifie juste les informations relatives au projet dans la table Deal avec \fonction{run\_query\_create}
-  \item{Projet interne} : on crée une nouvelle entrée dans la table Deal avec \fonction{run\_query\_insert}
- \end{description}
-
-\subsubsection{Affichage du projet}
-
- Il se fait en deux temps
- \begin{itemize}
-  \item{Récupération des informations dans la table} 
-  \item{Affichage des différentes informations}
- \end{itemize}
-
- On récupère donc les données suivantes
- \begin{itemize}
-  \item{\fonction{run\_query\_detail}} : informations qui caractérisent le projet (nom, société, type de projet, temps vendu/prévu)
-  \item{\fonction{run\_query\_tasks}} : liste des sous-tâches du projet et les informations sur leur arborescence.
-  \item{\fonction{run\_query\_members}} : liste des participants au projet et leur statut (chef de projet/participant)
-  \item{\fonction{run\_query\_allocation}} : liste des affectations de personnes au sous-tâches du projet.
- \end{itemize}
-
- On affiche ces informations avec \fonction{html\_project\_consult}
-
-\subsubsection{Modifications}
-
- Les informations susceptibles d'évoluer sont :
- \begin{itemize}
-  \item{informations générales} : \fonction{run\_query\_update} modifie le nom, le temps vendu/prévu
-  \item{liste des sous-tâches} : \fonction{run\_query\_tasklist\_insert} ajoute une sous-tâche et \fonction{run\_query\_tasklist\_delete} en enlève.
-  \item{liste des participants} : \fonction{run\_query\_memberlist\_insert} ajoute un (ou plusieurs)  participant, \fonction{run\_query\_memberlist\_delete} en enlève et \fonction{run\_query\_memberstatus\_change} modifie le statut (chef de projet/participant).
-  \item{liste des affectations} : \fonction{run\_query\_projectupdate} met à jour la liste des affectations.
-  \item{liste des affectations} : \fonction{run\_query\_progress} met à jour l'état d'avancement des participants.
- \end{itemize}

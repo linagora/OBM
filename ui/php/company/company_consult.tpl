@@ -6,22 +6,13 @@
       <td class="detailText">$name</td>
     </tr>
     $dis_aka
-    <tr> 
-      <td class="detailLabel">$l_number</td>
-      <td class="detailText">$num</td>
-    </tr>
+    $block_num
     <tr> 
       <td class="detailLabel">$l_archive</td>
       <td class="detailText">$archive</td>
     </tr>
-    <tr>
-      <td class="detailLabel">$l_kind</td>
-      <td class="detailText">$kind</td>
-    </tr>
-    <tr> 
-      <td class="detailLabel">$l_activity</td>
-      <td class="detailText">$act</td>
-    </tr>
+    $block_kind
+    $block_act
     <tr>
       <td class="detailLabel">$l_market</td>
       <td class="detailText">$lmarket</td>
@@ -39,10 +30,7 @@
       <td class="detailLabel">$l_address 2</td>
       <td class="detailText">$ad2</td>
     </tr>
-    <tr>
-      <td class="detailLabel">$l_address 3</td>
-      <td class="detailText">$ad3</td>
-    </tr>
+    $block_ad3
     <tr>
       <td class="detailLabel">$l_postcode</td>
       <td class="detailText">$zip</td>
@@ -76,12 +64,8 @@
       <td class="detailText">$web $link_web</td>
     </tr>
   </table>
-  
-<div class="detailHead">$l_category</div>
-  
-  <table class="detail">
-    $cat_disp
-  </table>
+
+$block_cat
 
 <div class="detailHead">$l_comment</div>
   

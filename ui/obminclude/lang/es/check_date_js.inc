@@ -1,14 +1,16 @@
 <script language="php">
 ///////////////////////////////////////////////////////////////////////////////
-// OBM   - Language : French                                                 //
-//       - File     : check_date_js.inc                                      //
-// 1999-01-25 Pierre Baudracco                                               //
+// OBM - Language : Español                                                  //
+//     - File     : check_date_js.inc                                        //
+// 2003-11-18 Jaime E. Gomez H.   kasandra@skina.com.co                      //
 ///////////////////////////////////////////////////////////////////////////////
-// Fonction JAVASCRIPT qui verifie la validite d'une date                    //
-// Les formats acceptes sont JJ/MM/AAAA et le format ISO AAAA-MM-JJ          //
-// Une date correcte renvoie true                                            //
-// Une date incorrecte ou vide "" renvoie false et affiche un message        //
-// Le champ passe en parametre recoit la date correcte au format ISO         //
+// $Id$ //
+///////////////////////////////////////////////////////////////////////////////
+// JAVASCRIPT function that check the validity of a given date               //
+// Formats accepted are MM/JJ/AAAA and the ISO format ISO AAAA-MM-JJ         //
+// A correct date return true                                                //
+// An incorrect or empty date returns false and displays an alert            //
+// The field given as argument receive the correct date in the ISO format    //
 ///////////////////////////////////////////////////////////////////////////////
 
 $extra_js .= "
@@ -28,21 +30,21 @@ function check_date(champ_date, nom_date) {
 
   ind1=date.indexOf(\"/\");       
 
-  // Cas du format JJ/MM/AAA
+  // MM/JJ/AAA format case
 
   if (ind1 > 0) {
 
-    day = date.substring(0,ind1); 
+    month = date.substring(0,ind1); 
     ind2=date.indexOf(\"/\",ind1+1);        
     if (ind2 == -1) {
       alert( nom_date + \" : $l_invalid_date\");
       return false;
     } 
-    month = date.substring(ind1+1,ind2); 
+    day = date.substring(ind1+1,ind2); 
     year = date.substring(ind2+1,date.length);
   }
 
-  // Cas du format ISO AAAA-MM-JJ
+  // ISO AAAA-MM-JJ format case
 
   else { 
 
@@ -62,7 +64,7 @@ function check_date(champ_date, nom_date) {
     day = date.substring(ind2+1,date.length);
   }
 
-  // Verification des jours, mois et annees
+  // Days, monthes and years verifications
 
   if ((day.length != 1 && day.length != 2) || (month.length != 1 && month.length != 2) || (year.length != 2 && year.length != 4)) {
     alert( nom_date + \" : $l_invalid_date\");
@@ -74,9 +76,10 @@ function check_date(champ_date, nom_date) {
     return false;
   }
 
-  // On ecrit la date au format ISO
+  // We write the date in the ISO format
+
   champ_date.value = year + \"-\" + month + \"-\" + day;
 
   return true;  
 }  
-";
+"; // End

@@ -115,9 +115,9 @@ if ($menu != "") {
       include("$lang_file");
     } else {
       $lang_file = "$obminclude/site/lang/$set_lang_default/$lc_menu.inc";
-      if (file_exists("$path/../".$lang_file)) {
-	include("$lang_file");
-      }
+      //      if (file_exists("$path/../".$lang_file)) {
+      //	include("$lang_file");
+      //      }
     }
   }
 }

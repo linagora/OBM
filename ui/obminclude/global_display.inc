@@ -8,7 +8,7 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 class OBM_DISPLAY {
-  var $display_type;      // determines the type of display. possible values
+  var $display_type;     // determines the type of display. possible values
     // - PREFERENCES  : to set the display preference
     // - DATA         : to display all elements, for exemple all contacts
   var $display_module;   // module where to find the entity in use
@@ -106,13 +106,15 @@ class OBM_DISPLAY {
     global $l_display_no, $l_display_yes, $l_down, $l_up;
     // Images
     global $ico_arrow_up, $ico_arrow_down, $set_theme, $ico_crow, $ico_ball, $ico_forbidden;
-    global $fieldnames;
+    global $fieldnames, $cgp_hide;
     
     $nb_field = $this->display_pref->nf() - 1;
 
     // actions names
     $action_display = "dispref_display";
     $action_level = "dispref_level";
+
+    $entity = $this->display_entity;
 
     if ($this->display_module != "") {
       $url = $this->display_module . "_index.php";
@@ -138,18 +140,26 @@ class OBM_DISPLAY {
       $entity = $this->display_entity;
       $fieldname = $this->display_pref->f("display_fieldname");
       $disstatus = $this->display_pref->f("display_display");
+
+      if ($cgp_hide[$entity][$fieldname]) {
+	$td_class = "resultPrefHide";
+      } else {
+	$td_class = "resultTextC";
+      }
+
       $block .= "
     <tr>
-      <td class=\"resultTextC\">";
-      if ($disstatus == 1) {
-	$block .= "
-      <a class=\"resultText\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
-      <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
-      } else if ($disstatus == 0) {
+    <td class=\"$td_class\">";
+
+      if ($disstatus == 0) {
 	$nb_field_hidden++;
 	$block .= "
-      <a class=\"resultTextC\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
+      <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
       <img alt=\"$l_display_yes\" src=\"/images/$set_theme/$ico_crow\" /></a>";
+      } else if ($disstatus == 1) {
+	$block .= "
+      <a class=\"$td_class\" href=\"".url_prepare("$url?action=$action_display&amp;entity=$entity&amp;fieldname=$fieldname&amp;disstatus=$disstatus")."\">
+      <img alt=\"$l_display_no\" src=\"/images/$set_theme/$ico_ball\" /></a>";
       } else if ($disstatus == 2) {
 	$block .= "
       <img alt=\"$l_mandatory\" src=\"/images/$set_theme/$ico_forbidden\" />";
@@ -157,7 +167,7 @@ class OBM_DISPLAY {
 
       $block .= "
       </td>
-      <td class=\"resultTextC\">";
+      <td class=\"$td_class\">";
 
       if ($disstatus == 0) {
 	$block .= "&nbsp;";
@@ -166,38 +176,39 @@ class OBM_DISPLAY {
 	$block .= "$pos";
       }
       $block .= "</td>
-      <td class=\"resultTextC\">".$fieldnames[$fieldname]."</td>
-      <td class=\"resultText\">
-        <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
-        <tr>";
-
+    <td class=\"$td_class\">".$fieldnames[$fieldname]."</td>
+    <td class=\"$td_class\">
+      <table width=\"100%\" cellpadding=\"0\" cellspacing=\"0\">
+      <tr>";
+      
       // If last field we doesn't display the down arrow
       if ($i == $nb_field) {
 	$block .= "
-          <td>&nbsp;</td>";
+        <td>&nbsp;</td>";
       } else {
 	$block .= "
-          <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
-            <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
+        <td><a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=down&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
+          <img alt=\"$l_down\" src=\"/images/$set_theme/$ico_arrow_down\" /></a></td>";
       }
-
+      
       // If first field we doesn't display the up arrow
       if ($i == 0) {
 	$block .= "
-          <td >&nbsp;</td>";
+        <td >&nbsp;</td>";
       } else {
 	$block .= "
-          <td>
-            <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
-            <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
+        <td>
+          <a href=\"".url_prepare("$url?action=$action_level&amp;entity=$entity&amp;new_level=up&amp;fieldorder=".$this->display_pref->f("display_fieldorder"))."\">
+          <img alt=\"$l_up\" src=\"/images/$set_theme/$ico_arrow_up\" /></a></td>";
       }
       $block .= "
-        </tr>
-        </table>   
-      </td>
-    </tr>";
+      </tr>
+      </table>   
+    </td>
+  </tr>";
       $i++;
-    }
+    } // While end
+
     $block .= "
     </table>";
 
@@ -276,9 +287,10 @@ class OBM_DISPLAY {
   //   - $dis_data_entity : function to call
   /////////////////////////////////////////////////////////////////////////////
   function dis_data($dis_data_entity) {
-    global $path, $cdg_id, $set_debug, $set_theme, $set_rows;
+    global $path, $cgp_hide, $cdg_id, $set_debug, $set_theme, $set_rows;
 
     $link_ok = $this->display_link;
+    $module = $this->display_module;
 
     $block .= "<div class=\"result\">";
 
@@ -340,78 +352,81 @@ class OBM_DISPLAY {
       while ($this->display_pref->next_record()) {
 	// Default values
 	$fieldname = $this->display_pref->f("display_fieldname");
-	$name = $this->data_set->f($fieldname);
-	$url = "";
-	$popup = false;
-	$popup_width = 600;
-	$popup_height = 400;
-	$align = "left";
 
-        //--------------------------------------------------
-        // Global field display disposition
-        //--------------------------------------------------
-	// Format dates
-	if (substr($fieldname,0,5) == "date_") {
-	  $name = date_format($this->data_set->f($fieldname));
-	}
-	elseif ($fieldname == "timeupdate") {
-	  $name = datetime_format($this->data_set->f($fieldname));
-	}
-	else if ($fieldname == "timecreate") {
-	  $name = datetime_format($this->data_set->f($fieldname));
-	}
+	if (! $cgp_hide[$module][$fieldname]) {
 
-        //--------------------------------------------------
-        // We call module specific field display disposition
-        //--------------------------------------------------
-	if (function_exists($dis_data_entity)) {
-	  $res = $dis_data_entity($this, $fieldname, $link_ok);
-	  if ($res["name"] != "") $name = $res["name"];
-	  $url = $res["url"];
-	  $align = $res["align"];
-	  $style = $res["style"];
-	  $popup = $res["popup"];
-	  $popup_width = $res["popup_width"];
-	  $popup_height = $res["popup_height"];
-	}	  
+	  $name = $this->data_set->f($fieldname);
+	  $url = "";
+	  $popup = false;
+	  $popup_width = 600;
+	  $popup_height = 400;
+	  $align = "left";
 
-        //--------------------------------------------------
-        // Column display
-        //--------------------------------------------------
-        $content = "";
+	  //--------------------------------------------------
+	  // Global field display disposition
+	  //--------------------------------------------------
+	  // Format dates
+	  if (substr($fieldname,0,5) == "date_") {
+	    $name = date_format($this->data_set->f($fieldname));
+	  }
+	  elseif ($fieldname == "timeupdate") {
+	    $name = datetime_format($this->data_set->f($fieldname));
+	  }
+	  else if ($fieldname == "timecreate") {
+	    $name = datetime_format($this->data_set->f($fieldname));
+	  }
+	  
+	  //--------------------------------------------------
+	  // We call module specific field display disposition
+	  //--------------------------------------------------
+	  if (function_exists($dis_data_entity)) {
+	    $res = $dis_data_entity($this, $fieldname, $link_ok);
+	    if ($res["name"] != "") $name = $res["name"];
+	    $url = $res["url"];
+	    $align = $res["align"];
+	    $style = $res["style"];
+	    $popup = $res["popup"];
+	    $popup_width = $res["popup_width"];
+	    $popup_height = $res["popup_height"];
+	  }
 
-	// Set the style
-	if ($rowstyle != "") {
-	  $td = "<td>";
-	} else if ($style != "") {
-	  $td = "<td $style>";
-	} else if ($align == "center") {
-	  $td = "<td class=\"resultTextC\">";
-	} else {
-	  $td = "<td class=\"resultText\">";
+	  //--------------------------------------------------
+	  // Column display
+	  //--------------------------------------------------
+	  $content = "";
+	  
+	  // Set the style
+	  if ($rowstyle != "") {
+	    $td = "<td>";
+	  } else if ($style != "") {
+	    $td = "<td $style>";
+	  } else if ($align == "center") {
+	    $td = "<td class=\"resultTextC\">";
+	  } else {
+	    $td = "<td class=\"resultText\">";
+	  }
+	  
+	  // Pre cell display (open popup, link)
+	  if ($popup) {
+	    $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
+	  } else if ($url != "") {
+	    $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
+	  }
+	
+	  // Cell display
+	  $content .= $name;
+	  
+	  // Post cell display (close link, popup)
+	  if ($popup || ($url != "")) {
+	    $content .= "</a>";
+	  }
+	  
+	  // Cell writing
+	  $block .= "$td $content </td>\n";
 	}
-	
-	// Pre cell display (open popup, link)
-	if ($popup) {
-	  $content = "<a class=\"resultText\" href=\"\" onclick=\"window.name='root';window.open('$url','',config='height=$popup_height,width=$popup_width,scrollbars=no,toolbar=no,menubar=no,resizable=no'); return false;\">";
-	} else if ($url != "") {
-	  $content = "<a class=\"resultText\" href=\"".url_prepare("$url")."\">";
-	}
-	
-	// Cell display
-	$content .= $name;
-	
-	// Post cell display (close link, popup)
-	if ($popup || ($url != "")) {
-	  $content .= "</a>";
-	}
-	
-	// Cell writing
-	$block .= "$td $content </td>\n";
       }
-      
 
-      // If a left checkbox has to be displayed
+      // If a right checkbox has to be displayed
       if (($this->data_cb_side == "right") && ($this->data_cb_text != "")) {
 	$col_show = $this->data_cb_show;
         // If cb are to be displayed or column telling visibility is true
@@ -552,13 +567,14 @@ class OBM_DISPLAY {
   /////////////////////////////////////////////////////////////////////////////
   function dis_data_header($url) {
     global $page, $new_order, $order_dir;
-    global $fieldnames, $cdg_id, $set_debug;
+    global $fieldnames, $cgp_hide, $cdg_id, $set_debug;
 
     // If displayed without links (in popup) add this in url
     if (! $this->display_link) {
       $url .= "&amp;popup=1";
     }
 
+    $module = $this->display_module;
     $entity = $this->display_entity;
 
     $this->display_pref->seek(0);
@@ -569,6 +585,7 @@ class OBM_DISPLAY {
     if (($set_debug > 0) && (($set_debug & $cdg_id) == $cdg_id)) {
       $block .= "<td class=\"resultHead\">Id</td>";
     }
+    echo "entity=$module";
 
     // Display the checkbox title if needed (exists and left side)
     if (($this->data_cb_side == "left")
@@ -578,22 +595,24 @@ class OBM_DISPLAY {
 
     while ($this->display_pref->next_record()) {
       $fieldname = $this->display_pref->f("display_fieldname");
-      $label = $fieldnames[$fieldname];
-      $order = ($order_dir == "ASC" ? "DESC" : "ASC");
 
-      $block .= "
+      if (! $cgp_hide[$module][$fieldname]) {
+	$label = $fieldnames[$fieldname];
+	$order = ($order_dir == "ASC" ? "DESC" : "ASC");
+
+	$block .= "
         <td class=\"resultHead\">";
-      if ($this->data_order) {
-        $block .= "<a class=\"resultHead\" href=\"".$url.
-          (($url != "") ? "&amp;page=$page" : "" ) .
-          "&amp;new_order=$fieldname&amp;order_dir=$order&amp;entity=$entity\">";
+	if ($this->data_order) {
+	  $block .= "<a class=\"resultHead\" href=\"".$url.
+	    (($url != "") ? "&amp;page=$page" : "" ) .
+	    "&amp;new_order=$fieldname&amp;order_dir=$order&amp;entity=$entity\">";
+	}
+	$block .= $label;
+	if ($this->data_order) {
+	  $block .= "</a>";
+	}
+	$block .= "</td>";
       }
-      $block .= $label;
-      if ($this->data_order) {
-        $block .= "</a>";
-      }
-
-      $block .= "</td>";
     }
 
     // Display the checkbox title if needed (exists and right side)

@@ -159,10 +159,10 @@ function dis_company_search_form($company="") {
 //     keys used  : archive, name, kind, zip, mm
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
-  global $l_company_name, $l_company_kind, $l_postcode, $l_archive, $l_phone;
+  global $l_company_name, $l_postcode, $l_kind, $l_archive, $l_phone;
   global $l_market, $l_activity, $l_country, $l_town, $l_after, $l_before; 
-  global $l_all, $l_find; 
-  global $c_all;
+  global $l_all, $l_find;
+  global $c_all, $cgp_hide;
 
   $popup = $company["popup"];
   $archive = ($company["archive"] == "1" ? "checked = \"checked\"" : "");
@@ -177,27 +177,44 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
   $dateafter = stripslashes($company["dateafter"]);
   $datebefore = stripslashes($company["datebefore"]);
 
+  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
+  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+
   // Kind select
-  $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
+  if ($show_kind) {
+    $sel_kind = "<select id=\"sel_kind\" name=\"sel_kind\">
     <option value=\"$c_all\">$l_all</option>";
-  while ($kind_q->next_record()) {
-    $k_id = $kind_q->f("companytype_id");
-    $sel_kind .= "\n<option value=\"$k_id\"";
-    if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
-    $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
+    while ($kind_q->next_record()) {
+      $k_id = $kind_q->f("companytype_id");
+      $sel_kind .= "\n<option value=\"$k_id\"";
+      if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
+      $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
+    }
+    $sel_kind .= "</select>";
+
+    $block_kind = "
+    <div class=\"searchLabel\">$l_kind<br />
+      $sel_kind
+    </div>";
   }
-  $sel_kind .= "</select>";
 
   // Activity select
-  $sel_act = "<select id=\"sel_act\" name=\"sel_act\">
+  if ($show_act) {
+    $sel_act = "<select id=\"sel_act\" name=\"sel_act\">
     <option value=\"$c_all\">$l_all</option>";
-  while ($act_q->next_record()) {
-    $a_id = $act_q->f("companyactivity_id");
-    $sel_act .= "\n<option value=\"$a_id\"";
-    if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
-    $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
+    while ($act_q->next_record()) {
+      $a_id = $act_q->f("companyactivity_id");
+      $sel_act .= "\n<option value=\"$a_id\"";
+      if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
+      $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
+    }
+    $sel_act .= "</select>";
+
+    $block_act = "
+    <div class=\"searchLabel\">$l_activity<br />
+      $sel_act
+    </div>";
   }
-  $sel_act .= "</select>";
 
   // Country select
   $sel_ctry = "<select id=\"sel_ctry\" name=\"sel_ctry\">
@@ -250,12 +267,8 @@ function html_company_search_form($kind_q, $act_q, $usr_q, $ctry_q, $company) {
       <input type=\"text\" name=\"tf_phone\" id=\"tf_phone\" size=\"8\"
       value=\"$phone\" />
     </div>
-    <div class=\"searchLabel\">$l_company_kind<br />
-      $sel_kind
-    </div>
-    <div class=\"searchLabel\">$l_activity<br />
-      $sel_act
-    </div>
+    $block_kind
+    $block_act
     <div class=\"searchLabel\">$l_postcode<br />
       <input type=\"text\" name=\"tf_zip\" id=\"tf_zip\" size=\"6\"
       value=\"$zip\" />
@@ -479,7 +492,7 @@ function html_company_consult($co_q, $cat_q) {
   global $l_phone,$l_fax,$l_address,$l_postcode,$l_expresspostal;
   global $l_town,$l_country,$l_email,$l_web,$l_comment,$l_market;
   global $l_insert,$l_update,$l_delete, $l_company, $l_coord,$l_category;
-  global $display, $c_yes, $c_no;
+  global $display, $c_yes, $c_no, $cgp_hide;
 
   $id = $co_q->f("company_id");
   $num = $co_q->f("company_number");
@@ -520,7 +533,60 @@ function html_company_consult($co_q, $cat_q) {
   } else {
     $dis_aka = "";
   }
+
+  // Conditionnal fields
+  $show_number = (! $cgp_hide["company"]["number"]);
+  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
+  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_cat = (! $cgp_hide["company"]["category"]);
+  $show_ad3 = (! $cgp_hide["company"]["address3"]);
+
+  // Number field
+  if ($show_number) {
+    $block_num = "
+    <tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$num</td>
+    </tr>";
+  }
+
+  // Kind field
+  if ($show_kind) {
+    $block_kind = "
+    <tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailText\">$kind</td>
+    </tr>";
+  }
+
+  // Activity field
+  if ($show_act) {
+    $block_act = "
+    <tr> 
+      <td class=\"detailLabel\">$l_activity</td>
+      <td class=\"detailText\">$act</td>
+    </tr>";
+  }
+
+  // Category field
+  if ($show_cat) {
+    $block_cat = "
+<div class=\"detailHead\">$l_category</div>
   
+  <table class=\"detail\">
+    $cat_disp
+  </table>";
+  }
+  
+  // Address3 field
+  if ($show_ad3) {
+    $block_ad3 = "
+    <tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailText\">$ad3</td>
+    </tr>";
+  }
+
   // Email link
   if ($email != "") {
     $link_email = "<a href=\"mailto:$email\">
@@ -588,7 +654,7 @@ function html_company_consult($co_q, $cat_q) {
 //                : ctry, phone, fax, web, email ,com
 ///////////////////////////////////////////////////////////////////////////////
 function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $cat_q, $compcat, $ctry_q, $company) {
-  global $display, $auth, $set_dsrc, $l_none, $ico_add;
+  global $display, $auth, $cgp_hide, $set_dsrc, $l_none, $ico_add;
   global $set_theme,$ico_web,$ico_mail,$l_category,$popup_height,$popup_width;
   global $l_datasource, $l_name, $l_aka, $l_kind,$l_activity,$l_archive;
   global $l_phone,$l_fax, $l_address, $l_postcode,$l_expresspostal,$l_town;
@@ -649,6 +715,21 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   if (isset($company["com"])) { $com = stripslashes($company["com"]); }
   if (isset($company["cat"])) { $compcat = $company["cat"]; }
 
+  // Conditionnal fields
+  $show_number = (! $cgp_hide["company"]["number"]);
+  $show_kind = (! $cgp_hide["company"]["companytype_label"]);
+  $show_act = (! $cgp_hide["company"]["companyactivity_label"]);
+  $show_cat = (! $cgp_hide["company"]["category"]);
+  $show_ad3 = (! $cgp_hide["company"]["address3"]);
+
+  // Number field
+  if ($show_number) {
+    $block_num = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>";
+  }
+
   // data source select
   $sel_dsrc = "<select name=\"sel_dsrc\" id=\"sel_dsrc\">
     <option value=\"0\">$l_none</option>";
@@ -660,52 +741,83 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   }
   $sel_dsrc .= "</select>";
 
-  // kind select
-  $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">
+  // Kind select field
+  if ($show_kind) {
+    $sel_kind = "<select name=\"sel_kind\" id=\"sel_kind\">
     <option value=\"0\">$l_none</option>";
-  while ($kind_q->next_record()) {
-    $k_id = $kind_q->f("companytype_id");
-    $sel_kind .= "\n<option value=\"$k_id\"";
-    if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
-    $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
+    while ($kind_q->next_record()) {
+      $k_id = $kind_q->f("companytype_id");
+      $sel_kind .= "\n<option value=\"$k_id\"";
+      if ($k_id == $kind) { $sel_kind .= " selected=\"selected\""; }
+      $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
+    }
+    $sel_kind .= "</select>";
+    $block_kind = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_kind</td>
+      <td class=\"detailForm\">$sel_kind</td>";
   }
-  $sel_kind .= "</select>";
+
   $cat_a = run_query_ordered_category($cat_q); 
   
-  // cat select
-  $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
-  $j =0;
-  if (is_array($cat_a)) {
-    foreach ($cat_a as $cat_info) {
-      $c_id = $cat_info["id"];
-      $c_code = $cat_info["code"];
-      $c_label = $cat_info["label"];
-      if ($compcat[$j]["id"] == $c_id) { 
-	$sel_cat .= "\n<option value=\"$c_id\"";
-	$sel_cat .= " selected=\"selected\""; 
-	$j++;
-	$length = 8 - strlen($c_code);
-	$label = $c_code;
-	for ($i=0;$i<$length;$i++) {
-	  $label .= "&nbsp;";
+  // Cat select field
+  if ($show_cat) {
+    $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;font-weight:400;\">";
+    $j =0;
+    if (is_array($cat_a)) {
+      foreach ($cat_a as $cat_info) {
+	$c_id = $cat_info["id"];
+	$c_code = $cat_info["code"];
+	$c_label = $cat_info["label"];
+	if ($compcat[$j]["id"] == $c_id) { 
+	  $sel_cat .= "\n<option value=\"$c_id\"";
+	  $sel_cat .= " selected=\"selected\""; 
+	  $j++;
+	  $length = 8 - strlen($c_code);
+	  $label = $c_code;
+	  for ($i=0;$i<$length;$i++) {
+	    $label .= "&nbsp;";
+	  }
+	  $label .= "$c_label";
+	  $sel_cat .= ">$label</option>";
 	}
-	$label .= "$c_label";
-	$sel_cat .= ">$label</option>";
       }
     }
-  }
-  $sel_cat .= "</select>";
+    $sel_cat .= "</select>";
 
-  // activity select
-  $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
-    <option value=\"0\">$l_none</option>";
-  while ($act_q->next_record()) {
-    $a_id = $act_q->f("companyactivity_id");
-    $sel_act .= "\n<option value=\"$a_id\"";
-    if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
-    $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
+    $block_cat = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_category</td>
+      <td class=\"detailForm\">    
+       <table>
+	<tr><td>
+	  $sel_cat 
+	</td><td>
+	  <a href=\"javascript: return false;\" style=\"float:right;\"
+	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+	   <img src=\"/images/$set_theme/$ico_add\" /></a>
+	</td></tr>
+       </table>
+      </td>";
   }
-  $sel_act .= "</select>";
+
+  // Activity select field
+  if ($show_act) {
+    $sel_act = "<select name=\"sel_act\" id=\"sel_act\">
+    <option value=\"0\">$l_none</option>";
+    while ($act_q->next_record()) {
+      $a_id = $act_q->f("companyactivity_id");
+      $sel_act .= "\n<option value=\"$a_id\"";
+      if ($a_id == $act) { $sel_act .= " selected=\"selected\""; }
+      $sel_act .= ">". $act_q->f("companyactivity_label") . "</option>\n";
+    }
+    $sel_act .= "</select>";
+
+    $block_act = "
+    </tr><tr>      
+      <td class=\"detailLabel\">$l_activity</td>
+      <td class=\"detailForm\">$sel_act</td>";
+  }
 
   // Marketing manager select
   $sel_market = "<select name=\"sel_market\" id=\"sel_market\">
@@ -717,6 +829,14 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>";
   }
   $sel_market .= "</select>";
+
+  // Address 3 field
+  if ($show_ad3) {
+    $block_ad3 = "
+    </tr><tr>
+      <td class=\"detailLabel\">$l_address 3</td>
+      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>";
+  }
 
   // Country select
   $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\" onChange=\"
@@ -799,34 +919,16 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     </tr><tr>
       <td class=\"detailLabel\">$l_aka</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
+    $block_num
     </tr><tr>
       <td class=\"detailLabel\">$l_datasource</td> 
       <td class=\"detailForm\">$sel_dsrc</td>
     </tr><tr>
       <td class=\"detailLabel\">$l_archive</td>
       <td class=\"detailForm\"><input type=\"checkbox\" name=\"cb_archive\" value=\"1\" $archive /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_kind</td>
-      <td class=\"detailForm\">$sel_kind</td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_category</td>
-      <td class=\"detailForm\">    
-       <table>
-	<tr><td>
-	  $sel_cat 
-	</td><td>
-	  <a href=\"javascript: return false;\" style=\"float:right;\"
-	   onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
-	   <img src=\"/images/$set_theme/$ico_add\" /></a>
-	</td></tr>
-       </table>
-      </td>
-    </tr><tr>      
-      <td class=\"detailLabel\">$l_activity</td>
-      <td class=\"detailForm\">$sel_act</td>
+    $block_kind
+    $block_cat
+    $block_act
     </tr><tr>    
       <td class=\"detailLabel\">$l_market</td> 
       <td class=\"detailForm\">$sel_market</td>
@@ -842,9 +944,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     </tr><tr>
       <td class=\"detailLabel\">$l_address 2</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad2\" name=\"tf_ad2\" maxlength=\"30\" size=\"30\" value=\"$ad2\" /></td>
-    </tr><tr>
-      <td class=\"detailLabel\">$l_address 3</td>
-      <td class=\"detailForm\"><input type=\"text\" id=\"tf_ad3\" name=\"tf_ad3\" maxlength=\"30\" size=\"30\" value=\"$ad3\" /></td>
+    $block_ad3
     </tr><tr>
       <td class=\"detailLabel\">$l_postcode</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_zip\" name=\"tf_zip\" maxlength=\"14\" size=\"6\" value=\"$zip\" /></td>
@@ -1165,13 +1265,22 @@ function dis_delete_form($p_id) {
 // Display the company administration index                                  //
 ///////////////////////////////////////////////////////////////////////////////
 function dis_admin_index() {
+  global $cgp_hide;
 
-  $kind_q = run_query_companytype();
-  $cat_q = run_query_companycat();
-  $act_q = run_query_companyactivity();
-  $block = html_company_kind_form($kind_q);
-  $block .= html_company_cat_form($cat_q);
-  $block .= html_company_activity_form($act_q);
+  if (! $cgp_hide["company"]["companytype_label"]) {
+    $kind_q = run_query_companytype();
+    $block .= html_company_kind_form($kind_q);
+  }
+
+  if (! $cgp_hide["company"]["category"]) {
+    $cat_q = run_query_companycat();
+    $block .= html_company_cat_form($cat_q);
+  }
+
+  if (! $cgp_hide["company"]["companyactivity_label"]) {
+    $act_q = run_query_companyactivity();
+    $block .= html_company_activity_form($act_q);
+  }
 
   return $block;
 }

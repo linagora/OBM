@@ -566,6 +566,15 @@ table.resultPref	 {
 	width:			auto;
 }
 
+td.resultPrefHide  {
+	font-family:		sans-serif;
+	font-size:		10px;
+	text-align:		center;
+	color:			#000000;
+	background-color:	#55aaff;
+}
+
+
 a.resultHead:link	{ color: #ffffff; background-color: transparent;}
 a.resultHead:active	{ color: #ffffff; background-color: transparent;}
 a.resultHead:visited 	{ color: #ffffff; background-color: transparent;}
