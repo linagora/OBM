@@ -77,7 +77,16 @@ require("list_js.inc");
 ///////////////////////////////////////////////////////////////////////////////
 // External calls (main menu not displayed)                                  //
 ///////////////////////////////////////////////////////////////////////////////
-if ($action == "new_criterion") {
+if ($action == "ext_get_id") {
+  $display["search"] = dis_list_search_form($list);
+  if ($set_display == "yes") {
+    $display["detail"] = dis_list_search_list($list, $popup);
+  } else {
+    $display["msg"] .= display_ok_msg($l_no_display);
+  }
+
+}
+else if ($action == "new_criterion") {
   require("$obminclude/calendar.js");  
   $display["detail"] = dis_add_criterion_form($list);
 
@@ -543,6 +552,14 @@ function get_list_action() {
    'Right'    => $cright_read,
    'Condition'=> array ('None') 
                                             );
+
+// Company Select 
+  $actions["LIST"]["ext_get_id"]  = array (
+    'Url'      => "$path/list/list_index.php?action=ext_get_id",
+    'Right'    => $cright_read,
+    'Condition'=> array ('None') 
+                                     		 );
+					    
 }
 
 

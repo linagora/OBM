@@ -20,3 +20,7 @@ $l_totals = "Total";
 $l_null = "None";
 
 $l_compcat = "Company's categories";
+
+$l_select_list = "Select a list of companies from List module";
+
+$l_generate_stats = "Generate statistics";

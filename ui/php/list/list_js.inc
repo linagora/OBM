@@ -18,6 +18,18 @@ function check_list(list) {
 return true;
 }
 
+function check_get_id_url(p_url, valeur) {
+  if ((valeur < 1) || (valeur == null)) {
+    alert (\"$l_j_select_company\");
+    return false;
+  } else {
+    new_url = p_url + valeur;
+    window.opener.location.href=new_url;
+    window.close();
+    return true;
+  }
+}
+
 function check_name_list(form) {
   name_list = form.tf_name.value ;
   subject_list = form.tf_subject.value ;

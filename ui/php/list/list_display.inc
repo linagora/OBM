@@ -57,8 +57,9 @@ $fieldnames["publication_lang"] = $l_publication." ".$l_lang;
 //   - $res : hash with 'name', 'url', 'align' values
 ///////////////////////////////////////////////////////////////////////////////
 function dis_data_list(&$OD, $fieldname, $link_ok) {
-  global $path, $set_theme;
+  global $path, $list, $set_theme;
 
+  $ext_url = $list["ext_url"];
   // We set an indicator to tell if the contact has an address
   if ( ($OD->data_set->f("contact_address1") != "")
          || ($OD->data_set->f("contact_address2") != "")
@@ -71,8 +72,14 @@ function dis_data_list(&$OD, $fieldname, $link_ok) {
     $contact_has_address = false;
   }
 
-  if (($fieldname == "list_name")  && $link_ok) {
-    $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
+  if (($fieldname == "list_name")) {
+    if ($OD->display_ext == "get_id") {
+      $res["url"] = "javascript:check_get_id(".$OD->data_set->f("list_id").",'".addslashes($OD->data_set->f("list_name"))."');";
+    } else if ($OD->display_ext == "get_id_url") {
+      $res["url"] = "javascript:check_get_id_url('$ext_url',".$OD->data_set->f("list_id").");";
+    } elseif($link_ok) {
+      $res["url"] = "list_index.php?action=detailconsult&amp;param_list=".$OD->data_set->f("list_id");
+    }    
   }
   
   else if ($fieldname == "list_nb_contact") {
@@ -371,9 +378,10 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     $ext_url = $list["ext_url"];
     $ext_id = $list["ext_id"];
     $ext_target = $list["ext_target"];
-    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id";
+    $ext_widget = $list["ext_widget"];
+    $ext_widget_text = $list["ext_widget_text"];
+    $url_ext = "&amp;ext_action=$ext_action&amp;ext_url=$ext_url&amp;ext_id=$ext_id&amp;ext_target=$ext_target&amp;ext_widget=$ext_widget&amp;ext_widget_text=$ext_widget_text&amp;popup=1";
   }
-
   $name = urlencode(stripslashes($list["name"]));
   $contact = urlencode(stripslashes($list["contact"]));
 
@@ -382,18 +390,33 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
   $url = url_prepare("list_index.php?action=search&amp;tf_name=$namet&amp;tf_contact=$contact$url_ext");
   
   $dis_list = new OBM_DISPLAY("DATA", $pref_q, "list");
-  if ($popup) {
+/*  if ($popup) {
     $dis_list->display_link = false;
     $dis_list->data_cb_text = "X";
     $dis_list->data_idfield = "list_id";
     $dis_list->data_cb_name = "cb_list";
     $block .= "<form target=\"$ext_target\" method=\"get\" action=\"$ext_url\">";
   }
+  */
+  if ($popup) {
+    $dis_list->display_link = false;
+    if ($ext_url != "") {
+      $dis_list->display_ext = "get_id_url";
+    } else if ( ($ext_widget != "") && ($ext_widget_text != "") ) { 
+      $dis_list->display_ext = "get_id";
+    }
+    $display_popup_end = "
+      <p>
+      <a href=\"\" onclick='window.close();'>$l_close</a>
+      </p>";
+  }
+  
   $dis_list->data_set = $obm_q;
   $dis_list->data_header = "both";
   $dis_list->data_url = $url;
   $block .= $dis_list->display("dis_data_list");
-
+  $block .= $display_popup_end;  
+/*
   if ($popup) {
     $block .= "
     <p class=\"detailButton\">
@@ -406,7 +429,7 @@ function html_list_search_list($obm_q, $pref_q, $nb_list, $list, $popup) {
     </form>
     <p align=\"right\">
     <a href=\"\" onclick='window.close();'>$l_close</a></p>";
-  }
+  }*/
 
   return $block;
 }

@@ -31,6 +31,12 @@ div.agendaHidden {
 	width:			auto;
 
 }
+table.agendaHidden {
+        background-color:	#000000;
+	border:			1px solid black;
+	width:			200px;
+	border-spacing:		0;
+}
 
 .agendaMain	{
         margin-left:		auto;
@@ -55,7 +61,8 @@ table.agendaCalWeek		{
 	margin-right:		auto;
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
-	width:			540px;
+	width:			554px;
+	border-spacing:		0;
 }
 
 table.agendaCalDay		{
@@ -72,6 +79,8 @@ table.agendaCalMonth		{
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			735px;
+	border-collapse:	collapse;
+	border-spacing:		0;
 }
 
 table.agendaCalYear		{
@@ -79,6 +88,8 @@ table.agendaCalYear		{
 	margin-right:		auto;
 	border: 		1px #a1a5a9 solid; 
 	width:			676px;
+	border-collapse:	collapse;
+	border-spacing:		0;
 }
 
 table.agendaCalMeeting		{
@@ -86,6 +97,8 @@ table.agendaCalMeeting		{
 	margin-right:		auto;
 	border: 		1px #a1a5a9 solid; 
 	width:			540px;
+	border-collapse:	collapse;
+	border-spacing:		0;
 }
 
 .agendaRight			{
@@ -98,6 +111,8 @@ table.agendaCal		{
 	background-color: 	#ffffff;
 	border: 		1px #a1a5a9 solid; 
 	width:			100%;
+	border-collapse:	collapse;
+	border-spacing:		0;
 }
 
 table.agendaMonth	{
@@ -157,7 +172,7 @@ td.agendaHead		{
 	font-family:		sans-serif;
 	font-size:		18px;
 	color: 			#000000; 
-	vertical-align:		top;
+	vertical-align:		bottom;
 	white-space:		nowrap;	
 	background-image: 	url(time_bg.gif); 
 }

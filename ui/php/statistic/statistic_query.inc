@@ -148,8 +148,12 @@ function run_query_get_selected_company($query,$id) {
 
   if (preg_match('/(FROM (.*))( GROUP BY)?(?(3)|$)/Uis', $query, $matches)) { 
    $query_f = "select distinct(company_id) ". $matches[1];
+   $or = "OR";
   }
-
+  else {
+    $query_f = "select distinct(company_id) from Contact 
+     LEFT JOIN Company ON Contact.contact_company_id = Company.company_id where";
+  }
   $query_c = "select distinct(contact_id) as id from ContactList
          LEFT JOIN Contact ON contactlist_contact_id=contact_id
          LEFT JOIN Company ON Contact.contact_company_id = Company.company_id
@@ -160,7 +164,7 @@ function run_query_get_selected_company($query,$id) {
   $obm_q = new DB_OBM;
   $obm_q->query($query_c, 1);
   if($obm_q->nf() != 0) {
-    $query_f .= " OR contact_id IN (";
+    $query_f .= "$or contact_id IN (";
     while($obm_q->next_record()) {
       $query_f .= $coma .$obm_q->f("id");
       $coma =",";

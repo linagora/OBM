@@ -145,6 +145,7 @@ function get_statistic_action() {
 // Sel user add : Users selection
   $actions["GROUP"]["sel_statistic"] = array (
     'Url'      => "$path/list/list_index?action=ext_get_ids&amp;popup=1&amp;ext_title=".urlencode($l_add_user)."&amp;ext_action=company_statistic",
+    'Right'    => $cright_read,    
     'Popup'    => 1,
     'Target'   => $l_statistic
   );
