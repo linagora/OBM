@@ -129,6 +129,7 @@ if ($popup != 2) {
 ///////////////////////////////////////////////////////////////////////////////
 //Initialisation                                                             //
 ///////////////////////////////////////////////////////////////////////////////
+// bcontins : normalement pas utile, deja fait plus tot
 //set user_id if not set
 if (!(isset($time["user_id"])))
   $time["user_id"] = $uid;
@@ -225,7 +226,7 @@ if ($action == "globalview") {
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"month");
 
-  // display ???
+  // display validation panel
   $display["detail"] .= dis_time_index($time);
 } 
 
@@ -256,7 +257,7 @@ elseif ($action == "validate") {
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"month");
 
-  // display ???
+  // display validation panel
   $display["detail"] .= dis_time_index($time);
 }
 
@@ -269,7 +270,7 @@ elseif ($action == "unvalidate") {
   // display links to previous and next week
   $display["detail"] = dis_time_links($time,"month");
 
-  // display ???
+  // display validation panel
   $display["detail"] .= dis_time_index($time);
 }
 
@@ -290,14 +291,15 @@ elseif ($action == "stats") {
   $display["detail"] .= dis_time_statsuser($statproj_q, $stattt_q, $time);
 }
 
-elseif ($action == "export_stats") {
-//////////////////////////////////////////////////////////////////////////////
-  // interval is week -- see if we may need to use others intervals
-  $time["interval"] = "month";
+// bcontins : pas utilise pour le moment
+// elseif ($action == "export_stats") {
+// //////////////////////////////////////////////////////////////////////////////
+//   // interval is week -- see if we may need to use others intervals
+//   $time["interval"] = "month";
 
-  //  echo "export stats<br>";
-  $display["detail"] = dis_time_export_stats($time);
-}
+//   //  echo "export stats<br>";
+//   $display["detail"] = dis_time_export_stats($time);
+// }
 
 elseif ($action == "delete") {
 //////////////////////////////////////////////////////////////////////////////
@@ -320,7 +322,8 @@ elseif ($action == "delete") {
 
 elseif ($action == "detailupdate") {
 //////////////////////////////////////////////////////////////////////////////
-
+  
+  // open the popup
   // interval is week -- see if we may need to use others intervals
   if ( $popup == 1 ) {
     // Get elements for insertion of new task
@@ -346,6 +349,7 @@ elseif ($action == "detailupdate") {
 
   }
 
+  // close the popup
   else {
     run_query_update($time);
     run_query_validate($time["user_id"]);
@@ -363,7 +367,7 @@ elseif ($action == "detailupdate") {
 
 elseif ($action == "admin") {
 //////////////////////////////////////////////////////////////////////////////
-
+  $display["msg"] .= display_info_msg($l_no_display);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

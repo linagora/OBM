@@ -797,30 +797,31 @@ function display_shortview($time, $array_res) { //, $order) {
     $fract = $user_total/$c_day_fraction;
 
     if ($user_status == 2) {
-      $bg_color= "bgcolor=\"#$66dd66\"";
+      $class= "timeValok";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=unvalidate&amp;wbegin=$date&amp;user_id=$uid") ."\">
        <img border=0 src=\"/images/$set_theme/non2.gif\" height=\"20\" width=\"20\" alt=\"\" /> $l_unvalid</a>";
       $link_act = "$l_see";
     } else if ($fract != $tot_workingdays) {
-      $bg_color= "bgcolor=\"#$col_blue\"";
+      $class= "timeValunfilled";
       $dis_validlink = "&nbsp;";
       $link_act = "$l_fill";
     } else {
-      $bg_color= "";
+      $class= "timeValfilled";
       $dis_validlink = "
        <a href=\"". url_prepare("time_index.php?action=validate&amp;wbegin=$date&amp;user_id=$uid") ."\">
        <img border=0 src=\"/images/$set_theme/oui2.gif\" height=\"20\" width=\"20\" alt=\"\" /> $l_valid</a>";
       $link_act = "$l_see";
     }
 
-    $dis_tot= $fract != $tot_workingdays ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
+    $fract = ($fract != number_format($fract, 0)) ? number_format($fract, 1) : $fract;
+    $dis_tot= ($fract != $tot_workingdays) ? "<b>$fract / $tot_workingdays</b>" : "$fract / $tot_workingdays";
 
     $dis_months .= "
      <tr>
       <td><b>&nbsp;$user_title</b></td>
       <td>&nbsp;&nbsp;</td>
-      <td $bg_color>$dis_tot</td>
+      <td class=\"$class\">$dis_tot</td>
       <td>&nbsp;&nbsp;</td>
       <td>
        <a href=\"". url_prepare("time_index.php?action=viewmonth&amp;wbegin=$date&amp;user_id=$uid") ."\">

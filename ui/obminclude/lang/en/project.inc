@@ -57,6 +57,7 @@ $l_advanceinfos = "Project progress";
 $l_tasksinfos = "Project tasks";
 $l_membersinfos = "Progress evaluation";
 $l_memberstimeinfos = "Fill in the working length (in days) projected for each person assigned to a task";
+$l_advupdateinfos = "Fill in the working length (in days) missing for each person to complete a task";
 
 // Actions
 $l_insert = "Create the project";

@@ -39,7 +39,7 @@ function init_projects() {
     where timetask_projecttask_id != 0
     group by timetask_projecttask_id";
 
-  // echo "$query \n ---------------------------------------------\n";
+  echo "$query \n ---------------------------------------------\n";
 
   $toinit_q = new DB_OBM;
   $toinit_q->query($query);
@@ -62,7 +62,7 @@ function init_projects() {
       deal_soldtime = 1
     where deal_id in $toinit_tab";
 
-  // echo "$query \n ---------------------------------------------\n";
+  echo "$query \n ---------------------------------------------\n";
 
   $init_q = new DB_OBM;
   $init_q->query($query);
@@ -91,7 +91,7 @@ function fill_projecttask() {
     from Deal, TimeTask
     where timetask_projecttask_id = deal_id";
   
-  // echo "$query \n ---------------------------------------------\n";
+  echo "$query \n ---------------------------------------------\n";
   
   $tasks_q = new DB_OBM;
   $tasks_q->query($query);
@@ -129,7 +129,7 @@ function fill_projecttask() {
         0
       )";
 
-    // echo "$query \n ---------------------------------------------\n";
+    echo "$query \n ---------------------------------------------\n";
     
     $project_q->query($query);
     $nreq ++;
@@ -143,7 +143,7 @@ function fill_projecttask() {
         and projecttask_label = '$text'
     ";
 
-   // echo "$query \n ---------------------------------------------\n";
+   echo "$query \n ---------------------------------------------\n";
     
     $newtask_q->query($query);
     $nreq ++;
@@ -162,9 +162,9 @@ function fill_projecttask() {
     if ($label == "")
       $query .= "and timetask_label = ''";
     else
-      $query .= "and timetask_label like '%$text%'";
+      $query .= "and trim(timetask_label) like '$text'";
 
-      // echo "$query \n ---------------------------------------------\n";
+      echo "$query \n ---------------------------------------------\n";
 
     $time_q->query($query);
     $nreq ++;
@@ -186,6 +186,7 @@ function fill_projectuser() {
 
   $query = "
     select distinct
+      deal_id as deal,
       timetask_projecttask_id as ptask,
       timetask_user_id as user
     from Deal, ProjectTask, TimeTask
@@ -193,7 +194,7 @@ function fill_projectuser() {
       and projecttask_deal_id = deal_id
       and deal_project_status = 1";
   
-  // echo "$query \n ---------------------------------------------\n";
+  echo "$query \n ---------------------------------------------\n";
 
   $members_q = new DB_OBM;
   $members_q->query($query);
@@ -207,6 +208,7 @@ function fill_projectuser() {
   
   while($members_q->next_record()) {
   
+    $deal = $members_q->f("deal");
     $ptask = $members_q->f("ptask");
     $user = $members_q->f("user");
     $date = date("Ymd");
@@ -215,22 +217,24 @@ function fill_projectuser() {
 
     $query = "
       insert into ProjectUser (
-        projectuser_projecttask_id,
         projectuser_user_id,
+        projectuser_deal_id,
+        projectuser_projecttask_id,
         projectuser_projectedtime,
         projectuser_missingtime,
         projectuser_validity,
         projectuser_manager)
       values (
-        $ptask,
         $user,
+        $deal,
+        $ptask,
         1,
         1,
         $date,
         0
         )";
 
-    // echo "$query \n ---------------------------------------------\n";
+    echo "$query \n ---------------------------------------------\n";
     
     $projuser_q->query($query);
     $nreq ++;
@@ -256,7 +260,7 @@ function fill_preferences() {
       userobm_id as id
     from UserObm";
   
-  // echo "$query \n ---------------------------------------------\n";
+  echo "$query \n ---------------------------------------------\n";
 
   $users_q = new DB_OBM;
   $users_q->query($query);
@@ -272,7 +276,7 @@ function fill_preferences() {
   
     $id = $users_q->f("id");
     
-    // fill the ProjectUser table
+    // fill the DisplayPref table
 
     $query = "
       insert into DisplayPref (
@@ -305,7 +309,7 @@ function fill_preferences() {
         ($id,'time_tt','total_after',4,1)
     ";
 
-    // echo "$query \n ---------------------------------------------\n";
+    echo "$query \n ---------------------------------------------\n";
     
     $prefs_q->query($query);
     $nreq ++;

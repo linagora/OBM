@@ -104,17 +104,7 @@ if ($action == "index" || $action == "") {
   $tasks_q = run_query_tasks($param_project);
   $members_q = run_query_members($param_project);
 
-  if (($tasks_q != 0) && ($tasks_q->num_rows() != 0)) {
-
-    $display["detail"]  = html_project_memberadd_form($project);
-    $display["detail"] .= html_project_member_form($members_q, $project );
-
-  } else {
-
-    $display["msg"] = display_warn_msg($l_no_tasks);
-    $display["detail"]  = html_project_taskadd_form(0, $project);
-    $display["detail"] .= html_project_tasklist(0, $project);
-  }
+  $display["detail"] .= html_project_member_form($members_q, $project );
 
 } elseif ($action == "membertime_fill")  {
 ///////////////////////////////////////////////////////////////////////////////
@@ -256,10 +246,12 @@ if ($action == "index" || $action == "") {
     } else {
       // this project's page has "private" access
       $display["msg"] .= display_err_msg($l_error_visibility);
+      $action = "";
     }
 
   } else {
     $display["msg"] .= display_err_msg($l_error_visibility);
+    $action = "";
   }
   
 } elseif ($action == "detailupdate")  {

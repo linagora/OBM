@@ -57,6 +57,7 @@ $l_advanceinfos = "Avancement du projet";
 $l_tasksinfos = "Tâches du projet";
 $l_membersinfos = "Detail de l'avancement";
 $l_memberstimeinfos = "Renseignez le temps de travail (en jours) prévu pour chaque personne assignée à une tâche";
+$l_advupdateinfos = "Renseignez le temps de travail (en jours) manquant aux participants pour terminer une tâche";
 
 // Actions
 $l_insert = "Créer le projet";

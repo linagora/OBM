@@ -11,19 +11,14 @@
 	text-align:		center;
 	}
 
+/* Time browsing panel */
+
 table.timeLinks			{
 	border-spacing:		1;
 	margin:			auto;
 	}
 
 table.timeMonth			{
-	border-spacing:		1;
-	margin:			auto;
-	padding:		2;
-	}
-
-table.timeValid			{
-	border:			1px #4f7091 solid;
 	border-spacing:		1;
 	margin:			auto;
 	padding:		2;
@@ -36,6 +31,17 @@ td.timePeriod			{
 	font-weight: 		600;
 	color:			#4f7091;
 	}
+
+table.timeValid			{
+	border:			1px #4f7091 solid;
+	border-spacing:		1;
+	margin:			auto;
+	padding:		2;
+	text-align:		left;
+	font-size:		12px;
+	}
+
+/* Addtask form */
 
 table.timeDetail		{
  	font-family: 		sans-serif;
@@ -56,6 +62,8 @@ td.timeForm			{
 	background-color:	#e7ebef;
 	padding:		3;
 	}
+
+/* Week panel */
 
 td.timeWeekhead			{
  	font-family: 		sans-serif;
@@ -81,13 +89,7 @@ td.timeWeekvalid			{
 	background-color:	#c1cfdd;
 	}
 
-td.timeHead			{
- 	font-family: 		sans-serif;
-	font-size:		10px;
-	text-align:		center;
-	color:			#4f7091;
-	background-color:	#a5bace;
-	}
+/* Month panel */
 
 td.timeUnvalid			{
 	font-family:		sans-serif;
@@ -123,6 +125,31 @@ td.timeOffday 	 	 {
 	font-weight: 		bold;
 }
 
+/* Validation panel */
+
+td.timeValunfilled		{
+	font-family:		sans-serif;
+	text-align:		right;
+	color:			#4f7091;
+	background-color:	#fbf7db;
+	}
+
+td.timeValfilled		{
+	font-family:		sans-serif;
+	text-align:		right;
+	color:			#4f7091;
+	background-color:	#c1cfdd;
+	}
+
+td.timeValok			{
+	font-family:		sans-serif;
+	text-align:		right;
+	color:			#4f7091;
+	background-color:	#ffffff;
+	}
+
+/* User select panel */
+
 table.timeUser		{
         margin-left:		auto;
 	margin-right:		auto;
@@ -144,6 +171,8 @@ td.timeUserback		{
  	text-align: 		center; 
 	background-color:	#ffffff;
 	}
+
+/* OBM display row styles */
 
 tr.timeUnvalid			{
 	font-family:		sans-serif;

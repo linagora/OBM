@@ -85,9 +85,12 @@ CREATE TABLE ProjectTask (
 -------------------------------------------------------------------------------
 -- ProjectUser
 -------------------------------------------------------------------------------
+
 CREATE TABLE ProjectUser (
-  projectuser_projecttask_id int(8) NOT NULL,
+  projectuser_id int(8) DEFAULT '0' NOT NULL auto_increment,
   projectuser_user_id int(8) NOT NULL,
+  projectuser_deal_id int(8) NOT NULL,
+  projectuser_projecttask_id int(8),
   projectuser_timeupdate timestamp(14) NOT NULL,
   projectuser_timecreate timestamp(14) NOT NULL,
   projectuser_userupdate int(8) default NULL,
@@ -97,7 +100,7 @@ CREATE TABLE ProjectUser (
   projectuser_validity timestamp(14) default NULL,
   projectuser_soldprice int(8) default NULL,
   projectuser_manager int(1) default NULL,
-  PRIMARY KEY (projectuser_projecttask_id, projectuser_user_id)
+  PRIMARY KEY (projectuser_id)
 );
 
 -------------------------------------------------------------------------------
