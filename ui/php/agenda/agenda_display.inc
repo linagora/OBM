@@ -1360,10 +1360,11 @@ function dis_free_interval($agenda,$calendar_user,$usr_q ){
 	$current_time = strtotime("+$i days +$delta hours +$delta2 minutes",$start_week_time);
         $dayLink = date("Ymd",$current_time);
         $end_time = $current_time + $duration;	
+	$begin_date = date("YmdHis",$current_time);
+	$end_date = date("YmdHis",$end_time);	
+	$goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user";
 	if(isset($events[$dayLink])) {
 	  $day = $events[$dayLink];
-	  $begin_date = date("YmdHis",$current_time);
-	  $end_date = date("YmdHis",$end_time);
 	  $have_event = $day->have_events_between($current_time, $current_time + $time_unit_sec);
 	  $will_have_event = $day->have_events_between($current_time,$end_time);
 	  $goto = "agenda_index.php?action=new&amp;param_date_begin=$begin_date&amp;param_date_end=$end_date&amp;p_user_meeting=1$param_user";
