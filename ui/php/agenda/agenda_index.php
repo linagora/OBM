@@ -387,8 +387,8 @@ function get_param_agenda() {
 ///////////////////////////////////////////////////////////////////////////////
 function get_agenda_action() {
   global $actions, $path;
-  global $l_header_find,$l_header_new_f,$l_header_update,$l_header_delete;
-  global $l_header_display,$l_header_day,$l_header_week,$l_header_year,$l_header_admin;
+  global $l_header_update,$l_header_delete;
+  global $l_header_day,$l_header_week,$l_header_year;
   global $l_header_month,$l_header_new_event,$param_event,$param_date;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
