@@ -963,6 +963,9 @@ CREATE TABLE Invoice (
   invoice_timecreate        TIMESTAMP,
   invoice_userupdate        integer,
   invoice_usercreate        integer,
+  invoice_company_id        integer NOT NULL,
+  invoice_deal_id           integer default NULL,
+  invoice_project_id        integer default NULL,
   invoice_number            varchar(10) DEFAULT '0',
   invoice_label             varchar(40) NOT NULL DEFAULT '',
   invoice_amount_ht         DECIMAL(10,2),
@@ -987,20 +990,6 @@ CREATE TABLE InvoiceStatus (
 
 
 --
--- New table 'DealInvoice'
---
-CREATE TABLE DealInvoice (
-  dealinvoice_deal_id     integer NOT NULL,
-  dealinvoice_invoice_id  integer NOT NULL,
-  dealinvoice_timeupdate  TIMESTAMP,
-  dealinvoice_timecreate  TIMESTAMP,
-  dealinvoice_usercreate  integer,
-  dealinvoice_userupdate  integer,
-  PRIMARY KEY (dealinvoice_deal_id, dealinvoice_invoice_id)
-);
-
-
---
 -- New table 'Payment'
 --
 CREATE TABLE  Payment (
@@ -1009,6 +998,8 @@ CREATE TABLE  Payment (
   payment_timecreate      timestamp,
   payment_userupdate      integer,
   payment_usercreate      integer,
+  payment_invoice_id      integer NOT NULL,
+  payment_company_id      integer NOT NULL,
   payment_number          integer default null,
   payment_date            date,
   payment_expected_date   date,		

@@ -24,7 +24,9 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   $company = $invoice["company"];
   $deal = $invoice["deal"];
   $archive = $invoice["archive"];
-  $deal_id = $invoice["param_deal"];
+  $comp_id = $invoice["company_id"];
+  $deal_id = $invoice["deal_id"];
+  $proj_id = $invoice["project_id"];
 
   $obm_q = new DB_OBM;
   $db_type = $obm_q->type;
@@ -60,11 +62,17 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
   if ($company != "") {
     $where .= " and company_name $like '$company%'";
   }
+  if ($comp_id != "") {
+    $where .= " and invoice_company_id = '$comp_id'";
+  }
   if ($deal != "") {
     $where .= " and deal_label $like '$deal%'";
   }
   if ($deal_id != "") {
-    $where .= " and deal_id = '$deal_id'";
+    $where .= " and invoice_deal_id = '$deal_id'";
+  }
+  if ($proj_id != "") {
+    $where .= " and invoice_project_id = '$proj_id'";
   }
   if ($archive != "1") {
     $where .= " and invoice_archive = '0'";
@@ -82,9 +90,8 @@ function run_query_search ($invoice, $p_new_order, $p_order_dir) {
       deal_id, deal_label as invoice_deal,
       invoicestatus_id, invoicestatus_label as invoice_status
     from Invoice
-      left outer join DealInvoice on dealinvoice_invoice_id = invoice_id
-      left outer join Deal on dealinvoice_deal_id = deal_id
-      left outer join Company on deal_company_id = company_id
+      left outer join Deal on invoice_deal_id = deal_id
+      left outer join Company on invoice_company_id = company_id
       left join InvoiceStatus on invoice_status_id = invoicestatus_id
     $whereq
     $orderq
@@ -134,7 +141,8 @@ function run_query_detail($p_invoice_id) {
       left join UserObm as u on invoice_userupdate=u.userobm_id
     where invoice_id='$p_invoice_id'
     group by Invoice.invoice_id, invoice_timeupdate, invoice_timecreate,
-      invoice_userupdate, invoice_usercreate, invoice_number, invoice_label,
+      invoice_userupdate, invoice_usercreate, invoice_company_id,
+      invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
       invoice_comment, invoice_inout, invoice_archive,
       c.userobm_login, u.userobm_login";
@@ -164,7 +172,9 @@ function run_query_insert($invoice) {
   $comment = $invoice["comment"];
   $date = $invoice["date"];
   $inout = $invoice["inout"];
-  $deal = $invoice["param_deal"];
+  $comp_id = ($invoice["company_id"] > 0 ? $invoice["company_id"] : "0");
+  $deal_id = $invoice["deal_id"];
+  $proj_id = $invoice["project_id"];
 
   if ($status == ""){
     $status = "0";
@@ -175,6 +185,9 @@ function run_query_insert($invoice) {
       invoice_timecreate,
       invoice_userupdate,
       invoice_usercreate,
+      invoice_company_id,
+      invoice_deal_id,
+      invoice_project_id,
       invoice_number,
       invoice_label,
       invoice_amount_ht,
@@ -188,6 +201,9 @@ function run_query_insert($invoice) {
      '$now',
      null,
      '$uid',
+     '$comp_id',
+     '$deal_id',
+     '$proj_id',
      '$number',
      '$label',
      '$ht', 
@@ -200,28 +216,6 @@ function run_query_insert($invoice) {
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $obm_q->query($query);
-
-  // following code is only when creating an invoice from a deal :
-  if (isset($deal) && $deal != "") {
-    // we need to re-get the id of the invoice freshly inserted
-    $new_invoice = run_query_search ($invoice, $new_order, $order_dir);
-    $new_invoice->next_record();
-    $newid = $new_invoice->f("invoice_id");
-    
-    $query = "insert into DealInvoice (
-        dealinvoice_deal_id,
-        dealinvoice_invoice_id,
-        dealinvoice_timecreate,
-        dealinvoice_usercreate
-      ) values (
-        '$deal',
-        '$newid',
-        '$now',
-        '$uid'
-      )";
-    display_debug_msg ($query, $cdg_sql, "asso deal-invoice");
-    $obm_q->query($query);
-  }
 }
 
 
@@ -246,10 +240,16 @@ function run_query_update ($invoice) {
   if ($status == ""){
     $status="0";
   }
+  $comp_id = ($invoice["company_id"] > 0 ? $invoice["company_id"] : "0");
+  $deal_id = $invoice["deal_id"];
+  $proj_id = $invoice["project_id"];
 
   $query = "update Invoice set
       invoice_timeupdate='$now',
       invoice_userupdate='$uid',
+      invoice_company_id='$comp_id',
+      invoice_deal_id='$deal_id',
+      invoice_project_id='$proj_id',
       invoice_number='$number',
       invoice_label='$label',
       invoice_amount_ht='$ht',
@@ -287,177 +287,42 @@ function run_query_invoicestatus() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// data of deals connecte to $p_invoice
-///////////////////////////////////////////////////////////////////////////////
-function run_query_search_deal_invoice ($p_invoice) {
-  global $cdg_sql;
-
-  $query = "select ".
-     " deal_label ".
-     ", deal_id ".
-     ", tasktype_label ".
-     ", company_id as deal_company_id ".
-     ", company_name as deal_company_name ".
-     ", deal_todo ".
-     ", dealtype_label ".
-     ", dealtype_label ".
-     ", deal_datealarm ".
-     ", dealstatus_label ".
-     " from Deal, DealInvoice, Invoice , TaskType, DealType, DealStatus ". 
-     " , Company".
-     " where dealinvoice_invoice_id = invoice_id ".
-     " and deal_status_id = dealstatus_id ".
-     " and deal_type_id = dealtype_id ".
-     " and deal_tasktype_id = tasktype_id ".
-     " and deal_id = dealinvoice_deal_id ".
-     " and deal_company_id = company_id ".
-     " and invoice_id = ".$p_invoice ;
-
-  display_debug_msg("<b>run_query_search_deal_invoice : </b>$query", $cdg_sql);
-  $obm_q = new DB_OBM;
-  $obm_q->query($query);
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// getting all deals of the same kind as $q_invoice,
-// but not connected to any invoice
-// and not archived (!)
-// $p_deal_label = label of the deal to search
-// $p_deal_company = deals connected to that company
-// $p_deal_archive = 1 means look into archived deals as well
-///////////////////////////////////////////////////////////////////////////////
-function run_query_deal($q_invoice, $p_deal_label="",$p_deal_company="", $p_deal_archive = 0) {
-  global $cdg_sql;
-
-  $obm_q = new DB_OBM;
-  $db_type = $obm_q->type;
-  $like = sql_casei_like($db_type);
-    
-  if (is_object ($q_invoice)) {
-    // list all deals of this invoice
-    $query = "select
-        dealinvoice_deal_id
-      from DealInvoice
-      where dealinvoice_invoice_id = '".$q_invoice->f("invoice_id")."'";
-    display_debug_msg("<b>run_query_deal() : </b>$query", $cdg_sql);
-    $obm_q->query($query);
-    
-    if ($obm_q->nf() > 0){
-      $obm_q->next_record();
-      $deals_to_skip = $obm_q->f("dealinvoice_deal_id");
-      while ($obm_q->next_record ()){
-	$deals_to_skip .= ",".$obm_q->f("dealinvoice_deal_id");
-      } 
-    }
-  }
-
-  $query = "select ".
-     " deal_id ".
-     ", deal_label ".
-     ", company_id ".
-     ", company_name as deal_company_name ".
-     ", deal_todo ".
-     ", dealtype_label ".
-     ", deal_datealarm ".
-     ", dealstatus_label ".
-     ", tasktype_label ".
-     " from Deal,Company,TaskType,DealType,DealStatus ".
-     " where ".
-     " deal_tasktype_id = tasktype_id ".
-     " and dealtype_id = deal_type_id".
-     " and deal_status_id = dealstatus_id ".
-     " and dealtype_inout = '".$q_invoice->f("invoice_inout")."' ".
-     " and deal_company_id = company_id ";
-  $query .= ($p_deal_label == "")? "":"and deal_label $like '$p_deal_label%' ";
-  $query .= ($deals_to_skip == "")?"":"and deal_id not in ('$deals_to_skip')";
-  if ($p_deal_company != "") {
-    $query .= " and company_name $like '$p_deal_company%' ";
-  }
-  if ($p_deal_archive != 0) {
-    $query .= " and deal_archive in ('1','0') ";
-  } else {
-    $query .= " and deal_archive = 0 ";
-  }
-
-  display_debug_msg ("<b>run_query_deal :</b>$query", $cdg_sql);
-  $obm_q->query($query);
-  
-  return $obm_q;
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
 // getting all payments of invoice $p_invoice 
 // if $not_paid = 1, we search only for not paid payments,
 // ie. lines having paymentinvoice_amount = 0.0
 // if $not_paid == -1, we return only paid payments
 // ie. lines having paymetinvoice_amoount != 0.0
 ///////////////////////////////////////////////////////////////////////////////
-function run_query_search_payment_invoice ($p_invoice, $not_paid=0) {
-  // trouble with date format with MySQL
+function run_query_invoice_payment ($p_invoice, $not_paid=0) {
   global $db_type_mysql, $db_type_pgsql, $cdg_sql;
 
-  $connect = new DB_OBM;
-  $query = "select ".
-     " payment_label ".
-     " ,payment_number ";
-  if ($connect->type==$db_type_pgsql) {     
-    $query .= " ,payment_date ";
-  }
-  elseif ($connect->type ==$db_type_mysql) {
-    $query .= " , UNIX_TIMESTAMP(payment_date) ";
-  }
-  $query.= " ,payment_amount ".
-     " ,payment_id ".
-     ", payment_number ".
-     ", payment_expected_date as payment_expect_date ".
-     " ,paymentinvoice_amount ".
-     " from Invoice, PaymentInvoice, Payment ".
-     " where invoice_id = paymentinvoice_invoice_id ".
-     " and payment_id = paymentinvoice_payment_id ".
-     " and invoice_id = ".$p_invoice;
+  $obm_q = new DB_OBM;
+  $db_type = $obm_q->type;
+  $date = sql_date_format($db_type, "payment_date", "payment_date");
+  $exp_date = sql_date_format($db_type, "payment_expected_date", "payment_expect_date");
+
+  $query = "select
+      payment_id,
+      payment_label,
+      payment_number,
+      $date,
+      payment_amount,
+      $exp_date,
+      payment_amount
+    from Payment
+    where payment_invoice_id = '$p_invoice'";
+
   if ($not_paid == 1) {
     $query .= " and paymentinvoice_amount = 0.0 ";
   } elseif ($not_paid == -1) {
     $query .= " and paymentinvoice_amount <> 0.0 ";
   }
   
-  display_debug_msg("<b>run_query_search_payment_invoice</b>$query", $cdg_sql);
-  $connect->query($query);
-  return $connect;
+  display_debug_msg($query, $cdg_sql, "run_query_invoice_payment");
+  $obm_q->query($query);
+  return $obm_q;
 }
 
-
-///////////////////////////////////////////////////////////////////////////////
-// add a deal to an invoice 
-///////////////////////////////////////////////////////////////////////////////
-function run_query_add_deal($p_invoice_id, $p_deal_id) {
-  global $cdg_sql;
-
-  $query = "insert into DealInvoice (dealinvoice_invoice_id, dealinvoice_deal_id) values('$p_invoice_id', '$p_deal_id')";
-  display_debug_msg($query, $cdg_sql);
-  $db = new DB_OBM;
-  $db->query($query);
-}
-
-
-///////////////////////////////////////////////////////////////////////////////
-// delete a connection between a deal and an invoice.
-// if $p_deal_id == "", delete all data about that invoice
-///////////////////////////////////////////////////////////////////////////////
-function run_query_remove_deal($p_invoice_id, $p_deal_id="") {
-  global $cdg_sql;
-
-  $db = new DB_OBM;
-  $query = "delete from DealInvoice where dealinvoice_invoice_id = '$p_invoice_id'";
-  if ($p_deal_id != ""){
-    $query .= "and  dealinvoice_deal_id='$p_deal_id'";
-  }
-  display_debug_msg ($query, $cdg_sql);
-  $db->query($query);
-}
 
 /*
 ///////////////////////////////////////////////////////////////////////////////

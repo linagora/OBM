@@ -302,7 +302,141 @@ function html_invoice_search_list ($inv_q, $pref_q, $nb_invoice, $invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display the Invoice search result
+// Display the Invoice detail screen
+// Parameters:
+//   - $invoice[] : invoice hash parameters
+///////////////////////////////////////////////////////////////////////////////
+function dis_invoice_consult($invoice) {
+  global $auth, $display, $l_no_found, $l_query_error;
+
+  $id = $invoice["id"];
+  $uid = $auth->auth["uid"];
+
+  $inv_q = run_query_detail($id);
+  if ($inv_q->num_rows() != 1) {
+    $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
+  }
+  if ($id > 0) {
+    $pay_q = run_query_invoice_payment($id);
+    $pref_pay_q = run_query_display_pref($uid, "payment");
+    $display["detailInfo"] = display_record_info($inv_q);
+    $block = html_invoice_consult($inv_q, $pay_q, $pref_pay_q);
+  }
+
+  return $block;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// XHTML Display invoice detail screen
+// Parameters:
+//   - $inv_q     : DBO invoice info
+//   - $pay_q     : DBO : payments for the invoice
+//   - pref_pay_q : display pref for payments
+///////////////////////////////////////////////////////////////////////////////
+function html_invoice_consult($inv_q, $pay_q, $pref_pay_q) {
+  global $display, $set_theme;
+  global $l_delete, $l_invoice_infos;
+  global $l_list_payment, $l_no_payment, $l_payments_todel, $l_invoice_del_payment, $l_del_payment_chosen;
+  global $perm, $menu, $cright_write_admin;
+
+  $i_id = $inv_q->f('invoice_id');
+
+  $block = dis_invoice_detail ($inv_q);
+  
+  //  payments data :
+  $block .= "<div class=\"detailHead\">$l_list_payment</div>";
+
+  if ($pay_q->nf() == 0) {
+    // no payment
+    $block .= "
+     <table class=\"detail\">
+      <tr>
+       <td class=\"detailLabel\">$l_no_payment</td>
+      </tr>
+     </table>";
+
+  } else {
+    $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=$i_id");
+
+    $dis_payment = new OBM_DISPLAY("DATA", $pref_pay_q, "invoice");
+    $dis_payment->data_set = $pay_q;
+    $dis_payment->data_header = "top";
+    $dis_payment->data_url = $url;
+    $dis_payment->data_order = false;
+    
+    $block .= $dis_payment->display("dis_data_invoice");
+  }
+
+  return $block;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Displays an invoice details :
+/////////////////////////////////////////////////////////////////////////////
+function dis_invoice_detail ($inv_q){
+  global $display;
+  global $l_update, $l_comment,$l_amount_ht, $l_amount_ttc, $l_status;
+  global $l_date, $l_label, $l_number, $l_inout, $l_supplier;
+  global $l_client, $l_duplicate, $l_invoice, $l_geninvoice;
+
+  $label = $inv_q->f("invoice_label");
+  $num = $inv_q->f("invoice_number");
+  $date = date_format($inv_q->f("date"));
+  $status = $inv_q->f("invoicestatus_label");
+  $inout = ($inv_q->f("invoice_inout")=='-') ? $l_supplier : $l_client;
+  $ht = $inv_q->f("invoice_amount_ht");
+  $ttc = $inv_q->f("invoice_amount_ttc");
+  $comment = nl2br($inv_q->f("invoice_comment"));
+
+  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
+
+  $block .= "
+    <div class=\"detailHead\">$l_geninvoice</div>
+
+    <table class=\"detail\">
+     <tr>
+      <td class=\"detailLabel\">$l_label</td>
+      <td class=\"detailText\">$label</td>
+     </tr>
+     <tr>
+      $dis_company
+      <td class=\"detailLabel\">$l_number</td>
+      <td class=\"detailText\">$num</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_date</td>
+      <td class=\"detailText\">$date</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_status</td>
+      <td class=\"detailText\">$status</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_inout</td>
+      <td class=\"detailText\">$inout</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_amount_ht</td>
+      <td class=\"detailText\">$ht</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_amount_ttc</td>
+      <td class=\"detailText\">$ttc</td>
+     </tr>
+     <tr>
+      <td class=\"detailLabel\">$l_comment</td>
+      <td class=\"detailText\">$comment</td>
+     </tr>
+    </table>";
+
+  return $block;
+} 
+
+
+///////////////////////////////////////////////////////////////////////////////
+// Display the Invoice Form
 // Parameters:
 //   - $action    : action called
 //   - $invoice[] : invoice hash parameters
@@ -326,7 +460,7 @@ function dis_invoice_form($action, $invoice) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// Display Invoice Form              
+// XHTML Display Invoice Form              
 // Parameters:
 //   - $action    : action called
 //   - $invoice[] : invoice hash parameters
@@ -520,215 +654,6 @@ function dis_invoice_display_pref ($pref_inv_q, $pref_deal_q) {
 
   return $block;
 }
-
-
-///////////////////////////////////////////////////////////////////////////////
-// Parameters :
-// ------------
-//  $action = action that brought us here
-//  $q_invoice : information about the invoice
-//  $q_status : all kind of status available for an invoice
-//  $q_deal/$q_payment : deals/payments connected to that invoice
-//  $options_{deals,payments} : display pref for deals/payments
-//
-// screen to access if you want to add/remove deals linked to an invoice
-///////////////////////////////////////////////////////////////////////////////
-function html_invoice_consult($action, $q_invoice, $q_status, $q_deal, $options_deals, $q_payment, $options_payments) {
-  global $display, $set_theme;
-  // - Labels
-  global $l_update,$l_delete,$l_insert, $l_invoice_infos,$l_deals_todel;
-  global $l_invoice_del_deal, $l_del_deal_chosen, $l_list_deal,$l_no_deal;
-  global $l_list_payment, $l_no_payment, $l_payments_todel, $l_invoice_del_payment, $l_del_payment_chosen;
-  global $l_add_deal, $l_del_deal;
-  global $l_label,$l_comment,$l_number, $l_date, $l_deal, $l_status;
-  global $perms_user,$l_perms_user;
-  global $perm, $param_invoice, $menu, $cright_write_admin;
-
-  $i_id = $q_invoice->f('invoice_id');
-
-  $block = dis_invoice_detail ($action,$q_invoice, $q_status);
-  
-  // bcontins : ?
-  // to add/remove deals
-  //   $action_add = url_prepare("invoice_index.php?action=add_deal".
-  // 			   "&amp;param_invoice=".
-  // 			   $q_invoice->f("invoice_id"));
-  //   $action_del = url_prepare("invoice_index.php?action=del_deal".
-  // 			   "&amp;param_invoice=".
-  // 			   $q_invoice->f("invoice_id"));
-
-  // deals data 
-  $block .= "<div class=\"detailHead\">$l_list_payment</div>";
-
-  if ($q_deal->nf() == 0) {
-    // no deals :
-    $block .= "
-     <table class=\"detail\">
-      <tr>
-       <td class=\"detailLabel\">$l_no_payment</td>
-      </tr>
-     </table>";
-
-    // bcontins : mettre la lien ajouter dans la barre de menu
-    //     // form to add some :
-    //     $block .= "
-    // <table cellspacing=\"0\" border=\"0\">
-    //  <tr><td valign=\"top\">
-    //   <form method=\"post\" action=\"\">
-    //    <input type=\"button\" value=\"$l_add_deal\" ".
-    // " onClick=\"this.form.action='".$action_add."' ; this.form.submit ();\">
-    //  </td></tr>
-    // </table>";
-
-  } else {
-
-    // bcontins
-    //     if ($action == "del_deal") {
-    //       $url = url_prepare("invoice_index.php?action=del_deal&amp;param_invoice=$i_id");
-    //     } else {
-    //       $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=$i_id");
-    //     }
-    
-    $dis_deal = new OBM_DISPLAY("DATA", $options_deals, "invoice");
-    $dis_deal->data_set = $q_deal;
-    $dis_deal->data_header = "top";
-    $dis_deal->data_url = $url;
-    $dis_deal->data_order = false;
-
-    if (($action == "del_deal") && ($perm->check_right($menu, $cright_write_admin))) {
-      $url_submit = url_prepare("invoice_index.php?action=del_deal_chosen&amp;param_invoice=".$q_invoice->f('invoice_id'));
-      $display["msg"] .= display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-      $block .= "<form method=\"post\" name=\"del_deal\" action=\"$url_submit\">";
-      $dis_deal->data_cb_text = $l_invoice_del_deal;
-      $dis_deal->data_idfield = "deal_id";
-      $dis_deal->data_cb_side = "left";
-      $dis_deal->data_cb_name = "del_";
-    }
-    
-    $block .= $dis_deal->display("dis_data_invoice");
-
-    if ($perm->check_right($menu, $cright_write_admin)) {
-      if ($action == "del_deal" ) {
-	// $block .= "<br>
-	//  <input align=\"center\" type=\"submit\" value=\"$l_del_deal_chosen\" />
-	//  </form>";
-      } else {
-
-	// bcontins
-	// we display the button to add some deals or remove some...
-	// 	$block .= "
-	// <table>
-	//  <tr><td valign=\"top\">
-	//   <form method=\"post\" action=\"\">
-	//    <input type=\"button\" value=\"$l_add_deal\"
-	//      onClick=\"this.form.action='$action_add' ; this.form.submit ();\">
-	//  </td><td valign=\"top\">
-	//    <input type=\"button\" value=\"$l_del_deal\"
-	//      onClick=\"this.form.action='$action_del' ; this.form.submit ();\">
-	//   </form>
-	//  </td></tr>
-	// </table>";
-      }
-    }
-  }
-
-  //  payments data :
-  $block .= "<div class=\"detailHead\">$l_list_payment</div>";
-
-  if ($q_payment->nf() == 0) {
-    // no payment
-    $block .= "
-     <table class=\"detail\">
-      <tr>
-       <td class=\"detailLabel\">$l_no_payment</td>
-      </tr>
-     </table>";
-
-  } else {
-    $url = url_prepare("invoice_index.php?action=detailconsult&amp;param_invoice=$i_id");
-
-    $dis_payment = new OBM_DISPLAY("DATA",$options_payments, "invoice");
-    $dis_payment->data_set = $q_payment;
-    $dis_payment->data_header = "top";
-    $dis_payment->data_url = $url;
-    $dis_payment->data_order = false;
-    
-    $block .= $dis_payment->display("dis_data_invoice");
-  }
-
-  return $block;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-// displays an invoice details :
-/////////////////////////////////////////////////////////////////////////////
-function dis_invoice_detail ($p_action, $q_invoice, $q_status){
-  global $param_invoice, $display;
-  global $l_update, $l_comment,$l_amount_ht, $l_amount_ttc, $l_status;
-  global $l_date, $l_label, $l_number, $l_inout, $l_supplier;
-  global $l_client, $l_duplicate, $l_invoice, $l_geninvoice;
-
-  $label = $q_invoice->f("invoice_label");
-  $num = $q_invoice->f("invoice_number");
-  $date = date_format($q_invoice->f("date"));
-  $status_id = $q_invoice->f("invoice_status_id");
-
-  while ($q_status->next_record()) {
-    if ($q_status->f("invoicestatus_id") == $status_id){
-      $status .= $q_status->f("invoicestatus_label");
-      break; // as soon as we catch the one we leave
-    }
-  }
-
-  $inout = ($q_invoice->f("invoice_inout")=='-') ? $l_supplier : $l_client;
-  $ht = $q_invoice->f("invoice_amount_ht");
-  $ttc = $q_invoice->f("invoice_amount_ttc");
-  $comment = nl2br($q_invoice->f("invoice_comment"));
-
-  $display["title"] = "<div class=\"title\">$l_invoice : $label</div>";
-
-  $block .= "
-    <div class=\"detailHead\">$l_geninvoice</div>
-
-    <table class=\"detail\">
-     <tr>
-      <td class=\"detailLabel\">$l_label</td>
-      <td class=\"detailText\">$label</td>
-     </tr>
-     <tr>
-      $dis_company
-      <td class=\"detailLabel\">$l_number</td>
-      <td class=\"detailText\">$num</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_date</td>
-      <td class=\"detailText\">$date</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_status</td>
-      <td class=\"detailText\">$status</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_inout</td>
-      <td class=\"detailText\">$inout</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_ht</td>
-      <td class=\"detailText\">$ht</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_amount_ttc</td>
-      <td class=\"detailText\">$ttc</td>
-     </tr>
-     <tr>
-      <td class=\"detailLabel\">$l_comment</td>
-      <td class=\"detailText\">$comment</td>
-     </tr>
-    </table>";
-
-  return $block;
-} 
 
 
 /////////////////////////////////////////////////////////////////////////////

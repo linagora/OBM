@@ -53,33 +53,24 @@ if ($action == "index" || $action == "") {
   $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "insert")  {
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_insert($invoice);
   $display["msg"] .= display_ok_msg($l_insert_ok);
   require("invoice_js.inc");
   $display["search"] = dis_invoice_search_form($invoice); 
   
 } elseif ($action == "detailconsult")  {
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
-  if ($invoice["id"] > 0) {    
-    $inv_q = run_query_detail($param_invoice);
-    $obm_q_deals = run_query_search_deal_invoice($param_invoice);
-    $obm_q_payment = run_query_search_payment_invoice ($param_invoice);
-
-    $options_deal = run_query_display_pref($auth->auth["uid"],"deal");
-    $options_payment = run_query_display_pref ($auth->auth["uid"], "payment");
-    $display["detailInfo"] = display_record_info($inv_q);
-    $display["detail"] = html_invoice_consult($action, $inv_q, run_query_invoicestatus(),$obm_q_deals, $options_deal,$obm_q_payment, $options_payment);
-  }
+  $display["detail"] = dis_invoice_consult($invoice);
 
 } elseif ($action == "detailupdate")  { 
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
     require("invoice_js.inc");
     $display["detail"] = dis_invoice_form($action, $invoice);
 
 } elseif ($action == "update")  {
-///////////////////////h//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
   run_query_update($invoice); 
   $display["msg"] .= display_ok_msg($l_update_ok); 
   require("invoice_js.inc"); 
@@ -97,123 +88,10 @@ if ($action == "index" || $action == "") {
     }
   }
   $display["msg"] .= display_ok_msg ($l_archive_ok);
-  echo $nb_invoices . " " . $l_archive_number . "<BR>\n";
+  echo $nb_invoices . " " . $l_archive_number . "<br />\n";
   
   require ("invoice_js.inc");
   $display["search"] = dis_invoice_search_form($invoice); 
-
-} elseif ($action=="add_deal"){
-///////////////////////////////////////////////////////////////////////////////
-  if (true){
-    $display["msg"] .= display_debug_msg("FIXME PERMISSION", $cdg_param);
-    $inv_q = run_query_detail($invoice["invoice"]);
-    $dis_options_deal = run_query_display_pref($auth->auth["uid"],"deal");
-    $display["search"] = dis_search_deal_form ($action, $inv_q, $dis_options_deal);
-  } else{
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
-} elseif ($action == "search_deal") {
-///////////////////////////////////////////////////////////////////////////////
-  if (true){
-    $display["msg"] .= display_debug_msg("FIXME PERMISSION : ", $cdg_param);
-    $inv_q = run_query_detail($invoice["invoice"]);
-    $dis_options_deal = run_query_display_pref($auth->auth["uid"],"deal");
-    $obm_q_deal = run_query_deal ($inv_q, $tf_deal_label, $tf_deal_company, $cb_deal_archive);
-    $display["search"] = dis_search_deal_form ($action, $inv_q, $dis_options_deal, $obm_q_deal,$tf_deal_label, $tf_deal_company, $cb_deal_archive);
-  } else{
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
-
-} elseif ($action == "add_deal_chosen") {
-///////////////////////////////////////////////////////////////////////////////
-  if (true){
-    $display["msg"] .= display_debug_msg ("FIXME : PERMISSIONS", $cdg_param);
-    reset($HTTP_POST_VARS);
-    $nb_deals_added = 0;
-    while (list($key) = each ($HTTP_POST_VARS)){
-      $display["msg"] .= display_debug_msg ("traitement du deal : $key", $cdg_param);
-      if (strcmp(substr($key,0,4),"add_")==0){
-	run_query_add_deal ($invoice["invoice"], substr($key,4));
-	$nb_deals_added++;
-      }
-    }
-
-    if ($nb_deals_added!=0){
-      run_query_update_updater ($auth, $invoice["invoice"]);
-    }
-
-    $display["msg"] .= display_ok_msg ($l_insert_deal_ok);
-    $action = "detailconsult";
-    $inv_q = run_query_detail ($invoice["invoice"]);
-    $obm_q_deals = run_query_search_deal_invoice($invoice["invoice"]);
-    $obm_q_payment = run_query_search_payment_invoice ($param_invoice);
-
-    $options_deal = run_query_display_pref($auth->auth["uid"],"deal");
-    $options_payment = run_query_display_pref ($auth->auth["uid"], "payment");
-
-    $display["detailInfo"] = display_record_info($inv_q);
-    $display["detail"] = html_invoice_consult($action,$obm_q_invoice, run_query_invoicestatus(),$obm_q_deals, $options_deal,$obm_q_payment, $options_payment);
-
-  } else{
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
-
-} elseif ($action == "del_deal") {
-///////////////////////////////////////////////////////////////////////////////
-  if (true) {
-    $display["msg"] .= display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-    $inv_q = run_query_detail ($invoice["invoice"]);
-    $invoice_deals = run_query_search_deal_invoice($invoice["invoice"]);
-    $q_payments = run_query_search_payment_invoice ($invoice["invoice"]);
-    $deal_dis_options = run_query_display_pref ($auth->auth["uid"],"deal");
-    $payments_options = run_query_display_pref ($auth->auth["uid"], "payment");
-    $display["detail"] = html_invoice_consult ($action, $inv_q, run_query_invoicestatus(),$invoice_deals, $deal_dis_options, $q_payments, $payments_options); 
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
-
-} elseif ($action == "del_deal_chosen"){
-///////////////////////////////////////////////////////////////////////////////
-  if (true){
-    $display["msg"] .= display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-    reset ($HTTP_POST_VARS);
-    $deals_related = run_query_search_deal_invoice ($invoice["invoice"]);
-    $q_payments = run_query_search_payment_invoice ($invoice["invoice"]);
-    $nb_payments = $q_payments->nf();
-    $nb_deals_remaining = $deals_related->nf ();
-    $nb_deals_deleted  = 0;
-
-    while (list($key) = each ($HTTP_POST_VARS)){
-      $display["msg"] .= display_debug_msg ("nb_deals_deleted = $nb_deals_deleted<br>nb_deals_remaining = $nb_deals_remaining<br>", $cdg_param);
-      // no deletion of the last deal if there are still payments
-      // we accept deletion of deals anytime...
-      //if (($nb_deals_remaining == 1) && ($nb_payments != 0)) {
-      //	html_error_last_deal_remove ($q_invoice);
-      //break; // out of the "while"
-      //} else {
-      if (strcmp (substr($key,0,4), "del_") == 0){
-	run_query_remove_deal ($invoice["invoice"], substr($key,4));
-	$nb_deals_deleted++;
-	$nb_deals_remaining--;
-      }
-      //}
-    }
-    if ($nb_deals_deleted > 0) {
-      // update the invoice update date
-      run_query_update_updater ($auth, $invoice["invoice"]);
-      $display["msg"] .= display_ok_msg ($l_remove_deal_ok);
-    }
-    $action = "del_deal";
-    $inv_q = run_query_detail ($invoice["invoice"]);
-    $q_deals = run_query_search_deal_invoice($invoice["invoice"]);
-    $options_deal = run_query_display_pref($auth->auth["uid"], "deal");
-    $q_payments = run_query_search_payment_invoice ($invoice["invoice"]);
-    $payments_options = run_query_display_pref ($auth->auth["uid"], "payment");
-    $display["detailInfo"] = display_record_info($inv_q);
-    $display["detail"] = html_invoice_consult($action, $inv_q, run_query_invoicestatus(),$q_deals, $options_deal, $q_payments, $payments_options);
-  } else {
-    $display["msg"] .= display_err_msg($l_error_permission);
-  }
 
 } /*elseif ($action =="add_payment") {
 ///////////////////////////////////////////////////////////////////////////////
@@ -267,7 +145,7 @@ if ($action == "index" || $action == "") {
     // invoice data 
     $q_invoice = run_query_detail ($invoice["invoice"]);
     // already connected payments data 
-    $q_payments_invoice = run_query_search_payment_invoice ($invoice["invoice"]);
+    $q_payments_invoice = run_query_invoice_payment ($invoice["invoice"]);
 
     html_form_add_payments ($q_invoice, $q_payments_invoice, $payments_to_proceed, $nb_payments_added);
 
@@ -281,16 +159,7 @@ if ($action == "index" || $action == "") {
 } elseif ($action == "del_payment") {
 ////////////////////////h//////////////////////////////////////////////////////
   if (true) {
-    display_debug_msg ("FIXME PERMISSIONS", $cdg_param);
-    $q_invoice = run_query_detail ($invoice["invoice"]);
-    
-    $payment_dis_options = run_query_display_option ($auth,"payment");
-    $invoice_payments = run_query_search_payment_invoice($invoice["invoice"]);
-    $deals_options = run_query_display_option ($auth, "deal");
-    $q_deals = run_query_search_deal_invoice ($invoice["invoice"]);
-    html_invoice_consult ($action, $q_invoice, run_query_invoicestatus(),$q_deals, $deals_options, $invoice_payments, $payment_dis_options); 
-  } else {
-    display_err_msg($l_error_permission);
+    $display["detail"] = dis_invoice_consult($invoice);
   }
 
 } elseif ($action =="del_payment_chosen") {
@@ -311,16 +180,7 @@ if ($action == "index" || $action == "") {
 
     $page = 0;
     $action = "search_payment";
-    $inv_q = run_query_detail ($invoice["invoice"]);
-    $obm_q_payments = run_query_search_payment_invoice($invoice["invoice"]);
-    $obm_q_deals = run_query_search_deal_invoice ($invoice["invoice"]);
-
-    $options_payment = run_query_display_option($auth,"payment");
-    $options_deal = run_query_display_option ($auth, "deal");
-    display_ok_msg ($l_insert_payment_ok);
-
-    $display["detailInfo"] = display_record_info($inv_q);
-    $display["detail"] .= html_invoice_consult($action, $inv_q, run_query_invoicestatus(),$obm_q_deals, $options_deal, $obm_q_payments, $options_payment);
+    $display["detail"] = dis_invoice_consult($invoice);
   } else {
     display_err_msg($l_error_permission);
   }
@@ -329,7 +189,7 @@ if ($action == "index" || $action == "") {
 elseif ($action == "delete")  { // delete means delete an invoice 
 ///////////////////////h//////////////////////////////////////////////////////
   // are there any payments (paid) connected to this invoice ?
-  $payments_connected = run_query_search_payment_invoice ($invoice["invoice"], -1);
+  $payments_connected = run_query_invoice_payment($invoice["invoice"], -1);
   // if yes, we delete all associations
   if ($payments_connected->nf() == 0) {
     run_query_delete($invoice["invoice"]); 
@@ -393,10 +253,14 @@ function get_param_invoice() {
   global $tf_label, $tf_number, $tf_amount_ht, $tf_amount_ttc;
   global $ta_comment, $sel_status, $param_invoice, $tf_date;
   global $tf_date_after, $tf_date_before, $rd_inout, $hd_inout;
-  global $tf_deal, $tf_company, $cb_archive, $param_deal;
+  global $tf_deal, $tf_company, $cb_archive;
+  global $param_company, $param_deal, $param_project;
   global $set_debug, $cdg_param, $action;
 
   if (isset ($param_invoice)) $invoice["id"] = $param_invoice;
+  if (isset ($param_company)) $invoice["company_id"]= $param_company;
+  if (isset ($param_deal)) $invoice["deal_id"]= $param_deal; 
+  if (isset ($param_project)) $invoice["project_id"]= $param_project; 
   if (isset ($tf_label)) $invoice["label"] = $tf_label;
   if (isset ($tf_number)) $invoice["number"] = $tf_number;
   if (isset ($tf_amount_ht)) $invoice["ht"] = $tf_amount_ht;
@@ -411,7 +275,6 @@ function get_param_invoice() {
   if (isset ($tf_bank)) $invoice["bank"] = $tf_bank;
   if (isset ($ta_comment)) $invoice["comment"] = $ta_comment;
   if (isset ($tf_deal)) $invoice["deal"] = $tf_deal;
-  if (isset ($param_deal)) $invoice["param_deal"]= $param_deal;
   if (isset ($tf_company)) $invoice["company"] = $tf_company;
   if (isset ($cb_archive)) $invoice["archive"] = $cb_archive;
 

@@ -435,14 +435,13 @@ function html_contact_search_list($obm_q, $pref_q, $nb_con, $contact, $popup) {
 //     keys used  : company_id, name, company
 ///////////////////////////////////////////////////////////////////////////////
 function dis_contact_consult($contact) {
-  global $display, $l_no_found, $path, $l_query_error;
-  global $auth;
+  global $auth, $display, $l_no_found, $path, $l_query_error;
 
   $view = $contact["view"];
   $param_contact = $contact["id"];
   $con_q = run_query_contact_detail($param_contact);
   if ($con_q->num_rows() != 1) {
-    $display["msg"] .= display_err_msg($l_query_error . " - " . $con_q->query . " !");
+    $display["msg"] .= display_err_msg("$l_query_error  - $l_no_found !");
   }
   $display["detailInfo"] = display_record_info($con_q);
   if ($view != "") {
