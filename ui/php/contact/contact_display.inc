@@ -16,6 +16,7 @@ $fieldnames["contact_lastname"] = $l_lastname;
 $fieldnames["contact_firstname"] = $l_firstname;
 $fieldnames["contact_function"] = $l_function;
 $fieldnames["contact_title"] = $l_title;
+$fieldnames["contact_address"] = $l_address;
 $fieldnames["contact_phone"] = $l_phone;
 $fieldnames["contact_homephone"] = $l_hphone;
 $fieldnames["contact_mobilephone"] = $l_mphone;
@@ -70,6 +71,35 @@ function dis_data_contact(&$OD, $fieldname, $link_ok) {
       $res["url"] = "mailto:$email";
       $res["name"] = "<img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" />";
     }
+  }
+
+  else if ($fieldname == "contact_address") {
+    if ($OD->data_set->f("contact_address1") != "") {
+      $res["name"] .= $OD->data_set->f("contact_address1")."<br />\n";
+    }
+    if ($OD->data_set->f("contact_address2") != "") {
+      $res["name"] .= $OD->data_set->f("contact_address2")."<br />\n";
+    }
+    if ($OD->data_set->f("contact_address3") != "") {
+      $res["name"] .= $OD->data_set->f("contact_address3")."<br />\n";
+    }
+    if ($OD->data_set->f("contact_zipcode") != "" ) {
+      $res["name"] .= $OD->data_set->f("contact_zipcode") . " ";
+    } else {
+      $res["name"] .= " ";
+    }
+    if ($OD->data_set->f("contact_town") != "" ) {
+      $res["name"] .= $OD->data_set->f("contact_town");
+    }
+    if ($OD->data_set->f("country_name") != "" ) {
+      $res["name"] .= " " . $OD->data_set->f("country_name");
+    }
+    $res["txt_name"] = trim($OD->data_set->f("contact_address1") . " " .
+                       $OD->data_set->f("contact_address2") . " " .
+                       $OD->data_set->f("contact_address3") . " " .
+                       $OD->data_set->f("contact_zipcode") . " " .
+                       $OD->data_set->f("contact_town") . " " .
+		       $OD->data_set->f("country_name"));
   }
   
   return $res;

@@ -116,15 +116,15 @@ function dis_data_company(&$OD, $fieldname, $link_ok) {
       $res["name"] .= $OD->data_set->f("company_address3")."<br />\n";
     }
     if ($OD->data_set->f("company_zipcode") != "" ) {
-      $res["name"] .= $OD->data_set->f("company_zipcode") . "&nbsp;&nbsp;";
+      $res["name"] .= $OD->data_set->f("company_zipcode") . " ";
     } else {
-      $res["name"] .= "&nbsp;&nbsp;";
+      $res["name"] .= " ";
     }
     if ($OD->data_set->f("company_town") != "" ) {
       $res["name"] .= $OD->data_set->f("company_town");
     }
     if ($OD->data_set->f("country_name") != "" ) {
-      $res["name"] .= "&nbsp;" . $OD->data_set->f("country_name");
+      $res["name"] .= " " . $OD->data_set->f("country_name");
     }
     $res["txt_name"] = trim($OD->data_set->f("company_address1") . " " .
                        $OD->data_set->f("company_address2") . " " .
