@@ -14,13 +14,14 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Ce script s'utilise avec PHP en mode commande (php4 sous debian)          //
 ///////////////////////////////////////////////////////////////////////////////
+
 $path = "..";
 $section = "ADMIN";
 $menu = "ADMIN_PREF";
 
 $obminclude = getenv("OBM_INCLUDE_VAR");
 if ($obminclude == "") $obminclude = "obminclude";
-include("$obminclude/global.inc"); 
+include("$obminclude/global.inc");
 require("admin_pref_display.inc");
 require("admin_pref_query.inc");
 

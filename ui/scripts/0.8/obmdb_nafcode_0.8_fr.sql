@@ -233,6 +233,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '268A', 'Fabrication de produits abrasifs');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '268C', 'Fabrication de produits minéraux non métalliques n.c.a.');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '27', 'Metallurgies');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '271Y', 'Sidérurgie');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '271Z', 'Sidérurgie (CECA)');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '272A', 'Fabrication de tubes en fonte');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '272C', 'Fabrication de tubes en acier');
@@ -258,6 +259,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '281C', 'Fabrication de menuiseries et fermetures métalliques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '282A', 'Fabrication de réservoirs et citernes métalliques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '282B', 'Fabrication de bouteilles pour gaz comprimés');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '282C', 'Fabrication de réservoirs, citernes et conteneurs métalliques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '282D', 'Fabric de radiateurs et de chaudières pour le chauffage central');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '283A', 'Fabrication de générateurs de vapeur');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '283B', 'Chaudronnerie nucléaire');
@@ -282,10 +284,13 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '287M', 'Fabrication de coffres forts');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '287N', 'Fabrication de petits articles métalliques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '287P', 'Fabrication d\'articles métalliques n.c.a.');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '287Q', 'Fabrication d\'articles métalliques divers');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '29', 'Fabrication de machines et équipements');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291A', 'Fabrication de moteurs et turbines');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291B', 'Fabrication de pompes');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291C', 'Fabrication de pompes et compresseurs');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291D', 'Fabrication de transmissions hydrauliques et pneumatiques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291E', 'Fabrication de compresseurs');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291F', 'Fabrication d\'articles de robinetterie');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291H', 'Fabrication de roulements');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '291J', 'Fabrication d\'organes mécaniques de transmission');
@@ -296,6 +301,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '292H', 'Fabrication d\'équipements d\'emballage et de conditionnement');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '292J', 'Fabrication d\'appareils de pesage');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '292K', 'Fabrication de machines diverses d\'usage général');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '292L', 'Fabrication de matériel pour les industries chimiques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '292M', 'Fabrication d\'autres machines d\'usage général');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '293A', 'Fabrication de tracteurs agricoles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '293C', 'Réparation de matériel agricole');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '293D', 'Fabrication de matériel agricole');
@@ -305,7 +312,9 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '294D', 'Fabrication de matériel de soudage');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '294E', 'Fabrication d\'autres machines outils');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295A', 'Fabrication de machines pour la métallurgie');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295B', 'Fabrication de matériels de mines pour l\'extraction');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295C', 'Fabrication de machines pour l\'extraction ou la construction');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295D', 'Fabrication de matériels de travaux publics');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295E', 'Fabrication de machines pour l\'industrie agroalimentaire');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295G', 'Fabrication de machines pour les industries textiles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295J', 'Fabric de machines pour les industries du papier et du carton');
@@ -313,6 +322,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295M', 'Fabric de machines pour travail du caoutchouc ou des plastiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295N', 'Fabrication de moules et modèles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295P', 'Fabrication d\'autres machines spécialisées');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295Q', 'Fabrication de machines d\'assemblage automatique');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '295R', 'Fabrication de machines spécialisées diverses');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '296A', 'Fabrication d\'armement');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '296B', 'Fabrication d\'armes de chasse, de tir et de défense');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '297A', 'Fabrication d\'appareils électroménagers');
@@ -336,7 +347,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '316D', 'Fabrication de matériels électriques n.c.a.');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '32', 'Fabrication d\'équipements de radio, télévision et communications');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '321A', 'Fabrication de composants passifs et de condensateurs');
-insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '321B', 'Fabrication de composants électroniques actifs');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '321C', 'Fabrication de composants électroniques actifs');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '321D', 'Assemblage de cartes électroniques pour compte de tiers');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '322A', 'Fabrication équipements d\'émission et de transmission hertzienne');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '322B', 'Fabrication d\'appareils de téléphonie');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '323Z', 'Fab appareils réception, enregistrmt, reproduction son et image');
@@ -388,7 +400,12 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '371Z', 'Récupération de matières métalliques recyclables');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '372Z', 'Récupération de matières non métalliques recyclables');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '40', 'Production et distribution d\'électricité, de gaz et de chaleurs');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '401A', 'Production d\'électricité');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '401C', 'Transport d\'électricité');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '401E', 'Distribution et commerce d\'électricité');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '401Z', 'Production et distribution d\'électricité');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '402A', 'Production de combustibles gazeux');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '402C', 'Distribution de combustibles gazeux');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '402Z', 'Production et distribution de combustibles gazeux');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '403Z', 'Production et distribution de chaleur');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '41', 'Captage, traitement et distribution d\'eau');
@@ -492,6 +509,18 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '516L', 'Comm gros fournitures et équipts divers pr commerce et services');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '516N', 'Commerce de gros de matériel agricole');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '517Z', 'Autres commerces de gros');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '5181', 'Commerce de gros de machines outils');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518C', 'Commerce de gros de machines pour l\'extraction, la construction et le génie civil');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518E', 'Commerce de gros de machines pour l\'industrie textile et l\'habillement');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518G', 'Commerce de gros d\'ordinateurs, d\'équipements informatiques périphériques et de progiciels');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518H', 'Commerce de gros d\'autres machines et équipements de bureau');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518J', 'Commerce de gros de composants et d\'autres équipements électroniques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518L', 'Commerce de gros de matériel électrique');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518M', 'Commerce de gros de fournitures et équipement industriels divers');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518N', 'Commerce de gros de fournitures et équipement industriels divers pour le commerce et les services');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '518P', 'Commerce de gros de matériel agricole');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '519A', 'Autres commerces de gros spécialisés');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '519B', 'Commerce de gros non spécialisé');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '52', 'Commerce de détail et réparation d\'articles domestiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '521A', 'Commerce de détail de produits surgelés');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '521B', 'Commerce d\'alimentation générale');
@@ -545,6 +574,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '551A', 'Hôtels avec restaurant');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '551C', 'Hôtels de tourisme sans restaurant');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '551D', 'Hôtels de préfecture');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '551E', 'Autres hôtels');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '552A', 'Auberges de jeunesse et refuges');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '552C', 'Exploitation de terrains de camping');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '552E', 'Autre hébergement touristique');
@@ -553,6 +583,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '553B', 'Restauration de type rapide');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '554A', 'Cafés tabacs');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '554B', 'Débits de boisson');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '554C', 'Discothèques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '555A', 'Cantines, restaurants d\'entreprises');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '555C', 'Restauration collective sous contrat');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '555D', 'Traiteurs, organisation de réceptions');
@@ -593,6 +624,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '641C', 'Autres activités de courrier');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '642A', 'Télécommunications nationales');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '642B', 'Autres activités de télécommunications');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '642C', 'Télécommunications hors transmissions audiovisuelles');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '642D', 'Transmission d\'émissions de radio er de télévision');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '65', 'Intermédiation financières');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '651A', 'Banque centrale');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '651C', 'Banques');
@@ -628,6 +661,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '703D', 'Administration d\'autres biens immobiliers');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '703E', 'Supports juridiques de gestion de patrimoine');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '71', 'Location sans opérateurs');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '711A', 'Location de courte durée de véhicules automobiles');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '711B', 'Location de longue durée de véhicules automobiles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '711Z', 'Location de véhicules automobiles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '712A', 'Location d\'autres matériels de transport terrestre');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '712C', 'Location de matériels de transport par eau');
@@ -640,6 +675,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '714B', 'Location d\'autres biens personnels et domestiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '72', 'Activités informatiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '721Z', 'Conseil en systèmes informatiques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '722A', 'Edition de logiciels (non personnalisés)');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '722C', 'Autres activités de réalisation de logiciels');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '722Z', 'Réalisation de logiciels');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '723Z', 'Traitement de données');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '724Z', 'Activités de banques de données');
@@ -670,6 +707,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748D', 'Conditionnement à façon');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748F', 'Secrétariat et traduction');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748G', 'Routage');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748H', 'Centres d\'appel');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748J', 'Organisation de foires et salons');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '748K', 'Services annexes à la production');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '75', 'Administration publiques');
@@ -716,6 +754,8 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '900A', 'Epuration des eaux usées');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '900B', 'Enlèvement et traitement des ordures ménagères');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '900C', 'Elimination et traitement des autres déchets');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '900E', 'Traitements des autres déchets solides');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '900G', 'Autres travaux d\'assainissement et de voirie');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '91', 'Activités associatives');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '911A', 'Organisations patronales et consulaires');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '911C', 'Organisations professionnelles');
@@ -734,12 +774,16 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922A', 'Activités de radio');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922B', 'Production de programmes de télévision');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922C', 'Diffusion de programmes de télévision');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922D', 'Edition de chaînes généralistes');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922E', 'Edition de chaînes thématiques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '922F', 'Distribution de bouquets de programmes de radio et de télévision');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923A', 'Activités artistiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923B', 'Services annexes aux spectacles');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923D', 'Gestion de salles de spectacle');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923F', 'Manèges forains et parcs d\'attractions');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923H', 'Bals et discothèques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923J', 'Autres spectacles');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '923K', 'Activités diverses du spectacle');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '924Z', 'Agences de presse');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '925A', 'Gestion des bibliothèques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '925C', 'Gestion du patrimoine culturel');
@@ -760,5 +804,7 @@ insert into CompanyNafCode (companynafcode_title, companynafcode_code, companyna
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '930N', 'Autres services personnels');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '95', 'Services domestiques');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '950Z', 'Services domestiques');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '960Z', 'Activités indifférenciées des ménages en tant que producteurs de biens pour usage propre');
+insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '970Z', 'Activités indifférenciées des ménages en tant que producteurs de services pour usage propre');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('1', '99', 'Activités extra territoriales');
 insert into CompanyNafCode (companynafcode_title, companynafcode_code, companynafcode_label) values ('0', '990Z', 'Activités extra territoriales');

@@ -601,8 +601,8 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
     $number = $inv_q->f("invoice_number");
     $comment = $inv_q->f("invoice_comment");
     $status = $inv_q->f("invoice_status_id");
-    $date = $inv_q->f("invoice_date");
-    $pdate = $inv_q->f("invoice_payment_date");
+    $date = isodate_format($inv_q->f("date"));
+    $pdate = isodate_format($inv_q->f("payment_date"));
     $inout = $inv_q->f("invoice_inout");
     $ht = $inv_q->f("invoice_amount_ht");
     $ttc = $inv_q->f("invoice_amount_ttc");
@@ -627,7 +627,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   // if we duplicate we have to modify some fields :
   if ($action == "duplicate") {
     $comment = "duplicata de <$label>\n".$comment;
-    $date = "";
+    $date = isodate_format();
     $label .= "-".date("Y-m-d");
   }
 

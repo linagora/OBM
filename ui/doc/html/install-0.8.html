@@ -7,7 +7,7 @@
 
 <a href="javascript:back();">back</a>
 
-<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5.
+<p />These docs are valid for OBM 0.8.0, 0.8.1, 0.8.2, 0.8.3, 0.8.4, 0.8.5, 0.8.6.
 
 Only specific OBM steps are described. To know how to install apache, php, mysql or others components, look in your distribution manuals.
 
@@ -33,10 +33,10 @@ And uncompress it in /var/www (or where your document root will be located).
 <table bgcolor="#CCCCCC" border="1">
 <tr>
   <td><pre>
-wget http://obm.aliacom.fr/obm-archives/obm-0.8.5.tar.gz
-tar -C /var/www -xzvf obm-0.8.5.tar.gz
+wget http://obm.aliacom.fr/obm-archives/obm-0.8.6.tar.gz
+tar -C /var/www -xzvf obm-0.8.6.tar.gz
 cd /var/www
-ln -s obm-0.8.5 obm
+ln -s obm-0.8.6 obm
 </pre>
   </td>
 </tr>
@@ -59,7 +59,7 @@ chown -R apache:apache *  (on Redhat)
 <h2>2: PHP (module and command line configuration)</h2>
 
 PHP apache module config file : on Debian : /etc/php/apache/php.ini, on RedHat /etc/php.ini.
-<br />Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).) (on Debian : /etc/php4/cgi/php.ini)
+<br />Command line PHP must be configured too (Some tools (install script, admin tools) works or are also available with php in command line mode (php-cgi).) (on Debian : /etc/php4/cgi/php.ini, ot /etc/php4/cli/php.ini on recent versions it seems)
 <p />
 The include_path directive must be set :
 
@@ -581,6 +581,36 @@ mysql -u obm -pobm obm < scripts/0.8/update-0.8.4-0.8.5.mysql.sql
 <tr>
   <td><pre>
 psql -U obm obm < scripts/0.8/update-0.8.4-0.8.5.pgsql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+<p />
+# Insert new default preferences values and propagate them to users (see <a href="#upgrade-common">common upgrade actions</a>).
+
+<p />
+# Update store values for List module (see <a href="#upgrade-common">common upgrade actions</a>).
+
+
+<p />
+<a name="upgrade-0.8.6"><h1>UPGRADE OBM DATABASE 0.8.5 to 0.8.6 (MySQL and Postgres)</h1></a>
+<p />
+# MySQL Database has evolved from 0.8.5 to 0.8.6 (beware, update script <b>requires MySQL 4.x</b> and does not work with MySQL 3.23 ! Check your mysql version before upgrading)
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+mysql -u obm -pobm obm < scripts/0.8/update-0.8.5-0.8.6.mysql.sql
+</pre>
+  </td>
+</tr>
+</table>
+
+# Postgres Database has evolved from 0.8.5 to 0.8.6
+<table bgcolor="#CCCCCC" border="1">
+<tr>
+  <td><pre>
+psql -U obm obm < scripts/0.8/update-0.8.5-0.8.6.pgsql.sql
 </pre>
   </td>
 </tr>

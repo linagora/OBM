@@ -124,7 +124,7 @@ function run_query_detail($p_invoice_id) {
   $db_type = $obm_q->type;
   $like = sql_casei_like($db_type);
   $date = sql_date_format($db_type, "Invoice.invoice_date", "date");
-  $pdate = sql_date_format($db_type, "Invoice.invoice_payment_date", "invoice_payment_date");
+  $pdate = sql_date_format($db_type, "Invoice.invoice_payment_date", "payment_date");
   $datemodif = sql_date_format($db_type, "invoice_timeupdate", "datemodif");
   $timeupdate = sql_date_format($db_type, "invoice_timeupdate", "timeupdate");
   $timecreate = sql_date_format($db_type, "invoice_timecreate", "timecreate");
@@ -156,7 +156,8 @@ function run_query_detail($p_invoice_id) {
       invoice_userupdate, invoice_usercreate, invoice_company_id,
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
-      invoice_comment, invoice_inout, invoice_archive,
+      invoice_payment_date, invoice_comment, invoice_inout, invoice_archive,
+      invoicestatus_label,
       c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
   display_debug_msg ($query, $cdg_sql, "run_query_detail()"); 

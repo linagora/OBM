@@ -842,18 +842,16 @@ function run_query_contact_publication_links($p_id) {
 function run_query_contact_delete($p_id) {
   global $cdg_sql;
 
+  $comp_id = get_contact_company_id($p_id);
+  run_query_delete_document_links($p_id, "contact");    
+  run_query_company_contact_dec($comp_id);
+  run_query_delete_contact_subscription($p_id);    
+
   $query = "delete from Contact where contact_id='$p_id'";
 
   display_debug_msg($query, $cdg_sql);
   $obm_q = new DB_OBM;
   $retour = $obm_q->query($query);
-
-  if ($retour) {
-    $comp_id = get_contact_company_id($p_id);
-    run_query_delete_document_links($p_id, "contact");    
-    run_query_company_contact_dec($comp_id);
-    run_query_delete_contact_subscription($p_id);    
-  }
 
   return $retour;
 }

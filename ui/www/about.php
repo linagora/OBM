@@ -77,7 +77,7 @@
       </tr>
       <tr bgcolor="#E2F1F3"> 
         <td>MySQL</td>
-        <td>3.22.8 - 3.22.32; 3.23.x; 4.0.x </td>
+        <td>3.23.x; 4.0.x </td>
         <td>&nbsp;</td>
       </tr>
       <tr bgcolor="#F1F9FA"> 

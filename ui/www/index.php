@@ -24,6 +24,20 @@
     <ul class="detailList">
 
       <li>
+        <div align="left"><b>2004-09-02</b> : version <b>0.8.6</b> released (new functionality and fixes)
+        <ol>
+          <li> Invoice module total rewrite
+          <li> Postgres Install fixes
+          <li> Countries handling enhancements (now referenced by iso code)
+          <li> New Company European VAT field
+          <li> New links to Document from Project, Invoice
+          <li> Many enahancement and fixes in Company, Deal, List, Document
+        </ol>
+        </div>
+        <br />
+      </li>
+
+      <li>
         <div align="left"><b>2004-08-16</b> : version <b>0.8.5</b> released (fixes, functionality and architecture enhancements)
         <br />As Postgres, Privacy handling and Search queries (with limit flag) have been dealt with, it remains only one point to do (allow data from one module to be displayed in an other module) on the architectural side before 0.9 starts. 
         <ol>
@@ -50,20 +64,6 @@
           <li> Enhancements in Company, List, Contact, Contract, User
           <li> Fixes in Install, Company, Deal, Group, Contract
           <li> Clean up in external modules calls
-        </ol>
-        </div>
-        <br />
-      </li>
-
-      <li>
-        <div align="left"><b>2004-07-13</b> : version <b>0.8.3</b> released (fixes and minors enhancements)
-        <ol>
-          <li> New multiple categories for deals
-          <li> A Contract can now be archived
-          <li> More fields in List export to allow better mail merge
-          <li> Fixes in Company, Contact, Project, Incident
-          <li> Enhancements in Company, List, Contact, Incident, Contract
-          <li> French Company Naf code data provided
         </ol>
         </div>
         <br />
