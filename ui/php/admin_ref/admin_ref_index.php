@@ -188,43 +188,7 @@ function get_admin_ref_action() {
   global $l_header_datasource, $l_header_country;
   global $admin_ref_read, $admin_ref_write;
 
-  // index
-  $actions["ADMIN_REF"]["datasource"] = array (
-     'Name'     => $l_header_datasource,
-     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource&amp;mode=html",
-     'Right'    => $admin_ref_read,
-     'Condition'=> array ('all')
-                                    	  );
-
-// DataSource Insert
-  $actions["ADMIN_REF"]["datasource_insert"] = array (
-    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_insert",
-    'Right'    => $admin_ref_write,
-    'Condition'=> array ('None') 
-                                     	     );
-
-// DataSource Update
-  $actions["ADMIN_REF"]["datasource_update"] = array (
-    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_update",
-    'Right'    => $admin_ref_write,
-    'Condition'=> array ('None') 
-                                     	      );
-
-// DataSource Check Link
-  $actions["ADMIN_REF"]["datasource_checklink"] = array (
-    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_checklink",
-    'Right'    => $admin_ref_write,
-    'Condition'=> array ('None') 
-                                     		);
-
-// DataSource Delete
-  $actions["ADMIN_REF"]["datasource_delete"] = array (
-    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
-    'Right'    => $admin_ref_write,
-    'Condition'=> array ('None') 
-                                     	       );
-
-  // index
+  // Country index
   $actions["ADMIN_REF"]["country"] = array (
      'Name'     => $l_header_country,
      'Url'      => "$path/admin_ref/admin_ref_index.php?action=country&amp;mode=html",
@@ -256,6 +220,42 @@ function get_admin_ref_action() {
 // Country Delete
   $actions["ADMIN_REF"]["country_delete"] = array (
     'Url'      => "$path/admin_ref/admin_ref_index.php?action=country_delete",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	       );
+
+  // DataSource index
+  $actions["ADMIN_REF"]["datasource"] = array (
+     'Name'     => $l_header_datasource,
+     'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource&amp;mode=html",
+     'Right'    => $admin_ref_read,
+     'Condition'=> array ('all')
+                                    	  );
+
+// DataSource Insert
+  $actions["ADMIN_REF"]["datasource_insert"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_insert",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	     );
+
+// DataSource Update
+  $actions["ADMIN_REF"]["datasource_update"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_update",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     	      );
+
+// DataSource Check Link
+  $actions["ADMIN_REF"]["datasource_checklink"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_checklink",
+    'Right'    => $admin_ref_write,
+    'Condition'=> array ('None') 
+                                     		);
+
+// DataSource Delete
+  $actions["ADMIN_REF"]["datasource_delete"] = array (
+    'Url'      => "$path/admin_ref/admin_ref_index.php?action=datasource_delete",
     'Right'    => $admin_ref_write,
     'Condition'=> array ('None') 
                                      	       );

@@ -131,7 +131,7 @@ if ($action == "ext_get_id") {
     $cat_q = run_query_get_companycat_name($param_company);
     if ($comp_q->num_rows() == 1) {
       $display["detailInfo"] = display_record_info($comp_q);
-      $display["detail"] = html_company_consult($comp_q,$cat_q);
+      $display["detail"] = html_company_consult($comp_q, $cat_q);
     } else {
       $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->query . " !");
     }
@@ -216,8 +216,9 @@ if ($action == "ext_get_id") {
       $display["msg"] .= display_err_msg($l_update_error);
     }
     $comp_q = run_query_detail($param_company);
+    $cat_q = run_query_get_companycat_name($param_company);
     $display["detailInfo"] .= display_record_info($comp_q);
-    $display["detail"] = html_company_consult($comp_q);
+    $display["detail"] = html_company_consult($comp_q, $cat_q);
   } else {
     $display["msg"] .= display_warn_msg($l_invalid_data . " : " . $err_msg);
     $dsrc_q = run_query_datasource();
@@ -397,14 +398,16 @@ if ($action == "ext_get_id") {
     $display["msg"] .= display_err_msg($l_no_document_added);
   }
   $comp_q = run_query_detail($company["id"]);
+  $cat_q = run_query_get_companycat_name($param_company);
   if ($comp_q->num_rows() == 1) {
     $display["detailInfo"] = display_record_info($comp_q);
-    $display["detail"] = html_company_consult($comp_q);
+    $display["detail"] = html_company_consult($comp_q, $cat_q);
   } else {
     var_dump($company);    
     $display["msg"] .= display_err_msg($l_query_error . " - " . $comp_q->num_rows() . " !");
   }
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Display

@@ -597,8 +597,9 @@ function run_query_kind_links($p_id) {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
-// Category company query execution                                              //
+// Category company query execution                                          //
 // Return:
 //   Database Object
 ///////////////////////////////////////////////////////////////////////////////
@@ -613,6 +614,7 @@ function run_query_companycat() {
   return $obm_q;
 }
 
+
 ///////////////////////////////////////////////////////////////////////////////
 // Query to build the file tree
 // Parameters:
@@ -621,13 +623,17 @@ function run_query_companycat() {
 function run_query_get_companycat($id) { 
   global $cdg_sql;
 
-  $query = "select * from CompanyCategoryLink,CompanyCategory where companycategorylink_companyid = '$id' 
-  and companycategorylink_categoryid = companycategory_id order by companycategory_code"; 
+  $query = "select *
+    from CompanyCategoryLink, CompanyCategory
+    where companycategorylink_companyid = '$id' 
+      and companycategorylink_categoryid = companycategory_id
+    order by companycategory_code"; 
+
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
   $i=0;
-  while($obm_q->next_record()) {
+  while ($obm_q->next_record()) {
     $links[$i++] = $obm_q->f("companycategorylink_categoryid");
   }
   return $links;
@@ -642,13 +648,19 @@ function run_query_get_companycat($id) {
 function run_query_get_companycat_name($id) { 
   global $cdg_sql;
 
-  $query = "select * from CompanyCategoryLink,CompanyCategory where companycategorylink_companyid = '$id' 
-  and companycategorylink_categoryid = companycategory_id order by companycategory_code"; 
+  $query = "select *
+    from CompanyCategoryLink,
+      CompanyCategory
+    where companycategorylink_companyid = '$id' 
+      and companycategorylink_categoryid = companycategory_id
+    order by companycategory_code"; 
+
   $obm_q = new DB_OBM;
   $obm_q->query($query);
   display_debug_msg($query, $cdg_sql);
   return $obm_q;
 }
+
 
 ///////////////////////////////////////////////////////////////////////////////
 // Categorie insertion query construction and execution                           //

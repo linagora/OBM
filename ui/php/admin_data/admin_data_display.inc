@@ -99,6 +99,7 @@ function html_data_index($actions, $modules) {
       <td class=\"adminText\">$sel_module</td>
     </tr>
     </table>
+    </form>
 
     <hr />
 

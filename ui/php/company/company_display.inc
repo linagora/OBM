@@ -292,12 +292,13 @@ function html_company_links($co_q) {
   $id = $co_q->f("company_id");
   $name = $co_q->f("company_name");
   $market = $co_q->f("company_marketingmanager_id");
+  $ctry = $co_q->f("company_country_id");
   $con_num = $co_q->f("company_contact_number");
   $deal_num = $co_q->f("company_deal_number");
 
   $uname = urlencode($name);
   $url_con_list = url_prepare("$path/contact/contact_index.php?action=search&amp;param_company=$id&amp;tf_company=$uname");
-  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market");
+  $url_con_new = url_prepare("$path/contact/contact_index.php?action=new&amp;param_company=$id&amp;sel_market=$market&amp;sel_ctry=$ctry");
   $url_deal_list = url_prepare("$path/deal/deal_index.php?action=search&amp;param_company=$id&amp;tf_company_name=$uname");
   $url_deal_new = url_prepare("$path/deal/deal_index.php?action=new&amp;param_company=$id");
   $url_doc = url_prepare("$path/document/document_index.php?action=search&amp;param_entity=$id&amp;entity=Company");
@@ -356,7 +357,7 @@ function html_company_links($co_q) {
 // Parameters:
 //   - $co_q : company database result 
 ///////////////////////////////////////////////////////////////////////////////
-function html_company_consult($co_q,$cat_q) {
+function html_company_consult($co_q, $cat_q) {
   // - Themes
   global $set_theme, $ico_contact, $ico_contact_new, $ico_web, $ico_mail;
   // - Labels
@@ -418,7 +419,7 @@ function html_company_consult($co_q,$cat_q) {
   $cat_disp = "<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>";
   $i = 0;
   while($cat_q->next_record()) {
-    if($i==0) {
+    if ($i==0) {
       $cat_disp .= "<tr>";
     }
     $length = 8 - strlen($cat_q->f("companycategory_code"));
@@ -429,7 +430,7 @@ function html_company_consult($co_q,$cat_q) {
     $label .= "-".$cat_q->f("companycategory_label");    
     $i++;
     $cat_disp .= "<td class=\"detailText\"> $label </td>";
-    if($i==3) {
+    if ($i==3) {
       $cat_disp .= "</tr>";
     }    
   }
@@ -554,23 +555,26 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $sel_kind .= ">". $kind_q->f("companytype_label") . "</option>\n";
   }
   $sel_kind .= "</select>";
+
   // cat select
   $sel_cat = "<select multiple=\"multiple\" name=\"sel_cat[]\" id=\"sel_cat[]\"  style=\"font-family:monospace;\">";
-  $i =0;
+  $i = 0;
   while($cat_q->next_record()) {
     $c_id = $cat_q->f("companycategory_id");
+    $c_code = $cat_q->f("companycategory_code");
+    $c_label = $cat_q->f("companycategory_label");
     $sel_cat .= "\n<option value=\"$c_id\"";
     if ($compcat[$i] == $c_id) { 
       $sel_cat .= " selected=\"selected\""; 
       $i++;
     }
-    $length = 8 - strlen($cat_q->f("companycategory_code"));
-    $label = $cat_q->f("companycategory_code");
+    $length = 8 - strlen($c_code);
+    $label = $c_code;
     for($i=0;$i<$length;$i++) {
       $label .= "-";
     }
-    $label .= "-".$cat_q->f("companycategory_label");
-    $sel_cat .= ">$label</option>\n";
+    $label .= "-$c_label";
+    $sel_cat .= ">$label</option>";
   }
   $sel_kind .= "</select>";
  
@@ -591,26 +595,37 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     $u_id = $usr_q->f("userobm_id");
     $sel_market .= "\n<option value=\"$u_id\"";
     if ($u_id == $mark) { $sel_market .= " selected=\"selected\""; }
-    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>\n";
+    $sel_market .= ">". $usr_q->f("userobm_lastname")." ".$usr_q->f("userobm_firstname") . "</option>";
   }
   $sel_market .= "</select>";
 
   // Country select
-  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\">";
+  $sel_ctry = "<select name=\"sel_ctry\" id=\"sel_ctry\" onChange=\"
+      if (trim(this.form.tf_phone.value) == '') {
+        this.form.tf_phone.value = country_phone[this.options[this.selectedIndex].value];
+      }
+    \">";
+  $js_ctry = "<script type=\"text/javascript\">
+      var country_phone = new Array ();
+      ";
   while ($ctry_q->next_record()) {
     $c_id = $ctry_q->f("country_id");
+    $c_name = $ctry_q->f("country_name");
+    $c_phone = $ctry_q->f("country_phone");
     $sel_ctry .= "\n<option value=\"$c_id\"";
     if ($c_id == $ctry) { $sel_ctry .= " selected=\"selected\""; }
-    $sel_ctry .= ">". $ctry_q->f("country_name") . "</option>\n";
+    $sel_ctry .= ">$c_name</option>";
+    $js_ctry .= "country_phone[$c_id] = '$c_phone';\n";
   }
   $sel_ctry .= "</select>";
+  $js_ctry .= "
+    </script>";
 
   // Email link
   if (($action=="detailupdate") || ($action=="update")) { 
     if ($email != "") {
       $link_email = "<a href=\"mailto:$email\">
-        <img src=\"/images/$set_theme/$ico_mail\"
-        alt=\"$email\" /></a>";
+        <img src=\"/images/$set_theme/$ico_mail\" alt=\"$email\" /></a>";
     } else { $link_email = "&nbsp;"; }
   } else { $link_email = "&nbsp;"; }
 
@@ -620,13 +635,12 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       $link_web = "<a target=\"_blank\" href=\"";
       if (strcmp(substr($web,0,5), "http:") != 0) { $link_web .= "http://"; }
       $link_web .= $web . "\">
-        <img src=\"/images/$set_theme/$ico_web\"
-        alt=\"$web\" /></a>";
+        <img src=\"/images/$set_theme/$ico_web\" alt=\"$web\" /></a>";
     } else { $link_web = "&nbsp;"; }
   } else { $link_web = "&nbsp;"; }
 
   if (($action == "detailupdate") || ($action == "update")) {
-    $links = html_company_links($id, $name, $con_num, $deal_num);
+    $links = html_company_links($co_q);
   }
 
   if (($action == "detailupdate") || ($action == "update")) {
@@ -649,6 +663,8 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
   // --- HTML Template --------------------------------------------------------
 
   $block = "
+    $js_ctry
+
     <form method=\"post\" name=\"form_company\"
       onsubmit=\"if (check_company(this)) return true; else return false;\"
       action=\"".url_prepare("company_index.php")."\">
@@ -662,7 +678,7 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
     </tr><tr>
       <td class=\"detailLabel\">$l_aka</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_aka\" name=\"tf_aka\" maxlength=\"255\" size=\"50\" value=\"$aka\" /></td>
-    </tr><tr
+    </tr><tr>
       <td class=\"detailLabel\">$l_number</td>
       <td class=\"detailForm\"><input type=\"text\" id=\"tf_num\" name=\"tf_num\" value=\"$num\" size=\"30\" maxlength=\"32\" /></td>
     </tr><tr>
@@ -675,11 +691,11 @@ function html_company_form($action, $co_q, $dsrc_q, $kind_q, $act_q, $usr_q, $ca
       <td class=\"detailLabel\">$l_kind</td>
       <td class=\"detailForm\">$sel_kind</td>
     </tr><tr>
-      <td class=\"detailLabel\">$l_category
-      <a href=\"javascript: return false;\" 
-      onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">+</a>
+      <td class=\"detailLabel\">$l_category</td>
+      <td class=\"detailForm\">$sel_cat
+        <a href=\"javascript: return false;\" 
+        onclick=\"window.open('$url','','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\"> AA+</a>
       </td>
-      <td class=\"detailForm\">$sel_cat</td>
     </tr><tr>      
       <td class=\"detailLabel\">$l_activity</td>
       <td class=\"detailForm\">$sel_act</td>
@@ -1115,14 +1131,14 @@ function html_company_cat_form($cat_q) {
     mytext = mytext.substr(pos2+1); 
     forms.form_cat_update.tf_cat.value=mytext;
     forms.form_cat_update.tf_cat_code.value=ext;\"
-    size=\"4\" style=\"font-family:monospace;\">";
+    size=\"10\" style=\"font-family:monospace;\">";
   while ($cat_q->next_record()) {
     $id = $cat_q->f("companycategory_id");
     $code = $cat_q->f("companycategory_code");
     $label = $cat_q->f("companycategory_label");
     $length = 8 - strlen($cat_q->f("companycategory_code"));
     $label2 = $cat_q->f("companycategory_code");
-    for($i=0;$i<$length;$i++) {
+    for ($i=0;$i<$length;$i++) {
       $label2 .= "-";
     }
     $label2 .= " ".$cat_q->f("companycategory_label");    
