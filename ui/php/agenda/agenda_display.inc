@@ -193,7 +193,7 @@ function dis_year_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-   html_planning_bar($agenda,$usr_q, $p_user_array);
+   html_planning_bar($agenda,$usr_q, $p_user_array,$calendar_user);
 echo "
  </tr>
 </table>
@@ -371,7 +371,7 @@ function dis_month_planning($agenda,$obm_q,$user_q,$usr_q, $p_user_array) {
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda,$usr_q, $p_user_array);
+  html_planning_bar($agenda,$usr_q, $p_user_array,$calendar_user);
 echo "
  </tr>
 </table>
@@ -555,7 +555,7 @@ echo "
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda,$usr_q, $p_user_array);
+  html_planning_bar($agenda,$usr_q, $p_user_array,$calendar_user);
 echo "
  </tr>
 </table>
@@ -706,7 +706,7 @@ echo "
   </td>
   <td width=\"20\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"20\" height=\"1\" alt=\"\" /></td>
   <td width=\"160\" style=\"vertical-align : top;\">";
-  html_planning_bar($agenda,$usr_q, $p_user_array);
+  html_planning_bar($agenda,$usr_q, $p_user_array,$calendar_user);
 echo "
  </tr>
 </table>
@@ -721,7 +721,7 @@ echo "
 //    $agenda: agenda parameters
 ///////////////////////////////////////////////////////////////////////////////
 
-function html_planning_bar($agenda,$usr_q,$p_user_array) {
+function html_planning_bar($agenda,$usr_q,$p_user_array,$calendar_user) {
   global $set_theme,$ico_spacer,$l_go_to,$l_tomorrow_event,$l_user_calendar;
   global $set_weekstart_default, $l_daysofweekreallyshort,$l_valid;
   
@@ -830,7 +830,7 @@ function html_planning_bar($agenda,$usr_q,$p_user_array) {
     
     $dis_sel_user .= " $tag_user>$u_lname $u_fname</option>";
   } 
-  $dis_sel_user .= "</select>";
+  $dis_sel_user .= "</select><br />";
   $dis_sel_user .= "<input type=\"submit\" value=\"$l_valid\" />";
 
 
@@ -873,7 +873,11 @@ function html_planning_bar($agenda,$usr_q,$p_user_array) {
     }
   } while ($whole_month == TRUE);
 
-
+  // Legend
+  foreach($calendar_user as $user_id => $user_data) {
+    $dis_leg_user .=" <tr><td class=\"".$user_data["class"]."\" >&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td><td class=\"detailText\">&nbsp;&nbsp;".$user_data["name"]."</td></tr>";
+  }
+  
 echo "
 
    <table cellpadding=\"0\" cellspacing=\"0\" border=\"0\" width=\"170\">
@@ -956,10 +960,34 @@ echo "
 	 </form>
         </td>
        </tr>
+      </table>
+     </td>
+    </tr>
+    <tr>
+     <td><img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" /></td>
+    </tr>
+    <tr>
+     <td>
+      <table cellpadding=\"0\" cellspacing=\"0\" width=\"170\" class=\"agendaCal\">
+       <tr>
+        <td width=\"1%\" class=\"agendaHead2\">
+         <img src=\"/images/$set_theme/$ico_spacer\" width=\"1\" height=\"20\" alt=\"\" />
+        </td>
+        <td width=\"98%\" class=\"agendaHead2\">$l_user_calendar</td>
+	<td width=\"1%\" class=\"agendaHead2\"></td>
+       </tr>
+       <tr>
+        <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"21\" height=\"6\" alt=\"\" /></td>
+       </tr>
+       <tr>
+	<td width=\"1%\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"4\" height=\"1\" alt=\"\" /></td>
+       </tr>	
+       $dis_leg_user
        <tr>
         <td colspan=\"3\"><img src=\"/images/$set_theme/$ico_spacer\" width=\"148\" height=\"6\" alt=\"\" /></td>
        </tr>
       </table>
+      
      </td>
     </tr>
     <tr>
@@ -1092,21 +1120,6 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
       <input type=\"hidden\" name=\"action\" id=\"action\" value=\"update\" />
       <input type=\"submit\" value=\"$l_update\" /> 
       ";
-/*    $dis_delete = "
-      <form method=\"post\" name=\"f_sup_societe\"
-      onsubmit=\"if (valider_suppression()) return true; else return false;\"
-      action=\"" . url_prepare("company_index.php") . "\"> 
-      <table class=\"details\">
-        <tr>
-          <td>
-      <input type=\"hidden\" name=\"action\" value=\"check_delete\" />
-      <input type=\"hidden\" name=\"param_company\" value=\"$id\" />
-      <input type=\"submit\" value=\"$l_checkdelete\" />
-         </td>
-       </tr>
-      </table>
-      </form>
-      ";*/
   } elseif (($action == "new") || ($action == "insert")) {
     $dis_button = "
       <input type=\"hidden\" id=\"action\" name=\"action\" value=\"insert\" />
@@ -1344,7 +1357,7 @@ function  dis_event_form($action, $agenda,$obm_q_event, $usr_q, $category_list, 
 ///////////////////////////////////////////////////////////////////////////////
 function html_waiting_events($obm_wait) {
   global $l_users, $l_title, $l_priority, $l_category, $l_description,$l_high,$l_low,$l_medium,$l_datebegin;
-  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state;
+  global $l_dateend,$l_timebegin2,$l_timeend2,$l_repeat,$auth,$l_change_state,$l_validate;
   global $l_repeatkind,$l_repeatdays2,$l_use_endrepeat,$l_interval,$l_none,$l_daily,$l_weekly,$set_weekstart_default,$l_wait;
   global $l_monthlybydate,$l_monthlybyday,$l_yearly, $l_carac,$l_header_agenda,$l_format,$l_daysofweekshort,$l_update,$l_accept,$l_refuse;
   
@@ -1388,11 +1401,21 @@ function html_waiting_events($obm_wait) {
      <td class=\"detailText\">".$day_array2[1]."-".$day_array2[2]."-".$day_array2[3]."</td>
      <td class=\"detailText\">".$day_array[1]."-".$day_array[2]."-".$day_array[3]."</td>
      <td class=\"detailText\">".$day_array[4].":".$day_array[5]."</td>
-     <td class=\"detailText\">".$day_array1[4].":".$day_array1[5]."</td></tr>";
+     <td class=\"detailText\">".$day_array1[4].":".$day_array1[5]."</td>
+     <td class=\"detailText\">
+      <form method=\"get\">
+       <input type=\"hidden\" name=\"action\" value=\"decision\" />      
+       <input type=\"hidden\" name=\"param_event\" value=\"".$obm_wait->f("calendarevent_id")."\" />
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"A\"  onchange=\"this.form.submit()\" />$l_accept
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"W\" checked=\"checked\" onchange=\"this.form.submit()\" />$l_wait
+       <input type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse</td>
+     </form>
+     </tr>";
   }
 
 
-  echo "  
+    // --- HTML Template --------------------------------------------------------
+  echo "
    <table class=\"details\">
     <tr>
      <td class=\"detailLabel\">$l_title</td>
@@ -1404,12 +1427,11 @@ function html_waiting_events($obm_wait) {
      <td class=\"detailLabel\">$l_datebegin</td>
      <td class=\"detailLabel\">$l_timebegin2</td>
      <td class=\"detailLabel\">$l_timeend2</td>
+     <td></td>
     </tr>
     $dis_waiting_events
    </table>
-  </form>
-";
-
+  ";
   }
  
  
@@ -1471,10 +1493,10 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
       ${$obm_q_cust->f("calendarsegment_state")} = "checked=\"checked\"";
       $dis_decision_radio = "<tr><td colspan=\"2\" class=\"detailHead\">$l_change_state</td></tr>";
       $dis_decision_radio .= "<tr><td colspan=\"2\" class=\"detailText\">
-	<input type=\"hidden\" name=\"action\" value=\"update_decision\">
-	<input type=\"hidden\" name=\"param_event\" value=\"$id\">
-	<input type=\"hidden\" name=\"hd_date_begin\" value=\"".$day_array[0]."\">
-	<input type=\"hidden\" name=\"hd_date_end\" value=\"".$day_array2[0]."\">
+	<input type=\"hidden\" name=\"action\" value=\"update_decision\" />
+	<input type=\"hidden\" name=\"param_event\" value=\"$id\" />
+	<input type=\"hidden\" name=\"hd_date_begin\" value=\"".$day_array[0]."\" />
+	<input type=\"hidden\" name=\"hd_date_end\" value=\"".$day_array2[0]."\" />
 	<input type=\"radio\" $A name=\"rd_decision_event\" value=\"A\" onchange=\"this.form.submit()\" />$l_accept
 	<input $W type=\"radio\" name=\"rd_decision_event\" value=\"W\" onchange=\"this.form.submit()\" />$l_wait
 	<input $R type=\"radio\" name=\"rd_decision_event\" value=\"R\" onchange=\"this.form.submit()\" />$l_refuse</td></tr>";
@@ -1483,7 +1505,7 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
   }
   // --- HTML Template --------------------------------------------------------
   echo "
-  <form method=\"get\" name=\"f_mod_calendar\">
+  <form method=\"get\" name=\"f_mod_decision\">
    <table class=\"details\">
     <tr>
      <td colspan=\"2\" class=\"detailHead\">$l_header_agenda</td>
@@ -1561,13 +1583,13 @@ function html_calendar_consult($obm_q_event,$obm_q_cust) {
 //      $obm_q_company : list of companies
 //      $contact_q : list of contact from the company 
 ///////////////////////////////////////////////////////////////////////////////
-function html_dis_conflict($agenda,$conflict,$event_id='') {
+function html_dis_conflict($agenda,$conflict,$event_id='',$force) {
   global $set_theme,$set_weekstart_default,$auth;
   // -- Labels
   global $l_title, $l_conflicts, $l_datebegin,$l_dateend, $l_user,$l_force_all,$l_replace_all,$l_cancel_all,$l_validate;
   global $l_force_event,$l_cancel_event, $l_replace_event;
 
-  if($agenda["force"] == 1) { 
+  if($force == 1) { 
     $dis_form_begin = "<form name=\"f_conflict\" method=\"post\"><input type=\"hidden\" name=\"param_event\" value=\"$event_id\" />
                        <input type=\"hidden\" name=\"action\" value=\"insert_conflict\" />";
     $dis_form_button = "<tr><td class=\"detailHead\" colspan=\"7\">
@@ -1590,7 +1612,7 @@ function html_dis_conflict($agenda,$conflict,$event_id='') {
     $dis_conflict .= "<td class=\"detailText\">$date_b</td>";
     $dis_conflict .= "<td class=\"detailText\">$date_e</td>";     
     $dis_conflict .= "<td class=\"detailText\">".$data["user_name"]."</td>";
-    if($agenda["force"] == 1 && $data["user_id"] == $auth->auth["uid"]) {
+    if($force == 1 && $data["user_id"] == $auth->auth["uid"]) {
       $dis_conflict .= "<td class=\"detailText\">";
       $dis_conflict .= "<input type=\"radio\" checked=\"checked\" name=\"rd_conflict_event[".$data["date_begin"]."][".$data["event_id"]."]\" value=\"force\" /></td>";
       $dis_conflict .= "<td class=\"detailText\">";

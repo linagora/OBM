@@ -693,32 +693,32 @@ td.agendaEventHead	{
 		text-align:				center;	
 		font-weight: 			800;		
 	}
-td.agendaEventBg0 	{ 
-	background-color: 	#b1d29d; 
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
-	
-td.agendaEventBg1 	{ 
-	background-color: 	#33a457; 
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
-	
-td.agendaEventBg2 	{ 
-	background-color: 	#005a53;  
-    border-top: 		1px dashed #a1a4a8;
-    border-right: 		1px solid #a1a4a8;	}
-	
-td.agendaEventBg3 	{ 
-	background-color: 	#33348e;  
+td.agendaEventBg5 	{ 
+    background-color: 		#b1d29d; 
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
 td.agendaEventBg4 	{ 
+	background-color: 	#33a457; 
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg3 	{ 
+	background-color: 	#24682d;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg2 	{ 
+	background-color: 	#1137c6;  
+    border-top: 		1px dashed #a1a4a8;
+    border-right: 		1px solid #a1a4a8;	}
+	
+td.agendaEventBg1 	{ 
 	background-color: 	#608bc7;  
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}
 	
-td.agendaEventBg5 	{ 
+td.agendaEventBg0 	{ 
 	background-color: 	#bbcdec;  
     border-top: 		1px dashed #a1a4a8;
     border-right: 		1px solid #a1a4a8;	}	
@@ -767,9 +767,4 @@ a.agendaLink4:hover	{ font-family: sans-serif; font-size: 13px;color: #ffffff; b
 
 
 
-.eventbg2  	{ background-color: #6699CC; border-right: 1px solid #FFFFFF; }
-.eventbg2week 	{ background-color: #6699CC; border-right: 1px solid #A1A5A9; }
-.montheventtop	{ background-image: url(side_bg.gif); border-top: 1px solid #A1A5A9; }
-.montheventline	{ border-right: 1px dotted #A1A5A9; }
-.eventfont 	{ font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 11px; color: #FFFFFF; }
 

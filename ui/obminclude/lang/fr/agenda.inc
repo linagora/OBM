@@ -8,7 +8,7 @@
 //////////////////////////////////////////////////////////////////////////////
 
 
-$l_users = "Contacts";
+$l_users = "Utilisateurs";
 $l_groups = "Groupes";
 $l_title = "Titre";
 $l_priority = "Priorit&eacute;";

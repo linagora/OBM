@@ -8,6 +8,20 @@
 ///////////////////////////////////////////////////////////////////////////////
 // Actions :
 // - index (default) -- this week for this user.
+// - decision
+// - view_day
+// - view_week
+// - view_month
+// - view_year
+// - new
+// - insert
+// - insert_conflict
+// - detailconsult
+// - detailupdate
+// - update
+// - update_decision
+// - 
+
 ///////////////////////////////////////////////////////////////////////////////
 
 
@@ -72,6 +86,23 @@ if ($action == "index") {
     $user_q = run_query_get_user_name($p_user_array);
     $user_obm = run_query_userobm();  
     dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  }
+}
+elseif($action == "decision") {
+///////////////////////////////////////////////////////////////////////////////
+  $conflict = run_query_insert_decision($agenda);
+  if(count($conflict) == 0) {
+    display_ok_msg($l_update_ok);  
+    $p_user_array =  array($auth->auth["uid"]);
+    $obm_q = run_query_week_event_list($agenda,$p_user_array);
+    $user_q = run_query_get_user_name($p_user_array);
+    $user_obm = run_query_userobm();
+    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  }
+  else {
+    require("agenda_js.inc");
+    display_warn_msg($l_update_warning);      
+    html_dis_conflict($agenda,$conflict,$agenda["id"],1);
   }
 }
 elseif ($action == "view_day") {
@@ -155,11 +186,11 @@ elseif ($action == "insert") {
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
       display_warn_msg($l_insert_warning);
-      html_dis_conflict($agenda,$conflict,$event_id);
+      html_dis_conflict($agenda,$conflict,$event_id,1);
     }
     else{
       display_err_msg($l_insert_error);
-      html_dis_conflict($agenda,$conflict);
+      html_dis_conflict($agenda,$conflict,'',0);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
@@ -225,11 +256,11 @@ elseif ($action == "update") {
     elseif($agenda["force"] == 1) {
       require("agenda_js.inc");
       display_warn_msg($l_update_warning);      
-      html_dis_conflict($agenda,$conflict,$event_id);
+      html_dis_conflict($agenda,$conflict,$event_id,1);
     }
     else{
       display_error_msg($l_update_error); 
-      html_dis_conflict($agenda,$conflict);
+      html_dis_conflict($agenda,$conflict,'',0);
       $p_user_array =  array($auth->auth["uid"]);
       $obm_q = run_query_week_event_list($agenda,$p_user_array);
       $user_q = run_query_get_user_name($p_user_array);
@@ -247,7 +278,7 @@ elseif ($action == "update") {
 }
 elseif ($action == "update_decision") {
 ///////////////////////////////////////////////////////////////////////////////
-  run_query_change_decision($agenda);
+  $conflict = run_query_change_decision($agenda);
   if(count($conflict) == 0) {
     display_ok_msg($l_update_ok);  
     $p_user_array =  array($auth->auth["uid"]);
@@ -256,14 +287,10 @@ elseif ($action == "update_decision") {
     $user_obm = run_query_userobm();
     dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
   }
-  else{
-    display_error_msg($l_update_error); 
-    html_dis_conflict($agenda,$conflict);
-    $p_user_array =  array($auth->auth["uid"]);
-    $obm_q = run_query_week_event_list($agenda,$p_user_array);
-    $user_q = run_query_get_user_name($p_user_array);
-    $user_obm = run_query_userobm();
-    dis_week_planning($agenda,$obm_q,$user_q,$user_obm,$p_user_array);
+  else {
+    require("agenda_js.inc");
+    display_warn_msg($l_update_warning);      
+    html_dis_conflict($agenda,$conflict,$agenda["id"],1);
   }
 }
 ///////////////////////////////////////////////////////////////////////////////
@@ -365,19 +392,19 @@ function get_agenda_action() {
   global $l_header_month,$l_header_new_event,$param_event,$param_date;
   global $agenda_read, $agenda_write, $agenda_admin_read, $agenda_admin_write;
 
-  //Index
+//Index
 
   $actions["AGENDA"]["index"] = array (
     'Url'      => "$path/agenda/agenda_index.php?action=index",
     'Right'    => $agenda_read,
     'Condition'=> array ('None') 
-                                      );
+  );
+  
+//Decision
 
-//Approve
-
-  $actions["AGENDA"]["approve"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=approve",
-    'Right'    => $agenda_read,
+  $actions["AGENDA"]["decision"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=decision",
+    'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
@@ -389,7 +416,7 @@ function get_agenda_action() {
     'Right'    => $agenda_write,
     'Condition'=> array ('index','detailconsult','
                          view_month','view_week','view_day','view_year','view_month','insert',
-		         'insert_conflict') 
+		         'insert_conflict','decision') 
                                     );
 
 
@@ -484,39 +511,15 @@ function get_agenda_action() {
     'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
+					 
+//Update
 
-//Cancel Update
-
-  $actions["AGENDA"]["cancel_update"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=cancel_update",
+  $actions["AGENDA"]["update_decision"] = array (
+    'Url'      => "$path/agenda/agenda_index.php?action=update",
     'Right'    => $agenda_write,
     'Condition'=> array ('None') 
                                          );
 
-//Confirm Update
-
-  $actions["AGENDA"]["confirm_update"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=confirm_update",
-    'Right'    => $agenda_write,
-    'Condition'=> array ('None') 
-                                         );
-
-//Delete
-
-  $actions["AGENDA"]["delete"] = array (
-    'Name'     => $l_header_delete,
-    'Url'      => "$path/agenda/agenda_index.php?action=delete&amp;param_event=".$param_event."",
-    'Right'    => $agenda_write,
-    'Condition'=> array ('detailconsult') 
-                                        );
-
-//Delete All
-
-  $actions["AGENDA"]["delete_all"] = array (
-    'Url'      => "$path/agenda/agenda_index.php?action=delete_all",
-    'Right'    => $agenda_write,
-    'Condition'=> array ('None') 
-                                        );
 
 }
   

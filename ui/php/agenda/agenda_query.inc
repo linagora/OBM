@@ -372,6 +372,97 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
   return $return_info;
 }
 /////////////////////////////////////////////////////////////////////////////
+// Insert a user decision for an user
+//////////////////////////////////////////////////////////////////////////////
+// Arguments :
+// -----------
+//    $agenda : Agenda params
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_insert_decision($agenda) {
+  global $auth;
+  $return_info = array();
+  $event_id = $agenda["id"];
+  $state = $agenda["decision_event"];
+  if($state == 'A') {
+    $conflicts = run_query_get_latent_conflicts($event_id, $auth->auth["uid"]);
+  }
+  else{
+    $conflicts = array();
+  }
+  run_query_insert_occurence_state($event_id,$auth->auth["uid"],$state,$conflicts);
+  return $conflicts;
+} 
+/////////////////////////////////////////////////////////////////////////////
+// Get conflict if the waiting events are set to accept
+//////////////////////////////////////////////////////////////////////////////
+// Arguments :
+// -----------
+//    $event_id 
+//    $user_id
+/////////////////////////////////////////////////////////////////////////////
+function run_query_get_latent_conflicts($event_id, $user_id) {
+  global $cdg_sql;
+  $return_info = array();
+  $obm_db = new DB_OBM;
+  $query = "SELECT DISTINCT
+		   cs1.calendarsegment_date as datebegin,
+		   cs2.calendarsegment_date as dateend
+            FROM  CalendarSegment cs1, CalendarSegment cs2, CalendarEvent
+	    WHERE cs1.calendarsegment_customerid = $user_id
+		  AND cs1.calendarsegment_state = 'W'
+  		  AND cs2.calendarsegment_customerid = $user_id
+		  AND cs2.calendarsegment_state = 'W'
+	          AND cs2.calendarsegment_eventid = cs1.calendarsegment_eventid
+		  AND cs1.calendarsegment_eventid = $event_id	
+		  AND cs1.calendarsegment_flag = 'begin'
+		  AND cs2.calendarsegment_flag = 'end'
+		  AND calendarevent_id = cs1.calendarsegment_eventid
+		  AND UNIX_TIMESTAMP(CONCAT(cs2.calendarsegment_date,'00')) - calendarevent_length
+		  =  UNIX_TIMESTAMP(CONCAT(cs1.calendarsegment_date,'00'))
+		 ORDER BY cs1.calendarsegment_date"; 
+	       
+  display_debug_msg($query, $cdg_sql);
+  $obm_db->query($query);
+  while( $obm_db->next_record() ) {
+    $conflicts = run_query_get_conflicts($obm_db->f("datebegin"),$obm_db->f("dateend"),array($user_id));
+    $return_info = array_merge($return_info, $conflicts);
+    var_dump($return_info);
+  }
+  return $return_info;  
+  
+}
+/////////////////////////////////////////////////////////////////////////////
+// Update a user decision for an user
+//////////////////////////////////////////////////////////////////////////////
+// Arguments : 
+// -----------
+//    $agenda : Agenda params
+
+/////////////////////////////////////////////////////////////////////////////
+
+function run_query_insert_occurence_state($event_id,$user_id,$state, $conflicts){
+  global $cdg_sql;
+  $obm_db = new DB_OBM;
+  $query = "UPDATE CalendarSegment 
+            SET calendarsegment_state = '$state'
+            WHERE calendarsegment_customerid = $user_id
+		  AND calendarsegment_state = 'W'
+		  AND calendarsegment_eventid = $event_id";
+  if(count($conflicts) != 0) {
+    $query .= " AND calendarsegment_date NOT IN ('".$conflicts[0]["date_begin"]."','".$conflicts[0]["date_end"]."'";
+    for ($i=1;$i<count($contacts_array);$i++) {
+      $query.= ",'".$conflicts[$i]["date_begin"]."','".$conflicts[$i]["date_end"]."'";
+    }
+    $query.=")";
+  }   
+  display_debug_msg($query, $cdg_sql);  
+  $obm_db->query($query);
+  return $obm_db;    
+  
+}
+
+/////////////////////////////////////////////////////////////////////////////
 // Update a user decision for an user
 //////////////////////////////////////////////////////////////////////////////
 // Arguments : 
@@ -382,7 +473,6 @@ function run_query_add_event($agenda,$contacts_array,&$event_id) {
 
 function run_query_change_decision($agenda) {
   global $auth;
-  echo $agenda["decision_event"];
   if($agenda["decision_event"] == 'A') {
     $conflicts = run_query_get_conflicts($agenda["date_begin"],$agenda["date_end"],array($auth->auth["uid"]));   
   }
@@ -392,7 +482,7 @@ function run_query_change_decision($agenda) {
   if(count($conflicts) == 0) {
     run_query_update_occurence_state($agenda["id"],$agenda["date_begin"],$agenda["date_end"],$auth->auth["uid"],$agenda["decision_event"]);	
   }
-  return $return_info;
+  return $conflicts;
 }
 /////////////////////////////////////////////////////////////////////////////
 // Perform the conflict management
@@ -548,7 +638,7 @@ function run_query_get_conflicts_user($date_begin,$date_end,$user_id) {
 
   $query = "SELECT DISTINCT calendarsegment_eventid ,calendarsegment_date
             ,calendarsegment_date FROM  CalendarEvent, CalendarSegment
-	    WHERE calendarsegment_eventid = calendarevent_id AND calendarsegment_state != 'R' AND
+	    WHERE calendarsegment_eventid = calendarevent_id AND calendarsegment_state = 'A' AND
 	          ((calendarsegment_flag = 'begin' AND calendarsegment_date < $date_end AND
 	            UNIX_TIMESTAMP(CONCAT(calendarsegment_date,'00')) + calendarevent_length > $date_begin_time)
 	        OR (calendarsegment_flag = 'end' AND calendarsegment_date > $date_begin AND	    
@@ -582,7 +672,7 @@ function run_query_get_conflicts($date_begin,$date_end,$contacts_array) {
                    cs2.calendarsegment_date as date_end, calendarevent_title,userobm_lastname,userobm_firstname
             FROM   CalendarEvent, CalendarSegment cs1,CalendarSegment cs2, UserObm 
 	    WHERE cs1.calendarsegment_eventid = calendarevent_id AND userobm_id = cs1.calendarsegment_customerid 
-	          AND cs1.calendarsegment_state != 'R' AND cs2.calendarsegment_state != 'R' 
+	          AND cs1.calendarsegment_state = 'A' AND cs2.calendarsegment_state = 'A' 
 		  AND cs2.calendarsegment_eventid = calendarevent_id AND userobm_id = cs2.calendarsegment_customerid
 	          AND (cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $date_end AND
 		  UNIX_TIMESTAMP(CONCAT(cs1.calendarsegment_date,'00')) + calendarevent_length > $date_begin_time)
@@ -627,7 +717,7 @@ function run_query_get_conflicts_update($date_begin,$date_end,$contacts_array,$e
                    cs2.calendarsegment_date as date_end, calendarevent_title,userobm_lastname,userobm_firstname
             FROM   CalendarEvent, CalendarSegment cs1,CalendarSegment cs2, UserObm 
 	    WHERE cs1.calendarsegment_eventid = calendarevent_id AND userobm_id = cs1.calendarsegment_customerid 
-	          AND cs1.calendarsegment_state != 'R' AND cs2.calendarsegment_state != 'R' 
+	          AND cs1.calendarsegment_state = 'A' AND cs2.calendarsegment_state != 'A' 
 		  AND calendarevent_id != $event_id
 		  AND cs2.calendarsegment_eventid = calendarevent_id AND userobm_id = cs2.calendarsegment_customerid
 	          AND (cs1.calendarsegment_flag = 'begin' AND cs1.calendarsegment_date < $date_end AND
@@ -883,7 +973,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
     $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
     $event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
                                                         substr($obm_q->f("calendarsegment_date"),10,2);
-    }while($obm_q->next_record());
+  }while($obm_q->next_record());
 
 }
 /////////////////////////////////////////////////////////////////////////////
