@@ -943,7 +943,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
       }
     }
     while($obm_q->f("calendarsegment_date") != "" && $obm_q->f("calendarsegment_date") < $current_time) {
-      $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = $obm_q->f("calendarevent_id");
+      $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")][] = $obm_q->f("calendarevent_id");
       $status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
       $event_data[$obm_q->f("calendarevent_id")] = 
         array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
@@ -953,7 +953,7 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
     }
     while($obm_q->f("calendarsegment_date") == $current_time) {
       if($obm_q->f("calendarsegment_flag") == "begin") {
-	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = $obm_q->f("calendarevent_id");
+	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")][] = $obm_q->f("calendarevent_id");
 	$status = $event_data[$obm_q->f("calendarevent_id")]["status"] + 1;
 	$event_data[$obm_q->f("calendarevent_id")] = 
   	array("title"=>$obm_q->f("calendarevent_title"),"type"=>$obm_q->f("calendarcategory_label"),
@@ -961,7 +961,11 @@ function store_events($obm_q,&$curent_event,&$event_data,$p_date_begin,$p_date_e
 	substr($obm_q->f("calendarsegment_date"),10,2),"status" => $status);
 	$obm_q->next_record(); 
       }elseif($obm_q->f("calendarsegment_flag") == "end"){
-	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
+	$curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = array_diff($curent_event[$current_time][$obm_q->f("calendarsegment_customerid")],array($obm_q->f("calendarevent_id")));
+	if(count($curent_event[$current_time][$obm_q->f("calendarsegment_customerid")]) == 0) {
+	  $curent_event[$current_time][$obm_q->f("calendarsegment_customerid")] = -1;
+	}
+	
 	$event_data[$obm_q->f("calendarevent_id")]["end"] = substr($obm_q->f("calendarsegment_date"),8,2).":".
 							   substr($obm_q->f("calendarsegment_date"),10,2);
 	$obm_q->next_record(); 
