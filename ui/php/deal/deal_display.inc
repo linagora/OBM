@@ -529,7 +529,9 @@ function html_deal_links($deal_q) {
   $cid = $deal_q->f("deal_company_id");
   $tt_id = $deal_q->f("deal_tasktype_id");
   $cname = $deal_q->f("company_name");
+  $uname = urlencode($cname);
   $label = $deal_q->f("deal_label");
+  $ulabel = urlencode($label);
   $con1 = $deal_q->f("deal_contact1_id");
   $con2 = $deal_q->f("deal_contact2_id");
   $hitrate = $deal_q->f("deal_hitrate");
@@ -589,7 +591,7 @@ function html_deal_links($deal_q) {
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_deal=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_deal=$id&amp;deal_label=$ulabel&amp;param_company=$cid&amp;company_name=$uname");
     $nb_inv_tot = run_query_linked_invoice_nb($id, "deal", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "deal");
     $block_invoice = "

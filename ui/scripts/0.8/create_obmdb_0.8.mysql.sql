@@ -261,8 +261,8 @@ CREATE TABLE Company (
 --
 CREATE TABLE CompanyCategory (
   companycategory_id          int(8) NOT NULL auto_increment,
-  companycategory_timeupdate  timestamp(14) NOT NULL,
-  companycategory_timecreate  timestamp(14) NOT NULL,
+  companycategory_timeupdate  timestamp(14),
+  companycategory_timecreate  timestamp(14),
   companycategory_userupdate  int(8) NOT NULL default '0',
   companycategory_usercreate  int(8) NOT NULL default '0',
   companycategory_code        varchar(10) NOT NULL default '',
@@ -304,7 +304,7 @@ CREATE TABLE Contact (
   contact_address2             varchar(64),
   contact_address3             varchar(64),
   contact_zipcode              varchar(14),
-  contact_town                 varchar(24),
+  contact_town                 varchar(64),
   contact_expresspostal        varchar(8),
   contact_country_iso3166      char(2) DEFAULT '',
   contact_function_id          int(8),
@@ -556,7 +556,7 @@ CREATE TABLE ContactList (
 CREATE TABLE CalendarSegment (
   calendarsegment_eventid     int(8) NOT NULL default '0',
   calendarsegment_customerid  int(8) NOT NULL default '0',
-  calendarsegment_date        timestamp(14) NOT NULL default '0',
+  calendarsegment_date        timestamp(14) NOT NULL,
   calendarsegment_flag        varchar(5) NOT NULL default '',
   calendarsegment_type        varchar(5) NOT NULL default '',
   calendarsegment_state       char(1) NOT NULL default '',
@@ -581,7 +581,7 @@ CREATE TABLE CalendarEvent (
   calendarevent_length       int(4) NOT NULL default '',
   calendarevent_repeatkind   varchar(20) default NULL,
   calendarevent_repeatdays   varchar(7) default NULL,
-  calendarevent_endrepeat    timestamp(14) NOT NULL default '0',
+  calendarevent_endrepeat    timestamp(14) NOT NULL,
   PRIMARY KEY (calendarevent_id)
 );
 
@@ -691,8 +691,8 @@ CREATE TABLE DocumentCategory1 (
 --
 CREATE TABLE DocumentCategory2 (
   documentcategory2_id          int(8) NOT NULL auto_increment,
-  documentcategory2_timeupdate  timestamp(14) NOT NULL,
-  documentcategory2_timecreate  timestamp(14) NOT NULL,
+  documentcategory2_timeupdate  timestamp(14),
+  documentcategory2_timecreate  timestamp(14),
   documentcategory2_userupdate  int(8) default NULL,
   documentcategory2_usercreate  int(8) default NULL,
   documentcategory2_label       varchar(255) default NULL,
@@ -761,8 +761,8 @@ CREATE TABLE Project (
 CREATE TABLE ProjectTask (
   projecttask_id             int(8) DEFAULT '0' NOT NULL auto_increment,
   projecttask_project_id     int(8) NOT NULL,
-  projecttask_timeupdate     timestamp(14) NOT NULL,
-  projecttask_timecreate     timestamp(14) NOT NULL,
+  projecttask_timeupdate     timestamp(14),
+  projecttask_timecreate     timestamp(14),
   projecttask_userupdate     int(8) default NULL,
   projecttask_usercreate     int(8) default NULL,
   projecttask_label          varchar(128) default NULL,
@@ -781,8 +781,8 @@ CREATE TABLE ProjectUser (
   projectuser_project_id      int(8) NOT NULL,
   projectuser_user_id         int(8) NOT NULL,
   projectuser_projecttask_id  int(8),
-  projectuser_timeupdate      timestamp(14) NOT NULL,
-  projectuser_timecreate      timestamp(14) NOT NULL,
+  projectuser_timeupdate      timestamp(14),
+  projectuser_timecreate      timestamp(14),
   projectuser_userupdate      int(8) default NULL,
   projectuser_usercreate      int(8) default NULL,
   projectuser_projectedtime   int(8) default NULL,
@@ -818,8 +818,8 @@ CREATE TABLE ProjectStat (
 --
 CREATE TABLE TimeTask (
   timetask_id              int(8) NOT NULL auto_increment,
-  timetask_timeupdate      timestamp(14) NOT NULL,
-  timetask_timecreate      timestamp(14) NOT NULL,
+  timetask_timeupdate      timestamp(14),
+  timetask_timecreate      timestamp(14),
   timetask_userupdate      int(8) default NULL,
   timetask_usercreate      int(8) default NULL,
   timetask_user_id         int(8) default NULL,
@@ -839,8 +839,8 @@ CREATE TABLE TimeTask (
 --
 CREATE TABLE TaskType (
   tasktype_id          int(8) NOT NULL auto_increment,
-  tasktype_timeupdate  timestamp(14) NOT NULL,
-  tasktype_timecreate  timestamp(14) NOT NULL,
+  tasktype_timeupdate  timestamp(14),
+  tasktype_timecreate  timestamp(14),
   tasktype_userupdate  int(8) default NULL,
   tasktype_usercreate  int(8) default NULL,
   tasktype_internal    int(1) NOT NULL,
@@ -968,10 +968,10 @@ CREATE TABLE Invoice (
   invoice_amount_ht         double(10,2),
   invoice_amount_ttc        double(10,2),
   invoice_status_id         int(4) DEFAULT '0' NOT NULL,
-  invoice_comment           text,
   invoice_date              date not NULL DEFAULT '0000-00-00',
   invoice_inout             char(1),
   invoice_archive           char(1) NOT NULL DEFAULT '0',
+  invoice_comment           text,
   PRIMARY KEY (invoice_id)
 );
 
@@ -980,8 +980,10 @@ CREATE TABLE Invoice (
 -- New table 'InvoiceStatus'
 --
 CREATE TABLE InvoiceStatus (
-  invoicestatus_id     int (8) NOT NULL auto_increment,
-  invoicestatus_label  varchar(10) default '' NOT NULL,
+  invoicestatus_id       int(8) NOT NULL auto_increment,
+  invoicestatus_payment  int(1) DEFAULT '0' NOT NULL,
+  invoicestatus_archive  int(1) DEFAULT '0' NOT NULL,
+  invoicestatus_label    varchar(24) default '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
 

@@ -341,8 +341,13 @@ function html_project_links($p_q) {
 
   $id = $p_q->f("project_id");
   $name = $p_q->f("project_name");
-
   $uname = urlencode($name);
+  $cid = $p_q->f("project_company_id");
+  $cname = $p_q->f("company_name");
+  $ucname = urlencode($cname);
+  $did = $p_q->f("project_deal_id");
+  $dlabel = $p_q->f("deal_label");
+  $udlabel = urlencode($dlabel);
 
   // Document
   if ($cgp_show["module"]["document"]) {
@@ -369,7 +374,7 @@ function html_project_links($p_q) {
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_project=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_project=$id&amp;project_name=$uname&amp;param_company=$cid&amp;company_name=$ucname&amp;param_deal=$did&amp;deal_label=$udlabel");
     $nb_inv_tot = run_query_linked_invoice_nb($id, "project", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "project");
     $block_invoice = "
@@ -863,8 +868,8 @@ function html_project_form($action, $project_q, $project) {
     $deal = $project["deal"];
     $soldtime = $project["soldtime"];
     $estimated = $project["estimated"];
-    $company_name = $project["company_name"];
-    $deal_label = $project["deal_label"];
+    $company_name = stripslashes($project["company_name"]);
+    $deal_label = stripslashes($project["deal_label"]);
     $task = $project["tasklabel"];
     $member = $project["member"];
     $datebegin = $project["datebegin"];

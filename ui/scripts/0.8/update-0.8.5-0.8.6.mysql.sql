@@ -84,3 +84,35 @@ ALTER TABLE DocumentEntity CHANGE documententity_entityid documententity_entity_
 UPDATE DocumentEntity set documententity_entity = 'company' where documententity_entity='Company';
 UPDATE DocumentEntity set documententity_entity = 'contact' where documententity_entity='Contact';
 UPDATE DocumentEntity set documententity_entity = 'deal' where documententity_entity='Deal';
+
+
+-------------------------------------------------------------------------------
+-- Update Contact table
+-------------------------------------------------------------------------------
+ALTER TABLE Contact CHANGE COLUMN contact_town contact_town varchar(64);
+
+
+-------------------------------------------------------------------------------
+-- Update InvoiceStatus table
+-------------------------------------------------------------------------------
+-- Maintenance
+ALTER TABLE InvoiceStatus CHANGE COLUMN invoicestatus_label invoicestatus_label varchar(24) default '' NOT NULL;
+
+-- New columns
+ALTER TABLE InvoiceStatus ADD COLUMN invoicestatus_payment int(1) NOT NULL DEFAULT '0' after invoicestatus_id;
+ALTER TABLE InvoiceStatus ADD COLUMN invoicestatus_archive int(1) NOT NULL DEFAULT '0' after invoicestatus_payment;
+
+-- Update Content
+
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '0', 'To create');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Sent');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Partially paid');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Conflict');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '1', 'Paid');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', 'Cancelled');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', 'Loss');
+
+UPDATE Invoice set invoice_status_id=6 where invoice_status_id=1;
+UPDATE Invoice set invoice_status_id=9 where invoice_status_id=2;
+
+DELETE FROM InvoiceStatus where invoicestatus_id < 5;

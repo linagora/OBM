@@ -85,6 +85,16 @@ function dis_data_invoice(&$OD, $fieldname, $link_ok) {
     $res["name"] = date_format($OD->data_set->f("payment_expect_date"));
   }
 
+  else if ($fieldname == "payment_amount") {
+    $amount = $OD->data_set->f("payment_amount");
+    $pi_amount = $OD->data_set->f("paymentinvoice_amount");
+    if ($amount == $pi_amount) {
+      $res["name"] = $amount;
+    } else { 
+      $res["name"] = "$pi_amount ($amount)";
+    }
+  }
+
   return $res;
 }
 
@@ -456,7 +466,7 @@ function dis_invoice_detail($inv_q) {
   $ht = $inv_q->f("invoice_amount_ht");
   $ttc = $inv_q->f("invoice_amount_ttc");
   $comment = nl2br($inv_q->f("invoice_comment"));
-  $comp_id = $inv_q->f("company_id");
+  $comp_id = $inv_q->f("invoice_company_id");
   $company = $inv_q->f("company_name");
   $deal_id = $inv_q->f("invoice_deal_id");
   $deal = $inv_q->f("deal_label");
@@ -611,20 +621,28 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
   }
 
   // If parameters have been given, they supercede the default action value
-  if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
-  if (isset($invoice["company_name"])) { $c_name = $invoice["company_name"]; }
-  if (isset($invoice["comp_new_id"])) { $c_new_id = $invoice["comp_new_id"]; }
-  if (isset($invoice["comp_new_name"])) { $c_new_name = $invoice["comp_new_name"]; }
   if (isset($invoice["id"])) { $id = $invoice["id"]; }
-  if (isset($invoice["label"])) { $label = $invoice["label"]; }
+  if (isset($invoice["label"])) { $label = stripslashes($invoice["label"]); }
   if (isset($invoice["number"])) { $number = $invoice["number"]; }
   if (isset($invoice["date"])) { $date = $invoice["date"]; }
   if (isset($invoice["status"])) { $status = $invoice["status"]; }
   if (isset($invoice["inout"])) { $inout = $invoice["inout"]; }
   if (isset($invoice["ht"])) { $ht = $invoice["ht"]; }
   if (isset($invoice["ttc"])) { $ttc = $invoice["ttc"]; }
-  if (isset($invoice["comment"])) { $comment = $invoice["comment"]; }
+  if (isset($invoice["comment"])) { $comment = stripslashes($invoice["comment"]); }
 
+  if (isset($invoice["company_id"])) { $c_id = $invoice["company_id"]; }
+  if (isset($invoice["company_name"])) { $c_name = stripslashes($invoice["company_name"]); }
+  if (isset($invoice["comp_new_id"])) { $c_new_id = $invoice["comp_new_id"]; }
+  if (isset($invoice["comp_new_name"])) { $c_new_name = stripslashes($invoice["comp_new_name"]); }
+  if (isset($invoice["deal_id"])) { $d_id = $invoice["deal_id"]; }
+  if (isset($invoice["deal_label"])) { $d_label = stripslashes($invoice["deal_label"]); }
+  if (isset($invoice["deal_new_id"])) { $d_new_id = $invoice["deal_new_id"]; }
+  if (isset($invoice["deal_new_label"])) { $d_new_label = stripslashes($invoice["deal_new_label"]); }
+  if (isset($invoice["project_id"])) { $p_id = $invoice["project_id"]; }
+  if (isset($invoice["project_name"])) { $p_name = stripslashes($invoice["project_name"]); }
+  if (isset($invoice["proj_new_id"])) { $p_new_id = $invoice["proj_new_id"]; }
+  if (isset($invoice["proj_new_name"])) { $p_new_name = stripslashes($invoice["proj_new_name"]); }
 
   $title = ($inout == '-') ? $l_supplier : $l_client;
 
@@ -683,7 +701,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
       </a><input type=\"hidden\" name=\"param_company\" value=\"$c_id\" />
       <input type=\"hidden\" name=\"company_name\" value=\"$c_name\" />
       <input type=\"hidden\" name=\"company_new_id\" value=\"$c_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_invoice.company_new_id&amp;ext_widget_text=f_invoice.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/company/company_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.company_new_id&amp;ext_widget_text=f_invoice.company_new_name','Company','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"/images/$set_theme/$ico_company\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"company_new_name\" value=\"$c_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -695,7 +713,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
       </a><input type=\"hidden\" name=\"param_deal\" value=\"$d_id\" />
       <input type=\"hidden\" name=\"deal_label\" value=\"$d_label\" />
       <input type=\"hidden\" name=\"deal_new_id\" value=\"$d_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_invoice.deal_new_id&amp;ext_widget_text=f_invoice.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/deal/deal_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.deal_new_id&amp;ext_widget_text=f_invoice.deal_new_label','Deal','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"/images/$set_theme/$ico_deal\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"deal_new_label\" value=\"$d_new_label\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>
@@ -707,7 +725,7 @@ function html_invoice_form($action, $invoice, $inv_q, $stat_q) {
       </a><input type=\"hidden\" name=\"param_project\" value=\"$p_id\" />
       <input type=\"hidden\" name=\"project_name\" value=\"$p_name\" />
       <input type=\"hidden\" name=\"project_new_id\" value=\"$p_new_id\" />
-      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_title=".urlencode($l_contact_select_company)."&amp;ext_widget=f_invoice.project_new_id&amp;ext_widget_text=f_invoice.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
+      <a href=\"\" onclick=\"window.open('$path/project/project_index.php?action=ext_get_id&amp;popup=1&amp;ext_widget=f_invoice.project_new_id&amp;ext_widget_text=f_invoice.project_new_name','Project','height=$popup_height,width=$popup_width,scrollbars=yes'); return false;\">
       <img src=\"/images/$set_theme/$ico_project\" alt=\"\" /></a>
       <input type=\"text\" size=\"32\" name=\"project_new_name\" value=\"$p_new_name\" readonly=\"readonly\" onfocus=\"this.blur();\" />
     </td>

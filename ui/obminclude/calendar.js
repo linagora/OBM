@@ -31,7 +31,8 @@ function getCalendar(in_dateField,url)
     }
 
     var cal_width = 284;
-    var cal_height = 264;
+//    var cal_height = 264; // XXXXX why this is insufficient now with mozilla
+    var cal_height = 348;
 
     if ((document.all) && (navigator.userAgent.indexOf(\"Konqueror\") == -1)) {
         cal_width = 284;

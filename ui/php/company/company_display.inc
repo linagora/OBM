@@ -602,7 +602,7 @@ function html_company_links($co_q) {
   if ($cgp_show["module"]["invoice"]) {
     $url_inv = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id");
     $url_inv_tot = url_prepare("$path/invoice/invoice_index.php?action=search&amp;param_company=$id&amp;cb_archive=1");
-    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id");
+    $url_inv_new = url_prepare("$path/invoice/invoice_index.php?action=new&amp;param_company=$id&amp;company_name=$uname");
     $nb_inv_tot = run_query_linked_invoice_nb($id, "company", 1);
     $nb_inv = run_query_linked_invoice_nb($id, "company");
     $block_invoice = "

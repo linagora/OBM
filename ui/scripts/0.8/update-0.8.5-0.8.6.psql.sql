@@ -62,7 +62,8 @@ DROP Table DealInvoice;
 -------------------------------------------------------------------------------
 -- Update Payment table
 -------------------------------------------------------------------------------
-ALTER TABLE Payment ADD COLUMN payment_company_id integer DEFAULT NULL;
+ALTER TABLE Payment ADD COLUMN payment_company_id integer;
+ALTER TABLE Payment ALTER COLUMN payment_company_id SET NOT NULL;
 
 
 -------------------------------------------------------------------------------
@@ -74,3 +75,26 @@ ALTER TABLE DocumentEntity RENAME COLUMN documententity_entityid TO documententi
 UPDATE DocumentEntity set documententity_entity = 'company' where documententity_entity='Company';
 UPDATE DocumentEntity set documententity_entity = 'contact' where documententity_entity='Contact';
 UPDATE DocumentEntity set documententity_entity = 'deal' where documententity_entity='Deal';
+
+
+-------------------------------------------------------------------------------
+-- Update Contact table
+-------------------------------------------------------------------------------
+ALTER TABLE Contact ADD COLUMN town_temp varchar(64);
+UPDATE Contact set town_temp=contact_town;
+ALTER TABLE Contact DROP COLUMN contact_town;
+ALTER TABLE Contact RENAME COLUMN town_temp TO contact_town;
+
+
+-------------------------------------------------------------------------------
+-- Replace InvoiceStatus table
+-------------------------------------------------------------------------------
+DROP TABLE InvoiceStatus;
+
+CREATE TABLE InvoiceStatus (
+  invoicestatus_id       serial,
+  invoicestatus_payment  integer DEFAULT '0' NOT NULL,
+  invoicestatus_archive  integer DEFAULT '0' NOT NULL,
+  invoicestatus_label    varchar(24) DEFAULT '' NOT NULL,
+  PRIMARY KEY (invoicestatus_id)
+);

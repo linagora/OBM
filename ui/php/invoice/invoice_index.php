@@ -12,15 +12,16 @@
 // - new                -- $params        -- show the new invoice form
 // - detailconsult      -- $param_invoice -- show the invoice detail
 // - detailupdate       -- $param_invoice -- show the invoice detail form
+// - duplicate          -- $invoice       -- new invoice form from existing one
 // - insert             -- form fields    -- insert the invoice
 // - update             -- form fields    -- update the invoice
+// - updatearchive      -- $invoice sess
 // - check_delete       -- $param_invoice -- check links before delete
 // - delete             -- $param_invoice -- delete the invoice
 // - display            --                -- display and set display parameters
 // - dispref_display    --                -- update one field display value
 // - dispref_level      --                -- update one field display position 
-// - duplicate
-// - updatearchive
+// - document_add       -- $invoice sess  -- link documents to an invoice
 ///////////////////////////////////////////////////////////////////////////////
 
 $path = "..";
@@ -70,6 +71,21 @@ if ($action == "index" || $action == "") {
   require("invoice_js.inc"); 
   $display["detail"] = dis_invoice_form($action, $invoice);
 
+} elseif ($action == "detailconsult")  {
+///////////////////////////////////////////////////////////////////////////////
+  $display["detail"] = dis_invoice_consult($invoice);
+
+} elseif ($action == "detailupdate")  { 
+///////////////////////////////////////////////////////////////////////////////
+  require("invoice_js.inc");
+  $display["detail"] = dis_invoice_form($action, $invoice);
+
+} elseif ($action == "duplicate") {
+///////////////////////////////////////////////////////////////////////////////
+  // we give the user the traditionnal form to modify this invoice :
+  require("invoice_js.inc"); 
+  $display["detail"] = dis_invoice_form($action, $invoice);
+  
 } elseif ($action == "insert")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc");
@@ -86,15 +102,6 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_invoice_form($action, $invoice);
   }
   
-} elseif ($action == "detailconsult")  {
-///////////////////////////////////////////////////////////////////////////////
-  $display["detail"] = dis_invoice_consult($invoice);
-
-} elseif ($action == "detailupdate")  { 
-///////////////////////////////////////////////////////////////////////////////
-  require("invoice_js.inc");
-  $display["detail"] = dis_invoice_form($action, $invoice);
-
 } elseif ($action == "update")  {
 ///////////////////////////////////////////////////////////////////////////////
   require("invoice_js.inc"); 
@@ -145,12 +152,6 @@ if ($action == "index" || $action == "") {
     $display["detail"] = dis_invoice_consult($invoice);
   }
 
-} elseif ($action == "duplicate") {
-///////////////////////////////////////////////////////////////////////////////
-  // we give the user the traditionnal form to modify this invoice :
-  require("invoice_js.inc"); 
-  $display["detail"] = dis_invoice_form($action, $invoice);
-  
 } elseif ($action == "document_add")  {
 ///////////////////////////////////////////////////////////////////////////////
   if ($invoice["doc_nb"] > 0) {
@@ -311,7 +312,7 @@ function get_invoice_action() {
     'Name'     => $l_header_dupplicate,
     'Url'      => "$path/invoice/invoice_index.php?action=duplicate&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update')
                                      	   );
 
 // Detail Update
@@ -319,7 +320,7 @@ function get_invoice_action() {
     'Name'     => $l_header_update,
     'Url'      => "$path/invoice/invoice_index.php?action=detailupdate&amp;param_invoice=".$invoice["id"]."",
     'Right'    => $cright_write,
-    'Condition'=> array ('detailconsult') 
+    'Condition'=> array ('detailconsult', 'update') 
                                      	       );
 
 // Update

@@ -72,10 +72,13 @@ INSERT INTO CalendarCategory (calendarcategory_timeupdate, calendarcategory_time
 --
 -- dump for table  InvoiceStatus :
 --
-INSERT INTO InvoiceStatus VALUES(1, 'created');
-INSERT INTO InvoiceStatus VALUES(2, 'paid');
-INSERT INTO InvoiceStatus VALUES(3, 'checked');
-INSERT INTO InvoiceStatus VALUES(4, 'trouble');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '0', 'To create');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Sent');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Partially paid');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '0', 'Conflict');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('1', '1', 'Paid');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', 'Cancelled');
+INSERT INTO InvoiceStatus (invoicestatus_payment, invoicestatus_archive, invoicestatus_label) VALUES ('0', '1', 'Loss');
 
  
 --

@@ -139,12 +139,14 @@ function run_query_detail($p_invoice_id) {
       company_name,
       deal_label,
       project_name,
-      sum(payment_amount) as invoice_paid
+      invoicestatus_label,
+      sum(paymentinvoice_amount) as invoice_paid
     from Invoice
       left join Company on invoice_company_id=company_id
       left join Deal on invoice_deal_id=deal_id
       left join Project on invoice_project_id=project_id
-      left outer join Payment on invoice_id=payment_invoice_id
+      left join InvoiceStatus on invoice_status_id=invoicestatus_id
+      left outer join PaymentInvoice on invoice_id=paymentinvoice_invoice_id
       left join UserObm as c on invoice_usercreate=c.userobm_id
       left join UserObm as u on invoice_userupdate=u.userobm_id
     where invoice_id='$p_invoice_id'
@@ -153,7 +155,7 @@ function run_query_detail($p_invoice_id) {
       invoice_deal_id, invoice_project_id, invoice_number, invoice_label,
       invoice_amount_ht, invoice_amount_ttc, invoice_status_id, invoice_date,
       invoice_comment, invoice_inout, invoice_archive,
-      c.userobm_login, u.userobm_login";
+      c.userobm_login, u.userobm_login, company_name, deal_label, project_name";
 
   display_debug_msg ($query, $cdg_sql, "run_query_detail()"); 
   $obm_q->query($query);
@@ -182,10 +184,13 @@ function run_query_insert($invoice) {
   $inout = $invoice["inout"];
   $comp_id = $invoice["comp_new_id"];
   if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
+  if ($comp_id == "") { $comp_id = "0"; }
   $deal_id = $invoice["deal_new_id"];
   if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
+  if ($deal_id == "") { $deal_id = "0"; }
   $proj_id = $invoice["proj_new_id"];
   if ($proj_id < 1) { $proj_id = $invoice["project_id"]; }
+  if ($proj_id == "") { $proj_id = "0"; }
 
   if ($status == ""){
     $status = "0";
@@ -259,10 +264,13 @@ function run_query_update ($invoice) {
   $arch = (isset($project["archive"]) ? $project["archive"] : '0');
   $comp_id = $invoice["comp_new_id"];
   if ($comp_id < 1) { $comp_id = $invoice["company_id"]; }
+  if ($comp_id == "") { $comp_id = "0"; }
   $deal_id = $invoice["deal_new_id"];
   if ($deal_id < 1) { $deal_id = $invoice["deal_id"]; }
+  if ($deal_id == "") { $deal_id = "0"; }
   $proj_id = $invoice["proj_new_id"];
   if ($proj_id < 1) { $proj_id = $invoice["project_id"]; }
+  if ($proj_id == "") { $proj_id = "0"; }
 
   $query = "update Invoice set
       invoice_timeupdate='$now',
@@ -298,7 +306,7 @@ function run_query_invoicestatus() {
   $query = "select invoicestatus_id,
       invoicestatus_label
     from InvoiceStatus
-     order by invoicestatus_id asc";
+     order by invoicestatus_archive, invoicestatus_payment";
   display_debug_msg($query, $cdg_sql, "run_query_invoicestatus()");
   $obm_q = new DB_OBM;
   $obm_q->query($query);
@@ -323,15 +331,16 @@ function run_query_invoice_payment ($p_invoice, $not_paid=0) {
   $exp_date = sql_date_format($db_type, "payment_expected_date", "payment_expect_date");
 
   $query = "select
+      paymentinvoice_amount,
       payment_id,
       payment_label,
       payment_number,
       $date,
-      payment_amount,
       $exp_date,
       payment_amount
-    from Payment
-    where payment_invoice_id = '$p_invoice'";
+    from PaymentInvoice
+         left join Payment on paymentinvoice_payment_id=payment_id
+    where paymentinvoice_invoice_id = '$p_invoice'";
 
   if ($not_paid == 1) {
     $query .= " and paymentinvoice_amount = 0.0 ";

@@ -305,7 +305,7 @@ CREATE TABLE Contact (
   contact_address2             varchar(64),
   contact_address3             varchar(64),
   contact_zipcode              varchar(14),
-  contact_town                 varchar(24),
+  contact_town                 varchar(64),
   contact_expresspostal        varchar(8),
   contact_country_iso3166      char(2) DEFAULT '',
   contact_function_id          integer,
@@ -635,13 +635,13 @@ CREATE TABLE RepeatKind (
 --
 CREATE TABLE Todo (
   todo_id          serial,
-  todo_timeupdate  TIMESTAMP,
-  todo_timecreate  TIMESTAMP,
+  todo_timeupdate  timestamp,
+  todo_timecreate  timestamp,
   todo_userupdate  integer,
   todo_usercreate  integer,
   todo_user        integer,
-  todo_date        TIMESTAMP DEFAULT NULL,
-  todo_deadline    TIMESTAMP DEFAULT NULL,
+  todo_date        timestamp,
+  todo_deadline    timestamp,
   todo_priority    integer DEFAULT NULL,
   todo_title       varchar(80) DEFAULT NULL,
   todo_content     text DEFAULT NULL,
@@ -790,7 +790,7 @@ CREATE TABLE ProjectUser (
   projectuser_usercreate      integer default NULL,
   projectuser_projectedtime   integer default NULL,
   projectuser_missingtime     integer default NULL,
-  projectuser_validity        timestamp default NULL,
+  projectuser_validity        timestamp,
   projectuser_soldprice       integer default NULL,
   projectuser_manager         integer default NULL,
   PRIMARY KEY (projectuser_id)
@@ -821,12 +821,12 @@ CREATE TABLE ProjectStat (
 --
 CREATE TABLE TimeTask (
   timetask_id              serial,
-  timetask_timeupdate      TIMESTAMP,
-  timetask_timecreate      TIMESTAMP,
+  timetask_timeupdate      timestamp,
+  timetask_timecreate      timestamp,
   timetask_userupdate      integer DEFAULT NULL,
   timetask_usercreate      integer DEFAULT NULL,
   timetask_user_id         integer DEFAULT NULL,
-  timetask_date            TIMESTAMP NOT NULL,
+  timetask_date            timestamp NOT NULL,
   timetask_projecttask_id  integer DEFAULT NULL,
   timetask_length          integer DEFAULT NULL,
   timetask_tasktype_id     integer DEFAULT NULL,
@@ -901,13 +901,13 @@ CREATE TABLE ContractType (
 --
 CREATE TABLE Incident (
   incident_id           serial,
-  incident_timeupdate   TIMESTAMP,
-  incident_timecreate   TIMESTAMP,
+  incident_timeupdate   timestamp,
+  incident_timecreate   timestamp,
   incident_userupdate   integer DEFAULT NULL,
   incident_usercreate   integer DEFAULT NULL,
   incident_contract_id  integer NOT NULL,
   incident_label        varchar(100) DEFAULT NULL,
-  incident_date         TIMESTAMP,
+  incident_date         timestamp,
   incident_priority_id  integer DEFAULT NULL,
   incident_status_id    integer DEFAULT NULL,
   incident_logger       integer DEFAULT NULL,
@@ -925,8 +925,8 @@ CREATE TABLE Incident (
 --
 CREATE TABLE IncidentPriority (
   incidentpriority_id          serial,
-  incidentpriority_timeupdate  TIMESTAMP,
-  incidentpriority_timecreate  TIMESTAMP,
+  incidentpriority_timeupdate  timestamp,
+  incidentpriority_timecreate  timestamp,
   incidentpriority_userupdate  integer DEFAULT NULL,
   incidentpriority_usercreate  integer DEFAULT NULL,
   incidentpriority_order       integer,
@@ -941,8 +941,8 @@ CREATE TABLE IncidentPriority (
 --
 CREATE TABLE IncidentStatus (
   incidentstatus_id          serial,
-  incidentstatus_timeupdate  TIMESTAMP,
-  incidentstatus_timecreate  TIMESTAMP,
+  incidentstatus_timeupdate  timestamp,
+  incidentstatus_timecreate  timestamp,
   incidentstatus_userupdate  integer DEFAULT NULL,
   incidentstatus_usercreate  integer DEFAULT NULL,
   incidentstatus_order       integer,
@@ -958,23 +958,23 @@ CREATE TABLE IncidentStatus (
 -- New table 'Invoice'
 --
 CREATE TABLE Invoice ( 
-  invoice_id                serial,
-  invoice_timeupdate        TIMESTAMP,
-  invoice_timecreate        TIMESTAMP,
-  invoice_userupdate        integer,
-  invoice_usercreate        integer,
-  invoice_company_id        integer NOT NULL,
-  invoice_deal_id           integer default NULL,
-  invoice_project_id        integer default NULL,
-  invoice_number            varchar(10) DEFAULT '0',
-  invoice_label             varchar(40) NOT NULL DEFAULT '',
-  invoice_amount_ht         DECIMAL(10,2),
-  invoice_amount_ttc        DECIMAL(10,2),
-  invoice_status_id         integer DEFAULT '0' NOT NULL,
-  invoice_comment           text,
-  invoice_date              date not NULL DEFAULT '0001-01-01',
-  invoice_inout             char(1),
-  invoice_archive           char(1) NOT NULL DEFAULT '0',
+  invoice_id           serial,
+  invoice_timeupdate   timestamp,
+  invoice_timecreate   timestamp,
+  invoice_userupdate   integer,
+  invoice_usercreate   integer,
+  invoice_company_id   integer NOT NULL,
+  invoice_deal_id      integer default NULL,
+  invoice_project_id   integer default NULL,
+  invoice_number       varchar(10) DEFAULT '0',
+  invoice_label        varchar(40) NOT NULL DEFAULT '',
+  invoice_amount_ht    DECIMAL(10,2),
+  invoice_amount_ttc   DECIMAL(10,2),
+  invoice_status_id    integer DEFAULT '0' NOT NULL,
+  invoice_date         date not NULL DEFAULT '0001-01-01',
+  invoice_inout        char(1),
+  invoice_archive      char(1) NOT NULL DEFAULT '0',
+  invoice_comment      text,
   PRIMARY KEY (invoice_id)
 );
 
@@ -983,8 +983,10 @@ CREATE TABLE Invoice (
 -- New table 'InvoiceStatus'
 --
 CREATE TABLE InvoiceStatus (
-  invoicestatus_id     serial,
-  invoicestatus_label  varchar(10) DEFAULT '' NOT NULL,
+  invoicestatus_id       serial,
+  invoicestatus_payment  interger DEFAULT '0' NOT NULL,
+  invoicestatus_archive  integer DEFAULT '0' NOT NULL,
+  invoicestatus_label    varchar(24) DEFAULT '' NOT NULL,
   PRIMARY KEY (invoicestatus_id)
 );
 
@@ -1048,8 +1050,8 @@ CREATE TABLE PaymentInvoice (
 --
 CREATE TABLE Account (
   account_id          serial,
-  account_timeupdate  TIMESTAMP,
-  account_timecreate  TIMESTAMP,
+  account_timeupdate  timestamp,
+  account_timecreate  timestamp,
   account_userupdate  integer,
   account_usercreate  integer,
   account_bank	      varchar(60) DEFAULT '' NOT NULL,
@@ -1114,8 +1116,8 @@ CREATE TABLE  PaymentTemp (
 --
 CREATE TABLE UGroup (
   group_id          serial,
-  group_timeupdate  TIMESTAMP,
-  group_timecreate  TIMESTAMP,
+  group_timeupdate  timestamp,
+  group_timecreate  timestamp,
   group_userupdate  integer,
   group_usercreate  integer,
   group_system      integer DEFAULT '0',
