@@ -184,6 +184,7 @@ function run_query_days_unfilled() {
       sum(timetask_length) as total_length
     from TimeTask
     where timetask_date <= '".date("Ymd")."'
+    and timetask_date >= '".date("Y0101")."'
       and timetask_user_id = '".$auth->auth["uid"]."' 
     ";
   

@@ -638,6 +638,7 @@ function run_query_waiting_events() {
 		 userobm_id,
 		 userobm_lastname,
 	      	 userobm_firstname
+		 ORDER BY userobm_id
 		 "; 
   display_debug_msg($query, $cdg_sql);
   $obm_db->query($query);
